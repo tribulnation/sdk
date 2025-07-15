@@ -1,0 +1,5 @@
+build
+twine
+ipykernel
+pyright
+-e sdk
