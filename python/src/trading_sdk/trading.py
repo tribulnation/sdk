@@ -1,4 +1,4 @@
-from typing_extensions import Protocol, TypedDict, Literal, TypeVar, NotRequired
+from typing_extensions import Protocol, TypedDict, Literal, TypeVar, NotRequired, Mapping, overload
 from decimal import Decimal
 
 from trading_sdk.types import Side, TimeInForce, Num
@@ -18,7 +18,6 @@ class Trading(Protocol):
     time_in_force: NotRequired[TimeInForce]
     post_only: NotRequired[bool]
 
-
   class MarketOrder(BaseOrder):
     type: Literal['MARKET']
     qty: Num
@@ -28,28 +27,38 @@ class Trading(Protocol):
 
   OrderStatus = Literal['NEW', 'PARTIALLY_FILLED', 'FILLED', 'CANCELED']
   
-  class PlaceOrderResponse(TypedDict):
+  class PlaceOrder(TypedDict):
     order_id: str
 
-  async def place_order(self, symbol: str, order: Order) -> PlaceOrderResponse | AuthedError:
-    ...
+  @overload
+  async def place_order(self, symbol: str, order: Order, *, unsafe: Literal[True]) -> PlaceOrder: ...
+  @overload
+  async def place_order(self, symbol: str, order: Order, *, unsafe: bool = False) -> PlaceOrder | AuthedError: ...
 
-  async def cancel_order(self, symbol: str, *, order_id: str) -> AuthedError | None:
-    ...
+  @overload
+  async def cancel_order(self, symbol: str, *, order_id: str, unsafe: Literal[True]) -> None: ...
+  @overload
+  async def cancel_order(self, symbol: str, *, order_id: str, unsafe: bool = False) -> AuthedError | None: ...
 
-  async def cancel_all_orders(self, symbol: str) -> AuthedError | None:
-    ...
+  @overload
+  async def cancel_all_orders(self, symbol: str, *, unsafe: Literal[True]) -> None: ...
+  @overload
+  async def cancel_all_orders(self, symbol: str, *, unsafe: bool = False) -> AuthedError | None: ...
 
-  class QueryOrderResponse(TypedDict):
+  class QueryOrder(TypedDict):
     status: 'Trading.OrderStatus'
     executed_qty: Decimal
 
-  async def query_order(self, symbol: str, *, order_id: str) -> QueryOrderResponse:
-    ...
+  @overload
+  async def query_order(self, symbol: str, *, order_id: str, unsafe: Literal[True]) -> QueryOrder: ...
+  @overload
+  async def query_order(self, symbol: str, *, order_id: str, unsafe: bool = False) -> QueryOrder | AuthedError: ...
 
   class Balance(TypedDict):
     free: Decimal
     locked: Decimal
 
-  async def get_balances(self, *currencies: S) -> dict[S, Balance]:
-    ...
+  @overload
+  async def get_balances(self, *currencies: S, unsafe: Literal[True]) -> Mapping[S, Balance]: ...
+  @overload
+  async def get_balances(self, *currencies: S, unsafe: bool = False) -> Mapping[S, Balance] | AuthedError: ...
