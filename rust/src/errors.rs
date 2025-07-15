@@ -1,19 +1,22 @@
 #[derive(Debug, Clone)]
-pub struct BaseError {
+pub struct NetworkFailure {
   pub detail: String,
 }
 
 #[derive(Debug, Clone)]
-pub struct NetworkFailure(BaseError);
+pub struct InvalidParams {
+  pub detail: String,
+}
 
 #[derive(Debug, Clone)]
-pub struct InvalidParams(BaseError);
+pub struct InvalidResponse {
+  pub detail: String,
+}
 
 #[derive(Debug, Clone)]
-pub struct InvalidResponse(BaseError);
-
-#[derive(Debug, Clone)]
-pub struct InvalidAuth(BaseError);
+pub struct InvalidAuth {
+  pub detail: String,
+}
 
 #[derive(Debug, Clone)]
 pub enum UnauthedError {
