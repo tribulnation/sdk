@@ -1,0 +1,13 @@
+[package]
+name = "trading-sdk"
+version = "0.1.0"
+edition = "2024"
+description = "Abstract Crypto Trading SDK"
+authors = ["Marcel Claramunt <marcel@marcelc.uk>"]
+readme = "../README.md"
+repository = "https://github.com/tribulnation/sdk"
+
+[dependencies]
+async-trait = "0.1"
+chrono = { version = "0.4", features = ["serde", "clock"] }
+serde = { version = "1.0.219", features = ["derive"] }
