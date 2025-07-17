@@ -1,8 +1,7 @@
-from typing_extensions import TypedDict, Sequence, AsyncIterable, Protocol, overload, Literal
+from typing_extensions import TypedDict, Sequence, AsyncIterable, Protocol
 from datetime import datetime, timedelta
 from decimal import Decimal
 
-from trading_sdk.types import Num
 from trading_sdk.errors import UnauthedError
 
 class MarketData(Protocol):
@@ -14,10 +13,7 @@ class MarketData(Protocol):
     asks: Sequence['MarketData.BookEntry']
     bids: Sequence['MarketData.BookEntry']
 
-  @overload
-  async def order_book(self, symbol: str, *, limit: int | None = None, unsafe: Literal[True]) -> OrderBook: ...
-  @overload
-  async def order_book(self, symbol: str, *, limit: int | None = None, unsafe: bool = False) -> OrderBook | UnauthedError: ...
+  async def order_book(self, symbol: str, *, limit: int | None = None) -> OrderBook: ...
   
   class Trade(TypedDict):
     price: Decimal
@@ -25,48 +21,27 @@ class MarketData(Protocol):
     time: datetime
     buyer_maker: bool
 
-  @overload
-  async def trades(self, symbol: str, *, limit: int | None = None, unsafe: Literal[True]) -> Sequence[Trade]: ...
-  @overload
-  async def trades(self, symbol: str, *, limit: int | None = None, unsafe: bool = False) -> Sequence[Trade] | UnauthedError:
+  async def trades(self, symbol: str, *, limit: int | None = None) -> Sequence[Trade]:
     """Recent trades, sorted by increasing time (recent last)."""
+    ...
   
-  @overload
   async def agg_trades(
     self, symbol: str, *,
     limit: int | None = None,
     start: datetime | None = None, start_id: str | None = None,
-    end: datetime | None = None, unsafe: Literal[True]
-  ) -> Sequence[Trade]: ...
-  @overload
-  async def agg_trades(
-    self, symbol: str, *,
-    limit: int | None = None,
-    start: datetime | None = None, start_id: str | None = None,
-    end: datetime | None = None, unsafe: bool = False
-  ) -> Sequence[Trade] | UnauthedError:
+    end: datetime | None = None
+  ) -> Sequence[Trade]:
     """Aggregate trades, sorted by increasing time (recent last)."""
+    ...
 
-  @overload
-  def agg_trades_paged(
-    self, symbol: str, *, limit: int | None = None,
-    start: datetime, end: datetime, unsafe: Literal[True]
-  ) -> AsyncIterable[Sequence[Trade]]:
-    ...
-  @overload
-  def agg_trades_paged(
-    self, symbol: str, *, limit: int | None = None,
-    start: datetime, end: datetime, unsafe: bool = False
-  ) -> AsyncIterable[Sequence[Trade] | UnauthedError]:
-    ...
   async def agg_trades_paged(
     self, symbol: str, *, limit: int | None = None,
-    start: datetime, end: datetime, unsafe: bool = False
-  ) -> AsyncIterable[Sequence[Trade] | UnauthedError]:
+    start: datetime, end: datetime
+  ) -> AsyncIterable[Sequence[Trade]]:
     """Aggregate trades, sorted by increasing time (recent last). Paged to collect all trades in a time range."""
     last = start
     while last < end:
-      new_trades = await self.agg_trades(symbol, limit=limit, start=last, end=last+timedelta(hours=1), unsafe=unsafe)
+      new_trades = await self.agg_trades(symbol, limit=limit, start=last, end=last+timedelta(hours=1))
       if not new_trades:
         break
       yield new_trades
