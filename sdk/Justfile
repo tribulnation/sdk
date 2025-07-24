@@ -10,6 +10,7 @@ build:
   cd {{PKG}} && \
   rm -drf dist && \
   pyright . && \
+  cp ../README.md . && \
   {{PYTHON}} -m build && \
   rm -drf build
 

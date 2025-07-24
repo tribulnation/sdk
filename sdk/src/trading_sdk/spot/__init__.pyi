@@ -1,11 +1,11 @@
-from .trading import Trading
+from ._spot import Spot
 from .market_data import MarketData
-from .wallet import Wallet
 from .user_data import UserData
+from .trading import Trading
 
 __all__ = [
-  'Trading',
+  'Spot',
   'MarketData',
-  'Wallet',
   'UserData',
+  'Trading',
 ]
