@@ -12,6 +12,7 @@ build:
   pyright . && \
   cp ../README.md . && \
   {{PYTHON}} -m build && \
+  rm README.md && \
   rm -drf build
 
 # Publish `dist/*` to pypi, then delete

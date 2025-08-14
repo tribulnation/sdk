@@ -1,7 +1,8 @@
-from typing_extensions import Protocol
+from abc import ABC, abstractmethod
 from datetime import datetime
 
-class Time(Protocol):
+class Time(ABC):
+  @abstractmethod
   async def time(self) -> datetime:
     """Get the current server time."""
     ...

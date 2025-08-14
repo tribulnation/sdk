@@ -1,10 +1,15 @@
-from typing_extensions import Protocol
+from abc import ABC, abstractmethod
+from trading_sdk.spot.user_data.query_order import OrderState
 
-class CancelOrder(Protocol):
-  async def cancel_order(self, symbol: str, *, id: str):
+class CancelOrder(ABC):
+  @abstractmethod
+  async def cancel_order(self, base: str, quote: str, *, id: str) -> OrderState:
     """Cancel an order.
     
-    - `symbol`: The symbol to cancel the order for.
+    - `base`: The base asset, e.g. `BTC`.
+    - `quote`: The quote asset, e.g. `USDT`.
     - `id`: The ID of the order to cancel.
+
+    Returns the state of the order.
     """
     ...

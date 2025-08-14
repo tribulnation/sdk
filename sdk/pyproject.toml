@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "trading-sdk"
-version = "0.1.2"
+version = "0.1.5"
 authors = [
-  {name="Marcel Claramunt", email="marcel@marcelc.uk"}
+  {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
-description = "Abstract Crypto Trading SDK"
+description = "An abstract, fully-typed, async Python SDK for automated crypto trading. By Tribulnation."
 dependencies = [
   "lazy-loader",
 ]
@@ -16,10 +16,4 @@ requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}
 
 [project.urls]
-repo = "https://github.com/tribulnation/sdk.git"
-
-# [project.optional-dependencies]
-# test = [
-#   "pytest < 5.0.0",
-#   "pytest-cov[all]"
-# ]
+Github = "https://github.com/tribulnation/sdk.git"

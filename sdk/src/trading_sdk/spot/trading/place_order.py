@@ -1,29 +1,30 @@
-from typing_extensions import Protocol, TypedDict, Literal, NotRequired
-from trading_sdk.types import Side, TimeInForce
+from abc import ABC, abstractmethod
+from typing_extensions import TypedDict, Literal
+from trading_sdk.types import Side, Num
 
 class BaseOrder(TypedDict):
   side: Side
-  time_in_force: NotRequired[TimeInForce]
-  quantity: str
+  qty: Num
   """Quantity of the order in the base asset."""
 
 class LimitOrder(BaseOrder):
+  price: Num
   type: Literal['LIMIT']
-  price: str
 
 class MarketOrder(BaseOrder):
   type: Literal['MARKET']
 
 Order = LimitOrder | MarketOrder
 
-class Response(TypedDict):
-  id: str
-
-class PlaceOrder(Protocol):
-  async def place_order(self, symbol: str, order: Order) -> Response:
+class PlaceOrder(ABC):
+  @abstractmethod
+  async def place_order(self, base: str, quote: str, order: Order) -> str:
     """Place an order.
     
-    - `symbol`: The symbol to place the order for.
+    - `base`: The base asset, e.g. `BTC`.
+    - `quote`: The quote asset, e.g. `USDT`.
     - `order`: The order to place.
+
+    Returns the order ID.
     """
     ...

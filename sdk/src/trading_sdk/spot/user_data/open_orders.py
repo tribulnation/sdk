@@ -1,20 +1,13 @@
-from typing_extensions import Protocol, TypedDict, Sequence
-from decimal import Decimal
-from datetime import datetime
-from trading_sdk.types import Side
+from abc import ABC, abstractmethod
+from typing_extensions import Sequence
+from .query_order import OrderState
 
-class OrderState(TypedDict):
-  id: str
-  price: Decimal
-  quantity: Decimal
-  filled_quantity: Decimal
-  time: datetime
-  side: Side
-
-class OpenOrders(Protocol):
-  async def open_orders(self, symbol: str) -> Sequence[OrderState]:
+class OpenOrders(ABC):
+  @abstractmethod
+  async def open_orders(self, base: str, quote: str) -> Sequence[OrderState]:
     """Fetch currently open orders (of your account) on a given symbol.
     
-    - `symbol`: The symbol being traded, e.g. `BTCUSDT`
+    - `base`: The base asset, e.g. `BTC`.
+    - `quote`: The quote asset, e.g. `USDT`.
     """
     ...

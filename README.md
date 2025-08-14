@@ -1,6 +1,6 @@
 # Trading SDK
 
-> A fully-typed, async Python SDK for automated crypto trading.
+> An abstract, fully-typed, async Python SDK for automated crypto trading.
 
 ## Installation
 
@@ -14,6 +14,14 @@ pip install mexc-trading-sdk # or others, see below
 - **Fully async**
 - **Type-annotated**: with `TypedDict`, `Literal`, etc.
 - **Composable** : cherry-pick the exact methods you need.
+
+## Supported Exchanges
+
+- [MEXC](https://github.com/tribulnation/mexc)
+- [Deribit](https://github.com/tribulnation/deribit) (coming soon)
+- [Bybit](https://github.com/tribulnation/bybit) (coming soon)
+- [Bitget](https://github.com/tribulnation/bitget) (coming soon)
+- [Binance](https://github.com/tribulnation/binance) (coming soon)
 
 ## Installation
 

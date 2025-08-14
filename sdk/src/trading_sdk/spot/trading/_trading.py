@@ -1,6 +1,6 @@
+from .edit_order import EditOrder
 from .cancel_order import CancelOrder
-from .place_order import PlaceOrder
-from .query_order import QueryOrder
+from .place_orders import PlaceOrders
 
-class Trading(CancelOrder, PlaceOrder, QueryOrder):
+class Trading(CancelOrder, EditOrder, PlaceOrders):
   ...
