@@ -1,41 +1,50 @@
-from typing_extensions import Literal, Union
+from typing_extensions import Literal, TypeGuard
 
-BinanceSmartChain = Literal['BSC']
-Ethereum = Literal['ETH']
-Polygon = Literal['POL']
-Tron = Literal['TRX']
-Arbitrum = Literal['ARB']
-Base = Literal['BASE']
-Avalanche = Literal['AVAX']
-Solana = Literal['SOL']
-Fantom = Literal['FTM']
-Optimism = Literal['OP']
-TheOpenNetwork = Literal['TON']
-Sonic = Literal['SONIC']
-Tezos = Literal['XTZ']
-Core = Literal['CORE']
-Celo = Literal['CELO']
-Near = Literal['NEAR']
-Mantle = Literal['MNT']
-Unichain = Literal['UNI']
-
-Network = Union[
-  BinanceSmartChain,
-  Ethereum,
-  Polygon,
-  Tron,
-  Arbitrum,
-  Base,
-  Avalanche,
-  Solana,
-  Fantom,
-  Optimism,
-  TheOpenNetwork,
-  Sonic,
-  Tezos,
-  Core,
-  Celo,
-  Near,
-  Mantle,
-  Unichain,
+Network = Literal[
+  'BSC',
+  'ETH',
+  'POL',
+  'TRX',
+  'ARB',
+  'BASE',
+  'AVAX',
+  'SOL',
+  'FTM',
+  'OP',
+  'TON',
+  'SONIC',
+  'XTZ',
+  'CORE',
+  'CELO',
+  'NEAR',
+  'MNT',
+  'UNI',
+  'APTOS',
+  'SUI',
 ]
+
+NETWORK_NAMES: dict[Network, str] = {
+  'BSC': 'Binance Smart Chain',
+  'ETH': 'Ethereum',
+  'POL': 'Polygon',
+  'TRX': 'Tron',
+  'ARB': 'Arbitrum',
+  'BASE': 'Base',
+  'AVAX': 'Avalanche',
+  'SOL': 'Solana',
+  'FTM': 'Fantom',
+  'OP': 'Optimism',
+  'TON': 'The Open Network',
+  'SONIC': 'Sonic',
+  'XTZ': 'Tezos',
+  'CORE': 'Core',
+  'CELO': 'Celo',
+  'NEAR': 'Near',
+  'MNT': 'Mantle',
+  'UNI': 'Unichain',
+  'APTOS': 'Aptos',
+  'SUI': 'Sui',
+}
+
+def is_network(s: str) -> TypeGuard[Network]:
+  return s in NETWORK_NAMES
