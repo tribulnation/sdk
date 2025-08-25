@@ -12,3 +12,6 @@ class UserError(Error):
 
 class AuthError(Error):
   ...
+
+class ApiError(Error):
+  ...
