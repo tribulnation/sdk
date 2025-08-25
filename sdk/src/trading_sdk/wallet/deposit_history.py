@@ -1,17 +1,28 @@
-from typing_extensions import Protocol, TypedDict, NotRequired, AsyncIterable, Sequence
+from typing_extensions import AsyncIterable, Sequence
+from dataclasses import dataclass
+from abc import ABC, abstractmethod
 from decimal import Decimal
 from datetime import datetime
 from trading_sdk.types import Network
 
-class Deposit(TypedDict):
-  source_address: str
-  source_memo: NotRequired[str | None]
+@dataclass
+class Deposit:
+  @dataclass
+  class Fee:
+    asset: str
+    amount: Decimal
+  id: str
   amount: Decimal
   asset: str
   network: Network
+  address: str
+  time: datetime
+  fee: Fee | None = None
+  memo: str | None = None
 
-class DepositHistory(Protocol):
-  async def deposit_history(
+class DepositHistory(ABC):
+  @abstractmethod
+  def deposit_history(
     self, *, start: datetime | None = None,
     end: datetime | None = None
   ) -> AsyncIterable[Sequence[Deposit]]:

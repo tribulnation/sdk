@@ -1,17 +1,18 @@
+from dataclasses import dataclass
 from abc import ABC, abstractmethod
-from typing_extensions import TypedDict, NotRequired
 from trading_sdk.types import Network
 
-class Address(TypedDict):
+@dataclass
+class Address:
   address: str
-  memo: NotRequired[str | None]
+  memo: str | None = None
 
 class DepositAddress(ABC):
   @abstractmethod
-  async def deposit_address(self, currency: str, *, network: Network) -> Address:
-    """Get the deposit address for a currency.
+  async def deposit_address(self, asset: str, *, network: Network) -> Address:
+    """Get the deposit address for an asset.
     
-    - `currency`: The currency to get the deposit address for.
+    - `asset`: The asset to get the deposit address for.
     - `network`: The network to get the deposit address for.
     """
     ...

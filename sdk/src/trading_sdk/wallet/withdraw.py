@@ -4,13 +4,13 @@ from trading_sdk.types import Num, Network
 class Withdraw(ABC):
   @abstractmethod
   async def withdraw(
-    self, currency: str, *, address: str, amount: Num,
+    self, asset: str, *, address: str, amount: Num,
     network: Network, memo: str | None = None,
     contract_address: str | None = None,
   ):
     """Withdraw funds.
     
-    - `currency`: The currency to withdraw.
+    - `asset`: The asset to withdraw.
     - `address`: The address to withdraw to.
     - `amount`: The amount to withdraw.
     - `network`: The network to withdraw to.

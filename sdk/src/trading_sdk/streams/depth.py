@@ -4,7 +4,7 @@ from trading_sdk.spot.market_data.depth import Book
 
 class Depth(ABC):
   @abstractmethod
-  async def depth(self, base: str, quote: str, *, limit: int | None = None) -> AsyncIterable[Book]:
+  def depth(self, base: str, quote: str, *, limit: int | None = None) -> AsyncIterable[Book]:
     """Stream of Book snapshots for the given symbol.
     
     - `base`: The base asset, e.g. `BTC`.

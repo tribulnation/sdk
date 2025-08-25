@@ -5,18 +5,25 @@ from decimal import Decimal
 from datetime import datetime
 from trading_sdk.types import Side
 
+
 @dataclass
 class Trade:
+  @dataclass
+  class Fee:
+    asset: str
+    amount: Decimal
+
   id: str
   price: Decimal
   qty: Decimal
   time: datetime
   side: Side
+  fee: Fee | None = None
   maker: bool | None = None
 
 class MyTrades(ABC):
   @abstractmethod
-  async def my_trades(
+  def my_trades(
     self, base: str, quote: str, *,
     start: datetime | None = None, end: datetime | None = None
   ) -> AsyncIterable[Sequence[Trade]]:
