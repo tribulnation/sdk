@@ -2,6 +2,8 @@ from ._spot import Spot
 from .market_data import MarketData, Depth, Time, ExchangeInfo
 from .user_data import UserData, MyTrades, OpenOrders, QueryOrder, QueryOrders, Balances
 from .trading import Trading, CancelOrder, EditOrder, PlaceOrders, PlaceOrder
+from .market_streams import MarketStreams
+from .user_streams import UserStreams
 
 __all__ = [
   'Spot',
@@ -20,4 +22,6 @@ __all__ = [
   'QueryOrder',
   'QueryOrders',
   'Balances',
+  'MarketStreams',
+  'UserStreams',
 ]

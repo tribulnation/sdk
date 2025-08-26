@@ -1,0 +1,1 @@
+from trading_sdk.spot.user_streams.my_trades import MyTrades, Trade
