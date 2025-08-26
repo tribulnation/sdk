@@ -33,10 +33,5 @@ class MyTrades(ABC):
     - `quote`: The quote asset, e.g. `USDT`.
     - `start`: The start time to query. If given, only trades after this time will be returned.
     - `end`: The end time to query. If given, only trades before this time will be returned.
-
-    ### Ordering
-
-    - If `start` is given, trades are ordered forwards by time.
-    - Otherwise, ordered backwards by time.
     """
     ...
