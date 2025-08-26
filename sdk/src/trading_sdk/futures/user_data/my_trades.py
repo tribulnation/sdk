@@ -1,0 +1,1 @@
+from trading_sdk.spot.user_data.my_trades import Trade, MyTrades
