@@ -1,7 +1,9 @@
 from typing_extensions import Protocol, TypeVar
 from dataclasses import dataclass
 from decimal import Decimal
+
 from trading_sdk.util import trunc2tick
+from trading_sdk.market.types import Instrument
 
 S = TypeVar('S', bound=str)
 
@@ -40,10 +42,32 @@ class Info:
     return base_qty * price
   
 class ExchangeInfo(Protocol):
-  async def exchange_info(self, base: str, quote: str) -> Info:
+  async def exchange_info(self, instrument: Instrument) -> Info:
     """Get the exchange info for the given symbol.
+    
+    - `instrument`: The instrument to get the exchange info for.
+    """
+    ...
+
+  async def exchange_info_any(self, instrument: str) -> Info:
+    """Get the exchange info for the given instrument by the exchange-specific name.
+    
+    - `instrument`: The name of the instrument to get the exchange info for.
+    """
+    return await self.exchange_info({'type': 'any', 'name': instrument})
+  
+  async def exchange_info_spot(self, base: str, quote: str) -> Info:
+    """Get the exchange info for the given spot instrument.
     
     - `base`: The base asset, e.g. `BTC`.
     - `quote`: The quote asset, e.g. `USDT`.
     """
-    ...
+    return await self.exchange_info({'type': 'spot', 'base': base, 'quote': quote})
+  
+  async def exchange_info_perp(self, base: str, quote: str) -> Info:
+    """Get the exchange info for the given perpetual instrument.
+    
+    - `base`: The base asset, e.g. `BTC`.
+    - `quote`: The quote asset, e.g. `USDT`.
+    """
+    return await self.exchange_info({'type': 'perp', 'base': base, 'quote': quote})

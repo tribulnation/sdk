@@ -1,16 +1,12 @@
 from .wallet import Wallet
-from .spot import Spot
-from .futures import Futures
+from .market import Market
 from .earn import Earn
-from .types import Side, TimeInForce, fmt_num, Error, NetworkError, ValidationError, UserError, AuthError
+from .types import fmt_num, Error, NetworkError, ValidationError, UserError, AuthError, ApiError
 
 __all__ = [
   'Wallet',
-  'Spot',
-  'Futures',
+  'Market',
   'Earn',
-  'Side',
-  'TimeInForce',
   'fmt_num',
-  'Error', 'NetworkError', 'ValidationError', 'UserError', 'AuthError',
+  'Error', 'NetworkError', 'ValidationError', 'UserError', 'AuthError', 'ApiError',
 ]
