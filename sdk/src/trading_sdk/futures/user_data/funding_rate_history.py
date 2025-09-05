@@ -1,5 +1,4 @@
-from abc import ABC, abstractmethod
-from typing_extensions import AsyncIterable, Sequence, Literal
+from typing_extensions import Protocol, AsyncIterable, Sequence, Literal
 from dataclasses import dataclass
 from decimal import Decimal
 from datetime import datetime
@@ -14,8 +13,7 @@ class Funding:
   time: datetime
   position_type: PositionType
 
-class FundingRateHistory(ABC):
-  @abstractmethod
+class FundingRateHistory(Protocol):
   def funding_rate_history(
     self, base: str, quote: str, *, start: datetime | None = None,
     end: datetime | None = None,

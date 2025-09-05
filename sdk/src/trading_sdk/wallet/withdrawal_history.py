@@ -1,5 +1,4 @@
-from typing_extensions import AsyncIterable, Sequence
-from abc import ABC, abstractmethod
+from typing_extensions import Protocol, AsyncIterable, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 from datetime import datetime
@@ -13,22 +12,23 @@ class Withdrawal:
     amount: Decimal
 
   id: str
-  address: str
   amount: Decimal
   asset: str
-  network: Network
   time: datetime
+  address: str | None = None
+  network: Network | None = None
   fee: Fee | None = None
   memo: str | None = None
 
-class WithdrawalHistory(ABC):
-  @abstractmethod
+class WithdrawalHistory(Protocol):
   def withdrawal_history(
-    self, *, start: datetime | None = None,
-    end: datetime | None = None
+    self, *, asset: str | None = None,
+    start: datetime,
+    end: datetime,
   ) -> AsyncIterable[Sequence[Withdrawal]]:
     """Fetch your withdrawals.
     
+    - `asset`: if given, retrieves withdrawals for this asset.
     - `start`: if given, retrieves withdrawals after this time.
     - `end`: if given, retrieves withdrawals before this time.
     """

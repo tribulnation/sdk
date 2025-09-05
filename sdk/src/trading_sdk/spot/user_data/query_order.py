@@ -1,11 +1,10 @@
-from abc import ABC, abstractmethod
-from typing_extensions import Literal
+from typing_extensions import Protocol, Literal
 from dataclasses import dataclass
 from decimal import Decimal
 from datetime import datetime
 from trading_sdk.types import Side
 
-OrderStatus = Literal['NEW', 'PARTIALLY_FILLED', 'FILLED', 'CANCELED', 'PARTIALLY_CANCELED']
+OrderStatus = Literal['NEW', 'PARTIALLY_FILLED', 'FILLED', 'CANCELED', 'PARTIALLY_CANCELED', 'UNTRIGGERED']
 
 @dataclass
 class OrderState:
@@ -25,8 +24,7 @@ class OrderState:
   def unfilled_qty(self) -> Decimal:
     return self.qty - self.filled_qty
   
-class QueryOrder(ABC):
-  @abstractmethod
+class QueryOrder(Protocol):
   async def query_order(self, base: str, quote: str, *, id: str) -> OrderState:
     """Query an order.
     

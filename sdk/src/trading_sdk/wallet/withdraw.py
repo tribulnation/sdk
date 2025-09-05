@@ -1,13 +1,12 @@
-from abc import ABC, abstractmethod
+from typing_extensions import Protocol
 from trading_sdk.types import Num, Network
 
-class Withdraw(ABC):
-  @abstractmethod
+class Withdraw(Protocol):
   async def withdraw(
     self, asset: str, *, address: str, amount: Num,
     network: Network, memo: str | None = None,
     contract_address: str | None = None,
-  ):
+  ) -> None:
     """Withdraw funds.
     
     - `asset`: The asset to withdraw.

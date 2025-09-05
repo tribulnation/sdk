@@ -1,5 +1,4 @@
-from abc import ABC, abstractmethod
-from typing_extensions import TypedDict, Literal
+from typing_extensions import Protocol, TypedDict, Literal
 from trading_sdk.types import Side, Num
 
 class BaseOrder(TypedDict):
@@ -16,8 +15,7 @@ class MarketOrder(BaseOrder):
 
 Order = LimitOrder | MarketOrder
 
-class PlaceOrder(ABC):
-  @abstractmethod
+class PlaceOrder(Protocol):
   async def place_order(self, base: str, quote: str, order: Order) -> str:
     """Place an order.
     

@@ -1,5 +1,4 @@
-from abc import ABC, abstractmethod
-from typing_extensions import TypeVar
+from typing_extensions import Protocol, TypeVar
 from dataclasses import dataclass
 from decimal import Decimal
 from trading_sdk.util import trunc2tick
@@ -29,7 +28,7 @@ class Info:
   def trunc_qty(self, base_qty: Decimal) -> Decimal | None:
     """Truncate the (base asset) quantity to the nearest step size. Returns `None` if the quantity is too small."""
     qty = trunc2tick(base_qty, self.step_size)
-    if qty >= self.min_qty:
+    if qty > self.min_qty:
       return qty
   
   def amount2qty(self, quote_amount: Decimal, *, price: Decimal) -> Decimal | None:
@@ -40,8 +39,7 @@ class Info:
     """Convert a base quantity to a quote amount."""
     return base_qty * price
   
-class ExchangeInfo(ABC):
-  @abstractmethod
+class ExchangeInfo(Protocol):
   async def exchange_info(self, base: str, quote: str) -> Info:
     """Get the exchange info for the given symbol.
     

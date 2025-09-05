@@ -1,8 +1,7 @@
-from abc import ABC, abstractmethod
+from typing_extensions import Protocol
 from trading_sdk.types import Num
 
-class EditOrder(ABC):
-  @abstractmethod
+class EditOrder(Protocol):
   async def edit_order(self, base: str, quote: str, *, id: str, qty: Num) -> str:
     """Edit an existing order.
     

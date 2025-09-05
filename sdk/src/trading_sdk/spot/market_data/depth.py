@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from typing_extensions import Protocol
 from dataclasses import dataclass
 from decimal import Decimal
 
@@ -41,8 +41,7 @@ class Book:
       f'\n{hr}'
     )
 
-class Depth(ABC):
-  @abstractmethod
+class Depth(Protocol):
   async def depth(self, base: str, quote: str, *, limit: int | None = None) -> Book:
     """Get the order book for a given symbol.
     
@@ -50,3 +49,4 @@ class Depth(ABC):
     - `quote`: The quote asset, e.g. `USDT`.
     - `limit`: The maximum number of bids/asks to return.
     """
+    ...

@@ -1,8 +1,8 @@
 import asyncio
-from typing_extensions import Sequence
+from typing_extensions import Sequence, Protocol
 from .query_order import QueryOrder, OrderState
 
-class QueryOrders(QueryOrder):
+class QueryOrders(QueryOrder, Protocol):
   async def query_orders(self, base: str, quote: str, *, ids: Sequence[str]) -> Sequence[OrderState]:
     """Query multiple orders by symbol and ID.
     

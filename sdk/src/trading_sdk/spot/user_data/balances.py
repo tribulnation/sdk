@@ -1,5 +1,4 @@
-from abc import ABC, abstractmethod
-from typing_extensions import Mapping, TypeVar
+from typing_extensions import Protocol, Mapping, TypeVar
 from dataclasses import dataclass
 from decimal import Decimal
 import asyncio
@@ -15,13 +14,11 @@ class Balance:
   def total(self) -> Decimal:
     return self.free + self.locked
 
-class Balances(ABC):
-  @abstractmethod
+class Balances(Protocol):
   async def balance(self, currency: S, /) -> Balance:
     """Get the balance of the given currency."""
     return (await self.balances(currency))[currency]
 
-  @abstractmethod
   async def balances(self, *currencies: S) -> Mapping[S, Balance]:
     """Get the balances of the given currencies."""
     balances = await asyncio.gather(*(self.balance(currency) for currency in currencies))

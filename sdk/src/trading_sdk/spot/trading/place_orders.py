@@ -1,8 +1,8 @@
-from typing_extensions import Sequence
+from typing_extensions import Protocol, Sequence
 import asyncio
 from .place_order import Order, PlaceOrder
 
-class PlaceOrders(PlaceOrder):
+class PlaceOrders(PlaceOrder, Protocol):
   async def place_orders(self, base: str, quote: str, orders: Sequence[Order]) -> Sequence[str]:
     """Place multiple orders on a given symbol.
     

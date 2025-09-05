@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from abc import ABC, abstractmethod
+from typing_extensions import Protocol
 from trading_sdk.types import Network
 
 @dataclass
@@ -7,8 +7,7 @@ class Address:
   address: str
   memo: str | None = None
 
-class DepositAddress(ABC):
-  @abstractmethod
+class DepositAddress(Protocol):
   async def deposit_address(self, asset: str, *, network: Network) -> Address:
     """Get the deposit address for an asset.
     

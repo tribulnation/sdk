@@ -1,5 +1,4 @@
-from abc import ABC, abstractmethod
-from typing_extensions import Sequence
+from typing_extensions import Protocol, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 from trading_sdk.types import Network
@@ -16,8 +15,7 @@ class WithdrawalMethod:
   fee: Fee | None = None
   contract_address: str | None = None
 
-class WithdrawalMethods(ABC):
-  @abstractmethod
+class WithdrawalMethods(Protocol):
   async def withdrawal_methods(self, asset: str) -> Sequence[WithdrawalMethod]:
     """Get the withdrawal methods for an asset.
     

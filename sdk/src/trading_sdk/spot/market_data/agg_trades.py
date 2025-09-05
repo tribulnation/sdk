@@ -1,5 +1,4 @@
-from abc import ABC, abstractmethod
-from typing_extensions import Literal, AsyncIterable, Sequence
+from typing_extensions import Protocol, Literal, AsyncIterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
@@ -15,8 +14,7 @@ class AggTrade:
   """Which side was the maker."""
 
   
-class AggTrades(ABC):
-  @abstractmethod
+class AggTrades(Protocol):
   async def trades(
     self, base: str, quote: str, *,
     start: datetime | None = None, end: datetime | None = None

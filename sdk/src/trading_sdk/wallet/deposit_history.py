@@ -1,6 +1,5 @@
-from typing_extensions import AsyncIterable, Sequence
+from typing_extensions import Protocol, AsyncIterable, Sequence
 from dataclasses import dataclass
-from abc import ABC, abstractmethod
 from decimal import Decimal
 from datetime import datetime
 from trading_sdk.types import Network
@@ -14,20 +13,21 @@ class Deposit:
   id: str
   amount: Decimal
   asset: str
-  network: Network
-  address: str
   time: datetime
+  address: str | None = None
+  network: Network | None = None
   fee: Fee | None = None
   memo: str | None = None
 
-class DepositHistory(ABC):
-  @abstractmethod
+class DepositHistory(Protocol):
   def deposit_history(
-    self, *, start: datetime | None = None,
-    end: datetime | None = None
+    self, *, asset: str | None = None,
+    start: datetime,
+    end: datetime,
   ) -> AsyncIterable[Sequence[Deposit]]:
     """Fetch your deposits.
     
+    - `asset`: if given, retrieves deposits for this asset.
     - `start`: if given, retrieves deposits after this time.
     - `end`: if given, retrieves deposits before this time.
     """

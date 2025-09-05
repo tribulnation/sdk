@@ -1,5 +1,4 @@
-from abc import ABC, abstractmethod
-from typing_extensions import AsyncIterable, Sequence
+from typing_extensions import Protocol, AsyncIterable, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 from datetime import datetime
@@ -11,8 +10,7 @@ class Reward:
   qty: Decimal
   time: datetime
 
-class RewardHistory(ABC):
-  @abstractmethod
+class RewardHistory(Protocol):
   async def reward_history(
     self, *, start: datetime | None = None,
     end: datetime | None = None

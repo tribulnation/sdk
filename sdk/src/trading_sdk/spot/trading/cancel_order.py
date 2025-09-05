@@ -1,8 +1,7 @@
-from abc import ABC, abstractmethod
+from typing_extensions import Protocol
 from trading_sdk.spot.user_data.query_order import OrderState
 
-class CancelOrder(ABC):
-  @abstractmethod
+class CancelOrder(Protocol):
   async def cancel_order(self, base: str, quote: str, *, id: str) -> OrderState:
     """Cancel an order.
     

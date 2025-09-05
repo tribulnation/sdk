@@ -3,6 +3,7 @@ from .depth import Depth
 from .exchange_info import ExchangeInfo
 from .time import Time
 from .agg_trades import AggTrades
+from .candles import Candles
 
 __all__ = [
   'MarketData',
@@ -10,4 +11,5 @@ __all__ = [
   'ExchangeInfo',
   'Time',
   'AggTrades',
+  'Candles',
 ]
