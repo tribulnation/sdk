@@ -1,4 +1,4 @@
-from typing_extensions import Protocol, AsyncIterable, Sequence
+from typing_extensions import Protocol, AsyncIterable, Sequence, Literal
 from dataclasses import dataclass
 from decimal import Decimal
 from datetime import datetime
@@ -6,10 +6,12 @@ from datetime import datetime
 @dataclass
 class Funding:
   rate: Decimal
+  funding: Decimal
   time: datetime
+  side: Literal['LONG', 'SHORT']
 
-class FundingRateHistory(Protocol):
-  def funding_rate_history(
+class MyFundingHistory(Protocol):
+  def my_funding_history(
     self, instrument: str, /, *,
     start: datetime, end: datetime,
   ) -> AsyncIterable[Sequence[Funding]]:
@@ -21,8 +23,8 @@ class FundingRateHistory(Protocol):
     """
     ...
 
-class PerpFundingRateHistory(FundingRateHistory, Protocol):
-  def perp_funding_rate_history(
+class PerpMyFundingHistory(MyFundingHistory, Protocol):
+  def perp_my_funding_history(
     self, base: str, quote: str, /, *,
     start: datetime, end: datetime,
   ) -> AsyncIterable[Sequence[Funding]]:
@@ -35,8 +37,8 @@ class PerpFundingRateHistory(FundingRateHistory, Protocol):
     """
     ...
 
-class InversePerpFundingRateHistory(FundingRateHistory, Protocol):
-  async def inverse_perp_funding_rate_history(
+class InversePerpMyFundingHistory(MyFundingHistory, Protocol):
+  def inverse_perp_my_funding_history(
     self, currency: str, /, *,
     start: datetime, end: datetime,
   ) -> AsyncIterable[Sequence[Funding]]:
