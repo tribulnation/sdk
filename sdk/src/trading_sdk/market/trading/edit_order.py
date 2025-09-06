@@ -1,10 +1,9 @@
 from typing_extensions import Protocol
 
 from trading_sdk.types import Num
-from trading_sdk.market.types import Instrument
 
 class EditOrder(Protocol):
-  async def edit_order(self, instrument: Instrument, *, id: str, qty: Num | None = None, price: Num | None = None) -> str:
+  async def edit_order(self, instrument: str, /, *, id: str, qty: Num | None = None, price: Num | None = None) -> str:
     """Edit an existing order.
     
     - `instrument`: The instrument to edit the order on.
@@ -16,16 +15,8 @@ class EditOrder(Protocol):
     """
     ...
 
-  async def edit_order_any(self, instrument: str, *, id: str, qty: Num | None = None, price: Num | None = None) -> str:
-    """Edit an existing order by the exchange-specific name.
-    
-    - `instrument`: The name of the instrument to edit the order on.
-    - `id`: The ID of the order to edit.
-    - `qty`: The new quantity of the order.
-    - `price`: The new price of the order.
-    """
-
-  async def edit_order_spot(self, base: str, quote: str, *, id: str, qty: Num | None = None, price: Num | None = None) -> str:
+class SpotEditOrder(EditOrder, Protocol):
+  async def spot_edit_order(self, base: str, quote: str, /, *, id: str, qty: Num | None = None, price: Num | None = None) -> str:
     """Edit an existing order on a spot instrument.
     
     - `base`: The base asset, e.g. `BTC`.
@@ -33,9 +24,13 @@ class EditOrder(Protocol):
     - `id`: The ID of the order to edit.
     - `qty`: The new quantity of the order.
     - `price`: The new price of the order.
+
+    Returns the new ID of the order.
     """
-  
-  async def edit_order_perp(self, base: str, quote: str, *, id: str, qty: Num | None = None, price: Num | None = None) -> str:
+    ...
+
+class PerpEditOrder(EditOrder, Protocol):
+  async def perp_edit_order(self, base: str, quote: str, /, *, id: str, qty: Num | None = None, price: Num | None = None) -> str:
     """Edit an existing order on a perpetual instrument.
     
     - `base`: The base asset, e.g. `BTC`.
@@ -43,4 +38,20 @@ class EditOrder(Protocol):
     - `id`: The ID of the order to edit.
     - `qty`: The new quantity of the order.
     - `price`: The new price of the order.
+
+    Returns the new ID of the order.
     """
+    ...
+
+class InversePerpEditOrder(EditOrder, Protocol):
+  async def inverse_perp_edit_order(self, currency: str, /, *, id: str, qty: Num | None = None, price: Num | None = None) -> str:
+    """Edit an existing order on a inverse perpetual instrument.
+    
+    - `currency`: The currency, e.g. `BTC`.
+    - `id`: The ID of the order to edit.
+    - `qty`: The new quantity of the order.
+    - `price`: The new price of the order.
+    
+    Returns the new ID of the order.
+    """
+    ...

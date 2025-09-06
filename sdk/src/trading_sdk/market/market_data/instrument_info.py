@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from trading_sdk.util import trunc2tick
-from trading_sdk.market.types import Instrument
 
 S = TypeVar('S', bound=str)
 
@@ -41,33 +40,36 @@ class Info:
     """Convert a base quantity to a quote amount."""
     return base_qty * price
   
-class ExchangeInfo(Protocol):
-  async def exchange_info(self, instrument: Instrument) -> Info:
-    """Get the exchange info for the given symbol.
+class InstrumentInfo(Protocol):
+  async def instrument_info(self, instrument: str, /) -> Info:
+    """Get the info for the given instrument.
     
-    - `instrument`: The instrument to get the exchange info for.
+    - `instrument`: The instrument to get the info for.
     """
     ...
 
-  async def exchange_info_any(self, instrument: str) -> Info:
-    """Get the exchange info for the given instrument by the exchange-specific name.
-    
-    - `instrument`: The name of the instrument to get the exchange info for.
-    """
-    return await self.exchange_info({'type': 'any', 'name': instrument})
-  
-  async def exchange_info_spot(self, base: str, quote: str) -> Info:
-    """Get the exchange info for the given spot instrument.
+class SpotInfo(InstrumentInfo, Protocol):
+  async def spot_info(self, base: str, quote: str, /) -> Info:
+    """Get the info for the given spot instrument.
     
     - `base`: The base asset, e.g. `BTC`.
     - `quote`: The quote asset, e.g. `USDT`.
     """
-    return await self.exchange_info({'type': 'spot', 'base': base, 'quote': quote})
-  
-  async def exchange_info_perp(self, base: str, quote: str) -> Info:
-    """Get the exchange info for the given perpetual instrument.
+    ...
+
+class PerpInfo(InstrumentInfo, Protocol):
+  async def perp_info(self, base: str, quote: str, /) -> Info:
+    """Get the info for the given perpetual instrument.
     
     - `base`: The base asset, e.g. `BTC`.
     - `quote`: The quote asset, e.g. `USDT`.
     """
-    return await self.exchange_info({'type': 'perp', 'base': base, 'quote': quote})
+    ...
+
+class InversePerpInfo(InstrumentInfo, Protocol):
+  async def inverse_perp_info(self, currency: str, /) -> Info:
+    """Get the info for the given inverse perpetual instrument.
+    
+    - `currency`: The currency, e.g. `BTC`.
+    """
+    ...

@@ -3,8 +3,6 @@ from dataclasses import dataclass
 from decimal import Decimal
 from datetime import datetime, timedelta
 
-from trading_sdk.market.types import Instrument
-
 @dataclass
 class Candle:
   open: Decimal
@@ -16,7 +14,7 @@ class Candle:
 
 class Candles(Protocol):
   def candles(
-    self, instrument: Instrument, *,
+    self, instrument: str, /, *,
     interval: timedelta,
     start: datetime,
     end: datetime,
@@ -31,46 +29,8 @@ class Candles(Protocol):
     - `limit`: Candles to retrieve by request.
     """
 
-  async def candles_any(self, instrument: str, *, interval: timedelta, start: datetime, end: datetime, limit: int | None = None) -> AsyncIterable[Sequence[Candle]]:
-    """Fetch candles for a given instrument by the exchange-specific name.
-    
-    - `instrument`: The name of the instrument to get the candles for.
-    - `interval`: The interval of the candles (may be adjusted depending on the exchange)
-    - `start`: The start time to query. If given, only candles after this time will be returned.
-    - `end`: The end time to query. If given, only candles before this time will be returned.
-    - `limit`: Candles to retrieve by request.
-    """
-    async for chunk in self.candles({'type': 'any', 'name': instrument}, interval=interval, start=start, end=end, limit=limit):
-      yield chunk
-
-  async def candles_spot(self, base: str, quote: str, *, interval: timedelta, start: datetime, end: datetime, limit: int | None = None) -> AsyncIterable[Sequence[Candle]]:
-    """Fetch candles for a given spot instrument.
-    
-    - `base`: The base asset, e.g. `BTC`.
-    - `quote`: The quote asset, e.g. `USDT`.
-    - `interval`: The interval of the candles (may be adjusted depending on the exchange)
-    - `start`: The start time to query. If given, only candles after this time will be returned.
-    - `end`: The end time to query. If given, only candles before this time will be returned.
-    - `limit`: Candles to retrieve by request.
-    """
-    async for chunk in self.candles({'type': 'spot', 'base': base, 'quote': quote}, interval=interval, start=start, end=end, limit=limit):
-      yield chunk
-
-  async def candles_perp(self, base: str, quote: str, *, interval: timedelta, start: datetime, end: datetime, limit: int | None = None) -> AsyncIterable[Sequence[Candle]]:
-    """Fetch candles for a given perpetual instrument.
-    
-    - `base`: The base asset, e.g. `BTC`.
-    - `quote`: The quote asset, e.g. `USDT`.
-    - `interval`: The interval of the candles (may be adjusted depending on the exchange)
-    - `start`: The start time to query. If given, only candles after this time will be returned.
-    - `end`: The end time to query. If given, only candles before this time will be returned.
-    - `limit`: Candles to retrieve by request.
-    """
-    async for chunk in self.candles({'type': 'perp', 'base': base, 'quote': quote}, interval=interval, start=start, end=end, limit=limit):
-      yield chunk
-
   async def candles_sync(
-    self, instrument: Instrument, *,
+    self, instrument: str, /, *,
     interval: timedelta,
     start: datetime,
     end: datetime,
@@ -84,24 +44,20 @@ class Candles(Protocol):
     - `end`: The end time to query. If given, only candles before this time will be returned.
     - `limit`: Candles to retrieve by request.
     """
-    candles = []
-    async for chunk in self.candles(instrument, interval=interval, start=start, end=end, limit=limit):
-      candles.extend(chunk)
+    candles: list[Candle] = []
+    async for candle in self.candles(instrument, interval=interval, start=start, end=end, limit=limit):
+      candles.append(candle)
     return candles
 
-  async def candles_any_sync(self, instrument: str, *, interval: timedelta, start: datetime, end: datetime, limit: int | None = None) -> Sequence[Candle]:
-    """Fetch candles for a given instrument by the exchange-specific name, without streaming.
-    
-    - `instrument`: The name of the instrument to get the candles for.
-    - `interval`: The interval of the candles (may be adjusted depending on the exchange)
-    - `start`: The start time to query. If given, only candles after this time will be returned.
-    - `end`: The end time to query. If given, only candles before this time will be returned.
-    - `limit`: Candles to retrieve by request.
-    """
-    return await self.candles_any_sync(instrument, interval=interval, start=start, end=end, limit=limit)
-  
-  async def candles_spot_sync(self, base: str, quote: str, *, interval: timedelta, start: datetime, end: datetime, limit: int | None = None) -> Sequence[Candle]:
-    """Fetch candles for a given spot instrument, without streaming.
+class SpotCandles(Candles, Protocol):
+  def spot_candles(
+    self, base: str, quote: str, /, *,
+    interval: timedelta,
+    start: datetime,
+    end: datetime,
+    limit: int | None = None,
+  ) -> AsyncIterable[Sequence[Candle]]:
+    """Fetch candles for a given spot instrument.
     
     - `base`: The base asset, e.g. `BTC`.
     - `quote`: The quote asset, e.g. `USDT`.
@@ -110,16 +66,61 @@ class Candles(Protocol):
     - `end`: The end time to query. If given, only candles before this time will be returned.
     - `limit`: Candles to retrieve by request.
     """
-    return await self.candles_spot_sync(base, quote, interval=interval, start=start, end=end, limit=limit)
+    ...
 
-  async def candles_perp_sync(self, base: str, quote: str, *, interval: timedelta, start: datetime, end: datetime, limit: int | None = None) -> Sequence[Candle]:
-    """Fetch candles for a given perpetual instrument, without streaming.
-    
-    - `base`: The base asset, e.g. `BTC`.
-    - `quote`: The quote asset, e.g. `USDT`.
-    - `interval`: The interval of the candles (may be adjusted depending on the exchange)
-    - `start`: The start time to query. If given, only candles after this time will be returned.
-    - `end`: The end time to query. If given, only candles before this time will be returned.
-    - `limit`: Candles to retrieve by request.
-    """
-    return await self.candles_perp_sync(base, quote, interval=interval, start=start, end=end, limit=limit)
+  async def spot_candles_sync(
+    self, base: str, quote: str, /, *,
+    interval: timedelta,
+    start: datetime,
+    end: datetime,
+    limit: int | None = None,
+  ) -> Sequence[Candle]:
+    """Fetch candles for a given spot instrument, without streaming."""
+    candles: list[Candle] = []
+    async for candle in self.spot_candles(base, quote, interval=interval, start=start, end=end, limit=limit):
+      candles.append(candle)
+    return candles
+
+class PerpCandles(Candles, Protocol):
+  def perp_candles(
+    self, base: str, quote: str, /, *,
+    interval: timedelta,
+    start: datetime,
+    end: datetime,
+    limit: int | None = None,
+  ) -> AsyncIterable[Sequence[Candle]]:
+    ...
+
+  async def perp_candles_sync(
+    self, base: str, quote: str, /, *,
+    interval: timedelta,
+    start: datetime,
+    end: datetime,
+    limit: int | None = None,
+  ) -> Sequence[Candle]:
+    candles: list[Candle] = []
+    async for candle in self.perp_candles(base, quote, interval=interval, start=start, end=end, limit=limit):
+      candles.append(candle)
+    return candles
+
+class InversePerpCandles(Candles, Protocol):
+  def inverse_perp_candles(
+    self, currency: str, /, *,
+    interval: timedelta,
+    start: datetime,
+    end: datetime,
+    limit: int | None = None,
+  ) -> AsyncIterable[Sequence[Candle]]:
+    ...
+
+  async def inverse_perp_candles_sync(
+    self, currency: str, /, *,
+    interval: timedelta,
+    start: datetime,
+    end: datetime,
+    limit: int | None = None,
+  ) -> Sequence[Candle]:
+    candles: list[Candle] = []
+    async for candle in self.inverse_perp_candles(currency, interval=interval, start=start, end=end, limit=limit):
+      candles.append(candle)
+    return candles

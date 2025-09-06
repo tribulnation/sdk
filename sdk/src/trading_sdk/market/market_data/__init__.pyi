@@ -1,15 +1,8 @@
-from ._market_data import MarketData
-from .depth import Depth
-from .exchange_info import ExchangeInfo
-from .time import Time
-from .agg_trades import AggTrades
-from .candles import Candles
+from ._market_data import MarketData, SpotMarketData, PerpMarketData, InversePerpMarketData
 
 __all__ = [
   'MarketData',
-  'Depth',
-  'ExchangeInfo',
-  'Time',
-  'AggTrades',
-  'Candles',
+  'SpotMarketData',
+  'PerpMarketData',
+  'InversePerpMarketData',
 ]

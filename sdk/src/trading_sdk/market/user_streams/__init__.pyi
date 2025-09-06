@@ -1,4 +1,3 @@
-from ._streams import UserStreams
-from .my_trades import MyTrades
+from ._streams import UserStreams, SpotUserStreams, PerpUserStreams, InversePerpUserStreams
 
-__all__ = ['UserStreams', 'MyTrades']
+__all__ = ['UserStreams', 'SpotUserStreams', 'PerpUserStreams', 'InversePerpUserStreams']

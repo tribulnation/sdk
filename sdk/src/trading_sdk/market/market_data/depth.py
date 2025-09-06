@@ -2,8 +2,6 @@ from typing_extensions import Protocol
 from dataclasses import dataclass
 from decimal import Decimal
 
-from trading_sdk.market.types import Instrument
-
 @dataclass
 class Book:
   @dataclass
@@ -44,7 +42,7 @@ class Book:
     )
 
 class Depth(Protocol):
-  async def depth(self, instrument: Instrument, *, limit: int | None = None) -> Book:
+  async def depth(self, instrument: str, /, *, limit: int | None = None) -> Book:
     """Get the order book for a given symbol.
     
     - `instrument`: The instrument to get the depth for.
@@ -52,28 +50,31 @@ class Depth(Protocol):
     """
     ...
 
-  async def depth_any(self, instrument: str, *, limit: int | None = None) -> Book:
-    """Get the order book for a given instrument by the exchange-specific name.
-    
-    - `instrument`: The name of the instrument to get the depth for.
-    - `limit`: The maximum number of bids/asks to return.
-    """
-    return await self.depth({'type': 'any', 'name': instrument}, limit=limit)
-
-  async def depth_spot(self, base: str, quote: str, *, limit: int | None = None) -> Book:
+class SpotDepth(Depth, Protocol):
+  async def spot_depth(self, base: str, quote: str, /, *, limit: int | None = None) -> Book:
     """Get the order book for a given spot instrument.
     
     - `base`: The base asset, e.g. `BTC`.
     - `quote`: The quote asset, e.g. `USDT`.
     - `limit`: The maximum number of bids/asks to return.
     """
-    return await self.depth({'type': 'spot', 'base': base, 'quote': quote}, limit=limit)
+    ...
 
-  async def depth_perp(self, base: str, quote: str, *, limit: int | None = None) -> Book:
+class PerpDepth(Depth, Protocol):
+  async def perp_depth(self, base: str, quote: str, /, *, limit: int | None = None) -> Book:
     """Get the order book for a given perpetual instrument.
     
     - `base`: The base asset, e.g. `BTC`.
     - `quote`: The quote asset, e.g. `USDT`.
     - `limit`: The maximum number of bids/asks to return.
     """
-    return await self.depth({'type': 'perp', 'base': base, 'quote': quote}, limit=limit)
+    ...
+
+class InversePerpDepth(Depth, Protocol):
+  async def inverse_perp_depth(self, currency: str, /, *, limit: int | None = None) -> Book:
+    """Get the order book for a given inverse perpetual instrument.
+    
+    - `currency`: The currency, e.g. `BTC`.
+    - `limit`: The maximum number of bids/asks to return.
+    """
+    ...
