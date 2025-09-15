@@ -44,8 +44,8 @@ class MyTrades(Protocol):
     - `end`: The end time to query. If given, only trades before this time will be returned.
     """
     trades: list[Trade] = []
-    async for trade in self.my_trades(instrument, start=start, end=end):
-      trades.append(trade)
+    async for batch in self.my_trades(instrument, start=start, end=end):
+      trades.extend(batch)
     return trades
 
 
@@ -75,8 +75,8 @@ class SpotMyTrades(MyTrades, Protocol):
     - `end`: The end time to query. If given, only trades before this time will be returned.
     """
     trades: list[Trade] = []
-    async for trade in self.spot_my_trades(base, quote, start=start, end=end):
-      trades.append(trade)
+    async for batch in self.spot_my_trades(base, quote, start=start, end=end):
+      trades.extend(batch)
     return trades
 
 class PerpMyTrades(MyTrades, Protocol):
@@ -105,8 +105,8 @@ class PerpMyTrades(MyTrades, Protocol):
     - `end`: The end time to query. If given, only trades before this time will be returned.
     """
     trades: list[Trade] = []
-    async for trade in self.perp_my_trades(base, quote, start=start, end=end):
-      trades.append(trade)
+    async for batch in self.perp_my_trades(base, quote, start=start, end=end):
+      trades.extend(batch)
     return trades
 
 class InversePerpMyTrades(MyTrades, Protocol):
@@ -133,6 +133,6 @@ class InversePerpMyTrades(MyTrades, Protocol):
     - `end`: The end time to query. If given, only trades before this time will be returned.
     """
     trades: list[Trade] = []
-    async for trade in self.inverse_perp_my_trades(currency, start=start, end=end):
-      trades.append(trade)
+    async for batch in self.inverse_perp_my_trades(currency, start=start, end=end):
+      trades.extend(batch)
     return trades

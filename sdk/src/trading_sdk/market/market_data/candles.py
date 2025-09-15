@@ -28,6 +28,7 @@ class Candles(Protocol):
     - `end`: The end time to query. If given, only candles before this time will be returned.
     - `limit`: Candles to retrieve by request.
     """
+    ...
 
   async def candles_sync(
     self, instrument: str, /, *,
@@ -45,8 +46,8 @@ class Candles(Protocol):
     - `limit`: Candles to retrieve by request.
     """
     candles: list[Candle] = []
-    async for candles in self.candles(instrument, interval=interval, start=start, end=end, limit=limit):
-      candles.extend(candles)
+    async for chunk in self.candles(instrument, interval=interval, start=start, end=end, limit=limit):
+      candles.extend(chunk)
     return candles
 
 class SpotCandles(Candles, Protocol):

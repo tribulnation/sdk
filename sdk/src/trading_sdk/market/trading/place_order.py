@@ -23,7 +23,7 @@ class PlaceOrder(Protocol):
 
     Returns the order IDs.
     """
-    return await asyncio.gather(*[self.place_order(instrument, order) for order in orders])
+    return await asyncio.gather(*[self.place_order(instrument, order=order) for order in orders])
 
 class SpotPlaceOrder(PlaceOrder, Protocol):
   async def spot_place_order(self, base: str, quote: str, /, *, order: Order) -> str:
@@ -69,7 +69,7 @@ class PerpPlaceOrder(PlaceOrder, Protocol):
 
     Returns the order IDs.
     """
-    return await asyncio.gather(*[self.perp_place_order(base, quote, order) for order in orders])
+    return await asyncio.gather(*[self.perp_place_order(base, quote, order=order) for order in orders])
 
 class InversePerpPlaceOrder(PlaceOrder, Protocol):
   async def inverse_perp_place_order(self, currency: str, /, *, order: Order) -> str:
