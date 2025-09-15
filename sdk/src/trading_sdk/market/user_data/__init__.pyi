@@ -1,3 +1,13 @@
 from ._user_data import UserData, SpotUserData, PerpUserData, InversePerpUserData
+from .my_funding_history import MyFundingHistory, PerpMyFundingHistory, InversePerpMyFundingHistory
+from .my_trades import MyTrades, SpotMyTrades, PerpMyTrades, InversePerpMyTrades
+from .open_orders import OpenOrders, SpotOpenOrders, PerpOpenOrders, InversePerpOpenOrders
+from .query_order import QueryOrder, SpotQueryOrder, PerpQueryOrder, InversePerpQueryOrder
 
-__all__ = ['UserData', 'SpotUserData', 'PerpUserData', 'InversePerpUserData']
+__all__ = [
+  'UserData', 'SpotUserData', 'PerpUserData', 'InversePerpUserData',
+  'MyFundingHistory', 'PerpMyFundingHistory', 'InversePerpMyFundingHistory',
+  'MyTrades', 'SpotMyTrades', 'PerpMyTrades', 'InversePerpMyTrades',
+  'OpenOrders', 'SpotOpenOrders', 'PerpOpenOrders', 'InversePerpOpenOrders',
+  'QueryOrder', 'SpotQueryOrder', 'PerpQueryOrder', 'InversePerpQueryOrder',
+]

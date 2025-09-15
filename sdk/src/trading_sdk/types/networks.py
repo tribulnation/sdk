@@ -1,6 +1,7 @@
 from typing_extensions import Literal, TypeGuard
 
 Network = Literal[
+  'BTC',
   'BSC',
   'ETH',
   'POL',
@@ -24,6 +25,7 @@ Network = Literal[
 ]
 
 NETWORK_NAMES: dict[Network, str] = {
+  'BTC': 'Bitcoin',
   'BSC': 'Binance Smart Chain',
   'ETH': 'Ethereum',
   'POL': 'Polygon',

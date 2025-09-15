@@ -45,8 +45,8 @@ class Candles(Protocol):
     - `limit`: Candles to retrieve by request.
     """
     candles: list[Candle] = []
-    async for candle in self.candles(instrument, interval=interval, start=start, end=end, limit=limit):
-      candles.append(candle)
+    async for candles in self.candles(instrument, interval=interval, start=start, end=end, limit=limit):
+      candles.extend(candles)
     return candles
 
 class SpotCandles(Candles, Protocol):
@@ -77,8 +77,8 @@ class SpotCandles(Candles, Protocol):
   ) -> Sequence[Candle]:
     """Fetch candles for a given spot instrument, without streaming."""
     candles: list[Candle] = []
-    async for candle in self.spot_candles(base, quote, interval=interval, start=start, end=end, limit=limit):
-      candles.append(candle)
+    async for chunk in self.spot_candles(base, quote, interval=interval, start=start, end=end, limit=limit):
+      candles.extend(chunk)
     return candles
 
 class PerpCandles(Candles, Protocol):
@@ -99,8 +99,8 @@ class PerpCandles(Candles, Protocol):
     limit: int | None = None,
   ) -> Sequence[Candle]:
     candles: list[Candle] = []
-    async for candle in self.perp_candles(base, quote, interval=interval, start=start, end=end, limit=limit):
-      candles.append(candle)
+    async for chunk in self.perp_candles(base, quote, interval=interval, start=start, end=end, limit=limit):
+      candles.extend(chunk)
     return candles
 
 class InversePerpCandles(Candles, Protocol):
@@ -121,6 +121,6 @@ class InversePerpCandles(Candles, Protocol):
     limit: int | None = None,
   ) -> Sequence[Candle]:
     candles: list[Candle] = []
-    async for candle in self.inverse_perp_candles(currency, interval=interval, start=start, end=end, limit=limit):
-      candles.append(candle)
+    async for chunk in self.inverse_perp_candles(currency, interval=interval, start=start, end=end, limit=limit):
+      candles.extend(chunk)
     return candles

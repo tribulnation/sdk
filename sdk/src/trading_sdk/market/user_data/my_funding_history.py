@@ -5,10 +5,10 @@ from datetime import datetime
 
 @dataclass
 class Funding:
-  rate: Decimal
   funding: Decimal
   time: datetime
   side: Literal['LONG', 'SHORT']
+  rate: Decimal | None = None
 
 class MyFundingHistory(Protocol):
   def my_funding_history(
