@@ -1,30 +1,7 @@
-from typing_extensions import Protocol, Literal, Sequence
+from typing_extensions import Protocol, Sequence
 import asyncio
-from dataclasses import dataclass
-from decimal import Decimal
-from datetime import datetime
 
-from trading_sdk.market.types import Side
-
-OrderStatus = Literal['NEW', 'PARTIALLY_FILLED', 'FILLED', 'CANCELED', 'PARTIALLY_CANCELED', 'UNTRIGGERED']
-
-@dataclass
-class OrderState:
-  id: str
-  price: Decimal
-  qty: Decimal
-  filled_qty: Decimal
-  side: Side
-  status: OrderStatus
-  time: datetime
-
-  @property
-  def quote_qty(self) -> Decimal:
-    return self.qty * self.price
-
-  @property
-  def unfilled_qty(self) -> Decimal:
-    return self.qty - self.filled_qty
+from trading_sdk.market.types import OrderState
   
 class QueryOrder(Protocol):
   async def query_order(self, instrument: str, /, *, id: str) -> OrderState:
