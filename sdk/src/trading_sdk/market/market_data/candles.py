@@ -11,6 +11,7 @@ class Candle:
   close: Decimal
   volume: Decimal
   time: datetime
+  quote_volume: Decimal | None = None
 
 class Candles(Protocol):
   def candles(
