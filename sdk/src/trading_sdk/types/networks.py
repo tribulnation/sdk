@@ -22,6 +22,9 @@ Network = Literal[
   'UNI',
   'APTOS',
   'SUI',
+  'XRP',
+  'ZKSYNC',
+  'LINEA',
 ]
 
 NETWORK_NAMES: dict[Network, str] = {
@@ -46,6 +49,9 @@ NETWORK_NAMES: dict[Network, str] = {
   'UNI': 'Unichain',
   'APTOS': 'Aptos',
   'SUI': 'Sui',
+  'XRP': 'XRP',
+  'ZKSYNC': 'ZKsync',
+  'LINEA': 'Linea',
 }
 
 def is_network(s: str) -> TypeGuard[Network]:
