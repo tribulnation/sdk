@@ -15,7 +15,7 @@ class Balance:
     return self.free + self.locked
 
 class Balances(Protocol):
-  async def balance(self, currency: S, /) -> Balance:
+  async def balance(self, currency: str, /) -> Balance:
     """Get the balance of the given currency."""
     return (await self.balances(currency))[currency]
 
