@@ -8,6 +8,7 @@ class Funding:
   funding: Decimal
   time: datetime
   side: Literal['LONG', 'SHORT']
+  currency: str
   rate: Decimal | None = None
 
 class MyFundingHistory(Protocol):
