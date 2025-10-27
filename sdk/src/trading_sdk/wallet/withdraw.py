@@ -6,7 +6,7 @@ class Withdraw(Protocol):
     self, asset: str, *, address: str, amount: Num,
     network: Network, memo: str | None = None,
     contract_address: str | None = None,
-  ) -> None:
+  ):
     """Withdraw funds.
     
     - `asset`: The asset to withdraw.

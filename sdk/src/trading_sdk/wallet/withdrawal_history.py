@@ -15,21 +15,20 @@ class Withdrawal:
   amount: Decimal
   asset: str
   time: datetime
-  address: str | None = None
-  network: Network | None = None
+  dest_address: str
+  network: Network
   fee: Fee | None = None
-  memo: str | None = None
+  dest_memo: str | None = None
 
 class WithdrawalHistory(Protocol):
   def withdrawal_history(
-    self, *, asset: str | None = None,
-    start: datetime,
-    end: datetime,
+    self, asset: str, /, *,
+    start: datetime, end: datetime,
   ) -> AsyncIterable[Sequence[Withdrawal]]:
     """Fetch your withdrawals.
     
-    - `asset`: if given, retrieves withdrawals for this asset.
-    - `start`: if given, retrieves withdrawals after this time.
-    - `end`: if given, retrieves withdrawals before this time.
+    - `asset`: The asset to get the withdrawal history for.
+    - `start`: retrieves withdrawals after this time.
+    - `end`: retrieves withdrawals before this time.
     """
     ...

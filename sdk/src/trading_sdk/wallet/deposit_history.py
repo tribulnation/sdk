@@ -10,25 +10,25 @@ class Deposit:
   class Fee:
     asset: str
     amount: Decimal
+
   id: str
   amount: Decimal
   asset: str
   time: datetime
-  address: str | None = None
-  network: Network | None = None
+  source_address: str
+  network: Network
   fee: Fee | None = None
-  memo: str | None = None
+  source_memo: str | None = None
 
 class DepositHistory(Protocol):
   def deposit_history(
-    self, *, asset: str | None = None,
-    start: datetime,
-    end: datetime,
+    self, asset: str, /, *,
+    start: datetime, end: datetime,
   ) -> AsyncIterable[Sequence[Deposit]]:
     """Fetch your deposits.
     
-    - `asset`: if given, retrieves deposits for this asset.
-    - `start`: if given, retrieves deposits after this time.
-    - `end`: if given, retrieves deposits before this time.
+    - `asset`: The asset to get the deposit history for.
+    - `start`: retrieves deposits after this time.
+    - `end`: retrieves deposits before this time.
     """
     ...
