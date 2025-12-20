@@ -15,6 +15,8 @@ class Book:
     def __format__(self, fmt: str) -> str:
       return f'[{self.price:{fmt}}] {self.qty:{fmt}}'
 
+  id: str
+  """Book Update ID"""
   bids: list[Entry]
   asks: list[Entry]
 
@@ -86,39 +88,9 @@ def avg_price(entries: Sequence[Book.Entry]) -> Decimal:
   return Decimal(total) / Decimal(total_qty)
 
 class Depth(Protocol):
-  async def depth(self, instrument: str, /, *, limit: int | None = None) -> Book:
-    """Get the order book for a given symbol.
+  async def depth(self, *, limit: int | None = None) -> Book:
+    """Fetch the market order book.
     
-    - `instrument`: The instrument to get the depth for.
-    - `limit`: The maximum number of bids/asks to return.
-    """
-    ...
-
-class SpotDepth(Depth, Protocol):
-  async def spot_depth(self, base: str, quote: str, /, *, limit: int | None = None) -> Book:
-    """Get the order book for a given spot instrument.
-    
-    - `base`: The base asset, e.g. `BTC`.
-    - `quote`: The quote asset, e.g. `USDT`.
-    - `limit`: The maximum number of bids/asks to return.
-    """
-    ...
-
-class PerpDepth(Depth, Protocol):
-  async def perp_depth(self, base: str, quote: str, /, *, limit: int | None = None) -> Book:
-    """Get the order book for a given perpetual instrument.
-    
-    - `base`: The base asset, e.g. `BTC`.
-    - `quote`: The quote asset, e.g. `USDT`.
-    - `limit`: The maximum number of bids/asks to return.
-    """
-    ...
-
-class InversePerpDepth(Depth, Protocol):
-  async def inverse_perp_depth(self, currency: str, /, *, limit: int | None = None) -> Book:
-    """Get the order book for a given inverse perpetual instrument.
-    
-    - `currency`: The currency, e.g. `BTC`.
     - `limit`: The maximum number of bids/asks to return.
     """
     ...

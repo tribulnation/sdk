@@ -1,2 +1,8 @@
-import lazy_loader as lazy
-__getattr__, __dir__, __all__ = lazy.attach_stub(__name__, __file__)
+from typing_extensions import Protocol
+from .cancel_order import CancelOrder
+from .open_orders import OpenOrders
+from .place_order import PlaceOrder
+from .query_order import QueryOrder
+
+class Trading(CancelOrder, OpenOrders, PlaceOrder, QueryOrder, Protocol):
+  ...

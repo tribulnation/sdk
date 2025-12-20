@@ -20,6 +20,6 @@ class Balances(Protocol):
     return (await self.balances(currency))[currency]
 
   async def balances(self, *currencies: S) -> Mapping[S, Balance]:
-    """Get the balances of the given currencies."""
+    """Get the balances of the given currencies. If no currencies are provided, get all balances."""
     balances = await asyncio.gather(*(self.balance(currency) for currency in currencies))
     return {currency: balance for currency, balance in zip(currencies, balances)}

@@ -3,6 +3,8 @@ from dataclasses import dataclass
 from decimal import Decimal
 from datetime import datetime
 
+from trading_sdk.util import ChunkedStream
+
 @dataclass
 class Funding:
   rate: Decimal
@@ -10,40 +12,12 @@ class Funding:
 
 class FundingRateHistory(Protocol):
   def funding_rate_history(
-    self, instrument: str, /, *,
-    start: datetime, end: datetime,
+    self, start: datetime, end: datetime,
+  ) -> ChunkedStream[Funding]:
+    """Fetch perpetual funding rate history."""
+    return ChunkedStream(self._funding_rate_history_impl(start=start, end=end))
+  
+  def _funding_rate_history_impl(
+    self, start: datetime, end: datetime,
   ) -> AsyncIterable[Sequence[Funding]]:
-    """Fetch funding rate history for a given perpetual instrument.
-
-    - `instrument`: The instrument, e.g. `BTCUSDT`.
-    - `start`: if given, retrieves funding rates after this time.
-    - `end`: if given, retrieves funding rates before this time.
-    """
-    ...
-
-class PerpFundingRateHistory(FundingRateHistory, Protocol):
-  def perp_funding_rate_history(
-    self, base: str, quote: str, /, *,
-    start: datetime, end: datetime,
-  ) -> AsyncIterable[Sequence[Funding]]:
-    """Fetch funding rate history for a given linear perpetual instrument.
-
-    - `base`: The base asset, e.g. `BTC`.
-    - `quote`: The quote asset, e.g. `USDT`.
-    - `start`: if given, retrieves funding rates after this time.
-    - `end`: if given, retrieves funding rates before this time.
-    """
-    ...
-
-class InversePerpFundingRateHistory(FundingRateHistory, Protocol):
-  async def inverse_perp_funding_rate_history(
-    self, currency: str, /, *,
-    start: datetime, end: datetime,
-  ) -> AsyncIterable[Sequence[Funding]]:
-    """Fetch funding rate history for a given inverse perpetual instrument.
-
-    - `currency`: The currency, e.g. `BTC`.
-    - `start`: if given, retrieves funding rates after this time.
-    - `end`: if given, retrieves funding rates before this time.
-    """
     ...

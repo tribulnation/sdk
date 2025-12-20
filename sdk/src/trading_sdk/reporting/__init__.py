@@ -1,6 +1,9 @@
 from .types import (
-  Posting, Operation, Transaction, Snapshot,
-  Trade, Yield,
+  Posting, CurrencyPosting, FuturePosting, StrategyPosting,
+  Snapshot, CurrencySnapshot, FutureSnapshot, StrategySnapshot,
+  Transaction,
+  Operation,
+  Trade, Yield, Other,
   Deposit, CryptoDeposit, FiatDeposit,
   Withdrawal, CryptoWithdrawal, FiatWithdrawal,
   Bonus, InternalTransfer,

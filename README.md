@@ -23,53 +23,34 @@ pip install mexc-trading-sdk # or others, see below
 - [Bitget](https://github.com/tribulnation/bitget) (coming soon)
 - [Binance](https://github.com/tribulnation/binance) (coming soon)
 
-## Installation
-
-```bash
-pip install trading-sdk
-```
-
 ## Usage
 
-1. Define your strategy using the available interfaces (or a composition of them).
+1. Define your strategy.
 
 ```python
-from trading_sdk.spot import Trading, MarketData
+from trading_sdk import Market
 
-class MyClient(Trading, MarketData):
-  ...
-
-async def micro_strategy(client: MyClient):
+async def strategy(market: Market):
   while True:
-    book = await client.depth('BTCUSDT', '15m')
-    await client.place_order('BTCUSDT', {
+    book = await market.depth(limit=1)
+    order_id = await market.place_order({
       'quantity': '1',
-      'type': 'MARKET',
+      'type': 'LIMIT',
       'side': 'BUY',
+      'price': book.asks[0].price,
     })
     await asyncio.sleep(3600*24)
+    order = await market.order_state(order_id)
+    if order.status != 'FILLED':
+      await market.cancel_order(order_id)
 ```
 
-2. Use an existing exchange implementation.
+2. Use an existing exchange implementation (or implement your own).
 
 ```python
 from mexc.sdk import MEXC
 
-async with MEXC(API_KEY, API_SECRET) as client:
-  await micro_strategy(client)
-```
-
-3. Or implement your own.
-
-```python
-from trading_sdk.spot import Trading, MarketData
-
-class MyClient(Trading, MarketData):
-  async def depth(self, symbol: str, interval: str) -> dict:
-    ...
-
-  async def place_order(self, symbol: str, order: dict) -> dict:
-    ...
-
-  # ...
+async with MEXC(API_KEY, API_SECRET) as sdk:
+  market = sdk.spot('BTC', 'USDT')
+  await strategy(client)
 ```

@@ -22,8 +22,6 @@ class MarketOrder(BaseOrder):
 
 Order = LimitOrder | MarketOrder
 
-
-
 OrderStatus = Literal['NEW', 'PARTIALLY_FILLED', 'FILLED', 'CANCELED', 'PARTIALLY_CANCELED', 'UNTRIGGERED']
 
 @dataclass

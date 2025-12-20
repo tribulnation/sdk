@@ -5,7 +5,7 @@ from .types import Transaction, Snapshot
 
 class Transactions(Protocol):
   def transactions(
-    self, *, start: datetime | None = None, end: datetime | None = None
+    self, *, start: datetime, end: datetime
   ) -> AsyncIterable[Sequence[Transaction]]:
     """Collect all transactions of the account.
     
@@ -15,7 +15,7 @@ class Transactions(Protocol):
     ...
 
   async def transactions_sync(
-    self, *, start: datetime | None = None, end: datetime | None = None
+    self, *, start: datetime, end: datetime
   ) -> Sequence[Transaction]:
     """Collect all transactions of the account.
     

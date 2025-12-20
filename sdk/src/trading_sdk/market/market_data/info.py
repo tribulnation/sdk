@@ -1,13 +1,11 @@
-from typing_extensions import Protocol, TypeVar
+from typing_extensions import Protocol
 from dataclasses import dataclass
 from decimal import Decimal
 
 from trading_sdk.util import trunc2tick
 
-S = TypeVar('S', bound=str)
-
 @dataclass
-class Info:
+class Information:
   tick_size: Decimal
   """Tick size of the price (in quote units)."""
   step_size: Decimal
@@ -40,36 +38,7 @@ class Info:
     """Convert a base quantity to a quote amount."""
     return base_qty * price
   
-class InstrumentInfo(Protocol):
-  async def instrument_info(self, instrument: str, /) -> Info:
-    """Get the info for the given instrument.
-    
-    - `instrument`: The instrument to get the info for.
-    """
-    ...
-
-class SpotInfo(InstrumentInfo, Protocol):
-  async def spot_info(self, base: str, quote: str, /) -> Info:
-    """Get the info for the given spot instrument.
-    
-    - `base`: The base asset, e.g. `BTC`.
-    - `quote`: The quote asset, e.g. `USDT`.
-    """
-    ...
-
-class PerpInfo(InstrumentInfo, Protocol):
-  async def perp_info(self, base: str, quote: str, /) -> Info:
-    """Get the info for the given perpetual instrument.
-    
-    - `base`: The base asset, e.g. `BTC`.
-    - `quote`: The quote asset, e.g. `USDT`.
-    """
-    ...
-
-class InversePerpInfo(InstrumentInfo, Protocol):
-  async def inverse_perp_info(self, currency: str, /) -> Info:
-    """Get the info for the given inverse perpetual instrument.
-    
-    - `currency`: The currency, e.g. `BTC`.
-    """
+class Info(Protocol):
+  async def info(self) -> Information:
+    """Fetch market information."""
     ...

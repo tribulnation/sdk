@@ -1,2 +1,12 @@
-import lazy_loader as lazy
-__getattr__, __dir__, __all__ = lazy.attach_stub(__name__, __file__)
+from typing_extensions import Protocol
+from .market_data import MarketData, PerpMarketData
+from .market_streams import MarketStreams
+from .trading import Trading
+from .user_data import UserData, PerpUserData
+from .user_streams import UserStreams
+
+class Market(MarketData, MarketStreams, Trading, UserData, UserStreams, Protocol):
+  ...
+
+class PerpMarket(Market, PerpMarketData, PerpUserData, Protocol):
+  ...

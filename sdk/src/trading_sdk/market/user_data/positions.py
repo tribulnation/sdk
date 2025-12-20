@@ -1,24 +1,14 @@
-from typing_extensions import Protocol, Literal, Sequence
+from typing_extensions import Protocol
 from dataclasses import dataclass
 from decimal import Decimal
 
 @dataclass
 class Position:
-  side: Literal['LONG', 'SHORT']
   size: Decimal
+  """Signed position size (negative for short, positive for long)."""
   entry_price: Decimal
 
-class Positions(Protocol):
-  async def positions(self, instrument: str, /) -> Sequence[Position]:
-    """Get the open position on a given instrument."""
-    ...
-
-class PerpPositions(Positions, Protocol):
-  async def perp_position(self, base: str, quote: str, /) -> Sequence[Position]:
-    """Get the open position on a given perpetual instrument."""
-    ...
-
-class InversePerpPositions(Positions, Protocol):
-  async def inverse_perp_positions(self, currency: str, /) -> Sequence[Position]:
-    """Get the open position on a given inverse perpetual instrument."""
+class MyPosition(Protocol):
+  async def position(self) -> Position | None:
+    """Get your open position, if any."""
     ...
