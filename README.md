@@ -52,5 +52,5 @@ from mexc.sdk import MEXC
 
 async with MEXC(API_KEY, API_SECRET) as sdk:
   market = sdk.spot('BTC', 'USDT')
-  await strategy(client)
+  await strategy(market)
 ```
