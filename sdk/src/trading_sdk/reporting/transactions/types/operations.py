@@ -1,15 +1,10 @@
-from typing_extensions import Literal, Union, Any, Sequence
+from typing_extensions import Literal, Any, Union
 from dataclasses import dataclass
-from datetime import datetime
 from decimal import Decimal
 
 @dataclass(kw_only=True)
 class BaseOperation:
   details: Any | None = None
-
-@dataclass(kw_only=True)
-class Other(BaseOperation):
-  kind: Literal['other'] = 'other'
 
 @dataclass
 class Fee:
@@ -138,59 +133,3 @@ Operation = Union[
   Bonus, InternalTransfer,
   EthereumTransaction, ERC20Transfer,
 ]
-
-@dataclass(kw_only=True)
-class BasePosting:
-  asset: str
-  change: Decimal
-
-  def __format__(self, fmt: str) -> str:
-    s = '+' if self.change > 0 else ''
-    return f'{s}{self.change:{fmt}} {self.asset}'
-
-  def __str__(self) -> str:
-    return f'{self}'
-
-@dataclass(kw_only=True)
-class CurrencyPosting(BasePosting):
-  kind: Literal['currency'] = 'currency'
-
-@dataclass(kw_only=True)
-class FuturePosting(BasePosting):
-  kind: Literal['future'] = 'future'
-  price: Decimal
-
-@dataclass(kw_only=True)
-class StrategyPosting(BasePosting):
-  kind: Literal['strategy'] = 'strategy'
-
-Posting = CurrencyPosting | FuturePosting | StrategyPosting
-
-@dataclass(kw_only=True)
-class Transaction:
-  id: str
-  time: datetime
-  operation: Operation
-  postings: Sequence[Posting]
-
-@dataclass(kw_only=True)
-class BaseSnapshot:
-  asset: str
-  time: datetime
-  qty: Decimal
-
-@dataclass(kw_only=True)
-class CurrencySnapshot(BaseSnapshot):
-  kind: Literal['currency'] = 'currency'
-
-@dataclass(kw_only=True)
-class FutureSnapshot(BaseSnapshot):
-  kind: Literal['future'] = 'future'
-  avg_price: Decimal
-  """Average entry price"""
-
-@dataclass(kw_only=True)
-class StrategySnapshot(BaseSnapshot):
-  kind: Literal['strategy'] = 'strategy'
-
-Snapshot = CurrencySnapshot | FutureSnapshot | StrategySnapshot
