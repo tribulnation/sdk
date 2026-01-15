@@ -133,9 +133,8 @@ Operation = Union[
   Yield,
   PerpetualFunding,
   PerpetualSettlement,
-  Deposit,
   CryptoDeposit, FiatDeposit,
-  Withdrawal, CryptoWithdrawal, FiatWithdrawal,
+  CryptoWithdrawal, FiatWithdrawal,
   Bonus, InternalTransfer,
   EthereumTransaction, ERC20Transfer,
 ]
