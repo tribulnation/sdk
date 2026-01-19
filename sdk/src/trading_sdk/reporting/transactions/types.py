@@ -128,6 +128,7 @@ class FutureTrade(BaseOperation[D], Generic[D]):
         type='future_trade',
         asset=self.asset,
         change=s*self.size,
+        price=self.price,
         details=self.details,
       )
     ]
