@@ -4,26 +4,13 @@ from datetime import datetime
 from decimal import Decimal
 
 @dataclass(kw_only=True)
-class BaseSnapshot:
+class Snapshot:
   asset: str
   time: datetime
   qty: Decimal
-
-@dataclass(kw_only=True)
-class CurrencySnapshot(BaseSnapshot):
-  kind: Literal['currency'] = 'currency'
-
-@dataclass(kw_only=True)
-class FutureSnapshot(BaseSnapshot):
-  kind: Literal['future'] = 'future'
-  avg_price: Decimal
+  kind: Literal['currency', 'future', 'strategy']
+  avg_price: Decimal | None = None
   """Average entry price"""
-
-@dataclass(kw_only=True)
-class StrategySnapshot(BaseSnapshot):
-  kind: Literal['strategy'] = 'strategy'
-
-Snapshot = CurrencySnapshot | FutureSnapshot | StrategySnapshot
 
 class Snapshots(Protocol):
   async def snapshots(self, assets: Sequence[str] = []) -> Sequence[Snapshot]:
