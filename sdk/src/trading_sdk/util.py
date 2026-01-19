@@ -1,8 +1,8 @@
-from typing_extensions import AsyncIterable, TypeVar, ParamSpec, Generic, Sequence, AsyncGenerator, Callable, Any, Awaitable
-from functools import wraps
+from typing_extensions import AsyncIterable, TypeVar, ParamSpec, Generic, Sequence, Callable, Awaitable
 from decimal import Decimal, ROUND_HALF_DOWN, ROUND_FLOOR
 
 T = TypeVar('T')
+U = TypeVar('U')
 P = ParamSpec('P')
 
 def round2tick(x: Decimal, tick_size: Decimal) -> Decimal:
@@ -27,12 +27,11 @@ class Stream(AsyncIterable[T], Awaitable[Sequence[T]], Generic[T]):
     return coro().__await__()
 
   @staticmethod
-  def lift(fn: Callable[P, AsyncGenerator[T, Any]]):
-    @wraps(fn)
-    def wrapper(*args: P.args, **kwargs: P.kwargs) -> Stream[T]:
+  def lift(fn: Callable[P, AsyncIterable[U]]):
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> Stream[U]:
       return Stream(fn(*args, **kwargs))
     return wrapper
-
+  
 class ChunkedStream(AsyncIterable[Sequence[T]], Awaitable[Sequence[T]], Generic[T]):
   def __init__(self, xs: AsyncIterable[Sequence[T]]):
     self.xs = xs
@@ -51,8 +50,7 @@ class ChunkedStream(AsyncIterable[Sequence[T]], Awaitable[Sequence[T]], Generic[
         yield x
 
   @staticmethod
-  def lift(fn: Callable[P, AsyncGenerator[Sequence[T], Any]]) -> Callable[P, 'ChunkedStream[T]']:
-    @wraps(fn)
-    def wrapper(*args: P.args, **kwargs: P.kwargs) -> ChunkedStream[T]:
+  def lift(fn: Callable[P, AsyncIterable[Sequence[U]]]):
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> ChunkedStream[U]:
       return ChunkedStream(fn(*args, **kwargs))
     return wrapper
