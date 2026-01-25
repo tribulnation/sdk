@@ -6,15 +6,17 @@ from datetime import datetime
 D = TypeVar('D', default=Any, covariant=True)
 D2 = TypeVar('D2', default=Any, covariant=True)
 
+Label = Literal[
+  'trade', 'yield', 'fee', 'bonus', 'other', 'internal_transfer',
+  'future_trade', 'settlement', 'settlement_fee', 'funding',
+  'strategy_deposit', 'strategy_withdrawal',
+  'crypto_deposit', 'fiat_deposit', 'crypto_withdrawal', 'fiat_withdrawal', 'withdrawal_fee',
+  'ethereum_transfer', 'erc20_transfer',
+]
+
 @dataclass(kw_only=True, frozen=True)
 class Flow(Generic[D]):
-  Label = Literal[
-    'trade', 'yield', 'fee', 'bonus', 'other', 'internal_transfer',
-    'future_trade', 'settlement', 'settlement_fee', 'funding',
-    'strategy_deposit', 'strategy_withdrawal',
-    'crypto_deposit', 'fiat_deposit', 'crypto_withdrawal', 'fiat_withdrawal', 'withdrawal_fee',
-    'ethereum_transfer', 'erc20_transfer',
-  ]
+  Label = Label
   kind: Literal['currency', 'future', 'strategy'] | None = None
   asset: str
   change: Decimal

@@ -1,5 +1,5 @@
 from .types import (
-  Transaction, Event, Flow,
+  Transaction, Event, Flow, Label,
   Fee, Trade, FutureTrade, SingleEvent,
   Yield, Bonus, Funding, Settlement, Other,
   CryptoDeposit, FiatDeposit, CryptoWithdrawal, FiatWithdrawal,
