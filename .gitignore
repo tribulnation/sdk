@@ -1,5 +1,7 @@
+.env
 .venv
 .vscode
+.cursor
 node_modules
 __pycache__
 *.egg-info/
