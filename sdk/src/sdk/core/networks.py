@@ -1,58 +1,46 @@
-from typing_extensions import Literal, TypeGuard
+from typing_extensions import Literal, NewType, TypeGuard
+import re
 
-Network = Literal[
-  'BTC',
-  'BSC',
-  'ETH',
-  'POL',
-  'TRX',
-  'ARB',
-  'BASE',
-  'AVAX',
-  'SOL',
-  'FTM',
-  'OP',
-  'TON',
-  'SONIC',
-  'XTZ',
-  'CORE',
-  'CELO',
-  'NEAR',
-  'MNT',
-  'UNI',
-  'APTOS',
-  'SUI',
+EthereumNetwork = NewType('EthereumNetwork', str)
+"""`Ethereum::{chain_id}`"""
+ETHEREUM_NETWORK_PATTERN = re.compile(r'^Ethereum::(\d+)$')
+
+def is_ethereum_network(s: str) -> TypeGuard[EthereumNetwork]:
+  return ETHEREUM_NETWORK_PATTERN.match(s) is not None
+
+def ethereum_network(chain_id: int) -> EthereumNetwork:
+  return EthereumNetwork(f'Ethereum::{chain_id}')
+
+OtherNetwork = Literal[
+  'Bitcoin',
+  'Bitcoin::ARC20',
+  'Bitcoin::BRC20',
+  'Bitcoin::Runes',
+  'Solana',
+  'The Open Network',
+  'Tron',
+  'Aptos',
+  'Cardano',
+  'Neo',
+  'Terra',
+  'Hyperliquid',
+  'Merlin',
+  'Starknet',
   'XRP',
-  'ZKSYNC',
-  'LINEA',
+  'Stacks',
+  'AB Core',
+  'Lightning',
+  'Litecoin',
+  'Noble',
+  'Dogecoin',
+  'Zcash',
+  'Cosmos',
+  'Tezos',
 ]
+OTHER_NETWORKS: set[OtherNetwork] = set(OtherNetwork)
+Network = EthereumNetwork | OtherNetwork
 
-NETWORK_NAMES: dict[Network, str] = {
-  'BTC': 'Bitcoin',
-  'BSC': 'Binance Smart Chain',
-  'ETH': 'Ethereum',
-  'POL': 'Polygon',
-  'TRX': 'Tron',
-  'ARB': 'Arbitrum',
-  'BASE': 'Base',
-  'AVAX': 'Avalanche',
-  'SOL': 'Solana',
-  'FTM': 'Fantom',
-  'OP': 'Optimism',
-  'TON': 'The Open Network',
-  'SONIC': 'Sonic',
-  'XTZ': 'Tezos',
-  'CORE': 'Core',
-  'CELO': 'Celo',
-  'NEAR': 'Near',
-  'MNT': 'Mantle',
-  'UNI': 'Unichain',
-  'APTOS': 'Aptos',
-  'SUI': 'Sui',
-  'XRP': 'XRP',
-  'ZKSYNC': 'ZKsync',
-  'LINEA': 'Linea',
-}
+
 
 def is_network(s: str) -> TypeGuard[Network]:
-  return s in NETWORK_NAMES
+  return s in OTHER_NETWORKS or is_ethereum_network(s)
