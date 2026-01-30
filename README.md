@@ -28,7 +28,7 @@ pip install mexc-trading-sdk # or others, see below
 1. Define your strategy.
 
 ```python
-from trading_sdk import Market
+from sdk import Market
 
 async def strategy(market: Market):
   while True:
