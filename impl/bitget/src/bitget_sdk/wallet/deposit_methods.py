@@ -5,7 +5,7 @@ from sdk.wallet.deposit_methods import (
 	DepositMethod,
 	DepositMethods as _DepositMethods,
 )
-from bitget_sdk.core import SdkMixin, parse_network
+from bitget_sdk.core import SdkMixin
 from bitget.spot.public.coins import CoinChain, CoinInfo
 
 
@@ -28,9 +28,7 @@ def _parse_coins_response_deposits(
 		for ch in chains:
 			if not _rechargeable(ch):
 				continue
-			network = parse_network(ch["chain"])
-			if network is None:
-				continue
+			network = ch["chain"]
 			fee = DepositMethod.Fee(asset=coin, amount=Decimal("0"))
 			contract = ch.get("contractAddress")
 			contract_address = str(contract) if contract is not None else None

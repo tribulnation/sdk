@@ -2,11 +2,10 @@ from decimal import Decimal
 from typing_extensions import Sequence
 
 from sdk.wallet.withdrawal_methods import (
-	Network,
 	WithdrawalMethod,
 	WithdrawalMethods as _WithdrawalMethods,
 )
-from bitget_sdk.core import SdkMixin, parse_network
+from bitget_sdk.core import SdkMixin
 from bitget.spot.public.coins import CoinChain, CoinInfo
 
 
@@ -26,9 +25,7 @@ def _parse_coins_response(raw: list[CoinInfo]) -> Sequence[WithdrawalMethod]:
 		for ch in chains:
 			if not _withdrawable(ch):
 				continue
-			network = parse_network(ch['chain'])
-			if network is None:
-				continue
+			network = ch['chain']
 			fee_amount = _to_decimal(ch['withdrawFee'])
 			fee = WithdrawalMethod.Fee(asset=coin, amount=fee_amount)
 			contract = ch['contractAddress']
@@ -50,7 +47,7 @@ class WithdrawalMethods(SdkMixin, _WithdrawalMethods):
 		self,
 		*,
 		assets: Sequence[str] | None = None,
-		networks: Sequence[Network] | None = None,
+		networks: Sequence[str] | None = None,
 	) -> Sequence[WithdrawalMethod]:
 		r = await self.client.spot.public.coins()
 		parsed = _parse_coins_response(r)

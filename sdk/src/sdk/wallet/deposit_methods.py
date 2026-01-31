@@ -1,7 +1,7 @@
 from typing_extensions import Protocol, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
-from sdk.core import SDK, Network
+from sdk.core import SDK
 
 @dataclass(kw_only=True)
 class DepositMethod:
@@ -11,7 +11,7 @@ class DepositMethod:
     amount: Decimal
 
   asset: str
-  network: Network
+  network: str
   fee: Fee | None
   contract_address: str | None = None
   min_confirmations: int | None = None

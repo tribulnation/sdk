@@ -1,7 +1,7 @@
 from typing_extensions import Protocol, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
-from sdk.core import SDK, Network
+from sdk.core import SDK
 
 @dataclass(kw_only=True)
 class WithdrawalMethod:
@@ -12,14 +12,14 @@ class WithdrawalMethod:
 
   asset: str
   contract_address: str | None = None
-  network: Network
+  network: str
   fee: Fee | None
 
 class WithdrawalMethods(SDK, Protocol):
   @SDK.method
   async def withdrawal_methods(
     self, *, assets: Sequence[str] | None = None,
-    networks: Sequence[Network] | None = None
+    networks: Sequence[str] | None = None
   ) -> Sequence[WithdrawalMethod]:
     """Get withdrawal methods.
 

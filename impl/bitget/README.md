@@ -5,5 +5,5 @@
 ## Installation
 
 ```bash
-pip install bitget-sdk
+pip install bitget-trading-sdk
 ```
