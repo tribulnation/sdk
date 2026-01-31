@@ -17,7 +17,7 @@ class Balance:
 class Balances(Protocol):
   async def balance(self, currency: str, /) -> Balance:
     """Get the balance of the given currency."""
-    return (await self.balances(currency))[currency]
+    return (await self.balances(currency)).get(currency) or Balance(free=Decimal(0), locked=Decimal(0))
 
   async def balances(self, *currencies: S) -> Mapping[S, Balance]:
     """Get the balances of the given currencies. If no currencies are provided, get all balances."""
