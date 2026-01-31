@@ -8,7 +8,7 @@ version = "0.1.0"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
-description = "Tribulnation SDK implementation for Bitget."
+description = "Tribulnation SDK implementation for Binance."
 dependencies = [
   "typed-binance", "trading-sdk"
 ]

@@ -37,6 +37,7 @@ from sdk.earn.instruments import (
 )
 from binance_sdk.core import SdkMixin
 
+BINANCE_EARN_URL = 'https://www.binance.com/earn'
 
 def _to_decimal(v: Decimal | str | int) -> Decimal:
   if isinstance(v, Decimal):
@@ -55,7 +56,7 @@ def _parse_flexible_row(row: dict) -> Flexible:
     yield_asset=asset,
     min_qty=min_qty,
     max_qty=None,
-    url=None,
+    url=BINANCE_EARN_URL,
   )
 
 
@@ -76,7 +77,7 @@ def _parse_fixed_row(row: dict) -> Fixed:
     yield_asset=yield_asset,
     min_qty=min_qty,
     max_qty=max_qty,
-    url=None,
+    url=BINANCE_EARN_URL,
     duration=duration,
   )
 
