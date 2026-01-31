@@ -9,6 +9,7 @@ from sdk.earn.instruments import (
 	Instruments as _Instruments,
 	InstrumentType,
 )
+from bitget.earn.savings.products import Product
 from bitget_sdk.core import SdkMixin
 
 BITGET_SAVINGS_URL = 'https://www.bitget.com/earning/savings'
@@ -16,7 +17,7 @@ BITGET_SAVINGS_URL = 'https://www.bitget.com/earning/savings'
 def _to_decimal(v: Decimal | str) -> Decimal:
 	return v if isinstance(v, Decimal) else Decimal(str(v))
 
-def _parse_product(raw: dict) -> Sequence[Instrument]:
+def _parse_product(raw: Product) -> Sequence[Instrument]:
 	coin = raw['coin']
 	period_type = raw['periodType']
 	apy_list = raw['apyList']
@@ -41,6 +42,7 @@ def _parse_product(raw: dict) -> Sequence[Instrument]:
 				url=BITGET_SAVINGS_URL,
 			))
 		else:
+			assert duration is not None
 			out.append(Fixed(
 				type='fixed',
 				asset=coin,

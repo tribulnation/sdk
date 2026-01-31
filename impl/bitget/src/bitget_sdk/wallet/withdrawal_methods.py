@@ -7,7 +7,7 @@ from sdk.wallet.withdrawal_methods import (
 	WithdrawalMethods as _WithdrawalMethods,
 )
 from bitget_sdk.core import SdkMixin, parse_network
-from bitget.spot.market.coins import CoinChain, CoinInfo
+from bitget.spot.public.coins import CoinChain, CoinInfo
 
 
 def _to_decimal(v: Decimal | str) -> Decimal:
@@ -52,7 +52,7 @@ class WithdrawalMethods(SdkMixin, _WithdrawalMethods):
 		assets: Sequence[str] | None = None,
 		networks: Sequence[Network] | None = None,
 	) -> Sequence[WithdrawalMethod]:
-		r = await self.client.spot.market.coins()
+		r = await self.client.spot.public.coins()
 		parsed = _parse_coins_response(r)
 		if assets is not None:
 			assets_set = set(assets)

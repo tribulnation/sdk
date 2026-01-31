@@ -31,7 +31,7 @@ Instrument = Flexible | Fixed
 
 class Instruments(SDK, Protocol):
   @SDK.method
-  def instruments(
+  async def instruments(
     self, *, types: Sequence[InstrumentType] | None = None,
     assets: Sequence[str] | None = None,
   ) -> Sequence[Instrument]:

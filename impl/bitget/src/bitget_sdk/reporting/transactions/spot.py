@@ -8,7 +8,7 @@ from sdk.reporting.transactions import (
   Transaction, Trade, CryptoDeposit, CryptoWithdrawal, Fee
 )
 from bitget import Bitget
-from bitget.spot.market.symbols import Symbol
+from bitget.spot.public.symbols import Symbol
 
 DEFAULT_TRANSACTION_TYPES: dict[str, Flow.Label] = {
   'Buy': 'trade',
@@ -46,7 +46,7 @@ class SpotTransactions:
   @property
   async def symbols_map(self) -> dict[str, Symbol]:
     if self.symbols is None:
-      self.symbols = {s['symbol']: s for s in await self.client.spot.market.symbols()}
+      self.symbols = {s['symbol']: s for s in await self.client.spot.public.symbols()}
     return self.symbols
 
   def transaction_type(self, type: str) -> Flow.Label | None:
@@ -104,7 +104,7 @@ class SpotTransactions:
 
   @Stream.lift
   async def deposits(self, start: datetime, end: datetime):
-    async for chunk in self.client.spot.account.deposit_records_paged(start, end):
+    async for chunk in self.client.spot.wallet.deposit_records_paged(start, end):
       for deposit in chunk:
         if deposit['dest'] != 'on_chain' or deposit['status'] != 'success':
           continue
@@ -120,7 +120,7 @@ class SpotTransactions:
   
   @Stream.lift
   async def withdrawals(self, start: datetime, end: datetime):
-    async for chunk in self.client.spot.account.withdrawal_records_paged(start, end):
+    async for chunk in self.client.spot.wallet.withdrawal_records_paged(start, end):
       for withdrawal in chunk:
         if withdrawal['dest'] != 'on_chain' or withdrawal['status'] != 'success':
           continue

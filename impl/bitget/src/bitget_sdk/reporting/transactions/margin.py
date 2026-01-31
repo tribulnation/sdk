@@ -8,7 +8,7 @@ from sdk.reporting.transactions import (
   Transaction, Trade, Fee
 )
 from bitget import Bitget
-from bitget.spot.market.symbols import Symbol
+from bitget.spot.public.symbols import Symbol
 
 DEFAULT_TRANSACTION_TYPES: dict[str, Flow.Label] = {
   'margin_coupon_profit': 'bonus',
@@ -30,7 +30,7 @@ class MarginTransactions:
   @property
   async def symbols_map(self) -> dict[str, Symbol]:
     if self.symbols is None:
-      self.symbols = {s['symbol']: s for s in await self.client.spot.market.symbols()}
+      self.symbols = {s['symbol']: s for s in await self.client.spot.public.symbols()}
     return self.symbols
 
   def transaction_type(self, type: str) -> Flow.Label | None:

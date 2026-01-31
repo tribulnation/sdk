@@ -36,6 +36,7 @@ OtherNetwork = Literal[
   'Zcash',
   'Cosmos',
   'Tezos',
+  'Sui',
 ]
 OTHER_NETWORKS: set[OtherNetwork] = set(OtherNetwork)
 Network = EthereumNetwork | OtherNetwork

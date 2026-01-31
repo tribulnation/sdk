@@ -6,7 +6,7 @@ from sdk.wallet.deposit_methods import (
 	DepositMethods as _DepositMethods,
 )
 from bitget_sdk.core import SdkMixin, parse_network
-from bitget.spot.market.coins import CoinChain, CoinInfo
+from bitget.spot.public.coins import CoinChain, CoinInfo
 
 
 def _rechargeable(chain: CoinChain) -> bool:
@@ -57,5 +57,5 @@ class DepositMethods(SdkMixin, _DepositMethods):
 	async def deposit_methods(
 		self, *, assets: Sequence[str] | None = None,
 	) -> Sequence[DepositMethod]:
-		r = await self.client.spot.market.coins()
+		r = await self.client.spot.public.coins()
 		return _parse_coins_response_deposits(r, assets=assets)
