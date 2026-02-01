@@ -16,7 +16,7 @@ requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}
 
 [project.urls]
-repo = "https://github.com/tribulnation/REPO.git"
+repo = "https://github.com/tribulnation/sdk.git"
 
 # [project.optional-dependencies]
 # test = [
