@@ -18,6 +18,8 @@ def _to_decimal(v: Decimal | str) -> Decimal:
 	return v if isinstance(v, Decimal) else Decimal(str(v))
 
 def _parse_product(raw: Product) -> Sequence[Instrument]:
+	if raw['status'] != 'in_progress':
+		return []
 	coin = raw['coin']
 	period_type = raw['periodType']
 	apy_list = raw['apyList']
