@@ -30,7 +30,7 @@ def _parse_product(raw: Product) -> Sequence[Instrument]:
 
 	out: list[Instrument] = []
 	for tier in apy_list:
-		apr = _to_decimal(tier['currentApy'])
+		apr = _to_decimal(tier['currentApy']) / 100
 		min_qty = _to_decimal(tier['minStepVal'])
 		max_qty = _to_decimal(tier['maxStepVal'])
 		if period_type == 'flexible':
