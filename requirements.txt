@@ -3,3 +3,7 @@ twine
 ipykernel
 pyright
 -e sdk
+-e impl/binance
+-e impl/bitget
+-e impl/kraken
+-e impl/mexc

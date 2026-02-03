@@ -104,7 +104,7 @@ class FinancialProduct(BaseModel):
 	profitCurrencyIcon: str | None = None
 	minPledgeQuantity: str
 	perPledgeMaxQuantity: str  # "-1" means no max
-	userPledgeQuantityFull: bool = False
+	userPledgeQuantityFull: bool | None = None
 	shareUrl: str | None = None
 
 	model_config = {"populate_by_name": True}
