@@ -77,6 +77,8 @@ class Instruments(_Instruments, SdkMixin):
 			if assets_set is not None and currency not in assets_set:
 				continue
 			for product in group.financialProductList:
+				if product.soldOut:
+					continue
 				invest_type = product.investPeriodType or product.financialType
 				if invest_type == "FIXED" and not include_fixed:
 					continue
