@@ -13,6 +13,7 @@ class BaseInstrument:
 	type: Type
 	asset: str
 	apr: Decimal
+	"""Anual Percent Rate, as a fraction of 1 (0.01 = 1%)"""
 	yield_asset: str
 	min_qty: Decimal | None = None
 	max_qty: Decimal | None = None

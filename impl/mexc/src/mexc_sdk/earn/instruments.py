@@ -25,7 +25,7 @@ def _to_decimal(v: str | int | Decimal) -> Decimal:
 
 def _parse_product(currency: str, product: FinancialProduct) -> Instrument:
 	asset = currency
-	apr = _to_decimal(product.baseApr or product.showApr or "0")
+	apr = _to_decimal(product.baseApr or product.showApr or "0") / 100
 	yield_asset = product.profitCurrency or asset
 	min_qty = _to_decimal(product.minPledgeQuantity)
 	per_max = product.perPledgeMaxQuantity
