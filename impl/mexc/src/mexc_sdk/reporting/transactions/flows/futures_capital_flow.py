@@ -2,7 +2,7 @@ from decimal import Decimal
 from datetime import timedelta, timezone
 import re
 import pandas as pd
-from sdk.reporting import Flow
+from tribulnation.sdk.reporting import Flow
 
 from .. import util
 

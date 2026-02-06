@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from decimal import Decimal
 from datetime import datetime
 
-from sdk.market.types import Side
-from sdk.core import ChunkedStream
+from tribulnation.sdk.market.types import Side
+from tribulnation.sdk.core import ChunkedStream
 
 @dataclass
 class Trade:

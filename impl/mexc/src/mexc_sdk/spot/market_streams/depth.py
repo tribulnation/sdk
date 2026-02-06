@@ -2,7 +2,7 @@ from typing_extensions import Literal
 from dataclasses import dataclass
 from decimal import Decimal
 
-from sdk.market.market_streams.depth import Depth as _Depth, Book
+from tribulnation.sdk.market.market_streams.depth import Depth as _Depth, Book
 from mexc_sdk.core import MarketMixin, wrap_exceptions
 
 def level(limit: int | None) -> Literal[5, 10, 20]:

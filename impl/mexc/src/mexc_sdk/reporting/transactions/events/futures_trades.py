@@ -4,7 +4,7 @@ from datetime import datetime, timezone, timedelta
 from collections import Counter
 import re
 import pandas as pd
-from sdk.reporting.transactions import FutureTrade, Fee
+from tribulnation.sdk.reporting.transactions import FutureTrade, Fee
 
 from .. import util
 

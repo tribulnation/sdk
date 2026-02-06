@@ -3,7 +3,7 @@ from decimal import Decimal
 from datetime import timezone, timedelta
 import re
 import pandas as pd
-from sdk.reporting import FiatDeposit, FiatWithdrawal
+from tribulnation.sdk.reporting import FiatDeposit, FiatWithdrawal
 
 from .. import util
 

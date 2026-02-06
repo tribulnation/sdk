@@ -1,7 +1,7 @@
 from typing_extensions import AsyncIterable, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from sdk.reporting import Transactions as _Transactions, Transaction
+from tribulnation.sdk.reporting import Transactions as _Transactions, Transaction
 
 from bitget_sdk.core import SdkMixin
 from .spot import SpotTransactions

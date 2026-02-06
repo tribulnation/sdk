@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-from sdk.market.user_data.balances import Balances as BalancesTDK, Balance
+from tribulnation.sdk.market.user_data.balances import Balances as BalancesTDK, Balance
 
 from mexc_sdk.core import SdkMixin, wrap_exceptions
 

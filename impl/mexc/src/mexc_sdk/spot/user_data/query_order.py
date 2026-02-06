@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-from sdk.market.trading.query_order import QueryOrder as _QueryOrder, OrderState
+from tribulnation.sdk.market.trading.query_order import QueryOrder as _QueryOrder, OrderState
 
 from mexc.spot.user_data.query_order import QueryOrder as Client
 from mexc.core import timestamp

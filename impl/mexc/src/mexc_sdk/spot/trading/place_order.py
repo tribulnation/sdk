@@ -1,8 +1,8 @@
 from typing_extensions import Literal
 from dataclasses import dataclass
 
-from sdk.core import fmt_num
-from sdk.market.trading.place_order import PlaceOrder as _PlaceOrder, Order as _Order, OrderState
+from tribulnation.sdk.core import fmt_num
+from tribulnation.sdk.market.trading.place_order import PlaceOrder as _PlaceOrder, Order as _Order, OrderState
 
 from mexc.spot.trading.place_order import Order, LimitOrder, MarketOrder
 from mexc_sdk.core import MarketMixin, wrap_exceptions

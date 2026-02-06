@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-from sdk.core import Num, fmt_num
+from tribulnation.sdk.core import Num, fmt_num
 
 from mexc.spot.trading.place_order import LimitOrder
 from mexc_sdk.core import MarketMixin, wrap_exceptions

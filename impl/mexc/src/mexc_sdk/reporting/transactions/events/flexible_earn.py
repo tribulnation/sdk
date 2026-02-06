@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from collections import Counter
 import re
 import pandas as pd
-from sdk.reporting import Yield
+from tribulnation.sdk.reporting import Yield
 
 from .. import util
 

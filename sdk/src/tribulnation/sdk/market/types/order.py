@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from datetime import datetime
 
-from sdk.core import Num
+from tribulnation.sdk.core import Num
 
 Side = Literal['BUY', 'SELL']
 

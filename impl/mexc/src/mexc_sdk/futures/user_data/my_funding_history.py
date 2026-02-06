@@ -3,8 +3,8 @@ from typing_extensions import AsyncIterable, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 
-from sdk.core import ApiError
-from sdk.market.user_data.my_funding_history import MyFundingHistory as _MyFundingHistory, Funding
+from tribulnation.sdk.core import ApiError
+from tribulnation.sdk.market.user_data.my_funding_history import MyFundingHistory as _MyFundingHistory, Funding
 
 from mexc.core import timestamp as ts
 from mexc_sdk.core import MarketMixin, wrap_exceptions

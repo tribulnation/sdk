@@ -2,7 +2,7 @@ from datetime import timedelta
 from decimal import Decimal
 from typing_extensions import Sequence
 
-from sdk.earn.instruments import (
+from tribulnation.sdk.earn.instruments import (
 	Fixed,
 	Flexible,
 	Instrument,

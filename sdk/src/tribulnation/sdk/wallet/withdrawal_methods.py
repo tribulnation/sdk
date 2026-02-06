@@ -1,10 +1,10 @@
 from typing_extensions import Protocol, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
-from sdk.core import SDK
+from tribulnation.sdk.core import SDK
 
 @dataclass(kw_only=True)
-class DepositMethod:
+class WithdrawalMethod:
   @dataclass
   class Fee:
     asset: str
@@ -12,16 +12,17 @@ class DepositMethod:
 
   asset: str
   network: str
-  fee: Fee | None
+  fee: Fee | None = None
   contract_address: str | None = None
-  min_confirmations: int | None = None
 
-class DepositMethods(SDK, Protocol):
+class WithdrawalMethods(SDK, Protocol):
   @SDK.method
-  async def deposit_methods(
+  async def withdrawal_methods(
     self, *, assets: Sequence[str] | None = None,
-  ) -> Sequence[DepositMethod]:
-    """Get deposit methods.
+    networks: Sequence[str] | None = None
+  ) -> Sequence[WithdrawalMethod]:
+    """Get withdrawal methods.
 
     - `assets`: optional filter by asset.
+    - `networks`: optional filter by network.
     """

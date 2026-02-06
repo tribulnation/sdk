@@ -13,7 +13,7 @@ from typing_extensions import Sequence
 
 from pydantic import BaseModel
 
-from sdk.earn.instruments import (
+from tribulnation.sdk.earn.instruments import (
     Fixed,
     Flexible,
     Instrument,

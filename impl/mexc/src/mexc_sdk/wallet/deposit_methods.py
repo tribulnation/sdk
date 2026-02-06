@@ -1,7 +1,7 @@
 from typing_extensions import Sequence
 from decimal import Decimal
 
-from sdk.wallet.deposit_methods import DepositMethod, DepositMethods as _DepositMethods
+from tribulnation.sdk.wallet.deposit_methods import DepositMethod, DepositMethods as _DepositMethods
 
 from mexc_sdk.core import SdkMixin, wrap_exceptions
 

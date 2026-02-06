@@ -1,7 +1,7 @@
 from decimal import Decimal
 from datetime import timezone
 import pandas as pd
-from sdk.reporting.transactions import CryptoDeposit
+from tribulnation.sdk.reporting.transactions import CryptoDeposit
 
 from .. import util
 

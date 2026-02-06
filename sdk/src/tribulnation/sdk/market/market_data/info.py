@@ -2,7 +2,7 @@ from typing_extensions import Protocol
 from dataclasses import dataclass
 from decimal import Decimal
 
-from sdk.core import trunc2tick
+from tribulnation.sdk.core import trunc2tick
 
 @dataclass
 class Information:

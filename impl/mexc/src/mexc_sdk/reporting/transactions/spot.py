@@ -1,7 +1,7 @@
 from typing_extensions import TypedDict, Required, Iterable
 from datetime import timezone
 
-from sdk.reporting.transactions import (
+from tribulnation.sdk.reporting.transactions import (
   SingleEvent, Event,
   Transaction, match_transactions
 )

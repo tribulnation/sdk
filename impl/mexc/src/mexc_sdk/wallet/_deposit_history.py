@@ -3,7 +3,7 @@ from typing_extensions import AsyncIterable, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 
-# from sdk.wallet.deposit_history import Deposit, DepositHistory as DepositHistoryTDK
+# from tribulnation.sdk.wallet.deposit_history import Deposit, DepositHistory as DepositHistoryTDK
 Deposit = dict
 class _DepositHistory:
   ...

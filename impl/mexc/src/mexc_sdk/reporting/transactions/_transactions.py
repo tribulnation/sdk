@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 import os
 
-from sdk.reporting import (
+from tribulnation.sdk.reporting import (
   Transaction, Transactions as TransactionsTDK
 )
 

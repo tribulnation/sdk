@@ -41,8 +41,8 @@ from decimal import Decimal
 import re
 from typing_extensions import Sequence
 
-from sdk.core import SDK
-from sdk.earn.instruments import (
+from tribulnation.sdk.core import SDK
+from tribulnation.sdk.earn.instruments import (
   Fixed,
   Flexible,
   Instrument,

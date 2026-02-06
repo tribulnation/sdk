@@ -1,6 +1,6 @@
 from typing_extensions import Protocol, AsyncIterable
 
-from sdk.market.market_data.depth import Book
+from tribulnation.sdk.market.market_data.depth import Book
 
 class Depth(Protocol):
   def depth_stream(self, *, limit: int | None = None) -> AsyncIterable[Book]:

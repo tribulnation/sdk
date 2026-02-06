@@ -1,5 +1,5 @@
 from typing_extensions import Protocol
-from sdk.core import SDK, Num, Network
+from tribulnation.sdk.core import SDK, Num, Network
 
 class Withdraw(SDK, Protocol):
   @SDK.method

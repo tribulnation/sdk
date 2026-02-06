@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
 
-from sdk.market.market_data.candles import Candles as _Candles, Candle
+from tribulnation.sdk.market.market_data.candles import Candles as _Candles, Candle
 
 from mexc.core import timestamp as ts
 from mexc.spot.market_data.candles import Interval

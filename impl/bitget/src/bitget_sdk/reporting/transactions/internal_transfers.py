@@ -3,7 +3,7 @@ from dataclasses import replace
 from datetime import timedelta
 from decimal import Decimal
 
-from sdk.reporting.transactions import InternalTransfer, Strategy, Transaction
+from tribulnation.sdk.reporting.transactions import InternalTransfer, Strategy, Transaction
 
 def _match_transfers_impl(
   transfers: dict[int, InternalTransfer], *,

@@ -1,7 +1,7 @@
 from typing_extensions import Protocol, Sequence, Literal, overload
 import asyncio
 
-from sdk.market.types import Order, OrderState
+from tribulnation.sdk.market.types import Order, OrderState
 
 ResponseModel = Literal['id', 'state']
 

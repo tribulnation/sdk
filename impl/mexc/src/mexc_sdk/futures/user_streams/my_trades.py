@@ -3,8 +3,8 @@ from decimal import Decimal
 from collections import defaultdict
 import asyncio
 
-from sdk.core import ApiError
-from sdk.market.user_streams.my_trades import MyTrades as _MyTrades, Trade
+from tribulnation.sdk.core import ApiError
+from tribulnation.sdk.market.user_streams.my_trades import MyTrades as _MyTrades, Trade
 
 from mexc.core import timestamp as ts
 from mexc_sdk.core import SdkMixin, wrap_exceptions, perp_name

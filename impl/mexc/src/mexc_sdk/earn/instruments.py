@@ -2,7 +2,7 @@ from datetime import timedelta
 from decimal import Decimal
 from typing_extensions import Sequence
 
-from sdk.earn.instruments import (
+from tribulnation.sdk.earn.instruments import (
 	Fixed,
 	Flexible,
 	Instrument,
@@ -80,7 +80,7 @@ class Instruments(_Instruments, SdkMixin):
 				if product.soldOut:
 					continue
 				invest_type = product.investPeriodType or product.financialType
-				if invest_type == "FIXED" and not include_fixed:
+				if invest_type == "FIXED": # and not include_fixed: -- MEXC fixed products are generally one-time, and this can't be differentiated from the data. so we just ignore them
 					continue
 				if invest_type != "FIXED" and not include_flexible:
 					continue

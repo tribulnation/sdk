@@ -1,7 +1,7 @@
 from typing_extensions import Protocol, Sequence
 import asyncio
 
-from sdk.market.types import OrderState
+from tribulnation.sdk.market.types import OrderState
 
 class CancelOrder(Protocol):
   async def cancel_order(self, id: str) -> OrderState:

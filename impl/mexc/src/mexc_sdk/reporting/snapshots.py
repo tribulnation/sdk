@@ -5,7 +5,7 @@ from decimal import Decimal
 from collections import Counter
 import asyncio
 
-from sdk.reporting import (
+from tribulnation.sdk.reporting import (
   Snapshot, Snapshots as SnapshotsTDK,
 )
 

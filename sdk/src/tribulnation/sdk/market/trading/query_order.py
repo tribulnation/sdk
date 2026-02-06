@@ -1,7 +1,7 @@
 from typing_extensions import Protocol, Sequence
 import asyncio
 
-from sdk.market.types import OrderState
+from tribulnation.sdk.market.types import OrderState
   
 class QueryOrder(Protocol):
   async def query_order(self, id: str) -> OrderState:

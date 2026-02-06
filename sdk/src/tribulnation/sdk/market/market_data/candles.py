@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from datetime import datetime, timedelta
 
-from sdk.core import ChunkedStream
+from tribulnation.sdk.core import ChunkedStream
 
 @dataclass
 class Candle:

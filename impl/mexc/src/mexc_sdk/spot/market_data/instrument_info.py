@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-from sdk.market.market_data.info import Info as _Info, Information
+from tribulnation.sdk.market.market_data.info import Info as _Info, Information
 
 from mexc_sdk.core import MarketMixin, wrap_exceptions
 

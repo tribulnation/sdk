@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from decimal import Decimal
 from datetime import datetime
 
-from sdk.market.trading.cancel_order import CancelOrder as _CancelOrder, OrderState
-from sdk.market.trading.query_order import OrderState
+from tribulnation.sdk.market.trading.cancel_order import CancelOrder as _CancelOrder, OrderState
+from tribulnation.sdk.market.trading.query_order import OrderState
 
 from mexc_sdk.core import MarketMixin, wrap_exceptions
 

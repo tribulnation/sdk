@@ -1,7 +1,7 @@
 from typing_extensions import Iterable, Protocol
 from datetime import timezone
 
-from sdk.reporting.transactions import Event
+from tribulnation.sdk.reporting.transactions import Event
 
 class Module(Protocol):
   @staticmethod

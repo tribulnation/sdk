@@ -6,7 +6,7 @@ from decimal import Decimal
 Withdrawal = dict
 class _WithdrawalHistory:
   ...
-# from sdk.wallet.withdrawal_history import Withdrawal, WithdrawalHistory as _WithdrawalHistory
+# from tribulnation.sdk.wallet.withdrawal_history import Withdrawal, WithdrawalHistory as _WithdrawalHistory
 
 from mexc.core import timestamp
 from mexc.spot.wallet.withdrawal_history import WithdrawalHistory as Client, Status

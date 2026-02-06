@@ -1,8 +1,8 @@
 from decimal import Decimal
 from typing_extensions import Sequence
 
-from sdk.core import SDK
-from sdk.wallet.deposit_methods import (
+from tribulnation.sdk.core import SDK
+from tribulnation.sdk.wallet.deposit_methods import (
     DepositMethod,
     DepositMethods as _DepositMethods,
 )

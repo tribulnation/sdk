@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-from sdk.market.market_data.depth import Depth as _Depth, Book
+from tribulnation.sdk.market.market_data.depth import Depth as _Depth, Book
 
 from mexc_sdk.core import MarketMixin, wrap_exceptions
 

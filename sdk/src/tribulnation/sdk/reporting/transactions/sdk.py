@@ -1,7 +1,7 @@
 from typing_extensions import Protocol, AsyncIterable, Sequence
 from datetime import datetime
 
-from sdk.core import ChunkedStream
+from tribulnation.sdk.core import ChunkedStream
 from .types import Transaction
 
 class Transactions(Protocol):

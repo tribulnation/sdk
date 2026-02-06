@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-from sdk.market.trading.open_orders import OpenOrders as _OpenOrders, OrderState
+from tribulnation.sdk.market.trading.open_orders import OpenOrders as _OpenOrders, OrderState
 
 from mexc.core import timestamp
 from mexc_sdk.core import MarketMixin, wrap_exceptions

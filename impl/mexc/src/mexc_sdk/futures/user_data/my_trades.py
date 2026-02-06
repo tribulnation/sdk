@@ -4,8 +4,8 @@ from functools import cache
 from datetime import datetime
 from decimal import Decimal
 
-from sdk.core import ApiError
-from sdk.market.user_data.my_trades import MyTrades as _MyTrades, Trade, Side as SideTDK
+from tribulnation.sdk.core import ApiError
+from tribulnation.sdk.market.user_data.my_trades import MyTrades as _MyTrades, Trade, Side as SideTDK
 
 from mexc.core import timestamp
 from mexc.futures.user_data.my_trades import Side

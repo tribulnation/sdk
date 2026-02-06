@@ -2,8 +2,8 @@ from typing_extensions import AsyncIterable
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from sdk.core import Stream, ChunkedStream
-from sdk.reporting.transactions import (
+from tribulnation.sdk.core import Stream, ChunkedStream
+from tribulnation.sdk.reporting.transactions import (
   Flow, match_transactions,
   Transaction, Trade, CryptoDeposit, CryptoWithdrawal, Fee
 )

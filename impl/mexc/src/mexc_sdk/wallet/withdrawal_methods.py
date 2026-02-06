@@ -2,7 +2,7 @@ from typing_extensions import Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 
-from sdk.wallet.withdrawal_methods import WithdrawalMethod, WithdrawalMethods as _WithdrawalMethods
+from tribulnation.sdk.wallet.withdrawal_methods import WithdrawalMethod, WithdrawalMethods as _WithdrawalMethods
 
 from mexc_sdk.core import SdkMixin, wrap_exceptions
 
