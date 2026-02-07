@@ -136,7 +136,6 @@ async def fetch_financial_products_list_v2() -> list[CurrencyGroup]:
 	async with httpx.AsyncClient(timeout=30.0) as client:
 		resp = await client.get(
 			MEXC_FINANCIAL_PRODUCTS_LIST_V2_URL,
-			headers={"User-Agent": "mexc-sdk/1.0"},
 		)
 		resp.raise_for_status()
 		body: Any = resp.json()
