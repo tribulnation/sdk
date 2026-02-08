@@ -7,7 +7,7 @@ from tribulnation.sdk.core import SDK
 
 @dataclass(kw_only=True)
 class Instrument:
-	Tag = Literal['flexible', 'fixed', 'one-time', 'new-users']
+	Tag = Literal['flexible', 'fixed', 'one-time', 'new-users', 'staking']
 	tags: Collection[Tag]
 	asset: str
 	apr: Decimal
