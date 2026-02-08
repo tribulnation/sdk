@@ -5,7 +5,7 @@ from tribulnation.sdk.wallet.withdrawal_methods import (
 	WithdrawalMethod,
 	WithdrawalMethods as _WithdrawalMethods,
 )
-from bitget_sdk.core import SdkMixin
+from bitget_sdk.core import SdkMixin, wrap_exceptions
 from bitget.spot.public.coins import CoinChain, CoinInfo
 
 
@@ -43,6 +43,7 @@ def _parse_coins_response(raw: list[CoinInfo]) -> Sequence[WithdrawalMethod]:
 
 
 class WithdrawalMethods(SdkMixin, _WithdrawalMethods):
+	@wrap_exceptions
 	async def withdrawal_methods(
 		self,
 		*,

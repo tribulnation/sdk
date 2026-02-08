@@ -5,7 +5,7 @@ from tribulnation.sdk.wallet.deposit_methods import (
 	DepositMethod,
 	DepositMethods as _DepositMethods,
 )
-from bitget_sdk.core import SdkMixin
+from bitget_sdk.core import SdkMixin, wrap_exceptions
 from bitget.spot.public.coins import CoinChain, CoinInfo
 
 
@@ -52,6 +52,7 @@ def _parse_coins_response_deposits(
 
 
 class DepositMethods(SdkMixin, _DepositMethods):
+	@wrap_exceptions
 	async def deposit_methods(
 		self, *, assets: Sequence[str] | None = None,
 	) -> Sequence[DepositMethod]:
