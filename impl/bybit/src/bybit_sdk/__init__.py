@@ -9,4 +9,4 @@ class Bybit(SdkMixin):
   earn: Earn = _field(init=False)
 
   def __post_init__(self):
-    self.earn = Earn(self.client)
+    self.earn = Earn(self.client, self.platform)
