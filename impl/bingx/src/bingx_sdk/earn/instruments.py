@@ -6,17 +6,13 @@ import uuid
 import hashlib
 from datetime import timedelta
 from decimal import Decimal
-from typing_extensions import Sequence
+from typing_extensions import Collection, Iterable, Sequence
 
 import httpx
+import pydantic
 
-from tribulnation.sdk.earn.instruments import (
-	Fixed,
-	Flexible,
-	Instrument,
-	Instruments as _Instruments,
-	InstrumentType,
-)
+from tribulnation.sdk.core import ApiError, NetworkError, ValidationError
+from tribulnation.sdk.earn.instruments import Instrument, Instruments as _Instruments
 
 BINGX_EARN_URL = "https://bingx.com/en-us/wealth"
 BINGX_APP_VERSION = os.environ.get("BINGX_APP_VERSION", "5.2.45")
@@ -31,12 +27,6 @@ _ENCRYPTION_KEYS = {
 	"p2": "0ae9018fb7",
 	"p3": "f2eab69",
 }
-
-
-def _to_decimal(v: str | int | Decimal) -> Decimal:
-	if isinstance(v, Decimal):
-		return v
-	return Decimal(str(v))
 
 
 def _clean_object(obj: object) -> object:
@@ -89,8 +79,47 @@ def _build_sign(*, timestamp: int, trace_id: str, device_id: str, platform_id: s
 	)
 	return hashlib.sha256(encryption.encode("utf-8")).hexdigest().upper()
 
+class TierRule(pydantic.BaseModel):
+	model_config = {"extra": "ignore"}
+	low: Decimal | None = None
+	high: Decimal | None = None
+	apy: Decimal
+	level: int | None = None
 
-async def _fetch_product_list() -> dict:
+class TieredApyRule(pydantic.BaseModel):
+	model_config = {"extra": "ignore"}
+	rules: list[TierRule] = []
+
+class Product(pydantic.BaseModel):
+	model_config = {"extra": "ignore"}
+	productId: int | str
+	productType: int | None = None
+	duration: int | str | None = None
+	productName: str | None = None
+	apy: Decimal
+	soldOut: int | bool = False
+	tieredApyRule: TieredApyRule | None = None
+
+class ProductGroup(pydantic.BaseModel):
+	model_config = {"extra": "ignore"}
+	assetName: str
+	products: list[Product] = []
+
+class ProductListData(pydantic.BaseModel):
+	model_config = {"extra": "ignore"}
+	result: list[ProductGroup] = []
+	searchResult: list[ProductGroup] | bool | None = None
+	total: int | None = None
+
+class ProductListResponse(pydantic.BaseModel):
+	model_config = {"extra": "ignore"}
+	code: int
+	timestamp: int | None = None
+	msg: str | None = None
+	data: ProductListData | None = None
+
+
+async def _fetch_product_list() -> ProductListResponse:
 	params = {"searchType": "", "dataType": "", "assetName": "", "orderBy": ""}
 	trace_id = uuid.uuid4().hex
 	device_id = os.environ.get("BINGX_DEVICE_ID", uuid.uuid4().hex)
@@ -122,89 +151,104 @@ async def _fetch_product_list() -> dict:
 	)
 
 	url = "https://api-app.qq-os.com/api/wealth-sales-trading/v1/product/list"
-	async with httpx.AsyncClient(timeout=30.0) as client:
-		r = await client.get(url, params=params, headers=headers)
-		r.raise_for_status()
-		return r.json()
+	try:
+		async with httpx.AsyncClient(timeout=30.0) as client:
+			r = await client.get(url, params=params, headers=headers)
+			r.raise_for_status()
+	except httpx.HTTPError as e:
+		raise NetworkError(*e.args) from e
+	try:
+		return ProductListResponse.model_validate(r.json())
+	except pydantic.ValidationError as e:
+		raise ValidationError(*e.args) from e
 
 
-def _parse_product_group(group: dict) -> list[Instrument]:
-	asset = group.get("assetName") or ""
+def _parse_duration(duration: int | str | None) -> timedelta | None:
+	if duration is None:
+		return None
+	try:
+		days = int(duration)
+	except (TypeError, ValueError):
+		return None
+	if days <= 0:
+		return None
+	return timedelta(days=days)
+
+
+def _parse_product_group(group: ProductGroup) -> Iterable[Instrument]:
+	asset = group.assetName or ""
 	out: list[Instrument] = []
 	if not asset:
 		return out
-	for product in group.get("products", []) or []:
-		if product.get("soldOut"):
+	for product in group.products:
+		if bool(product.soldOut):
 			continue
-		apy = product.get("apy") or "0"
-		apr = _to_decimal(apy) / Decimal("100")
-		duration = product.get("duration")
-		duration_days = None
-		if duration is not None:
-			try:
-				duration_days = int(duration)
-			except (TypeError, ValueError):
-				duration_days = None
-		is_fixed = duration_days is not None and duration_days > 0
-		tier_rules = (product.get("tieredApyRule") or {}).get("rules") or []
+		apr = Decimal(str(product.apy)) / Decimal("100")
+		duration = _parse_duration(product.duration)
+		is_fixed = duration is not None
+		tier_rules = (product.tieredApyRule.rules if product.tieredApyRule else [])
 		if tier_rules and not is_fixed:
 			for rule in tier_rules:
-				rule_apr = _to_decimal(rule.get("apy") or "0") / Decimal("100")
-				low = rule.get("low")
-				high = rule.get("high")
-				min_qty = _to_decimal(low) if low is not None else None
-				max_qty = _to_decimal(high) if high is not None else None
-				out.append(Flexible(
-					type="flexible",
-					asset=asset,
-					apr=rule_apr,
-					yield_asset=asset,
-					min_qty=min_qty,
-					max_qty=max_qty,
-					url=BINGX_EARN_URL,
-				))
+				rule_apr = Decimal(str(rule.apy)) / Decimal("100")
+				min_qty = Decimal(str(rule.low)) if rule.low is not None else None
+				max_qty = Decimal(str(rule.high)) if rule.high is not None else None
+				out.append(
+					Instrument(
+						tags=["flexible"],
+						asset=asset,
+						apr=rule_apr,
+						min_qty=min_qty,
+						max_qty=max_qty,
+						url=BINGX_EARN_URL,
+						id=str(product.productId),
+					)
+				)
 			continue
 
 		if is_fixed:
-			out.append(Fixed(
-				type="fixed",
-				asset=asset,
-				apr=apr,
-				yield_asset=asset,
-				min_qty=None,
-				max_qty=None,
-				url=BINGX_EARN_URL,
-				duration=timedelta(days=duration_days),
-			))
+			out.append(
+				Instrument(
+					tags=["fixed"],
+					asset=asset,
+					apr=apr,
+					min_qty=None,
+					max_qty=None,
+					url=BINGX_EARN_URL,
+					duration=duration,
+					id=str(product.productId),
+				)
+			)
 		else:
-			out.append(Flexible(
-				type="flexible",
-				asset=asset,
-				apr=apr,
-				yield_asset=asset,
-				min_qty=None,
-				max_qty=None,
-				url=BINGX_EARN_URL,
-			))
+			out.append(
+				Instrument(
+					tags=["flexible"],
+					asset=asset,
+					apr=apr,
+					min_qty=None,
+					max_qty=None,
+					url=BINGX_EARN_URL,
+					id=str(product.productId),
+				)
+			)
 	return out
 
 
 class Instruments(_Instruments):
 	async def instruments(
-		self, *, types: Sequence[InstrumentType] | None = None,
+		self, *, tags: Collection[Instrument.Tag] | None = None,
 		assets: Sequence[str] | None = None,
 	) -> Sequence[Instrument]:
 		data = await _fetch_product_list()
-		if data.get("code") not in (0, "0"):
-			raise RuntimeError(f"BingX API error: {data}")
-		result = data.get("data", {}).get("result", []) or []
+		if data.code != 0:
+			raise ApiError(f"BingX API error: {data}")
+		result = data.data.result if data.data else []
 		parsed: list[Instrument] = []
 		for group in result:
 			parsed.extend(_parse_product_group(group))
 
-		if types is not None:
-			types_set = set(types)
-			parsed = [p for p in parsed if p.type in types_set]
+		if tags is not None:
+			tags_set = set(tags)
+			parsed = [p for p in parsed if any(t in tags_set for t in p.tags)]
 		if assets is not None:
 			assets_set = set(assets)
 			parsed = [p for p in parsed if p.asset in assets_set]
