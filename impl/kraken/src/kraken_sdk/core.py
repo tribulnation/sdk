@@ -1,7 +1,39 @@
 import os
 from dataclasses import dataclass
+import inspect
 
 from ccxt.async_support import kraken
+from ccxt.base.errors import NetworkError, AuthenticationError, BaseError
+
+from tribulnation.sdk.core import AuthError, Error, NetworkError
+
+def wrap_exceptions(fn):
+  if inspect.iscoroutinefunction(fn):
+    async def wrapper(*args, **kwargs):
+      try:
+        return await fn(*args, **kwargs)
+      except NetworkError as e:
+        raise NetworkError(*e.args) from e
+      except AuthenticationError as e:
+        raise AuthError(*e.args) from e
+      except BaseError as e:
+        raise Error(*e.args) from e
+    return wrapper
+  elif inspect.isgeneratorfunction(fn):
+    async def wrapper(*args, **kwargs):
+      try:
+        async for item in fn(*args, **kwargs):
+          yield item
+      except NetworkError as e:
+        raise NetworkError(*e.args) from e
+      except AuthenticationError as e:
+          raise AuthError(*e.args) from e
+      except BaseError as e:
+        raise Error(*e.args) from e
+    return wrapper
+  else:
+    raise ValueError(f"Function {fn.__name__} is not a coroutine or generator function")
+    
 
 @dataclass
 class SdkMixin:
