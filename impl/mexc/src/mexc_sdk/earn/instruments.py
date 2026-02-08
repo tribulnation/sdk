@@ -1,89 +1,135 @@
+from typing_extensions import Sequence, Literal, Iterable
 from datetime import timedelta
 from decimal import Decimal
-from typing_extensions import Sequence
+import pydantic
+import httpx
 
-from tribulnation.sdk.earn.instruments import (
-	Fixed,
-	Flexible,
-	Instrument,
-	Instruments as _Instruments,
-	InstrumentType,
-)
-from mexc_sdk.core import SdkMixin, wrap_exceptions
-from mexc_sdk.earn._financial_products import (
-	CurrencyGroup,
-	FinancialProduct,
-	fetch_financial_products_list_v2,
-)
+from tribulnation.sdk.core import NetworkError, ValidationError, ApiError
+from tribulnation.sdk.earn.instruments import Instrument, Instruments as _Instruments
+from mexc_sdk.core import SdkMixin
+
+MEXC_EARN_URL = 'https://www.mexc.com/earn'
+
+class TieredSubsidyApr(pydantic.BaseModel):
+  model_config = {'extra': 'forbid'}
+  startQuantity: str
+  endQuantity: Decimal | None
+  apr: Decimal
+
+class FinancialProduct(pydantic.BaseModel):
+  model_config = {'extra': 'forbid'}
+  financialId: str
+  financialType: Literal['FLEXIBLE', 'FIXED', 'BLC_EARN']
+  investPeriodType: Literal['FLEXIBLE', 'FIXED']
+  fixedInvestPeriodType: int | None = None
+  fixedInvestPeriodCount: int | None = None # days
+  currencyId: str
+  currency: str
+  currencyIcon: str
+  showApr: Decimal
+  showAprMaxTip: bool = False
+  subsidyTieredFlag: bool = False
+  baseApr: Decimal
+  subsidyApr: Decimal
+  tieredSubsidyApr: list[TieredSubsidyApr] | None = None
+  financialState: int
+  startTime: int
+  endTime: int | None
+  soldOut: bool
+  sort: int
+  memberType: Literal['NORMAL', 'EFTD']
+  """EFTD = New user"""
+  profitCurrency: str | None = None
+  profitCurrencyId: str | None = None
+  profitCurrencyIcon: str | None = None
+  minPledgeQuantity: Decimal
+  perPledgeMaxQuantity: Decimal
+  userPledgeQuantityFull: bool | None = None
+  shareUrl: str | None = None
 
 
-def _to_decimal(v: str | int | Decimal) -> Decimal:
-	if isinstance(v, Decimal):
-		return v
-	return Decimal(str(v))
+class CurrencyGroup(pydantic.BaseModel):
+  model_config = {'extra': 'forbid'}
+  currencyId: str
+  currency: str
+  currencyIcon: str
+  minApr: str
+  maxApr: str
+  hasAprRange: bool = False
+  investPeriodTypes: list[str]
+  financialProductList: list[FinancialProduct]
+  sort: int
+
+class FinancialProductsResponse(pydantic.BaseModel):
+  model_config = {'extra': 'forbid'}
+  data: list[CurrencyGroup] 
+  code: int = 0
+  msg: str = ""
+  timestamp: int = 0
 
 
-def _parse_product(currency: str, product: FinancialProduct) -> Instrument:
-	asset = currency
-	apr = _to_decimal(product.baseApr or product.showApr or "0") / 100
-	yield_asset = product.profitCurrency or asset
-	min_qty = _to_decimal(product.minPledgeQuantity)
-	per_max = product.perPledgeMaxQuantity
-	max_qty = None if str(per_max) == "-1" else _to_decimal(per_max)
-	invest_type = product.investPeriodType or product.financialType
+def parse_tags(product: FinancialProduct) -> Iterable[Instrument.Tag]:
+  if product.financialType == 'FIXED':
+    yield 'fixed'
+  else:
+    yield 'flexible'
+  if product.memberType == 'EFTD':
+    yield 'new-users'
 
-	url = product.shareUrl or 'https://www.mexc.com/earn'
+def parse_duration(product: FinancialProduct) -> timedelta | None:
+  if product.fixedInvestPeriodCount is not None:
+    return timedelta(days=product.fixedInvestPeriodCount)
+  return None
 
-	if invest_type == "FIXED":
-		days = product.fixedInvestPeriodCount
-		duration = timedelta(days=int(days)) if days is not None else timedelta()
-		return Fixed(
-			type="fixed",
-			asset=asset,
-			apr=apr,
-			yield_asset=yield_asset,
-			min_qty=min_qty,
-			max_qty=max_qty,
-			url=url,
-			duration=duration,
-		)
-	else:
-		return Flexible(
-			type="flexible",
-			asset=asset,
-			apr=apr,
-			yield_asset=yield_asset,
-			min_qty=min_qty,
-			max_qty=max_qty,
-			url=url,
-		)
-
+def parse_group(group: CurrencyGroup) -> Iterable[Instrument]:
+  for prod in group.financialProductList:
+    if not prod.soldOut:
+      tags = list(parse_tags(prod))
+      duration = parse_duration(prod)
+      apr = (prod.baseApr + prod.subsidyApr) / 100
+      for tier in (prod.tieredSubsidyApr or []):
+        if tier.apr:
+          yield Instrument(
+            asset=group.currency,
+            apr=apr + tier.apr/100,
+            yield_asset=prod.profitCurrency,
+            min_qty=prod.minPledgeQuantity,
+            max_qty=tier.endQuantity or prod.perPledgeMaxQuantity,
+            tags=tags,
+            duration=duration,
+            url=prod.shareUrl or MEXC_EARN_URL,
+          )
+      yield Instrument(
+        asset=group.currency,
+        apr=apr,
+        yield_asset=prod.profitCurrency,
+        min_qty=prod.minPledgeQuantity,
+        max_qty=prod.perPledgeMaxQuantity,
+        tags=tags,
+        url=prod.shareUrl or MEXC_EARN_URL,
+      )
 
 class Instruments(_Instruments, SdkMixin):
-	@wrap_exceptions
-	async def instruments(
-		self, *, types: Sequence[InstrumentType] | None = None,
-		assets: Sequence[str] | None = None,
-	) -> Sequence[Instrument]:
-		data = await fetch_financial_products_list_v2()
-		types_set = set(types) if types is not None else None
-		assets_set = set(assets) if assets is not None else None
-		include_flexible = types_set is None or "flexible" in types_set
-		include_fixed = types_set is None or "fixed" in types_set
+  async def instruments(
+    self, *, tags: Sequence[Instrument.Tag] | None = None,
+    assets: Sequence[str] | None = None,
+  ) -> Sequence[Instrument]:
+    
+    async with httpx.AsyncClient() as client:
+      r = await client.get('https://www.mexc.com/api/financialactivity/financial/products/list/V2')
+    if r.status_code != 200:
+      raise ApiError(f'MEXC API error: {r.status_code}')
+    try:
+      response: FinancialProductsResponse = FinancialProductsResponse.model_validate(r.json())
+    except pydantic.ValidationError as e:
+      raise ValidationError(*e.args) from e
 
-		out: list[Instrument] = []
-		for group in data:
-			currency = group.currency
-			if assets_set is not None and currency not in assets_set:
-				continue
-			for product in group.financialProductList:
-				if product.soldOut:
-					continue
-				invest_type = product.investPeriodType or product.financialType
-				if invest_type == "FIXED": # and not include_fixed: -- MEXC fixed products are generally one-time, and this can't be differentiated from the data. so we just ignore them
-					continue
-				if invest_type != "FIXED" and not include_flexible:
-					continue
-				inst = _parse_product(currency, product)
-				out.append(inst)
-		return out
+    if response.code != 0:
+      raise ApiError(f'MEXC API error: {response}')
+
+    out: list[Instrument] = []
+    for group in response.data:
+      for instr in parse_group(group):
+        if (assets is None or instr.asset in assets) and (tags is None or set(instr.tags).issubset(tags)):
+          out.append(instr)
+    return out
