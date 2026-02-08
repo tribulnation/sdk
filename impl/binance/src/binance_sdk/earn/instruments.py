@@ -1,4 +1,4 @@
-from typing_extensions import Sequence, Iterable
+from typing_extensions import Collection, Sequence, Iterable
 from datetime import timedelta
 from decimal import Decimal
 import re
@@ -121,8 +121,8 @@ class Instruments(SdkMixin, _Instruments):
 
   @SDK.method
   async def instruments(
-    self, *, tags: Sequence[Instrument.Tag] | None = None,
-    assets: Sequence[str] | None = None,
+    self, *, tags: Collection[Instrument.Tag] | None = None,
+    assets: Collection[str] | None = None,
   ) -> Sequence[Instrument]:
 
     out: list[Instrument] = []
