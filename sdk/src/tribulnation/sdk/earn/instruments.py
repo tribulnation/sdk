@@ -1,4 +1,4 @@
-from typing_extensions import Literal, Protocol, Collection, Sequence
+from typing_extensions import Literal, Protocol, Collection, Sequence, ClassVar
 from dataclasses import dataclass
 from decimal import Decimal
 from datetime import timedelta
@@ -7,8 +7,8 @@ from tribulnation.sdk.core import SDK
 
 @dataclass(kw_only=True)
 class Instrument:
-	Tag = Literal['flexible', 'fixed', 'one-time', 'new-users', 'staking']
-	tags: Collection[Tag]
+	Tag: ClassVar[type] = Literal['flexible', 'fixed', 'one-time', 'new-users', 'staking']
+	tags: Sequence[Tag]
 	asset: str
 	apr: Decimal
 	"""Annual Percent Rate, as a fraction of 1 (0.01 = 1%)"""
