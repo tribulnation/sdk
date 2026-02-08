@@ -79,7 +79,6 @@ def parse_tags(product: FinancialProduct) -> Iterable[Instrument.Tag]:
 def parse_duration(product: FinancialProduct) -> timedelta | None:
   if product.fixedInvestPeriodCount is not None:
     return timedelta(days=product.fixedInvestPeriodCount)
-  return None
 
 def parse_group(group: CurrencyGroup) -> Iterable[Instrument]:
   for prod in group.financialProductList:
@@ -106,6 +105,7 @@ def parse_group(group: CurrencyGroup) -> Iterable[Instrument]:
         min_qty=prod.minPledgeQuantity,
         max_qty=prod.perPledgeMaxQuantity,
         tags=tags,
+        duration=duration,
         url=prod.shareUrl or MEXC_EARN_URL,
       )
 
