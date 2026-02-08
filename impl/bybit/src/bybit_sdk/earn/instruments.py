@@ -50,85 +50,121 @@ class ByfiCoinsResponse(pydantic.BaseModel):
   result: ByfiCoinsResponseResult | None = None
 
 
-class ExploreProductInfo(pydantic.BaseModel):
+class EasyEarnProductTagInfo(pydantic.BaseModel):
   model_config = {'extra': 'ignore'}
-  product_type: int
-  apy_min_e8: str
-  apy_max_e8: str
-  duration_min_hour: int | None = None
-  duration_max_hour: int | None = None
-  value: str | None = None
+  display_on_country_code: str | None = None
+  display_tag_key: str | None = None
+  display_mode: int | None = None
+
+
+class EasyEarnProduct(pydantic.BaseModel):
+  model_config = {'extra': 'ignore'}
+  product_id: str
+  coin: int
+  return_coin: int | None = None
+  apy: str
+  product_tag_info: EasyEarnProductTagInfo | None = None
+  display_status: int | None = None
   tiered_apy_list: list[dict] = []
-  coin_x: int | None = None
-  coin_y: int | None = None
+  tiered_non_reward_apy_e8: str | None = None
+  interest_apy_e8: str | None = None
+  product_type: int | None = None
+  subscribe_start_at: str | None = None
+  subscribe_end_at: str | None = None
+  product_max_share: str | None = None
+  total_deposit_share: str | None = None
+  product_area: int | None = None
+  staking_term: str | None = None
+  is_fixed_term_loan_coin_product: bool | None = None
+  is_display_countdown: bool | None = None
+  is_vip: bool | None = None
+  mega_drop_msg: str | None = None
 
 
-class ExploreProtectedGroup(pydantic.BaseModel):
+class EasyEarnCoinProducts(pydantic.BaseModel):
   model_config = {'extra': 'ignore'}
-  apy_min_e8: str | None = None
-  apy_max_e8: str | None = None
-  product_infos: list[ExploreProductInfo]
-  coin_enum: int
+  coin: int
+  apy: str | None = None
+  saving_products: list[EasyEarnProduct]
 
 
-class ExploreProductsResult(pydantic.BaseModel):
+class EasyEarnProductsResult(pydantic.BaseModel):
   model_config = {'extra': 'ignore'}
   status_code: int
-  protected_list: list[ExploreProtectedGroup] = []
+  coin_products: list[EasyEarnCoinProducts] = []
+  total: int | None = None
 
 
-class ExploreProductsResponse(pydantic.BaseModel):
+class EasyEarnProductsResponse(pydantic.BaseModel):
   model_config = {'extra': 'ignore'}
   ret_code: int
   ret_msg: str | None = None
-  result: ExploreProductsResult | None = None
+  result: EasyEarnProductsResult | None = None
 
 
-def _parse_apr_e8(value: str | None) -> Decimal:
+def _parse_apr(value: str | None) -> Decimal:
   if not value:
     return Decimal('0')
-  return Decimal(value) / Decimal('100000000')
+  text = value.strip()
+  if text.endswith('%'):
+    text = text[:-1]
+  if not text:
+    return Decimal('0')
+  return Decimal(text) / Decimal('100')
 
 
-def _parse_duration(info: ExploreProductInfo) -> timedelta | None:
-  min_h = info.duration_min_hour
-  max_h = info.duration_max_hour
-  if min_h is None or max_h is None:
+def _parse_duration(product: EasyEarnProduct) -> timedelta | None:
+  if not product.staking_term:
     return None
-  if min_h <= 0 or max_h <= 0:
+  try:
+    days = int(product.staking_term)
+  except (TypeError, ValueError):
     return None
-  if min_h == max_h:
-    return timedelta(hours=max_h)
-  return None
+  if days <= 0:
+    return None
+  return timedelta(days=days)
 
 
-def _parse_tags(info: ExploreProductInfo) -> list[Instrument.Tag]:
-  duration = _parse_duration(info)
-  if duration is not None:
-    return ['fixed']
-  return ['flexible']
+def _parse_tags(product: EasyEarnProduct) -> list[Instrument.Tag]:
+  tags: list[Instrument.Tag] = []
+  if _parse_duration(product) is not None:
+    tags.append('fixed')
+  else:
+    tags.append('flexible')
+  tag_info = product.product_tag_info
+  if tag_info and tag_info.display_tag_key:
+    key = tag_info.display_tag_key.lower()
+    if 'newuser' in key or 'new_user' in key:
+      tags.append('new-users')
+  return tags
 
 
 def _parse_products(
-  group: ExploreProtectedGroup,
+  group: EasyEarnCoinProducts,
   *,
   symbol: str | None,
   url: str | None,
+  coin_map: dict[int, str],
 ) -> Iterable[Instrument]:
   if not symbol:
     return []
-  for info in group.product_infos:
-    duration = _parse_duration(info)
-    tags = _parse_tags(info)
-    apr = _parse_apr_e8(info.apy_max_e8)
+  for product in group.saving_products:
+    duration = _parse_duration(product)
+    tags = _parse_tags(product)
+    apr = _parse_apr(product.apy)
+    yield_asset = None
+    if product.return_coin is not None:
+      yield_asset = coin_map.get(product.return_coin)
     yield Instrument(
       tags=tags,
       asset=symbol,
       apr=apr,
+      yield_asset=yield_asset,
       min_qty=None,
       max_qty=None,
       duration=duration,
       url=url,
+      id=product.product_id,
     )
 
 
@@ -149,14 +185,14 @@ async def _fetch_coins(client: httpx.AsyncClient, *, base: str) -> ByfiCoinsResp
     raise ValidationError(*e.args) from e
 
 
-async def _fetch_explore_products(client: httpx.AsyncClient, *, base: str) -> ExploreProductsResponse:
+async def _fetch_easy_earn_products(client: httpx.AsyncClient, *, base: str) -> EasyEarnProductsResponse:
   data = await _fetch_json(
     client,
-    f'{base}/x-api/s1/byfi/get-explore-products',
-    json_body={'match_user_asset': False, 'sort_apr': 0},
+    f'{base}/x-api/s1/byfi/get-easy-earn-product-list',
+    json_body={},
   )
   try:
-    return ExploreProductsResponse.model_validate(data)
+    return EasyEarnProductsResponse.model_validate(data)
   except pydantic.ValidationError as e:
     raise ValidationError(*e.args) from e
 
@@ -169,7 +205,7 @@ class Instruments(SdkMixin, _Instruments):
     base, earn_url, headers = _platform_config(self.platform)
     async with httpx.AsyncClient(timeout=30.0, headers=headers) as client:
       coins_resp = await _fetch_coins(client, base=base)
-      products_resp = await _fetch_explore_products(client, base=base)
+      products_resp = await _fetch_easy_earn_products(client, base=base)
 
     if coins_resp.ret_code != 0:
       raise ApiError(f'Bybit API error: {coins_resp}')
@@ -187,10 +223,10 @@ class Instruments(SdkMixin, _Instruments):
           coins[coin_id] = entry.coin[1]
 
     out: list[Instrument] = []
-    groups = products_resp.result.protected_list if products_resp.result else []
+    groups = products_resp.result.coin_products if products_resp.result else []
     for group in groups:
-      symbol = coins.get(group.coin_enum)
-      for inst in _parse_products(group, symbol=symbol, url=earn_url):
+      symbol = coins.get(group.coin)
+      for inst in _parse_products(group, symbol=symbol, url=earn_url, coin_map=coins):
         if assets is not None and inst.asset not in assets:
           continue
         if tags is not None and not any(t in tags for t in inst.tags):
