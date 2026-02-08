@@ -1,39 +1,37 @@
-from typing_extensions import Literal, Sequence, Protocol
+from typing_extensions import Literal, Protocol, Collection, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 from datetime import timedelta
 
 from tribulnation.sdk.core import SDK
 
-InstrumentType = Literal['flexible', 'fixed']
-
 @dataclass(kw_only=True)
-class BaseInstrument:
-	Type = InstrumentType
-	type: Type
+class Instrument:
+	Tag = Literal['flexible', 'fixed', 'one-time', 'new-users']
+	tags: Collection[Tag]
 	asset: str
 	apr: Decimal
-	"""Anual Percent Rate, as a fraction of 1 (0.01 = 1%)"""
-	yield_asset: str
+	"""Annual Percent Rate, as a fraction of 1 (0.01 = 1%)"""
+	yield_asset: str | None = None
+	"""Asset that yields the interest. If not provided, it's the same as the subscribed asset."""
 	min_qty: Decimal | None = None
+	"""Minimum quantity of the asset to invest"""
 	max_qty: Decimal | None = None
+	"""Maximum quantity of the asset to invest"""
 	url: str | None = None
-	
-@dataclass(kw_only=True)
-class Flexible(BaseInstrument):
-	type: Literal['flexible'] = 'flexible'
-	
-@dataclass(kw_only=True)
-class Fixed(BaseInstrument):
-	type: Literal['fixed'] = 'fixed'
-	duration: timedelta
-
-Instrument = Flexible | Fixed
+	duration: timedelta | None = None
+	"""Duration of the instrument"""
+	id: str | None = None
+	"""Unique identifier for the instrument, if available."""
 
 class Instruments(SDK, Protocol):
   @SDK.method
   async def instruments(
-    self, *, types: Sequence[InstrumentType] | None = None,
-    assets: Sequence[str] | None = None,
+    self, *, tags: Collection[Instrument.Tag] | None = None,
+    assets: Collection[str] | None = None,
   ) -> Sequence[Instrument]:
-    ...
+    """Fetch instruments from the exchange.
+		
+		- `tags`: Filter by tags. Returns all assets matching at least one of the tags.
+		- `assets`: Filter by (subscription) assets.
+		"""
