@@ -17,7 +17,7 @@ def merge_positions(positions: list[Position]) -> Position | None:
     )
 
 @dataclass
-class MyPosition(_MyPosition, MarketMixin):
+class MyPosition(MarketMixin, _MyPosition):
   @wrap_exceptions
   async def position(self) -> Position | None:
     r = await self.client.futures.positions(self.instrument)

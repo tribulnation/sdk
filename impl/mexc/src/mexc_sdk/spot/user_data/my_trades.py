@@ -9,9 +9,9 @@ from mexc.core import timestamp
 from mexc_sdk.core import MarketMixin, wrap_exceptions
 
 @dataclass
-class MyTrades(_MyTrades, MarketMixin):
+class MyTrades(MarketMixin, _MyTrades):
   @wrap_exceptions
-  async def my_trades(
+  async def _my_trades_impl(
     self, start: datetime, end: datetime,
   ) -> AsyncIterable[Sequence[Trade]]:
     async for trades in self.client.spot.my_trades_paged(self.instrument, start=start, end=end):

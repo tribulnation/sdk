@@ -7,7 +7,7 @@ from tribulnation.sdk.wallet.withdrawal_methods import WithdrawalMethod, Withdra
 from mexc_sdk.core import SdkMixin, wrap_exceptions
 
 @dataclass
-class WithdrawalMethods(_WithdrawalMethods, SdkMixin):
+class WithdrawalMethods(SdkMixin, _WithdrawalMethods):
   @wrap_exceptions
   async def withdrawal_methods(
     self, *, assets: Sequence[str] | None = None,

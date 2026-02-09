@@ -19,42 +19,35 @@ def parse_side(side: Side) -> SideTDK:
       return 'SELL'
 
 @dataclass
-class MyTrades(_MyTrades, MarketMixin):
+class MyTrades(MarketMixin, _MyTrades):
   @wrap_exceptions
-  async def my_trades(
+  async def _my_trades_impl(
     self, start: datetime, end: datetime
   ) -> AsyncIterable[Sequence[Trade]]:
     page_size = 100
     page_num = 1
 
     r = await self.client.futures.contract_info(self.instrument)
-    if not 'data' in r:
-      raise ApiError(r)
-    else:
-      contract_size = r['data']['contractSize']
+    contract_size = Decimal(r['contractSize'])
 
     while True:
-      r = await self.client.futures.my_trades(self.instrument, start=start, end=end, page_size=page_size, page_num=page_num)
-      if not 'data' in r:
-        raise ApiError(r)
-      else:
-        trades = r['data']
-        yield [
-          Trade(
-            id=str(t['id']),
-            price=t['price'],
-            qty=t['vol'] * contract_size,
-            time=timestamp.parse(t['timestamp']),
-            side=parse_side(t['side']),
-            maker=not t['taker'],
-            fee=Trade.Fee(
-              asset=t['feeCurrency'],
-              amount=t['fee'],
-            ) if t['feeCurrency'] and t['fee'] else None,
-          )
-          for t in trades
-        ]
-        if len(trades) < page_size:
-          break
-        page_num += 1
+      trades = await self.client.futures.my_trades(self.instrument, start=start, end=end, page_size=page_size, page_num=page_num)
+      yield [
+        Trade(
+          id=str(t['id']),
+          price=t['price'],
+          qty=t['vol'] * contract_size,
+          time=timestamp.parse(t['timestamp']),
+          side=parse_side(t['side']),
+          maker=not t['taker'],
+          fee=Trade.Fee(
+            asset=t['feeCurrency'],
+            amount=t['fee'],
+          ) if t['feeCurrency'] and t['fee'] else None,
+        )
+        for t in trades
+      ]
+      if len(trades) < page_size:
+        break
+      page_num += 1
     

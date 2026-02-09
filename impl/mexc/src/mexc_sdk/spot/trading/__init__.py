@@ -1,8 +1,10 @@
 from dataclasses import dataclass as _dataclass
 
-from .place_order import PlaceOrder
 from .cancel_order import CancelOrder
+from .open_orders import OpenOrders
+from .place_order import PlaceOrder
+from .query_order import QueryOrder
 
 @_dataclass
-class Trading(PlaceOrder, CancelOrder):
+class Trading(CancelOrder, OpenOrders, PlaceOrder, QueryOrder):
   ...

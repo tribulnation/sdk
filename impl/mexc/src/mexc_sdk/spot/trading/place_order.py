@@ -6,7 +6,7 @@ from tribulnation.sdk.market.trading.place_order import PlaceOrder as _PlaceOrde
 
 from mexc.spot.trading.place_order import Order, LimitOrder, MarketOrder
 from mexc_sdk.core import MarketMixin, wrap_exceptions
-from ..user_data.query_order import query_order
+from .query_order import query_order
 
 def dump_order(order: _Order) -> Order:
   if order['type'] == 'LIMIT':
@@ -26,7 +26,7 @@ def dump_order(order: _Order) -> Order:
 @dataclass
 class PlaceOrder(_PlaceOrder, MarketMixin):
   @wrap_exceptions
-  async def place_order(self, order: _Order, *, response: Literal['id', 'state'] = 'id') -> str | OrderState:
+  async def _place_order_impl(self, order: _Order, *, response: Literal['id', 'state'] = 'id') -> str | OrderState:
     r = await self.client.spot.place_order(self.instrument, dump_order(order))
     if response == 'id':
       return r['orderId']

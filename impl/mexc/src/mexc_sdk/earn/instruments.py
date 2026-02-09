@@ -1,4 +1,4 @@
-from typing_extensions import Sequence, Literal, Iterable
+from typing_extensions import Sequence, Literal, Iterable, Collection
 from datetime import timedelta
 from decimal import Decimal
 import pydantic
@@ -117,8 +117,8 @@ def parse_group(group: CurrencyGroup) -> Iterable[Instrument]:
 
 class Instruments(_Instruments, SdkMixin):
   async def instruments(
-    self, *, tags: Sequence[Instrument.Tag] | None = None,
-    assets: Sequence[str] | None = None,
+    self, *, tags: Collection[Instrument.Tag] | None = None,
+    assets: Collection[str] | None = None,
   ) -> Sequence[Instrument]:
     
     async with httpx.AsyncClient() as client:

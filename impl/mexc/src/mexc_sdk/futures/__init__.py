@@ -9,4 +9,4 @@ class Futures(MarketData, UserData):
   user_streams: UserStreams = _field(init=False)
   
   def __post_init__(self):
-    self.user_streams = UserStreams(client=self.client)
+    self.user_streams = UserStreams(client=self.client, instrument=self.instrument)

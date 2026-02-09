@@ -6,7 +6,7 @@ from tribulnation.sdk.wallet.deposit_methods import DepositMethod, DepositMethod
 from mexc_sdk.core import SdkMixin, wrap_exceptions
 
 
-class DepositMethods(_DepositMethods, SdkMixin):
+class DepositMethods(SdkMixin, _DepositMethods):
 	@wrap_exceptions
 	async def deposit_methods(
 		self, *, assets: Sequence[str] | None = None,

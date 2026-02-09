@@ -1,3 +1,4 @@
+from typing_extensions import AsyncIterable
 from dataclasses import dataclass, field
 from decimal import Decimal
 from collections import defaultdict
@@ -9,7 +10,7 @@ from mexc.core import timestamp as ts
 from mexc_sdk.core import MarketMixin, wrap_exceptions
 
 @dataclass
-class MyTrades(_MyTrades, MarketMixin):
+class MyTrades(MarketMixin, _MyTrades):
   _queues: defaultdict[str, asyncio.Queue[Trade]] = field(default_factory=lambda: defaultdict(asyncio.Queue))
   _listener: asyncio.Task | None = None
 
@@ -20,7 +21,7 @@ class MyTrades(_MyTrades, MarketMixin):
     await super().__aexit__(exc_type, exc_value, traceback)
 
   @wrap_exceptions
-  async def my_trades_stream(self):
+  async def my_trades_stream(self) -> AsyncIterable[Trade]:
     if self._listener is None:
       async def listener():
         async for trade in self.client.spot.streams.my_trades():
@@ -41,4 +42,5 @@ class MyTrades(_MyTrades, MarketMixin):
       await asyncio.wait([t, self._listener], return_when='FIRST_COMPLETED')
       if self._listener.done() and (exc := self._listener.exception()) is not None:
         raise exc
-      yield await t
+      trade = await t
+      yield trade

@@ -16,7 +16,7 @@ def level(limit: int | None) -> Literal[5, 10, 20]:
     return 20
 
 @dataclass
-class Depth(_Depth, MarketMixin):
+class Depth(MarketMixin, _Depth):
   @wrap_exceptions
   async def depth_stream(self, *, limit: int | None = None):
     async for book in self.client.spot.streams.depth(self.instrument, level(limit)):
