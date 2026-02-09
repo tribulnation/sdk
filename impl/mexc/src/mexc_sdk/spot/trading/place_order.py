@@ -26,7 +26,7 @@ def dump_order(order: _Order) -> Order:
 @dataclass
 class PlaceOrder(_PlaceOrder, MarketMixin):
   @wrap_exceptions
-  async def _place_order(self, order: _Order, *, response: Literal['id', 'state'] = 'id') -> str | OrderState:
+  async def place_order(self, order: _Order, *, response: Literal['id', 'state'] = 'id') -> str | OrderState:
     r = await self.client.spot.place_order(self.instrument, dump_order(order))
     if response == 'id':
       return r['orderId']

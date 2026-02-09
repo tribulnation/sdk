@@ -1,9 +1,11 @@
 from dataclasses import dataclass as _dataclass
 
+from .candles import Candles
 from .depth import Depth
 from .instrument_info import InstrumentInfo
-from .candles import Candles
+from .time import Time
+from .trades import Trades
 
 @_dataclass
-class MarketData(Depth, InstrumentInfo, Candles):
+class MarketData(Candles, Depth, InstrumentInfo, Time, Trades):
   ...

@@ -80,20 +80,26 @@ def parse_duration(product: FinancialProduct) -> timedelta | None:
   if product.fixedInvestPeriodCount is not None:
     return timedelta(days=product.fixedInvestPeriodCount)
 
+def parse_qty(qty: Decimal) -> Decimal | None:
+  """Support for -1 indicating no limit"""
+  if qty > 0:
+    return qty
+
 def parse_group(group: CurrencyGroup) -> Iterable[Instrument]:
   for prod in group.financialProductList:
     if not prod.soldOut:
       tags = list(parse_tags(prod))
       duration = parse_duration(prod)
       apr = (prod.baseApr + prod.subsidyApr) / 100
+      min_qty = parse_qty(prod.minPledgeQuantity)
       for tier in (prod.tieredSubsidyApr or []):
         if tier.apr:
           yield Instrument(
             asset=group.currency,
             apr=apr + tier.apr/100,
             yield_asset=prod.profitCurrency,
-            min_qty=prod.minPledgeQuantity,
-            max_qty=tier.endQuantity or prod.perPledgeMaxQuantity,
+            min_qty=min_qty,
+            max_qty=parse_qty(tier.endQuantity or prod.perPledgeMaxQuantity),
             tags=tags,
             duration=duration,
             url=prod.shareUrl or MEXC_EARN_URL,
@@ -102,8 +108,8 @@ def parse_group(group: CurrencyGroup) -> Iterable[Instrument]:
         asset=group.currency,
         apr=apr,
         yield_asset=prod.profitCurrency,
-        min_qty=prod.minPledgeQuantity,
-        max_qty=prod.perPledgeMaxQuantity,
+        min_qty=min_qty,
+        max_qty=parse_qty(prod.perPledgeMaxQuantity),
         tags=tags,
         duration=duration,
         url=prod.shareUrl or MEXC_EARN_URL,

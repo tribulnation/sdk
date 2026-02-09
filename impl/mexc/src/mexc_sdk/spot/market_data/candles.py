@@ -28,7 +28,7 @@ def parse_interval(dt: timedelta) -> Interval:
 @dataclass
 class Candles(_Candles, MarketMixin):
   @wrap_exceptions
-  async def candles(
+  async def _candles_impl(
     self, *,
     interval: timedelta,
     start: datetime, end: datetime,
