@@ -80,18 +80,26 @@ def _build_sign(*, timestamp: int, trace_id: str, device_id: str, platform_id: s
 	return hashlib.sha256(encryption.encode("utf-8")).hexdigest().upper()
 
 class TierRule(pydantic.BaseModel):
-	model_config = {"extra": "ignore"}
+	model_config = {"extra": "allow"}
 	low: Decimal | None = None
 	high: Decimal | None = None
 	apy: Decimal
 	level: int | None = None
 
 class TieredApyRule(pydantic.BaseModel):
-	model_config = {"extra": "ignore"}
+	model_config = {"extra": "allow"}
 	rules: list[TierRule] = []
 
+class ProductTag(pydantic.BaseModel):
+	model_config = {"extra": "allow"}
+	tagId: int | None = None
+	tagType: int | None = None
+	tagDesc: str | None = None
+	tagAlertMsg: str | None = None
+	tagJumpUrl: str | None = None
+
 class Product(pydantic.BaseModel):
-	model_config = {"extra": "ignore"}
+	model_config = {"extra": "allow"}
 	productId: int | str
 	productType: int | None = None
 	duration: int | str | None = None
@@ -99,20 +107,21 @@ class Product(pydantic.BaseModel):
 	apy: Decimal
 	soldOut: int | bool = False
 	tieredApyRule: TieredApyRule | None = None
+	tags: list[ProductTag] | None = None
 
 class ProductGroup(pydantic.BaseModel):
-	model_config = {"extra": "ignore"}
+	model_config = {"extra": "allow"}
 	assetName: str
 	products: list[Product] = []
 
 class ProductListData(pydantic.BaseModel):
-	model_config = {"extra": "ignore"}
+	model_config = {"extra": "allow"}
 	result: list[ProductGroup] = []
 	searchResult: list[ProductGroup] | bool | None = None
 	total: int | None = None
 
 class ProductListResponse(pydantic.BaseModel):
-	model_config = {"extra": "ignore"}
+	model_config = {"extra": "allow"}
 	code: int
 	timestamp: int | None = None
 	msg: str | None = None
@@ -174,6 +183,23 @@ def _parse_duration(duration: int | str | None) -> timedelta | None:
 		return None
 	return timedelta(days=days)
 
+def _extract_tags(product: Product) -> tuple[list[Instrument.Tag], bool]:
+	tags: list[Instrument.Tag] = []
+	is_vip = False
+	for tag in (product.tags or []):
+		desc = (tag.tagDesc or "").strip()
+		if not desc:
+			continue
+		desc_lower = desc.lower()
+		if desc_lower == "vip":
+			is_vip = True
+			continue
+		if "new user" in desc_lower:
+			tags.append("new-users")
+		if "one-time" in desc_lower:
+			tags.append("one-time")
+	return tags, is_vip
+
 
 def _parse_product_group(group: ProductGroup) -> Iterable[Instrument]:
 	asset = group.assetName or ""
@@ -182,6 +208,9 @@ def _parse_product_group(group: ProductGroup) -> Iterable[Instrument]:
 		return out
 	for product in group.products:
 		if bool(product.soldOut):
+			continue
+		extra_tags, is_vip = _extract_tags(product)
+		if is_vip:
 			continue
 		apr = Decimal(str(product.apy)) / Decimal("100")
 		duration = _parse_duration(product.duration)
@@ -194,7 +223,7 @@ def _parse_product_group(group: ProductGroup) -> Iterable[Instrument]:
 				max_qty = Decimal(str(rule.high)) if rule.high is not None else None
 				out.append(
 					Instrument(
-						tags=["flexible"],
+						tags=["flexible", *extra_tags],
 						asset=asset,
 						apr=rule_apr,
 						min_qty=min_qty,
@@ -208,7 +237,7 @@ def _parse_product_group(group: ProductGroup) -> Iterable[Instrument]:
 		if is_fixed:
 			out.append(
 				Instrument(
-					tags=["fixed"],
+					tags=["fixed", *extra_tags],
 					asset=asset,
 					apr=apr,
 					min_qty=None,
@@ -221,7 +250,7 @@ def _parse_product_group(group: ProductGroup) -> Iterable[Instrument]:
 		else:
 			out.append(
 				Instrument(
-					tags=["flexible"],
+					tags=["flexible", *extra_tags],
 					asset=asset,
 					apr=apr,
 					min_qty=None,
