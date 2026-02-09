@@ -2,7 +2,7 @@ from typing_extensions import Protocol, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 
-@dataclass
+@dataclass(kw_only=True)
 class Book:
   @dataclass
   class Entry:
@@ -15,7 +15,7 @@ class Book:
     def __format__(self, fmt: str) -> str:
       return f'[{self.price:{fmt}}] {self.qty:{fmt}}'
 
-  id: str
+  id: str | None = None
   """Book Update ID"""
   bids: list[Entry]
   asks: list[Entry]
