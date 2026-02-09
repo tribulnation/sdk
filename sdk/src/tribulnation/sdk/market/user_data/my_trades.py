@@ -4,7 +4,7 @@ from decimal import Decimal
 from datetime import datetime
 
 from tribulnation.sdk.market.types import Side
-from tribulnation.sdk.core import ChunkedStream
+from tribulnation.sdk.core import ChunkedStream, SDK
 
 @dataclass
 class Trade:
@@ -21,7 +21,7 @@ class Trade:
   fee: Fee | None = None
   maker: bool | None = None
 
-class MyTrades(Protocol):
+class MyTrades(SDK):
   def my_trades(
     self, start: datetime, end: datetime,
   ) -> ChunkedStream[Trade]:

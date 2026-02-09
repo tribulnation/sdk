@@ -34,6 +34,9 @@ class PlaceOrder(Protocol):
     self, order: Order, *,
     response: Literal['id', 'state'] = 'id'
   ) -> str | OrderState:
+    return await self._place_order_impl(order, response=response)
+
+  async def _place_order_impl(self, order: Order, *, response: Literal['id', 'state'] = 'id') -> str | OrderState:
     ...
 
   @overload

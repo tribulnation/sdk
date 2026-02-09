@@ -1,21 +1,23 @@
-from typing_extensions import TypeVar, Callable, Coroutine, AsyncGenerator, Protocol, Generic, _ProtocolMeta
+from typing_extensions import TypeVar, Callable, Coroutine, AsyncGenerator, Protocol, Generic
+from typing_extensions import _ProtocolMeta # type: ignore
 from dataclasses import dataclass
 import asyncio
 import inspect
 
 T = TypeVar('T')
-Fn = TypeVar('Fn', bound=Callable[..., Coroutine|AsyncGenerator])
+AsyncFn = Callable[..., Coroutine|AsyncGenerator]
+Fn = TypeVar('Fn', bound=AsyncFn)
 
 @dataclass
 class Method(Generic[Fn]):
   fn: Fn
 
   def __get__(self, instance: object, owner: type) -> Fn:
-    return self.fn.__get__(instance, owner)
+    return self.fn.__get__(instance, owner) # type: ignore
 
 class SDKMeta(_ProtocolMeta):
-  def __init__(cls, name, bases, dct):
-    super().__init__(name, bases, dct)
+  def __new__(cls, name, bases, dct):
+    cls = super().__new__(cls, name, bases, dct)
     cls.__sdk_methods__ = {
       k for k, v in dct.items() if isinstance(v, Method)
     }
@@ -23,8 +25,10 @@ class SDKMeta(_ProtocolMeta):
       if (methods := getattr(base, '__sdk_methods__', None)) is not None:
         cls.__sdk_methods__.update(methods)
 
+    return cls
+
 class SDK(Protocol, metaclass=SDKMeta):
-  __sdk_methods__: set[str]
+  # __sdk_methods__: set[str]
 
   @classmethod
   def method(cls, fn: Fn) -> Fn:
@@ -42,13 +46,12 @@ def instrument(sdk: T, *mappers: Callable[[Fn], Fn]) -> T:
       instrument(value, *mappers)
   return sdk
 
-E = TypeVar('E', bound=Exception)
+E = TypeVar('E', bound=Exception, contravariant=True)
 
 class RetryLogger(Protocol, Generic[E]):
   def __call__(self, exception: E, *, retries: int, delay: float):
     ...
-
-def default_retry_logger(exception: E, *, retries: int, delay: float):
+def default_retry_logger(exception: Exception, *, retries: int, delay: float):
   print(f'Exponential retry [{retries=}, {delay=:.2f}s]. Exception:', exception)
 
 def exponential_retry(
@@ -73,7 +76,7 @@ def exponential_retry(
               if log is not None:
                 log(e, retries=retries, delay=delay)
               await asyncio.sleep(delay)
-        return exponential_retry_wrapped
+        return exponential_retry_wrapped # type: ignore
 
       else:
         return fn
@@ -81,32 +84,32 @@ def exponential_retry(
     return exponential_retry_wrapper
 
 class Logger(Protocol):
-  def __call__(self, function: Fn, args: tuple, kwargs: dict):
+  def __call__(self, function: AsyncFn, args: tuple, kwargs: dict):
     ...
 
-def default_logger(function: Fn, args: tuple, kwargs: dict):
+def default_logger(function: AsyncFn, args: tuple, kwargs: dict):
   print(f'Calling {function.__name__} with {args=}, {kwargs=}')
 
 def log(logger: Logger = default_logger) -> Callable[[Fn], Fn]:
   def log_wrapper(fn: Fn) -> Fn:
     if inspect.iscoroutinefunction(fn):
-      async def log_wrapped(*args, **kwargs):
+      async def coro_log_wrapped(*args, **kwargs):
         logger(fn, args, kwargs)
         return await fn(*args, **kwargs)
-      return log_wrapped
+      return coro_log_wrapped # type: ignore
 
     elif inspect.isasyncgenfunction(fn):
-      async def log_wrapped(*args, **kwargs):
+      async def agen_log_wrapped(*args, **kwargs):
         logger(fn, args, kwargs)
         async for x in fn(*args, **kwargs):
           yield x
-      return log_wrapped
+      return agen_log_wrapped # type: ignore
 
     elif inspect.isfunction(fn):
       def log_wrapped(*args, **kwargs):
         logger(fn, args, kwargs)
         return fn(*args, **kwargs)
-      return log_wrapped
+      return log_wrapped # type: ignore
 
     else:
       raise ValueError(f"Unexpected function type: {type(fn)}")

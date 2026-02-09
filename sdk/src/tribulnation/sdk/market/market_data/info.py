@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from tribulnation.sdk.core import trunc2tick
 
-@dataclass
+@dataclass(kw_only=True)
 class Information:
   tick_size: Decimal
   """Tick size of the price (in quote units)."""
@@ -18,6 +18,12 @@ class Information:
   """Minimum price of the order (in quote units)."""
   max_price: Decimal | None = None
   """Maximum price of the order (in quote units)."""
+  maker_fee: Decimal | None = None
+  """Maker fee of the order (in quote units)."""
+  taker_fee: Decimal | None = None
+  """Taker fee of the order (in quote units)."""
+  api: bool
+  """Whether the instrument can be traded via API."""
 
   @property
   def min_qty(self) -> Decimal:

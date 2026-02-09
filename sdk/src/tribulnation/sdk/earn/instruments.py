@@ -5,10 +5,12 @@ from datetime import timedelta
 
 from tribulnation.sdk.core import SDK
 
+InstrumentTag = Literal['flexible', 'fixed', 'one-time', 'new-users', 'staking']
+
 @dataclass(kw_only=True)
 class Instrument:
-	Tag: ClassVar[type] = Literal['flexible', 'fixed', 'one-time', 'new-users', 'staking']
-	tags: Sequence[Tag]
+	Tag: ClassVar = InstrumentTag
+	tags: Sequence[InstrumentTag]
 	asset: str
 	apr: Decimal
 	"""Annual Percent Rate, as a fraction of 1 (0.01 = 1%)"""
@@ -27,11 +29,12 @@ class Instrument:
 class Instruments(SDK, Protocol):
   @SDK.method
   async def instruments(
-    self, *, tags: Collection[Instrument.Tag] | None = None,
+    self, *, tags: Collection[InstrumentTag] | None = None,
     assets: Collection[str] | None = None,
   ) -> Sequence[Instrument]:
     """Fetch instruments from the exchange.
-		
-		- `tags`: Filter by tags. Returns all assets matching at least one of the tags.
-		- `assets`: Filter by (subscription) assets.
-		"""
+
+    - `tags`: Filter by tags. Returns all assets matching at least one of the tags.
+    - `assets`: Filter by (subscription) assets.
+    """
+    ...
