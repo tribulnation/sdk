@@ -20,10 +20,11 @@ class MyTrades(_MyTrades, MarketMixin):
     await super().__aexit__(exc_type, exc_value, traceback)
 
   @wrap_exceptions
-  async def my_trades(self):
+  async def my_trades_stream(self):
     if self._listener is None:
       async def listener():
-        async for trade in self.client.spot.streams.my_trades(self.instrument):
+        async for trade in self.client.spot.streams.my_trades():
+          if trade.symbol == self.instrument:
             t = Trade(
               id=trade.tradeId,
               price=Decimal(trade.price),
