@@ -75,7 +75,7 @@ def parse_locked(prod: LockedProduct) -> Iterable[Instrument]:
       raise LogicError(f'Multiple yield assets: {yield_assets}, instrument: {prod}')
     yield_asset = yield_assets.pop()
     yield Instrument(
-      tags=['locked'],
+      tags=['fixed'],
       asset=asset,
       apr=apr,
       yield_asset=yield_asset,
