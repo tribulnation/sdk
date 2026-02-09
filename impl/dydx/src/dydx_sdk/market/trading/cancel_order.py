@@ -12,8 +12,8 @@ from .query_order import query_order
 @dataclass
 class CancelOrder(MarketMixin, TradingMixin, _CancelOrder):
   @wrap_exceptions
-  async def cancel_order(self, instrument: str, /, *, id: str) -> OrderState:
-    order_id = OrderId.FromString(id) # type: ignore
+  async def cancel_order(self, id: str) -> OrderState:
+    order_id = OrderId.FromString(id.encode())
     if order_id.order_flags == OrderFlags.LONG_TERM:
       await self.node.cancel_order(order_id, unsafe=True)
     # else it's a short term order, which gets automatically canceled

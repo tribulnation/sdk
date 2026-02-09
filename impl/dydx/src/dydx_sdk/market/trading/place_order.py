@@ -6,8 +6,8 @@ from tribulnation.sdk.market.trading.place_order import (
   PlaceOrder as _PlaceOrder, Order as _Order, OrderState
 )
 
-from dydx.node.private.place_order import Order
-from dydx.core.types import PerpetualMarket, TimeInForce
+from dydx.node.private.place_order import Order, TimeInForce
+from dydx.core.types import PerpetualMarket
 from dydx_sdk.core import MarketMixin, TradingMixin, wrap_exceptions, perp_name
 from .query_order import query_order
 
@@ -32,7 +32,7 @@ def time_in_force(order: _Order) -> TimeInForce:
     case 'LIMIT':
       return 'GOOD_TIL_TIME'
     case 'MARKET':
-      return 'IOC'
+      return 'IMMEDIATE_OR_CANCEL'
 
 @dataclass
 class PlaceOrder(MarketMixin, TradingMixin, _PlaceOrder):
@@ -47,13 +47,13 @@ class PlaceOrder(MarketMixin, TradingMixin, _PlaceOrder):
     )
       
   @wrap_exceptions
-  async def place_order(
-    self, order: Order, *,
+  async def _place_order_impl(
+    self, order: _Order, *,
     response: Literal['id', 'state'] = 'id'
   ) -> str | OrderState:
     market = await self.fetch_market(self.market)
     r = await self.node.place_order(market, self.parse_order(order, market), unsafe=True)
-    id = r['order'].order_id.SerializeToString()
+    id = r['order'].order_id.SerializeToString().decode()
     if response == 'id':
       return id
     else:

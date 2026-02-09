@@ -13,9 +13,14 @@ class MyPosition(MarketMixin, UserDataMixin, _MyPosition):
   @wrap_exceptions
   async def position(self) -> Position | None:
     r = await self.indexer_data.list_positions(self.address, subaccount=self.subaccount, status='OPEN', unsafe=True)
+    for p in r['positions']:
+      if p['size'] < 0 and p['side'] == 'LONG':
+        raise LogicError(f'Found long position with negative size: {p}')
+      elif p['size'] > 0 and p['side'] == 'SHORT':
+        raise LogicError(f'Found short position with positive size: {p}')
+        
     positions = [
       Position(
-        side=p['side'],
         size=p['size'],
         entry_price=p['entryPrice'],
       )

@@ -62,8 +62,7 @@ class TradingMixin:
     indexer_url: str = INDEXER_HTTP_URL,
     validate: bool = True,
     limit_flags: Flags = 'LONG_TERM',
-    market_flags: Flags = 'SHORT_TERM',
   ):
     node = await PrivateNode.connect(mnemonic, url=node_url)
     indexer_data = IndexerData(url=indexer_url, default_validate=validate)
-    return cls(node=node, indexer_data=indexer_data, limit_flags=limit_flags, market_flags=market_flags)
+    return cls(node=node, indexer_data=indexer_data, limit_flags=limit_flags)

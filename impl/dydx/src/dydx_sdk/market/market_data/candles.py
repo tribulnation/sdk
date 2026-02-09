@@ -3,11 +3,10 @@ from dataclasses import dataclass
 from datetime import timedelta, datetime
 from decimal import Decimal
 
-from tribulnation.sdk.market.market_data.candles import Candles, Candle
-
+from tribulnation.sdk.market.market_data.candles import Candles as _Candles, Candle
 from dydx.core import timestamp as ts
 from dydx.indexer.data.get_candles import Resolution
-from dydx_sdk.core import MarketMixin, MarketDataMixin, wrap_exceptions, perp_name
+from dydx_sdk.core import MarketMixin, MarketDataMixin, wrap_exceptions
 
 def parse_interval(dt: timedelta) -> Resolution:
   if dt < timedelta(minutes=5):
@@ -24,9 +23,9 @@ def parse_interval(dt: timedelta) -> Resolution:
     return '1DAY'
   
 @dataclass
-class Candles(MarketDataMixin, MarketMixin, Candles):
+class Candles(MarketDataMixin, MarketMixin, _Candles):
   @wrap_exceptions
-  async def candles(
+  async def _candles_impl(
     self, *, interval: timedelta,
     start: datetime, end: datetime,
     limit: int | None = None
