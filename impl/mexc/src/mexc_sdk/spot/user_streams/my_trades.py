@@ -32,6 +32,7 @@ class MyTrades(MarketMixin, _MyTrades):
               qty=Decimal(trade.base_qty),
               time=ts.parse(trade.time),
               side=trade.side,
+              maker=trade.maker,
             )
             self._queues[trade.symbol].put_nowait(t)
       self._listener = asyncio.create_task(listener())

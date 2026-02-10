@@ -20,7 +20,7 @@ class MyTrades(MarketMixin, _MyTrades):
           id=t['id'],
           price=Decimal(t['price']),
           qty=Decimal(t['qty']),
-          time=timestamp.parse(t['time']),
+          time=timestamp.parse(t['time']).astimezone(),
           side='BUY' if t['isBuyer'] else 'SELL',
           maker=t['isMaker'],
           fee=Trade.Fee(
