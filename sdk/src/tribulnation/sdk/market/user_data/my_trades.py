@@ -21,7 +21,7 @@ class Trade:
   fee: Fee | None = None
   maker: bool | None = None
 
-class MyTrades(SDK):
+class MyTrades(SDK, Protocol):
   def my_trades(
     self, start: datetime, end: datetime,
   ) -> ChunkedStream[Trade]:

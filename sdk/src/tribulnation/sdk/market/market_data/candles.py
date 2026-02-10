@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from datetime import datetime, timedelta
 
-from tribulnation.sdk.core import ChunkedStream
+from tribulnation.sdk.core import ChunkedStream, SDK
 
 @dataclass
 class Candle:
@@ -15,7 +15,7 @@ class Candle:
   time: datetime
   quote_volume: Decimal | None = None
 
-class Candles(Protocol):
+class Candles(SDK, Protocol):
   def candles(
     self, *,
     interval: timedelta,

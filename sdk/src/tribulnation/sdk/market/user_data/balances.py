@@ -16,7 +16,7 @@ class Balance:
   def total(self) -> Decimal:
     return self.free + self.locked
 
-class Balances(SDK):
+class Balances(SDK, Protocol):
   async def balance(self, currency: str, /) -> Balance:
     """Get the balance of the given currency."""
     return (await self.balances(currency)).get(currency) or Balance(free=Decimal(0), locked=Decimal(0))

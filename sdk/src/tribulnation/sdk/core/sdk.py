@@ -28,7 +28,7 @@ class SDKMeta(_ProtocolMeta):
     return cls
 
 class SDK(Protocol, metaclass=SDKMeta):
-  # __sdk_methods__: set[str]
+  __sdk_methods__: set[str] = set()
 
   @classmethod
   def method(cls, fn: Fn) -> Fn:
