@@ -26,7 +26,7 @@ def parse_status(status: OrderStatus) -> _OrderStatus:
       raise ValueError(f'Unknown order status: {status}')
 
 async def query_order(indexer_data: IndexerData, *, address: str, instrument: str, id: str) -> OrderState:
-  order_id = OrderId.FromString(id.encode())
+  order_id = OrderId.FromString(bytes.fromhex(id))
   client_id = str(order_id.client_id)
   orders = await indexer_data.list_orders(address, ticker=instrument, unsafe=True)
   for o in orders:

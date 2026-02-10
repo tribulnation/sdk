@@ -53,7 +53,7 @@ class PlaceOrder(MarketMixin, TradingMixin, _PlaceOrder):
   ) -> str | OrderState:
     market = await self.fetch_market(self.market)
     r = await self.node.place_order(market, self.parse_order(order, market), unsafe=True)
-    id = r['order'].order_id.SerializeToString().decode()
+    id = r['order'].order_id.SerializeToString().hex()
     if response == 'id':
       return id
     else:
