@@ -1,4 +1,4 @@
-from typing_extensions import Protocol, AsyncIterable, Sequence
+from typing_extensions import Protocol, AsyncIterable, Sequence, Literal
 from dataclasses import dataclass
 from decimal import Decimal
 from datetime import datetime
@@ -20,6 +20,14 @@ class Trade:
   side: Side
   fee: Fee | None = None
   maker: bool | None = None
+
+  @property
+  def sign(self) -> Literal[-1, 1]:
+    return -1 if self.side == 'SELL' else 1
+
+  @property
+  def signed_qty(self) -> Decimal:
+    return self.qty * self.sign
 
 class MyTrades(SDK, Protocol):
   def my_trades(
