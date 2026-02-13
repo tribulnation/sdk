@@ -15,11 +15,15 @@ def wrap_exceptions(fn):
       try:
         return await fn(*args, **kwargs)
       except httpx.HTTPError as e:
-        raise NetworkError from e
+        raise NetworkError(*e.args) from e
+      except core.NetworkError as e:
+        raise NetworkError(*e.args) from e
       except pydantic.ValidationError as e:
-        raise ValidationError from e
+        raise ValidationError(*e.args) from e
       except core.ApiError as e:
-        raise ApiError from e
+        raise ApiError(*e.args) from e
+      except core.Error as e:
+        raise Error(*e.args) from e
       
   elif inspect.isgeneratorfunction(fn):
     @wraps(fn)
@@ -27,20 +31,28 @@ def wrap_exceptions(fn):
       try:
         return await fn(*args, **kwargs)
       except httpx.HTTPError as e:
-        raise NetworkError from e
+        raise NetworkError(*e.args) from e
+      except core.NetworkError as e:
+        raise NetworkError(*e.args) from e
       except pydantic.ValidationError as e:
-        raise ValidationError from e
+        raise ValidationError(*e.args) from e
       except core.ApiError as e:
-        raise ApiError from e
+        raise ApiError(*e.args) from e
+      except core.Error as e:
+        raise Error(*e.args) from e
   else:
     @wraps(fn)
     def wrapper(*args, **kwargs):
       try:
         return fn(*args, **kwargs)
       except httpx.HTTPError as e:
-        raise NetworkError from e
+        raise NetworkError(*e.args) from e
+      except core.NetworkError as e:
+        raise NetworkError(*e.args) from e
       except pydantic.ValidationError as e:
-        raise ValidationError from e
+        raise ValidationError(*e.args) from e
       except core.ApiError as e:
-        raise ApiError from e
+        raise ApiError(*e.args) from e
+      except core.Error as e:
+        raise Error(*e.args) from e
   return wrapper

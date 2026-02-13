@@ -1,7 +1,10 @@
-from typing_extensions import Literal, Protocol, Sequence
+from typing_extensions import Literal, Sequence
+from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
+
+from tribulnation.sdk import SDK
 
 @dataclass(kw_only=True)
 class Snapshot:
@@ -12,7 +15,9 @@ class Snapshot:
   avg_price: Decimal | None = None
   """Average entry price"""
 
-class Snapshots(Protocol):
+class Snapshots(SDK):
+  @SDK.method
+  @abstractmethod
   async def snapshots(self, assets: Sequence[str] = []) -> Sequence[Snapshot]:
     """Snapshot the portfolio of the account.
     

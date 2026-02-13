@@ -1,14 +1,15 @@
+from typing_extensions import Mapping
 from dataclasses import dataclass
 from decimal import Decimal
 
-from tribulnation.sdk.market.user_data.balances import Balances as _Balances, Balance
+from tribulnation.sdk.market.user_data.balance import Balances as _Balances, Balance
 
-from mexc_sdk.core import SdkMixin, wrap_exceptions
+from mexc_sdk.core import MarketMixin, wrap_exceptions
 
 @dataclass
-class Balances(SdkMixin, _Balances):
+class Balances(MarketMixin, _Balances):
   @wrap_exceptions
-  async def _balances_impl(self, *currencies: str) -> dict[str, Balance]:
+  async def _balances_impl(self, *currencies: str) -> Mapping[str, Balance]:
     r = await self.client.spot.account(recvWindow=self.recvWindow)
     return {
       b['asset']: Balance(
@@ -17,4 +18,7 @@ class Balances(SdkMixin, _Balances):
       )
       for b in r['balances']
     }
+
+  async def balance(self, currency: str, /) -> Balance:
+    return await super().balance(currency)
     

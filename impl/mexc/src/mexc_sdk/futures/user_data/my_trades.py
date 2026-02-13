@@ -1,22 +1,22 @@
-from typing_extensions import Sequence, AsyncIterable
+from typing_extensions import Sequence, AsyncIterable, Literal
 from dataclasses import dataclass
 from functools import cache
 from datetime import datetime
 from decimal import Decimal
 
 from tribulnation.sdk.core import ApiError
-from tribulnation.sdk.market.user_data.my_trades import MyTrades as _MyTrades, Trade, Side as SideTDK
+from tribulnation.sdk.market.user_data.my_trades import MyTrades as _MyTrades, Trade
 
 from mexc.core import timestamp
 from mexc.futures.user_data.my_trades import Side
 from mexc_sdk.core import MarketMixin, wrap_exceptions
 
-def parse_side(side: Side) -> SideTDK:
+def parse_side(side: Side) -> Literal[1, -1]:
   match side:
     case Side.open_long | Side.close_short:
-      return 'BUY'
+      return 1
     case Side.open_short | Side.close_long:
-      return 'SELL'
+      return -1
 
 @dataclass
 class MyTrades(MarketMixin, _MyTrades):
@@ -36,9 +36,8 @@ class MyTrades(MarketMixin, _MyTrades):
         Trade(
           id=str(t['id']),
           price=t['price'],
-          qty=t['vol'] * contract_size,
+          qty=t['vol'] * contract_size * parse_side(t['side']),
           time=timestamp.parse(t['timestamp']),
-          side=parse_side(t['side']),
           maker=not t['taker'],
           fee=Trade.Fee(
             asset=t['feeCurrency'],

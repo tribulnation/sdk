@@ -6,7 +6,7 @@ from tribulnation.sdk.market.market_data.depth import Depth as _Depth, Book
 from mexc_sdk.core import MarketMixin, wrap_exceptions
 
 @dataclass
-class Depth(_Depth, MarketMixin):
+class Depth(MarketMixin, _Depth):
   @wrap_exceptions
   async def depth(self, *, limit: int | None = None) -> Book:
     r = await self.client.spot.depth(self.instrument, limit=limit)

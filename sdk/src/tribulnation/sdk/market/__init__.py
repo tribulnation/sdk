@@ -7,7 +7,7 @@ from .trading import Trading
 from .user_data import UserData, PerpUserData
 from .user_streams import UserStreams
 
-class Market(SDK, Protocol):
+class Market(SDK):
   @property
   def market_data(self) -> MarketData: ...
   @property
@@ -19,7 +19,11 @@ class Market(SDK, Protocol):
   @property
   def user_streams(self) -> UserStreams: ...
 
-class PerpMarket(Market, Protocol):
+  @property
+  def id(self) -> str:
+    ...
+
+class PerpMarket(Market):
   @property
   def market_data(self) -> PerpMarketData: ...
   @property

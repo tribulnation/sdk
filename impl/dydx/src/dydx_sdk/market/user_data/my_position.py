@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from tribulnation.sdk.core import LogicError
-from tribulnation.sdk.market.user_data.positions import (
+from tribulnation.sdk.market.user_data.my_position import (
   MyPosition as _MyPosition, Position
 )
 

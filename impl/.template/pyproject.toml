@@ -16,10 +16,4 @@ requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}
 
 [project.urls]
-repo = "https://github.com/tribulnation/REPO.git"
-
-# [project.optional-dependencies]
-# test = [
-#   "pytest < 5.0.0",
-#   "pytest-cov[all]"
-# ]
+repo = "https://github.com/tribulnation/sdk.git"

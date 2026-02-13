@@ -1,4 +1,5 @@
-from typing_extensions import Protocol, Sequence, AsyncIterable
+from typing_extensions import Sequence, AsyncIterable
+from abc import abstractmethod
 from dataclasses import dataclass
 from decimal import Decimal
 from datetime import datetime, timedelta
@@ -15,7 +16,8 @@ class Candle:
   time: datetime
   quote_volume: Decimal | None = None
 
-class Candles(SDK, Protocol):
+class Candles(SDK):
+  @SDK.method
   def candles(
     self, *,
     interval: timedelta,
@@ -32,6 +34,7 @@ class Candles(SDK, Protocol):
     """
     return ChunkedStream(self._candles_impl(interval=interval, start=start, end=end, limit=limit))
   
+  @abstractmethod
   def _candles_impl(
     self, *,
     interval: timedelta,

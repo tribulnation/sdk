@@ -1,6 +1,9 @@
-from typing_extensions import Protocol, Sequence
+from typing_extensions import Sequence
+from abc import abstractmethod
 from dataclasses import dataclass
 from decimal import Decimal
+
+from tribulnation.sdk.core import SDK
 
 @dataclass(kw_only=True)
 class Book:
@@ -87,7 +90,9 @@ def avg_price(entries: Sequence[Book.Entry]) -> Decimal:
   total_qty = sum(e.qty for e in entries)
   return Decimal(total) / Decimal(total_qty)
 
-class Depth(Protocol):
+class Depth(SDK):
+  @SDK.method
+  @abstractmethod
   async def depth(self, *, limit: int | None = None) -> Book:
     """Fetch the market order book.
     

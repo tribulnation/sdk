@@ -1,11 +1,15 @@
-from typing_extensions import Protocol
+from abc import abstractmethod
 from dataclasses import dataclass
 from decimal import Decimal
 
-from tribulnation.sdk.core import trunc2tick
+from tribulnation.sdk.core import SDK, trunc2tick
 
 @dataclass(kw_only=True)
 class Information:
+  base: str
+  """Base asset of the instrument."""
+  quote: str
+  """Quote asset of the instrument."""
   tick_size: Decimal
   """Tick size of the price (in quote units)."""
   step_size: Decimal
@@ -44,7 +48,9 @@ class Information:
     """Convert a base quantity to a quote amount."""
     return base_qty * price
   
-class Info(Protocol):
+class Info(SDK):
+  @SDK.method
+  @abstractmethod
   async def info(self) -> Information:
     """Fetch market information."""
     ...

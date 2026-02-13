@@ -21,7 +21,7 @@ class MyTrades(MarketMixin, _MyTrades):
     await super().__aexit__(exc_type, exc_value, traceback)
 
   @wrap_exceptions
-  async def my_trades_stream(self):
+  async def my_trades(self):
     r = await self.client.futures.contract_info(self.instrument)
     if not 'data' in r:
       raise ApiError(r)

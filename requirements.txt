@@ -7,3 +7,5 @@ pyright
 -e impl/bitget
 -e impl/kraken
 -e impl/mexc
+-e impl/bybit
+-e impl/bingx

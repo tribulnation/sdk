@@ -12,7 +12,7 @@ from mexc_sdk.core import MarketMixin, wrap_exceptions
 
 
 @dataclass
-class Trades(_Trades, MarketMixin):
+class Trades(MarketMixin, _Trades):
   trades_paging_interval: timedelta = field(default_factory=lambda: timedelta(hours=1), kw_only=True)
   """Interval to page trades."""
   trades_max_back: timedelta = field(default_factory=lambda: timedelta(days=2), kw_only=True)

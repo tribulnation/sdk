@@ -8,9 +8,8 @@ from tribulnation.sdk.core import Num
 Side = Literal['BUY', 'SELL']
 
 class BaseOrder(TypedDict):
-  side: Side
   qty: Num
-  """Quantity of the order in the base asset."""
+  """Quantity of the order in the base asset. Negative -> sell, positive -> buy."""
 
 class LimitOrder(BaseOrder):
   price: Num
@@ -22,17 +21,20 @@ class MarketOrder(BaseOrder):
 
 Order = LimitOrder | MarketOrder
 
-OrderStatus = Literal['NEW', 'PARTIALLY_FILLED', 'FILLED', 'CANCELED', 'PARTIALLY_CANCELED', 'UNTRIGGERED']
-
 @dataclass
 class OrderState:
   id: str
   price: Decimal
   qty: Decimal
+  """Signed quantity (netagive -> sell, positive -> buy)"""
   filled_qty: Decimal
-  side: Side
-  status: OrderStatus
+  """Signed quantity (netagive -> sell, positive -> buy)"""
+  active: bool
   time: datetime
+
+  @property
+  def side(self) -> Side:
+    return 'BUY' if self.qty > 0 else 'SELL'
 
   @property
   def quote_qty(self) -> Decimal:

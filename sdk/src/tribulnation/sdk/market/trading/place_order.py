@@ -1,11 +1,13 @@
-from typing_extensions import Protocol, Sequence, Literal, overload
+from typing_extensions import Sequence, Literal, overload
+from abc import abstractmethod
 import asyncio
 
+from tribulnation.sdk import SDK
 from tribulnation.sdk.market.types import Order, OrderState
 
 ResponseModel = Literal['id', 'state']
 
-class PlaceOrder(Protocol):
+class PlaceOrder(SDK):
   @overload
   async def place_order(
     self, order: Order, *,
@@ -30,12 +32,14 @@ class PlaceOrder(Protocol):
     Returns the order state.
     """
     ...
+  @SDK.method
   async def place_order(
     self, order: Order, *,
     response: Literal['id', 'state'] = 'id'
   ) -> str | OrderState:
     return await self._place_order_impl(order, response=response)
 
+  @abstractmethod
   async def _place_order_impl(self, order: Order, *, response: Literal['id', 'state'] = 'id') -> str | OrderState:
     ...
 

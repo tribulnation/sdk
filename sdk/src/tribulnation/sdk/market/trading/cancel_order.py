@@ -1,9 +1,13 @@
-from typing_extensions import Protocol, Sequence
+from typing_extensions import Sequence
+from abc import abstractmethod
 import asyncio
 
+from tribulnation.sdk import SDK
 from tribulnation.sdk.market.types import OrderState
 
-class CancelOrder(Protocol):
+class CancelOrder(SDK):
+  @SDK.method
+  @abstractmethod
   async def cancel_order(self, id: str) -> OrderState:
     """Cancel an order.
     

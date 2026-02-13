@@ -26,12 +26,12 @@ class MyTrades(MarketMixin, _MyTrades):
       async def listener():
         async for trade in self.client.spot.streams.my_trades():
           if trade.symbol == self.instrument:
+            sign = 1 if trade.side == 'BUY' else -1
             t = Trade(
               id=trade.tradeId,
               price=Decimal(trade.price),
-              qty=Decimal(trade.base_qty),
+              qty=Decimal(trade.base_qty) * sign,
               time=ts.parse(trade.time),
-              side=trade.side,
               maker=trade.maker,
             )
             self._queues[trade.symbol].put_nowait(t)

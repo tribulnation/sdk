@@ -1,8 +1,12 @@
-from typing_extensions import Protocol, Sequence
+from typing_extensions import Sequence
+from abc import abstractmethod
 
+from tribulnation.sdk import SDK
 from .query_order import OrderState
 
-class OpenOrders(Protocol):
+class OpenOrders(SDK):  
+  @SDK.method
+  @abstractmethod
   async def open_orders(self) -> Sequence[OrderState]:
     """Fetch your currently open orders."""
     ...

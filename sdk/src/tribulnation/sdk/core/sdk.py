@@ -1,50 +1,82 @@
-from typing_extensions import TypeVar, Callable, Coroutine, AsyncGenerator, Protocol, Generic
-from typing_extensions import _ProtocolMeta # type: ignore
+from typing_extensions import TypeVar, Any, Callable, Protocol, Generic, Self, overload
+from abc import ABCMeta
 from dataclasses import dataclass
 import asyncio
 import inspect
 
 T = TypeVar('T')
-AsyncFn = Callable[..., Coroutine|AsyncGenerator]
-Fn = TypeVar('Fn', bound=AsyncFn)
+Fn = TypeVar('Fn', bound=Callable)
 
 @dataclass
-class Method(Generic[Fn]):
-  fn: Fn
+class Method:
+  name: str
+  data: Any
 
-  def __get__(self, instance: object, owner: type) -> Fn:
-    return self.fn.__get__(instance, owner) # type: ignore
+  @staticmethod
+  def get(fn) -> 'Method | None':
+    return getattr(fn, '__sdk_method__', None)
 
-class SDKMeta(_ProtocolMeta):
-  def __new__(cls, name, bases, dct):
-    cls = super().__new__(cls, name, bases, dct)
+class SDKMeta(ABCMeta):
+  def __new__(cls: type, name: str, bases: tuple[type, ...], dct: dict[str, Any]):
+    cls = ABCMeta.__new__(cls, name, bases, dct)
     cls.__sdk_methods__ = {
-      k for k, v in dct.items() if isinstance(v, Method)
+      k: method for k, v in dct.items() if (method := Method.get(v)) is not None
     }
     for base in bases:
       if (methods := getattr(base, '__sdk_methods__', None)) is not None:
         cls.__sdk_methods__.update(methods)
-
+    cls.__sdk_fields__ = {
+      k: v for k, v in cls.__annotations__.items()
+        if getattr(v, '__sdk_fields__', None) is not None
+    }
     return cls
 
-class SDK(Protocol, metaclass=SDKMeta):
-  __sdk_methods__: set[str] = set()
+class SDK(metaclass=SDKMeta):
+  __sdk_methods__: dict[str, Method] = {}
+  __sdk_fields__: dict[str, type['SDK']] = {}
+
+  def __sdk_instrument__(self, *mappers: Callable[[Fn, Method], Fn]) -> Self:
+    for method, data in self.__sdk_methods__.items():
+      fn = getattr(self, method)
+      for mapper in mappers:
+        fn = mapper(fn, data)
+        setattr(self, method, fn)
+    for field in self.__sdk_fields__:
+      sdk: SDK = getattr(self, field)
+      sdk.__sdk_instrument__(*mappers)
+    return self
 
   @classmethod
-  def method(cls, fn: Fn) -> Fn:
-    return Method(fn) # type: ignore
+  def __sdk_hierarchy__(cls, *, indent: int = 0) -> str:
+    out = ' ' * indent + '- ' + cls.__name__ + '\n'
+    for method, data in cls.__sdk_methods__.items():
+      out += ' ' * (indent + 2) + '> ' + method + '\n'
+    for field in cls.__sdk_fields__:
+      sdk: SDK = cls.__annotations__[field]
+      out += sdk.__sdk_hierarchy__(indent=indent + 2)
+    return out
 
-def instrument(sdk: T, *mappers: Callable[[Fn], Fn]) -> T:
-  if (methods := getattr(sdk, '__sdk_methods__', None)) is not None:
-    for attr in methods:
-      if (fn := getattr(sdk, attr)) is not None:
-        for mapper in mappers:
-          fn = mapper(fn)
-        setattr(sdk, attr, fn)
-  for attr, value in list(sdk.__dict__.items()):
-    if getattr(value, '__sdk_methods__', None) is not None:
-      instrument(value, *mappers)
-  return sdk
+  @overload
+  @classmethod
+  def method(cls, fn: Fn, /) -> Fn:
+    ...
+  @overload
+  @classmethod
+  def method(cls, /, *, name: str | None = None, data: Any = None) -> Callable[[Fn], Fn]:
+    ...
+  @classmethod
+  def method(cls, fn = None, /, *, name: str | None = None, data: Any = None):
+    def decorator(fn: Fn) -> Fn:
+      setattr(fn, '__sdk_method__', Method(name=name or fn.__name__, data=data))
+      return fn
+
+    if fn is None:
+      return decorator
+    else:
+      return decorator(fn)
+
+def instrument(sdk: SDK, *mappers: Callable[[Fn, Method], Fn]):
+  sdk.__sdk_instrument__(*mappers)
 
 E = TypeVar('E', bound=Exception, contravariant=True)
 
@@ -58,8 +90,8 @@ def exponential_retry(
   *exceptions: type[E],
   max_retries: int | None = None, base_delay: float = 1.0,
   max_delay: float | None = None, log: RetryLogger[E] | None = default_retry_logger
-) -> Callable[[Fn], Fn]:
-    def exponential_retry_wrapper(fn: Fn) -> Fn:
+) -> Callable[[Fn, Method], Fn]:
+    def exponential_retry_wrapper(fn: Fn, method: Method) -> Fn:
       if inspect.iscoroutinefunction(fn):
         async def exponential_retry_wrapped(*args, **kwargs):
           retries = 0
@@ -84,14 +116,14 @@ def exponential_retry(
     return exponential_retry_wrapper
 
 class Logger(Protocol):
-  def __call__(self, function: AsyncFn, args: tuple, kwargs: dict):
+  def __call__(self, function: Callable, args: tuple, kwargs: dict):
     ...
 
-def default_logger(function: AsyncFn, args: tuple, kwargs: dict):
+def default_logger(function: Callable, args: tuple, kwargs: dict):
   print(f'Calling {function.__name__} with {args=}, {kwargs=}')
 
-def log(logger: Logger = default_logger) -> Callable[[Fn], Fn]:
-  def log_wrapper(fn: Fn) -> Fn:
+def log(logger: Logger = default_logger) -> Callable[[Fn, Method], Fn]:
+  def log_wrapper(fn: Fn, method: Method) -> Fn:
     if inspect.iscoroutinefunction(fn):
       async def coro_log_wrapped(*args, **kwargs):
         logger(fn, args, kwargs)
@@ -112,6 +144,6 @@ def log(logger: Logger = default_logger) -> Callable[[Fn], Fn]:
       return log_wrapped # type: ignore
 
     else:
-      raise ValueError(f"Unexpected function type: {type(fn)}")
+      return fn
 
   return log_wrapper

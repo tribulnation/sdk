@@ -1,9 +1,7 @@
 from dataclasses import dataclass
-from collections import defaultdict
 from decimal import Decimal
-import asyncio
 
-from tribulnation.sdk.market.user_data.positions import MyPosition as _MyPosition, Position
+from tribulnation.sdk.market.user_data.my_position import MyPosition as _MyPosition, Position
 
 from mexc_sdk.core import MarketMixin, wrap_exceptions
 from mexc.futures.user_data.positions import PositionType

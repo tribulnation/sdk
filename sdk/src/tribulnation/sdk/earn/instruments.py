@@ -1,4 +1,5 @@
-from typing_extensions import Literal, Protocol, Collection, Sequence, ClassVar
+from typing_extensions import Literal, Collection, Sequence, ClassVar
+from abc import abstractmethod
 from dataclasses import dataclass
 from decimal import Decimal
 from datetime import timedelta
@@ -26,8 +27,9 @@ class Instrument:
 	id: str | None = None
 	"""Unique identifier for the instrument, if available."""
 
-class Instruments(SDK, Protocol):
+class Instruments(SDK):
   @SDK.method
+  @abstractmethod
   async def instruments(
     self, *, tags: Collection[InstrumentTag] | None = None,
     assets: Collection[str] | None = None,
@@ -37,4 +39,3 @@ class Instruments(SDK, Protocol):
     - `tags`: Filter by tags. Returns all assets matching at least one of the tags.
     - `assets`: Filter by (subscription) assets.
     """
-    ...

@@ -31,22 +31,20 @@ class MyTrades(MarketMixin, UserDataMixin, _MyTrades):
     async for fills in self.indexer_data.get_fills_paged(
       self.address, subaccount=self.subaccount, ticker=self.market, end=end,
     ):
-      trades = [
-        Trade(
-          id=f['id'],
-          price=Decimal(f['price']),
-          qty=Decimal(f['size']),
-          time=t,
-          side=f['side'],
-          maker=f['liquidity'] == 'MAKER',
-          fee=Trade.Fee(
-            asset='USDC',
-            amount=Decimal(f['fee']),
-          )
-        )
-        for f in fills
-          if within(t := ts.parse(f['createdAt']))
-          and f['market'] == self.market
-      ]
+      trades: list[Trade] = []
+      for f in fills:
+        if within(t := ts.parse(f['createdAt'])) and f['market'] == self.market:
+          sign = 1 if f['side'] == 'BUY' else -1
+          trades.append(Trade(
+            id=f['id'],
+            price=Decimal(f['price']),
+            qty=Decimal(f['size']) * sign,
+            time=t,
+            maker=f['liquidity'] == 'MAKER',
+            fee=Trade.Fee(
+              asset='USDC',
+              amount=Decimal(f['fee']),
+            )
+          ))
       if trades:
         yield trades

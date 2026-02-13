@@ -1,9 +1,10 @@
-from typing_extensions import Protocol, Mapping, TypeVar
+from typing_extensions import Mapping, TypeVar
+from abc import abstractmethod
 from dataclasses import dataclass
 from decimal import Decimal
 import asyncio
 
-from tribulnation.sdk.core import SDK
+from tribulnation.sdk import SDK
 
 S = TypeVar('S', bound=str, default=str)
 
@@ -16,11 +17,14 @@ class Balance:
   def total(self) -> Decimal:
     return self.free + self.locked
 
-class Balances(SDK, Protocol):
+class Balances(SDK):
+  @SDK.method
+  @abstractmethod
   async def balance(self, currency: str, /) -> Balance:
     """Get the balance of the given currency."""
     return (await self.balances(currency)).get(currency) or Balance(free=Decimal(0), locked=Decimal(0))
 
+  @SDK.method
   async def balances(self, *currencies: S) -> Mapping[S, Balance]:
     """Get the balances of the given currencies. If no currencies are provided, get all balances."""
     return await self._balances_impl(*currencies) # type: ignore

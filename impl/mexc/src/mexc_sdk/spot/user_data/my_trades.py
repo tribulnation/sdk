@@ -15,18 +15,18 @@ class MyTrades(MarketMixin, _MyTrades):
     self, start: datetime, end: datetime,
   ) -> AsyncIterable[Sequence[Trade]]:
     async for trades in self.client.spot.my_trades_paged(self.instrument, start=start, end=end):
-      yield [
-        Trade(
+      chunk: list[Trade] = []
+      for t in trades:
+        sign = 1 if t['isBuyer'] else -1
+        chunk.append(Trade(
           id=t['id'],
           price=Decimal(t['price']),
-          qty=Decimal(t['qty']),
+          qty=Decimal(t['qty']) * sign,
           time=timestamp.parse(t['time']).astimezone(),
-          side='BUY' if t['isBuyer'] else 'SELL',
           maker=t['isMaker'],
           fee=Trade.Fee(
             asset=a,
             amount=Decimal(c),
           ) if (a := t.get('commissionAsset')) and (c := t.get('commission')) else None,
-        )
-        for t in trades
-      ]
+        ))
+      yield chunk

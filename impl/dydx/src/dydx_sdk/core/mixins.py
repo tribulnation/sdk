@@ -6,7 +6,7 @@ import asyncio
 from dydx.core.types import PerpetualMarket
 from dydx.indexer import IndexerData, INDEXER_HTTP_URL, IndexerStreams, INDEXER_WS_URL
 from dydx.indexer.streams.subaccounts import UpdateMessage as SubaccountMessage
-from dydx.node import PrivateNode, POLKACHU_GRPC_URL
+from dydx.node import PrivateNode, OEGS_GRPC_URL
 from dydx.node.private.place_order import Flags
 
 @dataclass(kw_only=True)
@@ -58,7 +58,7 @@ class UserStreamsMixin:
     
     if self._subaccounts_listener is None:
       async def listener():
-        _, stream = await self.indexer_streams.subaccounts(self.address, subaccount=self.subaccount)
+        _, stream = await self.indexer_streams.subaccounts(self.address, subaccount=self.subaccount, validate=False)
         async for log in stream:
           for q in self._subaccounts_queues:
             q.put_nowait(log)
@@ -91,7 +91,7 @@ class TradingMixin:
   @classmethod
   async def connect(
     cls, mnemonic: str, *,
-    node_url: str = POLKACHU_GRPC_URL,
+    node_url: str = OEGS_GRPC_URL,
     indexer_url: str = INDEXER_HTTP_URL,
     validate: bool = True,
     limit_flags: Flags = 'LONG_TERM',
