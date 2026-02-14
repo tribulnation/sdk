@@ -1,5 +1,6 @@
-from typing_extensions import TypedDict, Literal, Sequence
+from typing_extensions import TypedDict, Literal, Sequence, Any
 from abc import abstractmethod
+from dataclasses import dataclass
 import asyncio
 
 from tribulnation.sdk.core import Num, SDK
@@ -18,13 +19,18 @@ class Place(SDK):
     type: Literal['MARKET']
 
   Order = LimitOrder | MarketOrder
+
+  @dataclass(kw_only=True)
+  class Result:
+    id: str
+    details: Any = None
   
   @SDK.method
   @abstractmethod
-  async def order(self, order: Order) -> str:
-    """Place an order and return the order ID."""
+  async def order(self, order: Order) -> Result:
+    """Place an order in the market."""
   
   @SDK.method
-  async def orders(self, orders: Sequence[Order]) -> Sequence[str]:
-    """Place multiple orders and return the order IDs."""
+  async def orders(self, orders: Sequence[Order]) -> Sequence[Result]:
+    """Place multiple orders in the market."""
     return await asyncio.gather(*[self.order(order) for order in orders])

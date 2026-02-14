@@ -1,4 +1,4 @@
-from typing_extensions import Sequence, AsyncIterable
+from typing_extensions import Sequence, AsyncIterable, Any
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
@@ -7,16 +7,23 @@ from decimal import Decimal
 from tribulnation.sdk.core import SDK
 
 class Trades(SDK):
+
   @dataclass(kw_only=True)
   class Trade:
+    @dataclass(kw_only=True)
+    class Fee:
+      amount: Decimal
+      """Fee paid (or received if negative, in fee asset units)."""
+      asset: str
+
     id: str | None
     price: Decimal
     qty: Decimal
     """Signed quantity (netagive -> sell, positive -> buy)"""
     time: datetime
     maker: bool
-    fee: Decimal | None
-    """Fee paid (or received if negative, in fee asset units)."""
+    fee: Fee | None = None
+    details: Any = None
 
   @SDK.method
   @abstractmethod

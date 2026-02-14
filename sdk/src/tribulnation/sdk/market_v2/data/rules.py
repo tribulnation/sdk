@@ -1,3 +1,4 @@
+from typing_extensions import Any
 from abc import abstractmethod
 from dataclasses import dataclass
 from decimal import Decimal
@@ -32,6 +33,8 @@ class Rules(SDK):
     """Taker fee of the order (in quote units)."""
     api: bool
     """Whether the instrument can be traded via API."""
+    details: Any = None
+    """Raw details of the rules."""
 
     @property
     def min_qty(self) -> Decimal:

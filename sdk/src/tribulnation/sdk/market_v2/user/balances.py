@@ -8,8 +8,8 @@ from tribulnation.sdk.core import SDK
 class Balances(SDK):
   @dataclass
   class Balance:
-    free: Decimal
-    locked: Decimal
+    free: Decimal = Decimal(0)
+    locked: Decimal = Decimal(0)
 
     @property
     def total(self) -> Decimal:

@@ -1,4 +1,4 @@
-from typing_extensions import Sequence
+from typing_extensions import Sequence, Any
 from abc import abstractmethod
 from dataclasses import dataclass
 from decimal import Decimal
@@ -7,7 +7,7 @@ from datetime import datetime
 from tribulnation.sdk.core import SDK
 
 class Orders(SDK):
-  @dataclass
+  @dataclass(kw_only=True)
   class Order:
     id: str
     price: Decimal
@@ -18,6 +18,7 @@ class Orders(SDK):
     active: bool
     """Whether the order is active in the market."""
     time: datetime
+    details: Any = None
 
   @SDK.method
   @abstractmethod
