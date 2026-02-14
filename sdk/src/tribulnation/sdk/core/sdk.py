@@ -19,16 +19,19 @@ class Method:
 class SDKMeta(ABCMeta):
   def __new__(cls: type, name: str, bases: tuple[type, ...], dct: dict[str, Any]):
     cls = ABCMeta.__new__(cls, name, bases, dct)
-    cls.__sdk_methods__ = {
-      k: method for k, v in dct.items() if (method := Method.get(v)) is not None
-    }
+    cls.__sdk_methods__ = {}
+    cls.__sdk_fields__ = {}
     for base in bases:
       if (methods := getattr(base, '__sdk_methods__', None)) is not None:
         cls.__sdk_methods__.update(methods)
-    cls.__sdk_fields__ = {
-      k: v for k, v in cls.__annotations__.items()
-        if getattr(v, '__sdk_fields__', None) is not None
-    }
+      if (fields := getattr(base, '__sdk_fields__', None)) is not None:
+        cls.__sdk_fields__.update(fields.items())
+    for k, v in dct.items():
+      if (method := Method.get(v)) is not None:
+        cls.__sdk_methods__[k] = method
+    for k, v in cls.__annotations__.items():
+      if (field := getattr(v, '__sdk_fields__', None)) is not None:
+        cls.__sdk_fields__[k] = v
     return cls
 
 class SDK(metaclass=SDKMeta):
@@ -47,14 +50,43 @@ class SDK(metaclass=SDKMeta):
     return self
 
   @classmethod
-  def __sdk_hierarchy__(cls, *, indent: int = 0) -> str:
-    out = ' ' * indent + '- ' + cls.__name__ + '\n'
-    for method, data in cls.__sdk_methods__.items():
-      out += ' ' * (indent + 2) + '> ' + method + '\n'
-    for field in cls.__sdk_fields__:
-      sdk: SDK = cls.__annotations__[field]
-      out += sdk.__sdk_hierarchy__(indent=indent + 2)
-    return out
+  def __sdk_hierarchy__(cls, *, field: str | None = None, indent: int = 0, prefix: str = "") -> str:
+    # Prepare current line
+    line = ""
+    if indent > 0:
+      # Show vertical line and branch
+      line += prefix + "├─ "
+    else:
+      line += ""
+    if field is not None:
+      line += f"{field}: "
+    line += cls.__name__ + "\n"
+
+    # Prepare new prefix for children
+    if indent > 0:
+      child_prefix = prefix + "│  "
+    else:
+      child_prefix = ""
+
+    # Print methods
+    method_items = list(cls.__sdk_methods__.items())
+    field_items = list(cls.__sdk_fields__.items())
+
+    for i, (method, data) in enumerate(method_items):
+      is_last = (i == len(method_items) - 1 and not field_items)
+      mid_prefix = child_prefix + ("└─ " if is_last else "├─ ")
+      line += mid_prefix + method + "()" + "\n"
+
+    # Print fields
+    for j, (next_field, sdk) in enumerate(field_items):
+      is_last_field = (j == len(field_items) - 1)
+      next_prefix = child_prefix
+      # Continue vertical bars except for last
+      if is_last_field:
+        next_prefix = prefix + "   "
+      line += sdk.__sdk_hierarchy__(indent=indent + 1, field=next_field, prefix=child_prefix)
+
+    return line
 
   @overload
   @classmethod
