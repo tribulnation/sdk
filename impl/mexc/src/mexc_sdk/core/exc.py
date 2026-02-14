@@ -3,7 +3,7 @@ from functools import wraps
 import httpx
 import pydantic
 
-from tribulnation.sdk.core import NetworkError, ValidationError, ApiError
+from tribulnation.sdk.core import NetworkError, ValidationError, ApiError, Error
 
 from mexc import core
 
