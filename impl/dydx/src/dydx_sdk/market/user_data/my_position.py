@@ -5,10 +5,10 @@ from tribulnation.sdk.market.user_data.my_position import (
   MyPosition as _MyPosition, Position
 )
 
-from dydx_sdk.core import MarketMixin, UserDataMixin, wrap_exceptions
+from dydx_sdk.core import MarketMixin, SubaccountMixin, wrap_exceptions
 
 @dataclass
-class MyPosition(MarketMixin, UserDataMixin, _MyPosition):
+class MyPosition(MarketMixin, SubaccountMixin, _MyPosition):
 
   @wrap_exceptions
   async def position(self) -> Position | None:

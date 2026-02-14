@@ -6,12 +6,12 @@ from tribulnation.sdk.market import Trading as _Trading
 from tribulnation.sdk.market.types.order import OrderState, Order
 
 from dydx_v4_client import OrderFlags
-from dydx_sdk.core import MarketMixin, TradingMixin, UserDataMixin, wrap_exceptions
+from dydx_sdk.core import MarketMixin, TradingMixin, SubaccountMixin, wrap_exceptions
 from .indexer import parse_state, parse_id, serialize_id
 from .node import export_order
 
 @dataclass
-class Trading(MarketMixin, TradingMixin, UserDataMixin, _Trading):
+class Trading(TradingMixin, _Trading):
 
   @SDK.method
   @wrap_exceptions

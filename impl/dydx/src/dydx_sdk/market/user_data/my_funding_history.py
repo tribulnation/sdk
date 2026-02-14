@@ -7,10 +7,10 @@ from tribulnation.sdk.market.user_data.my_funding_history import (
 )
 
 from dydx.core import timestamp as ts
-from dydx_sdk.core import MarketMixin, UserDataMixin, wrap_exceptions
+from dydx_sdk.core import MarketMixin, SubaccountMixin, wrap_exceptions
 
 @dataclass
-class MyFundingHistory(MarketMixin, UserDataMixin, _MyFundingHistory):
+class MyFundingHistory(MarketMixin, SubaccountMixin, _MyFundingHistory):
 
   @wrap_exceptions
   async def _my_funding_history_impl(

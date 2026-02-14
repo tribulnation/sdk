@@ -1,12 +1,11 @@
 from typing_extensions import AsyncIterable
 from dataclasses import dataclass, field
-from decimal import Decimal
 import asyncio
 
-from dydx.core.types import PerpetualMarket
-from dydx.indexer import IndexerData, INDEXER_HTTP_URL, IndexerStreams, INDEXER_WS_URL
+from dydx.indexer.types import PerpetualMarket
+from dydx.indexer import IndexerData, IndexerStreams
 from dydx.indexer.streams.subaccounts import UpdateMessage as SubaccountMessage
-from dydx.node import PrivateNode, OEGS_GRPC_URL
+from dydx.node import PublicNode, PrivateNode, OEGS_GRPC_URL
 from dydx.node.private.place_order import Flags
 
 @dataclass(kw_only=True)
@@ -14,35 +13,29 @@ class MarketMixin:
   market: str
 
 @dataclass(kw_only=True)
-class MarketDataMixin:
+class IndexerDataMixin:
   indexer_data: IndexerData = field(default_factory=IndexerData)
 
-  @classmethod
-  def new(cls, url: str = INDEXER_HTTP_URL, *, validate: bool = True):
-    return cls(indexer_data=IndexerData(url=url, default_validate=validate))
-
 @dataclass(kw_only=True)
-class UserDataMixin:
-  address: str
-  subaccount: int = 0
-  indexer_data: IndexerData = field(default_factory=IndexerData)
-
-  @classmethod
-  def new(cls, address: str, *, subaccount: int = 0, url: str = INDEXER_HTTP_URL, validate: bool = True):
-    return cls(address=address, subaccount=subaccount, indexer_data=IndexerData(url=url, default_validate=validate))
-
-
-@dataclass(kw_only=True)
-class UserStreamsMixin:
-  address: str
-  subaccount: int = 0
+class IndexerStreamsMixin:
   indexer_streams: IndexerStreams = field(default_factory=IndexerStreams)
+
+@dataclass(kw_only=True)
+class PublicNodeMixin:
+  public_node: PublicNode
+
+@dataclass(kw_only=True)
+class AccountMixin:
+  address: str
+
+@dataclass(kw_only=True)
+class SubaccountMixin(AccountMixin):
+  subaccount: int = 0
+
+@dataclass(kw_only=True)
+class SubaccountStreamMixin(SubaccountMixin, IndexerStreamsMixin):
   _subaccounts_queues: list[asyncio.Queue[SubaccountMessage]] = field(default_factory=list, init=False, repr=False)
   _subaccounts_listener: asyncio.Task | None = field(default=None, init=False, repr=False)
-
-  @classmethod
-  def new(cls, address: str, *, subaccount: int = 0, url: str = INDEXER_WS_URL, validate: bool = True):
-    return cls(address=address, subaccount=subaccount, indexer_streams=IndexerStreams.new(url=url, validate=validate))
 
   async def close(self):
     if self._subaccounts_listener is not None:
@@ -72,30 +65,35 @@ class UserStreamsMixin:
         raise exc
       yield await task
 
+@dataclass(kw_only=True)
+class PrivateNodeMixin:
+  private_node: PrivateNode
 
 @dataclass(kw_only=True)
-class TradingMixin:
-  node: PrivateNode
-  indexer_data: IndexerData = field(default_factory=IndexerData)
+class TradingMixin(MarketMixin, IndexerDataMixin, SubaccountMixin, PrivateNodeMixin):
   limit_flags: Flags = 'SHORT_TERM'
   """Place limit orders as short/long term"""
-  market_cache: dict[str, PerpetualMarket] = field(default_factory=dict, init=False, repr=False)
-  market_buffer: Decimal = Decimal(0.1)
-  """Buffer to add to the current price when placing an order (since dYdX doesn't only supports limit orders)"""
-
-  async def fetch_market(self, market: str):
-    if market not in self.market_cache:
-      self.market_cache[market] = await self.indexer_data.get_market(market, limit=1, unsafe=True)
-    return self.market_cache[market]
+  perpetual_market: PerpetualMarket
 
   @classmethod
   async def connect(
     cls, mnemonic: str, *,
+    market: str,
     node_url: str = OEGS_GRPC_URL,
-    indexer_url: str = INDEXER_HTTP_URL,
+    subaccount: int = 0,
     validate: bool = True,
     limit_flags: Flags = 'LONG_TERM',
+    indexer_data: IndexerData | None = None,
   ):
     node = await PrivateNode.connect(mnemonic, url=node_url)
-    indexer_data = IndexerData(url=indexer_url, default_validate=validate)
-    return cls(node=node, indexer_data=indexer_data, limit_flags=limit_flags)
+    indexer_data = indexer_data or IndexerData(default_validate=validate)
+    perpetual_market = await indexer_data.get_market(market)
+    return cls(
+      private_node=node,
+      indexer_data=indexer_data,
+      limit_flags=limit_flags,
+      address=node.address,
+      subaccount=subaccount,
+      market=market,
+      perpetual_market=perpetual_market,
+    )

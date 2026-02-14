@@ -8,10 +8,10 @@ from tribulnation.sdk.market.user_data.my_trades import (
 )
 
 from dydx.core import timestamp as ts
-from dydx_sdk.core import MarketMixin, UserDataMixin, wrap_exceptions
+from dydx_sdk.core import MarketMixin, SubaccountMixin, wrap_exceptions
 
 @dataclass
-class MyTrades(MarketMixin, UserDataMixin, _MyTrades):
+class MyTrades(MarketMixin, SubaccountMixin, _MyTrades):
 
   @wrap_exceptions
   async def _my_trades_impl(

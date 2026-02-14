@@ -7,10 +7,10 @@ from tribulnation.sdk.market.user_streams.my_trades import (
 )
 
 from dydx.core import timestamp as ts
-from dydx_sdk.core import MarketMixin, UserStreamsMixin, wrap_exceptions
+from dydx_sdk.core import MarketMixin, SubaccountStreamMixin, wrap_exceptions
 
 @dataclass
-class MyTrades(MarketMixin, UserStreamsMixin, _MyTrades):
+class MyTrades(MarketMixin, SubaccountStreamMixin, _MyTrades):
   @wrap_exceptions
   async def my_trades_stream(self) -> AsyncIterable[Trade]:
     async for log in self.subscribe_subaccounts():

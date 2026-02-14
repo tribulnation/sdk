@@ -7,7 +7,7 @@ from tribulnation.sdk.market.trading.place_order import (
 )
 
 from dydx.node.private.place_order import Order, TimeInForce, Flags
-from dydx.core.types import PerpetualMarket
+from dydx.indexer.types import PerpetualMarket
 
 def market_price(order: _Order, market: PerpetualMarket, *, buffer: Decimal = Decimal(0.1)) -> Decimal:
   if Decimal(order['qty']) > 0:

@@ -3,10 +3,10 @@ from decimal import Decimal
 
 from tribulnation.sdk.market.market_data.depth import Depth as _Depth, Book
 
-from dydx_sdk.core import MarketMixin, MarketDataMixin, wrap_exceptions, perp_name
+from dydx_sdk.core import MarketMixin, IndexerDataMixin, wrap_exceptions, perp_name
 
 @dataclass
-class Depth(MarketDataMixin, MarketMixin, _Depth):
+class Depth(IndexerDataMixin, MarketMixin, _Depth):
   @wrap_exceptions
   async def depth(self, *, limit: int | None = None) -> Book:
     book = await self.indexer_data.get_order_book(self.market, unsafe=True)

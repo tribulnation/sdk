@@ -1,13 +1,21 @@
 from .naming import perp_name
 from .exc import wrap_exceptions
-from .mixins import MarketDataMixin, UserDataMixin, UserStreamsMixin, TradingMixin, MarketMixin
+from .mixins import (
+  IndexerDataMixin, IndexerStreamsMixin, PublicNodeMixin,
+  AccountMixin, SubaccountMixin, SubaccountStreamMixin,
+  TradingMixin, MarketMixin, PrivateNodeMixin
+)
 
 __all__ = [
   'perp_name',
   'wrap_exceptions',
-  'MarketDataMixin',
-  'UserDataMixin',
-  'UserStreamsMixin',
+  'IndexerDataMixin',
+  'IndexerStreamsMixin',
+  'PublicNodeMixin',
+  'AccountMixin',
+  'SubaccountMixin',
+  'SubaccountStreamMixin',
   'TradingMixin',
   'MarketMixin',
+  'PrivateNodeMixin',
 ]
