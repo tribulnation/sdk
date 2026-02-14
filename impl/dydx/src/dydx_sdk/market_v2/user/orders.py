@@ -47,6 +47,7 @@ def parse_state(o: OrderState, *, address: str) -> _Orders.Order:
     filled_qty=Decimal(o['totalFilled']) * sign,
     active=active,
     time=ts.parse(o.get('updatedAt') or '1970-01-01T00:00:00Z'),
+    details=o,
   )
 
 @dataclass

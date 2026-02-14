@@ -1,3 +1,4 @@
+from typing_extensions import Any
 from dataclasses import dataclass
 from decimal import Decimal
 
@@ -39,11 +40,11 @@ def export_order(
     time_in_force=time_in_force(order),
   )
     
-
 @dataclass
 class Place(TradingMixin, _Place):
   @wrap_exceptions
-  async def order(self, order: _Place.Order) -> str:
+  async def order(self, order: _Place.Order) -> _Place.Result:
     dydx_order = export_order(order, limit_flags=self.limit_flags)
     r = await self.private_node.place_order(self.perpetual_market, dydx_order)
-    return serialize_id(r['order'].order_id)
+    id = serialize_id(r['order'].order_id)
+    return _Place.Result(id=id, details=r)

@@ -35,7 +35,10 @@ class Trades(MarketMixin, IndexerDataMixin, SubaccountStreamMixin, _Trades):
             qty=f['size'] * sign,
             time=t,
             maker=f['liquidity'] == 'MAKER',
-            fee=f['fee']
+            fee=_Trades.Trade.Fee(
+              asset='USDC',
+              amount=f['fee'],
+            )
           ))
       if trades:
         yield trades
@@ -53,4 +56,5 @@ class Trades(MarketMixin, IndexerDataMixin, SubaccountStreamMixin, _Trades):
             time=ts.parse(fill['createdAt']),
             maker=fill['liquidity'] == 'MAKER',
             fee=None,
+            details=fill,
           )    

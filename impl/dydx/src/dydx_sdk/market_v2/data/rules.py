@@ -24,5 +24,10 @@ class Rules(MarketMixin, IndexerDataMixin, AccountMixin, PublicNodeMixin, _Rules
       step_size=Decimal(market['stepSize']),
       maker_fee=fees.maker,
       taker_fee=fees.taker,
-      api=clob.status == ClobPair.Status.STATUS_ACTIVE
+      api=clob.status == ClobPair.Status.STATUS_ACTIVE,
+      details={
+        'perpetual_market': market,
+        'clob_pair': clob,
+        'user_fees': fees,
+      }
     )
