@@ -6,7 +6,7 @@ import os
 from ccxt.async_support import bybit
 from ccxt.base.errors import NetworkError as CcxtNetworkError, AuthenticationError, BaseError
 
-from tribulnation.sdk.core import AuthError, Error, NetworkError
+from trading_sdk.core import AuthError, Error, NetworkError
 
 
 def wrap_exceptions(fn):

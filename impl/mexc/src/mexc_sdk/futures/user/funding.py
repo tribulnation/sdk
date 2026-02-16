@@ -3,7 +3,7 @@ from typing_extensions import AsyncIterable, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 
-from tribulnation.sdk.market.user import Funding as _Funding
+from trading_sdk.market.user import Funding as _Funding
 
 from mexc.core import timestamp as ts
 from mexc_sdk.core import MarketMixin, wrap_exceptions

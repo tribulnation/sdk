@@ -3,7 +3,7 @@ from dataclasses import dataclass as _dataclass
 from mexc import MEXC
 from mexc.spot.market_data.exchange_info import Info
 
-from tribulnation.sdk.market import Trading as _Trading
+from trading_sdk.market import Trading as _Trading
 from .cancel import Cancel
 from .place import Place
 

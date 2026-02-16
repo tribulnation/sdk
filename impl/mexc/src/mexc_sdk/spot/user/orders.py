@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-from tribulnation.sdk.core import ValidationError
-from tribulnation.sdk.market.user import Orders as _Orders
+from trading_sdk.core import ValidationError
+from trading_sdk.market.user import Orders as _Orders
 
 from mexc.core import timestamp as ts, OrderStatus
 from mexc.spot.user_data.query_order import OrderState

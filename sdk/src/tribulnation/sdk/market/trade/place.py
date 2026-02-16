@@ -3,7 +3,7 @@ from abc import abstractmethod
 from dataclasses import dataclass
 import asyncio
 
-from tribulnation.sdk.core import Num, SDK
+from trading_sdk.core import Num, SDK
 
 
 class Place(SDK):

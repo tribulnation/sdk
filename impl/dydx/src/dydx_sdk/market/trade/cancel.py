@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from tribulnation.sdk.market.trade import Cancel as _Cancel
+from trading_sdk.market.trade import Cancel as _Cancel
 
 from dydx_v4_client import OrderFlags
 from dydx_sdk.core import PrivateNodeMixin, wrap_exceptions

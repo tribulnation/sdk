@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-from tribulnation.sdk.market.user import PerpPosition as _PerpPosition
+from trading_sdk.market.user import PerpPosition as _PerpPosition
 
 from mexc.futures.user_data.positions import PositionType
 from mexc_sdk.core import MarketMixin, wrap_exceptions

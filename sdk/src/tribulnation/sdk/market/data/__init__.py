@@ -1,5 +1,5 @@
 from dataclasses import dataclass as _dataclass
-from tribulnation.sdk.core import SDK
+from trading_sdk.core import SDK
 
 from .rules import Rules
 from .depth import Depth

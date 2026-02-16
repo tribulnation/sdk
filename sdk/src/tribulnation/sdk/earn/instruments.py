@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from datetime import timedelta
 
-from tribulnation.sdk.core import SDK
+from trading_sdk.core import SDK
 
 InstrumentTag = Literal['flexible', 'fixed', 'one-time', 'new-users', 'staking']
 

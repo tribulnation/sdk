@@ -3,7 +3,7 @@ import inspect
 
 from grpc._channel import _InactiveRpcError
 
-from tribulnation.sdk.core import NetworkError, ValidationError, ApiError, Error
+from trading_sdk.core import NetworkError, ValidationError, ApiError, Error
 from dydx import core
 
 def wrap_exceptions(fn):

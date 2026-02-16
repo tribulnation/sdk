@@ -8,7 +8,7 @@ from dydx.node import (
 )
 from dydx_sdk.core import TradingSettings as _TradingSettings
 
-from tribulnation.sdk.market import PerpMarket
+from trading_sdk.market import PerpMarket
 from .data import MarketData
 from .trade import Trading
 from .user import UserData

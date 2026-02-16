@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-from tribulnation.sdk.market.data import Index as _Index
+from trading_sdk.market.data import Index as _Index
 
 from mexc_sdk.core import MarketMixin
 

@@ -3,7 +3,7 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from decimal import Decimal
 
-from tribulnation.sdk.core import SDK, trunc2tick, round2tick
+from trading_sdk.core import SDK, trunc2tick, round2tick
 
 class Rules(SDK):
   @dataclass(kw_only=True)

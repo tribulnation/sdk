@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from dydx.core import timestamp as ts
-from tribulnation.sdk.market.user import Funding as _Funding
+from trading_sdk.market.user import Funding as _Funding
 from dydx_sdk.core import MarketMixin, IndexerDataMixin, SubaccountMixin, wrap_exceptions
 
 @dataclass

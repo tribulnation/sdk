@@ -3,8 +3,8 @@ from decimal import Decimal
 
 import pydantic
 
-from tribulnation.sdk.core import SDK, ApiError, ValidationError
-from tribulnation.sdk.earn.instruments import Instrument, Instruments as _Instruments
+from trading_sdk.core import SDK, ApiError, ValidationError
+from trading_sdk.earn.instruments import Instrument, Instruments as _Instruments
 from kraken_sdk.core import SdkMixin, wrap_exceptions
 
 KRAKEN_EARN_URL = 'https://www.kraken.com/c/rewards'

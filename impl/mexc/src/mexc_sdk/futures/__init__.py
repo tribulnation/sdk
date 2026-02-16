@@ -2,7 +2,7 @@ from dataclasses import dataclass as _dataclass
 
 from mexc import MEXC
 
-from tribulnation.sdk import PerpMarket as _PerpMarket
+from trading_sdk import PerpMarket as _PerpMarket
 
 from .data import MarketData
 from .trade import Trading

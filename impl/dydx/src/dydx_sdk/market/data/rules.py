@@ -3,7 +3,7 @@ from decimal import Decimal
 import asyncio
 
 from v4_proto.dydxprotocol.clob.clob_pair_pb2 import ClobPair
-from tribulnation.sdk.market.data import Rules as _Rules
+from trading_sdk.market.data import Rules as _Rules
 from dydx_sdk.core import MarketMixin, IndexerDataMixin, AccountMixin, PublicNodeMixin, wrap_exceptions
 
 @dataclass

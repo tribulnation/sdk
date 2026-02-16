@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-from tribulnation.sdk.core import ValidationError, fmt_num
-from tribulnation.sdk.market.trade import Place as _Place
+from trading_sdk.core import ValidationError, fmt_num
+from trading_sdk.market.trade import Place as _Place
 
 from mexc.spot.trading.place_order import Order, LimitOrder, MarketOrder
 from mexc_sdk.core import SpotMixin, StreamsMixin, wrap_exceptions

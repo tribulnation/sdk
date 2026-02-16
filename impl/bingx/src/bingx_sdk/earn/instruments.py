@@ -11,8 +11,8 @@ from typing_extensions import Collection, Iterable, Sequence
 import httpx
 import pydantic
 
-from tribulnation.sdk.core import ApiError, NetworkError, ValidationError
-from tribulnation.sdk.earn.instruments import Instrument, Instruments as _Instruments
+from trading_sdk.core import ApiError, NetworkError, ValidationError
+from trading_sdk.earn.instruments import Instrument, Instruments as _Instruments
 
 BINGX_EARN_URL = "https://bingx.com/en-us/wealth"
 BINGX_APP_VERSION = os.environ.get("BINGX_APP_VERSION", "5.2.45")

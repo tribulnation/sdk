@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from tribulnation.sdk.market.data import Rules as _Rules
+from trading_sdk.market.data import Rules as _Rules
 
 from mexc_sdk.core import MarketMixin
 

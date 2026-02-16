@@ -1,6 +1,6 @@
 from dataclasses import dataclass as _dataclass
 
-from tribulnation.sdk.core import SDK
+from trading_sdk.core import SDK
 from .data import MarketData, PerpMarketData
 from .user import UserData, PerpUserData
 from .trade import Trading

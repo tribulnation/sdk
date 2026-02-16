@@ -3,8 +3,8 @@ from datetime import timedelta
 from decimal import Decimal
 import re
 
-from tribulnation.sdk.core import SDK, LogicError
-from tribulnation.sdk.earn.instruments import Instrument, Instruments as _Instruments
+from trading_sdk.core import SDK, LogicError
+from trading_sdk.earn.instruments import Instrument, Instruments as _Instruments
 from binance.simple_earn.flexible.list import FlexibleProduct
 from binance.simple_earn.fixed.list import LockedProduct, LockedProductDetail
 from binance_sdk.core import SdkMixin, wrap_exceptions

@@ -4,8 +4,8 @@ from datetime import datetime
 from decimal import Decimal
 import warnings
 
-from tribulnation.sdk.core import Stream, ChunkedStream
-from tribulnation.sdk.reporting.transactions import (
+from trading_sdk.core import Stream, ChunkedStream
+from trading_sdk.reporting.transactions import (
   Flow, SingleEvent,match_transactions,
   Transaction, FutureTrade, Fee
 )

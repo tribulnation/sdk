@@ -1,6 +1,6 @@
 from dataclasses import dataclass as _dataclass
 
-from tribulnation.sdk.core import SDK
+from trading_sdk.core import SDK
 from .place import Place
 from .cancel import Cancel
 

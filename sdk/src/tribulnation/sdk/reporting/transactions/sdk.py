@@ -2,7 +2,7 @@ from typing_extensions import AsyncIterable, Sequence
 from abc import abstractmethod
 from datetime import datetime
 
-from tribulnation.sdk.core import ChunkedStream, SDK
+from trading_sdk.core import ChunkedStream, SDK
 from .types import Transaction
 
 class Transactions(SDK):

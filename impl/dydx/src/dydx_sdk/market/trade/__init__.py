@@ -5,7 +5,7 @@ from dydx.node import PrivateNode as _PrivateNode
 from dydx.indexer.types import PerpetualMarket as _PerpetualMarket
 from dydx_sdk.core import TradingSettings as _TradingSettings
 
-from tribulnation.sdk.market import Trading as _Trading
+from trading_sdk.market import Trading as _Trading
 from .cancel import Cancel
 from .place import Place
 

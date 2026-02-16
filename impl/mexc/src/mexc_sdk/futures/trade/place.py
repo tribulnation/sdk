@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from tribulnation.sdk.market.trade import Place as _Place
+from trading_sdk.market.trade import Place as _Place
 
 from mexc_sdk.core import MarketMixin
 

@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-from tribulnation.sdk.market.user import Orders as _Orders
-from tribulnation.sdk.core import ApiError, ValidationError
+from trading_sdk.market.user import Orders as _Orders
+from trading_sdk.core import ApiError, ValidationError
 
 from v4_proto.dydxprotocol.subaccounts.subaccount_pb2 import SubaccountId
 from v4_proto.dydxprotocol.clob.order_pb2 import OrderId

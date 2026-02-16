@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 
-from tribulnation.sdk.core import SDK
+from trading_sdk.core import SDK
 
 class Trades(SDK):
 

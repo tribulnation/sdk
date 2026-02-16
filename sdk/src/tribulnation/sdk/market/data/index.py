@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from decimal import Decimal
 
-from tribulnation.sdk.core import SDK
+from trading_sdk.core import SDK
 
 class Index(SDK):
 	@SDK.method

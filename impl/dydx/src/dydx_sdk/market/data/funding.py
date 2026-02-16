@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from datetime import datetime, timedelta
 
-from tribulnation.sdk.market.data import Funding as _Funding
+from trading_sdk.market.data import Funding as _Funding
 from dydx.core import timestamp as ts
 from dydx_sdk.core import MarketMixin, IndexerDataMixin, wrap_exceptions
 

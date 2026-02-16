@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from tribulnation.sdk.market.trade import Cancel as _Cancel
+from trading_sdk.market.trade import Cancel as _Cancel
 from mexc_sdk.core import SpotMixin, StreamsMixin, wrap_exceptions
 
 @dataclass

@@ -2,7 +2,7 @@ from dataclasses import dataclass as _dataclass
 
 from mexc import MEXC
 
-from tribulnation.sdk.market import Trading as _Trading
+from trading_sdk.market import Trading as _Trading
 
 from .place import Place
 from .cancel import Cancel

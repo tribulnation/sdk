@@ -2,7 +2,7 @@ from typing_extensions import TypeVar
 from dataclasses import dataclass
 import inspect
 
-from tribulnation.sdk.core.exc import ApiError, AuthError, Error, NetworkError, UserError, ValidationError
+from trading_sdk.core.exc import ApiError, AuthError, Error, NetworkError, UserError, ValidationError
 from binance import Binance
 from binance.core import exc
 

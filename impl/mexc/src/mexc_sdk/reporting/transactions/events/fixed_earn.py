@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 from collections import Counter
 import re
 import pandas as pd
-from tribulnation.sdk.reporting.transactions import Yield
+from trading_sdk.reporting.transactions import Yield
 
 from .. import util
 

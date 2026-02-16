@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from tribulnation.sdk.market.data import Depth as _Depth
+from trading_sdk.market.data import Depth as _Depth
 
 from mexc_sdk.core import MarketMixin
 

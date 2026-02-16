@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from tribulnation.sdk.market.user import Orders as _Orders
+from trading_sdk.market.user import Orders as _Orders
 
 from mexc_sdk.core import MarketMixin
 

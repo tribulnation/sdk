@@ -5,8 +5,8 @@ from decimal import Decimal
 from collections import Counter, defaultdict
 import asyncio
 
-from tribulnation.sdk import SDK
-from tribulnation.sdk.reporting import (
+from trading_sdk import SDK
+from trading_sdk.reporting import (
   Snapshot, Snapshots as _Snapshots
 )
 

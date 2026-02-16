@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from datetime import datetime
 
-from tribulnation.sdk.market.user import Trades as _Trades
+from trading_sdk.market.user import Trades as _Trades
 
 from mexc.core import timestamp as ts
 from mexc_sdk.core import SpotMixin, StreamsMixin, wrap_exceptions

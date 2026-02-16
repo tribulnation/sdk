@@ -5,8 +5,8 @@ from typing_extensions import Collection, Iterable, Sequence
 import httpx
 import pydantic
 
-from tribulnation.sdk.core import ApiError, NetworkError, ValidationError
-from tribulnation.sdk.earn.instruments import Instrument, Instruments as _Instruments
+from trading_sdk.core import ApiError, NetworkError, ValidationError
+from trading_sdk.earn.instruments import Instrument, Instruments as _Instruments
 from bybit_sdk.core import SdkMixin, Platform
 
 BYBIT_HEADERS_UA = (

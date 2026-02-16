@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 
-from tribulnation.sdk import SDK
+from trading_sdk import SDK
 
 @dataclass(kw_only=True)
 class Snapshot:

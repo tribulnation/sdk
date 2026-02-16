@@ -1,7 +1,7 @@
 from typing_extensions import Collection, Sequence, Iterable
 from datetime import timedelta
 
-from tribulnation.sdk.earn.instruments import Instrument, Instruments as _Instruments
+from trading_sdk.earn.instruments import Instrument, Instruments as _Instruments
 from bitget.earn.savings.products import Product
 from bitget_sdk.core import SdkMixin, wrap_exceptions
 

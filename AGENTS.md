@@ -6,7 +6,7 @@ Guidance for AI agents and developers working on this repo.
 
 ## Repo layout
 
-- **`sdk/`** – Abstract SDK (package **trading-sdk**, import as `tribulnation.sdk`). Defines protocols, dataclasses, and types; no exchange-specific code.
+- **`sdk/`** – Abstract SDK (package **trading-sdk**, import as `trading_sdk`). Defines protocols, dataclasses, and types; no exchange-specific code.
 - **`impl/`** – Exchange implementations. Each `impl/<exchange>/` is a separate package (e.g. **bitget-trading-sdk**, **binance-trading-sdk**, **mexc-trading-sdk**) that depends on **trading-sdk** and a typed exchange client (e.g. **typed-bitget**, **typed-binance**, **typed-mexc**).
 - **`.cursor/repl.py`** – MCP Python REPL server. `restart_environment` clears user-loaded modules from `sys.modules` so the next run imports fresh code from disk.
 
@@ -16,7 +16,7 @@ Implementations live under `impl/<name>/src/<name>_sdk/` (e.g. `impl/bitget/src/
 
 ## SDK surface (relevant to impls)
 
-### Earn – `tribulnation.sdk.earn.instruments`
+### Earn – `trading_sdk.earn.instruments`
 
 - **Types**: `Instrument = Flexible | Fixed`, `InstrumentType = Literal['flexible', 'fixed']`.
 - **BaseInstrument**: `type`, `asset`, `apr` (Decimal), `yield_asset`, `min_qty`, `max_qty`, `url`.
@@ -90,7 +90,7 @@ Implementations live under `impl/<name>/src/<name>_sdk/` (e.g. `impl/bitget/src/
 
 ## Conventions
 
-- **Imports**: Impls import SDK types from `tribulnation.sdk` (e.g. `tribulnation.sdk.earn.instruments`, `tribulnation.sdk.wallet.deposit_methods`). Some code may still reference `sdk` if the package is installed or the path is set to the SDK’s public package name.
+- **Imports**: Impls import SDK types from `trading_sdk` (e.g. `trading_sdk.earn.instruments`, `trading_sdk.wallet.deposit_methods`). Some code may still reference `sdk` if the package is installed or the path is set to the SDK’s public package name.
 - **Naming**: Wallet modules: `deposit_methods.py`, `withdrawal_methods.py`. Earn: `earn/instruments.py`. Optional private helpers (e.g. fetch + schema) in `_financial_products.py`.
 - **Errors**: MEXC uses `@wrap_exceptions` from `mexc_sdk.core` for consistent error handling; other impls may use similar decorators or plain try/except.
 

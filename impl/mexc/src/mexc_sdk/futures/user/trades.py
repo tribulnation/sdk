@@ -5,7 +5,7 @@ from datetime import datetime
 from collections import defaultdict
 import asyncio
 
-from tribulnation.sdk.market.user import Trades as _Trades
+from trading_sdk.market.user import Trades as _Trades
 
 from mexc.core import timestamp as ts
 from mexc.futures.user_data.my_trades import Side

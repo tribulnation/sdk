@@ -2,7 +2,7 @@ from dataclasses import dataclass as _dataclass
 
 from dydx.indexer import Indexer as _Indexer
 
-from tribulnation.sdk.market import PerpUserData
+from trading_sdk.market import PerpUserData
 from .balances import Balances
 from .funding import Funding
 from .orders import Orders

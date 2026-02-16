@@ -5,7 +5,7 @@ from collections import Counter
 from datetime import datetime
 import asyncio
 
-from tribulnation.sdk.reporting import (
+from trading_sdk.reporting import (
   Snapshot, Snapshots as SnapshotsTDK,
 )
 

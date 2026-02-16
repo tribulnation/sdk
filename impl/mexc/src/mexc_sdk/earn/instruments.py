@@ -4,8 +4,8 @@ from decimal import Decimal
 import pydantic
 import httpx
 
-from tribulnation.sdk.core import NetworkError, ValidationError, ApiError
-from tribulnation.sdk.earn.instruments import Instrument, Instruments as _Instruments
+from trading_sdk.core import NetworkError, ValidationError, ApiError
+from trading_sdk.earn.instruments import Instrument, Instruments as _Instruments
 from mexc_sdk.core import SdkMixin
 
 MEXC_EARN_URL = 'https://www.mexc.com/earn'

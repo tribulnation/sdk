@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing_extensions import AsyncIterable, Sequence
 
-from tribulnation.sdk.market.data import Funding as _Funding
+from trading_sdk.market.data import Funding as _Funding
 
 from mexc_sdk.core import MarketMixin
 

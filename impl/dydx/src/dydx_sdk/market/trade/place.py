@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-from tribulnation.sdk.market.trade import Place as _Place
-from tribulnation.sdk.core import ValidationError
+from trading_sdk.market.trade import Place as _Place
+from trading_sdk.core import ValidationError
 
 from dydx.node.private.place_order import Order, TimeInForce, Flags
 from dydx_sdk.core import TradingMixin, wrap_exceptions
