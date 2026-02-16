@@ -13,7 +13,7 @@ def order_price(order: _Place.Order) -> Decimal:
     case 'LIMIT' | 'POST_ONLY':
       return Decimal(order['price'])
     case 'MARKET':
-      return Decimal('1e12') if Decimal(order['qty']) > 0 else Decimal(0)
+      return Decimal('1e8') if Decimal(order['qty']) > 0 else Decimal(0)
     case other:
       raise ValidationError(f'Unknown order type: {other}')
 
