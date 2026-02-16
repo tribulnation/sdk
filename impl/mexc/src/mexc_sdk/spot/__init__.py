@@ -1,44 +1,40 @@
-from dataclasses import dataclass as _dataclass, field as _field
+from dataclasses import dataclass as _dataclass
 
-from tribulnation.sdk.market import Market
+from mexc import MEXC
+from mexc.spot.market_data.exchange_info import Info
 
-from mexc_sdk.core import MarketMixin
-from .market_data import MarketData
-from .trading import Trading
-from .user_data import UserData
-from .market_streams import MarketStreams
-from .user_streams import UserStreams
+from tribulnation.sdk.core import UserError
+from tribulnation.sdk import Market as _Market
 
-@_dataclass
-class Spot(Market, MarketMixin):
+from .data import MarketData
+from .trade import Trading
+from .user import UserData
 
-  @property
-  def id(self) -> str:
-    return f'mexc:{self.instrument}'
+@_dataclass(frozen=True)
+class Market(_Market):
+  data: MarketData
+  trade: Trading
+  user: UserData
 
-  def __post_init__(self):
-    self._market_data = MarketData(client=self.client, instrument=self.instrument, validate=self.validate, recvWindow=self.recvWindow)
-    self._trading = Trading(client=self.client, instrument=self.instrument, validate=self.validate, recvWindow=self.recvWindow)
-    self._user_data = UserData(client=self.client, instrument=self.instrument, validate=self.validate, recvWindow=self.recvWindow)
-    self._market_streams = MarketStreams(client=self.client, instrument=self.instrument)
-    self._user_streams = UserStreams(client=self.client, instrument=self.instrument)
+  @classmethod
+  def new(
+    cls, instrument: Info, client: MEXC, *,
+    validate: bool = True, recvWindow: int | None = None
+  ):
+    return cls(
+      data=MarketData.new(instrument, client, validate=validate, recvWindow=recvWindow),
+      trade=Trading.new(instrument, client, validate=validate, recvWindow=recvWindow),
+      user=UserData.new(instrument, client, validate=validate, recvWindow=recvWindow)
+    )
 
-  @property
-  def market_data(self) -> MarketData:
-    return self._market_data
-
-  @property
-  def trading(self) -> Trading:
-    return self._trading
-
-  @property
-  def user_data(self) -> UserData:
-    return self._user_data
-
-  @property
-  def market_streams(self) -> MarketStreams:
-    return self._market_streams
-
-  @property
-  def user_streams(self) -> UserStreams:
-    return self._user_streams
+  @classmethod
+  async def connect(
+    cls, instrument: str, *,
+    api_key: str | None = None, api_secret: str | None = None,
+    validate: bool = True, recvWindow: int | None = None
+  ):
+    client = MEXC.new(api_key=api_key, api_secret=api_secret, validate=validate)
+    infos = await client.spot.exchange_info(instrument)
+    if (info := infos.get(instrument)) is None:
+      raise UserError(f'Instrument "{instrument}" not found')
+    return cls.new(info, client, validate=validate, recvWindow=recvWindow)
