@@ -69,7 +69,7 @@ class SubaccountStreamMixin(SubaccountMixin, IndexerStreamsMixin):
 class PrivateNodeMixin:
   private_node: PrivateNode
 
-class TradingSettings(TypedDict):
+class TradingSettings(TypedDict, total=False):
   limit_flags: Flags
   """Place limit orders as short/long term"""
   reduce_only: bool

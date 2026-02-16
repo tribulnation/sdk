@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-from tribulnation.sdk.market_v2.data import Depth as _Depth
+from tribulnation.sdk.market.data import Depth as _Depth
 from dydx_sdk.core import MarketMixin, IndexerDataMixin, wrap_exceptions
 
 @dataclass

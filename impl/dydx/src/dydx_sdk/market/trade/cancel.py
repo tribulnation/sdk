@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 
-from tribulnation.sdk.market_v2.trade import Cancel as _Cancel
+from tribulnation.sdk.market.trade import Cancel as _Cancel
 
 from dydx_v4_client import OrderFlags
 from dydx_sdk.core import PrivateNodeMixin, wrap_exceptions
 
-from dydx_sdk.market_v2.user.orders import parse_id
+from dydx_sdk.market.user.orders import parse_id
 
 @dataclass
 class Cancel(PrivateNodeMixin, _Cancel):

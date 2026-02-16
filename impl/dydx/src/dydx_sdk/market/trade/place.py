@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-from tribulnation.sdk.market_v2.trade import Place as _Place
+from tribulnation.sdk.market.trade import Place as _Place
 from tribulnation.sdk.core import ValidationError
 
 from dydx.node.private.place_order import Order, TimeInForce, Flags
 from dydx_sdk.core import TradingMixin, wrap_exceptions
-from dydx_sdk.market_v2.user.orders import serialize_id
+from dydx_sdk.market.user.orders import serialize_id
 
 def order_price(order: _Place.Order) -> Decimal:
   match order['type']:

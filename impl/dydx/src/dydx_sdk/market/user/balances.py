@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-from tribulnation.sdk.market_v2.user import Balances as _Balances
+from tribulnation.sdk.market.user import Balances as _Balances
 from dydx_sdk.core import MarketMixin, IndexerDataMixin, SubaccountMixin, wrap_exceptions
 
 @dataclass

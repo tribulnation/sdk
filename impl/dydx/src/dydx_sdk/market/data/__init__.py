@@ -3,7 +3,7 @@ from dataclasses import dataclass as _dataclass
 from dydx.indexer import IndexerData as _IndexerData
 from dydx.node import PublicNode as _PublicNode
 
-from tribulnation.sdk.market_v2 import PerpMarketData
+from tribulnation.sdk.market import PerpMarketData
 from .depth import Depth
 from .funding import Funding
 from .index import Index

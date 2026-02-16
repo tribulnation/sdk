@@ -4,7 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from dydx.core import timestamp as ts
-from tribulnation.sdk.market_v2.user import Trades as _Trades
+from tribulnation.sdk.market.user import Trades as _Trades
 from dydx_sdk.core import MarketMixin, IndexerDataMixin, SubaccountStreamMixin, wrap_exceptions
 
 @dataclass
