@@ -1,0 +1,13 @@
+from dataclasses import dataclass
+
+from tribulnation.sdk.market.user import Orders as _Orders
+
+from mexc_sdk.core import MarketMixin
+
+@dataclass
+class Orders(MarketMixin, _Orders):
+  async def query(self, id: str) -> _Orders.Order:
+    raise NotImplementedError('MEXC futures order query is not implemented')
+
+  async def open(self) -> list[_Orders.Order]:
+    raise NotImplementedError('MEXC futures open orders are not implemented')

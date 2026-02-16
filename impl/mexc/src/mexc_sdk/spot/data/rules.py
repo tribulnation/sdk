@@ -8,7 +8,7 @@ from mexc_sdk.core import SpotMixin, wrap_exceptions
 @dataclass
 class Rules(SpotMixin, _Rules):
   @wrap_exceptions
-  async def __call__(self) -> _Rules.Rules:
+  async def get(self) -> _Rules.Rules:
     return _Rules.Rules(
       base=self.info['baseAsset'],
       quote=self.info['quoteAsset'],

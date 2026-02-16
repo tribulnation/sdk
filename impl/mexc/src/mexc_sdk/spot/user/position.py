@@ -8,7 +8,7 @@ from mexc_sdk.core import SpotMixin, wrap_exceptions
 @dataclass
 class Position(SpotMixin, _Position):
   @wrap_exceptions
-  async def __call__(self) -> _Position.Position:
+  async def get(self) -> _Position.Position:
     r = await self.client.spot.account(recvWindow=self.recvWindow)
     for b in r['balances']:
       if b['asset'] == self.info['baseAsset']:

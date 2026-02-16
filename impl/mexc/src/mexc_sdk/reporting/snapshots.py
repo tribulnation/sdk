@@ -2,27 +2,55 @@ from typing_extensions import Sequence
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from decimal import Decimal
-from collections import Counter
+from collections import Counter, defaultdict
 import asyncio
 
+from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import (
-  Snapshot, Snapshots as SnapshotsTDK,
+  Snapshot, Snapshots as _Snapshots
 )
 
 from mexc_sdk.core import SdkMixin
-from mexc_sdk.spot.user_data import Balances as SpotBalances
-from mexc_sdk.futures.user_data import Balances as FuturesBalances, MyPosition
+from mexc_sdk.futures.user.position import _PerpPosition, PositionType, merge_positions
 
 @dataclass
-class Snapshots(SnapshotsTDK, SdkMixin):
+class Snapshots(_Snapshots, SdkMixin):
+  @SDK.method
+  async def spot_balances(self):
+    r = await self.client.spot.account(recvWindow=self.recvWindow)
+    return {
+      b['asset']: Decimal(b['free']) + Decimal(b['locked'])
+      for b in r['balances']
+    }
+
+  @SDK.method
+  async def futures_balances(self):
+    r = await self.client.futures.assets(recvWindow=self.recvWindow)
+    return {
+      b['currency']: Decimal(b['availableBalance']) + Decimal(b['positionMargin'])
+      for b in r
+    }
+
+  async def futures_positions(self):
+    positions = await self.client.futures.positions()
+    out = defaultdict[str, list[_PerpPosition.Position]](list)
+
+    for pos in positions:
+      contract = await self.client.futures.contract_info(pos['symbol'])
+      contract_size = Decimal(contract['contractSize'])
+      s = 1 if pos['positionType'] == PositionType.long.value else -1
+      size = s * abs(Decimal(pos['holdVol'])) * contract_size
+      out[pos['symbol']].append(_PerpPosition.Position(size=size, entry_price=Decimal(pos['openAvgPrice'])))
+
+    return { symbol: merge_positions(positions) for symbol, positions in out.items() }
+
   async def snapshots(self, assets: Sequence[str] = []) -> Sequence[Snapshot]:
-    spot_r, future_r = await asyncio.gather(
-      SpotBalances.balances(self), # type: ignore
-      FuturesBalances.balances(self), # type: ignore
+    spot_balances, future_balances, future_positions = await asyncio.gather(
+      self.spot_balances(),
+      self.futures_balances(),
+      self.futures_positions(),
     )
     time = datetime.now(timezone.utc)
-    spot_balances = { k: v.total for k, v in spot_r.items() }
-    future_balances = { k: v.total for k, v in future_r.items() }
     balances: dict[str, Decimal] = Counter(spot_balances) + Counter(future_balances) # type: ignore
 
     currency_snapshots = [
@@ -30,12 +58,9 @@ class Snapshots(SnapshotsTDK, SdkMixin):
       for currency, balance in balances.items()
     ]
 
-    positions = await Positions.positions(self) # type: ignore
-    time = datetime.now(timezone.utc)
-
     futures_snapshots = [
       Snapshot(time=time, asset=symbol, qty=p.size, avg_price=p.entry_price, kind='future')
-      for symbol, p in positions.items()
+      for symbol, p in future_positions.items()
     ]
 
     return currency_snapshots + futures_snapshots

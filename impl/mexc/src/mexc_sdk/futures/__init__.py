@@ -1,12 +1,26 @@
-from dataclasses import dataclass as _dataclass, field as _field
+from dataclasses import dataclass as _dataclass
 
-from .market_data import MarketData
-from .user_data import UserData
-from .user_streams import UserStreams
+from mexc import MEXC
 
-@_dataclass
-class Futures(MarketData, UserData):
-  user_streams: UserStreams = _field(init=False)
-  
-  def __post_init__(self):
-    self.user_streams = UserStreams(client=self.client, instrument=self.instrument)
+from tribulnation.sdk import PerpMarket as _PerpMarket
+
+from .data import MarketData
+from .trade import Trading
+from .user import UserData
+
+@_dataclass(frozen=True)
+class Futures(_PerpMarket):
+  data: MarketData
+  trade: Trading
+  user: UserData
+
+  @classmethod
+  def new(
+    cls, instrument: str, client: MEXC, *,
+    validate: bool = True, recvWindow: int | None = None
+  ):
+    return cls(
+      data=MarketData.new(instrument, client, validate=validate, recvWindow=recvWindow),
+      trade=Trading.new(instrument, client, validate=validate, recvWindow=recvWindow),
+      user=UserData.new(instrument, client, validate=validate, recvWindow=recvWindow),
+    )

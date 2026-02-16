@@ -11,7 +11,7 @@ from .trade import Trading
 from .user import UserData
 
 @_dataclass(frozen=True)
-class Market(_Market):
+class Spot(_Market):
   data: MarketData
   trade: Trading
   user: UserData

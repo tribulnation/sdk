@@ -13,16 +13,17 @@ class MEXC(SdkMixin):
   wallet: Wallet = _field(init=False)
 
   @_overload
-  def spot(self, base: str, quote: str, /) -> Spot: ...
+  async def spot(self, base: str, quote: str, /) -> Spot: ...
   @_overload
-  def spot(self, instrument: str, /) -> Spot: ...
-  def spot(self, base: str | None = None, quote: str | None = None, instrument: str | None = None) -> Spot:
+  async def spot(self, instrument: str, /) -> Spot: ...
+  async def spot(self, base: str | None = None, quote: str | None = None, instrument: str | None = None) -> Spot:
     if base is not None and quote is not None:
       instrument = spot_name(base, quote)
     elif instrument is None:
       raise ValueError('Either base and quote or instrument must be provided')
 
-    return Spot(self.client, validate=self.validate, instrument=instrument)
+    info = (await self.client.spot.exchange_info(instrument))[instrument]
+    return Spot.new(info, self.client, validate=self.validate)
 
   @_overload
   def perp(self, base: str, quote: str, /) -> Futures: ...
@@ -34,7 +35,7 @@ class MEXC(SdkMixin):
     elif instrument is None:
       raise ValueError('Either base and quote or instrument must be provided')
 
-    return Futures(self.client, validate=self.validate, instrument=instrument)
+    return Futures.new(instrument, self.client, validate=self.validate)
 
   def __post_init__(self):
     self.earn = Earn(self.client, validate=self.validate)
