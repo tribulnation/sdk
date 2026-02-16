@@ -131,8 +131,9 @@ def default_retry_logger(
   fn: Callable, method: Method, path: Sequence[str], *,
   args: tuple, kwargs: dict, exception: Exception, retries: int, delay: float
 ):
+  name = getattr(fn, '__name__', method.name)
   path_str = '.'.join(path)
-  print(f'Exponential retry [{retries=}, {delay=:.2f}s]. Calling {path_str}.{method.name} with {args=}, {kwargs=}. Exception:', exception)
+  print(f'Exponential retry [{retries=}, {delay=:.2f}s]. Calling {path_str}.{name} with {args=}, {kwargs=}. Exception:', exception)
 
 def exponential_retry(
   *exceptions: type[E],
@@ -175,7 +176,8 @@ def default_logger(
   args: tuple, kwargs: dict
 ):
   path_str = '.'.join(path)
-  print(f'Calling {path_str}.{method.name} with {args=}, {kwargs=}')
+  name = getattr(fn, '__name__', method.name)
+  print(f'Calling {path_str}.{name} with {args=}, {kwargs=}')
 
 def log(logger: Logger = default_logger) -> Mapper:
   def log_wrapper(fn: Fn, method: Method, path: Sequence[str]) -> Fn:
