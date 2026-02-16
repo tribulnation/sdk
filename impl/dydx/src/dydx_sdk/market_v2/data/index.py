@@ -7,6 +7,6 @@ from dydx_sdk.core import MarketMixin, IndexerDataMixin, wrap_exceptions
 @dataclass
 class Index(MarketMixin, IndexerDataMixin, _Index):
   @wrap_exceptions
-  async def __call__(self):
+  async def price(self):
     market = await self.indexer_data.get_market(self.market)
     return Decimal(market['oraclePrice'])

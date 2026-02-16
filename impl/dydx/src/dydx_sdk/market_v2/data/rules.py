@@ -9,7 +9,7 @@ from dydx_sdk.core import MarketMixin, IndexerDataMixin, AccountMixin, PublicNod
 @dataclass
 class Rules(MarketMixin, IndexerDataMixin, AccountMixin, PublicNodeMixin, _Rules):
   @wrap_exceptions
-  async def __call__(self) -> _Rules.Rules:
+  async def get(self) -> _Rules.Rules:
     market, fees = await asyncio.gather(
       self.indexer_data.get_market(self.market),
       self.public_node.get_user_fee_tier(self.address)

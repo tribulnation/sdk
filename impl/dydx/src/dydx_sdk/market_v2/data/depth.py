@@ -7,7 +7,7 @@ from dydx_sdk.core import MarketMixin, IndexerDataMixin, wrap_exceptions
 @dataclass
 class Depth(MarketMixin, IndexerDataMixin, _Depth):
   @wrap_exceptions
-  async def __call__(self, *, limit: int | None = None) -> _Depth.Book:
+  async def book(self, *, limit: int | None = None) -> _Depth.Book:
     book = await self.indexer_data.get_order_book(self.market)
     return _Depth.Book(
       asks=[_Depth.Book.Entry(

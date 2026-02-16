@@ -1,4 +1,4 @@
-from typing_extensions import TypeVar, Any, Callable, Protocol, Generic, Self, overload
+from typing_extensions import TypeVar, Any, Callable, Protocol, Generic, Self, overload, Sequence
 from abc import ABCMeta
 from dataclasses import dataclass
 import asyncio
@@ -30,32 +30,39 @@ class SDKMeta(ABCMeta):
       if (method := Method.get(v)) is not None:
         cls.__sdk_methods__[k] = method
     for k, v in cls.__annotations__.items():
-      if (field := getattr(v, '__sdk_fields__', None)) is not None:
+      if getattr(v, '__sdk_fields__', None) is not None:
         cls.__sdk_fields__[k] = v
     return cls
+
+
+class Mapper(Protocol, Generic[Fn]):
+  def __call__(self, fn: Fn, method: Method, path: Sequence[str]) -> Fn:
+    ...
 
 class SDK(metaclass=SDKMeta):
   __sdk_methods__: dict[str, Method] = {}
   __sdk_fields__: dict[str, type['SDK']] = {}
 
-  def __sdk_instrument__(self, *mappers: Callable[[Fn, Method], Fn]) -> Self:
+  def __sdk_instrument__(self, *mappers: Mapper[Fn], path: tuple[str, ...] = ()) -> Self:
     for method, data in self.__sdk_methods__.items():
       fn = getattr(self, method)
       for mapper in mappers:
-        fn = mapper(fn, data)
+        fn = mapper(fn, data, path)
         setattr(self, method, fn)
     for field in self.__sdk_fields__:
       sdk: SDK = getattr(self, field)
-      sdk.__sdk_instrument__(*mappers)
+      sdk.__sdk_instrument__(*mappers, path=path + (field,))
     return self
 
   @classmethod
-  def __sdk_hierarchy__(cls, *, field: str | None = None, indent: int = 0, prefix: str = "") -> str:
+  def __sdk_hierarchy__(
+    cls, *, field: str | None = None, indent: int = 0, prefix: str = "", last: bool = False
+  ) -> str:
     # Prepare current line
     line = ""
     if indent > 0:
       # Show vertical line and branch
-      line += prefix + "├─ "
+      line += prefix + ("└─ " if last else "├─ ")
     else:
       line += ""
     if field is not None:
@@ -64,7 +71,7 @@ class SDK(metaclass=SDKMeta):
 
     # Prepare new prefix for children
     if indent > 0:
-      child_prefix = prefix + "│  "
+      child_prefix = prefix + ("   " if last else "│  ")
     else:
       child_prefix = ""
 
@@ -80,11 +87,12 @@ class SDK(metaclass=SDKMeta):
     # Print fields
     for j, (next_field, sdk) in enumerate(field_items):
       is_last_field = (j == len(field_items) - 1)
-      next_prefix = child_prefix
-      # Continue vertical bars except for last
-      if is_last_field:
-        next_prefix = prefix + "   "
-      line += sdk.__sdk_hierarchy__(indent=indent + 1, field=next_field, prefix=child_prefix)
+      line += sdk.__sdk_hierarchy__(
+        indent=indent + 1,
+        field=next_field,
+        prefix=child_prefix,
+        last=is_last_field,
+      )
 
     return line
 
@@ -107,23 +115,31 @@ class SDK(metaclass=SDKMeta):
     else:
       return decorator(fn)
 
-def instrument(sdk: SDK, *mappers: Callable[[Fn, Method], Fn]):
+def instrument(sdk: SDK, *mappers: Mapper[Fn]):
   sdk.__sdk_instrument__(*mappers)
 
 E = TypeVar('E', bound=Exception, contravariant=True)
 
 class RetryLogger(Protocol, Generic[E]):
-  def __call__(self, exception: E, *, retries: int, delay: float):
+  def __call__(
+    self, fn: Callable, method: Method, path: tuple[str, ...], *,
+    args: tuple, kwargs: dict, exception: E, retries: int, delay: float
+  ):
     ...
-def default_retry_logger(exception: Exception, *, retries: int, delay: float):
-  print(f'Exponential retry [{retries=}, {delay=:.2f}s]. Exception:', exception)
+
+def default_retry_logger(
+  fn: Callable, method: Method, path: Sequence[str], *,
+  args: tuple, kwargs: dict, exception: Exception, retries: int, delay: float
+):
+  path_str = '.'.join(path)
+  print(f'Exponential retry [{retries=}, {delay=:.2f}s]. Calling {path_str}.{method.name} with {args=}, {kwargs=}. Exception:', exception)
 
 def exponential_retry(
   *exceptions: type[E],
   max_retries: int | None = None, base_delay: float = 1.0,
   max_delay: float | None = None, log: RetryLogger[E] | None = default_retry_logger
-) -> Callable[[Fn, Method], Fn]:
-    def exponential_retry_wrapper(fn: Fn, method: Method) -> Fn:
+) -> Mapper[Fn]:
+    def exponential_retry_wrapper(fn: Fn, method: Method, path: Sequence[str]) -> Fn:
       if inspect.iscoroutinefunction(fn):
         async def exponential_retry_wrapped(*args, **kwargs):
           retries = 0
@@ -138,7 +154,7 @@ def exponential_retry(
               if max_delay is not None and delay > max_delay:
                 delay = max_delay
               if log is not None:
-                log(e, retries=retries, delay=delay)
+                log(fn, method, path, args=args, kwargs=kwargs, exception=e, retries=retries, delay=delay)
               await asyncio.sleep(delay)
         return exponential_retry_wrapped # type: ignore
 
@@ -148,30 +164,37 @@ def exponential_retry(
     return exponential_retry_wrapper
 
 class Logger(Protocol):
-  def __call__(self, function: Callable, args: tuple, kwargs: dict):
+  def __call__(
+    self, fn: Callable, method: Method, path: Sequence[str], *,
+    args: tuple, kwargs: dict
+  ):
     ...
 
-def default_logger(function: Callable, args: tuple, kwargs: dict):
-  print(f'Calling {function.__name__} with {args=}, {kwargs=}')
+def default_logger(
+  fn: Callable, method: Method, path: Sequence[str], *,
+  args: tuple, kwargs: dict
+):
+  path_str = '.'.join(path)
+  print(f'Calling {path_str}.{method.name} with {args=}, {kwargs=}')
 
-def log(logger: Logger = default_logger) -> Callable[[Fn, Method], Fn]:
-  def log_wrapper(fn: Fn, method: Method) -> Fn:
+def log(logger: Logger = default_logger) -> Mapper[Fn]:
+  def log_wrapper(fn: Fn, method: Method, path: Sequence[str]) -> Fn:
     if inspect.iscoroutinefunction(fn):
       async def coro_log_wrapped(*args, **kwargs):
-        logger(fn, args, kwargs)
+        logger(fn, method, path, args=args, kwargs=kwargs)
         return await fn(*args, **kwargs)
       return coro_log_wrapped # type: ignore
 
     elif inspect.isasyncgenfunction(fn):
       async def agen_log_wrapped(*args, **kwargs):
-        logger(fn, args, kwargs)
+        logger(fn, method, path, args=args, kwargs=kwargs)
         async for x in fn(*args, **kwargs):
           yield x
       return agen_log_wrapped # type: ignore
 
     elif inspect.isfunction(fn):
       def log_wrapped(*args, **kwargs):
-        logger(fn, args, kwargs)
+        logger(fn, method, path, args=args, kwargs=kwargs)
         return fn(*args, **kwargs)
       return log_wrapped # type: ignore
 

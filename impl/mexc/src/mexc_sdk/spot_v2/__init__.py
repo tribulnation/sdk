@@ -3,6 +3,7 @@ from dataclasses import dataclass as _dataclass
 from mexc import MEXC
 from mexc.spot.market_data.exchange_info import Info
 
+from tribulnation.sdk.core import UserError
 from tribulnation.sdk.market_v2 import Market as _Market
 from .data import MarketData
 from .trade import Trading
@@ -32,5 +33,7 @@ class Market(_Market):
     validate: bool = True, recvWindow: int | None = None
   ):
     client = MEXC.new(api_key=api_key, api_secret=api_secret, validate=validate)
-    info = (await client.spot.exchange_info(instrument))[instrument]
+    infos = await client.spot.exchange_info(instrument)
+    if (info := infos.get(instrument)) is None:
+      raise UserError(f'Instrument "{instrument}" not found')
     return cls.new(info, client, validate=validate, recvWindow=recvWindow)

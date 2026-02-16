@@ -72,6 +72,19 @@ class Book:
   def mark_price(self) -> Decimal:
     return (self.best_bid.price + self.best_ask.price) / 2
 
+
+  @property
+  def bid_volume(self) -> Decimal:
+    return Decimal(sum(e.qty for e in self.bids))
+
+  @property
+  def ask_volume(self) -> Decimal:
+    return Decimal(sum(e.qty for e in self.asks))
+
+  @property
+  def volume(self) -> Decimal:
+    return self.bid_volume + self.ask_volume
+
   def __str__(self) -> str:
     return f'{self:f}'
 
@@ -97,8 +110,15 @@ class Depth(SDK):
 
   @SDK.method
   @abstractmethod
+  async def book(self, *, limit: int | None = None) -> Book:
+    """Fetch the market order book.
+    
+    - `limit`: The maximum number of bids/asks to return.
+    """
+
   async def __call__(self, *, limit: int | None = None) -> Book:
     """Fetch the market order book.
     
     - `limit`: The maximum number of bids/asks to return.
     """
+    return await self.book(limit=limit)

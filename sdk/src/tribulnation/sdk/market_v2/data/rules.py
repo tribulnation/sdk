@@ -3,7 +3,7 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from decimal import Decimal
 
-from tribulnation.sdk.core import SDK, trunc2tick
+from tribulnation.sdk.core import SDK, trunc2tick, round2tick
 
 class Rules(SDK):
   @dataclass(kw_only=True)
@@ -27,9 +27,9 @@ class Rules(SDK):
     """Minimum price of the order (in quote units)."""
     max_price: Decimal | None = None
     """Maximum price of the order (in quote units)."""
-    maker_fee: Decimal | None = None
+    maker_fee: Decimal
     """Maker fee of the order (in quote units)."""
-    taker_fee: Decimal | None = None
+    taker_fee: Decimal
     """Taker fee of the order (in quote units)."""
     api: bool
     """Whether the instrument can be traded via API."""
@@ -46,6 +46,10 @@ class Rules(SDK):
       qty = trunc2tick(base_qty, self.step_size)
       if qty > self.min_qty:
         return qty
+
+    def round_price(self, price: Decimal) -> Decimal:
+      """Round the price to the nearest tick size."""
+      return round2tick(price, self.tick_size)
     
     def amount2qty(self, quote_amount: Decimal, *, price: Decimal) -> Decimal | None:
       """Convert a quote amount to a base quantity, truncating to the nearest step size. Returns `None` if the quantity is too small."""
@@ -57,5 +61,9 @@ class Rules(SDK):
   
   @SDK.method
   @abstractmethod
+  async def get(self) -> Rules:
+    """Fetch market rules."""
+
   async def __call__(self) -> Rules:
     """Fetch market rules."""
+    return await self.get()
