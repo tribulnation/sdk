@@ -1,4 +1,3 @@
-from typing_extensions import Any
 from dataclasses import dataclass
 from decimal import Decimal
 
@@ -18,17 +17,21 @@ def order_price(order: _Place.Order) -> Decimal:
     case other:
       raise ValidationError(f'Unknown order type: {other}')
 
-def time_in_force(order: _Place.Order) -> TimeInForce:
+def time_in_force(order: _Place.Order, limit_flags: Flags) -> TimeInForce:
   match order['type']:
     case 'POST_ONLY':
       return 'POST_ONLY'
-    case 'LIMIT':
+    case 'LIMIT' if limit_flags == 'LONG_TERM':
       return 'GOOD_TIL_TIME'
+    case 'LIMIT' if limit_flags == 'SHORT_TERM':
+      return 'IMMEDIATE_OR_CANCEL'
     case 'MARKET':
       return 'IMMEDIATE_OR_CANCEL'
+    case other:
+      raise ValidationError(f'Unknown order type "{other}" with limit flags "{limit_flags}"')
 
 def export_order(
-  order: _Place.Order, *, limit_flags: Flags
+  order: _Place.Order, *, limit_flags: Flags = 'LONG_TERM', reduce_only: bool = False
 ) -> Order:
   signed_qty = Decimal(order['qty'])
   side = 'BUY' if signed_qty >= 0 else 'SELL'
@@ -37,14 +40,15 @@ def export_order(
     price=order_price(order),
     size=abs(signed_qty),
     flags=limit_flags if order['type'] in ('LIMIT', 'POST_ONLY') else 'SHORT_TERM',
-    time_in_force=time_in_force(order),
+    time_in_force=time_in_force(order, limit_flags),
+    reduce_only=reduce_only,
   )
     
 @dataclass
 class Place(TradingMixin, _Place):
   @wrap_exceptions
   async def order(self, order: _Place.Order) -> _Place.Result:
-    dydx_order = export_order(order, limit_flags=self.limit_flags)
-    r = await self.private_node.place_order(self.perpetual_market, dydx_order)
+    dydx_order = export_order(order, **(self.settings or {}))
+    r = await self.private_node.place_order(self.perpetual_market, dydx_order, subaccount=self.subaccount)
     id = serialize_id(r['order'].order_id)
     return _Place.Result(id=id, details=r)

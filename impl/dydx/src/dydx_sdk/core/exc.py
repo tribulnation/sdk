@@ -1,7 +1,9 @@
 from functools import wraps
 import inspect
-from tribulnation.sdk.core import NetworkError, ValidationError, ApiError, Error
 
+from grpc._channel import _InactiveRpcError
+
+from tribulnation.sdk.core import NetworkError, ValidationError, ApiError, Error
 from dydx import core
 
 def wrap_exceptions(fn):
@@ -14,7 +16,7 @@ def wrap_exceptions(fn):
         raise NetworkError(*e.args) from e
       except core.ValidationError as e:
         raise ValidationError(*e.args) from e
-      except core.ApiError as e:
+      except (core.ApiError, _InactiveRpcError) as e:
         raise ApiError(*e.args) from e
       except core.Error as e:
         raise Error(*e.args) from e
@@ -28,7 +30,7 @@ def wrap_exceptions(fn):
         raise NetworkError(*e.args) from e
       except core.ValidationError as e:
         raise ValidationError(*e.args) from e
-      except core.ApiError as e:
+      except (core.ApiError, _InactiveRpcError) as e:
         raise ApiError(*e.args) from e
       except core.Error as e:
         raise Error(*e.args) from e
@@ -41,7 +43,7 @@ def wrap_exceptions(fn):
         raise NetworkError(*e.args) from e
       except core.ValidationError as e:
         raise ValidationError(*e.args) from e
-      except core.ApiError as e:
+      except (core.ApiError, _InactiveRpcError) as e:
         raise ApiError(*e.args) from e
       except core.Error as e:
         raise Error(*e.args) from e

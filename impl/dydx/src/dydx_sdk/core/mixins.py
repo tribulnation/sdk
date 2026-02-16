@@ -1,4 +1,4 @@
-from typing_extensions import AsyncIterable
+from typing_extensions import AsyncIterable, TypedDict
 from dataclasses import dataclass, field
 import asyncio
 
@@ -69,10 +69,14 @@ class SubaccountStreamMixin(SubaccountMixin, IndexerStreamsMixin):
 class PrivateNodeMixin:
   private_node: PrivateNode
 
+class TradingSettings(TypedDict):
+  limit_flags: Flags
+  """Place limit orders as short/long term"""
+  reduce_only: bool
+
 @dataclass(kw_only=True)
 class TradingMixin(MarketMixin, IndexerDataMixin, SubaccountMixin, PrivateNodeMixin):
-  limit_flags: Flags = 'SHORT_TERM'
-  """Place limit orders as short/long term"""
+  settings: TradingSettings | None = None
   perpetual_market: PerpetualMarket
 
   @classmethod
@@ -82,7 +86,7 @@ class TradingMixin(MarketMixin, IndexerDataMixin, SubaccountMixin, PrivateNodeMi
     node_url: str = OEGS_GRPC_URL,
     subaccount: int = 0,
     validate: bool = True,
-    limit_flags: Flags = 'LONG_TERM',
+    settings: TradingSettings | None = None,
     indexer_data: IndexerData | None = None,
   ):
     node = await PrivateNode.connect(mnemonic, url=node_url)
@@ -91,7 +95,7 @@ class TradingMixin(MarketMixin, IndexerDataMixin, SubaccountMixin, PrivateNodeMi
     return cls(
       private_node=node,
       indexer_data=indexer_data,
-      limit_flags=limit_flags,
+      settings=settings,
       address=node.address,
       subaccount=subaccount,
       market=market,

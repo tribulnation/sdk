@@ -3,7 +3,7 @@ from dataclasses import dataclass as _dataclass
 from dydx.indexer import IndexerData as _IndexerData
 from dydx.node import PrivateNode as _PrivateNode
 from dydx.indexer.types import PerpetualMarket as _PerpetualMarket
-from dydx.node.private.place_order import Flags as _Flags
+from dydx_sdk.core import TradingSettings as _TradingSettings
 
 from tribulnation.sdk.market_v2 import Trading as _Trading
 from .cancel import Cancel
@@ -21,7 +21,7 @@ class Trading(_Trading):
     subaccount: int = 0,
     indexer_data: _IndexerData,
     private_node: _PrivateNode,
-    limit_flags: _Flags,
+    settings: _TradingSettings | None = None,
     perpetual_market: _PerpetualMarket,
   ):
     return cls(
@@ -29,7 +29,7 @@ class Trading(_Trading):
       place=Place(
         private_node=private_node, indexer_data=indexer_data,
         address=address, subaccount=subaccount,
-        market=market, limit_flags=limit_flags,
+        market=market, settings=settings,
         perpetual_market=perpetual_market,
       ),
     )

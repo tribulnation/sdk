@@ -3,7 +3,7 @@ from .exc import wrap_exceptions
 from .mixins import (
   IndexerDataMixin, IndexerStreamsMixin, PublicNodeMixin,
   AccountMixin, SubaccountMixin, SubaccountStreamMixin,
-  TradingMixin, MarketMixin, PrivateNodeMixin
+  TradingMixin, MarketMixin, PrivateNodeMixin, TradingSettings
 )
 
 __all__ = [
@@ -18,4 +18,5 @@ __all__ = [
   'TradingMixin',
   'MarketMixin',
   'PrivateNodeMixin',
+  'TradingSettings',
 ]

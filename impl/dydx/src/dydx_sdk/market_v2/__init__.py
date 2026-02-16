@@ -6,8 +6,7 @@ from dydx.node import (
   PublicNode as _PublicNode,
   OEGS_GRPC_URL as _OEGS_GRPC_URL,
 )
-from dydx.indexer.types import PerpetualMarket as _PerpetualMarket
-from dydx.node.private.place_order import Flags as _Flags
+from dydx_sdk.core import TradingSettings as _TradingSettings
 
 from tribulnation.sdk.market_v2 import PerpMarket
 from .data import MarketData
@@ -28,7 +27,7 @@ class Market(PerpMarket):
     validate: bool = True,
     node_url: str = _OEGS_GRPC_URL,
     indexer_url: str = _INDEXER_HTTP_URL,
-    limit_flags: _Flags = 'LONG_TERM',
+    settings: _TradingSettings | None = None,
   ):
     if mnemonic is None:
       import os
@@ -43,6 +42,6 @@ class Market(PerpMarket):
       user=UserData.new(market, address=address, subaccount=subaccount, indexer_data=indexer_data),
       trade=Trading.new(
         market, address=address, subaccount=subaccount, indexer_data=indexer_data,
-        private_node=node, limit_flags=limit_flags, perpetual_market=perpetual_market,
+        private_node=node, settings=settings, perpetual_market=perpetual_market,
       ),
     )

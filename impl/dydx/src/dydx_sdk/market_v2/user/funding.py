@@ -14,9 +14,7 @@ class Funding(MarketMixin, IndexerDataMixin, SubaccountMixin, _Funding):
     end = end.astimezone()
       
     def within(t: datetime) -> bool:
-      after = start is None or t >= start
-      before = end is None or t <= end
-      return after and before
+      return start <= t <= end
     
     async for batch in self.indexer_data.get_funding_payments_paged(
       self.address, subaccount=self.subaccount, ticker=self.market, start=start
