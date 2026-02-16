@@ -122,7 +122,7 @@ E = TypeVar('E', bound=Exception, contravariant=True)
 
 class RetryLogger(Protocol, Generic[E]):
   def __call__(
-    self, fn: Callable, method: Method, path: tuple[str, ...], *,
+    self, fn: Callable, method: Method, path: Sequence[str], *,
     args: tuple, kwargs: dict, exception: E, retries: int, delay: float
   ):
     ...
@@ -138,7 +138,7 @@ def exponential_retry(
   *exceptions: type[E],
   max_retries: int | None = None, base_delay: float = 1.0,
   max_delay: float | None = None, log: RetryLogger[E] | None = default_retry_logger
-) -> Mapper[Fn]:
+) -> Mapper:
     def exponential_retry_wrapper(fn: Fn, method: Method, path: Sequence[str]) -> Fn:
       if inspect.iscoroutinefunction(fn):
         async def exponential_retry_wrapped(*args, **kwargs):
@@ -177,7 +177,7 @@ def default_logger(
   path_str = '.'.join(path)
   print(f'Calling {path_str}.{method.name} with {args=}, {kwargs=}')
 
-def log(logger: Logger = default_logger) -> Mapper[Fn]:
+def log(logger: Logger = default_logger) -> Mapper:
   def log_wrapper(fn: Fn, method: Method, path: Sequence[str]) -> Fn:
     if inspect.iscoroutinefunction(fn):
       async def coro_log_wrapped(*args, **kwargs):
