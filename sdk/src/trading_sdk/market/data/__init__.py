@@ -8,10 +8,14 @@ from .index import Index
 
 @_dataclass(frozen=True)
 class MarketData(SDK):
+	Rules = Rules
+	Depth = Depth
 	rules: Rules
 	depth: Depth
 
 @_dataclass(frozen=True)
 class PerpMarketData(MarketData):
+	Funding = Funding
+	Index = Index
 	funding: Funding
 	index: Index

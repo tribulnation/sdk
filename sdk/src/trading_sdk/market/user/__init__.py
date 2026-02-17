@@ -9,6 +9,10 @@ from .funding import Funding
 
 @_dataclass(frozen=True)
 class UserData(SDK):
+	Balances = Balances
+	Position = Position
+	Trades = Trades
+	Orders = Orders
 	balances: Balances
 	position: Position
 	trades: Trades
@@ -16,5 +20,7 @@ class UserData(SDK):
 	
 @_dataclass(frozen=True)
 class PerpUserData(UserData):
+	Position = PerpPosition
+	Funding = Funding
 	position: PerpPosition
 	funding: Funding

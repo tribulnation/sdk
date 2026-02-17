@@ -6,5 +6,7 @@ from .cancel import Cancel
 
 @_dataclass(frozen=True)
 class Trading(SDK):
+	Place = Place
+	Cancel = Cancel
 	place: Place
 	cancel: Cancel

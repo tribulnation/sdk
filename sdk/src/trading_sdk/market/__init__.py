@@ -7,11 +7,16 @@ from .trade import Trading
 
 @_dataclass(frozen=True)
 class Market(SDK):
+  Data = MarketData
+  User = UserData
+  Trade = Trading
   data: MarketData
   user: UserData
   trade: Trading
-  
+
 @_dataclass(frozen=True)
 class PerpMarket(Market):
+  Data = PerpMarketData
+  User = PerpUserData
   data: PerpMarketData
   user: PerpUserData
