@@ -21,6 +21,8 @@ class Rules(SDK):
     """Step size of the quantity (in base units)."""
     min_qty_: Decimal | None = None
     """Minimum quantity of the order (in base units)."""
+    min_value: Decimal | None = None
+    """Minimum value of the order (in quote units)."""
     max_qty: Decimal | None = None
     """Maximum quantity of the order (in base units)."""
     min_price: Decimal | None = None
@@ -36,15 +38,17 @@ class Rules(SDK):
     details: Any = None
     """Raw details of the rules."""
 
-    @property
-    def min_qty(self) -> Decimal:
+    def min_qty(self, price: Decimal) -> Decimal:
       """Minimum quantity of the order (in base units)."""
-      return self.min_qty_ or self.step_size
+      min_qty = self.min_qty_ or self.step_size
+      if self.min_value is not None:
+        min_qty = max(min_qty, self.min_value / price)
+      return min_qty
     
-    def trunc_qty(self, base_qty: Decimal) -> Decimal | None:
+    def trunc_qty(self, base_qty: Decimal, *, price: Decimal) -> Decimal | None:
       """Truncate the (base asset) quantity to the nearest step size. Returns `None` if the quantity is too small."""
       qty = trunc2tick(base_qty, self.step_size)
-      if qty > self.min_qty:
+      if qty > self.min_qty(price):
         return qty
 
     def round_price(self, price: Decimal) -> Decimal:
@@ -53,7 +57,7 @@ class Rules(SDK):
     
     def amount2qty(self, quote_amount: Decimal, *, price: Decimal) -> Decimal | None:
       """Convert a quote amount to a base quantity, truncating to the nearest step size. Returns `None` if the quantity is too small."""
-      return self.trunc_qty(quote_amount / price)
+      return self.trunc_qty(quote_amount / price, price=price)
     
     def qty2amount(self, base_qty: Decimal, *, price: Decimal) -> Decimal:
       """Convert a base quantity to a quote amount."""
