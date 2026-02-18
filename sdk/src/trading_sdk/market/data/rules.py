@@ -19,15 +19,19 @@ class Rules(SDK):
     """Tick size of the price (in quote units)."""
     step_size: Decimal
     """Step size of the quantity (in base units)."""
-    min_qty_: Decimal | None = None
+    fixed_min_qty: Decimal | None = None
     """Minimum quantity of the order (in base units)."""
     min_value: Decimal | None = None
     """Minimum value of the order (in quote units)."""
     max_qty: Decimal | None = None
     """Maximum quantity of the order (in base units)."""
-    min_price: Decimal | None = None
+    fixed_min_price: Decimal | None = None
     """Minimum price of the order (in quote units)."""
-    max_price: Decimal | None = None
+    rel_min_price: Decimal | None = None
+    """Minimum price of the order (in quote units), relative to the current price (e.g. 0.95 = 5% below the current price)."""
+    rel_max_price: Decimal | None = None
+    """Maximum price of the order (in quote units), relative to the current price (e.g. 1.05 = 5% above the current price)."""
+    fixed_max_price: Decimal | None = None
     """Maximum price of the order (in quote units)."""
     maker_fee: Decimal
     """Maker fee of the order (in quote units)."""
@@ -38,9 +42,27 @@ class Rules(SDK):
     details: Any = None
     """Raw details of the rules."""
 
+    def min_price(self, mark_price: Decimal, /) -> Decimal | None:
+      """Minimum price of the order (in quote units), accounting for the minimum value and fixed minimum price."""
+      values: list[Decimal] = []
+      if self.fixed_min_price is not None:
+        values.append(self.fixed_min_price)
+      if self.rel_min_price is not None:
+        values.append(self.rel_min_price * mark_price)
+      return min(values, default=None)
+
+    def max_price(self, mark_price: Decimal, /) -> Decimal | None:
+      """Maximum price of the order (in quote units), accounting for the maximum value and fixed maximum price."""
+      values: list[Decimal] = []
+      if self.fixed_max_price is not None:
+        values.append(self.fixed_max_price)
+      if self.rel_max_price is not None:
+        values.append(self.rel_max_price * mark_price)
+      return max(values, default=None)
+
     def min_qty(self, price: Decimal) -> Decimal:
-      """Minimum quantity of the order (in base units)."""
-      min_qty = self.min_qty_ or self.step_size
+      """Minimum quantity of the order (in base units), accounting for the minimum value and fixed minimum quantity."""
+      min_qty = self.fixed_min_qty or self.step_size
       if self.min_value is not None:
         min_qty = max(min_qty, self.min_value / price)
       return min_qty
