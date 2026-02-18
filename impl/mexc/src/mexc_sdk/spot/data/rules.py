@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from trading_sdk.market.data import Rules as _Rules
 
-from mexc_sdk.core import SpotMixin, wrap_exceptions
+from mexc_sdk.core import SpotMixin, wrap_exceptions, MIN_ORDER_VALUE
 
 @dataclass
 class Rules(SpotMixin, _Rules):
@@ -18,5 +18,6 @@ class Rules(SpotMixin, _Rules):
       api=self.info['isSpotTradingAllowed'],
       maker_fee=Decimal(self.info['makerCommission']),
       taker_fee=Decimal(self.info['takerCommission']),
+      min_value=MIN_ORDER_VALUE, 
       details=self.info,
     )
