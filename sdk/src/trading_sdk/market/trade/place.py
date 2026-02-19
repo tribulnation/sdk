@@ -7,18 +7,13 @@ from trading_sdk.core import Num, SDK
 
 
 class Place(SDK):
-  class BaseOrder(TypedDict):
+  class Order(TypedDict):
     qty: Num
     """Quantity of the order in the base asset. Negative -> sell, positive -> buy."""
-
-  class LimitOrder(BaseOrder):
     price: Num
     type: Literal['LIMIT', 'POST_ONLY']
+    """No, market orders are not supported. Purposefully."""
 
-  class MarketOrder(BaseOrder):
-    type: Literal['MARKET']
-
-  Order = LimitOrder | MarketOrder
 
   @dataclass(kw_only=True)
   class Result:

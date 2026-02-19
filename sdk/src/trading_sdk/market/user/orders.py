@@ -17,7 +17,6 @@ class Orders(SDK):
     """Signed quantity (netagive -> sell, positive -> buy)"""
     active: bool
     """Whether the order is active in the market."""
-    time: datetime
     details: Any = None
 
   @SDK.method

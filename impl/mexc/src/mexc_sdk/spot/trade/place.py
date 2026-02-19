@@ -4,7 +4,7 @@ from decimal import Decimal
 from trading_sdk.core import ValidationError, fmt_num
 from trading_sdk.market.trade import Place as _Place
 
-from mexc.spot.trading.place_order import Order, LimitOrder, MarketOrder
+from mexc.spot.trading.place_order import Order, LimitOrder
 from mexc_sdk.core import SpotMixin, StreamsMixin, wrap_exceptions
 
 def dump_order(order: _Place.Order) -> Order:
@@ -24,12 +24,6 @@ def dump_order(order: _Place.Order) -> Order:
         type='LIMIT_MAKER',
         side=side,
         price=fmt_num(order['price']),
-        quantity=qty
-      )
-    case 'MARKET':
-      return MarketOrder(
-        type='MARKET',
-        side=side,
         quantity=qty
       )
     case other:

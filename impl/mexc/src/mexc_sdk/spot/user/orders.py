@@ -24,7 +24,6 @@ def parse_order(order: OrderState) -> _Orders.Order:
     price=Decimal(order['price']),
     qty=Decimal(order['origQty']) * sign,
     filled_qty=Decimal(order['executedQty']) * sign,
-    time=ts.parse(order['time']),
     active=parse_status(order['status']),
     details=order,
   )

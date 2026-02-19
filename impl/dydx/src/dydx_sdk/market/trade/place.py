@@ -8,15 +8,6 @@ from dydx.node.private.place_order import Order, TimeInForce, Flags
 from dydx_sdk.core import TradingMixin, wrap_exceptions
 from dydx_sdk.market.user.orders import serialize_id
 
-def order_price(order: _Place.Order) -> Decimal:
-  match order['type']:
-    case 'LIMIT' | 'POST_ONLY':
-      return Decimal(order['price'])
-    case 'MARKET':
-      return Decimal('1e8') if Decimal(order['qty']) > 0 else Decimal(0)
-    case other:
-      raise ValidationError(f'Unknown order type: {other}')
-
 def time_in_force(order: _Place.Order, limit_flags: Flags) -> TimeInForce:
   match order['type']:
     case 'POST_ONLY':
@@ -37,9 +28,9 @@ def export_order(
   side = 'BUY' if signed_qty >= 0 else 'SELL'
   return Order(
     side=side,
-    price=order_price(order),
+    price=Decimal(order['price']),
     size=abs(signed_qty),
-    flags=limit_flags if order['type'] in ('LIMIT', 'POST_ONLY') else 'SHORT_TERM',
+    flags=limit_flags,
     time_in_force=time_in_force(order, limit_flags),
     reduce_only=reduce_only,
   )
