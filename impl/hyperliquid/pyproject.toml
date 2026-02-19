@@ -8,9 +8,9 @@ version = "0.1.0"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
-description = "Tribulnation SDK implementation for Bitget."
+description = "Tribulnation SDK implementation for Hyperliquid."
 dependencies = [
-  "trading-sdk"
+  "trading-sdk", "typed-hyperliquid", "pydantic",
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}
