@@ -23,7 +23,9 @@ class Book:
       return f'[{self.price:{fmt}}] {self.qty:{fmt}}'
 
   bids: list[Entry]
+  """Bids, sorted by price descending (best bid first)."""
   asks: list[Entry]
+  """Asks, sorted by price ascending (best ask first)."""
 
   @property
   def best_bid(self) -> Entry:
