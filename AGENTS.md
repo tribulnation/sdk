@@ -7,10 +7,10 @@ Guidance for AI agents and developers working on this repo.
 ## Repo layout
 
 - **`sdk/`** – Abstract SDK (package **trading-sdk**, import as `trading_sdk`). Defines protocols, dataclasses, and types; no exchange-specific code.
-- **`impl/`** – Exchange implementations. Each `impl/<exchange>/` is a separate package (e.g. **bitget-trading-sdk**, **binance-trading-sdk**, **mexc-trading-sdk**) that depends on **trading-sdk** and a typed exchange client (e.g. **typed-bitget**, **typed-binance**, **typed-mexc**).
-- **`.cursor/repl.py`** – MCP Python REPL server. `restart_environment` clears user-loaded modules from `sys.modules` so the next run imports fresh code from disk.
+- **`impl/`** – Exchange implementations. Each `impl/<exchange>/` is a separate package (e.g. **bitget-trading-sdk**, **binance-trading-sdk**, **mexc-trading-sdk**) that depends on **trading-sdk** and some underlying exchange client.
+- **`.cursor/repl.py`** – MCP Python REPL server. Use it to test code.
 
-Implementations live under `impl/<name>/src/<name>_sdk/` (e.g. `impl/bitget/src/bitget_sdk/`). The top-level class (e.g. `Bitget`, `Binance`, `MEXC`) is a dataclass that composes `earn`, `wallet`, and optionally `reporting` / `spot` / `futures` via `__post_init__`.
+Implementations live under `impl/<name>/src/<name>_sdk/` (e.g. `impl/bitget/src/bitget_sdk/`). The top-level class (e.g. `Bitget`, `Binance`, `MEXC`) is a dataclass that composes the various SDK modules: `earn`, `wallet`, `market`, etc.
 
 ---
 
@@ -45,7 +45,6 @@ Implementations live under `impl/<name>/src/<name>_sdk/` (e.g. `impl/bitget/src/
 ### Core / client
 
 - Each impl has a **core** (e.g. `bitget_sdk/core.py`, `binance_sdk/core.py`) defining **SdkMixin**: holds the underlying client (e.g. `Bitget`, `Binance`), `validate`, and `new(...)` (and optionally `__aenter__` / `__aexit__`).
-- No exchange-specific `parse_network` or network enums in the wallet layer; pass through API chain/network strings.
 
 ### Earn instruments
 
@@ -65,7 +64,6 @@ Implementations live under `impl/<name>/src/<name>_sdk/` (e.g. `impl/bitget/src/
 
 ### Parsing and filtering
 
-- Normalize numeric API fields to `Decimal` where the SDK expects it (e.g. `_to_decimal(...)`).
 - Prefer filtering **inside** the parsing loop (by `assets` / `networks` / `types`) so expensive steps (e.g. many HTTP calls) are only done for requested assets/networks.
 - When the API returns tiers (e.g. Bitget earn), emit **one instrument per tier** with tier-specific min/max and APR.
 
