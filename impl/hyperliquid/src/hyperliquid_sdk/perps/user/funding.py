@@ -15,7 +15,7 @@ class Funding(PerpMixin, _Funding):
       yield [
         _Funding.Payment(
           amount=Decimal(p['delta']['usdc']),
-          time=ts.parse(p['time']),
+          time=ts.parse(p['time']).astimezone(),
         )
         for p in chunk
           if p['delta']['coin'] == self.asset_name

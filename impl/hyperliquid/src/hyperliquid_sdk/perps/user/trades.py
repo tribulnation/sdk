@@ -15,7 +15,7 @@ def parse_fill(f: UserFill | WsFill) -> _Trades.Trade:
     id=str(f['tid']),
     price=Decimal(f['px']),
     qty=Decimal(f['sz']) * sign,
-    time=ts.parse(f['time']),
+    time=ts.parse(f['time']).astimezone(),
     maker=not f['crossed'],
     fee=_Trades.Trade.Fee(
       amount=Decimal(f['fee']),
