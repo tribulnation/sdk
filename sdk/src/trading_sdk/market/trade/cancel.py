@@ -17,6 +17,11 @@ class Cancel(SDK):
 		"""Cancel an order."""
 		
 	@SDK.method
-	async def orders(self, ids: Sequence[str]) -> Sequence[Result]:
+	async def orders(self, ids: Sequence[str]) -> Any:
 		"""Cancel multiple orders."""
 		return await asyncio.gather(*[self.order(id) for id in ids])
+
+	@SDK.method
+	@abstractmethod
+	async def open(self) -> Any:
+		"""Cancel all open orders."""

@@ -1,7 +1,7 @@
 class Error(Exception):
   """Base SDK exception."""
   def __str__(self):
-    args = self.args[0] if len(self.args) == 1 else ', '.join(self.args)
+    args = self.args[0] if len(self.args) == 1 else ', '.join(map(str, self.args))
     return f'{self.__class__.__name__}({args})'
 
 class NetworkError(Error):
