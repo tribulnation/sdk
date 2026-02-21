@@ -1,8 +1,7 @@
 from dataclasses import dataclass as _dataclass
 
-from dydx.indexer import Indexer as _Indexer
-
 from trading_sdk.market import PerpUserData
+from dydx_sdk.core import Mixin as _Mixin
 from .balances import Balances
 from .funding import Funding
 from .orders import Orders
@@ -18,17 +17,11 @@ class UserData(PerpUserData):
   trades: Trades
 
   @classmethod
-  def new(
-    cls, market: str, *,
-    address: str,
-    subaccount: int = 0,
-    indexer: _Indexer | None = None,
-  ):
-    indexer = indexer or _Indexer.new()
+  def of(cls, base: _Mixin):
     return cls(
-      balances=Balances(market=market, indexer_data=indexer.data, address=address, subaccount=subaccount),
-      funding=Funding(market=market, indexer_data=indexer.data, address=address, subaccount=subaccount),
-      orders=Orders(market=market, indexer_data=indexer.data, address=address, subaccount=subaccount),
-      position=Position(market=market, indexer_data=indexer.data, address=address, subaccount=subaccount),
-      trades=Trades(market=market, indexer_data=indexer.data, indexer_streams=indexer.streams, address=address, subaccount=subaccount),
+      balances=Balances.of(base),
+      funding=Funding.of(base),
+      orders=Orders.of(base),
+      position=Position.of(base),
+      trades=Trades.of(base),
     )

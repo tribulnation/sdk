@@ -5,10 +5,10 @@ from decimal import Decimal
 
 from dydx.core import timestamp as ts
 from trading_sdk.market.user import Trades as _Trades
-from dydx_sdk.core import MarketMixin, IndexerDataMixin, SubaccountStreamMixin, wrap_exceptions
+from dydx_sdk.core import Mixin, wrap_exceptions
 
 @dataclass
-class Trades(MarketMixin, IndexerDataMixin, SubaccountStreamMixin, _Trades):
+class Trades(Mixin, _Trades):
   @wrap_exceptions
   async def history(self, start: datetime, end: datetime) -> AsyncIterable[Sequence[_Trades.Trade]]:
     if start is not None:
@@ -21,7 +21,7 @@ class Trades(MarketMixin, IndexerDataMixin, SubaccountStreamMixin, _Trades):
       before = end is None or t <= end
       return after and before
 
-    async for fills in self.indexer_data.get_fills_paged(
+    async for fills in self.indexer.data.get_fills_paged(
       self.address, subaccount=self.subaccount, end=end,
       market=self.market, market_type='PERPETUAL'
     ):

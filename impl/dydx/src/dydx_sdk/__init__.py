@@ -21,7 +21,7 @@ class DYDX:
     node = await _PrivateNode.connect(mnemonic)
     return cls(address=node.address, indexer=indexer, node=node)
 
-  async def market(self, market: str, *, subaccount: int = 0, settings: _TradingSettings | None = None) -> Market:
+  async def market(self, market: str, *, subaccount: int = 0, settings: _TradingSettings = {}) -> Market:
     perp_market = await self.indexer.data.get_market(market)
     return Market.new(
       market, address=self.address, subaccount=subaccount,

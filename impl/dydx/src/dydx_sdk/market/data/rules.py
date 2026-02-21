@@ -4,14 +4,14 @@ import asyncio
 
 from v4_proto.dydxprotocol.clob.clob_pair_pb2 import ClobPair
 from trading_sdk.market.data import Rules as _Rules
-from dydx_sdk.core import MarketMixin, IndexerDataMixin, AccountMixin, PublicNodeMixin, wrap_exceptions
+from dydx_sdk.core import Mixin, wrap_exceptions
 
 @dataclass
-class Rules(MarketMixin, IndexerDataMixin, AccountMixin, PublicNodeMixin, _Rules):
+class Rules(Mixin, _Rules):
   @wrap_exceptions
   async def get(self) -> _Rules.Rules:
     market, fees = await asyncio.gather(
-      self.indexer_data.get_market(self.market),
+      self.indexer.data.get_market(self.market),
       self.public_node.get_user_fee_tier(self.address)
     )
     clob = await self.public_node.get_clob_pair(int(market['clobPairId']))

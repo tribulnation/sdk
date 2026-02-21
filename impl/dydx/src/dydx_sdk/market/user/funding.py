@@ -4,10 +4,10 @@ from datetime import datetime
 
 from dydx.core import timestamp as ts
 from trading_sdk.market.user import Funding as _Funding
-from dydx_sdk.core import MarketMixin, IndexerDataMixin, SubaccountMixin, wrap_exceptions
+from dydx_sdk.core import Mixin, wrap_exceptions
 
 @dataclass
-class Funding(MarketMixin, IndexerDataMixin, SubaccountMixin, _Funding):
+class Funding(Mixin, _Funding):
   @wrap_exceptions
   async def history(self, start: datetime, end: datetime) -> AsyncIterable[Sequence[_Funding.Payment]]:
     start = start.astimezone()
@@ -16,7 +16,7 @@ class Funding(MarketMixin, IndexerDataMixin, SubaccountMixin, _Funding):
     def within(t: datetime) -> bool:
       return start <= t <= end
     
-    async for batch in self.indexer_data.get_funding_payments_paged(
+    async for batch in self.indexer.data.get_funding_payments_paged(
       self.address, subaccount=self.subaccount, ticker=self.market, start=start
     ):
       fundings = [

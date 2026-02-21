@@ -3,47 +3,87 @@ from dataclasses import dataclass, field
 import asyncio
 
 from dydx.indexer.types import PerpetualMarket
-from dydx.indexer import IndexerData, IndexerStreams
+from dydx.indexer import Indexer
 from dydx.indexer.streams.subaccounts import UpdateMessage as SubaccountMessage
 from dydx.node import PublicNode, PrivateNode, OEGS_GRPC_URL
 from dydx.node.private.place_order import Flags
 
-@dataclass(kw_only=True)
-class MarketMixin:
-  market: str
+class TradingSettings(TypedDict, total=False):
+  limit_flags: Flags
+  """Place limit orders as short/long term"""
+  reduce_only: bool
 
 @dataclass(kw_only=True)
-class IndexerDataMixin:
-  indexer_data: IndexerData = field(default_factory=IndexerData)
-
-@dataclass(kw_only=True)
-class IndexerStreamsMixin:
-  indexer_streams: IndexerStreams = field(default_factory=IndexerStreams)
-
-@dataclass(kw_only=True)
-class PublicNodeMixin:
-  public_node: PublicNode
-
-@dataclass(kw_only=True)
-class AccountMixin:
+class BaseMixin:
+  perpetual_market: PerpetualMarket
   address: str
-
-@dataclass(kw_only=True)
-class SubaccountMixin(AccountMixin):
   subaccount: int = 0
+  indexer: Indexer = field(default_factory=Indexer)
+  public_node: PublicNode
+  private_node: PrivateNode
+  settings: TradingSettings = field(default_factory=TradingSettings)
+
+  @property
+  def market(self) -> str:
+    return self.perpetual_market['ticker']
+
+  @classmethod
+  async def connect(
+    cls, mnemonic: str, *,
+    market: str,
+    node_url: str = OEGS_GRPC_URL,
+    subaccount: int = 0,
+    validate: bool = True,
+    settings: TradingSettings = {},
+    indexer: Indexer | None = None,
+  ):
+    private_node = await PrivateNode.connect(mnemonic, url=node_url)
+    public_node = PublicNode(node_client=private_node.node_client)
+    indexer = indexer or Indexer.new(validate=validate)
+    perpetual_market = await indexer.data.get_market(market)
+    return cls(
+      private_node=private_node,
+      public_node=public_node,
+      indexer=indexer,
+      settings=settings,
+      address=private_node.address,
+      subaccount=subaccount,
+      perpetual_market=perpetual_market,
+    )
+
+  async def __aenter__(self):
+    return self
+
+  async def __aexit__(self, exc_type, exc_value, traceback):
+    ...
+
 
 @dataclass(kw_only=True)
-class SubaccountStreamMixin(SubaccountMixin, IndexerStreamsMixin):
-  _subaccounts_queues: list[asyncio.Queue[SubaccountMessage]] = field(default_factory=list, init=False, repr=False)
-  _subaccounts_listener: asyncio.Task | None = field(default=None, init=False, repr=False)
+class Mixin(BaseMixin):
+  _subaccounts_queues: list[asyncio.Queue[SubaccountMessage]] = field(default_factory=list)
+  _subaccounts_listener: asyncio.Task | None = field(default=None)
+
+  @classmethod
+  def of(cls, other: 'Mixin'):
+    return cls(
+      perpetual_market=other.perpetual_market,
+      address=other.address,
+      subaccount=other.subaccount,
+      indexer=other.indexer,
+      public_node=other.public_node,
+      private_node=other.private_node,
+      settings=other.settings,
+      _subaccounts_queues=other._subaccounts_queues,
+      _subaccounts_listener=other._subaccounts_listener,
+    )
 
   async def close(self):
     if self._subaccounts_listener is not None:
       self._subaccounts_listener.cancel()
       self._subaccounts_listener = None
 
-  def __del__(self):
-    asyncio.create_task(self.close())
+  async def __aexit__(self, exc_type, exc_value, traceback):
+    await self.close()
 
   async def subscribe_subaccounts(self) -> AsyncIterable[SubaccountMessage]:
     queue = asyncio.Queue[SubaccountMessage]()
@@ -51,7 +91,7 @@ class SubaccountStreamMixin(SubaccountMixin, IndexerStreamsMixin):
     
     if self._subaccounts_listener is None:
       async def listener():
-        _, stream = await self.indexer_streams.subaccounts(self.address, subaccount=self.subaccount, validate=False)
+        _, stream = await self.indexer.streams.subaccounts(self.address, subaccount=self.subaccount, validate=False)
         async for log in stream:
           for q in self._subaccounts_queues:
             q.put_nowait(log)
@@ -64,40 +104,3 @@ class SubaccountStreamMixin(SubaccountMixin, IndexerStreamsMixin):
       if self._subaccounts_listener.done() and (exc := self._subaccounts_listener.exception()) is not None:
         raise exc
       yield await task
-
-@dataclass(kw_only=True)
-class PrivateNodeMixin:
-  private_node: PrivateNode
-
-class TradingSettings(TypedDict, total=False):
-  limit_flags: Flags
-  """Place limit orders as short/long term"""
-  reduce_only: bool
-
-@dataclass(kw_only=True)
-class TradingMixin(MarketMixin, IndexerDataMixin, SubaccountMixin, PrivateNodeMixin):
-  settings: TradingSettings | None = None
-  perpetual_market: PerpetualMarket
-
-  @classmethod
-  async def connect(
-    cls, mnemonic: str, *,
-    market: str,
-    node_url: str = OEGS_GRPC_URL,
-    subaccount: int = 0,
-    validate: bool = True,
-    settings: TradingSettings | None = None,
-    indexer_data: IndexerData | None = None,
-  ):
-    node = await PrivateNode.connect(mnemonic, url=node_url)
-    indexer_data = indexer_data or IndexerData(default_validate=validate)
-    perpetual_market = await indexer_data.get_market(market)
-    return cls(
-      private_node=node,
-      indexer_data=indexer_data,
-      settings=settings,
-      address=node.address,
-      subaccount=subaccount,
-      market=market,
-      perpetual_market=perpetual_market,
-    )

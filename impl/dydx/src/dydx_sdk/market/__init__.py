@@ -6,7 +6,7 @@ from dydx.node import (
   PrivateNode as _PrivateNode,
   PublicNode as _PublicNode,
 )
-from dydx_sdk.core import TradingSettings as _TradingSettings
+from dydx_sdk.core import TradingSettings as _TradingSettings, Mixin as _Mixin
 
 from trading_sdk.market import PerpMarket
 from .data import MarketData
@@ -18,6 +18,7 @@ class Market(PerpMarket):
   data: MarketData
   user: UserData
   trade: Trading
+  market: str
 
   @classmethod
   def new(
@@ -27,11 +28,22 @@ class Market(PerpMarket):
   ):
     indexer = indexer or _Indexer()
     public_node = _PublicNode(node_client=node.node_client)
-    return cls(
-      data=MarketData.new(market, address=address, indexer_data=indexer.data, public_node=public_node),
-      user=UserData.new(market, address=address, subaccount=subaccount, indexer=indexer),
-      trade=Trading.new(
-        market, address=address, subaccount=subaccount, indexer_data=indexer.data,
-        private_node=node, settings=settings, perpetual_market=perpetual_market,
-      )
+    base = _Mixin(
+      address=address, subaccount=subaccount,
+      perpetual_market=perpetual_market, settings=settings,
+      indexer=indexer, public_node=public_node, private_node=node,
     )
+    return cls(
+      market=market,
+      data=MarketData.of(base),
+      user=UserData.of(base),
+      trade=Trading.of(base),
+    )
+
+  @property
+  def venue(self) -> str:
+    return 'dydx'
+
+  @property
+  def market_id(self) -> str:
+    return self.market

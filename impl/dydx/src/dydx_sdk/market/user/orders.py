@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from decimal import Decimal
+import base64
 
 from trading_sdk.market.user import Orders as _Orders
 from trading_sdk.core import ApiError, ValidationError
@@ -7,9 +8,8 @@ from trading_sdk.core import ApiError, ValidationError
 from v4_proto.dydxprotocol.subaccounts.subaccount_pb2 import SubaccountId
 from v4_proto.dydxprotocol.clob.order_pb2 import OrderId
 
-from dydx.core import timestamp as ts
 from dydx.indexer.types import OrderStatus, OrderState
-from dydx_sdk.core import MarketMixin, IndexerDataMixin, SubaccountMixin, wrap_exceptions
+from dydx_sdk.core import Mixin, wrap_exceptions
 
 def parse_status(status: OrderStatus) -> bool:
   match status:
@@ -32,10 +32,10 @@ def order_id(o: OrderState, *, address: str) -> OrderId:
   )
 
 def serialize_id(id: OrderId) -> str:
-  return id.SerializeToString().hex()
+  return base64.b64encode(id.SerializeToString()).decode()
 
 def parse_id(id: str) -> OrderId:
-  return OrderId.FromString(bytes.fromhex(id))
+  return OrderId.FromString(base64.b64decode(id))
 
 def parse_state(o: OrderState, *, address: str) -> _Orders.Order:
   active = parse_status(o['status'])
@@ -49,23 +49,22 @@ def parse_state(o: OrderState, *, address: str) -> _Orders.Order:
     details=o,
   )
 
-@dataclass
-class Orders(MarketMixin, IndexerDataMixin, SubaccountMixin, _Orders):
-  
-  @wrap_exceptions
-  async def _list_orders(self) -> list[_Orders.Order]:
-    orders = await self.indexer_data.list_orders(
-      self.address, ticker=self.market, subaccount=self.subaccount,
-    )
-    return [parse_state(o, address=self.address) for o in orders]
+@wrap_exceptions
+async def list_orders(self: Mixin, *, status: OrderStatus | None = None) -> list[_Orders.Order]:
+  orders = await self.indexer.data.list_orders(
+    self.address, subaccount=self.subaccount,
+    ticker=self.market, status=status,
+  )
+  return [parse_state(o, address=self.address) for o in orders]
 
+@dataclass
+class Orders(Mixin, _Orders):
   async def query(self, id: str) -> _Orders.Order:
-    orders = await self._list_orders()
+    orders = await list_orders(self)
     for o in orders:
       if o.id == id:
         return o
     raise ApiError(f'Order not found: {id}')
 
   async def open(self):
-    orders = await self._list_orders()
-    return [o for o in orders if o.active]
+    return await list_orders(self, status='OPEN')

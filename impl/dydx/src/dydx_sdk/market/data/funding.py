@@ -6,15 +6,15 @@ from datetime import datetime, timedelta
 
 from trading_sdk.market.data import Funding as _Funding
 from dydx.core import timestamp as ts
-from dydx_sdk.core import MarketMixin, IndexerDataMixin, wrap_exceptions
+from dydx_sdk.core import Mixin, wrap_exceptions
 
 @dataclass
-class Funding(MarketMixin, IndexerDataMixin, _Funding):
+class Funding(Mixin, _Funding):
   @wrap_exceptions
   async def history(self, start: datetime, end: datetime) -> AsyncIterable[Sequence[_Funding.Funding]]:
     start = start.astimezone()
     end = end.astimezone()
-    async for page in self.indexer_data.get_historical_funding_paged(self.market, end=end):
+    async for page in self.indexer.data.get_historical_funding_paged(self.market, end=end):
       fundings = [
         _Funding.Funding(rate=Decimal(f['rate']), time=time)
         for f in page
@@ -27,7 +27,7 @@ class Funding(MarketMixin, IndexerDataMixin, _Funding):
 
   @wrap_exceptions
   async def next(self) -> _Funding.Funding:
-    market = await self.indexer_data.get_market(self.market)
+    market = await self.indexer.data.get_market(self.market)
     now = datetime.now().astimezone()
     next_hour = now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
     return _Funding.Funding(
