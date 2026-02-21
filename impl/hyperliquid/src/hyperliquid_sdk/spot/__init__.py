@@ -26,6 +26,14 @@ class SpotMarket(SpotMixin, Market):
       user=UserData.of(address=address, client=client, validate=validate, meta=meta),
     )
 
+  @property
+  def venue(self) -> str:
+    return 'hyperliquid'
+
+  @property
+  def market_id(self) -> str:
+    return f'{self.base_name}/{self.quote_name}'
+
 @_dataclass(frozen=True, kw_only=True)
 class Spot(_Mixin):
   spot_meta: SpotMetaResponse

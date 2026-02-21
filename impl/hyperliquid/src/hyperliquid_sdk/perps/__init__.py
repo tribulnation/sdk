@@ -30,6 +30,14 @@ class PerpMarket(PerpMixin, PerpMarket):
       user=UserData.of(address=address, client=client, validate=validate, meta=meta),
     )
 
+  @property
+  def venue(self) -> str:
+    return 'hyperliquid'
+
+  @property
+  def market_id(self) -> str:
+    return f'{self.asset_name}/{self.collateral_name}'
+
 def find_perp(name: str, perp_meta: PerpMeta):
   finds: list[int] = []
   for idx, asset in enumerate(perp_meta['universe']):
@@ -59,13 +67,13 @@ class Perp(_Mixin):
     meta = PerpMarket.meta_of(asset_idx, perp_meta=self.perp_meta, spot_meta=self.spot_meta, settings=settings, index_price=index_price)
     return PerpMarket.of(address=self.address, client=self.client, validate=self.validate, meta=meta)
 
-  def find(self, name: str, *, settings: TradingSettings | None = None):
+  def find(self, name: str, *, settings: TradingSettings | None = None, index_price: _Literal['oracle', 'mark'] = 'mark'):
     idx = find_perp(name, self.perp_meta)
-    return self.perp(idx, settings=settings)
+    return self.perp(idx, settings=settings, index_price=index_price)
 
-  def match(self, name: str, *, settings: TradingSettings | None = None):
+  def match(self, name: str, *, settings: TradingSettings | None = None, index_price: _Literal['oracle', 'mark'] = 'mark'):
     for idx in match_perp(name, self.perp_meta):
-      yield self.perp(idx, settings=settings)
+      yield self.perp(idx, settings=settings, index_price=index_price)
 
   @classmethod
   async def fetch(cls, *, address: str, client: _Hyperliquid, validate: bool = True):
