@@ -10,11 +10,12 @@ from .data import MarketData
 from .trade import Trading
 from .user import UserData
 
-@_dataclass(frozen=True)
+@_dataclass(frozen=True, kw_only=True)
 class Spot(_Market):
   data: MarketData
   trade: Trading
   user: UserData
+  instrument: Info
 
   @classmethod
   def new(
@@ -22,6 +23,7 @@ class Spot(_Market):
     validate: bool = True, recvWindow: int | None = None
   ):
     return cls(
+      instrument=instrument,
       data=MarketData.new(instrument, client, validate=validate, recvWindow=recvWindow),
       trade=Trading.new(instrument, client, validate=validate, recvWindow=recvWindow),
       user=UserData.new(instrument, client, validate=validate, recvWindow=recvWindow)
@@ -38,3 +40,12 @@ class Spot(_Market):
     if (info := infos.get(instrument)) is None:
       raise UserError(f'Instrument "{instrument}" not found')
     return cls.new(info, client, validate=validate, recvWindow=recvWindow)
+
+
+  @property
+  def venue(self) -> str:
+    return 'mexc'
+
+  @property
+  def market_id(self) -> str:
+    return self.instrument['symbol']
