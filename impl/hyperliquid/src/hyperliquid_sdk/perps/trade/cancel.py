@@ -1,4 +1,4 @@
-from typing_extensions import Sequence
+from typing_extensions import Sequence, Any
 from dataclasses import dataclass
 
 from trading_sdk.core import ApiError
@@ -8,7 +8,7 @@ from hyperliquid_sdk.perps.core import PerpMixin
 
 @dataclass(frozen=True)
 class Cancel(PerpMixin, _Cancel):
-  async def orders(self, ids: Sequence[str]) -> Sequence[_Cancel.Result]:
+  async def orders(self, ids: Sequence[str]) -> Any:
     asset = self.asset_id
     cancels: list[CancelType] = [
       {'a': asset, 'o': int(id)}
@@ -22,7 +22,7 @@ class Cancel(PerpMixin, _Cancel):
       errors: dict[str, str] = {}
       for i, s in enumerate(result['response']['data']['statuses']):
         if s == 'success':
-          out.append(_Cancel.Result(details='success'))
+          out.append(_Cancel.Result(details={'status': 'success', 'id': ids[i]}))
         elif isinstance(s, dict) and (err := s.get('error')) is not None:
           errors[ids[i]] = err
         else:
@@ -33,3 +33,8 @@ class Cancel(PerpMixin, _Cancel):
 
   async def order(self, id: str) -> _Cancel.Result:
     return (await self.orders([id]))[0]
+
+
+  async def open(self) -> Any:
+    orders = await self.client.info.open_orders(self.address, dex=self.dex)
+    return await self.orders([str(o['oid']) for o in orders if o['coin'] == self.asset_name])

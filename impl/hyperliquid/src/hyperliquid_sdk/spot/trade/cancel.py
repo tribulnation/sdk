@@ -22,7 +22,7 @@ class Cancel(SpotMixin, _Cancel):
       errors: dict[str, str] = {}
       for i, s in enumerate(result['response']['data']['statuses']):
         if s == 'success':
-          out.append(_Cancel.Result(details='success'))
+          out.append(_Cancel.Result(details={'status': 'success', 'id': ids[i]}))
         elif isinstance(s, dict) and (err := s.get('error')) is not None:
           errors[ids[i]] = err
         else:
@@ -33,4 +33,7 @@ class Cancel(SpotMixin, _Cancel):
 
   async def order(self, id: str) -> _Cancel.Result:
     return (await self.orders([id]))[0]
-    
+
+  async def open(self):
+    orders = await self.client.info.open_orders(self.address)
+    return await self.orders([str(o['oid']) for o in orders if o['coin'] == self.asset_name])
