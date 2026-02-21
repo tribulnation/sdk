@@ -9,3 +9,7 @@ class Cancel(SpotMixin, StreamsMixin, _Cancel):
   async def order(self, id: str) -> _Cancel.Result:
     r = await self.client.spot.cancel_order(self.instrument, orderId=id)
     return _Cancel.Result(details=r)
+
+  @wrap_exceptions
+  async def open(self):
+    return await self.client.spot.cancel_all_orders(self.instrument)
