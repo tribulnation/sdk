@@ -3,7 +3,8 @@ from decimal import Decimal
 Num = Decimal | str | float | int
 
 def fmt_num(num: Num) -> str:
-  if isinstance(num, str):
-    return num
+  out = f'{Decimal(num).normalize():f}'
+  if out == '-0':
+    return '0'
   else:
-    return f'{num:f}'
+    return out
