@@ -47,7 +47,7 @@ class Place(Mixin, _Place):
     id = serialize_id(r['order'].order_id)
     return _Place.Result(id=id, details=r)
 
-
+  @wrap_exceptions
   async def orders(self, orders: Sequence[_Place.Order]) -> Sequence[_Place.Result]:
     results: list[_Place.Result] = []
     # handle sequences serially to avoid nonce issues
