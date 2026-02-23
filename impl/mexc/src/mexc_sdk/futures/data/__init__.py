@@ -2,28 +2,27 @@ from dataclasses import dataclass as _dataclass
 
 from mexc import MEXC
 
-from trading_sdk.market import PerpMarketData as _PerpMarketData
 
+from trading_sdk.market import PerpMarketData as _PerpMarketData
+from mexc_sdk.core import PerpMixin, Settings
 from .rules import Rules
 from .depth import Depth
 from .funding import Funding
 from .index import Index
 
 @_dataclass(frozen=True)
-class MarketData(_PerpMarketData):
+class MarketData(PerpMixin, _PerpMarketData):
   rules: Rules
   depth: Depth
   funding: Funding
   index: Index
 
   @classmethod
-  def new(
-    cls, instrument: str, client: MEXC, *,
-    validate: bool = True, recvWindow: int | None = None
-  ):
+  def of(cls, meta: PerpMixin.Meta, *, client: MEXC, settings: Settings = {}):
     return cls(
-      rules=Rules(client, instrument=instrument, validate=validate, recvWindow=recvWindow),
-      depth=Depth(client, instrument=instrument, validate=validate, recvWindow=recvWindow),
-      funding=Funding(client, instrument=instrument, validate=validate, recvWindow=recvWindow),
-      index=Index(client, instrument=instrument, validate=validate, recvWindow=recvWindow),
+      meta=meta, client=client, settings=settings,
+      rules=Rules.of(meta=meta, client=client, settings=settings),
+      depth=Depth.of(meta=meta, client=client, settings=settings),
+      funding=Funding.of(meta=meta, client=client, settings=settings),
+      index=Index.of(meta=meta, client=client, settings=settings),
     )

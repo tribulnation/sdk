@@ -4,9 +4,9 @@ from decimal import Decimal
 from trading_sdk.core import ValidationError
 from trading_sdk.market.user import Orders as _Orders
 
-from mexc.core import timestamp as ts, OrderStatus
+from mexc.core import OrderStatus
 from mexc.spot.user_data.query_order import OrderState
-from mexc_sdk.core import SpotMixin, StreamsMixin, wrap_exceptions
+from mexc_sdk.core import SpotMixin, wrap_exceptions
 
 def parse_status(status: OrderStatus) -> bool:
   match status:
@@ -28,8 +28,8 @@ def parse_order(order: OrderState) -> _Orders.Order:
     details=order,
   )
 
-@dataclass
-class Orders(SpotMixin, StreamsMixin, _Orders):
+@dataclass(frozen=True)
+class Orders(SpotMixin, _Orders):
   @wrap_exceptions
   async def query(self, id: str) -> _Orders.Order:
     order = await self.client.spot.query_order(self.instrument, orderId=id)

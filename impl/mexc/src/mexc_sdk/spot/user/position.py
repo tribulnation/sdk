@@ -5,7 +5,7 @@ from trading_sdk.market.user import Position as _Position
 
 from mexc_sdk.core import SpotMixin, wrap_exceptions
 
-@dataclass
+@dataclass(frozen=True)
 class Position(SpotMixin, _Position):
   @wrap_exceptions
   async def get(self) -> _Position.Position:

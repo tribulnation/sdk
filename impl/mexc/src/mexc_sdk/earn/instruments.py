@@ -4,9 +4,9 @@ from decimal import Decimal
 import pydantic
 import httpx
 
-from trading_sdk.core import NetworkError, ValidationError, ApiError
+from trading_sdk.core import ValidationError, ApiError
 from trading_sdk.earn.instruments import Instrument, Instruments as _Instruments
-from mexc_sdk.core import SdkMixin
+from mexc_sdk.core import Mixin
 
 MEXC_EARN_URL = 'https://www.mexc.com/earn'
 
@@ -115,7 +115,7 @@ def parse_group(group: CurrencyGroup) -> Iterable[Instrument]:
         url=prod.shareUrl or MEXC_EARN_URL,
       )
 
-class Instruments(_Instruments, SdkMixin):
+class Instruments(_Instruments, Mixin):
   async def instruments(
     self, *, tags: Collection[Instrument.Tag] | None = None,
     assets: Collection[str] | None = None,

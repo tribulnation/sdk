@@ -1,45 +1,34 @@
 from typing_extensions import Sequence, AsyncIterable, Literal
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from decimal import Decimal
 from datetime import datetime
-from collections import defaultdict
-import asyncio
 
 from trading_sdk.market.user import Trades as _Trades
 
 from mexc.core import timestamp as ts
-from mexc.futures.user_data.my_trades import Side
-from mexc_sdk.core import MarketMixin, wrap_exceptions
+from mexc.futures.user_data.my_trades import Side as HistorySide
+from mexc.futures.streams.user.my_trades import Side as StreamSide
+from mexc_sdk.core import PerpMixin, wrap_exceptions
 
 
-def parse_side(side: Side) -> Literal[1, -1]:
-  match side:
-    case Side.open_long | Side.close_short:
+def parse_side(side: HistorySide | StreamSide | int) -> Literal[1, -1]:
+  value = side.value if hasattr(side, 'value') else int(side)
+  match value:
+    case HistorySide.open_long.value | HistorySide.close_short.value:
       return 1
-    case Side.open_short | Side.close_long:
+    case HistorySide.open_short.value | HistorySide.close_long.value:
       return -1
+  raise ValueError(f'Unknown side: {side}')
 
 
-@dataclass
-class Trades(MarketMixin, _Trades):
-  _queues: defaultdict[str, asyncio.Queue[_Trades.Trade]] = field(
-    default_factory=lambda: defaultdict(asyncio.Queue)
-  )
-  _listener: asyncio.Task | None = None
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    if self._listener is not None:
-      self._listener.cancel()
-      self._listener = None
-    await super().__aexit__(exc_type, exc_value, traceback)
-
+@dataclass(frozen=True)
+class Trades(PerpMixin, _Trades):
   @wrap_exceptions
   async def history(self, start: datetime, end: datetime) -> AsyncIterable[Sequence[_Trades.Trade]]:
     page_size = 100
     page_num = 1
 
-    r = await self.client.futures.contract_info(self.instrument)
-    contract_size = Decimal(r['contractSize'])
+    contract_size = Decimal(self.info['contractSize'])
 
     while True:
       trades = await self.client.futures.my_trades(
@@ -54,7 +43,7 @@ class Trades(MarketMixin, _Trades):
           id=str(t['id']),
           price=Decimal(t['price']),
           qty=Decimal(t['vol']) * contract_size * parse_side(t['side']),
-          time=ts.parse(t['timestamp']),
+          time=ts.parse(t['timestamp']).astimezone(),
           maker=not t['taker'],
           fee=_Trades.Trade.Fee(
             asset=t['feeCurrency'],
@@ -68,33 +57,19 @@ class Trades(MarketMixin, _Trades):
         break
       page_num += 1
 
+  @wrap_exceptions
   async def stream(self) -> AsyncIterable[_Trades.Trade]:
-    r = await self.client.futures.contract_info(self.instrument)
-    contract_size = Decimal(r['contractSize'])
-
-    if self._listener is None:
-      async def listener():
-        async for trade in self.client.futures.streams.my_trades():
-          qty = Decimal(trade['vol']) * contract_size
-          t = _Trades.Trade(
-            id=str(trade['id']),
-            price=Decimal(trade['price']),
-            qty=qty if trade['side'] == 'BUY' else -qty,
-            time=ts.parse(trade['timestamp']),
-            maker=trade.get('maker', False),
-            fee=_Trades.Trade.Fee(
-              amount=Decimal(trade['fee']),
-              asset=trade['feeCurrency'],
-            ) if trade.get('feeCurrency') and trade.get('fee') else None,
-            details=trade,
-          )
-          self._queues[trade['symbol']].put_nowait(t)
-      self._listener = asyncio.create_task(listener())
-
-    self._queues[self.instrument]
-    while True:
-      task = asyncio.create_task(self._queues[self.instrument].get())
-      await asyncio.wait([task, self._listener], return_when='FIRST_COMPLETED')
-      if self._listener.done() and (exc := self._listener.exception()) is not None:
-        raise exc
-      yield await task
+    contract_size = Decimal(self.info['contractSize'])
+    async for trade in self.my_trades_stream():
+      yield _Trades.Trade(
+        id=str(trade['id']),
+        price=Decimal(trade['price']),
+        qty=Decimal(trade['vol']) * contract_size * parse_side(trade['side']),
+        time=ts.parse(trade['timestamp']),
+        maker=not trade['taker'],
+        fee=_Trades.Trade.Fee(
+          amount=Decimal(trade['fee']),
+          asset=trade['feeCurrency'],
+        ) if trade.get('feeCurrency') and trade.get('fee') else None,
+        details=trade,
+      )

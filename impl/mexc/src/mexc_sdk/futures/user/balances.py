@@ -3,14 +3,13 @@ from decimal import Decimal
 
 from trading_sdk.market.user import Balances as _Balances
 
-from mexc_sdk.core import MarketMixin, wrap_exceptions
+from mexc_sdk.core import PerpMixin, wrap_exceptions
 
-@dataclass
-class Balances(MarketMixin, _Balances):
+@dataclass(frozen=True)
+class Balances(PerpMixin, _Balances):
   @wrap_exceptions
   async def quote(self) -> _Balances.Balance:
-    info = await self.client.futures.contract_info(self.instrument)
-    settle = info.get('settleCoin')
+    settle = self.info.get('settleCoin')
     if settle is None:
       return _Balances.Balance()
 

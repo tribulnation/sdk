@@ -10,11 +10,11 @@ from trading_sdk.reporting import (
   Snapshot, Snapshots as _Snapshots
 )
 
-from mexc_sdk.core import SdkMixin
+from mexc_sdk.core import Mixin
 from mexc_sdk.futures.user.position import _PerpPosition, PositionType, merge_positions
 
 @dataclass
-class Snapshots(_Snapshots, SdkMixin):
+class Snapshots(_Snapshots, Mixin):
   @SDK.method
   async def spot_balances(self):
     r = await self.client.spot.account(recvWindow=self.recvWindow)

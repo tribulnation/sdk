@@ -3,10 +3,9 @@ from decimal import Decimal
 
 from trading_sdk.wallet.deposit_methods import DepositMethod, DepositMethods as _DepositMethods
 
-from mexc_sdk.core import SdkMixin, wrap_exceptions
+from mexc_sdk.core import Mixin, wrap_exceptions
 
-
-class DepositMethods(SdkMixin, _DepositMethods):
+class DepositMethods(Mixin, _DepositMethods):
 	@wrap_exceptions
 	async def deposit_methods(
 		self, *, assets: Sequence[str] | None = None,

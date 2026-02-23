@@ -5,7 +5,7 @@ from trading_sdk.market.data import Depth as _Depth
 
 from mexc_sdk.core import SpotMixin, wrap_exceptions
 
-@dataclass
+@dataclass(frozen=True)
 class Depth(SpotMixin, _Depth):
   @wrap_exceptions
   async def book(self, *, limit: int | None = None) -> _Depth.Book:

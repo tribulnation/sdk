@@ -3,21 +3,19 @@ from dataclasses import dataclass as _dataclass
 from mexc import MEXC
 
 from trading_sdk.market import Trading as _Trading
-
+from mexc_sdk.core import PerpMixin, Settings
 from .place import Place
 from .cancel import Cancel
 
 @_dataclass(frozen=True)
-class Trading(_Trading):
+class Trading(PerpMixin, _Trading):
   place: Place
   cancel: Cancel
 
   @classmethod
-  def new(
-    cls, instrument: str, client: MEXC, *,
-    validate: bool = True, recvWindow: int | None = None
-  ):
+  def of(cls, meta: PerpMixin.Meta, *, client: MEXC, settings: Settings = {}):
     return cls(
-      place=Place(client, instrument=instrument, validate=validate, recvWindow=recvWindow),
-      cancel=Cancel(client, instrument=instrument, validate=validate, recvWindow=recvWindow),
+      meta=meta, client=client, settings=settings,
+      place=Place.of(meta=meta, client=client, settings=settings),
+      cancel=Cancel.of(meta=meta, client=client, settings=settings),
     )

@@ -4,7 +4,7 @@ from decimal import Decimal
 from trading_sdk.market.user import PerpPosition as _PerpPosition
 
 from mexc.futures.user_data.positions import PositionType
-from mexc_sdk.core import MarketMixin, wrap_exceptions
+from mexc_sdk.core import PerpMixin, wrap_exceptions
 
 
 def merge_positions(positions: list[_PerpPosition.Position]) -> _PerpPosition.Position:
@@ -19,14 +19,13 @@ def merge_positions(positions: list[_PerpPosition.Position]) -> _PerpPosition.Po
   return _PerpPosition.Position(size=Decimal(total_size), entry_price=entry_price)
 
 
-@dataclass
-class Position(MarketMixin, _PerpPosition):
+@dataclass(frozen=True)
+class Position(PerpMixin, _PerpPosition):
 
   @wrap_exceptions
   async def get(self) -> _PerpPosition.Position:
     positions = await self.client.futures.positions(self.instrument)
-    contract = await self.client.futures.contract_info(self.instrument)
-    contract_size = Decimal(contract['contractSize'])
+    contract_size = Decimal(self.info['contractSize'])
 
     out: list[_PerpPosition.Position] = []
     for pos in positions:

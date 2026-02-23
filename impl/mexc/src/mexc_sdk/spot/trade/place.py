@@ -5,7 +5,7 @@ from trading_sdk.core import ValidationError, fmt_num
 from trading_sdk.market.trade import Place as _Place
 
 from mexc.spot.trading.place_order import Order, LimitOrder
-from mexc_sdk.core import SpotMixin, StreamsMixin, wrap_exceptions
+from mexc_sdk.core import SpotMixin, wrap_exceptions
 
 def dump_order(order: _Place.Order) -> Order:
   signed_qty = Decimal(order['qty'])
@@ -29,8 +29,8 @@ def dump_order(order: _Place.Order) -> Order:
     case other:
       raise ValidationError(f'Unknown order type: {other}')
 
-@dataclass
-class Place(SpotMixin, StreamsMixin, _Place):
+@dataclass(frozen=True)
+class Place(SpotMixin, _Place):
   @wrap_exceptions
   async def order(self, order: _Place.Order) -> _Place.Result:
     r = await self.client.spot.place_order(self.instrument, dump_order(order))

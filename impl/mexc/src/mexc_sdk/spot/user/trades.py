@@ -6,10 +6,10 @@ from datetime import datetime
 from trading_sdk.market.user import Trades as _Trades
 
 from mexc.core import timestamp as ts
-from mexc_sdk.core import SpotMixin, StreamsMixin, wrap_exceptions
+from mexc_sdk.core import SpotMixin, wrap_exceptions
 
-@dataclass
-class Trades(SpotMixin, StreamsMixin, _Trades):
+@dataclass(frozen=True) 
+class Trades(SpotMixin, _Trades):
   @wrap_exceptions
   async def history(self, start: datetime, end: datetime) -> AsyncIterable[Sequence[_Trades.Trade]]:
     async for trades in self.client.spot.my_trades_paged(self.instrument, start=start, end=end):

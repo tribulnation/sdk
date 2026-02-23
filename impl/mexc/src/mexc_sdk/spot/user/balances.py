@@ -5,7 +5,7 @@ from trading_sdk.market.user import Balances as _Balances
 
 from mexc_sdk.core import SpotMixin, wrap_exceptions
 
-@dataclass
+@dataclass(frozen=True)
 class Balances(SpotMixin, _Balances):
   @wrap_exceptions
   async def quote(self) -> _Balances.Balance:

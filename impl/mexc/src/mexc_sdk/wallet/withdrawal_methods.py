@@ -1,13 +1,11 @@
 from typing_extensions import Sequence
-from dataclasses import dataclass
 from decimal import Decimal
 
 from trading_sdk.wallet.withdrawal_methods import WithdrawalMethod, WithdrawalMethods as _WithdrawalMethods
 
-from mexc_sdk.core import SdkMixin, wrap_exceptions
+from mexc_sdk.core import Mixin, wrap_exceptions
 
-@dataclass
-class WithdrawalMethods(SdkMixin, _WithdrawalMethods):
+class WithdrawalMethods(Mixin, _WithdrawalMethods):
   @wrap_exceptions
   async def withdrawal_methods(
     self, *, assets: Sequence[str] | None = None,

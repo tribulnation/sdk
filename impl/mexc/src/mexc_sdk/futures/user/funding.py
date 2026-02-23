@@ -6,10 +6,10 @@ from decimal import Decimal
 from trading_sdk.market.user import Funding as _Funding
 
 from mexc.core import timestamp as ts
-from mexc_sdk.core import MarketMixin, wrap_exceptions
+from mexc_sdk.core import PerpMixin, wrap_exceptions
 
-@dataclass
-class Funding(MarketMixin, _Funding):
+@dataclass(frozen=True)
+class Funding(PerpMixin, _Funding):
   @wrap_exceptions
   def history(self, start: datetime, end: datetime) -> AsyncIterable[Sequence[_Funding.Payment]]:
     async def iterator():
