@@ -1,7 +1,7 @@
 from typing_extensions import TypedDict, NotRequired, Literal
 from dataclasses import dataclass
 
-from hyperliquid_sdk.core import Mixin, TradingSettings
+from hyperliquid_sdk.core import Mixin
 from hyperliquid.info.spot.spot_meta import SpotTokenInfo, SpotMetaResponse
 from hyperliquid.info.perps.perp_meta_and_asset_ctxs import PerpAssetInfo, PerpMeta
 
@@ -16,17 +16,25 @@ class Meta(TypedDict):
   collateral_meta: SpotTokenInfo
   index_price: Literal['oracle', 'mark']
   """Which price source to use for the index price. See the [docs](https://hyperliquid.gitbook.io/hyperliquid-docs/trading/robust-price-indices) for details."""
-  trading_settings: NotRequired[TradingSettings|None]
 
 @dataclass(kw_only=True, frozen=True)
 class PerpMixin(Mixin):
   meta: Meta
 
   @classmethod
+  def of(cls, other: 'PerpMixin'):
+    return cls(
+      address=other.address,
+      client=other.client,
+      settings=other.settings,
+      streams=other.streams,
+      meta=other.meta,
+    )
+
+  @classmethod
   def meta_of(
     cls, asset_idx: int, /, *, perp_meta: PerpMeta, spot_meta: SpotMetaResponse,
     dex: DEX | None = None, index_price: Literal['oracle', 'mark'] = 'mark',
-    settings: TradingSettings | None = None,
   ) -> Meta:
     asset_meta = perp_meta['universe'][asset_idx]
     collateral_idx = perp_meta['collateralToken']
@@ -36,7 +44,6 @@ class PerpMixin(Mixin):
       'asset_meta': asset_meta,
       'collateral_meta': spot_meta['tokens'][collateral_idx],
       'index_price': index_price,
-      'trading_settings': settings,
     }
 
   @property
@@ -80,7 +87,3 @@ class PerpMixin(Mixin):
   @property
   def index_price(self) -> Literal['oracle', 'mark']:
     return self.meta['index_price']
-
-  @property
-  def trading_settings(self) -> TradingSettings:
-    return self.meta.get('trading_settings') or {}

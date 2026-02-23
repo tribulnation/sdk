@@ -1,8 +1,7 @@
 from dataclasses import dataclass as _dataclass
 
 from trading_sdk.market import UserData as _UserData
-from hyperliquid import Hyperliquid as _Hyperliquid
-from hyperliquid_sdk.spot.core import Meta, SpotMixin
+from hyperliquid_sdk.spot.core import SpotMixin
 from .balances import Balances
 from .orders import Orders
 from .position import Position
@@ -20,11 +19,15 @@ class UserData(SpotMixin, _UserData):
   trades: Trades
 
   @classmethod
-  def of(cls, *, address: str, client: _Hyperliquid, validate: bool = True, meta: Meta):
+  def of(cls, other: 'SpotMixin'):
     return cls(
-      address=address, client=client, validate=validate, meta=meta,
-      balances=Balances(address=address, client=client, validate=validate, meta=meta),
-      orders=Orders(address=address, client=client, validate=validate, meta=meta),
-      position=Position(address=address, client=client, validate=validate, meta=meta),
-      trades=Trades(address=address, client=client, validate=validate, meta=meta),
+      address=other.address,
+      client=other.client,
+      settings=other.settings,
+      streams=other.streams,
+      meta=other.meta,
+      balances=Balances.of(other),
+      orders=Orders.of(other),
+      position=Position.of(other),
+      trades=Trades.of(other),
     )

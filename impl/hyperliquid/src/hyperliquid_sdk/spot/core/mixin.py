@@ -1,29 +1,37 @@
 from typing_extensions import TypedDict, NotRequired
 from dataclasses import dataclass
 
-from hyperliquid_sdk.core import Mixin, TradingSettings
+from hyperliquid_sdk.core import Mixin, Settings
 from hyperliquid.info.spot.spot_meta import SpotAssetInfo, SpotTokenInfo, SpotMetaResponse
 
 class Meta(TypedDict):
   asset_meta: SpotAssetInfo
   base_meta: SpotTokenInfo
   quote_meta: SpotTokenInfo
-  trading_settings: NotRequired[TradingSettings|None]
 
 @dataclass(kw_only=True, frozen=True)
 class SpotMixin(Mixin):
   meta: Meta
 
   @staticmethod
-  def meta_of(asset_idx: int, /, *, spot_meta: SpotMetaResponse, settings: TradingSettings | None = None) -> Meta:
+  def meta_of(asset_idx: int, /, *, spot_meta: SpotMetaResponse, ) -> Meta:
     asset_meta = spot_meta['universe'][asset_idx]
     base_idx, quote_idx = asset_meta['tokens']
     return {
       'asset_meta': asset_meta,
       'base_meta': spot_meta['tokens'][base_idx],
       'quote_meta': spot_meta['tokens'][quote_idx],
-      'trading_settings': settings,
     }
+
+  @classmethod
+  def of(cls, other: 'SpotMixin'):
+    return cls(
+      address=other.address,
+      client=other.client,
+      settings=other.settings,
+      streams=other.streams,
+      meta=other.meta,
+    )
 
   @property
   def asset_idx(self) -> int:
@@ -57,7 +65,3 @@ class SpotMixin(Mixin):
   @property
   def quote_name(self) -> str:
     return self.quote_meta['name']
-
-  @property
-  def trading_settings(self) -> TradingSettings:
-    return self.meta.get('trading_settings') or {}

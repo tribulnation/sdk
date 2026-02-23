@@ -1,8 +1,7 @@
 from dataclasses import dataclass as _dataclass
 
 from trading_sdk.market import MarketData as _MarketData
-from hyperliquid import Hyperliquid as _Hyperliquid
-from hyperliquid_sdk.spot.core import Meta, SpotMixin
+from hyperliquid_sdk.spot.core import SpotMixin
 from .depth import Depth
 from .rules import Rules
 
@@ -14,9 +13,13 @@ class MarketData(SpotMixin, _MarketData):
   rules: Rules
 
   @classmethod
-  def of(cls, *, address: str, client: _Hyperliquid, validate: bool = True, meta: Meta):
+  def of(cls, other: 'SpotMixin'):
     return cls(
-      address=address, client=client, validate=validate, meta=meta,
-      depth=Depth(address=address, client=client, validate=validate, meta=meta),
-      rules=Rules(address=address, client=client, validate=validate, meta=meta),
+      address=other.address,
+      client=other.client,
+      settings=other.settings,
+      streams=other.streams,
+      meta=other.meta,
+      depth=Depth.of(other),
+      rules=Rules.of(other),
     )

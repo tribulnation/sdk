@@ -1,8 +1,7 @@
 from dataclasses import dataclass as _dataclass
 
 from trading_sdk.market import Trading as _Trading
-from hyperliquid import Hyperliquid as _Hyperliquid
-from hyperliquid_sdk.perps.core import Meta, PerpMixin
+from hyperliquid_sdk.perps.core import PerpMixin
 from .cancel import Cancel
 from .place import Place
 
@@ -14,9 +13,13 @@ class Trading(PerpMixin, _Trading):
   place: Place
 
   @classmethod
-  def of(cls, *, address: str, client: _Hyperliquid, validate: bool = True, meta: Meta):
+  def of(cls, other: 'PerpMixin'):
     return cls(
-      address=address, client=client, validate=validate, meta=meta,
-      cancel=Cancel(address=address, client=client, validate=validate, meta=meta),
-      place=Place(address=address, client=client, validate=validate, meta=meta),
+      address=other.address,
+      client=other.client,
+      settings=other.settings,
+      streams=other.streams,
+      meta=other.meta,
+      cancel=Cancel.of(other),
+      place=Place.of(other),
     )

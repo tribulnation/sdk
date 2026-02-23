@@ -5,9 +5,10 @@ from decimal import Decimal
 from trading_sdk.core import ApiError, ValidationError, fmt_num
 from trading_sdk.market.trade import Place as _Place
 from hyperliquid.exchange.order import Order
-from hyperliquid_sdk.perps.core import PerpMixin, TradingSettings
+from hyperliquid_sdk.core import Settings
+from hyperliquid_sdk.perps.core import PerpMixin
 
-def export_order(o: _Place.Order, *, asset: int, settings: TradingSettings) -> Order:
+def export_order(o: _Place.Order, *, asset: int, settings: Settings) -> Order:
   if o['type'] == 'LIMIT':
     tif = settings.get('limit_tif', 'Gtc')
   elif o['type'] == 'POST_ONLY':
@@ -33,7 +34,7 @@ class Place(PerpMixin, _Place):
   async def orders(self, orders: Sequence[_Place.Order]) -> Sequence[_Place.Result]:
     asset = self.asset_id
     result = await self.client.exchange.order(*(
-      export_order(o, asset=asset, settings=self.trading_settings)
+      export_order(o, asset=asset, settings=self.settings)
       for o in orders
     ))
     if result['status'] != 'ok':

@@ -1,8 +1,7 @@
 from dataclasses import dataclass as _dataclass
 
 from trading_sdk.market import PerpMarketData
-from hyperliquid import Hyperliquid as _Hyperliquid
-from hyperliquid_sdk.perps.core import Meta, PerpMixin
+from hyperliquid_sdk.perps.core import PerpMixin
 from .depth import Depth
 from .funding import Funding
 from .index import Index
@@ -20,11 +19,15 @@ class MarketData(PerpMixin, PerpMarketData):
   rules: Rules
 
   @classmethod
-  def of(cls, *, address: str, client: _Hyperliquid, validate: bool = True, meta: Meta):
+  def of(cls, other: 'PerpMixin'):
     return cls(
-      address=address, client=client, validate=validate, meta=meta,
-      depth=Depth(address=address, client=client, validate=validate, meta=meta),
-      funding=Funding(address=address, client=client, validate=validate, meta=meta),
-      index=Index(address=address, client=client, validate=validate, meta=meta),
-      rules=Rules(address=address, client=client, validate=validate, meta=meta),
+      address=other.address,
+      client=other.client,
+      settings=other.settings,
+      streams=other.streams,
+      meta=other.meta,
+      depth=Depth.of(other),
+      funding=Funding.of(other),
+      index=Index.of(other),
+      rules=Rules.of(other),
     )

@@ -1,5 +1,6 @@
 from .exc import wrap_exceptions
-from .mixin import Mixin, TradingSettings
+from .mixin import Mixin, Settings
+from .util import StreamManager
 from .constants import (
   PRICE_MAX_DECIMALS,
   SPOT_PRICE_MAX_DECIMALS,

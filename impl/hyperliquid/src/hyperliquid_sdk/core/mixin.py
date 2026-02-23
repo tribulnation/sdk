@@ -5,68 +5,53 @@ import os
 
 from hyperliquid import Hyperliquid, Wallet
 from hyperliquid.exchange.order import TimeInForce
-from hyperliquid.streams.user_fills import WsFill
+from hyperliquid.streams.user_fills import WsFill, WsUserFills
+from .util import StreamManager
 
-class TradingSettings(TypedDict, total=False):
+class Settings(TypedDict, total=False):
+  validate: bool
   reduce_only: bool
   limit_tif: TimeInForce
 
 @dataclass(kw_only=True, frozen=True)
-class BaseMixin:
+class Mixin:
   address: str
   client: Hyperliquid
-  validate: bool = True
+  streams: dict[str, StreamManager]
+  settings: Settings = field(default_factory=Settings)
+
+  @property
+  def validate(self) -> bool:
+    return self.settings.get('validate', True)
 
   @classmethod
   def new(
     cls, address: str | None = None, *, wallet: Wallet | None = None,
-    mainnet: bool = True, validate: bool = True,
+    mainnet: bool = True, settings: Settings = {},
     protocol: Literal['http', 'ws'] = 'http',
   ):
     if address is None:
       address = os.environ['HYPERLIQUID_ADDRESS']
     if protocol == 'http':
-      client = Hyperliquid.http(wallet, mainnet=mainnet, validate=validate)
+      client = Hyperliquid.http(wallet, mainnet=mainnet, validate=settings.get('validate', True))
     else:
-      client = Hyperliquid.ws(wallet, mainnet=mainnet, validate=validate)
-    return cls(address=address, client=client, validate=validate)
-  
+      client = Hyperliquid.ws(wallet, mainnet=mainnet, validate=settings.get('validate', True))
+    return cls(address=address, client=client, settings=settings, streams={})
+
   async def __aenter__(self):
     await self.client.__aenter__()
     return self
 
   async def __aexit__(self, exc_type, exc_value, traceback):
+    await asyncio.gather(*[stream.close() for stream in self.streams.values()])
     await self.client.__aexit__(exc_type, exc_value, traceback)
 
-
-@dataclass(kw_only=True, frozen=True)
-class Mixin(BaseMixin):
-  _user_fills_queues: list[asyncio.Queue[list[WsFill]]] = field(default_factory=list, init=False, repr=False)
-  _user_fills_listener: asyncio.Task | None = field(default=None, init=False, repr=False)
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    if self._user_fills_listener is not None:
-      self._user_fills_listener.cancel()
-      self._user_fills_listener = None
-    await super().__aexit__(exc_type, exc_value, traceback)
-
   async def subscribe_user_fills(self) -> AsyncIterable[list[WsFill]]:
-    queue = asyncio.Queue[list[WsFill]]()
-    self._user_fills_queues.append(queue)
+    if 'user_fills' not in self.streams:
+      stream = await self.client.streams.user_fills(self.address, aggregate_by_time=True)
+      self.streams['user_fills'] = StreamManager.of(stream)
     
-    if self._user_fills_listener is None:
-      async def listener():
-        stream = await self.client.streams.user_fills(self.address, aggregate_by_time=True)
-        async for chunk in stream:
-          if not chunk.get('isSnapshot'):
-            for q in self._user_fills_queues:
-              q.put_nowait(chunk['fills'])
-      self._user_fills_listener = asyncio.create_task(listener())
-
-    while True:
-      # propagate exceptions raised in the listener
-      task = asyncio.create_task(queue.get())
-      await asyncio.wait([task, self._user_fills_listener], return_when='FIRST_COMPLETED')
-      if self._user_fills_listener.done() and (exc := self._user_fills_listener.exception()) is not None:
-        raise exc
-      yield await task
+    manager: StreamManager[WsUserFills] = self.streams['user_fills']
+    async for chunk in manager.subscribe():
+      if not chunk.get('isSnapshot'):
+        yield chunk['fills']
