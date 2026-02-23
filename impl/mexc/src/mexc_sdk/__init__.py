@@ -27,7 +27,7 @@ class MEXC(Mixin):
       raise ValueError('Either base and quote or instrument must be provided')
 
     info = (await self.client.spot.exchange_info(instrument))[instrument]
-    return Spot.of(meta={'info': info}, client=self.client, settings=settings)
+    return Spot.of(meta={'info': info}, client=self.client, settings=settings, streams=self.streams)
 
   @_overload
   async def perp(self, base: str, quote: str, /, *, settings: Settings = {}) -> Futures: ...
@@ -46,13 +46,13 @@ class MEXC(Mixin):
       raise ValueError('Either base and quote or instrument must be provided')
 
     info = await self.client.futures.contract_info(instrument)
-    return Futures.of(meta={'info': info}, client=self.client, settings=settings)
+    return Futures.of(meta={'info': info}, client=self.client, settings=settings, streams=self.streams)
 
 
   @property
   def earn(self) -> Earn:
-    return Earn(client=self.client, settings=self.settings)
+    return Earn(client=self.client, settings=self.settings, streams=self.streams)
 
   @property
   def wallet(self) -> Wallet:
-    return Wallet(client=self.client, settings=self.settings)
+    return Wallet(client=self.client, settings=self.settings, streams=self.streams)

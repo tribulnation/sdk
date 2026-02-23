@@ -3,7 +3,7 @@ from dataclasses import dataclass as _dataclass
 from mexc import MEXC
 
 from trading_sdk.market import Trading as _Trading
-from mexc_sdk.core import PerpMixin, Settings
+from mexc_sdk.core import PerpMixin, Settings, StreamManager
 from .place import Place
 from .cancel import Cancel
 
@@ -13,9 +13,9 @@ class Trading(PerpMixin, _Trading):
   cancel: Cancel
 
   @classmethod
-  def of(cls, meta: PerpMixin.Meta, *, client: MEXC, settings: Settings = {}):
+  def of(cls, meta: PerpMixin.Meta, *, client: MEXC, settings: Settings = {}, streams: dict[str, StreamManager] = {}):
     return cls(
-      meta=meta, client=client, settings=settings,
-      place=Place.of(meta=meta, client=client, settings=settings),
-      cancel=Cancel.of(meta=meta, client=client, settings=settings),
+      meta=meta, client=client, settings=settings, streams=streams,
+      place=Place.of(meta=meta, client=client, settings=settings, streams=streams),
+      cancel=Cancel.of(meta=meta, client=client, settings=settings, streams=streams),
     )

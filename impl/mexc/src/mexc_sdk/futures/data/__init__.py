@@ -4,7 +4,7 @@ from mexc import MEXC
 
 
 from trading_sdk.market import PerpMarketData as _PerpMarketData
-from mexc_sdk.core import PerpMixin, Settings
+from mexc_sdk.core import PerpMixin, Settings, StreamManager
 from .rules import Rules
 from .depth import Depth
 from .funding import Funding
@@ -18,11 +18,11 @@ class MarketData(PerpMixin, _PerpMarketData):
   index: Index
 
   @classmethod
-  def of(cls, meta: PerpMixin.Meta, *, client: MEXC, settings: Settings = {}):
+  def of(cls, meta: PerpMixin.Meta, *, client: MEXC, settings: Settings = {}, streams: dict[str, StreamManager] = {}):
     return cls(
-      meta=meta, client=client, settings=settings,
-      rules=Rules.of(meta=meta, client=client, settings=settings),
-      depth=Depth.of(meta=meta, client=client, settings=settings),
-      funding=Funding.of(meta=meta, client=client, settings=settings),
-      index=Index.of(meta=meta, client=client, settings=settings),
+      meta=meta, client=client, settings=settings, streams=streams,
+      rules=Rules.of(meta=meta, client=client, settings=settings, streams=streams),
+      depth=Depth.of(meta=meta, client=client, settings=settings, streams=streams),
+      funding=Funding.of(meta=meta, client=client, settings=settings, streams=streams),
+      index=Index.of(meta=meta, client=client, settings=settings, streams=streams),
     )

@@ -3,7 +3,7 @@ from dataclasses import dataclass as _dataclass
 from mexc import MEXC
 
 from trading_sdk import PerpMarket as _PerpMarket
-from mexc_sdk.core import PerpMixin, Settings
+from mexc_sdk.core import PerpMixin, Settings, StreamManager
 from .data import MarketData
 from .trade import Trading
 from .user import UserData
@@ -23,10 +23,10 @@ class Futures(PerpMixin, _PerpMarket):
     return self.instrument
 
   @classmethod
-  def of(cls, meta: PerpMixin.Meta, *, client: MEXC, settings: Settings = {}):
+  def of(cls, meta: PerpMixin.Meta, *, client: MEXC, settings: Settings = {}, streams: dict[str, StreamManager] = {}):
     return cls(
-      meta=meta, client=client, settings=settings,
-      data=MarketData.of(meta=meta, client=client, settings=settings),
-      trade=Trading.of(meta=meta, client=client, settings=settings),
-      user=UserData.of(meta=meta, client=client, settings=settings),
+      meta=meta, client=client, settings=settings, streams=streams,
+      data=MarketData.of(meta=meta, client=client, settings=settings, streams=streams),
+      trade=Trading.of(meta=meta, client=client, settings=settings, streams=streams),
+      user=UserData.of(meta=meta, client=client, settings=settings, streams=streams),
     )
