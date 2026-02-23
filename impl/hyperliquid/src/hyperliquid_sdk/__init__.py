@@ -10,5 +10,5 @@ class Hyperliquid(_Mixin):
   async def spot(self):
     return await Spot.fetch(address=self.address, client=self.client, validate=self.validate)
 
-  async def perp(self):
-    return await Perp.fetch(address=self.address, client=self.client, validate=self.validate)
+  async def perp(self, dex: str | None = None):
+    return await Perp.fetch(address=self.address, client=self.client, validate=self.validate, dex=dex)

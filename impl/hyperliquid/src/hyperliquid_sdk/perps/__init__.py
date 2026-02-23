@@ -76,10 +76,10 @@ class Perp(_Mixin):
       yield self.perp(idx, settings=settings, index_price=index_price)
 
   @classmethod
-  async def fetch(cls, *, address: str, client: _Hyperliquid, validate: bool = True):
+  async def fetch(cls, *, address: str, client: _Hyperliquid, validate: bool = True, dex: str | None = None):
     spot_meta, (perp_meta, _) = await _asyncio.gather(
       client.info.spot_meta(),
-      client.info.perp_meta_and_asset_ctxs(),
+      client.info.perp_meta_and_asset_ctxs(dex),
     )
     return cls(
       address=address, client=client, validate=validate,
