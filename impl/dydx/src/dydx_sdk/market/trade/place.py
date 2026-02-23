@@ -7,7 +7,7 @@ from trading_sdk.core import ValidationError
 
 from dydx_v4_client.node.builder import TxOptions
 from dydx.node.private.place_order import Order, TimeInForce, Flags
-from dydx_sdk.core import Mixin, wrap_exceptions
+from dydx_sdk.core import MarketMixin, wrap_exceptions
 from dydx_sdk.market.user.orders import serialize_id
 
 def time_in_force(order: _Place.Order, limit_flags: Flags) -> TimeInForce:
@@ -38,8 +38,8 @@ def export_order(
     reduce_only=reduce_only or False,
   )
     
-@dataclass
-class Place(Mixin, _Place):
+@dataclass(frozen=True)
+class Place(MarketMixin, _Place):
   @wrap_exceptions
   async def order(self, order: _Place.Order) -> _Place.Result:
     dydx_order = export_order(order, limit_flags=self.settings.get('limit_flags'), reduce_only=self.settings.get('reduce_only'))

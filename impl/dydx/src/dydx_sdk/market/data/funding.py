@@ -6,10 +6,10 @@ from datetime import datetime, timedelta
 
 from trading_sdk.market.data import Funding as _Funding
 from dydx.core import timestamp as ts
-from dydx_sdk.core import Mixin, wrap_exceptions
+from dydx_sdk.core import MarketMixin, wrap_exceptions
 
-@dataclass
-class Funding(Mixin, _Funding):
+@dataclass(frozen=True)
+class Funding(MarketMixin, _Funding):
   @wrap_exceptions
   async def history(self, start: datetime, end: datetime) -> AsyncIterable[Sequence[_Funding.Funding]]:
     start = start.astimezone()

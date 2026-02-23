@@ -5,10 +5,10 @@ from decimal import Decimal
 
 from dydx.core import timestamp as ts
 from trading_sdk.market.user import Trades as _Trades
-from dydx_sdk.core import Mixin, wrap_exceptions
+from dydx_sdk.core import MarketMixin, wrap_exceptions
 
-@dataclass
-class Trades(Mixin, _Trades):
+@dataclass(frozen=True)
+class Trades(MarketMixin, _Trades):
   @wrap_exceptions
   async def history(self, start: datetime, end: datetime) -> AsyncIterable[Sequence[_Trades.Trade]]:
     if start is not None:

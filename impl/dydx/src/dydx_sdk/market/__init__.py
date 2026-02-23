@@ -6,7 +6,7 @@ from dydx.node import (
   PrivateNode as _PrivateNode,
   PublicNode as _PublicNode,
 )
-from dydx_sdk.core import TradingSettings as _TradingSettings, Mixin as _Mixin
+from dydx_sdk.core import MarketMixin
 
 from trading_sdk.market import PerpMarket
 from .data import MarketData
@@ -14,30 +14,25 @@ from .trade import Trading
 from .user import UserData
 
 @_dataclass(frozen=True)
-class Market(PerpMarket):
+class Market(MarketMixin, PerpMarket):
   data: MarketData
   user: UserData
   trade: Trading
-  market: str
 
   @classmethod
-  def new(
-    cls, market: str, *, address: str, subaccount: int = 0,
-    perpetual_market: _PerpetualMarket, settings: _TradingSettings | None = None,
-    indexer: _Indexer | None = None, node: _PrivateNode,
-  ):
-    indexer = indexer or _Indexer()
-    public_node = _PublicNode(node_client=node.node_client)
-    base = _Mixin(
-      address=address, subaccount=subaccount,
-      perpetual_market=perpetual_market, settings=settings,
-      indexer=indexer, public_node=public_node, private_node=node,
-    )
+  def of(cls, other: 'MarketMixin'):
     return cls(
-      market=market,
-      data=MarketData.of(base),
-      user=UserData.of(base),
-      trade=Trading.of(base),
+      address=other.address,
+      indexer=other.indexer,
+      public_node=other.public_node,
+      private_node=other.private_node,
+      streams=other.streams,
+      settings=other.settings,
+      perpetual_market=other.perpetual_market,
+      subaccount=other.subaccount,
+      data=MarketData.of(other),
+      user=UserData.of(other),
+      trade=Trading.of(other),
     )
 
   @property
@@ -47,3 +42,7 @@ class Market(PerpMarket):
   @property
   def market_id(self) -> str:
     return self.market
+
+  @property
+  def market(self) -> str:
+    return self.perpetual_market['ticker']

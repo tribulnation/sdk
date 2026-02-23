@@ -4,10 +4,10 @@ import asyncio
 
 from v4_proto.dydxprotocol.clob.clob_pair_pb2 import ClobPair
 from trading_sdk.market.data import Rules as _Rules
-from dydx_sdk.core import Mixin, wrap_exceptions
+from dydx_sdk.core import MarketMixin, wrap_exceptions
 
-@dataclass
-class Rules(Mixin, _Rules):
+@dataclass(frozen=True)
+class Rules(MarketMixin, _Rules):
   @wrap_exceptions
   async def get(self) -> _Rules.Rules:
     market, fees = await asyncio.gather(

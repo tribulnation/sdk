@@ -9,7 +9,7 @@ from v4_proto.dydxprotocol.subaccounts.subaccount_pb2 import SubaccountId
 from v4_proto.dydxprotocol.clob.order_pb2 import OrderId
 
 from dydx.indexer.types import OrderStatus, OrderState
-from dydx_sdk.core import Mixin, wrap_exceptions
+from dydx_sdk.core import MarketMixin, wrap_exceptions
 
 def parse_status(status: OrderStatus) -> bool:
   match status:
@@ -50,15 +50,15 @@ def parse_state(o: OrderState, *, address: str) -> _Orders.Order:
   )
 
 @wrap_exceptions
-async def list_orders(self: Mixin, *, status: OrderStatus | None = None) -> list[_Orders.Order]:
+async def list_orders(self: MarketMixin, *, status: OrderStatus | None = None) -> list[_Orders.Order]:
   orders = await self.indexer.data.list_orders(
     self.address, subaccount=self.subaccount,
     ticker=self.market, status=status,
   )
   return [parse_state(o, address=self.address) for o in orders]
 
-@dataclass
-class Orders(Mixin, _Orders):
+@dataclass(frozen=True)
+class Orders(MarketMixin, _Orders):
   async def query(self, id: str) -> _Orders.Order:
     orders = await list_orders(self)
     for o in orders:

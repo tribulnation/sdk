@@ -1,7 +1,7 @@
 from dataclasses import dataclass as _dataclass
 
 from trading_sdk.market import PerpUserData
-from dydx_sdk.core import Mixin as _Mixin
+from dydx_sdk.core import MarketMixin
 from .balances import Balances
 from .funding import Funding
 from .orders import Orders
@@ -9,7 +9,7 @@ from .position import Position
 from .trades import Trades
 
 @_dataclass(frozen=True)
-class UserData(PerpUserData):
+class UserData(MarketMixin, PerpUserData):
   balances: Balances
   funding: Funding
   orders: Orders
@@ -17,11 +17,19 @@ class UserData(PerpUserData):
   trades: Trades
 
   @classmethod
-  def of(cls, base: _Mixin):
+  def of(cls, other: MarketMixin):
     return cls(
-      balances=Balances.of(base),
-      funding=Funding.of(base),
-      orders=Orders.of(base),
-      position=Position.of(base),
-      trades=Trades.of(base),
+      address=other.address,
+      indexer=other.indexer,
+      public_node=other.public_node,
+      private_node=other.private_node,
+      streams=other.streams,
+      settings=other.settings,
+      perpetual_market=other.perpetual_market,
+      subaccount=other.subaccount,
+      balances=Balances.of(other),
+      funding=Funding.of(other),
+      orders=Orders.of(other),
+      position=Position.of(other),
+      trades=Trades.of(other),
     )

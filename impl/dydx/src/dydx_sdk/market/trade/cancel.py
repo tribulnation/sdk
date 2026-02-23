@@ -4,11 +4,11 @@ from dataclasses import dataclass
 from trading_sdk.market.trade import Cancel as _Cancel
 from dydx_v4_client import OrderFlags
 from dydx_v4_client.node.builder import TxOptions
-from dydx_sdk.core import Mixin, wrap_exceptions
+from dydx_sdk.core import MarketMixin, wrap_exceptions
 from dydx_sdk.market.user.orders import parse_id, list_orders
 
-@dataclass
-class Cancel(Mixin, _Cancel):
+@dataclass(frozen=True)
+class Cancel(MarketMixin, _Cancel):
   @wrap_exceptions
   async def order(self, id: str) -> _Cancel.Result:
     order_id = parse_id(id)

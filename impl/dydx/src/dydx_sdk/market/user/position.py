@@ -2,10 +2,10 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from trading_sdk.market.user import PerpPosition
-from dydx_sdk.core import Mixin, wrap_exceptions
+from dydx_sdk.core import MarketMixin, wrap_exceptions
 
-@dataclass
-class Position(Mixin, PerpPosition):
+@dataclass(frozen=True)
+class Position(MarketMixin, PerpPosition):
   @wrap_exceptions
   async def get(self) -> PerpPosition.Position:
     position = await self.indexer.data.get_open_position(self.market, address=self.address, subaccount=self.subaccount)
