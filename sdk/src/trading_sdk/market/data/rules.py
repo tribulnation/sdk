@@ -3,7 +3,7 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from decimal import Decimal
 
-from trading_sdk.core import SDK, trunc2tick, round2tick
+from trading_sdk.core import SDK, trunc2tick, round2tick, ceil2tick
 
 class Rules(SDK):
   @dataclass(kw_only=True)
@@ -65,7 +65,7 @@ class Rules(SDK):
       min_qty = self.fixed_min_qty or self.step_size
       if self.min_value is not None:
         min_qty = max(min_qty, self.min_value / price)
-      return min_qty
+      return ceil2tick(min_qty, self.step_size)
     
     def trunc_qty(self, base_qty: Decimal, *, price: Decimal) -> Decimal | None:
       """Truncate the (base asset) quantity to the nearest step size. Returns `None` if the quantity is too small."""

@@ -1,5 +1,5 @@
 from typing_extensions import AsyncIterable, TypeVar, ParamSpec, Generic, Sequence, Callable, Awaitable
-from decimal import Decimal, ROUND_HALF_DOWN, ROUND_FLOOR
+from decimal import Decimal, ROUND_HALF_DOWN, ROUND_FLOOR, ROUND_CEILING
 
 T = TypeVar('T')
 U = TypeVar('U')
@@ -15,6 +15,9 @@ def trunc2tick(x: Decimal, tick_size: Decimal) -> Decimal:
   r = (x / tick_size).to_integral_value(rounding=ROUND_FLOOR) * tick_size
   return r.normalize()
 
+def ceil2tick(x: Decimal, tick_size: Decimal) -> Decimal:
+  r = (x / tick_size).to_integral_value(rounding=ROUND_CEILING) * tick_size
+  return r.normalize()
 
 class Stream(AsyncIterable[T], Awaitable[Sequence[T]], Generic[T]):
   def __init__(self, xs: AsyncIterable[T]):
