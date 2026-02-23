@@ -13,7 +13,7 @@ from trading_sdk.reporting import (
 from mexc_sdk.core import Mixin
 from mexc_sdk.futures.user.position import _PerpPosition, PositionType, merge_positions
 
-@dataclass
+@dataclass(frozen=True)
 class Snapshots(_Snapshots, Mixin):
   @SDK.method
   async def spot_balances(self):

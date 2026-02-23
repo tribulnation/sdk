@@ -12,11 +12,10 @@ from mexc_sdk.core import PerpMixin, wrap_exceptions
 
 
 def parse_side(side: HistorySide | StreamSide | int) -> Literal[1, -1]:
-  value = side.value if hasattr(side, 'value') else int(side)
-  match value:
-    case HistorySide.open_long.value | HistorySide.close_short.value:
+  match side:
+    case HistorySide.open_long | HistorySide.close_short | StreamSide.open_long | StreamSide.close_short:
       return 1
-    case HistorySide.open_short.value | HistorySide.close_long.value:
+    case HistorySide.open_short | HistorySide.close_long | StreamSide.open_short | StreamSide.close_long:
       return -1
   raise ValueError(f'Unknown side: {side}')
 
