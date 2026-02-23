@@ -1,6 +1,6 @@
-from typing_extensions import Sequence, overload, Literal
+from typing_extensions import Sequence, overload
 from abc import abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from decimal import Decimal
 
 from trading_sdk.core import SDK
@@ -69,14 +69,27 @@ class Book:
     else:
       raise ValueError("Either qty or notional must be provided")
 
-  def fillable_at(self, price: Decimal, *, side: Literal['buy', 'sell']) -> Decimal:
-    """Max. fillable quantity at `price`."""
-    if side == 'buy':
-      return buyable_qty(self.bids, price)
-    elif side == 'sell':
-      return sellable_qty(self.asks, price)
-    else:
-      raise ValueError("Invalid side")
+  def sellable_at(self, price: Decimal) -> Decimal:
+    """Max. sellable quantity that will fill at average price >= `price`."""
+    return sellable_qty(self.bids, price)
+
+  def buyable_at(self, price: Decimal) -> Decimal:
+    """Max. buyable quantity that will fill at average price <= `price`."""
+    return buyable_qty(self.asks, price)
+
+  def buy(self, *, qty: Decimal) -> Decimal | None:
+    """Buy `qty` base units at the best price, returning the average fill price.
+    
+    #### Warning: Mutates the book in place.
+    """
+    return fill(self.asks, qty=qty)
+
+  def sell(self, *, qty: Decimal) -> Decimal | None:
+    """Sell `qty` base units at the best price, returning the average fill price.
+    
+    #### Warning: Mutates the book in place.
+    """
+    return fill(self.bids, qty=qty)
 
   def merge(self, *others: 'Book') -> 'Book':
     return Book(
@@ -173,12 +186,12 @@ def market_price_notional(entries: list[Book.Entry], notional: Decimal) -> Decim
     return avg_price(trades)
 
 
-def buyable_qty(entries: list[Book.Entry], price: Decimal) -> Decimal:
+def buyable_qty(asks: list[Book.Entry], price: Decimal) -> Decimal:
   """Max. fillable quantity with average fill price <= `price`."""
   Q = Decimal(0) # total qty
   N = Decimal(0) # total notional
   P = price # target price
-  for e in entries:
+  for e in asks:
     if e.price <= P:
       Q += e.qty
       N += e.qty*e.price
@@ -191,12 +204,12 @@ def buyable_qty(entries: list[Book.Entry], price: Decimal) -> Decimal:
   return Q
 
 
-def sellable_qty(entries: list[Book.Entry], price: Decimal) -> Decimal:
+def sellable_qty(bids: list[Book.Entry], price: Decimal) -> Decimal:
   """Max. fillable quantity with average fill price >= `price`."""
   Q = Decimal(0) # total qty
   N = Decimal(0) # total notional
   P = price # target price
-  for e in entries:
+  for e in bids:
     if e.price >= P:
       Q += e.qty
       N += e.qty*e.price
@@ -207,6 +220,28 @@ def sellable_qty(entries: list[Book.Entry], price: Decimal) -> Decimal:
       if q < e.qty:
         break
   return Q
+
+def fill(entries: list[Book.Entry], *, qty: Decimal) -> Decimal | None:
+  """Fill `qty` base units of the book, returning the average fill price.
+  
+  #### Warning: Mutates the book in place.
+  """
+  orig_qty = qty
+  notional = Decimal(0)
+
+  while qty > 0 and entries:
+    e = entries[0]
+    if e.qty <= qty:
+      entries.pop(0)
+      notional += e.qty*e.price
+      qty -= e.qty
+    else:
+      e.qty -= qty
+      notional += qty*e.price
+      qty = Decimal(0)
+
+  if qty == 0:
+    return notional / orig_qty
 
 def with_fees(self: 'Book', fee: Decimal) -> 'Book':
   """Lower bids and raise asks to account for fees."""
