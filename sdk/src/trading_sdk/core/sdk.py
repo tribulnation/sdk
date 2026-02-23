@@ -44,15 +44,42 @@ class SDK(metaclass=SDKMeta):
   __sdk_fields__: dict[str, type['SDK']] = {}
 
   def __sdk_instrument__(self, *mappers: Mapper[Fn], path: tuple[str, ...] = ()) -> Self:
+    attrs = {}
     for method, data in self.__sdk_methods__.items():
       fn = getattr(self, method)
       for mapper in mappers:
         fn = mapper(fn, data, path)
-        setattr(self, method, fn)
+      attrs[method] = fn
     for field in self.__sdk_fields__:
       sdk: SDK = getattr(self, field)
-      sdk.__sdk_instrument__(*mappers, path=path + (field,))
-    return self
+      attrs[field] = sdk.__sdk_instrument__(*mappers, path=path + (field,))
+
+    if (fn := getattr(self, '__call__', None)) is not None:
+      for mapper in mappers:
+        fn = mapper(fn, data, path)
+      attrs['__call__'] = fn
+
+    sdk = self
+    class Proxy:
+      def __getattr__(self, name: str) -> Any:
+        if name in attrs:
+          return attrs[name]
+        else:
+          return sdk.__getattr__(name)
+
+      def __setattr__(self, name: str, value: Any) -> None:
+        self.sdk.__setattr__(name, value)
+
+      def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        if '__call__' in attrs:
+          return attrs['__call__'](*args, **kwargs)
+        else:
+          return sdk.__call__(*args, **kwargs)
+
+      def __repr__(self) -> str:
+        return sdk.__repr__()
+
+    return Proxy() # type: ignore
 
   @classmethod
   def __sdk_hierarchy__(
@@ -115,8 +142,9 @@ class SDK(metaclass=SDKMeta):
     else:
       return decorator(fn)
 
-def instrument(sdk: SDK, *mappers: Mapper[Fn]):
-  sdk.__sdk_instrument__(*mappers)
+S = TypeVar('S', bound=SDK)
+def instrument(sdk: S, *mappers: Mapper[Fn]) -> S:
+  return sdk.__sdk_instrument__(*mappers)
 
 E = TypeVar('E', bound=Exception, contravariant=True)
 
