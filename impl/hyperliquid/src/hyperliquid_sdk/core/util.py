@@ -1,5 +1,5 @@
 from typing_extensions import Generic, TypeVar, AsyncIterable
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 import asyncio
 
 T = TypeVar('T')
