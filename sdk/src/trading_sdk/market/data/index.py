@@ -9,6 +9,7 @@ class Index(SDK):
 	async def price(self) -> Decimal:
 		"""Fetch the market's index price."""
 
+	@SDK.method
 	async def __call__(self) -> Decimal:
 		"""Fetch the market's index price."""
 		return await self.price()
