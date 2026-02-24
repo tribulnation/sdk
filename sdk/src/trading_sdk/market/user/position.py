@@ -15,6 +15,7 @@ class Position(SDK):
   async def get(self) -> Position:
     """Fetch your (base) balance/position in the market."""
 
+  @SDK.method
   async def __call__(self) -> Position:
     """Fetch your (base) balance/position in the market."""
     return await self.get()
@@ -31,6 +32,7 @@ class PerpPosition(Position):
   async def get(self) -> Position:
     """Fetch your (base) position in the market."""
   
+  @SDK.method
   async def __call__(self) -> Position:
     """Fetch your (base) position in the market."""
     return await self.get()

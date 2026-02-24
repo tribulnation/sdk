@@ -133,6 +133,7 @@ class Depth(SDK):
     - `limit`: The maximum number of bids/asks to return.
     """
 
+  @SDK.method
   async def __call__(self, *, limit: int | None = None) -> Book:
     """Fetch the market order book.
     

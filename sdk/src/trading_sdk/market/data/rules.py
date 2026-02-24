@@ -90,6 +90,7 @@ class Rules(SDK):
   async def get(self) -> Rules:
     """Fetch market rules."""
 
+  @SDK.method
   async def __call__(self) -> Rules:
     """Fetch market rules."""
     return await self.get()
