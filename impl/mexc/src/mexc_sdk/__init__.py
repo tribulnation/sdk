@@ -1,5 +1,5 @@
 from typing_extensions import overload as _overload
-from dataclasses import dataclass as _dataclass, field as _field
+from dataclasses import dataclass as _dataclass
 
 from mexc_sdk.core import Mixin, Settings, spot_name, perp_name
 from .earn import Earn
@@ -11,41 +11,33 @@ from .futures import Futures
 class MEXC(Mixin):
 
   @_overload
-  async def spot(self, base: str, quote: str, /, *, settings: Settings = {}) -> Spot: ...
+  async def spot(self, base: str, quote: str, /, *, settings: Settings = {}, refetch: bool = False) -> Spot: ...
   @_overload
-  async def spot(self, instrument: str, /, *, settings: Settings = {}) -> Spot: ...
+  async def spot(self, instrument: str, /, *, settings: Settings = {}, refetch: bool = False) -> Spot: ...
   async def spot(
-    self,
-    base: str | None = None, quote: str | None = None,
-    instrument: str | None = None,
-    *,
-    settings: Settings = {},
+    self, first: str, second: str | None = None, *,
+    settings: Settings = {}, refetch: bool = False,
   ) -> Spot:
-    if base is not None and quote is not None:
-      instrument = spot_name(base, quote)
-    elif instrument is None:
-      raise ValueError('Either base and quote or instrument must be provided')
-
-    info = (await self.client.spot.exchange_info(instrument))[instrument]
+    if second is None:
+      instrument = first
+    else:
+      instrument = spot_name(first, second)
+    info = await self.cached_spot_market(instrument, refetch=refetch)
     return Spot.of(meta={'info': info}, client=self.client, settings=settings, streams=self.streams)
 
   @_overload
-  async def perp(self, base: str, quote: str, /, *, settings: Settings = {}) -> Futures: ...
+  async def perp(self, base: str, quote: str, /, *, settings: Settings = {}, refetch: bool = False) -> Futures: ...
   @_overload
-  async def perp(self, instrument: str, /, *, settings: Settings = {}) -> Futures: ...
+  async def perp(self, instrument: str, /, *, settings: Settings = {}, refetch: bool = False) -> Futures: ...
   async def perp(
-    self,
-    base: str | None = None, quote: str | None = None,
-    instrument: str | None = None,
-    *,
-    settings: Settings = {},
+    self, first: str, second: str | None = None, *,
+    settings: Settings = {}, refetch: bool = False,
   ) -> Futures:
-    if base is not None and quote is not None:
-      instrument = perp_name(base, quote)
-    elif instrument is None:
-      raise ValueError('Either base and quote or instrument must be provided')
-
-    info = await self.client.futures.contract_info(instrument)
+    if second is None:
+      instrument = first
+    else:
+      instrument = perp_name(first, second)
+    info = await self.cached_perp_market(instrument, refetch=refetch)
     return Futures.of(meta={'info': info}, client=self.client, settings=settings, streams=self.streams)
 
 

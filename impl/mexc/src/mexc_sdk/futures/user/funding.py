@@ -19,7 +19,7 @@ class Funding(PerpMixin, _Funding):
         r = await self.client.futures.my_funding_history(self.instrument)
         payments: list[_Funding.Payment] = []
         for f in r['resultList']:
-          t = ts.parse(f['settleTime'])
+          t = ts.parse(f['settleTime']).astimezone()
           if start <= t <= end:
             payments.append(_Funding.Payment(
               amount=Decimal(f['funding']),

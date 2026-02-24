@@ -13,11 +13,17 @@ class Settings(TypedDict, total=False):
   validate: bool
   recvWindow: int
 
+@dataclass
+class Cache:
+  spot_markets: dict[str, SpotInfo] = field(default_factory=dict)
+  perp_markets: dict[str, PerpInfo] = field(default_factory=dict)
+
 @dataclass(kw_only=True, frozen=True)
 class Mixin:
   client: MEXC
   settings: Settings = field(default_factory=Settings)
   streams: dict[str, StreamManager]
+  cache: Cache = field(default_factory=Cache)
 
   @property
   def validate(self) -> bool:
@@ -42,6 +48,16 @@ class Mixin:
   async def __aexit__(self, exc_type, exc_value, traceback):
     await asyncio.gather(*[stream.close() for stream in self.streams.values()])
     await self.client.__aexit__(exc_type, exc_value, traceback)
+
+  async def cached_spot_market(self, instrument: str, *, refetch: bool = False) -> SpotInfo:
+    if refetch or instrument not in self.cache.spot_markets:
+      self.cache.spot_markets = await self.client.spot.exchange_info()
+    return self.cache.spot_markets[instrument]
+
+  async def cached_perp_market(self, instrument: str, *, refetch: bool = False) -> PerpInfo:
+    if refetch or instrument not in self.cache.perp_markets:
+      self.cache.perp_markets[instrument] = await self.client.futures.contract_info(instrument)
+    return self.cache.perp_markets[instrument]
 
 
 @dataclass(kw_only=True, frozen=True)
