@@ -68,7 +68,7 @@ class SDK(metaclass=SDKMeta):
           return sdk.__getattr__(name)
 
       def __setattr__(self, name: str, value: Any) -> None:
-        self.sdk.__setattr__(name, value)
+        sdk.__setattr__(name, value)
 
       def __call__(self, *args: Any, **kwargs: Any) -> Any:
         if '__call__' in attrs:
