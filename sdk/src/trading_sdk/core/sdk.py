@@ -54,9 +54,9 @@ class SDK(metaclass=SDKMeta):
       sdk: SDK = getattr(self, field)
       attrs[field] = sdk.__sdk_instrument__(*mappers, path=path + (field,))
 
-    if (fn := getattr(self, '__call__', None)) is not None:
+    if (fn := getattr(self, '__call__', None)) is not None and (method := Method.get(fn)) is not None:
       for mapper in mappers:
-        fn = mapper(fn, data, path)
+        fn = mapper(fn, method, path)
       attrs['__call__'] = fn
 
     sdk = self
@@ -65,7 +65,7 @@ class SDK(metaclass=SDKMeta):
         if name in attrs:
           return attrs[name]
         else:
-          return sdk.__getattr__(name)
+          return sdk.__getattr__(name) # type: ignore
 
       def __setattr__(self, name: str, value: Any) -> None:
         sdk.__setattr__(name, value)
@@ -74,7 +74,7 @@ class SDK(metaclass=SDKMeta):
         if '__call__' in attrs:
           return attrs['__call__'](*args, **kwargs)
         else:
-          return sdk.__call__(*args, **kwargs)
+          return sdk.__call__(*args, **kwargs) # type: ignore
 
       def __repr__(self) -> str:
         return sdk.__repr__()
