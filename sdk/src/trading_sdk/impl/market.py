@@ -59,7 +59,7 @@ async def hyperliquid_perp_market(base: str, dex: str | None = None, *, address:
   return perp.find(base)
 
 @alru_cache
-async def load_market(id: str):
+async def load_market(id: str) -> Market:
   """Load market SDK from ID.
   
   ### Supported exchanges
