@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mexc-trading-sdk"
-version = "0.1.0"
+version = "0.2.1"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
 description = "Tribulnation SDK implementation for MEXC."
 dependencies = [
-  "typed-mexc", "trading-sdk", "httpx", "pydantic"
+  "typed-mexc", "trading-sdk",
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}

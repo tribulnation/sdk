@@ -90,7 +90,7 @@ async def load_market(id: str) -> Market:
       return await hyperliquid_spot_market(base, quote, index)
     elif kind == 'perp':
       dex, base = rest.split(':', 1)
-      return await hyperliquid_perp(base=base, dex=dex)
+      return await hyperliquid_perp_market(base=base, dex=dex)
     else:
       raise ValueError(f'Invalid market kind: {kind} [{id=:}]')
   else:

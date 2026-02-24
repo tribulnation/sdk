@@ -10,7 +10,7 @@ authors = [
 ]
 description = "Tribulnation SDK implementation for Hyperliquid."
 dependencies = [
-  "trading-sdk", "typed-hyperliquid", "pydantic",
+  "trading-sdk", "typed-hyperliquid"
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}

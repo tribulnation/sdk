@@ -65,10 +65,10 @@ class SDK(metaclass=SDKMeta):
         if name in attrs:
           return attrs[name]
         else:
-          return sdk.__getattr__(name) # type: ignore
+          return getattr(sdk, name)
 
       def __setattr__(self, name: str, value: Any) -> None:
-        sdk.__setattr__(name, value)
+        setattr(sdk, name, value)
 
       def __call__(self, *args: Any, **kwargs: Any) -> Any:
         if '__call__' in attrs:

@@ -1,9 +1,9 @@
-# Binance SDK
+# dYdX SDK
 
-> Tribulnation SDK implementation for Binance.
+> Tribulnation SDK implementation for dYdX.
 
 ## Installation
 
 ```bash
-pip install binance-trading-sdk
+pip install dydx-trading-sdk
 ```

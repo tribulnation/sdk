@@ -1,9 +1,9 @@
-# Binance SDK
+# MEXC SDK
 
-> Tribulnation SDK implementation for Binance.
+> Tribulnation SDK implementation for MEXC.
 
 ## Installation
 
 ```bash
-pip install binance-trading-sdk
+pip install mexc-trading-sdk
 ```
