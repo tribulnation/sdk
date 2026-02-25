@@ -5,7 +5,7 @@ from decimal import Decimal
 from trading_sdk.core import ApiError, ValidationError, fmt_num
 from trading_sdk.market.trade import Place as _Place
 from hyperliquid.exchange.order import Order
-from hyperliquid_sdk.core import Settings
+from hyperliquid_sdk.core import Settings, round_price
 from hyperliquid_sdk.spot.core import SpotMixin
 
 def export_order(o: _Place.Order, *, asset: int, settings: Settings) -> Order:
@@ -16,10 +16,11 @@ def export_order(o: _Place.Order, *, asset: int, settings: Settings) -> Order:
   else:
     raise ValidationError(f'Unknown order type: {o["type"]}')
   qty = Decimal(o['qty'])
+  price = round_price(Decimal(o['price']))
   return {
     'a': asset,
     'b': qty >= 0,
-    'p': fmt_num(o['price']),
+    'p': fmt_num(price),
     's': fmt_num(abs(qty)),
     'r': settings.get('reduce_only', False),
     't': {
