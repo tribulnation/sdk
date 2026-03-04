@@ -28,13 +28,12 @@ async def hyperliquid_spot(address: str | None = None, *, wallet: str | None = N
   hyperliquid = hyperliquid_sdk(address, wallet=wallet)
   return await hyperliquid.spot()
 
-async def hyperliquid_spot_market(base: str, quote: str, index: int, *, address: str | None = None, wallet: str | None = None):
+async def hyperliquid_spot_market(base: str, quote: str, index: int | None = None, *, address: str | None = None, wallet: str | None = None):
   spot = await hyperliquid_spot(address=address, wallet=wallet)
-  market = spot.spot(index)
-  if market.base_name != base or market.quote_name != quote:
+  market = spot.find(base, quote)
+  if index is not None and market.asset_idx != index:
     raise ValueError(f'Expected market {base}/{quote} at index {index}, got {market.base_name}/{market.quote_name}')
   return market
-
 
 async def hyperliquid_perp(dex: str | None = None, *, address: str | None = None, wallet: str | None = None):
   hyperliquid = hyperliquid_sdk(address, wallet=wallet)
@@ -53,7 +52,7 @@ async def load_market(id: str) -> Market:
   - dYdX: `dydx:<subaccount>:<base>-USD`, e.g. `dydx:0:BTC-USD`
   - MEXC Spot: `mexc:spot:<instrument>`, e.g. `mexc:spot:BTCUSDT`
   - MEXC Perp: `mexc:perp:<instrument>`, e.g. `mexc:perp:BTC_USDT`
-  - Hyperliquid Spot: `hyperliquid:spot:<base>/<quote>:<index>`, e.g. `hyperliquid:spot:UBTC/USDC:142`
+  - Hyperliquid Spot: `hyperliquid:spot:<base>/<quote>(:<index>)?`, e.g. `hyperliquid:spot:UBTC/USDC:142`
   - Hyperliquid Perp: `hyperliquid:perp:<dex>:<base>`, e.g. `hyperliquid:perp::BTC`
   """
   venue, rest = id.split(':', 1)
@@ -71,9 +70,9 @@ async def load_market(id: str) -> Market:
   elif venue == 'hyperliquid':
     kind, rest = rest.split(':', 1)
     if kind == 'spot':
-      ticker, index = rest.split(':', 1)
+      ticker, index = rest.split(':', 1) if ':' in rest else (rest, None)
       base, quote = ticker.split('/')
-      index = int(index)
+      index = int(index) if index is not None else None
       return await hyperliquid_spot_market(base, quote, index)
     elif kind == 'perp':
       dex, base = rest.split(':', 1)
