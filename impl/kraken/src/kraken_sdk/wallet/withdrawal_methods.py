@@ -35,7 +35,7 @@ class WithdrawalMethods(SdkMixin, _WithdrawalMethods):
     assets: Sequence[str] | None = None,
     networks: Sequence[str] | None = None,
   ) -> Sequence[WithdrawalMethod]:
-    r = await self.client.private_post_withdrawmethods()
+    r = await self.client.private_post_withdrawmethods() # type: ignore
     if r.get("error"):
       raise RuntimeError(f"Kraken API error: {r['error']}")
     items = r.get("result") or []

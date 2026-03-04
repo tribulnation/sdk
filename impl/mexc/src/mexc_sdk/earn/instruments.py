@@ -11,13 +11,13 @@ from mexc_sdk.core import Mixin
 MEXC_EARN_URL = 'https://www.mexc.com/earn'
 
 class TieredSubsidyApr(pydantic.BaseModel):
-  model_config = {'extra': 'forbid'}
+  model_config = {'extra': 'ignore'}
   startQuantity: str
   endQuantity: Decimal | None
   apr: Decimal
 
 class FinancialProduct(pydantic.BaseModel):
-  model_config = {'extra': 'forbid'}
+  model_config = {'extra': 'ignore'}
   financialId: str
   financialType: Literal['FLEXIBLE', 'FIXED', 'BLC_EARN']
   investPeriodType: Literal['FLEXIBLE', 'FIXED']
@@ -49,7 +49,7 @@ class FinancialProduct(pydantic.BaseModel):
 
 
 class CurrencyGroup(pydantic.BaseModel):
-  model_config = {'extra': 'forbid'}
+  model_config = {'extra': 'ignore'}
   currencyId: str
   currency: str
   currencyIcon: str
@@ -61,7 +61,7 @@ class CurrencyGroup(pydantic.BaseModel):
   sort: int
 
 class FinancialProductsResponse(pydantic.BaseModel):
-  model_config = {'extra': 'forbid'}
+  model_config = {'extra': 'ignore'}
   data: list[CurrencyGroup] 
   code: int = 0
   msg: str = ""

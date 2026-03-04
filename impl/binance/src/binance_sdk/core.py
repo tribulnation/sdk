@@ -8,9 +8,9 @@ from binance.core import exc
 
 Fn = TypeVar('Fn')
 
-def wrap_exceptions(fn) -> Fn:
+def wrap_exceptions(fn: Fn) -> Fn:
   if inspect.iscoroutinefunction(fn):
-    async def wrapper(*args, **kwargs):
+    async def awrapper(*args, **kwargs):
       try:
         return await fn(*args, **kwargs)
       except exc.ApiError as e:
@@ -25,11 +25,12 @@ def wrap_exceptions(fn) -> Fn:
         raise ValidationError(*e.args) from e
       except exc.Error as e:
         raise Error(*e.args) from e
-    return wrapper
-  elif inspect.isgeneratorfunction(fn):
-    async def wrapper(*args, **kwargs):
+    return awrapper # type: ignore
+  elif inspect.isasyncgenfunction(fn):
+    async def agen_wrapper(*args, **kwargs):
       try:
-        return await fn(*args, **kwargs)
+        async for item in fn(*args, **kwargs):
+          yield item
       except exc.ApiError as e:
         raise ApiError(*e.args) from e
       except exc.AuthError as e:
@@ -42,9 +43,9 @@ def wrap_exceptions(fn) -> Fn:
         raise ValidationError(*e.args) from e
       except exc.Error as e:
         raise Error(*e.args) from e
-    return wrapper
+    return agen_wrapper # type: ignore
   else:
-    raise ValueError(f"Function {fn.__name__} is not a coroutine or generator function")
+    raise ValueError(f"Function {fn} is not a coroutine or generator function")
 
 @dataclass
 class SdkMixin:

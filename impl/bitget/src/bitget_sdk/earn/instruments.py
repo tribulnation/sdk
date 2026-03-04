@@ -38,7 +38,7 @@ class Instruments(SdkMixin, _Instruments):
 	@wrap_exceptions
 	async def instruments(
 		self, *, tags: Collection[Instrument.Tag] | None = None,
-		assets: Sequence[str] | None = None,
+		assets: Collection[str] | None = None,
 	) -> Sequence[Instrument]:
 		out: list[Instrument] = []
 		r = await self.client.earn.savings.products()

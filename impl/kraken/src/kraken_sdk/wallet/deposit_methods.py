@@ -27,7 +27,7 @@ class DepositMethods(SdkMixin, _DepositMethods):
     @SDK.method
     async def _fetch_assets(self) -> dict:
         """Fetch asset info from Kraken. Returns raw API response."""
-        return await self.client.public_get_assets()
+        return await self.client.public_get_assets() # type: ignore
 
     @SDK.method
     async def _fetch_deposit_methods_for_asset(self, asset: str) -> dict:

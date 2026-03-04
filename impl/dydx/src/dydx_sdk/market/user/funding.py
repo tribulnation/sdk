@@ -20,9 +20,9 @@ class Funding(MarketMixin, _Funding):
       self.address, subaccount=self.subaccount, ticker=self.market, start=start
     ):
       fundings = [
-        Funding.Payment(amount=f['payment'], time=t)
+        Funding.Payment(amount=f['payment'], time=f['createdAt'])
         for f in batch
-          if within(t := ts.parse(f['createdAt']))
+          if within(f['createdAt'])
       ]
       if fundings:
         yield fundings

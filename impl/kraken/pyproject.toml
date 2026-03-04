@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kraken-trading-sdk"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
-description = "Tribulnation SDK implementation for Bitget."
+description = "Tribulnation SDK implementation for Kraken."
 dependencies = [
   "trading-sdk", "pydantic", "ccxt",
 ]

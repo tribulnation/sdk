@@ -5,114 +5,135 @@ from collections import Counter
 from datetime import datetime
 import asyncio
 
+from trading_sdk.core import SDK
 from trading_sdk.reporting import (
-  Snapshot, Snapshots as SnapshotsTDK,
+  Snapshot, Snapshots as _Snapshots,
 )
 
 from bitget import Bitget
-from bitget_sdk.core import SdkMixin
-
-async def spot_balances(client: Bitget) -> Counter:
-  balances = await client.spot.account.assets()
-  counter = Counter()
-  for balance in balances:
-    counter[balance['coin']] += balance['available'] + balance['frozen'] + balance['locked'] # type: ignore
-  return counter
-
-async def futures_balances(client: Bitget) -> Counter:
-  balances = Counter()
-  for asset_type in ('USDT-FUTURES', 'USDC-FUTURES', 'COIN-FUTURES'):
-    accounts = await client.futures.account.account_list(asset_type)
-    for a in accounts:
-      balances[a['marginCoin']] += Decimal(a['available']) # type: ignore
-
-  for k, v in list(balances.items()):
-    if v == 0:
-      del balances[k]
-
-  return balances
-
-class Position(NamedTuple):
-  size: Decimal
-  entry: Decimal
-
-async def futures_positions(client: Bitget) -> dict[str, Position]:
-  positions: dict[str, Position] = {}
-  for asset_type in ('USDT-FUTURES', 'USDC-FUTURES', 'COIN-FUTURES'):
-    assets = await client.futures.position.all_positions(asset_type)
-    for asset in assets:
-      assert not asset['symbol'] in positions
-      positions[asset['symbol']] = Position(
-        size=asset['total'],
-        entry=asset['openPriceAvg'],
-      )
-  
-  return positions
-
-async def earn_balances(client: Bitget) -> Counter:
-  balances = await client.earn.account.assets()
-  counter = Counter()
-  for balance in balances:
-    counter[balance['coin']] += balance['amount'] # type: ignore
-  return counter
-
-async def cross_margin_balances(client: Bitget) -> Counter:
-  balances = await client.margin.cross.account.assets()
-  counter = Counter()
-  for balance in balances:
-    counter[balance['coin']] += balance['net'] # type: ignore
-  return counter
-
-async def isolated_margin_balances(client: Bitget) -> Counter:
-  balances = await client.margin.isolated.account.assets()
-  counter = Counter()
-  for balance in balances:
-    counter[balance['coin']] += balance['net'] # type: ignore
-  return counter
-
-async def bot_balances(client: Bitget) -> Counter:
-  counter = Counter()
-  for account_type in ('spot', 'futures'):
-    balances = await client.common.assets.bot(account_type)
-    for balance in balances:
-      if balance['equity']:
-        total = balance['equity']
-      else:
-        total = balance['available'] + (balance['frozen'] or 0)
-      counter[balance['coin']] += total # type: ignore
-  return counter
-
-async def funding_balances(client: Bitget) -> Counter:
-  balances = await client.common.assets.funding()
-  counter = Counter()
-  for balance in balances:
-    counter[balance['coin']] += balance['available'] + balance['frozen'] # type: ignore
-  return counter
-
-balance_functions = [
-  spot_balances,
-  futures_balances,
-  earn_balances,
-  cross_margin_balances,
-  isolated_margin_balances,
-  funding_balances,
-]
-
-async def all_balances(client: Bitget) -> Counter:
-  balances = await asyncio.gather(*[fn(client) for fn in balance_functions])
-  return sum(balances, start=Counter())
+from bitget_sdk.core import SdkMixin, wrap_exceptions
 
 @dataclass(kw_only=True)
-class Snapshots(SdkMixin, SnapshotsTDK):
+class Snapshots(SdkMixin, _Snapshots):
   """Bitget Snapshots
   
   **Does not support**:
   - P2P trading
   - Copy trading
   """
-  raise_if_copy: bool = True
+  raise_if_copy: bool = False
   """Raise an error if copy trading is detected (since it cannot be reflected in the balances, thus yielding incorrect results)"""
 
+  @SDK.method
+  @wrap_exceptions
+  async def spot_balances(self) -> Counter:
+    balances = await self.client.spot.account.assets()
+    counter = Counter()
+    for balance in balances:
+      counter[balance['coin']] += balance['available'] + balance['frozen'] + balance['locked'] # type: ignore
+    return counter
+
+  @SDK.method
+  @wrap_exceptions
+  async def futures_balances(self) -> Counter:
+    balances = Counter()
+    for asset_type in ('USDT-FUTURES', 'USDC-FUTURES', 'COIN-FUTURES'):
+      accounts = await self.client.futures.account.account_list(asset_type)
+      for a in accounts:
+        balances[a['marginCoin']] += Decimal(a['available']) # type: ignore
+
+    for k, v in list(balances.items()):
+      if v == 0:
+        del balances[k]
+
+    return balances
+
+  class Position(NamedTuple):
+    size: Decimal
+    entry: Decimal
+
+  @SDK.method
+  @wrap_exceptions
+  async def futures_positions(self) -> dict[str, Position]:
+    positions: dict[str, Snapshots.Position] = {}
+    for asset_type in ('USDT-FUTURES', 'USDC-FUTURES', 'COIN-FUTURES'):
+      assets = await self.client.futures.position.all_positions(asset_type)
+      for asset in assets:
+        assert not asset['symbol'] in positions
+        positions[asset['symbol']] = Snapshots.Position(
+          size=asset['total'],
+          entry=asset['openPriceAvg'],
+        )
+    
+    return positions
+
+  @SDK.method
+  @wrap_exceptions
+  async def earn_balances(self) -> Counter:
+    balances = await self.client.earn.account.assets()
+    counter = Counter()
+    for balance in balances:
+      counter[balance['coin']] += balance['amount'] # type: ignore
+    return counter
+
+  @SDK.method
+  @wrap_exceptions
+  async def cross_margin_balances(self) -> Counter:
+    balances = await self.client.margin.cross.account.assets()
+    counter = Counter()
+    for balance in balances:
+      counter[balance['coin']] += balance['net'] # type: ignore
+    return counter
+
+  @SDK.method
+  @wrap_exceptions
+  async def isolated_margin_balances(self) -> Counter:
+    balances = await self.client.margin.isolated.account.assets()
+    counter = Counter()
+    for balance in balances:
+      counter[balance['coin']] += balance['net'] # type: ignore
+    return counter
+
+  @SDK.method
+  @wrap_exceptions
+  async def bot_balances(self) -> Counter:
+    counter = Counter()
+    for account_type in ('spot', 'futures'):
+      balances = await self.client.common.assets.bot(account_type)
+      for balance in balances:
+        if balance['equity']:
+          total = balance['equity']
+        else:
+          total = balance['available'] + (balance['frozen'] or 0)
+        counter[balance['coin']] += total # type: ignore
+    return counter
+
+  @SDK.method
+  @wrap_exceptions
+  async def funding_balances(self) -> Counter:
+    balances = await self.client.common.assets.funding()
+    counter = Counter()
+    for balance in balances:
+      counter[balance['coin']] += balance['available'] + balance['frozen'] # type: ignore
+    return counter
+
+  balance_functions = [
+    spot_balances,
+    futures_balances,
+    earn_balances,
+    cross_margin_balances,
+    isolated_margin_balances,
+    funding_balances,
+  ]
+
+  @SDK.method
+  @wrap_exceptions
+  async def all_balances(self) -> Counter:
+    balances = await asyncio.gather(*[fn(self) for fn in Snapshots.balance_functions])
+    return sum(balances, start=Counter())
+
+
+  @wrap_exceptions
   async def snapshots(self, assets: Sequence[str] = []) -> Sequence[Snapshot]:
 
     if self.raise_if_copy:
@@ -126,9 +147,9 @@ class Snapshots(SdkMixin, SnapshotsTDK):
 
 
     positions, balances, bot_assets = await asyncio.gather(
-      futures_positions(self.client),
-      all_balances(self.client),
-      bot_balances(self.client),
+      self.futures_positions(),
+      self.all_balances(),
+      self.bot_balances(),
     )
     
     time = datetime.now()

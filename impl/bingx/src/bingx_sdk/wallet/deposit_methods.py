@@ -53,5 +53,5 @@ class DepositMethods(SdkMixin, _DepositMethods):
 	async def deposit_methods(
 		self, *, assets: Sequence[str] | None = None,
 	) -> Sequence[DepositMethod]:
-		r = await self.client.wallets_v1_private_get_capital_config_getall()
+		r = await self.client.wallets_v1_private_get_capital_config_getall() # type: ignore
 		return _parse_deposit_methods(r, assets=assets)

@@ -265,7 +265,7 @@ def _parse_product_group(group: ProductGroup) -> Iterable[Instrument]:
 class Instruments(_Instruments):
 	async def instruments(
 		self, *, tags: Collection[Instrument.Tag] | None = None,
-		assets: Sequence[str] | None = None,
+		assets: Collection[str] | None = None,
 	) -> Sequence[Instrument]:
 		data = await _fetch_product_list()
 		if data.code != 0:

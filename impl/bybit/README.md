@@ -1,9 +1,9 @@
-# Binance SDK
+# Bybit SDK
 
-> Tribulnation SDK implementation for Binance.
+> Tribulnation SDK implementation for Bybit.
 
 ## Installation
 
 ```bash
-pip install binance-trading-sdk
+pip install bybit-trading-sdk
 ```

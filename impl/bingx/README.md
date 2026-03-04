@@ -1,9 +1,9 @@
-# Binance SDK
+# BingX SDK
 
-> Tribulnation SDK implementation for Binance.
+> Tribulnation SDK implementation for BingX.
 
 ## Installation
 
 ```bash
-pip install binance-trading-sdk
+pip install bingx-trading-sdk
 ```

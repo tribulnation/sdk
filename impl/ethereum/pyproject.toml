@@ -3,18 +3,14 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "bingx-trading-sdk"
-version = "0.1.1"
+name = "ethereum-trading-sdk"
+version = "0.1.0"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
-description = "Tribulnation SDK implementation for BingX."
+description = "Tribulnation SDK implementation for Ethereum."
 dependencies = [
-  "trading-sdk",
-  "httpx"
+  "web3", "httpx", "pydantic"
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}
-
-[project.urls]
-repo = "https://github.com/tribulnation/sdk.git"

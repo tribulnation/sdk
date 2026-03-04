@@ -4,6 +4,7 @@ import inspect
 import os
 
 from ccxt.async_support import bybit
+from ccxt.base.types import ConstructorArgs
 from ccxt.base.errors import NetworkError as CcxtNetworkError, AuthenticationError, BaseError
 
 from trading_sdk.core import AuthError, Error, NetworkError
@@ -11,7 +12,7 @@ from trading_sdk.core import AuthError, Error, NetworkError
 
 def wrap_exceptions(fn):
   if inspect.iscoroutinefunction(fn):
-    async def wrapper(*args, **kwargs):
+    async def awrapper(*args, **kwargs):
       try:
         return await fn(*args, **kwargs)
       except CcxtNetworkError as e:
@@ -20,9 +21,9 @@ def wrap_exceptions(fn):
         raise AuthError(*e.args) from e
       except BaseError as e:
         raise Error(*e.args) from e
-    return wrapper
+    return awrapper # type: ignore
   elif inspect.isgeneratorfunction(fn):
-    async def wrapper(*args, **kwargs):
+    async def agen_wrapper(*args, **kwargs):
       try:
         async for item in fn(*args, **kwargs):
           yield item
@@ -32,9 +33,9 @@ def wrap_exceptions(fn):
         raise AuthError(*e.args) from e
       except BaseError as e:
         raise Error(*e.args) from e
-    return wrapper
+    return agen_wrapper # type: ignore
   else:
-    raise ValueError(f"Function {fn.__name__} is not a coroutine or generator function")
+    raise ValueError(f"Function {fn} is not a coroutine or generator function")
 
 Platform = Literal['bybit', 'bybit_eu']
 
@@ -49,7 +50,7 @@ class SdkMixin:
       api_key = os.environ.get('BYBIT_API_KEY')
     if api_secret is None:
       api_secret = os.environ.get('BYBIT_API_SECRET')
-    config = {}
+    config: ConstructorArgs = {}
     if api_key is not None:
       config['apiKey'] = api_key
     if api_secret is not None:

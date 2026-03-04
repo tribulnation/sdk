@@ -200,7 +200,7 @@ async def _fetch_easy_earn_products(client: httpx.AsyncClient, *, base: str) -> 
 class Instruments(SdkMixin, _Instruments):
   async def instruments(
     self, *, tags: Collection[Instrument.Tag] | None = None,
-    assets: Sequence[str] | None = None,
+    assets: Collection[str] | None = None,
   ) -> Sequence[Instrument]:
     base, earn_url, headers = _platform_config(self.platform)
     async with httpx.AsyncClient(timeout=30.0, headers=headers) as client:

@@ -50,7 +50,7 @@ class WithdrawalMethods(SdkMixin, _WithdrawalMethods):
 		assets: Sequence[str] | None = None,
 		networks: Sequence[str] | None = None,
 	) -> Sequence[WithdrawalMethod]:
-		r = await self.client.wallets_v1_private_get_capital_config_getall()
+		r = await self.client.wallets_v1_private_get_capital_config_getall() # type: ignore
 		parsed = _parse_withdrawal_methods(r)
 		if assets is not None:
 			assets_set = set(assets)

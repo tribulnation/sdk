@@ -1,9 +1,9 @@
-# Binance SDK
+# Kraken SDK
 
-> Tribulnation SDK implementation for Binance.
+> Tribulnation SDK implementation for Kraken.
 
 ## Installation
 
 ```bash
-pip install binance-trading-sdk
+pip install kraken-trading-sdk
 ```

@@ -27,13 +27,13 @@ class Trades(MarketMixin, _Trades):
     ):
       trades: list[_Trades.Trade] = []
       for f in fills:
-        if within(t := ts.parse(f['createdAt'])) and f['market'] == self.market:
+        if within(f['createdAt']) and f['market'] == self.market:
           sign = 1 if f['side'] == 'BUY' else -1
           trades.append(_Trades.Trade(
             id=f['id'],
             price=f['price'],
             qty=f['size'] * sign,
-            time=t,
+            time=f['createdAt'],
             maker=f['liquidity'] == 'MAKER',
             fee=_Trades.Trade.Fee(
               asset='USDC',

@@ -31,6 +31,7 @@ class Snapshots(_Snapshots, Mixin):
       for b in r
     }
 
+  @SDK.method
   async def futures_positions(self):
     positions = await self.client.futures.positions()
     out = defaultdict[str, list[_PerpPosition.Position]](list)
@@ -44,6 +45,7 @@ class Snapshots(_Snapshots, Mixin):
 
     return { symbol: merge_positions(positions) for symbol, positions in out.items() }
 
+  @SDK.method
   async def snapshots(self, assets: Sequence[str] = []) -> Sequence[Snapshot]:
     spot_balances, future_balances, future_positions = await asyncio.gather(
       self.spot_balances(),

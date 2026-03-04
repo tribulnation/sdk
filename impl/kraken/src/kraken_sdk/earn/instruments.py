@@ -71,9 +71,9 @@ class Instruments(SdkMixin, _Instruments):
     self,
     *,
     tags: Collection[Instrument.Tag] | None = None,
-    assets: Sequence[str] | None = None,
+    assets: Collection[str] | None = None,
   ) -> Sequence[Instrument]:
-    r = await self.client.private_post_earn_strategies()
+    r = await self.client.private_post_earn_strategies() # type: ignore
     out: list[Instrument] = []
     async for item in self._earn_strategies():
       out.append(Instrument(
