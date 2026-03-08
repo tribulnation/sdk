@@ -30,8 +30,6 @@ class ExportHistory(_History):
   paths: ExcelPaths
   tz: timezone | AutoDetect = AUTO_DETECT
   """Timezone of the files' times."""
-  skip_zero_changes: bool = True
-  """Skip zero change operations."""
 
   @classmethod
   def autoload(cls, folder: str, *, log: bool = True):
