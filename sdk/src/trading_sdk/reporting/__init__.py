@@ -1,5 +1,5 @@
-from .transactions import *
-from .snapshots import *
+from .snapshots import Snapshots, Snapshot
+from .history import History, Flow, Event
 
-class Report(Transactions, Snapshots):
+class Report(History, Snapshots):
   ...

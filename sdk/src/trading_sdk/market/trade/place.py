@@ -3,7 +3,8 @@ from abc import abstractmethod
 from dataclasses import dataclass
 import asyncio
 
-from trading_sdk.core import Num, SDK
+from trading_sdk.core import SDK
+from trading_sdk.util import Num
 
 
 class Place(SDK):
