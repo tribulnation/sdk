@@ -2,7 +2,8 @@ from typing_extensions import Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 
-from trading_sdk.core import ApiError, ValidationError, fmt_num
+from trading_sdk.core import ApiError, ValidationError
+from trading_sdk.util import fmt_num
 from trading_sdk.market.trade import Place as _Place
 from hyperliquid.exchange.order import Order
 from hyperliquid_sdk.core import Settings, round_price
