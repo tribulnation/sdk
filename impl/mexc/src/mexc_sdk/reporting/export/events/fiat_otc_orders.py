@@ -11,7 +11,8 @@ end_time_regex = re.compile(r'End Time\(UTC\+(\d{2}):(\d{2})\)')
 
 def parse_timezone(key: str) -> timezone:
   match = end_time_regex.match(key)
-  assert match is not None
+  if match is None:
+    raise util.InvalidSchema([util.MissingColumn(end_time_regex, str)])
   hours, minutes = match.groups()
   return timezone(timedelta(hours=int(hours), minutes=int(minutes)))
 
