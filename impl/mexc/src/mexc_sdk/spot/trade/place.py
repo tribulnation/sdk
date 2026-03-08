@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-from trading_sdk.core import ValidationError, fmt_num
+from trading_sdk.core import ValidationError
+from trading_sdk.util import fmt_num
 from trading_sdk.market.trade import Place as _Place
 
 from mexc.spot.trading.place_order import Order, LimitOrder

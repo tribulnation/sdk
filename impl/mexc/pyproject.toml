@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mexc-trading-sdk"
-version = "0.2.2"
+version = "0.2.3"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
@@ -18,8 +18,7 @@ readme = {file="README.md", content-type="text/markdown"}
 [project.urls]
 repo = "https://github.com/tribulnation/sdk.git"
 
-# [project.optional-dependencies]
-# test = [
-#   "pytest < 5.0.0",
-#   "pytest-cov[all]"
-# ]
+[project.optional-dependencies]
+export = [
+  "openpyxl", "pandas"
+]

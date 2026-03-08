@@ -4,12 +4,9 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 import os
 
-from trading_sdk.reporting import (
-  Transaction, Transactions as TransactionsTDK
-)
-
-from .spot import spot_transactions, SpotPaths
-from .futures import futures_transactions, FuturesPaths
+from trading_sdk.reporting.history import History as _History
+from .spot import spot_history, SpotPaths
+from .futures import futures_history, FuturesPaths
 
 class ExcelPaths(SpotPaths, FuturesPaths):
   ...
@@ -20,9 +17,10 @@ class AutoDetect:
 AUTO_DETECT = AutoDetect()
 
 @dataclass
-class Transactions(TransactionsTDK):
+class ExportHistory(_History):
   """Parse Transactions from the MEXC [data export](https://www.mexc.com/support/data-export).
   
+  #### Required excel files:
   - `Futures` > `Futures Capital Flow` & `Futures Trade History`
   - `Spot` > `Spot Statement` & `Spot Trade History`
   - `Funding History` > `Deposit History` & `Withdrawal History`
@@ -84,23 +82,18 @@ class Transactions(TransactionsTDK):
     else:
       return self.tz
   
-  async def _transactions_impl(
-    self, start: datetime | None = None, end: datetime | None = None
-  ) -> AsyncIterable[list[Transaction]]:
-    if start is not None:
-      start = start.astimezone(timezone.utc)
-    if end is not None:
-      end = end.astimezone(timezone.utc)
+  async def history(self, start: datetime, end: datetime) -> AsyncIterable[_History.History]:
+    start = start.astimezone(self.timezone)
+    end = end.astimezone(self.timezone)
     
-    def filter_time(tx: Transaction) -> bool:
-      return (start is None or start <= tx.time) and (end is None or tx.time < end)
+    spot = spot_history(self.paths, self.timezone)
+    yield _History.History(
+      flows=[f for f in spot.flows if start <= f.time <= end],
+      events=[e for e in spot.events if start <= e.time <= end],
+    )
 
-    for path in self.paths.values():
-      if not os.path.exists(path): # type: ignore (yes path is a string, fucking pyright)
-        raise FileNotFoundError(f'File not found: {path}')
-    for tx in spot_transactions(self.paths, self.timezone, skip_zero_changes=self.skip_zero_changes):
-      if filter_time(tx):
-        yield [tx]
-    for tx in futures_transactions(self.paths, self.timezone, skip_zero_changes=self.skip_zero_changes):
-      if filter_time(tx):
-        yield [tx]
+    futures = futures_history(self.paths, self.timezone)
+    yield _History.History(
+      flows=[f for f in futures.flows if start <= f.time <= end],
+      events=[e for e in futures.events if start <= e.time <= end],
+    )

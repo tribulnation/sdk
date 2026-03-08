@@ -10,12 +10,13 @@ from trading_sdk.reporting import (
   Snapshot, Snapshots as _Snapshots
 )
 
-from mexc_sdk.core import Mixin
+from mexc_sdk.core import Mixin, wrap_exceptions
 from mexc_sdk.futures.user.position import _PerpPosition, PositionType, merge_positions
 
 @dataclass(frozen=True)
 class Snapshots(_Snapshots, Mixin):
   @SDK.method
+  @wrap_exceptions
   async def spot_balances(self):
     r = await self.client.spot.account(recvWindow=self.recvWindow)
     return {
@@ -24,6 +25,7 @@ class Snapshots(_Snapshots, Mixin):
     }
 
   @SDK.method
+  @wrap_exceptions
   async def futures_balances(self):
     r = await self.client.futures.assets(recvWindow=self.recvWindow)
     return {
@@ -32,6 +34,7 @@ class Snapshots(_Snapshots, Mixin):
     }
 
   @SDK.method
+  @wrap_exceptions
   async def futures_positions(self):
     positions = await self.client.futures.positions()
     out = defaultdict[str, list[_PerpPosition.Position]](list)
@@ -44,7 +47,7 @@ class Snapshots(_Snapshots, Mixin):
       out[pos['symbol']].append(_PerpPosition.Position(size=size, entry_price=Decimal(pos['openAvgPrice'])))
 
     return { symbol: merge_positions(positions) for symbol, positions in out.items() }
-
+  
   @SDK.method
   async def snapshots(self, assets: Sequence[str] = []) -> Sequence[Snapshot]:
     spot_balances, future_balances, future_positions = await asyncio.gather(
