@@ -10,9 +10,10 @@ from trading_sdk.reporting.history import Flow, FuturesTrade, History
 from bitget import Bitget
 from bitget.futures.trade.fills import fill_direction
 
+from .util import TimezoneMixin
 
-@dataclass
-class FuturesHistory(History):
+@dataclass(kw_only=True)
+class FuturesHistory(TimezoneMixin, History):
   client: Bitget
 
   @SDK.method
@@ -22,7 +23,7 @@ class FuturesHistory(History):
         yield Flow(
           asset=tx['marginCoin'],
           change=tx['amount'],
-          time=tx['ts'],
+          time=self.add_tz(tx['ts']),
           event_tag=tx['futureTaxType'],
           raw=tx,
           source='bitget:futures_transaction_records',
@@ -30,7 +31,7 @@ class FuturesHistory(History):
         if (fee := abs(tx['fee'])) > 0:
           yield Flow(
             asset=tx['marginCoin'], change=-fee,
-            time=tx['ts'],
+            time=self.add_tz(tx['ts']),
             event_tag='fee',
             raw=tx,
             source='bitget:futures_transaction_records',
@@ -52,7 +53,7 @@ class FuturesHistory(History):
 
         yield FuturesTrade(
           id=fill['tradeId'],
-          time=fill['cTime'],
+          time=self.add_tz(fill['cTime']),
           instrument=fill['symbol'],
           qty=fill['baseVolume'],
           price=fill['price'],

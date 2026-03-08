@@ -7,8 +7,10 @@ from trading_sdk.reporting.history import Flow, SpotTrade, History
 from bitget import Bitget
 from bitget.spot.public.symbols import Symbol
 
-@dataclass
-class MarginHistory(History):
+from .util import TimezoneMixin
+
+@dataclass(kw_only=True)
+class MarginHistory(TimezoneMixin, History):
   client: Bitget
   symbols_cache: dict[str, Symbol] | None = field(kw_only=True, default=None)
 
@@ -24,14 +26,16 @@ class MarginHistory(History):
       for tx in chunk:
         yield Flow(
           asset=tx['coin'], change=tx['amount'],
-          time=tx['ts'], raw=tx,
+          time=self.add_tz(tx['ts']),
+          raw=tx,
           event_tag=tx['marginTaxType'],
           source='bitget:margin_transaction_records',
         )
         if (fee := abs(tx['fee'])) > 0:
           yield Flow(
             asset=tx['coin'], change=-fee,
-            time=tx['ts'], raw=tx,
+            time=self.add_tz(tx['ts']),
+            raw=tx,
             event_tag='fee',
             source='bitget:margin_transaction_records',
           )
@@ -49,7 +53,7 @@ class MarginHistory(History):
         quote = symbols[symbol]['quoteCoin']
         yield SpotTrade(
           id=fill['tradeId'],
-          time=fill['cTime'],
+          time=self.add_tz(fill['cTime']),
           base=base, quote=quote,
           qty=fill['size'], price=fill['priceAvg'],
           liquidity=fill['tradeScope'],
@@ -62,7 +66,6 @@ class MarginHistory(History):
 
   @SDK.method
   async def trades(self, margin_type: Literal['isolated', 'crossed'], symbols: Iterable[str], start: datetime, end: datetime):
-    symbols = await self.symbols
     for symbol in symbols:
       chunk = [t async for t in self.symbol_trades(margin_type, symbol, start, end)]
       yield chunk

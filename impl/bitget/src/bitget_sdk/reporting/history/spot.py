@@ -9,8 +9,10 @@ from trading_sdk.reporting.history import (
 from bitget import Bitget
 from bitget.spot.public.symbols import Symbol
 
-@dataclass
-class SpotHistory(History):
+from .util import TimezoneMixin
+
+@dataclass(kw_only=True)
+class SpotHistory(TimezoneMixin, History):
   client: Bitget
   symbols_cache: dict[str, Symbol] | None = field(kw_only=True, default=None)
 
@@ -26,14 +28,16 @@ class SpotHistory(History):
       for tx in chunk:
         yield Flow(
           asset=tx['coin'], change=tx['amount'],
-          time=tx['ts'], raw=tx,
+          time=self.add_tz(tx['ts']),
+          raw=tx,
           event_tag=tx['spotTaxType'],
           source='bitget:spot_transaction_records',
         )
         if (fee := abs(tx['fee'])) > 0:
           yield Flow(
             asset=tx['coin'], change=-fee,
-            time=tx['ts'], raw=tx,
+            time=self.add_tz(tx['ts']),
+            raw=tx,
             event_tag='fee',
             source='bitget:spot_transaction_records',
           )
@@ -47,7 +51,7 @@ class SpotHistory(History):
         quote = symbols[fill['symbol']]['quoteCoin']
         yield SpotTrade(
           id=fill['tradeId'],
-          time=fill['cTime'],
+          time=self.add_tz(fill['cTime']),
           base=base, quote=quote,
           qty=fill['size'], price=fill['priceAvg'],
           liquidity=fill['tradeScope'],
@@ -66,7 +70,7 @@ class SpotHistory(History):
           continue
         yield CryptoDeposit(
           id=deposit['tradeId'],
-          time=deposit['cTime'],
+          time=self.add_tz(deposit['cTime']),
           asset=deposit['coin'],
           qty=deposit['size'],
           network=deposit['chain'],
@@ -85,7 +89,7 @@ class SpotHistory(History):
         fee = abs(withdrawal['fee'])
         yield CryptoWithdrawal(
           id=withdrawal['tradeId'],
-          time=withdrawal['cTime'],
+          time=self.add_tz(withdrawal['cTime']),
           asset=withdrawal['coin'],
           qty=withdrawal['size'],
           network=withdrawal['chain'],

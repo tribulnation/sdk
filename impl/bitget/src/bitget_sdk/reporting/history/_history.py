@@ -8,38 +8,21 @@ from .spot import SpotHistory
 from .futures import FuturesHistory
 from .margin import MarginHistory
 
-class AutoDetect:
-  ...
-
-AUTO_DETECT = AutoDetect()
-
-Tx = TypeVar('Tx', Flow, Event)
+from .util import TimezoneMixin
 
 @dataclass
-class History(SdkMixin, _History):
+class History(TimezoneMixin, SdkMixin, _History):
   """Bitget Reporting History
   
   **Does not support**:
   - P2P trading
   - Copy trading
   """
-  tz: timezone | AutoDetect = AUTO_DETECT
-  """Timezone of the API times (defaults to the local timezone)."""
-
-  @property
-  def timezone(self) -> timezone:
-    if isinstance(self.tz, AutoDetect):
-      return datetime.now().astimezone().tzinfo # type: ignore
-    else:
-      return self.tz
-
-  def add_tz(self, tx: Tx) -> Tx:
-    return replace(tx, time=tx.time.replace(tzinfo=self.timezone))
 
   def __post_init__(self):
-    self.spot_history = SpotHistory(self.client)
-    self.future_history = FuturesHistory(self.client)
-    self.margin_history = MarginHistory(self.client)
+    self.spot_history = SpotHistory(client=self.client, tz=self.tz)
+    self.future_history = FuturesHistory(client=self.client, tz=self.tz)
+    self.margin_history = MarginHistory(client=self.client, tz=self.tz)
 
   async def history(self, start: datetime, end: datetime) -> AsyncIterable[_History.History]:
     async for chunk in self.spot_history.history(start, end):
