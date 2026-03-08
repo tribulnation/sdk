@@ -9,3 +9,6 @@ pyright
 -e impl/mexc
 -e impl/bybit
 -e impl/bingx
+-e impl/ethereum
+-e impl/dydx
+-e impl/hyperliquid
