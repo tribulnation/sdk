@@ -37,7 +37,7 @@ class InvalidColumnString:
   wrong_values: Collection[str]
 
   def __str__(self):
-    return f'Column "{self.column}" has invalid values (expected it to match {self.expected_type.pattern}). Wrong values: {", ".join(self.wrong_values)}'
+    return f'Column "{self.column}" has invalid values (expected it to match {self.expected_type.pattern}). Wrong values: {", ".join(list(self.wrong_values)[:10])}'
 
 SchemaError = MissingColumn | InvalidColumnType | InvalidColumnString
 
