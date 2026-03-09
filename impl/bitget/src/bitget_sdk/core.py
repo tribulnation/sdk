@@ -9,7 +9,7 @@ from bitget.core import exc
 
 Fn = TypeVar('Fn')
 
-def wrap_exceptions(fn) -> Fn:
+def wrap_exceptions(fn: Fn) -> Fn:
   if inspect.iscoroutinefunction(fn):
     async def awrapper(*args, **kwargs):
       try:
@@ -27,7 +27,7 @@ def wrap_exceptions(fn) -> Fn:
       except exc.Error as e:
         raise Error(*e.args) from e
     return awrapper # type: ignore
-  elif inspect.isgeneratorfunction(fn):
+  elif inspect.isasyncgenfunction(fn):
     async def agen_wrapper(*args, **kwargs):
       try:
         async for item in fn(*args, **kwargs):

@@ -47,8 +47,8 @@ class withdrawal_records:
     util.validate_schema(df, withdrawal_records.schema)
     df = df[df['Status'] == 'Successful'].copy()
     df.reset_index(drop=True, inplace=True)
-    df['Time(UTC)'] = pd.to_datetime(df['Date']).dt.tz_localize(tz).dt.tz_convert(timezone.utc)
-    return df
+    df['Time(UTC)'] = pd.to_datetime(df['Date']).dt.tz_localize(tz).dt.tz_convert(timezone.utc) # type: ignore
+    return df # type: ignore
 
   @staticmethod
   def parse(path: str, tz: timezone, *_, **__):

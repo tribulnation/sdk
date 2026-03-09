@@ -78,7 +78,7 @@ class cross_margin_order_history:
     for _, row in df.iterrows():
       if str(row['Date']) == 'Date':
         continue
-      if pd.isna(row['Time(UTC)']):
+      if pd.isna(row['Time(UTC)']): # type: ignore
         continue
       executed = Decimal(str(row['Executed']))
       if executed == 0:

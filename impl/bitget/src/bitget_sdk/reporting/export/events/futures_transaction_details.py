@@ -1,3 +1,4 @@
+from typing_extensions import Literal
 from decimal import Decimal
 from datetime import timezone
 import re
@@ -74,7 +75,7 @@ class futures_transaction_details:
   def parse_df(df: pd.DataFrame):
     for _, row in df.iterrows():
       direction = str(row['Direction']).strip().lower()
-      direction_map = {
+      direction_map: dict[str, Literal['buy', 'sell']] = {
         'open long': 'buy',
         'close long': 'sell',
         'liquidation for long': 'sell',
