@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ethereum-trading-sdk"
-version = "0.1.0"
+version = "0.1.7"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
 description = "Tribulnation SDK implementation for Ethereum."
 dependencies = [
-  "web3", "httpx", "pydantic"
+  "web3", "httpx", "pydantic", "typed-ethereum"
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}

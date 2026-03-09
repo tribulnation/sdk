@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from decimal import Decimal
 
+from web3 import Web3
 from web3.exceptions import ContractLogicError, BadFunctionCallOutput
 
 from trading_sdk import ApiError, SDK
@@ -23,6 +24,7 @@ class Snapshots(_Snapshots, Mixin):
     time = datetime.now(timezone.utc)
     snapshots: list[Snapshot] = [Snapshot(asset='ETH', qty=eth_balance, time=time, kind='currency')]
     contracts = assets or await self._list_assets()
+    contracts = [Web3.to_checksum_address(contract) for contract in contracts]
     for contract in contracts:
       try:
         balance = await self.node.token(contract).balance(self.address)

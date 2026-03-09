@@ -1,5 +1,9 @@
 # Ethereum SDK
 
-> Tribulnation SDK implementation for Ethereum (placeholder).
+> Tribulnation SDK implementation for Ethereum.
 
-This package is currently a stub and does not expose any shared interfaces yet.
+## Installation
+
+```bash
+pip install ethereum-trading-sdk
+```
