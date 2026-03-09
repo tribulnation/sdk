@@ -48,13 +48,14 @@ class Trades(MarketMixin, _Trades):
     async for log in self.subscribe_subaccounts():
       if (fills := log.get('fills')):
         for fill in fills:
-          sign = 1 if fill['side'] == 'BUY' else -1
-          yield _Trades.Trade(
-            id=fill['id'],
-            price=Decimal(fill['price']),
-            qty=Decimal(fill['size']) * sign,
-            time=ts.parse(fill['createdAt']),
-            maker=fill['liquidity'] == 'MAKER',
-            fee=None,
-            details=fill,
-          )    
+          if fill['ticker'] == self.market:
+            sign = 1 if fill['side'] == 'BUY' else -1
+            yield _Trades.Trade(
+              id=fill['id'],
+              price=Decimal(fill['price']),
+              qty=Decimal(fill['size']) * sign,
+              time=ts.parse(fill['createdAt']),
+              maker=fill['liquidity'] == 'MAKER',
+              fee=None,
+              details=fill,
+            )    
