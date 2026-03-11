@@ -7,13 +7,19 @@ from dydx.indexer.types import PerpetualMarket
 from dydx.indexer import Indexer
 from dydx.indexer.streams.subaccounts import UpdateMessage as SubaccountMessage
 from dydx.node import PublicNode, PrivateNode, OEGS_GRPC_URL
-from dydx.node.private.place_order import Flags
+from dydx.node.private.place_order import Flags, TimeInForce
 
 from .util import StreamManager
 
 class Settings(TypedDict, total=False):
-  limit_flags: Flags
-  """Place limit orders as short/long term"""
+  order_flags: Flags
+  """Order flags for all orders"""
+  limit_tif: TimeInForce
+  """Time in force for limit orders"""
+  short_term_gtb: int
+  """GTB delta for short-term orders. The GTB will be `current_block() + short_term_gtb`"""
+  long_term_gtbt: int
+  """GTBT delta for long-term orders. The GTBT will be `current_block().time.seconds + long_term_gtbt`"""
   reduce_only: bool
 
 @dataclass(kw_only=True, frozen=True)
