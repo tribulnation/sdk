@@ -7,6 +7,9 @@ from .perps import Perp, PerpMarket
 
 @_dataclass(frozen=True)
 class Hyperliquid(_Mixin):
+  Spot = Spot
+  Perp = Perp
+
   async def spot(self):
     return await Spot.fetch(address=self.address, client=self.client, settings=self.settings, streams=self.streams)
 
