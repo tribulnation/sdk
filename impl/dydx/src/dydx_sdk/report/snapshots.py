@@ -14,7 +14,7 @@ class Snapshots(_Snapshots, Mixin):
   @wrap_exceptions
   async def snapshots(self, assets: Sequence[str] = []) -> Sequence[Snapshot]:
     time = datetime.now().astimezone()
-    subaccounts = await self.indexer.data.get_subaccounts(self.address)
+    subaccounts = (await self.indexer.data.get_subaccounts(self.address))['subaccounts']
     equity = Decimal(0)
     unrealized = Decimal(0)
     realized = Decimal(0)

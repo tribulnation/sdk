@@ -8,8 +8,11 @@ from trading_sdk.core import ApiError, ValidationError
 from v4_proto.dydxprotocol.subaccounts.subaccount_pb2 import SubaccountId
 from v4_proto.dydxprotocol.clob.order_pb2 import OrderId
 
-from dydx.indexer.types import OrderStatus, OrderState
+from dydx.indexer.data.api.list_orders import Order
 from dydx_sdk.core import MarketMixin, wrap_exceptions
+
+OrderStatus = str
+OrderState = dict
 
 def parse_status(status: OrderStatus) -> bool:
   match status:
@@ -52,7 +55,7 @@ def parse_state(o: OrderState, *, address: str) -> _Orders.Order:
 @wrap_exceptions
 async def list_orders(self: MarketMixin, *, status: OrderStatus | None = None) -> list[_Orders.Order]:
   orders = await self.indexer.data.list_orders(
-    self.address, subaccount=self.subaccount,
+    address=self.address, subaccount_number=self.subaccount,
     ticker=self.market, status=status,
   )
   return [parse_state(o, address=self.address) for o in orders]

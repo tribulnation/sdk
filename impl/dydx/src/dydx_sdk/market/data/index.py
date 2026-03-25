@@ -9,4 +9,4 @@ class Index(MarketMixin, _Index):
   @wrap_exceptions
   async def price(self):
     market = await self.indexer.data.get_market(self.market)
-    return Decimal(market['oraclePrice'])
+    return market['oraclePrice']

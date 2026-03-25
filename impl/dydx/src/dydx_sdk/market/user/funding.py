@@ -17,10 +17,10 @@ class Funding(MarketMixin, _Funding):
       return start <= t <= end
     
     async for batch in self.indexer.data.get_funding_payments_paged(
-      self.address, subaccount=self.subaccount, ticker=self.market, start=start
+      address=self.address, subaccount_number=self.subaccount, ticker=self.market, after_or_at=start
     ):
       fundings = [
-        Funding.Payment(amount=f['payment'], time=f['createdAt'])
+        _Funding.Payment(amount=f['payment'], time=f['createdAt'])
         for f in batch
           if within(f['createdAt'])
       ]

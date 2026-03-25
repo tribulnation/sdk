@@ -8,7 +8,7 @@ from dydx_sdk.core import MarketMixin, wrap_exceptions
 class Balances(MarketMixin, _Balances):
   @wrap_exceptions
   async def quote(self) -> _Balances.Balance:
-    subaccount = await self.indexer.data.get_subaccount(self.address)
+    subaccount = (await self.indexer.data.get_subaccount(address=self.address, subaccount_number=0))['subaccount']
     free = Decimal(subaccount['freeCollateral'])
     total = Decimal(subaccount['equity'])
     return _Balances.Balance(free=free, locked=total - free)

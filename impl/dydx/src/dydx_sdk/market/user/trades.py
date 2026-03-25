@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 
-from dydx.core import timestamp as ts
 from trading_sdk.market.user import Trades as _Trades
 from dydx_sdk.core import MarketMixin, wrap_exceptions
 
@@ -22,7 +21,7 @@ class Trades(MarketMixin, _Trades):
       return after and before
 
     async for fills in self.indexer.data.get_fills_paged(
-      self.address, subaccount=self.subaccount, end=end,
+      address=self.address, subaccount_number=self.subaccount, created_before_or_at=end,
       market=self.market, market_type='PERPETUAL'
     ):
       trades: list[_Trades.Trade] = []
@@ -54,7 +53,7 @@ class Trades(MarketMixin, _Trades):
               id=fill['id'],
               price=Decimal(fill['price']),
               qty=Decimal(fill['size']) * sign,
-              time=ts.parse(fill['createdAt']),
+              time=fill['createdAt'],
               maker=fill['liquidity'] == 'MAKER',
               fee=None,
               details=fill,
