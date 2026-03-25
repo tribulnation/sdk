@@ -6,7 +6,7 @@ from trading_sdk.core import ApiError, ValidationError
 from trading_sdk.util import fmt_num
 from trading_sdk.market.trade import Place as _Place
 from hyperliquid.exchange.order import Order
-from hyperliquid_sdk.core import Settings, round_price
+from hyperliquid_sdk.core import Settings, round_price, wrap_exceptions
 from hyperliquid_sdk.spot.core import SpotMixin
 
 def export_order(o: _Place.Order, *, asset: int, settings: Settings) -> Order:
@@ -33,6 +33,7 @@ def export_order(o: _Place.Order, *, asset: int, settings: Settings) -> Order:
 
 @dataclass(frozen=True)
 class Place(SpotMixin, _Place):
+  @wrap_exceptions
   async def orders(self, orders: Sequence[_Place.Order]) -> Sequence[_Place.Result]:
     asset = self.asset_id
     result = await self.client.exchange.order(*(

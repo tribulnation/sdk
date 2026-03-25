@@ -6,6 +6,7 @@ from trading_sdk import ApiError
 from trading_sdk.market.user import Orders as _Orders
 from hyperliquid.info.methods.order_status import Order
 from hyperliquid.info.methods.open_orders import OpenOrder
+from hyperliquid_sdk.core import wrap_exceptions
 from hyperliquid_sdk.spot.core import SpotMixin
 
 def parse_order(o: Order | OpenOrder, *, active: bool, details) -> _Orders.Order:
@@ -21,6 +22,7 @@ def parse_order(o: Order | OpenOrder, *, active: bool, details) -> _Orders.Order
 
 @dataclass(frozen=True)
 class Orders(SpotMixin, _Orders):
+  @wrap_exceptions
   async def query(self, id: str) -> _Orders.Order:
     status = await self.client.info.order_status(self.address, int(id))
     if status['status'] == 'unknownOid':
@@ -28,6 +30,7 @@ class Orders(SpotMixin, _Orders):
     o = status['order']['order']
     return parse_order(o, active=status['order']['status'] == 'open', details=status['order'])
     
+  @wrap_exceptions
   async def open(self) -> Sequence[_Orders.Order]:
     orders = await self.client.info.open_orders(self.address)
     return [parse_order(o, active=True, details=o) for o in orders if o['coin'] == self.asset_name]

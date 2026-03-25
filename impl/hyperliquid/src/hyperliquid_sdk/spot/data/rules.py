@@ -4,12 +4,13 @@ from decimal import Decimal
 from trading_sdk.market.data import Rules as _Rules
 from hyperliquid_sdk.core import (
   PRICE_MAX_DECIMALS, SPOT_PRICE_MAX_DECIMALS, MIN_ORDER_VALUE,
-  MAX_RELATIVE_PRICE, MIN_RELATIVE_PRICE,
+  MAX_RELATIVE_PRICE, MIN_RELATIVE_PRICE, wrap_exceptions,
 )
 from hyperliquid_sdk.spot.core import SpotMixin
 
 @dataclass(frozen=True)
 class Rules(SpotMixin, _Rules):
+  @wrap_exceptions
   async def get(self) -> _Rules.Rules:
     user_fees = await self.client.info.user_fees(self.address)
 

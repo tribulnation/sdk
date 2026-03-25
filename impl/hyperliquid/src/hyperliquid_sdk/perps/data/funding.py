@@ -6,10 +6,12 @@ from datetime import datetime, timedelta
 from trading_sdk import LogicError
 from trading_sdk.market.data import Funding as _Funding
 from hyperliquid.core import timestamp as ts
+from hyperliquid_sdk.core import wrap_exceptions
 from hyperliquid_sdk.perps.core import PerpMixin
 
 @dataclass(frozen=True)
 class Funding(PerpMixin, _Funding):
+  @wrap_exceptions
   async def next(self) -> _Funding.Funding:
     perp_meta, asset_ctxs = await self.client.info.perp_meta_and_asset_ctxs(self.dex)
     if perp_meta['universe'][self.asset_idx]['name'] != self.asset_name:
@@ -19,6 +21,7 @@ class Funding(PerpMixin, _Funding):
     next_time = datetime.now().replace(minute=0, second=0, microsecond=0) + timedelta(hours=1) # next hour
     return _Funding.Funding(rate=funding, time=next_time)
 
+  @wrap_exceptions
   async def history(self, start: datetime, end: datetime) -> AsyncIterable[Sequence[_Funding.Funding]]:
     start_ts, end_ts = ts.dump(start), ts.dump(end)
     async for chunk in self.client.info.funding_history_paged(self.asset_name, start_ts, end_time=end_ts):

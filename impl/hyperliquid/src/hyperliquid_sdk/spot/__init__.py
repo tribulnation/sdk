@@ -2,7 +2,7 @@ from dataclasses import dataclass as _dataclass
 
 from trading_sdk.market import Market
 from hyperliquid import Hyperliquid as _Hyperliquid
-from hyperliquid_sdk.core import Mixin as _Mixin, Settings, StreamManager
+from hyperliquid_sdk.core import Mixin as _Mixin, Settings, StreamManager, wrap_exceptions
 from .core import SpotMixin, find_spot, match_spot, SpotMetaResponse
 from .data import MarketData
 from .trade import Trading
@@ -56,6 +56,7 @@ class Spot(_Mixin):
       yield self.spot(idx, settings=settings)
 
   @classmethod
+  @wrap_exceptions
   async def fetch(cls, *, address: str, client: _Hyperliquid, settings: Settings = {}, streams: dict[str, StreamManager] = {}):
     return cls(
       address=address, client=client, settings=settings, streams=streams,

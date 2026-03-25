@@ -4,7 +4,7 @@ from decimal import Decimal
 from trading_sdk.market.data import Rules as _Rules
 from hyperliquid_sdk.core import (
   PRICE_MAX_DECIMALS, FUTURES_PRICE_MAX_DECIMALS, MIN_ORDER_VALUE,
-  MAX_RELATIVE_PRICE, MIN_RELATIVE_PRICE,
+  MAX_RELATIVE_PRICE, MIN_RELATIVE_PRICE, wrap_exceptions,
 )
 from hyperliquid_sdk.perps.core import PerpMixin
 
@@ -17,6 +17,7 @@ def parse_perp_name(name: str) -> tuple[str, str]:
 
 @dataclass(frozen=True)
 class Rules(PerpMixin, _Rules):
+  @wrap_exceptions
   async def get(self) -> _Rules.Rules:
     user_fees = await self.client.info.user_fees(self.address)
 

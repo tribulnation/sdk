@@ -3,10 +3,12 @@ from decimal import Decimal
 
 from trading_sdk import LogicError
 from trading_sdk.market.data import Index as _Index
+from hyperliquid_sdk.core import wrap_exceptions
 from hyperliquid_sdk.perps.core import PerpMixin
 
 @dataclass(frozen=True)
 class Index(PerpMixin, _Index):
+  @wrap_exceptions
   async def price(self) -> Decimal:
     perp_meta, asset_ctxs = await self.client.info.perp_meta_and_asset_ctxs(self.dex)
     if perp_meta['universe'][self.asset_idx]['name'] != self.asset_meta['name']:

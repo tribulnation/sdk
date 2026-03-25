@@ -2,10 +2,12 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from trading_sdk.market.user import PerpPosition
+from hyperliquid_sdk.core import wrap_exceptions
 from hyperliquid_sdk.perps.core import PerpMixin
 
 @dataclass(frozen=True)
 class Position(PerpMixin, PerpPosition):
+  @wrap_exceptions
   async def get(self) -> PerpPosition.Position:
     state = await self.client.info.clearinghouse_state(self.address)
     for entry in state['assetPositions']:

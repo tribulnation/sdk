@@ -6,6 +6,7 @@ import os
 from hyperliquid import Hyperliquid, Wallet
 from hyperliquid.exchange.order import TimeInForce
 from hyperliquid.streams.user_fills import WsFill, WsUserFills
+from .exc import wrap_exceptions
 from .util import StreamManager
 
 class Settings(TypedDict, total=False):
@@ -38,14 +39,17 @@ class Mixin:
       client = Hyperliquid.ws(wallet, mainnet=mainnet, validate=settings.get('validate', True))
     return cls(address=address, client=client, settings=settings, streams={})
 
+  @wrap_exceptions
   async def __aenter__(self):
     await self.client.__aenter__()
     return self
 
+  @wrap_exceptions
   async def __aexit__(self, exc_type, exc_value, traceback):
     await asyncio.gather(*[stream.close() for stream in self.streams.values()])
     await self.client.__aexit__(exc_type, exc_value, traceback)
 
+  @wrap_exceptions
   async def subscribe_user_fills(self) -> AsyncIterable[list[WsFill]]:
     if 'user_fills' not in self.streams:
       stream = await self.client.streams.user_fills(self.address, aggregate_by_time=True)

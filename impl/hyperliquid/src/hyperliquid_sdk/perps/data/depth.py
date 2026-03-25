@@ -2,10 +2,12 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from trading_sdk.market.data import Depth as _Depth
+from hyperliquid_sdk.core import wrap_exceptions
 from hyperliquid_sdk.perps.core import PerpMixin
 
 @dataclass(frozen=True)
 class Depth(PerpMixin, _Depth):
+  @wrap_exceptions
   async def book(self, *, limit: int | None = None) -> _Depth.Book:
     book = await self.client.info.l2_book(self.asset_name)
     raw_bids, raw_asks = book['levels']

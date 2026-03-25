@@ -3,10 +3,12 @@ from decimal import Decimal
 
 from trading_sdk import LogicError
 from trading_sdk.market.user import Balances as _Balances
+from hyperliquid_sdk.core import wrap_exceptions
 from hyperliquid_sdk.perps.core import PerpMixin
 
 @dataclass(frozen=True)
 class Balances(PerpMixin, _Balances):
+  @wrap_exceptions
   async def quote(self) -> _Balances.Balance:
     state = await self.client.info.spot_clearinghouse_state(self.address)
     for balance in state['balances']:

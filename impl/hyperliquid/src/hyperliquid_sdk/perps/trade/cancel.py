@@ -4,10 +4,12 @@ from dataclasses import dataclass
 from trading_sdk.core import ApiError
 from trading_sdk.market.trade import Cancel as _Cancel
 from hyperliquid.exchange.cancel import Cancel as CancelType
+from hyperliquid_sdk.core import wrap_exceptions
 from hyperliquid_sdk.perps.core import PerpMixin
 
 @dataclass(frozen=True)
 class Cancel(PerpMixin, _Cancel):
+  @wrap_exceptions
   async def orders(self, ids: Sequence[str]) -> Any:
     asset = self.asset_id
     cancels: list[CancelType] = [
@@ -35,6 +37,7 @@ class Cancel(PerpMixin, _Cancel):
     return (await self.orders([id]))[0]
 
 
+  @wrap_exceptions
   async def open(self) -> Any:
     orders = await self.client.info.open_orders(self.address, dex=self.dex)
     return await self.orders([str(o['oid']) for o in orders if o['coin'] == self.asset_name])

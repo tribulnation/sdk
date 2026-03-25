@@ -6,7 +6,7 @@ from trading_sdk.market import PerpMarket as _PerpMarket
 from hyperliquid import Hyperliquid as _Hyperliquid
 from hyperliquid.info.perps.perp_meta_and_asset_ctxs import PerpMeta
 from hyperliquid.info.spot.spot_meta import SpotMetaResponse
-from hyperliquid_sdk.core import Mixin as _Mixin, Settings, StreamManager
+from hyperliquid_sdk.core import Mixin as _Mixin, Settings, StreamManager, wrap_exceptions
 from hyperliquid_sdk.perps.core import Meta, PerpMixin
 from .data import MarketData
 from .trade import Trading
@@ -81,6 +81,7 @@ class Perp(_Mixin):
       yield self.perp(idx, settings=settings, index_price=index_price)
 
   @classmethod
+  @wrap_exceptions
   async def fetch(
     cls, *, address: str, client: _Hyperliquid, dex: str | None = None,
     settings: Settings = {},
