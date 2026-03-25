@@ -1,4 +1,4 @@
-from typing_extensions import TypeVar, Any, Callable, Protocol, Generic, Self, overload, Sequence
+from typing_extensions import TypeVar, Any, Callable, Protocol, Generic, Self, overload, Sequence, Awaitable
 from abc import ABCMeta
 from dataclasses import dataclass
 import asyncio
@@ -15,6 +15,11 @@ class Method:
   @staticmethod
   def get(fn) -> 'Method | None':
     return getattr(fn, '__sdk_method__', None)
+
+  @classmethod
+  def decorate(cls, fn: Fn, name: str | None = None, data: Any = None) -> Fn:
+    setattr(fn, '__sdk_method__', Method(name=name or fn.__name__, data=data))
+    return fn
 
 class SDKMeta(ABCMeta):
   def __new__(cls: type, name: str, bases: tuple[type, ...], dct: dict[str, Any]):
@@ -43,41 +48,62 @@ class SDK(metaclass=SDKMeta):
   __sdk_methods__: dict[str, Method] = {}
   __sdk_fields__: dict[str, type['SDK']] = {}
 
-  def __sdk_instrument__(self, *mappers: Mapper[Fn], path: tuple[str, ...] = ()) -> Self:
+  def __sdk_instrument__(self, *mappers: Mapper[Fn], path: tuple[str, ...] = (), log: bool = False) -> Self:
     attrs = {}
+    methods = {}
     for method, data in self.__sdk_methods__.items():
-      fn = getattr(self, method)
-      for mapper in mappers:
-        fn = mapper(fn, data, path)
-      attrs[method] = fn
+      if log:
+        print(f'Instrumenting method: {method}')
+      methods[method] = data
     for field in self.__sdk_fields__:
+      if log:
+        print(f'Instrumenting field: {field}')
       sdk: SDK = getattr(self, field)
       attrs[field] = sdk.__sdk_instrument__(*mappers, path=path + (field,))
 
-    if (fn := getattr(self, '__call__', None)) is not None and (method := Method.get(fn)) is not None:
-      for mapper in mappers:
-        fn = mapper(fn, method, path)
-      attrs['__call__'] = fn
+    call_method = None
+    if (fn := getattr(type(self), '__call__', None)) is not None and (method := Method.get(fn)) is not None:
+      if log:
+        print(f'Instrumenting method __call__: {method}')
+      call_method = method
 
     sdk = self
+    method_cache = {}
     class Proxy:
       def __getattr__(self, name: str) -> Any:
+        if name in methods:
+          if name in method_cache:
+            return method_cache[name]
+          fn = getattr(type(sdk), name).__get__(self, type(sdk))
+          for mapper in mappers:
+            fn = mapper(fn, methods[name], path)
+          method_cache[name] = fn
+          return fn
+
         if name in attrs:
-          return attrs[name]
+          value = attrs[name]
         else:
-          return getattr(sdk, name)
+          value = getattr(sdk, name)
+        # key fix: if this is a method bound to original sdk,
+        # rebind it so internal self.method() calls go through Proxy
+        if inspect.ismethod(value) and getattr(value, "__self__", None) is sdk:
+          return value.__func__.__get__(self, type(sdk))
+        return value
 
       def __setattr__(self, name: str, value: Any) -> None:
         setattr(sdk, name, value)
 
       def __call__(self, *args: Any, **kwargs: Any) -> Any:
-        if '__call__' in attrs:
-          return attrs['__call__'](*args, **kwargs)
-        else:
+        if call_method is None:
           return sdk.__call__(*args, **kwargs) # type: ignore
 
+        fn = getattr(type(sdk), '__call__').__get__(self, type(sdk))
+        for mapper in mappers:
+          fn = mapper(fn, call_method, path)
+        return fn(*args, **kwargs)
+
       def __repr__(self) -> str:
-        return sdk.__repr__()
+        return f'Proxy({sdk.__repr__()})'
 
     return Proxy() # type: ignore
 
@@ -133,18 +159,19 @@ class SDK(metaclass=SDKMeta):
     ...
   @classmethod
   def method(cls, fn = None, /, *, name: str | None = None, data: Any = None):
-    def decorator(fn: Fn) -> Fn:
-      setattr(fn, '__sdk_method__', Method(name=name or fn.__name__, data=data))
-      return fn
 
     if fn is None:
-      return decorator
+      return lambda fn: Method.decorate(fn, name=name, data=data)
     else:
-      return decorator(fn)
+      return Method.decorate(fn, name=name, data=data)
+
+  @Method.decorate
+  async def call(self, fn: Callable[[], Awaitable[T]]) -> T:
+    return await fn()
 
 S = TypeVar('S', bound=SDK)
-def instrument(sdk: S, *mappers: Mapper[Fn]) -> S:
-  return sdk.__sdk_instrument__(*mappers)
+def instrument(sdk: S, *mappers: Mapper[Fn], log: bool = False) -> S:
+  return sdk.__sdk_instrument__(*mappers, log=log)
 
 E = TypeVar('E', bound=Exception, contravariant=True)
 
