@@ -5,9 +5,10 @@ from dataclasses import dataclass as _dataclass
 from trading_sdk.market import PerpMarket as _PerpMarket
 from hyperliquid import Hyperliquid as _Hyperliquid
 from hyperliquid.info.perps.perp_meta_and_asset_ctxs import PerpMeta
+from hyperliquid.info.perps.perp_dexs import PerpDex
 from hyperliquid.info.spot.spot_meta import SpotMetaResponse
 from hyperliquid_sdk.core import Mixin as _Mixin, Settings, StreamManager, wrap_exceptions
-from hyperliquid_sdk.perps.core import Meta, PerpMixin
+from hyperliquid_sdk.perps.core import DEX, PerpMixin
 from .data import MarketData
 from .trade import Trading
 from .user import UserData
@@ -58,17 +59,27 @@ def match_perp(name: str, perp_meta: PerpMeta):
     if name in asset['name']:
       yield idx
 
+def find_dex(name: str, dexs: list[PerpDex|None]) -> int:
+  for idx, obj in enumerate(dexs):
+    if obj and obj['name'] == name:
+      return idx
+  raise ValueError(f'DEX {name} not found')
+
 @_dataclass(frozen=True, kw_only=True)
 class Perp(_Mixin):
   spot_meta: SpotMetaResponse
   perp_meta: PerpMeta
+  dex: DEX | None
 
   def perp(
     self, asset_idx: int, *,
     settings: Settings = {},
     index_price: _Literal['oracle', 'mark'] = 'mark',
   ):
-    meta = PerpMarket.meta_of(asset_idx, perp_meta=self.perp_meta, spot_meta=self.spot_meta, index_price=index_price)
+    meta = PerpMarket.meta_of(
+      asset_idx, perp_meta=self.perp_meta, spot_meta=self.spot_meta, index_price=index_price,
+      dex=self.dex,
+    )
     mixin = PerpMixin(address=self.address, client=self.client, settings=settings, streams=self.streams, meta=meta)
     return PerpMarket.of(mixin)
 
@@ -91,7 +102,13 @@ class Perp(_Mixin):
       client.info.spot_meta(),
       client.info.perp_meta_and_asset_ctxs(dex),
     )
+    if dex is None:
+      dex_obj = None
+    else:
+      dexs = await client.info.perp_dexs()
+      dex_idx = find_dex(dex, dexs)
+      dex_obj: DEX | None = {'idx': dex_idx, 'name': dex}
     return cls(
       address=address, client=client, settings=settings, streams=streams,
-      spot_meta=spot_meta, perp_meta=perp_meta,
+      spot_meta=spot_meta, perp_meta=perp_meta, dex=dex_obj,
     )
