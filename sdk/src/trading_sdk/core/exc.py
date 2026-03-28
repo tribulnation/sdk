@@ -5,27 +5,32 @@ class Error(Exception):
     return f'{self.__class__.__name__}({args})'
 
 class NetworkError(Error):
-  """Network error: HTTP error, connection timeout, etc."""
+  """Error reaching the server."""
   def __str__(self):
     return super().__str__()
 
 class ValidationError(Error):
-  """Validation error: invalid response, invalid data, etc."""
-  def __str__(self):
-    return super().__str__()
-
-class UserError(Error):
-  """User error: invalid request, invalid input, etc."""
-  def __str__(self):
-    return super().__str__()
-
-class AuthError(Error):
-  """Authentication error: invalid API key, invalid API secret, etc."""
+  """Invalid response format."""
   def __str__(self):
     return super().__str__()
 
 class ApiError(Error):
-  """Unknown error returned by the API."""
+  """Error returned by the API."""
+  def __str__(self):
+    return super().__str__()
+
+class BadRequest(ApiError):
+  """Bad request: invalid request, invalid input, etc."""
+  def __str__(self):
+    return super().__str__()
+
+class AuthError(ApiError):
+  """Authentication error: invalid API key, invalid API secret, etc."""
+  def __str__(self):
+    return super().__str__()
+
+class RateLimited(ApiError):
+  """Rate limited: the API has reached the rate limit."""
   def __str__(self):
     return super().__str__()
 
