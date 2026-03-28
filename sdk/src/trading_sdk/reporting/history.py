@@ -26,15 +26,15 @@ class BaseEvent:
   raw: Any
   source: str
 
-  def flow(self, asset: str, change: Decimal) -> Flow:
+  def flow(self, asset: str, change: Decimal, *, tag: str | None = None) -> Flow:
     return Flow(
       time=self.time,
       asset=asset,
       change=change,
       raw=self,
       event_id=self.id,
-      event_tag=self.tag,
-      source=f'generated:{self.tag}',
+      event_tag=tag or self.tag,
+      source=self.source,
     )
 
   @property
@@ -160,39 +160,69 @@ class Yield(BaseEvent):
     return [self.flow(self.asset, self.qty)]
 
 @dataclass(kw_only=True, frozen=True)
-class EthereumTx(BaseEvent):
+class EvmTx(BaseEvent):
   @dataclass(kw_only=True, frozen=True)
   class Execution:
-    method_name: str | None = None
-    """Function called (if any, if identified from source code)"""
-    method_id: str
-    """Function ID (if any)"""
-    input: str
+    contract_address: str
+    """Contract address"""
+    input: str | None = None
     """Input data (if any)"""
+    method_name: str | None = None
+    """Function called (if available)"""
 
-  tag: Literal['ethereum_transaction'] = 'ethereum_transaction'
+  @dataclass(kw_only=True, frozen=True)
+  class BaseTransfer:
+    direction: Literal['in', 'out']
+    """Direction of the transfer"""
+    counterparty: str
+    """Counterparty address"""
+    value: Decimal
+    """Value"""
+  
+  @dataclass(kw_only=True, frozen=True)
+  class NativeTransfer(BaseTransfer):
+    kind: Literal['native'] = 'native'
+    internal: bool
+
+  @dataclass(kw_only=True, frozen=True)
+  class ERC20Transfer(BaseTransfer):
+    kind: Literal['erc20'] = 'erc20'
+    contract_address: str
+    """Contract address"""
+
+  Transfer = Union[NativeTransfer, ERC20Transfer]
+
+  tag: Literal['evm_tx'] = 'evm_tx'
   hash: str
-  value: Decimal | None = None
-  """Value received (if positive) or sent (if negative) [ETH]"""
   fee: Decimal | None = None
   """Fee paid [ETH]"""
   execution: Execution | None = None
   """Contract execution details (if any)"""
+  transfers: Sequence[Transfer] = field(default_factory=list)
+  """Transfers"""
 
   @property
   def flows(self) -> Sequence[Flow]:
     flows: list[Flow] = []
-    if self.value:
-      flows.append(self.flow('ETH', self.value))
+    for t in self.transfers:
+      assert t.direction in ('in', 'out'), f'Invalid direction: {t.direction}'
+      sign = 1 if t.direction == 'in' else -1
+      value = sign * t.value
+      if t.kind == 'native':
+        flows.append(self.flow('native', value, tag='evm_tx:native'))
+      elif t.kind == 'erc20':
+        flows.append(self.flow(t.contract_address, value, tag='evm_tx:erc20'))
+      else:
+        raise ValueError(f'Unknown transfer kind: {t.kind}')
     if self.fee:
-      flows.append(self.flow('ETH', -self.fee))
+      flows.append(self.flow('native', -self.fee, tag='evm_tx:fee'))
     return flows
 
 Event = Union[
   SpotTrade, FuturesTrade, Yield,
   CryptoDeposit, CryptoWithdrawal,
   FiatDeposit, FiatWithdrawal,
-  EthereumTx,
+  EvmTx,
 ]
 
 class History(SDK):
