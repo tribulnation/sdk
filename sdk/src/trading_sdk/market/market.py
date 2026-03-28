@@ -113,7 +113,7 @@ class PerpMarket(Market):
 
   @SDK.method
   @abstractmethod
-  def funding_paymets(self, start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingPayment]]:
+  def funding_payments(self, start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingPayment]]:
     """Fetch your funding payments history."""
 
   @SDK.method

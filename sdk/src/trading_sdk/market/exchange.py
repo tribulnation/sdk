@@ -72,7 +72,8 @@ class Exchange(SDK):
   async def trades_stream(self, market_id: str, /) -> AsyncIterable[Trade]:
     """Subscribe to your real-time trades."""
     market = await self.market(market_id)
-    async for trade in await market.trades_stream():
+    stream = await market.trades_stream()
+    async for trade in stream:
       yield trade
 
   @SDK.method
@@ -121,10 +122,10 @@ class PerpExchange(Exchange):
       yield page
 
   @SDK.method
-  async def funding_paymets(self, market_id: str, /, start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingPayment]]:
+  async def funding_payments(self, market_id: str, /, start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingPayment]]:
     """Fetch your funding payments history."""
     market = await self.market(market_id)
-    async for page in market.funding_paymets(start, end):
+    async for page in market.funding_payments(start, end):
       yield page
 
   @SDK.method

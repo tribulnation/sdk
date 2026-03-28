@@ -50,9 +50,10 @@ class TradingVenue(SDK):
   async def markets(self) -> Sequence[str]:
     """List available markets."""
     markets: list[str] = []
-    for exchange in await self.exchanges():
-      exchange = await self.exchange(exchange.id)
-      markets.extend(await exchange.markets())
+    for desc in await self.exchanges():
+      exchange = await self.exchange(desc.id)
+      flat_markets = await exchange.markets()
+      markets.extend([f'{desc.id}:{market}' for market in flat_markets])
     return markets
 
   @SDK.method
@@ -160,10 +161,10 @@ class PerpTradingVenue(TradingVenue):
       yield page
 
   @SDK.method
-  async def funding_paymets(self, market_id: str, /, start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingPayment]]:
+  async def funding_payments(self, market_id: str, /, start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingPayment]]:
     """Fetch your funding payments history."""
     market = await self.market(market_id)
-    async for page in market.funding_paymets(start, end):
+    async for page in market.funding_payments(start, end):
       yield page
 
   @SDK.method
