@@ -35,6 +35,7 @@ class Markets:
     - `dydx:perp:BTC-USD`
     - `hyperliquid:perp:BTC`
     - `hyperliquid:perp:xyz:BTC`
+    - `hyperliquid:spot:PUMP/USDC:142`
     """
     venue, market_type, instrument_id = spec.split(':', 2)
     if market_type == 'spot':
