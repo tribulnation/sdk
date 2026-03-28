@@ -1,17 +1,20 @@
 from dataclasses import dataclass
 
-from ethereum.node_rpc import NodeRpc
+from ethereum import NodeRpc
 
 @dataclass(kw_only=True)
-class NodeRpcMixin:
+class Mixin:
   node: NodeRpc
   address: str
-  ignore_bad_contracts: bool = True
+
+  @property
+  def w3(self):
+    return self.node.w3
 
   @classmethod
-  def at(cls, rpc_url: str, *, address: str, ignore_bad_contracts: bool = True):
+  def at(cls, rpc_url: str, *, address: str):
     node = NodeRpc.at(rpc_url)
-    return cls(node=node, address=address, ignore_bad_contracts=ignore_bad_contracts)
+    return cls(node=node, address=address)
   
   async def __aenter__(self):
     await self.node.__aenter__()

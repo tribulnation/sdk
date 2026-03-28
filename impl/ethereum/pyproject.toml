@@ -10,7 +10,7 @@ authors = [
 ]
 description = "Tribulnation SDK implementation for Ethereum."
 dependencies = [
-  "web3", "httpx", "pydantic", "typed-ethereum"
+  "web3", "httpx", "pydantic", "typed-ethereum", "typed-alchemy", "typed-etherscan"
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}

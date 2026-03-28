@@ -9,16 +9,21 @@ from web3.exceptions import ContractLogicError, BadFunctionCallOutput
 from trading_sdk import ApiError, SDK
 from trading_sdk.reporting import Snapshots as _Snapshots, Snapshot
 
-from ethereum_sdk.core import Mixin
+from ethereum_sdk.core import NodeRpcMixin, EtherscanMixin, wrap_exceptions
 
 @dataclass
-class Snapshots(_Snapshots, Mixin):
+class Snapshots(NodeRpcMixin, EtherscanMixin, _Snapshots):
+  address: str
+  ignore_bad_contracts: bool = True
+  ignore_zero_value: bool = True
 
   @SDK.method
+  @wrap_exceptions
   async def _list_assets(self):
-    txs = await self.etherscan.token_transactions_paged_sync(self.address, self.chain_id)
+    txs = await self.etherscan.account.token_transactions_paged(self.address, self.chain_id)
     return set(tx['contractAddress'] for tx in txs)
 
+  @wrap_exceptions
   async def snapshots(self, assets: Sequence[str] = []) -> list[Snapshot]:
     eth_balance = Decimal(await self.node.eth_balance(self.address))
     time = datetime.now(timezone.utc)
