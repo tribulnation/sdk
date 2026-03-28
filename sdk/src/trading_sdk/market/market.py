@@ -4,7 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 import asyncio
 
-from trading_sdk import SDK
+from trading_sdk.core import SDK, Stream
 from .types import (
   Book,
   FundingRate, FundingPayment,
@@ -16,18 +16,32 @@ from .types import (
 
 class Market(SDK):
   """An abstract market interface."""
+
+  @property
+  def market_id(self) -> str:
+    ...
+
+  @property
+  def exchange_id(self) -> str:
+    ...
+
+  @property
+  def venue_id(self) -> str:
+    ...
+
+  @property
+  def id(self) -> str:
+    return f'{self.venue_id}:{self.exchange_id}:{self.market_id}'
+
   @SDK.method
   @abstractmethod
   async def depth(self) -> Book:
     """Fetch the market order book."""
   
   @SDK.method
-  async def depth_stream(self) -> AsyncIterable[Book]:
+  async def depth_stream(self) -> Stream[Book]:
     """Subscribe to the market order book."""
-    async def stream():
-      while True:
-        yield await self.depth()
-    return stream()
+    return Stream.polled(self.depth)
 
   @SDK.method
   @abstractmethod
@@ -57,10 +71,8 @@ class Market(SDK):
 
   @SDK.method
   @abstractmethod
-  async def trades_stream(self) -> AsyncIterable[Trade]:
+  async def trades_stream(self) -> Stream[Trade]:
     """Subscribe to your real-time trades."""
-    # YES: the intended usage is `async for trade in await self.trades_stream(): ...`
-    # After the `await`, the stream is operational - thus no trades will be missed during start-up.
 
   @SDK.method
   @abstractmethod

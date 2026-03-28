@@ -1,8 +1,6 @@
 from typing_extensions import Any, AsyncIterable, Sequence
 from abc import abstractmethod
 from datetime import datetime
-from decimal import Decimal
-import asyncio
 
 from trading_sdk import SDK
 from .types import (
@@ -17,7 +15,19 @@ from .market import Market, PerpMarket
 
 class Exchange(SDK):
   """An abstract multi-market exchange interface."""
-  
+
+  @property
+  def venue_id(self) -> str:
+    ...
+
+  @property
+  def exchange_id(self) -> str:
+    ...
+
+  @property
+  def id(self) -> str:
+    return f'{self.venue_id}:{self.exchange_id}'
+
   @abstractmethod
   async def market(self, market_id: str, /) -> Market:
     """Fetch a market by ID."""
@@ -33,12 +43,10 @@ class Exchange(SDK):
     return await market.depth()
 
   @SDK.method
-  async def depth_stream(self, market_id: str, /) -> AsyncIterable[Book]:
+  async def depth_stream(self, market_id: str, /):
     """Subscribe to the market order book."""
     market = await self.market(market_id)
-    stream = await market.depth_stream()
-    async for book in stream:
-      yield book
+    return await market.depth_stream()
   
   @SDK.method
   async def rules(self, market_id: str, /, *, refetch: bool = False) -> Rules:
@@ -69,12 +77,10 @@ class Exchange(SDK):
       yield page
 
   @SDK.method
-  async def trades_stream(self, market_id: str, /) -> AsyncIterable[Trade]:
+  async def trades_stream(self, market_id: str, /):
     """Subscribe to your real-time trades."""
     market = await self.market(market_id)
-    stream = await market.trades_stream()
-    async for trade in stream:
-      yield trade
+    return await market.trades_stream()
 
   @SDK.method
   async def position(self, market_id: str, /) -> Position:

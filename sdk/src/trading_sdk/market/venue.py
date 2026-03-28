@@ -22,6 +22,14 @@ class ExchangeDescription:
 
 class TradingVenue(SDK):
   """An abstract multi-exchange venue interface."""
+
+  @property
+  def venue_id(self) -> str:
+    ...
+
+  @property
+  def id(self) -> str:
+    return self.venue_id
   
   @SDK.method
   @abstractmethod
@@ -63,12 +71,10 @@ class TradingVenue(SDK):
     return await market.depth()
 
   @SDK.method
-  async def depth_stream(self, market_id: str, /) -> AsyncIterable[Book]:
+  async def depth_stream(self, market_id: str, /):
     """Subscribe to the market order book."""
     market = await self.market(market_id)
-    stream = await market.depth_stream()
-    async for book in stream:
-      yield book
+    return await market.depth_stream()
   
   @SDK.method
   async def rules(self, market_id: str, /, *, refetch: bool = False) -> Rules:
@@ -102,9 +108,7 @@ class TradingVenue(SDK):
   async def trades_stream(self, market_id: str, /) -> AsyncIterable[Trade]:
     """Subscribe to your real-time trades."""
     market = await self.market(market_id)
-    stream = await market.trades_stream()
-    async for trade in stream:
-      yield trade
+    return await market.trades_stream()
 
   @SDK.method
   async def position(self, market_id: str, /) -> Position:
