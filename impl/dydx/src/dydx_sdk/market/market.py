@@ -1,0 +1,113 @@
+from typing_extensions import AsyncIterable, Sequence
+from dataclasses import dataclass
+from datetime import datetime
+from decimal import Decimal
+
+from trading_sdk.core import Stream
+from trading_sdk.market import (
+  Book,
+  FundingPayment,
+  FundingRate,
+  Order,
+  OrderResponse,
+  OrderState,
+  PerpMarket,
+  PerpPosition,
+  Rules,
+  Trade,
+)
+
+from dydx_sdk.core import wrap_exceptions
+from .impl import  (
+  MarketMixin,
+  parse_book,
+  trades_history,
+  trades_stream,
+  next_funding,
+  funding_history,
+  funding_payments,
+  open_orders,
+  place_order,
+  place_orders,
+  query_order,
+  cancel_order,
+  cancel_orders,
+)
+
+@dataclass(frozen=True)
+class Market(MarketMixin, PerpMarket):
+
+  @property
+  def market_id(self) -> str:
+    return self.market
+
+  @property
+  def exchange_id(self) -> str:
+    return 'perp'
+
+  @property
+  def venue_id(self) -> str:
+    return 'dydx'
+
+  @wrap_exceptions
+  async def depth(self) -> Book:
+    book = await self.indexer.data.get_order_book(self.market)
+    return parse_book(book)
+
+  async def depth_stream(self) -> Stream[Book]:
+    return await self.subscribe_depth(self.market)
+    
+  async def rules(self, *, refetch: bool = False) -> Rules:
+    return await self.shared.rules(self.market, refetch=refetch)
+
+  def trades_history(self, start: datetime, end: datetime) -> AsyncIterable[Sequence[Trade]]:
+    return trades_history(self, start, end)
+
+  async def open_orders(self) -> Sequence[OrderState]:
+    return await open_orders(self)
+
+  async def trades_stream(self) -> Stream[Trade]:
+    return await trades_stream(self)
+
+  @wrap_exceptions
+  async def position(self) -> PerpPosition:
+    position = await self.indexer.data.get_open_position(
+      self.market,
+      address=self.address,
+      subaccount=self.subaccount,
+    )
+    if position is None:
+      return PerpPosition()
+    return PerpPosition(
+      size=Decimal(position['size']),
+      entry_price=Decimal(position['entryPrice']),
+    )
+
+  async def place_order(self, order: Order) -> OrderResponse:
+    return await place_order(self, order)
+
+  async def place_orders(self, orders: Sequence[Order]) -> Sequence[OrderResponse]:
+    return await place_orders(self, orders)
+
+  async def query_order(self, id: str) -> OrderState | None:
+    return await query_order(self, id)
+
+  async def cancel_order(self, id: str):
+    return await cancel_order(self, id)
+
+  async def cancel_orders(self, ids: Sequence[str]):
+    return await cancel_orders(self, ids)
+
+  @wrap_exceptions
+  async def index(self) -> Decimal:
+    market = await self.indexer.data.get_market(self.market)
+    return Decimal(market['oraclePrice'])
+
+  async def next_funding(self) -> FundingRate:
+    return await next_funding(self)
+
+  def funding_history(self, start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingRate]]:
+    return funding_history(self, start, end)
+
+  def funding_payments(self, start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingPayment]]:
+    return funding_payments(self, start, end)

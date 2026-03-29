@@ -1,16 +1,19 @@
 from typing_extensions import Sequence
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime
 from collections import defaultdict
 from decimal import Decimal
-import asyncio
 
+from trading_sdk.core import wrap_exceptions
 from trading_sdk.reporting import Snapshot, Snapshots as _Snapshots
 
-from dydx_sdk.core import Mixin, wrap_exceptions
+from dydx import Indexer
 
 @dataclass(frozen=True)
-class Snapshots(_Snapshots, Mixin):
+class Snapshots(_Snapshots):
+  address: str
+  indexer: Indexer
+
   @wrap_exceptions
   async def snapshots(self, assets: Sequence[str] = []) -> Sequence[Snapshot]:
     time = datetime.now().astimezone()

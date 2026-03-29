@@ -4,7 +4,7 @@ import inspect
 from grpc._channel import _InactiveRpcError
 
 from trading_sdk.core import NetworkError, ValidationError, ApiError, Error
-from dydx import core
+from typed_core import exceptions as core
 
 def wrap_exceptions(fn):
   if inspect.iscoroutinefunction(fn):
