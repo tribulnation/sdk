@@ -118,6 +118,33 @@ class Book:
   def __format__(self, fmt: str) -> str:
     return fmt_book(self, fmt)
 
+  def copy(self) -> 'Book':
+    import copy
+    return copy.deepcopy(self)
+  
+  def update(self, updates: 'Book'):
+    """Update the local book with an incoming update.
+    - Matching entries are replaced with the new values.
+    - New entries are added to the book.
+    - Entries with zero quantity are removed from the book.
+    """
+    bids = {e.price: e for e in self.bids}
+    asks = {e.price: e for e in self.asks}
+    for e in updates.bids:
+      if e.qty > 0:
+        bids[e.price] = e
+      else:
+        bids.pop(e.price, None)
+    for e in updates.asks:
+      if e.qty > 0:
+        asks[e.price] = e
+      else:
+        asks.pop(e.price, None)
+
+    self.bids = [bids[p] for p in sorted(bids.keys(), reverse=True)]
+    self.asks = [asks[p] for p in sorted(asks.keys())]
+    
+
 
 def avg_price(entries: Sequence['Book.Entry']) -> Decimal:
   total = sum(e.price * e.qty for e in entries)
