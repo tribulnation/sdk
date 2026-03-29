@@ -1,9 +1,15 @@
-from .exc import Error, NetworkError, ValidationError, ApiError, BadRequest, AuthError, RateLimited, LogicError
+from .exc import (
+  Error, NetworkError, ValidationError,
+  ApiError, BadRequest, AuthError, RateLimited,
+  LogicError,
+)
 from .sdk import SDK, instrument, exponential_retry, log
-from .stream import Stream
+from .stream import Stream, Subscription
 
 __all__ = [
-  'Error', 'NetworkError', 'ValidationError', 'ApiError', 'BadRequest', 'AuthError', 'RateLimited', 'LogicError',
+  'Error', 'NetworkError', 'ValidationError',
+  'ApiError', 'BadRequest', 'AuthError', 'RateLimited',
+  'LogicError',
   'SDK', 'instrument', 'exponential_retry', 'log',
-  'Stream',
+  'Stream', 'Subscription',
 ]
