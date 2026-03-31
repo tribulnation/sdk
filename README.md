@@ -1,85 +1,91 @@
 # Trading SDK
 
-> An abstract, fully-typed, async Python SDK for automated crypto trading, with exchange-specific implementations.
+> An abstract, fully-typed, async Python SDK for automated crypto trading.
 
-**Status: Beta.** The API is under active development and **very likely to change at any time**.
+## Quick Start
+
+```python
+from trading_sdk import TradingSDK
+
+sdk = TradingSDK()
+mexc = await sdk.market('mexc:spot:BTCUSDT')
+dydx = await sdk.market('dydx:perp:BTC-USD')
+
+async for my_trade in mexc.trades_stream():
+  print(f'Hedging {my_trade}')
+  await dydx.place_order({
+    'type': 'LIMIT',
+    'qty': -my_trade.qty,
+    'price': my_trade.price,
+  })
+```
 
 ## Installation
 
 ```bash
-pip install trading-sdk
-pip install mexc-trading-sdk  # or any exchange package listed below
+pip install trading-sdk[mexc, dydx, hyperliquid]
 ```
 
-## Features
+## Supported Venues
 
-- **Fully async**
-- **Type-annotated**: `TypedDict`, `Literal`, `Protocol`, etc.
-- **Composable**: mix and match market data, trading, user data, wallet, earn, and reporting modules.
-- **Exchange-agnostic core** with per-exchange adapters under `impl/`.
+- `mexc`: [MEXC](https://www.mexc.com/)
+- `dydx`: [dYdX](https://dydx.exchange/)
+- `hyperliquid`: [Hyperliquid](https://hyperliquid.xyz/)
 
-## Quickstart
+## Market IDs
 
-1. Define your strategy against the abstract `Market` interface.
+Market IDs have this form: `<venue_id>:<exchange_id>:<market_id>`.
 
-```python
-from trading_sdk import Market
+You can also scope. These are equivalent:
 
-async def strategy(market: Market):
-  book = await market.data.depth(limit=1)
-  best_ask = book.best_ask.price
-  result = await market.trade.place.order({
-    "qty": "1",
-    "price": str(best_ask),
-    "type": "LIMIT",
-  })
+1. Directly on the SDK:
 
-  order = await market.user.orders.query(result.id)
-  if order.active:
-    await market.trade.cancel.order(result.id)
-```
+  ```python
+  await sdk.book('mexc:spot:BTCUSDT')
+  ```
 
-2. Use an exchange implementation.
+2. By venue:
 
-```python
-from mexc_sdk import MEXC
+  ```python
+  venue = await sdk.venue('mexc')
+  await venue.book('spot:BTCUSDT')
+  ```
 
-async with MEXC.new(API_KEY, API_SECRET) as sdk:
-  market = await sdk.spot("BTC", "USDT")
-  await strategy(market)
-```
+3. By exchange:
 
-## Wallet and Earn Examples
+  ```python
+  exchange = await venue.exchange('spot')
+  await exchange.book('BTCUSDT')
+  ```
 
-```python
-from mexc_sdk import MEXC
+4. By market:
 
-async with MEXC.new(API_KEY, API_SECRET) as sdk:
-  deposit_methods = await sdk.wallet.deposit_methods(assets=["USDT"])
-  withdrawal_methods = await sdk.wallet.withdrawal_methods(assets=["USDT"], networks=["TRC20"])
-  instruments = await sdk.earn.instruments()
-```
+  ```python
+  market = await exchange.market('BTCUSDT')
+  await market.depth()
+  ```
 
-## Interfaces
+## Market Interface
 
-Brief overview of the core interfaces:
-
-- [`Market`](docs/market.md): unified market data and trading.
-- [`Earn`](docs/earn.md): investment products (flexible/fixed/etc.) data.
-- [`Wallet`](docs/wallet.md): deposit and withdrawal methods with network, fee, and confirmation data.
-
-> [Support matrix](docs/support.md).
-
-## Exchange Packages
-
-Each implementation is a separate package under `impl/<exchange>/`:
-
-- [mexc](impl/mexc/README.md)
-- [binance](impl/binance/README.md)
-- [bitget](impl/bitget/README.md)
-- [bybit](impl/bybit/README.md)
-- [bingx](impl/bingx/README.md)
-- [kraken](impl/kraken/README.md)
-- [dydx](impl/dydx/README.md)
-- [hyperliquid](impl/hyperliquid/README.md)
-- [ethereum](impl/ethereum/README.md)
+- Public data:
+  - `depth() -> Book`: order book
+  - `depth_stream() -> Stream[Book]`: real-time order book updates
+  - `rules() -> Rules`: market rules (tick size, fees, etc.)
+- User data:
+  - `query_order(id: str) -> OrderState | None`
+  - `open_orders() -> Sequence[OrderState]`
+  - `trades_history(start: datetime, end: datetime) -> AsyncIterable[Sequence[Trade]]`
+  - `trades_stream() -> Stream[Trade]`: real-time user trades
+  - `position() -> Position`: base-asset position	
+- Trading:
+  - `place_order(order: Order) -> OrderResponse`
+  - `place_orders(orders: Sequence[Order]) -> Sequence[OrderResponse]`
+  - `cancel_order(id: str) -> Any`
+  - `cancel_orders(ids: Sequence[str])`
+  - `cancel_open_orders()`
+- Perpetual markets:
+  - `index() -> Decimal`: index price
+  - `next_funding() -> FundingRate`: next funding rate
+  - `funding_history(start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingRate]]`: market funding rate history
+  - `funding_payments(start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingPayment]]`: your funding payments history
+  - `position() -> PerpPosition`: open base-asset position, including the entry price
