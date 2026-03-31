@@ -211,7 +211,7 @@ class EvmTx(BaseEvent):
       if t.kind == 'native':
         flows.append(self.flow('native', value, tag='evm_tx:native'))
       elif t.kind == 'erc20':
-        flows.append(self.flow(t.contract_address, value, tag='evm_tx:erc20'))
+        flows.append(self.flow(t.contract_address, value, tag='evm_tx:erc20')) # type: ignore (wtf)
       else:
         raise ValueError(f'Unknown transfer kind: {t.kind}')
     if self.fee:
