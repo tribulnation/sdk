@@ -2,7 +2,6 @@ from typing_extensions import AsyncIterable, Sequence
 from datetime import datetime, timedelta
 from decimal import Decimal
 
-from trading_sdk.core import PaginatedResponse
 from trading_sdk.market import FundingRate, FundingPayment
 
 from dydx_sdk.core import wrap_exceptions
@@ -19,7 +18,6 @@ async def next_funding(self: MarketMixin) -> FundingRate:
   )
 
 @wrap_exceptions
-@PaginatedResponse.lift
 async def funding_history(self: MarketMixin, start: datetime, end: datetime):
   start = start.astimezone()
   end = end.astimezone()

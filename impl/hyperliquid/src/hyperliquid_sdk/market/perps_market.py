@@ -46,7 +46,7 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
 
   @property
   def exchange_id(self) -> str:
-    return "perp"
+    return self.dex_name or ''
 
   @property
   def market_id(self) -> str:

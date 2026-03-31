@@ -82,8 +82,14 @@ class Market(MarketMixin, PerpMarket):
     if not market_positions:
       return PerpPosition()
 
+    for p in market_positions:
+      assert (
+        (Decimal(p['size']) > 0 and p['side'] == 'LONG') or
+        (Decimal(p['size']) < 0 and p['side'] == 'SHORT')
+      )
+
     signed_sizes = [
-      Decimal(p['size']) * (Decimal(1) if p['side'] == 'LONG' else Decimal(-1))
+      Decimal(p['size'])
       for p in market_positions
     ]
     net_size = sum(signed_sizes, Decimal(0))
@@ -91,10 +97,10 @@ class Market(MarketMixin, PerpMarket):
       return PerpPosition()
 
     total_notional = sum(
-      abs(Decimal(p['size'])) * Decimal(p['entryPrice'])
+      Decimal(p['size']) * Decimal(p['entryPrice'])
       for p in market_positions
     )
-    total_size = sum(abs(Decimal(p['size'])) for p in market_positions)
+    total_size = sum(Decimal(p['size']) for p in market_positions)
     avg_entry = total_notional / total_size if total_size != 0 else Decimal(0)
 
     return PerpPosition(size=net_size, entry_price=avg_entry)
