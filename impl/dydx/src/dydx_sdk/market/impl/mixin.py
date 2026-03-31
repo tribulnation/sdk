@@ -87,8 +87,8 @@ class ExchangeMixin:
   shared: Shared
 
   @classmethod
-  def new(cls, mnemonic: str | None = None):
-    client = DYDX.new(mnemonic)
+  def new(cls, mnemonic: str | None = None, *, mainnet: bool = True, validate: bool = True):
+    client = DYDX.new(mnemonic, validate=validate) if mainnet else DYDX.testnet(mnemonic, validate=validate)
     return cls(shared=Shared(client=client))
     
   @property

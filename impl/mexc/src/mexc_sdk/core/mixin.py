@@ -4,7 +4,7 @@ import asyncio
 
 from mexc import MEXC
 from mexc.spot.market_data.exchange_info import Info as SpotInfo
-from mexc.spot.streams.user.my_trades import Trade as SpotTrade
+from mexc.spot.streams.core.proto import PrivateDealsV3Api as SpotTrade
 from mexc.futures.market_data.contract_info import Info as PerpInfo
 from mexc.futures.streams.user.my_trades import Deal as PerpTrade
 from .util import StreamManager

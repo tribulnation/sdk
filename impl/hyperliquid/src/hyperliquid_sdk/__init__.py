@@ -1,17 +1,1 @@
-from dataclasses import dataclass as _dataclass
-
-from hyperliquid_sdk.core import Mixin as _Mixin
-from .spot import Spot, SpotMarket
-from .perps import Perp, PerpMarket
-
-
-@_dataclass(frozen=True)
-class Hyperliquid(_Mixin):
-  Spot = Spot
-  Perp = Perp
-
-  async def spot(self):
-    return await Spot.fetch(address=self.address, client=self.client, settings=self.settings, streams=self.streams)
-
-  async def perp(self, dex: str | None = None):
-    return await Perp.fetch(address=self.address, client=self.client, settings=self.settings, dex=dex, streams=self.streams)
+from .market import HyperliquidMarket

@@ -12,42 +12,31 @@ from .types import (
   Rules,
 )
 from .market import Market, PerpMarket
-from .exchange import Exchange, PerpExchange
+from .exchange import PerpExchange
+from .venue import TradingVenue
 
-class ExchangeDescription(TypedDict):
-  id: str
-  type: Literal['spot', 'perp']
-
-class TradingVenue(SDK):
-  """An abstract multi-exchange venue interface."""
-  ExchangeDescription = ExchangeDescription
-
-  @property
-  @abstractmethod
-  def venue_id(self) -> str:
-    ...
-
-  @property
-  def id(self) -> str:
-    return self.venue_id
-  
-  @SDK.method
-  @abstractmethod
-  async def exchange(self, exchange_id: str, /) -> Exchange:
-    """Fetch an exchange by ID."""
+class TradingMarkets(SDK):
+  """A collection of all venues supported by the SDK."""
 
   @SDK.method
   @abstractmethod
-  async def exchanges(self) -> Sequence[ExchangeDescription]:
-    """List available exchanges."""
+  async def venue(self, id: str, /) -> TradingVenue:
+    """Fetch a venue by ID."""
 
-  async def market(self, exchange_market_id: str, /) -> Market:
+  @SDK.method
+  @abstractmethod
+  async def venues(self) -> Sequence[str]:
+    """List supported all venues."""
+
+  @SDK.method
+  async def market(self, id: str, /) -> Market:
     """Fetch a market by ID.
     
-    - `exchange_market_id`: `<exchange_id>:<market_id>`
+    - `market_id`: `<venue_id>:<exchange_id>:<market_id>`
     """
-    exchange_id, market_id = exchange_market_id.split(':', 1)
-    exchange = await self.exchange(exchange_id)
+    venue_id, exchange_id, market_id = id.split(':', 2)
+    venue = await self.venue(venue_id)
+    exchange = await venue.exchange(exchange_id)
     return await exchange.market(market_id)
 
   @SDK.method
