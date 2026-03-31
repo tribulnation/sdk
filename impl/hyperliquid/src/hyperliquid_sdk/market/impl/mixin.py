@@ -218,21 +218,21 @@ class SharedMixin:
   @classmethod
   def http(
     cls, address: str | None = None, *, wallet: Wallet | None = None,
-    mainnet: bool = True, validate: bool = True, settings: Settings = {}
+    mainnet: bool = True, settings: Settings = {}
   ):
     if address is None:
       address = os.environ['HYPERLIQUID_ADDRESS'] if mainnet else os.environ['HYPERLIQUID_TESTNET_ADDRESS']
-    client = Hyperliquid.http(wallet, mainnet=mainnet, validate=validate)
+    client = Hyperliquid.http(wallet, mainnet=mainnet, validate=settings.get('validate', True))
     return cls(shared=Shared(client=client, address=address, settings=settings))
 
   @classmethod
   def ws(
     cls, address: str | None = None, *, wallet: Wallet | None = None,
-    mainnet: bool = True, validate: bool = True, settings: Settings = {}
+    mainnet: bool = True, settings: Settings = {}
   ):
     if address is None:
       address = os.environ['HYPERLIQUID_ADDRESS']
-    client = Hyperliquid.ws(wallet, mainnet=mainnet, validate=validate)
+    client = Hyperliquid.ws(wallet, mainnet=mainnet, validate=settings.get('validate', True))
     return cls(shared=Shared(client=client, address=address, settings=settings))
 
   @property

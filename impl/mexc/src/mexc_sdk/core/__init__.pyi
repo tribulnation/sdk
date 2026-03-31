@@ -1,12 +1,12 @@
 from .exc import wrap_exceptions
-from .mixin import Mixin, PerpMixin, SpotMixin, Settings
+from .mixin import Mixin, Settings
 from .naming import spot_name, perp_name
 from .constants import MIN_ORDER_VALUE
 from .util import StreamManager
 
 __all__ = [
   'wrap_exceptions',
-  'Mixin', 'PerpMixin', 'SpotMixin',
+  'Mixin',
   'Settings',
   'StreamManager',
   'spot_name', 'perp_name',

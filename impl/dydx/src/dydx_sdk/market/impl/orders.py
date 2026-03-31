@@ -69,7 +69,7 @@ async def list_orders(
   address = await self.address
   orders = await self.indexer.data.list_orders(
     address=address,
-    subaccount_number=self.subaccount,
+    subaccount=self.subaccount,
     ticker=self.market,
     status=status,
   )

@@ -8,7 +8,7 @@ from .mixin import PerpMarketMixin
 
 @wrap_exceptions
 async def position(self: PerpMarketMixin) -> PerpPosition:
-  state = await self.client.info.clearinghouse_state(self.address, dex=self.dex)
+  state = await self.client.info.clearinghouse_state(self.address, dex=self.dex_name)
   for entry in state["assetPositions"]:
     pos = entry["position"]
     if pos["coin"] == self.asset_name:

@@ -72,8 +72,8 @@ class Market(MarketMixin, PerpMarket):
   @wrap_exceptions
   async def position(self) -> PerpPosition:
     position = await self.indexer.data.get_open_position(
-      self.market,
-      address=self.address,
+      market=self.market,
+      address=await self.address,
       subaccount=self.subaccount,
     )
     if position is None:

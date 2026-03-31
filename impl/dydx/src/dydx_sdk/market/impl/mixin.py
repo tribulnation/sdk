@@ -15,6 +15,7 @@ from .depth import depth_stream, Book
 from .rules import parse_rules, Rules
 
 class Settings(TypedDict, total=False):
+  validate: bool
   order_flags: Flags
   """Order flags for all orders"""
   limit_tif: TimeInForce
@@ -87,9 +88,10 @@ class ExchangeMixin:
   shared: Shared
 
   @classmethod
-  def new(cls, mnemonic: str | None = None, *, mainnet: bool = True, validate: bool = True):
+  def new(cls, mnemonic: str | None = None, *, mainnet: bool = True, settings: Settings = {}):
+    validate = settings.get('validate', True)
     client = DYDX.new(mnemonic, validate=validate) if mainnet else DYDX.testnet(mnemonic, validate=validate)
-    return cls(shared=Shared(client=client))
+    return cls(shared=Shared(client=client, settings=settings))
     
   @property
   def client(self):

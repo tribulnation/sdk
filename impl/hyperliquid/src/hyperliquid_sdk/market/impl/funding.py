@@ -11,7 +11,7 @@ from .mixin import PerpMarketMixin
 
 @wrap_exceptions
 async def next_funding(self: PerpMarketMixin) -> FundingRate:
-  perp_meta, asset_ctxs = await self.shared.load_perp_meta()
+  _, perp_meta, asset_ctxs = await self.shared.load_perp_meta_for_dex(self.dex_name, refetch=True)
   if perp_meta["universe"][self.asset_idx]["name"] != self.asset_name:
     raise ValueError(
       f"Expected asset {self.asset_name} at index {self.asset_idx}, got {perp_meta['universe'][self.asset_idx]['name']}"

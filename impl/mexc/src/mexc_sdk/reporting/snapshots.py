@@ -11,7 +11,19 @@ from trading_sdk.reporting import (
 )
 
 from mexc_sdk.core import Mixin, wrap_exceptions
-from mexc_sdk.futures.user.position import _PerpPosition, PositionType, merge_positions
+from mexc.futures.user_data.positions import PositionType
+
+@dataclass
+class Position:
+  size: Decimal
+  entry_price: Decimal
+
+def merge_positions(positions: list[Position]) -> Position:
+  size = sum(p.size for p in positions)
+  if size == 0:
+    return Position(size=Decimal(0), entry_price=Decimal(0))
+  entry_price = sum(p.size * p.entry_price for p in positions) / size
+  return Position(size=size, entry_price=entry_price)
 
 @dataclass(frozen=True)
 class Snapshots(_Snapshots, Mixin):
@@ -37,14 +49,14 @@ class Snapshots(_Snapshots, Mixin):
   @wrap_exceptions
   async def futures_positions(self):
     positions = await self.client.futures.positions()
-    out = defaultdict[str, list[_PerpPosition.Position]](list)
+    out = defaultdict[str, list[Position]](list)
 
     for pos in positions:
       contract = await self.client.futures.contract_info(pos['symbol'])
       contract_size = Decimal(contract['contractSize'])
       s = 1 if pos['positionType'] == PositionType.long.value else -1
       size = s * abs(Decimal(pos['holdVol'])) * contract_size
-      out[pos['symbol']].append(_PerpPosition.Position(size=size, entry_price=Decimal(pos['openAvgPrice'])))
+      out[pos['symbol']].append(Position(size=size, entry_price=Decimal(pos['openAvgPrice'])))
 
     return { symbol: merge_positions(positions) for symbol, positions in out.items() }
   

@@ -1,4 +1,4 @@
-from .mixin import Shared, SharedMixin, SpotMixin, PerpMixin, SpotMarketMixin, PerpMarketMixin, SpotMeta, PerpMeta
+from .mixin import Shared, SharedMixin, SpotMixin, PerpMixin, SpotMarketMixin, PerpMarketMixin, SpotMeta, PerpMeta, Settings
 
 from .depth import depth, depth_stream
 from .orders import open_orders, place_order, cancel_order, query_order

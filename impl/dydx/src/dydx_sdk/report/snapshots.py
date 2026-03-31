@@ -4,7 +4,7 @@ from datetime import datetime
 from collections import defaultdict
 from decimal import Decimal
 
-from trading_sdk.core import wrap_exceptions
+from dydx_sdk.core import wrap_exceptions
 from trading_sdk.reporting import Snapshot, Snapshots as _Snapshots
 
 from dydx import Indexer

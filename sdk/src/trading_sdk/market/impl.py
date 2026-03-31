@@ -1,5 +1,16 @@
-from dataclasses import dataclass
+from typing_extensions import TYPE_CHECKING, TypedDict
+from dataclasses import dataclass, field
 from . import TradingMarkets, TradingVenue
+
+if TYPE_CHECKING:
+  from dydx_sdk import Settings as DydxSettings
+  from hyperliquid_sdk import Settings as HyperliquidSettings
+  from mexc_sdk import Settings as MexcSettings
+
+  class Settings(TypedDict, total=False):
+    dydx: DydxSettings
+    hyperliquid: HyperliquidSettings
+    mexc: MexcSettings
 
 SUPPORTED_VENUES = (
   'dydx',
@@ -9,42 +20,43 @@ SUPPORTED_VENUES = (
   'mexc',
 )
 
-def load_dydx(mainnet: bool = True):
-  try:
-    from dydx_sdk import DydxMarket
-    return DydxMarket.new(mainnet=mainnet)
-  except ImportError:
-    raise ImportError('dydx market is not installed. Please install it with `pip install dydx-trading-sdk`.')
-
-def load_hyperliquid(mainnet: bool = True):
-  try:
-    from hyperliquid_sdk import HyperliquidMarket
-    return HyperliquidMarket.http(mainnet=mainnet)
-  except ImportError:
-    raise ImportError('hyperliquid market is not installed. Please install it with `pip install hyperliquid-trading-sdk`.')
-
-def load_mexc():
-  try:
-    from mexc_sdk import MexcMarket
-    return MexcMarket.new()
-  except ImportError:
-    raise ImportError('mexc market is not installed. Please install it with `pip install mexc-trading-sdk`.')
-
 @dataclass(frozen=True)
 class TradingSDK(TradingMarkets):
+  settings: 'Settings' = field(default_factory=lambda: {})
+
+  def dydx(self, mainnet: bool = True):
+    try:
+      from dydx_sdk import DydxMarket
+      return DydxMarket.new(mainnet=mainnet, settings=self.settings.get('dydx', {}))
+    except ImportError:
+      raise ImportError('dydx market is not installed. Please install it with `pip install dydx-trading-sdk`.')
+
+  def hyperliquid(self, mainnet: bool = True):
+    try:
+      from hyperliquid_sdk import HyperliquidMarket
+      return HyperliquidMarket.http(mainnet=mainnet, settings=self.settings.get('hyperliquid', {}))
+    except ImportError:
+      raise ImportError('hyperliquid market is not installed. Please install it with `pip install hyperliquid-trading-sdk`.')
+
+  def mexc(self):
+    try:
+      from mexc_sdk import MexcMarket
+      return MexcMarket.new(settings=self.settings.get('mexc', {}))
+    except ImportError:
+      raise ImportError('mexc market is not installed. Please install it with `pip install mexc-trading-sdk`.')
 
   async def venue(self, id: str, /) -> TradingVenue:
     match id:
       case 'dydx':
-        return load_dydx()
+        return self.dydx()
       case 'dydx_testnet':
-        return load_dydx(mainnet=False)
+        return self.dydx(mainnet=False)
       case 'hyperliquid':
-        return load_hyperliquid()
+        return self.hyperliquid()
       case 'hyperliquid_testnet':
-        return load_hyperliquid(mainnet=False)
+        return self.hyperliquid(mainnet=False)
       case 'mexc':
-        return load_mexc()
+        return self.mexc()
       case _:
         raise ValueError(f'Invalid venue ID: {id}. Supported venues: {SUPPORTED_VENUES}')
 

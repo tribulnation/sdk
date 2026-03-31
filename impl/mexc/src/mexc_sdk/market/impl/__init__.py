@@ -1,4 +1,4 @@
-from .mixin import Shared, SharedMixin, ExchangeMixin, MarketMixin, Meta
+from .mixin import Shared, SharedMixin, ExchangeMixin, MarketMixin, Meta, Settings
 from .depth import depth, depth_stream
 from .rules import rules
 from .orders import open_orders, query_order, place_order, cancel_order
