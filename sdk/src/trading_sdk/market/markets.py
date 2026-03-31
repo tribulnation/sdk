@@ -11,8 +11,8 @@ from .types import (
   Trade,
   Rules,
 )
-from .market import Market, PerpMarket
-from .exchange import PerpExchange
+from .market import Market
+from .exchange import Exchange, PerpExchange
 from .venue import TradingVenue
 
 class TradingMarkets(SDK):
@@ -27,6 +27,26 @@ class TradingMarkets(SDK):
   @abstractmethod
   async def venues(self) -> Sequence[str]:
     """List supported all venues."""
+
+  @SDK.method
+  async def exchange(self, id: str, /) -> Exchange:
+    """Fetch an exchange by ID.
+    
+    - `id`: `<venue_id>:<exchange_id>`
+    """
+    venue_id, exchange_id = id.split(':', 1)
+    venue = await self.venue(venue_id)
+    return await venue.exchange(exchange_id)
+
+  @SDK.method
+  async def perp_exchange(self, id: str, /) -> PerpExchange:
+    """Fetch a perpetual exchange by ID.
+    
+    - `id`: `<venue_id>:<exchange_id>`
+    """
+    venue_id, exchange_id = id.split(':', 1)
+    venue = await self.venue(venue_id)
+    return await venue.perp_exchange(exchange_id)
 
   @SDK.method
   async def market(self, id: str, /) -> Market:
