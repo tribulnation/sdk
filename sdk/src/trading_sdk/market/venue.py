@@ -2,7 +2,7 @@ from typing_extensions import Any, AsyncIterable, Sequence, Literal, TypedDict
 from abc import abstractmethod
 from datetime import datetime
 
-from trading_sdk import SDK
+from trading_sdk.core import SDK, PaginatedResponse
 from .types import (
   Book,
   FundingRate, FundingPayment,
@@ -84,7 +84,8 @@ class TradingVenue(SDK):
     return await market.open_orders()
 
   @SDK.method
-  async def trades_history(self, market_id: str, /, start: datetime, end: datetime) -> AsyncIterable[Sequence[Trade]]:
+  @PaginatedResponse.lift
+  async def trades_history(self, market_id: str, /, start: datetime, end: datetime):
     """Fetch your trades history."""
     market = await self.market(market_id)
     async for page in market.trades_history(start, end):
@@ -126,13 +127,10 @@ class TradingVenue(SDK):
     market = await self.market(market_id)
     return await market.cancel_open_orders()
 
-
-class PerpTradingVenue(TradingVenue):
-  """An abstract perpetual venue interface."""
   @SDK.method
-  @abstractmethod
   async def perp_exchange(self, exchange_id: str, /) -> PerpExchange:
     """Fetch a perpetual exchange by ID."""
+    raise NotImplementedError(f'Perp exchanges are not supported by this venue [{self.id}].')
 
   @SDK.method
   async def perp_market(self, exchange_market_id: str, /) -> PerpMarket:
@@ -145,21 +143,35 @@ class PerpTradingVenue(TradingVenue):
     return await exchange.market(market_id)
 
   @SDK.method
-  async def funding_history(self, market_id: str, /, start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingRate]]:
+  async def index(self, market_id: str, /):
+    """Fetch the market index price."""
+    market = await self.perp_market(market_id)
+    return await market.index()
+
+  @SDK.method
+  async def next_funding(self, market_id: str, /) -> FundingRate:
+    """Fetch the next funding rate and time."""
+    market = await self.perp_market(market_id)
+    return await market.next_funding()
+
+  @SDK.method
+  @PaginatedResponse.lift
+  async def funding_history(self, market_id: str, /, start: datetime, end: datetime):
     """Fetch perpetual funding rate history."""
     market = await self.perp_market(market_id)
     async for page in market.funding_history(start, end):
       yield page
 
   @SDK.method
-  async def funding_payments(self, market_id: str, /, start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingPayment]]:
+  @PaginatedResponse.lift
+  async def funding_payments(self, market_id: str, /, start: datetime, end: datetime):
     """Fetch your funding payments history."""
     market = await self.perp_market(market_id)
     async for page in market.funding_payments(start, end):
       yield page
 
   @SDK.method
-  async def position(self, market_id: str, /) -> PerpPosition:
-    """Fetch your open position in the market."""
+  async def perp_position(self, market_id: str, /) -> PerpPosition:
+    """Fetch your open position in the perpetual market."""
     market = await self.perp_market(market_id)
-    return await market.position()
+    return await market.perp_position()

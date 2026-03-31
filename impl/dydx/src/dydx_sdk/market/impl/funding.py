@@ -2,6 +2,7 @@ from typing_extensions import AsyncIterable, Sequence
 from datetime import datetime, timedelta
 from decimal import Decimal
 
+from trading_sdk.core import PaginatedResponse
 from trading_sdk.market import FundingRate, FundingPayment
 
 from dydx_sdk.core import wrap_exceptions
@@ -18,13 +19,15 @@ async def next_funding(self: MarketMixin) -> FundingRate:
   )
 
 @wrap_exceptions
-async def funding_history(self: MarketMixin, start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingRate]]:
+@PaginatedResponse.lift
+async def funding_history(self: MarketMixin, start: datetime, end: datetime):
   start = start.astimezone()
   end = end.astimezone()
   paging = self.indexer.data.get_historical_funding_paged(self.market, effective_before_or_at=end)
   state = paging.init
   while state is not None:
-    page, state = await self.call(lambda: paging.next(state))
+    next_state = state
+    page, state = await self.call(lambda: paging.next(next_state))
     rates = [
       FundingRate(rate=Decimal(item['rate']), time=time)
       for item in page

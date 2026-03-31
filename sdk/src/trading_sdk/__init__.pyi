@@ -7,7 +7,7 @@ from .earn import Earn
 from .market import (
   Market, PerpMarket,
   Exchange, PerpExchange,
-  TradingVenue, PerpTradingVenue,
+  TradingVenue,
   TradingMarkets, TradingSDK,
 )
 from .wallet import Wallet
@@ -17,7 +17,7 @@ __all__ = [
   'Earn', 'Wallet',
   'Market', 'PerpMarket',
   'Exchange', 'PerpExchange',
-  'TradingVenue', 'PerpTradingVenue',
+  'TradingVenue',
   'TradingMarkets', 'TradingSDK',
   'Error', 'NetworkError', 'ValidationError', 'ApiError', 'BadRequest', 'AuthError', 'RateLimited', 'LogicError',
 ]

@@ -3,11 +3,12 @@ from datetime import datetime
 from decimal import Decimal
 
 from trading_sdk.market import Trade
-from trading_sdk.core import Stream
+from trading_sdk.core import Stream, PaginatedResponse
 
 from dydx_sdk.core import wrap_exceptions
 from .mixin import MarketMixin
 
+@PaginatedResponse.lift
 @wrap_exceptions
 async def trades_history(self: MarketMixin, start: datetime, end: datetime) -> AsyncIterable[Sequence[Trade]]:
   start = start.astimezone()

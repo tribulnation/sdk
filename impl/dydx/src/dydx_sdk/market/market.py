@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 
-from trading_sdk.core import Stream
+from trading_sdk.core import Stream, PaginatedResponse
 from trading_sdk.market import (
   Book,
   FundingPayment,
@@ -60,8 +60,8 @@ class Market(MarketMixin, PerpMarket):
   async def rules(self, *, refetch: bool = False) -> Rules:
     return await self.shared.rules(self.market, refetch=refetch)
 
-  def trades_history(self, start: datetime, end: datetime) -> AsyncIterable[Sequence[Trade]]:
-    return trades_history(self, start, end)
+  def trades_history(self, start: datetime, end: datetime) -> PaginatedResponse[Trade]:
+    return PaginatedResponse(trades_history(self, start, end))
 
   async def open_orders(self) -> Sequence[OrderState]:
     return await open_orders(self)
@@ -70,7 +70,7 @@ class Market(MarketMixin, PerpMarket):
     return await trades_stream(self)
 
   @wrap_exceptions
-  async def position(self) -> PerpPosition:
+  async def perp_position(self) -> PerpPosition:
     position = await self.indexer.data.get_open_position(
       market=self.market,
       address=await self.address,
@@ -106,8 +106,8 @@ class Market(MarketMixin, PerpMarket):
   async def next_funding(self) -> FundingRate:
     return await next_funding(self)
 
-  def funding_history(self, start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingRate]]:
-    return funding_history(self, start, end)
+  def funding_history(self, start: datetime, end: datetime) -> PaginatedResponse[FundingRate]:
+    return PaginatedResponse(funding_history(self, start, end))
 
-  def funding_payments(self, start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingPayment]]:
-    return funding_payments(self, start, end)
+  def funding_payments(self, start: datetime, end: datetime) -> PaginatedResponse[FundingPayment]:
+    return PaginatedResponse(funding_payments(self, start, end))

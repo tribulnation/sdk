@@ -4,7 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 import asyncio
 
-from trading_sdk.core import SDK, Stream
+from trading_sdk.core import SDK, Stream, PaginatedResponse
 from .types import (
   Book,
   FundingRate, FundingPayment,
@@ -66,7 +66,7 @@ class Market(SDK):
 
   @SDK.method
   @abstractmethod
-  def trades_history(self, start: datetime, end: datetime) -> AsyncIterable[Sequence[Trade]]:
+  def trades_history(self, start: datetime, end: datetime) -> PaginatedResponse[Trade]:
     """Fetch your trades history."""
 
   @SDK.method
@@ -120,7 +120,7 @@ class PerpMarket(Market):
 
   @SDK.method
   @abstractmethod
-  def funding_history(self, start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingRate]]:
+  def funding_history(self, start: datetime, end: datetime) -> PaginatedResponse[FundingRate]:
     """Fetch perpetual funding rate history."""
 
   @SDK.method
@@ -129,6 +129,11 @@ class PerpMarket(Market):
     """Fetch your funding payments history."""
 
   @SDK.method
-  @abstractmethod
-  async def position(self) -> PerpPosition:
+  async def position(self) -> Position:
     """Fetch your open position in the market."""
+    return await self.perp_position()
+
+  @SDK.method
+  @abstractmethod
+  async def perp_position(self) -> PerpPosition:
+    """Fetch your open position in the perpetual market."""

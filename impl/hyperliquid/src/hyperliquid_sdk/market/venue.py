@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 
-from trading_sdk import PerpTradingVenue
+from trading_sdk import TradingVenue
 
 from .impl import SharedMixin
 from .perps_exchange import PerpExchange
 from .spot_exchange import SpotExchange
 
 @dataclass(frozen=True)
-class HyperliquidMarket(SharedMixin, PerpTradingVenue):
+class HyperliquidMarket(SharedMixin, TradingVenue):
   @property
   def venue_id(self) -> str:
     return 'hyperliquid'
@@ -26,13 +26,8 @@ class HyperliquidMarket(SharedMixin, PerpTradingVenue):
     exchange = await self.exchange(exchange_id)
     return await exchange.market(market_id)
 
-  async def perp_market(self, exchange_market_id: str, /):
-    exchange_id, market_id = exchange_market_id.split(':', 1)
-    exchange = await self.perp_exchange(exchange_id)
-    return await exchange.market(market_id)
-
-  async def exchanges(self) -> list[PerpTradingVenue.ExchangeDescription]:
-    out: list[PerpTradingVenue.ExchangeDescription] = [
+  async def exchanges(self) -> list[TradingVenue.ExchangeDescription]:
+    out: list[TradingVenue.ExchangeDescription] = [
       {'id': 'spot', 'type': 'spot'},
       {'id': '', 'type': 'perp'},
     ]

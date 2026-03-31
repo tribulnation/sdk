@@ -1,8 +1,8 @@
-from typing_extensions import AsyncIterable, Sequence
+from typing_extensions import Sequence
 from dataclasses import dataclass
 from datetime import datetime
 
-from trading_sdk.core import Stream
+from trading_sdk.core import Stream, PaginatedResponse
 from trading_sdk.market import (
   Market,
   Book,
@@ -68,8 +68,8 @@ class SpotMarket(SpotMarketMixin, Market):
   async def position(self) -> Position:
     return await spot_position(self)
 
-  def trades_history(self, start: datetime, end: datetime) -> AsyncIterable[Sequence[Trade]]:
-    return trades_history(self, start, end)
+  def trades_history(self, start: datetime, end: datetime) -> PaginatedResponse[Trade]:
+    return PaginatedResponse(trades_history(self, start, end))
 
   @wrap_exceptions
   async def query_order(self, id: str) -> OrderState | None:
