@@ -8,7 +8,7 @@ from dydx.indexer.types import PerpetualMarket
 from dydx import DYDX
 from dydx.node.private.place_order import Flags, TimeInForce
 from dydx.node.public.get_user_fee_tier import FeeTier
-from dydx.indexer.streams.api.subaccounts import Notification as SubaccountNotification
+from dydx.indexer.streams.api.parent_subaccounts import Notification as ParentSubaccountNotification
 
 from dydx_sdk.core import wrap_exceptions
 from .depth import depth_stream, Book
@@ -16,6 +16,7 @@ from .rules import parse_rules, Rules
 
 class Settings(TypedDict, total=False):
   validate: bool
+  parent_subaccount: int
   order_flags: Flags
   """Order flags for all orders"""
   limit_tif: TimeInForce
@@ -32,7 +33,7 @@ class Shared:
   settings: Settings = field(default_factory=Settings)
   perpetual_markets: dict[str, PerpetualMarket] | None = None
   fee_tier: FeeTier | None = None
-  subaccount_subscriptions: dict[int, Subscription[SubaccountNotification]] = field(default_factory=dict)
+  parent_subaccount_subscriptions: dict[int, Subscription[ParentSubaccountNotification]] = field(default_factory=dict)
   depth_subscriptions: dict[str, Subscription[Book]] = field(default_factory=dict)
 
   @property
@@ -58,18 +59,18 @@ class Shared:
     )
     return parse_rules(markets[market], fee_tier)
 
-  def account_subscription(self, subaccount: int):
-    if subaccount not in self.subaccount_subscriptions:
+  def parent_account_subscription(self, parent_subaccount: int):
+    if parent_subaccount not in self.parent_subaccount_subscriptions:
       @wrap_exceptions
-      async def subscribe():  
-        stream = await self.client.indexer.streams.subaccounts(await self.address, subaccount=subaccount)
+      async def subscribe():
+        stream = await self.client.indexer.streams.parent_subaccounts(await self.address, subaccount=parent_subaccount)
         @wrap_exceptions
         async def parsed_stream():
           async for msg in stream:
             yield msg
         return Stream(parsed_stream(), stream.unsubscribe)
-      self.subaccount_subscriptions[subaccount] = Subscription.of(subscribe)
-    return self.subaccount_subscriptions[subaccount]
+      self.parent_subaccount_subscriptions[parent_subaccount] = Subscription.of(subscribe)
+    return self.parent_subaccount_subscriptions[parent_subaccount]
 
   def depth_subscription(self, market: str):
     if market not in self.depth_subscriptions:
@@ -116,8 +117,8 @@ class ExchangeMixin:
   async def __aexit__(self, exc_type, exc_value, traceback):
     await self.shared.__aexit__(exc_type, exc_value, traceback)
 
-  async def subscribe_subaccount(self, subaccount: int):
-    return await self.shared.account_subscription(subaccount).subscribe()
+  async def subscribe_parent_subaccount(self, parent_subaccount: int):
+    return await self.shared.parent_account_subscription(parent_subaccount).subscribe()
 
   async def subscribe_depth(self, market: str):
     return await self.shared.depth_subscription(market).subscribe()

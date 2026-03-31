@@ -17,40 +17,44 @@ async def trades_history(self: MarketMixin, start: datetime, end: datetime) -> A
   def within(time: datetime) -> bool:
     return start <= time <= end
 
-  paging = self.indexer.data.get_fills_paged(
-    address=await self.address,
-    subaccount=self.subaccount,
-    created_before_or_at=end,
-    market=self.market,
-    market_type='PERPETUAL',
-  )
-  state = paging.init
-  while state is not None:
-    fills, state = await paging.next(state)
-    trades: list[Trade] = []
-    for fill in fills:
-      if fill['market'] != self.market or not within(fill['createdAt']):
-        continue
-      sign = 1 if fill['side'] == 'BUY' else -1
-      trades.append(Trade(
-        id=fill['id'],
-        price=Decimal(fill['price']),
-        qty=Decimal(fill['size']) * sign,
-        time=fill['createdAt'],
-        maker=fill['liquidity'] == 'MAKER',
-        fee=Trade.Fee(asset='USDC', amount=Decimal(fill['fee'])),
-        details=fill,
-      ))
-    if trades:
-      yield trades
+  address = await self.address
+  subaccounts = (await self.indexer.data.get_subaccounts(address))['subaccounts']
+
+  for sub in subaccounts:
+    paging = self.indexer.data.get_fills_paged(
+      address=address,
+      subaccount=int(sub['subaccountNumber']),
+      created_before_or_at=end,
+      market=self.market,
+      market_type='PERPETUAL',
+    )
+    state = paging.init
+    while state is not None:
+      fills, state = await paging.next(state)
+      trades: list[Trade] = []
+      for fill in fills:
+        if fill['market'] != self.market or not within(fill['createdAt']):
+          continue
+        sign = 1 if fill['side'] == 'BUY' else -1
+        trades.append(Trade(
+          id=fill['id'],
+          price=Decimal(fill['price']),
+          qty=Decimal(fill['size']) * sign,
+          time=fill['createdAt'],
+          maker=fill['liquidity'] == 'MAKER',
+          fee=Trade.Fee(asset='USDC', amount=Decimal(fill['fee'])),
+          details=fill,
+        ))
+      if trades:
+        yield trades
 
 
 @wrap_exceptions
 async def trades_stream(self: MarketMixin) -> Stream[Trade]:
-  subaccounts = await self.subscribe_subaccount(self.subaccount)
+  parent_subaccounts = await self.subscribe_parent_subaccount(self.settings.get('parent_subaccount', 0))
 
   async def stream():
-    async for log in subaccounts:
+    async for log in parent_subaccounts:
       fills = log.get('fills')
       if fills is None:
         continue
@@ -68,4 +72,4 @@ async def trades_stream(self: MarketMixin) -> Stream[Trade]:
           details=fill,
         )
 
-  return Stream(stream(), subaccounts.unsubscribe)
+  return Stream(stream(), parent_subaccounts.unsubscribe)

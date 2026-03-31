@@ -42,19 +42,23 @@ async def funding_history(self: MarketMixin, start: datetime, end: datetime):
 async def funding_payments(self: MarketMixin, start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingPayment]]:
   start = start.astimezone()
   end = end.astimezone()
-  paging = self.indexer.data.get_funding_payments_paged(
-    address=await self.address,
-    subaccount=self.subaccount,
-    ticker=self.market,
-    after_or_at=start,
-  )
-  state = paging.init
-  while state is not None:
-    batch, state = await self.call(lambda: paging.next(state))
-    payments = [
-      FundingPayment(amount=Decimal(item['payment']), time=item['createdAt'])
-      for item in batch
-      if start <= item['createdAt'] <= end
-    ]
-    if payments:
-      yield payments
+  address = await self.address
+  subaccounts = (await self.indexer.data.get_subaccounts(address))['subaccounts']
+
+  for sub in subaccounts:
+    paging = self.indexer.data.get_funding_payments_paged(
+      address=address,
+      subaccount=int(sub['subaccountNumber']),
+      ticker=self.market,
+      after_or_at=start,
+    )
+    state = paging.init
+    while state is not None:
+      batch, state = await self.call(lambda: paging.next(state))
+      payments = [
+        FundingPayment(amount=Decimal(item['payment']), time=item['createdAt'])
+        for item in batch
+        if start <= item['createdAt'] <= end
+      ]
+      if payments:
+        yield payments

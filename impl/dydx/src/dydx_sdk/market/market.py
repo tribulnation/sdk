@@ -71,17 +71,33 @@ class Market(MarketMixin, PerpMarket):
 
   @wrap_exceptions
   async def perp_position(self) -> PerpPosition:
-    position = await self.indexer.data.get_open_position(
-      market=self.market,
-      address=await self.address,
-      subaccount=self.subaccount,
+    positions = await self.indexer.data.list_parent_positions(
+      await self.address,
+      parent_subaccount=self.settings.get('parent_subaccount', 0),
     )
-    if position is None:
+    market_positions = [
+      p for p in positions
+      if p['market'] == self.market and p['status'] == 'OPEN'
+    ]
+    if not market_positions:
       return PerpPosition()
-    return PerpPosition(
-      size=Decimal(position['size']),
-      entry_price=Decimal(position['entryPrice']),
+
+    signed_sizes = [
+      Decimal(p['size']) * (Decimal(1) if p['side'] == 'LONG' else Decimal(-1))
+      for p in market_positions
+    ]
+    net_size = sum(signed_sizes, Decimal(0))
+    if net_size == 0:
+      return PerpPosition()
+
+    total_notional = sum(
+      abs(Decimal(p['size'])) * Decimal(p['entryPrice'])
+      for p in market_positions
     )
+    total_size = sum(abs(Decimal(p['size'])) for p in market_positions)
+    avg_entry = total_notional / total_size if total_size != 0 else Decimal(0)
+
+    return PerpPosition(size=net_size, entry_price=avg_entry)
 
   async def place_order(self, order: Order) -> OrderResponse:
     return await place_order(self, order)

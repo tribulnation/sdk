@@ -1,8 +1,8 @@
-from typing_extensions import Any, Literal, Sequence
+from typing_extensions import Literal, Sequence
 from decimal import Decimal
 import base64
 
-from dydx.indexer.data.api.list_orders import Order as IndexerOrder
+from dydx.indexer.data.api.list_parent_orders import Order as IndexerOrder
 from dydx.node.private.place_order import Order as DydxOrder, TimeInForce
 from dydx_v4_client import OrderFlags
 from dydx_v4_client.node.builder import TxOptions
@@ -51,7 +51,7 @@ def parse_id(id: str) -> OrderId:
   return OrderId.FromString(base64.b64decode(id))
 
 def parse_state(order: IndexerOrder, *, address: str) -> OrderState:
-  sign = _sign(order.get('side'))
+  sign = _sign(order['side'])
   return OrderState(
     id=serialize_id(_protobuf_id(order, address=address)),
     price=Decimal(order['price']),
@@ -67,9 +67,9 @@ async def list_orders(
   status: Literal['OPEN', 'FILLED', 'CANCELED', 'BEST_EFFORT_CANCELED', 'UNTRIGGERED', 'BEST_EFFORT_OPENED', 'PENDING'] | None = None,
 ) -> list[OrderState]:
   address = await self.address
-  orders = await self.indexer.data.list_orders(
+  orders = await self.indexer.data.list_parent_orders(
     address=address,
-    subaccount=self.subaccount,
+    parent_subaccount=self.settings.get('parent_subaccount', 0),
     ticker=self.market,
     status=status,
   )
@@ -137,16 +137,16 @@ async def place_orders(self: MarketMixin, orders: Sequence[Order]) -> Sequence[O
   return results
 
 @wrap_exceptions
-async def cancel_order(self: MarketMixin, id: str) -> Any:
+async def cancel_order(self: MarketMixin, id: str):
   return await self.client.node.cancel_order(parse_id(id))
 
 @wrap_exceptions
-async def cancel_orders(self: MarketMixin, ids: Sequence[str]) -> Any:
+async def cancel_orders(self: MarketMixin, ids: Sequence[str]):
   order_ids = [parse_id(id) for id in ids]
   short_term = [order_id for order_id in order_ids if order_id.order_flags == OrderFlags.SHORT_TERM]
   long_term = [order_id for order_id in order_ids if order_id.order_flags == OrderFlags.LONG_TERM]
 
-  results: dict[str, Any] = {}
+  results: dict = {}
   if short_term:
     results['short_term'] = await self.client.node.batch_cancel_orders(short_term)
   if long_term:
