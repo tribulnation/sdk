@@ -84,6 +84,7 @@ class Shared:
       
     key = (symbol, lvl)
     if key not in self.depth_subscriptions:
+      @wrap_exceptions
       async def subscribe() -> Stream[PublicLimitDepthsV3Api]:
         stream = await self.client.spot.streams.depth(symbol, level=lvl)
         return Stream(stream.stream, stream.unsubscribe)
@@ -92,6 +93,7 @@ class Shared:
 
   def my_trades_sub(self) -> Subscription[PrivateDealsV3Api]:
     if self.my_trades_subscription is None:
+      @wrap_exceptions
       async def subscribe() -> Stream[PrivateDealsV3Api]:
         stream = await self.client.spot.streams.my_trades()
         return Stream(stream.stream, stream.unsubscribe)

@@ -53,6 +53,7 @@ async def trades_history(self: MarketMixin, start: datetime, end: datetime) -> A
 async def trades_stream(self: MarketMixin) -> Stream[Trade]:
   parent_subaccounts = await self.subscribe_parent_subaccount(self.settings.get('parent_subaccount', 0))
 
+  @wrap_exceptions
   async def stream():
     async for log in parent_subaccounts:
       fills = log.get('fills')
