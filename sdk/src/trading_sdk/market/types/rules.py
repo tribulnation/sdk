@@ -74,6 +74,14 @@ class Rules:
   def round_price(self, price: Decimal) -> Decimal:
     """Round the price to the nearest tick size."""
     return round2tick(price, self.tick_size)
+
+  def trunc_price(self, price: Decimal) -> Decimal:
+    """Truncate the price to the nearest tick size."""
+    return trunc2tick(price, self.tick_size)
+
+  def ceil_price(self, price: Decimal) -> Decimal:
+    """Ceil the price to the nearest tick size."""
+    return ceil2tick(price, self.tick_size)
   
   def amount2qty(self, quote_amount: Decimal, *, price: Decimal) -> Decimal | None:
     """Convert a quote amount to a base quantity, truncating to the nearest step size. Returns `None` if the quantity is too small."""

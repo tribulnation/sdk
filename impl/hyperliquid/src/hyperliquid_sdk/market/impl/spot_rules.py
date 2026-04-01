@@ -8,11 +8,12 @@ from hyperliquid_sdk.core import (
   MIN_ORDER_VALUE,
   MAX_RELATIVE_PRICE,
   MIN_RELATIVE_PRICE,
+  wrap_exceptions
 )
 
 from .mixin import SpotMarketMixin
 
-
+@wrap_exceptions
 async def rules(self: SpotMarketMixin, *, refetch: bool = False) -> Rules:
   user_fees = await self.shared.load_user_fees(refetch=refetch)
 

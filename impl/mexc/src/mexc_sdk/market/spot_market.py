@@ -1,6 +1,7 @@
 from typing_extensions import Sequence
 from dataclasses import dataclass
 from datetime import datetime
+from decimal import Decimal
 
 from trading_sdk.core import Stream, PaginatedResponse
 from trading_sdk.market import (
@@ -68,6 +69,14 @@ class SpotMarket(MarketMixin, Market):
 
   async def position(self) -> Position:
     return await position(self)
+
+  @wrap_exceptions
+  async def available_notional(self):
+    r = await self.client.spot.account(recvWindow=self.settings.get('recvWindow'))
+    for b in r['balances']:
+      if b['asset'] == self.info['quoteAsset']:
+        return Decimal(b['free'])
+    return Decimal(0)
 
   async def place_order(self, order: Order) -> OrderResponse:
     return await place_order(self, order)

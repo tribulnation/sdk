@@ -1,7 +1,8 @@
-from typing_extensions import AsyncIterable, Sequence
+from typing_extensions import Any, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
+import asyncio
 
 from trading_sdk.core import Stream, PaginatedResponse
 from trading_sdk.market import (
@@ -20,6 +21,7 @@ from trading_sdk.market import (
 from dydx_sdk.core import wrap_exceptions
 from .impl import  (
   MarketMixin,
+  max_leverage,
   parse_book,
   trades_history,
   trades_stream,
@@ -105,6 +107,17 @@ class Market(MarketMixin, PerpMarket):
 
     return PerpPosition(size=net_size, entry_price=avg_entry)
 
+  @wrap_exceptions
+  async def available_notional(self) -> Decimal:
+    address = await self.address
+    sub, market = await asyncio.gather(
+      self.indexer.data.get_subaccount(address=await self.address, subaccount=self.subaccount),
+      self.indexer.data.get_market(self.market)
+    )
+    collateral = Decimal(sub['subaccount']['freeCollateral'])
+    leverage = max_leverage(market)
+    return collateral*leverage
+
   async def place_order(self, order: Order) -> OrderResponse:
     return await place_order(self, order)
 
@@ -114,10 +127,10 @@ class Market(MarketMixin, PerpMarket):
   async def query_order(self, id: str) -> OrderState | None:
     return await query_order(self, id)
 
-  async def cancel_order(self, id: str):
+  async def cancel_order(self, id: str) -> Any:
     return await cancel_order(self, id)
 
-  async def cancel_orders(self, ids: Sequence[str]):
+  async def cancel_orders(self, ids: Sequence[str]) -> Any:
     return await cancel_orders(self, ids)
 
   @wrap_exceptions

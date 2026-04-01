@@ -287,6 +287,14 @@ class SpotMarketMixin(SDK, SpotMixin):
     return self.asset_meta['name']
 
   @property
+  def base_meta(self):
+    return self.meta['base_meta']
+
+  @property
+  def quote_meta(self):
+    return self.meta['quote_meta']
+
+  @property
   def base_name(self) -> str:
     return self.meta['base_meta']['name']
 

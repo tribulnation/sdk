@@ -4,10 +4,12 @@ from trading_sdk.core import Stream
 from trading_sdk.market import Book
 
 from hyperliquid_sdk.core import wrap_exceptions
+from .mixin import SpotMarketMixin, PerpMarketMixin
 
+Mixin = SpotMarketMixin | PerpMarketMixin
 
 @wrap_exceptions
-async def depth(self) -> Book:
+async def depth(self: Mixin) -> Book:
   book = await self.client.info.l2_book(self.asset_name)
   raw_bids, raw_asks = book["levels"]
   bids = [Book.Entry(price=Decimal(b["px"]), qty=Decimal(b["sz"])) for b in raw_bids]
@@ -18,7 +20,7 @@ async def depth(self) -> Book:
   )
 
 
-async def depth_stream(self) -> Stream[Book]:
+async def depth_stream(self: Mixin) -> Stream[Book]:
   l2 = await self.subscribe_l2_book(self.asset_name)
 
   async def stream():

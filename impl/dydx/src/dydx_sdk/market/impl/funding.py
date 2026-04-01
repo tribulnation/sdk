@@ -18,7 +18,7 @@ async def next_funding(self: MarketMixin) -> FundingRate:
   )
 
 @wrap_exceptions
-async def funding_history(self: MarketMixin, start: datetime, end: datetime):
+async def funding_history(self: MarketMixin, start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingRate]]:
   start = start.astimezone()
   end = end.astimezone()
   paging = self.indexer.data.get_historical_funding_paged(self.market, effective_before_or_at=end)

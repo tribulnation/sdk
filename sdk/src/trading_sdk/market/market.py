@@ -81,6 +81,15 @@ class Market(SDK):
 
   @SDK.method
   @abstractmethod
+  async def available_notional(self) -> Decimal:
+    """Fetch the max. notional position you can open.
+    
+    - For spot, returns the free quote token balance
+    - For futures, returns the available collateral times the maximum leverage
+    """
+
+  @SDK.method
+  @abstractmethod
   async def place_order(self, order: Order) -> OrderResponse:
     """Place an order in the market."""
 

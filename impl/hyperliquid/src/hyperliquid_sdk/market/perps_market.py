@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 
-from trading_sdk.core import Stream, PaginatedResponse
+from trading_sdk.core import Stream, PaginatedResponse, LogicError
 from trading_sdk.market import (
   PerpMarket as _PerpMarket,
   Book,
@@ -73,9 +73,23 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
   async def trades_stream(self) -> Stream[Trade]:
     return await trades_stream(self)
 
-  @wrap_exceptions
   async def perp_position(self) -> PerpPosition:
     return await perps_position(self)
+
+  @wrap_exceptions
+  async def available_notional(self) -> Decimal:
+    state = await self.client.info.spot_clearinghouse_state(self.address)
+    for balance in state['balances']:
+      if balance['token'] == self.collateral_meta['index']:
+        if balance['coin'] != self.collateral_name:
+          raise LogicError(f'Found balance with matching index {balance["token"]}, but wrong coin "{balance["coin"]}" != "{self.collateral_name}"')
+        total = Decimal(balance['total'])
+        locked = Decimal(balance['hold'])
+        collateral = total - locked
+        leverage = self.asset_meta['maxLeverage']
+        return collateral * leverage
+
+    return Decimal(0)
 
   async def place_order(self, order: Order) -> OrderResponse:
     return await place_order(self, order)
@@ -86,7 +100,6 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
   async def cancel_order(self, id: str):
     return await cancel_order(self, id)
 
-  @wrap_exceptions
   async def index(self) -> Decimal:
     return await index(self)
 

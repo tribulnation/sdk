@@ -72,6 +72,11 @@ class Subscription(Generic[T]):
       return cls.Context(aiter(stream.stream), stream.unsubscribe)
     return cls(subscribe_stream)
 
+  async def start(self):
+    async with self.lock:
+      if self.ctx is None:
+        self.ctx = await self.subscribe_stream()
+
   async def step(self):
     async with self.lock:
       if self.ctx is None:
@@ -83,7 +88,7 @@ class Subscription(Generic[T]):
   async def subscribe(self) -> Stream[T]:
     queue = asyncio.Queue()
     self.subscribers.append(queue)
-    await self.step() # ensure the stream is started
+    await self.start()
 
     unsubscribed = asyncio.Future()
 

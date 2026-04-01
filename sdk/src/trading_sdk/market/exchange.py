@@ -90,6 +90,16 @@ class Exchange(SDK):
     return await market.position()
 
   @SDK.method
+  async def available_notional(self, market_id: str, /):
+    """Fetch the max. notional position you can open.
+    
+    - For spot, returns the free quote token balance
+    - For futures, returns the available collateral times the maximum leverage
+    """
+    market = await self.market(market_id)
+    return await market.available_notional()
+
+  @SDK.method
   async def place_order(self, market_id: str, /, order: Order) -> OrderResponse:
     """Place an order in the market."""
     market = await self.market(market_id)
