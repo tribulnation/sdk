@@ -13,7 +13,6 @@ from mexc_sdk.core.exc import wrap_exceptions
 class Settings(TypedDict, total=False):
   validate: bool
   recvWindow: int
-  depth_level: Literal[5, 10, 20]
 
 class Meta(TypedDict):
   info: SpotInfo
@@ -36,10 +35,6 @@ class Shared:
   @property
   def recvWindow(self) -> int | None:
     return self.settings.get("recvWindow", None)
-
-  @property
-  def depth_level(self) -> Literal[5, 10, 20]:
-    return self.settings.get("depth_level", 5)
 
   @classmethod
   def new(
@@ -77,8 +72,16 @@ class Shared:
       self.spot_markets = await self.client.spot.exchange_info(validate=self.validate)
       return self.spot_markets
 
-  def depth_subscription(self, symbol: str, /, *, level: Literal[5, 10, 20] | None = None):
-    lvl = level or self.depth_level
+  def depth_subscription(self, symbol: str, /, *, levels: int | None = None):
+    if levels is None:
+      lvl = 20
+    elif levels <= 5:
+      lvl = 5
+    elif levels <= 10:
+      lvl = 10
+    else:
+      lvl = 20
+      
     key = (symbol, lvl)
     if key not in self.depth_subscriptions:
       async def subscribe() -> Stream[PublicLimitDepthsV3Api]:
@@ -138,8 +141,8 @@ class MarketMixin(SDK, ExchangeMixin):
   def instrument(self) -> str:
     return self.info["symbol"]
 
-  async def subscribe_depth(self) -> Stream[PublicLimitDepthsV3Api]:
-    return await self.shared.depth_subscription(self.instrument).subscribe()
+  async def subscribe_depth(self, *, levels: int | None = None) -> Stream[PublicLimitDepthsV3Api]:
+    return await self.shared.depth_subscription(self.instrument, levels=levels).subscribe()
 
   async def subscribe_my_trades(self) -> Stream[PrivateDealsV3Api]:
     return await self.shared.my_trades_sub().subscribe()

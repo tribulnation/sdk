@@ -53,10 +53,10 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
     return self.asset_name
 
   @wrap_exceptions
-  async def depth(self) -> Book:
+  async def depth(self, *, levels: int | None = None) -> Book:
     return await depth(self)
 
-  async def depth_stream(self) -> Stream[Book]:
+  async def depth_stream(self, *, levels: int | None = None) -> Stream[Book]:
     return await depth_stream(self)
 
   @wrap_exceptions
@@ -111,4 +111,3 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
 
   def funding_payments(self, start: datetime, end: datetime) -> PaginatedResponse[FundingPayment]:
     return PaginatedResponse(funding_payments(self, start, end))
-

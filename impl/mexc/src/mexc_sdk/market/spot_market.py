@@ -46,11 +46,11 @@ class SpotMarket(MarketMixin, Market):
     return self.instrument
 
   @wrap_exceptions
-  async def depth(self) -> Book:
-    return await depth(self)
+  async def depth(self, *, levels: int | None = None) -> Book:
+    return await depth(self, levels=levels)
 
-  async def depth_stream(self) -> Stream[Book]:
-    return await depth_stream(self)
+  async def depth_stream(self, *, levels: int | None = None) -> Stream[Book]:
+    return await depth_stream(self, levels=levels)
 
   async def rules(self, *, refetch: bool = False) -> Rules:
     return await rules(self, refetch=refetch)
@@ -83,4 +83,3 @@ class SpotMarket(MarketMixin, Market):
 
   async def cancel_order(self, id: str):
     return await cancel_order(self, id)
-

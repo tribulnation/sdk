@@ -37,16 +37,16 @@ class Exchange(SDK):
     """List available markets."""
   
   @SDK.method
-  async def depth(self, market_id: str, /) -> Book:
+  async def depth(self, market_id: str, /, *, levels: int | None = None) -> Book:
     """Fetch the market order book."""
     market = await self.market(market_id)
-    return await market.depth()
+    return await market.depth(levels=levels)
 
   @SDK.method
-  async def depth_stream(self, market_id: str, /):
+  async def depth_stream(self, market_id: str, /, *, levels: int | None = None):
     """Subscribe to the market order book."""
     market = await self.market(market_id)
-    return await market.depth_stream()
+    return await market.depth_stream(levels=levels)
   
   @SDK.method
   async def rules(self, market_id: str, /, *, refetch: bool = False) -> Rules:

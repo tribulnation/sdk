@@ -35,13 +35,13 @@ class Market(SDK):
 
   @SDK.method
   @abstractmethod
-  async def depth(self) -> Book:
+  async def depth(self, *, levels: int | None = None) -> Book:
     """Fetch the market order book."""
   
   @SDK.method
-  async def depth_stream(self) -> Stream[Book]:
+  async def depth_stream(self, *, levels: int | None = None) -> Stream[Book]:
     """Subscribe to the market order book."""
-    return Stream.polled(self.depth)
+    return Stream.polled(lambda: self.depth(levels=levels))
 
   @SDK.method
   @abstractmethod

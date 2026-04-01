@@ -8,16 +8,16 @@ from .mixin import MarketMixin
 
 
 @wrap_exceptions
-async def depth(self: MarketMixin) -> Book:
-  r = await self.client.spot.depth(self.instrument, validate=self.shared.validate)
+async def depth(self: MarketMixin, *, levels: int | None = None) -> Book:
+  r = await self.client.spot.depth(self.instrument, validate=self.shared.validate, limit=levels)
   return Book(
     asks=[Book.Entry(price=Decimal(p.price), qty=Decimal(p.qty)) for p in r["asks"]],
     bids=[Book.Entry(price=Decimal(p.price), qty=Decimal(p.qty)) for p in r["bids"]],
   )
 
 
-async def depth_stream(self: MarketMixin) -> Stream[Book]:
-  stream = await self.subscribe_depth()
+async def depth_stream(self: MarketMixin, *, levels: int | None = None) -> Stream[Book]:
+  stream = await self.subscribe_depth(levels=levels)
 
   async def gen():
     async for msg in stream:

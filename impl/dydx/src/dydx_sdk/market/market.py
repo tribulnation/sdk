@@ -52,11 +52,11 @@ class Market(MarketMixin, PerpMarket):
     return 'dydx'
 
   @wrap_exceptions
-  async def depth(self) -> Book:
+  async def depth(self, *, levels: int | None = None) -> Book:
     book = await self.indexer.data.get_order_book(self.market)
     return parse_book(book)
 
-  async def depth_stream(self) -> Stream[Book]:
+  async def depth_stream(self, *, levels: int | None = None) -> Stream[Book]:
     return await self.subscribe_depth(self.market)
     
   async def rules(self, *, refetch: bool = False) -> Rules:
