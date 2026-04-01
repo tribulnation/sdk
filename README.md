@@ -32,6 +32,20 @@ pip install trading-sdk[mexc, dydx, hyperliquid]
 - `dydx`: [dYdX](https://dydx.exchange/)
 - `hyperliquid`: [Hyperliquid](https://hyperliquid.xyz/)
 
+## Enumerating Venues/Exchanges/Markets
+
+```python
+venues = await sdk.venues()
+
+venue = await sdk.venue(venues[0])
+
+exchanges = await venue.exchanges()
+exchange = await venue.exchange(exchanges[0])
+
+markets = await exchange.markets()
+market = await exchange.market(markets[0])
+```
+
 ## Market IDs
 
 Market IDs have this form: `<venue_id>:<exchange_id>:<market_id>`.
