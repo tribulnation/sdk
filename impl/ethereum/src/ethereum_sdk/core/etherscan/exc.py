@@ -8,9 +8,7 @@ from trading_sdk.core import (
   NetworkError,
   ValidationError,
   ApiError,
-  RateLimited,
   Error,
-  UserError,
   AuthError,
 )
 
@@ -32,12 +30,8 @@ def wrap_exceptions(fn: Fn) -> Fn:
         raise NetworkError(*e.args) from e
       except core.ValidationError as e:
         raise ValidationError(*e.args) from e
-      except core.UserError as e:
-        raise UserError(*e.args) from e
       except core.AuthError as e:
         raise AuthError(*e.args) from e
-      except core.RateLimited as e:
-        raise RateLimited(*e.args) from e
       except core.ApiError as e:
         raise ApiError(*e.args) from e
       except core.Error as e:
@@ -56,12 +50,8 @@ def wrap_exceptions(fn: Fn) -> Fn:
         raise NetworkError(*e.args) from e
       except core.ValidationError as e:
         raise ValidationError(*e.args) from e
-      except core.UserError as e:
-        raise UserError(*e.args) from e
       except core.AuthError as e:
         raise AuthError(*e.args) from e
-      except core.RateLimited as e:
-        raise RateLimited(*e.args) from e
       except core.ApiError as e:
         raise ApiError(*e.args) from e
       except core.Error as e:
@@ -80,12 +70,8 @@ def wrap_exceptions(fn: Fn) -> Fn:
         raise NetworkError(*e.args) from e
       except core.ValidationError as e:
         raise ValidationError(*e.args) from e
-      except core.UserError as e:
-        raise UserError(*e.args) from e
       except core.AuthError as e:
         raise AuthError(*e.args) from e
-      except core.RateLimited as e:
-        raise RateLimited(*e.args) from e
       except core.ApiError as e:
         raise ApiError(*e.args) from e
       except core.Error as e:
@@ -104,12 +90,8 @@ def wrap_exceptions(fn: Fn) -> Fn:
         raise NetworkError(*e.args) from e
       except core.ValidationError as e:
         raise ValidationError(*e.args) from e
-      except core.UserError as e:
-        raise UserError(*e.args) from e
       except core.AuthError as e:
         raise AuthError(*e.args) from e
-      except core.RateLimited as e:
-        raise RateLimited(*e.args) from e
       except core.ApiError as e:
         raise ApiError(*e.args) from e
       except core.Error as e:

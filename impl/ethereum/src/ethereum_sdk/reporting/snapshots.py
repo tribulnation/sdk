@@ -9,21 +9,37 @@ from web3.exceptions import ContractLogicError, BadFunctionCallOutput
 from trading_sdk import ApiError, SDK
 from trading_sdk.reporting import Snapshots as _Snapshots, Snapshot
 
-from ethereum_sdk.core import NodeRpcMixin, EtherscanMixin, wrap_exceptions
+from ethereum_sdk.core import rpc, etherscan
 
 @dataclass
-class Snapshots(NodeRpcMixin, EtherscanMixin, _Snapshots):
+class Snapshots(rpc.Mixin, etherscan.Mixin, _Snapshots):
   address: str
   ignore_bad_contracts: bool = True
   ignore_zero_value: bool = True
 
+  @classmethod
+  def new_at(
+    cls, rpc_url: str, *, address: str, chain_id: int,
+    validate: bool = True, etherscan_api_key: str | None = None,
+  ):
+    from etherscan import Etherscan
+    from ethereum import NodeRpc
+    etherscan = Etherscan.new(api_key=etherscan_api_key, validate=validate)
+    node = NodeRpc.at(rpc_url)
+    return cls(
+      node=node,
+      etherscan=etherscan,
+      chain_id=chain_id,
+      address=address,
+    )
+
   @SDK.method
-  @wrap_exceptions
+  @etherscan.wrap_exceptions
   async def _list_assets(self):
     txs = await self.etherscan.account.token_transactions_paged(self.address, self.chain_id)
     return set(tx['contractAddress'] for tx in txs)
 
-  @wrap_exceptions
+  @rpc.wrap_exceptions
   async def snapshots(self, assets: Sequence[str] = []) -> list[Snapshot]:
     eth_balance = Decimal(await self.node.eth_balance(self.address))
     time = datetime.now(timezone.utc)

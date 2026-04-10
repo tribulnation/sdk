@@ -9,7 +9,6 @@ from trading_sdk.core import (
   ValidationError,
   ApiError,
   Error,
-  UserError,
   AuthError,
 )
 
@@ -31,8 +30,6 @@ def wrap_exceptions(fn: Fn) -> Fn:
         raise NetworkError(*e.args) from e
       except core.ValidationError as e:
         raise ValidationError(*e.args) from e
-      except core.UserError as e:
-        raise UserError(*e.args) from e
       except core.AuthError as e:
         raise AuthError(*e.args) from e
       except core.ApiError as e:
@@ -55,8 +52,6 @@ def wrap_exceptions(fn: Fn) -> Fn:
         raise NetworkError(*e.args) from e
       except core.ValidationError as e:
         raise ValidationError(*e.args) from e
-      except core.UserError as e:
-        raise UserError(*e.args) from e
       except core.AuthError as e:
         raise AuthError(*e.args) from e
       except core.ApiError as e:
@@ -79,8 +74,6 @@ def wrap_exceptions(fn: Fn) -> Fn:
         raise NetworkError(*e.args) from e
       except core.ValidationError as e:
         raise ValidationError(*e.args) from e
-      except core.UserError as e:
-        raise UserError(*e.args) from e
       except core.AuthError as e:
         raise AuthError(*e.args) from e
       except core.ApiError as e:
@@ -103,8 +96,6 @@ def wrap_exceptions(fn: Fn) -> Fn:
         raise NetworkError(*e.args) from e
       except core.ValidationError as e:
         raise ValidationError(*e.args) from e
-      except core.UserError as e:
-        raise UserError(*e.args) from e
       except core.AuthError as e:
         raise AuthError(*e.args) from e
       except core.ApiError as e:

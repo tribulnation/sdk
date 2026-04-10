@@ -1,5 +1,5 @@
 from typing_extensions import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from collections import defaultdict
 from decimal import Decimal
@@ -12,7 +12,21 @@ from dydx import Indexer
 @dataclass(frozen=True)
 class Snapshots(_Snapshots):
   address: str
-  indexer: Indexer
+  indexer: Indexer = field(default_factory=Indexer.new)
+
+  @classmethod
+  def new(cls, address: str | None = None):
+    if address is None:
+      import os
+      address = os.environ['DYDX_ADDRESS']
+    return cls(address=address)
+
+  async def __aenter__(self):
+    await self.indexer.__aenter__()
+    return self
+
+  async def __aexit__(self, exc_type, exc_value, traceback):
+    await self.indexer.__aexit__(exc_type, exc_value, traceback)
 
   @wrap_exceptions
   async def snapshots(self, assets: Sequence[str] = []) -> Sequence[Snapshot]:

@@ -2,7 +2,7 @@ from typing_extensions import TypeVar
 from dataclasses import dataclass
 import inspect
 
-from trading_sdk.core.exc import ApiError, AuthError, Error, NetworkError, UserError, ValidationError
+from trading_sdk.core.exc import ApiError, AuthError, Error, NetworkError, ValidationError
 from binance import Binance
 from binance.core import exc
 
@@ -19,8 +19,6 @@ def wrap_exceptions(fn: Fn) -> Fn:
         raise AuthError(*e.args) from e
       except exc.NetworkError as e:
         raise NetworkError(*e.args) from e
-      except exc.UserError as e:
-        raise UserError(*e.args) from e
       except exc.ValidationError as e:
         raise ValidationError(*e.args) from e
       except exc.Error as e:
@@ -37,8 +35,6 @@ def wrap_exceptions(fn: Fn) -> Fn:
         raise AuthError(*e.args) from e
       except exc.NetworkError as e:
         raise NetworkError(*e.args) from e
-      except exc.UserError as e :
-        raise UserError(*e.args) from e
       except exc.ValidationError as e:
         raise ValidationError(*e.args) from e
       except exc.Error as e:

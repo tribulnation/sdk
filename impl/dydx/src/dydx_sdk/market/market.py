@@ -4,7 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 import asyncio
 
-from trading_sdk.core import Stream, PaginatedResponse
+from trading_sdk.core import Stream, PaginatedResponse, ApiError
 from trading_sdk.market import (
   Book,
   FundingPayment,
@@ -136,7 +136,10 @@ class Market(MarketMixin, PerpMarket):
   @wrap_exceptions
   async def index(self) -> Decimal:
     market = await self.indexer.data.get_market(self.market)
-    return Decimal(market['oraclePrice'])
+    price = market.get('oraclePrice')
+    if price is None:
+      raise ApiError('Oracle price unavailable')
+    return Decimal(price)
 
   async def next_funding(self) -> FundingRate:
     return await next_funding(self)

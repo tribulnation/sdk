@@ -8,7 +8,7 @@ from web3 import Web3
 from trading_sdk.core import SDK
 from trading_sdk.reporting.history import Flow, History, EvmTx
 
-from ethereum_sdk.core import EtherscanMixin, wrap_exceptions
+from ethereum_sdk.core import etherscan
 from etherscan.core import tx_value, tx_fee
 from etherscan.api.account.transactions import Transaction as NativeTransaction
 from etherscan.api.account.token_transactions import TokenTransaction, token_value
@@ -20,8 +20,8 @@ T = TypeVar('T')
 def parse_native_transaction(tx: NativeTransaction, *, address: str) -> EvmTx:
   if (method := tx['methodId']) != '0x':
     execution = EvmTx.Execution(
+      contract_address=tx['contractAddress'],
       input=tx['input'],
-      method_id=method,
       method_name=tx['functionName'] or None,
     )
   else:
@@ -44,7 +44,7 @@ def parse_native_transaction(tx: NativeTransaction, *, address: str) -> EvmTx:
   return EvmTx(
     time=datetime.fromtimestamp(int(tx['timeStamp'])),
     hash=tx['hash'],
-    value=value,
+    # value=value,
     fee=fee,
     execution=execution,
     raw=tx,
@@ -94,18 +94,19 @@ Tx = TypeVar('Tx', Flow, EvmTx)
 
 
 @dataclass
-class EtherscanHistory(EtherscanMixin, History):
+class EtherscanHistory(etherscan.Mixin, History):
+  address: str
   tz: timezone | AutoDetect = AUTO_DETECT
   """Timezone of the API times (defaults to the local timezone)."""
 
   @SDK.method
-  @wrap_exceptions
+  @etherscan.wrap_exceptions
   async def get_block_by_time(self, time: datetime, closest: Literal['before', 'after'] = 'before') -> int:
-    return await self.etherscan.block_by_time(time, self.chain_id, closest=closest)
+    return await self.etherscan.blocks.block_by_time(time, self.chain_id, closest=closest)
 
   @SDK.method
   async def native_transactions(self, start_block: int, end_block: int) -> AsyncIterable[Sequence[EvmTx]]:
-    paging = self.etherscan.transactions_paged(
+    paging = self.etherscan.account.transactions_paged(
       self.address,
       self.chain_id,
       start_block=start_block,
@@ -118,7 +119,7 @@ class EtherscanHistory(EtherscanMixin, History):
 
   @SDK.method
   async def token_transactions(self, start_block: int, end_block: int) -> AsyncIterable[Sequence[Flow]]:
-    paging = self.etherscan.token_transactions_paged(
+    paging = self.etherscan.account.token_transactions_paged(
       self.address,
       self.chain_id,
       start_block=start_block,
@@ -131,7 +132,7 @@ class EtherscanHistory(EtherscanMixin, History):
 
   @SDK.method
   async def internal_transactions(self, start_block: int, end_block: int) -> AsyncIterable[Sequence[Flow]]:
-    paging = self.etherscan.internal_transactions_paged(
+    paging = self.etherscan.account.internal_transactions_paged(
       self.address,
       self.chain_id,
       start_block=start_block,

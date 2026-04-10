@@ -6,35 +6,36 @@ from etherscan import Etherscan, ETHERSCAN_API_URL
 class Mixin:
   etherscan: Etherscan
   chain_id: int
+  address: str
 
   @classmethod
   def new(
-    cls, chain_id: int, *, api_key: str | None = None,
+    cls, address: str, chain_id: int, *, api_key: str | None = None,
     base_url: str = ETHERSCAN_API_URL, validate: bool = True,
   ):
     etherscan = Etherscan.new(api_key=api_key, base_url=base_url, validate=validate)
-    return cls(etherscan=etherscan, chain_id=chain_id)
+    return cls(etherscan=etherscan, chain_id=chain_id, address=address)
 
   @classmethod
   def ethereum(
-    cls, *, api_key: str | None = None,
+    cls, address: str, *, api_key: str | None = None,
     base_url: str = ETHERSCAN_API_URL, validate: bool = True,
   ):
-    return cls.new(1, api_key=api_key, base_url=base_url, validate=validate)
+    return cls.new(address, 1, api_key=api_key, base_url=base_url, validate=validate)
 
   @classmethod
   def arbitrum(
-    cls, *, api_key: str | None = None,
+    cls, address: str, *, api_key: str | None = None,
     base_url: str = ETHERSCAN_API_URL, validate: bool = True,
   ):
-    return cls.new(42161, api_key=api_key, base_url=base_url, validate=validate)
+    return cls.new(address, 42161, api_key=api_key, base_url=base_url, validate=validate)
 
   @classmethod
   def polygon(
-    cls, *, api_key: str | None = None,
+    cls, address: str, *, api_key: str | None = None,
     base_url: str = ETHERSCAN_API_URL, validate: bool = True,
   ):
-    return cls.new(137, api_key=api_key, base_url=base_url, validate=validate)
+    return cls.new(address, 137, api_key=api_key, base_url=base_url, validate=validate)
 
   async def __aenter__(self):
     await self.etherscan.__aenter__()
