@@ -21,10 +21,11 @@ class Snapshots(rpc.Mixin, etherscan.Mixin, _Snapshots):
   def new_at(
     cls, rpc_url: str, *, address: str, chain_id: int,
     validate: bool = True, etherscan_api_key: str | None = None,
+    etherscan_rate_limit: int | None = None
   ):
     from etherscan import Etherscan
     from ethereum import NodeRpc
-    etherscan = Etherscan.new(api_key=etherscan_api_key, validate=validate)
+    etherscan = Etherscan.new(api_key=etherscan_api_key, validate=validate, rate_limit=etherscan_rate_limit)
     node = NodeRpc.at(rpc_url)
     return cls(
       node=node,
@@ -33,11 +34,19 @@ class Snapshots(rpc.Mixin, etherscan.Mixin, _Snapshots):
       address=address,
     )
 
-  @SDK.method
   @etherscan.wrap_exceptions
+  async def call(self, fn):
+    return await fn()
+
+  @SDK.method
   async def _list_assets(self):
-    txs = await self.etherscan.account.token_transactions_paged(self.address, self.chain_id)
-    return set(tx['contractAddress'] for tx in txs)
+    paging = self.etherscan.account.token_transactions_paged(self.address, self.chain_id)
+    contracts = set[str]()
+    state = paging.init
+    while state is not None:
+      chunk, state = await self.call(lambda: paging.next(state))
+      contracts.update(tx['contractAddress'] for tx in chunk)
+    return contracts
 
   @rpc.wrap_exceptions
   async def snapshots(self, assets: Sequence[str] = []) -> list[Snapshot]:

@@ -11,9 +11,9 @@ class Mixin:
   @classmethod
   def new(
     cls, address: str, chain_id: int, *, api_key: str | None = None,
-    base_url: str = ETHERSCAN_API_URL, validate: bool = True,
+    base_url: str = ETHERSCAN_API_URL, validate: bool = True, rate_limit: int | None = None
   ):
-    etherscan = Etherscan.new(api_key=api_key, base_url=base_url, validate=validate)
+    etherscan = Etherscan.new(api_key=api_key, base_url=base_url, validate=validate, rate_limit=rate_limit)
     return cls(etherscan=etherscan, chain_id=chain_id, address=address)
 
   @classmethod
