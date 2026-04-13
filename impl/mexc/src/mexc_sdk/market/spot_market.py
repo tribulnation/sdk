@@ -45,7 +45,6 @@ class SpotMarket(MarketMixin, Market):
   def market_id(self) -> str:
     return self.instrument
 
-  @wrap_exceptions
   async def depth(self, *, levels: int | None = None) -> Book:
     return await depth(self, levels=levels)
 

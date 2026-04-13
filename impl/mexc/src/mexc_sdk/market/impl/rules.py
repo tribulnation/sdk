@@ -2,10 +2,10 @@ from decimal import Decimal
 
 from trading_sdk.market import Rules
 
-from mexc_sdk.core.constants import MIN_ORDER_VALUE
+from mexc_sdk.core import MIN_ORDER_VALUE, wrap_exceptions
 from .mixin import MarketMixin
 
-
+@wrap_exceptions
 async def rules(self: MarketMixin, *, refetch: bool = False) -> Rules:
   if refetch:
     markets = await self.shared.load_markets(refetch=True)

@@ -16,9 +16,11 @@ async def depth(self: MarketMixin, *, levels: int | None = None) -> Book:
   )
 
 
+@wrap_exceptions
 async def depth_stream(self: MarketMixin, *, levels: int | None = None) -> Stream[Book]:
   stream = await self.subscribe_depth(levels=levels)
 
+  @wrap_exceptions
   async def gen():
     async for msg in stream:
       book = Book(

@@ -33,6 +33,7 @@ def _parse_trade(t: MexcTrade) -> Trade:
 async def trades_stream(self: MarketMixin) -> Stream[Trade]:
   s = await self.subscribe_my_trades()
 
+  @wrap_exceptions
   async def gen():
     async for msg in s:
       # PrivateDealsV3Api corresponds to a single fill.
