@@ -1,0 +1,21 @@
+help:
+  @just --list
+
+# Build the package (into `dist/`)
+build:
+  rm -drf dist && \
+  pyright . && \
+  python -m build && \
+  rm -drf build
+
+# Publish `dist/*` to pypi, then delete
+publish: build
+  python -m twine upload dist/* && \
+  rm -drf dist
+
+# Increase patch version
+patch:
+  $CIT_SCRIPTS/bump.sh pyproject.toml
+
+# Build and publish
+republish: patch build publish
