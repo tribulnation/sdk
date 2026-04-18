@@ -63,7 +63,8 @@ class Snapshots(rpc.Mixin, etherscan.Mixin, _Snapshots):
           continue
         else:
           raise ApiError(f'Contract {contract} raised a logic error', *e.args) from e
-      time = datetime.now().astimezone()
-      snapshots.append(Snapshot(asset=contract, qty=balance, time=time, kind='currency'))
+      if not self.ignore_zero_value or balance > 0:
+        time = datetime.now().astimezone()
+        snapshots.append(Snapshot(asset=contract, qty=balance, time=time, kind='currency'))
 
     return snapshots
