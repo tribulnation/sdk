@@ -1,7 +1,8 @@
 from typing_extensions import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from decimal import Decimal
+import asyncio
 
 from web3 import Web3
 from web3.exceptions import ContractLogicError, BadFunctionCallOutput
@@ -14,14 +15,29 @@ from ethereum_sdk.core import rpc, etherscan
 @dataclass
 class Snapshots(rpc.Mixin, etherscan.Mixin, _Snapshots):
   address: str
-  ignore_bad_contracts: bool = True
-  ignore_zero_value: bool = True
+  ignore_bad_contracts: bool = field(kw_only=True)
+  ignore_zero_value: bool = field(kw_only=True)
+  native_asset_id: str = field(default='native', kw_only=True)
+
+  async def __aenter__(self):
+    await asyncio.gather(
+      self.node.__aenter__(),
+      self.etherscan.__aenter__(),
+    )
+    return self
+
+  async def __aexit__(self, exc_type, exc_value, traceback):
+    await asyncio.gather(
+      self.node.__aexit__(exc_type, exc_value, traceback),
+      self.etherscan.__aexit__(exc_type, exc_value, traceback),
+    )
 
   @classmethod
   def new_at(
     cls, rpc_url: str, *, address: str, chain_id: int,
     validate: bool = True, etherscan_api_key: str | None = None,
-    etherscan_rate_limit: int | None = None
+    etherscan_rate_limit: int | None = None,
+    ignore_bad_contracts: bool = True, ignore_zero_value: bool = True,
   ):
     from etherscan import Etherscan
     from ethereum import NodeRpc
@@ -32,6 +48,8 @@ class Snapshots(rpc.Mixin, etherscan.Mixin, _Snapshots):
       etherscan=etherscan,
       chain_id=chain_id,
       address=address,
+      ignore_bad_contracts=ignore_bad_contracts,
+      ignore_zero_value=ignore_zero_value,
     )
 
   @etherscan.wrap_exceptions
@@ -52,7 +70,7 @@ class Snapshots(rpc.Mixin, etherscan.Mixin, _Snapshots):
   async def snapshots(self, assets: Sequence[str] = []) -> list[Snapshot]:
     eth_balance = Decimal(await self.node.eth_balance(self.address))
     time = datetime.now(timezone.utc)
-    snapshots: list[Snapshot] = [Snapshot(asset='ETH', qty=eth_balance, time=time, kind='currency')]
+    snapshots: list[Snapshot] = [Snapshot(asset=self.native_asset_id, qty=eth_balance, time=time, kind='currency')]
     contracts = assets or await self._list_assets()
     contracts = [Web3.to_checksum_address(contract) for contract in contracts]
     for contract in contracts:

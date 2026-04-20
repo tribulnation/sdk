@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 
-from web3 import Web3
 from alchemy import Transfers
-
 
 @dataclass(kw_only=True)
 class Mixin:
@@ -10,47 +8,39 @@ class Mixin:
   alchemy_transfers: Transfers
 
   @classmethod
-  def new(cls, transfers: Transfers, address: str):
-    assert Web3.is_checksum_address(address), f'{address} is not a checksum address'
-    return cls(
-      address=address,
-      alchemy_transfers=transfers,
-    )
-
-  @classmethod
-  def ethereum(cls, address: str, *, api_key: str | None = None, validate: bool = True):
+  def alchemy_ethereum(cls, address: str, *, api_key: str | None = None, validate: bool = True):
     transfers = Transfers.ethereum(api_key=api_key, validate=validate)
-    return cls.new(transfers, address)
+    return cls(address=address, alchemy_transfers=transfers)
 
   @classmethod
-  def arbitrum(cls, address: str, *, api_key: str | None = None, validate: bool = True):
+  def alchemy_arbitrum(cls, address: str, *, api_key: str | None = None, validate: bool = True):
     transfers = Transfers.arbitrum(api_key=api_key, validate=validate)
-    return cls.new(transfers, address)
+    return cls(address=address, alchemy_transfers=transfers)
 
   @classmethod
-  def polygon(cls, address: str, *, api_key: str | None = None, validate: bool = True):
+  def alchemy_polygon(cls, address: str, *, api_key: str | None = None, validate: bool = True):
     transfers = Transfers.polygon(api_key=api_key, validate=validate)
-    return cls.new(transfers, address)
+    return cls(address=address, alchemy_transfers=transfers)
 
   @classmethod
-  def base(cls, address: str, *, api_key: str | None = None, validate: bool = True):
+  def alchemy_base(cls, address: str, *, api_key: str | None = None, validate: bool = True):
     transfers = Transfers.base(api_key=api_key, validate=validate)
-    return cls.new(transfers, address)
+    return cls(address=address, alchemy_transfers=transfers)
 
   @classmethod
-  def optimism(cls, address: str, *, api_key: str | None = None, validate: bool = True):
+  def alchemy_optimism(cls, address: str, *, api_key: str | None = None, validate: bool = True):
     transfers = Transfers.optimism(api_key=api_key, validate=validate)
-    return cls.new(transfers, address)
+    return cls(address=address, alchemy_transfers=transfers)
 
   @classmethod
-  def bnb(cls, address: str, *, api_key: str | None = None, validate: bool = True):
+  def alchemy_bnb(cls, address: str, *, api_key: str | None = None, validate: bool = True):
     transfers = Transfers.bnb(api_key=api_key, validate=validate)
-    return cls.new(transfers, address)
+    return cls(address=address, alchemy_transfers=transfers)
 
   @classmethod
-  def avalanche(cls, address: str, *, api_key: str | None = None, validate: bool = True):
+  def alchemy_avalanche(cls, address: str, *, api_key: str | None = None, validate: bool = True):
     transfers = Transfers.avalanche(api_key=api_key, validate=validate)
-    return cls.new(transfers, address)
+    return cls(address=address, alchemy_transfers=transfers)
 
   async def __aenter__(self):
     await self.alchemy_transfers.__aenter__()

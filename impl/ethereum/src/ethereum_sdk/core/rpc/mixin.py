@@ -12,7 +12,7 @@ class Mixin:
     return self.node.w3
 
   @classmethod
-  def at(cls, rpc_url: str, *, address: str):
+  def rpc_at(cls, rpc_url: str, *, address: str):
     node = NodeRpc.at(rpc_url)
     return cls(node=node, address=address)
   

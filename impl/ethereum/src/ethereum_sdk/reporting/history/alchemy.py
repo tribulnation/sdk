@@ -6,9 +6,11 @@ from decimal import Decimal
 import asyncio
 
 from web3.types import TxReceipt, TxData, BlockIdentifier, _Hash32
+from web3 import Web3
 
 from ethereum_sdk.core import alchemy, rpc, wei2eth, same_address
-from alchemy.api.transfers import Transfer, Params
+from alchemy.api.transfers import Transfers, Transfer, Params
+from ethereum import NodeRpc
 
 from trading_sdk.core import SDK
 from trading_sdk.reporting.history import History, EvmTx
@@ -25,7 +27,7 @@ def parse_execution(tx: TxData) -> EvmTx.Execution | None:
   if (input := tx.get('input')):
     assert 'to' in tx
     return EvmTx.Execution(
-      contract_address=tx['to'],
+      contract_address=Web3.to_checksum_address(tx['to']),
       input=input.to_0x_hex(),
     )
 
@@ -38,6 +40,22 @@ class AlchemyHistory(alchemy.Mixin, rpc.Mixin, History):
   include_internal_transfers: bool = field(kw_only=True)
   batch_size: int = field(default=32, kw_only=True)
   block_timestamps_cache: dict[BlockIdentifier, asyncio.Future[datetime]] = field(default_factory=dict, kw_only=True)
+
+  @classmethod
+  def alchemy_new(
+    cls, address: str, *, alchemy_url: str, rpc_url: str, api_key: str | None = None, validate: bool = True,
+    include_internal_transfers: bool = False,
+    batch_size: int = 32, poa_middleware: bool = False,
+  ):
+    transfers = Transfers.new(alchemy_url, api_key=api_key, validate=validate)
+    node = NodeRpc.at(rpc_url, poa_middleware=poa_middleware)
+    return cls(
+      address=address,
+      node=node,
+      alchemy_transfers=transfers,
+      include_internal_transfers=include_internal_transfers,
+      batch_size=batch_size,
+    )
 
   @SDK.method
   @rpc.wrap_exceptions
@@ -87,7 +105,6 @@ class AlchemyHistory(alchemy.Mixin, rpc.Mixin, History):
       out.extend(chunk)
     return out
 
-  @SDK.method
   async def get_all_transfers(self) -> list[Transfer]:
     out_transfers, in_transfers = await asyncio.gather(
       self.get_transfers(incoming=False),
@@ -95,10 +112,9 @@ class AlchemyHistory(alchemy.Mixin, rpc.Mixin, History):
     )
     return sorted(in_transfers + out_transfers, key=lambda t: t['blockNum'])
 
-  async def parse_fee(self, tx: TxData) -> Decimal | None:
+  def parse_fee(self, tx: TxData, receipt: TxReceipt) -> Decimal | None:
     if (from_addr := tx.get('from')) and same_address(from_addr, self.address):
       assert 'hash' in tx
-      receipt = await self.get_tx_receipt(tx['hash'])
       return tx_fee(receipt)
 
   def parse_transfer(self, transfer: Transfer) -> EvmTx.Transfer | None:
@@ -119,7 +135,7 @@ class AlchemyHistory(alchemy.Mixin, rpc.Mixin, History):
 
     if transfer['category'] == 'erc20' and (address := transfer['rawContract'].get('address')):
       return EvmTx.ERC20Transfer(
-        contract_address=address,
+        contract_address=Web3.to_checksum_address(address),
         value=Decimal(value),
         direction=direction,
         counterparty=counterparty,
@@ -132,13 +148,16 @@ class AlchemyHistory(alchemy.Mixin, rpc.Mixin, History):
         internal=transfer['category'] == 'internal',
       )
 
-  async def parse_tx(self, hash: str, transfers: list[Transfer]) -> EvmTx:
-    tx = await self.get_tx(hash)
-    assert 'blockNumber' in tx
-    fee, time = await asyncio.gather(
-      self.parse_fee(tx),
-      self.get_block_timestamp(tx['blockNumber']),
+  async def parse_tx(self, hash: str, transfers: list[Transfer]) -> EvmTx | None:
+    tx, receipt = await asyncio.gather(
+      self.get_tx(hash),
+      self.get_tx_receipt(hash),
     )
+    if receipt['status'] != 1:
+      return None
+    assert 'blockNumber' in tx
+    time = await self.get_block_timestamp(tx['blockNumber'])
+    fee = self.parse_fee(tx, receipt)
     return EvmTx(
       id=hash,
       time=time,
@@ -163,7 +182,7 @@ class AlchemyHistory(alchemy.Mixin, rpc.Mixin, History):
       tx_groups[t['hash']].append(t)
 
     sem = asyncio.Semaphore(self.batch_size)
-    async def parse_limited(hash: str, transfers: list[Transfer]) -> EvmTx:
+    async def parse_limited(hash: str, transfers: list[Transfer]) -> EvmTx | None:
       async with sem:
         return await self.parse_tx(hash, transfers)
 
@@ -173,6 +192,6 @@ class AlchemyHistory(alchemy.Mixin, rpc.Mixin, History):
     ]
     for task in asyncio.as_completed(tasks):
       event = await task
-      if start <= event.time <= end:
+      if event is not None and start <= event.time <= end:
         yield History.History(events=[event], flows=event.flows)
 
