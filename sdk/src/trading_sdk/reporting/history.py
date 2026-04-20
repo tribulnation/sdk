@@ -190,6 +190,10 @@ class EvmTx(BaseEvent):
     contract_address: str
     """Contract address"""
 
+    def __post_init__(self):
+      from web3 import Web3
+      assert Web3.is_checksum_address(self.contract_address)
+
   Transfer = Union[NativeTransfer, ERC20Transfer]
 
   tag: Literal['evm_tx'] = 'evm_tx'
