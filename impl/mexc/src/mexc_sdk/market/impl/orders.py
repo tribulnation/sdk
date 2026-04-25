@@ -6,7 +6,7 @@ from trading_sdk.market import Order, OrderResponse, OrderState
 
 from mexc.core import OrderStatus
 from mexc.spot.user_data.query_order import OrderState as MexcOrderState
-from mexc.spot.trading.place_order import LimitOrder, Order as MexcOrder
+from mexc.spot.trading.place_order import LimitOrder, MarketOrder, Order as MexcOrder
 
 from mexc_sdk.core.exc import wrap_exceptions
 from .mixin import MarketMixin
@@ -40,12 +40,12 @@ def _dump_order(order: Order) -> MexcOrder:
   qty = str(abs(signed_qty))
 
   match order["type"]:
+    case "MARKET":
+      return MarketOrder(type="MARKET", side=side, quantity=qty)
     case "LIMIT":
       return LimitOrder(type="LIMIT", side=side, price=str(order["price"]), quantity=qty)
     case "POST_ONLY":
       return LimitOrder(type="LIMIT_MAKER", side=side, price=str(order["price"]), quantity=qty)
-    case other:
-      raise ValidationError(f"Unknown order type: {other}")
 
 
 @wrap_exceptions

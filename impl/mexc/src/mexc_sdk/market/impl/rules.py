@@ -19,6 +19,17 @@ async def rules(self: MarketMixin, *, refetch: bool = False) -> Rules:
   if base_step == 0:
     base_step = Decimal("0.01")
 
+  rel_min_price: Decimal | None = None
+  rel_max_price: Decimal | None = None
+
+  for filter in info['filters']:
+    if filter['filterType'] == 'PERCENT_PRICE_BY_SIDE':
+      new_min_price = 1 - filter['askMultiplierDown']
+      rel_min_price = max(rel_min_price or Decimal('-inf'), new_min_price)
+      
+      new_max_price = 1 + filter['bidMultiplierUp']
+      rel_max_price = min(rel_max_price or Decimal('inf'), new_max_price)
+
   return Rules(
     base=info["baseAsset"],
     quote=info["quoteAsset"],
@@ -29,6 +40,8 @@ async def rules(self: MarketMixin, *, refetch: bool = False) -> Rules:
     maker_fee=Decimal(info["makerCommission"]),
     taker_fee=Decimal(info["takerCommission"]),
     min_value=MIN_ORDER_VALUE,
+    rel_min_price=rel_min_price,
+    rel_max_price=rel_max_price,
     details=info,
   )
 
