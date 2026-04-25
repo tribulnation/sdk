@@ -8,8 +8,8 @@ class Order(TypedDict):
   qty: Num
   """Quantity of the order in the base asset. Negative -> sell, positive -> buy."""
   price: Num
-  type: Literal['LIMIT', 'POST_ONLY']
-  """No, market orders are not supported. Purposefully."""
+  type: Literal['MARKET', 'LIMIT', 'POST_ONLY']
+  """Market orders are only partially supported. If not supported, the market will place a limit order at the indicated price."""
 
 @dataclass(kw_only=True)
 class OrderResponse:
