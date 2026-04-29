@@ -46,15 +46,15 @@ class SpotExport:
   @classmethod
   def autoload(cls, folder: str, *, log: bool = True):
     required_patterns = {
-      'spot_transactions': 'Export spot transactions-*.csv',
+      'spot_transactions': '**/Export spot transactions*.csv',
     }
     patterns = {
-      'spot_order_details': 'Export spot order details-*.csv',
-      'withdrawal_records': 'withdrawal records-*.csv',
+      'spot_order_details': '**/Export spot order details*.csv',
+      'withdrawal_records': '**/withdrawal records*.csv',
     }
     paths: SpotPaths = {} # type: ignore
     for key, pattern in required_patterns.items():
-      matches = glob(os.path.join(folder, pattern))
+      matches = glob(os.path.join(folder, pattern), recursive=True)
       if len(matches) == 0:
         raise FileNotFoundError(f'No files found for {key} in {folder}')
       elif len(matches) > 1:
@@ -65,7 +65,7 @@ class SpotExport:
       paths[key] = matches[0]
 
     for key, pattern in patterns.items():
-      matches = glob(os.path.join(folder, pattern))
+      matches = glob(os.path.join(folder, pattern), recursive=True)
       if len(matches) == 0:
         if log:
           print(f'[WARN] No files found for {key} in {folder}, skipping')

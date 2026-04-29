@@ -58,7 +58,7 @@ class futures_transactions:
       keep_default_na=False,
     )
     df.rename(columns=lambda c: str(c).lstrip('\ufeff'), inplace=True)
-    util.validate_schema(df, futures_transactions.schema)
+    util.validate_schema(df, futures_transactions.schema, id=path)
     df['Time(UTC)'] = pd.to_datetime(df['Date']).dt.tz_localize(tz).dt.tz_convert(timezone.utc)
     return df
 

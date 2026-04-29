@@ -147,6 +147,10 @@ class EtherscanHistory(etherscan.Mixin, History):
       if (transfer := self.parse_token_tx(tx)) is not None
     ]
 
+  def parse_fee(self, tx: NativeTransaction):
+    if same_address(tx['from'], self.address):
+      return tx_fee(tx)
+
   def parse_tx(
     self, hash: str, *,
     native_txs: list[NativeTransaction],
@@ -167,7 +171,7 @@ class EtherscanHistory(etherscan.Mixin, History):
     return EvmTx(
       id=hash, hash=hash,
       time=any_tx['timeStamp'],
-      fee=native_tx and tx_fee(native_tx),
+      fee=native_tx and self.parse_fee(native_tx),
       transfers=transfers,
       raw={
         'native_txs': native_txs,

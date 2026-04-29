@@ -42,14 +42,14 @@ class IsolatedMarginExport:
   @classmethod
   def autoload(cls, folder: str, *, log: bool = True):
     required_patterns = {
-      'isolated_margin_transactions': 'Export isolated margin transactions-*.csv',
+      'isolated_margin_transactions': '**/Export isolated margin transactions*.csv',
     }
     patterns = {
-      'isolated_margin_order_history': 'Export isolated margin order history-*.csv',
+      'isolated_margin_order_history': '**/Export isolated margin order history*.csv',
     }
     paths: IsolatedMarginPaths = {} # type: ignore
     for key, pattern in required_patterns.items():
-      matches = glob(os.path.join(folder, pattern))
+      matches = glob(os.path.join(folder, pattern), recursive=True)
       if len(matches) == 0:
         raise FileNotFoundError(f'No files found for {key} in {folder}')
       elif len(matches) > 1:
@@ -60,7 +60,7 @@ class IsolatedMarginExport:
       paths[key] = matches[0]
 
     for key, pattern in patterns.items():
-      matches = glob(os.path.join(folder, pattern))
+      matches = glob(os.path.join(folder, pattern), recursive=True)
       if len(matches) == 0:
         if log:
           print(f'[WARN] No files found for {key} in {folder}, skipping')

@@ -32,10 +32,10 @@ class FuturesExport:
 
   @classmethod
   def autoload(cls, folder: str, *, log: bool = True):
-    tx_pattern = 'Export futures transactions-*.csv'
-    detail_pattern = 'Export futures transaction details-*.csv'
+    tx_pattern = '**/Export*utures transactions*.csv'
+    detail_pattern = '**/Export*utures order details*.csv'
 
-    tx_matches = sorted(glob(os.path.join(folder, tx_pattern)))
+    tx_matches = sorted(glob(os.path.join(folder, tx_pattern), recursive=True))
     if len(tx_matches) == 0:
       raise FileNotFoundError(f'No files found for futures_transactions in {folder}')
     if log:
@@ -43,7 +43,7 @@ class FuturesExport:
       for m in tx_matches:
         print(f'  - {m}')
 
-    detail_matches = sorted(glob(os.path.join(folder, detail_pattern)))
+    detail_matches = sorted(glob(os.path.join(folder, detail_pattern), recursive=True))
     if len(detail_matches) == 0:
       if log:
         print(f'[WARN] No files found for futures_transaction_details in {folder}, skipping')

@@ -17,7 +17,19 @@ AUTO_DETECT = AutoDetect()
 
 @dataclass
 class ExportHistory(_History):
-  """Parse history from Bitget CSV exports."""
+  """#### Parse history from Bitget CSV exports.
+  
+  CSV files can be exported from the [Bitget website](https://www.bitget.com/asset/export/downOrders):
+
+  - `Spot orders` > `Order Details` & `Transactions` & `Deposit/withdrawal records`
+  - `Margin orders` > `Order history` & `Transactions` (both cross and isolated)
+  - `Futures orders` > `Order details` & `Transactions` (USDT-M, Coin-M and USDC-M)
+
+  #### Not yet supported:
+
+  - `BGB conversion orders`
+  - `Onchain order`
+  """
   spot: SpotPaths | None = None
   cross_margin: CrossMarginPaths | None = None
   isolated_margin: IsolatedMarginPaths | None = None

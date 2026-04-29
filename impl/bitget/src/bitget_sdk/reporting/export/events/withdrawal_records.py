@@ -44,7 +44,7 @@ class withdrawal_records:
   def load(path: str, tz: timezone) -> pd.DataFrame:
     df = pd.read_csv(path, dtype={'Quantity': str, 'TxID': str})
     df.rename(columns=lambda c: str(c).lstrip('\ufeff'), inplace=True)
-    util.validate_schema(df, withdrawal_records.schema)
+    util.validate_schema(df, withdrawal_records.schema, id=path)
     df = df[df['Status'] == 'Successful'].copy()
     df.reset_index(drop=True, inplace=True)
     df['Time(UTC)'] = pd.to_datetime(df['Date']).dt.tz_localize(tz).dt.tz_convert(timezone.utc) # type: ignore

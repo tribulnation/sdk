@@ -37,17 +37,21 @@ class InvalidColumnString:
   wrong_values: Collection[str]
 
   def __str__(self):
-    return f'Column "{self.column}" has invalid values (expected it to match {self.expected_type.pattern}). Wrong values: {", ".join(list(self.wrong_values)[:10])}'
+    wrong_vals = list(self.wrong_values)[:10]
+    wrong_vals = list(map(str, wrong_vals))
+    wrong_vals_str = ', '.join(wrong_vals)
+    return f'Column "{self.column}" has invalid values (expected it to match {self.expected_type.pattern}). Wrong values: {wrong_vals_str}'
 
 SchemaError = MissingColumn | InvalidColumnType | InvalidColumnString
 
 class InvalidSchema(Exception):
-  def __init__(self, errors: list[SchemaError], *args, **kwargs):
+  def __init__(self, errors: list[SchemaError], *args, id: str = '', **kwargs):
     super().__init__(*args, **kwargs)
+    self.id = id
     self.errors = errors
 
   def __str__(self):
-    out = 'Schema Validation Error:\n'
+    out = f'Schema Validation Error ({self.id}):\n'
     for error in self.errors:
       out += f'> {error}\n'
     return out
@@ -62,7 +66,7 @@ def find_key(df: pd.DataFrame, key: str | re.Pattern) -> str | None:
       if key.match(k):
         return k
 
-def validate_schema(df: pd.DataFrame, schema: Schema):
+def validate_schema(df: pd.DataFrame, schema: Schema, id: str = ''):
   errors: list[SchemaError] = []
   for expected_key, expected_type in schema.items():
     key = find_key(df, expected_key)
@@ -82,4 +86,4 @@ def validate_schema(df: pd.DataFrame, schema: Schema):
         errors.append(InvalidColumnType(key, expected_type, type(row[key]), row[key]))
 
   if len(errors) > 0:
-    raise InvalidSchema(errors)
+    raise InvalidSchema(errors, id=id)

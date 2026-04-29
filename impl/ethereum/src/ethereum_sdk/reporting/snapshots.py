@@ -53,7 +53,7 @@ class Snapshots(rpc.Mixin, etherscan.Mixin, _Snapshots):
     )
 
   @etherscan.wrap_exceptions
-  async def call(self, fn):
+  async def call_etherscan(self, fn):
     return await fn()
 
   @SDK.method
@@ -62,7 +62,11 @@ class Snapshots(rpc.Mixin, etherscan.Mixin, _Snapshots):
     contracts = set[str]()
     state = paging.init
     while state is not None:
-      chunk, state = await self.call(lambda: paging.next(state))
+      async def next():
+        nonlocal state
+        return await paging.next(state)
+      chunk, next_state = await self.call_etherscan(next)
+      state = next_state
       contracts.update(tx['contractAddress'] for tx in chunk)
     return contracts
 

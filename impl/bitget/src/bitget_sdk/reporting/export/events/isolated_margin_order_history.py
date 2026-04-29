@@ -64,7 +64,7 @@ class isolated_margin_order_history:
       'Trading volume': str,
     })
     df.rename(columns=lambda c: str(c).lstrip('\ufeff'), inplace=True)
-    util.validate_schema(df, isolated_margin_order_history.schema)
+    util.validate_schema(df, isolated_margin_order_history.schema, id=path)
     df['Time(UTC)'] = pd.to_datetime(df['Date'], errors='coerce').dt.tz_localize(tz).dt.tz_convert(timezone.utc)
     return df
 

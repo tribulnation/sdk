@@ -48,7 +48,7 @@ class spot_order_details:
   def load(path: str, tz: timezone) -> pd.DataFrame:
     df = pd.read_csv(path, dtype={'Price': str, 'Amount': str, 'Total': str, 'Fee': str})
     df.rename(columns=lambda c: str(c).lstrip('\ufeff'), inplace=True)
-    util.validate_schema(df, spot_order_details.schema)
+    util.validate_schema(df, spot_order_details.schema, id=path)
     df['Time(UTC)'] = pd.to_datetime(df['Date']).dt.tz_localize(tz).dt.tz_convert(timezone.utc)
     return df
 

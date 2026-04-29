@@ -93,7 +93,6 @@ class CryptoDeposit(BaseEvent):
   network: str
   tx_hash: str
   idx: int | None = None
-  memo: str | None = None
 
   @property
   def flows(self) -> Sequence[Flow]:
@@ -152,6 +151,16 @@ class FiatWithdrawal(BaseEvent):
 @dataclass(kw_only=True, frozen=True)
 class Yield(BaseEvent):
   tag: Literal['yield'] = 'yield'
+  asset: str
+  qty: Decimal
+
+  @property
+  def flows(self) -> Sequence[Flow]:
+    return [self.flow(self.asset, self.qty)]
+
+@dataclass(kw_only=True, frozen=True)
+class Funding(BaseEvent):
+  tag: Literal['funding'] = 'funding'
   asset: str
   qty: Decimal
 
@@ -223,7 +232,7 @@ class EvmTx(BaseEvent):
     return flows
 
 Event = Union[
-  SpotTrade, FuturesTrade, Yield,
+  SpotTrade, FuturesTrade, Yield, Funding,
   CryptoDeposit, CryptoWithdrawal,
   FiatDeposit, FiatWithdrawal,
   EvmTx,

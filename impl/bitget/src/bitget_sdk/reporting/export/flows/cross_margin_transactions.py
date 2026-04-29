@@ -45,7 +45,7 @@ class cross_margin_transactions:
       keep_default_na=False,
     )
     df.rename(columns=lambda c: str(c).lstrip('\ufeff'), inplace=True)
-    util.validate_schema(df, cross_margin_transactions.schema)
+    util.validate_schema(df, cross_margin_transactions.schema, id=path)
     df['Time(UTC)'] = pd.to_datetime(df['Time']).dt.tz_localize(tz).dt.tz_convert(timezone.utc)
     return df
 
