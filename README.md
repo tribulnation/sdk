@@ -1,11 +1,11 @@
-# Trading SDK
+# Tribulnation SDK
 
 > An abstract, fully-typed, async Python SDK for automated crypto trading.
 
-## Quick Start
+## Trading Quick Start
 
 ```python
-from trading_sdk import TradingSDK
+from tribulnation.sdk import TradingSDK
 
 sdk = TradingSDK()
 mexc = await sdk.market('mexc:spot:BTCUSDT')
@@ -23,7 +23,7 @@ async for my_trade in mexc.trades_stream():
 ## Installation
 
 ```bash
-pip install trading-sdk[mexc, dydx, hyperliquid]
+pip install tribulnation-sdk[mexc, dydx, hyperliquid]
 ```
 
 ## Supported Venues

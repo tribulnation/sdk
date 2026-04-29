@@ -5,5 +5,5 @@
 ## Installation
 
 ```bash
-pip install kraken-trading-sdk
+pip install tribulnation-kraken
 ```

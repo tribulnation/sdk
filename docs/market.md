@@ -71,5 +71,5 @@ Perp-only user funding payments:
 
 ## Related
 
-- `sdk/src/trading_sdk/market/`
-- `trading_sdk.impl.market.load_market()` helper in `sdk/src/trading_sdk/impl/market.py`
+- `sdk/src/tribulnation.sdk/market/`
+- `tribulnation.sdk.impl.market.load_market()` helper in `sdk/src/tribulnation.sdk/impl/market.py`

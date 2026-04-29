@@ -5,5 +5,5 @@
 ## Installation
 
 ```bash
-pip install ethereum-trading-sdk
+pip install tribulnation-ethereum
 ```

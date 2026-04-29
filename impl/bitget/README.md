@@ -5,5 +5,5 @@
 ## Installation
 
 ```bash
-pip install bitget-trading-sdk
+pip install tribulnation-bitget
 ```

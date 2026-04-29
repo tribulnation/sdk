@@ -5,5 +5,5 @@
 ## Installation
 
 ```bash
-pip install bingx-trading-sdk
+pip install tribulnation-bingx
 ```

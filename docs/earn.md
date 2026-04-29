@@ -27,4 +27,4 @@
 
 ## Related
 
-- `sdk/src/trading_sdk/earn/instruments.py`
+- `sdk/src/tribulnation.sdk/earn/instruments.py`

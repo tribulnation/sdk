@@ -5,5 +5,5 @@
 ## Installation
 
 ```bash
-pip install hyperliquid-trading-sdk
+pip install tribulnation-hyperliquid
 ```

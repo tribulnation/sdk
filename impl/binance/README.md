@@ -5,5 +5,5 @@
 ## Installation
 
 ```bash
-pip install binance-trading-sdk
+pip install tribulnation-binance
 ```

@@ -1,9 +1,9 @@
-# Binance SDK
+# <Name> SDK
 
-> Tribulnation SDK implementation for Binance.
+> Tribulnation SDK implementation for <Name>.
 
 ## Installation
 
 ```bash
-pip install binance-trading-sdk
+pip install tribulnation-<name>
 ```

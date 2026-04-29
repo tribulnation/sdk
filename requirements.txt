@@ -12,3 +12,4 @@ pyright
 -e impl/ethereum
 -e impl/dydx
 -e impl/hyperliquid
+-e impl/bit2me

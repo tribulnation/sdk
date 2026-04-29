@@ -37,5 +37,5 @@
 
 ## Related
 
-- `sdk/src/trading_sdk/wallet/deposit_methods.py`
-- `sdk/src/trading_sdk/wallet/withdrawal_methods.py`
+- `sdk/src/tribulnation.sdk/wallet/deposit_methods.py`
+- `sdk/src/tribulnation.sdk/wallet/withdrawal_methods.py`

@@ -3,17 +3,17 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "bitget-trading-sdk"
+name = "tribulnation-bitget"
 version = "0.3.1"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
 description = "Tribulnation SDK implementation for Bitget."
 dependencies = [
-  "typed-bitget", "trading-sdk"
+  "tribulnation-sdk", "typed-bitget",
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}
 
 [project.urls]
-repo = "https://github.com/tribulnation/sdk.git"
+Repository = "https://github.com/tribulnation/sdk.git"

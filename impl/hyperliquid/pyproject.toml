@@ -3,17 +3,17 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "hyperliquid-trading-sdk"
-version = "1.0.7"
+name = "tribulnation-hyperliquid"
+version = "0.1.0"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
 description = "Tribulnation SDK implementation for Hyperliquid."
 dependencies = [
-  "trading-sdk", "typed-hyperliquid"
+  "tribulnation-sdk", "typed-hyperliquid"
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}
 
 [project.urls]
-repo = "https://github.com/tribulnation/sdk.git"
+Repository = "https://github.com/tribulnation/sdk.git"

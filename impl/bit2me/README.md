@@ -5,5 +5,5 @@
 ## Installation
 
 ```bash
-pip install bit2me-trading-sdk
+pip install tribulnation-bit2me
 ```

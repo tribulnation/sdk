@@ -5,5 +5,5 @@
 ## Installation
 
 ```bash
-pip install dydx-trading-sdk
+pip install tribulnation-dydx
 ```

@@ -5,5 +5,5 @@
 ## Installation
 
 ```bash
-pip install mexc-trading-sdk
+pip install tribulnation-mexc
 ```

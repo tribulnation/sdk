@@ -3,22 +3,17 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mexc-trading-sdk"
-version = "1.0.4"
+name = "tribulnation-mexc"
+version = "0.1.0"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
 description = "Tribulnation SDK implementation for MEXC."
 dependencies = [
-  "typed-mexc", "trading-sdk",
+  "tribulnation-sdk", "typed-mexc",
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}
 
 [project.urls]
-repo = "https://github.com/tribulnation/sdk.git"
-
-[project.optional-dependencies]
-export = [
-  "openpyxl", "pandas"
-]
+Repository = "https://github.com/tribulnation/sdk.git"

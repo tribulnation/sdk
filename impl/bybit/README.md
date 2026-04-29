@@ -5,5 +5,5 @@
 ## Installation
 
 ```bash
-pip install bybit-trading-sdk
+pip install tribulnation-bybit
 ```
