@@ -52,6 +52,7 @@ class Snapshots(rpc.Mixin, etherscan.Mixin, _Snapshots):
       ignore_zero_value=ignore_zero_value,
     )
 
+  @SDK.method
   @etherscan.wrap_exceptions
   async def call_etherscan(self, fn):
     return await fn()
