@@ -71,22 +71,31 @@ class Snapshots(rpc.Mixin, etherscan.Mixin, _Snapshots):
       contracts.update(tx['contractAddress'] for tx in chunk)
     return contracts
 
+  @SDK.method
+  @rpc.wrap_exceptions
+  async def eth_balance(self) -> Decimal:
+    return Decimal(await self.node.eth_balance(self.address))
+
+  @SDK.method
+  @rpc.wrap_exceptions
+  async def token_balance(self, contract: str) -> Decimal | None:
+    try:
+      return Decimal(await self.node.token(contract).balance(self.address))
+    except (ContractLogicError, BadFunctionCallOutput) as e:
+      if not self.ignore_bad_contracts:
+        raise ApiError(f'Contract {contract} raised a logic error', *e.args) from e
+    
+
   @rpc.wrap_exceptions
   async def snapshots(self, assets: Sequence[str] = []) -> list[Snapshot]:
-    eth_balance = Decimal(await self.node.eth_balance(self.address))
+    eth_balance = await self.eth_balance()
     time = datetime.now(timezone.utc)
     snapshots: list[Snapshot] = [Snapshot(asset=self.native_asset_id, qty=eth_balance, time=time, kind='currency')]
     contracts = assets or await self._list_assets()
     contracts = [Web3.to_checksum_address(contract) for contract in contracts]
     for contract in contracts:
-      try:
-        balance = await self.node.token(contract).balance(self.address)
-      except (ContractLogicError, BadFunctionCallOutput) as e:
-        if self.ignore_bad_contracts:
-          continue
-        else:
-          raise ApiError(f'Contract {contract} raised a logic error', *e.args) from e
-      if not self.ignore_zero_value or balance > 0:
+      balance = await self.token_balance(contract)
+      if balance is not None and (not self.ignore_zero_value or balance > 0):
         time = datetime.now().astimezone()
         snapshots.append(Snapshot(asset=contract, qty=balance, time=time, kind='currency'))
 
