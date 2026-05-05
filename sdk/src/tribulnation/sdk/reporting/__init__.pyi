@@ -1,6 +1,6 @@
 from .snapshots import Snapshots, Snapshot
 from .history import (
-  HistoryAPI,
+  History,
   Borrow,
   CryptoDeposit,
   CryptoTransaction,
@@ -8,6 +8,7 @@ from .history import (
   CryptoWithdrawal,
   Event,
   EventType,
+  Fee,
   FiatDeposit,
   FiatWithdrawal,
   Flow,
@@ -17,15 +18,17 @@ from .history import (
   Repay,
   SpotTrade,
   Yield,
-  History,
+  EvmTx,
   Provenance,
+  Record,
 )
 from .sdk import Report
+from .impl import ReportSDK
 
 __all__ = [
   'Snapshots',
   'Snapshot',
-  'HistoryAPI',
+  'History',
   'Borrow',
   'CryptoDeposit',
   'CryptoTransaction',
@@ -33,6 +36,7 @@ __all__ = [
   'CryptoWithdrawal',
   'Event',
   'EventType',
+  'Fee',
   'FiatDeposit',
   'FiatWithdrawal',
   'Flow',
@@ -42,8 +46,10 @@ __all__ = [
   'Repay',
   'SpotTrade',
   'Yield',
+  'EvmTx',
   'History',
   'Provenance',
-  'HistoryAPI',
+  'Record',
   'Report',
+  'ReportSDK',
 ]

@@ -1,11 +1,14 @@
 from .models import (
   Borrow,
   CryptoDeposit,
+  BaseCryptoTransaction,
   CryptoTransaction,
+  EvmTx,
   CryptoTransfer,
   CryptoWithdrawal,
   Event,
   EventType,
+  Fee,
   FiatDeposit,
   FiatWithdrawal,
   Flow,
@@ -15,7 +18,9 @@ from .models import (
   Repay,
   SpotTrade,
   Yield,
-  History,
+  Record,
   Provenance,
+  FileProvenance,
+  ApiProvenance,
 )
-from .sdk import HistoryAPI
+from .sdk import History
