@@ -10,7 +10,7 @@ from etherscan.api.account.token_transactions import TokenTransaction, token_val
 from etherscan.api.account.internal_transactions import InternalTransaction
 
 from tribulnation.sdk.core import SDK
-from tribulnation.sdk.reporting.history import History, EvmTx
+from tribulnation.sdk.reporting.history import History, EvmTx, Record
 from tribulnation.ethereum.core import etherscan, group_by, same_address
 
 T = TypeVar('T')
@@ -98,17 +98,16 @@ class EtherscanHistory(etherscan.Mixin, History):
   def parse_native_transfer(self, tx: NativeTransaction | InternalTransaction, *, internal: bool) -> EvmTx.NativeTransfer | None:
     if (value := tx_value(tx)) > 0:
       if same_address(tx['to'], self.address):
-        direction = 'in'
+        amount = value
         counterparty = tx['from']
       elif same_address(tx['from'], self.address):
-        direction = 'out'
+        amount = -value
         counterparty = tx['to']
       else:
         return None
       return EvmTx.NativeTransfer(
-        direction=direction,
         counterparty=counterparty,
-        value=value,
+        amount=amount,
         internal=internal,
       )
 
@@ -126,18 +125,18 @@ class EtherscanHistory(etherscan.Mixin, History):
     ]
 
   def parse_token_tx(self, token_tx: TokenTransaction) -> EvmTx.ERC20Transfer | None:
+    value = token_value(token_tx)
     if same_address(token_tx['to'], self.address):
-      direction = 'in'
+      amount = value
       counterparty = token_tx['from']
     elif same_address(token_tx['from'], self.address):
-      direction = 'out'
+      amount = -value
       counterparty = token_tx['to']
     else:
       return None
     return EvmTx.ERC20Transfer(
-      contract_address=Web3.to_checksum_address(token_tx['contractAddress']),
-      value=token_value(token_tx),
-      direction=direction,
+      asset=Web3.to_checksum_address(token_tx['contractAddress']),
+      amount=amount,
       counterparty=counterparty,
     )
 
@@ -169,20 +168,14 @@ class EtherscanHistory(etherscan.Mixin, History):
     transfers = self.parse_native_txs(native_txs) + self.parse_token_txs(token_txs) + self.parse_internal_txs(internal_txs)
 
     return EvmTx(
-      id=hash, hash=hash,
+      id=hash, tx_id=hash,
       time=any_tx['timeStamp'],
       fee=native_tx and self.parse_fee(native_tx),
       transfers=transfers,
-      raw={
-        'native_txs': native_txs,
-        'token_txs': token_txs,
-        'internal_txs': internal_txs,
-      },
-      source='etherscan',
     )
 
 
-  async def history(self, start: datetime, end: datetime) -> AsyncIterable[History.History]:
+  async def history(self, start: datetime, end: datetime) -> AsyncIterable[Record]:
     start_block, end_block = await asyncio.gather(
       self.get_block_by_time(start, 'before'),
       self.get_block_by_time(end, 'after'),
@@ -208,4 +201,4 @@ class EtherscanHistory(etherscan.Mixin, History):
       if tx is not None:
         transactions.append(tx)
     for tx in sorted(transactions, key=lambda tx: tx.time):
-      yield History.History(events=[tx], flows=tx.flows)
+      yield Record(events=[tx], provenance={'source': 'api', 'service': 'etherscan'})
