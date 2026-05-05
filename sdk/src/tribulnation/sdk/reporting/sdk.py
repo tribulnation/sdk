@@ -1,5 +1,5 @@
 from .snapshots import Snapshots
-from .history import HistoryAPI
+from .history import History
 
-class Report(HistoryAPI, Snapshots):
+class Report(History, Snapshots):
   ...

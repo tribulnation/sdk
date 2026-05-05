@@ -225,7 +225,13 @@ class ApiProvenance(TypedDict):
   params: NotRequired[dict]
   response: NotRequired[Any]
 
-Provenance = FileProvenance | ApiProvenance
+class ManualProvenance(TypedDict):
+  source: Literal['manual']
+  label: NotRequired[str]
+  note: NotRequired[str]
+  ref: NotRequired[str]
+
+Provenance = FileProvenance | ApiProvenance | ManualProvenance
 
 class Record(pydantic.BaseModel):
   flows: Sequence[Flow] = []

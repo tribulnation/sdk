@@ -22,5 +22,6 @@ from .models import (
   Provenance,
   FileProvenance,
   ApiProvenance,
+  ManualProvenance,
 )
 from .sdk import History

@@ -20,6 +20,7 @@ from .history import (
   Yield,
   EvmTx,
   Provenance,
+  ManualProvenance,
   Record,
 )
 from .sdk import Report
@@ -50,6 +51,7 @@ __all__ = [
   'EvmTx',
   'History',
   'Provenance',
+  'ManualProvenance',
   'Record',
   'Report',
   'ReportSDK',
