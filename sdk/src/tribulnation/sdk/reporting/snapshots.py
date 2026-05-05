@@ -1,4 +1,4 @@
-from typing_extensions import Literal, Sequence
+from typing_extensions import Literal
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
@@ -7,22 +7,30 @@ from decimal import Decimal
 from tribulnation.sdk import SDK
 
 @dataclass(kw_only=True)
-class Snapshot:
-  asset: str
-  time: datetime
+class Balance:
   qty: Decimal
   kind: Literal['currency', 'future', 'strategy']
   avg_price: Decimal | None = None
   """Average entry price"""
 
+
+@dataclass(kw_only=True)
+class Snapshot:
+  time: datetime
+  balances: dict[str, Balance]
+
+
 class Snapshots(SDK):
   @SDK.method
   @abstractmethod
-  async def snapshots(self, assets: Sequence[str] = []) -> Sequence[Snapshot]:
-    """Snapshot the portfolio of the account.
-    
-    - `assets`: hint of assets to snapshot. Behavior depends on the implementation.
-      - For platforms that can snapshot all assets, this is ignored.
-      - For platforms where all assets can't be known a priori (e.g. a blockchain), only the given `assets` are queried.
-    """
+  async def snapshots(self) -> Snapshot:
+    """Snapshot the full portfolio of the account."""
+    ...
+
+  @SDK.method
+  async def __aenter__(self):
+    return self
+
+  @SDK.method
+  async def __aexit__(self, exc_type, exc_value, traceback):
     ...

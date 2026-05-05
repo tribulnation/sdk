@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tribulnation-bit2me"
-version = "0.1.1"
+version = "0.2.0"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
 description = "Tribulnation SDK implementation for Bit2me."
 dependencies = [
-  "tribulnation-sdk", "typed-bit2me"
+  "tribulnation-sdk>=1.1.0", "typed-bit2me"
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}

@@ -1,4 +1,4 @@
-from typing_extensions import NamedTuple, Sequence
+from typing_extensions import NamedTuple
 from dataclasses import dataclass
 from decimal import Decimal
 from collections import Counter
@@ -7,7 +7,7 @@ import asyncio
 
 from tribulnation.sdk.core import SDK
 from tribulnation.sdk.reporting import (
-  Snapshot, Snapshots as _Snapshots,
+  Balance, Snapshot, Snapshots as _Snapshots,
 )
 
 from bitget import Bitget
@@ -134,7 +134,7 @@ class Snapshots(SdkMixin, _Snapshots):
 
 
   @wrap_exceptions
-  async def snapshots(self, assets: Sequence[str] = []) -> Sequence[Snapshot]:
+  async def snapshots(self) -> Snapshot:
 
     if self.raise_if_copy:
       future_copy, spot_copy = await asyncio.gather(
@@ -153,13 +153,18 @@ class Snapshots(SdkMixin, _Snapshots):
     )
     
     time = datetime.now()
-    return [
-      Snapshot(asset=asset, time=time, qty=Decimal(qty), kind='currency')
+    balances = {
+      asset: Balance(qty=Decimal(qty), kind='currency')
       for asset, qty in balances.items()
-    ] + [
-      Snapshot(asset=asset, time=time, qty=p.size, avg_price=p.entry, kind='future')
+    } | {
+      asset: Balance(qty=p.size, avg_price=p.entry, kind='future')
       for asset, p in positions.items()
-    ] + [
-      Snapshot(asset=asset, time=time, qty=Decimal(qty), kind='strategy')
-      for asset, qty in bot_assets.items()
-    ]
+    }
+    for asset, qty in bot_assets.items():
+      key = asset if asset not in balances else f'bot:{asset}'
+      balances[key] = Balance(qty=Decimal(qty), kind='strategy')
+
+    return Snapshot(
+      time=time,
+      balances=balances,
+    )

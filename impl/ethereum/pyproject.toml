@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tribulnation-ethereum"
-version = "0.1.1"
+version = "0.2.0"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
 description = "Tribulnation SDK implementation for Ethereum."
 dependencies = [
-  "tribulnation-sdk",
+  "tribulnation-sdk>=1.1.0",
   "web3",
   "httpx",
   "pydantic",

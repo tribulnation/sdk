@@ -1,4 +1,4 @@
-from .snapshots import Snapshots, Snapshot
+from .snapshots import Balance, Snapshots, Snapshot
 from .history import (
   History,
   Borrow,
@@ -28,6 +28,7 @@ from .impl import ReportSDK
 __all__ = [
   'Snapshots',
   'Snapshot',
+  'Balance',
   'History',
   'Borrow',
   'CryptoDeposit',

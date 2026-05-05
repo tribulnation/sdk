@@ -1,4 +1,3 @@
-from typing_extensions import Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -8,7 +7,7 @@ from web3 import Web3
 from web3.exceptions import ContractLogicError, BadFunctionCallOutput
 
 from tribulnation.sdk import ApiError, SDK
-from tribulnation.sdk.reporting import Snapshots as _Snapshots, Snapshot
+from tribulnation.sdk.reporting import Balance, Snapshots as _Snapshots, Snapshot
 
 from tribulnation.ethereum.core import rpc, etherscan
 
@@ -87,16 +86,17 @@ class Snapshots(rpc.Mixin, etherscan.Mixin, _Snapshots):
     
 
   @rpc.wrap_exceptions
-  async def snapshots(self, assets: Sequence[str] = []) -> list[Snapshot]:
+  async def snapshots(self) -> Snapshot:
     eth_balance = await self.eth_balance()
     time = datetime.now(timezone.utc)
-    snapshots: list[Snapshot] = [Snapshot(asset=self.native_asset_id, qty=eth_balance, time=time, kind='currency')]
-    contracts = assets or await self._list_assets()
+    balances: dict[str, Balance] = {
+      self.native_asset_id: Balance(qty=eth_balance, kind='currency')
+    }
+    contracts = await self._list_assets()
     contracts = [Web3.to_checksum_address(contract) for contract in contracts]
     for contract in contracts:
       balance = await self.token_balance(contract)
       if balance is not None and (not self.ignore_zero_value or balance > 0):
-        time = datetime.now().astimezone()
-        snapshots.append(Snapshot(asset=contract, qty=balance, time=time, kind='currency'))
+        balances[contract] = Balance(qty=balance, kind='currency')
 
-    return snapshots
+    return Snapshot(time=time, balances=balances)

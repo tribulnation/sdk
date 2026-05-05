@@ -1,11 +1,10 @@
-from typing_extensions import Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
 from collections import defaultdict
 from decimal import Decimal
 
 from tribulnation.dydx.core import wrap_exceptions
-from tribulnation.sdk.reporting import Snapshot, Snapshots as _Snapshots
+from tribulnation.sdk.reporting import Balance, Snapshot, Snapshots as _Snapshots
 
 from dydx import Indexer
 
@@ -29,7 +28,7 @@ class Snapshots(_Snapshots):
     await self.indexer.__aexit__(exc_type, exc_value, traceback)
 
   @wrap_exceptions
-  async def snapshots(self, assets: Sequence[str] = []) -> Sequence[Snapshot]:
+  async def snapshots(self) -> Snapshot:
     time = datetime.now().astimezone()
     subaccounts = (await self.indexer.data.get_subaccounts(self.address))['subaccounts']
     equity = Decimal(0)
@@ -57,9 +56,13 @@ class Snapshots(_Snapshots):
       for market in positions
     }
 
-    return [
-      Snapshot(asset='USDC', time=time, qty=collateral, kind='currency')
-    ] + [
-      Snapshot(asset=market, time=time, qty=positions[market], avg_price=entry_prices[market], kind='future')
-      for market in positions
-    ]
+    return Snapshot(
+      time=time,
+      balances={
+        'USDC': Balance(qty=collateral, kind='currency'),
+        **{
+          market: Balance(qty=positions[market], avg_price=entry_prices[market], kind='future')
+          for market in positions
+        },
+      },
+    )

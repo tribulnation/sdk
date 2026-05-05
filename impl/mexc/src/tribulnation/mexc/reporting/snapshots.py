@@ -1,4 +1,3 @@
-from typing_extensions import Sequence
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -7,7 +6,7 @@ import asyncio
 
 from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import (
-  Snapshot, Snapshots as _Snapshots
+  Balance, Snapshot, Snapshots as _Snapshots
 )
 
 from tribulnation.mexc.core import Mixin, wrap_exceptions
@@ -61,7 +60,7 @@ class Snapshots(_Snapshots, Mixin):
     return { symbol: merge_positions(positions) for symbol, positions in out.items() }
   
   @SDK.method
-  async def snapshots(self, assets: Sequence[str] = []) -> Sequence[Snapshot]:
+  async def snapshots(self) -> Snapshot:
     spot_balances, future_balances, future_positions = await asyncio.gather(
       self.spot_balances(),
       self.futures_balances(),
@@ -70,14 +69,16 @@ class Snapshots(_Snapshots, Mixin):
     time = datetime.now(timezone.utc)
     balances: dict[str, Decimal] = Counter(spot_balances) + Counter(future_balances) # type: ignore
 
-    currency_snapshots = [
-      Snapshot(time=time, asset=currency, qty=balance, kind='currency')
-      for currency, balance in balances.items()
-    ]
-
-    futures_snapshots = [
-      Snapshot(time=time, asset=symbol, qty=p.size, avg_price=p.entry_price, kind='future')
-      for symbol, p in future_positions.items()
-    ]
-
-    return currency_snapshots + futures_snapshots
+    return Snapshot(
+      time=time,
+      balances={
+        **{
+          currency: Balance(qty=balance, kind='currency')
+          for currency, balance in balances.items()
+        },
+        **{
+          symbol: Balance(qty=p.size, avg_price=p.entry_price, kind='future')
+          for symbol, p in future_positions.items()
+        },
+      },
+    )
