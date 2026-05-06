@@ -38,6 +38,8 @@ class Flow(pydantic.BaseModel):
   time: datetime
   event_id: str | None = None
   """Raw identifier of the causing event, if provided by the source."""
+  source_event_id: str | None = None
+  """Raw identifier of the causing event, when distinct from `event_id`."""
   event_type: EventType | None = None
   """Normalized event type, if known."""
 
@@ -46,6 +48,8 @@ class BaseEvent(pydantic.BaseModel):
   type: EventType
   id: str | None = None
   """Unique identifier, if provided by the source."""
+  source_id: str | None = None
+  """Raw source identifier, when distinct from `id`."""
   time: datetime
   fee: Fee | None = None
 
