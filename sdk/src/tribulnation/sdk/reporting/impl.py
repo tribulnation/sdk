@@ -72,7 +72,7 @@ class ReportSDK:
       'optimism': self.optimism(**credentials.get('optimism', {})),
     }
 
-  async def venue(self, id: str, /, **credentials: str) -> Report:
+  def venue(self, id: str, /, **credentials: str) -> Report:
     match id:
       case 'ethereum':
         return self.ethereum(**credentials)
@@ -91,5 +91,5 @@ class ReportSDK:
       case _:
         raise ValueError(f'Invalid venue ID: {id}. Supported venues: {SUPPORTED_VENUES}')
 
-  async def venues(self):
+  def venues(self):
     return SUPPORTED_VENUES
