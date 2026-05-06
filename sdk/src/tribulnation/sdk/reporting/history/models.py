@@ -21,6 +21,24 @@ EventType = Literal[
   'evm_tx',
 ]
 
+ObservationType = Literal[
+  'trade',
+  'trade_leg',
+  'fee',
+  'yield',
+  'funding',
+  'interest',
+  'borrow',
+  'repay',
+  'internal_transfer',
+  'crypto_deposit',
+  'crypto_withdrawal',
+  'fiat_deposit',
+  'fiat_withdrawal',
+  'crypto_transaction',
+  'evm_tx',
+]
+
 
 class Fee(pydantic.BaseModel):
   amount: Decimal
@@ -29,106 +47,96 @@ class Fee(pydantic.BaseModel):
   """Raw asset identifier, as provided by the source."""
 
 
-class Flow(pydantic.BaseModel):
+class BaseObservation(pydantic.BaseModel):
+  type: ObservationType
   id: str | None = None
-  """Unique identifier, if provided by the source."""
-  asset: str
-  """Raw asset identifier, as provided by the source."""
-  change: Decimal
-  time: datetime
-  event_id: str | None = None
-  """Raw identifier of the causing event, if provided by the source."""
-  source_event_id: str | None = None
-  """Raw identifier of the causing event, when distinct from `event_id`."""
-  event_type: EventType | None = None
-  """Normalized event type, if known."""
-
-
-class BaseEvent(pydantic.BaseModel):
-  type: EventType
-  id: str | None = None
-  """Unique identifier, if provided by the source."""
+  """Unique source identifier for this observation, if provided."""
   source_id: str | None = None
   """Raw source identifier, when distinct from `id`."""
-  time: datetime
+  time: datetime | None = None
   fee: Fee | None = None
 
-  def flow(self, asset: str, change: Decimal) -> Flow:
-    return Flow(
-      asset=asset,
-      change=change,
-      time=self.time,
-      event_id=self.id,
-      event_type=self.type,
-    )
 
-  @property
-  def flows(self) -> Sequence[Flow]:
-    return []
-
-class SpotTrade(BaseEvent):
+class Trade(BaseObservation):
   type: Literal['trade'] = 'trade' # type: ignore
-  base: str
-  """Raw base asset identifier, as provided by the source."""
-  quote: str
-  """Raw quote asset identifier, as provided by the source."""
-  size: Decimal
+  base: str | None = None
+  """Raw base asset identifier, if provided by the source."""
+  quote: str | None = None
+  """Raw quote asset identifier, if provided by the source."""
+  pair: str | None = None
+  """Raw pair or market identifier, if provided by the source."""
+  size: Decimal | None = None
   """Signed size in base asset units. Positive means bought, negative means sold."""
-  price: Decimal
+  price: Decimal | None = None
   """Quote asset units per base asset unit."""
+  order_id: str | None = None
+  trade_id: str | None = None
 
-  @property
-  def flows(self) -> Sequence[Flow]:
-    out: list[Flow] = [
-      self.flow(self.base, self.size),
-      self.flow(self.quote, -self.size * self.price),
-    ]
-    if self.fee:
-      out.append(self.flow(self.fee.asset, -self.fee.amount))
-    return out
 
-class SingleFlowEvent(BaseEvent):
+class TradeLeg(BaseObservation):
+  type: Literal['trade_leg'] = 'trade_leg' # type: ignore
+  asset: str
+  """Raw asset identifier, as provided by the source."""
   amount: Decimal
-  """Signed amount of the event, in the asset's base units."""
+  """Signed asset change."""
+  pair: str | None = None
+  order_id: str | None = None
+  trade_id: str | None = None
+  source_event_id: str | None = None
+
+
+class FeeLeg(BaseObservation):
+  type: Literal['fee'] = 'fee' # type: ignore
+  asset: str
+  """Raw fee asset identifier, as provided by the source."""
+  amount: Decimal
+  """Fee paid, stored as a positive amount."""
+  event_type: EventType | None = None
+  source_event_id: str | None = None
+
+
+class SingleAssetObservation(BaseObservation):
+  amount: Decimal
+  """Signed amount of the observation, in the asset's base units."""
   asset: str
   """Raw asset identifier, as provided by the source."""
 
-  @property
-  def flows(self) -> Sequence[Flow]:
-    return [self.flow(self.asset, self.amount)]
 
-class Yield(SingleFlowEvent):
+class Yield(SingleAssetObservation):
   type: Literal['yield'] = 'yield' # type: ignore
 
-class Funding(SingleFlowEvent):
+
+class Funding(SingleAssetObservation):
   type: Literal['funding'] = 'funding' # type: ignore
 
-class Interest(SingleFlowEvent):
+
+class Interest(SingleAssetObservation):
   type: Literal['interest'] = 'interest' # type: ignore
 
-class Borrow(SingleFlowEvent):
+
+class Borrow(SingleAssetObservation):
   type: Literal['borrow'] = 'borrow' # type: ignore
 
-class Repay(SingleFlowEvent):
+
+class Repay(SingleAssetObservation):
   type: Literal['repay'] = 'repay' # type: ignore
 
-class InternalTransfer(SingleFlowEvent):
+
+class InternalTransfer(SingleAssetObservation):
   type: Literal['internal_transfer'] = 'internal_transfer' # type: ignore
   src_account: str | None = None
   dst_account: str | None = None
 
-  @property
-  def flows(self) -> Sequence[Flow]:
-    return []
 
-class CryptoDeposit(SingleFlowEvent):
+class CryptoDeposit(SingleAssetObservation):
   type: Literal['crypto_deposit'] = 'crypto_deposit' # type: ignore
   network: str | None = None
   """Raw network name, if provided by the source."""
   tx_id: str | None = None
   """Blockchain transaction hash/identifier, if explicitly provided by the source."""
 
-class CryptoWithdrawal(SingleFlowEvent):
+
+class CryptoWithdrawal(SingleAssetObservation):
   type: Literal['crypto_withdrawal'] = 'crypto_withdrawal' # type: ignore
   network: str | None = None
   """Raw network name, if provided by the source."""
@@ -138,11 +146,13 @@ class CryptoWithdrawal(SingleFlowEvent):
   """Destination address, if explicitly provided by the source."""
 
 
-class FiatDeposit(SingleFlowEvent):
+class FiatDeposit(SingleAssetObservation):
   type: Literal['fiat_deposit'] = 'fiat_deposit' # type: ignore
 
-class FiatWithdrawal(SingleFlowEvent):
+
+class FiatWithdrawal(SingleAssetObservation):
   type: Literal['fiat_withdrawal'] = 'fiat_withdrawal' # type: ignore
+
 
 class CryptoTransfer(pydantic.BaseModel):
   asset: str
@@ -152,29 +162,22 @@ class CryptoTransfer(pydantic.BaseModel):
   counterparty: str | None = None
   """Counterparty address, if known."""
 
-class BaseCryptoTransaction(BaseEvent):
-  """Generic blockchain transaction."""
-  tx_id: str
-  """Blockchain transaction hash/identifier."""
-  transfers: Sequence[CryptoTransfer]
 
-  @property
-  def flows(self) -> Sequence[Flow]:
-    flows = [
-      self.flow(t.asset, t.change)
-      for t in self.transfers
-    ]
-    if self.fee:
-      flows.append(self.flow(self.fee.asset, -self.fee.amount))
-    return flows
+class BaseCryptoTransaction(BaseObservation):
+  """Generic blockchain transaction observation."""
+  tx_id: str | None = None
+  """Blockchain transaction hash/identifier."""
+  transfers: Sequence[CryptoTransfer] = []
+
 
 class CryptoTransaction(BaseCryptoTransaction):
   type: Literal['crypto_transaction'] = 'crypto_transaction' # type: ignore
 
+
 class EvmTx(BaseCryptoTransaction):
-  """EVM-compatible blockchain transaction."""
+  """EVM-compatible blockchain transaction observation."""
   type: Literal['evm_tx'] = 'evm_tx' # type: ignore
-  
+
   class Execution(pydantic.BaseModel):
     contract_address: str
     """Contract address"""
@@ -197,9 +200,12 @@ class EvmTx(BaseCryptoTransaction):
   """Contract execution details (if any)"""
   transfers: Sequence[Transfer] = [] # type: ignore
 
-Event = Annotated[
+
+Observation = Annotated[
   Union[
-    SpotTrade,
+    Trade,
+    TradeLeg,
+    FeeLeg,
     Yield,
     Funding,
     Interest,
@@ -216,11 +222,14 @@ Event = Annotated[
   pydantic.Discriminator('type')
 ]
 
+Event = Observation
+
 
 class FileProvenance(TypedDict):
   source: Literal['csv', 'excel']
   row: int
-  file: str 
+  file: str
+
 
 class ApiProvenance(TypedDict):
   source: Literal['api']
@@ -229,16 +238,20 @@ class ApiProvenance(TypedDict):
   params: NotRequired[dict]
   response: NotRequired[Any]
 
+
 class ManualProvenance(TypedDict):
   source: Literal['manual']
   label: NotRequired[str]
   note: NotRequired[str]
   ref: NotRequired[str]
 
+
 Provenance = FileProvenance | ApiProvenance | ManualProvenance
 
+
 class Record(pydantic.BaseModel):
-  flows: Sequence[Flow] = []
-  events: Sequence[Event] = []
+  model_config = pydantic.ConfigDict(extra='forbid')
+
+  observations: Sequence[Observation] = []
   snapshots: Sequence[Snapshot] = []
   provenance: Provenance
