@@ -23,6 +23,7 @@ EventType = Literal[
 
 ObservationType = Literal[
   'trade',
+  'spot_order',
   'trade_leg',
   'fee',
   'yield',
@@ -71,6 +72,26 @@ class Trade(BaseObservation):
   """Quote asset units per base asset unit."""
   order_id: str | None = None
   trade_id: str | None = None
+
+
+class SpotOrder(BaseObservation):
+  type: Literal['spot_order'] = 'spot_order' # type: ignore
+  order_id: str
+  """Source order identifier. This is a correlation key, not a fill identity."""
+  base: str | None = None
+  """Raw base asset identifier, if provided by the source."""
+  quote: str | None = None
+  """Raw quote asset identifier, if provided by the source."""
+  pair: str | None = None
+  """Raw pair or market identifier, if provided by the source."""
+  side: Literal['buy', 'sell'] | None = None
+  status: str | None = None
+  filled_size: Decimal | None = None
+  """Executed base asset amount, stored as a positive quantity."""
+  avg_price: Decimal | None = None
+  """Average execution price in quote asset units per base asset unit."""
+  quote_amount: Decimal | None = None
+  """Executed quote asset notional, stored as a positive quantity."""
 
 
 class TradeLeg(BaseObservation):
@@ -204,6 +225,7 @@ class EvmTx(BaseCryptoTransaction):
 Observation = Annotated[
   Union[
     Trade,
+    SpotOrder,
     TradeLeg,
     FeeLeg,
     Yield,

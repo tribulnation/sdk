@@ -25,6 +25,7 @@ from .models import (
   Record,
   Repay,
   SingleAssetObservation,
+  SpotOrder,
   Trade,
   TradeLeg,
   Yield,
