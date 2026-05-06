@@ -13,7 +13,7 @@ from alchemy.api.transfers import Transfers, Transfer, Params
 from ethereum import NodeRpc
 
 from tribulnation.sdk.core import SDK
-from tribulnation.sdk.reporting import History, EvmTx, Record
+from tribulnation.sdk.reporting import Fee, History, EvmTx, Record
 
 T = TypeVar('T')
 
@@ -112,10 +112,10 @@ class AlchemyHistory(alchemy.Mixin, rpc.Mixin, History):
     )
     return sorted(in_transfers + out_transfers, key=lambda t: t['blockNum'])
 
-  def parse_fee(self, tx: TxData, receipt: TxReceipt) -> Decimal | None:
+  def parse_fee(self, tx: TxData, receipt: TxReceipt) -> Fee | None:
     if (from_addr := tx.get('from')) and same_address(from_addr, self.address):
       assert 'hash' in tx
-      return tx_fee(receipt)
+      return Fee(asset='native', amount=tx_fee(receipt))
 
   def parse_transfer(self, transfer: Transfer) -> EvmTx.Transfer | None:
     if (
@@ -136,12 +136,12 @@ class AlchemyHistory(alchemy.Mixin, rpc.Mixin, History):
     if transfer['category'] == 'erc20' and (address := transfer['rawContract'].get('address')):
       return EvmTx.ERC20Transfer(
         asset=Web3.to_checksum_address(address),
-        amount=amount,
+        change=amount,
         counterparty=counterparty,
       )
     elif transfer['category'] in ('external', 'internal') and value:
       return EvmTx.NativeTransfer(
-        amount=amount,
+        change=amount,
         counterparty=counterparty,
         internal=transfer['category'] == 'internal',
       )
@@ -169,9 +169,9 @@ class AlchemyHistory(alchemy.Mixin, rpc.Mixin, History):
     )
 
   @SDK.method
-  async def history(self, start: datetime, end: datetime) -> AsyncIterable[Record]:
-    start = start.astimezone()
-    end = end.astimezone()
+  async def history(self, start: datetime | None = None, end: datetime | None = None) -> AsyncIterable[Record]:
+    start = start and start.astimezone()
+    end = end and end.astimezone()
     transfers = await self.get_all_transfers()
     tx_groups = defaultdict[str, list[Transfer]](list)
     for t in transfers:
@@ -186,8 +186,15 @@ class AlchemyHistory(alchemy.Mixin, rpc.Mixin, History):
       parse_limited(hash, transfers)
       for hash, transfers in tx_groups.items()
     ]
+
+    def filter_event(event: EvmTx) -> bool:
+      if start is not None and event.time is not None and event.time < start:
+        return False
+      if end is not None and event.time is not None and event.time > end:
+        return False
+      return True
+
     for task in asyncio.as_completed(tasks):
       event = await task
-      if event is not None and start <= event.time <= end:
-        yield Record(events=[event], provenance={'source': 'api', 'service': 'alchemy'})
-
+      if event is not None and filter_event(event):
+        yield Record(observations=[event], provenance={'source': 'api', 'service': 'alchemy'})
