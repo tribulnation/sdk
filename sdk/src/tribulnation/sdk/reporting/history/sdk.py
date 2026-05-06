@@ -8,7 +8,7 @@ from .models import Record
 class History(SDK):
   @SDK.method
   @abstractmethod
-  def history(self, start: datetime, end: datetime) -> AsyncIterable[Record]:
+  def history(self, start: datetime | None = None, end: datetime | None = None) -> AsyncIterable[Record]:
     """Fetch your reporting history."""
 
   @SDK.method
