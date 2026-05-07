@@ -2,6 +2,7 @@ build
 twine
 ipykernel
 pyright
+python-dotenv
 -e sdk
 -e impl/binance
 -e impl/bitget
