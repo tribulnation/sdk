@@ -6,7 +6,7 @@ from tribulnation.sdk.core import SDK, Stream, Subscription
 
 from mexc import MEXC
 from mexc.spot.market_data.exchange_info import Info as SpotInfo
-from mexc.spot.streams.core.proto import PublicLimitDepthsV3Api, PrivateDealsV3Api
+from mexc.spot.streams.core.proto import PublicAggreDepthsV3Api, PrivateDealsV3Api
 
 from tribulnation.mexc.core.exc import wrap_exceptions
 
@@ -24,7 +24,7 @@ class Shared:
 
   spot_markets: dict[str, SpotInfo] | None = None
   my_trades_subscription: Subscription[PrivateDealsV3Api] | None = None
-  depth_subscriptions: dict[tuple[str, Literal[5, 10, 20]], Subscription[PublicLimitDepthsV3Api]] = field(default_factory=dict)
+  depth_subscriptions: dict[str, Subscription[PublicAggreDepthsV3Api]] = field(default_factory=dict)
 
   _markets_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
 
@@ -72,24 +72,14 @@ class Shared:
       self.spot_markets = await self.client.spot.exchange_info(validate=self.validate)
       return self.spot_markets
 
-  def depth_subscription(self, symbol: str, /, *, levels: int | None = None):
-    if levels is None:
-      lvl = 20
-    elif levels <= 5:
-      lvl = 5
-    elif levels <= 10:
-      lvl = 10
-    else:
-      lvl = 20
-      
-    key = (symbol, lvl)
-    if key not in self.depth_subscriptions:
+  def depth_subscription(self, symbol: str):
+    if symbol not in self.depth_subscriptions:
       @wrap_exceptions
-      async def subscribe() -> Stream[PublicLimitDepthsV3Api]:
-        stream = await self.client.spot.streams.depth(symbol, level=lvl)
+      async def subscribe() -> Stream[PublicAggreDepthsV3Api]:
+        stream = await self.client.spot.streams.depth_updates(symbol, interval='10ms')
         return Stream(stream.stream, stream.unsubscribe)
-      self.depth_subscriptions[key] = Subscription.of(subscribe)
-    return self.depth_subscriptions[key]
+      self.depth_subscriptions[symbol] = Subscription.of(subscribe)
+    return self.depth_subscriptions[symbol]
 
   def my_trades_sub(self) -> Subscription[PrivateDealsV3Api]:
     if self.my_trades_subscription is None:
@@ -143,8 +133,8 @@ class MarketMixin(SDK, ExchangeMixin):
   def instrument(self) -> str:
     return self.info["symbol"]
 
-  async def subscribe_depth(self, *, levels: int | None = None) -> Stream[PublicLimitDepthsV3Api]:
-    return await self.shared.depth_subscription(self.instrument, levels=levels).subscribe()
+  async def subscribe_depth(self) -> Stream[PublicAggreDepthsV3Api]:
+    return await self.shared.depth_subscription(self.instrument).subscribe()
 
   async def subscribe_my_trades(self) -> Stream[PrivateDealsV3Api]:
     return await self.shared.my_trades_sub().subscribe()

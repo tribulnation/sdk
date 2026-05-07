@@ -1,9 +1,14 @@
+from dataclasses import dataclass
 from decimal import Decimal
+import asyncio
+from contextlib import suppress
 
 from tribulnation.sdk.core import Stream
 from tribulnation.sdk.market import Book
-
 from tribulnation.mexc.core.exc import wrap_exceptions
+from mexc.spot.market_data.depth import OrderBook
+from mexc.spot.streams.core.proto import PublicAggreDepthsV3Api
+
 from .mixin import MarketMixin
 
 
@@ -16,18 +21,131 @@ async def depth(self: MarketMixin, *, levels: int | None = None) -> Book:
   )
 
 
+@dataclass(kw_only=True)
+class DepthUpdate:
+  from_version: int
+  to_version: int
+  book: Book
+
+def parse_snapshot(reply: OrderBook) -> tuple[int, Book]:
+  return int(reply['lastUpdateId']), Book(
+    asks=[Book.Entry(price=Decimal(p.price), qty=Decimal(p.qty)) for p in reply['asks']],
+    bids=[Book.Entry(price=Decimal(p.price), qty=Decimal(p.qty)) for p in reply['bids']],
+  )
+
+def parse_update(msg: PublicAggreDepthsV3Api) -> DepthUpdate:
+  return DepthUpdate(
+    from_version=int(msg.from_version),
+    to_version=int(msg.to_version),
+    book=Book(
+      asks=[Book.Entry(price=Decimal(a.price), qty=Decimal(a.quantity)) for a in msg.asks],
+      bids=[Book.Entry(price=Decimal(b.price), qty=Decimal(b.quantity)) for b in msg.bids],
+    ),
+  )
+
+def drain_updates(queue: asyncio.Queue[DepthUpdate], cache: list[DepthUpdate]) -> None:
+  while not queue.empty():
+    cache.append(queue.get_nowait())
+
+async def receive_update(
+  queue: asyncio.Queue[DepthUpdate],
+  collector: asyncio.Task[None],
+) -> DepthUpdate:
+  if not queue.empty():
+    return queue.get_nowait()
+
+  pending_update = asyncio.create_task(queue.get())
+  done, _ = await asyncio.wait(
+    {pending_update, collector},
+    return_when=asyncio.FIRST_COMPLETED,
+  )
+  if pending_update in done:
+    return pending_update.result()
+
+  pending_update.cancel()
+  with suppress(asyncio.CancelledError):
+    await pending_update
+  exc = collector.exception()
+  if exc is not None:
+    raise exc
+  raise RuntimeError('Depth update stream ended')
+
+
+async def synchronized_book(
+  self: MarketMixin,
+  queue: asyncio.Queue[DepthUpdate],
+  collector: asyncio.Task[None],
+  levels: int | None = None,
+) -> tuple[int, Book]:
+  cache = [await receive_update(queue, collector)]
+
+  while True:
+    first = cache[0]
+    version, book = parse_snapshot(
+      await self.client.spot.depth(self.instrument, limit=levels)
+    )
+    drain_updates(queue, cache)
+
+    if version < first.from_version:
+      continue
+
+    cache = [update for update in cache if update.to_version > version]
+    if cache and cache[0].from_version > version + 1:
+      cache = [await receive_update(queue, collector)]
+      continue
+
+    for update in cache:
+      if update.to_version <= version:
+        continue
+      if update.from_version > version + 1:
+        break
+      book.update(update.book)
+      version = update.to_version
+    else:
+      return version, book
+
+    cache = [await receive_update(queue, collector)]
+
+
 @wrap_exceptions
 async def depth_stream(self: MarketMixin, *, levels: int | None = None) -> Stream[Book]:
-  stream = await self.subscribe_depth(levels=levels)
+  stream = await self.subscribe_depth()
+  queue: asyncio.Queue[DepthUpdate] = asyncio.Queue()
+  closed = False
 
-  @wrap_exceptions
-  async def gen():
+  async def collect() -> None:
     async for msg in stream:
-      book = Book(
-        asks=[Book.Entry(price=Decimal(a.price), qty=Decimal(a.quantity)) for a in msg.asks],
-        bids=[Book.Entry(price=Decimal(b.price), qty=Decimal(b.quantity)) for b in msg.bids],
-      )
-      yield book
+      await queue.put(parse_update(msg))
 
-  return Stream(gen(), stream.unsubscribe)
+  collector = asyncio.create_task(collect())
+
+  async def unsubscribe() -> None:
+    nonlocal closed
+    if closed:
+      return
+    closed = True
+    collector.cancel()
+    with suppress(asyncio.CancelledError):
+      await collector
+    await stream.unsubscribe()
+
+  async def gen():
+    try:
+      while True:
+        version, book = await synchronized_book(self, queue, collector, levels=levels)
+        yield book.copy()
+
+        while True:
+          update = await receive_update(queue, collector)
+          if update.to_version <= version:
+            continue
+          if update.from_version != version + 1:
+            break
+          book.update(update.book)
+          version = update.to_version
+          yield book.copy()
+    finally:
+      await unsubscribe()
+
+  return Stream(gen(), unsubscribe)
 
