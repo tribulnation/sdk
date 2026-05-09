@@ -33,7 +33,7 @@ async def records(
         for transfer in obs.transfers:
           assets.add(transfer.asset)
 
-  if start_time is not None:
+  if start is None and start_time is not None:
     snapshot_time = start_time - timedelta(days=1)
     yield Record(
       snapshots=[Snapshot(time=snapshot_time, balances={})],
