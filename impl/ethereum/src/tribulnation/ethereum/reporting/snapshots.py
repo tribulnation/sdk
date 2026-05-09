@@ -1,3 +1,4 @@
+from typing_extensions import Collection
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -7,7 +8,7 @@ from web3 import Web3
 from web3.exceptions import ContractLogicError, BadFunctionCallOutput
 
 from tribulnation.sdk import ApiError, SDK
-from tribulnation.sdk.reporting import Balance, Snapshots as _Snapshots, Snapshot
+from tribulnation.sdk.reporting import Balance, Record, Snapshots as _Snapshots, Snapshot
 
 from tribulnation.ethereum.core import rpc, etherscan
 
@@ -86,17 +87,21 @@ class Snapshots(rpc.Mixin, etherscan.Mixin, _Snapshots):
     
 
   @rpc.wrap_exceptions
-  async def snapshots(self) -> Snapshot:
+  async def snapshots(self, assets: Collection[str] | None = None) -> Record:
+    """Snapshot native balance and selected/discovered ERC20 balances."""
     eth_balance = await self.eth_balance()
     time = datetime.now(timezone.utc)
     balances: dict[str, Balance] = {
       self.native_asset_id: Balance(qty=eth_balance, kind='currency')
     }
-    contracts = await self._list_assets()
-    contracts = [Web3.to_checksum_address(contract) for contract in contracts]
+    contracts = assets if assets is not None else await self._list_assets()
+    contracts = [Web3.to_checksum_address(contract) for contract in contracts if contract != self.native_asset_id]
     for contract in contracts:
       balance = await self.token_balance(contract)
       if balance is not None and (not self.ignore_zero_value or balance > 0):
         balances[contract] = Balance(qty=balance, kind='currency')
 
-    return Snapshot(time=time, balances=balances)
+    return Record(
+      snapshots=[Snapshot(time=time, balances=balances)],
+      provenance={'source': 'api', 'service': 'node_rpc'},
+    )

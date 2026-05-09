@@ -1,4 +1,4 @@
-from typing import AsyncIterable
+from typing_extensions import AsyncIterable
 from datetime import datetime
 from abc import abstractmethod
 

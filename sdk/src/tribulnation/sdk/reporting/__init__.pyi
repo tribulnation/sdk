@@ -1,5 +1,6 @@
-from .snapshots import Balance, Snapshots, Snapshot
-from .history import (
+from .models import (
+  Balance,
+  Snapshot,
   ApiProvenance,
   BaseCryptoTransaction,
   BaseObservation,
@@ -8,8 +9,7 @@ from .history import (
   CryptoTransaction,
   CryptoTransfer,
   CryptoWithdrawal,
-  Event,
-  EventType,
+  DerivedProvenance,
   EvmTx,
   Fee,
   FeeLeg,
@@ -17,9 +17,7 @@ from .history import (
   FiatWithdrawal,
   FileProvenance,
   Funding,
-  History,
   InternalTransfer,
-  Interest,
   ManualProvenance,
   Observation,
   ObservationType,
@@ -30,8 +28,11 @@ from .history import (
   SpotOrder,
   Trade,
   TradeLeg,
+  UnknownObservation,
   Yield,
 )
+from .snapshots import Snapshots
+from .history import History
 from .sdk import Report
 from .impl import ReportSDK
 
@@ -48,8 +49,7 @@ __all__ = [
   'CryptoTransaction',
   'CryptoTransfer',
   'CryptoWithdrawal',
-  'Event',
-  'EventType',
+  'DerivedProvenance',
   'EvmTx',
   'Fee',
   'FeeLeg',
@@ -58,7 +58,6 @@ __all__ = [
   'FileProvenance',
   'Funding',
   'InternalTransfer',
-  'Interest',
   'ManualProvenance',
   'Observation',
   'ObservationType',
@@ -69,6 +68,7 @@ __all__ = [
   'SpotOrder',
   'Trade',
   'TradeLeg',
+  'UnknownObservation',
   'Yield',
   'Report',
   'ReportSDK',

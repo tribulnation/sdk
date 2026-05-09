@@ -101,7 +101,7 @@ class AlchemyHistory(alchemy.Mixin, rpc.Mixin, History):
     paging = self.alchemy_transfers.transfers_paged(params)
     state = paging.init
     while state is not None:
-      chunk, state = await self.call_alchemy(lambda: paging.next(state))
+      chunk, state = await self.call_alchemy(lambda: paging.next(state)) # type: ignore
       out.extend(chunk)
     return out
 

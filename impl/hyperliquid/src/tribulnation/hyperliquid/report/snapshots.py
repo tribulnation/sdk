@@ -1,9 +1,10 @@
+from typing_extensions import Collection
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 import asyncio
 
-from tribulnation.sdk.reporting import Balance, Snapshots as _Snapshots, Snapshot
+from tribulnation.sdk.reporting import Balance, Record, Snapshots as _Snapshots, Snapshot
 from hyperliquid import Info
 
 HYPE_ASSET = '150'
@@ -57,7 +58,7 @@ class Snapshots(_Snapshots):
       for asset, balance in balances.items()
     }
 
-  async def snapshots(self) -> Snapshot:
+  async def snapshots(self, assets: Collection[str] | None = None) -> Record:
     stake, spot_balances, perp_balances = await asyncio.gather(
       self.stake_snapshot(),
       self.spot_balances(),
@@ -70,4 +71,7 @@ class Snapshots(_Snapshots):
       if (hype_balance := balances.get(HYPE_ASSET)) is not None:
         hype_qty += hype_balance.qty
       balances[HYPE_ASSET] = Balance(qty=hype_qty, kind='currency')
-    return Snapshot(time=time, balances=balances)
+    return Record(
+      snapshots=[Snapshot(time=time, balances=balances)],
+      provenance={'source': 'api', 'service': 'hyperliquid', 'endpoint': 'snapshots'},
+    )

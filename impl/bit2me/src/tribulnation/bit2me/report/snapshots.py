@@ -3,9 +3,10 @@ from decimal import Decimal
 from datetime import datetime
 import asyncio
 from collections import Counter
+from typing_extensions import Sequence
 
 from tribulnation.sdk.core import SDK
-from tribulnation.sdk.reporting import Balance, Snapshots as _Snapshots, Snapshot
+from tribulnation.sdk.reporting import Balance, Record, Snapshots as _Snapshots, Snapshot
 from tribulnation.bit2me.core import wrap_exceptions
 from bit2me import Bit2Me
 
@@ -40,17 +41,20 @@ class Snapshots(_Snapshots):
       out[entry['currency']] += Decimal(entry['balance']) # type: ignore
     return out
 
-  async def snapshots(self) -> Snapshot:
+  async def snapshots(self, assets: Sequence[str] | None = None) -> Record:
     c1, c2 = await asyncio.gather(
       self.spot_balances(),
       self.earn_balances(),
     )
     time = datetime.now()
     total = c1 + c2
-    return Snapshot(
-      time=time,
-      balances={
-        asset: Balance(qty=Decimal(qty), kind='currency')
-        for asset, qty in total.items()
-      },
+    return Record(
+      snapshots=[Snapshot(
+        time=time,
+        balances={
+          asset: Balance(qty=Decimal(qty), kind='currency')
+          for asset, qty in total.items()
+        },
+      )],
+      provenance={'source': 'api', 'service': 'bit2me', 'endpoint': 'snapshots'},
     )

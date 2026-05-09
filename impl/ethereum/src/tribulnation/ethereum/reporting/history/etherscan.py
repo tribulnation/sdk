@@ -10,7 +10,7 @@ from etherscan.api.account.token_transactions import TokenTransaction, token_val
 from etherscan.api.account.internal_transactions import InternalTransaction
 
 from tribulnation.sdk.core import SDK
-from tribulnation.sdk.reporting.history import Fee, History, EvmTx, Record
+from tribulnation.sdk.reporting import Fee, History, EvmTx, Record
 from tribulnation.ethereum.core import etherscan, group_by, same_address
 
 T = TypeVar('T')
@@ -56,7 +56,7 @@ class EtherscanHistory(etherscan.Mixin, History):
     state = paging.init
     out: list[NativeTransaction] = []
     while state is not None:
-      chunk, state = await self.call_etherscan(lambda: paging.next(state))
+      chunk, state = await self.call_etherscan(lambda: paging.next(state)) # type: ignore
       out.extend(chunk)
     return out
 
@@ -71,7 +71,7 @@ class EtherscanHistory(etherscan.Mixin, History):
     state = paging.init
     out: list[TokenTransaction] = []
     while state is not None:
-      chunk, state = await self.call_etherscan(lambda: paging.next(state))
+      chunk, state = await self.call_etherscan(lambda: paging.next(state)) # type: ignore
       out.extend(chunk)
     return out
 
@@ -86,7 +86,7 @@ class EtherscanHistory(etherscan.Mixin, History):
     state = paging.init
     out: list[InternalTransaction] = []
     while state is not None:
-      chunk, state = await self.call_etherscan(lambda: paging.next(state))
+      chunk, state = await self.call_etherscan(lambda: paging.next(state)) # type: ignore
       out.extend(chunk)
     return out
 

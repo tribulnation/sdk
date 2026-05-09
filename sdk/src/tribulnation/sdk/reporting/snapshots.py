@@ -1,31 +1,16 @@
-from typing_extensions import Literal
+from typing_extensions import Sequence
 from abc import abstractmethod
-from dataclasses import dataclass
-from datetime import datetime
-from decimal import Decimal
 
 from tribulnation.sdk import SDK
-
-@dataclass(kw_only=True)
-class Balance:
-  qty: Decimal
-  kind: Literal['currency', 'future', 'strategy']
-  avg_price: Decimal | None = None
-  """Average entry price"""
-
-
-@dataclass(kw_only=True)
-class Snapshot:
-  time: datetime
-  balances: dict[str, Balance]
-
+from .models import Record
 
 class Snapshots(SDK):
   @SDK.method
   @abstractmethod
-  async def snapshots(self) -> Snapshot:
-    """Snapshot the full portfolio of the account."""
-    ...
+  async def snapshots(self, assets: Sequence[str] | None = None) -> Record:
+    """Fetch the current balances and positions of the account.
+    
+    - `assets` is used for asset discovery in venues that don't support full enumeration (e.g. EVM blockchains). For others (e.g. CEXs) it's ignored"""
 
   @SDK.method
   async def __aenter__(self):

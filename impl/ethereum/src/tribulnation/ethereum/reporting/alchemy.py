@@ -1,6 +1,11 @@
 from dataclasses import dataclass
+from datetime import datetime
+from typing_extensions import AsyncIterable, Sequence
 
+from tribulnation.sdk.core import SDK
 from tribulnation.sdk.reporting import Report as _Report
+from tribulnation.sdk.reporting import Record, EvmTx
+
 from tribulnation.ethereum.reporting.snapshots import Snapshots
 from tribulnation.ethereum.reporting.history import AlchemyHistory
 from etherscan import Etherscan
@@ -36,3 +41,18 @@ class AlchemyReport(_Report, Snapshots, AlchemyHistory):
       alchemy_transfers=transfers,
       include_internal_transfers=include_internal_transfers,
     )
+
+  @SDK.method
+  async def records(
+    self, start: datetime | None = None, end: datetime | None = None
+  ) -> AsyncIterable[Record]:
+    """Fetch Alchemy records with EVM boundary snapshots."""
+    assets = set[str]()
+    async for record in self.history(start, end):
+      yield record
+      for obs in record.observations:
+        if isinstance(obs, EvmTx):
+          for transfer in obs.transfers:
+            assets.add(transfer.asset)
+    if end is None:
+      yield await self.snapshots(assets=assets)
