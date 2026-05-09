@@ -44,5 +44,5 @@ async def records(
       },
     )
 
-  if start is None and end is None:
+  if end is None:
     yield await source.snapshots(assets=sorted(assets))
