@@ -226,10 +226,10 @@ class EvmTx(BaseCryptoTransaction):
   class ERC20Transfer(CryptoTransfer):
     kind: Literal['erc20'] = 'erc20'
 
-  Transfer = NativeTransfer | ERC20Transfer
+  Transfer: ClassVar = NativeTransfer | ERC20Transfer
   execution: Execution | None = None
   """Contract execution details (if any)"""
-  transfers: Sequence[Transfer] = [] # type: ignore
+  transfers: Sequence[NativeTransfer|ERC20Transfer] = [] # type: ignore
 
 def observation_discriminator(obj):
   def get_attr(obj, attr):

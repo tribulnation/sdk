@@ -1,11 +1,10 @@
+from typing_extensions import AsyncIterable
 from dataclasses import dataclass
 from datetime import datetime
-from typing_extensions import AsyncIterable, Sequence
 
 from tribulnation.sdk.core import SDK
-from tribulnation.sdk.reporting import Report as _Report
-from tribulnation.sdk.reporting import Record, EvmTx
-
+from tribulnation.sdk.reporting import Report as SdkReport, Record
+from tribulnation.ethereum.reporting.records import records as evm_records
 from tribulnation.ethereum.reporting.snapshots import Snapshots
 from tribulnation.ethereum.reporting.history import AlchemyHistory
 from etherscan import Etherscan
@@ -13,7 +12,9 @@ from alchemy.api.transfers import Transfers
 from ethereum import NodeRpc
 
 @dataclass
-class AlchemyReport(_Report, Snapshots, AlchemyHistory):
+class AlchemyReport(SdkReport, Snapshots, AlchemyHistory):
+  """Alchemy-backed EVM reporting."""
+
   @classmethod
   def new(
     cls, address: str, *,
@@ -47,12 +48,5 @@ class AlchemyReport(_Report, Snapshots, AlchemyHistory):
     self, start: datetime | None = None, end: datetime | None = None
   ) -> AsyncIterable[Record]:
     """Fetch Alchemy records with EVM boundary snapshots."""
-    assets = set[str]()
-    async for record in self.history(start, end):
+    async for record in evm_records(self, service='alchemy', start=start, end=end):
       yield record
-      for obs in record.observations:
-        if isinstance(obs, EvmTx):
-          for transfer in obs.transfers:
-            assets.add(transfer.asset)
-    if end is None:
-      yield await self.snapshots(assets=assets)

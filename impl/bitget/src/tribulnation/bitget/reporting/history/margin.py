@@ -3,45 +3,65 @@ from dataclasses import dataclass, field
 from datetime import datetime
 
 from tribulnation.sdk.core import SDK
-from tribulnation.sdk.reporting.history import Flow, SpotTrade, History
+from tribulnation.sdk.reporting import FeeLeg, Observation, Record, Trade, UnknownObservation
+from tribulnation.sdk.reporting import History as SdkHistory
 from bitget import Bitget
 from bitget.spot.public.symbols import Symbol
 
-from .util import TimezoneMixin
+from .util import (
+  TimezoneMixin,
+  api_record,
+  api_record_many,
+  nonzero_fee,
+  require_range,
+  signed_size,
+)
 
 @dataclass(kw_only=True)
-class MarginHistory(TimezoneMixin, History):
+class MarginHistory(TimezoneMixin, SdkHistory):
+  """Bitget margin account history."""
   client: Bitget
   symbols_cache: dict[str, Symbol] | None = field(kw_only=True, default=None)
 
   @property
   async def symbols(self) -> dict[str, Symbol]:
+    """Fetch and cache Bitget spot symbol metadata."""
     if self.symbols_cache is None:
       self.symbols_cache = {s['symbol']: s for s in await self.client.spot.public.symbols()}
     return self.symbols_cache
 
   @SDK.method
   async def flows(self, margin_type: Literal['isolated', 'crossed'], start: datetime, end: datetime):
+    """Fetch margin tax rows as unknown observations."""
     async for chunk in self.client.common.tax.margin_transaction_records_paged(margin_type, start=start, end=end):
       for tx in chunk:
-        yield Flow(
-          asset=tx['coin'], change=tx['amount'],
-          time=self.add_tz(tx['ts']),
-          raw=tx,
-          event_tag=tx['marginTaxType'],
-          source='bitget:margin_transaction_records',
-        )
-        if (fee := abs(tx['fee'])) > 0:
-          yield Flow(
-            asset=tx['coin'], change=-fee,
+        observations: list[Observation] = [
+          UnknownObservation(
+            id=tx['id'],
+            asset=tx['coin'],
+            amount=tx['amount'],
             time=self.add_tz(tx['ts']),
-            raw=tx,
-            event_tag='fee',
-            source='bitget:margin_transaction_records',
+            reason=tx['marginTaxType'],
           )
+        ]
+        if (fee := abs(tx['fee'])) > 0:
+          observations.append(FeeLeg(
+            id=f"{tx['id']}:fee",
+            asset=tx['coin'],
+            amount=-fee,
+            time=self.add_tz(tx['ts']),
+            event_type='unknown',
+            event_id=tx['id'],
+          ))
+        yield api_record_many(
+          observations,
+          endpoint=f'{margin_type}_margin_transaction_records',
+          response=tx,
+        )
 
   @SDK.method
   async def symbol_trades(self, margin_type: Literal['isolated', 'crossed'], symbol: str, start: datetime, end: datetime):
+    """Fetch margin fills for one symbol as trade observations."""
     symbols = await self.symbols
     if margin_type == 'isolated':
       fn = self.client.margin.isolated.trade.fills_paged
@@ -51,30 +71,46 @@ class MarginHistory(TimezoneMixin, History):
       for fill in chunk:
         base = symbols[symbol]['baseCoin']
         quote = symbols[symbol]['quoteCoin']
-        yield SpotTrade(
+        side = 'buy' if 'buy' in fill['side'] else 'sell'
+        yield api_record(Trade(
           id=fill['tradeId'],
           time=self.add_tz(fill['cTime']),
           base=base, quote=quote,
-          qty=fill['size'], price=fill['priceAvg'],
-          liquidity=fill['tradeScope'],
-          side='buy' if 'buy' in fill['side'] else 'sell',
-          fee=abs(fill['feeDetail']['totalFee']),
-          fee_asset=fill['feeDetail']['feeCoin'],
-          raw=fill,
-          source='bitget:margin_fills',
-        )
+          pair=symbol,
+          size=signed_size(fill['size'], side),
+          price=fill['priceAvg'],
+          order_id=fill['orderId'],
+          trade_id=fill['tradeId'],
+          fee=nonzero_fee(fill['feeDetail']['totalFee'], fill['feeDetail']['feeCoin']),
+        ), endpoint=f'{margin_type}_margin_fills', response=fill)
 
   @SDK.method
   async def trades(self, margin_type: Literal['isolated', 'crossed'], symbols: Iterable[str], start: datetime, end: datetime):
+    """Fetch margin fills for a set of symbols."""
     for symbol in symbols:
       chunk = [t async for t in self.symbol_trades(margin_type, symbol, start, end)]
       yield chunk
 
 
-  async def history(self, start: datetime, end: datetime) -> AsyncIterable[History.History]:
+  async def history(
+    self, start: datetime | None = None, end: datetime | None = None
+  ) -> AsyncIterable[Record]:
+    """Fetch margin history records."""
+    start, end = require_range(start, end)
     for margin_type in ('crossed', 'isolated'):
-      flows = [f async for f in self.flows(margin_type, start, end)]
-      yield History.History(flows=flows)
-      symbols = set(s for f in flows if (s := f.raw['symbol']))
+      records = [record async for record in self.flows(margin_type, start, end)]
+      for record in records:
+        yield record
+      symbols = {
+        symbol
+        for record in records
+        if (
+          record.provenance['source'] == 'api'
+          and (response := record.provenance.get('response'))
+          and isinstance(response, dict)
+          and isinstance(symbol := response.get('symbol'), str)
+        )
+      }
       async for chunk in self.trades(margin_type, symbols, start, end):
-        yield History.History(events=chunk)
+        for record in chunk:
+          yield record

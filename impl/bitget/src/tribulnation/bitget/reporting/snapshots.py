@@ -1,4 +1,4 @@
-from typing_extensions import NamedTuple
+from typing_extensions import NamedTuple, Collection
 from dataclasses import dataclass
 from decimal import Decimal
 from collections import Counter
@@ -7,7 +7,7 @@ import asyncio
 
 from tribulnation.sdk.core import SDK
 from tribulnation.sdk.reporting import (
-  Balance, Snapshot, Snapshots as _Snapshots,
+  Balance, Record, Snapshot, Snapshots as _Snapshots,
 )
 
 from bitget import Bitget
@@ -134,7 +134,7 @@ class Snapshots(SdkMixin, _Snapshots):
 
 
   @wrap_exceptions
-  async def snapshots(self) -> Snapshot:
+  async def snapshots(self, assets: Collection[str] | None = None) -> Record:
 
     if self.raise_if_copy:
       future_copy, spot_copy = await asyncio.gather(
@@ -164,7 +164,10 @@ class Snapshots(SdkMixin, _Snapshots):
       key = asset if asset not in balances else f'bot:{asset}'
       balances[key] = Balance(qty=Decimal(qty), kind='strategy')
 
-    return Snapshot(
-      time=time,
-      balances=balances,
+    return Record(
+      snapshots=[Snapshot(
+        time=time,
+        balances=balances,
+      )],
+      provenance={'source': 'api', 'service': 'bitget', 'endpoint': 'snapshots'},
     )
