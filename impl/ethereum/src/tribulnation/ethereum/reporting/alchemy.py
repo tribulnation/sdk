@@ -48,5 +48,5 @@ class AlchemyReport(SdkReport, Snapshots, AlchemyHistory):
     self, start: datetime | None = None, end: datetime | None = None
   ) -> AsyncIterable[Record]:
     """Fetch Alchemy records with EVM boundary snapshots."""
-    async for record in evm_records(self, service='alchemy', start=start, end=end):
+    async for record in evm_records(self, start=start, end=end):
       yield record

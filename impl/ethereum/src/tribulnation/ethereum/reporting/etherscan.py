@@ -17,5 +17,5 @@ class EtherscanReport(SdkReport, Snapshots, EtherscanHistory):
     self, start: datetime | None = None, end: datetime | None = None
   ) -> AsyncIterable[Record]:
     """Fetch Etherscan records with EVM boundary snapshots."""
-    async for record in evm_records(self, service='etherscan', start=start, end=end):
+    async for record in evm_records(self, start=start, end=end):
       yield record

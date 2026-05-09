@@ -18,7 +18,6 @@ class EvmRecordsSource(Protocol):
 
 async def records(
   source: EvmRecordsSource, *,
-  service: str,
   start: datetime | None = None,
   end: datetime | None = None,
 ) -> AsyncIterable[Record]:
@@ -45,5 +44,5 @@ async def records(
       },
     )
 
-  if end is None:
+  if start is None and end is None:
     yield await source.snapshots(assets=sorted(assets))
