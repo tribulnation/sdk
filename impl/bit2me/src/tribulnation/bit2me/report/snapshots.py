@@ -51,6 +51,6 @@ class Snapshots(_Snapshots):
       time=time,
       balances={
         asset: Balance(qty=Decimal(qty), kind='currency')
-      for asset, qty in total.items()
+        for asset, qty in total.items()
       },
     )
