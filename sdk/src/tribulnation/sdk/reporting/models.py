@@ -27,6 +27,7 @@ ObservationType = Literal[
   'crypto_withdrawal',
   'fiat_deposit',
   'fiat_withdrawal',
+  'fiat_conversion',
   'crypto_transaction',
   'unknown',
 ]
@@ -183,6 +184,20 @@ class FiatWithdrawal(SingleAssetObservation):
   fee: Fee | None = None
   """Fee paid, if any."""
 
+class FiatConversion(SingleAssetObservation):
+  """Crypto balance change caused by an external fiat buy or sell."""
+  type: Literal['fiat_conversion'] = 'fiat_conversion'
+  amount: Decimal
+  """Signed crypto account change. Positive means fiat buy; negative means fiat sell."""
+  fiat_asset: str | None = None
+  """Raw external fiat asset identifier, if provided by the source."""
+  fiat_amount: Decimal | None = None
+  """Positive external fiat amount, if provided by the source."""
+  fee: Fee | None = None
+  """External/payment fee metadata, if provided by the source."""
+  payment_method: str | None = None
+  """Raw external payment method, if provided by the source."""
+
 class CryptoTransfer(pydantic.BaseModel):
   """A crypto asset transferred within a blockchain transaction."""
   asset: str
@@ -259,6 +274,7 @@ Observation = Annotated[
     Annotated[CryptoWithdrawal, pydantic.Tag('crypto_withdrawal')],
     Annotated[FiatDeposit, pydantic.Tag('fiat_deposit')],
     Annotated[FiatWithdrawal, pydantic.Tag('fiat_withdrawal')],
+    Annotated[FiatConversion, pydantic.Tag('fiat_conversion')],
     Annotated[EvmTx, pydantic.Tag('crypto_transaction:evm')],
     Annotated[CryptoTransaction, pydantic.Tag('crypto_transaction')],
     Annotated[UnknownObservation, pydantic.Tag('unknown')],
