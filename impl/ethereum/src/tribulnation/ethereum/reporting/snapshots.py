@@ -38,11 +38,12 @@ class Snapshots(rpc.Mixin, etherscan.Mixin, _Snapshots):
     validate: bool = True, etherscan_api_key: str | None = None,
     etherscan_rate_limit: int | None = None,
     ignore_bad_contracts: bool = True, ignore_zero_value: bool = True,
+    poa_middleware: bool = False,
   ):
     from etherscan import Etherscan
     from ethereum import NodeRpc
     etherscan = Etherscan.new(api_key=etherscan_api_key, validate=validate, rate_limit=etherscan_rate_limit)
-    node = NodeRpc.at(rpc_url)
+    node = NodeRpc.at(rpc_url, poa_middleware=poa_middleware)
     return cls(
       node=node,
       etherscan=etherscan,

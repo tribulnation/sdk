@@ -1,5 +1,5 @@
 from typing_extensions import Literal, AsyncIterable, TypeVar, Awaitable, Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import timezone, datetime
 import asyncio
 
@@ -11,7 +11,7 @@ from etherscan.api.account.internal_transactions import InternalTransaction
 
 from tribulnation.sdk.core import SDK
 from tribulnation.sdk.reporting import Fee, History, EvmTx, Record
-from tribulnation.ethereum.core import etherscan, group_by, same_address
+from tribulnation.ethereum.core import etherscan, group_by, rpc, same_address
 
 T = TypeVar('T')
 
@@ -21,10 +21,11 @@ class AutoDetect:
 AUTO_DETECT = AutoDetect()
 
 @dataclass
-class EtherscanHistory(etherscan.Mixin, History):
+class EtherscanHistory(rpc.Mixin, etherscan.Mixin, History):
   address: str
   tz: timezone | AutoDetect = AUTO_DETECT
   """Timezone of the API times (defaults to the local timezone)."""
+  block_time_cache: dict[int, datetime] = field(default_factory=dict, kw_only=True)
 
   @property
   def timezone(self) -> timezone:
@@ -34,6 +35,19 @@ class EtherscanHistory(etherscan.Mixin, History):
 
   def add_tz(self, time: datetime) -> datetime:
     return time.replace(tzinfo=self.timezone)
+
+  @SDK.method
+  async def transaction_time(self, tx: NativeTransaction | TokenTransaction | InternalTransaction) -> datetime:
+    """Return the UTC timestamp for a transaction's block from RPC."""
+    block_number = int(tx['blockNumber'])
+    cached = self.block_time_cache.get(block_number)
+    if cached is not None:
+      return cached
+    block = await self.node.w3.eth.get_block(block_number)
+    assert 'timestamp' in block
+    time = datetime.fromtimestamp(block['timestamp'], timezone.utc)
+    self.block_time_cache[block_number] = time
+    return time
 
   @SDK.method
   @etherscan.wrap_exceptions
@@ -153,7 +167,7 @@ class EtherscanHistory(etherscan.Mixin, History):
     if same_address(tx['from'], self.address):
       return Fee(asset='native', amount=tx_fee(tx))
 
-  def parse_tx(
+  async def parse_tx(
     self, hash: str, *,
     native_txs: list[NativeTransaction],
     token_txs: list[TokenTransaction],
@@ -164,15 +178,25 @@ class EtherscanHistory(etherscan.Mixin, History):
     all_txs = native_txs + token_txs + internal_txs
     any_tx = all_txs[0]
     native_tx = native_txs[0] if native_txs else None
+    time = await self.transaction_time(any_tx)
 
     if native_tx and native_tx['isError'] != '0':
-      return
+      fee = self.parse_fee(native_tx)
+      if fee is None:
+        return
+      return EvmTx(
+        id=hash, tx_id=hash,
+        time=time,
+        fee=fee,
+        execution=self.parse_execution(native_tx),
+        transfers=[],
+      )
 
     transfers = self.parse_native_txs(native_txs) + self.parse_token_txs(token_txs) + self.parse_internal_txs(internal_txs)
 
     return EvmTx(
       id=hash, tx_id=hash,
-      time=self.add_tz(any_tx['timeStamp']),
+      time=time,
       fee=native_tx and self.parse_fee(native_tx),
       transfers=transfers,
     )
@@ -213,7 +237,7 @@ class EtherscanHistory(etherscan.Mixin, History):
       native_txs = grouped_native_txs.get(hash, [])
       token_txs = grouped_token_txs.get(hash, [])
       internal_txs = grouped_internal_txs.get(hash, [])
-      tx = self.parse_tx(hash, native_txs=native_txs, token_txs=token_txs, internal_txs=internal_txs)
+      tx = await self.parse_tx(hash, native_txs=native_txs, token_txs=token_txs, internal_txs=internal_txs)
       if tx is not None:
         transactions.append(tx)
     for tx in sorted(transactions, key=lambda tx: tx.time or datetime.min):

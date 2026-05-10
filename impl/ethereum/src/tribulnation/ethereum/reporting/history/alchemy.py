@@ -1,4 +1,4 @@
-from typing_extensions import AsyncIterable, Callable, Awaitable, TypeVar
+from typing_extensions import AsyncIterable, Callable, Awaitable, TypeVar, Any
 from dataclasses import dataclass, field
 from collections import defaultdict
 from datetime import datetime
@@ -17,11 +17,21 @@ from tribulnation.sdk.reporting import Fee, History, EvmTx, Record
 
 T = TypeVar('T')
 
+def wei_field(value: Any) -> Decimal:
+  """Return a wei-valued receipt field as a decimal integer."""
+  if value is None:
+    return Decimal('0')
+  if isinstance(value, str) and value.startswith('0x'):
+    return Decimal(int(value, 16))
+  return Decimal(value)
+
 def tx_fee(tx: TxReceipt) -> Decimal:
-  """Transaction fee [ETH]"""
-  used = Decimal(tx['gasUsed']) # gas
-  price = Decimal(tx['effectiveGasPrice']) # wei/gas
-  return wei2eth(price*used)
+  """Return the full transaction fee in native units."""
+  used = wei_field(tx['gasUsed'])
+  price = wei_field(tx['effectiveGasPrice'])
+  l1_fee = wei_field(tx.get('l1Fee'))
+  operator_fee = wei_field(tx.get('operatorFee'))
+  return wei2eth(used * price + l1_fee + operator_fee)
 
 def parse_execution(tx: TxData) -> EvmTx.Execution | None:
   if (input := tx.get('input')):

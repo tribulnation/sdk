@@ -22,7 +22,7 @@ def polygon(address: str, *, rpc_url: str | None = None):
   from tribulnation.ethereum.reporting import EtherscanReport
   from ethereum import PUBLIC_NODE_URLS
   rpc_url = rpc_url or os.environ.get('POLYGON_RPC_URL') or PUBLIC_NODE_URLS['polygon']
-  return EtherscanReport.new_at(rpc_url=rpc_url, chain_id=137, address=address)
+  return EtherscanReport.new_at(rpc_url=rpc_url, chain_id=137, address=address, poa_middleware=True)
 
 def bnb(address: str, *, rpc_url: str | None = None):
   from tribulnation.ethereum.reporting import AlchemyReport
