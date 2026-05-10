@@ -1,4 +1,5 @@
-from typing_extensions import Literal, Annotated, Union, Sequence, Any, TypedDict, NotRequired, ClassVar
+from types import UnionType
+from typing_extensions import Literal, Annotated, Union, Sequence, Any, TypedDict, NotRequired, ClassVar, TypeAlias
 from datetime import datetime
 from decimal import Decimal
 import pydantic
@@ -241,7 +242,8 @@ class EvmTx(BaseCryptoTransaction):
   class ERC20Transfer(CryptoTransfer):
     kind: Literal['erc20'] = 'erc20'
 
-  Transfer: ClassVar = NativeTransfer | ERC20Transfer
+  model_config = {'ignored_types': (UnionType,)} # type: ignore (make Transfer not freak out pydantic)
+  Transfer = NativeTransfer | ERC20Transfer
   execution: Execution | None = None
   """Contract execution details (if any)"""
   transfers: Sequence[NativeTransfer|ERC20Transfer] = [] # type: ignore
