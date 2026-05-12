@@ -14,7 +14,7 @@ from .mixin import MarketMixin
 
 @wrap_exceptions
 async def depth(self: MarketMixin, *, levels: int | None = None) -> Book:
-  r = await self.client.spot.depth(self.instrument, validate=self.shared.validate, limit=levels)
+  r = await self.client.spot.market.depth(self.instrument, validate=self.shared.validate, limit=levels)
   return Book(
     asks=[Book.Entry(price=Decimal(p.price), qty=Decimal(p.qty)) for p in r["asks"]],
     bids=[Book.Entry(price=Decimal(p.price), qty=Decimal(p.qty)) for p in r["bids"]],
@@ -82,7 +82,7 @@ async def synchronized_book(
   while True:
     first = cache[0]
     version, book = parse_snapshot(
-      await self.client.spot.depth(self.instrument, limit=levels)
+      await self.client.spot.market.depth(self.instrument, limit=levels)
     )
     drain_updates(queue, cache)
 
@@ -148,4 +148,3 @@ async def depth_stream(self: MarketMixin, *, levels: int | None = None) -> Strea
       await unsubscribe()
 
   return Stream(gen(), unsubscribe)
-

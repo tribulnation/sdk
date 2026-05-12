@@ -58,7 +58,7 @@ async def trades_stream(self: MarketMixin) -> Stream[Trade]:
 
 @wrap_exceptions
 async def trades_history(self: MarketMixin, start: datetime, end: datetime) -> AsyncIterable[Sequence[Trade]]:
-  async for chunk in self.client.spot.my_trades_paged(
+  async for chunk in self.client.spot.account.trades_paged(
     self.instrument,
     start=start,
     end=end,
@@ -66,4 +66,3 @@ async def trades_history(self: MarketMixin, start: datetime, end: datetime) -> A
     validate=self.shared.validate,
   ):
     yield [_parse_trade(t) for t in chunk]
-

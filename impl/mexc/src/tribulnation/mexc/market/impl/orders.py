@@ -50,7 +50,7 @@ def _dump_order(order: Order) -> MexcOrder:
 
 @wrap_exceptions
 async def open_orders(self: MarketMixin) -> Sequence[OrderState]:
-  orders = await self.client.spot.open_orders(
+  orders = await self.client.spot.account.open_orders(
     self.instrument,
     recvWindow=self.shared.recvWindow,
     validate=self.shared.validate,
@@ -60,7 +60,7 @@ async def open_orders(self: MarketMixin) -> Sequence[OrderState]:
 
 @wrap_exceptions
 async def query_order(self: MarketMixin, id: str) -> OrderState | None:
-  order = await self.client.spot.query_order(
+  order = await self.client.spot.account.order(
     self.instrument,
     orderId=id,
     recvWindow=self.shared.recvWindow,
@@ -71,7 +71,7 @@ async def query_order(self: MarketMixin, id: str) -> OrderState | None:
 
 @wrap_exceptions
 async def place_order(self: MarketMixin, order: Order) -> OrderResponse:
-  r = await self.client.spot.place_order(
+  r = await self.client.spot.trade.place_order(
     self.instrument,
     _dump_order(order),
     recvWindow=self.shared.recvWindow,
@@ -82,10 +82,9 @@ async def place_order(self: MarketMixin, order: Order) -> OrderResponse:
 
 @wrap_exceptions
 async def cancel_order(self: MarketMixin, id: str) -> Any:
-  return await self.client.spot.cancel_order(
+  return await self.client.spot.trade.cancel_order(
     self.instrument,
     orderId=id,
     recvWindow=self.shared.recvWindow,
     validate=self.shared.validate,
   )
-

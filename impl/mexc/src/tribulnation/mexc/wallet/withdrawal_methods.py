@@ -11,7 +11,7 @@ class WithdrawalMethods(Mixin, _WithdrawalMethods):
     self, *, assets: Sequence[str] | None = None,
     networks: Sequence[str] | None = None
   ) -> Sequence[WithdrawalMethod]:
-    currencies = await self.client.spot.currency_info()
+    currencies = await self.client.spot.wallet.currency_info()
 
     out: list[WithdrawalMethod] = []
     for c in currencies:

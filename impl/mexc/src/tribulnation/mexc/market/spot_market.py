@@ -71,7 +71,7 @@ class SpotMarket(MarketMixin, Market):
 
   @wrap_exceptions
   async def available_notional(self):
-    r = await self.client.spot.account(recvWindow=self.settings.get('recvWindow'))
+    r = await self.client.spot.account.info(recvWindow=self.settings.get('recvWindow'))
     for b in r['balances']:
       if b['asset'] == self.info['quoteAsset']:
         return Decimal(b['free'])

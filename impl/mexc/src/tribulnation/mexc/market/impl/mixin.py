@@ -69,14 +69,14 @@ class Shared:
     async with self._markets_lock:
       if not refetch and self.spot_markets is not None:
         return self.spot_markets
-      self.spot_markets = await self.client.spot.exchange_info(validate=self.validate)
+      self.spot_markets = await self.client.spot.market.exchange_info(validate=self.validate)
       return self.spot_markets
 
   def depth_subscription(self, symbol: str):
     if symbol not in self.depth_subscriptions:
       @wrap_exceptions
       async def subscribe() -> Stream[PublicAggreDepthsV3Api]:
-        stream = await self.client.spot.streams.depth_updates(symbol, interval='10ms')
+        stream = await self.client.spot.streams.market.depth_updates(symbol, interval='10ms')
         return Stream(stream.stream, stream.unsubscribe)
       self.depth_subscriptions[symbol] = Subscription.of(subscribe)
     return self.depth_subscriptions[symbol]
@@ -85,7 +85,7 @@ class Shared:
     if self.my_trades_subscription is None:
       @wrap_exceptions
       async def subscribe() -> Stream[PrivateDealsV3Api]:
-        stream = await self.client.spot.streams.my_trades()
+        stream = await self.client.spot.streams.user.trades()
         return Stream(stream.stream, stream.unsubscribe)
       self.my_trades_subscription = Subscription.of(subscribe)
     return self.my_trades_subscription
@@ -138,4 +138,3 @@ class MarketMixin(SDK, ExchangeMixin):
 
   async def subscribe_my_trades(self) -> Stream[PrivateDealsV3Api]:
     return await self.shared.my_trades_sub().subscribe()
-

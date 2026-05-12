@@ -51,12 +51,11 @@ class Mixin:
 
   async def cached_spot_market(self, instrument: str, *, refetch: bool = False) -> SpotInfo:
     if refetch or instrument not in self.cache.spot_markets:
-      self.cache.spot_markets = await self.client.spot.exchange_info()
+      self.cache.spot_markets = await self.client.spot.market.exchange_info()
     return self.cache.spot_markets[instrument]
 
   async def cached_perp_market(self, instrument: str, *, refetch: bool = False) -> PerpInfo:
     if refetch or instrument not in self.cache.perp_markets:
-      self.cache.perp_markets[instrument] = await self.client.futures.contract_info(instrument)
+      self.cache.perp_markets[instrument] = await self.client.futures.market.contract_info(instrument)
     return self.cache.perp_markets[instrument]
-
 

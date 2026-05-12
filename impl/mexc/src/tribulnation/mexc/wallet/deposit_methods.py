@@ -10,7 +10,7 @@ class DepositMethods(Mixin, _DepositMethods):
 	async def deposit_methods(
 		self, *, assets: Sequence[str] | None = None,
 	) -> Sequence[DepositMethod]:
-		currencies = await self.client.spot.currency_info()
+		currencies = await self.client.spot.wallet.currency_info()
 
 		out: list[DepositMethod] = []
 		for c in currencies:

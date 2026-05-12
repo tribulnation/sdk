@@ -30,7 +30,7 @@ class Snapshots(_Snapshots, Mixin):
   @SDK.method
   @wrap_exceptions
   async def spot_balances(self):
-    r = await self.client.spot.account(recvWindow=self.recvWindow)
+    r = await self.client.spot.account.info(recvWindow=self.recvWindow)
     return {
       b['asset']: Decimal(b['free']) + Decimal(b['locked'])
       for b in r['balances']
@@ -39,7 +39,7 @@ class Snapshots(_Snapshots, Mixin):
   @SDK.method
   @wrap_exceptions
   async def futures_balances(self):
-    r = await self.client.futures.assets(recvWindow=self.recvWindow)
+    r = await self.client.futures.account.assets(recvWindow=self.recvWindow)
     return {
       b['currency']: Decimal(b['availableBalance']) + Decimal(b['positionMargin'])
       for b in r
@@ -48,11 +48,11 @@ class Snapshots(_Snapshots, Mixin):
   @SDK.method
   @wrap_exceptions
   async def futures_positions(self):
-    positions = await self.client.futures.positions()
+    positions = await self.client.futures.position.open()
     out = defaultdict[str, list[Position]](list)
 
     for pos in positions:
-      contract = await self.client.futures.contract_info(pos['symbol'])
+      contract = await self.client.futures.market.contract_info(pos['symbol'])
       contract_size = Decimal(contract['contractSize'])
       s = 1 if pos['positionType'] == PositionType.long.value else -1
       size = s * abs(Decimal(pos['holdVol'])) * contract_size
