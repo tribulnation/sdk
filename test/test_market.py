@@ -10,11 +10,12 @@ import pytest
 
 from tribulnation.sdk import TradingSDK
 from tribulnation.sdk.core import Stream
-from tribulnation.sdk.market import Book, Market, PerpMarket, Order, Rules
+from tribulnation.sdk.market import Book, Market, PerpMarket, Order, OrderState, Rules
 
 from conftest import load_venue_env
 
 Side = Literal['buy', 'sell']
+OrderType = Literal['LIMIT', 'MARKET']
 
 @dataclass(frozen=True)
 class MarketTestPlan:
@@ -25,6 +26,7 @@ class MarketTestPlan:
   order_notional: Decimal
   fill_notional: Decimal
   side: Side = 'buy'
+  fill_order_type: OrderType = 'LIMIT'
   history_window: timedelta = timedelta(days=7)
   stream_timeout: float = 15.0
 
@@ -50,6 +52,7 @@ PLANS = [
     required_env=('MEXC_ACCESS_KEY', 'MEXC_SECRET_KEY'),
     order_notional=Decimal('6'),
     fill_notional=Decimal('6'),
+    fill_order_type='MARKET',
   ),
 ]
 
@@ -89,17 +92,69 @@ def passive_buy_order(rules: Rules, *, book: Book, notional: Decimal) -> Order:
   }
 
 
-def marketable_order(rules: Rules, *, book: Book, notional: Decimal, side: Side) -> Order:
+def marketable_order(
+  rules: Rules,
+  *,
+  book: Book,
+  notional: Decimal,
+  side: Side,
+  type: OrderType,
+) -> Order:
   """Build a small marketable limit order."""
+  qty = order_qty(rules, notional=notional, price=book.mark_price)
+  if side == 'sell':
+    qty = -qty
+  return closing_order(rules, book=book, qty=qty, type=type)
+
+
+def closing_order(rules: Rules, *, book: Book, qty: Decimal, type: OrderType) -> Order:
+  """Build a marketable limit order for an exact signed quantity."""
+  side: Side = 'buy' if qty > 0 else 'sell'
   if side == 'buy':
-    raw_price = book.best_ask.price * Decimal('1.02')
+    raw_price = book.best_ask.price * (Decimal('1.02') if type == 'LIMIT' else Decimal('1'))
+    max_price = rules.max_price(book.mark_price)
+    if max_price is not None:
+      raw_price = min(raw_price, max_price)
     price = rules.ceil_price(raw_price)
-    qty = order_qty(rules, notional=notional, price=price)
   else:
-    raw_price = book.best_bid.price * Decimal('0.98')
+    raw_price = book.best_bid.price * (Decimal('0.98') if type == 'LIMIT' else Decimal('1'))
+    min_price = rules.min_price(book.mark_price)
+    if min_price is not None:
+      raw_price = max(raw_price, min_price)
     price = rules.trunc_price(raw_price)
-    qty = -order_qty(rules, notional=notional, price=price)
-  return {'type': 'LIMIT', 'price': price, 'qty': qty}
+  return {'type': type, 'price': price, 'qty': qty}
+
+
+def immediate_filled_qty(details: object, *, qty: Decimal) -> Decimal | None:
+  """Extract an immediate placement fill from venue-specific response details."""
+  if not isinstance(details, dict):
+    return None
+  filled = details.get('filled')
+  if not isinstance(filled, dict):
+    return None
+  raw = filled.get('totalSz') or filled.get('sz')
+  if raw is None:
+    return None
+  sign = Decimal(1) if qty >= 0 else Decimal(-1)
+  return Decimal(str(raw)) * sign
+
+
+async def wait_for_fill(market: Market, id: str, *, qty: Decimal, timeout: float) -> OrderState:
+  """Wait until a live order reports the requested filled quantity."""
+  deadline = asyncio.get_running_loop().time() + timeout
+  target = abs(qty)
+  last: OrderState | None = None
+  while asyncio.get_running_loop().time() < deadline:
+    state = await market.query_order(id)
+    if state is not None:
+      last = state
+      if abs(state.filled_qty) >= target:
+        return state
+      if not state.active:
+        break
+    await asyncio.sleep(0.5)
+  pytest.fail(f'Order {id} did not fill {target}; last state: {last}')
+  raise RuntimeError('unreachable after pytest.fail')
 
 
 async def assert_order_lifecycle(market: Market, *, plan: MarketTestPlan, rules: Rules, book: Book) -> None:
@@ -120,17 +175,32 @@ async def assert_fill(market: Market, *, plan: MarketTestPlan, rules: Rules, boo
   if available < plan.fill_notional:
     pytest.skip(f'Available notional is below configured fill size for {plan.market_id}')
 
-  first = marketable_order(rules, book=book, notional=plan.fill_notional, side=plan.side)
+  first = marketable_order(
+    rules,
+    book=book,
+    notional=plan.fill_notional,
+    side=plan.side,
+    type=plan.fill_order_type,
+  )
   first_response = await market.place_order(first)
   assert first_response.id
+  first_qty = Decimal(first['qty'])
+  filled_qty = immediate_filled_qty(first_response.details, qty=first_qty)
+  if filled_qty is None or abs(filled_qty) < abs(first_qty):
+    first_state = await wait_for_fill(
+      market,
+      first_response.id,
+      qty=first_qty,
+      timeout=plan.stream_timeout,
+    )
+    filled_qty = first_state.filled_qty
 
   refreshed = await market.depth()
-  opposite: Side = 'sell' if first['qty'] > 0 else 'buy'
-  second = marketable_order(
+  second = closing_order(
     rules,
     book=refreshed,
-    notional=abs(Decimal(first['qty']) * Decimal(first['price'])),
-    side=opposite,
+    qty=-filled_qty,
+    type=plan.fill_order_type,
   )
   second_response = await market.place_order(second)
   assert second_response.id
