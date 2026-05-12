@@ -1,18 +1,28 @@
-from typing_extensions import Any, Sequence
+from typing_extensions import Literal, NotRequired, Required, Sequence, TypedDict
 from decimal import Decimal
+
+from mexc.spot.account.open_orders import OpenOrder
+from mexc.spot.account.order import OrderStatus as MexcOrderStatus
+from mexc.spot.trade.cancel_order import CancelOrderResponse
+from mexc.spot.trade.place_order import PlaceOrderResponse
 
 from tribulnation.sdk.core import ValidationError
 from tribulnation.sdk.market import Order, OrderResponse, OrderState
 
-from mexc.core import OrderStatus
-from mexc.spot.user_data.query_order import OrderState as MexcOrderState
-from mexc.spot.trading.place_order import LimitOrder, MarketOrder, Order as MexcOrder
-
 from tribulnation.mexc.core.exc import wrap_exceptions
 from .mixin import MarketMixin
 
+OrderStatus = Literal['NEW', 'PARTIALLY_FILLED', 'FILLED', 'CANCELED', 'PARTIALLY_CANCELED']
+OrderSide = Literal['BUY', 'SELL']
+MexcOrderType = Literal['LIMIT', 'MARKET', 'LIMIT_MAKER']
 
-def _active(status: OrderStatus) -> bool:
+class DumpedOrder(TypedDict):
+  side: Required[OrderSide]
+  type_: Required[MexcOrderType]
+  quantity: Required[str]
+  price: NotRequired[str]
+
+def _active(status: str) -> bool:
   match status:
     case "NEW" | "PARTIALLY_FILLED":
       return True
@@ -22,37 +32,46 @@ def _active(status: OrderStatus) -> bool:
       raise ValidationError(f"Unknown order status: {status}")
 
 
-def _parse_order(order: MexcOrderState) -> OrderState:
-  sign = 1 if order["side"] == "BUY" else -1
+def _required(order: OpenOrder | MexcOrderStatus, key: str) -> str:
+  value = order.get(key) # type: ignore[call-overload]
+  if value is None:
+    raise ValidationError(f'Missing order field: {key}')
+  return str(value)
+
+
+def _parse_order(order: OpenOrder | MexcOrderStatus) -> OrderState:
+  sign = 1 if _required(order, 'side') == 'BUY' else -1
   return OrderState(
-    id=order["orderId"],
-    price=Decimal(order["price"]),
-    qty=Decimal(order["origQty"]) * sign,
-    filled_qty=Decimal(order["executedQty"]) * sign,
-    active=_active(order["status"]),
+    id=_required(order, 'orderId'),
+    price=Decimal(_required(order, 'price')),
+    qty=Decimal(_required(order, 'origQty')) * sign,
+    filled_qty=Decimal(_required(order, 'executedQty')) * sign,
+    active=_active(_required(order, 'status')),
     details=order,
   )
 
 
-def _dump_order(order: Order) -> MexcOrder:
-  signed_qty = Decimal(order["qty"])
-  side = "BUY" if signed_qty >= 0 else "SELL"
+def _dump_order(order: Order) -> DumpedOrder:
+  signed_qty = Decimal(order['qty'])
+  side: OrderSide = 'BUY' if signed_qty >= 0 else 'SELL'
   qty = str(abs(signed_qty))
 
-  match order["type"]:
-    case "MARKET":
-      return MarketOrder(type="MARKET", side=side, quantity=qty)
-    case "LIMIT":
-      return LimitOrder(type="LIMIT", side=side, price=str(order["price"]), quantity=qty)
-    case "POST_ONLY":
-      return LimitOrder(type="LIMIT_MAKER", side=side, price=str(order["price"]), quantity=qty)
+  match order['type']:
+    case 'MARKET':
+      return {'type_': 'MARKET', 'side': side, 'quantity': qty}
+    case 'LIMIT':
+      return {'type_': 'LIMIT', 'side': side, 'price': str(order['price']), 'quantity': qty}
+    case 'POST_ONLY':
+      return {'type_': 'LIMIT_MAKER', 'side': side, 'price': str(order['price']), 'quantity': qty}
+    case _:
+      raise ValidationError(f"Unknown order type: {order['type']}")
 
 
 @wrap_exceptions
 async def open_orders(self: MarketMixin) -> Sequence[OrderState]:
   orders = await self.client.spot.account.open_orders(
-    self.instrument,
-    recvWindow=self.shared.recvWindow,
+    symbol=self.instrument,
+    recv_window=self.shared.recvWindow,
     validate=self.shared.validate,
   )
   return [_parse_order(o) for o in orders]
@@ -61,9 +80,9 @@ async def open_orders(self: MarketMixin) -> Sequence[OrderState]:
 @wrap_exceptions
 async def query_order(self: MarketMixin, id: str) -> OrderState | None:
   order = await self.client.spot.account.order(
-    self.instrument,
-    orderId=id,
-    recvWindow=self.shared.recvWindow,
+    symbol=self.instrument,
+    order_id=id,
+    recv_window=self.shared.recvWindow,
     validate=self.shared.validate,
   )
   return _parse_order(order)
@@ -71,20 +90,24 @@ async def query_order(self: MarketMixin, id: str) -> OrderState | None:
 
 @wrap_exceptions
 async def place_order(self: MarketMixin, order: Order) -> OrderResponse:
-  r = await self.client.spot.trade.place_order(
-    self.instrument,
-    _dump_order(order),
-    recvWindow=self.shared.recvWindow,
+  dumped = _dump_order(order)
+  r: PlaceOrderResponse = await self.client.spot.trade.place_order(
+    symbol=self.instrument,
+    side=dumped['side'],
+    type_=dumped['type_'],
+    quantity=dumped['quantity'],
+    price=dumped.get('price'),
+    recv_window=self.shared.recvWindow,
     validate=self.shared.validate,
   )
-  return OrderResponse(id=r["orderId"], details=r)
+  return OrderResponse(id=str(r.get('orderId')), details=r)
 
 
 @wrap_exceptions
-async def cancel_order(self: MarketMixin, id: str) -> Any:
+async def cancel_order(self: MarketMixin, id: str) -> CancelOrderResponse:
   return await self.client.spot.trade.cancel_order(
-    self.instrument,
-    orderId=id,
-    recvWindow=self.shared.recvWindow,
+    symbol=self.instrument,
+    order_id=id,
+    recv_window=self.shared.recvWindow,
     validate=self.shared.validate,
   )

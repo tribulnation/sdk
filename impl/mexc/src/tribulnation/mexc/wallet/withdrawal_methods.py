@@ -15,17 +15,23 @@ class WithdrawalMethods(Mixin, _WithdrawalMethods):
 
     out: list[WithdrawalMethod] = []
     for c in currencies:
-      if assets is None or c['coin'] in assets:
-        for m in c['networkList']:
-          if m['withdrawEnable'] and (networks is None or m['netWork'] in networks):
-            out.append(WithdrawalMethod(
-              network=m['netWork'],
-              contract_address=m.get('contract'),
-              asset=c['coin'],
-              fee=WithdrawalMethod.Fee(
-                asset=c['coin'],
-                amount=Decimal(m['withdrawFee']),
-              ),
-            ))
+      asset = c.get('coin')
+      if asset is None or (assets is not None and asset not in assets):
+        continue
+      for m in c.get('networkList', []):
+        network = m.get('netWork') or m.get('network')
+        if not m.get('withdrawEnable') or network is None:
+          continue
+        if networks is not None and network not in networks:
+          continue
+        out.append(WithdrawalMethod(
+          network=network,
+          contract_address=m.get('contract'),
+          asset=asset,
+          fee=WithdrawalMethod.Fee(
+            asset=asset,
+            amount=Decimal(m.get('withdrawFee') or '0'),
+          ),
+        ))
 
     return out

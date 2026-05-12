@@ -11,7 +11,6 @@ from tribulnation.sdk.reporting import (
 )
 
 from tribulnation.mexc.core import Mixin, wrap_exceptions
-from mexc.futures.user_data.positions import PositionType
 
 @dataclass
 class Position:
@@ -30,33 +29,47 @@ class Snapshots(_Snapshots, Mixin):
   @SDK.method
   @wrap_exceptions
   async def spot_balances(self):
-    r = await self.client.spot.account.info(recvWindow=self.recvWindow)
+    r = await self.client.spot.account.info(recv_window=self.recvWindow)
     return {
-      b['asset']: Decimal(b['free']) + Decimal(b['locked'])
-      for b in r['balances']
+      b.get('asset') or '': Decimal(b.get('free') or '0') + Decimal(b.get('locked') or '0')
+      for b in r.get('balances', [])
     }
 
   @SDK.method
   @wrap_exceptions
   async def futures_balances(self):
-    r = await self.client.futures.account.assets(recvWindow=self.recvWindow)
+    r = await self.client.futures.account.assets()
+    data = r.get('data')
+    if data is None:
+      raise ValueError('MEXC futures assets response did not include data')
     return {
-      b['currency']: Decimal(b['availableBalance']) + Decimal(b['positionMargin'])
-      for b in r
+      b.get('currency') or '': Decimal(str(b.get('availableBalance') or '0')) + Decimal(str(b.get('positionMargin') or '0'))
+      for b in data
     }
 
   @SDK.method
   @wrap_exceptions
   async def futures_positions(self):
-    positions = await self.client.futures.position.open()
+    response = await self.client.futures.position.open()
+    data = response.get('data')
+    if data is None:
+      raise ValueError('MEXC futures positions response did not include data')
     out = defaultdict[str, list[Position]](list)
 
-    for pos in positions:
-      contract = await self.client.futures.market.contract_info(pos['symbol'])
-      contract_size = Decimal(contract['contractSize'])
-      s = 1 if pos['positionType'] == PositionType.long.value else -1
-      size = s * abs(Decimal(pos['holdVol'])) * contract_size
-      out[pos['symbol']].append(Position(size=size, entry_price=Decimal(pos['openAvgPrice'])))
+    for pos in data:
+      symbol = pos.get('symbol')
+      if symbol is None:
+        continue
+      contract_response = await self.client.futures.market.contract_info(symbol=symbol)
+      contract = contract_response.get('data')
+      if contract is None:
+        raise ValueError(f'MEXC contract info response did not include data for {symbol}')
+      if isinstance(contract, list):
+        contract = next(c for c in contract if c.get('symbol') == symbol)
+      contract_size = Decimal(str(contract.get('contractSize') or '0'))
+      s = 1 if pos.get('positionType') == 1 else -1
+      size = s * abs(Decimal(str(pos.get('holdVol') or '0'))) * contract_size
+      out[symbol].append(Position(size=size, entry_price=Decimal(str(pos.get('openAvgPrice') or '0'))))
 
     return { symbol: merge_positions(positions) for symbol, positions in out.items() }
   

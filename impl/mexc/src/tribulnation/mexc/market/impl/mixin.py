@@ -5,10 +5,12 @@ import asyncio
 from tribulnation.sdk.core import SDK, Stream, Subscription
 
 from mexc import MEXC
-from mexc.spot.market_data.exchange_info import Info as SpotInfo
+from mexc.spot.market.exchange_info import SymbolInfo
 from mexc.spot.streams.core.proto import PublicAggreDepthsV3Api, PrivateDealsV3Api
 
 from tribulnation.mexc.core.exc import wrap_exceptions
+
+SpotInfo = SymbolInfo
 
 class Settings(TypedDict, total=False):
   validate: bool
@@ -69,14 +71,20 @@ class Shared:
     async with self._markets_lock:
       if not refetch and self.spot_markets is not None:
         return self.spot_markets
-      self.spot_markets = await self.client.spot.market.exchange_info(validate=self.validate)
+      info = await self.client.spot.market.exchange_info(validate=self.validate)
+      markets = {
+        market['symbol']: market
+        for market in info['symbols']
+        if 'symbol' in market
+      }
+      self.spot_markets = markets
       return self.spot_markets
 
   def depth_subscription(self, symbol: str):
     if symbol not in self.depth_subscriptions:
       @wrap_exceptions
       async def subscribe() -> Stream[PublicAggreDepthsV3Api]:
-        stream = await self.client.spot.streams.market.depth_updates(symbol, interval='10ms')
+        stream = await self.client.spot.streams.market.depth_updates(symbol, aggregation='10ms')
         return Stream(stream.stream, stream.unsubscribe)
       self.depth_subscriptions[symbol] = Subscription.of(subscribe)
     return self.depth_subscriptions[symbol]
@@ -131,7 +139,10 @@ class MarketMixin(SDK, ExchangeMixin):
 
   @property
   def instrument(self) -> str:
-    return self.info["symbol"]
+    symbol = self.info.get('symbol')
+    if symbol is None:
+      raise ValueError('MEXC spot market metadata is missing symbol')
+    return symbol
 
   async def subscribe_depth(self) -> Stream[PublicAggreDepthsV3Api]:
     return await self.shared.depth_subscription(self.instrument).subscribe()

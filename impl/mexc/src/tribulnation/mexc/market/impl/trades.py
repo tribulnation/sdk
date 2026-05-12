@@ -6,24 +6,26 @@ from tribulnation.sdk.core import Stream
 from tribulnation.sdk.market import Trade
 
 from mexc.core import timestamp as ts
-from mexc.spot.user_data.my_trades import Trade as MexcTrade
+from mexc.spot.account.trades import AccountTrade
 from mexc.spot.streams.core.proto import PrivateDealsV3Api
 
 from tribulnation.mexc.core.exc import wrap_exceptions
 from .mixin import MarketMixin
 
-
-def _parse_trade(t: MexcTrade) -> Trade:
-  sign = 1 if t["isBuyer"] else -1
+def _parse_trade(t: AccountTrade) -> Trade:
+  sign = 1 if t.get('isBuyer') else -1
   fee = None
-  if (a := t.get("commissionAsset")) and (c := t.get("commission")):
+  if (a := t.get('commissionAsset')) and (c := t.get('commission')):
     fee = Trade.Fee(asset=a, amount=Decimal(c))
+  time = t.get('time')
+  if time is None:
+    raise ValueError('Missing trade time')
   return Trade(
-    id=t["id"],
-    price=Decimal(t["price"]),
-    qty=Decimal(t["qty"]) * sign,
-    time=ts.parse(t["time"]).astimezone(),
-    maker=t["isMaker"],
+    id=str(t.get('id')),
+    price=Decimal(t.get('price') or '0'),
+    qty=Decimal(t.get('qty') or '0') * sign,
+    time=time.astimezone() if isinstance(time, datetime) else ts.parse(time).astimezone(),
+    maker=bool(t.get('isMaker')),
     fee=fee,
     details=t,
   )
@@ -58,11 +60,11 @@ async def trades_stream(self: MarketMixin) -> Stream[Trade]:
 
 @wrap_exceptions
 async def trades_history(self: MarketMixin, start: datetime, end: datetime) -> AsyncIterable[Sequence[Trade]]:
-  async for chunk in self.client.spot.account.trades_paged(
-    self.instrument,
-    start=start,
-    end=end,
-    recvWindow=self.shared.recvWindow,
+  trades = await self.client.spot.account.trades(
+    symbol=self.instrument,
+    start_time=start,
+    end_time=end,
+    recv_window=self.shared.recvWindow,
     validate=self.shared.validate,
-  ):
-    yield [_parse_trade(t) for t in chunk]
+  )
+  yield [_parse_trade(t) for t in trades]

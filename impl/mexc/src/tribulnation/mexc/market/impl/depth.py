@@ -6,7 +6,7 @@ from contextlib import suppress
 from tribulnation.sdk.core import Stream
 from tribulnation.sdk.market import Book
 from tribulnation.mexc.core.exc import wrap_exceptions
-from mexc.spot.market_data.depth import OrderBook
+from mexc.spot.market.depth import OrderBook
 from mexc.spot.streams.core.proto import PublicAggreDepthsV3Api
 
 from .mixin import MarketMixin
@@ -14,10 +14,10 @@ from .mixin import MarketMixin
 
 @wrap_exceptions
 async def depth(self: MarketMixin, *, levels: int | None = None) -> Book:
-  r = await self.client.spot.market.depth(self.instrument, validate=self.shared.validate, limit=levels)
+  r = await self.client.spot.market.depth(symbol=self.instrument, validate=self.shared.validate, limit=levels)
   return Book(
-    asks=[Book.Entry(price=Decimal(p.price), qty=Decimal(p.qty)) for p in r["asks"]],
-    bids=[Book.Entry(price=Decimal(p.price), qty=Decimal(p.qty)) for p in r["bids"]],
+    asks=[Book.Entry(price=Decimal(p), qty=Decimal(q)) for p, q in r['asks']],
+    bids=[Book.Entry(price=Decimal(p), qty=Decimal(q)) for p, q in r['bids']],
   )
 
 
@@ -29,8 +29,8 @@ class DepthUpdate:
 
 def parse_snapshot(reply: OrderBook) -> tuple[int, Book]:
   return int(reply['lastUpdateId']), Book(
-    asks=[Book.Entry(price=Decimal(p.price), qty=Decimal(p.qty)) for p in reply['asks']],
-    bids=[Book.Entry(price=Decimal(p.price), qty=Decimal(p.qty)) for p in reply['bids']],
+    asks=[Book.Entry(price=Decimal(p), qty=Decimal(q)) for p, q in reply['asks']],
+    bids=[Book.Entry(price=Decimal(p), qty=Decimal(q)) for p, q in reply['bids']],
   )
 
 def parse_update(msg: PublicAggreDepthsV3Api) -> DepthUpdate:
@@ -82,7 +82,7 @@ async def synchronized_book(
   while True:
     first = cache[0]
     version, book = parse_snapshot(
-      await self.client.spot.market.depth(self.instrument, limit=levels)
+      await self.client.spot.market.depth(symbol=self.instrument, limit=levels)
     )
     drain_updates(queue, cache)
 

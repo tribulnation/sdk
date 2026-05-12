@@ -6,25 +6,28 @@ from tribulnation.sdk.wallet.deposit_methods import DepositMethod, DepositMethod
 from tribulnation.mexc.core import Mixin, wrap_exceptions
 
 class DepositMethods(Mixin, _DepositMethods):
-	@wrap_exceptions
-	async def deposit_methods(
-		self, *, assets: Sequence[str] | None = None,
-	) -> Sequence[DepositMethod]:
-		currencies = await self.client.spot.wallet.currency_info()
+  @wrap_exceptions
+  async def deposit_methods(
+    self, *, assets: Sequence[str] | None = None,
+  ) -> Sequence[DepositMethod]:
+    currencies = await self.client.spot.wallet.currency_info()
 
-		out: list[DepositMethod] = []
-		for c in currencies:
-			if assets is None or c["coin"] in assets:
-				for m in c["networkList"]:
-					if m["depositEnable"]:
-						out.append(DepositMethod(
-							asset=c["coin"],
-							network=m["netWork"],
-							fee=DepositMethod.Fee(
-								asset=c["coin"],
-								amount=Decimal("0"),
-							),
-							contract_address=m.get("contract"),
-							min_confirmations=None,
-						))
-		return out
+    out: list[DepositMethod] = []
+    for c in currencies:
+      asset = c.get('coin')
+      if asset is None or (assets is not None and asset not in assets):
+        continue
+      for m in c.get('networkList', []):
+        network = m.get('netWork') or m.get('network')
+        if m.get('depositEnable') and network is not None:
+          out.append(DepositMethod(
+            asset=asset,
+            network=network,
+            fee=DepositMethod.Fee(
+              asset=asset,
+              amount=Decimal('0'),
+            ),
+            contract_address=m.get('contract'),
+            min_confirmations=None,
+          ))
+    return out
