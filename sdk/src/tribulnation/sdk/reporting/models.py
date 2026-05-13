@@ -16,9 +16,11 @@ class Snapshot(pydantic.BaseModel):
 
 ObservationType = Literal[
   'trade',
+  'future_trade',
   'spot_order',
   'trade_leg',
   'fee',
+  'pnl',
   'yield',
   'funding',
   'borrow',
@@ -57,6 +59,28 @@ class Trade(BaseObservation):
   """Signed size in base asset units. Positive means bought, negative means sold."""
   price: Decimal | None = None
   """Quote asset units per base asset unit."""
+  order_id: str | None = None
+  """Raw order identifier, if provided by the source."""
+  trade_id: str | None = None
+  """Raw trade identifier, if provided by the source."""
+  fee: Fee | None = None
+  """Fee paid, if any."""
+
+class FutureTrade(BaseObservation):
+  """A futures or perpetual fill that changes derivative exposure."""
+  type: Literal['future_trade'] = 'future_trade'
+  market: str
+  """Raw futures or perpetual market identifier."""
+  side: Literal['buy', 'sell'] | None = None
+  """Execution side, if provided by the source."""
+  size: Decimal
+  """Signed contract size. Positive increases long exposure; negative increases short exposure."""
+  price: Decimal
+  """Execution price in quote or collateral units."""
+  collateral_asset: str | None = None
+  """Collateral or settlement asset used for the market."""
+  subaccount: int | None = None
+  """Venue subaccount number, if applicable."""
   order_id: str | None = None
   """Raw order identifier, if provided by the source."""
   trade_id: str | None = None
@@ -134,6 +158,16 @@ class Yield(SingleAssetObservation):
 class Funding(SingleAssetObservation):
   """Funding received or paid for a perpetual contract position."""
   type: Literal['funding'] = 'funding'
+
+class Pnl(SingleAssetObservation):
+  """Realized account PnL derived from a venue-provided cumulative PnL series."""
+  type: Literal['pnl'] = 'pnl'
+  market: str | None = None
+  """Raw market identifier, if the source attributes PnL to one market."""
+  subaccount: int | None = None
+  """Venue subaccount number, if applicable."""
+  basis: str | None = None
+  """Source field or method used to derive the PnL amount."""
 
 class Borrow(SingleAssetObservation):
   """Inflow from a loan."""
@@ -264,9 +298,11 @@ def observation_discriminator(obj):
 Observation = Annotated[
   Union[
     Annotated[Trade, pydantic.Tag('trade')],
+    Annotated[FutureTrade, pydantic.Tag('future_trade')],
     Annotated[SpotOrder, pydantic.Tag('spot_order')],
     Annotated[TradeLeg, pydantic.Tag('trade_leg')],
     Annotated[FeeLeg, pydantic.Tag('fee')],
+    Annotated[Pnl, pydantic.Tag('pnl')],
     Annotated[Yield, pydantic.Tag('yield')],
     Annotated[Funding, pydantic.Tag('funding')],
     Annotated[Borrow, pydantic.Tag('borrow')],
