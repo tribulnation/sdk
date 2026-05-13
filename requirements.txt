@@ -3,6 +3,8 @@ twine
 ipykernel
 pyright
 python-dotenv
+pytest
+pytest-asyncio
 -e sdk
 -e impl/binance
 -e impl/bitget
