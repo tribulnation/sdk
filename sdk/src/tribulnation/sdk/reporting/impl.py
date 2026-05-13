@@ -1,5 +1,11 @@
 from . import Report
 
+def parse_bool(value: str | None, *, default: bool) -> bool:
+  """Parse a string boolean used by generic venue credentials."""
+  if value is None:
+    return default
+  return value.lower() not in {'0', 'false', 'no'}
+
 SUPPORTED_VENUES = (
   'ethereum',
   'arbitrum',
@@ -8,6 +14,7 @@ SUPPORTED_VENUES = (
   'base',
   'avalanche',
   'optimism',
+  'dydx',
 )
 
 class ReportSDK:
@@ -61,6 +68,14 @@ class ReportSDK:
     except ImportError:
       raise ImportError('ethereum sdk is not installed. Please install it with `pip install tribulnation-ethereum`.')
 
+  def dydx(self, address: str | None = None, *, mainnet: bool = True, validate: bool = True) -> Report:
+    """Create a dYdX reporting client."""
+    try:
+      from tribulnation.dydx import Reporting
+      return Reporting.new(address, mainnet=mainnet, validate=validate)
+    except ImportError:
+      raise ImportError('dydx sdk is not installed. Please install it with `pip install tribulnation-dydx`.')
+
   def all(self, credentials: dict[str, dict[str, str]] = {}) -> dict[str, Report]:
     return {
       'ethereum': self.ethereum(**credentials.get('ethereum', {})),
@@ -70,7 +85,16 @@ class ReportSDK:
       'base': self.base(**credentials.get('base', {})),
       'avalanche': self.avalanche(**credentials.get('avalanche', {})),
       'optimism': self.optimism(**credentials.get('optimism', {})),
+      'dydx': self.dydx_from_credentials(credentials.get('dydx', {})),
     }
+
+  def dydx_from_credentials(self, credentials: dict[str, str]) -> Report:
+    """Create a dYdX reporting client from generic credential strings."""
+    return self.dydx(
+      credentials.get('address'),
+      mainnet=parse_bool(credentials.get('mainnet'), default=True),
+      validate=parse_bool(credentials.get('validate'), default=True),
+    )
 
   def venue(self, id: str, /, **credentials: str) -> Report:
     match id:
@@ -88,6 +112,8 @@ class ReportSDK:
         return self.avalanche(**credentials)
       case 'optimism':
         return self.optimism(**credentials)
+      case 'dydx':
+        return self.dydx_from_credentials(credentials)
       case _:
         raise ValueError(f'Invalid venue ID: {id}. Supported venues: {SUPPORTED_VENUES}')
 

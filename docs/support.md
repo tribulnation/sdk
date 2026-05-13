@@ -8,6 +8,6 @@
 | Bybit | `tribulnation-bybit` | ❌ | ✅ | ❌ | ❌ | ❌ |
 | BingX | `tribulnation-bingx` | ❌ | ✅ | ✅ | ❌ | ❌ |
 | Kraken | `tribulnation-kraken` | ❌ | ✅ | ✅ | ❌ | ❌ |
-| dYdX | `tribulnation-dydx` | ✅ | ❌ | ❌ | ✅ | ❌ |
+| dYdX | `tribulnation-dydx` | ✅ | ❌ | ❌ | ✅ | ✅ |
 | Hyperliquid | `tribulnation-hyperliquid` | ✅ | ❌ | ❌ | ✅ | ❌ |
 | Ethereum | `tribulnation-ethereum` | ❌ | ❌ | ❌ | ✅ | ✅ |
