@@ -5,8 +5,8 @@ from tribulnation.sdk.market import Book
 
 from tribulnation.dydx.core import wrap_exceptions
 from dydx import Indexer
-from dydx.indexer.data.api.get_order_book import OrderBook
-from dydx.indexer.streams.api.orders import Notification as BookUpdate
+from dydx.indexer.data.get_order_book import OrderBook
+from dydx.indexer.streams.orders import Notification as BookUpdate
 
 def parse_update(update: BookUpdate) -> Book:
   return Book(

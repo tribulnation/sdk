@@ -25,5 +25,6 @@ def effective_imf(market: PerpetualMarket):
   return Decimal(effective_IMF)
 
 def max_leverage(market: PerpetualMarket):
+  """Return the maximum leverage implied by market margin metadata."""
   imf = effective_imf(market)
   return Decimal(1) / imf

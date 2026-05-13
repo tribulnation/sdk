@@ -3,9 +3,14 @@ from decimal import Decimal
 from tribulnation.sdk.market import Rules
 
 from dydx.indexer.types import PerpetualMarket
-from dydx.node.public.get_user_fee_tier import FeeTier
+from dydx.protos.dydxprotocol import feetiers as feetiers_proto
 
-def parse_rules(market: PerpetualMarket, fees: FeeTier) -> Rules:
+def fee_ppm(value: int) -> Decimal:
+  """Convert dYdX fee parts-per-million into a decimal rate."""
+  return Decimal(value) / Decimal(1_000_000)
+
+def parse_rules(market: PerpetualMarket, fees: feetiers_proto.PerpetualFeeTier) -> Rules:
+  """Convert dYdX market and fee-tier metadata into SDK trading rules."""
   base, quote = market['ticker'].split('-')
   return Rules(
     base=base,
@@ -13,8 +18,8 @@ def parse_rules(market: PerpetualMarket, fees: FeeTier) -> Rules:
     fee_asset=quote,
     tick_size=Decimal(market['tickSize']),
     step_size=Decimal(market['stepSize']),
-    maker_fee=fees.maker,
-    taker_fee=fees.taker,
+    maker_fee=fee_ppm(fees.maker_fee_ppm),
+    taker_fee=fee_ppm(fees.taker_fee_ppm),
     api=market['status'] == 'ACTIVE',
     details={
       'perpetual_market': market,

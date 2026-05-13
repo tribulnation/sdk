@@ -52,7 +52,8 @@ async def funding_payments(self: MarketMixin, start: datetime, end: datetime) ->
     )
     state = paging.init
     while state is not None:
-      batch, state = await self.call(lambda: paging.next(state))
+      next_state = state
+      batch, state = await self.call(lambda: paging.next(next_state))
       payments = [
         FundingPayment(amount=Decimal(item['payment']), time=item['createdAt'])
         for item in batch

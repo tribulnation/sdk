@@ -5,10 +5,10 @@ import asyncio
 from tribulnation.sdk.core import SDK, Stream, Subscription
 
 from dydx.indexer.types import PerpetualMarket
-from dydx import DYDX
-from dydx.node.private.place_order import Flags, TimeInForce
-from dydx.node.public.get_user_fee_tier import FeeTier
-from dydx.indexer.streams.api.parent_subaccounts import Notification as ParentSubaccountNotification
+from dydx import Dydx
+from dydx.indexer.streams.parent_subaccounts import Notification as ParentSubaccountNotification
+from dydx.node.orders import Flags, TimeInForce
+from dydx.protos.dydxprotocol import feetiers as feetiers_proto
 
 from tribulnation.dydx.core import wrap_exceptions
 from .depth import depth_stream, Book
@@ -29,16 +29,16 @@ class Settings(TypedDict, total=False):
 
 @dataclass(kw_only=True)
 class Shared:
-  client: DYDX
+  client: Dydx
   settings: Settings = field(default_factory=Settings)
   perpetual_markets: dict[str, PerpetualMarket] | None = None
-  fee_tier: FeeTier | None = None
+  fee_tier: feetiers_proto.PerpetualFeeTier | None = None
   parent_subaccount_subscriptions: dict[int, Subscription[ParentSubaccountNotification]] = field(default_factory=dict)
   depth_subscriptions: dict[str, Subscription[Book]] = field(default_factory=dict)
 
   @property
   async def address(self) -> str:
-    return await self.client.node.address
+    return self.client.node.require_wallet().address
 
   @wrap_exceptions
   async def load_markets(self, *, refetch: bool = False) -> dict[str, PerpetualMarket]:
@@ -47,9 +47,12 @@ class Shared:
     return self.perpetual_markets
 
   @wrap_exceptions
-  async def load_fee_tier(self, *, refetch: bool = False) -> FeeTier:
+  async def load_fee_tier(self, *, refetch: bool = False) -> feetiers_proto.PerpetualFeeTier:
     if refetch or self.fee_tier is None:
-      self.fee_tier = await self.client.node.get_user_fee_tier(await self.address)
+      response = await self.client.chain.feetiers.user_fee_tier(await self.address)
+      if response.tier is None:
+        raise ValueError('dYdX fee tier response did not include a tier')
+      self.fee_tier = response.tier
     return self.fee_tier
 
   async def rules(self, market: str, *, refetch: bool = False) -> Rules:
@@ -91,7 +94,7 @@ class ExchangeMixin:
   @classmethod
   def new(cls, mnemonic: str | None = None, *, mainnet: bool = True, settings: Settings = {}):
     validate = settings.get('validate', True)
-    client = DYDX.new(mnemonic, validate=validate) if mainnet else DYDX.testnet(mnemonic, validate=validate)
+    client = Dydx.mainnet(mnemonic, indexer={'validate': validate}, public=mnemonic is None) if mainnet else Dydx.testnet(mnemonic, indexer={'validate': validate}, public=mnemonic is None)
     return cls(shared=Shared(client=client, settings=settings))
     
   @property
