@@ -4,19 +4,21 @@ from datetime import datetime, timezone
 from decimal import Decimal
 
 import pytest
+from typing_extensions import Literal
 
 from tribulnation.dydx import Reporting
-from tribulnation.dydx.report.history import account_label, in_window
+from tribulnation.dydx.report.history import account_label, event_attributes, in_window
+from dydx.indexer.data.get_fills import Fill
 from dydx.node import DYDX_MAINNET_USDC_DENOM
 from dydx.protos.cosmos.bank import v1beta1 as bank_proto
 from dydx.protos.cosmos.base import v1beta1 as coin_proto
 from dydx.protos.cosmos.distribution import v1beta1 as distribution_proto
 from dydx.protos.cosmos.staking import v1beta1 as staking_proto
 from tribulnation.sdk.reporting import (
+  CryptoTransaction,
   Funding,
   FutureTrade,
   InternalTransfer,
-  Pnl,
   Report,
   ReportSDK,
   UnknownObservation,
@@ -31,6 +33,42 @@ class FakeComet:
   async def block(self, height: int, validate: bool | None = None):
     """Return a minimal block response."""
     return {'block': {'header': {'time': NOW}}}
+
+class FakePaging:
+  """Fake typed-dydx paginated response."""
+  init: int = 1
+
+  async def next(self, state: int):
+    """Return one page of transaction evidence."""
+    pages = {
+      1: ([
+        {'hash': 'ABC', 'height': '100', 'tx_result': {'events': []}, 'tx': '', 'index': 0},
+        {'hash': 'SEEN', 'height': '101', 'tx_result': {'events': []}, 'tx': '', 'index': 1},
+      ], 2),
+      2: ([
+        {'hash': 'DEF', 'height': '102', 'tx_result': {'events': []}, 'tx': '', 'index': 0},
+      ], None),
+    }
+    return pages[state]
+
+class FakeSearchComet(FakeComet):
+  """Fake Comet client with paged transaction search."""
+  queries: list[tuple[str, int | None, str | None, bool | None]]
+
+  def __init__(self):
+    self.queries = []
+
+  def tx_search_paged(
+    self,
+    query: str,
+    *,
+    per_page: int | None = None,
+    order_by: str | None = None,
+    validate: bool | None = None,
+  ):
+    """Return fake transaction search pages."""
+    self.queries.append((query, per_page, order_by, validate))
+    return FakePaging()
 
 class FakeChain:
   """Fake chain client carrying Comet helpers."""
@@ -100,6 +138,20 @@ class FakeSnapshotClient:
   """Fake client carrying full snapshot chain helpers."""
   chain: FakeSnapshotChain = FakeSnapshotChain()
 
+class FakeSearchChain:
+  """Fake chain client carrying searchable Comet helpers."""
+  comet: FakeSearchComet
+
+  def __init__(self):
+    self.comet = FakeSearchComet()
+
+class FakeSearchClient:
+  """Fake dYdX client carrying searchable chain helpers."""
+  chain: FakeSearchChain
+
+  def __init__(self):
+    self.chain = FakeSearchChain()
+
 def test_parse_fill() -> None:
   """Convert a dYdX indexer fill into an SDK trade observation."""
   record = reporting().parse_fill({
@@ -117,35 +169,134 @@ def test_parse_fill() -> None:
     'createdAtHeight': '10',
     'subaccountNumber': 0,
     'orderId': 'order-1',
+    'positionSizeBefore': Decimal('0'),
+    'entryPriceBefore': Decimal('0'),
   })
 
   trade = record.observations[0]
   assert isinstance(trade, FutureTrade)
-  assert trade.market == 'BTC-USD'
+  assert trade.instrument == 'BTC-USD'
+  assert trade.base == 'BTC'
+  assert trade.quote == 'USD'
+  assert trade.settle == 'USDC'
   assert trade.size == Decimal('0.01')
-  assert trade.collateral_asset == 'USDC'
+  assert trade.realized_pnl == Decimal('0')
   assert trade.subaccount == 0
   assert trade.fee is not None
   assert trade.fee.asset == 'USDC'
   assert trade.fee.amount == Decimal('0.02')
 
-def test_parse_pnl() -> None:
-  """Convert a dYdX historical PnL delta into a derived PnL observation."""
-  record = reporting().parse_pnl({
-    'blockHeight': '10',
-    'blockTime': NOW,
+def fill_trade(
+  *,
+  side: Literal['BUY', 'SELL'] = 'SELL',
+  price: Decimal = Decimal('51000'),
+  size: Decimal = Decimal('0.01'),
+  position_size_before: Decimal | None = None,
+  entry_price_before: Decimal | None = None,
+) -> FutureTrade:
+  """Parse one test fill and return its future trade observation."""
+  fill: Fill = {
+    'id': 'fill-1',
+    'side': side,
+    'liquidity': 'MAKER',
+    'type': 'LIMIT',
+    'market': 'BTC-USD',
+    'marketType': 'PERPETUAL',
+    'price': price,
+    'size': size,
+    'fee': Decimal('0.02'),
+    'affiliateRevShare': Decimal('0'),
     'createdAt': NOW,
-    'equity': Decimal('20'),
-    'totalPnl': Decimal('12'),
-    'netTransfers': Decimal('0'),
-  }, amount=Decimal('1.25'), subaccount=0)
+    'createdAtHeight': '10',
+    'subaccountNumber': 0,
+  }
+  if position_size_before is not None:
+    fill['positionSizeBefore'] = position_size_before
+  if entry_price_before is not None:
+    fill['entryPriceBefore'] = entry_price_before
+  trade = reporting().parse_fill(fill).observations[0]
+  assert isinstance(trade, FutureTrade)
+  return trade
 
-  pnl = record.observations[0]
-  assert isinstance(pnl, Pnl)
-  assert pnl.asset == 'USDC'
-  assert pnl.amount == Decimal('1.25')
-  assert pnl.subaccount == 0
-  assert record.provenance['source'] == 'derived'
+def test_parse_fill_realized_pnl_for_long_close() -> None:
+  """Compute realized PnL when a fill reduces a long position."""
+  trade = fill_trade(
+    position_size_before=Decimal('0.05'),
+    entry_price_before=Decimal('50000'),
+  )
+
+  assert trade.realized_pnl == Decimal('10.00')
+
+def test_parse_fill_realized_pnl_for_short_close() -> None:
+  """Compute realized PnL when a fill reduces a short position."""
+  trade = fill_trade(
+    side='BUY',
+    price=Decimal('49000'),
+    position_size_before=Decimal('-0.05'),
+    entry_price_before=Decimal('50000'),
+  )
+
+  assert trade.realized_pnl == Decimal('10.00')
+
+def test_parse_fill_realized_pnl_for_flip_only_counts_closed_size() -> None:
+  """Compute realized PnL only on the closed portion of a flip fill."""
+  trade = fill_trade(
+    size=Decimal('0.08'),
+    position_size_before=Decimal('0.05'),
+    entry_price_before=Decimal('50000'),
+  )
+
+  assert trade.realized_pnl == Decimal('50.00')
+
+def test_parse_fill_realized_pnl_missing_context_is_unknown() -> None:
+  """Leave realized PnL unknown when dYdX omits prior position context."""
+  trade = fill_trade()
+
+  assert trade.realized_pnl is None
+
+def test_parse_fills_reconstructs_realized_pnl_from_stream() -> None:
+  """Reconstruct fill-level realized PnL when dYdX omits position context."""
+  fills: list[Fill] = [
+    {
+      'id': 'open',
+      'side': 'BUY',
+      'liquidity': 'MAKER',
+      'type': 'LIMIT',
+      'market': 'BTC-USD',
+      'marketType': 'PERPETUAL',
+      'price': Decimal('50000'),
+      'size': Decimal('0.05'),
+      'fee': Decimal('0.01'),
+      'affiliateRevShare': Decimal('0'),
+      'createdAt': NOW,
+      'createdAtHeight': '10',
+      'subaccountNumber': 0,
+    },
+    {
+      'id': 'close',
+      'side': 'SELL',
+      'liquidity': 'MAKER',
+      'type': 'LIMIT',
+      'market': 'BTC-USD',
+      'marketType': 'PERPETUAL',
+      'price': Decimal('51000'),
+      'size': Decimal('0.02'),
+      'fee': Decimal('0.01'),
+      'affiliateRevShare': Decimal('0'),
+      'createdAt': NOW,
+      'createdAtHeight': '11',
+      'subaccountNumber': 0,
+    },
+  ]
+
+  records = reporting().parse_fills(fills, start=None, end=None)
+  first = records[0].observations[0]
+  second = records[1].observations[0]
+
+  assert isinstance(first, FutureTrade)
+  assert isinstance(second, FutureTrade)
+  assert first.realized_pnl == Decimal('0')
+  assert second.realized_pnl == Decimal('20.00')
 
 @pytest.mark.asyncio
 async def test_snapshot_balances_include_wallet_staking_and_collateral() -> None:
@@ -163,26 +314,50 @@ async def test_snapshot_balances_include_wallet_staking_and_collateral() -> None
   assert balances['DYDX:rewards'].qty == Decimal('3')
   assert balances['BTC-USD'].kind == 'future'
 
-def test_parse_funding_payment() -> None:
-  """Convert a dYdX funding payment into an SDK funding observation."""
-  record = reporting().parse_funding_payment({
-    'createdAt': NOW,
-    'createdAtHeight': '10',
-    'perpetualId': '0',
-    'ticker': 'BTC-USD',
-    'oraclePrice': Decimal('50000'),
-    'size': Decimal('0.01'),
-    'side': 'LONG',
-    'rate': Decimal('0.0001'),
-    'payment': Decimal('-0.5'),
-    'subaccountNumber': '0',
-    'fundingIndex': Decimal('1'),
-  })
+def test_parse_settled_funding_event() -> None:
+  """Convert a Comet settled funding event into an SDK funding observation."""
+  record = reporting().parse_settled_funding_event({
+    'type': 'settled_funding',
+    'attributes': [
+      {'key': 'subaccount', 'value': ADDRESS, 'index': True},
+      {'key': 'subaccount_number', 'value': '0', 'index': True},
+      {'key': 'perpetual_id', 'value': '0', 'index': True},
+      {'key': 'funding_paid_quote_quantums', 'value': '500000', 'index': True},
+    ],
+  }, tx={
+    'hash': 'ABC',
+    'height': '100',
+    'tx_result': {'events': []},
+    'tx': '',
+    'index': 0,
+  }, time=NOW, event_index=3)
 
+  assert record is not None
   funding = record.observations[0]
   assert isinstance(funding, Funding)
   assert funding.asset == 'USDC'
   assert funding.amount == Decimal('-0.5')
+  assert funding.id == 'ABC:3'
+
+def test_parse_settled_funding_event_ignores_other_accounts() -> None:
+  """Ignore settled funding events for other account owners."""
+  record = reporting().parse_settled_funding_event({
+    'type': 'settled_funding',
+    'attributes': [
+      {'key': 'subaccount', 'value': 'dydx1other', 'index': True},
+      {'key': 'subaccount_number', 'value': '0', 'index': True},
+      {'key': 'perpetual_id', 'value': '0', 'index': True},
+      {'key': 'funding_paid_quote_quantums', 'value': '500000', 'index': True},
+    ],
+  }, tx={
+    'hash': 'ABC',
+    'height': '100',
+    'tx_result': {'events': []},
+    'tx': '',
+    'index': 0,
+  }, time=NOW, event_index=3)
+
+  assert record is None
 
 def test_parse_subaccount_transfer() -> None:
   """Convert dYdX subaccount transfers into internal transfers."""
@@ -207,30 +382,105 @@ def test_parse_subaccount_transfer() -> None:
   assert transfer.dst_account == f'{ADDRESS}:0'
 
 @pytest.mark.asyncio
-async def test_parse_unmatched_chain_tx() -> None:
-  """Represent unmatched Comet evidence without guessing economics."""
-  record = await reporting().parse_chain_tx({
+async def test_parse_chain_fee_tx() -> None:
+  """Represent wallet-paid chain fees as crypto transaction metadata."""
+  record = await reporting().parse_chain_fee_tx({
     'hash': 'ABC',
     'height': '100',
-    'tx_result': {'events': []},
+    'tx_result': {'events': [{
+      'type': 'tx',
+      'attributes': [
+        {'key': 'fee', 'value': f'3577{DYDX_MAINNET_USDC_DENOM}', 'index': True},
+        {'key': 'fee_payer', 'value': ADDRESS, 'index': True},
+      ],
+    }]},
     'tx': '',
     'index': 0,
   }, start=None, end=None)
 
   assert record is not None
-  observation = record.observations[0]
-  assert isinstance(observation, UnknownObservation)
-  assert observation.id == 'ABC'
-  assert observation.time == NOW
+  transaction = record.observations[0]
+  assert isinstance(transaction, CryptoTransaction)
+  assert transaction.id == 'ABC'
+  assert transaction.tx_id == 'ABC'
+  assert transaction.fee is not None
+  assert transaction.fee.asset == 'USDC'
+  assert transaction.fee.amount == Decimal('0.003577')
+
+@pytest.mark.asyncio
+async def test_parse_inbound_fallback_tx() -> None:
+  """Represent unsupported inbound wallet credits as fallback chain evidence."""
+  record = await reporting().parse_inbound_fallback_tx({
+    'hash': 'ABC',
+    'height': '100',
+    'tx_result': {'events': [{
+      'type': 'transfer',
+      'attributes': [
+        {'key': 'sender', 'value': 'dydx1module', 'index': True},
+        {'key': 'recipient', 'value': ADDRESS, 'index': True},
+        {'key': 'amount', 'value': f'150{DYDX_MAINNET_USDC_DENOM}', 'index': True},
+      ],
+    }]},
+    'tx': '',
+    'index': 0,
+  }, covered_hashes=set(), include_fee=True, start=None, end=None)
+
+  assert record is not None
+  transaction = record.observations[0]
+  unknown = record.observations[1]
+  assert isinstance(transaction, CryptoTransaction)
+  assert transaction.id == 'ABC'
+  assert len(transaction.transfers) == 1
+  assert transaction.transfers[0].asset == 'USDC'
+  assert transaction.transfers[0].change == Decimal('0.000150')
+  assert transaction.transfers[0].counterparty == 'dydx1module'
+  assert isinstance(unknown, UnknownObservation)
+  assert unknown.id == 'ABC:unknown'
+
+@pytest.mark.asyncio
+async def test_inbound_fallback_skips_covered_hashes() -> None:
+  """Avoid generic inbound fallback for hashes covered by indexer transfers."""
+  record = await reporting().parse_inbound_fallback_tx({
+    'hash': 'ABC',
+    'height': '100',
+    'tx_result': {'events': [{
+      'type': 'transfer',
+      'attributes': [
+        {'key': 'sender', 'value': 'dydx1module', 'index': True},
+        {'key': 'recipient', 'value': ADDRESS, 'index': True},
+        {'key': 'amount', 'value': f'150{DYDX_MAINNET_USDC_DENOM}', 'index': True},
+      ],
+    }]},
+    'tx': '',
+    'index': 0,
+  }, covered_hashes={'ABC'}, include_fee=True, start=None, end=None)
+
+  assert record is None
+
+@pytest.mark.asyncio
+async def test_fetch_comet_txs_uses_paged_search() -> None:
+  """Collect raw Comet transactions through tx_search_paged."""
+  client = FakeSearchClient()
+  report = Reporting(address=ADDRESS, client=client) # type: ignore
+  txs = await report.fetch_comet_txs(f"tx.fee_payer='{ADDRESS}'", per_page=25)
+
+  assert [tx.get('hash') for tx in txs] == ['ABC', 'SEEN', 'DEF']
+  assert client.chain.comet.queries == [
+    (f"tx.fee_payer='{ADDRESS}'", 25, 'desc', None),
+  ]
 
 def test_reporting_sdk_registers_dydx() -> None:
   """Expose dYdX through the generic reporting registry."""
   sdk = ReportSDK()
   assert 'dydx' in sdk.venues()
-  assert isinstance(sdk.dydx(ADDRESS), Report)
+  assert isinstance(sdk.dydx(address=ADDRESS), Report)
   assert isinstance(sdk.venue('dydx', address=ADDRESS), Report)
 
 def test_small_helpers() -> None:
   """Check dYdX reporting helper behavior."""
   assert in_window(NOW, start=None, end=None)
   assert account_label({'address': ADDRESS, 'subaccountNumber': 1}) == f'{ADDRESS}:1'
+  assert event_attributes({
+    'type': 'settled_funding',
+    'attributes': [{'key': 'subaccount_number', 'value': '0', 'index': True}],
+  }) == {'subaccount_number': '0'}
