@@ -3,8 +3,8 @@ from dataclasses import dataclass, field
 from . import TradingMarkets, TradingVenue
 
 if TYPE_CHECKING:
-  from tribulnation.dydx import Settings as DydxSettings
-  from tribulnation.hyperliquid import Settings as HyperliquidSettings
+  from tribulnation.dydx.market import Settings as DydxSettings
+  from tribulnation.hyperliquid.market import Settings as HyperliquidSettings
   from tribulnation.mexc import Settings as MexcSettings
 
   class Settings(TypedDict, total=False):
