@@ -1,10 +1,13 @@
+from typing_extensions import TYPE_CHECKING, TypedDict
+from dataclasses import dataclass, field
+from tribulnation.sdk import SDK
 from . import Report
 
-def parse_bool(value: str | None, *, default: bool) -> bool:
-  """Parse a string boolean used by generic venue credentials."""
-  if value is None:
-    return default
-  return value.lower() not in {'0', 'false', 'no'}
+if TYPE_CHECKING:
+  from tribulnation.dydx.report import Settings as DydxSettings
+
+  class Settings(TypedDict, total=False):
+    dydx: DydxSettings
 
 SUPPORTED_VENUES = (
   'ethereum',
@@ -15,64 +18,67 @@ SUPPORTED_VENUES = (
   'avalanche',
   'optimism',
   'dydx',
+  'dydx_testnet',
 )
 
-class ReportSDK:
+@dataclass(frozen=True)
+class ReportSDK(SDK):
+  settings: 'Settings' = field(default_factory=lambda: {})
 
-  def ethereum(self, **credentials: str) -> Report:
+  def ethereum(self, **credentials) -> Report:
     try:
       from tribulnation.ethereum.reporting import ethereum
       return ethereum(**credentials)
     except ImportError:
       raise ImportError('ethereum sdk is not installed. Please install it with `pip install tribulnation-ethereum`.')
   
-  def arbitrum(self, **credentials: str) -> Report:
+  def arbitrum(self, **credentials) -> Report:
     try:
       from tribulnation.ethereum.reporting import arbitrum
       return arbitrum(**credentials)
     except ImportError:
       raise ImportError('ethereum sdk is not installed. Please install it with `pip install tribulnation-ethereum`.')
   
-  def polygon(self, **credentials: str) -> Report:
+  def polygon(self, **credentials) -> Report:
     try:
       from tribulnation.ethereum.reporting import polygon
       return polygon(**credentials)
     except ImportError:
       raise ImportError('ethereum sdk is not installed. Please install it with `pip install tribulnation-ethereum`.')
   
-  def bnb(self, **credentials: str) -> Report:
+  def bnb(self, **credentials) -> Report:
     try:
       from tribulnation.ethereum.reporting import bnb
       return bnb(**credentials)
     except ImportError:
       raise ImportError('ethereum sdk is not installed. Please install it with `pip install tribulnation-ethereum`.')
   
-  def base(self, **credentials: str) -> Report:
+  def base(self, **credentials) -> Report:
     try:
       from tribulnation.ethereum.reporting import base
       return base(**credentials)
     except ImportError:
       raise ImportError('ethereum sdk is not installed. Please install it with `pip install tribulnation-ethereum`.')
   
-  def avalanche(self, **credentials: str) -> Report:
+  def avalanche(self, **credentials) -> Report:
     try:
       from tribulnation.ethereum.reporting import avalanche
       return avalanche(**credentials)
     except ImportError:
       raise ImportError('ethereum sdk is not installed. Please install it with `pip install tribulnation-ethereum`.')
   
-  def optimism(self, **credentials: str) -> Report:
+  def optimism(self, **credentials) -> Report:
     try:
       from tribulnation.ethereum.reporting import optimism
       return optimism(**credentials)
     except ImportError:
       raise ImportError('ethereum sdk is not installed. Please install it with `pip install tribulnation-ethereum`.')
 
-  def dydx(self, address: str | None = None, *, mainnet: bool = True, validate: bool = True) -> Report:
+  def dydx(self, *, mainnet: bool = True, **credentials) -> Report:
     """Create a dYdX reporting client."""
     try:
       from tribulnation.dydx import Reporting
-      return Reporting.new(address, mainnet=mainnet, validate=validate)
+      return Reporting.new(mainnet=mainnet, **credentials, **self.settings.get('dydx', {}))
     except ImportError:
       raise ImportError('dydx sdk is not installed. Please install it with `pip install tribulnation-dydx`.')
 
@@ -85,18 +91,12 @@ class ReportSDK:
       'base': self.base(**credentials.get('base', {})),
       'avalanche': self.avalanche(**credentials.get('avalanche', {})),
       'optimism': self.optimism(**credentials.get('optimism', {})),
-      'dydx': self.dydx_from_credentials(credentials.get('dydx', {})),
+      'dydx': self.dydx(mainnet=True, **credentials.get('dydx', {})),
+      'dydx_testnet': self.dydx(mainnet=False, **credentials.get('dydx_testnet', {})),
     }
 
-  def dydx_from_credentials(self, credentials: dict[str, str]) -> Report:
-    """Create a dYdX reporting client from generic credential strings."""
-    return self.dydx(
-      credentials.get('address'),
-      mainnet=parse_bool(credentials.get('mainnet'), default=True),
-      validate=parse_bool(credentials.get('validate'), default=True),
-    )
 
-  def venue(self, id: str, /, **credentials: str) -> Report:
+  def venue(self, id: str, /, **credentials) -> Report:
     match id:
       case 'ethereum':
         return self.ethereum(**credentials)
@@ -113,7 +113,9 @@ class ReportSDK:
       case 'optimism':
         return self.optimism(**credentials)
       case 'dydx':
-        return self.dydx_from_credentials(credentials)
+        return self.dydx(mainnet=True, **credentials)
+      case 'dydx_testnet':
+        return self.dydx(mainnet=False, **credentials)
       case _:
         raise ValueError(f'Invalid venue ID: {id}. Supported venues: {SUPPORTED_VENUES}')
 
