@@ -20,7 +20,6 @@ ObservationType = Literal[
   'spot_order',
   'trade_leg',
   'fee',
-  'pnl',
   'yield',
   'funding',
   'borrow',
@@ -159,16 +158,6 @@ class Funding(SingleAssetObservation):
   """Funding received or paid for a perpetual contract position."""
   type: Literal['funding'] = 'funding'
 
-class Pnl(SingleAssetObservation):
-  """Realized account PnL derived from a venue-provided cumulative PnL series."""
-  type: Literal['pnl'] = 'pnl'
-  market: str | None = None
-  """Raw market identifier, if the source attributes PnL to one market."""
-  subaccount: int | None = None
-  """Venue subaccount number, if applicable."""
-  basis: str | None = None
-  """Source field or method used to derive the PnL amount."""
-
 class Borrow(SingleAssetObservation):
   """Inflow from a loan."""
   type: Literal['borrow'] = 'borrow'
@@ -302,7 +291,6 @@ Observation = Annotated[
     Annotated[SpotOrder, pydantic.Tag('spot_order')],
     Annotated[TradeLeg, pydantic.Tag('trade_leg')],
     Annotated[FeeLeg, pydantic.Tag('fee')],
-    Annotated[Pnl, pydantic.Tag('pnl')],
     Annotated[Yield, pydantic.Tag('yield')],
     Annotated[Funding, pydantic.Tag('funding')],
     Annotated[Borrow, pydantic.Tag('borrow')],
