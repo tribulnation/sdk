@@ -20,14 +20,6 @@ class Snapshots(_Snapshots):
   address: str
   client: Dydx = field(default_factory=lambda: Dydx.mainnet(public=True))
 
-  @classmethod
-  def new(cls, address: str | None = None, *, mainnet: bool = True, validate: bool = True):
-    """Create a dYdX reporting snapshot client."""
-    if address is None:
-      address = os.environ['DYDX_ADDRESS']
-    client = Dydx.mainnet(indexer={'validate': validate}, public=True) if mainnet else Dydx.testnet(indexer={'validate': validate}, public=True)
-    return cls(address=address, client=client)
-
   @property
   def indexer(self) -> Indexer:
     """Return the indexer transport used for snapshot reads."""
