@@ -68,16 +68,22 @@ class Trade(BaseObservation):
 class FutureTrade(BaseObservation):
   """A futures or perpetual fill that changes derivative exposure."""
   type: Literal['future_trade'] = 'future_trade'
-  market: str
-  """Raw futures or perpetual market identifier."""
+  instrument: str | None = None
+  """Raw futures or perpetual instrument identifier."""
+  base: str | None = None
+  """Underlying/base asset, if known."""
+  quote: str | None = None
+  """Quote asset used for the instrument price, if known."""
+  settle: str | None = None
+  """Settlement asset for realized PnL, fees, and funding."""
   side: Literal['buy', 'sell'] | None = None
   """Execution side, if provided by the source."""
   size: Decimal
   """Signed contract size. Positive increases long exposure; negative increases short exposure."""
   price: Decimal
-  """Execution price in quote or collateral units."""
-  collateral_asset: str | None = None
-  """Collateral or settlement asset used for the market."""
+  """Execution price in quote units."""
+  realized_pnl: Decimal | None = None
+  """Fill-level realized PnL in settlement asset units, excluding fees. If provided by the source."""
   subaccount: int | None = None
   """Venue subaccount number, if applicable."""
   order_id: str | None = None
