@@ -1,4 +1,4 @@
-from typing_extensions import AsyncIterable, Sequence
+from typing_extensions import AsyncIterable
 from datetime import datetime
 
 from tribulnation.sdk import SDK
