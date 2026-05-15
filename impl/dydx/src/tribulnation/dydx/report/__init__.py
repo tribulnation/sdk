@@ -1,8 +1,8 @@
-"""dYdX SDK reporting surfaces."""
-from typing_extensions import TypedDict
+from typing_extensions import TypedDict, AsyncIterable
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 
-from tribulnation.sdk.reporting import Report as _Report
+from tribulnation.sdk.reporting import Report as _Report, Record, Snapshot
 
 from dydx import Dydx
 from dydx.chain import (
@@ -56,3 +56,26 @@ class Reporting(Snapshots, History, _Report):
     )
     client = Dydx.new(chain=chain, public=True)
     return cls(address=address, client=client)
+
+
+  async def records(self, start: datetime | None = None, end: datetime | None = None) -> AsyncIterable[Record]:
+    start_time: datetime | None = None
+    async for record in self.history(start, end):
+      yield record
+      for obs in record.observations:
+        if obs.time is not None:
+          start_time = obs.time if start_time is None else min(start_time, obs.time)
+
+    if start is None and start_time is not None:
+      snapshot_time = start_time - timedelta(days=1)
+      yield Record(
+        snapshots=[Snapshot(time=snapshot_time, balances={})],
+        provenance={
+          'source': 'derived',
+          'method': 'dydx_zero_baseline_snapshot',
+          'reason': 'dYdX full-history reports imply zero balances before the first observed transaction.',
+        },
+      )
+
+    if end is None:
+      yield await self.snapshots()
