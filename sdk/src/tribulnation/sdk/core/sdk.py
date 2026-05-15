@@ -48,6 +48,12 @@ class SDK(metaclass=SDKMeta):
   __sdk_methods__: dict[str, Method] = {}
   __sdk_fields__: dict[str, type['SDK']] = {}
 
+  async def __aenter__(self) -> Self:
+    return self
+  
+  async def __aexit__(self, exc_type, exc_value, traceback):
+    ...
+
   def __sdk_instrument__(self, *mappers: Mapper[Fn], path: tuple[str, ...] = (), log: bool = False) -> Self:
     attrs = {}
     methods = {}
@@ -96,11 +102,16 @@ class SDK(metaclass=SDKMeta):
       def __call__(self, *args: Any, **kwargs: Any) -> Any:
         if call_method is None:
           return sdk.__call__(*args, **kwargs) # type: ignore
-
         fn = getattr(type(sdk), '__call__').__get__(self, type(sdk))
         for mapper in mappers:
           fn = mapper(fn, call_method, path)
         return fn(*args, **kwargs)
+
+      async def __aenter__(self) -> Self:
+        return await sdk.__aenter__()
+
+      async def __aexit__(self, exc_type, exc_value, traceback) -> None:
+        await sdk.__aexit__(exc_type, exc_value, traceback)
 
       def __repr__(self) -> str:
         return f'Proxy({sdk.__repr__()})'
