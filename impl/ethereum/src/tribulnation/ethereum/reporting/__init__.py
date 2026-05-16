@@ -257,6 +257,3 @@ class Report(Snapshots, History, _Report):
 
     if end is None:
       yield await self.snapshots(assets=sorted(assets))
-
-
-Reporting = Report
