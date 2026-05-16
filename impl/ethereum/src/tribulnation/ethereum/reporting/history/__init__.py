@@ -1,46 +1,62 @@
-from alchemy import BNB_ALCHEMY_URL, BASE_ALCHEMY_URL, AVAX_ALCHEMY_URL, OPTIMISM_ALCHEMY_URL
+"""Unified EVM reporting history dispatch."""
+
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+import asyncio
+
+from alchemy.api.transfers import Transfers
+from etherscan import Etherscan
+from ethereum import NodeRpc
+from moralis import Moralis
+from typing_extensions import AsyncIterable
+from web3.types import BlockIdentifier
+
+from tribulnation.sdk.core import SDK
+from tribulnation.sdk.reporting import History as _History, Record
 from .alchemy import AlchemyHistory
-from .etherscan import EtherscanHistory
+from .etherscan import AUTO_DETECT, AutoDetect, EtherscanHistory
+from .moralis import MoralisHistory
+from ..config import EvmConfig, EvmNetwork
+from ..constants import DEFAULT_HISTORY_SOURCES
 
-# Included in the Etherscan free plan
 
-def ethereum(address: str, *, api_key: str | None = None, rate_limit: int | None = None):
-  return EtherscanHistory.etherscan_ethereum(address, api_key=api_key, rate_limit=rate_limit)
+@dataclass(frozen=True)
+class History(EtherscanHistory, AlchemyHistory, MoralisHistory, _History):
+  """EVM reporting history from the configured evidence source."""
+  address: str
+  network: EvmNetwork
+  chain_id: int
+  config: EvmConfig
+  node: NodeRpc | None = None
+  etherscan: Etherscan | None = None
+  alchemy_transfers: Transfers | None = None
+  moralis: Moralis | None = None
+  include_internal_transfers: bool = False
+  batch_size: int = 32
+  tz: timezone | AutoDetect = AUTO_DETECT
+  block_time_cache: dict[int, datetime] = field(default_factory=dict)
+  block_timestamps_cache: dict[BlockIdentifier, asyncio.Future[datetime]] = field(default_factory=dict)
 
-def arbitrum(address: str, *, api_key: str | None = None, rate_limit: int | None = None):
-  return EtherscanHistory.etherscan_arbitrum(address, api_key=api_key, rate_limit=rate_limit)
+  def source(self, key: str, default: str) -> str:
+    """Return the configured source for one EVM history bucket."""
+    return self.config.get('sources', {}).get(key, default)
 
-def polygon(address: str, *, api_key: str | None = None, rate_limit: int | None = None):
-  return EtherscanHistory.etherscan_polygon(address, api_key=api_key, rate_limit=rate_limit)
-
-# These are not supported by the Etherscan free plan -> Alchemy
-
-def new_alchemy(
-  address: str, *, alchemy_url: str, rpc_url: str | None = None,
-  api_key: str | None = None, poa_middleware: bool = False
-):
-  if api_key is None:
-    import os
-    api_key = os.environ['ALCHEMY_API_KEY']
-  if rpc_url is None:
-    rpc_url = alchemy_url + '/' + api_key
-  return AlchemyHistory.alchemy_new(
-    address,
-    alchemy_url=alchemy_url,
-    rpc_url=rpc_url,
-    api_key=api_key,
-    include_internal_transfers=False,
-    poa_middleware=poa_middleware,
-  )
-
-def bnb(address: str, *, alchemy_url: str = BNB_ALCHEMY_URL, rpc_url: str | None = None, api_key: str | None = None):
-  return new_alchemy(address, alchemy_url=alchemy_url, rpc_url=rpc_url, api_key=api_key, poa_middleware=True)
-
-def base(address: str, *, alchemy_url: str = BASE_ALCHEMY_URL, rpc_url: str | None = None, api_key: str | None = None):
-  return new_alchemy(address, alchemy_url=alchemy_url, rpc_url=rpc_url, api_key=api_key)
-
-def avalanche(address: str, *, alchemy_url: str = AVAX_ALCHEMY_URL, rpc_url: str | None = None, api_key: str | None = None):
-  return new_alchemy(address, alchemy_url=alchemy_url, rpc_url=rpc_url, api_key=api_key, poa_middleware=True)
-
-def optimism(address: str, *, alchemy_url: str = OPTIMISM_ALCHEMY_URL, rpc_url: str | None = None, api_key: str | None = None):
-  return new_alchemy(address, alchemy_url=alchemy_url, rpc_url=rpc_url, api_key=api_key, poa_middleware=True)
+  @SDK.method
+  async def history(self, start: datetime | None = None, end: datetime | None = None) -> AsyncIterable[Record]:
+    """Fetch EVM history records from the configured provider."""
+    source = self.source('history', DEFAULT_HISTORY_SOURCES[self.network])
+    if source == 'etherscan':
+      if self.etherscan is None:
+        raise ValueError('EVM Etherscan history requires an Etherscan provider.')
+      async for record in self.etherscan_history(start, end):
+        yield record
+    elif source == 'alchemy':
+      if self.alchemy_transfers is None:
+        raise ValueError('EVM Alchemy history requires an Alchemy provider.')
+      async for record in self.alchemy_history(start, end):
+        yield record
+    elif source == 'moralis':
+      async for record in self.moralis_history(start, end):
+        yield record
+    else:
+      raise ValueError(f'Invalid EVM history source: {source}')

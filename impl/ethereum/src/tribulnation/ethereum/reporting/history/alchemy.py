@@ -1,5 +1,6 @@
+"""Alchemy-backed EVM reporting history."""
+
 from typing_extensions import AsyncIterable, Callable, Awaitable, TypeVar, Any
-from dataclasses import dataclass, field
 from collections import defaultdict
 from datetime import datetime
 from decimal import Decimal
@@ -9,11 +10,12 @@ from web3.types import TxReceipt, TxData, BlockIdentifier, _Hash32
 from web3 import Web3
 
 from tribulnation.ethereum.core import alchemy, rpc, wei2eth, same_address
-from alchemy.api.transfers import Transfers, Transfer, Params
+from alchemy.api.transfers import Transfers
+from alchemy.api.transfers.get_asset_transfers import AssetTransfersBaseParams, Transfer
 from ethereum import NodeRpc
 
 from tribulnation.sdk.core import SDK
-from tribulnation.sdk.reporting import Fee, History, EvmTx, Record
+from tribulnation.sdk.reporting import Fee, EvmTx, Record
 
 T = TypeVar('T')
 
@@ -34,6 +36,7 @@ def tx_fee(tx: TxReceipt) -> Decimal:
   return wei2eth(used * price + l1_fee + operator_fee)
 
 def parse_execution(tx: TxData) -> EvmTx.Execution | None:
+  """Parse contract execution metadata from a raw transaction."""
   if (input := tx.get('input')):
     assert 'to' in tx
     return EvmTx.Execution(
@@ -42,62 +45,73 @@ def parse_execution(tx: TxData) -> EvmTx.Execution | None:
     )
 
 def fmt_hex(number: int) -> str:
+  """Format a block number as an Alchemy hex quantity."""
   return f'0x{number:x}'
 
-@dataclass
-class AlchemyHistory(alchemy.Mixin, rpc.Mixin, History):
+class AlchemyHistory:
+  """Alchemy-backed EVM history source."""
   address: str
-  include_internal_transfers: bool = field(kw_only=True)
-  batch_size: int = field(default=32, kw_only=True)
-  block_timestamps_cache: dict[BlockIdentifier, asyncio.Future[datetime]] = field(default_factory=dict, kw_only=True)
+  node: NodeRpc | None
+  alchemy_transfers: Transfers | None
+  include_internal_transfers: bool = False
+  batch_size: int = 32
+  block_timestamps_cache: dict[BlockIdentifier, asyncio.Future[datetime]]
 
-  @classmethod
-  def alchemy_new(
-    cls, address: str, *, alchemy_url: str, rpc_url: str, api_key: str | None = None, validate: bool = True,
-    include_internal_transfers: bool = False,
-    batch_size: int = 32, poa_middleware: bool = False,
-  ):
-    transfers = Transfers.new(alchemy_url, api_key=api_key, validate=validate)
-    node = NodeRpc.at(rpc_url, poa_middleware=poa_middleware)
-    return cls(
-      address=address,
-      node=node,
-      alchemy_transfers=transfers,
-      include_internal_transfers=include_internal_transfers,
-      batch_size=batch_size,
-    )
+  @property
+  def w3(self):
+    """Return the configured Web3 client."""
+    node = self.require_node()
+    return node.w3
+
+  def require_node(self) -> NodeRpc:
+    """Return the configured node client."""
+    if self.node is None:
+      raise ValueError('Alchemy history requires an RPC client.')
+    return self.node
+
+  def require_alchemy_transfers(self) -> Transfers:
+    """Return the configured Alchemy transfers client."""
+    if self.alchemy_transfers is None:
+      raise ValueError('Alchemy history requires an Alchemy transfers provider.')
+    return self.alchemy_transfers
 
   @SDK.method
   @rpc.wrap_exceptions
   async def get_tx_receipt(self, hash: _Hash32 | str) -> TxReceipt:
+    """Fetch a transaction receipt from the configured node."""
     return await self.w3.eth.get_transaction_receipt(hash) # type: ignore
 
   @SDK.method
   @rpc.wrap_exceptions
   async def get_tx(self, hash: _Hash32 | str) -> TxData:
+    """Fetch a transaction by hash from the configured node."""
     return await self.w3.eth.get_transaction(hash) # type: ignore
 
   @SDK.method
   @rpc.wrap_exceptions
   async def get_block_timestamp(self, number: BlockIdentifier) -> datetime:
+    """Fetch a block timestamp from the configured node."""
     block = await self.w3.eth.get_block(number)
     assert 'timestamp' in block
     return datetime.fromtimestamp(block['timestamp']).astimezone()
 
   async def get_block_timestamp_cached(self, number: BlockIdentifier) -> datetime:
-    if number in self.block_timestamps_cache:
+    """Fetch a block timestamp with per-report request coalescing."""
+    if number not in self.block_timestamps_cache:
       self.block_timestamps_cache[number] = asyncio.create_task(self.get_block_timestamp(number))
     return await self.block_timestamps_cache[number]
 
   @SDK.method
   @alchemy.wrap_exceptions
   async def call_alchemy(self, fn: Callable[[], Awaitable[T]]) -> T:
+    """Call Alchemy under the SDK exception wrapper."""
     return await fn()
 
   @SDK.method
   async def get_transfers(self, *, incoming: bool) -> list[Transfer]:
+    """Fetch one direction of Alchemy asset transfers for this wallet."""
     out: list[Transfer] = []
-    params: Params = {
+    params: AssetTransfersBaseParams = {
       'category': ['external', 'erc20', 'erc721', 'erc1155', 'specialnft'],
       'excludeZeroValue': False,
     }
@@ -108,7 +122,7 @@ class AlchemyHistory(alchemy.Mixin, rpc.Mixin, History):
     else:
       params['fromAddress'] = self.address
 
-    paging = self.alchemy_transfers.transfers_paged(params)
+    paging = self.require_alchemy_transfers().transfers_paged(params)
     state = paging.init
     while state is not None:
       chunk, state = await self.call_alchemy(lambda: paging.next(state)) # type: ignore
@@ -116,18 +130,21 @@ class AlchemyHistory(alchemy.Mixin, rpc.Mixin, History):
     return out
 
   async def get_all_transfers(self) -> list[Transfer]:
+    """Fetch incoming and outgoing Alchemy transfers."""
     out_transfers, in_transfers = await asyncio.gather(
       self.get_transfers(incoming=False),
       self.get_transfers(incoming=True),
     )
     return sorted(in_transfers + out_transfers, key=lambda t: t['blockNum'])
 
-  def parse_fee(self, tx: TxData, receipt: TxReceipt) -> Fee | None:
+  def alchemy_parse_fee(self, tx: TxData, receipt: TxReceipt) -> Fee | None:
+    """Parse an EVM gas fee paid by this wallet."""
     if (from_addr := tx.get('from')) and same_address(from_addr, self.address):
       assert 'hash' in tx
       return Fee(asset='native', amount=tx_fee(receipt))
 
-  def parse_transfer(self, transfer: Transfer) -> EvmTx.Transfer | None:
+  def alchemy_parse_transfer(self, transfer: Transfer) -> EvmTx.Transfer | None:
+    """Parse an Alchemy transfer row into an SDK EVM transfer."""
     if (
       not (value := transfer.get('value'))
       or (to := transfer.get('to')) is None
@@ -135,10 +152,10 @@ class AlchemyHistory(alchemy.Mixin, rpc.Mixin, History):
       return None
 
     if same_address(to, self.address):
-      amount = value
+      amount = Decimal(str(value))
       counterparty = transfer['from']
     elif same_address(transfer['from'], self.address):
-      amount = -value
+      amount = -Decimal(str(value))
       counterparty = to
     else:
       return None
@@ -156,7 +173,8 @@ class AlchemyHistory(alchemy.Mixin, rpc.Mixin, History):
         internal=transfer['category'] == 'internal',
       )
 
-  async def parse_tx(self, hash: str, transfers: list[Transfer]) -> EvmTx | None:
+  async def alchemy_parse_tx(self, hash: str, transfers: list[Transfer]) -> EvmTx | None:
+    """Build an SDK EVM transaction from grouped Alchemy transfer rows."""
     tx, receipt = await asyncio.gather(
       self.get_tx(hash),
       self.get_tx_receipt(hash),
@@ -165,7 +183,7 @@ class AlchemyHistory(alchemy.Mixin, rpc.Mixin, History):
       return None
     assert 'blockNumber' in tx
     time = await self.get_block_timestamp(tx['blockNumber'])
-    fee = self.parse_fee(tx, receipt)
+    fee = self.alchemy_parse_fee(tx, receipt)
     return EvmTx(
       id=hash,
       tx_id=hash,
@@ -174,12 +192,13 @@ class AlchemyHistory(alchemy.Mixin, rpc.Mixin, History):
       execution=parse_execution(tx),
       transfers=[
         transfer for t in transfers
-        if (transfer := self.parse_transfer(t)) is not None
+        if (transfer := self.alchemy_parse_transfer(t)) is not None
       ],
     )
 
   @SDK.method
-  async def history(self, start: datetime | None = None, end: datetime | None = None) -> AsyncIterable[Record]:
+  async def alchemy_history(self, start: datetime | None = None, end: datetime | None = None) -> AsyncIterable[Record]:
+    """Fetch EVM history from Alchemy asset transfers."""
     start = start and start.astimezone()
     end = end and end.astimezone()
     transfers = await self.get_all_transfers()
@@ -189,8 +208,9 @@ class AlchemyHistory(alchemy.Mixin, rpc.Mixin, History):
 
     sem = asyncio.Semaphore(self.batch_size)
     async def parse_limited(hash: str, transfers: list[Transfer]) -> EvmTx | None:
+      """Parse a transaction while respecting the configured concurrency limit."""
       async with sem:
-        return await self.parse_tx(hash, transfers)
+        return await self.alchemy_parse_tx(hash, transfers)
 
     tasks = [
       parse_limited(hash, transfers)
@@ -198,6 +218,7 @@ class AlchemyHistory(alchemy.Mixin, rpc.Mixin, History):
     ]
 
     def filter_event(event: EvmTx) -> bool:
+      """Return whether an event is inside the requested time window."""
       if start is not None and event.time is not None and event.time < start:
         return False
       if end is not None and event.time is not None and event.time > end:
