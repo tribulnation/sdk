@@ -17,6 +17,8 @@ class Snapshot(pydantic.BaseModel):
 ObservationType = Literal[
   'trade',
   'future_trade',
+  'future_order',
+  'realized_pnl',
   'spot_order',
   'trade_leg',
   'fee',
@@ -76,22 +78,62 @@ class FutureTrade(BaseObservation):
   """Quote asset used for the instrument price, if known."""
   settle: str | None = None
   """Settlement asset for realized PnL, fees, and funding."""
-  side: Literal['buy', 'sell'] | None = None
-  """Execution side, if provided by the source."""
   size: Decimal
   """Signed contract size. Positive increases long exposure; negative increases short exposure."""
   price: Decimal
   """Execution price in quote units."""
   realized_pnl: Decimal | None = None
   """Fill-level realized PnL in settlement asset units, excluding fees. If provided by the source."""
-  subaccount: int | None = None
-  """Venue subaccount number, if applicable."""
+  subaccount: int | str | None = None
+  """Venue subaccount identifier, if applicable."""
   order_id: str | None = None
   """Raw order identifier, if provided by the source."""
   trade_id: str | None = None
   """Raw trade identifier, if provided by the source."""
   fee: Fee | None = None
   """Fee paid, if any."""
+
+class FutureOrder(BaseObservation):
+  """A futures or perpetual order that can contextualize fill-level trades."""
+  type: Literal['future_order'] = 'future_order'
+  order_id: str | None = None
+  """Raw order identifier, if provided by the source."""
+  side: Literal['buy', 'sell'] | None = None
+  """Order side, if provided by the source."""
+  instrument: str | None = None
+  """Raw futures or perpetual instrument identifier."""
+  base: str | None = None
+  """Underlying/base asset, if known."""
+  quote: str | None = None
+  """Quote asset used for the instrument price, if known."""
+  settle: str | None = None
+  """Settlement asset for realized PnL, fees, and funding."""
+  status: str | None = None
+  """Raw order status, if provided by the source."""
+  filled_size: Decimal | None = None
+  """Executed contract amount. Positive buy or negative sell when the source is signed."""
+  avg_price: Decimal | None = None
+  """Average execution price, if provided by the source."""
+  subaccount: int | str | None = None
+  """Venue subaccount identifier, if applicable."""
+  fee: Fee | None = None
+  """Fee paid, if any."""
+
+class RealizedPnl(BaseObservation):
+  """A source-provided realized PnL settlement observation."""
+  type: Literal['realized_pnl'] = 'realized_pnl'
+  instrument: str | None = None
+  """Raw futures or perpetual instrument identifier."""
+  settle: str | None = None
+  """Settlement asset for realized PnL."""
+  amount: Decimal
+  """Signed realized PnL in settlement asset units."""
+  subaccount: int | str | None = None
+  """Venue subaccount identifier, if applicable."""
+  order_id: str | None = None
+  """Raw order identifier, if provided by the source."""
+  trade_id: str | None = None
+  """Raw trade/fill identifier, if provided by the source."""
 
 class SpotOrder(BaseObservation):
   """A spot order (executed or not) for an asset pair, with an optional fee."""
@@ -163,6 +205,12 @@ class Yield(SingleAssetObservation):
 class Funding(SingleAssetObservation):
   """Funding received or paid for a perpetual contract position."""
   type: Literal['funding'] = 'funding'
+  instrument: str | None = None
+  """Raw futures or perpetual instrument identifier, if provided by the source."""
+  settle: str | None = None
+  """Settlement asset for the funding payment, if distinct from the raw asset field."""
+  subaccount: int | str | None = None
+  """Venue subaccount identifier, if applicable."""
 
 class Borrow(SingleAssetObservation):
   """Inflow from a loan."""
@@ -294,6 +342,8 @@ Observation = Annotated[
   Union[
     Annotated[Trade, pydantic.Tag('trade')],
     Annotated[FutureTrade, pydantic.Tag('future_trade')],
+    Annotated[FutureOrder, pydantic.Tag('future_order')],
+    Annotated[RealizedPnl, pydantic.Tag('realized_pnl')],
     Annotated[SpotOrder, pydantic.Tag('spot_order')],
     Annotated[TradeLeg, pydantic.Tag('trade_leg')],
     Annotated[FeeLeg, pydantic.Tag('fee')],
