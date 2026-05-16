@@ -27,6 +27,7 @@ ObservationType = Literal[
   'borrow',
   'repay',
   'internal_transfer',
+  'transfer',
   'crypto_deposit',
   'crypto_withdrawal',
   'fiat_deposit',
@@ -221,10 +222,26 @@ class Repay(SingleAssetObservation):
   type: Literal['repay'] = 'repay'
 
 class InternalTransfer(SingleAssetObservation):
-  """Amount transferred from a subaccount to another."""
+  """Movement between compartments inside the current venue account scope."""
   type: Literal['internal_transfer'] = 'internal_transfer'
+  amount: Decimal
+  """Positive moved amount. Direction is described by src_account and dst_account."""
   src_account: str | None = None
+  """Source compartment inside the current venue account scope, if known."""
   dst_account: str | None = None
+  """Destination compartment inside the current venue account scope, if known."""
+
+class Transfer(SingleAssetObservation):
+  """Movement into or out of the current venue account scope."""
+  type: Literal['transfer'] = 'transfer'
+  amount: Decimal
+  """Signed balance change from the current account perspective."""
+  src_account: str | None = None
+  """Raw source account label, if provided by the source."""
+  dst_account: str | None = None
+  """Raw destination account label, if provided by the source."""
+  fee: Fee | None = None
+  """Fee paid, if any."""
 
 class BaseCryptoTransfer(SingleAssetObservation):
   network: str | None = None
@@ -352,6 +369,7 @@ Observation = Annotated[
     Annotated[Borrow, pydantic.Tag('borrow')],
     Annotated[Repay, pydantic.Tag('repay')],
     Annotated[InternalTransfer, pydantic.Tag('internal_transfer')],
+    Annotated[Transfer, pydantic.Tag('transfer')],
     Annotated[CryptoDeposit, pydantic.Tag('crypto_deposit')],
     Annotated[CryptoWithdrawal, pydantic.Tag('crypto_withdrawal')],
     Annotated[FiatDeposit, pydantic.Tag('fiat_deposit')],
