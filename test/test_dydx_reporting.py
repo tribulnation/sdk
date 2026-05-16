@@ -1,5 +1,6 @@
 """dYdX reporting adapter tests."""
 
+import asyncio
 from datetime import datetime, timezone
 from decimal import Decimal
 
@@ -7,8 +8,12 @@ import pytest
 from typing_extensions import Literal
 
 from tribulnation.dydx import Reporting
-from tribulnation.dydx.report.history import account_label, event_attributes, in_window
+from tribulnation.dydx.report.history.accounts import account_label
+from tribulnation.dydx.report.history.coins import parse_coins, parse_fee_coin
+from tribulnation.dydx.report.history.comet import event_attributes
+from tribulnation.dydx.report.history.time import in_window
 from dydx.indexer.data.get_fills import Fill
+from dydx.indexer.data.get_subaccounts import Subaccount
 from dydx.node import DYDX_MAINNET_USDC_DENOM
 from dydx.protos.cosmos.bank import v1beta1 as bank_proto
 from dydx.protos.cosmos.base import v1beta1 as coin_proto
@@ -19,9 +24,11 @@ from tribulnation.sdk.reporting import (
   Funding,
   FutureTrade,
   InternalTransfer,
+  Record,
   Report,
   ReportSDK,
   UnknownObservation,
+  Yield,
 )
 
 NOW = datetime(2026, 5, 13, 12, tzinfo=timezone.utc)
@@ -152,6 +159,72 @@ class FakeSearchClient:
   def __init__(self):
     self.chain = FakeSearchChain()
 
+class StreamingReporting(Reporting):
+  """Reporting adapter with controlled source completion order."""
+
+  async def subaccounts(self) -> list[Subaccount]:
+    """Return one delayed subaccount."""
+    await asyncio.sleep(0.03)
+    return [{
+      'address': ADDRESS,
+      'subaccountNumber': 0,
+      'equity': Decimal(0),
+      'freeCollateral': Decimal(0),
+      'openPerpetualPositions': {},
+      'assetPositions': {},
+      'marginEnabled': False,
+      'updatedAtHeight': '0',
+      'latestProcessedBlockHeight': '0',
+    }]
+
+  async def subaccount_records(
+    self,
+    subaccount: int,
+    *,
+    start: datetime | None,
+    end: datetime | None,
+    include_fills: bool,
+    include_transfers: bool,
+  ) -> tuple[list[Record], set[str]]:
+    """Return delayed indexer records."""
+    await asyncio.sleep(0.03)
+    return ([Record(
+      observations=[UnknownObservation(id='indexer', reason='test')],
+      provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'indexer'},
+    )], set())
+
+  async def bigquery_funding(self, *, start: datetime | None, end: datetime | None) -> list[Record]:
+    """Return fast funding records."""
+    await asyncio.sleep(0.01)
+    return [Record(
+      observations=[UnknownObservation(id='funding', reason='test')],
+      provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'funding'},
+    )]
+
+  async def bigquery_chain_fees(self, *, start: datetime | None, end: datetime | None) -> list[Record]:
+    """Return delayed fee records."""
+    await asyncio.sleep(0.05)
+    return [Record(
+      observations=[UnknownObservation(id='fees', reason='test')],
+      provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'fees'},
+    )]
+
+  async def bigquery_staking_transfers(self, *, start: datetime | None, end: datetime | None) -> list[Record]:
+    """Return delayed staking records."""
+    await asyncio.sleep(0.04)
+    return [Record(
+      observations=[UnknownObservation(id='staking', reason='test')],
+      provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'staking'},
+    )]
+
+  async def bigquery_native_wallet_transfers(self, *, start: datetime | None, end: datetime | None) -> list[Record]:
+    """Return delayed native wallet records."""
+    await asyncio.sleep(0.02)
+    return [Record(
+      observations=[UnknownObservation(id='native', reason='test')],
+      provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'native'},
+    )]
+
 def test_parse_fill() -> None:
   """Convert a dYdX indexer fill into an SDK trade observation."""
   record = reporting().parse_fill({
@@ -179,6 +252,7 @@ def test_parse_fill() -> None:
   assert trade.base == 'BTC'
   assert trade.quote == 'USD'
   assert trade.settle == 'USDC'
+  assert not hasattr(trade, 'side')
   assert trade.size == Decimal('0.01')
   assert trade.realized_pnl == Decimal('0')
   assert trade.subaccount == 0
@@ -309,10 +383,41 @@ async def test_snapshot_balances_include_wallet_staking_and_collateral() -> None
   )
 
   assert balances['USDC'].qty == Decimal('48.435969')
-  assert balances['DYDX'].qty == Decimal('1')
-  assert balances['DYDX:staked'].qty == Decimal('2')
-  assert balances['DYDX:rewards'].qty == Decimal('3')
+  assert balances['DYDX'].qty == Decimal('6')
+  assert 'DYDX:staked' not in balances
+  assert 'DYDX:rewards' not in balances
   assert balances['BTC-USD'].kind == 'future'
+
+@pytest.mark.asyncio
+async def test_history_yields_completed_sources_without_final_aggregation() -> None:
+  """Yield records as source tasks complete rather than after all tasks finish."""
+  report = StreamingReporting(
+    address=ADDRESS,
+    client=FakeClient(), # type: ignore
+    config={'sources': {'chain_fees': 'bigquery'}},
+  )
+  ids: list[str | None] = []
+
+  async for record in report.history():
+    ids.append(record.observations[0].id)
+
+  assert ids[0] == 'funding'
+  assert ids.index('native') < ids.index('indexer')
+  assert set(ids) == {'funding', 'native', 'indexer', 'staking', 'fees'}
+
+def test_parse_coins_normalizes_native_denoms() -> None:
+  """Parse dYdX native and USDC coin strings into reporting assets."""
+  coins = parse_coins(f'201217357510726adydx,10534{DYDX_MAINNET_USDC_DENOM}')
+
+  assert coins == [
+    ('DYDX', Decimal('0.000201217357510726')),
+    ('USDC', Decimal('0.010534')),
+  ]
+
+def test_parse_fee_coin_rejects_multi_coin_fees() -> None:
+  """Reject multi-denom tx fees because the SDK fee model is single-asset."""
+  with pytest.raises(ValueError, match='Expected one dYdX fee coin'):
+    parse_fee_coin(f'1adydx,2{DYDX_MAINNET_USDC_DENOM}')
 
 def test_parse_settled_funding_event() -> None:
   """Convert a Comet settled funding event into an SDK funding observation."""
@@ -358,6 +463,25 @@ def test_parse_settled_funding_event_ignores_other_accounts() -> None:
   }, time=NOW, event_index=3)
 
   assert record is None
+
+def test_parse_bigquery_funding() -> None:
+  """Convert a Numia settled funding row into an SDK funding observation."""
+  record = reporting().parse_bigquery_funding({
+    'block_timestamp': NOW,
+    'tx_hash': 'ABC',
+    'message_index': 0,
+    'action_index': 2,
+    'funding_paid_quote_quantums': Decimal('-250000'),
+    'subaccount_number': 128,
+  })
+
+  funding = record.observations[0]
+  assert isinstance(funding, Funding)
+  assert funding.id == 'ABC:0:2'
+  assert funding.asset == 'USDC'
+  assert funding.settle == 'USDC'
+  assert funding.amount == Decimal('0.25')
+  assert funding.subaccount == 128
 
 def test_parse_subaccount_transfer() -> None:
   """Convert dYdX subaccount transfers into internal transfers."""
@@ -408,6 +532,163 @@ async def test_parse_chain_fee_tx() -> None:
   assert transaction.fee.amount == Decimal('0.003577')
 
 @pytest.mark.asyncio
+async def test_parse_chain_fee_tx_normalizes_dydx_fee() -> None:
+  """Normalize native dYdX chain fees into DYDX units."""
+  record = await reporting().parse_chain_fee_tx({
+    'hash': 'ABC',
+    'height': '100',
+    'tx_result': {'events': [{
+      'type': 'tx',
+      'attributes': [
+        {'key': 'fee', 'value': '4982425000000000adydx', 'index': True},
+        {'key': 'fee_payer', 'value': ADDRESS, 'index': True},
+      ],
+    }]},
+    'tx': '',
+    'index': 0,
+  }, start=None, end=None)
+
+  assert record is not None
+  transaction = record.observations[0]
+  assert isinstance(transaction, CryptoTransaction)
+  assert transaction.fee is not None
+  assert transaction.fee.asset == 'DYDX'
+  assert transaction.fee.amount == Decimal('0.004982425')
+
+def test_parse_staking_delegate_event() -> None:
+  """Represent dYdX delegation as an internal transfer into staking."""
+  record = reporting().parse_staking_event({
+    'type': 'delegate',
+    'attributes': [
+      {'key': 'validator', 'value': 'dydxvaloper1abc', 'index': True},
+      {'key': 'delegator', 'value': ADDRESS, 'index': True},
+      {'key': 'amount', 'value': '152669867730366000000adydx', 'index': True},
+    ],
+  }, tx={
+    'hash': 'ABC',
+    'height': '100',
+    'tx_result': {'events': []},
+    'tx': '',
+    'index': 0,
+  }, time=NOW, event_index=9)
+
+  assert record is not None
+  transfer = record.observations[0]
+  assert isinstance(transfer, InternalTransfer)
+  assert transfer.id == 'ABC:delegate:9'
+  assert transfer.asset == 'DYDX'
+  assert transfer.amount == Decimal('152.669867730366')
+  assert transfer.src_account == f'dydx:{ADDRESS}:wallet'
+  assert transfer.dst_account == f'dydx:{ADDRESS}:staking:dydxvaloper1abc'
+
+def test_parse_staking_unbond_event() -> None:
+  """Represent dYdX unbonding as an internal transfer out of staking."""
+  record = reporting().parse_staking_event({
+    'type': 'unbond',
+    'attributes': [
+      {'key': 'validator', 'value': 'dydxvaloper1abc', 'index': True},
+      {'key': 'delegator', 'value': ADDRESS, 'index': True},
+      {'key': 'amount', 'value': '152669000000000000000adydx', 'index': True},
+    ],
+  }, tx={
+    'hash': 'ABC',
+    'height': '100',
+    'tx_result': {'events': []},
+    'tx': '',
+    'index': 0,
+  }, time=NOW, event_index=10)
+
+  assert record is not None
+  transfer = record.observations[0]
+  assert isinstance(transfer, InternalTransfer)
+  assert transfer.id == 'ABC:unbond:10'
+  assert transfer.asset == 'DYDX'
+  assert transfer.amount == Decimal('152.669')
+  assert transfer.src_account == f'dydx:{ADDRESS}:staking:dydxvaloper1abc'
+  assert transfer.dst_account == f'dydx:{ADDRESS}:wallet'
+
+def test_parse_bigquery_delegate_transfer() -> None:
+  """Represent Numia delegate rows as internal staking transfers."""
+  record = reporting().parse_bigquery_staking_transfer({
+    'block_timestamp': NOW,
+    'tx_hash': 'ABC',
+    'message_index': 0,
+    'action_index': 1,
+    'validator': 'dydxvaloper1abc',
+    'token_amount': Decimal('152669867730366000000'),
+    'token_denom': 'adydx',
+  }, kind='delegate')
+
+  transfer = record.observations[0]
+  assert isinstance(transfer, InternalTransfer)
+  assert transfer.id == 'ABC:delegate:0:1'
+  assert transfer.asset == 'DYDX'
+  assert transfer.amount == Decimal('152.669867730366')
+  assert transfer.src_account == f'dydx:{ADDRESS}:wallet'
+  assert transfer.dst_account == f'dydx:{ADDRESS}:staking:dydxvaloper1abc'
+
+def test_parse_bigquery_undelegate_transfer_uses_completion_time() -> None:
+  """Represent Numia undelegate rows as completed internal staking transfers."""
+  record = reporting().parse_bigquery_staking_transfer({
+    'block_timestamp': datetime(2026, 4, 22, 14, 53, tzinfo=timezone.utc),
+    'completion_time': '2026-05-13T14:53:18Z',
+    'tx_hash': 'ABC',
+    'message_index': 0,
+    'action_index': 1,
+    'validator': 'dydxvaloper1abc',
+    'token_amount': Decimal('152669000000000000000'),
+    'token_denom': 'adydx',
+  }, kind='undelegate')
+
+  transfer = record.observations[0]
+  assert isinstance(transfer, InternalTransfer)
+  assert transfer.time == datetime(2026, 5, 13, 14, 53, 18, tzinfo=timezone.utc)
+  assert transfer.src_account == f'dydx:{ADDRESS}:staking:dydxvaloper1abc'
+  assert transfer.dst_account == f'dydx:{ADDRESS}:wallet'
+
+def test_parse_bigquery_trading_reward() -> None:
+  """Represent Numia trading reward rows as yield observations."""
+  record = reporting().parse_bigquery_trading_reward({
+    'block_height': 56463881,
+    'block_timestamp': NOW,
+    'action_index': 6,
+    'sender': 'dydx16wrau2x4tsg033xfrrdpae6kxfn9kyuerr5jjp',
+    'recipient': ADDRESS,
+    'token_amount': Decimal('3694541597371286'),
+    'token_denom': 'adydx',
+  })
+
+  reward = record.observations[0]
+  assert isinstance(reward, Yield)
+  assert reward.id == '56463881:6'
+  assert reward.asset == 'DYDX'
+  assert reward.amount == Decimal('0.003694541597371286')
+
+def test_parse_bigquery_native_wallet_transfer() -> None:
+  """Represent raw EndBlock transfers as internal wallet movements."""
+  record = reporting().parse_bigquery_native_wallet_transfer({
+    'block_height': 54816914,
+    'block_timestamp': NOW,
+    'event_index': 12666,
+    'event_type': 'transfer',
+    'event_attributes': {
+      'amount': '7000000000000000000adydx',
+      'mode': 'EndBlock',
+      'recipient': ADDRESS,
+      'sender': 'dydx15ztc7xy42tn2ukkc0qjthkucw9ac63pgp70urn',
+    },
+  })
+
+  assert record is not None
+  transfer = record.observations[0]
+  assert isinstance(transfer, InternalTransfer)
+  assert transfer.id == '54816914:12666:0'
+  assert transfer.asset == 'DYDX'
+  assert transfer.amount == Decimal('7')
+  assert transfer.src_account == 'dydx15ztc7xy42tn2ukkc0qjthkucw9ac63pgp70urn'
+  assert transfer.dst_account == ADDRESS
+
+@pytest.mark.asyncio
 async def test_parse_inbound_fallback_tx() -> None:
   """Represent unsupported inbound wallet credits as fallback chain evidence."""
   record = await reporting().parse_inbound_fallback_tx({
@@ -436,6 +717,32 @@ async def test_parse_inbound_fallback_tx() -> None:
   assert transaction.transfers[0].counterparty == 'dydx1module'
   assert isinstance(unknown, UnknownObservation)
   assert unknown.id == 'ABC:unknown'
+
+@pytest.mark.asyncio
+async def test_parse_inbound_fallback_tx_parses_multi_coin_transfers() -> None:
+  """Represent each coin in a multi-denom Comet transfer amount."""
+  record = await reporting().parse_inbound_fallback_tx({
+    'hash': 'ABC',
+    'height': '100',
+    'tx_result': {'events': [{
+      'type': 'transfer',
+      'attributes': [
+        {'key': 'sender', 'value': 'dydx1module', 'index': True},
+        {'key': 'recipient', 'value': ADDRESS, 'index': True},
+        {'key': 'amount', 'value': f'201217357510726adydx,10534{DYDX_MAINNET_USDC_DENOM}', 'index': True},
+      ],
+    }]},
+    'tx': '',
+    'index': 0,
+  }, covered_hashes=set(), include_fee=True, start=None, end=None)
+
+  assert record is not None
+  transaction = record.observations[0]
+  assert isinstance(transaction, CryptoTransaction)
+  assert [(transfer.asset, transfer.change) for transfer in transaction.transfers] == [
+    ('DYDX', Decimal('0.000201217357510726')),
+    ('USDC', Decimal('0.010534')),
+  ]
 
 @pytest.mark.asyncio
 async def test_inbound_fallback_skips_covered_hashes() -> None:
