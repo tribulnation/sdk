@@ -1,13 +1,25 @@
+"""Top-level reporting SDK venue dispatcher."""
+
 from typing_extensions import TYPE_CHECKING, TypedDict
 from dataclasses import dataclass, field
 from tribulnation.sdk import SDK
 from . import Report
 
 if TYPE_CHECKING:
-  from tribulnation.dydx.report import Settings as DydxSettings
+  from tribulnation.dydx.report import DydxConfig
+  from tribulnation.ethereum.reporting import EvmConfig
+  from .config import ProvidersConfig
 
   class Settings(TypedDict, total=False):
-    dydx: DydxSettings
+    providers: ProvidersConfig
+    dydx: DydxConfig
+    ethereum: EvmConfig
+    arbitrum: EvmConfig
+    polygon: EvmConfig
+    bnb: EvmConfig
+    base: EvmConfig
+    avalanche: EvmConfig
+    optimism: EvmConfig
 
 SUPPORTED_VENUES = (
   'ethereum',
@@ -18,71 +30,112 @@ SUPPORTED_VENUES = (
   'avalanche',
   'optimism',
   'dydx',
-  'dydx_testnet',
 )
 
 @dataclass(frozen=True)
 class ReportSDK(SDK):
+  """Factory for venue-specific reporting clients."""
   settings: 'Settings' = field(default_factory=lambda: {})
 
-  def ethereum(self, **credentials) -> Report:
+  def ethereum(self, address: str) -> Report:
+    """Create an Ethereum mainnet reporting client."""
     try:
-      from tribulnation.ethereum.reporting import ethereum
-      return ethereum(**credentials)
+      from tribulnation.ethereum.reporting import Report as EvmReport
+      return EvmReport.ethereum(
+        address,
+        config=self.settings.get('ethereum'),
+        providers=self.settings.get('providers'),
+      )
     except ImportError:
       raise ImportError('ethereum sdk is not installed. Please install it with `pip install tribulnation-ethereum`.')
   
-  def arbitrum(self, **credentials) -> Report:
+  def arbitrum(self, address: str) -> Report:
+    """Create an Arbitrum reporting client."""
     try:
-      from tribulnation.ethereum.reporting import arbitrum
-      return arbitrum(**credentials)
+      from tribulnation.ethereum.reporting import Report as EvmReport
+      return EvmReport.arbitrum(
+        address,
+        config=self.settings.get('arbitrum'),
+        providers=self.settings.get('providers'),
+      )
     except ImportError:
       raise ImportError('ethereum sdk is not installed. Please install it with `pip install tribulnation-ethereum`.')
   
-  def polygon(self, **credentials) -> Report:
+  def polygon(self, address: str) -> Report:
+    """Create a Polygon reporting client."""
     try:
-      from tribulnation.ethereum.reporting import polygon
-      return polygon(**credentials)
+      from tribulnation.ethereum.reporting import Report as EvmReport
+      return EvmReport.polygon(
+        address,
+        config=self.settings.get('polygon'),
+        providers=self.settings.get('providers'),
+      )
     except ImportError:
       raise ImportError('ethereum sdk is not installed. Please install it with `pip install tribulnation-ethereum`.')
   
-  def bnb(self, **credentials) -> Report:
+  def bnb(self, address: str) -> Report:
+    """Create a BNB Chain reporting client."""
     try:
-      from tribulnation.ethereum.reporting import bnb
-      return bnb(**credentials)
+      from tribulnation.ethereum.reporting import Report as EvmReport
+      return EvmReport.bnb(
+        address,
+        config=self.settings.get('bnb'),
+        providers=self.settings.get('providers'),
+      )
     except ImportError:
       raise ImportError('ethereum sdk is not installed. Please install it with `pip install tribulnation-ethereum`.')
   
-  def base(self, **credentials) -> Report:
+  def base(self, address: str) -> Report:
+    """Create a Base reporting client."""
     try:
-      from tribulnation.ethereum.reporting import base
-      return base(**credentials)
+      from tribulnation.ethereum.reporting import Report as EvmReport
+      return EvmReport.base(
+        address,
+        config=self.settings.get('base'),
+        providers=self.settings.get('providers'),
+      )
     except ImportError:
       raise ImportError('ethereum sdk is not installed. Please install it with `pip install tribulnation-ethereum`.')
   
-  def avalanche(self, **credentials) -> Report:
+  def avalanche(self, address: str) -> Report:
+    """Create an Avalanche reporting client."""
     try:
-      from tribulnation.ethereum.reporting import avalanche
-      return avalanche(**credentials)
+      from tribulnation.ethereum.reporting import Report as EvmReport
+      return EvmReport.avalanche(
+        address,
+        config=self.settings.get('avalanche'),
+        providers=self.settings.get('providers'),
+      )
     except ImportError:
       raise ImportError('ethereum sdk is not installed. Please install it with `pip install tribulnation-ethereum`.')
   
-  def optimism(self, **credentials) -> Report:
+  def optimism(self, address: str) -> Report:
+    """Create an Optimism reporting client."""
     try:
-      from tribulnation.ethereum.reporting import optimism
-      return optimism(**credentials)
+      from tribulnation.ethereum.reporting import Report as EvmReport
+      return EvmReport.optimism(
+        address,
+        config=self.settings.get('optimism'),
+        providers=self.settings.get('providers'),
+      )
     except ImportError:
       raise ImportError('ethereum sdk is not installed. Please install it with `pip install tribulnation-ethereum`.')
 
-  def dydx(self, *, mainnet: bool = True, **credentials) -> Report:
+  def dydx(self, address: str) -> Report:
     """Create a dYdX reporting client."""
     try:
-      from tribulnation.dydx import Reporting
-      return Reporting.new(mainnet=mainnet, **credentials, **self.settings.get('dydx', {}))
+      from tribulnation.dydx import Report as DydxReport
+      return DydxReport.new(
+        address,
+        config=self.settings.get('dydx'),
+        providers=self.settings.get('providers'),
+      )
     except ImportError:
       raise ImportError('dydx sdk is not installed. Please install it with `pip install tribulnation-dydx`.')
 
-  def all(self, credentials: dict[str, dict[str, str]] = {}) -> dict[str, Report]:
+  def all(self, credentials: dict[str, dict[str, str]] | None = None) -> dict[str, Report]:
+    """Create reporting clients for every supported venue."""
+    credentials = credentials or {}
     return {
       'ethereum': self.ethereum(**credentials.get('ethereum', {})),
       'arbitrum': self.arbitrum(**credentials.get('arbitrum', {})),
@@ -91,12 +144,12 @@ class ReportSDK(SDK):
       'base': self.base(**credentials.get('base', {})),
       'avalanche': self.avalanche(**credentials.get('avalanche', {})),
       'optimism': self.optimism(**credentials.get('optimism', {})),
-      'dydx': self.dydx(mainnet=True, **credentials.get('dydx', {})),
-      'dydx_testnet': self.dydx(mainnet=False, **credentials.get('dydx_testnet', {})),
+      'dydx': self.dydx(**credentials.get('dydx', {})),
     }
 
 
   def venue(self, id: str, /, **credentials) -> Report:
+    """Create a reporting client by venue id."""
     match id:
       case 'ethereum':
         return self.ethereum(**credentials)
@@ -113,11 +166,10 @@ class ReportSDK(SDK):
       case 'optimism':
         return self.optimism(**credentials)
       case 'dydx':
-        return self.dydx(mainnet=True, **credentials)
-      case 'dydx_testnet':
-        return self.dydx(mainnet=False, **credentials)
+        return self.dydx(**credentials)
       case _:
         raise ValueError(f'Invalid venue ID: {id}. Supported venues: {SUPPORTED_VENUES}')
 
   def venues(self):
+    """Return supported venue ids."""
     return SUPPORTED_VENUES
