@@ -49,6 +49,8 @@ class BaseObservation(pydantic.BaseModel):
   id: str | None = None
   """Raw identifier, if provided by the source."""
   time: datetime | None = None
+  subaccount: str | int | None = None
+  """Venue subaccount or compartment label, if the source row has a scoped account."""
 
 class Trade(BaseObservation):
   """An exchange of an asset for another, with an optional fee."""
@@ -89,8 +91,6 @@ class FutureTrade(BaseObservation):
   """Execution price in quote units."""
   realized_pnl: Decimal | None = None
   """Fill-level realized PnL in settlement asset units, excluding fees. If provided by the source."""
-  subaccount: int | str | None = None
-  """Venue subaccount identifier, if applicable."""
   order_id: str | None = None
   """Raw order identifier, if provided by the source."""
   trade_id: str | None = None
@@ -121,8 +121,6 @@ class FutureOrder(BaseObservation):
   """Executed contract amount. Positive buy or negative sell when the source is signed."""
   avg_price: Decimal | None = None
   """Average execution price, if provided by the source."""
-  subaccount: int | str | None = None
-  """Venue subaccount identifier, if applicable."""
   fee: Fee | None = None
   """Fee paid, if any."""
 
@@ -137,8 +135,6 @@ class RealizedPnl(BaseObservation):
   """Raw futures position identifier, if provided by the source."""
   amount: Decimal
   """Signed realized PnL in settlement asset units."""
-  subaccount: int | str | None = None
-  """Venue subaccount identifier, if applicable."""
   order_id: str | None = None
   """Raw order identifier, if provided by the source."""
   trade_id: str | None = None
@@ -157,8 +153,6 @@ class FuturePositionSummary(BaseObservation):
   """Quote asset used for the instrument price, if known."""
   settle: str | None = None
   """Settlement asset for realized PnL, fees, and funding."""
-  subaccount: int | str | None = None
-  """Venue subaccount identifier, if applicable."""
   position_side: Literal['long', 'short'] | None = None
   """Position direction, when reported by the source."""
   margin_mode: str | None = None
@@ -272,8 +266,6 @@ class Funding(SingleAssetObservation):
   """Settlement asset for the funding payment, if distinct from the raw asset field."""
   position_id: str | None = None
   """Raw futures position identifier, if provided by the source."""
-  subaccount: int | str | None = None
-  """Venue subaccount identifier, if applicable."""
 
 class Borrow(SingleAssetObservation):
   """Inflow from a loan."""
@@ -292,6 +284,14 @@ class InternalTransfer(SingleAssetObservation):
   """Source compartment inside the current venue account scope, if known."""
   dst_account: str | None = None
   """Destination compartment inside the current venue account scope, if known."""
+
+  @pydantic.field_validator('amount')
+  @classmethod
+  def amount_must_be_positive(cls, value: Decimal) -> Decimal:
+    """Reject internal transfers without a positive moved amount."""
+    if value <= 0:
+      raise ValueError('internal_transfer.amount must be positive')
+    return value
 
 class Transfer(SingleAssetObservation):
   """Movement into or out of the current venue account scope."""

@@ -2,6 +2,7 @@
 
 from decimal import Decimal
 
+import pytest
 from tribulnation.sdk import reporting
 from tribulnation.sdk.reporting import (
   Bonus,
@@ -9,6 +10,7 @@ from tribulnation.sdk.reporting import (
   FutureOrder,
   FuturePositionSummary,
   FutureTrade,
+  InternalTransfer,
   RealizedPnl,
   Record,
   Transfer,
@@ -35,6 +37,54 @@ def test_transfer_observation_validates_through_record_union():
   assert transfer.dst_account is None
   assert transfer.fee is not None
   assert transfer.fee.amount == Decimal('0.10')
+
+
+def test_shared_observation_subaccount_validates_through_record_union():
+  record = Record.model_validate({
+    'observations': [
+      {
+        'type': 'trade',
+        'time': '2025-01-01T00:00:00Z',
+        'base': 'BTC',
+        'quote': 'USDT',
+        'size': '0.1',
+        'price': '100000',
+        'subaccount': 'spot',
+      },
+      {
+        'type': 'internal_transfer',
+        'time': '2025-01-01T00:00:00Z',
+        'asset': 'USDT',
+        'amount': '25',
+        'subaccount': 'earn:flexible',
+        'src_account': 'spot',
+        'dst_account': 'self',
+      },
+    ],
+    'provenance': {'source': 'manual', 'label': 'mexc'},
+  })
+
+  trade = record.observations[0]
+  transfer = record.observations[1]
+  assert trade.subaccount == 'spot'
+  assert isinstance(transfer, InternalTransfer)
+  assert transfer.subaccount == 'earn:flexible'
+  assert transfer.dst_account == 'self'
+
+
+def test_internal_transfer_amount_must_be_positive():
+  with pytest.raises(ValueError, match='internal_transfer.amount must be positive'):
+    Record.model_validate({
+      'observations': [{
+        'type': 'internal_transfer',
+        'time': '2025-01-01T00:00:00Z',
+        'asset': 'USDT',
+        'amount': '-25',
+        'src_account': 'spot',
+        'dst_account': 'earn:flexible',
+      }],
+      'provenance': {'source': 'manual', 'label': 'mexc'},
+    })
 
 
 def test_bonus_observation_validates_through_record_union():

@@ -187,18 +187,17 @@ class IndexerHistory:
   def parse_transfer(self, transfer: Transfer, *, subaccount: int) -> Record | None:
     """Convert an indexer transfer into an SDK transfer record."""
     amount = Decimal(transfer['size'])
-    if is_account(transfer['recipient'], address=self.address, subaccount=subaccount):
-      signed = amount
-    elif is_account(transfer['sender'], address=self.address, subaccount=subaccount):
-      signed = -amount
-    else:
+    if not (
+      is_account(transfer['recipient'], address=self.address, subaccount=subaccount) or
+      is_account(transfer['sender'], address=self.address, subaccount=subaccount)
+    ):
       return None
     return Record(
       observations=[InternalTransfer(
         id=f"{transfer['id']}:{subaccount}",
         time=transfer['createdAt'],
         asset=transfer['symbol'],
-        amount=signed,
+        amount=amount,
         src_account=account_label(transfer['sender']),
         dst_account=account_label(transfer['recipient']),
       )],

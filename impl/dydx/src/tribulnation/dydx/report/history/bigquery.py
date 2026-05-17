@@ -650,11 +650,7 @@ class BigQueryHistory:
     amount_value = attributes.get('amount')
     if amount_value is None:
       return None
-    if recipient == self.address:
-      amount_sign = Decimal(1)
-    elif sender == self.address:
-      amount_sign = Decimal(-1)
-    else:
+    if recipient != self.address and sender != self.address:
       return None
     records: list[InternalTransfer] = []
     row_id = f"{row_int(row, 'block_height')}:{row_int(row, 'event_index')}"
@@ -663,7 +659,7 @@ class BigQueryHistory:
         id=f'{row_id}:{coin_index}',
         time=row_time(row),
         asset=asset,
-        amount=amount * amount_sign,
+        amount=amount,
         src_account=str(sender) if sender is not None else None,
         dst_account=str(recipient) if recipient is not None else None,
       ))
