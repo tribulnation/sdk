@@ -1,5 +1,4 @@
-"""Moralis-backed EVM reporting history."""
-
+from typing_extensions import Callable, Awaitable, TypeVar
 from collections import defaultdict
 from datetime import datetime, timezone
 from dataclasses import dataclass
@@ -13,10 +12,11 @@ from web3 import Web3
 
 from tribulnation.sdk.core import SDK
 from tribulnation.sdk.reporting import EvmTx, Fee, Record
-from tribulnation.ethereum.core import same_address
+from tribulnation.ethereum.core import same_address, moralis as moralis_core
 from ..constants import MORALIS_CHAINS
 from ..config import EvmNetwork
 
+T = TypeVar('T')
 
 def parse_time(value: str | None) -> datetime | None:
   """Parse a Moralis ISO timestamp."""
@@ -24,18 +24,15 @@ def parse_time(value: str | None) -> datetime | None:
     return None
   return datetime.fromisoformat(value.replace('Z', '+00:00')).astimezone()
 
-
 def decimal_value(value: str | int | float | None) -> Decimal:
   """Parse a Moralis numeric field."""
   return Decimal(str(value or '0'))
-
 
 def native_value(transfer: NativeTransfer) -> Decimal:
   """Return a native transfer value in display units."""
   if (formatted := transfer.get('value_formatted')) is not None:
     return Decimal(formatted)
   return Decimal(transfer['value']) * (Decimal(10) ** -18)
-
 
 def token_value(transfer: TokenTransfer) -> Decimal:
   """Return an ERC20 transfer value in display units."""
@@ -58,6 +55,12 @@ class MoralisHistory(SDK):
       raise ValueError('EVM Moralis history requires a Moralis provider.')
     return self.moralis
 
+  @SDK.method
+  @moralis_core.wrap_exceptions
+  async def call_moralis(self, fn: Callable[[], Awaitable[T]]) -> T:
+    """Call Moralis under the SDK exception wrapper."""
+    return await fn()
+
   async def moralis_wallet_history(
     self, start: datetime | None = None, end: datetime | None = None,
   ) -> list[WalletHistoryTransaction]:
@@ -70,7 +73,12 @@ class MoralisHistory(SDK):
       include_internal_transactions=True,
       limit=25,
     )
-    return list(await paging)
+    out: list[WalletHistoryTransaction] = []
+    state = paging.init
+    while state is not None:
+      chunk, state = await self.call_moralis(lambda: paging.next(state)) # type: ignore
+      out.extend(chunk)
+    return out
 
   async def moralis_token_transfers(
     self, start: datetime | None = None, end: datetime | None = None,
@@ -83,7 +91,12 @@ class MoralisHistory(SDK):
       to_date=end.isoformat() if end is not None else None,
       limit=25,
     )
-    return list(await paging)
+    out: list[TokenTransfer] = []
+    state = paging.init
+    while state is not None:
+      chunk, state = await self.call_moralis(lambda: paging.next(state)) # type: ignore
+      out.extend(chunk)
+    return out
 
   def parse_moralis_fee(self, tx: WalletHistoryTransaction) -> Fee | None:
     """Parse a transaction fee paid by this wallet."""
@@ -195,14 +208,11 @@ class MoralisHistory(SDK):
       if (hash := row.get('transaction_hash')) is not None:
         token_by_hash[hash].append(row)
     hashes = set(wallet_by_hash) | set(token_by_hash)
-    transactions = [
-      tx for hash in hashes
-      if (tx := self.parse_moralis_tx(
+    for hash in hashes:
+      tx = self.parse_moralis_tx(
         hash,
         wallet_txs=wallet_by_hash.get(hash, []),
         token_transfers=token_by_hash.get(hash, []),
-      )) is not None
-    ]
-    fallback_time = datetime.min.replace(tzinfo=timezone.utc)
-    for tx in sorted(transactions, key=lambda tx: tx.time or fallback_time):
-      yield Record(observations=[tx], provenance={'source': 'api', 'service': 'moralis'})
+      )
+      if tx is not None:
+        yield Record(observations=[tx], provenance={'source': 'api', 'service': 'moralis'})
