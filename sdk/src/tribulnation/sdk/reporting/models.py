@@ -23,6 +23,7 @@ ObservationType = Literal[
   'trade_leg',
   'fee',
   'yield',
+  'bonus',
   'funding',
   'borrow',
   'repay',
@@ -203,6 +204,12 @@ class Yield(SingleAssetObservation):
   """Inflow from staking, lending, etc."""
   type: Literal['yield'] = 'yield'
 
+class Bonus(SingleAssetObservation):
+  """Promotional credit, grant, recycle, expiry, revocation, or reversal."""
+  type: Literal['bonus'] = 'bonus'
+  category: str | None = None
+  """Raw source category/action, if provided by the source."""
+
 class Funding(SingleAssetObservation):
   """Funding received or paid for a perpetual contract position."""
   type: Literal['funding'] = 'funding'
@@ -365,6 +372,7 @@ Observation = Annotated[
     Annotated[TradeLeg, pydantic.Tag('trade_leg')],
     Annotated[FeeLeg, pydantic.Tag('fee')],
     Annotated[Yield, pydantic.Tag('yield')],
+    Annotated[Bonus, pydantic.Tag('bonus')],
     Annotated[Funding, pydantic.Tag('funding')],
     Annotated[Borrow, pydantic.Tag('borrow')],
     Annotated[Repay, pydantic.Tag('repay')],
