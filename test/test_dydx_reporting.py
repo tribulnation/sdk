@@ -11,9 +11,11 @@ from tribulnation.dydx import Reporting
 from tribulnation.dydx.report.history.accounts import account_label
 from tribulnation.dydx.report.history.coins import parse_coins, parse_fee_coin
 from tribulnation.dydx.report.history.comet import event_attributes
+from tribulnation.dydx.report.history.constants import COMMUNITY_TREASURY_ADDRESS
 from tribulnation.dydx.report.history.time import in_window
 from dydx.indexer.data.get_fills import Fill
 from dydx.indexer.data.get_subaccounts import Subaccount
+from dydx.chain.comet.types import TxResponse
 from dydx.node import DYDX_MAINNET_USDC_DENOM
 from dydx.protos.cosmos.bank import v1beta1 as bank_proto
 from dydx.protos.cosmos.base import v1beta1 as coin_proto
@@ -27,6 +29,7 @@ from tribulnation.sdk.reporting import (
   Record,
   Report,
   ReportSDK,
+  Transfer,
   UnknownObservation,
   Yield,
 )
@@ -162,6 +165,10 @@ class FakeSearchClient:
 class StreamingReporting(Reporting):
   """Reporting adapter with controlled source completion order."""
 
+  async def fetch_comet_txs(self, query: str, *, per_page: int = 100) -> list[TxResponse]:
+    """Return empty node evidence for streaming orchestration tests."""
+    return []
+
   async def subaccounts(self) -> list[Subaccount]:
     """Return one delayed subaccount."""
     await asyncio.sleep(0.03)
@@ -201,7 +208,13 @@ class StreamingReporting(Reporting):
       provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'funding'},
     )]
 
-  async def bigquery_chain_fees(self, *, start: datetime | None, end: datetime | None) -> list[Record]:
+  async def chain_fees(
+    self,
+    txs: list[TxResponse],
+    *,
+    start: datetime | None,
+    end: datetime | None,
+  ) -> list[Record]:
     """Return delayed fee records."""
     await asyncio.sleep(0.05)
     return [Record(
@@ -224,6 +237,30 @@ class StreamingReporting(Reporting):
       observations=[UnknownObservation(id='native', reason='test')],
       provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'native'},
     )]
+
+  async def bigquery_trading_rewards(self, *, start: datetime | None, end: datetime | None) -> list[Record]:
+    """Return no trading rewards for streaming orchestration tests."""
+    return []
+
+  async def chain_megavault_transfers(
+    self,
+    txs: list[TxResponse],
+    *,
+    start: datetime | None,
+    end: datetime | None,
+  ) -> list[Record]:
+    """Return no Megavault records."""
+    return []
+
+  async def chain_ibc_transfers(
+    self,
+    txs: list[TxResponse],
+    *,
+    start: datetime | None,
+    end: datetime | None,
+  ) -> list[Record]:
+    """Return no IBC records."""
+    return []
 
 def test_parse_fill() -> None:
   """Convert a dYdX indexer fill into an SDK trade observation."""
@@ -394,7 +431,14 @@ async def test_history_yields_completed_sources_without_final_aggregation() -> N
   report = StreamingReporting(
     address=ADDRESS,
     client=FakeClient(), # type: ignore
-    config={'sources': {'chain_fees': 'bigquery'}},
+    config={'sources': {
+      'funding': 'bigquery',
+      'staking': 'bigquery',
+      'community_treasury_distributions': 'disabled',
+      'megavault': 'disabled',
+      'ibc_wallet_transfers': 'disabled',
+      'wallet_transfers': 'disabled',
+    }},
   )
   ids: list[str | None] = []
 
@@ -402,8 +446,8 @@ async def test_history_yields_completed_sources_without_final_aggregation() -> N
     ids.append(record.observations[0].id)
 
   assert ids[0] == 'funding'
-  assert ids.index('native') < ids.index('indexer')
-  assert set(ids) == {'funding', 'native', 'indexer', 'staking', 'fees'}
+  assert ids.index('funding') < ids.index('indexer')
+  assert set(ids) == {'funding', 'indexer', 'staking', 'fees'}
 
 def test_parse_coins_normalizes_native_denoms() -> None:
   """Parse dYdX native and USDC coin strings into reporting assets."""
@@ -413,6 +457,10 @@ def test_parse_coins_normalizes_native_denoms() -> None:
     ('DYDX', Decimal('0.000201217357510726')),
     ('USDC', Decimal('0.010534')),
   ]
+
+def test_parse_coins_normalizes_ibc_packet_usdc() -> None:
+  """Parse IBC packet USDC denom into reporting USDC."""
+  assert parse_coins('500000000uusdc') == [('USDC', Decimal('500'))]
 
 def test_parse_fee_coin_rejects_multi_coin_fees() -> None:
   """Reject multi-denom tx fees because the SDK fee model is single-asset."""
@@ -504,6 +552,247 @@ def test_parse_subaccount_transfer() -> None:
   assert transfer.amount == Decimal('12.5')
   assert transfer.src_account == ADDRESS
   assert transfer.dst_account == f'{ADDRESS}:0'
+
+def test_parse_external_subaccount_transfer() -> None:
+  """Convert indexer subaccount credits into internal transfers."""
+  record = reporting().parse_transfer({
+    'id': 'transfer-2',
+    'sender': {'address': 'dydx1external', 'subaccountNumber': 0},
+    'recipient': {'address': ADDRESS, 'subaccountNumber': 128},
+    'size': Decimal('25.343388'),
+    'createdAt': NOW,
+    'createdAtHeight': '10',
+    'symbol': 'USDC',
+    'type': 'TRANSFER_IN',
+    'transactionHash': 'ABC',
+  }, subaccount=128)
+
+  assert record is not None
+  transfer = record.observations[0]
+  assert isinstance(transfer, InternalTransfer)
+  assert transfer.asset == 'USDC'
+  assert transfer.amount == Decimal('25.343388')
+  assert transfer.src_account == 'dydx1external:0'
+  assert transfer.dst_account == f'{ADDRESS}:128'
+
+def test_parse_node_subaccount_deposit_event() -> None:
+  """Convert a node subaccount deposit event into an internal transfer."""
+  record = reporting().parse_subaccount_transfer_event({
+    'type': 'deposit_to_subaccount',
+    'attributes': [
+      {'key': 'sender', 'value': ADDRESS, 'index': True},
+      {'key': 'recipient', 'value': ADDRESS, 'index': True},
+      {'key': 'recipient_number', 'value': '7', 'index': True},
+      {'key': 'asset_id', 'value': '0', 'index': True},
+      {'key': 'quantums', 'value': '12345678', 'index': True},
+    ],
+  }, tx={
+    'hash': 'ABC',
+    'height': '100',
+    'tx_result': {'events': []},
+    'tx': '',
+    'index': 0,
+  }, time=NOW, event_index=11)
+
+  assert record is not None
+  transfer = record.observations[0]
+  assert isinstance(transfer, InternalTransfer)
+  assert transfer.id == 'ABC:deposit_to_subaccount:11'
+  assert transfer.asset == 'USDC'
+  assert transfer.amount == Decimal('12.345678')
+  assert transfer.src_account == f'dydx:{ADDRESS}:wallet'
+  assert transfer.dst_account == f'dydx:{ADDRESS}:7'
+
+def test_parse_node_subaccount_withdraw_event() -> None:
+  """Convert a node subaccount withdrawal event into an internal transfer."""
+  record = reporting().parse_subaccount_transfer_event({
+    'type': 'withdraw_from_subaccount',
+    'attributes': [
+      {'key': 'sender', 'value': ADDRESS, 'index': True},
+      {'key': 'sender_number', 'value': '7', 'index': True},
+      {'key': 'recipient', 'value': ADDRESS, 'index': True},
+      {'key': 'asset_id', 'value': '0', 'index': True},
+      {'key': 'quantums', 'value': '87654321', 'index': True},
+    ],
+  }, tx={
+    'hash': 'ABC',
+    'height': '100',
+    'tx_result': {'events': []},
+    'tx': '',
+    'index': 0,
+  }, time=NOW, event_index=12)
+
+  assert record is not None
+  transfer = record.observations[0]
+  assert isinstance(transfer, InternalTransfer)
+  assert transfer.id == 'ABC:withdraw_from_subaccount:12'
+  assert transfer.asset == 'USDC'
+  assert transfer.amount == Decimal('87.654321')
+  assert transfer.src_account == f'dydx:{ADDRESS}:7'
+  assert transfer.dst_account == f'dydx:{ADDRESS}:wallet'
+
+def test_parse_node_megavault_deposit_event() -> None:
+  """Convert a node Megavault deposit event into a wallet transfer."""
+  record = reporting().parse_megavault_event({
+    'type': 'deposit_to_megavault',
+    'attributes': [
+      {'key': 'depositor', 'value': ADDRESS, 'index': True},
+      {'key': 'quote_quantums', 'value': '10000000', 'index': True},
+    ],
+  }, tx={
+    'hash': 'ABC',
+    'height': '100',
+    'tx_result': {'events': []},
+    'tx': '',
+    'index': 0,
+  }, time=NOW, event_index=13)
+
+  assert record is not None
+  transfer = record.observations[0]
+  assert isinstance(transfer, Transfer)
+  assert transfer.id == 'ABC:deposit_to_megavault:13'
+  assert transfer.asset == 'USDC'
+  assert transfer.amount == Decimal('-10')
+  assert transfer.src_account == f'dydx:{ADDRESS}:0'
+  assert transfer.dst_account == f'dydx:{ADDRESS}:megavault'
+
+def test_parse_node_megavault_withdraw_event() -> None:
+  """Convert a node Megavault withdrawal event into a wallet transfer."""
+  record = reporting().parse_megavault_event({
+    'type': 'withdraw_from_megavault',
+    'attributes': [
+      {'key': 'withdrawer', 'value': ADDRESS, 'index': True},
+      {'key': 'redeemed_quote_quantums', 'value': '9998721', 'index': True},
+    ],
+  }, tx={
+    'hash': 'ABC',
+    'height': '100',
+    'tx_result': {'events': []},
+    'tx': '',
+    'index': 0,
+  }, time=NOW, event_index=14)
+
+  assert record is not None
+  transfer = record.observations[0]
+  assert isinstance(transfer, Transfer)
+  assert transfer.id == 'ABC:withdraw_from_megavault:14'
+  assert transfer.asset == 'USDC'
+  assert transfer.amount == Decimal('9.998721')
+  assert transfer.src_account == f'dydx:{ADDRESS}:megavault'
+  assert transfer.dst_account == f'dydx:{ADDRESS}:0'
+
+def test_parse_node_ibc_outbound_event() -> None:
+  """Convert a node outbound IBC transfer event into a wallet transfer."""
+  record = reporting().parse_ibc_transfer_event({
+    'type': 'ibc_transfer',
+    'attributes': [
+      {'key': 'sender', 'value': ADDRESS, 'index': True},
+      {'key': 'receiver', 'value': 'osmo1receiver', 'index': True},
+      {'key': 'denom', 'value': DYDX_MAINNET_USDC_DENOM, 'index': True},
+      {'key': 'amount', 'value': '42000000', 'index': True},
+    ],
+  }, tx={
+    'hash': 'ABC',
+    'height': '100',
+    'tx_result': {'events': []},
+    'tx': '',
+    'index': 0,
+  }, time=NOW, event_index=15)
+
+  assert record is not None
+  transfer = record.observations[0]
+  assert isinstance(transfer, Transfer)
+  assert transfer.id == 'ABC:ibc_transfer:15'
+  assert transfer.asset == 'USDC'
+  assert transfer.amount == Decimal('-42')
+  assert transfer.src_account == ADDRESS
+  assert transfer.dst_account == 'osmo1receiver'
+
+def test_parse_node_create_transfer_event() -> None:
+  """Convert a node create_transfer event into a subaccount transfer."""
+  record = reporting().parse_subaccount_transfer_event({
+    'type': 'create_transfer',
+    'attributes': [
+      {'key': 'sender', 'value': ADDRESS, 'index': True},
+      {'key': 'sender_number', 'value': '0', 'index': True},
+      {'key': 'recipient', 'value': ADDRESS, 'index': True},
+      {'key': 'recipient_number', 'value': '128', 'index': True},
+      {'key': 'asset_id', 'value': '0', 'index': True},
+      {'key': 'quantums', 'value': '208725000', 'index': True},
+    ],
+  }, tx={
+    'hash': 'ABC',
+    'height': '100',
+    'tx_result': {'events': []},
+    'tx': '',
+    'index': 0,
+  }, time=NOW, event_index=12)
+
+  assert record is not None
+  transfer = record.observations[0]
+  assert isinstance(transfer, InternalTransfer)
+  assert transfer.id == 'ABC:create_transfer:12'
+  assert transfer.asset == 'USDC'
+  assert transfer.amount == Decimal('208.725')
+  assert transfer.src_account == f'dydx:{ADDRESS}:0'
+  assert transfer.dst_account == f'dydx:{ADDRESS}:128'
+
+def test_parse_node_external_create_transfer_event() -> None:
+  """Convert external node create_transfer credits into internal transfers."""
+  record = reporting().parse_subaccount_transfer_event({
+    'type': 'create_transfer',
+    'attributes': [
+      {'key': 'sender', 'value': 'dydx1external', 'index': True},
+      {'key': 'sender_number', 'value': '0', 'index': True},
+      {'key': 'recipient', 'value': ADDRESS, 'index': True},
+      {'key': 'recipient_number', 'value': '128', 'index': True},
+      {'key': 'asset_id', 'value': '0', 'index': True},
+      {'key': 'quantums', 'value': '25343388', 'index': True},
+    ],
+  }, tx={
+    'hash': 'ABC',
+    'height': '100',
+    'tx_result': {'events': []},
+    'tx': '',
+    'index': 0,
+  }, time=NOW, event_index=13)
+
+  assert record is not None
+  transfer = record.observations[0]
+  assert isinstance(transfer, InternalTransfer)
+  assert transfer.id == 'ABC:create_transfer:13'
+  assert transfer.asset == 'USDC'
+  assert transfer.amount == Decimal('25.343388')
+  assert transfer.src_account == 'dydx:dydx1external:0'
+  assert transfer.dst_account == f'dydx:{ADDRESS}:128'
+
+def test_parse_node_ibc_inbound_event() -> None:
+  """Convert a successful node inbound IBC packet event into a wallet transfer."""
+  record = reporting().parse_ibc_transfer_event({
+    'type': 'fungible_token_packet',
+    'attributes': [
+      {'key': 'sender', 'value': 'osmo1sender', 'index': True},
+      {'key': 'receiver', 'value': ADDRESS, 'index': True},
+      {'key': 'denom', 'value': DYDX_MAINNET_USDC_DENOM, 'index': True},
+      {'key': 'amount', 'value': '21000000', 'index': True},
+      {'key': 'success', 'value': 'true', 'index': True},
+    ],
+  }, tx={
+    'hash': 'ABC',
+    'height': '100',
+    'tx_result': {'events': []},
+    'tx': '',
+    'index': 0,
+  }, time=NOW, event_index=16)
+
+  assert record is not None
+  transfer = record.observations[0]
+  assert isinstance(transfer, Transfer)
+  assert transfer.id == 'ABC:fungible_token_packet:16'
+  assert transfer.asset == 'USDC'
+  assert transfer.amount == Decimal('21')
+  assert transfer.src_account == 'osmo1sender'
+  assert transfer.dst_account == ADDRESS
 
 @pytest.mark.asyncio
 async def test_parse_chain_fee_tx() -> None:
@@ -646,6 +935,30 @@ def test_parse_bigquery_undelegate_transfer_uses_completion_time() -> None:
   assert transfer.src_account == f'dydx:{ADDRESS}:staking:dydxvaloper1abc'
   assert transfer.dst_account == f'dydx:{ADDRESS}:wallet'
 
+def test_parse_bigquery_staking_reward() -> None:
+  """Represent Numia withdraw_rewards message events as yield observations."""
+  record = reporting().parse_bigquery_staking_reward({
+    'block_timestamp': NOW,
+    'tx_hash': 'ABC',
+    'event_index': 5,
+    'event_attributes': {
+      'amount': '201217357510726adydx,10534ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5',
+      'delegator': ADDRESS,
+      'validator': 'dydxvaloper1abc',
+    },
+  })
+
+  assert record is not None
+  assert len(record.observations) == 2
+  first, second = record.observations
+  assert isinstance(first, Yield)
+  assert isinstance(second, Yield)
+  assert first.id == 'ABC:withdraw_rewards:5:0'
+  assert first.asset == 'DYDX'
+  assert first.amount == Decimal('0.000201217357510726')
+  assert second.asset == 'USDC'
+  assert second.amount == Decimal('0.010534')
+
 def test_parse_bigquery_trading_reward() -> None:
   """Represent Numia trading reward rows as yield observations."""
   record = reporting().parse_bigquery_trading_reward({
@@ -686,6 +999,217 @@ def test_parse_bigquery_native_wallet_transfer() -> None:
   assert transfer.asset == 'DYDX'
   assert transfer.amount == Decimal('7')
   assert transfer.src_account == 'dydx15ztc7xy42tn2ukkc0qjthkucw9ac63pgp70urn'
+  assert transfer.dst_account == ADDRESS
+
+def test_parse_bigquery_community_treasury_distribution() -> None:
+  """Represent Community Treasury block-event transfers as yield observations."""
+  record = reporting().parse_bigquery_community_treasury_distribution({
+    'block_height': 54816914,
+    'block_timestamp': NOW,
+    'event_index': 12667,
+    'event_type': 'transfer',
+    'event_attributes': {
+      'amount': f'2500000{DYDX_MAINNET_USDC_DENOM},7000000000000000000adydx',
+      'mode': 'EndBlock',
+      'recipient': ADDRESS,
+      'sender': COMMUNITY_TREASURY_ADDRESS,
+    },
+  })
+
+  assert record is not None
+  usdc = record.observations[0]
+  dydx = record.observations[1]
+  assert isinstance(usdc, Yield)
+  assert isinstance(dydx, Yield)
+  assert usdc.id == '54816914:12667:community_treasury:0'
+  assert usdc.asset == 'USDC'
+  assert usdc.amount == Decimal('2.5')
+  assert dydx.id == '54816914:12667:community_treasury:1'
+  assert dydx.asset == 'DYDX'
+  assert dydx.amount == Decimal('7')
+
+def test_parse_bigquery_subaccount_transfer() -> None:
+  """Represent Numia subaccount-to-subaccount rows as internal transfers."""
+  record = reporting().parse_bigquery_subaccount_transfer({
+    'block_timestamp': NOW,
+    'tx_hash': 'ABC',
+    'message_index': 1,
+    'action_index': 2,
+    'sender': ADDRESS,
+    'sender_number': 3,
+    'recipient': ADDRESS,
+    'recipient_number': 7,
+    'quantums': Decimal('12500000'),
+  }, table='dydx_transfer')
+
+  assert record is not None
+  transfer = record.observations[0]
+  assert isinstance(transfer, InternalTransfer)
+  assert transfer.id == 'ABC:dydx_transfer:1:2'
+  assert transfer.asset == 'USDC'
+  assert transfer.amount == Decimal('12.5')
+  assert transfer.src_account == f'dydx:{ADDRESS}:3'
+  assert transfer.dst_account == f'dydx:{ADDRESS}:7'
+
+def test_parse_bigquery_subaccount_transfer_preserves_zero_subaccount() -> None:
+  """Preserve zero-valued Numia subaccount numbers in transfer rows."""
+  record = reporting().parse_bigquery_subaccount_transfer({
+    'block_timestamp': NOW,
+    'tx_hash': 'ABC',
+    'message_index': 1,
+    'action_index': 2,
+    'sender': ADDRESS,
+    'sender_number': 0,
+    'recipient': ADDRESS,
+    'recipient_number': 7,
+    'quantums': Decimal('12500000'),
+  }, table='dydx_transfer')
+
+  assert record is not None
+  transfer = record.observations[0]
+  assert isinstance(transfer, InternalTransfer)
+  assert transfer.src_account == f'dydx:{ADDRESS}:0'
+
+def test_parse_bigquery_external_subaccount_transfer() -> None:
+  """Represent external Numia subaccount credits as internal transfers."""
+  record = reporting().parse_bigquery_subaccount_transfer({
+    'block_timestamp': NOW,
+    'tx_hash': 'ABC',
+    'message_index': 1,
+    'action_index': 2,
+    'sender': 'dydx1external',
+    'sender_number': 0,
+    'recipient': ADDRESS,
+    'recipient_number': 128,
+    'quantums': Decimal('25343388'),
+  }, table='dydx_transfer')
+
+  assert record is not None
+  transfer = record.observations[0]
+  assert isinstance(transfer, InternalTransfer)
+  assert transfer.id == 'ABC:dydx_transfer:1:2'
+  assert transfer.asset == 'USDC'
+  assert transfer.amount == Decimal('25.343388')
+  assert transfer.src_account == 'dydx:dydx1external:0'
+  assert transfer.dst_account == f'dydx:{ADDRESS}:128'
+
+def test_parse_bigquery_wallet_transfer() -> None:
+  """Represent unmatched Numia wallet transfers as balance-changing transfers."""
+  record = reporting().parse_bigquery_wallet_transfer({
+    'block_timestamp': NOW,
+    'tx_hash': 'ABC',
+    'event_index': 42,
+    'event_attributes': {
+      'sender': 'dydx1module',
+      'recipient': ADDRESS,
+      'amount': '1234567ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5',
+    },
+  })
+
+  assert record is not None
+  transfer = record.observations[0]
+  assert isinstance(transfer, Transfer)
+  assert transfer.id == 'ABC:wallet_transfer:42:0'
+  assert transfer.asset == 'USDC'
+  assert transfer.amount == Decimal('1.234567')
+  assert transfer.src_account == 'dydx1module'
+  assert transfer.dst_account == ADDRESS
+
+def test_parse_bigquery_megavault_deposit() -> None:
+  """Represent Numia Megavault deposit events as wallet transfers."""
+  record = reporting().parse_bigquery_megavault_transfer({
+    'block_timestamp': NOW,
+    'tx_hash': 'ABC',
+    'message_index': 1,
+    'event_index': 3,
+    'event_type': 'deposit_to_megavault',
+    'event_attributes': {
+      'depositor': ADDRESS,
+      'quote_quantums': '10000000',
+    },
+  })
+
+  assert record is not None
+  transfer = record.observations[0]
+  assert isinstance(transfer, Transfer)
+  assert transfer.id == 'ABC:deposit_to_megavault:3'
+  assert transfer.asset == 'USDC'
+  assert transfer.amount == Decimal('-10')
+  assert transfer.src_account == f'dydx:{ADDRESS}:0'
+  assert transfer.dst_account == f'dydx:{ADDRESS}:megavault'
+
+def test_parse_bigquery_megavault_withdraw() -> None:
+  """Represent Numia Megavault withdrawal events as wallet transfers."""
+  record = reporting().parse_bigquery_megavault_transfer({
+    'block_timestamp': NOW,
+    'tx_hash': 'ABC',
+    'message_index': 2,
+    'event_index': 4,
+    'event_type': 'withdraw_from_megavault',
+    'event_attributes': {
+      'withdrawer': ADDRESS,
+      'redeemed_quote_quantums': '9998721',
+    },
+  })
+
+  assert record is not None
+  transfer = record.observations[0]
+  assert isinstance(transfer, Transfer)
+  assert transfer.id == 'ABC:withdraw_from_megavault:4'
+  assert transfer.asset == 'USDC'
+  assert transfer.amount == Decimal('9.998721')
+  assert transfer.src_account == f'dydx:{ADDRESS}:megavault'
+  assert transfer.dst_account == f'dydx:{ADDRESS}:0'
+
+def test_parse_bigquery_ibc_outbound_transfer() -> None:
+  """Represent Numia outbound IBC transfer events as wallet transfers."""
+  record = reporting().parse_bigquery_ibc_wallet_transfer({
+    'block_timestamp': NOW,
+    'tx_hash': 'ABC',
+    'message_index': 1,
+    'event_index': 5,
+    'event_type': 'ibc_transfer',
+    'event_attributes': {
+      'sender': ADDRESS,
+      'receiver': 'osmo1receiver',
+      'denom': DYDX_MAINNET_USDC_DENOM,
+      'amount': '42000000',
+    },
+  })
+
+  assert record is not None
+  transfer = record.observations[0]
+  assert isinstance(transfer, Transfer)
+  assert transfer.id == 'ABC:ibc:5'
+  assert transfer.asset == 'USDC'
+  assert transfer.amount == Decimal('-42')
+  assert transfer.src_account == ADDRESS
+  assert transfer.dst_account == 'osmo1receiver'
+
+def test_parse_bigquery_ibc_inbound_transfer() -> None:
+  """Represent Numia inbound IBC receive events as wallet transfers."""
+  record = reporting().parse_bigquery_ibc_wallet_transfer({
+    'block_timestamp': NOW,
+    'tx_hash': 'ABC',
+    'message_index': 2,
+    'event_index': 6,
+    'event_type': 'fungible_token_packet',
+    'event_attributes': {
+      'sender': 'osmo1sender',
+      'receiver': ADDRESS,
+      'denom': DYDX_MAINNET_USDC_DENOM,
+      'amount': '21000000',
+      'success': 'true',
+    },
+  })
+
+  assert record is not None
+  transfer = record.observations[0]
+  assert isinstance(transfer, Transfer)
+  assert transfer.id == 'ABC:ibc:6'
+  assert transfer.asset == 'USDC'
+  assert transfer.amount == Decimal('21')
+  assert transfer.src_account == 'osmo1sender'
   assert transfer.dst_account == ADDRESS
 
 @pytest.mark.asyncio
