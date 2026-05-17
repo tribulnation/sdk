@@ -2,6 +2,7 @@
 
 from collections import defaultdict
 from datetime import datetime, timezone
+from dataclasses import dataclass
 from decimal import Decimal
 
 from moralis import Moralis
@@ -10,7 +11,8 @@ from moralis.evm.wallet.token_transfers import TokenTransfer
 from typing_extensions import AsyncIterable
 from web3 import Web3
 
-from tribulnation.sdk.reporting import EvmTx, Fee, History, Record
+from tribulnation.sdk.core import SDK
+from tribulnation.sdk.reporting import EvmTx, Fee, Record
 from tribulnation.ethereum.core import same_address
 from ..constants import MORALIS_CHAINS
 from ..config import EvmNetwork
@@ -43,7 +45,8 @@ def token_value(transfer: TokenTransfer) -> Decimal:
   return Decimal(transfer['value']) * (Decimal(10) ** -decimals)
 
 
-class MoralisHistory(History):
+@dataclass(frozen=True)
+class MoralisHistory(SDK):
   """Moralis-backed EVM history source."""
   address: str
   network: EvmNetwork

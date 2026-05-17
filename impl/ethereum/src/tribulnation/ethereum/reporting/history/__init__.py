@@ -20,7 +20,7 @@ from ..config import EvmConfig, EvmNetwork
 from ..constants import DEFAULT_HISTORY_SOURCES
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class History(EtherscanHistory, AlchemyHistory, MoralisHistory, _History):
   """EVM reporting history from the configured evidence source."""
   address: str

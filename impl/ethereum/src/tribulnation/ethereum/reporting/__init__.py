@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
+import functools
 import os
 
 from alchemy import Alchemy
@@ -46,6 +47,9 @@ ALCHEMY_RPC_URLS: dict[EvmNetwork, str] = {
   'optimism': OPTIMISM_ALCHEMY_RPC_URL,
 }
 
+@functools.cache
+def cached_etherscan(api_key: str, *, rate_limit: int | None, validate: bool = True) -> Etherscan:
+  return Etherscan.new(api_key=api_key, validate=validate, rate_limit=rate_limit)
 
 @dataclass(frozen=True)
 class Report(Snapshots, History, _Report):
@@ -85,12 +89,9 @@ class Report(Snapshots, History, _Report):
     api_key: str | None, *, validate: bool, rate_limit: int | None,
   ) -> Etherscan | None:
     """Create an Etherscan client when credentials are available."""
-    try:
-      return Etherscan.new(api_key=api_key, validate=validate, rate_limit=rate_limit)
-    except KeyError as exc:
-      if exc.args == ('ETHERSCAN_API_KEY',):
-        return None
-      raise
+    api_key = api_key or os.environ.get('ETHERSCAN_API_KEY')
+    if api_key is not None:
+      return cached_etherscan(api_key, validate=validate, rate_limit=rate_limit)
 
   @classmethod
   def new(

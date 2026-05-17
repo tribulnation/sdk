@@ -4,6 +4,7 @@ from typing_extensions import AsyncIterable, Callable, Awaitable, TypeVar, Any
 from collections import defaultdict
 from datetime import datetime
 from decimal import Decimal
+from dataclasses import dataclass, field
 import asyncio
 
 from web3.types import TxReceipt, TxData, BlockIdentifier, _Hash32
@@ -48,14 +49,15 @@ def fmt_hex(number: int) -> str:
   """Format a block number as an Alchemy hex quantity."""
   return f'0x{number:x}'
 
-class AlchemyHistory:
+@dataclass(frozen=True)
+class AlchemyHistory(SDK):
   """Alchemy-backed EVM history source."""
   address: str
-  node: NodeRpc | None
-  alchemy_transfers: Transfers | None
+  node: NodeRpc | None = None
+  alchemy_transfers: Transfers | None = None
   include_internal_transfers: bool = False
   batch_size: int = 32
-  block_timestamps_cache: dict[BlockIdentifier, asyncio.Future[datetime]]
+  block_timestamps_cache: dict[BlockIdentifier, asyncio.Future[datetime]] = field(default_factory=dict)
 
   @property
   def w3(self):

@@ -6,7 +6,7 @@ from .config import EvmNetwork
 
 
 DEFAULT_ASSETS_SOURCE = 'alchemy'
-DEFAULT_SNAPSHOT_ASSETS_SOURCE = 'node'
+DEFAULT_SNAPSHOT_ASSETS_SOURCE = 'alchemy'
 
 DEFAULT_HISTORY_SOURCES: dict[EvmNetwork, str] = {
   'ethereum': 'etherscan',
@@ -68,4 +68,4 @@ MORALIS_CHAINS: dict[EvmNetwork, Chain] = {
   'optimism': 'optimism',
 }
 
-POA_NETWORKS: set[EvmNetwork] = {'bnb', 'avalanche', 'optimism'}
+POA_NETWORKS: set[EvmNetwork] = {'bnb', 'avalanche', 'optimism', 'polygon'}
