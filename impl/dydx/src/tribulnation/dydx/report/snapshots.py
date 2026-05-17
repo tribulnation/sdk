@@ -3,7 +3,6 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from collections import defaultdict
 from decimal import Decimal
-import os
 
 from tribulnation.dydx.core import wrap_exceptions
 from tribulnation.sdk.reporting import Balance, Record, Snapshot, Snapshots as _Snapshots
@@ -14,6 +13,9 @@ from dydx.protos.cosmos.bank import v1beta1 as bank_proto
 from dydx.protos.cosmos.base import v1beta1 as coin_proto
 
 USDC = 'USDC'
+DYDX = 'DYDX'
+DYDX_BASE_DENOM = 'adydx'
+DYDX_QUANTUMS = Decimal(1_000_000_000_000_000_000)
 
 @dataclass(frozen=True)
 class Snapshots(_Snapshots):
@@ -34,6 +36,8 @@ class Snapshots(_Snapshots):
     """Convert a chain coin into a display asset and quantity."""
     if coin.denom == DYDX_MAINNET_USDC_DENOM:
       return USDC, Decimal(coin.amount) / Decimal(1_000_000)
+    if coin.denom == DYDX_BASE_DENOM:
+      return DYDX, Decimal(coin.amount) / DYDX_QUANTUMS
     metadata = await self.denom_metadata(coin.denom)
     if metadata is None:
       return coin.denom, Decimal(coin.amount)
@@ -62,20 +66,18 @@ class Snapshots(_Snapshots):
       if delegation.balance is None:
         continue
       asset, qty = await self.coin_balance(delegation.balance)
-      key = f'{asset}:staked'
-      current = balances.get(key)
-      balances[key] = Balance(
+      current = balances.get(asset)
+      balances[asset] = Balance(
         qty=qty + (current.qty if current is not None else Decimal(0)),
-        kind='strategy',
+        kind='currency',
       )
     rewards = await self.client.chain.distribution.delegation_total_rewards(self.address)
     for reward in rewards.total:
       asset, qty = await self.coin_balance(coin_proto.Coin(denom=reward.denom, amount=reward.amount))
-      key = f'{asset}:rewards'
-      current = balances.get(key)
-      balances[key] = Balance(
+      current = balances.get(asset)
+      balances[asset] = Balance(
         qty=qty + (current.qty if current is not None else Decimal(0)),
-        kind='strategy',
+        kind='currency',
       )
 
   async def __aenter__(self):
