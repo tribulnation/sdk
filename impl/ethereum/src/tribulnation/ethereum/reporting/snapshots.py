@@ -1,5 +1,4 @@
-"""Unified EVM reporting snapshots."""
-
+from typing_extensions import Callable, Awaitable, TypeVar
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -15,7 +14,7 @@ from web3.exceptions import BadFunctionCallOutput, ContractLogicError
 from tribulnation.sdk import ApiError, SDK
 from tribulnation.sdk.reporting import Balance, Record, Snapshot, Snapshots as _Snapshots
 
-from tribulnation.ethereum.core import rpc
+from tribulnation.ethereum.core import rpc, alchemy as alchemy_core
 from .config import EvmConfig, EvmNetwork
 from .constants import (
   ALCHEMY_NETWORKS,
@@ -24,20 +23,18 @@ from .constants import (
   MORALIS_CHAINS,
 )
 
+T = TypeVar('T')
 
 NATIVE_ASSET = 'native'
 NATIVE_DECIMALS = 18
-
 
 def hex_balance(value: str) -> int:
   """Parse an Alchemy hex-encoded balance."""
   return int(value, 16) if value.startswith('0x') else int(value)
 
-
 def token_qty(value: str, decimals: int | None) -> Decimal:
   """Convert a raw integer token balance into display units."""
   return Decimal(hex_balance(value)) * (Decimal(10) ** -(decimals or NATIVE_DECIMALS))
-
 
 @dataclass(frozen=True)
 class Snapshots(_Snapshots):
@@ -141,11 +138,14 @@ class Snapshots(_Snapshots):
       provenance={'source': 'api', 'service': 'node_rpc'},
     )
 
-  async def alchemy_snapshots(self, assets: Sequence[str] | None = None) -> Record:
-    """Snapshot wallet balances with Alchemy Portfolio tokens."""
-    client = self.require_alchemy()
-    wanted = {Web3.to_checksum_address(asset) for asset in assets or [] if asset != NATIVE_ASSET}
-    tokens = await client.portfolio.tokens.paged({
+  @SDK.method
+  @alchemy_core.wrap_exceptions
+  async def call_alchemy(self, fn: Callable[[], Awaitable[T]]) -> T:
+    """Call Alchemy under the SDK exception wrapper."""
+    return await fn()
+
+  async def alchemy_portfolio_tokens(self):
+    paging = self.require_alchemy().portfolio.tokens.paged({
       'addresses': [{
         'address': self.address,
         'networks': [ALCHEMY_NETWORKS[self.network]],
@@ -155,7 +155,17 @@ class Snapshots(_Snapshots):
       'includeNativeTokens': True,
       'includeErc20Tokens': True,
     })
+    state = paging.init
+    while state is not None:
+      chunk, state = await self.call_alchemy(lambda: paging.next(state)) # type: ignore
+      for token in chunk:
+        yield token
+
+  async def alchemy_snapshots(self, assets: Sequence[str] | None = None) -> Record:
+    """Snapshot wallet balances with Alchemy Portfolio tokens."""
+    wanted = {Web3.to_checksum_address(asset) for asset in assets or [] if asset != NATIVE_ASSET}
     balances: dict[str, Balance] = {}
+    tokens = [token async for token in self.alchemy_portfolio_tokens()]
     for token in tokens:
       address = token.get('tokenAddress')
       metadata = token.get('tokenMetadata') or {}
