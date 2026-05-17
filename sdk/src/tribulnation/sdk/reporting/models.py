@@ -18,6 +18,7 @@ ObservationType = Literal[
   'trade',
   'future_trade',
   'future_order',
+  'future_position_summary',
   'realized_pnl',
   'spot_order',
   'trade_leg',
@@ -80,6 +81,8 @@ class FutureTrade(BaseObservation):
   """Quote asset used for the instrument price, if known."""
   settle: str | None = None
   """Settlement asset for realized PnL, fees, and funding."""
+  position_id: str | None = None
+  """Raw futures position identifier, if provided by the source."""
   size: Decimal
   """Signed contract size. Positive increases long exposure; negative increases short exposure."""
   price: Decimal
@@ -110,6 +113,8 @@ class FutureOrder(BaseObservation):
   """Quote asset used for the instrument price, if known."""
   settle: str | None = None
   """Settlement asset for realized PnL, fees, and funding."""
+  position_id: str | None = None
+  """Raw futures position identifier, if provided by the source."""
   status: str | None = None
   """Raw order status, if provided by the source."""
   filled_size: Decimal | None = None
@@ -128,6 +133,8 @@ class RealizedPnl(BaseObservation):
   """Raw futures or perpetual instrument identifier."""
   settle: str | None = None
   """Settlement asset for realized PnL."""
+  position_id: str | None = None
+  """Raw futures position identifier, if provided by the source."""
   amount: Decimal
   """Signed realized PnL in settlement asset units."""
   subaccount: int | str | None = None
@@ -136,6 +143,52 @@ class RealizedPnl(BaseObservation):
   """Raw order identifier, if provided by the source."""
   trade_id: str | None = None
   """Raw trade/fill identifier, if provided by the source."""
+
+class FuturePositionSummary(BaseObservation):
+  """Aggregate futures position evidence without direct ledger impact."""
+  type: Literal['future_position_summary'] = 'future_position_summary'
+  position_id: str | None = None
+  """Raw futures position identifier, if provided by the source."""
+  instrument: str | None = None
+  """Raw futures or perpetual instrument identifier."""
+  base: str | None = None
+  """Underlying/base asset, if known."""
+  quote: str | None = None
+  """Quote asset used for the instrument price, if known."""
+  settle: str | None = None
+  """Settlement asset for realized PnL, fees, and funding."""
+  subaccount: int | str | None = None
+  """Venue subaccount identifier, if applicable."""
+  position_side: Literal['long', 'short'] | None = None
+  """Position direction, when reported by the source."""
+  margin_mode: str | None = None
+  """Raw margin mode, such as isolated or cross, if reported."""
+  opened_at: datetime | None = None
+  """Source opening time for the summarized position interval."""
+  closed_at: datetime | None = None
+  """Source closing time for the summarized position interval."""
+  opened_size: Decimal | None = None
+  """Positive opened position amount, if provided by the source."""
+  closed_size: Decimal | None = None
+  """Positive closed position amount, if provided by the source."""
+  closed_value: Decimal | None = None
+  """Positive source-reported closed notional value, if provided."""
+  avg_entry_price: Decimal | None = None
+  """Average entry price for the summarized position."""
+  avg_close_price: Decimal | None = None
+  """Average close price for the summarized position."""
+  realized_pnl: Decimal | None = None
+  """Signed realized PnL in settlement asset units, excluding fees and funding."""
+  funding: Decimal | None = None
+  """Signed aggregate funding in settlement asset units."""
+  total_fee: Decimal | None = None
+  """Positive aggregate trading fee paid in settlement asset units."""
+  opening_fee: Decimal | None = None
+  """Positive opening trading fee component, if provided by the source."""
+  closing_fee: Decimal | None = None
+  """Positive closing trading fee component, if provided by the source."""
+  position_pnl: Decimal | None = None
+  """Signed source-reported net position PnL, if provided."""
 
 class SpotOrder(BaseObservation):
   """A spot order (executed or not) for an asset pair, with an optional fee."""
@@ -217,6 +270,8 @@ class Funding(SingleAssetObservation):
   """Raw futures or perpetual instrument identifier, if provided by the source."""
   settle: str | None = None
   """Settlement asset for the funding payment, if distinct from the raw asset field."""
+  position_id: str | None = None
+  """Raw futures position identifier, if provided by the source."""
   subaccount: int | str | None = None
   """Venue subaccount identifier, if applicable."""
 
@@ -367,6 +422,7 @@ Observation = Annotated[
     Annotated[Trade, pydantic.Tag('trade')],
     Annotated[FutureTrade, pydantic.Tag('future_trade')],
     Annotated[FutureOrder, pydantic.Tag('future_order')],
+    Annotated[FuturePositionSummary, pydantic.Tag('future_position_summary')],
     Annotated[RealizedPnl, pydantic.Tag('realized_pnl')],
     Annotated[SpotOrder, pydantic.Tag('spot_order')],
     Annotated[TradeLeg, pydantic.Tag('trade_leg')],
