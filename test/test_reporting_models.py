@@ -6,6 +6,7 @@ import pytest
 from tribulnation.sdk import reporting
 from tribulnation.sdk.reporting import (
   Bonus,
+  ConversionBatch,
   Funding,
   FutureOrder,
   FuturePositionSummary,
@@ -14,6 +15,7 @@ from tribulnation.sdk.reporting import (
   RealizedPnl,
   Record,
   Transfer,
+  TradeLeg,
 )
 
 
@@ -196,3 +198,59 @@ def test_futures_scoped_position_id_fields_validate_and_export():
   assert pnl.position_id == 'position-1'
   assert isinstance(funding, Funding)
   assert funding.position_id == 'position-1'
+
+
+def test_conversion_trade_leg_marker_validates_through_record_union():
+  record = Record.model_validate({
+    'observations': [{
+      'type': 'trade_leg',
+      'time': '2025-01-24T20:45:47Z',
+      'asset': 'EIGEN',
+      'amount': '-0.00465815',
+      'event_type': 'conversion',
+      'label': 'Small Assets Exchange BNB',
+    }],
+    'provenance': {'source': 'manual', 'label': 'binance'},
+  })
+
+  leg = record.observations[0]
+  assert isinstance(leg, TradeLeg)
+  assert leg.event_type == 'conversion'
+  assert leg.label == 'Small Assets Exchange BNB'
+
+
+def test_invalid_trade_leg_event_type_is_rejected():
+  with pytest.raises(ValueError):
+    Record.model_validate({
+      'observations': [{
+        'type': 'trade_leg',
+        'asset': 'USDT',
+        'amount': '-1',
+        'event_type': 'withdrawal',
+      }],
+      'provenance': {'source': 'manual', 'label': 'binance'},
+    })
+
+
+def test_conversion_batch_validates_through_record_union():
+  assert reporting.ConversionBatch is ConversionBatch
+  assert 'ConversionBatch' in reporting.__all__
+
+  record = Record.model_validate({
+    'observations': [{
+      'type': 'conversion_batch',
+      'time': '2025-01-24T20:45:47Z',
+      'label': 'Small Assets Exchange BNB',
+      'legs': [
+        {'asset': 'EIGEN', 'amount': '-0.00465815'},
+        {'asset': 'BNB', 'amount': '0.00002529'},
+      ],
+    }],
+    'provenance': {'source': 'manual', 'label': 'binance'},
+  })
+
+  batch = record.observations[0]
+  assert isinstance(batch, ConversionBatch)
+  assert batch.label == 'Small Assets Exchange BNB'
+  assert batch.legs[0].asset == 'EIGEN'
+  assert batch.legs[1].amount == Decimal('0.00002529')

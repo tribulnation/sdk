@@ -22,6 +22,7 @@ ObservationType = Literal[
   'realized_pnl',
   'spot_order',
   'trade_leg',
+  'conversion_batch',
   'fee',
   'yield',
   'bonus',
@@ -38,6 +39,8 @@ ObservationType = Literal[
   'crypto_transaction',
   'unknown',
 ]
+
+TradeLegEventType = Literal['trade', 'conversion']
 
 class Fee(pydantic.BaseModel):
   amount: Decimal
@@ -207,7 +210,7 @@ class SpotOrder(BaseObservation):
   """Fee paid, if any."""
 
 class TradeLeg(BaseObservation):
-  """A leg of a trade."""
+  """A source balance leg that can support a trade or conversion batch."""
   type: Literal['trade_leg'] = 'trade_leg'
   asset: str
   """Raw asset identifier, as provided by the source."""
@@ -218,6 +221,25 @@ class TradeLeg(BaseObservation):
   """Raw order identifier, if provided by the source."""
   trade_id: str | None = None
   """Raw trade identifier, if provided by the source."""
+  event_type: TradeLegEventType | None = None
+  """Leg semantic marker. Missing or trade means ordinary trade evidence."""
+  label: str | None = None
+  """Raw source operation label used for source-labeled grouping."""
+
+class ConversionBatchLeg(pydantic.BaseModel):
+  """A source-preserving leg inside a canonical conversion batch."""
+  asset: str
+  """Raw asset identifier, as provided by the source."""
+  amount: Decimal
+  """Signed asset balance change."""
+
+class ConversionBatch(BaseObservation):
+  """Canonical grouped conversion without reliable pair/order identity."""
+  type: Literal['conversion_batch'] = 'conversion_batch'
+  label: str
+  """Source operation label shared by the grouped conversion legs."""
+  legs: Sequence[ConversionBatchLeg]
+  """Signed source legs included in deterministic source order."""
 
 class FeeLeg(BaseObservation):
   """A fee leg of an event."""
@@ -426,6 +448,7 @@ Observation = Annotated[
     Annotated[RealizedPnl, pydantic.Tag('realized_pnl')],
     Annotated[SpotOrder, pydantic.Tag('spot_order')],
     Annotated[TradeLeg, pydantic.Tag('trade_leg')],
+    Annotated[ConversionBatch, pydantic.Tag('conversion_batch')],
     Annotated[FeeLeg, pydantic.Tag('fee')],
     Annotated[Yield, pydantic.Tag('yield')],
     Annotated[Bonus, pydantic.Tag('bonus')],
