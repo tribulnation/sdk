@@ -30,7 +30,6 @@ from .impl import  (
   funding_payments,
   open_orders,
   place_order,
-  place_orders,
   query_order,
   cancel_order,
   cancel_orders,
@@ -120,9 +119,6 @@ class Market(MarketMixin, PerpMarket):
 
   async def place_order(self, order: Order) -> OrderResponse:
     return await place_order(self, order)
-
-  async def place_orders(self, orders: Sequence[Order]) -> Sequence[OrderResponse]:
-    return await place_orders(self, orders)
 
   async def query_order(self, id: str) -> OrderState | None:
     return await query_order(self, id)

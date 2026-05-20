@@ -125,25 +125,6 @@ async def place_order(self: MarketMixin, order: Order) -> OrderResponse:
   )
 
 @wrap_exceptions
-async def place_orders(self: MarketMixin, orders: Sequence[Order]) -> Sequence[OrderResponse]:
-  placements: list[OrderPlacement] = [
-    {
-      'market': self.perpetual_market,
-      'order': await with_expiry(self, export_order(order, self.settings)),
-      'subaccount': self.subaccount,
-    }
-    for order in orders
-  ]
-  response = await self.client.node.place_orders(placements)
-  results: list[OrderResponse] = []
-  for order in response.orders:
-    order_id = order.order_id
-    if order_id is None:
-      raise ValidationError('dYdX place orders response did not include an order ID')
-    results.append(OrderResponse(id=serialize_id(order_id), details=response))
-  return results
-
-@wrap_exceptions
 async def cancel_order(self: MarketMixin, id: str):
   return await self.client.node.cancel_order(parse_id(id))
 

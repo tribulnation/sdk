@@ -3,7 +3,7 @@ from .depth import parse_book, depth_stream
 from .rules import parse_rules
 from .mixin import ExchangeMixin, MarketMixin, Settings
 from .orders import (
-  place_order, place_orders,
+  place_order,
   cancel_order, cancel_orders,
   query_order, open_orders,
 )
