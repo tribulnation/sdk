@@ -1,11 +1,14 @@
 from typing_extensions import Collection
 from dataclasses import dataclass
+from collections import defaultdict, Counter
 from datetime import datetime
 from decimal import Decimal
 import asyncio
 
+from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import Balance, Record, Snapshots as _Snapshots, Snapshot
 from hyperliquid import Info
+from tribulnation.hyperliquid.core import wrap_exceptions
 
 HYPE_ASSET = '150'
 
@@ -24,54 +27,82 @@ class Snapshots(_Snapshots):
     info = Info.ws(validate=validate, mainnet=mainnet)
     return cls(info, address)
 
+  @SDK.method
+  @wrap_exceptions
   async def stake_snapshot(self):
     summary = await self.info.staking_summary(self.address)
     return Decimal(summary['delegated']) + Decimal(summary['undelegated'])
 
+  @SDK.method
+  @wrap_exceptions
   async def spot_balances(self):
     spot = await self.info.spot_clearinghouse_state(self.address)
     return {
-      str(balance['token']): Balance(qty=qty, kind='currency')
+      str(balance['token']): qty
       for balance in spot['balances']
         if (qty := Decimal(balance['total'])) > 0
     }
 
-  async def dex_balances(self, dex: str | None):
+  @SDK.method
+  @wrap_exceptions
+  async def dex_meta(self, dex: str):
+    meta, _ = await self.info.perp_meta_and_asset_ctxs(dex)
+    return meta
+
+  @SDK.method
+  @wrap_exceptions
+  async def clearinghouse_state(self, dex: str):
+    return await self.info.clearinghouse_state(self.address, dex=dex)
+
+  async def dex_positions_and_pnl(self, dex: str | None):
     dex = dex or ''
-    state = await self.info.clearinghouse_state(self.address, dex=dex)
-    return {
+    state, meta = await asyncio.gather(
+      self.clearinghouse_state(dex),
+      self.dex_meta(dex),
+    )
+    balances = {
       p['position']['coin']: Balance(
         qty=Decimal(p['position']['szi']), avg_price=Decimal(p['position']['entryPx']), kind='future'
       )
       for p in state['assetPositions']
     }
+    unrealized = sum(Decimal(p['position']['unrealizedPnl']) for p in state['assetPositions'])
+    return balances, {str(meta['collateralToken']): Decimal(unrealized)}
 
-  async def perp_balances(self):
+
+  @SDK.method
+  @wrap_exceptions
+  async def perp_snapshots_and_pnl(self):
     dexs = await self.info.perp_dexs()
-    nested_balances = await asyncio.gather(*[
-      self.dex_balances(dex and dex['name'])
+    results = await asyncio.gather(*[
+      self.dex_positions_and_pnl(dex and dex['name'])
       for dex in dexs
     ])
-    return {
-      asset: balance
-      for balances in nested_balances
-      for asset, balance in balances.items()
-    }
+    positions: dict[str, Balance] = {}
+    pnls = Counter()
+    for balances, pnl in results:
+      positions.update(balances)
+      pnls.update(pnl)
+    return positions, pnls
 
   async def snapshots(self, assets: Collection[str] | None = None) -> Record:
-    stake, spot_balances, perp_balances = await asyncio.gather(
+    stake, spot_balances, (perp_snapshots, perp_pnls) = await asyncio.gather(
       self.stake_snapshot(),
       self.spot_balances(),
-      self.perp_balances(),
+      self.perp_snapshots_and_pnl(),
     )
     time = datetime.now().astimezone()
-    balances = spot_balances | perp_balances
+    balances = defaultdict(Decimal, spot_balances)
+    for asset, pnl in perp_pnls.items():
+      balances[asset] -= pnl
     if stake > 0:
-      hype_qty = stake
-      if (hype_balance := balances.get(HYPE_ASSET)) is not None:
-        hype_qty += hype_balance.qty
-      balances[HYPE_ASSET] = Balance(qty=hype_qty, kind='currency')
+      balances[HYPE_ASSET] += stake
+
+    snapshots = perp_snapshots | {
+      asset: Balance(qty=qty, kind='currency')
+      for asset, qty in balances.items()
+    }
     return Record(
-      snapshots=[Snapshot(time=time, balances=balances)],
+      snapshots=[Snapshot(time=time, balances=snapshots)],
       provenance={'source': 'api', 'service': 'hyperliquid', 'endpoint': 'snapshots'},
     )
