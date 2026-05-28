@@ -1,5 +1,5 @@
 from types import UnionType
-from typing_extensions import Literal, Annotated, Union, Sequence, Any, TypedDict, NotRequired, ClassVar, TypeAlias
+from typing_extensions import Literal, Annotated, Union, Sequence, Any, TypedDict, NotRequired, TypedDict
 from datetime import datetime
 from decimal import Decimal
 import pydantic
@@ -15,7 +15,7 @@ class Snapshot(pydantic.BaseModel):
   balances: dict[str, Balance]
 
 ObservationType = Literal[
-  'trade',
+  'spot_trade',
   'future_trade',
   'future_order',
   'future_position_summary',
@@ -40,13 +40,16 @@ ObservationType = Literal[
   'unknown',
 ]
 
-TradeLegEventType = Literal['trade', 'conversion']
+TradeLegEventType = Literal['spot_trade', 'conversion']
 
 class Fee(pydantic.BaseModel):
   amount: Decimal
   """Amount paid."""
   asset: str
   """Raw asset identifier, as provided by the source."""
+
+  def __str__(self) -> str:
+    return f'Fee({self.amount} {self.asset})'
 
 class BaseObservation(pydantic.BaseModel):
   id: str | None = None
@@ -55,9 +58,9 @@ class BaseObservation(pydantic.BaseModel):
   subaccount: str | int | None = None
   """Venue subaccount or compartment label, if the source row has a scoped account."""
 
-class Trade(BaseObservation):
+class SpotTrade(BaseObservation):
   """An exchange of an asset for another, with an optional fee."""
-  type: Literal['trade'] = 'trade'
+  type: Literal['spot_trade'] = 'spot_trade'
   base: str | None = None
   """Raw base asset identifier, if provided by the source."""
   quote: str | None = None
@@ -70,10 +73,11 @@ class Trade(BaseObservation):
   """Quote asset units per base asset unit."""
   order_id: str | None = None
   """Raw order identifier, if provided by the source."""
-  trade_id: str | None = None
-  """Raw trade identifier, if provided by the source."""
   fee: Fee | None = None
   """Fee paid, if any."""
+
+  def __str__(self) -> str:
+    return f'SpotTrade({self.size or "?"} @ {self.price or "?"} {self.base or "?"}/{self.quote or "?"}, {self.time}, fee: {self.fee or "-"})'
 
 class FutureTrade(BaseObservation):
   """A futures or perpetual fill that changes derivative exposure."""
@@ -226,6 +230,9 @@ class TradeLeg(BaseObservation):
   label: str | None = None
   """Raw source operation label used for source-labeled grouping."""
 
+  def __str__(self) -> str:
+    return f'TradeLeg({self.amount} {self.asset}, {self.time}, event_type: {self.event_type or "?"}, label: {self.label or "?"})'
+
 class ConversionBatchLeg(pydantic.BaseModel):
   """A source-preserving leg inside a canonical conversion batch."""
   asset: str
@@ -300,20 +307,12 @@ class Repay(SingleAssetObservation):
 class InternalTransfer(SingleAssetObservation):
   """Movement between compartments inside the current venue account scope."""
   type: Literal['internal_transfer'] = 'internal_transfer'
-  amount: Decimal
+  amount: Decimal = pydantic.Field(..., ge=0)
   """Positive moved amount. Direction is described by src_account and dst_account."""
   src_account: str | None = None
   """Source compartment inside the current venue account scope, if known."""
   dst_account: str | None = None
   """Destination compartment inside the current venue account scope, if known."""
-
-  @pydantic.field_validator('amount')
-  @classmethod
-  def amount_must_be_positive(cls, value: Decimal) -> Decimal:
-    """Reject internal transfers without a positive moved amount."""
-    if value <= 0:
-      raise ValueError('internal_transfer.amount must be positive')
-    return value
 
 class Transfer(SingleAssetObservation):
   """Movement into or out of the current venue account scope."""
@@ -441,7 +440,7 @@ def observation_discriminator(obj):
 
 Observation = Annotated[
   Union[
-    Annotated[Trade, pydantic.Tag('trade')],
+    Annotated[SpotTrade, pydantic.Tag('spot_trade')],
     Annotated[FutureTrade, pydantic.Tag('future_trade')],
     Annotated[FutureOrder, pydantic.Tag('future_order')],
     Annotated[FuturePositionSummary, pydantic.Tag('future_position_summary')],
