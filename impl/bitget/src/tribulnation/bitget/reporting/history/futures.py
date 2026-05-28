@@ -5,7 +5,7 @@ from decimal import Decimal
 import warnings
 
 from tribulnation.sdk.core import SDK
-from tribulnation.sdk.reporting import FeeLeg, Observation, Record, Trade, UnknownObservation
+from tribulnation.sdk.reporting import FeeLeg, Observation, Record, SpotTrade, UnknownObservation
 from tribulnation.sdk.reporting import History as SdkHistory
 
 from bitget import Bitget
@@ -70,14 +70,13 @@ class FuturesHistory(TimezoneMixin, SdkHistory):
           fee_asset = fill['feeDetail'][0]['feeCoin']
 
         side = fill_direction(fill)
-        yield api_record(Trade(
+        yield api_record(SpotTrade(
           id=fill['tradeId'],
           time=self.add_tz(fill['cTime']),
           pair=fill['symbol'],
           size=signed_size(fill['baseVolume'], side),
           price=fill['price'],
           order_id=fill['orderId'],
-          trade_id=fill['tradeId'],
           fee=None if fee is None or fee_asset is None else nonzero_fee(fee, fee_asset),
         ), endpoint='futures_fills', response=fill)
 

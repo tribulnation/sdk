@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 
 from tribulnation.sdk.core import SDK
-from tribulnation.sdk.reporting import FeeLeg, Observation, Record, Trade, UnknownObservation
+from tribulnation.sdk.reporting import FeeLeg, Observation, Record, SpotTrade, UnknownObservation
 from tribulnation.sdk.reporting import History as SdkHistory
 from bitget import Bitget
 from bitget.spot.public.symbols import Symbol
@@ -72,7 +72,7 @@ class MarginHistory(TimezoneMixin, SdkHistory):
         base = symbols[symbol]['baseCoin']
         quote = symbols[symbol]['quoteCoin']
         side = 'buy' if 'buy' in fill['side'] else 'sell'
-        yield api_record(Trade(
+        yield api_record(SpotTrade(
           id=fill['tradeId'],
           time=self.add_tz(fill['cTime']),
           base=base, quote=quote,
@@ -80,7 +80,6 @@ class MarginHistory(TimezoneMixin, SdkHistory):
           size=signed_size(fill['size'], side),
           price=fill['priceAvg'],
           order_id=fill['orderId'],
-          trade_id=fill['tradeId'],
           fee=nonzero_fee(fill['feeDetail']['totalFee'], fill['feeDetail']['feeCoin']),
         ), endpoint=f'{margin_type}_margin_fills', response=fill)
 

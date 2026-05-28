@@ -9,7 +9,7 @@ from tribulnation.sdk.reporting import (
   FeeLeg,
   Observation,
   Record,
-  Trade,
+  SpotTrade,
   UnknownObservation,
 )
 from tribulnation.sdk.reporting import History as SdkHistory
@@ -75,7 +75,7 @@ class SpotHistory(TimezoneMixin, SdkHistory):
       for fill in chunk:
         base = symbols[fill['symbol']]['baseCoin']
         quote = symbols[fill['symbol']]['quoteCoin']
-        yield api_record(Trade(
+        yield api_record(SpotTrade(
           id=fill['tradeId'],
           time=self.add_tz(fill['cTime']),
           base=base, quote=quote,
@@ -83,7 +83,6 @@ class SpotHistory(TimezoneMixin, SdkHistory):
           size=signed_size(fill['size'], fill['side']),
           price=fill['priceAvg'],
           order_id=fill['orderId'],
-          trade_id=fill['tradeId'],
           fee=nonzero_fee(fill['feeDetail']['totalFee'], fill['feeDetail']['feeCoin']),
         ), endpoint='spot_fills', response=fill)
 
