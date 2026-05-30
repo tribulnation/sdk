@@ -35,7 +35,7 @@ from .constants import (
 )
 from .history import History
 from .snapshots import Snapshots
-
+from .util import source_id
 
 ALCHEMY_RPC_URLS: dict[EvmNetwork, str] = {
   'ethereum': ETHEREUM_ALCHEMY_RPC_URL,
@@ -246,13 +246,16 @@ class Report(Snapshots, History, _Report):
             assets.add(transfer.asset)
 
     if start is None and start_time is not None:
+      start_time = start_time.astimezone()
       snapshot_time = start_time - timedelta(days=1)
       yield Record(
         snapshots=[Snapshot(time=snapshot_time, balances={})],
         provenance={
           'source': 'derived',
-          'method': 'evm_zero_baseline_snapshot',
-          'reason': 'EVM full-history reports imply zero balances before the first observed transaction.',
+          'id': source_id('derived'),
+          'details': {
+            'note': 'EVM full-history reports imply zero balances before the first observed transaction.',
+          },
         },
       )
 

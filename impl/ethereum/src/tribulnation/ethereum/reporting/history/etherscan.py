@@ -15,6 +15,7 @@ from etherscan.api.account.internal_transactions import InternalTransaction
 from tribulnation.sdk.core import SDK
 from tribulnation.sdk.reporting import Fee, EvmTx, Record
 from tribulnation.ethereum.core import etherscan as etherscan_core, group_by, same_address
+from ..util import source_id
 
 T = TypeVar('T')
 
@@ -195,7 +196,7 @@ class EtherscanHistory(SDK):
     all_txs = native_txs + token_txs + internal_txs
     any_tx = all_txs[0]
     native_tx = native_txs[0] if native_txs else None
-    time = any_tx['timeStamp']
+    time = self.add_tz(any_tx['timeStamp'])
 
     if native_tx and native_tx['isError'] != '0':
       fee = self.etherscan_parse_fee(native_tx)
@@ -262,4 +263,4 @@ class EtherscanHistory(SDK):
       internal_txs = grouped_internal_txs.get(hash, [])
       tx = self.etherscan_parse_tx(hash, native_txs=native_txs, token_txs=token_txs, internal_txs=internal_txs)
       if tx is not None:
-        yield Record(observations=[tx], provenance={'source': 'api', 'service': 'etherscan'})
+        yield Record(observations=[tx], provenance={'source': 'api', 'service': 'etherscan', 'id': source_id('etherscan')})

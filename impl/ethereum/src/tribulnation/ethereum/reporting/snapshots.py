@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from decimal import Decimal
 import asyncio
+from uuid import uuid4
 
 from alchemy import Alchemy
 from ethereum import NodeRpc
@@ -15,6 +16,7 @@ from tribulnation.sdk import ApiError, SDK
 from tribulnation.sdk.reporting import Balance, Record, Snapshot, Snapshots as _Snapshots
 
 from tribulnation.ethereum.core import rpc, alchemy as alchemy_core
+from .util import source_id
 from .config import EvmConfig, EvmNetwork
 from .constants import (
   ALCHEMY_NETWORKS,
@@ -135,7 +137,7 @@ class Snapshots(_Snapshots):
         balances[contract] = Balance(qty=balance, kind='currency')
     return Record(
       snapshots=[Snapshot(time=time, balances=balances)],
-      provenance={'source': 'api', 'service': 'node_rpc'},
+      provenance={'source': 'api', 'service': 'node_rpc', 'id': source_id('node_rpc')},
     )
 
   @SDK.method
@@ -177,7 +179,7 @@ class Snapshots(_Snapshots):
         balances[asset] = Balance(qty=qty, kind='currency')
     return Record(
       snapshots=[Snapshot(time=datetime.now(timezone.utc), balances=balances)],
-      provenance={'source': 'api', 'service': 'alchemy', 'endpoint': 'portfolio.tokens'},
+      provenance={'source': 'api', 'service': 'alchemy', 'id': source_id('alchemy')},
     )
 
   async def moralis_snapshots(self) -> Record:
@@ -202,7 +204,7 @@ class Snapshots(_Snapshots):
         balances[asset] = Balance(qty=qty, kind='currency')
     return Record(
       snapshots=[Snapshot(time=datetime.now(timezone.utc), balances=balances)],
-      provenance={'source': 'api', 'service': 'moralis', 'endpoint': 'wallet.token_balances'},
+      provenance={'source': 'api', 'service': 'moralis', 'id': source_id('moralis')},
     )
 
   @SDK.method

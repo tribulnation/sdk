@@ -15,14 +15,14 @@ from tribulnation.sdk.reporting import EvmTx, Fee, Record
 from tribulnation.ethereum.core import same_address, moralis as moralis_core
 from ..constants import MORALIS_CHAINS
 from ..config import EvmNetwork
+from ..util import source_id
 
 T = TypeVar('T')
 
 def parse_time(value: str | None) -> datetime | None:
   """Parse a Moralis ISO timestamp."""
-  if value is None:
-    return None
-  return datetime.fromisoformat(value.replace('Z', '+00:00')).astimezone()
+  if value is not None:
+    return datetime.fromisoformat(value.replace('Z', '+00:00')).astimezone()
 
 def decimal_value(value: str | int | float | None) -> Decimal:
   """Parse a Moralis numeric field."""
@@ -215,4 +215,4 @@ class MoralisHistory(SDK):
         token_transfers=token_by_hash.get(hash, []),
       )
       if tx is not None:
-        yield Record(observations=[tx], provenance={'source': 'api', 'service': 'moralis'})
+        yield Record(observations=[tx], provenance={'source': 'api', 'service': 'moralis', 'id': source_id('moralis')})

@@ -17,6 +17,7 @@ from ethereum import NodeRpc
 
 from tribulnation.sdk.core import SDK
 from tribulnation.sdk.reporting import Fee, EvmTx, Record
+from ..util import source_id
 
 T = TypeVar('T')
 
@@ -230,4 +231,4 @@ class AlchemyHistory(SDK):
     for task in asyncio.as_completed(tasks):
       event = await task
       if event is not None and filter_event(event):
-        yield Record(observations=[event], provenance={'source': 'api', 'service': 'alchemy'})
+        yield Record(observations=[event], provenance={'source': 'api', 'service': 'alchemy', 'id': source_id('alchemy')})

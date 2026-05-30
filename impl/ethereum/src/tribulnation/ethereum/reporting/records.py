@@ -2,6 +2,7 @@ from typing_extensions import AsyncIterable, Protocol, Sequence
 from datetime import datetime, timedelta
 
 from tribulnation.sdk.reporting import EvmTx, Record, Snapshot
+from .snapshots import source_id
 
 class EvmRecordsSource(Protocol):
   """Object able to fetch EVM history records and snapshots."""
@@ -39,8 +40,10 @@ async def records(
       snapshots=[Snapshot(time=snapshot_time, balances={})],
       provenance={
         'source': 'derived',
-        'method': 'evm_zero_baseline_snapshot',
-        'reason': 'EVM full-history reports imply zero balances before the first observed transaction.',
+        'id': source_id('derived'),
+        'details': {
+          'note': 'EVM full-history reports imply zero balances before the first observed transaction.',
+        },
       },
     )
 
