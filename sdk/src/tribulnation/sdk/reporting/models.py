@@ -273,7 +273,8 @@ class SingleAssetObservation(BaseObservation):
   """Raw asset identifier, as provided by the source."""
 
   def __str__(self) -> str:
-    return f'{self.type}: {self.amount} {self.asset} [{self.time}]'
+    type = self.type # type: ignore
+    return f'{type}: {self.amount} {self.asset} [{self.time}]'
 
 class UnknownObservation(SingleAssetObservation):
   """A source observation whose economic meaning is intentionally unclassified."""
