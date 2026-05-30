@@ -4,14 +4,15 @@ from datetime import datetime
 from collections import defaultdict
 from decimal import Decimal
 
-from tribulnation.sdk.core import SDK
-from tribulnation.sdk.reporting import Balance, Record, Snapshot, Snapshots as _Snapshots
-from tribulnation.dydx.core import wrap_exceptions
-
 from dydx import Dydx, Indexer
 from dydx.node import DYDX_MAINNET_USDC_DENOM
 from dydx.protos.cosmos.bank import v1beta1 as bank_proto
 from dydx.protos.cosmos.base import v1beta1 as coin_proto
+
+from tribulnation.sdk.core import SDK
+from tribulnation.sdk.reporting import Balance, Record, Snapshot, Snapshots as _Snapshots
+from tribulnation.dydx.core import wrap_exceptions
+from .util import source_id
 
 USDC = 'USDC'
 DYDX = 'DYDX'
@@ -159,7 +160,7 @@ class Snapshots(_Snapshots):
         time=time,
         balances=await self.snapshot_balances(collateral, positions, entry_prices),
       )],
-      provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'snapshots'},
+      provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )
 
   async def snapshot_balances(

@@ -14,6 +14,7 @@ from dydx.indexer.data.get_transfers import Transfer
 from .accounts import account_label, is_account
 from .constants import USDC
 from .time import in_window
+from ..util import source_id
 
 T = TypeVar('T')
 
@@ -150,10 +151,9 @@ class IndexerHistory:
         realized_pnl=realized_pnl,
         subaccount=fill['subaccountNumber'],
         order_id=fill.get('orderId'),
-        trade_id=fill['id'],
         fee=Fee(asset=USDC, amount=Decimal(fill['fee'])),
       )],
-      provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'fills', 'response': fill},
+      provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )
 
   def parse_fills(
@@ -201,7 +201,7 @@ class IndexerHistory:
         src_account=account_label(transfer['sender']),
         dst_account=account_label(transfer['recipient']),
       )],
-      provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'transfers', 'response': transfer},
+      provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )
 
   async def subaccount_records(

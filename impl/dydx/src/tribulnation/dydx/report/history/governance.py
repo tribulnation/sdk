@@ -16,6 +16,7 @@ from .coins import asset_symbol, denom_quantums
 from .comet import event_attributes
 from .constants import COMMUNITY_TREASURY_PROPOSAL_HEIGHTS, GOVERNANCE_API_URL
 from .time import in_window, parse_time
+from ..util import source_id
 
 def proposal_amount(coin: dict[str, object]) -> tuple[str, Decimal] | None:
   """Convert a proposal coin object into asset and amount."""
@@ -116,7 +117,7 @@ class GovernanceHistory:
       return None
     return Record(
       observations=observations,
-      provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'governance:proposals', 'response': proposal},
+      provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )
 
   async def confirm_governance_proposal(self, proposal_id: str) -> bool:

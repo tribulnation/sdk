@@ -1,3 +1,4 @@
+from tribulnation.dydx.report.util import source_id
 from typing_extensions import AsyncIterable, TYPE_CHECKING
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
@@ -25,6 +26,7 @@ from .history.constants import (
   DEFAULT_WALLET_TRANSFERS_SOURCE,
 )
 from .snapshots import Snapshots
+from .util import source_id
 
 if TYPE_CHECKING:
   from google.cloud.bigquery import Client as BigQueryClient
@@ -82,13 +84,16 @@ class Report(Snapshots, History, _Report):
           start_time = obs.time if start_time is None else min(start_time, obs.time)
 
     if start is None and start_time is not None:
+      start_time = start_time.astimezone()
       snapshot_time = start_time - timedelta(days=1)
       yield Record(
         snapshots=[Snapshot(time=snapshot_time, balances={})],
         provenance={
           'source': 'derived',
-          'method': 'dydx_zero_baseline_snapshot',
-          'reason': 'dYdX full-history reports imply zero balances before the first observed transaction.',
+          'id': source_id('dydx'),
+          'details': {
+            'note': 'dYdX full-history reports imply zero balances before the first observed transaction.',
+          }
         },
       )
 

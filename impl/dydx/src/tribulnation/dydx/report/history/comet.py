@@ -20,6 +20,7 @@ from tribulnation.sdk.reporting import (
 
 from dydx import Dydx
 from dydx.chain.comet.types import Event, TxResponse
+from ..util import source_id
 from .accounts import megavault_account, staking_account, subaccount_account, wallet_account
 from .coins import parse_coins, parse_fee_coin
 from .constants import COMET_BLOCK_CONCURRENCY, COMET_TX_SEARCH_PER_PAGE, DYDX, USDC, USDC_QUANTUMS
@@ -150,8 +151,7 @@ class CometHistory:
     provenance: ApiProvenance = {
       'source': 'api',
       'service': 'dydx',
-      'endpoint': 'comet_tx_search',
-      'response': {'tx': tx, 'event': event},
+      'id': source_id('dydx'),
     }
     return Record(
       observations=[Funding(
@@ -196,7 +196,7 @@ class CometHistory:
     tx_hash = tx.get('hash')
     return Record(
       observations=[CryptoTransaction(id=tx_hash, time=time, tx_id=tx_hash, fee=fee)],
-      provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'comet_tx_search', 'response': tx},
+      provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )
 
   def chain_fee(self, tx: TxResponse) -> Fee | None:
@@ -286,8 +286,7 @@ class CometHistory:
       provenance={
         'source': 'api',
         'service': 'dydx',
-        'endpoint': 'comet_tx_search',
-        'response': {'tx': tx, 'event': event},
+        'id': source_id('dydx'),
       },
     )
 
@@ -319,8 +318,7 @@ class CometHistory:
       provenance={
         'source': 'api',
         'service': 'dydx',
-        'endpoint': 'comet_tx_search',
-        'response': {'tx': tx, 'event': event},
+        'id': source_id('dydx'),
       },
     )
 
@@ -384,8 +382,7 @@ class CometHistory:
       provenance={
         'source': 'api',
         'service': 'dydx',
-        'endpoint': 'comet_tx_search',
-        'response': {'tx': tx, 'event': event},
+        'id': source_id('dydx'),
       },
     )
 
@@ -442,8 +439,7 @@ class CometHistory:
       provenance={
         'source': 'api',
         'service': 'dydx',
-        'endpoint': 'comet_tx_search',
-        'response': {'tx': tx, 'event': event},
+        'id': source_id('dydx'),
       },
     )
 
@@ -494,8 +490,7 @@ class CometHistory:
       provenance={
         'source': 'api',
         'service': 'dydx',
-        'endpoint': 'comet_tx_search',
-        'response': {'tx': tx, 'event': event},
+        'id': source_id('dydx'),
       },
     )
 
@@ -590,13 +585,8 @@ class CometHistory:
     return Record(
       observations=[
         CryptoTransaction(id=tx_hash, time=time, tx_id=tx_hash, fee=fee, transfers=transfers),
-        UnknownObservation(
-          id=f'{tx_hash}:unknown',
-          time=time,
-          reason='dYdX inbound wallet transfer was not matched to an indexer transfer or supported semantic event.',
-        ),
       ],
-      provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'comet_tx_search', 'response': tx},
+      provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )
 
   def inbound_transfers(self, tx: TxResponse) -> list[CryptoTransfer]:

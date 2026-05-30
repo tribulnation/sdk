@@ -11,6 +11,7 @@ from .accounts import megavault_account, staking_account, subaccount_account, wa
 from .coins import asset_symbol, denom_quantums, parse_coins, parse_fee_coin
 from .constants import COMMUNITY_TREASURY_ADDRESS, USDC, USDC_QUANTUMS
 from .time import parse_time
+from ..util import source_id
 
 if TYPE_CHECKING:
   from google.cloud.bigquery import Client as BigQueryClient
@@ -116,10 +117,9 @@ class BigQueryHistory:
         time=row_time(row),
         asset=USDC,
         amount=amount,
-        settle=USDC,
         subaccount=row_int(row, 'subaccount_number'),
       )],
-      provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'bigquery:dydx_settled_funding', 'response': row},
+      provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )
 
   async def bigquery_chain_fees(
@@ -157,7 +157,7 @@ class BigQueryHistory:
         tx_id=tx_id,
         fee=Fee(asset=fee_asset, amount=fee_amount),
       )],
-      provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'bigquery:dydx_transactions', 'response': row},
+      provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )
 
   async def bigquery_subaccount_transfers(
@@ -228,7 +228,7 @@ class BigQueryHistory:
         src_account=src_account,
         dst_account=dst_account,
       )],
-      provenance={'source': 'api', 'service': 'dydx', 'endpoint': f'bigquery:{table}', 'response': row},
+      provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )
 
   async def bigquery_staking_transfers(
@@ -293,7 +293,7 @@ class BigQueryHistory:
         src_account=src_account,
         dst_account=dst_account,
       )],
-      provenance={'source': 'api', 'service': 'dydx', 'endpoint': f'bigquery:dydx_{kind}', 'response': row},
+      provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )
 
   async def bigquery_staking_rewards(
@@ -341,7 +341,7 @@ class BigQueryHistory:
       return None
     return Record(
       observations=observations,
-      provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'bigquery:dydx_message_events', 'response': row},
+      provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )
 
   async def bigquery_trading_rewards(
@@ -369,7 +369,7 @@ class BigQueryHistory:
         asset=asset,
         amount=amount,
       )],
-      provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'bigquery:dydx_reward_distribution', 'response': row},
+      provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )
 
   async def bigquery_community_treasury_distributions(
@@ -417,7 +417,7 @@ class BigQueryHistory:
       return None
     return Record(
       observations=observations,
-      provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'bigquery:dydx_block_events', 'response': row},
+      provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )
 
   async def bigquery_megavault_transfers(
@@ -477,7 +477,7 @@ class BigQueryHistory:
         src_account=src_account,
         dst_account=dst_account,
       )],
-      provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'bigquery:dydx_message_events', 'response': row},
+      provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )
 
   async def bigquery_ibc_wallet_transfers(
@@ -529,7 +529,7 @@ class BigQueryHistory:
         src_account=str(sender) if sender is not None else None,
         dst_account=str(receiver) if receiver is not None else None,
       )],
-      provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'bigquery:dydx_message_events', 'response': row},
+      provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )
 
   async def bigquery_wallet_transfers(
@@ -608,7 +608,7 @@ class BigQueryHistory:
       return None
     return Record(
       observations=observations,
-      provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'bigquery:dydx_message_events', 'response': row},
+      provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )
 
   def string_parameter(self, name: str, value: str) -> 'ScalarQueryParameter':
@@ -667,5 +667,5 @@ class BigQueryHistory:
       return None
     return Record(
       observations=records,
-      provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'bigquery:dydx_block_events', 'response': row},
+      provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )
