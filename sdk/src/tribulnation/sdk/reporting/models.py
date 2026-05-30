@@ -11,8 +11,14 @@ class Balance(pydantic.BaseModel):
   """Average entry price"""
 
 class Snapshot(pydantic.BaseModel):
-  time: datetime
+  time: pydantic.AwareDatetime
   balances: dict[str, Balance]
+
+  def amount(self, asset: str) -> Decimal:
+    if (balance := self.balances.get(asset)):
+      return balance.qty
+    else:
+      return Decimal('0')
 
 ObservationType = Literal[
   'spot_trade',
@@ -22,7 +28,7 @@ ObservationType = Literal[
   'realized_pnl',
   'spot_order',
   'trade_leg',
-  'conversion_batch',
+  'conversion',
   'fee',
   'yield',
   'bonus',
@@ -40,10 +46,10 @@ ObservationType = Literal[
   'unknown',
 ]
 
-TradeLegEventType = Literal['spot_trade', 'conversion']
+TradeLegEventType = Literal['spot_trade', 'conversion', 'fiat_conversion']
 
 class Fee(pydantic.BaseModel):
-  amount: Decimal
+  amount: Decimal = pydantic.Field(..., ge=0)
   """Amount paid."""
   asset: str
   """Raw asset identifier, as provided by the source."""
@@ -54,7 +60,7 @@ class Fee(pydantic.BaseModel):
 class BaseObservation(pydantic.BaseModel):
   id: str | None = None
   """Raw identifier, if provided by the source."""
-  time: datetime | None = None
+  time: pydantic.AwareDatetime | None = None
   subaccount: str | int | None = None
   """Venue subaccount or compartment label, if the source row has a scoped account."""
 
@@ -100,8 +106,6 @@ class FutureTrade(BaseObservation):
   """Fill-level realized PnL in settlement asset units, excluding fees. If provided by the source."""
   order_id: str | None = None
   """Raw order identifier, if provided by the source."""
-  trade_id: str | None = None
-  """Raw trade identifier, if provided by the source."""
   fee: Fee | None = None
   """Fee paid, if any."""
 
@@ -136,12 +140,12 @@ class RealizedPnl(BaseObservation):
   type: Literal['realized_pnl'] = 'realized_pnl'
   instrument: str | None = None
   """Raw futures or perpetual instrument identifier."""
-  settle: str | None = None
+  asset: str
   """Settlement asset for realized PnL."""
-  position_id: str | None = None
-  """Raw futures position identifier, if provided by the source."""
   amount: Decimal
   """Signed realized PnL in settlement asset units."""
+  position_id: str | None = None
+  """Raw futures position identifier, if provided by the source."""
   order_id: str | None = None
   """Raw order identifier, if provided by the source."""
   trade_id: str | None = None
@@ -233,20 +237,22 @@ class TradeLeg(BaseObservation):
   def __str__(self) -> str:
     return f'TradeLeg({self.amount} {self.asset}, {self.time}, event_type: {self.event_type or "?"}, label: {self.label or "?"})'
 
-class ConversionBatchLeg(pydantic.BaseModel):
+class ConversionLeg(pydantic.BaseModel):
   """A source-preserving leg inside a canonical conversion batch."""
   asset: str
   """Raw asset identifier, as provided by the source."""
   amount: Decimal
   """Signed asset balance change."""
 
-class ConversionBatch(BaseObservation):
+class Conversion(BaseObservation):
   """Canonical grouped conversion without reliable pair/order identity."""
-  type: Literal['conversion_batch'] = 'conversion_batch'
+  type: Literal['conversion'] = 'conversion'
   label: str
   """Source operation label shared by the grouped conversion legs."""
-  legs: Sequence[ConversionBatchLeg]
+  legs: Sequence[ConversionLeg]
   """Signed source legs included in deterministic source order."""
+  fee: Fee | None = None
+  """Fee paid, if any."""
 
 class FeeLeg(BaseObservation):
   """A fee leg of an event."""
@@ -260,21 +266,18 @@ class FeeLeg(BaseObservation):
   event_id: str | None = None
   """Event/observation identifier, if provided by the source."""
 
-class UnknownObservation(BaseObservation):
-  """A source observation whose economic meaning is intentionally unclassified."""
-  type: Literal['unknown'] = 'unknown'
-  asset: str | None = None
-  """Raw asset identifier, if the row has a primary asset."""
-  amount: Decimal | None = None
-  """Raw source amount, if the row has a primary amount."""
-  reason: str | None = None
-  """Short explanation for why the row is not typed more specifically."""
-
 class SingleAssetObservation(BaseObservation):
   amount: Decimal
   """Signed amount of the observation, in the asset's base units."""
   asset: str
   """Raw asset identifier, as provided by the source."""
+
+  def __str__(self) -> str:
+    return f'{self.type}: {self.amount} {self.asset} [{self.time}]'
+
+class UnknownObservation(SingleAssetObservation):
+  """A source observation whose economic meaning is intentionally unclassified."""
+  type: Literal['unknown'] = 'unknown'
 
 class Yield(SingleAssetObservation):
   """Inflow from staking, lending, etc."""
@@ -291,8 +294,6 @@ class Funding(SingleAssetObservation):
   type: Literal['funding'] = 'funding'
   instrument: str | None = None
   """Raw futures or perpetual instrument identifier, if provided by the source."""
-  settle: str | None = None
-  """Settlement asset for the funding payment, if distinct from the raw asset field."""
   position_id: str | None = None
   """Raw futures position identifier, if provided by the source."""
 
@@ -346,31 +347,29 @@ class CryptoWithdrawal(BaseCryptoTransfer):
   """Outflow from withdrawing a crypto asset from an account."""
   type: Literal['crypto_withdrawal'] = 'crypto_withdrawal'
 
-class FiatDeposit(SingleAssetObservation):
-  """Inflow from depositing a fiat asset into an account."""
-  type: Literal['fiat_deposit'] = 'fiat_deposit'
+class BaseFiatTransfer(SingleAssetObservation):
   fiat_asset: str | None = None
   """Raw spent fiat asset identifier, if provided by the source (and different from the credited asset)."""
   fee: Fee | None = None
   """Fee paid, if any."""
 
-class FiatWithdrawal(SingleAssetObservation):
+class FiatDeposit(BaseFiatTransfer):
+  """Inflow from depositing a fiat asset into an account."""
+  type: Literal['fiat_deposit'] = 'fiat_deposit'
+
+class FiatWithdrawal(BaseFiatTransfer):
   """Outflow from withdrawing a fiat asset from an account."""
   type: Literal['fiat_withdrawal'] = 'fiat_withdrawal'
-  fiat_asset: str | None = None
-  """Raw sent fiat asset identifier, if provided by the source (and different from the spent asset)."""
-  fee: Fee | None = None
-  """Fee paid, if any."""
 
 class FiatConversion(SingleAssetObservation):
   """Crypto balance change caused by an external fiat buy or sell."""
   type: Literal['fiat_conversion'] = 'fiat_conversion'
   amount: Decimal
   """Signed crypto account change. Positive means fiat buy; negative means fiat sell."""
-  fiat_asset: str | None = None
+  fiat_asset: str
   """Raw external fiat asset identifier, if provided by the source."""
-  fiat_amount: Decimal | None = None
-  """Positive external fiat amount, if provided by the source."""
+  fiat_amount: Decimal
+  """Signed external fiat amount, if provided by the source."""
   fee: Fee | None = None
   """External/payment fee metadata, if provided by the source."""
   payment_method: str | None = None
@@ -447,7 +446,7 @@ Observation = Annotated[
     Annotated[RealizedPnl, pydantic.Tag('realized_pnl')],
     Annotated[SpotOrder, pydantic.Tag('spot_order')],
     Annotated[TradeLeg, pydantic.Tag('trade_leg')],
-    Annotated[ConversionBatch, pydantic.Tag('conversion_batch')],
+    Annotated[Conversion, pydantic.Tag('conversion')],
     Annotated[FeeLeg, pydantic.Tag('fee')],
     Annotated[Yield, pydantic.Tag('yield')],
     Annotated[Bonus, pydantic.Tag('bonus')],
@@ -468,32 +467,30 @@ Observation = Annotated[
   pydantic.Discriminator(observation_discriminator)
 ]
 
+class BaseProvenance(TypedDict):
+  id: str
+  """Unique identifier for all records sharing a same provenance."""
+  details: NotRequired[Any]
 
-class FileProvenance(TypedDict):
-  source: Literal['csv', 'excel']
+class TabularProvenance(BaseProvenance):
+  source: Literal['tabular']
   row: int
   file: str
 
-class ApiProvenance(TypedDict):
+class ApiProvenance(BaseProvenance):
   source: Literal['api']
   service: str
-  endpoint: NotRequired[str]
-  params: NotRequired[dict]
-  response: NotRequired[Any]
 
-class ManualProvenance(TypedDict):
+class ManualProvenance(BaseProvenance):
   source: Literal['manual']
-  label: NotRequired[str]
-  note: NotRequired[str]
-  ref: NotRequired[str]
 
-class DerivedProvenance(TypedDict):
+class DerivedProvenance(BaseProvenance):
   source: Literal['derived']
-  method: str
-  reason: str
-  params: NotRequired[dict]
 
-Provenance = FileProvenance | ApiProvenance | ManualProvenance | DerivedProvenance
+Provenance = Annotated[
+  TabularProvenance | ApiProvenance | ManualProvenance | DerivedProvenance,
+  pydantic.Discriminator('source')
+]
 
 class Record(pydantic.BaseModel):
   model_config = pydantic.ConfigDict(extra='forbid')
