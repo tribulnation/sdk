@@ -149,7 +149,7 @@ class IndexerHistory:
         size=Decimal(fill['size']) * side,
         price=Decimal(fill['price']),
         realized_pnl=realized_pnl,
-        subaccount=fill['subaccountNumber'],
+        subaccount=str(fill['subaccountNumber']),
         order_id=fill.get('orderId'),
         fee=Fee(asset=USDC, amount=Decimal(fill['fee'])),
       )],

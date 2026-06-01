@@ -117,7 +117,7 @@ class BigQueryHistory:
         time=row_time(row),
         asset=USDC,
         amount=amount,
-        subaccount=row_int(row, 'subaccount_number'),
+        subaccount=row_str(row, 'subaccount_number'),
       )],
       provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )

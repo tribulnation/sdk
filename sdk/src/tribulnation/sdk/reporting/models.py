@@ -61,7 +61,7 @@ class BaseObservation(pydantic.BaseModel):
   id: str | None = None
   """Raw identifier, if provided by the source."""
   time: pydantic.AwareDatetime | None = None
-  subaccount: str | int | None = None
+  subaccount: str | None = None
   """Venue subaccount or compartment label, if the source row has a scoped account."""
 
 class SpotTrade(BaseObservation):
@@ -247,8 +247,6 @@ class ConversionLeg(pydantic.BaseModel):
 class Conversion(BaseObservation):
   """Canonical grouped conversion without reliable pair/order identity."""
   type: Literal['conversion'] = 'conversion'
-  label: str
-  """Source operation label shared by the grouped conversion legs."""
   legs: Sequence[ConversionLeg]
   """Signed source legs included in deterministic source order."""
   fee: Fee | None = None
