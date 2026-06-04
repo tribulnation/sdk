@@ -7,7 +7,7 @@ import asyncio
 
 from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import Balance, Record, Snapshots as _Snapshots, Snapshot
-from hyperliquid import Info
+from hyperliquid.info import Info
 from tribulnation.hyperliquid.core import wrap_exceptions
 
 HYPE_ASSET = '150'
@@ -104,5 +104,5 @@ class Snapshots(_Snapshots):
     }
     return Record(
       snapshots=[Snapshot(time=time, balances=snapshots)],
-      provenance={'source': 'api', 'service': 'hyperliquid', 'endpoint': 'snapshots'},
+      provenance={'source': 'api', 'service': 'hyperliquid', 'id': time.isoformat()},
     )

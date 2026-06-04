@@ -42,7 +42,7 @@ def _export_order(self: SpotMarketMixin | PerpMarketMixin, o: Order) -> OrderWir
 
 @wrap_exceptions
 async def open_orders(self: SpotMarketMixin | PerpMarketMixin) -> Sequence[OrderState]:
-  dex = getattr(self, 'dex', None)
+  dex = getattr(self, 'dex_name', None)
   if dex is not None:
     orders = await self.client.info.open_orders(self.address, dex=dex)
   else:
