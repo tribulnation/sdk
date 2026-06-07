@@ -25,7 +25,7 @@ SUPPORTED_VENUES = (
   'ethereum',
   'arbitrum',
   'polygon',
-  'bnb',
+  'bnb_chain',
   'base',
   'avalanche',
   'optimism',
@@ -140,7 +140,7 @@ class ReportSDK(SDK):
       'ethereum': self.ethereum(**credentials.get('ethereum', {})),
       'arbitrum': self.arbitrum(**credentials.get('arbitrum', {})),
       'polygon': self.polygon(**credentials.get('polygon', {})),
-      'bnb': self.bnb(**credentials.get('bnb', {})),
+      'bnb_chain': self.bnb(**credentials.get('bnb_chain', {})),
       'base': self.base(**credentials.get('base', {})),
       'avalanche': self.avalanche(**credentials.get('avalanche', {})),
       'optimism': self.optimism(**credentials.get('optimism', {})),
@@ -157,7 +157,7 @@ class ReportSDK(SDK):
         return self.arbitrum(**credentials)
       case 'polygon':
         return self.polygon(**credentials)
-      case 'bnb':
+      case 'bnb_chain':
         return self.bnb(**credentials)
       case 'base':
         return self.base(**credentials)
