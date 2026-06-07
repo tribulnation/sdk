@@ -264,6 +264,9 @@ class FeeLeg(BaseObservation):
   event_id: str | None = None
   """Event/observation identifier, if provided by the source."""
 
+  def __str__(self) -> str:
+    return f'FeeLeg({self.amount} {self.asset}, {self.time:%Y-%m-%d %H:%M:%S}, event_type: {self.event_type or "?"}, event_id: {self.event_id or "?"})'
+
 class SingleAssetObservation(BaseObservation):
   amount: Decimal
   """Signed amount of the observation, in the asset's base units."""
@@ -272,7 +275,7 @@ class SingleAssetObservation(BaseObservation):
 
   def __str__(self) -> str:
     type = self.type # type: ignore
-    return f'{type}: {self.amount} {self.asset} [{self.time}]'
+    return f'{type}: {self.amount} {self.asset} [{self.time:%Y-%m-%d %H:%M:%S}]'
 
 class UnknownObservation(SingleAssetObservation):
   """A source observation whose economic meaning is intentionally unclassified."""
@@ -368,7 +371,7 @@ class FiatConversion(SingleAssetObservation):
   fiat_asset: str
   """Raw external fiat asset identifier, if provided by the source."""
   fiat_amount: Decimal
-  """Signed external fiat amount, if provided by the source."""
+  """Signed external fiat amount."""
   fee: Fee | None = None
   """External/payment fee metadata, if provided by the source."""
   payment_method: str | None = None
