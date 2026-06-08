@@ -40,9 +40,10 @@ class ReportSDK(SDK):
   def ethereum(self, address: str) -> Report:
     """Create an Ethereum mainnet reporting client."""
     try:
-      from tribulnation.ethereum.reporting import Report as EvmReport
-      return EvmReport.ethereum(
+      from tribulnation.ethereum.reporting import EthereumReport
+      return EthereumReport.new(
         address,
+        network='ethereum',
         config=self.settings.get('ethereum'),
         providers=self.settings.get('providers'),
       )
@@ -52,9 +53,10 @@ class ReportSDK(SDK):
   def arbitrum(self, address: str) -> Report:
     """Create an Arbitrum reporting client."""
     try:
-      from tribulnation.ethereum.reporting import Report as EvmReport
-      return EvmReport.arbitrum(
+      from tribulnation.ethereum.reporting import EthereumReport
+      return EthereumReport.new(
         address,
+        network='arbitrum',
         config=self.settings.get('arbitrum'),
         providers=self.settings.get('providers'),
       )
@@ -64,9 +66,10 @@ class ReportSDK(SDK):
   def polygon(self, address: str) -> Report:
     """Create a Polygon reporting client."""
     try:
-      from tribulnation.ethereum.reporting import Report as EvmReport
-      return EvmReport.polygon(
+      from tribulnation.ethereum.reporting import EthereumReport
+      return EthereumReport.new(
         address,
+        network='polygon',
         config=self.settings.get('polygon'),
         providers=self.settings.get('providers'),
       )
@@ -76,9 +79,10 @@ class ReportSDK(SDK):
   def bnb(self, address: str) -> Report:
     """Create a BNB Chain reporting client."""
     try:
-      from tribulnation.ethereum.reporting import Report as EvmReport
-      return EvmReport.bnb(
+      from tribulnation.ethereum.reporting import EthereumReport
+      return EthereumReport.new(
         address,
+        network='bnb',
         config=self.settings.get('bnb'),
         providers=self.settings.get('providers'),
       )
@@ -88,9 +92,10 @@ class ReportSDK(SDK):
   def base(self, address: str) -> Report:
     """Create a Base reporting client."""
     try:
-      from tribulnation.ethereum.reporting import Report as EvmReport
-      return EvmReport.base(
+      from tribulnation.ethereum.reporting import EthereumReport
+      return EthereumReport.new(
         address,
+        network='base',
         config=self.settings.get('base'),
         providers=self.settings.get('providers'),
       )
@@ -100,9 +105,10 @@ class ReportSDK(SDK):
   def avalanche(self, address: str) -> Report:
     """Create an Avalanche reporting client."""
     try:
-      from tribulnation.ethereum.reporting import Report as EvmReport
-      return EvmReport.avalanche(
+      from tribulnation.ethereum.reporting import EthereumReport
+      return EthereumReport.new(
         address,
+        network='avalanche',
         config=self.settings.get('avalanche'),
         providers=self.settings.get('providers'),
       )
@@ -112,9 +118,10 @@ class ReportSDK(SDK):
   def optimism(self, address: str) -> Report:
     """Create an Optimism reporting client."""
     try:
-      from tribulnation.ethereum.reporting import Report as EvmReport
-      return EvmReport.optimism(
+      from tribulnation.ethereum.reporting import EthereumReport
+      return EthereumReport.new(
         address,
+        network='optimism',
         config=self.settings.get('optimism'),
         providers=self.settings.get('providers'),
       )
