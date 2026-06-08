@@ -1,32 +1,22 @@
-from typing_extensions import Callable, Awaitable, TypeVar
-from collections import defaultdict
-from datetime import datetime, timezone
-from dataclasses import dataclass
+from typing_extensions import TypeVar, Callable, Awaitable
+from dataclasses import dataclass, field
 from decimal import Decimal
+from datetime import datetime
 
 from moralis import Moralis
-from moralis.evm.wallet.history import NativeTransfer, WalletHistoryTransaction
-from moralis.evm.wallet.token_transfers import TokenTransfer
-from typing_extensions import AsyncIterable
-from web3 import Web3
+from moralis.core import Chain
+from moralis.evm.wallet.history import (
+  WalletHistoryTransaction,
+  NativeTransfer,
+  TokenTransfer,
+)
 
-from tribulnation.sdk.core import SDK
-from tribulnation.sdk.reporting import EvmTx, Fee, Record
-from tribulnation.ethereum.core import same_address, moralis as moralis_core
-from ..constants import MORALIS_CHAINS
-from ..config import EvmNetwork
-from ..util import source_id
+from tribulnation.sdk import SDK
+from tribulnation.sdk.reporting import History, Record, EvmTx, Fee
+from tribulnation.ethereum.core import moralis as moralis_core, same_address
+from tribulnation.ethereum.reporting.util import source_id
 
 T = TypeVar('T')
-
-def parse_time(value: str | None) -> datetime | None:
-  """Parse a Moralis ISO timestamp."""
-  if value is not None:
-    return datetime.fromisoformat(value.replace('Z', '+00:00')).astimezone()
-
-def decimal_value(value: str | int | float | None) -> Decimal:
-  """Parse a Moralis numeric field."""
-  return Decimal(str(value or '0'))
 
 def native_value(transfer: NativeTransfer) -> Decimal:
   """Return a native transfer value in display units."""
@@ -41,19 +31,18 @@ def token_value(transfer: TokenTransfer) -> Decimal:
   decimals = int(transfer.get('token_decimals') or '0')
   return Decimal(transfer['value']) * (Decimal(10) ** -decimals)
 
-
-@dataclass(frozen=True)
-class MoralisHistory(SDK):
-  """Moralis-backed EVM history source."""
+@dataclass(frozen=True, kw_only=True)
+class MoralisHistory(History):
   address: str
-  network: EvmNetwork
-  moralis: Moralis | None
+  chain: Chain
+  moralis: Moralis = field(default_factory=Moralis.new)
 
-  def require_moralis(self) -> Moralis:
-    """Return the configured Moralis client or raise a concrete configuration error."""
-    if self.moralis is None:
-      raise ValueError('EVM Moralis history requires a Moralis provider.')
-    return self.moralis
+  async def __aenter__(self):
+    await self.moralis.__aenter__()
+    return self
+
+  async def __aexit__(self, exc_type, exc_value, traceback):
+    await self.moralis.__aexit__(exc_type, exc_value, traceback)
 
   @SDK.method
   @moralis_core.wrap_exceptions
@@ -61,158 +50,83 @@ class MoralisHistory(SDK):
     """Call Moralis under the SDK exception wrapper."""
     return await fn()
 
-  async def moralis_wallet_history(
-    self, start: datetime | None = None, end: datetime | None = None,
-  ) -> list[WalletHistoryTransaction]:
-    """Fetch decoded Moralis wallet history."""
-    paging = self.require_moralis().evm.wallet.history_paged(
+  async def wallet_history(self, start: datetime | None = None, end: datetime | None = None):
+    paging = self.moralis.evm.wallet.history_paged(
       self.address,
-      chain=MORALIS_CHAINS[self.network],
-      from_date=start.isoformat() if start is not None else None,
-      to_date=end.isoformat() if end is not None else None,
+      chain=self.chain,
+      from_date=start and start.isoformat() or None,
+      to_date=end and end.isoformat() or None,
       include_internal_transactions=True,
-      limit=25,
     )
-    out: list[WalletHistoryTransaction] = []
     state = paging.init
     while state is not None:
       chunk, state = await self.call_moralis(lambda: paging.next(state)) # type: ignore
-      out.extend(chunk)
-    return out
-
-  async def moralis_token_transfers(
-    self, start: datetime | None = None, end: datetime | None = None,
-  ) -> list[TokenTransfer]:
-    """Fetch Moralis ERC20 transfer history."""
-    paging = self.require_moralis().evm.wallet.token_transfers_paged(
-      self.address,
-      chain=MORALIS_CHAINS[self.network],
-      from_date=start.isoformat() if start is not None else None,
-      to_date=end.isoformat() if end is not None else None,
-      limit=25,
-    )
-    out: list[TokenTransfer] = []
-    state = paging.init
-    while state is not None:
-      chunk, state = await self.call_moralis(lambda: paging.next(state)) # type: ignore
-      out.extend(chunk)
-    return out
+      yield chunk
 
   def parse_moralis_fee(self, tx: WalletHistoryTransaction) -> Fee | None:
-    """Parse a transaction fee paid by this wallet."""
-    if not same_address(tx['from_address'], self.address):
-      return None
-    amount = decimal_value(tx.get('transaction_fee'))
-    if amount == 0:
-      return None
-    return Fee(asset='native', amount=amount)
-
-  def parse_moralis_execution(self, tx: WalletHistoryTransaction) -> EvmTx.Execution | None:
-    """Parse execution metadata from a decoded Moralis transaction."""
-    to_address = tx.get('to_address')
-    method = tx.get('method_label')
-    if to_address is None or method is None:
-      return None
-    return EvmTx.Execution(
-      contract_address=Web3.to_checksum_address(to_address),
-      input=None,
-      method_name=method,
-    )
+    if (fee := tx.get('transaction_fee')) and same_address(tx['from_address'], self.address):
+      return Fee(amount=Decimal(fee), asset='native')
 
   def parse_native_transfer(self, transfer: NativeTransfer) -> EvmTx.NativeTransfer | None:
-    """Parse a Moralis native transfer into an SDK EVM transfer."""
-    if same_address(transfer['to_address'], self.address):
-      amount = native_value(transfer)
-      counterparty = transfer['from_address']
-    elif same_address(transfer['from_address'], self.address):
-      amount = -native_value(transfer)
+    value = native_value(transfer)
+    if same_address(transfer['from_address'], self.address):
+      amount = -value
       counterparty = transfer['to_address']
+    elif same_address(transfer['to_address'], self.address):
+      amount = value
+      counterparty = transfer['from_address']
     else:
       return None
+    
     return EvmTx.NativeTransfer(
       change=amount,
       counterparty=counterparty,
-      internal=transfer.get('internal_transaction', False),
+      internal=bool(transfer.get('internal_transaction'))
     )
 
   def parse_token_transfer(self, transfer: TokenTransfer) -> EvmTx.ERC20Transfer | None:
-    """Parse a Moralis ERC20 transfer into an SDK EVM transfer."""
-    to_address = transfer.get('to_address')
-    from_address = transfer.get('from_address')
-    if to_address is not None and same_address(to_address, self.address):
-      amount = token_value(transfer)
-      counterparty = from_address
-    elif from_address is not None and same_address(from_address, self.address):
-      amount = -token_value(transfer)
-      counterparty = to_address
+    if not (from_ := transfer.get('from_address')) or not (to := transfer.get('to_address')):
+      return
+    value = token_value(transfer)
+    if same_address(from_, self.address):
+      amount = -value
+      counterparty = to
+    elif same_address(to, self.address):
+      amount = value
+      counterparty = from_
     else:
       return None
+
     return EvmTx.ERC20Transfer(
-      asset=Web3.to_checksum_address(transfer['address']),
+      asset=transfer['address'],
       change=amount,
       counterparty=counterparty,
     )
 
-  def parse_moralis_tx(
-    self,
-    hash: str,
-    *,
-    wallet_txs: list[WalletHistoryTransaction],
-    token_transfers: list[TokenTransfer],
-  ) -> EvmTx | None:
-    """Build an SDK EVM transaction from Moralis wallet and transfer rows."""
-    wallet_tx = wallet_txs[0] if wallet_txs else None
-    transfers: list[EvmTx.NativeTransfer | EvmTx.ERC20Transfer] = []
-    if wallet_tx is not None:
-      transfers.extend([
-        transfer for raw in wallet_tx.get('native_transfers', [])
-        if (transfer := self.parse_native_transfer(raw)) is not None
-      ])
-    transfers.extend([
-      transfer for raw in token_transfers
-      if (transfer := self.parse_token_transfer(raw)) is not None
-    ])
-    if wallet_tx is None and not token_transfers:
-      return None
-    time = parse_time(
-      wallet_tx.get('block_timestamp')
-      if wallet_tx is not None
-      else token_transfers[0].get('block_timestamp')
-    )
-    fee = self.parse_moralis_fee(wallet_tx) if wallet_tx is not None else None
-    execution = self.parse_moralis_execution(wallet_tx) if wallet_tx is not None else None
-    if fee is None and execution is None and not transfers:
-      return None
-    return EvmTx(
-      id=hash,
-      tx_id=hash,
-      time=time,
-      fee=fee,
-      execution=execution,
-      transfers=transfers,
-    )
+  def parse_native_transfers(self, tx: WalletHistoryTransaction):
+    for transfer in tx.get('native_transfers', []):
+      if (transfer := self.parse_native_transfer(transfer)) is not None:
+        yield transfer
 
-  async def moralis_history(
-    self, start: datetime | None = None, end: datetime | None = None,
-  ) -> AsyncIterable[Record]:
-    """Fetch EVM history from Moralis wallet history and ERC20 transfer endpoints."""
-    start = start.astimezone() if start is not None else None
-    end = end.astimezone() if end is not None else None
-    wallet_rows = await self.moralis_wallet_history(start=start, end=end)
-    token_rows = await self.moralis_token_transfers(start=start, end=end)
-    wallet_by_hash: dict[str, list[WalletHistoryTransaction]] = defaultdict(list)
-    token_by_hash: dict[str, list[TokenTransfer]] = defaultdict(list)
-    for row in wallet_rows:
-      wallet_by_hash[row['hash']].append(row)
-    for row in token_rows:
-      if (hash := row.get('transaction_hash')) is not None:
-        token_by_hash[hash].append(row)
-    hashes = set(wallet_by_hash) | set(token_by_hash)
-    for hash in hashes:
-      tx = self.parse_moralis_tx(
-        hash,
-        wallet_txs=wallet_by_hash.get(hash, []),
-        token_transfers=token_by_hash.get(hash, []),
+  def parse_token_transfers(self, tx: WalletHistoryTransaction):
+    for transfer in tx.get('erc20_transfers', []):
+      if (transfer := self.parse_token_transfer(transfer)) is not None:
+        yield transfer
+
+  def parse_moralis_tx(self, tx: WalletHistoryTransaction) -> EvmTx | None:
+    time = tx.get('block_timestamp')
+    if time:
+      transfers = list(self.parse_native_transfers(tx)) + list(self.parse_token_transfers(tx))
+      return EvmTx(
+        id=tx['hash'], tx_id=tx['hash'],
+        time=datetime.fromisoformat(time),
+        fee=self.parse_moralis_fee(tx),
+        transfers=transfers
       )
-      if tx is not None:
-        yield Record(observations=[tx], provenance={'source': 'api', 'service': 'moralis', 'id': source_id('moralis')})
+
+  async def history(self, start: datetime | None = None, end: datetime | None = None):
+    id = source_id('moralis')
+    async for chunk in self.wallet_history(start=start, end=end):
+      for tx in chunk:
+        if evm_tx := self.parse_moralis_tx(tx):
+          yield Record(observations=[evm_tx], provenance={'source': 'api', 'service': 'etherscan', 'id': id})

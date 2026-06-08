@@ -1,45 +1,43 @@
-"""Etherscan-backed EVM reporting history."""
-
-from typing_extensions import Literal, AsyncIterable, TypeVar, Awaitable, Callable
-from datetime import timezone, datetime
-from dataclasses import dataclass
+from typing_extensions import Literal, Awaitable, Callable, TypeVar
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
 import asyncio
 
 from web3 import Web3
 from etherscan import Etherscan
-from etherscan.core import tx_value, tx_fee
 from etherscan.api.account.transactions import Transaction as NativeTransaction
 from etherscan.api.account.token_transactions import TokenTransaction, token_value
 from etherscan.api.account.internal_transactions import InternalTransaction
 
 from tribulnation.sdk.core import SDK
-from tribulnation.sdk.reporting import Fee, EvmTx, Record
+from tribulnation.sdk.reporting import History, Record, EvmTx
 from tribulnation.ethereum.core import etherscan as etherscan_core, group_by, same_address
-from ..util import source_id
+from tribulnation.ethereum.reporting.util import source_id, AutoDetect, AUTO_DETECT, cached_etherscan
+from .mixin import HistoryMixin, parse_execution
 
 T = TypeVar('T')
 
-class AutoDetect:
-  """Sentinel for automatic local timezone detection."""
-  ...
-
-AUTO_DETECT = AutoDetect()
-
-@dataclass(frozen=True)
-class EtherscanHistory(SDK):
+@dataclass(frozen=True, kw_only=True)
+class EtherscanHistory(HistoryMixin, History):
   """Etherscan-backed EVM history source."""
-  address: str
+  etherscan: Etherscan = field(default_factory=cached_etherscan)
   chain_id: int
-  etherscan: Etherscan | None
-  block_time_cache: dict[int, datetime]
   tz: timezone | AutoDetect = AUTO_DETECT
   """Timezone of the API times (defaults to the local timezone)."""
+  batch_size: int = 4
 
-  def require_etherscan(self) -> Etherscan:
-    """Return the configured Etherscan client."""
-    if self.etherscan is None:
-      raise ValueError('Etherscan history requires an Etherscan provider.')
-    return self.etherscan
+  async def __aenter__(self):
+    await asyncio.gather(
+      super().__aenter__(),
+      self.etherscan.__aenter__(),
+    )
+    return self
+
+  async def __aexit__(self, exc_type, exc_value, traceback):
+    await asyncio.gather(
+      super().__aexit__(exc_type, exc_value, traceback),
+      self.etherscan.__aexit__(exc_type, exc_value, traceback),
+    )
 
   @property
   def timezone(self) -> timezone:
@@ -56,7 +54,7 @@ class EtherscanHistory(SDK):
   @etherscan_core.wrap_exceptions
   async def get_block_by_time(self, time: datetime, closest: Literal['before', 'after'] = 'before') -> int:
     """Resolve a timestamp to the closest Etherscan block number."""
-    return await self.require_etherscan().blocks.block_by_time(time, self.chain_id, closest=closest)
+    return await self.etherscan.blocks.block_by_time(time, self.chain_id, closest=closest)
 
   @SDK.method
   @etherscan_core.wrap_exceptions
@@ -67,7 +65,7 @@ class EtherscanHistory(SDK):
   @SDK.method
   async def native_transactions(self, start_block: int, end_block: int) -> list[NativeTransaction]:
     """Fetch native transactions from Etherscan."""
-    paging = self.require_etherscan().account.transactions_paged(
+    paging = self.etherscan.account.transactions_paged(
       self.address,
       self.chain_id,
       start_block=start_block,
@@ -83,7 +81,7 @@ class EtherscanHistory(SDK):
   @SDK.method
   async def token_transactions(self, start_block: int, end_block: int) -> list[TokenTransaction]:
     """Fetch ERC20 token transactions from Etherscan."""
-    paging = self.require_etherscan().account.token_transactions_paged(
+    paging = self.etherscan.account.token_transactions_paged(
       self.address,
       self.chain_id,
       start_block=start_block,
@@ -99,7 +97,7 @@ class EtherscanHistory(SDK):
   @SDK.method
   async def internal_transactions(self, start_block: int, end_block: int) -> list[InternalTransaction]:
     """Fetch internal native transactions from Etherscan."""
-    paging = self.require_etherscan().account.internal_transactions_paged(
+    paging = self.etherscan.account.internal_transactions_paged(
       self.address,
       self.chain_id,
       start_block=start_block,
@@ -112,50 +110,56 @@ class EtherscanHistory(SDK):
       out.extend(chunk)
     return out
 
-  def etherscan_parse_execution(self, tx: NativeTransaction) -> EvmTx.Execution | None:
-    """Parse contract execution metadata from a native transaction."""
-    if (method := tx['methodId']) != '0x':
-      return EvmTx.Execution(
-        contract_address=tx['contractAddress'],
-        input=tx['input'],
-        method_name=tx['functionName'] or None,
-      )
-
-  def etherscan_parse_native_transfer(
-    self, tx: NativeTransaction | InternalTransaction, *, internal: bool,
-  ) -> EvmTx.NativeTransfer | None:
-    """Parse a native transaction row into an SDK native transfer."""
-    if (value := tx_value(tx)) > 0:
-      if same_address(tx['to'], self.address):
-        amount = value
-        counterparty = tx['from']
-      elif same_address(tx['from'], self.address):
-        amount = -value
-        counterparty = tx['to']
+  async def fetch_limits(self, start: datetime | None = None, end: datetime | None = None) -> tuple[int, int]:
+    """Fetch limiting blocks for the given time range."""
+    async def get_start():
+      """Resolve the first block to request."""
+      if start is None:
+        return 0
       else:
-        return None
-      return EvmTx.NativeTransfer(
-        counterparty=counterparty,
-        change=amount,
-        internal=internal,
+        return await self.get_block_by_time(start, 'before')
+
+    async def get_end():
+      """Resolve the last block to request."""
+      if end is None:
+        return await self.call_etherscan(lambda: self.etherscan.proxy.eth_block_number(chain_id=self.chain_id))
+      else:
+        return await self.get_block_by_time(end, 'after')
+
+    return await asyncio.gather(
+      get_start(),
+      get_end(),
+    )
+
+  async def fetch_all_transactions(self, start: datetime | None = None, end: datetime | None = None):
+    """Fetch all transactions for the given time range."""
+    start_block, end_block = await self.fetch_limits(start, end)
+    all_native, all_token_txs, all_internal_txs = await asyncio.gather(
+      self.native_transactions(start_block, end_block),
+      self.token_transactions(start_block, end_block),
+      self.internal_transactions(start_block, end_block),
+    )
+    grouped_native = group_by(all_native, lambda tx: tx['hash'])
+    grouped_token_txs = group_by(all_token_txs, lambda tx: tx['hash'])
+    grouped_internal_txs = group_by(all_internal_txs, lambda tx: tx['hash'])
+    hashes = set(grouped_native) | set(grouped_token_txs) | set(grouped_internal_txs)
+    return {
+      hash: (
+        grouped_native.get(hash, []),
+        grouped_token_txs.get(hash, []),
+        grouped_internal_txs.get(hash, []),
       )
+      for hash in hashes
+    }
 
-
-  def etherscan_parse_native_txs(self, native_txs: list[NativeTransaction]) -> list[EvmTx.NativeTransfer]:
-    """Parse native Etherscan rows into SDK native transfers."""
-    return [
-      transfer for tx in native_txs
-      if (transfer := self.etherscan_parse_native_transfer(tx, internal=False)) is not None
-    ]
-
-  def etherscan_parse_internal_txs(self, internal_txs: list[InternalTransaction]) -> list[EvmTx.NativeTransfer]:
+  def parse_internal_txs(self, internal_txs: list[InternalTransaction]) -> list[EvmTx.NativeTransfer]:
     """Parse internal Etherscan rows into SDK native transfers."""
     return [
       transfer for tx in internal_txs
-      if (transfer := self.etherscan_parse_native_transfer(tx, internal=True)) is not None
+      if (transfer := self.parse_native_transfer(tx, internal=True)) is not None # type: ignore
     ]
 
-  def etherscan_parse_token_tx(self, token_tx: TokenTransaction) -> EvmTx.ERC20Transfer | None:
+  def parse_token_tx(self, token_tx: TokenTransaction) -> EvmTx.ERC20Transfer | None:
     """Parse an ERC20 Etherscan row into an SDK ERC20 transfer."""
     value = token_value(token_tx)
     if same_address(token_tx['to'], self.address):
@@ -172,95 +176,61 @@ class EtherscanHistory(SDK):
       counterparty=counterparty,
     )
 
-  def etherscan_parse_token_txs(self, token_txs: list[TokenTransaction]) -> list[EvmTx.ERC20Transfer]:
+  def parse_token_txs(self, token_txs: list[TokenTransaction]) -> list[EvmTx.ERC20Transfer]:
     """Parse ERC20 Etherscan rows into SDK ERC20 transfers."""
     return [
       transfer for tx in token_txs
-      if (transfer := self.etherscan_parse_token_tx(tx)) is not None
+      if (transfer := self.parse_token_tx(tx)) is not None
     ]
 
-  def etherscan_parse_fee(self, tx: NativeTransaction) -> Fee | None:
-    """Parse an EVM gas fee paid by this wallet."""
-    if same_address(tx['from'], self.address):
-      return Fee(asset='native', amount=tx_fee(tx))
-
-  def etherscan_parse_tx(
+  async def parse_tx(
     self, hash: str, *,
-    native_txs: list[NativeTransaction],
-    token_txs: list[TokenTransaction],
-    internal_txs: list[InternalTransaction],
+    native: list[NativeTransaction],
+    token: list[TokenTransaction],
+    internal: list[InternalTransaction]
   ) -> EvmTx | None:
-    """Build an SDK EVM transaction from grouped Etherscan rows."""
-    if len(native_txs) > 1:
+    if len(native) > 1:
       raise ValueError('Multiple native transactions')
-    all_txs = native_txs + token_txs + internal_txs
+    all_txs = native + token + internal
     any_tx = all_txs[0]
-    native_tx = native_txs[0] if native_txs else None
     time = self.add_tz(any_tx['timeStamp'])
+    tx, receipt = await self.get_tx_data(hash)
 
-    if native_tx and native_tx['isError'] != '0':
-      fee = self.etherscan_parse_fee(native_tx)
-      if fee is None:
-        return
-      return EvmTx(
-        id=hash, tx_id=hash,
-        time=time,
-        fee=fee,
-        execution=self.etherscan_parse_execution(native_tx),
-        transfers=[],
+    if receipt['status'] == 0:
+      transfers = []
+    else:
+      transfers: list[EvmTx.Transfer] = (
+        self.parse_native_transfers(tx) # type: ignore
+        + self.parse_token_txs(token)
+        + self.parse_internal_txs(internal)
       )
-
-    transfers = (
-      self.etherscan_parse_native_txs(native_txs)
-      + self.etherscan_parse_token_txs(token_txs)
-      + self.etherscan_parse_internal_txs(internal_txs)
-    )
 
     return EvmTx(
       id=hash, tx_id=hash,
       time=time,
-      fee=native_tx and self.etherscan_parse_fee(native_tx),
+      fee=self.parse_fee(tx, receipt),
       transfers=transfers,
+      execution=parse_execution(tx),
     )
 
+  async def history(self, start: datetime | None = None, end: datetime | None = None):
+    id = source_id('etherscan')
+    transactions = await self.fetch_all_transactions(start, end)
+    semaphore = asyncio.Semaphore(self.batch_size)
+    async def parse_limited(
+      hash: str,
+      native: list[NativeTransaction],
+      token: list[TokenTransaction],
+      internal: list[InternalTransaction],
+    ):
+      async with semaphore:
+        return await self.parse_tx(hash, native=native, token=token, internal=internal)
 
-  async def etherscan_history(self, start: datetime | None = None, end: datetime | None = None) -> AsyncIterable[Record]:
-    """Fetch EVM history from Etherscan account endpoints."""
-
-    async def get_start():
-      """Resolve the first block to request."""
-      if start is None:
-        return 0
-      else:
-        return await self.get_block_by_time(start, 'before')
-
-    async def get_end():
-      """Resolve the last block to request."""
-      if end is None:
-        return await self.call_etherscan(lambda: self.require_etherscan().proxy.eth_block_number(chain_id=self.chain_id))
-      else:
-        return await self.get_block_by_time(end, 'after')
-
-    start_block, end_block = await asyncio.gather(
-      get_start(),
-      get_end(),
-    )
-
-    all_native_txs, all_token_txs, all_internal_txs = await asyncio.gather(
-      self.native_transactions(start_block=start_block, end_block=end_block),
-      self.token_transactions(start_block=start_block, end_block=end_block),
-      self.internal_transactions(start_block=start_block, end_block=end_block),
-    )
-
-    grouped_native_txs = group_by(all_native_txs, lambda tx: tx['hash'])
-    grouped_token_txs = group_by(all_token_txs, lambda tx: tx['hash'])
-    grouped_internal_txs = group_by(all_internal_txs, lambda tx: tx['hash'])
-
-    hashes = list(set(grouped_native_txs) | set(grouped_token_txs) | set(grouped_internal_txs))
-    for i, hash in enumerate(hashes):
-      native_txs = grouped_native_txs.get(hash, [])
-      token_txs = grouped_token_txs.get(hash, [])
-      internal_txs = grouped_internal_txs.get(hash, [])
-      tx = self.etherscan_parse_tx(hash, native_txs=native_txs, token_txs=token_txs, internal_txs=internal_txs)
+    tasks = [
+      parse_limited(hash, native, token, internal)
+      for hash, (native, token, internal) in transactions.items()
+    ]
+    for task in asyncio.as_completed(tasks):
+      tx = await task
       if tx is not None:
-        yield Record(observations=[tx], provenance={'source': 'api', 'service': 'etherscan', 'id': source_id('etherscan')})
+        yield Record(observations=[tx], provenance={'source': 'api', 'service': 'etherscan', 'id': id})
