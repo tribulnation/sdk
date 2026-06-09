@@ -1,10 +1,11 @@
-import inspect
-from functools import wraps
-
 from typing_extensions import Any, AsyncIterable, TypeVar
-from web3 import exceptions as exc
+from functools import wraps
+import inspect
 
-from tribulnation.sdk.core import ApiError, NetworkError
+from web3 import exceptions as exc
+import aiohttp
+
+from tribulnation.sdk.core import ApiError, NetworkError, RateLimited
 
 Fn = TypeVar('Fn')
 
@@ -22,6 +23,11 @@ def wrap_exceptions(fn: Fn) -> Fn:
         return await fn(*args, **kwargs)
       except (exc.ProviderConnectionError, exc.TimeExhausted) as e:
         raise NetworkError(*e.args) from e
+      except aiohttp.ClientResponseError as e:
+        if e.status == 429:
+          raise RateLimited(*e.args) from e
+        else:
+          raise ApiError(*e.args) from e
       except exc.Web3Exception as e:
         raise ApiError(*e.args) from e
 
@@ -36,6 +42,11 @@ def wrap_exceptions(fn: Fn) -> Fn:
           yield item
       except (exc.ProviderConnectionError, exc.TimeExhausted) as e:
         raise NetworkError(*e.args) from e
+      except aiohttp.ClientResponseError as e:
+        if e.status == 429:
+          raise RateLimited(*e.args) from e
+        else:
+          raise ApiError(*e.args) from e
       except exc.Web3Exception as e:
         raise ApiError(*e.args) from e
 
@@ -50,6 +61,11 @@ def wrap_exceptions(fn: Fn) -> Fn:
           yield item
       except (exc.ProviderConnectionError, exc.TimeExhausted) as e:
         raise NetworkError(*e.args) from e
+      except aiohttp.ClientResponseError as e:
+        if e.status == 429:
+          raise RateLimited(*e.args) from e
+        else:
+          raise ApiError(*e.args) from e
       except exc.Web3Exception as e:
         raise ApiError(*e.args) from e
 
@@ -63,6 +79,11 @@ def wrap_exceptions(fn: Fn) -> Fn:
         return fn(*args, **kwargs)
       except (exc.ProviderConnectionError, exc.TimeExhausted) as e:
         raise NetworkError(*e.args) from e
+      except aiohttp.ClientResponseError as e:
+        if e.status == 429:
+          raise RateLimited(*e.args) from e
+        else:
+          raise ApiError(*e.args) from e
       except exc.Web3Exception as e:
         raise ApiError(*e.args) from e
 

@@ -2,6 +2,7 @@ from typing_extensions import TypeVar, Callable, Awaitable
 from dataclasses import dataclass, field
 from decimal import Decimal
 from datetime import datetime
+import asyncio
 
 from moralis import Moralis
 from moralis.core import Chain
@@ -15,6 +16,7 @@ from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import History, Record, EvmTx, Fee
 from tribulnation.ethereum.core import moralis as moralis_core, same_address
 from tribulnation.ethereum.reporting.util import source_id
+from .mixin import HistoryMixin, parse_execution
 
 T = TypeVar('T')
 
@@ -32,17 +34,24 @@ def token_value(transfer: TokenTransfer) -> Decimal:
   return Decimal(transfer['value']) * (Decimal(10) ** -decimals)
 
 @dataclass(frozen=True, kw_only=True)
-class MoralisHistory(History):
+class MoralisHistory(HistoryMixin, History):
   address: str
   chain: Chain
   moralis: Moralis = field(default_factory=Moralis.new)
+  batch_size: int = 4
 
   async def __aenter__(self):
-    await self.moralis.__aenter__()
+    await asyncio.gather(
+      super().__aenter__(),
+      self.moralis.__aenter__(),
+    )
     return self
 
   async def __aexit__(self, exc_type, exc_value, traceback):
-    await self.moralis.__aexit__(exc_type, exc_value, traceback)
+    await asyncio.gather(
+      super().__aexit__(exc_type, exc_value, traceback),
+      self.moralis.__aexit__(exc_type, exc_value, traceback),
+    )
 
   @SDK.method
   @moralis_core.wrap_exceptions
@@ -67,7 +76,7 @@ class MoralisHistory(History):
     if (fee := tx.get('transaction_fee')) and same_address(tx['from_address'], self.address):
       return Fee(amount=Decimal(fee), asset='native')
 
-  def parse_native_transfer(self, transfer: NativeTransfer) -> EvmTx.NativeTransfer | None:
+  def parse_moralis_native_transfer(self, transfer: NativeTransfer) -> EvmTx.NativeTransfer | None:
     value = native_value(transfer)
     if same_address(transfer['from_address'], self.address):
       amount = -value
@@ -83,6 +92,11 @@ class MoralisHistory(History):
       counterparty=counterparty,
       internal=bool(transfer.get('internal_transaction'))
     )
+
+  def parse_moralis_native_transfers(self, tx: WalletHistoryTransaction):
+    for transfer in tx.get('native_transfers', []):
+      if (transfer := self.parse_moralis_native_transfer(transfer)) is not None:
+        yield transfer
 
   def parse_token_transfer(self, transfer: TokenTransfer) -> EvmTx.ERC20Transfer | None:
     if not (from_ := transfer.get('from_address')) or not (to := transfer.get('to_address')):
@@ -103,30 +117,42 @@ class MoralisHistory(History):
       counterparty=counterparty,
     )
 
-  def parse_native_transfers(self, tx: WalletHistoryTransaction):
-    for transfer in tx.get('native_transfers', []):
-      if (transfer := self.parse_native_transfer(transfer)) is not None:
-        yield transfer
-
   def parse_token_transfers(self, tx: WalletHistoryTransaction):
     for transfer in tx.get('erc20_transfers', []):
       if (transfer := self.parse_token_transfer(transfer)) is not None:
         yield transfer
 
-  def parse_moralis_tx(self, tx: WalletHistoryTransaction) -> EvmTx | None:
-    time = tx.get('block_timestamp')
+  async def parse_moralis_tx(self, wallet_tx: WalletHistoryTransaction) -> EvmTx | None:
+    hash = wallet_tx['hash']
+    time = wallet_tx.get('block_timestamp')
+    tx, receipt = await self.get_tx_data(hash)
     if time:
-      transfers = list(self.parse_native_transfers(tx)) + list(self.parse_token_transfers(tx))
+      transfers = (
+        list(self.parse_moralis_native_transfers(wallet_tx))
+        + list(self.parse_token_transfers(wallet_tx))
+      )
+      fee_node = self.parse_fee(tx, receipt)
+      fee_moralis = self.parse_moralis_fee(wallet_tx)
+      if (fee_node is None) != (fee_moralis is None):
+        raise ValueError(f'Fee mismatch: {fee_node} != {fee_moralis}')
+      elif fee_node and fee_moralis and fee_node.amount != fee_moralis.amount:
+        raise ValueError(f'Fee mismatch: {fee_node.amount} != {fee_moralis.amount}')
       return EvmTx(
-        id=tx['hash'], tx_id=tx['hash'],
+        id=hash, tx_id=hash,
         time=datetime.fromisoformat(time),
-        fee=self.parse_moralis_fee(tx),
-        transfers=transfers
+        fee=self.parse_fee(tx, receipt),
+        transfers=transfers,
+        execution=parse_execution(tx),
       )
 
   async def history(self, start: datetime | None = None, end: datetime | None = None):
     id = source_id('moralis')
+    semaphore = asyncio.Semaphore(self.batch_size)
+    async def parse_limited(wallet_tx: WalletHistoryTransaction):
+      async with semaphore:
+        return await self.parse_moralis_tx(wallet_tx)
+        
     async for chunk in self.wallet_history(start=start, end=end):
       for tx in chunk:
-        if evm_tx := self.parse_moralis_tx(tx):
+        if evm_tx := await parse_limited(tx):
           yield Record(observations=[evm_tx], provenance={'source': 'api', 'service': 'etherscan', 'id': id})

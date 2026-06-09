@@ -22,9 +22,9 @@ def wei_field(value: Any) -> Decimal:
 class ValueFields(TypedDict):
   value: int | str | Wei
 
-def tx_value(tx: ValueFields) -> Decimal:
+def tx_value(tx: ValueFields | TxData) -> Decimal:
   """Return the value of a transaction."""
-  value = tx['value']
+  value = tx['value'] # type: ignore
   return wei2eth(Decimal(value))
 
 class FeeFields(TypedDict):
@@ -39,8 +39,6 @@ def tx_fee(tx: FeeFields) -> Decimal:
   price = wei_field(tx['effectiveGasPrice'])
   l1_fee = wei_field(tx.get('l1Fee'))
   operator_fee = wei_field(tx.get('operatorFee'))
-  if l1_fee or operator_fee:
-    print('L1 fee or operator fee', l1_fee, operator_fee)
   return wei2eth(used * price + l1_fee + operator_fee)
 
 def parse_execution(tx: TxData) -> EvmTx.Execution | None:
@@ -54,7 +52,7 @@ def parse_execution(tx: TxData) -> EvmTx.Execution | None:
 TransferFields = TypedDict('TransferFields', {'value': str, 'to': str, 'from': str})
 
 @dataclass(frozen=True, kw_only=True)
-class HistoryMixin:
+class HistoryMixin(SDK):
   """Mixin for EVM history sources."""
   address: str
   node: NodeRpc
@@ -95,7 +93,7 @@ class HistoryMixin:
     if (from_ := tx.get('from')) and same_address(from_, self.address):
       return Fee(amount=tx_fee(receipt), asset='native') # type: ignore
 
-  def parse_native_transfer(self, tx: ValueFields, *, internal: bool) -> EvmTx.NativeTransfer | None:
+  def parse_native_transfer(self, tx: ValueFields | TxData, *, internal: bool) -> EvmTx.NativeTransfer | None:
     """Parse a native transfer from a transaction."""
     to, from_ = tx['to'], tx['from'] # type: ignore
     if (value := tx_value(tx)) > 0:
@@ -113,7 +111,7 @@ class HistoryMixin:
         internal=internal,
       )
 
-  def parse_native_transfers(self, tx: ValueFields) -> list[EvmTx.NativeTransfer]:
+  def parse_native_transfers(self, tx: ValueFields | TxData) -> list[EvmTx.NativeTransfer]:
     """Parse native transfers from a transaction."""
     if transfer := self.parse_native_transfer(tx, internal=False):
       return [transfer]

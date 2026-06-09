@@ -30,12 +30,13 @@ class EthereumHistory(_History):
     return EtherscanHistory(address=address, chain_id=CHAIN_IDS[network], node=node, rpc_url=rpc_url, etherscan=etherscan)
 
   @classmethod
-  def moralis(cls, address: str, *, network: Network, api_key: str | None = None):
+  def moralis(cls, address: str, *, network: Network, rpc_url: str | None = None, api_key: str | None = None):
     from moralis import Moralis
-    from tribulnation.ethereum.core.moralis import MORALIS_CHAINS
+    from tribulnation.ethereum.core import rpc, MORALIS_CHAINS
     from .moralis import MoralisHistory
+    node, rpc_url = rpc.new(network, rpc_url, preferred='alchemy')
     moralis = Moralis.new(api_key)
-    return MoralisHistory(address=address, chain=MORALIS_CHAINS[network], moralis=moralis)
+    return MoralisHistory(address=address, chain=MORALIS_CHAINS[network], node=node, rpc_url=rpc_url, moralis=moralis)
 
   @classmethod
   def new(
@@ -51,6 +52,6 @@ class EthereumHistory(_History):
       return cls.etherscan(address=address, network=network, rpc_url=rpc_url, api_key=config.get('api_key'), rate_limit=config.get('rate_limit'))
     elif source == 'moralis':
       config = providers.get('moralis') or {}
-      return cls.moralis(address=address, network=network, api_key=config.get('api_key'))
+      return cls.moralis(address=address, network=network, rpc_url=rpc_url, api_key=config.get('api_key'))
     else:
       raise ValueError(f'Invalid history source: {source}')
