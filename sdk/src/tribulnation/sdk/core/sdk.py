@@ -59,13 +59,15 @@ class SDK(metaclass=SDKMeta):
     methods = {}
     for method, data in self.__sdk_methods__.items():
       if log:
-        print(f'Instrumenting method: {method}')
+        path_display = '.'.join(path + (method,))
+        print(f'Instrumenting method: {path_display}')
       methods[method] = data
     for field in self.__sdk_fields__:
       if log:
-        print(f'Instrumenting field: {field}')
+        path_display = '.'.join(path + (field,))
+        print(f'Instrumenting field: {path_display}')
       sdk: SDK = getattr(self, field)
-      attrs[field] = sdk.__sdk_instrument__(*mappers, path=path + (field,))
+      attrs[field] = sdk.__sdk_instrument__(*mappers, path=path + (field,), log=log)
 
     call_method = None
     if (fn := getattr(type(self), '__call__', None)) is not None and (method := Method.get(fn)) is not None:
