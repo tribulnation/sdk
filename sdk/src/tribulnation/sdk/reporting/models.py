@@ -350,8 +350,6 @@ class CryptoWithdrawal(BaseCryptoTransfer):
   type: Literal['crypto_withdrawal'] = 'crypto_withdrawal'
 
 class BaseFiatTransfer(SingleAssetObservation):
-  fiat_asset: str | None = None
-  """Raw spent fiat asset identifier, if provided by the source (and different from the credited asset)."""
   fee: Fee | None = None
   """Fee paid, if any."""
 
