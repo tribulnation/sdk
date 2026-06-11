@@ -381,7 +381,7 @@ class CryptoTransfer(pydantic.BaseModel):
   """Raw asset identifier/address."""
   change: Decimal
   """Signed amount being transferred."""
-  counterparty: str | None = None
+  counterparty: str
   """Counterparty address, if known."""
 
 class BaseCryptoTransaction(BaseObservation):

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tribulnation-sdk"
-version = "1.1.5"
+version = "1.1.6"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
