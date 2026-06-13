@@ -1,5 +1,5 @@
 from typing_extensions import Any, TypedDict, NotRequired
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal
 import asyncio
 
@@ -41,14 +41,6 @@ def tx_fee(tx: FeeFields) -> Decimal:
   operator_fee = wei_field(tx.get('operatorFee'))
   return wei2eth(used * price + l1_fee + operator_fee)
 
-def parse_execution(tx: TxData) -> EvmTx.Execution | None:
-  """Parse contract execution metadata from a raw transaction."""
-  if (input := tx.get('input')) and (to := tx.get('to')):
-    return EvmTx.Execution(
-      contract_address=Web3.to_checksum_address(to),
-      input=input.to_0x_hex(),
-    )
-
 TransferFields = TypedDict('TransferFields', {'value': str, 'to': str, 'from': str})
 
 @dataclass(frozen=True, kw_only=True)
@@ -57,6 +49,7 @@ class HistoryMixin(SDK):
   address: str
   node: NodeRpc
   rpc_url: str
+  eoa_cache: dict[str, bool] = field(default_factory=dict)
 
   async def __aenter__(self):
     await self.node.__aenter__()
@@ -69,6 +62,31 @@ class HistoryMixin(SDK):
   def w3(self):
     """Return the configured Web3 instance."""
     return self.node.w3
+
+  @SDK.method
+  @rpc.wrap_exceptions
+  async def is_eoa(self, address: str) -> bool:
+    """Check if an address is an EOA."""
+    code = await self.w3.eth.get_code(Web3.to_checksum_address(address))
+    return code.to_0x_hex() == '0x'
+
+  async def is_eoa_cached(self, address: str) -> bool:
+    """Check if an address is an EOA, cached."""
+    if address not in self.eoa_cache:
+      self.eoa_cache[address] = await self.is_eoa(address)
+    return self.eoa_cache[address]
+
+  async def parse_execution(self, tx: TxData) -> EvmTx.Execution:
+    """Parse contract execution metadata from a raw transaction."""
+    input, to = tx.get('input'), tx.get('to')
+    if input is None or to is None:
+      hash = (hash := tx.get('hash')) and hash.to_0x_hex()
+      raise ValueError(f'No input or to address in transaction: {hash}. Input: {input}. To: {to}')
+    return EvmTx.Execution(
+      to=Web3.to_checksum_address(to),
+      eoa=await self.is_eoa_cached(to),
+      input=input.to_0x_hex(),
+    )
 
   @SDK.method
   @rpc.wrap_exceptions

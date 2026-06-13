@@ -13,7 +13,7 @@ from tribulnation.sdk.core import SDK
 from tribulnation.sdk.reporting import History, Record, EvmTx
 from tribulnation.ethereum.core import etherscan as etherscan_core, group_by, same_address
 from tribulnation.ethereum.reporting.util import source_id, AutoDetect, AUTO_DETECT, cached_etherscan
-from .mixin import HistoryMixin, parse_execution
+from .mixin import HistoryMixin
 
 T = TypeVar('T')
 
@@ -210,7 +210,7 @@ class EtherscanHistory(HistoryMixin, History):
       time=time,
       fee=self.parse_fee(tx, receipt),
       transfers=transfers,
-      execution=parse_execution(tx),
+      execution=await self.parse_execution(tx),
     )
 
   async def history(self, start: datetime | None = None, end: datetime | None = None):

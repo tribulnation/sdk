@@ -403,12 +403,12 @@ class EvmTx(BaseCryptoTransaction):
   kind: Literal['evm'] = 'evm'
 
   class Execution(pydantic.BaseModel):
-    contract_address: str
-    """Contract address"""
-    input: str | None = None
+    to: str
+    """To address"""
+    input: str
     """Input data (if any)"""
-    method_name: str | None = None
-    """Function called (if available)"""
+    eoa: bool
+    """Whether the `to` address is an EOA or a contract"""
 
   class NativeTransfer(CryptoTransfer):
     kind: Literal['native'] = 'native'
@@ -420,9 +420,12 @@ class EvmTx(BaseCryptoTransaction):
 
   model_config = {'ignored_types': (UnionType,)} # type: ignore (make Transfer not freak out pydantic)
   Transfer = NativeTransfer | ERC20Transfer
-  execution: Execution | None = None
+  execution: Execution
   """Contract execution details (if any)"""
   transfers: Sequence[NativeTransfer|ERC20Transfer] = [] # type: ignore
+
+  def with_execution(self, execution: Execution | None) -> 'EvmTx':
+    return self.model_copy(update={'execution': execution})
 
 def observation_discriminator(obj):
   def get_attr(obj, attr):

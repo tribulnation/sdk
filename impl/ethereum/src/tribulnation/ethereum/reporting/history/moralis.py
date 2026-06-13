@@ -16,7 +16,7 @@ from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import History, Record, EvmTx, Fee
 from tribulnation.ethereum.core import moralis as moralis_core, same_address
 from tribulnation.ethereum.reporting.util import source_id
-from .mixin import HistoryMixin, parse_execution
+from .mixin import HistoryMixin
 
 T = TypeVar('T')
 
@@ -142,7 +142,7 @@ class MoralisHistory(HistoryMixin, History):
         time=datetime.fromisoformat(time),
         fee=self.parse_fee(tx, receipt),
         transfers=transfers,
-        execution=parse_execution(tx),
+        execution=await self.parse_execution(tx),
       )
 
   async def history(self, start: datetime | None = None, end: datetime | None = None):
