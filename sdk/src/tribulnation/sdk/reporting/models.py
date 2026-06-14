@@ -398,12 +398,18 @@ class CryptoTransaction(BaseCryptoTransaction):
   """Generic blockchain transaction observation."""
   kind: Literal[None] = None
 
+def to_checksum_address(address: str) -> str:
+  from web3 import Web3
+  return Web3.to_checksum_address(address)
+
+ChecksumAddress = Annotated[str, pydantic.AfterValidator(to_checksum_address)]
+
 class EvmTx(BaseCryptoTransaction):
   """EVM-compatible blockchain transaction observation."""
   kind: Literal['evm'] = 'evm'
 
   class Execution(pydantic.BaseModel):
-    to: str
+    to: ChecksumAddress
     """To address"""
     input: str
     """Input data (if any)"""
@@ -414,10 +420,12 @@ class EvmTx(BaseCryptoTransaction):
   class NativeTransfer(CryptoTransfer):
     kind: Literal['native'] = 'native'
     internal: bool
-    asset: str = 'native'
+    asset: Literal['native'] = 'native' # type: ignore
 
   class ERC20Transfer(CryptoTransfer):
     kind: Literal['erc20'] = 'erc20'
+    asset: ChecksumAddress # type: ignore
+    counterparty: ChecksumAddress # type: ignore
 
   model_config = {'ignored_types': (UnionType,)} # type: ignore (make Transfer not freak out pydantic)
   Transfer = NativeTransfer | ERC20Transfer
