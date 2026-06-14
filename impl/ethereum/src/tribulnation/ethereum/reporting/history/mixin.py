@@ -76,7 +76,7 @@ class HistoryMixin(SDK):
       self.eoa_cache[address] = await self.is_eoa(address)
     return self.eoa_cache[address]
 
-  async def parse_execution(self, tx: TxData) -> EvmTx.Execution:
+  async def parse_execution(self, tx: TxData, receipt: TxReceipt) -> EvmTx.Execution:
     """Parse contract execution metadata from a raw transaction."""
     input, to = tx.get('input'), tx.get('to')
     if input is None or to is None:
@@ -86,6 +86,7 @@ class HistoryMixin(SDK):
       to=Web3.to_checksum_address(to),
       eoa=await self.is_eoa_cached(to),
       input=input.to_0x_hex(),
+      canceled=receipt['status'] == 0,
     )
 
   @SDK.method

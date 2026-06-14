@@ -210,7 +210,7 @@ class EtherscanHistory(HistoryMixin, History):
       time=time,
       fee=self.parse_fee(tx, receipt),
       transfers=transfers,
-      execution=await self.parse_execution(tx),
+      execution=await self.parse_execution(tx, receipt),
     )
 
   async def history(self, start: datetime | None = None, end: datetime | None = None):

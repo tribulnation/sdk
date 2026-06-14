@@ -409,6 +409,7 @@ class EvmTx(BaseCryptoTransaction):
     """Input data (if any)"""
     eoa: bool
     """Whether the `to` address is an EOA or a contract"""
+    canceled: bool
 
   class NativeTransfer(CryptoTransfer):
     kind: Literal['native'] = 'native'
