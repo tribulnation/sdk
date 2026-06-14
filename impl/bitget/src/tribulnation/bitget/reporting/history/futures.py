@@ -36,7 +36,6 @@ class FuturesHistory(TimezoneMixin, SdkHistory):
             asset=tx['marginCoin'],
             amount=tx['amount'],
             time=self.add_tz(tx['ts']),
-            reason=tx['futureTaxType'],
           )
         ]
         if (fee := abs(tx['fee'])) > 0:

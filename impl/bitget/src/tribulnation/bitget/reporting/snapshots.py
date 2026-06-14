@@ -152,7 +152,7 @@ class Snapshots(SdkMixin, _Snapshots):
       self.bot_balances(),
     )
     
-    time = datetime.now()
+    time = datetime.now().astimezone()
     balances = {
       asset: Balance(qty=Decimal(qty), kind='currency')
       for asset, qty in balances.items()
@@ -169,5 +169,5 @@ class Snapshots(SdkMixin, _Snapshots):
         time=time,
         balances=balances,
       )],
-      provenance={'source': 'api', 'service': 'bitget', 'endpoint': 'snapshots'},
+      provenance={'source': 'api', 'service': 'bitget', 'id': ''},
     )

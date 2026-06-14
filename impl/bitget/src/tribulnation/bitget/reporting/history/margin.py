@@ -41,7 +41,6 @@ class MarginHistory(TimezoneMixin, SdkHistory):
             asset=tx['coin'],
             amount=tx['amount'],
             time=self.add_tz(tx['ts']),
-            reason=tx['marginTaxType'],
           )
         ]
         if (fee := abs(tx['fee'])) > 0:

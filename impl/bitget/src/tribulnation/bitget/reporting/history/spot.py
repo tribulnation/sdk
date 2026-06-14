@@ -49,7 +49,6 @@ class SpotHistory(TimezoneMixin, SdkHistory):
             asset=tx['coin'],
             amount=tx['amount'],
             time=self.add_tz(tx['ts']),
-            reason=tx['spotTaxType'],
           )
         ]
         if (fee := abs(tx['fee'])) > 0:

@@ -36,8 +36,7 @@ def api_provenance(endpoint: str, response: Any) -> ApiProvenance:
   return {
     'source': 'api',
     'service': 'bitget',
-    'endpoint': endpoint,
-    'response': response,
+    'id': ''
   }
 
 def api_record(observation: Observation, *, endpoint: str, response: Any) -> Record:
