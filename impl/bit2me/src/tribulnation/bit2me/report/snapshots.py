@@ -46,7 +46,7 @@ class Snapshots(_Snapshots):
       self.spot_balances(),
       self.earn_balances(),
     )
-    time = datetime.now()
+    time = datetime.now().astimezone()
     total = c1 + c2
     return Record(
       snapshots=[Snapshot(
@@ -56,5 +56,5 @@ class Snapshots(_Snapshots):
           for asset, qty in total.items()
         },
       )],
-      provenance={'source': 'api', 'service': 'bit2me', 'endpoint': 'snapshots'},
+      provenance={'source': 'api', 'service': 'bit2me', 'id': ''},
     )
