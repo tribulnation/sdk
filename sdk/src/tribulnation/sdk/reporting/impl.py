@@ -10,13 +10,16 @@ if TYPE_CHECKING:
   from tribulnation.ethereum.reporting import EvmConfig
   from .config import ProvidersConfig
 
-  class Settings(TypedDict, total=False):
+  BnbSettings = TypedDict('BnbSettings', {
+    'bnb-chain': EvmConfig
+  }, total=False)
+
+  class Settings(BnbSettings, total=False):
     providers: ProvidersConfig
     dydx: DydxConfig
     ethereum: EvmConfig
     arbitrum: EvmConfig
     polygon: EvmConfig
-    bnb: EvmConfig
     base: EvmConfig
     avalanche: EvmConfig
     optimism: EvmConfig
@@ -82,8 +85,8 @@ class ReportSDK(SDK):
       from tribulnation.ethereum.reporting import EthereumReport
       return EthereumReport.new(
         address,
-        network='bnb',
-        config=self.settings.get('bnb'),
+        network='bnb-chain',
+        config=self.settings.get('bnb-chain'),
         providers=self.settings.get('providers'),
       )
     except ImportError:
