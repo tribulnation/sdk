@@ -1,5 +1,5 @@
 from .models import (
-  Balance,
+  Position,
   Snapshot,
   ApiProvenance,
   BaseCryptoTransaction,
@@ -52,11 +52,12 @@ from .config import (
   MoralisProviderConfig,
   ProvidersConfig,
 )
+from .util import source_id
 
 __all__ = [
   'Snapshots',
   'Snapshot',
-  'Balance',
+  'Position',
   'History',
   'ApiProvenance',
   'BaseCryptoTransaction',
@@ -104,4 +105,5 @@ __all__ = [
   'EtherscanProviderConfig',
   'MoralisProviderConfig',
   'ProvidersConfig',
+  'source_id',
 ]
