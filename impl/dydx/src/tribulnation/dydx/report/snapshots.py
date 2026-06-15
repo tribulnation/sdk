@@ -10,9 +10,11 @@ from dydx.protos.cosmos.bank import v1beta1 as bank_proto
 from dydx.protos.cosmos.base import v1beta1 as coin_proto
 
 from tribulnation.sdk.core import SDK
-from tribulnation.sdk.reporting import Balance, Record, Snapshot, Snapshots as _Snapshots
+from tribulnation.sdk.reporting import (
+  Position, Record, Snapshot,
+  Snapshots as _Snapshots, source_id
+)
 from tribulnation.dydx.core import wrap_exceptions
-from .util import source_id
 
 USDC = 'USDC'
 DYDX = 'DYDX'
@@ -70,15 +72,12 @@ class Snapshots(_Snapshots):
       for coin in page:
         yield coin
 
-  async def add_wallet_balances(self, balances: dict[str, Balance]):
+  async def add_wallet_balances(self, balances: dict[str, Decimal]):
     """Add liquid wallet-level Cosmos bank balances to a snapshot."""
     async for coin in self.all_balances():
       asset, qty = await self.coin_balance(coin)
-      current = balances.get(asset)
-      balances[asset] = Balance(
-        qty=qty + (current.qty if current is not None else Decimal(0)),
-        kind='currency',
-      )
+      current = balances.get(asset, Decimal(0))
+      balances[asset] = current + qty
 
   async def delegator_delegations(self):
     """Fetch all delegator delegations."""
@@ -89,30 +88,15 @@ class Snapshots(_Snapshots):
       for delegation in page:
         yield delegation
 
-  @SDK.method
-  @wrap_exceptions
-  async def delegation_total_rewards(self):
-    return await self.client.chain.distribution.delegation_total_rewards(self.address)
 
-  async def add_staking_balances(self, balances: dict[str, Balance]):
+  async def add_staking_balances(self, balances: dict[str, Decimal]):
     """Add delegated and unclaimed staking balances to a snapshot."""
     async for delegation in self.delegator_delegations():
       if delegation.balance is None:
         continue
       asset, qty = await self.coin_balance(delegation.balance)
-      current = balances.get(asset)
-      balances[asset] = Balance(
-        qty=qty + (current.qty if current is not None else Decimal(0)),
-        kind='currency',
-      )
-    rewards = await self.delegation_total_rewards()
-    for reward in rewards.total:
-      asset, qty = await self.coin_balance(coin_proto.Coin(denom=reward.denom, amount=reward.amount))
-      current = balances.get(asset)
-      balances[asset] = Balance(
-        qty=qty + (current.qty if current is not None else Decimal(0)),
-        kind='currency',
-      )
+      current = balances.get(asset, Decimal(0))
+      balances[asset] = current + qty
 
   async def __aenter__(self):
     await self.client.__aenter__()
@@ -134,7 +118,7 @@ class Snapshots(_Snapshots):
     unrealized = Decimal(0)
     realized = Decimal(0)
 
-    positions = defaultdict[str, Decimal](Decimal)
+    positions_sizes = defaultdict[str, Decimal](Decimal)
     total_prices = defaultdict[str, Decimal](Decimal)
 
     for sub in subaccounts:
@@ -146,36 +130,35 @@ class Snapshots(_Snapshots):
         if (pnl := position.get('unrealizedPnl')) is not None:
           unrealized += Decimal(pnl)
 
-        positions[position['market']] += position['size']
+        positions_sizes[position['market']] += position['size']
         total_prices[position['market']] += position['size'] * position['entryPrice']
 
     collateral = equity - unrealized
     entry_prices = {
-      market: total_prices[market] / positions[market]
-      for market in positions
+      market: total_prices[market] / positions_sizes[market]
+      for market in positions_sizes
+    }
+
+    positions = {
+      market: Position(size=positions_sizes[market], avg_price=entry_prices[market])
+      for market in positions_sizes
     }
 
     return Record(
       snapshots=[Snapshot(
         time=time,
-        balances=await self.snapshot_balances(collateral, positions, entry_prices),
+        balances=await self.snapshot_balances(collateral),
+        positions=positions,
       )],
       provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )
 
   async def snapshot_balances(
-    self,
-    collateral: Decimal,
-    positions: dict[str, Decimal],
-    entry_prices: dict[str, Decimal],
-  ) -> dict[str, Balance]:
+    self, collateral: Decimal,
+  ) -> dict[str, Decimal]:
     """Build complete wallet, staking, collateral, and futures balances."""
-    balances: dict[str, Balance] = {
-      USDC: Balance(qty=collateral, kind='currency'),
-      **{
-        market: Balance(qty=positions[market], avg_price=entry_prices[market], kind='future')
-        for market in positions
-      },
+    balances: dict[str, Decimal] = {
+      USDC: collateral,
     }
     await self.add_wallet_balances(balances)
     await self.add_staking_balances(balances)

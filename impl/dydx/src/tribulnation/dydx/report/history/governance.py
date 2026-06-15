@@ -8,15 +8,13 @@ import json
 from urllib.parse import urlencode
 from urllib.request import urlopen
 
-from tribulnation.sdk.reporting import Record, Yield
-
+from tribulnation.sdk.reporting import Record, Yield, source_id
 from dydx import Dydx
 from dydx.chain.comet.types import BlockResultsResponse, Event
 from .coins import asset_symbol, denom_quantums
 from .comet import event_attributes
 from .constants import COMMUNITY_TREASURY_PROPOSAL_HEIGHTS, GOVERNANCE_API_URL
 from .time import in_window, parse_time
-from ..util import source_id
 
 def proposal_amount(coin: dict[str, object]) -> tuple[str, Decimal] | None:
   """Convert a proposal coin object into asset and amount."""

@@ -5,8 +5,10 @@ import asyncio
 from datetime import datetime
 from decimal import Decimal
 
-from tribulnation.sdk.reporting import Fee, FutureTrade, InternalTransfer, Record
-
+from tribulnation.sdk.reporting import (
+  Fee, FutureTrade, InternalTransfer,
+  Record, source_id
+)
 from dydx import Dydx
 from dydx.indexer.data.get_fills import Fill
 from dydx.indexer.data.get_subaccounts import Subaccount
@@ -14,7 +16,6 @@ from dydx.indexer.data.get_transfers import Transfer
 from .accounts import account_label, is_account
 from .constants import USDC
 from .time import in_window
-from ..util import source_id
 
 T = TypeVar('T')
 

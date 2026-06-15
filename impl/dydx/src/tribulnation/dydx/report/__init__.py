@@ -1,10 +1,11 @@
-from tribulnation.dydx.report.util import source_id
 from typing_extensions import AsyncIterable, TYPE_CHECKING
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 
-from tribulnation.sdk.reporting import ProvidersConfig, Report as _Report, Record, Snapshot
-
+from tribulnation.sdk.reporting import (
+  ProvidersConfig, Report as _Report,
+  Record, Snapshot, source_id
+)
 from dydx import Dydx
 from dydx.chain import (
   Chain,
@@ -26,7 +27,6 @@ from .history.constants import (
   DEFAULT_WALLET_TRANSFERS_SOURCE,
 )
 from .snapshots import Snapshots
-from .util import source_id
 
 if TYPE_CHECKING:
   from google.cloud.bigquery import Client as BigQueryClient
@@ -87,7 +87,7 @@ class Report(Snapshots, History, _Report):
       start_time = start_time.astimezone()
       snapshot_time = start_time - timedelta(days=1)
       yield Record(
-        snapshots=[Snapshot(time=snapshot_time, balances={})],
+        snapshots=[Snapshot(time=snapshot_time)],
         provenance={
           'source': 'derived',
           'id': source_id('dydx'),

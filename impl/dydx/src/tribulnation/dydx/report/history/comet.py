@@ -14,13 +14,12 @@ from tribulnation.sdk.reporting import (
   InternalTransfer,
   Record,
   Transfer,
-  UnknownObservation,
   Yield,
+  source_id,
 )
 
 from dydx import Dydx
 from dydx.chain.comet.types import Event, TxResponse
-from ..util import source_id
 from .accounts import megavault_account, staking_account, subaccount_account, wallet_account
 from .coins import parse_coins, parse_fee_coin
 from .constants import COMET_BLOCK_CONCURRENCY, COMET_TX_SEARCH_PER_PAGE, DYDX, USDC, USDC_QUANTUMS
@@ -605,7 +604,7 @@ class CometHistory:
         transfers.append(CryptoTransfer(
           asset=asset,
           change=change,
-          counterparty=attributes.get('sender'),
+          counterparty=attributes['sender'],
         ))
     return transfers
 
