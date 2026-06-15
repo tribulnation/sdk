@@ -1,13 +1,13 @@
-from typing_extensions import NamedTuple, Collection
+from typing_extensions import Collection
 from dataclasses import dataclass
 from decimal import Decimal
-from collections import Counter
+from collections import Counter, defaultdict
 from datetime import datetime
 import asyncio
 
 from tribulnation.sdk.core import SDK
 from tribulnation.sdk.reporting import (
-  Balance, Record, Snapshot, Snapshots as _Snapshots,
+  Record, Snapshot, Snapshots as _Snapshots, source_id, Position
 )
 
 from bitget import Bitget
@@ -48,21 +48,17 @@ class Snapshots(SdkMixin, _Snapshots):
 
     return balances
 
-  class Position(NamedTuple):
-    size: Decimal
-    entry: Decimal
-
   @SDK.method
   @wrap_exceptions
   async def futures_positions(self) -> dict[str, Position]:
-    positions: dict[str, Snapshots.Position] = {}
+    positions: dict[str, Position] = {}
     for asset_type in ('USDT-FUTURES', 'USDC-FUTURES', 'COIN-FUTURES'):
       assets = await self.client.futures.position.all_positions(asset_type)
       for asset in assets:
         assert not asset['symbol'] in positions
-        positions[asset['symbol']] = Snapshots.Position(
+        positions[asset['symbol']] = Position(
           size=asset['total'],
-          entry=asset['openPriceAvg'],
+          avg_price=asset['openPriceAvg'],
         )
     
     return positions
@@ -153,21 +149,19 @@ class Snapshots(SdkMixin, _Snapshots):
     )
     
     time = datetime.now().astimezone()
-    balances = {
-      asset: Balance(qty=Decimal(qty), kind='currency')
+    balances = defaultdict[str, Decimal](Decimal, {
+      asset: qty
       for asset, qty in balances.items()
-    } | {
-      asset: Balance(qty=p.size, avg_price=p.entry, kind='future')
-      for asset, p in positions.items()
-    }
+    })
     for asset, qty in bot_assets.items():
       key = asset if asset not in balances else f'bot:{asset}'
-      balances[key] = Balance(qty=Decimal(qty), kind='strategy')
+      balances[key] += qty
 
     return Record(
       snapshots=[Snapshot(
         time=time,
         balances=balances,
+        positions=positions,
       )],
-      provenance={'source': 'api', 'service': 'bitget', 'id': ''},
+      provenance={'source': 'api', 'service': 'bitget', 'id': source_id('bitget')},
     )

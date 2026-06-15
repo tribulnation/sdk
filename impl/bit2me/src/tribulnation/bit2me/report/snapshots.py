@@ -6,7 +6,7 @@ from collections import Counter
 from typing_extensions import Sequence
 
 from tribulnation.sdk.core import SDK
-from tribulnation.sdk.reporting import Balance, Record, Snapshots as _Snapshots, Snapshot
+from tribulnation.sdk.reporting import Record, Snapshots as _Snapshots, Snapshot, source_id, Position
 from tribulnation.bit2me.core import wrap_exceptions
 from bit2me import Bit2Me
 
@@ -47,14 +47,14 @@ class Snapshots(_Snapshots):
       self.earn_balances(),
     )
     time = datetime.now().astimezone()
-    total = c1 + c2
+    total = Counter()
+    for counter in (c1, c2):
+      for asset, qty in counter.items():
+        total[asset] += qty
     return Record(
       snapshots=[Snapshot(
         time=time,
-        balances={
-          asset: Balance(qty=Decimal(qty), kind='currency')
-          for asset, qty in total.items()
-        },
+        balances=dict(total), # type: ignore
       )],
-      provenance={'source': 'api', 'service': 'bit2me', 'id': ''},
+      provenance={'source': 'api', 'service': 'bit2me', 'id': source_id('bit2me')},
     )

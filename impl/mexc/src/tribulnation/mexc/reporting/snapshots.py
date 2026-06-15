@@ -7,22 +7,10 @@ import asyncio
 
 from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import (
-  Balance, Record, Snapshot, Snapshots as _Snapshots
+  Record, Snapshot, Snapshots as _Snapshots, source_id, Position
 )
 
 from tribulnation.mexc.core import Mixin, wrap_exceptions
-
-@dataclass
-class Position:
-  size: Decimal
-  entry_price: Decimal
-
-def merge_positions(positions: list[Position]) -> Position:
-  size = sum(p.size for p in positions)
-  if size == 0:
-    return Position(size=Decimal(0), entry_price=Decimal(0))
-  entry_price = sum(p.size * p.entry_price for p in positions) / size
-  return Position(size=size, entry_price=entry_price)
 
 @dataclass(frozen=True)
 class Snapshots(_Snapshots, Mixin):
@@ -69,9 +57,9 @@ class Snapshots(_Snapshots, Mixin):
       contract_size = Decimal(str(contract.get('contractSize') or '0'))
       s = 1 if pos.get('positionType') == 1 else -1
       size = s * abs(Decimal(str(pos.get('holdVol') or '0'))) * contract_size
-      out[symbol].append(Position(size=size, entry_price=Decimal(str(pos.get('openAvgPrice') or '0'))))
+      out[symbol].append(Position(size=size, avg_price=Decimal(str(pos.get('openAvgPrice') or '0'))))
 
-    return { symbol: merge_positions(positions) for symbol, positions in out.items() }
+    return { symbol: Position.merge(positions) for symbol, positions in out.items() }
   
   @SDK.method
   async def snapshots(self, assets: Collection[str] | None = None) -> Record:
@@ -87,15 +75,10 @@ class Snapshots(_Snapshots, Mixin):
       snapshots=[Snapshot(
         time=time,
         balances={
-          **{
-            currency: Balance(qty=balance, kind='currency')
-            for currency, balance in balances.items()
-          },
-          **{
-            symbol: Balance(qty=p.size, avg_price=p.entry_price, kind='future')
-            for symbol, p in future_positions.items()
-          },
+          currency: balance
+          for currency, balance in balances.items()
         },
+        positions=future_positions,
       )],
-      provenance={'source': 'api', 'service': 'mexc', 'endpoint': 'snapshots'},
+      provenance={'source': 'api', 'service': 'mexc', 'id': source_id('mexc')},
     )
