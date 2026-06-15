@@ -3,10 +3,13 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 import asyncio
 
-from tribulnation.sdk.reporting import Report, History, Snapshots, Record, EvmTx, Snapshot, ProvidersConfig
+from tribulnation.sdk.reporting import (
+  Report, History, Snapshots, Record,
+  EvmTx, Snapshot, ProvidersConfig,
+  source_id,
+)
 from tribulnation.ethereum.core import Network
 from .config import EvmConfig
-from .util import source_id
 
 @dataclass
 class EthereumReport(Report):

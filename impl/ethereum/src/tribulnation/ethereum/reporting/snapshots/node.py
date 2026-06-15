@@ -9,10 +9,9 @@ from web3.exceptions import BadFunctionCallOutput, ContractLogicError
 from ethereum import NodeRpc
 
 from tribulnation.sdk import SDK, ApiError
-from tribulnation.sdk.reporting import Snapshots, Record, Balance, Snapshot
+from tribulnation.sdk.reporting import Snapshots, Record, Snapshot, source_id
 from tribulnation.ethereum.core import rpc
 from ..config import NATIVE_ASSET
-from ..util import source_id
 
 @dataclass(frozen=True, kw_only=True)
 class NodeSnapshots(Snapshots):
@@ -51,8 +50,8 @@ class NodeSnapshots(Snapshots):
   async def snapshots(self, assets: Sequence[str] | None = None) -> Record:
     assets = assets or []
     time = datetime.now().astimezone()
-    balances: dict[str, Balance] = {
-      NATIVE_ASSET: Balance(qty=await self.eth_balance(), kind='currency'),
+    balances: dict[str, Decimal] = {
+      NATIVE_ASSET: await self.eth_balance(),
     }
 
     semaphore = asyncio.Semaphore(self.batch_size)
@@ -69,7 +68,7 @@ class NodeSnapshots(Snapshots):
     for task in asyncio.as_completed(tasks):
       balance, contract = await task
       if balance is not None and (not self.ignore_zero_value or balance > 0):
-        balances[contract] = Balance(qty=balance, kind='currency')
+        balances[contract] = balance
 
     return Record(
       snapshots=[Snapshot(time=time, balances=balances)],

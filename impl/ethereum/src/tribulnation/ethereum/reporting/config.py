@@ -25,7 +25,7 @@ DEFAULT_HISTORY_SOURCES: dict[Network, HistorySource] = {
   'ethereum': 'etherscan',
   'arbitrum': 'etherscan',
   'polygon': 'etherscan',
-  'bnb': 'moralis',
+  'bnb-chain': 'moralis',
   'base': 'moralis',
   'avalanche': 'moralis',
   'optimism': 'moralis',

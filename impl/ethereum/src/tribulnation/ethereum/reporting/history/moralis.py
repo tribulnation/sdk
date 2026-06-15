@@ -13,9 +13,8 @@ from moralis.evm.wallet.history import (
 )
 
 from tribulnation.sdk import SDK
-from tribulnation.sdk.reporting import History, Record, EvmTx, Fee
+from tribulnation.sdk.reporting import History, Record, EvmTx, Fee, source_id
 from tribulnation.ethereum.core import moralis as moralis_core, same_address
-from tribulnation.ethereum.reporting.util import source_id
 from .mixin import HistoryMixin
 
 T = TypeVar('T')

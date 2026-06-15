@@ -10,9 +10,9 @@ from etherscan.api.account.token_transactions import TokenTransaction, token_val
 from etherscan.api.account.internal_transactions import InternalTransaction
 
 from tribulnation.sdk.core import SDK
-from tribulnation.sdk.reporting import History, Record, EvmTx
+from tribulnation.sdk.reporting import History, Record, EvmTx, source_id
 from tribulnation.ethereum.core import etherscan as etherscan_core, group_by, same_address
-from tribulnation.ethereum.reporting.util import source_id, AutoDetect, AUTO_DETECT, cached_etherscan
+from tribulnation.ethereum.reporting.util import AutoDetect, AUTO_DETECT, cached_etherscan
 from .mixin import HistoryMixin
 
 T = TypeVar('T')

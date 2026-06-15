@@ -5,7 +5,7 @@ MORALIS_CHAINS: dict[Network, Chain] = {
   'ethereum': 'eth',
   'arbitrum': 'arbitrum',
   'polygon': 'polygon',
-  'bnb': 'bsc',
+  'bnb-chain': 'bsc',
   'base': 'base',
   'avalanche': 'avalanche',
   'optimism': 'optimism',

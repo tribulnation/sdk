@@ -7,10 +7,9 @@ from web3 import Web3
 from alchemy import Alchemy
 
 from tribulnation.sdk import SDK
-from tribulnation.sdk.reporting import Snapshots, Record, Balance, Snapshot
+from tribulnation.sdk.reporting import Snapshots, Record, Snapshot, source_id
 from tribulnation.ethereum.core import alchemy as alchemy_core
 from ..config import NATIVE_ASSET
-from ..util import source_id
 
 T = TypeVar('T')
 
@@ -62,7 +61,7 @@ class AlchemySnapshots(Snapshots):
         yield token
 
   async def snapshots(self, assets: Sequence[str] | None = None) -> Record:
-    balances: dict[str, Balance] = {}
+    balances: dict[str, Decimal] = {}
     tokens = [token async for token in self.alchemy_portfolio_tokens()]
     for token in tokens:
       address = token.get('tokenAddress')
@@ -70,7 +69,7 @@ class AlchemySnapshots(Snapshots):
       asset = NATIVE_ASSET if address is None else Web3.to_checksum_address(address)
       qty = token_qty(token['tokenBalance'], metadata.get('decimals'))
       if qty > 0 or not self.ignore_zero_value:
-        balances[asset] = Balance(qty=qty, kind='currency')
+        balances[asset] = qty
     return Record(
       snapshots=[Snapshot(time=datetime.now().astimezone(), balances=balances)],
       provenance={'source': 'api', 'service': 'alchemy', 'id': source_id('alchemy')},
