@@ -10,6 +10,7 @@ from .exchange import (
 )
 from .blockchain import CryptoTransaction, CryptoTransfer
 from .evm import EvmTx
+from .cosmos import CosmosTx, CosmosBlockEvents
 from .provenance import (
   Provenance, TabularProvenance, ApiProvenance,
   ManualProvenance, DerivedProvenance,

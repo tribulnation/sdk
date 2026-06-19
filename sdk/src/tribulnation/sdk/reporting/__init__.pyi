@@ -40,6 +40,8 @@ from .models import (
   ExchangeObservationType,
   UnknownObservation,
   Yield,
+  CosmosTx,
+  CosmosBlockEvents,
 )
 from .snapshots import Snapshots
 from .history import History
@@ -52,7 +54,7 @@ from .config import (
   MoralisProviderConfig,
   ProvidersConfig,
 )
-from .util import source_id
+from .util import source_id, Balances
 
 __all__ = [
   'Snapshots',
@@ -92,6 +94,8 @@ __all__ = [
   'Repay',
   'SingleAssetObservation',
   'SpotOrder',
+  'CosmosTx',
+  'CosmosBlockEvents',
   'Transfer',
   'SpotTrade',
   'TradeLeg',
@@ -106,4 +110,5 @@ __all__ = [
   'MoralisProviderConfig',
   'ProvidersConfig',
   'source_id',
+  'Balances',
 ]

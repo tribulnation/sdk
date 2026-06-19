@@ -1,5 +1,7 @@
 from typing_extensions import Annotated, Union, Sequence, Literal
 import pydantic
+
+from .snapshots import Snapshot
 from .exchange import (
   SpotTrade, SpotOrder, TradeLeg, Conversion, FeeLeg,
   FutureTrade, FutureOrder, FuturePositionSummary, RealizedPnl,
@@ -9,7 +11,7 @@ from .exchange import (
 )
 from .blockchain import CryptoTransaction
 from .evm import EvmTx
-from .snapshots import Snapshot
+from .cosmos import CosmosTx, CosmosBlockEvents
 from .provenance import Provenance
 
 ObservationType = Literal[
@@ -36,6 +38,8 @@ ObservationType = Literal[
   'fiat_conversion',
   'crypto_transaction',
   'evm_tx',
+  'cosmos_tx',
+  'cosmos_block_events',
   'unknown',
 ]
 
@@ -62,8 +66,10 @@ Observation = Annotated[
     FiatDeposit,
     FiatWithdrawal,
     FiatConversion,
-    EvmTx,
     CryptoTransaction,
+    EvmTx,
+    CosmosTx,
+    CosmosBlockEvents,
     UnknownObservation,
   ],
   pydantic.Discriminator('type')
