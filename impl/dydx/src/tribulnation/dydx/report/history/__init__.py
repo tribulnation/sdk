@@ -1,3 +1,1 @@
-"""dYdX reporting history package."""
-
-from .main import History
+from .main import History, BlockTimeCache

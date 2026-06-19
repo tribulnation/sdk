@@ -1,6 +1,5 @@
-"""Governance-backed dYdX reporting history."""
-
 from typing_extensions import Any
+from dataclasses import dataclass
 import asyncio
 from datetime import datetime
 from decimal import Decimal
@@ -9,37 +8,33 @@ from urllib.parse import urlencode
 from urllib.request import urlopen
 
 from tribulnation.sdk.reporting import Record, Yield, source_id
+from tribulnation.dydx.core import parse_denom_amount
 from dydx import Dydx
 from dydx.chain.comet.types import BlockResultsResponse, Event
-from .coins import asset_symbol, denom_quantums
-from .comet import event_attributes
-from .constants import COMMUNITY_TREASURY_PROPOSAL_HEIGHTS, GOVERNANCE_API_URL
-from .time import in_window, parse_time
 
-def proposal_amount(coin: dict[str, object]) -> tuple[str, Decimal] | None:
+GOVERNANCE_API_URL = 'https://dydx-dao-api.polkachu.com'
+
+def proposal_amount(coin: dict) -> tuple[str, Decimal] | None:
   """Convert a proposal coin object into asset and amount."""
   denom = coin.get('denom')
   amount = coin.get('amount')
   if denom is None or amount is None:
     return None
   denom_str = str(denom)
-  return asset_symbol(denom_str), Decimal(str(amount)) / denom_quantums(denom_str)
+  return parse_denom_amount(denom_str, int(amount))
 
+@dataclass
 class GovernanceHistory:
   """Governance-backed dYdX history methods."""
   address: str
-  client: Dydx
 
-  async def governance_community_treasury_distributions(
-    self, *, start: datetime | None, end: datetime | None,
-  ) -> list[Record]:
+  async def history(self) -> list[Record]:
     """Collect Community Treasury distributions from governance proposals."""
     proposals = await self.governance_proposals()
     records: list[Record] = []
     for proposal in proposals:
-      record = self.parse_governance_proposal(proposal, start=start, end=end)
-      proposal_id = self.proposal_id(proposal)
-      if record is not None and await self.confirm_governance_proposal(proposal_id):
+      record = self.parse_governance_proposal(proposal)
+      if record is not None:
         records.append(record)
     return records
 
@@ -77,20 +72,12 @@ class GovernanceHistory:
       return payload
     return await asyncio.to_thread(fetch)
 
-  def parse_governance_proposal(
-    self,
-    proposal: dict[str, Any],
-    *,
-    start: datetime | None,
-    end: datetime | None,
-  ) -> Record | None:
+  def parse_governance_proposal(self, proposal: dict[str, Any]) -> Record | None:
     """Convert one governance proposal into a Community Treasury yield record."""
     status = proposal.get('status')
     if status not in {'PROPOSAL_STATUS_PASSED', '3'}:
       return None
     time = self.governance_proposal_time(proposal)
-    if time is not None and not in_window(time, start=start, end=end):
-      return None
     proposal_id = self.proposal_id(proposal)
     observations: list[Yield] = []
     for message_index, message in enumerate(self.proposal_messages(proposal)):
@@ -118,26 +105,6 @@ class GovernanceHistory:
       provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )
 
-  async def confirm_governance_proposal(self, proposal_id: str) -> bool:
-    """Confirm known Community Treasury proposal execution with Comet block results."""
-    height = COMMUNITY_TREASURY_PROPOSAL_HEIGHTS.get(proposal_id)
-    if height is None:
-      return True
-    results = await self.client.chain.comet.block_results(height)
-    return self.block_results_has_active_proposal(results, proposal_id=proposal_id)
-
-  def block_results_has_active_proposal(
-    self, results: BlockResultsResponse, *, proposal_id: str,
-  ) -> bool:
-    """Return whether block results include the active proposal execution event."""
-    for event in self.block_result_events(results):
-      if event['type'] != 'active_proposal':
-        continue
-      attributes = event_attributes(event)
-      if attributes.get('proposal_id') == proposal_id:
-        return True
-    return False
-
   def block_result_events(self, results: BlockResultsResponse) -> list[Event]:
     """Return all events available in Comet block results."""
     events = list(results.get('finalize_block_events') or [])
@@ -150,7 +117,7 @@ class GovernanceHistory:
     for key in ('voting_end_time', 'submit_time'):
       value = proposal.get(key)
       if value is not None:
-        return parse_time(str(value))
+        return datetime.fromisoformat(str(value))
     return None
 
   def proposal_id(self, proposal: dict[str, Any]) -> str:

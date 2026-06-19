@@ -1,132 +1,94 @@
-from typing_extensions import Collection, Callable, Awaitable, TypeVar
+from typing_extensions import Sequence
 from dataclasses import dataclass, field
-from datetime import datetime
-from collections import defaultdict
 from decimal import Decimal
+from datetime import datetime, timezone
+import asyncio
 
-from dydx import Dydx, Indexer
-from dydx.node import DYDX_MAINNET_USDC_DENOM
-from dydx.protos.cosmos.bank import v1beta1 as bank_proto
-from dydx.protos.cosmos.base import v1beta1 as coin_proto
-
-from tribulnation.sdk.core import SDK
+from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import (
-  Position, Record, Snapshot,
-  Snapshots as _Snapshots, source_id
+  Snapshots as _Snapshots, Snapshot,
+  Balances, Position, Record, source_id
 )
-from tribulnation.dydx.core import wrap_exceptions
-
-USDC = 'USDC'
-DYDX = 'DYDX'
-DYDX_BASE_DENOM = 'adydx'
-DYDX_QUANTUMS = Decimal(1_000_000_000_000_000_000)
-
-T = TypeVar('T')
+from tribulnation.dydx.core import (
+  parse_coin, parse_dec_coin, parse_dydx_quantums,
+  DYDX, USDC, wrap_exceptions
+)
+from dydx import Dydx, Indexer
 
 @dataclass(frozen=True)
 class Snapshots(_Snapshots):
   address: str
   client: Dydx = field(default_factory=lambda: Dydx.mainnet(public=True))
 
+  @classmethod
+  def of(cls, address: str, dydx: Dydx | None = None):
+    if dydx is None:
+      dydx = Dydx.mainnet(public=True)
+    return cls(address=address, client=dydx)
+
   @property
   def indexer(self) -> Indexer:
-    """Return the indexer transport used for snapshot reads."""
     return self.client.indexer
 
   @SDK.method
   @wrap_exceptions
-  async def denom_metadata(self, denom: str) -> bank_proto.Metadata | None:
-    """Fetch bank metadata for a denom, returning none when unavailable."""
-    response = await self.client.chain.bank.denom_metadata(denom)
-    return response.metadata
+  async def bank_module_balances(self) -> Balances:
+    bank_balances = await self.client.chain.bank.all_balances_paged(self.address)
+    balances = Balances()
+    for coin in bank_balances:
+      asset, amount = parse_coin(coin)
+      balances[asset] += amount
+    return balances
 
-  async def coin_balance(self, coin: coin_proto.Coin) -> tuple[str, Decimal]:
-    """Convert a chain coin into a display asset and quantity."""
-    if coin.denom == DYDX_MAINNET_USDC_DENOM:
-      return USDC, Decimal(coin.amount) / Decimal(1_000_000)
-    if coin.denom == DYDX_BASE_DENOM:
-      return DYDX, Decimal(coin.amount) / DYDX_QUANTUMS
-    metadata = await self.denom_metadata(coin.denom)
-    if metadata is None:
-      return coin.denom, Decimal(coin.amount)
-    display = metadata.display or metadata.base or coin.denom
-    exponent = next(
-      (unit.exponent for unit in metadata.denom_units if unit.denom == display),
-      0,
-    )
-    asset = (metadata.symbol or display).upper()
-    return asset, Decimal(coin.amount) * (Decimal(10) ** -exponent)
 
   @SDK.method
   @wrap_exceptions
-  async def call_dydx(self, fn: Callable[[], Awaitable[T]]) -> T:
-    """Call dYdX under the SDK exception wrapper."""
-    return await fn()
+  async def active_delegations(self) -> Balances:
+    delegations = await self.client.chain.staking.delegator_delegations_paged(self.address)
+    balances = Balances()
+    for d in delegations:
+      if d.balance is not None:
+        asset, amount = parse_coin(d.balance)
+        balances[asset] += amount
+    return balances
 
-  async def all_balances(self):
-    """Fetch all wallet balances."""
-    paging = self.client.chain.bank.all_balances_paged(self.address)
-    state = paging.init
-    while state is not None:
-      page, state = await self.call_dydx(lambda: paging.next(state)) # type: ignore
-      for coin in page:
-        yield coin
-
-  async def add_wallet_balances(self, balances: dict[str, Decimal]):
-    """Add liquid wallet-level Cosmos bank balances to a snapshot."""
-    async for coin in self.all_balances():
-      asset, qty = await self.coin_balance(coin)
-      current = balances.get(asset, Decimal(0))
-      balances[asset] = current + qty
-
-  async def delegator_delegations(self):
-    """Fetch all delegator delegations."""
-    paging = self.client.chain.staking.delegator_delegations_paged(self.address)
-    state = paging.init
-    while state is not None:
-      page, state = await self.call_dydx(lambda: paging.next(state)) # type: ignore
-      for delegation in page:
-        yield delegation
-
-
-  async def add_staking_balances(self, balances: dict[str, Decimal]):
-    """Add delegated and unclaimed staking balances to a snapshot."""
-    async for delegation in self.delegator_delegations():
-      if delegation.balance is None:
-        continue
-      asset, qty = await self.coin_balance(delegation.balance)
-      current = balances.get(asset, Decimal(0))
-      balances[asset] = current + qty
-
-  async def __aenter__(self):
-    await self.client.__aenter__()
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await self.client.__aexit__(exc_type, exc_value, traceback)
 
   @SDK.method
   @wrap_exceptions
-  async def subaccounts(self):
-    return (await self.indexer.data.get_subaccounts(self.address))['subaccounts']
-
+  async def unbonding_delegations(self) -> Balances:
+    unbonding_delegations = await self.client.chain.staking.delegator_unbonding_delegations_paged(self.address)
+    balances = Balances()
+    for u in unbonding_delegations:
+      for e in u.entries:
+        balances[DYDX] += parse_dydx_quantums(e.balance)
+    return balances
+    
+    
+  @SDK.method
   @wrap_exceptions
-  async def snapshots(self, assets: Collection[str] | None = None) -> Record:
-    time = datetime.now().astimezone()
-    subaccounts = await self.subaccounts()
+  async def unclaimed_delegation_rewards(self) -> Balances:
+    rewards = await self.client.chain.distribution.delegation_total_rewards(self.address)
+    balances = Balances()
+    for r in rewards.total:
+      asset, amount = parse_dec_coin(r)
+      balances[asset] += amount
+    return balances
+
+
+  @SDK.method
+  @wrap_exceptions
+  async def perpetual_collateral_and_positions(self) -> tuple[Decimal, dict[str, Position]]:
+    subaccounts = (await self.client.indexer.data.get_subaccounts(self.address))['subaccounts']
     equity = Decimal(0)
     unrealized = Decimal(0)
-    realized = Decimal(0)
 
-    positions_sizes = defaultdict[str, Decimal](Decimal)
-    total_prices = defaultdict[str, Decimal](Decimal)
+    positions_sizes = Balances()
+    total_prices = Balances()
 
     for sub in subaccounts:
       equity += Decimal(sub['equity'])
 
       for position in sub['openPerpetualPositions'].values():
-        if (pnl := position.get('realizedPnl')) is not None:
-          realized += Decimal(pnl)
         if (pnl := position.get('unrealizedPnl')) is not None:
           unrealized += Decimal(pnl)
 
@@ -134,32 +96,33 @@ class Snapshots(_Snapshots):
         total_prices[position['market']] += position['size'] * position['entryPrice']
 
     collateral = equity - unrealized
+
+    positions_sizes = Balances({ k: v for k, v in positions_sizes.items() if v })
     entry_prices = {
       market: total_prices[market] / positions_sizes[market]
       for market in positions_sizes
     }
-
     positions = {
       market: Position(size=positions_sizes[market], avg_price=entry_prices[market])
       for market in positions_sizes
     }
 
+    return collateral, positions
+
+  async def snapshots(self, assets: Sequence[str] | None = None) -> Record:
+    bank, delegations, unbonding, unclaimed, (collateral, positions) = await asyncio.gather(
+      self.bank_module_balances(),
+      self.active_delegations(),
+      self.unbonding_delegations(),
+      self.unclaimed_delegation_rewards(),
+      self.perpetual_collateral_and_positions(),
+    )
+    balances = bank + delegations + unbonding + unclaimed + Balances({USDC: collateral})
     return Record(
       snapshots=[Snapshot(
-        time=time,
-        balances=await self.snapshot_balances(collateral),
+        time=datetime.now(timezone.utc),
+        balances=balances,
         positions=positions,
       )],
       provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )
-
-  async def snapshot_balances(
-    self, collateral: Decimal,
-  ) -> dict[str, Decimal]:
-    """Build complete wallet, staking, collateral, and futures balances."""
-    balances: dict[str, Decimal] = {
-      USDC: collateral,
-    }
-    await self.add_wallet_balances(balances)
-    await self.add_staking_balances(balances)
-    return balances
