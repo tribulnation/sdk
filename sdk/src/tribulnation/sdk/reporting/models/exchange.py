@@ -1,29 +1,13 @@
-from types import UnionType
-from typing_extensions import Literal, Annotated, Union, Sequence, Any, TypedDict, NotRequired, TypedDict
+from typing_extensions import Literal, Sequence
 from datetime import datetime
 from decimal import Decimal
 import pydantic
 
-class Position(pydantic.BaseModel):
-  size: Decimal
-  """Position size (of base units, positive or negative)"""
-  avg_price: Decimal
-  """Average entry price"""
+from .common import BaseObservation, Fee
 
-  @classmethod
-  def merge(cls, positions: list['Position']) -> 'Position':
-    size = sum(p.size for p in positions)
-    if size == 0:
-      return cls(size=Decimal(0), avg_price=Decimal(0))
-    avg_price = sum(p.size * p.avg_price for p in positions) / size
-    return cls(size=size, avg_price=avg_price)
+TradeLegEventType = Literal['spot_trade', 'conversion', 'fiat_conversion']
 
-class Snapshot(pydantic.BaseModel):
-  time: pydantic.AwareDatetime
-  balances: dict[str, Decimal] = {}
-  positions: dict[str, Position] = {}
-
-ObservationType = Literal[
+ExchangeObservationType = Literal[
   'spot_trade',
   'future_trade',
   'future_order',
@@ -45,27 +29,8 @@ ObservationType = Literal[
   'fiat_deposit',
   'fiat_withdrawal',
   'fiat_conversion',
-  'crypto_transaction',
   'unknown',
 ]
-
-TradeLegEventType = Literal['spot_trade', 'conversion', 'fiat_conversion']
-
-class Fee(pydantic.BaseModel):
-  amount: Decimal = pydantic.Field(..., ge=0)
-  """Amount paid."""
-  asset: str
-  """Raw asset identifier, as provided by the source."""
-
-  def __str__(self) -> str:
-    return f'Fee({self.amount} {self.asset})'
-
-class BaseObservation(pydantic.BaseModel):
-  id: str | None = None
-  """Raw identifier, if provided by the source."""
-  time: pydantic.AwareDatetime | None = None
-  subaccount: str | None = None
-  """Venue subaccount or compartment label, if the source row has a scoped account."""
 
 class SpotTrade(BaseObservation):
   """An exchange of an asset for another, with an optional fee."""
@@ -91,7 +56,7 @@ class SpotTrade(BaseObservation):
 class FutureTrade(BaseObservation):
   """A futures or perpetual fill that changes derivative exposure."""
   type: Literal['future_trade'] = 'future_trade'
-  instrument: str | None = None
+  instrument: str
   """Raw futures or perpetual instrument identifier."""
   base: str | None = None
   """Underlying/base asset, if known."""
@@ -262,7 +227,7 @@ class FeeLeg(BaseObservation):
   """Raw fee asset identifier, as provided by the source."""
   amount: Decimal
   """Raw source fee amount. Matching uses the absolute value."""
-  event_type: ObservationType | None = None
+  event_type: ExchangeObservationType | None = None
   """Event/observation type, if provided by the source."""
   event_id: str | None = None
   """Event/observation identifier, if provided by the source."""
@@ -377,138 +342,3 @@ class FiatConversion(SingleAssetObservation):
   """External/payment fee metadata, if provided by the source."""
   payment_method: str | None = None
   """Raw external payment method, if provided by the source."""
-
-class CryptoTransfer(pydantic.BaseModel):
-  """A crypto asset transferred within a blockchain transaction."""
-  asset: str
-  """Raw asset identifier/address."""
-  change: Decimal
-  """Signed amount being transferred."""
-  counterparty: str
-  """Counterparty address, if known."""
-
-class BaseCryptoTransaction(BaseObservation):
-  type: Literal['crypto_transaction'] = 'crypto_transaction'
-  """Generic blockchain transaction observation."""
-  tx_id: str | None = None
-  """Blockchain transaction hash/identifier."""
-  fee: Fee | None = None
-  """Fee paid, if any."""
-  transfers: Sequence[CryptoTransfer] = []
-  """Transfers occured within the transaction."""
-
-class CryptoTransaction(BaseCryptoTransaction):
-  """Generic blockchain transaction observation."""
-  kind: Literal[None] = None
-
-def to_checksum_address(address: str) -> str:
-  from web3 import Web3
-  return Web3.to_checksum_address(address)
-
-ChecksumAddress = Annotated[str, pydantic.AfterValidator(to_checksum_address)]
-
-class EvmTx(BaseCryptoTransaction):
-  """EVM-compatible blockchain transaction observation."""
-  kind: Literal['evm'] = 'evm'
-
-  class Execution(pydantic.BaseModel):
-    to: ChecksumAddress
-    """To address"""
-    input: str
-    """Input data (if any)"""
-    eoa: bool
-    """Whether the `to` address is an EOA or a contract"""
-    canceled: bool
-
-  class NativeTransfer(CryptoTransfer):
-    kind: Literal['native'] = 'native'
-    internal: bool
-    asset: Literal['native'] = 'native' # type: ignore
-
-  class ERC20Transfer(CryptoTransfer):
-    kind: Literal['erc20'] = 'erc20'
-    asset: ChecksumAddress # type: ignore
-    counterparty: ChecksumAddress # type: ignore
-
-  model_config = {'ignored_types': (UnionType,)} # type: ignore (make Transfer not freak out pydantic)
-  Transfer = NativeTransfer | ERC20Transfer
-  execution: Execution
-  """Contract execution details (if any)"""
-  transfers: Sequence[NativeTransfer|ERC20Transfer] = [] # type: ignore
-
-  def with_execution(self, execution: Execution | None) -> 'EvmTx':
-    return self.model_copy(update={'execution': execution})
-
-def observation_discriminator(obj):
-  def get_attr(obj, attr):
-    if isinstance(obj, dict):
-      return obj.get(attr)
-    else:
-      return getattr(obj, attr, '')
-  type = get_attr(obj, 'type')
-  if type == 'crypto_transaction':
-    kind = get_attr(obj, 'kind')
-    if kind:
-      type += f':{kind}'
-  return type
-
-Observation = Annotated[
-  Union[
-    Annotated[SpotTrade, pydantic.Tag('spot_trade')],
-    Annotated[FutureTrade, pydantic.Tag('future_trade')],
-    Annotated[FutureOrder, pydantic.Tag('future_order')],
-    Annotated[FuturePositionSummary, pydantic.Tag('future_position_summary')],
-    Annotated[RealizedPnl, pydantic.Tag('realized_pnl')],
-    Annotated[SpotOrder, pydantic.Tag('spot_order')],
-    Annotated[TradeLeg, pydantic.Tag('trade_leg')],
-    Annotated[Conversion, pydantic.Tag('conversion')],
-    Annotated[FeeLeg, pydantic.Tag('fee')],
-    Annotated[Yield, pydantic.Tag('yield')],
-    Annotated[Bonus, pydantic.Tag('bonus')],
-    Annotated[Funding, pydantic.Tag('funding')],
-    Annotated[Borrow, pydantic.Tag('borrow')],
-    Annotated[Repay, pydantic.Tag('repay')],
-    Annotated[InternalTransfer, pydantic.Tag('internal_transfer')],
-    Annotated[Transfer, pydantic.Tag('transfer')],
-    Annotated[CryptoDeposit, pydantic.Tag('crypto_deposit')],
-    Annotated[CryptoWithdrawal, pydantic.Tag('crypto_withdrawal')],
-    Annotated[FiatDeposit, pydantic.Tag('fiat_deposit')],
-    Annotated[FiatWithdrawal, pydantic.Tag('fiat_withdrawal')],
-    Annotated[FiatConversion, pydantic.Tag('fiat_conversion')],
-    Annotated[EvmTx, pydantic.Tag('crypto_transaction:evm')],
-    Annotated[CryptoTransaction, pydantic.Tag('crypto_transaction')],
-    Annotated[UnknownObservation, pydantic.Tag('unknown')],
-  ],
-  pydantic.Discriminator(observation_discriminator)
-]
-
-class BaseProvenance(TypedDict):
-  id: str
-  """Unique identifier for all records sharing a same provenance."""
-  details: NotRequired[Any]
-
-class TabularProvenance(BaseProvenance):
-  source: Literal['tabular']
-  row: int
-  file: str
-
-class ApiProvenance(BaseProvenance):
-  source: Literal['api']
-  service: str
-
-class ManualProvenance(BaseProvenance):
-  source: Literal['manual']
-
-class DerivedProvenance(BaseProvenance):
-  source: Literal['derived']
-
-Provenance = Annotated[
-  TabularProvenance | ApiProvenance | ManualProvenance | DerivedProvenance,
-  pydantic.Discriminator('source')
-]
-
-class Record(pydantic.BaseModel):
-  model_config = pydantic.ConfigDict(extra='forbid')
-  observations: Sequence[Observation] = []
-  snapshots: Sequence[Snapshot] = []
-  provenance: Provenance
