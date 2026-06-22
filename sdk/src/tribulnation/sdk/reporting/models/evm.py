@@ -1,4 +1,5 @@
-from typing_extensions import Literal, Sequence, Annotated, ClassVar
+from typing_extensions import Literal, Sequence, Annotated
+from types import UnionType
 from decimal import Decimal
 import pydantic
 from .common import BaseObservation, Fee
@@ -13,19 +14,22 @@ class BaseEvmTransfer(pydantic.BaseModel):
   change: Decimal
   counterparty: ChecksumAddress
 
-class NativeEvmTransfer(BaseEvmTransfer):
-  kind: Literal['native'] = 'native'
-  internal: bool
-
-class ERC20Transfer(BaseEvmTransfer):
-  kind: Literal['erc20'] = 'erc20'
-  asset: ChecksumAddress
-
-EvmTransfer = NativeEvmTransfer | ERC20Transfer
 
 class EvmTx(BaseObservation):
   """EVM-compatible blockchain transaction observation."""
+  model_config = {'ignored_types': (UnionType,)} # type: ignore
   type: Literal['evm_tx'] = 'evm_tx'
+  
+  class NativeTransfer(BaseEvmTransfer):
+    kind: Literal['native'] = 'native'
+    internal: bool
+    asset: Literal['native'] = 'native'
+
+  class ERC20Transfer(BaseEvmTransfer):
+    kind: Literal['erc20'] = 'erc20'
+    asset: ChecksumAddress
+
+  Transfer = NativeTransfer | ERC20Transfer
 
   class Execution(pydantic.BaseModel):
     to: ChecksumAddress
@@ -38,7 +42,5 @@ class EvmTx(BaseObservation):
 
   tx_id: str
   execution: Execution
-  transfers: Sequence[EvmTransfer] = []
+  transfers: Sequence['EvmTx.Transfer'] = []
   fee: Fee | None = None
-
-  Transfer: ClassVar = EvmTransfer
