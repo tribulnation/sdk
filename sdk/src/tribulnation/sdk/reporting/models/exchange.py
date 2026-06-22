@@ -119,6 +119,10 @@ class RealizedPnl(BaseObservation):
   trade_id: str | None = None
   """Raw trade/fill identifier, if provided by the source."""
 
+  @property
+  def balance_change(self) -> Decimal:
+    return self.amount
+
 class FuturePositionSummary(BaseObservation):
   """Aggregate futures position evidence without direct ledger impact."""
   type: Literal['future_position_summary'] = 'future_position_summary'
@@ -202,6 +206,10 @@ class TradeLeg(BaseObservation):
   label: str | None = None
   """Raw source operation label used for source-labeled grouping."""
 
+  @property
+  def balance_change(self) -> Decimal:
+    return self.amount
+
   def __str__(self) -> str:
     return f'TradeLeg({self.amount} {self.asset}, {self.time}, event_type: {self.event_type or "?"}, label: {self.label or "?"})'
 
@@ -232,6 +240,10 @@ class FeeLeg(BaseObservation):
   event_id: str | None = None
   """Event/observation identifier, if provided by the source."""
 
+  @property
+  def balance_change(self) -> Decimal:
+    return -abs(self.amount)
+
   def __str__(self) -> str:
     return f'FeeLeg({self.amount} {self.asset}, {self.time:%Y-%m-%d %H:%M:%S}, event_type: {self.event_type or "?"}, event_id: {self.event_id or "?"})'
 
@@ -240,6 +252,10 @@ class SingleAssetObservation(BaseObservation):
   """Signed amount of the observation, in the asset's base units."""
   asset: str
   """Raw asset identifier, as provided by the source."""
+
+  @property
+  def balance_change(self) -> Decimal:
+    return self.amount
 
   def __str__(self) -> str:
     type = self.type # type: ignore
@@ -270,16 +286,28 @@ class Funding(SingleAssetObservation):
 class Borrow(SingleAssetObservation):
   """Inflow from a loan."""
   type: Literal['borrow'] = 'borrow'
+  amount: Decimal
+  """Raw borrowed amount."""
+
+  @property
+  def balance_change(self) -> Decimal:
+    return abs(self.amount)
 
 class Repay(SingleAssetObservation):
   """Outflow to repay a loan."""
   type: Literal['repay'] = 'repay'
+  amount: Decimal
+  """Raw repaid amount."""
+
+  @property
+  def balance_change(self) -> Decimal:
+    return -abs(self.amount)
 
 class InternalTransfer(SingleAssetObservation):
   """Movement between compartments inside the current venue account scope."""
   type: Literal['internal_transfer'] = 'internal_transfer'
-  amount: Decimal = pydantic.Field(..., ge=0)
-  """Positive moved amount. Direction is described by src_account and dst_account."""
+  amount: Decimal
+  """Raw moved amount. Direction is described by src_account and dst_account."""
   src_account: str | None = None
   """Source compartment inside the current venue account scope, if known."""
   dst_account: str | None = None
@@ -312,10 +340,18 @@ class BaseCryptoTransfer(SingleAssetObservation):
 class CryptoDeposit(BaseCryptoTransfer):
   """Inflow from depositing a crypto asset into an account."""
   type: Literal['crypto_deposit'] = 'crypto_deposit'
+  amount: Decimal = pydantic.Field(..., ge=0)
+  """Deposited amount."""
 
 class CryptoWithdrawal(BaseCryptoTransfer):
   """Outflow from withdrawing a crypto asset from an account."""
   type: Literal['crypto_withdrawal'] = 'crypto_withdrawal'
+  amount: Decimal
+  """Raw withdrawn amount."""
+
+  @property
+  def balance_change(self) -> Decimal:
+    return -abs(self.amount)
 
 class BaseFiatTransfer(SingleAssetObservation):
   fee: Fee | None = None
@@ -324,10 +360,18 @@ class BaseFiatTransfer(SingleAssetObservation):
 class FiatDeposit(BaseFiatTransfer):
   """Inflow from depositing a fiat asset into an account."""
   type: Literal['fiat_deposit'] = 'fiat_deposit'
+  amount: Decimal = pydantic.Field(..., ge=0)
+  """Deposited amount."""
 
 class FiatWithdrawal(BaseFiatTransfer):
   """Outflow from withdrawing a fiat asset from an account."""
   type: Literal['fiat_withdrawal'] = 'fiat_withdrawal'
+  amount: Decimal
+  """Raw withdrawn amount."""
+
+  @property
+  def balance_change(self) -> Decimal:
+    return -abs(self.amount)
 
 class FiatConversion(SingleAssetObservation):
   """Crypto balance change caused by an external fiat buy or sell."""
