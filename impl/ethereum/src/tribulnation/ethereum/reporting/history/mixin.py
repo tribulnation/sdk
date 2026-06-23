@@ -87,6 +87,7 @@ class HistoryMixin(SDK):
       eoa=await self.is_eoa_cached(to),
       input=input.to_0x_hex(),
       canceled=receipt['status'] == 0,
+      logs=EvmTx.Log.parse_all(receipt['logs']),
     )
 
   @SDK.method
