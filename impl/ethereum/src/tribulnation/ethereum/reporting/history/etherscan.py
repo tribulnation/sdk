@@ -1,7 +1,6 @@
 from typing_extensions import Literal, Awaitable, Callable, TypeVar
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from decimal import Decimal
 import asyncio
 
 from web3 import Web3
@@ -10,7 +9,6 @@ from etherscan.api.account.transactions import Transaction as NativeTransaction
 from etherscan.api.account.token_transactions import TokenTransaction, token_value
 from etherscan.api.account.internal_transactions import InternalTransaction
 from etherscan.api.account.nft_transactions import NftTransaction
-from etherscan.api.account.multitoken_transactions import MultiTokenTransaction
 
 from tribulnation.sdk.core import SDK
 from tribulnation.sdk.reporting import History, Record, EvmTx, source_id
@@ -138,22 +136,6 @@ class EtherscanHistory(HistoryMixin, History):
       out.extend(chunk)
     return out
 
-  @SDK.method
-  async def multitoken_transactions(self, start_block: int, end_block: int) -> list[MultiTokenTransaction]:
-    """Fetch ERC1155 token transactions from Etherscan."""
-    paging = self.etherscan.account.multitoken_transactions_paged(
-      self.address,
-      self.chain_id,
-      start_block=start_block,
-      end_block=end_block,
-    )
-    state = paging.init
-    out: list[MultiTokenTransaction] = []
-    while state is not None:
-      chunk, state = await self.call_etherscan(lambda: paging.next(state)) # type: ignore
-      out.extend(chunk)
-    return out
-
 
   async def fetch_limits(self, start: datetime | None = None, end: datetime | None = None) -> tuple[int, int]:
     """Fetch limiting blocks for the given time range."""
@@ -179,24 +161,21 @@ class EtherscanHistory(HistoryMixin, History):
   async def fetch_all_transactions(self, start: datetime | None = None, end: datetime | None = None):
     """Fetch all transactions for the given time range."""
     start_block, end_block = await self.fetch_limits(start, end)
-    all_native, all_token_txs, all_nft_txs, all_internal_txs, all_multitoken_txs = await asyncio.gather(
+    all_native, all_token_txs, all_nft_txs, all_internal_txs = await asyncio.gather(
       self.native_transactions(start_block, end_block),
       self.token_transactions(start_block, end_block),
       self.nft_transactions(start_block, end_block),
       self.internal_transactions(start_block, end_block),
-      self.multitoken_transactions(start_block, end_block),
     )
     grouped_native = group_by(all_native, lambda tx: tx['hash'])
     grouped_token_txs = group_by(all_token_txs, lambda tx: tx['hash'])
     grouped_nft_txs = group_by(all_nft_txs, lambda tx: tx['hash'])
     grouped_internal_txs = group_by(all_internal_txs, lambda tx: tx['hash'])
-    grouped_multitoken_txs = group_by(all_multitoken_txs, lambda tx: tx['hash'])
     hashes = set.union(
       set(grouped_native),
       set(grouped_token_txs),
       set(grouped_nft_txs),
       set(grouped_internal_txs),
-      set(grouped_multitoken_txs),
     )
     return {
       hash: (
