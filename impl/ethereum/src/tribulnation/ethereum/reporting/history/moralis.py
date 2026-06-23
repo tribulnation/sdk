@@ -10,12 +10,13 @@ from moralis.evm.wallet.history import (
   WalletHistoryTransaction,
   NativeTransfer,
   TokenTransfer,
+  NftTransfer,
 )
 
 from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import History, Record, EvmTx, Fee, source_id
-from tribulnation.ethereum.core import moralis as moralis_core, same_address
-from .mixin import HistoryMixin
+from tribulnation.ethereum.core import Network, moralis as moralis_core, same_address
+from tribulnation.ethereum.reporting.history.mixin import HistoryMixin
 
 T = TypeVar('T')
 
@@ -38,6 +39,14 @@ class MoralisHistory(HistoryMixin, History):
   chain: Chain
   moralis: Moralis = field(default_factory=Moralis.new)
   batch_size: int = 4
+
+  @classmethod
+  def new(cls, address: str, *, network: Network, rpc_url: str | None = None, api_key: str | None = None):
+    from moralis import Moralis
+    from tribulnation.ethereum.core import rpc, MORALIS_CHAINS
+    node, rpc_url = rpc.new(network, rpc_url, preferred='alchemy')
+    moralis = Moralis.new(api_key)
+    return cls(address=address, chain=MORALIS_CHAINS[network], node=node, rpc_url=rpc_url, moralis=moralis)
 
   async def __aenter__(self):
     await asyncio.gather(
@@ -97,6 +106,36 @@ class MoralisHistory(HistoryMixin, History):
       if (transfer := self.parse_moralis_native_transfer(transfer)) is not None:
         yield transfer
 
+  def parse_nft_transfer(self, transfer: NftTransfer) -> EvmTx.NftTransfer | None:
+    if (
+      (from_ := transfer.get('from_address')) is None
+      or (to := transfer.get('to_address')) is None
+      or (token_id := transfer.get('token_id')) is None
+      or (contract_address := transfer.get('token_address')) is None
+    ):
+      return
+    if same_address(from_, self.address):
+      sign = -1
+      counterparty = to
+    elif same_address(to, self.address):
+      sign = 1
+      counterparty = from_
+    else:
+      return None
+
+    return EvmTx.NftTransfer(
+      contract_address=contract_address,
+      token_id=token_id,
+      change=Decimal(sign),
+      counterparty=counterparty,
+    )
+
+  def parse_nft_transfers(self, tx: WalletHistoryTransaction):
+    for transfer in tx.get('nft_transfers', []):
+      if (transfer := self.parse_nft_transfer(transfer)) is not None:
+        yield transfer
+
+
   def parse_token_transfer(self, transfer: TokenTransfer) -> EvmTx.ERC20Transfer | None:
     if not (from_ := transfer.get('from_address')) or not (to := transfer.get('to_address')):
       return
@@ -121,6 +160,7 @@ class MoralisHistory(HistoryMixin, History):
       if (transfer := self.parse_token_transfer(transfer)) is not None:
         yield transfer
 
+
   async def parse_moralis_tx(self, wallet_tx: WalletHistoryTransaction) -> EvmTx | None:
     hash = wallet_tx['hash']
     time = wallet_tx.get('block_timestamp')
@@ -129,6 +169,7 @@ class MoralisHistory(HistoryMixin, History):
       transfers = (
         list(self.parse_moralis_native_transfers(wallet_tx))
         + list(self.parse_token_transfers(wallet_tx))
+        + list(self.parse_nft_transfers(wallet_tx))
       )
       fee_node = self.parse_fee(tx, receipt)
       fee_moralis = self.parse_moralis_fee(wallet_tx)

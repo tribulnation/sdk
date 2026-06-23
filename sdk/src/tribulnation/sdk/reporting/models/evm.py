@@ -11,8 +11,8 @@ def to_checksum_address(address: str) -> str:
 ChecksumAddress = Annotated[str, pydantic.AfterValidator(to_checksum_address)]
 
 class BaseEvmTransfer(pydantic.BaseModel):
-  change: Decimal
   counterparty: ChecksumAddress
+  change: Decimal
 
 
 class EvmTx(BaseObservation):
@@ -23,13 +23,25 @@ class EvmTx(BaseObservation):
   class NativeTransfer(BaseEvmTransfer):
     kind: Literal['native'] = 'native'
     internal: bool
-    asset: Literal['native'] = 'native'
+    
+    @property
+    def asset(self):
+      return 'native'
 
   class ERC20Transfer(BaseEvmTransfer):
     kind: Literal['erc20'] = 'erc20'
     asset: ChecksumAddress
 
-  Transfer = NativeTransfer | ERC20Transfer
+  class NftTransfer(BaseEvmTransfer):
+    kind: Literal['nft'] = 'nft'
+    contract_address: ChecksumAddress
+    token_id: str
+
+    @property
+    def asset(self):
+      return f'{self.contract_address}:{self.token_id}'
+
+  Transfer = NativeTransfer | ERC20Transfer | NftTransfer
 
   class Execution(pydantic.BaseModel):
     to: ChecksumAddress

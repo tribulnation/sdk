@@ -1,6 +1,7 @@
 from typing_extensions import Literal, Awaitable, Callable, TypeVar
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from decimal import Decimal
 import asyncio
 
 from web3 import Web3
@@ -8,12 +9,14 @@ from etherscan import Etherscan
 from etherscan.api.account.transactions import Transaction as NativeTransaction
 from etherscan.api.account.token_transactions import TokenTransaction, token_value
 from etherscan.api.account.internal_transactions import InternalTransaction
+from etherscan.api.account.nft_transactions import NftTransaction
+from etherscan.api.account.multitoken_transactions import MultiTokenTransaction
 
 from tribulnation.sdk.core import SDK
 from tribulnation.sdk.reporting import History, Record, EvmTx, source_id
-from tribulnation.ethereum.core import etherscan as etherscan_core, group_by, same_address
+from tribulnation.ethereum.core import Network, etherscan as etherscan_core, group_by, same_address
 from tribulnation.ethereum.reporting.util import AutoDetect, AUTO_DETECT, cached_etherscan
-from .mixin import HistoryMixin
+from tribulnation.ethereum.reporting.history.mixin import HistoryMixin
 
 T = TypeVar('T')
 
@@ -25,6 +28,14 @@ class EtherscanHistory(HistoryMixin, History):
   tz: timezone | AutoDetect = AUTO_DETECT
   """Timezone of the API times (defaults to the local timezone)."""
   batch_size: int = 4
+
+  @classmethod
+  def new(cls, address: str, *, network: Network, rpc_url: str | None = None, api_key: str | None = None, rate_limit: int | None = None):
+    from tribulnation.ethereum.core import rpc, CHAIN_IDS
+    from tribulnation.ethereum.reporting.util import cached_etherscan
+    node, rpc_url = rpc.new(network, rpc_url, preferred='alchemy')
+    etherscan = cached_etherscan(api_key=api_key, rate_limit=rate_limit)
+    return cls(address=address, chain_id=CHAIN_IDS[network], node=node, rpc_url=rpc_url, etherscan=etherscan)
 
   async def __aenter__(self):
     await asyncio.gather(
@@ -93,6 +104,23 @@ class EtherscanHistory(HistoryMixin, History):
       chunk, state = await self.call_etherscan(lambda: paging.next(state)) # type: ignore
       out.extend(chunk)
     return out
+  
+  @SDK.method
+  async def nft_transactions(self, start_block: int, end_block: int) -> list[NftTransaction]:
+    """Fetch ERC721 token transactions from Etherscan."""
+    paging = self.etherscan.account.nft_transactions_paged(
+      self.address,
+      self.chain_id,
+      start_block=start_block,
+      end_block=end_block,
+    )
+    state = paging.init
+    out: list[
+      NftTransaction] = []
+    while state is not None:
+      chunk, state = await self.call_etherscan(lambda: paging.next(state)) # type: ignore
+      out.extend(chunk)
+    return out
 
   @SDK.method
   async def internal_transactions(self, start_block: int, end_block: int) -> list[InternalTransaction]:
@@ -109,6 +137,23 @@ class EtherscanHistory(HistoryMixin, History):
       chunk, state = await self.call_etherscan(lambda: paging.next(state)) # type: ignore
       out.extend(chunk)
     return out
+
+  @SDK.method
+  async def multitoken_transactions(self, start_block: int, end_block: int) -> list[MultiTokenTransaction]:
+    """Fetch ERC1155 token transactions from Etherscan."""
+    paging = self.etherscan.account.multitoken_transactions_paged(
+      self.address,
+      self.chain_id,
+      start_block=start_block,
+      end_block=end_block,
+    )
+    state = paging.init
+    out: list[MultiTokenTransaction] = []
+    while state is not None:
+      chunk, state = await self.call_etherscan(lambda: paging.next(state)) # type: ignore
+      out.extend(chunk)
+    return out
+
 
   async def fetch_limits(self, start: datetime | None = None, end: datetime | None = None) -> tuple[int, int]:
     """Fetch limiting blocks for the given time range."""
@@ -134,19 +179,30 @@ class EtherscanHistory(HistoryMixin, History):
   async def fetch_all_transactions(self, start: datetime | None = None, end: datetime | None = None):
     """Fetch all transactions for the given time range."""
     start_block, end_block = await self.fetch_limits(start, end)
-    all_native, all_token_txs, all_internal_txs = await asyncio.gather(
+    all_native, all_token_txs, all_nft_txs, all_internal_txs, all_multitoken_txs = await asyncio.gather(
       self.native_transactions(start_block, end_block),
       self.token_transactions(start_block, end_block),
+      self.nft_transactions(start_block, end_block),
       self.internal_transactions(start_block, end_block),
+      self.multitoken_transactions(start_block, end_block),
     )
     grouped_native = group_by(all_native, lambda tx: tx['hash'])
     grouped_token_txs = group_by(all_token_txs, lambda tx: tx['hash'])
+    grouped_nft_txs = group_by(all_nft_txs, lambda tx: tx['hash'])
     grouped_internal_txs = group_by(all_internal_txs, lambda tx: tx['hash'])
-    hashes = set(grouped_native) | set(grouped_token_txs) | set(grouped_internal_txs)
+    grouped_multitoken_txs = group_by(all_multitoken_txs, lambda tx: tx['hash'])
+    hashes = set.union(
+      set(grouped_native),
+      set(grouped_token_txs),
+      set(grouped_nft_txs),
+      set(grouped_internal_txs),
+      set(grouped_multitoken_txs),
+    )
     return {
       hash: (
         grouped_native.get(hash, []),
         grouped_token_txs.get(hash, []),
+        grouped_nft_txs.get(hash, []),
         grouped_internal_txs.get(hash, []),
       )
       for hash in hashes
@@ -182,16 +238,41 @@ class EtherscanHistory(HistoryMixin, History):
       transfer for tx in token_txs
       if (transfer := self.parse_token_tx(tx)) is not None
     ]
+  
+  def parse_nft_tx(self, nft_tx: NftTransaction) -> EvmTx.NftTransfer | None:
+    """Parse an ERC721 Etherscan row into an SDK ERC721 transfer."""
+    if same_address(nft_tx['to'], self.address):
+      sign = 1
+      counterparty = nft_tx['from']
+    elif same_address(nft_tx['from'], self.address):
+      sign = -1
+      counterparty = nft_tx['to']
+    else:
+      return None
+    return EvmTx.NftTransfer(
+      contract_address=nft_tx['contractAddress'],
+      token_id=nft_tx['tokenID'],
+      change=Decimal(sign),
+      counterparty=counterparty,
+    )
+
+  def parse_nft_txs(self, nft_txs: list[NftTransaction]) -> list[EvmTx.NftTransfer]:
+    """Parse ERC721 Etherscan rows into SDK ERC721 transfers."""
+    return [
+      transfer for tx in nft_txs
+      if (transfer := self.parse_nft_tx(tx)) is not None
+    ]
 
   async def parse_tx(
     self, hash: str, *,
     native: list[NativeTransaction],
     token: list[TokenTransaction],
+    nft: list[NftTransaction],
     internal: list[InternalTransaction]
   ) -> EvmTx | None:
     if len(native) > 1:
       raise ValueError('Multiple native transactions')
-    all_txs = native + token + internal
+    all_txs = native + token + nft + internal
     any_tx = all_txs[0]
     time = self.add_tz(any_tx['timeStamp'])
     tx, receipt = await self.get_tx_data(hash)
@@ -202,6 +283,7 @@ class EtherscanHistory(HistoryMixin, History):
       transfers: list[EvmTx.Transfer] = (
         self.parse_native_transfers(tx) # type: ignore
         + self.parse_token_txs(token)
+        + self.parse_nft_txs(nft)
         + self.parse_internal_txs(internal)
       )
 
@@ -221,14 +303,15 @@ class EtherscanHistory(HistoryMixin, History):
       hash: str,
       native: list[NativeTransaction],
       token: list[TokenTransaction],
+      nft: list[NftTransaction],
       internal: list[InternalTransaction],
     ):
       async with semaphore:
-        return await self.parse_tx(hash, native=native, token=token, internal=internal)
+        return await self.parse_tx(hash, native=native, token=token, nft=nft, internal=internal)
 
     tasks = [
-      parse_limited(hash, native, token, internal)
-      for hash, (native, token, internal) in transactions.items()
+      parse_limited(hash, native, token, nft, internal)
+      for hash, (native, token, nft, internal) in transactions.items()
     ]
     for task in asyncio.as_completed(tasks):
       tx = await task
