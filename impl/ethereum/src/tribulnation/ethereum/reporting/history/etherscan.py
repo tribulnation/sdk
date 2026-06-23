@@ -1,6 +1,7 @@
 from typing_extensions import Literal, Awaitable, Callable, TypeVar
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from decimal import Decimal
 import asyncio
 
 from web3 import Web3
