@@ -1,3 +1,4 @@
+from typing_extensions import Mapping
 from datetime import datetime, timezone
 from collections import defaultdict
 from decimal import Decimal
@@ -9,10 +10,11 @@ def source_id(service: str) -> str:
 
 
 class Balances(defaultdict[str, Decimal]):
-  def __init__(self, values: dict[str, Decimal] = {}):
+  def __init__(self, values: Mapping[str, Decimal] = {}):
     super().__init__(Decimal, values)
 
-  def __add__(self, other: 'Balances') -> 'Balances':
+  def __add__(self, other: 'Balances | Mapping[str, Decimal]') -> 'Balances':
+    other = Balances(other)
     result = Balances()
     for key in set(self) | set(other):
       result[key] = self[key] + other[key]
