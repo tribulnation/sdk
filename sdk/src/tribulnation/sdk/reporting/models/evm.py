@@ -28,6 +28,34 @@ class Log(pydantic.BaseModel):
       topics=[topic.to_0x_hex() for topic in log['topics']],
     )
 
+  # class LogReceipt(TypedDict):
+  #   address: ChecksumAddress
+  #   blockHash: HexBytes
+  #   blockNumber: BlockNumber
+  #   data: HexBytes
+  #   logIndex: int
+  #   removed: bool
+  #   topics: Sequence[HexBytes]
+  #   transactionHash: HexBytes
+  #   transactionIndex: int
+
+  def dump(
+    self, *, index: int = 0, block_number: int = 0, block_hash: str = '0x',
+    transaction_hash: str = '0x', transaction_index: int = 0, removed: bool = False,
+  ) -> 'LogReceipt':
+    from web3.types import HexBytes, ChecksumAddress, BlockNumber # type: ignore
+    return {
+      'address': ChecksumAddress(self.address), # type: ignore
+      'blockHash': HexBytes(block_hash),
+      'blockNumber': BlockNumber(block_number),
+      'data': HexBytes(self.data),
+      'topics': [HexBytes(topic) for topic in self.topics],
+      'transactionHash': HexBytes(transaction_hash),
+      'transactionIndex': transaction_index,
+      'logIndex': index,
+      'removed': removed,
+    }
+
   @classmethod
   def parse_all(cls, logs: Sequence['LogReceipt']) -> list['Log']:
     return [cls.parse(log) for log in sorted(logs, key=lambda log: log['logIndex'])]
