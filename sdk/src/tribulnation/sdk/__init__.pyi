@@ -1,5 +1,5 @@
 from .core import (
-  SDK,
+  SDK, Context,
   Error, NetworkError, ValidationError,
   ApiError, BadRequest, AuthError, RateLimited, LogicError,
 )
@@ -14,7 +14,7 @@ from .market import (
 )
 
 __all__ = [
-  'SDK',
+  'SDK', 'Context',
   'Earn', 'EarnSDK',
   'Wallet', 'WalletSDK',
   'ReportSDK', 'Report',
