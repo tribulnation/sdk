@@ -1,4 +1,4 @@
-from typing_extensions import Sequence
+from typing_extensions import Sequence, Collection
 from decimal import Decimal
 
 from tribulnation.sdk.wallet.deposit_methods import DepositMethod, DepositMethods as _DepositMethods
@@ -8,7 +8,7 @@ from tribulnation.mexc.core import Mixin, wrap_exceptions
 class DepositMethods(Mixin, _DepositMethods):
   @wrap_exceptions
   async def deposit_methods(
-    self, *, assets: Sequence[str] | None = None,
+    self, *, assets: Collection[str] | None = None,
   ) -> Sequence[DepositMethod]:
     currencies = await self.client.spot.wallet.currency_info()
 
