@@ -25,7 +25,7 @@ async def funding_history(self: MarketMixin, start: datetime, end: datetime) -> 
   state = paging.init
   while state is not None:
     next_state = state
-    page, state = await self.call(lambda: paging.next(next_state))
+    page, state = await self.call_dydx(lambda: paging.next(next_state))
     rates = [
       FundingRate(rate=Decimal(item['rate']), time=time)
       for item in page
@@ -53,7 +53,7 @@ async def funding_payments(self: MarketMixin, start: datetime, end: datetime) ->
     state = paging.init
     while state is not None:
       next_state = state
-      batch, state = await self.call(lambda: paging.next(next_state))
+      batch, state = await self.call_dydx(lambda: paging.next(next_state))
       payments = [
         FundingPayment(amount=Decimal(item['payment']), time=item['createdAt'])
         for item in batch

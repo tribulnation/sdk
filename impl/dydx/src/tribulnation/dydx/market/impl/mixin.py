@@ -1,8 +1,6 @@
-from typing_extensions import TypedDict
+from typing_extensions import TypedDict, Callable, Awaitable, TypeVar
 from dataclasses import dataclass, field
 import asyncio
-
-from tribulnation.sdk.core import SDK, Stream, Subscription
 
 from dydx.indexer.types import PerpetualMarket
 from dydx import Dydx
@@ -10,9 +8,12 @@ from dydx.indexer.streams.parent_subaccounts import Notification as ParentSubacc
 from dydx.node.orders import Flags, TimeInForce
 from dydx.protos.dydxprotocol import feetiers as feetiers_proto
 
+from tribulnation.sdk.core import SDK, Stream, Subscription
 from tribulnation.dydx.core import wrap_exceptions
 from .depth import depth_stream, Book
 from .rules import parse_rules, Rules
+
+T = TypeVar('T')
 
 class Settings(TypedDict, total=False):
   validate: bool
@@ -90,6 +91,10 @@ class Shared:
 @dataclass(kw_only=True, frozen=True)
 class ExchangeMixin:
   shared: Shared
+
+  @wrap_exceptions
+  async def call_dydx(self, fn: Callable[[], Awaitable[T]]) -> T:
+    return await fn()
 
   @classmethod
   def new(cls, mnemonic: str | None = None, *, mainnet: bool = True, settings: Settings = {}):
