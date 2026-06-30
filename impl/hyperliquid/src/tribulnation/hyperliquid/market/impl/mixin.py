@@ -64,8 +64,14 @@ def spot_meta_of(spot_index: int, /, *, spot_meta: SpotMetaResponse) -> SpotMeta
 @dataclass(kw_only=True)
 class Shared:
   client: Hyperliquid
-  address: str
+  maybe_address: str | None = None
   settings: Settings = field(default_factory=Settings)
+
+  @property
+  def address(self) -> str:
+    if self.maybe_address is None:
+      raise ValueError('Address must be provided')
+    return self.maybe_address
 
   # Cached meta (venue-wide).
   spot_meta: SpotMetaResponse | None = None
@@ -218,22 +224,24 @@ class SharedMixin:
   @classmethod
   def http(
     cls, address: str | None = None, *, wallet: Wallet | None = None,
-    mainnet: bool = True, settings: Settings = {}
+    mainnet: bool = True, settings: Settings = {},
   ):
     if address is None:
-      address = os.environ['HYPERLIQUID_ADDRESS'] if mainnet else os.environ['HYPERLIQUID_TESTNET_ADDRESS']
-    client = Hyperliquid.http(wallet, mainnet=mainnet, validate=settings.get('validate', True))
-    return cls(shared=Shared(client=client, address=address, settings=settings))
+      env_var = 'HYPERLIQUID_ADDRESS' if mainnet else 'HYPERLIQUID_TESTNET_ADDRESS'
+      address = os.environ.get(env_var)
+    client = Hyperliquid.http(wallet, mainnet=mainnet, validate=settings.get('validate', True), public=True)
+    return cls(shared=Shared(client=client, maybe_address=address, settings=settings))
 
   @classmethod
   def ws(
     cls, address: str | None = None, *, wallet: Wallet | None = None,
-    mainnet: bool = True, settings: Settings = {}
+    mainnet: bool = True, settings: Settings = {}, public: bool = False
   ):
     if address is None:
-      address = os.environ['HYPERLIQUID_ADDRESS']
-    client = Hyperliquid.ws(wallet, mainnet=mainnet, validate=settings.get('validate', True))
-    return cls(shared=Shared(client=client, address=address, settings=settings))
+      env_var = 'HYPERLIQUID_ADDRESS' if mainnet else 'HYPERLIQUID_TESTNET_ADDRESS'
+      address = os.environ.get(env_var)
+    client = Hyperliquid.ws(wallet, mainnet=mainnet, validate=settings.get('validate', True), public=True)
+    return cls(shared=Shared(client=client, maybe_address=address, settings=settings))
 
   @property
   def client(self) -> Hyperliquid:

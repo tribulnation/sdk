@@ -32,11 +32,11 @@ class Shared:
 
   @property
   def validate(self) -> bool:
-    return self.settings.get("validate", True)
+    return self.settings.get('validate', True)
 
   @property
   def recvWindow(self) -> int | None:
-    return self.settings.get("recvWindow", None)
+    return self.settings.get('recvWindow', None)
 
   @classmethod
   def new(
@@ -46,12 +46,15 @@ class Shared:
     *,
     settings: Settings = {},
   ):
-    client = MEXC.new(api_key=api_key, api_secret=api_secret, validate=settings.get("validate", True))
+    import os
+    api_key = api_key or os.environ.get('MEXC_API_KEY') or ''
+    api_secret = api_secret or os.environ.get('MEXC_API_SECRET') or ''
+    client = MEXC.new(api_key=api_key, api_secret=api_secret, validate=settings.get('validate', True))
     return cls(client=client, settings=settings)
 
   @classmethod
   def public(cls, *, settings: Settings = {}):
-    client = MEXC.public(validate=settings.get("validate", True))
+    client = MEXC.public(validate=settings.get('validate', True))
     return cls(client=client, settings=settings)
 
   @wrap_exceptions
@@ -135,7 +138,7 @@ class MarketMixin(SDK, ExchangeMixin):
 
   @property
   def info(self) -> SpotInfo:
-    return self.meta["info"]
+    return self.meta['info']
 
   @property
   def instrument(self) -> str:
