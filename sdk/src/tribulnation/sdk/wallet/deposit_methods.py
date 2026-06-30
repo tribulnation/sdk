@@ -1,4 +1,4 @@
-from typing_extensions import Sequence
+from typing_extensions import Sequence, Collection
 from abc import abstractmethod
 from dataclasses import dataclass
 from decimal import Decimal
@@ -22,7 +22,7 @@ class DepositMethods(SDK):
   @SDK.method
   @abstractmethod
   async def deposit_methods(
-    self, *, assets: Sequence[str] | None = None,
+    self, *, assets: Collection[str] | None = None,
   ) -> Sequence[DepositMethod]:
     """Get deposit methods.
 

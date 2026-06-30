@@ -1,4 +1,4 @@
-from typing_extensions import Sequence
+from typing_extensions import Sequence, Collection
 from abc import abstractmethod
 from dataclasses import dataclass
 from decimal import Decimal
@@ -21,8 +21,8 @@ class WithdrawalMethods(SDK):
   @SDK.method
   @abstractmethod
   async def withdrawal_methods(
-    self, *, assets: Sequence[str] | None = None,
-    networks: Sequence[str] | None = None
+    self, *, assets: Collection[str] | None = None,
+    networks: Collection[str] | None = None
   ) -> Sequence[WithdrawalMethod]:
     """Get withdrawal methods.
 
