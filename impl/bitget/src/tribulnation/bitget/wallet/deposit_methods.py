@@ -1,5 +1,5 @@
+from typing_extensions import Sequence, Collection
 from decimal import Decimal
-from typing_extensions import Sequence
 
 from tribulnation.sdk.wallet.deposit_methods import (
 	DepositMethod,
@@ -14,9 +14,7 @@ def _rechargeable(chain: CoinChain) -> bool:
 
 
 def _parse_coins_response_deposits(
-	raw: list[CoinInfo],
-	*,
-	assets: Sequence[str] | None = None,
+	raw: list[CoinInfo], *, assets: Collection[str] | None = None,
 ) -> list[DepositMethod]:
 	assets_set = set(assets) if assets is not None else None
 	out: list[DepositMethod] = []
@@ -54,7 +52,7 @@ def _parse_coins_response_deposits(
 class DepositMethods(SdkMixin, _DepositMethods):
 	@wrap_exceptions
 	async def deposit_methods(
-		self, *, assets: Sequence[str] | None = None,
+		self, *, assets: Collection[str] | None = None,
 	) -> Sequence[DepositMethod]:
 		r = await self.client.spot.public.coins()
 		return _parse_coins_response_deposits(r, assets=assets)

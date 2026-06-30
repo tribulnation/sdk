@@ -1,5 +1,5 @@
+from typing_extensions import Sequence, Collection
 from decimal import Decimal
-from typing_extensions import Sequence
 
 from tribulnation.sdk.wallet.withdrawal_methods import (
 	WithdrawalMethod,
@@ -45,10 +45,7 @@ def _parse_coins_response(raw: list[CoinInfo]) -> Sequence[WithdrawalMethod]:
 class WithdrawalMethods(SdkMixin, _WithdrawalMethods):
 	@wrap_exceptions
 	async def withdrawal_methods(
-		self,
-		*,
-		assets: Sequence[str] | None = None,
-		networks: Sequence[str] | None = None,
+		self, *, assets: Collection[str] | None = None, networks: Collection[str] | None = None,
 	) -> Sequence[WithdrawalMethod]:
 		r = await self.client.spot.public.coins()
 		parsed = _parse_coins_response(r)
