@@ -1,4 +1,5 @@
 from decimal import Decimal
+from datetime import datetime
 import pydantic
 
 class Position(pydantic.BaseModel):
@@ -16,6 +17,6 @@ class Position(pydantic.BaseModel):
     return cls(size=size, avg_price=avg_price)
 
 class Snapshot(pydantic.BaseModel):
-  time: pydantic.AwareDatetime
+  time: pydantic.AwareDatetime = pydantic.Field(default_factory=lambda: datetime.now().astimezone())
   balances: dict[str, Decimal] = {}
   positions: dict[str, Position] = {}
