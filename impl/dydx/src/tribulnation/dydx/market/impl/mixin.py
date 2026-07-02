@@ -16,8 +16,6 @@ from .rules import parse_rules, Rules
 T = TypeVar('T')
 
 class Settings(TypedDict, total=False):
-  validate: bool
-  parent_subaccount: int
   order_flags: Flags
   """Order flags for all orders"""
   limit_tif: TimeInForce
@@ -31,7 +29,7 @@ class Settings(TypedDict, total=False):
 @dataclass(kw_only=True)
 class Shared:
   client: Dydx
-  settings: Settings = field(default_factory=Settings)
+  parent_subaccount: int = 0
   perpetual_markets: dict[str, PerpetualMarket] | None = None
   fee_tier: feetiers_proto.PerpetualFeeTier | None = None
   parent_subaccount_subscriptions: dict[int, Subscription[ParentSubaccountNotification]] = field(default_factory=dict)
@@ -97,10 +95,9 @@ class ExchangeMixin:
     return await fn()
 
   @classmethod
-  def new(cls, mnemonic: str | None = None, *, mainnet: bool = True, settings: Settings = {}):
-    validate = settings.get('validate', True)
+  def new(cls, mnemonic: str | None = None, *, mainnet: bool = True, validate: bool = True, parent_subaccount: int = 0):
     client = Dydx.mainnet(mnemonic, indexer={'validate': validate}, public=mnemonic is None) if mainnet else Dydx.testnet(mnemonic, indexer={'validate': validate}, public=mnemonic is None)
-    return cls(shared=Shared(client=client, settings=settings))
+    return cls(shared=Shared(client=client, parent_subaccount=parent_subaccount))
     
   @property
   def client(self):
@@ -113,10 +110,6 @@ class ExchangeMixin:
   @property
   def address(self):
     return self.shared.address
-
-  @property
-  def settings(self):
-    return self.shared.settings
 
   async def __aenter__(self):
     await self.shared.__aenter__()

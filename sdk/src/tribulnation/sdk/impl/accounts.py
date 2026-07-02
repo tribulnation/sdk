@@ -21,6 +21,8 @@ class Dydx:
   """Account address (`dydx1...`)"""
   mnemonic: str = '$DYDX_MNEMONIC'
   """Account mnemonic (12-24 words)"""
+  parent_subaccount: int = 0
+  """dYdX parent subaccount number"""
 
   @property
   def resolved_address(self) -> str:

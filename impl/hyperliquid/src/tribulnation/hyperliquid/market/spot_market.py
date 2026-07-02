@@ -12,6 +12,7 @@ from tribulnation.sdk.market import (
   OrderState,
   Position,
   Rules,
+  Settings,
   Trade,
 )
 
@@ -84,9 +85,9 @@ class SpotMarket(SpotMarketMixin, Market):
     return await query_order(self, id)
 
   @wrap_exceptions
-  async def place_order(self, order: Order) -> OrderResponse:
-    return await place_order(self, order)
+  async def place_order(self, order: Order, *, settings: Settings = {}) -> OrderResponse:
+    return await place_order(self, order, settings=settings)
 
   @wrap_exceptions
-  async def cancel_order(self, id: str):
-    return await cancel_order(self, id)
+  async def cancel_order(self, id: str, *, settings: Settings = {}):
+    return await cancel_order(self, id, settings=settings)

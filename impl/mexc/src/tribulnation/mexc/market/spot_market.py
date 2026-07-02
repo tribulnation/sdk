@@ -12,6 +12,7 @@ from tribulnation.sdk.market import (
   OrderState,
   Position,
   Rules,
+  Settings,
   Trade,
 )
 
@@ -71,14 +72,14 @@ class SpotMarket(MarketMixin, Market):
 
   @wrap_exceptions
   async def available_notional(self):
-    r = await self.client.spot.account.info(recv_window=self.settings.get('recvWindow'))
+    r = await self.client.spot.account.info(recv_window=self.shared.recv_window)
     for b in r.get('balances', []):
       if b.get('asset') == self.info.get('quoteAsset'):
         return Decimal(b.get('free') or '0')
     return Decimal(0)
 
-  async def place_order(self, order: Order) -> OrderResponse:
-    return await place_order(self, order)
+  async def place_order(self, order: Order, *, settings: Settings = {}) -> OrderResponse:
+    return await place_order(self, order, settings=settings)
 
-  async def cancel_order(self, id: str):
-    return await cancel_order(self, id)
+  async def cancel_order(self, id: str, *, settings: Settings = {}):
+    return await cancel_order(self, id, settings=settings)

@@ -13,6 +13,7 @@ from .types import (
   Trade,
   Rules,
 )
+from .settings import Settings
 
 class Market(SDK):
   """An abstract market interface."""
@@ -98,36 +99,36 @@ class Market(SDK):
 
   @SDK.method
   @abstractmethod
-  async def place_order(self, order: Order) -> OrderResponse:
+  async def place_order(self, order: Order, *, settings: Settings = {}) -> OrderResponse:
     """Place an order in the market."""
 
   @SDK.method
-  async def place_orders(self, orders: Sequence[Order]) -> Sequence[OrderResponse]:
+  async def place_orders(self, orders: Sequence[Order], *, settings: Settings = {}) -> Sequence[OrderResponse]:
     """Place multiple orders in the market."""
-    return await asyncio.gather(*[self.place_order(order) for order in orders])
+    return await asyncio.gather(*[self.place_order(order, settings=settings) for order in orders])
 
   @SDK.method
   @abstractmethod
-  async def cancel_order(self, id: str) -> Any:
+  async def cancel_order(self, id: str, *, settings: Settings = {}) -> Any:
     """Cancel an order in the market."""
 
   @SDK.method
-  async def cancel_orders(self, ids: Sequence[str]) -> Any:
+  async def cancel_orders(self, ids: Sequence[str], *, settings: Settings = {}) -> Any:
     """Cancel multiple orders in the market."""
-    return await asyncio.gather(*[self.cancel_order(id) for id in ids])
+    return await asyncio.gather(*[self.cancel_order(id, settings=settings) for id in ids])
 
   @SDK.method
-  async def cancel_open_orders(self) -> Any:
+  async def cancel_open_orders(self, *, settings: Settings = {}) -> Any:
     """Cancel all open orders in the market."""
     open_orders = await self.open_orders()
-    return await self.cancel_orders([order.id for order in open_orders])
+    return await self.cancel_orders([order.id for order in open_orders], settings=settings)
 
 
 class PerpMarket(Market):
   """An abstract perpetual market interface."""
   @SDK.method
   @abstractmethod
-  async def index(self) -> Decimal:
+  async def index(self, *, settings: Settings = {}) -> Decimal:
     """Fetch the market index price."""
 
   @SDK.method

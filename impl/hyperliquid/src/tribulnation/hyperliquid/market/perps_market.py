@@ -12,6 +12,7 @@ from tribulnation.sdk.market import (
   OrderState,
   PerpPosition,
   Rules,
+  Settings,
   Trade,
   FundingRate,
   FundingPayment,
@@ -91,17 +92,17 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
 
     return Decimal(0)
 
-  async def place_order(self, order: Order) -> OrderResponse:
-    return await place_order(self, order)
+  async def place_order(self, order: Order, *, settings: Settings = {}) -> OrderResponse:
+    return await place_order(self, order, settings=settings)
 
   async def query_order(self, id: str) -> OrderState | None:
     return await query_order(self, id)
 
-  async def cancel_order(self, id: str):
-    return await cancel_order(self, id)
+  async def cancel_order(self, id: str, *, settings: Settings = {}):
+    return await cancel_order(self, id, settings=settings)
 
-  async def index(self) -> Decimal:
-    return await index(self)
+  async def index(self, *, settings: Settings = {}) -> Decimal:
+    return await index(self, settings=settings)
 
   async def next_funding(self) -> FundingRate:
     return await next_funding(self)

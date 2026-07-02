@@ -11,6 +11,7 @@ from .types import (
   Trade,
   Rules,
 )
+from .settings import Settings
 from .market import Market
 from .exchange import Exchange, PerpExchange
 from .venue import TradingVenue
@@ -134,28 +135,28 @@ class TradingMarkets(SDK):
     return await market.available_notional()
 
   @SDK.method
-  async def place_order(self, market_id: str, /, order: Order) -> OrderResponse:
+  async def place_order(self, market_id: str, /, order: Order, *, settings: Settings = {}) -> OrderResponse:
     """Place an order in the market."""
     market = await self.market(market_id)
-    return await market.place_order(order)
+    return await market.place_order(order, settings=settings)
 
   @SDK.method
-  async def cancel_order(self, market_id: str, /, id: str) -> Any:
+  async def cancel_order(self, market_id: str, /, id: str, *, settings: Settings = {}) -> Any:
     """Cancel an order in the market."""
     market = await self.market(market_id)
-    return await market.cancel_order(id)
+    return await market.cancel_order(id, settings=settings)
 
   @SDK.method
-  async def cancel_orders(self, market_id: str, /, ids: Sequence[str]) -> Any:
+  async def cancel_orders(self, market_id: str, /, ids: Sequence[str], *, settings: Settings = {}) -> Any:
     """Cancel multiple orders in the market."""
     market = await self.market(market_id)
-    return await market.cancel_orders(ids)
+    return await market.cancel_orders(ids, settings=settings)
 
   @SDK.method
-  async def cancel_open_orders(self, market_id: str, /) -> Any:
+  async def cancel_open_orders(self, market_id: str, /, *, settings: Settings = {}) -> Any:
     """Cancel all open orders in the market."""
     market = await self.market(market_id)
-    return await market.cancel_open_orders()
+    return await market.cancel_open_orders(settings=settings)
 
 
   @SDK.method

@@ -1,4 +1,4 @@
-from typing_extensions import TypedDict, Literal
+from typing_extensions import Literal, TypedDict
 from dataclasses import dataclass, field
 import asyncio
 
@@ -12,17 +12,14 @@ from tribulnation.mexc.core.exc import wrap_exceptions
 
 SpotInfo = SymbolInfo
 
-class Settings(TypedDict, total=False):
-  validate: bool
-  recvWindow: int
-
 class Meta(TypedDict):
   info: SpotInfo
 
 @dataclass(kw_only=True)
 class Shared:
   client: MEXC
-  settings: Settings = field(default_factory=Settings)
+  validate: bool = True
+  recv_window: int | None = None
 
   spot_markets: dict[str, SpotInfo] | None = None
   my_trades_subscription: Subscription[PrivateDealsV3Api] | None = None
@@ -30,32 +27,25 @@ class Shared:
 
   _markets_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
 
-  @property
-  def validate(self) -> bool:
-    return self.settings.get('validate', True)
-
-  @property
-  def recvWindow(self) -> int | None:
-    return self.settings.get('recvWindow', None)
-
   @classmethod
   def new(
     cls,
     api_key: str | None = None,
     api_secret: str | None = None,
     *,
-    settings: Settings = {},
+    validate: bool = True,
+    recv_window: int | None = None,
   ):
     import os
     api_key = api_key or os.environ.get('MEXC_API_KEY') or ''
     api_secret = api_secret or os.environ.get('MEXC_API_SECRET') or ''
-    client = MEXC.new(api_key=api_key, api_secret=api_secret, validate=settings.get('validate', True))
-    return cls(client=client, settings=settings)
+    client = MEXC.new(api_key=api_key, api_secret=api_secret, validate=validate)
+    return cls(client=client, validate=validate, recv_window=recv_window)
 
   @classmethod
-  def public(cls, *, settings: Settings = {}):
-    client = MEXC.public(validate=settings.get('validate', True))
-    return cls(client=client, settings=settings)
+  def public(cls, *, validate: bool = True):
+    client = MEXC.public(validate=validate)
+    return cls(client=client, validate=validate)
 
   @wrap_exceptions
   async def __aenter__(self):
@@ -106,20 +96,16 @@ class SharedMixin:
   shared: Shared
 
   @classmethod
-  def new(cls, api_key: str | None = None, api_secret: str | None = None, *, settings: Settings = {}):
-    return cls(shared=Shared.new(api_key=api_key, api_secret=api_secret, settings=settings))
+  def new(cls, api_key: str | None = None, api_secret: str | None = None, *, validate: bool = True, recv_window: int | None = None):
+    return cls(shared=Shared.new(api_key=api_key, api_secret=api_secret, validate=validate, recv_window=recv_window))
 
   @classmethod
-  def public(cls, *, settings: Settings = {}):
-    return cls(shared=Shared.public(settings=settings))
+  def public(cls, *, validate: bool = True):
+    return cls(shared=Shared.public(validate=validate))
 
   @property
   def client(self) -> MEXC:
     return self.shared.client
-
-  @property
-  def settings(self) -> Settings:
-    return self.shared.settings
 
   async def __aenter__(self):
     await self.shared.__aenter__()

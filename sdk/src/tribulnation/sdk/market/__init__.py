@@ -4,6 +4,7 @@ from .types import (
   Position, PerpPosition,
   Trade, Rules,
 )
+from .settings import Settings
 from .market import Market, PerpMarket
 from .exchange import Exchange, PerpExchange
 from .venue import TradingVenue, ExchangeDescription

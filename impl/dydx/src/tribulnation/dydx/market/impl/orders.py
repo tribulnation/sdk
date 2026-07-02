@@ -5,9 +5,8 @@ import base64
 from dydx.indexer.data.list_parent_orders import Order as IndexerOrder
 from dydx.node.orders import OrderParams, OrderPlacement, TimeInForce
 from tribulnation.sdk.core import ValidationError
-from tribulnation.sdk.market import Order, OrderResponse, OrderState
+from tribulnation.sdk.market import Order, OrderResponse, OrderState, Settings as MarketSettings
 from dydx.protos.dydxprotocol import clob, subaccounts
-
 from tribulnation.dydx.core import wrap_exceptions
 from .mixin import MarketMixin, Settings
 
@@ -69,7 +68,7 @@ async def list_orders(
   address = await self.address
   orders = await self.indexer.data.list_parent_orders(
     address=address,
-    parent_subaccount=self.settings.get('parent_subaccount', 0),
+    parent_subaccount=self.shared.parent_subaccount,
     ticker=self.market,
     status=status,
   )
@@ -93,15 +92,15 @@ def export_order(order: Order, settings: Settings) -> OrderParams:
     'reduce_only': settings.get('reduce_only', False),
   }
 
-async def with_expiry(self: MarketMixin, params: OrderParams) -> OrderParams:
+async def with_expiry(self: MarketMixin, params: OrderParams, settings: Settings) -> OrderParams:
   """Apply SDK-configured dYdX order expiry deltas."""
-  if params['flags'] == 'SHORT_TERM' and (delta := self.settings.get('short_term_gtb')) is not None:
+  if params['flags'] == 'SHORT_TERM' and (delta := settings.get('short_term_gtb')) is not None:
     latest = await self.client.chain.tendermint.get_latest_block()
     block = latest.block
     if block is None or block.header is None:
       raise ValidationError('Latest dYdX block response did not include a header')
     return {**params, 'good_til_block': block.header.height + delta}
-  if params['flags'] in {'LONG_TERM', 'CONDITIONAL'} and (delta := self.settings.get('long_term_gtbt')) is not None:
+  if params['flags'] in {'LONG_TERM', 'CONDITIONAL'} and (delta := settings.get('long_term_gtbt')) is not None:
     latest = await self.client.chain.tendermint.get_latest_block()
     block = latest.block
     if block is None or block.header is None or block.header.time is None:
@@ -110,10 +109,11 @@ async def with_expiry(self: MarketMixin, params: OrderParams) -> OrderParams:
   return params
 
 @wrap_exceptions
-async def place_order(self: MarketMixin, order: Order) -> OrderResponse:
+async def place_order(self: MarketMixin, order: Order, *, settings: MarketSettings = {}) -> OrderResponse:
+  s: Settings = settings.get('dydx', {})
   response = await self.client.node.place_order(
     self.perpetual_market,
-    order=await with_expiry(self, export_order(order, self.settings)),
+    order=await with_expiry(self, export_order(order, s), s),
     subaccount=self.subaccount,
   )
   order_id = response.order.order_id
@@ -125,11 +125,11 @@ async def place_order(self: MarketMixin, order: Order) -> OrderResponse:
   )
 
 @wrap_exceptions
-async def cancel_order(self: MarketMixin, id: str):
+async def cancel_order(self: MarketMixin, id: str, *, settings: MarketSettings = {}):
   return await self.client.node.cancel_order(parse_id(id))
 
 @wrap_exceptions
-async def cancel_orders(self: MarketMixin, ids: Sequence[str]):
+async def cancel_orders(self: MarketMixin, ids: Sequence[str], *, settings: MarketSettings = {}):
   order_ids = [parse_id(id) for id in ids]
   short_term = [order_id for order_id in order_ids if order_id.order_flags == 0]
   long_term = [order_id for order_id in order_ids if order_id.order_flags != 0]

@@ -7,7 +7,7 @@ from mexc.spot.trade.cancel_order import CancelOrderResponse
 from mexc.spot.trade.place_order import PlaceOrderResponse
 
 from tribulnation.sdk.core import ValidationError
-from tribulnation.sdk.market import Order, OrderResponse, OrderState
+from tribulnation.sdk.market import Order, OrderResponse, OrderState, Settings
 
 from tribulnation.mexc.core.exc import wrap_exceptions
 from .mixin import MarketMixin
@@ -71,7 +71,7 @@ def _dump_order(order: Order) -> DumpedOrder:
 async def open_orders(self: MarketMixin) -> Sequence[OrderState]:
   orders = await self.client.spot.account.open_orders(
     symbol=self.instrument,
-    recv_window=self.shared.recvWindow,
+    recv_window=self.shared.recv_window,
     validate=self.shared.validate,
   )
   return [_parse_order(o) for o in orders]
@@ -82,14 +82,14 @@ async def query_order(self: MarketMixin, id: str) -> OrderState | None:
   order = await self.client.spot.account.order(
     symbol=self.instrument,
     order_id=id,
-    recv_window=self.shared.recvWindow,
+    recv_window=self.shared.recv_window,
     validate=self.shared.validate,
   )
   return _parse_order(order)
 
 
 @wrap_exceptions
-async def place_order(self: MarketMixin, order: Order) -> OrderResponse:
+async def place_order(self: MarketMixin, order: Order, *, settings: Settings = {}) -> OrderResponse:
   dumped = _dump_order(order)
   r: PlaceOrderResponse = await self.client.spot.trade.place_order(
     symbol=self.instrument,
@@ -97,17 +97,17 @@ async def place_order(self: MarketMixin, order: Order) -> OrderResponse:
     type_=dumped['type_'],
     quantity=dumped['quantity'],
     price=dumped.get('price'),
-    recv_window=self.shared.recvWindow,
+    recv_window=self.shared.recv_window,
     validate=self.shared.validate,
   )
   return OrderResponse(id=str(r.get('orderId')), details=r)
 
 
 @wrap_exceptions
-async def cancel_order(self: MarketMixin, id: str) -> CancelOrderResponse:
+async def cancel_order(self: MarketMixin, id: str, *, settings: Settings = {}) -> CancelOrderResponse:
   return await self.client.spot.trade.cancel_order(
     symbol=self.instrument,
     order_id=id,
-    recv_window=self.shared.recvWindow,
+    recv_window=self.shared.recv_window,
     validate=self.shared.validate,
   )

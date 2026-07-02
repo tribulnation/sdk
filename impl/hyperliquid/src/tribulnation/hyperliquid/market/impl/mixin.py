@@ -65,7 +65,6 @@ def spot_meta_of(spot_index: int, /, *, spot_meta: SpotMetaResponse) -> SpotMeta
 class Shared:
   client: Hyperliquid
   maybe_address: str | None = None
-  settings: Settings = field(default_factory=Settings)
 
   @property
   def address(self) -> str:
@@ -224,24 +223,24 @@ class SharedMixin:
   @classmethod
   def http(
     cls, address: str | None = None, *, wallet: Wallet | None = None,
-    mainnet: bool = True, settings: Settings = {},
+    mainnet: bool = True, validate: bool = True,
   ):
     if address is None:
       env_var = 'HYPERLIQUID_ADDRESS' if mainnet else 'HYPERLIQUID_TESTNET_ADDRESS'
       address = os.environ.get(env_var)
-    client = Hyperliquid.http(wallet, mainnet=mainnet, validate=settings.get('validate', True), public=True)
-    return cls(shared=Shared(client=client, maybe_address=address, settings=settings))
+    client = Hyperliquid.http(wallet, mainnet=mainnet, validate=validate, public=True)
+    return cls(shared=Shared(client=client, maybe_address=address))
 
   @classmethod
   def ws(
     cls, address: str | None = None, *, wallet: Wallet | None = None,
-    mainnet: bool = True, settings: Settings = {}, public: bool = False
+    mainnet: bool = True, validate: bool = True, public: bool = False,
   ):
     if address is None:
       env_var = 'HYPERLIQUID_ADDRESS' if mainnet else 'HYPERLIQUID_TESTNET_ADDRESS'
       address = os.environ.get(env_var)
-    client = Hyperliquid.ws(wallet, mainnet=mainnet, validate=settings.get('validate', True), public=True)
-    return cls(shared=Shared(client=client, maybe_address=address, settings=settings))
+    client = Hyperliquid.ws(wallet, mainnet=mainnet, validate=validate, public=True)
+    return cls(shared=Shared(client=client, maybe_address=address))
 
   @property
   def client(self) -> Hyperliquid:
@@ -250,14 +249,6 @@ class SharedMixin:
   @property
   def address(self) -> str:
     return self.shared.address
-
-  @property
-  def settings(self) -> Settings:
-    return self.shared.settings
-
-  @property
-  def index_price(self) -> Literal['oracle', 'mark']:
-    return self.settings.get('index_price', 'oracle')
 
   async def __aenter__(self):
     await self.shared.__aenter__()

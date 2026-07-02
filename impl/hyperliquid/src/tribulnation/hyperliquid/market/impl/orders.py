@@ -2,14 +2,14 @@ from typing_extensions import Any, Sequence
 from decimal import Decimal
 
 from tribulnation.sdk.core import ApiError
-from tribulnation.sdk.market import Order, OrderResponse, OrderState
+from tribulnation.sdk.market import Order, OrderResponse, OrderState, Settings as MarketSettings
 from tribulnation.sdk.util import fmt_num
 
 from hyperliquid.exchange.cancel import Cancel as CancelWire
 from hyperliquid.exchange.order import Order as OrderWire
 from hyperliquid.info.methods.order_status import OrderStatusResponse
 
-from tribulnation.hyperliquid.core import round_price, wrap_exceptions
+from tribulnation.hyperliquid.core import Settings, round_price, wrap_exceptions
 from .mixin import SpotMarketMixin, PerpMarketMixin
 
 
@@ -17,10 +17,9 @@ def _active(status: str) -> bool:
   # conservative: only 'open' is definitely active; 'triggered' is still live too
   return status in {'open', 'triggered', 'scheduledCancel'}
 
-
-def _export_order(self: SpotMarketMixin | PerpMarketMixin, o: Order) -> OrderWire:
+def _export_order(self: SpotMarketMixin | PerpMarketMixin, o: Order, settings: Settings) -> OrderWire:
   if o['type'] == 'LIMIT':
-    tif = self.settings.get('limit_tif', 'Gtc')
+    tif = settings.get('limit_tif', 'Gtc')
   elif o['type'] == 'MARKET':
     tif = 'Ioc'
   elif o['type'] == 'POST_ONLY':
@@ -35,7 +34,7 @@ def _export_order(self: SpotMarketMixin | PerpMarketMixin, o: Order) -> OrderWir
     'b': qty >= 0,
     'p': fmt_num(price),
     's': fmt_num(abs(qty)),
-    'r': self.settings.get('reduce_only', False),
+    'r': settings.get('reduce_only', False),
     't': {'limit': {'tif': tif}},
   }
 
@@ -67,8 +66,9 @@ async def open_orders(self: SpotMarketMixin | PerpMarketMixin) -> Sequence[Order
 
 
 @wrap_exceptions
-async def place_order(self: SpotMarketMixin | PerpMarketMixin, order: Order) -> OrderResponse:
-  wire = _export_order(self, order)
+async def place_order(self: SpotMarketMixin | PerpMarketMixin, order: Order, *, settings: MarketSettings = {}) -> OrderResponse:
+  s: Settings = settings.get('hyperliquid', {})
+  wire = _export_order(self, order, s)
   result = await self.client.exchange.order(wire)
   if result['status'] != 'ok':
     raise ApiError(result)
@@ -88,7 +88,7 @@ async def place_order(self: SpotMarketMixin | PerpMarketMixin, order: Order) -> 
 
 
 @wrap_exceptions
-async def cancel_order(self: SpotMarketMixin | PerpMarketMixin, id: str) -> Any:
+async def cancel_order(self: SpotMarketMixin | PerpMarketMixin, id: str, *, settings: MarketSettings = {}) -> Any:
   cancel: CancelWire = {'a': self.asset_id, 'o': int(id)}
   result = await self.client.exchange.cancel(cancel)
   if result['status'] != 'ok':

@@ -13,7 +13,7 @@ class MarketSDK(TradingMarkets):
       from tribulnation.dydx import DydxMarket
     except ImportError as e:
       raise ImportError('dydx market is not installed. Please install it with `pip install tribulnation-dydx`.') from e
-    return DydxMarket.new(account.resolved_mnemonic, mainnet=account.venue == 'dydx')
+    return DydxMarket.new(account.resolved_mnemonic, mainnet=account.venue == 'dydx', parent_subaccount=account.parent_subaccount)
 
   def hyperliquid(self, account: Hyperliquid) -> TradingVenue:
     try:
@@ -27,7 +27,7 @@ class MarketSDK(TradingMarkets):
       from tribulnation.mexc import MexcMarket
     except ImportError as e:
       raise ImportError('mexc market is not installed. Please install it with `pip install tribulnation-mexc`.') from e
-    return MexcMarket.new(api_key=account.resolved_api_key, api_secret=account.resolved_api_secret)
+    return MexcMarket.new(api_key=account.resolved_api_key, api_secret=account.resolved_api_secret, validate=account.validate)
 
   async def venue(self, id: str, /) -> TradingVenue:
     if (account := self.accounts.get(id)) is None:

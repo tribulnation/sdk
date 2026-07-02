@@ -1,19 +1,21 @@
 from decimal import Decimal
 
+from tribulnation.sdk.market import Settings
 from tribulnation.hyperliquid.core import wrap_exceptions
 from .mixin import PerpMarketMixin
 
 
 @wrap_exceptions
-async def index(self: PerpMarketMixin) -> Decimal:
+async def index(self: PerpMarketMixin, *, settings: Settings = {}) -> Decimal:
   _, perp_meta, asset_ctxs = await self.shared.load_perp_meta_for_dex(self.dex_name, refetch=True)
   if perp_meta["universe"][self.asset_idx]["name"] != self.asset_name:
     raise ValueError(
       f"Expected asset {self.asset_name} at index {self.asset_idx}, got {perp_meta['universe'][self.asset_idx]['name']}"
     )
 
+  s = settings.get('hyperliquid', {})
   ctx = asset_ctxs[self.asset_idx]
-  if self.index_price == "oracle" or (mark := ctx.get("markPx")) is None:
+  if s.get('index_price', 'oracle') == "oracle" or (mark := ctx.get("markPx")) is None:
     return Decimal(ctx["oraclePx"])
   return Decimal(mark)
 

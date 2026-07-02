@@ -15,6 +15,7 @@ from tribulnation.sdk.market import (
   PerpMarket,
   PerpPosition,
   Rules,
+  Settings,
   Trade,
 )
 
@@ -74,7 +75,7 @@ class Market(MarketMixin, PerpMarket):
   async def perp_position(self) -> PerpPosition:
     positions = await self.indexer.data.list_parent_positions(
       await self.address,
-      parent_subaccount=self.settings.get('parent_subaccount', 0),
+      parent_subaccount=self.shared.parent_subaccount,
     )
     market_positions = [
       p for p in positions
@@ -117,17 +118,17 @@ class Market(MarketMixin, PerpMarket):
     leverage = max_leverage(market)
     return collateral*leverage
 
-  async def place_order(self, order: Order) -> OrderResponse:
-    return await place_order(self, order)
+  async def place_order(self, order: Order, *, settings: Settings = {}) -> OrderResponse:
+    return await place_order(self, order, settings=settings)
 
   async def query_order(self, id: str) -> OrderState | None:
     return await query_order(self, id)
 
-  async def cancel_order(self, id: str) -> Any:
-    return await cancel_order(self, id)
+  async def cancel_order(self, id: str, *, settings: Settings = {}) -> Any:
+    return await cancel_order(self, id, settings=settings)
 
-  async def cancel_orders(self, ids: Sequence[str]) -> Any:
-    return await cancel_orders(self, ids)
+  async def cancel_orders(self, ids: Sequence[str], *, settings: Settings = {}) -> Any:
+    return await cancel_orders(self, ids, settings=settings)
 
   @wrap_exceptions
   async def index(self) -> Decimal:

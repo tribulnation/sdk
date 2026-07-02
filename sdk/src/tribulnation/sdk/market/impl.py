@@ -1,16 +1,27 @@
-from typing_extensions import TYPE_CHECKING, TypedDict
+from typing_extensions import TypedDict
 from dataclasses import dataclass, field
 from . import TradingMarkets, TradingVenue
 
-if TYPE_CHECKING:
-  from tribulnation.dydx.market import Settings as DydxSettings
-  from tribulnation.hyperliquid.market import Settings as HyperliquidSettings
-  from tribulnation.mexc import Settings as MexcSettings
 
-  class Settings(TypedDict, total=False):
-    dydx: DydxSettings
-    hyperliquid: HyperliquidSettings
-    mexc: MexcSettings
+class _DydxConfig(TypedDict, total=False):
+  validate: bool
+  parent_subaccount: int
+
+
+class _HyperliquidConfig(TypedDict, total=False):
+  validate: bool
+
+
+class _MexcConfig(TypedDict, total=False):
+  validate: bool
+  recvWindow: int
+
+
+class Settings(TypedDict, total=False):
+  dydx: _DydxConfig
+  hyperliquid: _HyperliquidConfig
+  mexc: _MexcConfig
+
 
 SUPPORTED_VENUES = (
   'dydx',
@@ -22,26 +33,29 @@ SUPPORTED_VENUES = (
 
 @dataclass(frozen=True)
 class TradingSDK(TradingMarkets):
-  settings: 'Settings' = field(default_factory=lambda: {})
+  settings: Settings = field(default_factory=lambda: {})
 
   def dydx(self, *, mainnet: bool = True, **credentials: str):
     try:
       from tribulnation.dydx import DydxMarket
-      return DydxMarket.new(mainnet=mainnet, settings=self.settings.get('dydx', {}), **credentials)
+      s = self.settings.get('dydx', {})
+      return DydxMarket.new(mainnet=mainnet, validate=s.get('validate', True), parent_subaccount=s.get('parent_subaccount', 0), **credentials)
     except ImportError:
       raise ImportError('dydx market is not installed. Please install it with `pip install tribulnation-dydx`.')
 
   def hyperliquid(self, *, mainnet: bool = True, **credentials: str):
     try:
       from tribulnation.hyperliquid import HyperliquidMarket
-      return HyperliquidMarket.http(mainnet=mainnet, settings=self.settings.get('hyperliquid', {}), **credentials)
+      s = self.settings.get('hyperliquid', {})
+      return HyperliquidMarket.http(mainnet=mainnet, validate=s.get('validate', True), **credentials)
     except ImportError:
       raise ImportError('hyperliquid market is not installed. Please install it with `pip install tribulnation-hyperliquid`.')
 
   def mexc(self, **credentials: str):
     try:
       from tribulnation.mexc import MexcMarket
-      return MexcMarket.new(settings=self.settings.get('mexc', {}), **credentials)
+      s = self.settings.get('mexc', {})
+      return MexcMarket.new(validate=s.get('validate', True), recv_window=s.get('recvWindow'), **credentials)
     except ImportError:
       raise ImportError('mexc market is not installed. Please install it with `pip install tribulnation-mexc`.')
 
