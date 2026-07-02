@@ -12,6 +12,9 @@ class WithdrawalMethod:
     asset: str
     amount: Decimal
 
+    def __str__(self) -> str:
+      return f'Fee({self.amount} {self.asset})'
+
   asset: str
   network: str
   fee: Fee | None = None

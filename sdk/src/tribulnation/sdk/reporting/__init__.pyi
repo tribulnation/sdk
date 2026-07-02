@@ -46,7 +46,6 @@ from .models import (
 from .snapshots import Snapshots
 from .history import History
 from .sdk import Report
-from .impl import ReportSDK
 from .config import (
   AlchemyProviderConfig,
   BigQueryProviderConfig,
@@ -103,7 +102,6 @@ __all__ = [
   'UnknownObservation',
   'Yield',
   'Report',
-  'ReportSDK',
   'AlchemyProviderConfig',
   'BigQueryProviderConfig',
   'EtherscanProviderConfig',
