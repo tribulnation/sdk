@@ -1,12 +1,18 @@
 from typing_extensions import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from tribulnation.sdk.market import TradingMarkets, TradingVenue
 from .accounts import Account, Dydx, Hyperliquid, Mexc
 
+DEFAULT_ACCOUNTS: Mapping[str, Account] = {
+  'dydx': Dydx(),
+  'hyperliquid': Hyperliquid(),
+  'mexc': Mexc()
+}
+
 @dataclass(frozen=True)
 class MarketSDK(TradingMarkets):
-  accounts: Mapping[str, Account]
+  accounts: Mapping[str, Account] = field(default_factory=lambda: DEFAULT_ACCOUNTS)
 
   def dydx(self, account: Dydx) -> TradingVenue:
     try:
