@@ -11,7 +11,7 @@
 ## Installation
 
 ```bash
-pip install "tribulnation-sdk[dydx,hyperliquid,mexc]"
+pip install tribulnation-sdk[dydx,hyperliquid,mexc]
 ```
 
 See the [support matrix](docs/support.md) for details on extras.
