@@ -1,41 +1,29 @@
-# Wallet Interface
+# Wallet
 
-## Overview
+> `Wallet` queries deposit/withdrawal details
 
-`Wallet` provides deposit and withdrawal methods with per-network details.
+- `deposit_methods(assets=None)`
+- `withdrawal_methods(assets=None, networks=None)`
 
-## Types
+**Example:**
 
-`DepositMethod`
-- `asset`
-- `network`
-- `fee`: `Fee | None`
-- `contract_address`: `str | None`
-- `min_confirmations`: `int | None`
+```python
+from tribulnation.sdk import WalletSDK, accounts
+from dotenv import load_dotenv
 
-`WithdrawalMethod`
-- `asset`
-- `network`
-- `fee`: `Fee | None`
-- `contract_address`: `str | None`
+load_dotenv()
 
-`Fee`
-- `asset`
-- `amount`
+wallet = WalletSDK({
+  'binance': accounts.Binance(),
+  'bitget': accounts.Bitget()
+})
 
-## Methods
-
-`deposit_methods(assets: Sequence[str] | None = None) -> Sequence[DepositMethod]`
-- Returns deposit methods. When `assets` is `None`, returns all.
-
-`withdrawal_methods(assets: Sequence[str] | None = None, networks: Sequence[str] | None = None) -> Sequence[WithdrawalMethod]`
-- Returns withdrawal methods. When `assets` or `networks` is `None`, no filtering is applied on that dimension.
-
-## Notes
-
-- `network` is the raw exchange network/chain string (no normalization).
-
-## Related
-
-- `sdk/src/tribulnation.sdk/wallet/deposit_methods.py`
-- `sdk/src/tribulnation.sdk/wallet/withdrawal_methods.py`
+for account, sdk in wallet.all.items():
+  print(f'[{account}]')
+  methods = await sdk.withdrawal_methods()
+  for method in methods[:10]:
+    print(f'> {method.asset} -> {method.network} - {method.fee}')
+  if len(methods) > 10:
+    print(f'> ... and {len(methods) - 10} more methods')
+  print()
+```

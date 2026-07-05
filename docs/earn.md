@@ -1,30 +1,30 @@
-# Earn Interface
+# Earn
 
-## Overview
+> `Earn` lists yield-bearing instruments across venues.
 
-`Earn` exposes earn products as typed instruments with APR, limits, and optional duration.
+- `instruments(tags=None, assets=None)` — filters match *any* given tag or asset, not all
 
-## Types
+`apr` is a fraction of 1, not a percentage (`0.01` = 1%).
 
-`Instrument`
-- `tags`: `Sequence[InstrumentTag]`
-- `asset`: subscription asset
-- `apr`: annual percent rate as a fraction of 1 (0.01 = 1%)
-- `yield_asset`: asset paid as yield (optional)
-- `min_qty`, `max_qty`: quantity limits (optional)
-- `url`: product URL (optional)
-- `duration`: `timedelta` for fixed-term products (optional)
-- `id`: exchange-specific identifier (optional)
+**Example:**
 
-`InstrumentTag`
-- `flexible`, `fixed`, `one-time`, `new-users`, `staking`
+```python
+from tribulnation.sdk import EarnSDK, accounts
+from dotenv import load_dotenv
 
-## Methods
+load_dotenv()
 
-`instruments(tags: Collection[InstrumentTag] | None = None, assets: Collection[str] | None = None) -> Sequence[Instrument]`
-- When filters are `None`, returns all instruments.
-- When filters are provided, returns instruments matching any of the tags and/or the specified assets.
+earn = EarnSDK({
+  'binance': accounts.Binance(),
+  'mexc': accounts.Mexc()
+})
 
-## Related
-
-- `sdk/src/tribulnation.sdk/earn/instruments.py`
+for account, sdk in earn.all.items():
+  print(f'[{account}]')
+  instruments = await sdk.instruments()
+  for instr in instruments[:10]:
+    print(f'> {instr.asset} {instr.apr:.2%}')
+  if len(instruments) > 10:
+    print(f'> ... and {len(instruments) - 10} more instruments')
+  print()
+```
