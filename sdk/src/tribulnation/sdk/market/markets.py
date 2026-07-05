@@ -22,52 +22,52 @@ class TradingMarkets(SDK):
   @SDK.method
   @abstractmethod
   async def venue(self, id: str, /) -> TradingVenue:
-    """Fetch a venue by ID."""
+    """Fetch a venue by account ID."""
 
   @SDK.method
   @abstractmethod
   async def venues(self) -> Sequence[str]:
-    """List supported all venues."""
+    """List configured account IDs."""
 
   @SDK.method
   async def exchange(self, id: str, /) -> Exchange:
     """Fetch an exchange by ID.
-    
-    - `id`: `<venue_id>:<exchange_id>`
+
+    - `id`: `<account_id>:<exchange_id>`
     """
-    venue_id, exchange_id = id.split(':', 1)
-    venue = await self.venue(venue_id)
+    account_id, exchange_id = id.split(':', 1)
+    venue = await self.venue(account_id)
     return await venue.exchange(exchange_id)
 
   @SDK.method
   async def perp_exchange(self, id: str, /) -> PerpExchange:
     """Fetch a perpetual exchange by ID.
-    
-    - `id`: `<venue_id>:<exchange_id>`
+
+    - `id`: `<account_id>:<exchange_id>`
     """
-    venue_id, exchange_id = id.split(':', 1)
-    venue = await self.venue(venue_id)
+    account_id, exchange_id = id.split(':', 1)
+    venue = await self.venue(account_id)
     return await venue.perp_exchange(exchange_id)
 
   @SDK.method
   async def market(self, id: str, /) -> Market:
     """Fetch a market by ID.
-    
-    - `market_id`: `<venue_id>:<exchange_id>:<market_id>`
+
+    - `market_id`: `<account_id>:<exchange_id>:<market_id>`
     """
-    venue_id, exchange_id, market_id = id.split(':', 2)
-    venue = await self.venue(venue_id)
+    account_id, exchange_id, market_id = id.split(':', 2)
+    venue = await self.venue(account_id)
     exchange = await venue.exchange(exchange_id)
     return await exchange.market(market_id)
 
   @SDK.method
   async def perp_market(self, id: str, /):
     """Fetch a perpetual market by ID.
-    
-    - `market_id`: `<venue_id>:<exchange_id>:<market_id>`
+
+    - `market_id`: `<account_id>:<exchange_id>:<market_id>`
     """
-    venue_id, exchange_id, market_id = id.split(':', 2)
-    venue = await self.venue(venue_id)
+    account_id, exchange_id, market_id = id.split(':', 2)
+    venue = await self.venue(account_id)
     exchange = await venue.perp_exchange(exchange_id)
     return await exchange.market(market_id)
 

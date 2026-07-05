@@ -11,8 +11,9 @@ build:
   rm -drf dist && \
   pyright . && \
   cp ../README.md . && \
+  cp ../LICENSE . && \
   {{PYTHON}} -m build && \
-  rm README.md && \
+  rm README.md LICENSE && \
   rm -drf build
 
 # Publish `dist/*` to pypi, then delete
