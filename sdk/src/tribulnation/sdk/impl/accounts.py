@@ -32,6 +32,10 @@ class Dydx:
   def resolved_mnemonic(self) -> str:
     return resolve_env_var(self.mnemonic)
 
+  def verify_env_vars(self):
+    self.resolved_address
+    self.resolved_mnemonic
+
 
 @_dataclass
 class Hyperliquid:
@@ -48,6 +52,10 @@ class Hyperliquid:
   @property
   def resolved_private_key(self) -> str:
     return resolve_env_var(self.private_key)
+
+  def verify_env_vars(self):
+    self.resolved_address
+    self.resolved_private_key
 
 
 @_dataclass
@@ -67,6 +75,10 @@ class Mexc:
   @property
   def resolved_api_secret(self) -> str:
     return resolve_env_var(self.api_secret)
+  
+  def verify_env_vars(self):
+    self.resolved_api_key
+    self.resolved_api_secret
 
 
 @_dataclass
@@ -93,6 +105,10 @@ class Bitget:
   def resolved_passphrase(self) -> str:
     return resolve_env_var(self.passphrase)
 
+  def verify_env_vars(self):
+    self.resolved_access_key
+    self.resolved_secret_key
+    self.resolved_passphrase
 
 @_dataclass
 class Binance:
@@ -111,7 +127,10 @@ class Binance:
   @property
   def resolved_api_secret(self) -> str:
     return resolve_env_var(self.api_secret)
-
+  
+  def verify_env_vars(self):
+    self.resolved_api_key
+    self.resolved_api_secret
 
 
 @_dataclass
@@ -125,6 +144,9 @@ class Evm:
   @property
   def resolved_address(self) -> str:
     return resolve_env_var(self.address)
+  
+  def verify_env_vars(self):
+    self.resolved_address
 
 
 Account = _Annotated[
