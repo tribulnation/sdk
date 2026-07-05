@@ -12,7 +12,11 @@ DEFAULT_ACCOUNTS: Mapping[str, Account] = {
 
 @dataclass(frozen=True)
 class MarketSDK(TradingMarkets):
-  accounts: Mapping[str, Account] = field(default_factory=lambda: DEFAULT_ACCOUNTS)
+  accounts: Mapping[str, Account] = field(default_factory=dict)
+
+  @property
+  def all_accounts(self) -> Mapping[str, Account]:
+    return {**DEFAULT_ACCOUNTS, **self.accounts}
 
   def dydx(self, account: Dydx) -> TradingVenue:
     try:
@@ -36,7 +40,7 @@ class MarketSDK(TradingMarkets):
     return MexcMarket.new(api_key=account.resolved_api_key, api_secret=account.resolved_api_secret, validate=account.validate)
 
   async def venue(self, id: str, /) -> TradingVenue:
-    if (account := self.accounts.get(id)) is None:
+    if (account := self.all_accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
     match account.venue:
       case 'dydx' | 'dydx_testnet':
@@ -49,4 +53,4 @@ class MarketSDK(TradingMarkets):
         raise ValueError(f'Unsupported venue: {account.venue}')
 
   async def venues(self) -> Sequence[str]:
-    return list(self.accounts)
+    return list(self.all_accounts)
