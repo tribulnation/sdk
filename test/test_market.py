@@ -1,4 +1,4 @@
-"""Live market conformance tests for `TradingSDK` markets."""
+"""Live market conformance tests for `MarketSDK` markets."""
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -8,7 +8,7 @@ import asyncio
 from typing_extensions import Literal
 import pytest
 
-from tribulnation.sdk import TradingSDK
+from tribulnation.sdk import MarketSDK
 from tribulnation.sdk.core import Stream
 from tribulnation.sdk.market import Book, Market, PerpMarket, Order, OrderState, Rules
 
@@ -254,9 +254,9 @@ setattr(test_market, '__test__', False)
 @pytest.mark.live
 @pytest.mark.trading
 @pytest.mark.parametrize('plan', PLANS, ids=[plan.market_id for plan in PLANS])
-async def test_trading_sdk_market(plan: MarketTestPlan) -> None:
-  """Run live conformance against a market instantiated through `TradingSDK`."""
+async def test_market_sdk_market(plan: MarketTestPlan) -> None:
+  """Run live conformance against a market instantiated through `MarketSDK`."""
   load_venue_env(plan.venue, required=plan.required_env)
-  market = await TradingSDK().market(plan.market_id)
+  market = await MarketSDK().market(plan.market_id)
   async with market:
     await test_market(market, plan)
