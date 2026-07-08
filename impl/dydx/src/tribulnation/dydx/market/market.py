@@ -131,7 +131,7 @@ class Market(MarketMixin, PerpMarket):
     return await cancel_orders(self, ids, settings=settings)
 
   @wrap_exceptions
-  async def index(self) -> Decimal:
+  async def index(self, *, settings: Settings = {}) -> Decimal:
     market = await self.indexer.data.get_market(self.market)
     price = market.get('oraclePrice')
     if price is None:
