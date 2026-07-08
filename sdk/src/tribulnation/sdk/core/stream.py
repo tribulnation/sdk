@@ -95,7 +95,15 @@ class Subscription(Generic[T]):
         # connection). Unblock every subscriber instead of letting the raw
         # `StopAsyncIteration` escape this async generator, which Python
         # would otherwise turn into an opaque `RuntimeError`.
+        dead_ctx = self.ctx
         self.ctx = None
+        try:
+          # Best-effort: release the underlying channel/registry entry so a
+          # later resubscribe doesn't fail against state nothing else will
+          # clean up. Must not stop us from notifying subscribers below.
+          await dead_ctx.unsubscribe()
+        except Exception:
+          ...
         failed = _Failed(NetworkError('Upstream stream ended unexpectedly'))
         for queue in self.subscribers:
           queue.put_nowait(failed)
