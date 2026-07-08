@@ -1,0 +1,176 @@
+"""Unit tests for `Subscription` upstream-failure and unsubscribe handling.
+
+Regression tests for the `StopAsyncIteration` -> `RuntimeError` leak and the
+non-idempotent `unsubscribe()` described in `sdk_stop_iteration_bug.md`.
+"""
+
+import asyncio
+
+import pytest
+
+from tribulnation.sdk.core import NetworkError, Subscription
+
+
+def make_ctx_factory(items: list[object], *, on_unsubscribe=None):
+  """Build a `subscribe_stream` callable whose upstream yields `items` then ends."""
+  async def subscribe_stream():
+    async def gen():
+      for item in items:
+        yield item
+    async def unsubscribe():
+      if on_unsubscribe is not None:
+        on_unsubscribe()
+    return Subscription.Context(gen(), unsubscribe)
+  return subscribe_stream
+
+
+async def collect(stream):
+  items = []
+  async for item in stream:
+    items.append(item)
+  return items
+
+
+async def test_upstream_exhaustion_raises_network_error_not_stop_async_iteration():
+  """Consuming a stream whose upstream ends must not leak a raw StopAsyncIteration/RuntimeError."""
+  sub = Subscription(make_ctx_factory([1, 2]))
+  stream = await sub.subscribe()
+
+  items = []
+  with pytest.raises(NetworkError):
+    async for item in stream:
+      items.append(item)
+  assert items == [1, 2]
+
+  # Cleanup must be safe even though the upstream already ended internally.
+  await stream.unsubscribe()
+
+
+async def test_multiple_subscribers_all_unblocked_on_upstream_end():
+  """If the shared upstream ends, every subscriber must see it, none should hang."""
+  sub = Subscription(make_ctx_factory([1, 2]))
+  stream_a = await sub.subscribe()
+  stream_b = await sub.subscribe()
+
+  async def collect_expecting_failure(stream):
+    items = []
+    with pytest.raises(NetworkError):
+      async for item in stream:
+        items.append(item)
+    return items
+
+  (items_a, items_b) = await asyncio.wait_for(
+    asyncio.gather(collect_expecting_failure(stream_a), collect_expecting_failure(stream_b)),
+    timeout=2,
+  )
+  assert items_a == [1, 2]
+  assert items_b == [1, 2]
+
+  assert sub.ctx is None
+
+
+async def test_unsubscribe_is_idempotent_and_calls_upstream_unsubscribe_once():
+  unsubscribe_calls = 0
+  def on_unsubscribe():
+    nonlocal unsubscribe_calls
+    unsubscribe_calls += 1
+
+  sub = Subscription(make_ctx_factory([1, 2, 3], on_unsubscribe=on_unsubscribe))
+  stream = await sub.subscribe()
+  async for _ in stream:
+    break
+
+  await stream.unsubscribe()
+  await stream.unsubscribe()  # must not raise
+
+  assert unsubscribe_calls == 1
+
+
+async def test_unsubscribe_after_upstream_end_does_not_raise():
+  """Cleanup after an upstream failure must not try to unsubscribe an already-dead context."""
+  sub = Subscription(make_ctx_factory([1]))
+  stream = await sub.subscribe()
+
+  with pytest.raises(NetworkError):
+    async for _ in stream:
+      pass
+
+  await stream.unsubscribe()
+  await stream.unsubscribe()
+
+
+async def test_unsubscribe_racing_with_upstream_failure_does_not_raise_attribute_error():
+  """`unsubscribe()` must not act on a stale `ctx` if a concurrent `step()` clears it first."""
+  upstream_may_end = asyncio.Event()
+
+  async def subscribe_stream():
+    async def gen():
+      yield 1
+      await upstream_may_end.wait()
+      # generator returns here -> StopAsyncIteration on the next anext()
+    async def unsub():
+      ...
+    return Subscription.Context(gen(), unsub)
+
+  sub = Subscription(subscribe_stream)
+  stream = await sub.subscribe()
+
+  first = await stream.__aiter__().__anext__()
+  assert first == 1
+
+  # Simulate the consumer's own loop blocking inside step(), holding the lock
+  # on `anext()`, while something else concurrently calls unsubscribe().
+  step_task = asyncio.create_task(sub.step())
+  await asyncio.sleep(0)
+  unsub_task = asyncio.create_task(stream.unsubscribe())
+  await asyncio.sleep(0)
+
+  upstream_may_end.set()  # let anext() raise StopAsyncIteration, clearing ctx
+
+  await asyncio.wait_for(step_task, timeout=2)
+  await asyncio.wait_for(unsub_task, timeout=2)  # must not raise AttributeError
+  assert sub.ctx is None
+
+
+async def test_new_subscriber_ctx_survives_concurrent_teardown_by_departing_subscriber():
+  """A subscriber joining mid-teardown must not have its ctx torn down under it."""
+  upstream_may_continue = asyncio.Event()
+  unsub_calls = 0
+
+  async def subscribe_stream():
+    async def gen():
+      yield 1
+      await upstream_may_continue.wait()
+      yield 2
+
+    async def unsub():
+      nonlocal unsub_calls
+      unsub_calls += 1
+
+    return Subscription.Context(gen(), unsub)
+
+  sub = Subscription(subscribe_stream)
+  stream_a = await sub.subscribe()
+  assert (await stream_a.__aiter__().__anext__()) == 1
+
+  # A's loop calls step() for the next item and blocks on anext(), holding the lock.
+  step_task = asyncio.create_task(sub.step())
+  await asyncio.sleep(0)
+
+  # A unsubscribes (the only subscriber at this point) and blocks waiting for the lock.
+  unsub_task = asyncio.create_task(stream_a.unsubscribe())
+  await asyncio.sleep(0)
+
+  # Before A's teardown can run, B subscribes and also queues up on the same lock.
+  subscribe_task = asyncio.create_task(sub.subscribe())
+  await asyncio.sleep(0)
+
+  upstream_may_continue.set()  # let the in-flight anext() resolve
+
+  await asyncio.wait_for(step_task, timeout=2)
+  await asyncio.wait_for(unsub_task, timeout=2)
+  stream_b = await asyncio.wait_for(subscribe_task, timeout=2)
+
+  assert unsub_calls == 0, 'must not tear down the upstream ctx while B is still subscribed'
+  assert sub.ctx is not None
+  assert (await stream_b.__aiter__().__anext__()) == 2

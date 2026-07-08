@@ -5,11 +5,18 @@ from typing_extensions import (
 from dataclasses import dataclass, field
 import asyncio
 
+from .exc import NetworkError
+
 T = TypeVar('T')
 U = TypeVar('U')
 
 async def noop():
   ...
+
+@dataclass
+class _Failed:
+  """Sentinel put on subscriber queues when the upstream source dies unexpectedly."""
+  exc: Exception
 
 @dataclass
 class Stream(AsyncIterable[T], Generic[T]):
@@ -63,7 +70,7 @@ class Subscription(Generic[T]):
 
   lock: asyncio.Lock = field(init=False, default_factory=asyncio.Lock)
   ctx: Context[T] | None = field(init=False, default=None)
-  subscribers: list[asyncio.Queue[T]] = field(init=False, default_factory=list)
+  subscribers: list[asyncio.Queue[T | _Failed]] = field(init=False, default_factory=list)
 
   @classmethod
   def of(cls, subscribe: Callable[[], Awaitable[Stream[T]]]) -> 'Subscription[T]':
@@ -81,7 +88,18 @@ class Subscription(Generic[T]):
     async with self.lock:
       if self.ctx is None:
         self.ctx = await self.subscribe_stream()
-      T = await anext(self.ctx.iterator)
+      try:
+        T = await anext(self.ctx.iterator)
+      except StopAsyncIteration:
+        # The upstream source ended without us asking it to (e.g. a dropped
+        # connection). Unblock every subscriber instead of letting the raw
+        # `StopAsyncIteration` escape this async generator, which Python
+        # would otherwise turn into an opaque `RuntimeError`.
+        self.ctx = None
+        failed = _Failed(NetworkError('Upstream stream ended unexpectedly'))
+        for queue in self.subscribers:
+          queue.put_nowait(failed)
+        return
       for queue in self.subscribers:
         queue.put_nowait(T)
 
@@ -100,13 +118,18 @@ class Subscription(Generic[T]):
         if unsubscribed in done:
           break
         else:
-          yield await next(iter(done))
+          item = await next(iter(done))
+          if isinstance(item, _Failed):
+            raise item.exc
+          yield item
 
     async def unsubscribe():
+      if unsubscribed.done():
+        return
       unsubscribed.set_result(None)
       self.subscribers.remove(queue)
-      if not self.subscribers and self.ctx is not None:
-        async with self.lock:
+      async with self.lock:
+        if not self.subscribers and self.ctx is not None:
           await self.ctx.unsubscribe()
           self.ctx = None
           
