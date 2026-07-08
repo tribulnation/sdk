@@ -174,3 +174,46 @@ async def test_new_subscriber_ctx_survives_concurrent_teardown_by_departing_subs
   assert unsub_calls == 0, 'must not tear down the upstream ctx while B is still subscribed'
   assert sub.ctx is not None
   assert (await stream_b.__aiter__().__anext__()) == 2
+
+
+async def test_upstream_failure_releases_registry_so_resubscribe_does_not_collide():
+  """Regression for the dYdX 'Channel ... already subscribed' bug: an upstream
+  that dies unexpectedly must release its channel registration, not just its
+  own `ctx`, so a later `subscribe_stream()` call doesn't collide with a
+  registry entry nothing else would ever clean up.
+  """
+  channel = 'v4_parent_subaccounts:owner/0'
+  registry: set[str] = set()
+
+  def make_subscribe_stream(items: list[object]):
+    async def subscribe_stream():
+      if channel in registry:
+        raise ValueError(f'Channel {channel} already subscribed')
+      registry.add(channel)
+
+      async def gen():
+        for item in items:
+          yield item
+
+      async def unsubscribe():
+        registry.discard(channel)
+
+      return Subscription.Context(gen(), unsubscribe)
+    return subscribe_stream
+
+  sub = Subscription(make_subscribe_stream([1, 2]))
+
+  # First consumer (e.g. "hedger"): upstream ends unexpectedly mid-stream.
+  stream_a = await sub.subscribe()
+  with pytest.raises(NetworkError):
+    async for _ in stream_a:
+      pass
+
+  # The failure itself, not just an explicit unsubscribe, must have released
+  # the registry entry.
+  assert channel not in registry
+
+  # A later consumer (e.g. "maker" retrying) must be able to establish a
+  # fresh subscription instead of hitting "already subscribed".
+  stream_b = await sub.subscribe()
+  assert (await stream_b.__aiter__().__anext__()) == 1
