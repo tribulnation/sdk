@@ -1,6 +1,6 @@
 from typing_extensions import (
   AsyncIterable, AsyncIterator, Awaitable,
-  Generic, TypeVar, Callable, Any
+  Generic, TypeVar, Callable, Coroutine
 )
 from dataclasses import dataclass, field
 import asyncio
@@ -21,7 +21,7 @@ class _Failed:
 @dataclass
 class Stream(AsyncIterable[T], Generic[T]):
   stream: AsyncIterable[T]
-  unsubscribe: Callable[[], Awaitable] = noop
+  unsubscribe: Callable[[], Coroutine] = noop
 
   def __aiter__(self):
     return self.stream.__aiter__()
