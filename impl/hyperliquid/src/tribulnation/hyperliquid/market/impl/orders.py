@@ -77,14 +77,14 @@ async def place_order(self: SpotMarketMixin | PerpMarketMixin, order: Order, *, 
   if not statuses:
     raise ApiError({'error': 'empty status list', 'details': result})
 
-  s = statuses[0]
-  if (err := s.get('error')) is not None:
+  stat = statuses[0]
+  if (err := stat.get('error')) is not None:
     raise ApiError(err)
-  if (resting := s.get('resting')) is not None:
-    return OrderResponse(id=str(resting['oid']), details=s)
-  if (filled := s.get('filled')) is not None:
-    return OrderResponse(id=str(filled['oid']), details=s)
-  raise ApiError({'error': 'unknown order status', 'details': s})
+  if (resting := stat.get('resting')) is not None:
+    return OrderResponse(id=str(resting['oid']), details=stat)
+  if (filled := stat.get('filled')) is not None:
+    return OrderResponse(id=str(filled['oid']), details=stat)
+  raise ApiError({'error': 'unknown order status', 'details': stat})
 
 
 @wrap_exceptions
