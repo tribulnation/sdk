@@ -11,27 +11,31 @@ class ReportSDK:
   accounts: Mapping[str, Account]
   providers: ProvidersConfig = field(default_factory=ProvidersConfig)
 
-  def evm(self, account: Evm) -> Report:
+  def evm(self, account: Evm, id: str) -> Report:
     try:
       from tribulnation.ethereum.reporting import EthereumReport
     except ImportError as e:
       raise ImportError('ethereum sdk is not installed. Please install it with `pip install tribulnation-ethereum`.') from e
-    return EthereumReport.new(account.resolved_address, network=account.venue, providers=self.providers or None)
+    if (address := account.resolved_address) is None:
+      raise ValueError(f'Account {id} does not have a resolved address.')
+    return EthereumReport.new(address, network=account.venue, providers=self.providers or None)
 
-  def dydx(self, account: Dydx) -> Report:
+  def dydx(self, account: Dydx, id: str) -> Report:
     try:
       from tribulnation.dydx import Report as DydxReport
     except ImportError as e:
       raise ImportError('dydx sdk is not installed. Please install it with `pip install tribulnation-dydx`.') from e
-    return DydxReport.new(account.resolved_address, providers=self.providers or None)
+    if (address := account.resolved_address) is None:
+      raise ValueError(f'Account {id} does not have a resolved address.')
+    return DydxReport.new(address, providers=self.providers or None)
 
-  def binance(self, account: Binance) -> Report:
+  def binance(self, account: Binance, id: str) -> Report:
     raise NotImplementedError('binance reporting is not yet implemented.')
 
-  def bitget(self, account: Bitget) -> Report:
+  def bitget(self, account: Bitget, id: str) -> Report:
     raise NotImplementedError('bitget reporting is not yet implemented.')
 
-  def mexc(self, account: Mexc) -> Report:
+  def mexc(self, account: Mexc, id: str) -> Report:
     raise NotImplementedError('mexc reporting is not yet implemented.')
 
   def venue(self, id: str, /) -> Report:
@@ -39,15 +43,15 @@ class ReportSDK:
       raise ValueError(f'No account found for venue id: {id}')
     match account.venue:
       case 'ethereum' | 'arbitrum' | 'polygon' | 'bnb-chain' | 'base' | 'avalanche' | 'optimism':
-        return self.evm(account)
+        return self.evm(account, id)
       case 'dydx' | 'dydx_testnet':
-        return self.dydx(account)
+        return self.dydx(account, id)
       case 'binance':
-        return self.binance(account)
+        return self.binance(account, id)
       case 'bitget':
-        return self.bitget(account)
+        return self.bitget(account, id)
       case 'mexc':
-        return self.mexc(account)
+        return self.mexc(account, id)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 

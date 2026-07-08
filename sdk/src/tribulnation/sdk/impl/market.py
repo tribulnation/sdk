@@ -5,9 +5,9 @@ from tribulnation.sdk.market import TradingMarkets, TradingVenue
 from .accounts import Account, Dydx, Hyperliquid, Mexc
 
 DEFAULT_ACCOUNTS: Mapping[str, Account] = {
-  'dydx': Dydx(),
-  'hyperliquid': Hyperliquid(),
-  'mexc': Mexc()
+  'dydx': Dydx(public=True),
+  'hyperliquid': Hyperliquid(public=True),
+  'mexc': Mexc(public=True)
 }
 
 @dataclass(frozen=True)
