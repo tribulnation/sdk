@@ -64,7 +64,7 @@ async def trades_history(self: MarketMixin, start: datetime, end: datetime) -> A
     symbol=self.instrument,
     start_time=start,
     end_time=end,
-    recv_window=self.shared.recvWindow,
+    recv_window=self.shared.recv_window,
     validate=self.shared.validate,
   )
   yield [_parse_trade(t) for t in trades]
