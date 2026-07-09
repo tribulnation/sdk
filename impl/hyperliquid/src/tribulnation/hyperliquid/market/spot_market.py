@@ -1,9 +1,9 @@
-from typing_extensions import Sequence
+from typing_extensions import AsyncIterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 
-from tribulnation.sdk.core import Stream, PaginatedResponse, LogicError
+from tribulnation.sdk.core import PaginatedResponse, LogicError
 from tribulnation.sdk.market import (
   Market,
   Book,
@@ -50,8 +50,9 @@ class SpotMarket(SpotMarketMixin, Market):
   async def depth(self, *, levels: int | None = None) -> Book:
     return await depth(self)
 
-  async def depth_stream(self, *, levels: int | None = None) -> Stream[Book]:
-    return await depth_stream(self)
+  async def depth_stream(self, *, levels: int | None = None) -> AsyncIterable[Book]:
+    async for book in depth_stream(self):
+      yield book
 
   async def rules(self, *, refetch: bool = False) -> Rules:
     return await spot_rules(self, refetch=refetch)
@@ -59,8 +60,9 @@ class SpotMarket(SpotMarketMixin, Market):
   async def open_orders(self) -> Sequence[OrderState]:
     return await open_orders(self)
 
-  async def trades_stream(self) -> Stream[Trade]:
-    return await trades_stream(self)
+  async def trades_stream(self) -> AsyncIterable[Trade]:
+    async for trade in trades_stream(self):
+      yield trade
 
   async def position(self) -> Position:
     return await spot_position(self)

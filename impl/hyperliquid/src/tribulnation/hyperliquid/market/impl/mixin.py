@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 import asyncio
 import os
 
-from tribulnation.sdk.core import SDK, Stream, Subscription
+from tribulnation.sdk.core import SDK, Subscription
 
 from hyperliquid import Hyperliquid, Wallet
 from hyperliquid.info.spot.spot_meta import SpotMetaResponse, SpotAssetInfo, SpotTokenInfo
@@ -169,17 +169,17 @@ class Shared:
 
   def user_fills_sub(self) -> Subscription[WsUserFills]:
     if self.user_fills_subscription is None:
-      async def subscribe_user_fills() -> Stream[WsUserFills]:
+      async def subscribe_user_fills():
         stream = await self.client.streams.user_fills(self.address, aggregate_by_time=True)
-        return Stream(stream, stream.unsubscribe)
+        return stream, stream.unsubscribe
       self.user_fills_subscription = Subscription.of(subscribe_user_fills)
     return self.user_fills_subscription
 
   def l2_book_subscription(self, coin: str, /) -> Subscription[L2BookData]:
     if coin not in self.l2_book_subscriptions:
-      async def subscribe() -> Stream[L2BookData]:
+      async def subscribe():
         stream = await self.client.streams.l2_book(coin)
-        return Stream(stream, stream.unsubscribe)
+        return stream, stream.unsubscribe
       self.l2_book_subscriptions[coin] = Subscription.of(subscribe)
     return self.l2_book_subscriptions[coin]
 
@@ -257,11 +257,11 @@ class SharedMixin:
   async def __aexit__(self, exc_type, exc_value, traceback):
     await self.shared.__aexit__(exc_type, exc_value, traceback)
 
-  async def subscribe_user_fills(self) -> Stream[WsUserFills]:
-    return await self.shared.user_fills_sub().subscribe()
+  def subscribe_user_fills(self):
+    return self.shared.user_fills_sub().subscribe()
 
-  async def subscribe_l2_book(self, coin: str, /) -> Stream[L2BookData]:
-    return await self.shared.l2_book_subscription(coin).subscribe()
+  def subscribe_l2_book(self, coin: str, /):
+    return self.shared.l2_book_subscription(coin).subscribe()
 
 
 @dataclass(kw_only=True, frozen=True)

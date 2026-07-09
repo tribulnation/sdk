@@ -1,6 +1,6 @@
+from typing_extensions import AsyncIterable
 from decimal import Decimal
 
-from tribulnation.sdk.core import Stream
 from tribulnation.sdk.market import Book
 
 from tribulnation.hyperliquid.core import wrap_exceptions
@@ -20,10 +20,8 @@ async def depth(self: Mixin) -> Book:
   )
 
 
-async def depth_stream(self: Mixin) -> Stream[Book]:
-  l2 = await self.subscribe_l2_book(self.asset_name)
-
-  async def stream():
+async def depth_stream(self: Mixin) -> AsyncIterable[Book]:
+  async with self.subscribe_l2_book(self.asset_name) as l2:
     async for update in l2:
       raw_bids, raw_asks = update["levels"]
       # Hyperliquid `l2Book` is a snapshot-per-message feed.
@@ -39,6 +37,4 @@ async def depth_stream(self: Mixin) -> Stream[Book]:
         ),
       )
       yield book
-
-  return Stream(stream(), l2.unsubscribe)
 

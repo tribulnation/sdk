@@ -2,7 +2,6 @@ from typing_extensions import AsyncIterable, Sequence, Any
 from datetime import datetime
 from decimal import Decimal
 
-from tribulnation.sdk.core import Stream
 from tribulnation.sdk.market import Trade
 
 from tribulnation.hyperliquid.core import wrap_exceptions
@@ -15,10 +14,8 @@ def _parse_time(value: Any) -> datetime:
 
 
 @wrap_exceptions
-async def trades_stream(self: SpotMarketMixin | PerpMarketMixin) -> Stream[Trade]:
-  fills = await self.subscribe_user_fills()
-
-  async def stream():
+async def trades_stream(self: SpotMarketMixin | PerpMarketMixin) -> AsyncIterable[Trade]:
+  async with self.subscribe_user_fills() as fills:
     async for chunk in fills:
       # Both spot and perps subscriptions aggregate by time.
       if not chunk.get("isSnapshot"):
@@ -35,8 +32,6 @@ async def trades_stream(self: SpotMarketMixin | PerpMarketMixin) -> Stream[Trade
             fee=Trade.Fee(amount=Decimal(f["fee"]), asset=f["feeToken"]) if f.get("fee") is not None else None,
             details=f,
           )
-
-  return Stream(stream(), fills.unsubscribe)
 
 
 def trades_history(self: SpotMarketMixin | PerpMarketMixin, start: datetime, end: datetime) -> AsyncIterable[Sequence[Trade]]:
