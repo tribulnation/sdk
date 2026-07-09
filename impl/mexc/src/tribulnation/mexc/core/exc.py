@@ -25,11 +25,12 @@ def wrap_exceptions(fn):
       except core.Error as e:
         raise Error(*e.args) from e
       
-  elif inspect.isgeneratorfunction(fn):
+  elif inspect.isasyncgenfunction(fn):
     @wraps(fn)
     async def wrapper(*args, **kwargs): # type: ignore
       try:
-        return await fn(*args, **kwargs)
+        async for item in fn(*args, **kwargs):
+          yield item
       except httpx.HTTPError as e:
         raise NetworkError(*e.args) from e
       except core.NetworkError as e:

@@ -2,7 +2,6 @@ from typing_extensions import AsyncIterable, Sequence
 from datetime import datetime
 from decimal import Decimal
 
-from tribulnation.sdk.core import Stream
 from tribulnation.sdk.market import Trade
 
 from mexc.core import timestamp as ts
@@ -32,11 +31,8 @@ def _parse_trade(t: AccountTrade) -> Trade:
 
 
 @wrap_exceptions
-async def trades_stream(self: MarketMixin) -> Stream[Trade]:
-  s = await self.subscribe_my_trades()
-
-  @wrap_exceptions
-  async def gen():
+async def trades_stream(self: MarketMixin) -> AsyncIterable[Trade]:
+  async with self.subscribe_my_trades() as s:
     async for msg in s:
       # PrivateDealsV3Api corresponds to a single fill.
       if not isinstance(msg, PrivateDealsV3Api):
@@ -54,8 +50,6 @@ async def trades_stream(self: MarketMixin) -> Stream[Trade]:
         fee=Trade.Fee(asset=msg.fee_currency, amount=Decimal(msg.fee_amount)),
         details=msg,
       )
-
-  return Stream(gen(), s.unsubscribe)
 
 
 @wrap_exceptions

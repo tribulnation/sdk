@@ -1,8 +1,8 @@
-from typing_extensions import Literal, TypedDict
+from typing_extensions import TypedDict
 from dataclasses import dataclass, field
 import asyncio
 
-from tribulnation.sdk.core import SDK, Stream, Subscription
+from tribulnation.sdk.core import SDK, Subscription
 
 from mexc import MEXC
 from mexc.spot.market.exchange_info import SymbolInfo
@@ -76,18 +76,18 @@ class Shared:
   def depth_subscription(self, symbol: str):
     if symbol not in self.depth_subscriptions:
       @wrap_exceptions
-      async def subscribe() -> Stream[PublicAggreDepthsV3Api]:
+      async def subscribe():
         stream = await self.client.spot.streams.market.depth_updates(symbol, aggregation='10ms')
-        return Stream(stream.stream, stream.unsubscribe)
+        return stream.stream, stream.unsubscribe
       self.depth_subscriptions[symbol] = Subscription.of(subscribe)
     return self.depth_subscriptions[symbol]
 
   def my_trades_sub(self) -> Subscription[PrivateDealsV3Api]:
     if self.my_trades_subscription is None:
       @wrap_exceptions
-      async def subscribe() -> Stream[PrivateDealsV3Api]:
+      async def subscribe():
         stream = await self.client.spot.streams.user.trades()
-        return Stream(stream.stream, stream.unsubscribe)
+        return stream.stream, stream.unsubscribe
       self.my_trades_subscription = Subscription.of(subscribe)
     return self.my_trades_subscription
 
@@ -133,8 +133,8 @@ class MarketMixin(SDK, ExchangeMixin):
       raise ValueError('MEXC spot market metadata is missing symbol')
     return symbol
 
-  async def subscribe_depth(self) -> Stream[PublicAggreDepthsV3Api]:
-    return await self.shared.depth_subscription(self.instrument).subscribe()
+  def subscribe_depth(self):
+    return self.shared.depth_subscription(self.instrument).subscribe()
 
-  async def subscribe_my_trades(self) -> Stream[PrivateDealsV3Api]:
-    return await self.shared.my_trades_sub().subscribe()
+  def subscribe_my_trades(self):
+    return self.shared.my_trades_sub().subscribe()

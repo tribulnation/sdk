@@ -1,9 +1,9 @@
+from typing_extensions import AsyncIterable
 from dataclasses import dataclass
 from decimal import Decimal
 import asyncio
 from contextlib import suppress
 
-from tribulnation.sdk.core import Stream
 from tribulnation.sdk.market import Book
 from tribulnation.mexc.core.exc import wrap_exceptions
 from mexc.spot.market.depth import OrderBook
@@ -108,28 +108,15 @@ async def synchronized_book(
 
 
 @wrap_exceptions
-async def depth_stream(self: MarketMixin, *, levels: int | None = None) -> Stream[Book]:
-  stream = await self.subscribe_depth()
-  queue: asyncio.Queue[DepthUpdate] = asyncio.Queue()
-  closed = False
+async def depth_stream(self: MarketMixin, *, levels: int | None = None) -> AsyncIterable[Book]:
+  async with self.subscribe_depth() as stream:
+    queue: asyncio.Queue[DepthUpdate] = asyncio.Queue()
 
-  async def collect() -> None:
-    async for msg in stream:
-      await queue.put(parse_update(msg))
+    async def collect() -> None:
+      async for msg in stream:
+        await queue.put(parse_update(msg))
 
-  collector = asyncio.create_task(collect())
-
-  async def unsubscribe() -> None:
-    nonlocal closed
-    if closed:
-      return
-    closed = True
-    collector.cancel()
-    with suppress(asyncio.CancelledError):
-      await collector
-    await stream.unsubscribe()
-
-  async def gen():
+    collector = asyncio.create_task(collect())
     try:
       while True:
         version, book = await synchronized_book(self, queue, collector, levels=levels)
@@ -145,6 +132,6 @@ async def depth_stream(self: MarketMixin, *, levels: int | None = None) -> Strea
           version = update.to_version
           yield book.copy()
     finally:
-      await unsubscribe()
-
-  return Stream(gen(), unsubscribe)
+      collector.cancel()
+      with suppress(asyncio.CancelledError):
+        await collector
