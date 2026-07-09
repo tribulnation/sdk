@@ -52,10 +52,11 @@ class Exchange(SDK):
     return await market.depth(levels=levels)
 
   @SDK.method
-  async def depth_stream(self, market_id: str, /, *, levels: int | None = None):
+  async def depth_stream(self, market_id: str, /, *, levels: int | None = None) -> AsyncIterable[Book]:
     """Subscribe to the market order book."""
     market = await self.market(market_id)
-    return await market.depth_stream(levels=levels)
+    async for book in market.depth_stream(levels=levels):
+      yield book
   
   @SDK.method
   async def rules(self, market_id: str, /, *, refetch: bool = False) -> Rules:
@@ -87,10 +88,11 @@ class Exchange(SDK):
       yield page
 
   @SDK.method
-  async def trades_stream(self, market_id: str, /):
+  async def trades_stream(self, market_id: str, /) -> AsyncIterable[Trade]:
     """Subscribe to your real-time trades."""
     market = await self.market(market_id)
-    return await market.trades_stream()
+    async for trade in market.trades_stream():
+      yield trade
 
   @SDK.method
   async def position(self, market_id: str, /) -> Position:

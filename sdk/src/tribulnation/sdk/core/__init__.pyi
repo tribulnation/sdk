@@ -7,7 +7,7 @@ from .invocations import (
   Context, Middleware,
   SDK, log, retry,
 )
-from .stream import Stream, Subscription
+from .stream import Subscription
 from .paging import PaginatedResponse
 
 __all__ = [
@@ -16,6 +16,6 @@ __all__ = [
   'LogicError',
   'Context', 'Middleware',
   'SDK', 'log', 'retry',
-  'Stream', 'Subscription',
+  'Subscription',
   'PaginatedResponse',
 ]

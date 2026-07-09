@@ -4,7 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 import asyncio
 
-from tribulnation.sdk.core import SDK, Stream, PaginatedResponse
+from tribulnation.sdk.core import SDK, PaginatedResponse
 from .types import (
   Book,
   FundingRate, FundingPayment,
@@ -48,9 +48,10 @@ class Market(SDK):
     """Fetch the market order book."""
   
   @SDK.method
-  async def depth_stream(self, *, levels: int | None = None) -> Stream[Book]:
+  async def depth_stream(self, *, levels: int | None = None) -> AsyncIterable[Book]:
     """Subscribe to the market order book."""
-    return Stream.polled(lambda: self.depth(levels=levels))
+    while True:
+      yield await self.depth(levels=levels)
 
   @SDK.method
   @abstractmethod
@@ -80,8 +81,10 @@ class Market(SDK):
 
   @SDK.method
   @abstractmethod
-  async def trades_stream(self) -> Stream[Trade]:
+  async def trades_stream(self) -> AsyncIterable[Trade]:
     """Subscribe to your real-time trades."""
+    if False:
+      yield
 
   @SDK.method
   @abstractmethod

@@ -1,7 +1,8 @@
 from typing_extensions import (
   AsyncIterable, AsyncIterator, Awaitable,
-  Generic, TypeVar, Callable, Coroutine
+  Generic, TypeVar, Callable
 )
+from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 import asyncio
 
@@ -10,50 +11,21 @@ from .exc import NetworkError
 T = TypeVar('T')
 U = TypeVar('U')
 
-async def noop():
-  ...
-
 @dataclass
 class _Failed:
   """Sentinel put on subscriber queues when the upstream source dies unexpectedly."""
   exc: Exception
 
 @dataclass
-class Stream(AsyncIterable[T], Generic[T]):
-  stream: AsyncIterable[T]
-  unsubscribe: Callable[[], Coroutine] = noop
-
-  def __aiter__(self):
-    return self.stream.__aiter__()
-
-  @classmethod
-  def polled(cls, next: Callable[[], Awaitable[T]]) -> 'Stream[T]':
-    stopped = False
-
-    async def stream():
-      nonlocal stopped
-      while not stopped:
-        yield await next()
-
-    async def unsubscribe():
-      nonlocal stopped
-      stopped = True
-
-    return cls(stream(), unsubscribe)
-
-
-
-@dataclass
 class Subscription(Generic[T]):
   """Fan out a stream to multiple subscribers.
-  
+
   Subscribers usage:
 
   ```python
-  stream = await stream_fan_out.subscribe()
-  async for msg in stream:
-    ...
-  await stream.unsubscribe()
+  async with stream_fan_out.subscribe() as stream:
+    async for msg in stream:
+      ...
   ```
 
   Internally:
@@ -73,10 +45,13 @@ class Subscription(Generic[T]):
   subscribers: list[asyncio.Queue[T | _Failed]] = field(init=False, default_factory=list)
 
   @classmethod
-  def of(cls, subscribe: Callable[[], Awaitable[Stream[T]]]) -> 'Subscription[T]':
+  def of(
+    cls, subscribe: Callable[[], Awaitable[tuple[AsyncIterable[T], Callable[[], Awaitable]]]]
+  ) -> 'Subscription[T]':
+    """Build a `Subscription` from a callback returning `(iterable, unsubscribe)`."""
     async def subscribe_stream():
-      stream = await subscribe()
-      return cls.Context(aiter(stream.stream), stream.unsubscribe)
+      iterable, unsubscribe = await subscribe()
+      return cls.Context(aiter(iterable), unsubscribe)
     return cls(subscribe_stream)
 
   async def start(self):
@@ -111,34 +86,31 @@ class Subscription(Generic[T]):
       for queue in self.subscribers:
         queue.put_nowait(T)
 
-  async def subscribe(self) -> Stream[T]:
-    queue = asyncio.Queue()
+  @asynccontextmanager
+  async def subscribe(self) -> AsyncIterator[AsyncIterable[T]]:
+    queue: asyncio.Queue[T | _Failed] = asyncio.Queue()
     self.subscribers.append(queue)
     await self.start()
-
-    unsubscribed = asyncio.Future()
 
     async def stream() -> AsyncIterable[T]:
       while True:
         if queue.empty():
           await self.step()
-        done, _ = await asyncio.wait([unsubscribed, asyncio.create_task(queue.get())], return_when='FIRST_COMPLETED')
-        if unsubscribed in done:
-          break
-        else:
-          item = await next(iter(done))
-          if isinstance(item, _Failed):
-            raise item.exc
-          yield item
+        item = await queue.get()
+        if isinstance(item, _Failed):
+          raise item.exc
+        yield item
 
-    async def unsubscribe():
-      if unsubscribed.done():
-        return
-      unsubscribed.set_result(None)
+    try:
+      yield stream()
+    finally:
+      # Cancellation here can only land between these two statements or
+      # inside `await self.ctx.unsubscribe()` -- both are fine to interrupt:
+      # worst case a later subscriber's `step()` finds `self.subscribers`
+      # non-empty (this one never got removed) and just keeps fanning out to
+      # a queue nobody drains anymore, which is harmless.
       self.subscribers.remove(queue)
       async with self.lock:
         if not self.subscribers and self.ctx is not None:
           await self.ctx.unsubscribe()
           self.ctx = None
-          
-    return Stream(stream(), unsubscribe)
