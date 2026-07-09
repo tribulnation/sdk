@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from tribulnation.sdk.market import Trade
-from tribulnation.sdk.core import Stream, PaginatedResponse
+from tribulnation.sdk.core import PaginatedResponse
 
 from tribulnation.dydx.core import wrap_exceptions
 from .mixin import MarketMixin
@@ -50,11 +50,8 @@ async def trades_history(self: MarketMixin, start: datetime, end: datetime) -> A
 
 
 @wrap_exceptions
-async def trades_stream(self: MarketMixin) -> Stream[Trade]:
-  parent_subaccounts = await self.subscribe_parent_subaccount(self.shared.parent_subaccount)
-
-  @wrap_exceptions
-  async def stream():
+async def trades_stream(self: MarketMixin) -> AsyncIterable[Trade]:
+  async with self.subscribe_parent_subaccount(self.shared.parent_subaccount) as parent_subaccounts:
     async for log in parent_subaccounts:
       fills = log.get('fills')
       if fills is None:
@@ -72,5 +69,3 @@ async def trades_stream(self: MarketMixin) -> Stream[Trade]:
           fee=None,
           details=fill,
         )
-
-  return Stream(stream(), parent_subaccounts.unsubscribe)

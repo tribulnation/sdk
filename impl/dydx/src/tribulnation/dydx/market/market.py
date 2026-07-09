@@ -1,10 +1,10 @@
-from typing_extensions import Any, Sequence
+from typing_extensions import Any, AsyncIterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 import asyncio
 
-from tribulnation.sdk.core import Stream, PaginatedResponse, ApiError
+from tribulnation.sdk.core import PaginatedResponse, ApiError
 from tribulnation.sdk.market import (
   Book,
   FundingPayment,
@@ -56,8 +56,10 @@ class Market(MarketMixin, PerpMarket):
     book = await self.indexer.data.get_order_book(self.market)
     return parse_book(book)
 
-  async def depth_stream(self, *, levels: int | None = None) -> Stream[Book]:
-    return await self.subscribe_depth(self.market)
+  async def depth_stream(self, *, levels: int | None = None) -> AsyncIterable[Book]:
+    async with self.subscribe_depth(self.market) as stream:
+      async for book in stream:
+        yield book
     
   async def rules(self, *, refetch: bool = False) -> Rules:
     return await self.shared.rules(self.market, refetch=refetch)
@@ -68,8 +70,9 @@ class Market(MarketMixin, PerpMarket):
   async def open_orders(self) -> Sequence[OrderState]:
     return await open_orders(self)
 
-  async def trades_stream(self) -> Stream[Trade]:
-    return await trades_stream(self)
+  async def trades_stream(self) -> AsyncIterable[Trade]:
+    async for trade in trades_stream(self):
+      yield trade
 
   @wrap_exceptions
   async def perp_position(self) -> PerpPosition:

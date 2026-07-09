@@ -1,6 +1,6 @@
+from typing_extensions import AsyncIterable, Awaitable, Callable
 from decimal import Decimal
 
-from tribulnation.sdk.core import Stream
 from tribulnation.sdk.market import Book
 
 from tribulnation.dydx.core import wrap_exceptions
@@ -21,11 +21,11 @@ def parse_book(book: OrderBook) -> Book:
   )
 
 @wrap_exceptions
-async def depth_stream(indexer: Indexer, market: str) -> Stream[Book]:
+async def depth_stream(indexer: Indexer, market: str) -> tuple[AsyncIterable[Book], Callable[[], Awaitable]]:
   stream = await indexer.streams.orders(id=market)
   book = parse_book(stream.reply)
   async def parsed_stream():
     async for msg in stream:
       book.update(parse_update(msg))
       yield book
-  return Stream(parsed_stream(), stream.unsubscribe)
+  return parsed_stream(), stream.unsubscribe
