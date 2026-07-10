@@ -2,7 +2,7 @@ from typing_extensions import (
   AsyncIterable, AsyncIterator, Awaitable,
   Generic, TypeVar, Callable
 )
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 from dataclasses import dataclass, field
 import asyncio
 
@@ -20,18 +20,16 @@ class _Failed:
 class Subscription(Generic[T]):
   """Fan out a stream to multiple subscribers.
 
-  Subscribers usage:
-
   ```python
   async with stream_fan_out.subscribe() as stream:
     async for msg in stream:
       ...
   ```
 
-  Internally:
-  1. First subscriber triggers actual subscription to the source stream.
-  2. Subsequent subscribers listen to the already-subscribed stream.
-  3. When all subscribers are unsubscribed, the source stream is unsubscribed.
+  A dedicated pump task, owned by the `Subscription` rather than any one
+  subscriber, reads the upstream once and pushes to every subscriber's
+  queue. It starts with the first subscriber and stops with the last, so no
+  individual subscriber's cancellation can interrupt another's read.
   """
   @dataclass
   class Context(Generic[U]):
@@ -42,6 +40,7 @@ class Subscription(Generic[T]):
 
   lock: asyncio.Lock = field(init=False, default_factory=asyncio.Lock)
   ctx: Context[T] | None = field(init=False, default=None)
+  pump: 'asyncio.Task[None] | None' = field(init=False, default=None)
   subscribers: list[asyncio.Queue[T | _Failed]] = field(init=False, default_factory=list)
 
   @classmethod
@@ -56,35 +55,33 @@ class Subscription(Generic[T]):
 
   async def start(self):
     async with self.lock:
-      if self.ctx is None:
+      if self.pump is None or self.pump.done():
         self.ctx = await self.subscribe_stream()
+        self.pump = asyncio.create_task(self._pump(self.ctx))
 
-  async def step(self):
-    async with self.lock:
-      if self.ctx is None:
-        self.ctx = await self.subscribe_stream()
-      try:
-        T = await anext(self.ctx.iterator)
-      except StopAsyncIteration:
-        # The upstream source ended without us asking it to (e.g. a dropped
-        # connection). Unblock every subscriber instead of letting the raw
-        # `StopAsyncIteration` escape this async generator, which Python
-        # would otherwise turn into an opaque `RuntimeError`.
-        dead_ctx = self.ctx
-        self.ctx = None
-        try:
-          # Best-effort: release the underlying channel/registry entry so a
-          # later resubscribe doesn't fail against state nothing else will
-          # clean up. Must not stop us from notifying subscribers below.
-          await dead_ctx.unsubscribe()
-        except Exception:
-          ...
-        failed = _Failed(NetworkError('Upstream stream ended unexpectedly'))
+  async def _pump(self, ctx: 'Subscription.Context[T]'):
+    """Read `ctx.iterator` and fan out items to every subscriber.
+
+    Runs as its own task, independent of any subscriber's lifecycle, so a
+    subscriber's cancellation can never propagate into `ctx.iterator` and
+    take the shared upstream down for everyone else. `start()`/`subscribe()`
+    own `ctx`/`pump` entirely (via `Task.done()`) -- this only reads and
+    notifies.
+    """
+    try:
+      async for item in ctx.iterator:
         for queue in self.subscribers:
-          queue.put_nowait(failed)
-        return
-      for queue in self.subscribers:
-        queue.put_nowait(T)
+          queue.put_nowait(item)
+      # Ended on its own (e.g. a dropped connection) rather than being
+      # cancelled below -- report it instead of leaking a bare
+      # `StopAsyncIteration` as an opaque `RuntimeError`.
+      exc: Exception = NetworkError('Upstream stream ended unexpectedly')
+    except asyncio.CancelledError:
+      return
+    except Exception as e:
+      exc = e
+    for queue in self.subscribers:
+      queue.put_nowait(_Failed(exc))
 
   @asynccontextmanager
   async def subscribe(self) -> AsyncIterator[AsyncIterable[T]]:
@@ -94,8 +91,6 @@ class Subscription(Generic[T]):
 
     async def stream() -> AsyncIterable[T]:
       while True:
-        if queue.empty():
-          await self.step()
         item = await queue.get()
         if isinstance(item, _Failed):
           raise item.exc
@@ -104,13 +99,14 @@ class Subscription(Generic[T]):
     try:
       yield stream()
     finally:
-      # Cancellation here can only land between these two statements or
-      # inside `await self.ctx.unsubscribe()` -- both are fine to interrupt:
-      # worst case a later subscriber's `step()` finds `self.subscribers`
-      # non-empty (this one never got removed) and just keeps fanning out to
-      # a queue nobody drains anymore, which is harmless.
       self.subscribers.remove(queue)
       async with self.lock:
-        if not self.subscribers and self.ctx is not None:
-          await self.ctx.unsubscribe()
-          self.ctx = None
+        if self.subscribers or self.pump is None or self.ctx is None:
+          return
+        pump, ctx = self.pump, self.ctx
+        self.pump = self.ctx = None
+      pump.cancel()
+      with suppress(asyncio.CancelledError):
+        await pump
+      with suppress(Exception):
+        await ctx.unsubscribe()
