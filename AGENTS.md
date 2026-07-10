@@ -5,14 +5,7 @@
 - `sdk`: abstract SDK interface
 - `impl`: exchange-specific implementations
 
-## Guidelines
+## Actions
 
-### Coding Style
-
-1. Never use `from __future__ import annotations`
-2. Use double quotes for docstrings and single quotes for normal strings, e.g.:
-   ```python
-   def function(lit: Literal['a', 'b'] = 'a'):
-      """This is a docstring"""
-      return f'{lit}\n'
-3. Never add `__all__ = [...]` to `__init__.py` files.
+1. Bump and publish SDK: `cd sdk/ && just republish`
+2. Bump and publish implementation, e.g. `bitget`: `cd impl/bitget/ && just republish`
