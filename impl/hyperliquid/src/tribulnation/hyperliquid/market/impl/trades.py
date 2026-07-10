@@ -1,4 +1,5 @@
 from typing_extensions import AsyncIterable, Sequence, Any
+from contextlib import asynccontextmanager
 from datetime import datetime
 from decimal import Decimal
 
@@ -13,25 +14,29 @@ def _parse_time(value: Any) -> datetime:
   return ts.parse(value).astimezone()
 
 
+@asynccontextmanager
 @wrap_exceptions
-async def trades_stream(self: SpotMarketMixin | PerpMarketMixin) -> AsyncIterable[Trade]:
+async def trades_stream(self: SpotMarketMixin | PerpMarketMixin):
   async with self.subscribe_user_fills() as fills:
-    async for chunk in fills:
-      # Both spot and perps subscriptions aggregate by time.
-      if not chunk.get("isSnapshot"):
-        for f in (chunk.get("fills") or []):
-          if f.get("coin") != self.asset_name:
-            continue
-          sign = 1 if f["side"] == "B" else -1
-          yield Trade(
-            id=str(f.get("tid")),
-            price=Decimal(f["px"]),
-            qty=Decimal(f["sz"]) * sign,
-            time=_parse_time(f["time"]),
-            maker=not f.get("crossed", False),
-            fee=Trade.Fee(amount=Decimal(f["fee"]), asset=f["feeToken"]) if f.get("fee") is not None else None,
-            details=f,
-          )
+    @wrap_exceptions
+    async def gen() -> AsyncIterable[Trade]:
+      async for chunk in fills:
+        # Both spot and perps subscriptions aggregate by time.
+        if not chunk.get("isSnapshot"):
+          for f in (chunk.get("fills") or []):
+            if f.get("coin") != self.asset_name:
+              continue
+            sign = 1 if f["side"] == "B" else -1
+            yield Trade(
+              id=str(f.get("tid")),
+              price=Decimal(f["px"]),
+              qty=Decimal(f["sz"]) * sign,
+              time=_parse_time(f["time"]),
+              maker=not f.get("crossed", False),
+              fee=Trade.Fee(amount=Decimal(f["fee"]), asset=f["feeToken"]) if f.get("fee") is not None else None,
+              details=f,
+            )
+    yield gen()
 
 
 def trades_history(self: SpotMarketMixin | PerpMarketMixin, start: datetime, end: datetime) -> AsyncIterable[Sequence[Trade]]:

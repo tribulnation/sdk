@@ -34,7 +34,8 @@ async def collect(stream):
 async def test_upstream_exhaustion_raises_network_error_not_stop_async_iteration():
   """Consuming a stream whose upstream ends must not leak a raw StopAsyncIteration/RuntimeError."""
   sub = Subscription(make_ctx_factory([1, 2]))
-  stream = await sub.subscribe()
+  cm = sub.subscribe()
+  stream = await cm.__aenter__()
 
   items = []
   with pytest.raises(NetworkError):
@@ -43,14 +44,14 @@ async def test_upstream_exhaustion_raises_network_error_not_stop_async_iteration
   assert items == [1, 2]
 
   # Cleanup must be safe even though the upstream already ended internally.
-  await stream.unsubscribe()
+  await cm.__aexit__(None, None, None)
 
 
 async def test_multiple_subscribers_all_unblocked_on_upstream_end():
   """If the shared upstream ends, every subscriber must see it, none should hang."""
   sub = Subscription(make_ctx_factory([1, 2]))
-  stream_a = await sub.subscribe()
-  stream_b = await sub.subscribe()
+  stream_a = await sub.subscribe().__aenter__()
+  stream_b = await sub.subscribe().__aenter__()
 
   async def collect_expecting_failure(stream):
     items = []
@@ -76,12 +77,13 @@ async def test_unsubscribe_is_idempotent_and_calls_upstream_unsubscribe_once():
     unsubscribe_calls += 1
 
   sub = Subscription(make_ctx_factory([1, 2, 3], on_unsubscribe=on_unsubscribe))
-  stream = await sub.subscribe()
+  cm = sub.subscribe()
+  stream = await cm.__aenter__()
   async for _ in stream:
     break
 
-  await stream.unsubscribe()
-  await stream.unsubscribe()  # must not raise
+  await cm.__aexit__(None, None, None)
+  await cm.__aexit__(None, None, None)  # must not raise
 
   assert unsubscribe_calls == 1
 
@@ -89,14 +91,15 @@ async def test_unsubscribe_is_idempotent_and_calls_upstream_unsubscribe_once():
 async def test_unsubscribe_after_upstream_end_does_not_raise():
   """Cleanup after an upstream failure must not try to unsubscribe an already-dead context."""
   sub = Subscription(make_ctx_factory([1]))
-  stream = await sub.subscribe()
+  cm = sub.subscribe()
+  stream = await cm.__aenter__()
 
   with pytest.raises(NetworkError):
     async for _ in stream:
       pass
 
-  await stream.unsubscribe()
-  await stream.unsubscribe()
+  await cm.__aexit__(None, None, None)
+  await cm.__aexit__(None, None, None)
 
 
 async def test_unsubscribe_racing_with_upstream_failure_does_not_raise_attribute_error():
@@ -113,7 +116,8 @@ async def test_unsubscribe_racing_with_upstream_failure_does_not_raise_attribute
     return Subscription.Context(gen(), unsub)
 
   sub = Subscription(subscribe_stream)
-  stream = await sub.subscribe()
+  cm = sub.subscribe()
+  stream = await cm.__aenter__()
 
   first = await stream.__aiter__().__anext__()
   assert first == 1
@@ -122,7 +126,7 @@ async def test_unsubscribe_racing_with_upstream_failure_does_not_raise_attribute
   # on `anext()`, while something else concurrently calls unsubscribe().
   step_task = asyncio.create_task(sub.step())
   await asyncio.sleep(0)
-  unsub_task = asyncio.create_task(stream.unsubscribe())
+  unsub_task = asyncio.create_task(cm.__aexit__(None, None, None))
   await asyncio.sleep(0)
 
   upstream_may_end.set()  # let anext() raise StopAsyncIteration, clearing ctx
@@ -150,7 +154,8 @@ async def test_new_subscriber_ctx_survives_concurrent_teardown_by_departing_subs
     return Subscription.Context(gen(), unsub)
 
   sub = Subscription(subscribe_stream)
-  stream_a = await sub.subscribe()
+  cm_a = sub.subscribe()
+  stream_a = await cm_a.__aenter__()
   assert (await stream_a.__aiter__().__anext__()) == 1
 
   # A's loop calls step() for the next item and blocks on anext(), holding the lock.
@@ -158,11 +163,12 @@ async def test_new_subscriber_ctx_survives_concurrent_teardown_by_departing_subs
   await asyncio.sleep(0)
 
   # A unsubscribes (the only subscriber at this point) and blocks waiting for the lock.
-  unsub_task = asyncio.create_task(stream_a.unsubscribe())
+  unsub_task = asyncio.create_task(cm_a.__aexit__(None, None, None))
   await asyncio.sleep(0)
 
   # Before A's teardown can run, B subscribes and also queues up on the same lock.
-  subscribe_task = asyncio.create_task(sub.subscribe())
+  cm_b = sub.subscribe()
+  subscribe_task = asyncio.create_task(cm_b.__aenter__())
   await asyncio.sleep(0)
 
   upstream_may_continue.set()  # let the in-flight anext() resolve
@@ -204,7 +210,7 @@ async def test_upstream_failure_releases_registry_so_resubscribe_does_not_collid
   sub = Subscription(make_subscribe_stream([1, 2]))
 
   # First consumer (e.g. "hedger"): upstream ends unexpectedly mid-stream.
-  stream_a = await sub.subscribe()
+  stream_a = await sub.subscribe().__aenter__()
   with pytest.raises(NetworkError):
     async for _ in stream_a:
       pass
@@ -215,5 +221,5 @@ async def test_upstream_failure_releases_registry_so_resubscribe_does_not_collid
 
   # A later consumer (e.g. "maker" retrying) must be able to establish a
   # fresh subscription instead of hitting "already subscribed".
-  stream_b = await sub.subscribe()
+  stream_b = await sub.subscribe().__aenter__()
   assert (await stream_b.__aiter__().__anext__()) == 1

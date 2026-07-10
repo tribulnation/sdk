@@ -1,5 +1,6 @@
-from typing_extensions import Any, AsyncIterable, Sequence
+from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
 from abc import abstractmethod
+from contextlib import asynccontextmanager
 from datetime import datetime
 
 from tribulnation.sdk.core import SDK, PaginatedResponse
@@ -52,11 +53,15 @@ class Exchange(SDK):
     return await market.depth(levels=levels)
 
   @SDK.method
-  async def depth_stream(self, market_id: str, /, *, levels: int | None = None) -> AsyncIterable[Book]:
+  def depth_stream(self, market_id: str, /, *, levels: int | None = None) -> AsyncContextManager[AsyncIterable[Book]]:
     """Subscribe to the market order book."""
+    return self._depth_stream_impl(market_id, levels=levels)
+
+  @asynccontextmanager
+  async def _depth_stream_impl(self, market_id: str, /, *, levels: int | None = None):
     market = await self.market(market_id)
-    async for book in market.depth_stream(levels=levels):
-      yield book
+    async with market.depth_stream(levels=levels) as stream:
+      yield stream
   
   @SDK.method
   async def rules(self, market_id: str, /, *, refetch: bool = False) -> Rules:
@@ -88,11 +93,15 @@ class Exchange(SDK):
       yield page
 
   @SDK.method
-  async def trades_stream(self, market_id: str, /) -> AsyncIterable[Trade]:
+  def trades_stream(self, market_id: str, /) -> AsyncContextManager[AsyncIterable[Trade]]:
     """Subscribe to your real-time trades."""
+    return self._trades_stream_impl(market_id)
+
+  @asynccontextmanager
+  async def _trades_stream_impl(self, market_id: str, /):
     market = await self.market(market_id)
-    async for trade in market.trades_stream():
-      yield trade
+    async with market.trades_stream() as stream:
+      yield stream
 
   @SDK.method
   async def position(self, market_id: str, /) -> Position:

@@ -1,4 +1,5 @@
 from typing_extensions import AsyncIterable
+from contextlib import asynccontextmanager
 from decimal import Decimal
 
 from tribulnation.sdk.market import Book
@@ -20,21 +21,24 @@ async def depth(self: Mixin) -> Book:
   )
 
 
-async def depth_stream(self: Mixin) -> AsyncIterable[Book]:
+@asynccontextmanager
+async def depth_stream(self: Mixin):
   async with self.subscribe_l2_book(self.asset_name) as l2:
-    async for update in l2:
-      raw_bids, raw_asks = update["levels"]
-      # Hyperliquid `l2Book` is a snapshot-per-message feed.
-      book = Book(
-        bids=sorted(
-          [Book.Entry(price=Decimal(b["px"]), qty=Decimal(b["sz"])) for b in raw_bids],
-          key=lambda e: e.price,
-          reverse=True,
-        ),
-        asks=sorted(
-          [Book.Entry(price=Decimal(a["px"]), qty=Decimal(a["sz"])) for a in raw_asks],
-          key=lambda e: e.price,
-        ),
-      )
-      yield book
+    async def gen() -> AsyncIterable[Book]:
+      async for update in l2:
+        raw_bids, raw_asks = update["levels"]
+        # Hyperliquid `l2Book` is a snapshot-per-message feed.
+        book = Book(
+          bids=sorted(
+            [Book.Entry(price=Decimal(b["px"]), qty=Decimal(b["sz"])) for b in raw_bids],
+            key=lambda e: e.price,
+            reverse=True,
+          ),
+          asks=sorted(
+            [Book.Entry(price=Decimal(a["px"]), qty=Decimal(a["sz"])) for a in raw_asks],
+            key=lambda e: e.price,
+          ),
+        )
+        yield book
+    yield gen()
 

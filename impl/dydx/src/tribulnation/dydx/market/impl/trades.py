@@ -1,4 +1,5 @@
 from typing_extensions import AsyncIterable, Sequence
+from contextlib import asynccontextmanager
 from datetime import datetime
 from decimal import Decimal
 
@@ -49,23 +50,27 @@ async def trades_history(self: MarketMixin, start: datetime, end: datetime) -> A
         yield trades
 
 
+@asynccontextmanager
 @wrap_exceptions
-async def trades_stream(self: MarketMixin) -> AsyncIterable[Trade]:
+async def trades_stream(self: MarketMixin):
   async with self.subscribe_parent_subaccount(self.shared.parent_subaccount) as parent_subaccounts:
-    async for log in parent_subaccounts:
-      fills = log.get('fills')
-      if fills is None:
-        continue
-      for fill in fills:
-        if fill['ticker'] != self.market:
+    @wrap_exceptions
+    async def gen() -> AsyncIterable[Trade]:
+      async for log in parent_subaccounts:
+        fills = log.get('fills')
+        if fills is None:
           continue
-        sign = 1 if fill['side'] == 'BUY' else -1
-        yield Trade(
-          id=fill['id'],
-          price=Decimal(fill['price']),
-          qty=Decimal(fill['size']) * sign,
-          time=fill['createdAt'],
-          maker=fill['liquidity'] == 'MAKER',
-          fee=None,
-          details=fill,
-        )
+        for fill in fills:
+          if fill['ticker'] != self.market:
+            continue
+          sign = 1 if fill['side'] == 'BUY' else -1
+          yield Trade(
+            id=fill['id'],
+            price=Decimal(fill['price']),
+            qty=Decimal(fill['size']) * sign,
+            time=fill['createdAt'],
+            maker=fill['liquidity'] == 'MAKER',
+            fee=None,
+            details=fill,
+          )
+    yield gen()

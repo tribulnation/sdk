@@ -1,4 +1,5 @@
-from typing_extensions import Any, AsyncIterable, Sequence
+from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
@@ -56,11 +57,14 @@ class Market(MarketMixin, PerpMarket):
     book = await self.indexer.data.get_order_book(self.market)
     return parse_book(book)
 
-  async def depth_stream(self, *, levels: int | None = None) -> AsyncIterable[Book]:
+  def depth_stream(self, *, levels: int | None = None) -> AsyncContextManager[AsyncIterable[Book]]:
+    return self._depth_stream_impl()
+
+  @asynccontextmanager
+  async def _depth_stream_impl(self):
     async with self.subscribe_depth(self.market) as stream:
-      async for book in stream:
-        yield book
-    
+      yield stream
+
   async def rules(self, *, refetch: bool = False) -> Rules:
     return await self.shared.rules(self.market, refetch=refetch)
 
@@ -70,9 +74,8 @@ class Market(MarketMixin, PerpMarket):
   async def open_orders(self) -> Sequence[OrderState]:
     return await open_orders(self)
 
-  async def trades_stream(self) -> AsyncIterable[Trade]:
-    async for trade in trades_stream(self):
-      yield trade
+  def trades_stream(self) -> AsyncContextManager[AsyncIterable[Trade]]:
+    return trades_stream(self)
 
   @wrap_exceptions
   async def perp_position(self) -> PerpPosition:

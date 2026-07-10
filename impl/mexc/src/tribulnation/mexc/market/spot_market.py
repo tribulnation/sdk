@@ -1,4 +1,4 @@
-from typing_extensions import AsyncIterable, Sequence
+from typing_extensions import AsyncContextManager, AsyncIterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
@@ -49,9 +49,8 @@ class SpotMarket(MarketMixin, Market):
   async def depth(self, *, levels: int | None = None) -> Book:
     return await depth(self, levels=levels)
 
-  async def depth_stream(self, *, levels: int | None = None) -> AsyncIterable[Book]:
-    async for book in depth_stream(self, levels=levels):
-      yield book
+  def depth_stream(self, *, levels: int | None = None) -> AsyncContextManager[AsyncIterable[Book]]:
+    return depth_stream(self, levels=levels)
 
   async def rules(self, *, refetch: bool = False) -> Rules:
     return await rules(self, refetch=refetch)
@@ -65,9 +64,8 @@ class SpotMarket(MarketMixin, Market):
   def trades_history(self, start: datetime, end: datetime) -> PaginatedResponse[Trade]:
     return PaginatedResponse(trades_history(self, start, end))
 
-  async def trades_stream(self) -> AsyncIterable[Trade]:
-    async for trade in trades_stream(self):
-      yield trade
+  def trades_stream(self) -> AsyncContextManager[AsyncIterable[Trade]]:
+    return trades_stream(self)
 
   async def position(self) -> Position:
     return await position(self)

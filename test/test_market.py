@@ -5,11 +5,10 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 import asyncio
 
-from typing_extensions import Literal
+from typing_extensions import AsyncIterable, Literal
 import pytest
 
 from tribulnation.sdk import MarketSDK
-from tribulnation.sdk.core import Stream
 from tribulnation.sdk.market import Book, Market, PerpMarket, Order, OrderState, Rules
 
 from conftest import load_venue_env
@@ -56,12 +55,12 @@ PLANS = [
   ),
 ]
 
-async def first_stream_item(stream: Stream[object], *, timeout: float) -> object:
+async def first_stream_item(stream: AsyncIterable[object], *, timeout: float) -> object:
   """Read one item from a live stream."""
   return await asyncio.wait_for(anext(aiter(stream)), timeout=timeout)
 
 
-async def optional_stream_item(stream: Stream[object], *, timeout: float) -> object | None:
+async def optional_stream_item(stream: AsyncIterable[object], *, timeout: float) -> object | None:
   """Try to read one item from a live stream without making test success depend on live event timing."""
   try:
     return await first_stream_item(stream, timeout=timeout)
@@ -215,11 +214,8 @@ async def test_market(market: Market, plan: MarketTestPlan) -> None:
   assert book.bids
   assert book.asks
 
-  stream = await market.depth_stream(levels=5)
-  try:
+  async with market.depth_stream(levels=5) as stream:
     await first_stream_item(stream, timeout=plan.stream_timeout)
-  finally:
-    await stream.unsubscribe()
 
   rules = await market.rules(refetch=True)
   assert rules.api
@@ -238,12 +234,9 @@ async def test_market(market: Market, plan: MarketTestPlan) -> None:
 
   try:
     await assert_order_lifecycle(market, plan=plan, rules=rules, book=book)
-    trade_stream = await market.trades_stream()
-    try:
+    async with market.trades_stream() as trade_stream:
       await assert_fill(market, plan=plan, rules=rules, book=book)
       await optional_stream_item(trade_stream, timeout=plan.stream_timeout)
-    finally:
-      await trade_stream.unsubscribe()
   finally:
     await market.cancel_open_orders()
 

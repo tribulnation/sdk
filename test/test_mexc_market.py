@@ -1,8 +1,10 @@
 """Deterministic MEXC market implementation tests."""
 
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
+from typing_extensions import AsyncIterable
 import asyncio
 
 from mexc.spot.market.depth import OrderBook
@@ -11,7 +13,6 @@ import pytest
 
 from tribulnation.mexc.market.impl.depth import depth_stream, parse_snapshot, parse_update
 from tribulnation.mexc.market.impl.mixin import Shared
-from tribulnation.sdk.core import Stream
 from tribulnation.sdk.market import Book
 
 
@@ -119,13 +120,17 @@ class FakeMarket:
   instrument: str = 'BTCUSDT'
   subscribe_count: int = 0
 
-  async def subscribe_depth(self) -> Stream[PublicAggreDepthsV3Api]:
+  @asynccontextmanager
+  async def subscribe_depth(self):
     """Subscribe to the fake depth source."""
     self.subscribe_count += 1
-    return Stream(self.source, self.source.unsubscribe)
+    try:
+      yield self.source
+    finally:
+      await self.source.unsubscribe()
 
 
-async def next_book(stream: Stream[Book]) -> Book:
+async def next_book(stream: AsyncIterable[Book]) -> Book:
   """Read the next book from a stream."""
   return await asyncio.wait_for(anext(aiter(stream)), timeout=1)
 
@@ -162,16 +167,13 @@ async def test_mexc_depth_stream_recovers_after_version_gap() -> None:
   ])
   market = FakeMarket(client=FakeClient(spot=FakeSpot(market_api)), source=source)
 
-  stream = await depth_stream(market, levels=5) # pyright: ignore[reportArgumentType]
-  try:
+  async with depth_stream(market, levels=5) as stream: # pyright: ignore[reportArgumentType]
     await source.send(depth_msg(11, 11, bids=[('100', '3')]))
     first = await next_book(stream)
 
     await source.send(depth_msg(13, 13, bids=[('100', '4')]))
     await source.send(depth_msg(14, 14, asks=[('102', '0'), ('103', '5')]))
     second = await next_book(stream)
-  finally:
-    await stream.unsubscribe()
   assert first.best_bid.price == Decimal('100')
   assert second.best_bid.price == Decimal('98')
   assert second.best_ask.price == Decimal('103')
@@ -186,13 +188,9 @@ async def test_mexc_depth_stream_unsubscribe_closes_source() -> None:
   ])
   market = FakeMarket(client=FakeClient(spot=FakeSpot(market_api)), source=source)
 
-  stream = await depth_stream(market) # pyright: ignore[reportArgumentType]
-  try:
+  async with depth_stream(market) as stream: # pyright: ignore[reportArgumentType]
     await source.send(depth_msg(11, 11, bids=[('100', '3')]))
     await next_book(stream)
-  finally:
-    await stream.unsubscribe()
-  await stream.unsubscribe()
 
   assert source.unsubscribe_count == 1
   assert market.subscribe_count == 1

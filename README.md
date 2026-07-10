@@ -31,13 +31,14 @@ sdk = MarketSDK({
 mexc = await sdk.market('mexc_account1:spot:BTCUSDT')
 dydx = await sdk.market('dydx:perp:BTC-USD')
 
-async for my_trade in mexc.trades_stream():
-  print(f'Hedging {my_trade}')
-  await dydx.place_order({
-    'type': 'LIMIT',
-    'qty': -my_trade.qty,
-    'price': my_trade.price,
-  })
+async with mexc.trades_stream() as my_trades:
+  async for my_trade in my_trades:
+    print(f'Hedging {my_trade}')
+    await dydx.place_order({
+      'type': 'LIMIT',
+      'qty': -my_trade.qty,
+      'price': my_trade.price,
+    })
 ```
 
 `accounts.<Venue>()` reads credentials from environment variables named after each field (`accounts.Mexc()` reads `$MEXC_API_KEY`/`$MEXC_API_SECRET`) — pass explicit values or other `$VAR` names to override.
@@ -65,13 +66,13 @@ Hold a `Market` reference in hot loops; use the scoped one-shot calls otherwise.
 
 - Public data:
   - `depth() -> Book`
-  - `depth_stream() -> Stream[Book]`
+  - `depth_stream() -> AsyncContextManager[AsyncIterable[Book]]`
   - `rules() -> Rules`: tick/step size, fees, min/max, rounding helpers
 - User data:
   - `query_order(id) -> OrderState | None`
   - `open_orders() -> Sequence[OrderState]`
   - `trades_history(start, end) -> AsyncIterable[Sequence[Trade]]`
-  - `trades_stream() -> Stream[Trade]`
+  - `trades_stream() -> AsyncContextManager[AsyncIterable[Trade]]`
   - `position() -> Position`
   - `available_notional() -> Decimal`: max. notional you could open now
 - Trading:

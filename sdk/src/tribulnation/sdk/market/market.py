@@ -1,5 +1,6 @@
-from typing_extensions import Any, AsyncIterable, Sequence
+from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
 from abc import abstractmethod
+from contextlib import asynccontextmanager
 from datetime import datetime
 from decimal import Decimal
 import asyncio
@@ -48,10 +49,16 @@ class Market(SDK):
     """Fetch the market order book."""
   
   @SDK.method
-  async def depth_stream(self, *, levels: int | None = None) -> AsyncIterable[Book]:
+  def depth_stream(self, *, levels: int | None = None) -> AsyncContextManager[AsyncIterable[Book]]:
     """Subscribe to the market order book."""
-    while True:
-      yield await self.depth(levels=levels)
+    return self._depth_stream_default(levels=levels)
+
+  @asynccontextmanager
+  async def _depth_stream_default(self, *, levels: int | None = None):
+    async def gen():
+      while True:
+        yield await self.depth(levels=levels)
+    yield gen()
 
   @SDK.method
   @abstractmethod
@@ -81,10 +88,8 @@ class Market(SDK):
 
   @SDK.method
   @abstractmethod
-  async def trades_stream(self) -> AsyncIterable[Trade]:
+  def trades_stream(self) -> AsyncContextManager[AsyncIterable[Trade]]:
     """Subscribe to your real-time trades."""
-    if False:
-      yield
 
   @SDK.method
   @abstractmethod

@@ -2,7 +2,7 @@ from typing_extensions import AsyncIterable
 from dataclasses import dataclass
 from decimal import Decimal
 import asyncio
-from contextlib import suppress
+from contextlib import asynccontextmanager, suppress
 
 from tribulnation.sdk.market import Book
 from tribulnation.mexc.core.exc import wrap_exceptions
@@ -107,8 +107,9 @@ async def synchronized_book(
     cache = [await receive_update(queue, collector)]
 
 
+@asynccontextmanager
 @wrap_exceptions
-async def depth_stream(self: MarketMixin, *, levels: int | None = None) -> AsyncIterable[Book]:
+async def depth_stream(self: MarketMixin, *, levels: int | None = None):
   async with self.subscribe_depth() as stream:
     queue: asyncio.Queue[DepthUpdate] = asyncio.Queue()
 
@@ -118,19 +119,22 @@ async def depth_stream(self: MarketMixin, *, levels: int | None = None) -> Async
 
     collector = asyncio.create_task(collect())
     try:
-      while True:
-        version, book = await synchronized_book(self, queue, collector, levels=levels)
-        yield book.copy()
-
+      @wrap_exceptions
+      async def gen() -> AsyncIterable[Book]:
         while True:
-          update = await receive_update(queue, collector)
-          if update.to_version <= version:
-            continue
-          if update.from_version != version + 1:
-            break
-          book.update(update.book)
-          version = update.to_version
+          version, book = await synchronized_book(self, queue, collector, levels=levels)
           yield book.copy()
+
+          while True:
+            update = await receive_update(queue, collector)
+            if update.to_version <= version:
+              continue
+            if update.from_version != version + 1:
+              break
+            book.update(update.book)
+            version = update.to_version
+            yield book.copy()
+      yield gen()
     finally:
       collector.cancel()
       with suppress(asyncio.CancelledError):
