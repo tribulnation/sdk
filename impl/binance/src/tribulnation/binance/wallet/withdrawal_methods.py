@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing_extensions import Sequence
+from typing_extensions import Sequence, Collection
 
 from tribulnation.sdk.wallet.withdrawal_methods import (
 	WithdrawalMethod,
@@ -15,8 +15,8 @@ def _to_decimal(v: Decimal | str) -> Decimal:
 def _parse_coins_response_withdrawals(
 	raw: list,
 	*,
-	assets: Sequence[str] | None = None,
-	networks: Sequence[str] | None = None,
+	assets: Collection[str] | None = None,
+	networks: Collection[str] | None = None,
 ) -> list[WithdrawalMethod]:
 	assets_set = set(assets) if assets is not None else None
 	networks_set = set(networks) if networks is not None else None
@@ -48,8 +48,8 @@ def _parse_coins_response_withdrawals(
 
 class WithdrawalMethods(SdkMixin, _WithdrawalMethods):
 	async def withdrawal_methods(
-		self, *, assets: Sequence[str] | None = None,
-		networks: Sequence[str] | None = None,
+		self, *, assets: Collection[str] | None = None,
+		networks: Collection[str] | None = None,
 	) -> Sequence[WithdrawalMethod]:
 		r = await self.client.wallet.capital.coins()
 		return _parse_coins_response_withdrawals(r, assets=assets, networks=networks)

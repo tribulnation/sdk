@@ -1,4 +1,4 @@
-from typing_extensions import Sequence
+from typing_extensions import Sequence, Collection
 
 from tribulnation.sdk.wallet.deposit_methods import (
 	DepositMethod,
@@ -10,7 +10,7 @@ from tribulnation.binance.core import SdkMixin
 def _parse_coins_response_deposits(
 	raw: list,
 	*,
-	assets: Sequence[str] | None = None,
+	assets: Collection[str] | None = None,
 ) -> list[DepositMethod]:
 	assets_set = set(assets) if assets is not None else None
 	out: list[DepositMethod] = []
@@ -40,7 +40,7 @@ def _parse_coins_response_deposits(
 
 class DepositMethods(SdkMixin, _DepositMethods):
 	async def deposit_methods(
-		self, *, assets: Sequence[str] | None = None,
+		self, *, assets: Collection[str] | None = None,
 	) -> Sequence[DepositMethod]:
 		r = await self.client.wallet.capital.coins()
 		return _parse_coins_response_deposits(r, assets=assets)
