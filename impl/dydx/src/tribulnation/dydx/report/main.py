@@ -30,7 +30,7 @@ class Report(_Report):
   ):
     config = config or {}
     providers = providers or {}
-    require_bigquery = config.get('require_bigquery', True)
+    require_bigquery = config.get('require_bigquery', False)
     if (block_time_cache_path := config.get('block_time_cache_path')):
       from .history.block_time import FilesBlockTimeCache
       block_time_cache = FilesBlockTimeCache.at(block_time_cache_path)
