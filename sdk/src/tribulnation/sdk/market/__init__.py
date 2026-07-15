@@ -1,5 +1,5 @@
 from .types import (
-  Book, FundingRate, FundingPayment,
+  Book, FundingRate, NextFunding, FundingPayment,
   Order, OrderResponse, OrderState,
   Position, PerpPosition,
   Trade, Rules,

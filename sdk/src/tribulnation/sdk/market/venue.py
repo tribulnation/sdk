@@ -6,7 +6,7 @@ from datetime import datetime
 from tribulnation.sdk.core import SDK, PaginatedResponse
 from .types import (
   Book,
-  FundingRate, FundingPayment,
+  NextFunding,
   Order, OrderResponse, OrderState,
   Position, PerpPosition,
   Trade,
@@ -179,7 +179,7 @@ class TradingVenue(SDK):
     return await market.index()
 
   @SDK.method
-  async def next_funding(self, market_id: str, /) -> FundingRate:
+  async def next_funding(self, market_id: str, /) -> NextFunding:
     """Fetch the next funding rate and time."""
     market = await self.perp_market(market_id)
     return await market.next_funding()

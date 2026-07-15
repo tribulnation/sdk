@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from decimal import Decimal
-from datetime import datetime
+from datetime import datetime, timedelta
+
+YEAR_SECONDS = Decimal(365 * 24 * 3600)
 
 @dataclass(kw_only=True)
 class FundingRate:
@@ -8,6 +10,15 @@ class FundingRate:
   """Funding rate (in relative units, e.g. 0.01 = 1%)."""
   time: datetime
   """Funding payment time."""
+
+@dataclass(kw_only=True)
+class NextFunding(FundingRate):
+  interval: timedelta
+
+  @property
+  def annualized(self) -> Decimal:
+    """Annualized funding rate (in relative units, e.g. 0.01 = 1%)."""
+    return self.rate * YEAR_SECONDS / Decimal(self.interval.total_seconds())
 
 @dataclass
 class FundingPayment:

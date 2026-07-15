@@ -15,6 +15,7 @@ from tribulnation.sdk.market import (
   Settings,
   Trade,
   FundingRate,
+  NextFunding,
   FundingPayment,
 )
 
@@ -104,7 +105,7 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
   async def index(self, *, settings: Settings = {}) -> Decimal:
     return await index(self, settings=settings)
 
-  async def next_funding(self) -> FundingRate:
+  async def next_funding(self) -> NextFunding:
     return await next_funding(self)
 
   def funding_history(self, start: datetime, end: datetime) -> PaginatedResponse[FundingRate]:

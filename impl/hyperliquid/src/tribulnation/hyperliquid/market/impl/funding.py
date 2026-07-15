@@ -2,7 +2,7 @@ from typing_extensions import AsyncIterable, Sequence
 from datetime import datetime, timedelta
 from decimal import Decimal
 
-from tribulnation.sdk.market import FundingRate, FundingPayment
+from tribulnation.sdk.market import FundingRate, NextFunding, FundingPayment
 
 from hyperliquid.core import timestamp as ts
 from tribulnation.hyperliquid.core import wrap_exceptions
@@ -10,7 +10,7 @@ from .mixin import PerpMarketMixin
 
 
 @wrap_exceptions
-async def next_funding(self: PerpMarketMixin) -> FundingRate:
+async def next_funding(self: PerpMarketMixin) -> NextFunding:
   _, perp_meta, asset_ctxs = await self.shared.load_perp_meta_for_dex(self.dex_name, refetch=True)
   if perp_meta["universe"][self.asset_idx]["name"] != self.asset_name:
     raise ValueError(
@@ -20,7 +20,7 @@ async def next_funding(self: PerpMarketMixin) -> FundingRate:
   funding = Decimal(asset_ctxs[self.asset_idx]["funding"])
   now = datetime.now().astimezone()
   next_time = now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
-  return FundingRate(rate=funding, time=next_time)
+  return NextFunding(rate=funding, time=next_time, interval=timedelta(hours=1))
 
 
 @wrap_exceptions

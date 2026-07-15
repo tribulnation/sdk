@@ -8,7 +8,7 @@ import asyncio
 from tribulnation.sdk.core import SDK, PaginatedResponse
 from .types import (
   Book,
-  FundingRate, FundingPayment,
+  FundingRate, NextFunding, FundingPayment,
   Order, OrderResponse, OrderState,
   Position, PerpPosition,
   Trade,
@@ -141,7 +141,7 @@ class PerpMarket(Market):
 
   @SDK.method
   @abstractmethod
-  async def next_funding(self) -> FundingRate:
+  async def next_funding(self) -> NextFunding:
     """Fetch the next funding rate and time."""
 
   @SDK.method

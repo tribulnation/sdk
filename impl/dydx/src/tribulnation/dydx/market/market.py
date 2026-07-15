@@ -10,6 +10,7 @@ from tribulnation.sdk.market import (
   Book,
   FundingPayment,
   FundingRate,
+  NextFunding,
   Order,
   OrderResponse,
   OrderState,
@@ -144,7 +145,7 @@ class Market(MarketMixin, PerpMarket):
       raise ApiError('Oracle price unavailable')
     return Decimal(price)
 
-  async def next_funding(self) -> FundingRate:
+  async def next_funding(self) -> NextFunding:
     return await next_funding(self)
 
   def funding_history(self, start: datetime, end: datetime) -> PaginatedResponse[FundingRate]:

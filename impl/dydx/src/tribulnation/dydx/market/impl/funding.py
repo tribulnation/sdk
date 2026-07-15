@@ -2,19 +2,20 @@ from typing_extensions import AsyncIterable, Sequence
 from datetime import datetime, timedelta
 from decimal import Decimal
 
-from tribulnation.sdk.market import FundingRate, FundingPayment
+from tribulnation.sdk.market import FundingRate, NextFunding, FundingPayment
 
 from tribulnation.dydx.core import wrap_exceptions
 from .mixin import MarketMixin
 
 @wrap_exceptions
-async def next_funding(self: MarketMixin) -> FundingRate:
+async def next_funding(self: MarketMixin) -> NextFunding:
   market = await self.indexer.data.get_market(self.market)
   now = datetime.now().astimezone()
   next_hour = now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
-  return FundingRate(
+  return NextFunding(
     rate=Decimal(market['nextFundingRate']),
     time=next_hour,
+    interval=timedelta(hours=1),
   )
 
 @wrap_exceptions
