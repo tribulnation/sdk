@@ -70,6 +70,12 @@ class Rules:
     qty = trunc2tick(base_qty, self.step_size)
     if qty > self.min_qty(price):
       return qty
+    
+  def round_qty(self, base_qty: Decimal, *, price: Decimal) -> Decimal | None:
+    """Round the (base asset) quantity to the nearest step size."""
+    qty = round2tick(base_qty, self.step_size)
+    if qty > self.min_qty(price):
+      return qty
 
   def round_price(self, price: Decimal) -> Decimal:
     """Round the price to the nearest tick size."""
