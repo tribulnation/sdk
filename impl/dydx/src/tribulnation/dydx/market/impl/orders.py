@@ -77,6 +77,8 @@ async def list_orders(
 def _time_in_force(order: Order, settings: Settings) -> TimeInForce:
   if order['type'] == 'POST_ONLY':
     return 'POST_ONLY'
+  if order['type'] == 'MARKET':
+    return settings.get('market_tif', 'IMMEDIATE_OR_CANCEL')
   return settings.get('limit_tif', 'GOOD_TIL_TIME')
 
 def export_order(order: Order, settings: Settings) -> OrderParams:

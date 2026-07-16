@@ -20,6 +20,8 @@ class Settings(TypedDict, total=False):
   """Order flags for all orders"""
   limit_tif: TimeInForce
   """Time in force for limit orders"""
+  market_tif: TimeInForce
+  """Time in force for market orders. Defaults to immediate-or-cancel."""
   short_term_gtb: int
   """GTB delta for short-term orders. The GTB will be `current_block() + short_term_gtb`"""
   long_term_gtbt: int

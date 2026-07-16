@@ -108,7 +108,30 @@ class Market(SDK):
   @SDK.method
   @abstractmethod
   async def place_order(self, order: Order, *, settings: Settings = {}) -> OrderResponse:
-    """Place an order in the market."""
+    """Place an order in the market.
+
+    ``order["qty"]`` is signed in base units: positive buys and negative sells.
+    ``order["price"]`` is always required by the SDK order shape.
+
+    Order type semantics:
+
+    - ``"LIMIT"`` places a normal limit order at ``price``. It may rest on the
+      book unless venue settings request a different time-in-force.
+    - ``"POST_ONLY"`` places a maker-only limit order at ``price``. The venue
+      should reject or cancel it rather than taking liquidity.
+    - ``"MARKET"`` means immediate execution with price protection. The SDK
+      passes ``price`` as the worst acceptable limit price: for buys, the maximum
+      price to pay; for sells, the minimum price to accept. Venues with native
+      market orders may ignore ``price``; venues without native market orders
+      should implement this as an aggressive non-resting limit order, preferably
+      IOC. A market order may partially fill unless venue/settings semantics are
+      stricter, such as FOK.
+
+    Venue-specific ``settings`` may refine time-in-force, reduce-only, expiry,
+    or other execution flags. If a venue cannot support the requested semantics,
+    it should raise an API/validation error rather than silently placing a
+    materially different order.
+    """
 
   @SDK.method
   async def place_orders(self, orders: Sequence[Order], *, settings: Settings = {}) -> Sequence[OrderResponse]:

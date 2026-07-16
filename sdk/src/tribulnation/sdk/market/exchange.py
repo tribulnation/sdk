@@ -121,7 +121,10 @@ class Exchange(SDK):
 
   @SDK.method
   async def place_order(self, market_id: str, /, order: Order, *, settings: Settings = {}) -> OrderResponse:
-    """Place an order in the market."""
+    """Place an order in the market.
+
+    See ``Market.place_order`` for SDK order type semantics.
+    """
     market = await self.market(market_id)
     return await market.place_order(order, settings=settings)
 
