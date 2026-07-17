@@ -1,4 +1,5 @@
 from decimal import Decimal
+import asyncio
 
 from hyperliquid.info.perps.clearinghouse_state import (
   ClearinghouseStateResponse,
@@ -7,29 +8,33 @@ from hyperliquid.info.perps.clearinghouse_state import (
 )
 
 from tribulnation.sdk.market import Collateral, PerpCollateral
+from tribulnation.sdk.core import ApiError
 
 from tribulnation.hyperliquid.core import wrap_exceptions
 from .mixin import PerpMixin, PerpMarketMixin, SpotMarketMixin
 
 
-def cross_collateral(state: ClearinghouseStateResponse) -> PerpCollateral:
-  """The account-wide CROSS margin bucket.
+def cross_collateral(
+  state: ClearinghouseStateResponse,
+  *,
+  spot_equity: Decimal,
+  free_collateral: Decimal,
+) -> PerpCollateral:
+  """The account-wide CROSS margin bucket (unified account).
 
-  Every field comes straight from the venue: `crossMarginSummary.accountValue`
-  is the cross equity, `crossMaintenanceMarginUsed` is the exact maintenance
-  margin the venue enforces, and `withdrawable` is the free collateral.
+  In unified mode the real equity backing perps is the spot collateral token
+  balance, not `crossMarginSummary.accountValue` (which only reflects USDC
+  deposited into the perps engine). `free_collateral` comes from the spot
+  state's `tokenToAvailableAfterMaintenance` for the collateral token.
   """
-  summary = state['crossMarginSummary']
-  equity = Decimal(summary['accountValue'])
-  ntl = Decimal(summary['totalNtlPos'])
-  # leverage = total position notional / equity; 0 when flat or non-positive equity.
-  leverage = ntl / equity if equity > 0 else Decimal(0)
-  free_collateral = Decimal(state['withdrawable'])
+  ntl = Decimal(state['crossMarginSummary']['totalNtlPos'])
+  leverage = ntl / spot_equity if spot_equity > 0 else Decimal(0)
+  maintenance_margin = Decimal(state['crossMaintenanceMarginUsed'])
   return PerpCollateral(
-    equity=equity,
+    equity=spot_equity,
     free_collateral=free_collateral,
-    initial_margin=equity - free_collateral,
-    maintenance_margin=Decimal(state['crossMaintenanceMarginUsed']),
+    initial_margin=spot_equity - free_collateral,
+    maintenance_margin=maintenance_margin,
     leverage=leverage,
     margin_mode='cross',
   )
@@ -73,11 +78,42 @@ def isolated_collateral(pos: Position, leverage: LeverageIsolated) -> PerpCollat
   )
 
 
+async def _unified_cross_collateral(self: PerpMixin) -> PerpCollateral:
+  """Fetch the unified cross collateral, asserting unified account mode."""
+  mode = await self.client.info.user_abstraction(self.address)
+  if mode != 'unifiedAccount':
+    raise ApiError(f'Only unified accounts are supported, got mode={mode!r}')
+
+  dex_name = self.dex_name
+  perp_meta, _ = await self.client.info.perp_meta_and_asset_ctxs(dex_name)
+  collateral_token_idx = perp_meta['collateralToken']
+
+  state, spot_state = await asyncio.gather(
+    self.client.info.clearinghouse_state(self.address, dex=dex_name),
+    self.client.info.spot_clearinghouse_state(self.address),
+  )
+
+  # Equity = total spot balance of the collateral token
+  spot_equity = Decimal(0)
+  for balance in spot_state.get('balances', []):
+    if int(balance['token']) == collateral_token_idx:
+      spot_equity = Decimal(balance['total'])
+      break
+
+  # Free collateral from tokenToAvailableAfterMaintenance
+  free_collateral = Decimal(0)
+  for token_idx, available in spot_state.get('tokenToAvailableAfterMaintenance', []):
+    if int(token_idx) == collateral_token_idx:
+      free_collateral = Decimal(available)
+      break
+
+  return cross_collateral(state, spot_equity=spot_equity, free_collateral=free_collateral)
+
+
 @wrap_exceptions
 async def perp_exchange_collateral(self: PerpMixin) -> PerpCollateral:
-  """Exchange-level bucket = the account CROSS pool (one bucket per exchange)."""
-  state = await self.client.info.clearinghouse_state(self.address, dex=self.dex_name)
-  return cross_collateral(state)
+  """Exchange-level bucket = the unified account CROSS pool."""
+  return await _unified_cross_collateral(self)
 
 
 @wrap_exceptions
@@ -95,7 +131,7 @@ async def perp_market_collateral(self: PerpMarketMixin) -> PerpCollateral:
       if leverage['type'] == 'isolated':
         return isolated_collateral(pos, leverage)
       break  # cross position → fall through to the cross pool
-  return cross_collateral(state)
+  return await _unified_cross_collateral(self)
 
 
 @wrap_exceptions
