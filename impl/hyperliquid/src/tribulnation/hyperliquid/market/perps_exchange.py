@@ -1,9 +1,9 @@
 from typing_extensions import Sequence
 from dataclasses import dataclass
 
-from tribulnation.sdk.market import PerpExchange as _PerpExchange
+from tribulnation.sdk.market import PerpExchange as _PerpExchange, PerpCollateral
 
-from .impl import PerpMixin
+from .impl import PerpMixin, perp_exchange_collateral
 from .perps_market import PerpMarket
 
 
@@ -17,6 +17,12 @@ class PerpExchange(PerpMixin, _PerpExchange):
   @property
   def exchange_id(self) -> str:
     return self.dex_name or ''
+
+  async def perp_collateral(self, market_id: str | None = None, /) -> PerpCollateral:
+    if market_id is not None:
+      m = await self.market(market_id)
+      return await m.perp_collateral()
+    return await perp_exchange_collateral(self)
 
   async def markets(self) -> Sequence[str]:
     # Use default/no-dex universe here; callers that care about DEX can pass it when constructing.

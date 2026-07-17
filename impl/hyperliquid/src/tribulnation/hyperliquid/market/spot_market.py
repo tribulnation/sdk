@@ -7,6 +7,7 @@ from tribulnation.sdk.core import PaginatedResponse, LogicError, OverflowPolicy
 from tribulnation.sdk.market import (
   Market,
   Book,
+  Collateral,
   Order,
   OrderResponse,
   OrderState,
@@ -28,6 +29,7 @@ from .impl import (
   trades_history,
   trades_stream,
   spot_position,
+  spot_market_collateral,
   place_order,
   cancel_order,
 )
@@ -69,6 +71,9 @@ class SpotMarket(SpotMarketMixin, Market):
 
   async def position(self) -> Position:
     return await spot_position(self)
+
+  async def collateral(self) -> Collateral:
+    return await spot_market_collateral(self)
 
   @wrap_exceptions
   async def available_notional(self) -> Decimal:

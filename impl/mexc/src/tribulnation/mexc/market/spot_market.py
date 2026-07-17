@@ -7,6 +7,7 @@ from tribulnation.sdk.core import PaginatedResponse, OverflowPolicy
 from tribulnation.sdk.market import (
   Market,
   Book,
+  Collateral,
   Order,
   OrderResponse,
   OrderState,
@@ -82,6 +83,16 @@ class SpotMarket(MarketMixin, Market):
       if b.get('asset') == self.info.get('quoteAsset'):
         return Decimal(b.get('free') or '0')
     return Decimal(0)
+
+  @wrap_exceptions
+  async def collateral(self) -> Collateral:
+    r = await self.client.spot.account.info(recv_window=self.shared.recv_window)
+    for b in r.get('balances', []):
+      if b.get('asset') == self.info.get('quoteAsset'):
+        free = Decimal(b.get('free') or '0')
+        locked = Decimal(b.get('locked') or '0')
+        return Collateral(equity=free + locked, free_collateral=free)
+    return Collateral(equity=Decimal(0), free_collateral=Decimal(0))
 
   async def place_order(self, order: Order, *, settings: Settings = {}) -> OrderResponse:
     return await place_order(self, order, settings=settings)

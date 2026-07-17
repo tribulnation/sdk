@@ -10,6 +10,7 @@ from tribulnation.sdk.market import (
   Order,
   OrderResponse,
   OrderState,
+  PerpCollateral,
   PerpPosition,
   Rules,
   Settings,
@@ -31,6 +32,7 @@ from .impl import (
   funding_history,
   funding_payments,
   perps_position,
+  perp_market_collateral,
   open_orders,
   place_order,
   cancel_order,
@@ -82,6 +84,9 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
 
   async def perp_position(self) -> PerpPosition:
     return await perps_position(self)
+
+  async def perp_collateral(self) -> PerpCollateral:
+    return await perp_market_collateral(self)
 
   @wrap_exceptions
   async def available_notional(self) -> Decimal:

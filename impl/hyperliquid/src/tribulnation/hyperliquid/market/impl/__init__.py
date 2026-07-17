@@ -12,3 +12,9 @@ from .perps_position import position as perps_position
 
 from .index import index
 from .funding import next_funding, funding_history, funding_payments
+
+from .collateral import (
+  perp_exchange_collateral,
+  perp_market_collateral,
+  spot_market_collateral,
+)
