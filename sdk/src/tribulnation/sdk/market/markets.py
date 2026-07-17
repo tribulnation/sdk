@@ -1,9 +1,9 @@
-from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence, Literal, TypedDict
+from typing_extensions import Any, AsyncIterable, AsyncIterator, Sequence, Literal, TypedDict
 from abc import abstractmethod
 from contextlib import asynccontextmanager
 from datetime import datetime
 
-from tribulnation.sdk.core import SDK, PaginatedResponse
+from tribulnation.sdk.core import SDK, PaginatedResponse, OverflowPolicy
 from .types import (
   Book,
   FundingRate, NextFunding, FundingPayment,
@@ -79,14 +79,18 @@ class TradingMarkets(SDK):
     return await market.depth(levels=levels)
 
   @SDK.method
-  def depth_stream(self, market_id: str, /, *, levels: int | None = None) -> AsyncContextManager[AsyncIterable[Book]]:
-    """Subscribe to the market order book."""
-    return self._depth_stream_impl(market_id, levels=levels)
-
   @asynccontextmanager
-  async def _depth_stream_impl(self, market_id: str, /, *, levels: int | None = None):
+  async def depth_stream(
+    self, market_id: str, /, *, levels: int | None = None,
+    queue_size: int = 1, overflow: OverflowPolicy = 'latest',
+  ) -> AsyncIterator[AsyncIterable[Book]]:
+    """Subscribe to the market order book.
+
+    See `Market.depth_stream` for `queue_size`/`overflow` (e.g. `overflow='fail'`
+    with a larger `queue_size` to capture every book).
+    """
     market = await self.market(market_id)
-    async with market.depth_stream(levels=levels) as stream:
+    async with market.depth_stream(levels=levels, queue_size=queue_size, overflow=overflow) as stream:
       yield stream
   
   @SDK.method
@@ -119,14 +123,16 @@ class TradingMarkets(SDK):
       yield page
 
   @SDK.method
-  def trades_stream(self, market_id: str, /) -> AsyncContextManager[AsyncIterable[Trade]]:
-    """Subscribe to your real-time trades."""
-    return self._trades_stream_impl(market_id)
-
   @asynccontextmanager
-  async def _trades_stream_impl(self, market_id: str, /):
+  async def trades_stream(
+    self, market_id: str, /, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail',
+  ) -> AsyncIterator[AsyncIterable[Trade]]:
+    """Subscribe to your real-time trades.
+
+    See `Market.trades_stream` for `queue_size`/`overflow`.
+    """
     market = await self.market(market_id)
-    async with market.trades_stream() as stream:
+    async with market.trades_stream(queue_size=queue_size, overflow=overflow) as stream:
       yield stream
 
   @SDK.method

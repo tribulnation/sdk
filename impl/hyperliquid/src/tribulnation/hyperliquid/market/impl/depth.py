@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from decimal import Decimal
 
 from tribulnation.sdk.market import Book
+from tribulnation.sdk.core import OverflowPolicy
 
 from tribulnation.hyperliquid.core import wrap_exceptions
 from .mixin import SpotMarketMixin, PerpMarketMixin
@@ -22,8 +23,8 @@ async def depth(self: Mixin) -> Book:
 
 
 @asynccontextmanager
-async def depth_stream(self: Mixin):
-  async with self.subscribe_l2_book(self.asset_name) as l2:
+async def depth_stream(self: Mixin, *, queue_size: int = 1, overflow: OverflowPolicy = 'latest'):
+  async with self.subscribe_l2_book(self.asset_name, queue_size=queue_size, overflow=overflow) as l2:
     async def gen() -> AsyncIterable[Book]:
       async for update in l2:
         raw_bids, raw_asks = update["levels"]

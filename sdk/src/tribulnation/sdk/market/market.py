@@ -1,11 +1,10 @@
-from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
+from typing_extensions import Any, AsyncContextManager, AsyncIterable, AsyncIterator, Sequence
 from abc import abstractmethod
-from contextlib import asynccontextmanager
 from datetime import datetime
 from decimal import Decimal
 import asyncio
 
-from tribulnation.sdk.core import SDK, PaginatedResponse
+from tribulnation.sdk.core import SDK, PaginatedResponse, OverflowPolicy
 from .types import (
   Book,
   FundingRate, NextFunding, FundingPayment,
@@ -49,16 +48,24 @@ class Market(SDK):
     """Fetch the market order book."""
   
   @SDK.method
-  def depth_stream(self, *, levels: int | None = None) -> AsyncContextManager[AsyncIterable[Book]]:
-    """Subscribe to the market order book."""
-    return self._depth_stream_default(levels=levels)
+  def depth_stream(
+    self, *, levels: int | None = None,
+    queue_size: int = 1, overflow: OverflowPolicy = 'latest',
+  ) -> AsyncContextManager[AsyncIterable[Book]]:
+    """Subscribe to the market order book.
 
-  @asynccontextmanager
-  async def _depth_stream_default(self, *, levels: int | None = None):
-    async def gen():
-      while True:
-        yield await self.depth(levels=levels)
-    yield gen()
+    Venues fan out a shared upstream to each subscriber through a bounded queue:
+
+    - `queue_size`: how many books to buffer for this subscriber.
+    - `overflow`: what to do when the buffer is full. The default `'latest'`
+      keeps only the newest book (a slow consumer skips stale books); pass
+      `overflow='fail'` with a larger `queue_size` to capture every book
+      instead (e.g. to record a full depth history).
+
+    `queue_size`/`overflow` are ignored by this polling default, which has no
+    shared upstream to fan out; venue subscriptions honor them.
+    """
+    ...
 
   @SDK.method
   @abstractmethod
@@ -88,8 +95,18 @@ class Market(SDK):
 
   @SDK.method
   @abstractmethod
-  def trades_stream(self) -> AsyncContextManager[AsyncIterable[Trade]]:
-    """Subscribe to your real-time trades."""
+  def trades_stream(
+    self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail',
+  ) -> AsyncContextManager[AsyncIterable[Trade]]:
+    """Subscribe to your real-time trades.
+
+    Venues fan out a shared upstream to each subscriber through a bounded queue:
+
+    - `queue_size`: how many trades to buffer for this subscriber.
+    - `overflow`: what to do when the buffer is full. The default `'fail'` fails
+      the subscriber with a `NetworkError` (so the caller can reconnect) rather
+      than dropping trades silently; `'latest'` keeps only the newest instead.
+    """
 
   @SDK.method
   @abstractmethod

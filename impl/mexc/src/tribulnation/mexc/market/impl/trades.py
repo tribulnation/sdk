@@ -4,6 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from tribulnation.sdk.market import Trade
+from tribulnation.sdk.core import OverflowPolicy
 
 from mexc.core import timestamp as ts
 from mexc.spot.account.trades import AccountTrade
@@ -33,8 +34,8 @@ def _parse_trade(t: AccountTrade) -> Trade:
 
 @asynccontextmanager
 @wrap_exceptions
-async def trades_stream(self: MarketMixin):
-  async with self.subscribe_my_trades() as s:
+async def trades_stream(self: MarketMixin, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'):
+  async with self.subscribe_my_trades(queue_size=queue_size, overflow=overflow) as s:
     @wrap_exceptions
     async def gen() -> AsyncIterable[Trade]:
       async for msg in s:

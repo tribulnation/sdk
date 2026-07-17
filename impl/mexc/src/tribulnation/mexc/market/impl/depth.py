@@ -1,11 +1,13 @@
-from typing_extensions import AsyncIterable
+from typing_extensions import AsyncIterable, AsyncIterator
 from dataclasses import dataclass
 from decimal import Decimal
 import asyncio
 from contextlib import asynccontextmanager, suppress
 
 from tribulnation.sdk.market import Book
+from tribulnation.sdk.core import NetworkError, OverflowPolicy
 from tribulnation.mexc.core.exc import wrap_exceptions
+from mexc import MEXC
 from mexc.spot.market.depth import OrderBook
 from mexc.spot.streams.core.proto import PublicAggreDepthsV3Api
 
@@ -72,7 +74,8 @@ async def receive_update(
 
 
 async def synchronized_book(
-  self: MarketMixin,
+  client: MEXC,
+  symbol: str,
   queue: asyncio.Queue[DepthUpdate],
   collector: asyncio.Task[None],
   levels: int | None = None,
@@ -82,7 +85,7 @@ async def synchronized_book(
   while True:
     first = cache[0]
     version, book = parse_snapshot(
-      await self.client.spot.market.depth(symbol=self.instrument, limit=levels)
+      await client.spot.market.depth(symbol=symbol, limit=levels)
     )
     drain_updates(queue, cache)
 
@@ -107,35 +110,59 @@ async def synchronized_book(
     cache = [await receive_update(queue, collector)]
 
 
+@wrap_exceptions
+async def reconstruct_books(
+  client: MEXC,
+  symbol: str,
+  updates: AsyncIterable[PublicAggreDepthsV3Api],
+  *,
+  levels: int | None = None,
+) -> AsyncIterator[Book]:
+  """Reconstruct a live order book from MEXC's snapshot + incremental diff feed.
+
+  Runs once per shared subscription (not per consumer): the resulting full-book
+  snapshots are fanned out by the `Subscription`, so each consumer's bounded
+  inbox holds whole books rather than a growing backlog of raw diffs.
+  """
+  queue: asyncio.Queue[DepthUpdate] = asyncio.Queue(maxsize=100)
+
+  async def collect() -> None:
+    async for msg in updates:
+      if queue.full():
+        raise NetworkError('Depth reconstruction fell behind')
+      queue.put_nowait(parse_update(msg))
+
+  collector = asyncio.create_task(collect())
+  try:
+    while True:
+      version, book = await synchronized_book(client, symbol, queue, collector, levels=levels)
+      yield book.copy()
+
+      while True:
+        update = await receive_update(queue, collector)
+        if update.to_version <= version:
+          continue
+        if update.from_version != version + 1:
+          break
+        book.update(update.book)
+        version = update.to_version
+        yield book.copy()
+  finally:
+    collector.cancel()
+    with suppress(asyncio.CancelledError):
+      await collector
+
+
 @asynccontextmanager
 @wrap_exceptions
-async def depth_stream(self: MarketMixin, *, levels: int | None = None):
-  async with self.subscribe_depth() as stream:
-    queue: asyncio.Queue[DepthUpdate] = asyncio.Queue()
-
-    async def collect() -> None:
-      async for msg in stream:
-        await queue.put(parse_update(msg))
-
-    collector = asyncio.create_task(collect())
-    try:
-      @wrap_exceptions
-      async def gen() -> AsyncIterable[Book]:
-        while True:
-          version, book = await synchronized_book(self, queue, collector, levels=levels)
-          yield book.copy()
-
-          while True:
-            update = await receive_update(queue, collector)
-            if update.to_version <= version:
-              continue
-            if update.from_version != version + 1:
-              break
-            book.update(update.book)
-            version = update.to_version
-            yield book.copy()
-      yield gen()
-    finally:
-      collector.cancel()
-      with suppress(asyncio.CancelledError):
-        await collector
+async def depth_stream(
+  self: MarketMixin,
+  *,
+  levels: int | None = None,
+  queue_size: int = 1,
+  overflow: OverflowPolicy = 'latest',
+):
+  # `levels` is accepted for API compatibility but does not size the shared
+  # streaming book (mirrors dYdX); use `depth(levels=...)` for a sized snapshot.
+  async with self.subscribe_depth(queue_size=queue_size, overflow=overflow) as stream:
+    yield stream

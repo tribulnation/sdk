@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 
-from tribulnation.sdk.core import PaginatedResponse
+from tribulnation.sdk.core import PaginatedResponse, OverflowPolicy
 from tribulnation.sdk.market import (
   Market,
   Book,
@@ -49,8 +49,11 @@ class SpotMarket(MarketMixin, Market):
   async def depth(self, *, levels: int | None = None) -> Book:
     return await depth(self, levels=levels)
 
-  def depth_stream(self, *, levels: int | None = None) -> AsyncContextManager[AsyncIterable[Book]]:
-    return depth_stream(self, levels=levels)
+  def depth_stream(
+    self, *, levels: int | None = None,
+    queue_size: int = 1, overflow: OverflowPolicy = 'latest',
+  ) -> AsyncContextManager[AsyncIterable[Book]]:
+    return depth_stream(self, levels=levels, queue_size=queue_size, overflow=overflow)
 
   async def rules(self, *, refetch: bool = False) -> Rules:
     return await rules(self, refetch=refetch)
@@ -64,8 +67,10 @@ class SpotMarket(MarketMixin, Market):
   def trades_history(self, start: datetime, end: datetime) -> PaginatedResponse[Trade]:
     return PaginatedResponse(trades_history(self, start, end))
 
-  def trades_stream(self) -> AsyncContextManager[AsyncIterable[Trade]]:
-    return trades_stream(self)
+  def trades_stream(
+    self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail',
+  ) -> AsyncContextManager[AsyncIterable[Trade]]:
+    return trades_stream(self, queue_size=queue_size, overflow=overflow)
 
   async def position(self) -> Position:
     return await position(self)

@@ -1,11 +1,11 @@
-from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
+from typing_extensions import Any, AsyncContextManager, AsyncIterable, AsyncIterator, Sequence
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 import asyncio
 
-from tribulnation.sdk.core import PaginatedResponse, ApiError
+from tribulnation.sdk.core import PaginatedResponse, ApiError, OverflowPolicy
 from tribulnation.sdk.market import (
   Book,
   FundingPayment,
@@ -58,12 +58,12 @@ class Market(MarketMixin, PerpMarket):
     book = await self.indexer.data.get_order_book(self.market)
     return parse_book(book)
 
-  def depth_stream(self, *, levels: int | None = None) -> AsyncContextManager[AsyncIterable[Book]]:
-    return self._depth_stream_impl()
-
   @asynccontextmanager
-  async def _depth_stream_impl(self):
-    async with self.subscribe_depth(self.market) as stream:
+  async def depth_stream(
+    self, *, levels: int | None = None,
+    queue_size: int = 1, overflow: OverflowPolicy = 'latest',
+  ) -> AsyncIterator[AsyncIterable[Book]]:
+    async with self.subscribe_depth(self.market, queue_size=queue_size, overflow=overflow) as stream:
       yield stream
 
   async def rules(self, *, refetch: bool = False) -> Rules:
@@ -75,8 +75,10 @@ class Market(MarketMixin, PerpMarket):
   async def open_orders(self) -> Sequence[OrderState]:
     return await open_orders(self)
 
-  def trades_stream(self) -> AsyncContextManager[AsyncIterable[Trade]]:
-    return trades_stream(self)
+  def trades_stream(
+    self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail',
+  ) -> AsyncContextManager[AsyncIterable[Trade]]:
+    return trades_stream(self, queue_size=queue_size, overflow=overflow)
 
   @wrap_exceptions
   async def perp_position(self) -> PerpPosition:

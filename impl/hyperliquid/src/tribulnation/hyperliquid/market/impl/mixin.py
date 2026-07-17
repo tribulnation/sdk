@@ -1,9 +1,9 @@
-from typing_extensions import TypedDict, Literal, NotRequired
+from typing_extensions import TypedDict
 from dataclasses import dataclass, field
 import asyncio
 import os
 
-from tribulnation.sdk.core import SDK, Subscription
+from tribulnation.sdk.core import SDK, Subscription, OverflowPolicy
 
 from hyperliquid import Hyperliquid, Wallet
 from hyperliquid.info.spot.spot_meta import SpotMetaResponse, SpotAssetInfo, SpotTokenInfo
@@ -257,11 +257,11 @@ class SharedMixin:
   async def __aexit__(self, exc_type, exc_value, traceback):
     await self.shared.__aexit__(exc_type, exc_value, traceback)
 
-  def subscribe_user_fills(self):
-    return self.shared.user_fills_sub().subscribe()
+  def subscribe_user_fills(self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'):
+    return self.shared.user_fills_sub().subscribe(queue_size=queue_size, overflow=overflow)
 
-  def subscribe_l2_book(self, coin: str, /):
-    return self.shared.l2_book_subscription(coin).subscribe()
+  def subscribe_l2_book(self, coin: str, /, *, queue_size: int = 1, overflow: OverflowPolicy = 'latest'):
+    return self.shared.l2_book_subscription(coin).subscribe(queue_size=queue_size, overflow=overflow)
 
 
 @dataclass(kw_only=True, frozen=True)

@@ -4,6 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from tribulnation.sdk.market import Trade
+from tribulnation.sdk.core import OverflowPolicy
 
 from tribulnation.hyperliquid.core import wrap_exceptions
 from .mixin import SpotMarketMixin, PerpMarketMixin
@@ -16,8 +17,8 @@ def _parse_time(value: Any) -> datetime:
 
 @asynccontextmanager
 @wrap_exceptions
-async def trades_stream(self: SpotMarketMixin | PerpMarketMixin):
-  async with self.subscribe_user_fills() as fills:
+async def trades_stream(self: SpotMarketMixin | PerpMarketMixin, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'):
+  async with self.subscribe_user_fills(queue_size=queue_size, overflow=overflow) as fills:
     @wrap_exceptions
     async def gen() -> AsyncIterable[Trade]:
       async for chunk in fills:

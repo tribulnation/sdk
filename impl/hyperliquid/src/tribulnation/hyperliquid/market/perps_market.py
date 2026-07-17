@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 
-from tribulnation.sdk.core import PaginatedResponse, LogicError
+from tribulnation.sdk.core import PaginatedResponse, LogicError, OverflowPolicy
 from tribulnation.sdk.market import (
   PerpMarket as _PerpMarket,
   Book,
@@ -58,8 +58,11 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
   async def depth(self, *, levels: int | None = None) -> Book:
     return await depth(self)
 
-  def depth_stream(self, *, levels: int | None = None) -> AsyncContextManager[AsyncIterable[Book]]:
-    return depth_stream(self)
+  def depth_stream(
+    self, *, levels: int | None = None,
+    queue_size: int = 1, overflow: OverflowPolicy = 'latest',
+  ) -> AsyncContextManager[AsyncIterable[Book]]:
+    return depth_stream(self, queue_size=queue_size, overflow=overflow)
 
   @wrap_exceptions
   async def rules(self, *, refetch: bool = False) -> Rules:
@@ -72,8 +75,10 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
   async def open_orders(self) -> Sequence[OrderState]:
     return await open_orders(self)
 
-  def trades_stream(self) -> AsyncContextManager[AsyncIterable[Trade]]:
-    return trades_stream(self)
+  def trades_stream(
+    self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail',
+  ) -> AsyncContextManager[AsyncIterable[Trade]]:
+    return trades_stream(self, queue_size=queue_size, overflow=overflow)
 
   async def perp_position(self) -> PerpPosition:
     return await perps_position(self)

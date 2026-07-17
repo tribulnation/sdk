@@ -2,11 +2,12 @@ from typing_extensions import TypedDict
 from dataclasses import dataclass, field
 import asyncio
 
-from tribulnation.sdk.core import SDK, Subscription
+from tribulnation.sdk.core import SDK, Subscription, OverflowPolicy
+from tribulnation.sdk.market import Book
 
 from mexc import MEXC
 from mexc.spot.market.exchange_info import SymbolInfo
-from mexc.spot.streams.core.proto import PublicAggreDepthsV3Api, PrivateDealsV3Api
+from mexc.spot.streams.core.proto import PrivateDealsV3Api
 
 from tribulnation.mexc.core.exc import wrap_exceptions
 
@@ -23,7 +24,7 @@ class Shared:
 
   spot_markets: dict[str, SpotInfo] | None = None
   my_trades_subscription: Subscription[PrivateDealsV3Api] | None = None
-  depth_subscriptions: dict[str, Subscription[PublicAggreDepthsV3Api]] = field(default_factory=dict)
+  depth_subscriptions: dict[str, Subscription[Book]] = field(default_factory=dict)
 
   _markets_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
 
@@ -77,8 +78,12 @@ class Shared:
     if symbol not in self.depth_subscriptions:
       @wrap_exceptions
       async def subscribe():
+        # Local import avoids a circular import (depth.py imports MarketMixin).
+        from .depth import reconstruct_books
         stream = await self.client.spot.streams.market.depth_updates(symbol, aggregation='10ms')
-        return stream.stream, stream.unsubscribe
+        # Reconstruct the book once here so the shared subscription fans out
+        # full snapshots rather than raw diffs.
+        return reconstruct_books(self.client, symbol, stream.stream), stream.unsubscribe
       self.depth_subscriptions[symbol] = Subscription.of(subscribe)
     return self.depth_subscriptions[symbol]
 
@@ -133,8 +138,8 @@ class MarketMixin(SDK, ExchangeMixin):
       raise ValueError('MEXC spot market metadata is missing symbol')
     return symbol
 
-  def subscribe_depth(self):
-    return self.shared.depth_subscription(self.instrument).subscribe()
+  def subscribe_depth(self, *, queue_size: int = 1, overflow: OverflowPolicy = 'latest'):
+    return self.shared.depth_subscription(self.instrument).subscribe(queue_size=queue_size, overflow=overflow)
 
-  def subscribe_my_trades(self):
-    return self.shared.my_trades_sub().subscribe()
+  def subscribe_my_trades(self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'):
+    return self.shared.my_trades_sub().subscribe(queue_size=queue_size, overflow=overflow)

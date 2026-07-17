@@ -8,7 +8,7 @@ from dydx.indexer.streams.parent_subaccounts import Notification as ParentSubacc
 from dydx.node.orders import Flags, TimeInForce
 from dydx.protos.dydxprotocol import feetiers as feetiers_proto
 
-from tribulnation.sdk.core import SDK, Subscription
+from tribulnation.sdk.core import SDK, Subscription, OverflowPolicy
 from tribulnation.dydx.core import wrap_exceptions
 from .depth import depth_stream, Book
 from .rules import parse_rules, Rules
@@ -120,11 +120,13 @@ class ExchangeMixin:
   async def __aexit__(self, exc_type, exc_value, traceback):
     await self.shared.__aexit__(exc_type, exc_value, traceback)
 
-  def subscribe_parent_subaccount(self, parent_subaccount: int):
-    return self.shared.parent_account_subscription(parent_subaccount).subscribe()
+  def subscribe_parent_subaccount(
+    self, parent_subaccount: int, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail',
+  ):
+    return self.shared.parent_account_subscription(parent_subaccount).subscribe(queue_size=queue_size, overflow=overflow)
 
-  def subscribe_depth(self, market: str):
-    return self.shared.depth_subscription(market).subscribe()
+  def subscribe_depth(self, market: str, *, queue_size: int = 1, overflow: OverflowPolicy = 'latest'):
+    return self.shared.depth_subscription(market).subscribe(queue_size=queue_size, overflow=overflow)
 
 @dataclass(kw_only=True, frozen=True)
 class MarketMixin(SDK, ExchangeMixin):
