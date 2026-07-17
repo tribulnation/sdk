@@ -24,6 +24,28 @@ def effective_imf(market: PerpetualMarket):
   effective_IMF = min(base_IMF + max(IMF_increase, 0), 1)
   return Decimal(effective_IMF)
 
+def effective_mmf(market: PerpetualMarket):
+  """Compute the effective Maintenance Margin Fraction (MMF) of the given market.
+
+  dYdX scales the Initial Margin Fraction up with open interest (see `effective_imf`).
+  We assume the *same* OI scaling factor applies to the Maintenance Margin Fraction, so
+  maintenance margin isn't understated at high open interest:
+
+    effective_mmf = effective_imf(market) * base_mmf / base_imf
+
+  where `base_imf = market['initialMarginFraction']` and
+  `base_mmf = market['maintenanceMarginFraction']`.
+
+  NOTE: the "OI-scaling-applies-to-MMF" assumption should be confirmed against the dYdX
+  margin docs (https://docs.dydx.xyz/concepts/trading/margin#margining). Scaling *up* is
+  the risk-safe direction (maintenance is over- rather than under-stated).
+  """
+  base_imf = market['initialMarginFraction']
+  base_mmf = market['maintenanceMarginFraction']
+  if base_imf == 0:
+    return base_mmf
+  return effective_imf(market) * base_mmf / base_imf
+
 def max_leverage(market: PerpetualMarket):
   """Return the maximum leverage implied by market margin metadata."""
   imf = effective_imf(market)

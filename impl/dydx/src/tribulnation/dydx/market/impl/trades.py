@@ -18,7 +18,7 @@ async def trades_history(self: MarketMixin, start: datetime, end: datetime) -> A
   def within(time: datetime) -> bool:
     return start <= time <= end
 
-  address = await self.address
+  address = self.address
   subaccounts = (await self.indexer.data.get_subaccounts(address))['subaccounts']
 
   for sub in subaccounts:

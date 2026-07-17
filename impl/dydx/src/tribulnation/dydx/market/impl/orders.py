@@ -65,13 +65,17 @@ async def list_orders(
   self: MarketMixin, *,
   status: Literal['OPEN', 'FILLED', 'CANCELED', 'BEST_EFFORT_CANCELED', 'UNTRIGGERED', 'BEST_EFFORT_OPENED', 'PENDING'] | None = None,
 ) -> list[OrderState]:
-  address = await self.address
+  address = self.address
   orders = await self.indexer.data.list_parent_orders(
     address=address,
     parent_subaccount=self.shared.parent_subaccount,
     ticker=self.market,
     status=status,
   )
+  # Scope to the addressed subaccount. The parent exchange (subaccount == parent) keeps
+  # the parent-aggregate view; a child exchange filters down to just that child.
+  if self.subaccount != self.shared.parent_subaccount:
+    orders = [order for order in orders if order['subaccountNumber'] == self.subaccount]
   return [parse_state(order, address=address) for order in orders]
 
 def _time_in_force(order: Order, settings: Settings) -> TimeInForce:

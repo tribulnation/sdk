@@ -1,4 +1,4 @@
-from .leverage import max_leverage
+from .leverage import max_leverage, effective_imf, effective_mmf
 from .depth import parse_book, depth_stream
 from .rules import parse_rules
 from .mixin import ExchangeMixin, MarketMixin, Settings

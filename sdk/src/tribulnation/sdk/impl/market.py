@@ -23,7 +23,7 @@ class MarketSDK(TradingMarkets):
       from tribulnation.dydx import DydxMarket
     except ImportError as e:
       raise ImportError('dydx market is not installed. Please install it with `pip install tribulnation-dydx`.') from e
-    return DydxMarket.new(account.resolved_mnemonic, mainnet=account.venue == 'dydx', parent_subaccount=account.parent_subaccount)
+    return DydxMarket.new(account.resolved_mnemonic, address=account.resolved_address, mainnet=account.venue == 'dydx', parent_subaccount=account.parent_subaccount)
 
   def hyperliquid(self, account: Hyperliquid) -> TradingVenue:
     try:

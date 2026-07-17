@@ -32,14 +32,11 @@ class Settings(TypedDict, total=False):
 class Shared:
   client: Dydx
   parent_subaccount: int = 0
+  address: str
   perpetual_markets: dict[str, PerpetualMarket] | None = None
   fee_tier: feetiers_proto.PerpetualFeeTier | None = None
   parent_subaccount_subscriptions: dict[int, Subscription[ParentSubaccountNotification]] = field(default_factory=dict)
   depth_subscriptions: dict[str, Subscription[Book]] = field(default_factory=dict)
-
-  @property
-  async def address(self) -> str:
-    return self.client.node.require_wallet().address
 
   @wrap_exceptions
   async def load_markets(self, *, refetch: bool = False) -> dict[str, PerpetualMarket]:
@@ -50,7 +47,7 @@ class Shared:
   @wrap_exceptions
   async def load_fee_tier(self, *, refetch: bool = False) -> feetiers_proto.PerpetualFeeTier:
     if refetch or self.fee_tier is None:
-      response = await self.client.chain.feetiers.user_fee_tier(await self.address)
+      response = await self.client.chain.feetiers.user_fee_tier(self.address)
       if response.tier is None:
         raise ValueError('dYdX fee tier response did not include a tier')
       self.fee_tier = response.tier
@@ -67,7 +64,7 @@ class Shared:
     if parent_subaccount not in self.parent_subaccount_subscriptions:
       @wrap_exceptions
       async def subscribe():
-        stream = await self.client.indexer.streams.parent_subaccounts(await self.address, subaccount=parent_subaccount)
+        stream = await self.client.indexer.streams.parent_subaccounts(self.address, subaccount=parent_subaccount)
         @wrap_exceptions
         async def parsed_stream():
           async for msg in stream:
@@ -97,9 +94,13 @@ class ExchangeMixin:
     return await fn()
 
   @classmethod
-  def new(cls, mnemonic: str | None = None, *, mainnet: bool = True, validate: bool = True, parent_subaccount: int = 0):
+  def new(cls, mnemonic: str | None = None, *, address: str | None = None, mainnet: bool = True, validate: bool = True, parent_subaccount: int = 0):
     client = Dydx.mainnet(mnemonic, indexer={'validate': validate}, public=mnemonic is None) if mainnet else Dydx.testnet(mnemonic, indexer={'validate': validate}, public=mnemonic is None)
-    return cls(shared=Shared(client=client, parent_subaccount=parent_subaccount))
+    if address is None:
+      if mnemonic is None:
+        raise ValueError('Either address or mnemonic must be provided')
+      address = client.node.require_wallet().address
+    return cls(shared=Shared(client=client, address=address, parent_subaccount=parent_subaccount))
     
   @property
   def client(self):

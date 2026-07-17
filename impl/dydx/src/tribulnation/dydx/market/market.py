@@ -14,6 +14,7 @@ from tribulnation.sdk.market import (
   Order,
   OrderResponse,
   OrderState,
+  PerpCollateral,
   PerpMarket,
   PerpPosition,
   Rules,
@@ -83,12 +84,15 @@ class Market(MarketMixin, PerpMarket):
   @wrap_exceptions
   async def perp_position(self) -> PerpPosition:
     positions = await self.indexer.data.list_parent_positions(
-      await self.address,
+      self.address,
       parent_subaccount=self.shared.parent_subaccount,
     )
+    # Scope to the addressed subaccount. The parent exchange (subaccount == parent) keeps
+    # the parent-aggregate view; a child exchange filters down to just that child.
     market_positions = [
       p for p in positions
       if p['market'] == self.market and p['status'] == 'OPEN'
+      and (self.subaccount == self.shared.parent_subaccount or p['subaccountNumber'] == self.subaccount)
     ]
     if not market_positions:
       return PerpPosition()
@@ -118,9 +122,8 @@ class Market(MarketMixin, PerpMarket):
 
   @wrap_exceptions
   async def available_notional(self) -> Decimal:
-    address = await self.address
     sub, market = await asyncio.gather(
-      self.indexer.data.get_subaccount(address=await self.address, subaccount=self.subaccount),
+      self.indexer.data.get_subaccount(address=self.address, subaccount=self.subaccount),
       self.indexer.data.get_market(self.market)
     )
     collateral = Decimal(sub['subaccount']['freeCollateral'])
@@ -146,6 +149,13 @@ class Market(MarketMixin, PerpMarket):
     if price is None:
       raise ApiError('Oracle price unavailable')
     return Decimal(price)
+
+  async def perp_collateral(self) -> PerpCollateral:
+    # dYdX has no per-market margin mode: a market's collateral bucket is exactly its
+    # exchange's subaccount pool, which the market inherits. Delegate to the exchange.
+    from .exchange import Exchange
+    exchange = Exchange(shared=self.shared, subaccount=self.subaccount)
+    return await exchange.perp_collateral()
 
   async def next_funding(self) -> NextFunding:
     return await next_funding(self)

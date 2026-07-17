@@ -41,7 +41,7 @@ async def funding_history(self: MarketMixin, start: datetime, end: datetime) -> 
 async def funding_payments(self: MarketMixin, start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingPayment]]:
   start = start.astimezone()
   end = end.astimezone()
-  address = await self.address
+  address = self.address
   subaccounts = (await self.indexer.data.get_subaccounts(address))['subaccounts']
 
   for sub in subaccounts:
