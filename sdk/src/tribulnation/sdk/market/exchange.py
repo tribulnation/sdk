@@ -6,6 +6,7 @@ from datetime import datetime
 from tribulnation.sdk.core import SDK, PaginatedResponse, OverflowPolicy
 from .types import (
   Book,
+  Collateral, PerpCollateral,
   NextFunding,
   Order, OrderResponse, OrderState,
   Position, PerpPosition,
@@ -116,6 +117,18 @@ class Exchange(SDK):
     return await market.position()
 
   @SDK.method
+  async def collateral(self, market_id: str | None = None, /) -> Collateral:
+    """Fetch collateral.
+
+    - `market_id=None`: this exchange's collateral bucket (the whole pool).
+    - `market_id='<id>'`: delegates to the market's mode-aware collateral.
+    """
+    if market_id is not None:
+      market = await self.market(market_id)
+      return await market.collateral()
+    raise NotImplementedError(f'Collateral is not supported by this exchange [{self.id}].')
+
+  @SDK.method
   async def available_notional(self, market_id: str, /):
     """Fetch the max. notional position you can open.
     
@@ -193,3 +206,20 @@ class PerpExchange(Exchange):
     """Fetch your open position in the perpetual market."""
     market = await self.market(market_id)
     return await market.perp_position()
+
+  @SDK.method
+  async def collateral(self, market_id: str | None = None, /) -> Collateral:
+    """Fetch collateral (defers to `perp_collateral`)."""
+    return await self.perp_collateral(market_id)
+
+  @SDK.method
+  async def perp_collateral(self, market_id: str | None = None, /) -> PerpCollateral:
+    """Fetch perpetual collateral.
+
+    - `market_id=None`: this exchange's collateral bucket (the whole pool).
+    - `market_id='<id>'`: delegates to the market's mode-aware perp_collateral.
+    """
+    if market_id is not None:
+      market = await self.market(market_id)
+      return await market.perp_collateral()
+    raise NotImplementedError(f'Collateral is not supported by this exchange [{self.id}].')

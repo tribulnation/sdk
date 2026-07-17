@@ -6,6 +6,7 @@ from datetime import datetime
 from tribulnation.sdk.core import SDK, PaginatedResponse, OverflowPolicy
 from .types import (
   Book,
+  Collateral, PerpCollateral,
   NextFunding,
   Order, OrderResponse, OrderState,
   Position, PerpPosition,
@@ -130,6 +131,20 @@ class TradingVenue(SDK):
     return await market.position()
 
   @SDK.method
+  async def collateral(self, id: str, /) -> Collateral:
+    """Fetch collateral.
+
+    - 1-segment (`perp`): exchange-level bucket.
+    - 2-segment (`perp:BTC-USD`): market-level (mode-aware).
+    """
+    if ':' in id:
+      exchange_id, market_id = id.split(':', 1)
+      exchange = await self.exchange(exchange_id)
+      return await exchange.collateral(market_id)
+    exchange = await self.exchange(id)
+    return await exchange.collateral()
+
+  @SDK.method
   async def available_notional(self, market_id: str, /):
     """Fetch the max. notional position you can open.
     
@@ -214,3 +229,17 @@ class TradingVenue(SDK):
     """Fetch your open position in the perpetual market."""
     market = await self.perp_market(market_id)
     return await market.perp_position()
+
+  @SDK.method
+  async def perp_collateral(self, id: str, /) -> PerpCollateral:
+    """Fetch perpetual collateral.
+
+    - 1-segment (`perp`): exchange-level bucket.
+    - 2-segment (`perp:BTC-USD`): market-level (mode-aware).
+    """
+    if ':' in id:
+      exchange_id, market_id = id.split(':', 1)
+      exchange = await self.perp_exchange(exchange_id)
+      return await exchange.perp_collateral(market_id)
+    exchange = await self.perp_exchange(id)
+    return await exchange.perp_collateral()

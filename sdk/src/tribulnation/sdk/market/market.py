@@ -7,6 +7,7 @@ import asyncio
 from tribulnation.sdk.core import SDK, PaginatedResponse, OverflowPolicy
 from .types import (
   Book,
+  Collateral, PerpCollateral,
   FundingRate, NextFunding, FundingPayment,
   Order, OrderResponse, OrderState,
   Position, PerpPosition,
@@ -114,6 +115,11 @@ class Market(SDK):
     """Fetch your open position in the market."""
 
   @SDK.method
+  async def collateral(self) -> Collateral:
+    """Fetch the collateral bucket backing this market."""
+    raise NotImplementedError(f'Collateral is not supported by this market [{self.id}].')
+
+  @SDK.method
   @abstractmethod
   async def available_notional(self) -> Decimal:
     """Fetch the max. notional position you can open.
@@ -203,3 +209,13 @@ class PerpMarket(Market):
   @abstractmethod
   async def perp_position(self) -> PerpPosition:
     """Fetch your open position in the perpetual market."""
+
+  @SDK.method
+  async def collateral(self) -> Collateral:
+    """Fetch the collateral bucket backing this market."""
+    return await self.perp_collateral()
+
+  @SDK.method
+  async def perp_collateral(self) -> PerpCollateral:
+    """Fetch the perpetual collateral bucket backing this market."""
+    raise NotImplementedError(f'Collateral is not supported by this market [{self.id}].')

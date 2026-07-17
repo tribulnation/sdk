@@ -6,6 +6,7 @@ from datetime import datetime
 from tribulnation.sdk.core import SDK, PaginatedResponse, OverflowPolicy
 from .types import (
   Book,
+  Collateral, PerpCollateral,
   FundingRate, NextFunding, FundingPayment,
   Order, OrderResponse, OrderState,
   Position, PerpPosition,
@@ -142,6 +143,24 @@ class TradingMarkets(SDK):
     return await market.position()
 
   @SDK.method
+  async def collateral(self, id: str, /) -> Collateral:
+    """Fetch collateral.
+
+    - 2-segment (`dydx:perp`): exchange-level bucket.
+    - 3-segment (`dydx:perp:BTC-USD`): market-level (mode-aware).
+    """
+    parts = id.split(':', 2)
+    if len(parts) == 3:
+      account_id, exchange_id, market_id = parts
+      venue = await self.venue(account_id)
+      exchange = await venue.exchange(exchange_id)
+      return await exchange.collateral(market_id)
+    account_id, exchange_id = parts
+    venue = await self.venue(account_id)
+    exchange = await venue.exchange(exchange_id)
+    return await exchange.collateral()
+
+  @SDK.method
   async def available_notional(self, market_id: str, /):
     """Fetch the max. notional position you can open.
     
@@ -184,6 +203,24 @@ class TradingMarkets(SDK):
     """Fetch your open position in the perpetual market."""
     market = await self.perp_market(market_id)
     return await market.perp_position()
+
+  @SDK.method
+  async def perp_collateral(self, id: str, /) -> PerpCollateral:
+    """Fetch perpetual collateral.
+
+    - 2-segment (`dydx:perp`): exchange-level bucket.
+    - 3-segment (`dydx:perp:BTC-USD`): market-level (mode-aware).
+    """
+    parts = id.split(':', 2)
+    if len(parts) == 3:
+      account_id, exchange_id, market_id = parts
+      venue = await self.venue(account_id)
+      exchange = await venue.perp_exchange(exchange_id)
+      return await exchange.perp_collateral(market_id)
+    account_id, exchange_id = parts
+    venue = await self.venue(account_id)
+    exchange = await venue.perp_exchange(exchange_id)
+    return await exchange.perp_collateral()
 
   @SDK.method
   async def index(self, market_id: str, /):
