@@ -1,6 +1,7 @@
 from .models import (
   Position,
   Snapshot,
+  SubaccountSnapshot,
   ApiProvenance,
   BaseObservation,
   Bonus,
@@ -43,7 +44,7 @@ from .models import (
   CosmosTx,
   CosmosBlockEvents,
 )
-from .snapshots import Snapshots
+from .snapshots import SnapshotResult, Snapshots
 from .history import History
 from .sdk import Report
 from .config import (
@@ -58,6 +59,8 @@ from .util import source_id, Balances
 __all__ = [
   'Snapshots',
   'Snapshot',
+  'SubaccountSnapshot',
+  'SnapshotResult',
   'Position',
   'History',
   'ApiProvenance',

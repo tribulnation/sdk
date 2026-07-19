@@ -36,6 +36,7 @@ class FuturesHistory(TimezoneMixin, SdkHistory):
             asset=tx['marginCoin'],
             amount=tx['amount'],
             time=self.add_tz(tx['ts']),
+            subaccount='futures',
           )
         ]
         if (fee := abs(tx['fee'])) > 0:
@@ -46,6 +47,7 @@ class FuturesHistory(TimezoneMixin, SdkHistory):
             time=self.add_tz(tx['ts']),
             event_type='unknown',
             event_id=tx['id'],
+            subaccount='futures',
           ))
         yield api_record_many(
           observations,
@@ -77,6 +79,7 @@ class FuturesHistory(TimezoneMixin, SdkHistory):
           price=fill['price'],
           order_id=fill['orderId'],
           fee=None if fee is None or fee_asset is None else nonzero_fee(fee, fee_asset),
+          subaccount='futures',
         ), endpoint='futures_fills', response=fill)
 
   async def history(

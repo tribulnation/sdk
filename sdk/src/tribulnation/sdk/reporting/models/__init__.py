@@ -1,5 +1,5 @@
 from .common import Fee, BaseObservation
-from .snapshots import Snapshot, Position
+from .snapshots import Snapshot, SubaccountSnapshot, Position
 from .exchange import (
   TradeLegEventType, ExchangeObservationType,
   SpotTrade, SpotOrder, TradeLeg, Conversion, FeeLeg, ConversionLeg,

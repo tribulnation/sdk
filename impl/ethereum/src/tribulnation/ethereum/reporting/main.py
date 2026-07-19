@@ -1,11 +1,11 @@
-from typing_extensions import Sequence
+from typing_extensions import Collection
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 import asyncio
 
 from tribulnation.sdk.reporting import (
   Report, History, Snapshots, Record,
-  EvmTx, Snapshot, ProvidersConfig,
+  EvmTx, Snapshot, SnapshotResult, ProvidersConfig,
   source_id,
 )
 from tribulnation.ethereum.core import Network
@@ -50,8 +50,8 @@ class EthereumReport(Report):
     async for record in self.history_impl.history(start, end):
       yield record
 
-  async def snapshots(self, assets: Sequence[str] | None = None):
-    return await self.snapshots_impl.snapshots(assets)
+  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotResult:
+    return await self.snapshots_impl.snapshot(assets)
 
   async def records(self, start: datetime | None = None, end: datetime | None = None):
     assets = set[str]()
@@ -68,7 +68,7 @@ class EthereumReport(Report):
     if start is None and start_time is not None:
       snapshot_time = start_time - timedelta(days=1)
       yield Record(
-        snapshots=[Snapshot(time=snapshot_time, balances={})],
+        snapshots=[Snapshot(time=snapshot_time)],
         provenance={
           'source': 'derived',
           'id': source_id('derived'),
@@ -79,4 +79,5 @@ class EthereumReport(Report):
       )
 
     if end is None:
-      yield await self.asset_snapshots_impl.snapshots(assets=sorted(assets))
+      result = await self.asset_snapshots_impl.snapshot(assets=sorted(assets))
+      yield Record(snapshots=[result.snapshot], provenance=result.provenance)

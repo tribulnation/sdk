@@ -1,13 +1,17 @@
-from typing_extensions import Sequence
+from typing_extensions import Collection, NamedTuple
 from abc import abstractmethod
 
 from tribulnation.sdk import SDK
-from .models import Record
+from .models import Provenance, Snapshot
+
+class SnapshotResult(NamedTuple):
+  snapshot: Snapshot
+  provenance: Provenance
 
 class Snapshots(SDK):
   @SDK.method
   @abstractmethod
-  async def snapshots(self, assets: Sequence[str] | None = None) -> Record:
+  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotResult:
     """Fetch the current balances and positions of the account.
     
     - `assets` is used for asset discovery in venues that don't support full enumeration (e.g. EVM blockchains). For others (e.g. CEXs) it's ignored"""

@@ -15,4 +15,5 @@ class Report(History, Snapshots):
     async for record in self.history(start, end):
       yield record
     if end is None:
-      yield await self.snapshots()
+      result = await self.snapshot()
+      yield Record(snapshots=[result.snapshot], provenance=result.provenance)

@@ -35,12 +35,14 @@ class MarginHistory(TimezoneMixin, SdkHistory):
     """Fetch margin tax rows as unknown observations."""
     async for chunk in self.client.common.tax.margin_transaction_records_paged(margin_type, start=start, end=end):
       for tx in chunk:
+        subaccount = f'{margin_type}_margin'
         observations: list[Observation] = [
           UnknownObservation(
             id=tx['id'],
             asset=tx['coin'],
             amount=tx['amount'],
             time=self.add_tz(tx['ts']),
+            subaccount=subaccount,
           )
         ]
         if (fee := abs(tx['fee'])) > 0:
@@ -51,6 +53,7 @@ class MarginHistory(TimezoneMixin, SdkHistory):
             time=self.add_tz(tx['ts']),
             event_type='unknown',
             event_id=tx['id'],
+            subaccount=subaccount,
           ))
         yield api_record_many(
           observations,
@@ -68,6 +71,7 @@ class MarginHistory(TimezoneMixin, SdkHistory):
       fn = self.client.margin.cross.trade.fills_paged
     async for chunk in fn(symbol, start=start, end=end):
       for fill in chunk:
+        subaccount = f'{margin_type}_margin'
         base = symbols[symbol]['baseCoin']
         quote = symbols[symbol]['quoteCoin']
         side = 'buy' if 'buy' in fill['side'] else 'sell'
@@ -80,6 +84,7 @@ class MarginHistory(TimezoneMixin, SdkHistory):
           price=fill['priceAvg'],
           order_id=fill['orderId'],
           fee=nonzero_fee(fill['feeDetail']['totalFee'], fill['feeDetail']['feeCoin']),
+          subaccount=subaccount,
         ), endpoint=f'{margin_type}_margin_fills', response=fill)
 
   @SDK.method

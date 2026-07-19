@@ -1,11 +1,11 @@
-from typing_extensions import AsyncIterable, Sequence, TypedDict, Literal
+from typing_extensions import AsyncIterable, Collection, TypedDict, Literal
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
 import asyncio
 
 from tribulnation.sdk.reporting import (
-  Report as _Report, Record, Snapshot, source_id,
+  Report as _Report, Record, Snapshot, SnapshotResult, source_id,
   ProvidersConfig
 )
 from dydx import Dydx
@@ -63,8 +63,8 @@ class Report(_Report):
     async for record in self.history_impl.history(start, end):
       yield record
 
-  async def snapshots(self, assets: Sequence[str] | None = None):
-    return await self.snapshots_impl.snapshots(assets)
+  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotResult:
+    return await self.snapshots_impl.snapshot(assets)
 
   async def records(self, start: datetime | None = None, end: datetime | None = None) -> AsyncIterable[Record]:
       start_time: datetime | None = None
@@ -89,4 +89,5 @@ class Report(_Report):
         )
 
       if end is None:
-        yield await self.snapshots()
+        result = await self.snapshot()
+        yield Record(snapshots=[result.snapshot], provenance=result.provenance)

@@ -1,12 +1,13 @@
+from typing_extensions import Collection
 from dataclasses import dataclass
 from decimal import Decimal
-from datetime import datetime
 import asyncio
-from collections import Counter
-from typing_extensions import Sequence
 
 from tribulnation.sdk.core import SDK
-from tribulnation.sdk.reporting import Record, Snapshots as _Snapshots, Snapshot, source_id, Position
+from tribulnation.sdk.reporting import (
+  Balances, Snapshot, SnapshotResult, Snapshots as _Snapshots, SubaccountSnapshot,
+  source_id,
+)
 from tribulnation.bit2me.core import wrap_exceptions
 from bit2me import Bit2Me
 
@@ -23,38 +24,35 @@ class Snapshots(_Snapshots):
 
   @SDK.method
   @wrap_exceptions
-  async def spot_balances(self) -> Counter:
-    out = Counter()
+  async def spot_balances(self) -> Balances:
+    out = Balances()
     balances = await self.client.v1.trading.balance()
     for entry in balances:
-      asset = entry['currency'] # type: ignore
+      if (asset := entry.get('currency')) is None:
+        continue
       balance = Decimal(entry.get('balance', 0)) + Decimal(entry.get('blockedBalance', 0))
-      out[asset] += balance # type: ignore
+      out[asset] += balance
     return out
 
   @SDK.method
   @wrap_exceptions
-  async def earn_balances(self) -> Counter:
-    out = Counter()
+  async def earn_balances(self) -> Balances:
+    out = Balances()
     wallets = await self.client.v2.earn.wallets()
     for entry in wallets.get('data', []):
-      out[entry['currency']] += Decimal(entry['balance']) # type: ignore
+      if (balance := entry.get('balance')) is not None and (currency := entry.get('currency')) is not None:
+        out[currency] += Decimal(balance)
     return out
 
-  async def snapshots(self, assets: Sequence[str] | None = None) -> Record:
-    c1, c2 = await asyncio.gather(
+  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotResult:
+    spot, earn = await asyncio.gather(
       self.spot_balances(),
       self.earn_balances(),
     )
-    time = datetime.now().astimezone()
-    total = Counter()
-    for counter in (c1, c2):
-      for asset, qty in counter.items():
-        total[asset] += qty
-    return Record(
-      snapshots=[Snapshot(
-        time=time,
-        balances=dict(total), # type: ignore
-      )],
+    return SnapshotResult(
+      snapshot=Snapshot(subaccounts=[
+        SubaccountSnapshot(subaccount='spot', balances=spot),
+        SubaccountSnapshot(subaccount='earn', balances=earn),
+      ]),
       provenance={'source': 'api', 'service': 'bit2me', 'id': source_id('bit2me')},
     )

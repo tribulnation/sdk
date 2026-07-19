@@ -1,6 +1,5 @@
-from typing_extensions import Sequence
+from typing_extensions import Collection
 from dataclasses import dataclass
-from datetime import datetime
 from decimal import Decimal
 import asyncio
 
@@ -9,7 +8,9 @@ from web3.exceptions import BadFunctionCallOutput, ContractLogicError
 from ethereum import NodeRpc
 
 from tribulnation.sdk import SDK, ApiError
-from tribulnation.sdk.reporting import Snapshots, Record, Snapshot, source_id
+from tribulnation.sdk.reporting import (
+  Balances, Snapshot, SnapshotResult, Snapshots, SubaccountSnapshot, source_id,
+)
 from tribulnation.ethereum.core import rpc
 from ..config import NATIVE_ASSET
 
@@ -47,12 +48,11 @@ class NodeSnapshots(Snapshots):
       return None
 
   @rpc.wrap_exceptions
-  async def snapshots(self, assets: Sequence[str] | None = None) -> Record:
+  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotResult:
     assets = assets or []
-    time = datetime.now().astimezone()
-    balances: dict[str, Decimal] = {
+    balances = Balances({
       NATIVE_ASSET: await self.eth_balance(),
-    }
+    })
 
     semaphore = asyncio.Semaphore(self.batch_size)
     async def limited_token_balance(contract: str):
@@ -70,7 +70,7 @@ class NodeSnapshots(Snapshots):
       if balance is not None and (not self.ignore_zero_value or balance > 0):
         balances[contract] = balance
 
-    return Record(
-      snapshots=[Snapshot(time=time, balances=balances)],
+    return SnapshotResult(
+      snapshot=Snapshot(subaccounts=[SubaccountSnapshot(balances=balances)]),
       provenance={'source': 'api', 'service': 'node_rpc', 'id': source_id('node_rpc')},
     )

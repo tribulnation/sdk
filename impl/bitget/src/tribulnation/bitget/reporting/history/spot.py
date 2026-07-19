@@ -49,6 +49,7 @@ class SpotHistory(TimezoneMixin, SdkHistory):
             asset=tx['coin'],
             amount=tx['amount'],
             time=self.add_tz(tx['ts']),
+            subaccount='spot',
           )
         ]
         if (fee := abs(tx['fee'])) > 0:
@@ -59,6 +60,7 @@ class SpotHistory(TimezoneMixin, SdkHistory):
             time=self.add_tz(tx['ts']),
             event_type='unknown',
             event_id=tx['id'],
+            subaccount='spot',
           ))
         yield api_record_many(
           observations,
@@ -83,6 +85,7 @@ class SpotHistory(TimezoneMixin, SdkHistory):
           price=fill['priceAvg'],
           order_id=fill['orderId'],
           fee=nonzero_fee(fill['feeDetail']['totalFee'], fill['feeDetail']['feeCoin']),
+          subaccount='spot',
         ), endpoint='spot_fills', response=fill)
 
   @SDK.method
@@ -99,6 +102,7 @@ class SpotHistory(TimezoneMixin, SdkHistory):
           amount=deposit['size'],
           network=deposit['chain'],
           tx_id=deposit['tradeId'],
+          subaccount='spot',
         ), endpoint='spot_deposits', response=deposit)
   
   @SDK.method
@@ -118,6 +122,7 @@ class SpotHistory(TimezoneMixin, SdkHistory):
           tx_id=withdrawal['tradeId'],
           dst_address=withdrawal['toAddress'],
           fee=nonzero_fee(withdrawal['fee'], withdrawal['coin']),
+          subaccount='spot',
         ), endpoint='spot_withdrawals', response=withdrawal)
 
   @SDK.method

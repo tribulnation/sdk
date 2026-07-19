@@ -1,13 +1,14 @@
 from decimal import Decimal
-from typing_extensions import Sequence, TypeVar, Callable, Awaitable
+from typing_extensions import Collection, TypeVar, Callable, Awaitable
 from dataclasses import dataclass, field
-from datetime import datetime
 
 from web3 import Web3
 from alchemy import Alchemy
 
 from tribulnation.sdk import SDK
-from tribulnation.sdk.reporting import Snapshots, Record, Snapshot, source_id
+from tribulnation.sdk.reporting import (
+  Balances, Snapshot, SnapshotResult, Snapshots, SubaccountSnapshot, source_id,
+)
 from tribulnation.ethereum.core import alchemy as alchemy_core
 from ..config import NATIVE_ASSET
 
@@ -56,12 +57,13 @@ class AlchemySnapshots(Snapshots):
     })
     state = paging.init
     while state is not None:
-      chunk, state = await self.call_alchemy(lambda: paging.next(state)) # type: ignore
+      current = state
+      chunk, state = await self.call_alchemy(lambda: paging.next(current))
       for token in chunk:
         yield token
 
-  async def snapshots(self, assets: Sequence[str] | None = None) -> Record:
-    balances: dict[str, Decimal] = {}
+  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotResult:
+    balances = Balances()
     tokens = [token async for token in self.alchemy_portfolio_tokens()]
     for token in tokens:
       address = token.get('tokenAddress')
@@ -70,7 +72,9 @@ class AlchemySnapshots(Snapshots):
       qty = token_qty(token['tokenBalance'], metadata.get('decimals'))
       if qty > 0 or not self.ignore_zero_value:
         balances[asset] = qty
-    return Record(
-      snapshots=[Snapshot(time=datetime.now().astimezone(), balances=balances)],
+    return SnapshotResult(
+      snapshot=Snapshot(
+        subaccounts=[SubaccountSnapshot(balances=balances)],
+      ),
       provenance={'source': 'api', 'service': 'alchemy', 'id': source_id('alchemy')},
     )

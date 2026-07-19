@@ -1,13 +1,12 @@
-from typing_extensions import Sequence
+from typing_extensions import Collection
 from dataclasses import dataclass, field
 from decimal import Decimal
-from datetime import datetime, timezone
 import asyncio
 
 from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import (
-  Snapshots as _Snapshots, Snapshot,
-  Balances, Position, Record, source_id
+  Snapshots as _Snapshots, Snapshot, SnapshotResult, SubaccountSnapshot,
+  Balances, Position, source_id
 )
 from tribulnation.dydx.core import (
   parse_coin, parse_dec_coin, parse_dydx_quantums,
@@ -77,52 +76,62 @@ class Snapshots(_Snapshots):
 
   @SDK.method
   @wrap_exceptions
-  async def perpetual_collateral_and_positions(self) -> tuple[Decimal, dict[str, Position]]:
+  async def perpetual_subaccounts(self) -> list[SubaccountSnapshot]:
     subaccounts = (await self.client.indexer.data.get_subaccounts(self.address))['subaccounts']
-    equity = Decimal(0)
-    unrealized = Decimal(0)
-
-    positions_sizes = Balances()
-    total_prices = Balances()
-
+    out: list[SubaccountSnapshot] = []
     for sub in subaccounts:
-      equity += Decimal(sub['equity'])
-
+      unrealized = Decimal(0)
+      positions: dict[str, Position] = {}
       for position in sub['openPerpetualPositions'].values():
         if (pnl := position.get('unrealizedPnl')) is not None:
           unrealized += Decimal(pnl)
+        positions[position['market']] = Position(
+          size=Decimal(position['size']),
+          avg_price=Decimal(position['entryPrice']),
+        )
+      collateral = Decimal(sub['equity']) - unrealized
+      out.append(SubaccountSnapshot(
+        subaccount=str(sub['subaccountNumber']),
+        balances=Balances({USDC: collateral}),
+        positions=positions,
+      ))
+    return out
 
-        positions_sizes[position['market']] += position['size']
-        total_prices[position['market']] += position['size'] * position['entryPrice']
-
-    collateral = equity - unrealized
-
-    positions_sizes = Balances({ k: v for k, v in positions_sizes.items() if v })
-    entry_prices = {
-      market: total_prices[market] / positions_sizes[market]
-      for market in positions_sizes
+  @SDK.method
+  @wrap_exceptions
+  async def perpetual_collateral_and_positions(self) -> tuple[Decimal, dict[str, Position]]:
+    """Return the aggregate perpetual state retained for direct SDK callers."""
+    subaccounts = await self.perpetual_subaccounts()
+    collateral = sum(
+      (state.balances.get(USDC, Decimal(0)) for state in subaccounts),
+      start=Decimal(0),
+    )
+    positions: dict[str, list[Position]] = {}
+    for state in subaccounts:
+      for instrument, position in state.positions.items():
+        positions.setdefault(instrument, []).append(position)
+    return collateral, {
+      instrument: Position.merge(parts)
+      for instrument, parts in positions.items()
     }
-    positions = {
-      market: Position(size=positions_sizes[market], avg_price=entry_prices[market])
-      for market in positions_sizes
-    }
 
-    return collateral, positions
-
-  async def snapshots(self, assets: Sequence[str] | None = None) -> Record:
-    bank, delegations, unbonding, unclaimed, (collateral, positions) = await asyncio.gather(
+  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotResult:
+    bank, delegations, unbonding, unclaimed, perpetuals = await asyncio.gather(
       self.bank_module_balances(),
       self.active_delegations(),
       self.unbonding_delegations(),
       self.unclaimed_delegation_rewards(),
-      self.perpetual_collateral_and_positions(),
+      self.perpetual_subaccounts(),
     )
-    balances = bank + delegations + unbonding + unclaimed + Balances({USDC: collateral})
-    return Record(
-      snapshots=[Snapshot(
-        time=datetime.now(timezone.utc),
-        balances=balances,
-        positions=positions,
-      )],
+    return SnapshotResult(
+      snapshot=Snapshot(
+        subaccounts=[
+          SubaccountSnapshot(
+            subaccount='chain',
+            balances=bank + delegations + unbonding + unclaimed,
+          ),
+          *perpetuals,
+        ],
+      ),
       provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )
