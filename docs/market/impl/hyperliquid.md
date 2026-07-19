@@ -67,11 +67,15 @@ mark is unavailable; the default `'oracle'` always returns the oracle price.
 - Perp `available_notional`/leverage and spot balances are computed against
   Hyperliquid-native metadata (asset/collateral tokens, user fees), cached venue-wide and
   refreshed lazily.
-- **`perp_collateral`** at the exchange level returns the account **cross** pool from
-  `clearinghouse_state` (`equity=crossMarginSummary.accountValue`,
-  `initial_margin=equity-withdrawable`, `maintenance_margin=crossMaintenanceMarginUsed`,
-  `free_collateral=withdrawable`, `leverage=totalNtlPos/accountValue`,
-  `margin_mode='cross'`). `Market.perp_collateral()` is **mode-aware**: it finds the asset in
+- **`perp_collateral`** at the exchange level returns the account **cross** pool in **unified
+  account** mode. The implementation asserts `user_abstraction == "unifiedAccount"` and raises
+  on other modes. In unified mode, the real equity backing perps is the **spot collateral token
+  balance** (determined by `perp_meta['collateralToken']`, USDC for the default DEX), not
+  `crossMarginSummary.accountValue` (which only reflects USDC deposited into the perps engine).
+  Fields: `equity=spot_collateral_balance`, `free_collateral=tokenToAvailableAfterMaintenance`
+  for the collateral token, `initial_margin=equity-free_collateral`,
+  `maintenance_margin=crossMaintenanceMarginUsed`, `leverage=totalNtlPos/equity`,
+  `margin_mode='cross'`. `Market.perp_collateral()` is **mode-aware**: it finds the asset in
   `assetPositions` and branches on the position's leverage type — a cross position reports the
   same cross pool, while an **isolated** position gets its own bucket from that position's
   `rawUsd + unrealizedPnl` (equity), `marginUsed` (= `initial_margin`), and
