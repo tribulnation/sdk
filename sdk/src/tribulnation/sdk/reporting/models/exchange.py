@@ -306,7 +306,7 @@ class Repay(SingleAssetObservation):
 class InternalTransfer(SingleAssetObservation):
   """Movement between compartments inside the current venue account scope."""
   type: Literal['internal_transfer'] = 'internal_transfer'
-  amount: Decimal
+  amount: Decimal = pydantic.Field(..., ge=0)
   """Raw moved amount. Direction is described by src_account and dst_account."""
   src_account: str | None = None
   """Source compartment inside the current venue account scope, if known."""
