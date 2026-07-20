@@ -79,12 +79,12 @@ class HistoryMixin(SDK):
   async def parse_execution(self, tx: TxData, receipt: TxReceipt) -> EvmTx.Execution:
     """Parse contract execution metadata from a raw transaction."""
     input, to = tx.get('input'), tx.get('to')
-    if input is None or to is None:
+    if input is None:
       hash = (hash := tx.get('hash')) and hash.to_0x_hex()
       raise ValueError(f'No input or to address in transaction: {hash}. Input: {input}. To: {to}')
     return EvmTx.Execution(
-      to=Web3.to_checksum_address(to),
-      eoa=await self.is_eoa_cached(to),
+      to=to and Web3.to_checksum_address(to),
+      eoa=await self.is_eoa_cached(to) if to else False,
       input=input.to_0x_hex(),
       canceled=receipt['status'] == 0,
       logs=EvmTx.Log.parse_all(receipt['logs']),

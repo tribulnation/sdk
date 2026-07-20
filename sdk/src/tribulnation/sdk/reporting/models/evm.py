@@ -96,8 +96,8 @@ class EvmTx(BaseObservation):
   Transfer = NativeTransfer | ERC20Transfer | NftTransfer
 
   class Execution(pydantic.BaseModel):
-    to: ChecksumAddress
-    """To address"""
+    to: ChecksumAddress | None
+    """To address (can be None for contract creation)"""
     input: str
     """Input data (if any)"""
     eoa: bool
