@@ -3,7 +3,7 @@ from decimal import Decimal
 import base64
 
 from dydx.indexer.data.list_parent_orders import Order as IndexerOrder
-from dydx.node.orders import OrderParams, OrderPlacement, TimeInForce
+from dydx.node.orders import OrderParams, OrderPlacement, TimeInForce, Flags
 from tribulnation.sdk.core import ValidationError
 from tribulnation.sdk.market import Order, OrderResponse, OrderState, Settings as MarketSettings
 from dydx.protos.dydxprotocol import clob, subaccounts
@@ -85,6 +85,13 @@ def _time_in_force(order: Order, settings: Settings) -> TimeInForce:
     return settings.get('market_tif', 'IMMEDIATE_OR_CANCEL')
   return settings.get('limit_tif', 'GOOD_TIL_TIME')
 
+def _flags(order: Order, settings: Settings) -> Flags:
+  if order['type'] == 'MARKET':
+    return settings.get('market_flags', 'SHORT_TERM')
+  else:
+    return settings.get('limit_flags', 'LONG_TERM')
+
+
 def export_order(order: Order, settings: Settings) -> OrderParams:
   """Convert an SDK order into dYdX ergonomic order parameters."""
   signed_qty = Decimal(order['qty'])
@@ -93,7 +100,7 @@ def export_order(order: Order, settings: Settings) -> OrderParams:
     'side': side,
     'price': Decimal(order['price']),
     'size': abs(signed_qty),
-    'flags': settings.get('order_flags', 'LONG_TERM'),
+    'flags': _flags(order, settings),
     'time_in_force': _time_in_force(order, settings),
     'reduce_only': settings.get('reduce_only', False),
   }
