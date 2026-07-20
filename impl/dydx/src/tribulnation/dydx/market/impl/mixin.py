@@ -1,13 +1,13 @@
 from typing_extensions import TypedDict, Callable, Awaitable, TypeVar
 from dataclasses import dataclass, field
 import asyncio
+import pydantic
 
 from dydx.indexer.types import PerpetualMarket
 from dydx import Dydx
 from dydx.indexer.streams.parent_subaccounts import Notification as ParentSubaccountNotification
 from dydx.node.orders import Flags, TimeInForce
 from dydx.protos.dydxprotocol import feetiers as feetiers_proto
-
 from tribulnation.sdk.core import SDK, Subscription, OverflowPolicy
 from tribulnation.dydx.core import wrap_exceptions
 from .depth import depth_stream, Book
@@ -15,18 +15,19 @@ from .rules import parse_rules, Rules
 
 T = TypeVar('T')
 
+@pydantic.with_config({'extra': 'forbid'})
 class Settings(TypedDict, total=False):
-  order_flags: Flags
-  """Order flags for all orders"""
-  limit_tif: TimeInForce
-  """Time in force for limit orders"""
-  market_tif: TimeInForce
-  """Time in force for market orders. Defaults to immediate-or-cancel."""
+  flags: Flags
+  """Order flags. Defaults to SHORT_TERM for market orders and LONG_TERM for limit/post_only orders."""
+  tif: TimeInForce
+  """Time in force for limit orders. Defaults to IOC for market orders and GTC for limit/post_only orders."""
   short_term_gtb: int
   """GTB delta for short-term orders. The GTB will be `current_block() + short_term_gtb`"""
   long_term_gtbt: int
   """GTBT delta for long-term orders. The GTBT will be `current_block().time.seconds + long_term_gtbt`"""
   reduce_only: bool
+
+settings_adapter = pydantic.TypeAdapter(Settings)
 
 @dataclass(kw_only=True)
 class Shared:

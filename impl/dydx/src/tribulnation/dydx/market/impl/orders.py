@@ -3,12 +3,13 @@ from decimal import Decimal
 import base64
 
 from dydx.indexer.data.list_parent_orders import Order as IndexerOrder
-from dydx.node.orders import OrderParams, OrderPlacement, TimeInForce, Flags
+from dydx.node.orders import OrderParams, TimeInForce, Flags
 from tribulnation.sdk.core import ValidationError
 from tribulnation.sdk.market import Order, OrderResponse, OrderState, Settings as MarketSettings
 from dydx.protos.dydxprotocol import clob, subaccounts
 from tribulnation.dydx.core import wrap_exceptions
-from .mixin import MarketMixin, Settings
+from .mixin import MarketMixin, Settings, settings_adapter
+
 
 def _active(status: str) -> bool:
   match status:
@@ -78,18 +79,25 @@ async def list_orders(
     orders = [order for order in orders if order['subaccountNumber'] == self.subaccount]
   return [parse_state(order, address=address) for order in orders]
 
-def _time_in_force(order: Order, settings: Settings) -> TimeInForce:
+def _default_tif(order: Order) -> TimeInForce:
   if order['type'] == 'POST_ONLY':
     return 'POST_ONLY'
   if order['type'] == 'MARKET':
-    return settings.get('market_tif', 'IMMEDIATE_OR_CANCEL')
-  return settings.get('limit_tif', 'GOOD_TIL_TIME')
+    return 'IMMEDIATE_OR_CANCEL'
+  else:
+    return 'GOOD_TIL_TIME'
+
+def _time_in_force(order: Order, settings: Settings) -> TimeInForce:
+  return settings.get('tif', _default_tif(order))
+
+def _default_flags(order: Order) -> Flags:
+  if order['type'] == 'MARKET':
+    return 'SHORT_TERM'
+  else:
+    return 'LONG_TERM'
 
 def _flags(order: Order, settings: Settings) -> Flags:
-  if order['type'] == 'MARKET':
-    return settings.get('market_flags', 'SHORT_TERM')
-  else:
-    return settings.get('limit_flags', 'LONG_TERM')
+  return settings.get('flags', _default_flags(order))
 
 
 def export_order(order: Order, settings: Settings) -> OrderParams:
@@ -123,7 +131,7 @@ async def with_expiry(self: MarketMixin, params: OrderParams, settings: Settings
 
 @wrap_exceptions
 async def place_order(self: MarketMixin, order: Order, *, settings: MarketSettings = {}) -> OrderResponse:
-  s: Settings = settings.get('dydx', {})
+  s = settings_adapter.validate_python(settings.get('dydx', {}))
   response = await self.client.node.place_order(
     self.perpetual_market,
     order=await with_expiry(self, export_order(order, s), s),
