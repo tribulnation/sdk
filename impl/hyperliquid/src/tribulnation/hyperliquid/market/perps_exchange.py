@@ -1,9 +1,9 @@
 from typing_extensions import Collection, Mapping, Sequence
 from dataclasses import dataclass
 
-from tribulnation.sdk.market import PerpExchange as _PerpExchange, PerpCollateral, PerpStats, Settings
+from tribulnation.sdk.market import PerpExchange as _PerpExchange, PerpCollateral, PerpStats, Settings, Ticker
 
-from .impl import PerpMixin, perp_exchange_collateral, perp_stats
+from .impl import PerpMixin, perp_exchange_collateral, perp_stats, perp_tickers
 from .perps_market import PerpMarket
 
 
@@ -37,6 +37,11 @@ class PerpExchange(PerpMixin, _PerpExchange):
       A mapping of asset name to its `PerpStats`.
     """
     return await perp_stats(self, markets, settings=settings)
+
+  async def tickers(
+    self, markets: Collection[str] | None = None,
+  ) -> Mapping[str, Ticker]:
+    return await perp_tickers(self, markets)
 
   async def markets(self) -> Sequence[str]:
     # Use default/no-dex universe here; callers that care about DEX can pass it when constructing.

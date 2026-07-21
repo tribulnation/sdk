@@ -2,7 +2,7 @@ from typing_extensions import Collection, Mapping
 from datetime import datetime, timedelta
 from decimal import Decimal
 
-from tribulnation.sdk.market import PerpStats, Settings
+from tribulnation.sdk.market import PerpStats, Settings, Ticker
 
 from tribulnation.hyperliquid.core import wrap_exceptions
 from .mixin import PerpMixin
@@ -55,3 +55,33 @@ async def perp_stats(
   if wanted is not None and (missing := wanted - set(stats)):
     raise ValueError(f'Perps not found: {", ".join(sorted(missing))}')
   return stats
+
+
+@wrap_exceptions
+async def perp_tickers(
+  self: PerpMixin, markets: Collection[str] | None = None,
+) -> Mapping[str, Ticker]:
+  """Fetch ticker snapshots for the whole perp universe in one call.
+
+  Args:
+    markets: Asset names to keep. `None` keeps the whole universe.
+
+  Returns:
+    A mapping of asset name to its `Ticker`.
+  """
+  _, perp_meta, asset_ctxs = await self.shared.load_perp_meta_for_dex(self.dex_name, refetch=True)
+  wanted = None if markets is None else set(markets)
+
+  result: dict[str, Ticker] = {}
+  for asset, ctx in zip(perp_meta['universe'], asset_ctxs):
+    name = asset['name']
+    if wanted is not None and name not in wanted:
+      continue
+    result[name] = Ticker(
+      last=Decimal(px) if (px := ctx.get('midPx')) is not None else None,
+      base_volume_24h=Decimal(ctx['dayNtlVlm']),
+    )
+
+  if wanted is not None and (missing := wanted - set(result)):
+    raise ValueError(f'Perps not found: {", ".join(sorted(missing))}')
+  return result

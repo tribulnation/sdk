@@ -12,7 +12,7 @@ from .perps_position import position as perps_position
 
 from .index import index
 from .funding import next_funding, funding_rates, funding_payments
-from .stats import perp_stats
+from .stats import perp_stats, perp_tickers
 
 from .collateral import (
   perp_exchange_collateral,

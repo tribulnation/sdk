@@ -1,7 +1,8 @@
-from typing_extensions import Sequence
+from typing_extensions import Collection, Mapping, Sequence
 from dataclasses import dataclass
+from decimal import Decimal
 
-from tribulnation.sdk.market import Exchange as _Exchange
+from tribulnation.sdk.market import Exchange as _Exchange, Ticker
 
 from .impl import SpotMixin
 from .spot_market import SpotMarket
@@ -37,6 +38,31 @@ class SpotExchange(SpotMixin, _Exchange):
       m = await self.shared.spot_meta_of(spot_index)
       out.append(_market_id(m['base_meta']['name'], m['quote_meta']['name'], spot_index))
     return out
+
+  async def tickers(
+    self, markets: Collection[str] | None = None,
+  ) -> Mapping[str, Ticker]:
+    spot_meta, asset_ctxs = await self.shared.client.info.spot_meta_and_asset_ctxs()
+    tokens_by_index = {t['index']: t for t in spot_meta['tokens']}
+    wanted = None if markets is None else set(markets)
+
+    result: dict[str, Ticker] = {}
+    for asset, ctx in zip(spot_meta['universe'], asset_ctxs):
+      spot_index = asset['index']
+      base_idx, quote_idx = asset['tokens']
+      base_name = tokens_by_index[base_idx]['name']
+      quote_name = tokens_by_index[quote_idx]['name']
+      mid = _market_id(base_name, quote_name, spot_index)
+      if wanted is not None and mid not in wanted:
+        continue
+      result[mid] = Ticker(
+        last=Decimal(px) if (px := ctx.get('midPx')) is not None else None,
+        base_volume_24h=Decimal(ctx['dayNtlVlm']),
+      )
+
+    if wanted is not None and (missing := wanted - set(result)):
+      raise ValueError(f'Spot markets not found: {", ".join(sorted(missing))}')
+    return result
 
   async def market(self, market_id: str, /):
     base, quote, spot_index = parse_market_id(market_id)
