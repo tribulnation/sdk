@@ -30,7 +30,7 @@ from .impl import  (
   trades_history,
   trades_stream,
   next_funding,
-  funding_history,
+  funding_rates,
   funding_payments,
   open_orders,
   place_order,
@@ -160,8 +160,8 @@ class Market(MarketMixin, PerpMarket):
   async def next_funding(self) -> NextFunding:
     return await next_funding(self)
 
-  def funding_history(self, start: datetime, end: datetime) -> PaginatedResponse[FundingRate]:
-    return PaginatedResponse(funding_history(self, start, end))
+  def funding_rates(self, start: datetime | None = None, end: datetime | None = None) -> PaginatedResponse[FundingRate]:
+    return PaginatedResponse(funding_rates(self, start, end))
 
   def funding_payments(self, start: datetime, end: datetime) -> PaginatedResponse[FundingPayment]:
     return PaginatedResponse(funding_payments(self, start, end))

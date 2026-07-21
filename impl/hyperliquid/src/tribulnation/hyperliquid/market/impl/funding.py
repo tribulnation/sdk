@@ -24,11 +24,16 @@ async def next_funding(self: PerpMarketMixin) -> NextFunding:
 
 
 @wrap_exceptions
-async def funding_history(self: PerpMarketMixin, start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingRate]]:
-  start_ts, end_ts = ts.dump(start), ts.dump(end)
+async def funding_rates(self: PerpMarketMixin, start: datetime | None = None, end: datetime | None = None) -> AsyncIterable[Sequence[FundingRate]]:
+  start_ts = ts.dump(start) if start is not None else 0
+  end_ts = ts.dump(end) if end is not None else None
   async for chunk in self.client.info.funding_history_paged(self.asset_name, start_ts, end_time=end_ts):
     yield [
-      FundingRate(rate=Decimal(entry["fundingRate"]), time=ts.parse(entry["time"]).astimezone())
+      FundingRate(
+        rate=Decimal(entry["fundingRate"]),
+        time=ts.parse(entry["time"]).astimezone(),
+        premium=Decimal(premium) if (premium := entry.get("premium")) is not None else None,
+      )
       for entry in chunk
     ]
 

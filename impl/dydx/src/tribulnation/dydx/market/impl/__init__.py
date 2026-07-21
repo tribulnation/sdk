@@ -7,5 +7,6 @@ from .orders import (
   cancel_order, cancel_orders,
   query_order, open_orders,
 )
-from .funding import next_funding, funding_history, funding_payments
+from .funding import next_funding, funding_rates, funding_payments
+from .stats import perp_stats
 from .trades import trades_history, trades_stream

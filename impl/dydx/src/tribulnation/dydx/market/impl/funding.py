@@ -19,22 +19,22 @@ async def next_funding(self: MarketMixin) -> NextFunding:
   )
 
 @wrap_exceptions
-async def funding_history(self: MarketMixin, start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingRate]]:
-  start = start.astimezone()
-  end = end.astimezone()
+async def funding_rates(self: MarketMixin, start: datetime | None = None, end: datetime | None = None) -> AsyncIterable[Sequence[FundingRate]]:
+  start = start.astimezone() if start is not None else None
+  end = end.astimezone() if end is not None else None
   paging = self.indexer.data.get_historical_funding_paged(self.market, effective_before_or_at=end)
   state = paging.init
   while state is not None:
     next_state = state
     page, state = await self.call_dydx(lambda: paging.next(next_state))
     rates = [
-      FundingRate(rate=Decimal(item['rate']), time=time)
+      FundingRate(rate=Decimal(item['rate']), time=item['effectiveAt'])
       for item in page
-      if (time := item['effectiveAt']) >= start
+      if start is None or item['effectiveAt'] >= start
     ]
     if rates:
       yield rates
-    else:
+    elif start is not None:
       break
 
 @wrap_exceptions

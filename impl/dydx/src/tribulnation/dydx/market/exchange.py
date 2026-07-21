@@ -1,13 +1,14 @@
+from typing_extensions import Collection, Mapping
 from dataclasses import dataclass
 from decimal import Decimal
 import asyncio
 
 from tribulnation.sdk import PerpExchange
 from tribulnation.sdk.core import ApiError
-from tribulnation.sdk.market import PerpCollateral
+from tribulnation.sdk.market import PerpCollateral, PerpStats, Settings
 
 from tribulnation.dydx.core import wrap_exceptions
-from .impl import ExchangeMixin, effective_mmf
+from .impl import ExchangeMixin, effective_mmf, perp_stats
 from .market import Market
 
 # MIGRATION NOTE: the subaccount is no longer smuggled into the market id as a
@@ -37,6 +38,21 @@ class Exchange(ExchangeMixin, PerpExchange):
   async def markets(self):
     markets = await self.shared.load_markets()
     return list(markets)
+
+  async def perp_stats(
+    self, markets: Collection[str] | None = None, *, settings: Settings = {},
+  ) -> Mapping[str, PerpStats]:
+    """Fetch pricing and funding stats for every perp market in one call.
+
+    Args:
+      markets: Market tickers to keep. `None` keeps every market.
+      settings: Accepted for interface compatibility and ignored — dYdX reports
+        no mark price, so there is no oracle-vs-mark choice to make.
+
+    Returns:
+      A mapping of market ticker to its `PerpStats`.
+    """
+    return await perp_stats(self, markets)
 
   async def market(self, market_id: str, /):
     """Fetch a market by ID.

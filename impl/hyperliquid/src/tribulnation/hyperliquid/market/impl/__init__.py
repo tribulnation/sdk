@@ -11,7 +11,8 @@ from .perps_rules import rules as perps_rules
 from .perps_position import position as perps_position
 
 from .index import index
-from .funding import next_funding, funding_history, funding_payments
+from .funding import next_funding, funding_rates, funding_payments
+from .stats import perp_stats
 
 from .collateral import (
   perp_exchange_collateral,
