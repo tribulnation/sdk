@@ -84,11 +84,11 @@ Hold a `Market` reference in hot loops; use the scoped one-shot calls otherwise.
 - Perpetual markets:
   - `index() -> Decimal`
   - `next_funding() -> FundingRate`
-  - `funding_history(start, end) -> AsyncIterable[Sequence[FundingRate]]`
-  - `funding_payments(start, end) -> AsyncIterable[Sequence[FundingPayment]]`
+  - `funding_rates(start, end=None) -> AsyncIterable[Sequence[FundingRate]]`: market-wide rate history
+  - `funding_payments(start, end) -> AsyncIterable[Sequence[FundingPayment]]`: your own settled cashflows
   - `perp_position() -> PerpPosition`: includes entry price
 
-Full reference: [docs/market.md](docs/market.md).
+Full reference: [docs/market/index.md](docs/market/index.md), with per-venue notes for [dYdX](docs/market/impl/dydx.md), [Hyperliquid](docs/market/impl/hyperliquid.md), and [MEXC](docs/market/impl/mexc.md).
 
 Mutating methods also take an optional `settings` dict for venue-specific options, keyed by venue:
 

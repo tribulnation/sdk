@@ -106,6 +106,23 @@ same names exist on `Exchange`/`TradingVenue`/`TradingMarkets` with a leading `m
 - `rules(*, refetch=False) -> Rules` — tick/step sizes, fees, min/max, rounding helpers.
   Cached after the first call; pass `refetch=True` to bypass the cache.
 
+### Bulk market data (`Exchange` only)
+
+Defined on `Exchange` (and above), not on a single `Market` — they answer questions *about
+a set of markets*:
+
+- `tickers(markets=None) -> Mapping[str, Ticker]` — top-of-book snapshot per market.
+- `perp_stats(markets=None) -> Mapping[str, PerpStats]` (`PerpExchange` only) — index/mark
+  price, predicted funding, next funding time and interval, open interest per market.
+
+`markets=None` covers every market of the exchange. Both have a default implementation that
+fans out over the individual markets with `asyncio.gather`, so every venue supports them.
+Venues that can fetch the whole universe in one request override them — dYdX and
+Hyperliquid do so for `perp_stats`. This is a **correctness** difference, not only a speed
+one: a per-market loop spreads a single "snapshot" over minutes of wall clock, which
+permanently corrupts cross-market basis/funding analysis, whereas the bulk call yields a
+consistent cross-section at one instant.
+
 ### Your account data
 
 - `query_order(id) -> OrderState | None` — state of one order. The base implementation
@@ -171,9 +188,12 @@ a materially different order.
 - `index(*, settings={}) -> Decimal` — the index/oracle price.
 - `next_funding() -> NextFunding` — upcoming funding `rate`, `time`, and `interval`;
   `.annualized` extrapolates the rate to a yearly figure.
-- `funding_history(start, end) -> PaginatedResponse[FundingRate]` — historical funding rates.
-- `funding_payments(start, end) -> PaginatedResponse[FundingPayment]` — funding you paid
-  (positive) or received (negative), in quote units.
+- `funding_rates(start, end=None) -> PaginatedResponse[FundingRate]` — the market's public
+  funding rate history. `end=None` means everything since `start`. Each `FundingRate` may
+  also carry the `premium` (mark vs. index) the rate was computed from.
+- `funding_payments(start, end) -> PaginatedResponse[FundingPayment]` — *your own* funding
+  cashflows: paid (positive) or received (negative), in quote units. Credential-scoped,
+  unlike `funding_rates`.
 - `perp_position() -> PerpPosition` — position `size` plus average `entry_price`.
 - `perp_collateral() -> PerpCollateral` — the perpetual collateral bucket backing this
   market, with maintenance-margin risk fields (see below). `collateral()` delegates to it.
@@ -256,8 +276,15 @@ Returned types live under `tribulnation.sdk.market`:
 - **`Order`** / **`OrderResponse`** / **`OrderState`** — see [Trading](#trading).
 - **`Trade`** — `id`, `price`, signed `qty`, `time`, `maker` flag, optional `fee`
   (`amount` + `asset`).
-- **`FundingRate`** (`rate`, `time`), **`NextFunding`** (adds `interval`, `.annualized`),
-  **`FundingPayment`** (`amount`, `time`). Rates are fractions of 1 (`0.01` = 1%).
+- **`FundingRate`** (`rate`, `time`, optional `premium`), **`NextFunding`** (adds
+  `interval`, `.annualized`), **`FundingPayment`** (`amount`, `time`). Rates are fractions
+  of 1 (`0.01` = 1%). `premium` is the mark-vs-index quantity funding is computed from, and
+  is `None` on venues that don't report it (dYdX).
+- **`Ticker`** — `last`, `bid`, `ask`, `bid_qty`, `ask_qty`, `base_volume_24h`, all
+  optional. 24h open/high/low/change are deliberately absent: they are derivable from a
+  sampled series, and storing them would freeze the venue's windowing choices.
+- **`PerpStats`** — `index` (required) plus optional `mark`, `funding` (predicted rate for
+  the next settlement), `next_funding_time`, `funding_interval`, `open_interest`.
 
 ## Streaming & overflow
 
