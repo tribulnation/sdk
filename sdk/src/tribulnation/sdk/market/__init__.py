@@ -3,6 +3,7 @@ from .types import (
   FundingRate, NextFunding, FundingPayment,
   Order, OrderResponse, OrderState,
   Position, PerpPosition,
+  PerpStats, Ticker,
   Trade, Rules,
 )
 from .settings import Settings

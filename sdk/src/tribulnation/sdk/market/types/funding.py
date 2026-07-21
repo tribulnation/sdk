@@ -10,6 +10,11 @@ class FundingRate:
   """Funding rate (in relative units, e.g. 0.01 = 1%)."""
   time: datetime
   """Funding payment time."""
+  premium: Decimal | None = None
+  """Premium (mark vs. index, in relative units), the quantity funding is computed from.
+
+  `None` if the venue does not report it.
+  """
 
 @dataclass(kw_only=True)
 class NextFunding(FundingRate):
