@@ -5,10 +5,10 @@ import asyncio
 
 from tribulnation.sdk import PerpExchange
 from tribulnation.sdk.core import ApiError
-from tribulnation.sdk.market import PerpCollateral, PerpStats, Settings
+from tribulnation.sdk.market import PerpCollateral, PerpStats, Settings, Ticker
 
 from tribulnation.dydx.core import wrap_exceptions
-from .impl import ExchangeMixin, effective_mmf, perp_stats
+from .impl import ExchangeMixin, effective_mmf, perp_stats, tickers
 from .market import Market
 
 # MIGRATION NOTE: the subaccount is no longer smuggled into the market id as a
@@ -53,6 +53,11 @@ class Exchange(ExchangeMixin, PerpExchange):
       A mapping of market ticker to its `PerpStats`.
     """
     return await perp_stats(self, markets)
+
+  async def tickers(
+    self, markets: Collection[str] | None = None,
+  ) -> Mapping[str, Ticker]:
+    return await tickers(self, markets)
 
   async def market(self, market_id: str, /):
     """Fetch a market by ID.

@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 
 from tribulnation.sdk.core import ApiError
-from tribulnation.sdk.market import PerpStats
+from tribulnation.sdk.market import PerpStats, Ticker
 
 from tribulnation.dydx.core import wrap_exceptions
 from .mixin import ExchangeMixin
@@ -48,3 +48,28 @@ async def perp_stats(self: ExchangeMixin, markets: Collection[str] | None = None
       open_interest=Decimal(open_interest) if open_interest is not None else None,
     )
   return stats
+
+
+@wrap_exceptions
+async def tickers(self: ExchangeMixin, markets: Collection[str] | None = None) -> Mapping[str, Ticker]:
+  """Fetch ticker snapshots for every perp market in one call.
+
+  Args:
+    markets: Market tickers to keep. `None` keeps every market.
+
+  Returns:
+    A mapping of market ticker to its `Ticker`.
+  """
+  perpetual_markets = await self.shared.load_markets(refetch=True)
+  wanted = list(perpetual_markets) if markets is None else list(markets)
+
+  result: dict[str, Ticker] = {}
+  for ticker_name in wanted:
+    if (market := perpetual_markets.get(ticker_name)) is None:
+      raise ValueError(f'Market not found: {ticker_name}')
+    price = market.get('oraclePrice')
+    result[ticker_name] = Ticker(
+      last=Decimal(price) if price is not None else None,
+      base_volume_24h=Decimal(market['volume24H']),
+    )
+  return result

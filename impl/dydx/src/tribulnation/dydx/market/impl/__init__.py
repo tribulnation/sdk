@@ -8,5 +8,5 @@ from .orders import (
   query_order, open_orders,
 )
 from .funding import next_funding, funding_rates, funding_payments
-from .stats import perp_stats
+from .stats import perp_stats, tickers
 from .trades import trades_history, trades_stream
