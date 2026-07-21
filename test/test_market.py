@@ -228,7 +228,7 @@ async def test_market(market: Market, plan: MarketTestPlan) -> None:
   if isinstance(market, PerpMarket):
     await market.index()
     await market.next_funding()
-    await market.funding_history(start, end)
+    await market.funding_rates(start, end)
     await market.funding_payments(start, end)
     await market.perp_position()
 

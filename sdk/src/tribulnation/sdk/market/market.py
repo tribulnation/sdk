@@ -192,8 +192,13 @@ class PerpMarket(Market):
 
   @SDK.method
   @abstractmethod
-  def funding_history(self, start: datetime, end: datetime) -> PaginatedResponse[FundingRate]:
-    """Fetch perpetual funding rate history."""
+  def funding_rates(self, start: datetime | None = None, end: datetime | None = None) -> PaginatedResponse[FundingRate]:
+    """Fetch the market's historical funding rates.
+
+    Args:
+      start: Start of the window (inclusive). `None` fetches from the earliest available.
+      end: End of the window (inclusive). `None` means everything since `start`.
+    """
 
   @SDK.method
   @abstractmethod

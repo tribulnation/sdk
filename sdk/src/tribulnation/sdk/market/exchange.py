@@ -1,4 +1,4 @@
-from typing_extensions import Any, AsyncIterable, AsyncIterator, Sequence
+from typing_extensions import Any, AsyncIterable, AsyncIterator, Collection, Mapping, Sequence
 from abc import abstractmethod
 from contextlib import asynccontextmanager
 from datetime import datetime
@@ -10,11 +10,30 @@ from .types import (
   NextFunding,
   Order, OrderResponse, OrderState,
   Position, PerpPosition,
+  PerpStats, Ticker,
   Trade,
   Rules,
 )
 from .settings import Settings
 from .market import Market, PerpMarket
+
+def ticker_from_book(book: Book) -> Ticker:
+  """Derive a `Ticker` from the top of an order book.
+
+  Args:
+    book: The order book to read the best bid/ask from.
+
+  Returns:
+    A `Ticker` with only the top-of-book fields populated.
+  """
+  bid = book.bids[0] if book.bids else None
+  ask = book.asks[0] if book.asks else None
+  return Ticker(
+    bid=bid.price if bid is not None else None,
+    ask=ask.price if ask is not None else None,
+    bid_qty=bid.qty if bid is not None else None,
+    ask_qty=ask.qty if ask is not None else None,
+  )
 
 class Exchange(SDK):
   """An abstract multi-market exchange interface."""
@@ -69,9 +88,21 @@ class Exchange(SDK):
       yield stream
   
   @SDK.method
+  async def tickers(self, markets: Collection[str] | None = None) -> Mapping[str, Ticker]:
+    """Fetch a ticker snapshot for many markets at once.
+
+    Args:
+      markets: Market IDs to fetch. `None` fetches every market of the exchange.
+
+    Returns:
+      A mapping of market ID to its `Ticker`.
+    """
+    raise NotImplementedError(f'tickers is not supported by this exchange [{self.id}].')
+
+  @SDK.method
   async def rules(self, market_id: str, /, *, refetch: bool = False) -> Rules:
     """Fetch the market rules.
-    
+
     - `refetch`: if `True`, fetch the rules even if they are already cached.
     """
     market = await self.market(market_id)
@@ -186,11 +217,32 @@ class PerpExchange(Exchange):
     return await market.next_funding()
 
   @SDK.method
+  async def perp_stats(
+    self, markets: Collection[str] | None = None, *, settings: Settings = {},
+  ) -> Mapping[str, PerpStats]:
+    """Fetch a pricing and funding snapshot for many markets at once.
+
+    Args:
+      markets: Market IDs to fetch. `None` fetches every market of the exchange.
+      settings: Venue settings, forwarded to each market's `index()`.
+
+    Returns:
+      A mapping of market ID to its `PerpStats`.
+    """
+    raise NotImplementedError(f'perp_stats is not supported by this exchange [{self.id}].')
+
+  @SDK.method
   @PaginatedResponse.lift
-  async def funding_history(self, market_id: str, /, start: datetime, end: datetime):
-    """Fetch perpetual funding rate history."""
+  async def funding_rates(self, market_id: str, /, start: datetime | None = None, end: datetime | None = None):
+    """Fetch the market's historical funding rates.
+
+    Args:
+      market_id: Market to fetch rates for.
+      start: Start of the window (inclusive). `None` fetches from the earliest available.
+      end: End of the window (inclusive). `None` means everything since `start`.
+    """
     market = await self.market(market_id)
-    async for page in market.funding_history(start, end):
+    async for page in market.funding_rates(start, end):
       yield page
 
   @SDK.method

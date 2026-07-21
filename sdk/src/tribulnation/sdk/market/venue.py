@@ -210,10 +210,16 @@ class TradingVenue(SDK):
 
   @SDK.method
   @PaginatedResponse.lift
-  async def funding_history(self, market_id: str, /, start: datetime, end: datetime):
-    """Fetch perpetual funding rate history."""
+  async def funding_rates(self, market_id: str, /, start: datetime | None = None, end: datetime | None = None):
+    """Fetch the market's historical funding rates.
+
+    Args:
+      market_id: Market to fetch rates for.
+      start: Start of the window (inclusive). `None` fetches from the earliest available.
+      end: End of the window (inclusive). `None` means everything since `start`.
+    """
     market = await self.perp_market(market_id)
-    async for page in market.funding_history(start, end):
+    async for page in market.funding_rates(start, end):
       yield page
 
   @SDK.method
