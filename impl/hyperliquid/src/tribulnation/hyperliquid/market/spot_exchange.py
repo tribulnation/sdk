@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 from typing_extensions import Collection, Mapping, Sequence
 from dataclasses import dataclass
@@ -91,8 +92,8 @@ class SpotExchange(SpotMixin, _Exchange):
           t = result[market_id]
           t.bid, t.ask = bbo.bid, bbo.ask
           t.bid_qty, t.ask_qty = bbo.bid_qty, bbo.ask_qty
-        except Exception:
-          ...
+        except Exception as exc:
+          logging.warning('tickers: %s book fetch failed: %s', coin, exc)
 
     await asyncio.gather(*(_enrich(c, m) for c, m in coin_to_market.items()))
     return result

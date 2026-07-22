@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 from typing_extensions import Collection, Mapping
 from datetime import datetime, timedelta
@@ -110,8 +111,8 @@ async def perp_tickers(
         t = result[coin]
         t.bid, t.ask = bbo.bid, bbo.ask
         t.bid_qty, t.ask_qty = bbo.bid_qty, bbo.ask_qty
-      except Exception:
-        ...
+      except Exception as exc:
+        logging.warning('tickers: %s book fetch failed: %s', coin, exc)
 
   await asyncio.gather(*(_enrich(name) for name in result))
   return result
