@@ -1,11 +1,15 @@
+import asyncio
+
 from typing_extensions import Collection, Mapping
 from datetime import datetime, timedelta
 from decimal import Decimal
 
-from tribulnation.sdk.core import ApiError
+from tribulnation.sdk import SDK, ApiError
 from tribulnation.sdk.market import PerpStats, Ticker
+from tribulnation.sdk.market.exchange import ticker_from_book
 
 from tribulnation.dydx.core import wrap_exceptions
+from .depth import parse_book
 from .mixin import ExchangeMixin
 
 FUNDING_INTERVAL = timedelta(hours=1)
@@ -49,6 +53,11 @@ async def perp_stats(self: ExchangeMixin, markets: Collection[str] | None = None
     )
   return stats
 
+@SDK.method
+@wrap_exceptions
+async def fetch_order_book(self: ExchangeMixin, market_id: str):
+  raw = await self.shared.client.indexer.data.get_order_book(market_id)
+  return parse_book(raw)
 
 @wrap_exceptions
 async def tickers(self: ExchangeMixin, markets: Collection[str] | None = None) -> Mapping[str, Ticker]:
@@ -72,4 +81,19 @@ async def tickers(self: ExchangeMixin, markets: Collection[str] | None = None) -
       last=Decimal(price) if price is not None else None,
       base_volume_24h=Decimal(market['volume24H']),
     )
+
+  sem = asyncio.Semaphore(20)
+
+  async def _enrich(market_id: str) -> None:
+    async with sem:
+      try:
+        book = await fetch_order_book(self, market_id)
+        bbo = ticker_from_book(book)
+        t = result[market_id]
+        t.bid, t.ask = bbo.bid, bbo.ask
+        t.bid_qty, t.ask_qty = bbo.bid_qty, bbo.ask_qty
+      except Exception:
+        ...
+
+  await asyncio.gather(*(_enrich(m) for m in wanted))
   return result
