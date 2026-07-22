@@ -17,6 +17,8 @@ T = TypeVar('T')
 
 @pydantic.with_config({'extra': 'forbid'})
 class Settings(TypedDict, total=False):
+  tickers_depth_concurrent: int
+  """Maximum concurrent order-book requests used to enrich bulk tickers. Defaults to 20."""
   flags: Flags
   """Order flags. Defaults to SHORT_TERM for market orders and LONG_TERM for limit/post_only orders."""
   tif: TimeInForce

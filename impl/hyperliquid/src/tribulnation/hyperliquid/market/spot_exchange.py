@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from tribulnation.sdk import SDK
-from tribulnation.sdk.market import Book, Exchange as _Exchange, Ticker
+from tribulnation.sdk.market import Book, Exchange as _Exchange, Settings, Ticker
 from tribulnation.sdk.market.exchange import ticker_from_book
 
 from tribulnation.hyperliquid.core import wrap_exceptions
@@ -57,7 +57,7 @@ class SpotExchange(SpotMixin, _Exchange):
     return out
 
   async def tickers(
-    self, markets: Collection[str] | None = None,
+    self, markets: Collection[str] | None = None, *, settings: Settings = {},
   ) -> Mapping[str, Ticker]:
     spot_meta, asset_ctxs = await self.shared.client.info.spot_meta_and_asset_ctxs()
     tokens_by_index = {t['index']: t for t in spot_meta['tokens']}
@@ -82,7 +82,8 @@ class SpotExchange(SpotMixin, _Exchange):
     if wanted is not None and (missing := wanted - set(result)):
       raise ValueError(f'Spot markets not found: {", ".join(sorted(missing))}')
 
-    sem = asyncio.Semaphore(20)
+    concurrency = settings.get('hyperliquid', {}).get('tickers_depth_concurrent', 20)
+    sem = asyncio.Semaphore(concurrency)
 
     async def _enrich(coin: str, market_id: str) -> None:
       async with sem:
@@ -106,4 +107,3 @@ class SpotExchange(SpotMixin, _Exchange):
         f"Spot market_id mismatch for idx={spot_index}: expected {base}/{quote}, got {meta['base_meta']['name']}/{meta['quote_meta']['name']}"
       )
     return SpotMarket(shared=self.shared, meta=meta)
-

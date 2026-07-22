@@ -88,11 +88,14 @@ class Exchange(SDK):
       yield stream
   
   @SDK.method
-  async def tickers(self, markets: Collection[str] | None = None) -> Mapping[str, Ticker]:
+  async def tickers(
+    self, markets: Collection[str] | None = None, *, settings: Settings = {},
+  ) -> Mapping[str, Ticker]:
     """Fetch a ticker snapshot for many markets at once.
 
     Args:
       markets: Market IDs to fetch. `None` fetches every market of the exchange.
+      settings: Venue-specific ticker settings.
 
     Returns:
       A mapping of market ID to its `Ticker`.

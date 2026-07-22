@@ -2,7 +2,7 @@ from typing_extensions import Collection, Mapping, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 
-from tribulnation.sdk.market import Exchange, Ticker
+from tribulnation.sdk.market import Exchange, Settings, Ticker
 from tribulnation.mexc.core.exc import wrap_exceptions
 from .impl import ExchangeMixin
 from .spot_market import SpotMarket
@@ -28,11 +28,15 @@ class SpotExchange(ExchangeMixin, Exchange):
     return SpotMarket(shared=self.shared, meta={'info': info})
 
   @wrap_exceptions
-  async def tickers(self, markets: Collection[str] | None = None) -> Mapping[str, Ticker]:
+  async def tickers(
+    self, markets: Collection[str] | None = None, *, settings: Settings = {},
+  ) -> Mapping[str, Ticker]:
     """Fetch best bid/ask for every spot symbol in one call.
 
     Args:
       markets: Symbols to keep. `None` keeps every symbol.
+      settings: Accepted for interface compatibility and ignored because MEXC
+        returns all best bids and asks in one request.
     """
     items = await self.client.spot.market.book_ticker(validate=self.shared.validate)
     if not isinstance(items, list):
@@ -52,4 +56,3 @@ class SpotExchange(ExchangeMixin, Exchange):
         ask_qty=Decimal(q) if (q := item.get('askQty')) else None,
       )
     return result
-

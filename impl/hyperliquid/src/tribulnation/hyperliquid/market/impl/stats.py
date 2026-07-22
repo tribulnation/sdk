@@ -75,12 +75,14 @@ async def fetch_l2_book(self: PerpMixin, coin: str) -> Book:
 
 @wrap_exceptions
 async def perp_tickers(
-  self: PerpMixin, markets: Collection[str] | None = None,
+  self: PerpMixin, markets: Collection[str] | None = None, *, settings: Settings = {},
 ) -> Mapping[str, Ticker]:
   """Fetch ticker snapshots for the whole perp universe in one call.
 
   Args:
     markets: Asset names to keep. `None` keeps the whole universe.
+    settings: Venue settings. `hyperliquid.tickers_depth_concurrent` controls
+      the concurrent order-book requests and defaults to 20.
 
   Returns:
     A mapping of asset name to its `Ticker`.
@@ -101,7 +103,8 @@ async def perp_tickers(
   if wanted is not None and (missing := wanted - set(result)):
     raise ValueError(f'Perps not found: {", ".join(sorted(missing))}')
 
-  sem = asyncio.Semaphore(20)
+  concurrency = settings.get('hyperliquid', {}).get('tickers_depth_concurrent', 20)
+  sem = asyncio.Semaphore(concurrency)
 
   async def _enrich(coin: str) -> None:
     async with sem:

@@ -39,9 +39,9 @@ class PerpExchange(PerpMixin, _PerpExchange):
     return await perp_stats(self, markets, settings=settings)
 
   async def tickers(
-    self, markets: Collection[str] | None = None,
+    self, markets: Collection[str] | None = None, *, settings: Settings = {},
   ) -> Mapping[str, Ticker]:
-    return await perp_tickers(self, markets)
+    return await perp_tickers(self, markets, settings=settings)
 
   async def markets(self) -> Sequence[str]:
     # Use default/no-dex universe here; callers that care about DEX can pass it when constructing.
@@ -51,4 +51,3 @@ class PerpExchange(PerpMixin, _PerpExchange):
   async def market(self, market_id: str, /):
     meta = await self.shared.perp_meta_of(market_id, dex_name=self.dex_name)
     return PerpMarket(shared=self.shared, dex=self.dex, meta=meta)
-

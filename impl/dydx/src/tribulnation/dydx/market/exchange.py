@@ -55,9 +55,9 @@ class Exchange(ExchangeMixin, PerpExchange):
     return await perp_stats(self, markets)
 
   async def tickers(
-    self, markets: Collection[str] | None = None,
+    self, markets: Collection[str] | None = None, *, settings: Settings = {},
   ) -> Mapping[str, Ticker]:
-    return await tickers(self, markets)
+    return await tickers(self, markets, settings=settings)
 
   async def market(self, market_id: str, /):
     """Fetch a market by ID.
