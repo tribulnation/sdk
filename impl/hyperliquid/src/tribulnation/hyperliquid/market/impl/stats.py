@@ -81,8 +81,9 @@ async def perp_tickers(
 
   Args:
     markets: Asset names to keep. `None` keeps the whole universe.
-    settings: Venue settings. `hyperliquid.tickers_depth_concurrent` controls
-      the concurrent order-book requests and defaults to 20.
+    settings: Venue settings. `hyperliquid.tickers_fetch_depth` controls whether
+      order books are fetched (default `True`), and
+      `hyperliquid.tickers_depth_concurrent` controls their concurrency (default 20).
 
   Returns:
     A mapping of asset name to its `Ticker`.
@@ -103,7 +104,11 @@ async def perp_tickers(
   if wanted is not None and (missing := wanted - set(result)):
     raise ValueError(f'Perps not found: {", ".join(sorted(missing))}')
 
-  concurrency = settings.get('hyperliquid', {}).get('tickers_depth_concurrent', 20)
+  venue_settings = settings.get('hyperliquid', {})
+  if not venue_settings.get('tickers_fetch_depth', True):
+    return result
+
+  concurrency = venue_settings.get('tickers_depth_concurrent', 20)
   sem = asyncio.Semaphore(concurrency)
 
   async def _enrich(coin: str) -> None:

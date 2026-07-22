@@ -68,8 +68,9 @@ async def tickers(
 
   Args:
     markets: Market tickers to keep. `None` keeps every market.
-    settings: Venue settings. `dydx.tickers_depth_concurrent` controls the
-      concurrent order-book requests and defaults to 20.
+    settings: Venue settings. `dydx.tickers_fetch_depth` controls whether
+      order books are fetched (default `True`), and
+      `dydx.tickers_depth_concurrent` controls their concurrency (default 20).
 
   Returns:
     A mapping of market ticker to its `Ticker`.
@@ -87,7 +88,11 @@ async def tickers(
       base_volume_24h=Decimal(market['volume24H']),
     )
 
-  concurrency = settings.get('dydx', {}).get('tickers_depth_concurrent', 20)
+  venue_settings = settings.get('dydx', {})
+  if not venue_settings.get('tickers_fetch_depth', True):
+    return result
+
+  concurrency = venue_settings.get('tickers_depth_concurrent', 20)
   sem = asyncio.Semaphore(concurrency)
 
   async def _enrich(market_id: str) -> None:

@@ -59,6 +59,12 @@ class SpotExchange(SpotMixin, _Exchange):
   async def tickers(
     self, markets: Collection[str] | None = None, *, settings: Settings = {},
   ) -> Mapping[str, Ticker]:
+    """Fetch spot tickers, optionally enriched with per-market order books.
+
+    `hyperliquid.tickers_fetch_depth` controls whether order books are fetched
+    (default `True`), and `hyperliquid.tickers_depth_concurrent` controls their
+    concurrency (default 20).
+    """
     spot_meta, asset_ctxs = await self.shared.client.info.spot_meta_and_asset_ctxs()
     tokens_by_index = {t['index']: t for t in spot_meta['tokens']}
     wanted = None if markets is None else set(markets)
@@ -82,7 +88,11 @@ class SpotExchange(SpotMixin, _Exchange):
     if wanted is not None and (missing := wanted - set(result)):
       raise ValueError(f'Spot markets not found: {", ".join(sorted(missing))}')
 
-    concurrency = settings.get('hyperliquid', {}).get('tickers_depth_concurrent', 20)
+    venue_settings = settings.get('hyperliquid', {})
+    if not venue_settings.get('tickers_fetch_depth', True):
+      return result
+
+    concurrency = venue_settings.get('tickers_depth_concurrent', 20)
     sem = asyncio.Semaphore(concurrency)
 
     async def _enrich(coin: str, market_id: str) -> None:

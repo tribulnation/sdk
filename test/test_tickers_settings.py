@@ -30,7 +30,14 @@ def _tracking_fetch() -> tuple[Callable[..., Awaitable[Book]], Callable[[], int]
   return fetch, lambda: peak
 
 
-@pytest.mark.parametrize(('settings', 'expected'), [({}, 20), ({'dydx': {'tickers_depth_concurrent': 2}}, 2)])
+@pytest.mark.parametrize(
+  ('settings', 'expected'),
+  [
+    ({}, 20),
+    ({'dydx': {'tickers_fetch_depth': True, 'tickers_depth_concurrent': 2}}, 2),
+    ({'dydx': {'tickers_fetch_depth': False}}, 0),
+  ],
+)
 async def test_dydx_tickers_depth_concurrency(monkeypatch, settings, expected: int) -> None:
   from tribulnation.dydx.market.impl import stats
 
@@ -53,12 +60,25 @@ async def test_dydx_tickers_depth_concurrency(monkeypatch, settings, expected: i
 
   assert len(result) == count
   assert peak() == expected
-  assert all(ticker.bid == Decimal('99') for ticker in result.values())
+  assert all(ticker.last == Decimal('100') for ticker in result.values())
+  assert all(ticker.base_volume_24h == Decimal('10') for ticker in result.values())
+  if expected:
+    assert all(ticker.bid == Decimal('99') for ticker in result.values())
+  else:
+    assert all(
+      ticker.bid is None and ticker.ask is None
+      and ticker.bid_qty is None and ticker.ask_qty is None
+      for ticker in result.values()
+    )
 
 
 @pytest.mark.parametrize(
   ('settings', 'expected'),
-  [({}, 20), ({'hyperliquid': {'tickers_depth_concurrent': 2}}, 2)],
+  [
+    ({}, 20),
+    ({'hyperliquid': {'tickers_fetch_depth': True, 'tickers_depth_concurrent': 2}}, 2),
+    ({'hyperliquid': {'tickers_fetch_depth': False}}, 0),
+  ],
 )
 async def test_hyperliquid_perp_tickers_depth_concurrency(monkeypatch, settings, expected: int) -> None:
   from tribulnation.hyperliquid.market.impl import stats
@@ -81,12 +101,25 @@ async def test_hyperliquid_perp_tickers_depth_concurrency(monkeypatch, settings,
 
   assert len(result) == count
   assert peak() == expected
-  assert all(ticker.ask == Decimal('101') for ticker in result.values())
+  assert all(ticker.last == Decimal('100') for ticker in result.values())
+  assert all(ticker.base_volume_24h == Decimal('10') for ticker in result.values())
+  if expected:
+    assert all(ticker.ask == Decimal('101') for ticker in result.values())
+  else:
+    assert all(
+      ticker.bid is None and ticker.ask is None
+      and ticker.bid_qty is None and ticker.ask_qty is None
+      for ticker in result.values()
+    )
 
 
 @pytest.mark.parametrize(
   ('settings', 'expected'),
-  [({}, 20), ({'hyperliquid': {'tickers_depth_concurrent': 2}}, 2)],
+  [
+    ({}, 20),
+    ({'hyperliquid': {'tickers_fetch_depth': True, 'tickers_depth_concurrent': 2}}, 2),
+    ({'hyperliquid': {'tickers_fetch_depth': False}}, 0),
+  ],
 )
 async def test_hyperliquid_spot_tickers_depth_concurrency(monkeypatch, settings, expected: int) -> None:
   from tribulnation.hyperliquid.market import spot_exchange
@@ -116,4 +149,13 @@ async def test_hyperliquid_spot_tickers_depth_concurrency(monkeypatch, settings,
 
   assert len(result) == count
   assert peak() == expected
-  assert all(ticker.bid_qty == Decimal('2') for ticker in result.values())
+  assert all(ticker.last == Decimal('100') for ticker in result.values())
+  assert all(ticker.base_volume_24h == Decimal('10') for ticker in result.values())
+  if expected:
+    assert all(ticker.bid_qty == Decimal('2') for ticker in result.values())
+  else:
+    assert all(
+      ticker.bid is None and ticker.ask is None
+      and ticker.bid_qty is None and ticker.ask_qty is None
+      for ticker in result.values()
+    )

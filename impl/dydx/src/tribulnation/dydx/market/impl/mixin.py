@@ -17,6 +17,8 @@ T = TypeVar('T')
 
 @pydantic.with_config({'extra': 'forbid'})
 class Settings(TypedDict, total=False):
+  tickers_fetch_depth: bool
+  """Whether bulk tickers fetch order books for best bid and ask. Defaults to True."""
   tickers_depth_concurrent: int
   """Maximum concurrent order-book requests used to enrich bulk tickers. Defaults to 20."""
   flags: Flags
