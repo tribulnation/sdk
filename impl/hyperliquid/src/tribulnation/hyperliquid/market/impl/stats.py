@@ -1,8 +1,12 @@
+import asyncio
+
 from typing_extensions import Collection, Mapping
 from datetime import datetime, timedelta
 from decimal import Decimal
 
-from tribulnation.sdk.market import PerpStats, Settings, Ticker
+from tribulnation.sdk import SDK
+from tribulnation.sdk.market import Book, PerpStats, Settings, Ticker
+from tribulnation.sdk.market.exchange import ticker_from_book
 
 from tribulnation.hyperliquid.core import wrap_exceptions
 from .mixin import PerpMixin
@@ -57,6 +61,17 @@ async def perp_stats(
   return stats
 
 
+@SDK.method
+@wrap_exceptions
+async def fetch_l2_book(self: PerpMixin, coin: str) -> Book:
+  raw = await self.shared.client.info.l2_book(coin)
+  bids_raw, asks_raw = raw['levels']
+  return Book(
+    bids=[Book.Entry(price=Decimal(b['px']), qty=Decimal(b['sz'])) for b in bids_raw[:1]],
+    asks=[Book.Entry(price=Decimal(a['px']), qty=Decimal(a['sz'])) for a in asks_raw[:1]],
+  )
+
+
 @wrap_exceptions
 async def perp_tickers(
   self: PerpMixin, markets: Collection[str] | None = None,
@@ -84,4 +99,19 @@ async def perp_tickers(
 
   if wanted is not None and (missing := wanted - set(result)):
     raise ValueError(f'Perps not found: {", ".join(sorted(missing))}')
+
+  sem = asyncio.Semaphore(20)
+
+  async def _enrich(coin: str) -> None:
+    async with sem:
+      try:
+        book = await fetch_l2_book(self, coin)
+        bbo = ticker_from_book(book)
+        t = result[coin]
+        t.bid, t.ask = bbo.bid, bbo.ask
+        t.bid_qty, t.ask_qty = bbo.bid_qty, bbo.ask_qty
+      except Exception:
+        ...
+
+  await asyncio.gather(*(_enrich(name) for name in result))
   return result
