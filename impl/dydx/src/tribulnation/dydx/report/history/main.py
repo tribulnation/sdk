@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 import asyncio
 
+from tribulnation.sdk.core import managed_tasks
 from tribulnation.sdk.reporting import History as _History
 from dydx import Dydx
 from .bigquery import BigQueryClient, BigQueryHistory
@@ -59,7 +60,8 @@ class History(_History):
     if self.bigquery is not None:
       coros += (self.bigquery.history(start, end),)
     
-    for task in asyncio.as_completed(coros):
-      page = await task
-      for record in page:
-        yield record
+    async with managed_tasks(coros) as tasks:
+      for task in asyncio.as_completed(tasks):
+        page = await task
+        for record in page:
+          yield record
