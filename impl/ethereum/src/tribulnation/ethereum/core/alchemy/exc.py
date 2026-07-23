@@ -10,6 +10,7 @@ from tribulnation.sdk.core import (
   ApiError,
   Error,
   AuthError,
+  RateLimited,
 )
 
 Fn = TypeVar('Fn')
@@ -32,6 +33,8 @@ def wrap_exceptions(fn: Fn) -> Fn:
         raise ValidationError(*e.args) from e
       except core.AuthError as e:
         raise AuthError(*e.args) from e
+      except core.RateLimited as e:
+        raise RateLimited(*e.args) from e
       except core.ApiError as e:
         raise ApiError(*e.args) from e
       except core.Error as e:
@@ -54,6 +57,8 @@ def wrap_exceptions(fn: Fn) -> Fn:
         raise ValidationError(*e.args) from e
       except core.AuthError as e:
         raise AuthError(*e.args) from e
+      except core.RateLimited as e:
+        raise RateLimited(*e.args) from e
       except core.ApiError as e:
         raise ApiError(*e.args) from e
       except core.Error as e:
@@ -76,6 +81,8 @@ def wrap_exceptions(fn: Fn) -> Fn:
         raise ValidationError(*e.args) from e
       except core.AuthError as e:
         raise AuthError(*e.args) from e
+      except core.RateLimited as e:
+        raise RateLimited(*e.args) from e
       except core.ApiError as e:
         raise ApiError(*e.args) from e
       except core.Error as e:
@@ -98,6 +105,8 @@ def wrap_exceptions(fn: Fn) -> Fn:
         raise ValidationError(*e.args) from e
       except core.AuthError as e:
         raise AuthError(*e.args) from e
+      except core.RateLimited as e:
+        raise RateLimited(*e.args) from e
       except core.ApiError as e:
         raise ApiError(*e.args) from e
       except core.Error as e:
@@ -108,4 +117,3 @@ def wrap_exceptions(fn: Fn) -> Fn:
     return wrapper  # type: ignore[return-value]
 
   raise ValueError(f"Function {fn} is not a supported callable type for wrap_exceptions")
-
