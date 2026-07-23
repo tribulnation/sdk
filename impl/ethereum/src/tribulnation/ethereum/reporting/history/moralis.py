@@ -1,4 +1,4 @@
-from typing_extensions import TypeVar, Callable, Awaitable
+from typing_extensions import TypeVar, Callable, Awaitable, Iterable, AsyncContextManager
 from dataclasses import dataclass, field
 from decimal import Decimal
 from datetime import datetime
@@ -46,20 +46,14 @@ class MoralisHistory(HistoryMixin, History):
     from tribulnation.ethereum.core import rpc, MORALIS_CHAINS
     node, rpc_url = rpc.new(network, rpc_url, preferred='alchemy')
     moralis = Moralis.new(api_key)
-    return cls(address=address, chain=MORALIS_CHAINS[network], node=node, rpc_url=rpc_url, moralis=moralis)
-
-  async def __aenter__(self):
-    await asyncio.gather(
-      super().__aenter__(),
-      self.moralis.__aenter__(),
+    return cls(
+      address=address, chain=MORALIS_CHAINS[network],
+      node=node, rpc_url=rpc_url, moralis=moralis,
     )
-    return self
 
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await asyncio.gather(
-      super().__aexit__(exc_type, exc_value, traceback),
-      self.moralis.__aexit__(exc_type, exc_value, traceback),
-    )
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    yield from super().resources()
+    yield self.moralis
 
   @SDK.method
   @moralis_core.wrap_exceptions

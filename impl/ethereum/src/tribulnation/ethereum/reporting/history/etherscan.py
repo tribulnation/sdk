@@ -1,3 +1,5 @@
+from collections.abc import Iterable
+from typing import AsyncContextManager
 from typing_extensions import Literal, Awaitable, Callable, TypeVar
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -11,13 +13,22 @@ from etherscan.api.account.token_transactions import TokenTransaction, token_val
 from etherscan.api.account.internal_transactions import InternalTransaction
 from etherscan.api.account.nft_transactions import NftTransaction
 
-from tribulnation.sdk.core import SDK
+from tribulnation.sdk.core import SDK, managed_tasks
 from tribulnation.sdk.reporting import History, Record, EvmTx, source_id
 from tribulnation.ethereum.core import Network, etherscan as etherscan_core, group_by, same_address
 from tribulnation.ethereum.reporting.util import AutoDetect, AUTO_DETECT, cached_etherscan
 from tribulnation.ethereum.reporting.history.mixin import HistoryMixin
 
 T = TypeVar('T')
+TransactionGroups = dict[
+  str,
+  tuple[
+    list[NativeTransaction],
+    list[TokenTransaction],
+    list[NftTransaction],
+    list[InternalTransaction],
+  ],
+]
 
 @dataclass(frozen=True, kw_only=True)
 class EtherscanHistory(HistoryMixin, History):
@@ -34,20 +45,14 @@ class EtherscanHistory(HistoryMixin, History):
     from tribulnation.ethereum.reporting.util import cached_etherscan
     node, rpc_url = rpc.new(network, rpc_url, preferred='alchemy')
     etherscan = cached_etherscan(api_key=api_key, rate_limit=rate_limit)
-    return cls(address=address, chain_id=CHAIN_IDS[network], node=node, rpc_url=rpc_url, etherscan=etherscan)
-
-  async def __aenter__(self):
-    await asyncio.gather(
-      super().__aenter__(),
-      self.etherscan.__aenter__(),
+    return cls(
+      address=address, chain_id=CHAIN_IDS[network],
+      node=node, rpc_url=rpc_url, etherscan=etherscan,
     )
-    return self
 
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await asyncio.gather(
-      super().__aexit__(exc_type, exc_value, traceback),
-      self.etherscan.__aexit__(exc_type, exc_value, traceback),
-    )
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    yield from super().resources()
+    yield self.etherscan
 
   @property
   def timezone(self) -> timezone:
@@ -154,39 +159,60 @@ class EtherscanHistory(HistoryMixin, History):
       else:
         return await self.get_block_by_time(end, 'after')
 
-    return await asyncio.gather(
-      get_start(),
-      get_end(),
-    )
+    async with managed_tasks((get_start(), get_end())) as tasks:
+      start_block, end_block = await asyncio.gather(*tasks)
+    return start_block, end_block
 
-  async def fetch_all_transactions(self, start: datetime | None = None, end: datetime | None = None):
+  async def fetch_all_transactions(
+    self, start: datetime | None = None, end: datetime | None = None,
+  ) -> TransactionGroups:
     """Fetch all transactions for the given time range."""
     start_block, end_block = await self.fetch_limits(start, end)
-    all_native, all_token_txs, all_nft_txs, all_internal_txs = await asyncio.gather(
+    native_task = asyncio.create_task(
       self.native_transactions(start_block, end_block),
+    )
+    token_task = asyncio.create_task(
       self.token_transactions(start_block, end_block),
+    )
+    nft_task = asyncio.create_task(
       self.nft_transactions(start_block, end_block),
+    )
+    internal_task = asyncio.create_task(
       self.internal_transactions(start_block, end_block),
     )
-    grouped_native = group_by(all_native, lambda tx: tx['hash'])
-    grouped_token_txs = group_by(all_token_txs, lambda tx: tx['hash'])
-    grouped_nft_txs = group_by(all_nft_txs, lambda tx: tx['hash'])
-    grouped_internal_txs = group_by(all_internal_txs, lambda tx: tx['hash'])
+    tasks = (native_task, token_task, nft_task, internal_task)
+    async with managed_tasks(tasks):
+      all_native = await native_task
+      all_token_txs = await token_task
+      all_nft_txs = await nft_task
+      all_internal_txs = await internal_task
+    grouped_native: dict[str, list[NativeTransaction]] = group_by(
+      all_native, lambda tx: tx['hash'],
+    )
+    grouped_token_txs: dict[str, list[TokenTransaction]] = group_by(
+      all_token_txs, lambda tx: tx['hash'],
+    )
+    grouped_nft_txs: dict[str, list[NftTransaction]] = group_by(
+      all_nft_txs, lambda tx: tx['hash'],
+    )
+    grouped_internal_txs: dict[str, list[InternalTransaction]] = group_by(
+      all_internal_txs, lambda tx: tx['hash'],
+    )
     hashes = set.union(
       set(grouped_native),
       set(grouped_token_txs),
       set(grouped_nft_txs),
       set(grouped_internal_txs),
     )
-    return {
-      hash: (
+    transactions: TransactionGroups = {}
+    for hash in hashes:
+      transactions[hash] = (
         grouped_native.get(hash, []),
         grouped_token_txs.get(hash, []),
         grouped_nft_txs.get(hash, []),
         grouped_internal_txs.get(hash, []),
       )
-      for hash in hashes
-    }
+    return transactions
 
   def parse_internal_txs(self, internal_txs: list[InternalTransaction]) -> list[EvmTx.NativeTransfer]:
     """Parse internal Etherscan rows into SDK native transfers."""
@@ -261,7 +287,7 @@ class EtherscanHistory(HistoryMixin, History):
       transfers = []
     else:
       transfers: list[EvmTx.Transfer] = (
-        self.parse_native_transfers(tx) # type: ignore
+        self.parse_native_transfers(tx)
         + self.parse_token_txs(token)
         + self.parse_nft_txs(nft)
         + self.parse_internal_txs(internal)
@@ -289,11 +315,12 @@ class EtherscanHistory(HistoryMixin, History):
       async with semaphore:
         return await self.parse_tx(hash, native=native, token=token, nft=nft, internal=internal)
 
-    tasks = [
+    coros = [
       parse_limited(hash, native, token, nft, internal)
       for hash, (native, token, nft, internal) in transactions.items()
     ]
-    for task in asyncio.as_completed(tasks):
-      tx = await task
-      if tx is not None:
-        yield Record(observations=[tx], provenance={'source': 'api', 'service': 'etherscan', 'id': id})
+    async with managed_tasks(coros) as tasks:
+      for task in asyncio.as_completed(tasks):
+        tx = await task
+        if tx is not None:
+          yield Record(observations=[tx], provenance={'source': 'api', 'service': 'etherscan', 'id': id})

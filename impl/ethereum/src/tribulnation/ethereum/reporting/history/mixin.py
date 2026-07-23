@@ -1,4 +1,4 @@
-from typing_extensions import Any, TypedDict, NotRequired
+from typing_extensions import Any, TypedDict, NotRequired, AsyncContextManager, Iterable
 from dataclasses import dataclass, field
 from decimal import Decimal
 import asyncio
@@ -7,9 +7,10 @@ from web3 import Web3
 from web3.types import TxReceipt, TxData, _Hash32, Wei
 from ethereum import NodeRpc
 
-from tribulnation.sdk.core import SDK
+from tribulnation.sdk.core import AsyncResources, SDK, managed_tasks
 from tribulnation.sdk.reporting import EvmTx, Fee
 from tribulnation.ethereum.core import rpc, wei2eth, same_address
+
 
 def wei_field(value: Any) -> Decimal:
   """Return a wei-valued receipt field as a decimal integer."""
@@ -19,19 +20,23 @@ def wei_field(value: Any) -> Decimal:
     return Decimal(int(value, 16))
   return Decimal(value)
 
+
 class ValueFields(TypedDict):
   value: int | str | Wei
+
 
 def tx_value(tx: ValueFields | TxData) -> Decimal:
   """Return the value of a transaction."""
   value = tx['value'] # type: ignore
   return wei2eth(Decimal(value))
 
+
 class FeeFields(TypedDict):
   gasUsed: int
   effectiveGasPrice: int
   l1Fee: NotRequired[int]
   operatorFee: NotRequired[int]
+
 
 def tx_fee(tx: FeeFields) -> Decimal:
   """Return the full transaction fee in native units."""
@@ -41,22 +46,19 @@ def tx_fee(tx: FeeFields) -> Decimal:
   operator_fee = wei_field(tx.get('operatorFee'))
   return wei2eth(used * price + l1_fee + operator_fee)
 
+
 TransferFields = TypedDict('TransferFields', {'value': str, 'to': str, 'from': str})
 
+
 @dataclass(frozen=True, kw_only=True)
-class HistoryMixin(SDK):
+class HistoryMixin(AsyncResources, SDK):
   """Mixin for EVM history sources."""
   address: str
   node: NodeRpc
   rpc_url: str
   eoa_cache: dict[str, bool] = field(default_factory=dict)
-
-  async def __aenter__(self):
-    await self.node.__aenter__()
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await self.node.__aexit__(exc_type, exc_value, traceback)
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    yield self.node
 
   @property
   def w3(self):
@@ -102,14 +104,15 @@ class HistoryMixin(SDK):
     """Fetch a transaction by hash from the configured node."""
     return await self.w3.eth.get_transaction(hash) # type: ignore
 
-  async def get_tx_data(self, hash: _Hash32 | str):
-    return await asyncio.gather(
-      self.get_tx(hash),
-      self.get_tx_receipt(hash),
-    )
+  async def get_tx_data(self, hash: _Hash32 | str) -> tuple[TxData, TxReceipt]:
+    """Fetch a transaction and its receipt without leaving sibling tasks behind."""
+    tx_task = asyncio.create_task(self.get_tx(hash))
+    receipt_task = asyncio.create_task(self.get_tx_receipt(hash))
+    async with managed_tasks((tx_task, receipt_task)):
+      return await tx_task, await receipt_task
 
   def parse_fee(self, tx: TxData, receipt: TxReceipt) -> Fee | None:
-    """Parse the transaction fee from a receipt, if the from address matches the configured address."""
+    """Parse the transaction fee if the sender matches the configured address."""
     if (from_ := tx.get('from')) and same_address(from_, self.address):
       return Fee(amount=tx_fee(receipt), asset='native') # type: ignore
 

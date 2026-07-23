@@ -8,6 +8,7 @@ from web3.exceptions import BadFunctionCallOutput, ContractLogicError
 from ethereum import NodeRpc
 
 from tribulnation.sdk import SDK, ApiError
+from tribulnation.sdk.core import managed_tasks
 from tribulnation.sdk.reporting import (
   Balances, Snapshot, SnapshotResult, Snapshots, SubaccountSnapshot, source_id,
 )
@@ -64,11 +65,12 @@ class NodeSnapshots(Snapshots):
       for contract in assets
       if contract != NATIVE_ASSET
     ]
-    tasks = [limited_token_balance(contract) for contract in contracts]
-    for task in asyncio.as_completed(tasks):
-      balance, contract = await task
-      if balance is not None and (not self.ignore_zero_value or balance > 0):
-        balances[contract] = balance
+    coros = [limited_token_balance(contract) for contract in contracts]
+    async with managed_tasks(coros) as tasks:
+      for task in asyncio.as_completed(tasks):
+        balance, contract = await task
+        if balance is not None and (not self.ignore_zero_value or balance > 0):
+          balances[contract] = balance
 
     return SnapshotResult(
       snapshot=Snapshot(subaccounts=[SubaccountSnapshot(balances=balances)]),

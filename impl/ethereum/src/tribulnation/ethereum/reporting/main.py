@@ -1,18 +1,20 @@
+from collections.abc import Iterable
+from typing import AsyncContextManager
 from typing_extensions import Collection
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-import asyncio
 
 from tribulnation.sdk.reporting import (
   Report, History, Snapshots, Record,
   EvmTx, Snapshot, SnapshotResult, ProvidersConfig,
   source_id,
 )
+from tribulnation.sdk.core import AsyncResources
 from tribulnation.ethereum.core import Network
 from .config import EvmConfig
 
-@dataclass
-class EthereumReport(Report):
+@dataclass(frozen=True)
+class EthereumReport(AsyncResources, Report):
   address: str
   history_impl: History
   snapshots_impl: Snapshots
@@ -26,25 +28,24 @@ class EthereumReport(Report):
     sources = config.get('sources', {})
     rpc_url = config.get('rpc_url')
     archive_rpc_url = config.get('archive_rpc_url')
-    history_impl = EthereumHistory.new(address, network=network, source=sources.get('history'), rpc_url=archive_rpc_url, providers=providers)
-    snapshots_impl = EthereumSnapshots.new(address, network=network, source=sources.get('snapshot'), rpc_url=rpc_url, providers=providers)
-    asset_snapshots_impl = EthereumSnapshots.new(address, network=network, source=sources.get('snapshot_assets'), rpc_url=rpc_url, providers=providers)
+    history_impl = EthereumHistory.new(
+      address, network=network, source=sources.get('history'),
+      rpc_url=archive_rpc_url, providers=providers,
+    )
+    snapshots_impl = EthereumSnapshots.new(
+      address, network=network, source=sources.get('snapshot'),
+      rpc_url=rpc_url, providers=providers,
+    )
+    asset_snapshots_impl = EthereumSnapshots.new(
+      address, network=network, source=sources.get('snapshot_assets'),
+      rpc_url=rpc_url, providers=providers,
+    )
     return cls(address=address, history_impl=history_impl, snapshots_impl=snapshots_impl, asset_snapshots_impl=asset_snapshots_impl)
 
-  async def __aenter__(self):
-    await asyncio.gather(
-      self.history_impl.__aenter__(),
-      self.snapshots_impl.__aenter__(),
-      self.asset_snapshots_impl.__aenter__(),
-    )
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await asyncio.gather(
-      self.history_impl.__aexit__(exc_type, exc_value, traceback),
-      self.snapshots_impl.__aexit__(exc_type, exc_value, traceback),
-      self.asset_snapshots_impl.__aexit__(exc_type, exc_value, traceback),
-    )
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    yield self.history_impl
+    yield self.snapshots_impl
+    yield self.asset_snapshots_impl
 
   async def history(self, start: datetime | None = None, end: datetime | None = None):
     async for record in self.history_impl.history(start, end):
