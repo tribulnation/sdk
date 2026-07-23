@@ -29,12 +29,18 @@ class EthereumSnapshots(_Snapshots):
     return NodeSnapshots(address=address, node=node, rpc_url=rpc_url)
 
   @classmethod
-  def alchemy(cls, address: str, *, network: Network, api_key: str | None = None):
+  def alchemy(
+    cls, address: str, *, network: Network,
+    api_key: str | None = None,
+  ):
     from alchemy import Alchemy
     from tribulnation.ethereum.core.alchemy import ALCHEMY_NETWORKS
     from .alchemy import AlchemySnapshots
     alchemy = Alchemy.new(api_key=api_key)
-    return AlchemySnapshots(address=address, network=ALCHEMY_NETWORKS[network], alchemy=alchemy)
+    return AlchemySnapshots(
+      address=address, network=ALCHEMY_NETWORKS[network],
+      alchemy=alchemy,
+    )
 
   @classmethod
   def moralis(cls, address: str, *, network: Network, api_key: str | None = None):
@@ -45,14 +51,22 @@ class EthereumSnapshots(_Snapshots):
     return MoralisSnapshots(address=address, chain=MORALIS_CHAINS[network], moralis=moralis)
 
   @classmethod
-  def new(cls, address: str, *, network: Network, source: SnapshotSource | None = None, rpc_url: str | None = None, providers: _ProvidersConfig | None = None):
+  def new(
+    cls, address: str, *, network: Network,
+    source: SnapshotSource | None = None,
+    rpc_url: str | None = None,
+    providers: _ProvidersConfig | None = None,
+  ):
     source = source or DEFAULT_SNAPSHOT_SOURCE
     providers = providers or {}
     if source == 'node':
       return cls.node(address=address, network=network, rpc_url=rpc_url)
     elif source == 'alchemy':
       config = providers.get('alchemy') or {}
-      return cls.alchemy(address=address, network=network, api_key=config.get('api_key'))
+      return cls.alchemy(
+        address=address, network=network,
+        api_key=config.get('api_key'),
+      )
     elif source == 'moralis':
       config = providers.get('moralis') or {}
       return cls.moralis(address=address, network=network, api_key=config.get('api_key'))
