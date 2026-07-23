@@ -1,5 +1,5 @@
 from .core import (
-  SDK, Context,
+  SDK, Context, full_jitter,
   Error, NetworkError, ValidationError,
   ApiError, BadRequest, AuthError, RateLimited, LogicError,
 )
@@ -15,7 +15,7 @@ from .market import (
 from .impl import MarketSDK, EarnSDK, WalletSDK, ReportSDK, Account, accounts
 
 __all__ = [
-  'SDK', 'Context',
+  'SDK', 'Context', 'full_jitter',
   'Error', 'NetworkError', 'ValidationError', 'ApiError', 'BadRequest', 'AuthError', 'RateLimited', 'LogicError',
   'Earn', 'Wallet', 'Report',
   'TradingMarkets', 'TradingVenue', 'Market', 'PerpMarket', 'Exchange', 'PerpExchange',
