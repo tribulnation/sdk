@@ -53,6 +53,13 @@ class Report(_Report):
       snapshots_impl=Snapshots.of(address),
     )
 
+  async def __aenter__(self):
+    await asyncio.gather(
+      self.history_impl.__aenter__(),
+      self.snapshots_impl.__aenter__(),
+    )
+    return self
+
   async def __aexit__(self, exc_type, exc_value, traceback):
     await asyncio.gather(
       self.history_impl.__aexit__(exc_type, exc_value, traceback),

@@ -9,6 +9,7 @@ from tribulnation.sdk.reporting import FutureTrade, Fee, Funding, source_id, Rec
 from tribulnation.dydx.core import wrap_exceptions, USDC
 from dydx import Indexer, Dydx
 from dydx.indexer.data.get_fills import Fill
+from .window import in_window
 
 T = TypeVar('T')
 
@@ -136,18 +137,34 @@ class IndexerHistory(SDK):
   async def call(self, fn: Callable[[], Awaitable[T]]) -> T:
     return await fn()
 
-  async def fetch_fills(self, *, subaccount: int):
+  async def fetch_fills(
+    self, *, subaccount: int, end: datetime | None = None,
+  ):
     fills: list[Fill] = []
-    paging = self.indexer.data.get_fills_paged(self.address, subaccount=subaccount)
+    paging = self.indexer.data.get_fills_paged(
+      self.address,
+      subaccount=subaccount,
+      created_before_or_at=end,
+    )
     state = paging.init
     while state is not None:
       page, state = await self.call(lambda: paging.next(state)) # type: ignore
       fills.extend(page)
     return fills
 
-  async def fills(self, *, subaccount: int):
-    fills = await self.fetch_fills(subaccount=subaccount)
-    return parse_fills(fills)
+  async def fills(
+    self, *, subaccount: int,
+    start: datetime | None = None, end: datetime | None = None,
+  ):
+    fills = await self.fetch_fills(
+      subaccount=subaccount,
+      end=end,
+    )
+    return [
+      trade
+      for trade in parse_fills(fills)
+      if in_window(trade.time, start=start, end=end)
+    ]
 
 
   # HERE FOR COMPLETENESS, BUT WE PREFER TO USE THE CHAIN HISTORY TO GET FUNDINGS (THIS HAS ROUNDING ERRORS)
@@ -169,11 +186,17 @@ class IndexerHistory(SDK):
 
   @SDK.method
   @wrap_exceptions
-  async def history(self):
+  async def history(
+    self, start: datetime | None = None, end: datetime | None = None,
+  ):
     id = source_id('indexer')
     subaccounts = (await self.indexer.data.get_subaccounts(self.address))['subaccounts']
     nested_observations = await asyncio.gather(*[
-      self.fills(subaccount=s['subaccountNumber'])
+      self.fills(
+        subaccount=s['subaccountNumber'],
+        start=start,
+        end=end,
+      )
       for s in subaccounts
     ])
     return [

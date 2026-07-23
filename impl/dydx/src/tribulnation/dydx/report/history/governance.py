@@ -11,6 +11,7 @@ from tribulnation.sdk.reporting import Record, Yield, source_id
 from tribulnation.dydx.core import parse_denom_amount
 from dydx import Dydx
 from dydx.chain.comet.types import BlockResultsResponse, Event
+from .window import in_window
 
 GOVERNANCE_API_URL = 'https://dydx-dao-api.polkachu.com'
 
@@ -28,14 +29,22 @@ class GovernanceHistory:
   """Governance-backed dYdX history methods."""
   address: str
 
-  async def history(self) -> list[Record]:
+  async def history(
+    self, start: datetime | None = None, end: datetime | None = None,
+  ) -> list[Record]:
     """Collect Community Treasury distributions from governance proposals."""
     proposals = await self.governance_proposals()
     records: list[Record] = []
     for proposal in proposals:
       record = self.parse_governance_proposal(proposal)
       if record is not None:
-        records.append(record)
+        observations = [
+          observation
+          for observation in record.observations
+          if in_window(observation.time, start=start, end=end)
+        ]
+        if observations:
+          records.append(record.model_copy(update={'observations': observations}))
     return records
 
   async def governance_proposals(self) -> list[dict[str, Any]]:

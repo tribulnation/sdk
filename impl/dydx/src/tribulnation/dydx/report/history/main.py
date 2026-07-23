@@ -52,12 +52,12 @@ class History(_History):
 
   async def history(self, start: datetime | None = None, end: datetime | None = None):
     coros = [
-      self.chain.history(),
-      self.indexer.history(),
-      self.governance.history(),
+      self.chain.history(start, end),
+      self.indexer.history(start, end),
+      self.governance.history(start, end),
     ]
     if self.bigquery is not None:
-      coros += (self.bigquery.history(),)
+      coros += (self.bigquery.history(start, end),)
     
     for task in asyncio.as_completed(coros):
       page = await task

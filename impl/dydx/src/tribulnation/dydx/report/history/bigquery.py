@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from datetime import datetime
 from asyncer import asyncify
 from google.cloud import bigquery
 from google.cloud.bigquery import Client as BigQueryClient
@@ -7,6 +8,7 @@ import requests
 from tribulnation.sdk import SDK, NetworkError
 from tribulnation.sdk.reporting import Bonus, Record, source_id, ProvidersConfig
 from tribulnation.dydx.core import parse_denom_amount
+from .window import in_window
 
 def estimate_query_cost(client: bigquery.Client, query: str, price_per_tib: float = 6.25) -> dict:
   """Estimate BigQuery on-demand cost without executing the query."""
@@ -93,7 +95,9 @@ class BigQueryHistory(SDK):
       return cls(address=address, client=client)
 
   @SDK.method
-  async def reward_distributions(self):
+  async def reward_distributions(
+    self, start: datetime | None = None, end: datetime | None = None,
+  ):
     """Fetch trading reward distributions from BigQuery."""
     query = f"""
       SELECT
@@ -111,11 +115,18 @@ class BigQueryHistory(SDK):
     except requests.ConnectionError as e:
       raise NetworkError(*e.args) from e
 
-    return [parse_row(row) for row in results]
+    rewards = [parse_row(row) for row in results]
+    return [
+      reward
+      for reward in rewards
+      if in_window(reward.time, start=start, end=end)
+    ]
 
   
-  async def history(self):
-    rewards = await self.reward_distributions()
+  async def history(
+    self, start: datetime | None = None, end: datetime | None = None,
+  ):
+    rewards = await self.reward_distributions(start, end)
     id = source_id('bigquery')
     return [
       Record(observations=[r], provenance={'source': 'api', 'service': 'bigquery', 'id': id})

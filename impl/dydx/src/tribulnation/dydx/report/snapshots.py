@@ -29,6 +29,13 @@ class Snapshots(_Snapshots):
   def indexer(self) -> Indexer:
     return self.client.indexer
 
+  async def __aenter__(self):
+    await self.client.__aenter__()
+    return self
+
+  async def __aexit__(self, exc_type, exc_value, traceback):
+    await self.client.__aexit__(exc_type, exc_value, traceback)
+
   @SDK.method
   @wrap_exceptions
   async def bank_module_balances(self) -> Balances:
