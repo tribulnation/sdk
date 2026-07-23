@@ -4,7 +4,7 @@ from contextvars import ContextVar
 from dataclasses import dataclass, replace
 import inspect
 
-from .middleware import Middleware
+from .middleware import Middleware, RetryJitter
 
 T = TypeVar('T', covariant=True)
 Ps = ParamSpec('Ps')
@@ -33,6 +33,7 @@ class Context:
     max_retries: int | None = None,
     base_delay: float = 1.0,
     max_delay: float | None = None,
+    jitter: RetryJitter | None = None,
   ) -> 'Context':
     from . import middleware
     return self.add(middleware.retry(
@@ -40,6 +41,7 @@ class Context:
       max_retries=max_retries,
       base_delay=base_delay,
       max_delay=max_delay,
+      jitter=jitter,
     ))
   
   @overload

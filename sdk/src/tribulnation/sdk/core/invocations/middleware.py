@@ -2,11 +2,14 @@ from typing_extensions import TYPE_CHECKING, Any, Awaitable, Callable, Protocol,
 import asyncio
 import functools
 import inspect
+import math
+import random
 
 if TYPE_CHECKING:
   from .context import Context
 
 Fn = TypeVar('Fn', bound=Callable[..., Any])
+RetryJitter = Callable[[float], float]
 
 
 class Middleware(Protocol):
@@ -84,7 +87,14 @@ def default_retry_logger(
   delay: float,
 ) -> None:
   path = '.'.join(ctx.path)
-  print(f'Exponential retry [{retries=}, {delay=:.2f}s]. Calling {path} with {args=}, {kwargs=}. Exception:', exception)
+  print(f'Retry {retries} for {path} after {type(exception).__name__}; sleeping {delay:.2f}s')
+
+
+def full_jitter(
+  delay: float, *, random: Callable[[], float] = random.random,
+) -> float:
+  """Return a uniformly jittered delay between zero and the given delay."""
+  return delay * random()
 
 
 def retry(
@@ -92,6 +102,7 @@ def retry(
   max_retries: int | None = None,
   base_delay: float = 1.0,
   max_delay: float | None = None,
+  jitter: RetryJitter | None = full_jitter,
   log: RetryLogger | None = default_retry_logger,
 ) -> Middleware:
   handled = exceptions or (Exception,)
@@ -113,6 +124,13 @@ def retry(
           delay = base_delay * 2**retries
           if max_delay is not None and delay > max_delay:
             delay = max_delay
+          if jitter is not None:
+            cap = delay
+            delay = jitter(cap)
+            if not math.isfinite(delay) or not 0 <= delay <= cap:
+              raise ValueError(
+                f'Retry jitter returned {delay!r}; expected a finite delay between 0 and {cap}',
+              )
           if log is not None:
             log(fn, ctx, args=args, kwargs=kwargs, exception=e, retries=retries, delay=delay)
           await asyncio.sleep(delay)
