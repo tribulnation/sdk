@@ -1,4 +1,5 @@
-from typing_extensions import Callable, Awaitable, TypeVar
+from __future__ import annotations
+from typing_extensions import Callable, Awaitable, TypeVar, TYPE_CHECKING
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
@@ -10,6 +11,9 @@ from tribulnation.dydx.core import wrap_exceptions, USDC
 from dydx import Indexer, Dydx
 from dydx.indexer.data.get_fills import Fill
 from .window import in_window
+
+if TYPE_CHECKING:
+  from .cache import HistoryCache
 
 T = TypeVar('T')
 
@@ -119,6 +123,7 @@ def parse_fills(fills: list[Fill]):
 class IndexerHistory(SDK):
   address: str
   indexer: Indexer
+  cache: HistoryCache | None = None
 
   async def __aenter__(self):
     await self.indexer.__aenter__()
@@ -128,18 +133,18 @@ class IndexerHistory(SDK):
     await self.indexer.__aexit__(exc_type, exc_value, traceback)
 
   @classmethod
-  def of(cls, address: str, dydx: Dydx | None = None):
+  def of(cls, address: str, dydx: Dydx | None = None, cache: HistoryCache | None = None):
     indexer = dydx and dydx.indexer or Indexer()
-    return cls(address=address, indexer=indexer)
+    return cls(address=address, indexer=indexer, cache=cache)
 
   @SDK.method
   @wrap_exceptions
   async def call(self, fn: Callable[[], Awaitable[T]]) -> T:
     return await fn()
 
-  async def fetch_fills(
+  async def _fetch_from_indexer(
     self, *, subaccount: int, end: datetime | None = None,
-  ):
+  ) -> list[Fill]:
     fills: list[Fill] = []
     paging = self.indexer.data.get_fills_paged(
       self.address,
@@ -148,8 +153,39 @@ class IndexerHistory(SDK):
     )
     state = paging.init
     while state is not None:
-      page, state = await self.call(lambda: paging.next(state)) # type: ignore
+      page, state = await self.call(lambda: paging.next(state))  # type: ignore
       fills.extend(page)
+    return fills
+
+  async def fetch_fills(
+    self, *, subaccount: int, end: datetime | None = None,
+  ) -> list[Fill]:
+    if self.cache is None:
+      return await self._fetch_from_indexer(subaccount=subaccount, end=end)
+
+    watermark = self.cache.indexer_watermark(self.address, subaccount)
+    if watermark is not None:
+      cached = self.cache.read_indexer_fills(self.address, subaccount)
+      new_fills = await self._fetch_from_indexer(subaccount=subaccount, end=end)
+      above_watermark = [f for f in new_fills if int(f['createdAtHeight']) > watermark]
+      if above_watermark:
+        new_watermark = max(int(f['createdAtHeight']) for f in above_watermark)
+        self.cache.write_indexer_fills(
+          self.address, subaccount, above_watermark,
+          watermark_height=new_watermark,
+        )
+      return cached + above_watermark
+
+    fills = await self._fetch_from_indexer(subaccount=subaccount, end=end)
+    if fills:
+      wm = max(int(f['createdAtHeight']) for f in fills)
+      self.cache.write_indexer_fills(
+        self.address, subaccount, fills, watermark_height=wm,
+      )
+    else:
+      self.cache.write_indexer_fills(
+        self.address, subaccount, [], watermark_height=0,
+      )
     return fills
 
   async def fills(

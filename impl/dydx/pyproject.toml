@@ -4,13 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tribulnation-dydx"
-version = "0.5.11"
+version = "0.5.12"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
 description = "Tribulnation SDK implementation for dYdX."
 dependencies = [
-  "tribulnation-sdk>=1.4.0", "typed-dydx>=2.0.5", "google-cloud-bigquery~=3.41.0", "asyncer"
+  "tribulnation-sdk>=1.4.0", "typed-dydx>=2.0.5", "google-cloud-bigquery~=3.41.0", "asyncer",
+  "sqlalchemy>=2.0", "sqltypes"
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}

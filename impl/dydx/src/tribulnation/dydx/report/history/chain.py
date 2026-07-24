@@ -1,4 +1,5 @@
-from typing_extensions import Iterable, Callable, Awaitable, TypeVar, Protocol
+from __future__ import annotations
+from typing_extensions import Iterable, Callable, Awaitable, TypeVar, Protocol, TYPE_CHECKING
 from dataclasses import dataclass, field
 from datetime import datetime
 from collections import defaultdict
@@ -11,6 +12,9 @@ from dydx import Dydx
 from dydx.chain import Comet
 from dydx.chain.comet.types import TxResponse, Event, EventAttribute
 from .block_time import BlockTimeCache, MemoryBlockTimeCache
+
+if TYPE_CHECKING:
+  from .cache import HistoryCache
 
 T = TypeVar('T')
 
@@ -74,6 +78,7 @@ class ChainHistory(SDK):
   comet: Comet
   chain_semaphore: asyncio.Semaphore = field(default_factory=lambda: asyncio.Semaphore(4))
   block_time_cache: BlockTimeCache
+  cache: HistoryCache | None = None
 
   async def __aenter__(self):
     await self.comet.__aenter__()
@@ -83,10 +88,14 @@ class ChainHistory(SDK):
     await self.comet.__aexit__(exc_type, exc_value, traceback)
 
   @classmethod
-  def of(cls, address: str, dydx: Dydx, block_time_cache: BlockTimeCache | None = None):
+  def of(
+    cls, address: str, dydx: Dydx,
+    block_time_cache: BlockTimeCache | None = None,
+    cache: HistoryCache | None = None,
+  ):
     if block_time_cache is None:
       block_time_cache = MemoryBlockTimeCache()
-    return cls(address=address, comet=dydx.chain.comet, block_time_cache=block_time_cache)
+    return cls(address=address, comet=dydx.chain.comet, block_time_cache=block_time_cache, cache=cache)
 
   @SDK.method
   @wrap_exceptions
@@ -246,13 +255,9 @@ class ChainHistory(SDK):
       txs.extend(page)
     return txs
 
-  async def fetch_transactions(
-    self, start: datetime | None = None, end: datetime | None = None,
+  async def _fetch_from_node(
+    self, *, start_height: int | None, end_height: int | None,
   ) -> dict[str, TxResponse]:
-    """Fetch account transactions within an inclusive time window."""
-    if (window := await self.height_window(start, end)) is None:
-      return {}
-    start_height, end_height = window
     spent_txs, received_txs, fee_payer_txs, settled_funding_txs = await asyncio.gather(
       self.coin_spent_transactions(
         start_height=start_height, end_height=end_height,
@@ -268,9 +273,47 @@ class ChainHistory(SDK):
       ),
     )
     return {
-      tx['hash']: tx # type: ignore
+      tx['hash']: tx  # type: ignore
       for tx in spent_txs + received_txs + fee_payer_txs + settled_funding_txs
     }
+
+  async def fetch_transactions(
+    self, start: datetime | None = None, end: datetime | None = None,
+  ) -> dict[str, TxResponse]:
+    """Fetch account transactions within an inclusive time window."""
+    if (window := await self.height_window(start, end)) is None:
+      return {}
+    start_height, end_height = window
+
+    if self.cache is None:
+      return await self._fetch_from_node(
+        start_height=start_height, end_height=end_height,
+      )
+
+    watermark = self.cache.chain_watermark(self.address)
+    if watermark is not None and end_height is not None and end_height <= watermark:
+      return self.cache.read_chain_txs(
+        self.address, start_height=start_height, end_height=end_height,
+      )
+
+    fetch_start = watermark + 1 if watermark is not None else start_height
+    new_txs = await self._fetch_from_node(
+      start_height=fetch_start, end_height=end_height,
+    )
+
+    new_end = end_height if end_height is not None else (
+      max((int(tx['height']) for tx in new_txs.values()), default=watermark or 0)  # type: ignore
+    )
+    if new_txs or (end_height is not None and (watermark is None or end_height > watermark)):
+      self.cache.write_chain_txs(self.address, new_txs, end_height=new_end)
+
+    if watermark is not None and start_height is not None:
+      cached = self.cache.read_chain_txs(
+        self.address, start_height=start_height, end_height=watermark,
+      )
+      return {**cached, **new_txs}
+
+    return new_txs
     
 
   async def history(

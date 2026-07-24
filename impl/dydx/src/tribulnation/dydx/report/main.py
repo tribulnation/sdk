@@ -16,6 +16,8 @@ class DydxConfig(TypedDict, total=False):
   require_bigquery: bool
   block_time_cache_path: Path | str
   archive_node: Literal['kingnodes', 'polkachu']
+  cache: str
+  no_cache: bool
 
 @dataclass(kw_only=True)
 class Report(_Report):
@@ -31,15 +33,29 @@ class Report(_Report):
     config = config or {}
     providers = providers or {}
     require_bigquery = config.get('require_bigquery', False)
-    if (block_time_cache_path := config.get('block_time_cache_path')):
+
+    cache = None
+    if (cache_url := config.get('cache')):
+      from .history.cache import HistoryCache, migrate_file_cache
+      no_cache = config.get('no_cache', False)
+      cache = HistoryCache.connect(cache_url, no_cache_reads=no_cache)
+
+    if cache is not None:
+      block_time_cache = cache
+    elif (block_time_cache_path := config.get('block_time_cache_path')):
       from .history.block_time import FilesBlockTimeCache
       block_time_cache = FilesBlockTimeCache.at(block_time_cache_path)
     else:
       block_time_cache = None
+
+    if cache is not None and (legacy_path := config.get('block_time_cache_path')):
+      from .history.cache import migrate_file_cache
+      migrate_file_cache(cache, legacy_path)
+
     if (bigquery := providers.get('bigquery')):
       from .history.bigquery import bigquery_client
       bigquery = bigquery_client(providers)
-    
+
     archive_node = config.get('archive_node')
     if archive_node == 'kingnodes':
       dydx = Dydx.kingnodes_archive(public=True)
@@ -47,9 +63,13 @@ class Report(_Report):
       dydx = Dydx.polkachu_archive(public=True)
     else:
       dydx = None
-    
+
     return cls(
-      history_impl=History.of(address, dydx=dydx, bigquery=bigquery, block_time_cache=block_time_cache, require_bigquery=require_bigquery),
+      history_impl=History.of(
+        address, dydx=dydx, bigquery=bigquery,
+        block_time_cache=block_time_cache, cache=cache,
+        require_bigquery=require_bigquery,
+      ),
       snapshots_impl=Snapshots.of(address),
     )
 

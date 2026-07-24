@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing_extensions import TYPE_CHECKING
 from dataclasses import dataclass, field
 from datetime import datetime
 from asyncer import asyncify
@@ -9,6 +11,9 @@ from tribulnation.sdk import SDK, NetworkError
 from tribulnation.sdk.reporting import Bonus, Record, source_id, ProvidersConfig
 from tribulnation.dydx.core import parse_denom_amount
 from .window import in_window
+
+if TYPE_CHECKING:
+  from .cache import HistoryCache, BigQueryReward
 
 def estimate_query_cost(client: bigquery.Client, query: str, price_per_tib: float = 6.25) -> dict:
   """Estimate BigQuery on-demand cost without executing the query."""
@@ -72,10 +77,10 @@ def run_query_with_cost(
 
 run_query_with_cost_async = asyncify(run_query_with_cost)
 
-def parse_row(row: bigquery.Row) -> Bonus:
-  asset, amount = parse_denom_amount(row['token_denom'], row['token_amount'])
+def parse_row(row: bigquery.Row | BigQueryReward) -> Bonus:
+  asset, amount = parse_denom_amount(row.token_denom, row.token_amount)
   return Bonus(
-    time=row['block_timestamp'],
+    time=row.block_timestamp,
     asset=asset,
     amount=amount,
   )
@@ -86,19 +91,28 @@ class BigQueryHistory(SDK):
   address: str
   client: bigquery.Client = field(default_factory=bigquery.Client)
   max_cost_usd: float = 0.10
+  cache: HistoryCache | None = None
 
   @classmethod
-  def of(cls, address: str, client: bigquery.Client | None = None):
+  def of(cls, address: str, client: bigquery.Client | None = None, cache: HistoryCache | None = None):
     if client is None:
       client = bigquery_client()
     if client is not None:
-      return cls(address=address, client=client)
+      return cls(address=address, client=client, cache=cache)
 
   @SDK.method
   async def reward_distributions(
     self, start: datetime | None = None, end: datetime | None = None,
   ):
     """Fetch trading reward distributions from BigQuery."""
+    if self.cache is not None and self.cache.bigquery_has_cache(self.address):
+      cached_rows = self.cache.read_bigquery_rewards(self.address)
+      rewards = [parse_row(row) for row in cached_rows]
+      return [
+        reward for reward in rewards
+        if in_window(reward.time, start=start, end=end)
+      ]
+
     query = f"""
       SELECT
         block_timestamp,
@@ -114,6 +128,12 @@ class BigQueryHistory(SDK):
       results, _ = await run_query_with_cost_async(self.client, query, max_cost_usd=self.max_cost_usd)
     except requests.ConnectionError as e:
       raise NetworkError(*e.args) from e
+
+    if self.cache is not None:
+      self.cache.write_bigquery_rewards(
+        self.address,
+        [(row['block_timestamp'], row['token_denom'], str(row['token_amount'])) for row in results],
+      )
 
     rewards = [parse_row(row) for row in results]
     return [

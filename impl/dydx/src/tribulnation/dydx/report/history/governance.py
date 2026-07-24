@@ -1,4 +1,5 @@
-from typing_extensions import Any
+from __future__ import annotations
+from typing_extensions import Any, TYPE_CHECKING
 from dataclasses import dataclass
 import asyncio
 from datetime import datetime
@@ -12,6 +13,9 @@ from tribulnation.dydx.core import parse_denom_amount
 from dydx import Dydx
 from dydx.chain.comet.types import BlockResultsResponse, Event
 from .window import in_window
+
+if TYPE_CHECKING:
+  from .cache import HistoryCache
 
 GOVERNANCE_API_URL = 'https://dydx-dao-api.polkachu.com'
 
@@ -28,6 +32,7 @@ def proposal_amount(coin: dict) -> tuple[str, Decimal] | None:
 class GovernanceHistory:
   """Governance-backed dYdX history methods."""
   address: str
+  cache: HistoryCache | None = None
 
   async def history(
     self, start: datetime | None = None, end: datetime | None = None,
@@ -49,6 +54,9 @@ class GovernanceHistory:
 
   async def governance_proposals(self) -> list[dict[str, Any]]:
     """Fetch dYdX governance proposals from the public DAO REST API."""
+    if self.cache is not None and self.cache.governance_has_cache():
+      return self.cache.read_governance_proposals()
+
     proposals: list[dict[str, Any]] = []
     next_key: str | None = None
     while True:
@@ -66,6 +74,10 @@ class GovernanceHistory:
       if not raw_next_key:
         break
       next_key = str(raw_next_key)
+
+    if self.cache is not None:
+      self.cache.write_governance_proposals(proposals)
+
     return proposals
 
   async def governance_json(self, path: str, *, params: dict[str, str]) -> dict[str, Any]:

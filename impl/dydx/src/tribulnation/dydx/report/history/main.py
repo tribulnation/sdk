@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing_extensions import TYPE_CHECKING
 from dataclasses import dataclass
 from datetime import datetime
 import asyncio
@@ -9,6 +11,9 @@ from .bigquery import BigQueryClient, BigQueryHistory
 from .chain import ChainHistory, BlockTimeCache
 from .indexer import IndexerHistory
 from .governance import GovernanceHistory
+
+if TYPE_CHECKING:
+  from .cache import HistoryCache
 
 @dataclass(kw_only=True)
 class History(_History):
@@ -37,7 +42,8 @@ class History(_History):
     bigquery: BigQueryClient | None = None,
     dydx: Dydx | None = None,
     block_time_cache: BlockTimeCache | None = None,
-    require_bigquery: bool = True
+    cache: HistoryCache | None = None,
+    require_bigquery: bool = True,
   ):
     if dydx is None:
       dydx = Dydx.kingnodes_archive(public=True)
@@ -45,10 +51,10 @@ class History(_History):
       bigquery = BigQueryClient()
     return cls(
       address=address,
-      bigquery=BigQueryHistory.of(address, bigquery),
-      chain=ChainHistory.of(address, dydx, block_time_cache),
-      indexer=IndexerHistory.of(address, dydx),
-      governance=GovernanceHistory(address),
+      bigquery=BigQueryHistory.of(address, bigquery, cache=cache),
+      chain=ChainHistory.of(address, dydx, block_time_cache, cache=cache),
+      indexer=IndexerHistory.of(address, dydx, cache=cache),
+      governance=GovernanceHistory(address, cache=cache),
     )
 
   async def history(self, start: datetime | None = None, end: datetime | None = None):
