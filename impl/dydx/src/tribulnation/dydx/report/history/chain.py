@@ -11,7 +11,6 @@ from tribulnation.dydx.core import wrap_exceptions
 from dydx import Dydx
 from dydx.chain import Comet
 from dydx.chain.comet.types import TxResponse, Event, EventAttribute
-from .block_time import BlockTimeCache, MemoryBlockTimeCache
 
 if TYPE_CHECKING:
   from .cache import HistoryCache
@@ -77,8 +76,8 @@ class ChainHistory(SDK):
   address: str
   comet: Comet
   chain_semaphore: asyncio.Semaphore = field(default_factory=lambda: asyncio.Semaphore(4))
-  block_time_cache: BlockTimeCache
   cache: HistoryCache | None = None
+  _block_times: dict[int, datetime] = field(default_factory=dict)
 
   async def __aenter__(self):
     await self.comet.__aenter__()
@@ -88,14 +87,8 @@ class ChainHistory(SDK):
     await self.comet.__aexit__(exc_type, exc_value, traceback)
 
   @classmethod
-  def of(
-    cls, address: str, dydx: Dydx,
-    block_time_cache: BlockTimeCache | None = None,
-    cache: HistoryCache | None = None,
-  ):
-    if block_time_cache is None:
-      block_time_cache = MemoryBlockTimeCache()
-    return cls(address=address, comet=dydx.chain.comet, block_time_cache=block_time_cache, cache=cache)
+  def of(cls, address: str, dydx: Dydx, cache: HistoryCache | None = None):
+    return cls(address=address, comet=dydx.chain.comet, cache=cache)
 
   @SDK.method
   @wrap_exceptions
@@ -106,13 +99,17 @@ class ChainHistory(SDK):
   @SDK.method
   @wrap_exceptions
   async def block_time(self, height: int) -> datetime:
-    if (time := self.block_time_cache.get(height)) is not None:
+    if (time := self._block_times.get(height)) is not None:
       return time
-    else:
-      block = await self.comet.block(height)
-      time = block['block']['header']['time']
-      self.block_time_cache.set(height, time)
+    if self.cache is not None and (time := self.cache.get(height)) is not None:
+      self._block_times[height] = time
       return time
+    block = await self.comet.block(height)
+    time = block['block']['header']['time']
+    self._block_times[height] = time
+    if self.cache is not None:
+      self.cache.set(height, time)
+    return time
 
 
   async def tx_search(self, query: str, *, per_page: int | None = None):

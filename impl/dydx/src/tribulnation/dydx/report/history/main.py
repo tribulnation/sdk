@@ -8,7 +8,7 @@ from tribulnation.sdk.core import managed_tasks
 from tribulnation.sdk.reporting import History as _History
 from dydx import Dydx
 from .bigquery import BigQueryClient, BigQueryHistory
-from .chain import ChainHistory, BlockTimeCache
+from .chain import ChainHistory
 from .indexer import IndexerHistory
 from .governance import GovernanceHistory
 
@@ -41,7 +41,6 @@ class History(_History):
     cls, address: str, *,
     bigquery: BigQueryClient | None = None,
     dydx: Dydx | None = None,
-    block_time_cache: BlockTimeCache | None = None,
     cache: HistoryCache | None = None,
     require_bigquery: bool = True,
   ):
@@ -52,7 +51,7 @@ class History(_History):
     return cls(
       address=address,
       bigquery=BigQueryHistory.of(address, bigquery, cache=cache),
-      chain=ChainHistory.of(address, dydx, block_time_cache, cache=cache),
+      chain=ChainHistory.of(address, dydx, cache=cache),
       indexer=IndexerHistory.of(address, dydx, cache=cache),
       governance=GovernanceHistory(address, cache=cache),
     )

@@ -2,7 +2,6 @@ from __future__ import annotations
 from typing_extensions import Any
 from dataclasses import dataclass
 from datetime import datetime
-from pathlib import Path
 
 from sqlalchemy import Dialect, Engine, String, TypeDecorator, create_engine, event, select
 from sqlalchemy.engine.interfaces import DBAPIConnection
@@ -98,7 +97,7 @@ class HistoryCache:
     cache_metadata.create_all(engine)
     return cls(engine=engine, no_cache_reads=no_cache_reads)
 
-  # -- BlockTimeCache protocol --
+  # -- Block times --
 
   def get(self, height: int) -> datetime | None:
     if self.no_cache_reads:
@@ -251,19 +250,3 @@ class HistoryCache:
         fetched_at=datetime.now().astimezone(),
       ))
       session.commit()
-
-
-def migrate_file_cache(cache: HistoryCache, directory: Path | str) -> None:
-  directory = Path(directory)
-  if not directory.exists():
-    return
-  with Session(cache.engine) as session:
-    for path in directory.glob('*'):
-      if path.is_file():
-        try:
-          height = int(path.stem)
-          time = datetime.fromisoformat(path.read_text().strip())
-          session.merge(BlockTime(height=height, time=time))
-        except (ValueError, OSError):
-          continue
-    session.commit()
