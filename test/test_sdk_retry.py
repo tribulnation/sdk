@@ -186,6 +186,7 @@ async def test_default_retry_logger_excludes_sensitive_values(
   wrapped = retry(
     RetriableError,
     max_retries=1,
+    jitter=None,  # keep the logged delay deterministic; jitter is covered above
   )(target, Context(path=('report', 'history', 'get_tx')))
   assert await wrapped(SecretSelf(), 'argument-secret') == 'ok'
 

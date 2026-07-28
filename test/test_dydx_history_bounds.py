@@ -4,7 +4,6 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, cast
 import asyncio
 
-from tribulnation.dydx.report.history.block_time import MemoryBlockTimeCache
 from tribulnation.dydx.report.history.chain import ChainHistory
 from tribulnation.dydx.report.history.main import History
 from tribulnation.dydx.report.history.window import in_window
@@ -44,11 +43,14 @@ class FakeComet:
     return EmptyPaging()
 
 def chain_history(comet: FakeComet) -> ChainHistory:
-  """Create chain history around a Comet stub."""
+  """Create chain history around a Comet stub.
+
+  No `cache=`, so block times are memoized in the in-process `_block_times`
+  map -- which is what `..._reuses_cache` below asserts against.
+  """
   return ChainHistory(
     address='dydx1test',
     comet=cast(Any, comet),
-    block_time_cache=MemoryBlockTimeCache(),
   )
 
 def test_chain_resolves_inclusive_time_window_and_reuses_cache():

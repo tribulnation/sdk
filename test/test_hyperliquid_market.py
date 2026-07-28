@@ -82,8 +82,13 @@ def test_isolated_collateral_math() -> None:
   assert i.margin_mode == 'isolated'
 
 
-def test_public_instance_constructs() -> None:
-  """A public/no-credential venue instance constructs without error."""
+async def test_public_instance_constructs() -> None:
+  """A public/no-credential venue instance constructs without error.
+
+  Async because the constructor builds a websocket client that binds to the
+  ambient event loop; a sync test only passes when nothing has yet replaced
+  the default loop, which made it order-dependent in the full suite.
+  """
   venue = HyperliquidMarket.http('0x0000000000000000000000000000000000000000')
   assert venue.venue_id == 'hyperliquid'
 

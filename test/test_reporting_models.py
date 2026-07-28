@@ -6,7 +6,7 @@ import pytest
 from tribulnation.sdk import reporting
 from tribulnation.sdk.reporting import (
   Bonus,
-  ConversionBatch,
+  Conversion,
   Funding,
   FutureOrder,
   FuturePositionSummary,
@@ -29,7 +29,7 @@ def test_transfer_observation_validates_through_record_union():
       'src_account': 'funding',
       'fee': {'asset': 'USDC', 'amount': '0.10'},
     }],
-    'provenance': {'source': 'manual', 'label': 'mexc'},
+    'provenance': {'source': 'manual', 'id': 'mexc'},
   })
 
   transfer = record.observations[0]
@@ -45,7 +45,7 @@ def test_shared_observation_subaccount_validates_through_record_union():
   record = HistoryRecord.model_validate({
     'observations': [
       {
-        'type': 'trade',
+        'type': 'spot_trade',
         'time': '2025-01-01T00:00:00Z',
         'base': 'BTC',
         'quote': 'USDT',
@@ -63,7 +63,7 @@ def test_shared_observation_subaccount_validates_through_record_union():
         'dst_account': 'self',
       },
     ],
-    'provenance': {'source': 'manual', 'label': 'mexc'},
+    'provenance': {'source': 'manual', 'id': 'mexc'},
   })
 
   trade = record.observations[0]
@@ -75,7 +75,9 @@ def test_shared_observation_subaccount_validates_through_record_union():
 
 
 def test_internal_transfer_amount_must_be_positive():
-  with pytest.raises(ValueError, match='internal_transfer.amount must be positive'):
+  # Enforced by a `Field(ge=0)` constraint on InternalTransfer.amount; direction
+  # is carried by src_account/dst_account, never by the sign.
+  with pytest.raises(ValueError, match='greater_than_equal'):
     HistoryRecord.model_validate({
       'observations': [{
         'type': 'internal_transfer',
@@ -85,7 +87,7 @@ def test_internal_transfer_amount_must_be_positive():
         'src_account': 'spot',
         'dst_account': 'earn:flexible',
       }],
-      'provenance': {'source': 'manual', 'label': 'mexc'},
+      'provenance': {'source': 'manual', 'id': 'mexc'},
     })
 
 
@@ -98,7 +100,7 @@ def test_bonus_observation_validates_through_record_union():
       'amount': '-5',
       'category': 'user_grants_recycle',
     }],
-    'provenance': {'source': 'manual', 'label': 'bitget'},
+    'provenance': {'source': 'manual', 'id': 'bitget'},
   })
 
   bonus = record.observations[0]
@@ -143,7 +145,7 @@ def test_future_position_summary_validates_through_record_union():
         'position_pnl': '-0.28427483816',
       },
     ],
-    'provenance': {'source': 'manual', 'label': 'bitget'},
+    'provenance': {'source': 'manual', 'id': 'bitget'},
   })
 
   trade = record.observations[0]
@@ -173,7 +175,7 @@ def test_futures_scoped_position_id_fields_validate_and_export():
         'id': 'pnl-row-1',
         'position_id': 'position-1',
         'instrument': 'BTCUSDT',
-        'settle': 'USDT',
+        'asset': 'USDT',  # RealizedPnl names its settlement asset `asset`, not `settle`
         'amount': '-0.13044',
       },
       {
@@ -186,7 +188,7 @@ def test_futures_scoped_position_id_fields_validate_and_export():
         'amount': '-0.09720019016',
       },
     ],
-    'provenance': {'source': 'manual', 'label': 'bitget'},
+    'provenance': {'source': 'manual', 'id': 'bitget'},
   })
 
   order = record.observations[0]
@@ -210,7 +212,7 @@ def test_conversion_trade_leg_marker_validates_through_record_union():
       'event_type': 'conversion',
       'label': 'Small Assets Exchange BNB',
     }],
-    'provenance': {'source': 'manual', 'label': 'binance'},
+    'provenance': {'source': 'manual', 'id': 'binance'},
   })
 
   leg = record.observations[0]
@@ -228,29 +230,27 @@ def test_invalid_trade_leg_event_type_is_rejected():
         'amount': '-1',
         'event_type': 'withdrawal',
       }],
-      'provenance': {'source': 'manual', 'label': 'binance'},
+      'provenance': {'source': 'manual', 'id': 'binance'},
     })
 
 
-def test_conversion_batch_validates_through_record_union():
-  assert reporting.ConversionBatch is ConversionBatch
-  assert 'ConversionBatch' in reporting.__all__
+def test_conversion_validates_through_record_union():
+  assert reporting.Conversion is Conversion
+  assert 'Conversion' in reporting.__all__
 
   record = HistoryRecord.model_validate({
     'observations': [{
-      'type': 'conversion_batch',
+      'type': 'conversion',
       'time': '2025-01-24T20:45:47Z',
-      'label': 'Small Assets Exchange BNB',
       'legs': [
         {'asset': 'EIGEN', 'amount': '-0.00465815'},
         {'asset': 'BNB', 'amount': '0.00002529'},
       ],
     }],
-    'provenance': {'source': 'manual', 'label': 'binance'},
+    'provenance': {'source': 'manual', 'id': 'binance'},
   })
 
   batch = record.observations[0]
-  assert isinstance(batch, ConversionBatch)
-  assert batch.label == 'Small Assets Exchange BNB'
+  assert isinstance(batch, Conversion)
   assert batch.legs[0].asset == 'EIGEN'
   assert batch.legs[1].amount == Decimal('0.00002529')

@@ -15,7 +15,7 @@ def test_dydx_market_orders_default_to_ioc():
 def test_dydx_market_tif_can_be_overridden():
   order = export_order(
     {'type': 'MARKET', 'qty': Decimal('1'), 'price': Decimal('100')},
-    {'market_tif': 'FILL_OR_KILL'},
+    {'tif': 'FILL_OR_KILL'},
   )
 
   assert order['time_in_force'] == 'FILL_OR_KILL'
