@@ -1,7 +1,7 @@
 from typing_extensions import Collection as _Collection
 from dataclasses import dataclass as _dataclass
 from tribulnation.sdk.reporting import (
-  SnapshotResult as _SnapshotResult, Snapshots as _Snapshots,
+  SnapshotRecord as _SnapshotRecord, Snapshots as _Snapshots,
   ProvidersConfig as _ProvidersConfig,
 )
 from tribulnation.ethereum.core import Network
@@ -18,7 +18,7 @@ class EthereumSnapshots(_Snapshots):
   async def __aexit__(self, exc_type, exc_value, traceback):
     await self.impl.__aexit__(exc_type, exc_value, traceback)
 
-  async def snapshot(self, assets: _Collection[str] | None = None) -> _SnapshotResult:
+  async def snapshot(self, assets: _Collection[str] | None = None) -> _SnapshotRecord:
     return await self.impl.snapshot(assets)
 
   @classmethod

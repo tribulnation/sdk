@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 
 from tribulnation.sdk.core import SDK
-from tribulnation.sdk.reporting import FeeLeg, Observation, Record, SpotTrade, UnknownObservation
+from tribulnation.sdk.reporting import FeeLeg, Observation, HistoryRecord, SpotTrade, UnknownObservation
 from tribulnation.sdk.reporting import History as SdkHistory
 from bitget import Bitget
 from bitget.spot.public.symbols import Symbol
@@ -97,7 +97,7 @@ class MarginHistory(TimezoneMixin, SdkHistory):
 
   async def history(
     self, start: datetime | None = None, end: datetime | None = None
-  ) -> AsyncIterable[Record]:
+  ) -> AsyncIterable[HistoryRecord]:
     """Fetch margin history records."""
     start, end = require_range(start, end)
     for margin_type in ('crossed', 'isolated'):

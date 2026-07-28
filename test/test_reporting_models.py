@@ -13,14 +13,14 @@ from tribulnation.sdk.reporting import (
   FutureTrade,
   InternalTransfer,
   RealizedPnl,
-  Record,
+  HistoryRecord,
   Transfer,
   TradeLeg,
 )
 
 
 def test_transfer_observation_validates_through_record_union():
-  record = Record.model_validate({
+  record = HistoryRecord.model_validate({
     'observations': [{
       'type': 'transfer',
       'id': 'funds-sent-1',
@@ -42,7 +42,7 @@ def test_transfer_observation_validates_through_record_union():
 
 
 def test_shared_observation_subaccount_validates_through_record_union():
-  record = Record.model_validate({
+  record = HistoryRecord.model_validate({
     'observations': [
       {
         'type': 'trade',
@@ -76,7 +76,7 @@ def test_shared_observation_subaccount_validates_through_record_union():
 
 def test_internal_transfer_amount_must_be_positive():
   with pytest.raises(ValueError, match='internal_transfer.amount must be positive'):
-    Record.model_validate({
+    HistoryRecord.model_validate({
       'observations': [{
         'type': 'internal_transfer',
         'time': '2025-01-01T00:00:00Z',
@@ -90,7 +90,7 @@ def test_internal_transfer_amount_must_be_positive():
 
 
 def test_bonus_observation_validates_through_record_union():
-  record = Record.model_validate({
+  record = HistoryRecord.model_validate({
     'observations': [{
       'type': 'bonus',
       'id': 'grant-1',
@@ -108,7 +108,7 @@ def test_bonus_observation_validates_through_record_union():
 
 
 def test_future_position_summary_validates_through_record_union():
-  record = Record.model_validate({
+  record = HistoryRecord.model_validate({
     'observations': [
       {
         'type': 'future_trade',
@@ -160,7 +160,7 @@ def test_futures_scoped_position_id_fields_validate_and_export():
   assert reporting.FuturePositionSummary is FuturePositionSummary
   assert 'FuturePositionSummary' in reporting.__all__
 
-  record = Record.model_validate({
+  record = HistoryRecord.model_validate({
     'observations': [
       {
         'type': 'future_order',
@@ -201,7 +201,7 @@ def test_futures_scoped_position_id_fields_validate_and_export():
 
 
 def test_conversion_trade_leg_marker_validates_through_record_union():
-  record = Record.model_validate({
+  record = HistoryRecord.model_validate({
     'observations': [{
       'type': 'trade_leg',
       'time': '2025-01-24T20:45:47Z',
@@ -221,7 +221,7 @@ def test_conversion_trade_leg_marker_validates_through_record_union():
 
 def test_invalid_trade_leg_event_type_is_rejected():
   with pytest.raises(ValueError):
-    Record.model_validate({
+    HistoryRecord.model_validate({
       'observations': [{
         'type': 'trade_leg',
         'asset': 'USDT',
@@ -236,7 +236,7 @@ def test_conversion_batch_validates_through_record_union():
   assert reporting.ConversionBatch is ConversionBatch
   assert 'ConversionBatch' in reporting.__all__
 
-  record = Record.model_validate({
+  record = HistoryRecord.model_validate({
     'observations': [{
       'type': 'conversion_batch',
       'time': '2025-01-24T20:45:47Z',

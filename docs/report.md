@@ -2,11 +2,10 @@
 
 > `Report` provides method to retrieve historical transactions and current balances/positions.
 
-- `history(start?, end?)`: transaction history 
-- `snapshot(assets?)`: current balances and positions with their provenance
-- `records(start?, end?)` — `history(start, end)` plus a trailing snapshot record when `end=None`
+- `history(start?, end?)`: transaction history, as a stream of `HistoryRecord`
+- `snapshot(assets?)`: current balances and positions, as a `SnapshotRecord`
 
-`ReportSDK` has no built-in default accounts (unlike `MarketSDK`/`WalletSDK`/`EarnSDK`) — every account must be listed explicitly. Every `Record` carries a `Provenance` (api/tabular/manual/derived) tracing where it came from. `providers` (BigQuery/Alchemy/Etherscan/Moralis credentials) are only needed by chain-based venues that use them.
+`ReportSDK` has no built-in default accounts (unlike `MarketSDK`/`WalletSDK`/`EarnSDK`) — every account must be listed explicitly. Both record types carry a `Provenance` (api/tabular/manual/derived) tracing where they came from. `providers` (BigQuery/Alchemy/Etherscan/Moralis credentials) are only needed by chain-based venues that use them.
 
 **Example:**
 

@@ -5,7 +5,7 @@ import asyncio
 
 from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import (
-  Balances, Position, Snapshot, SnapshotResult, Snapshots as _Snapshots,
+  Balances, Position, Snapshot, SnapshotRecord, Snapshots as _Snapshots,
   SubaccountSnapshot,
 )
 from hyperliquid.info import Info
@@ -92,7 +92,7 @@ class Snapshots(_Snapshots):
       pnls += pnl
     return positions, pnls
 
-  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotResult:
+  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotRecord:
     stake, spot_balances, (perp_positions, perp_pnls) = await asyncio.gather(
       self.stake_snapshot(),
       self.spot_balances(),
@@ -108,7 +108,7 @@ class Snapshots(_Snapshots):
         ),
         SubaccountSnapshot(subaccount='staking', balances=staking),
       ])
-    return SnapshotResult(
+    return SnapshotRecord(
       snapshot=snapshot,
       provenance={'source': 'api', 'service': 'hyperliquid', 'id': snapshot.time.isoformat()},
     )

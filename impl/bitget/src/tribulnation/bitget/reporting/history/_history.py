@@ -2,7 +2,7 @@ from typing_extensions import AsyncIterable
 from dataclasses import dataclass
 from datetime import datetime
 
-from tribulnation.sdk.reporting import History as SdkHistory, Record
+from tribulnation.sdk.reporting import History as SdkHistory, HistoryRecord
 
 from tribulnation.bitget.core import SdkMixin
 from .spot import SpotHistory
@@ -28,7 +28,7 @@ class History(TimezoneMixin, SdkMixin, SdkHistory):
 
   async def history(
     self, start: datetime | None = None, end: datetime | None = None
-  ) -> AsyncIterable[Record]:
+  ) -> AsyncIterable[HistoryRecord]:
     """Fetch all supported Bitget reporting records."""
     start, end = require_range(start, end)
     async for chunk in self.spot_history.history(start, end):

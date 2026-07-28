@@ -8,7 +8,7 @@ from tribulnation.sdk.reporting import (
   CryptoWithdrawal,
   FeeLeg,
   Observation,
-  Record,
+  HistoryRecord,
   SpotTrade,
   UnknownObservation,
 )
@@ -128,7 +128,7 @@ class SpotHistory(TimezoneMixin, SdkHistory):
   @SDK.method
   async def history(
     self, start: datetime | None = None, end: datetime | None = None
-  ) -> AsyncIterable[Record]:
+  ) -> AsyncIterable[HistoryRecord]:
     """Fetch spot history records."""
     start, end = require_range(start, end)
     async for record in self.flows(start, end):

@@ -5,7 +5,7 @@ import asyncio
 
 from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import (
-  Snapshots as _Snapshots, Snapshot, SnapshotResult, SubaccountSnapshot,
+  Snapshots as _Snapshots, Snapshot, SnapshotRecord, SubaccountSnapshot,
   Balances, Position, source_id
 )
 from tribulnation.dydx.core import (
@@ -122,7 +122,7 @@ class Snapshots(_Snapshots):
       for instrument, parts in positions.items()
     }
 
-  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotResult:
+  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotRecord:
     bank, delegations, unbonding, unclaimed, perpetuals = await asyncio.gather(
       self.bank_module_balances(),
       self.active_delegations(),
@@ -130,7 +130,7 @@ class Snapshots(_Snapshots):
       self.unclaimed_delegation_rewards(),
       self.perpetual_subaccounts(),
     )
-    return SnapshotResult(
+    return SnapshotRecord(
       snapshot=Snapshot(
         subaccounts=[
           SubaccountSnapshot(

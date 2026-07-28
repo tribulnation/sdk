@@ -11,7 +11,7 @@ class SnapshotSourcesConfig(TypedDict, total=False):
   - Sources may combine asset discovery and balance retrieval in one call."""
   snapshot_assets: SnapshotSource
   """Default: `node`.
-  - Used by `snapshot(assets=...)` and open-ended `records()` reports.
+  - Used by `snapshot(assets=...)`.
   - `node` requires the asset contract set to be known."""
 
 DEFAULT_SNAPSHOT_SOURCE: SnapshotSource = 'alchemy'

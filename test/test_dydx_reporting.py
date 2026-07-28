@@ -26,7 +26,7 @@ from tribulnation.sdk.reporting import (
   Funding,
   FutureTrade,
   InternalTransfer,
-  Record,
+  HistoryRecord,
   Report,
   ReportSDK,
   Transfer,
@@ -192,18 +192,18 @@ class StreamingReporting(Reporting):
     end: datetime | None,
     include_fills: bool,
     include_transfers: bool,
-  ) -> tuple[list[Record], set[str]]:
+  ) -> tuple[list[HistoryRecord], set[str]]:
     """Return delayed indexer records."""
     await asyncio.sleep(0.03)
-    return ([Record(
+    return ([HistoryRecord(
       observations=[UnknownObservation(id='indexer', reason='test')],
       provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'indexer'},
     )], set())
 
-  async def bigquery_funding(self, *, start: datetime | None, end: datetime | None) -> list[Record]:
+  async def bigquery_funding(self, *, start: datetime | None, end: datetime | None) -> list[HistoryRecord]:
     """Return fast funding records."""
     await asyncio.sleep(0.01)
-    return [Record(
+    return [HistoryRecord(
       observations=[UnknownObservation(id='funding', reason='test')],
       provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'funding'},
     )]
@@ -214,31 +214,31 @@ class StreamingReporting(Reporting):
     *,
     start: datetime | None,
     end: datetime | None,
-  ) -> list[Record]:
+  ) -> list[HistoryRecord]:
     """Return delayed fee records."""
     await asyncio.sleep(0.05)
-    return [Record(
+    return [HistoryRecord(
       observations=[UnknownObservation(id='fees', reason='test')],
       provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'fees'},
     )]
 
-  async def bigquery_staking_transfers(self, *, start: datetime | None, end: datetime | None) -> list[Record]:
+  async def bigquery_staking_transfers(self, *, start: datetime | None, end: datetime | None) -> list[HistoryRecord]:
     """Return delayed staking records."""
     await asyncio.sleep(0.04)
-    return [Record(
+    return [HistoryRecord(
       observations=[UnknownObservation(id='staking', reason='test')],
       provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'staking'},
     )]
 
-  async def bigquery_native_wallet_transfers(self, *, start: datetime | None, end: datetime | None) -> list[Record]:
+  async def bigquery_native_wallet_transfers(self, *, start: datetime | None, end: datetime | None) -> list[HistoryRecord]:
     """Return delayed native wallet records."""
     await asyncio.sleep(0.02)
-    return [Record(
+    return [HistoryRecord(
       observations=[UnknownObservation(id='native', reason='test')],
       provenance={'source': 'api', 'service': 'dydx', 'endpoint': 'native'},
     )]
 
-  async def bigquery_trading_rewards(self, *, start: datetime | None, end: datetime | None) -> list[Record]:
+  async def bigquery_trading_rewards(self, *, start: datetime | None, end: datetime | None) -> list[HistoryRecord]:
     """Return no trading rewards for streaming orchestration tests."""
     return []
 
@@ -248,7 +248,7 @@ class StreamingReporting(Reporting):
     *,
     start: datetime | None,
     end: datetime | None,
-  ) -> list[Record]:
+  ) -> list[HistoryRecord]:
     """Return no Megavault records."""
     return []
 
@@ -258,7 +258,7 @@ class StreamingReporting(Reporting):
     *,
     start: datetime | None,
     end: datetime | None,
-  ) -> list[Record]:
+  ) -> list[HistoryRecord]:
     """Return no IBC records."""
     return []
 

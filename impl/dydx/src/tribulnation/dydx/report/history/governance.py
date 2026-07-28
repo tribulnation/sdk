@@ -8,7 +8,7 @@ import json
 from urllib.parse import urlencode
 from urllib.request import urlopen
 
-from tribulnation.sdk.reporting import Record, Yield, source_id
+from tribulnation.sdk.reporting import HistoryRecord, Yield, source_id
 from tribulnation.dydx.core import parse_denom_amount
 from dydx import Dydx
 from dydx.chain.comet.types import BlockResultsResponse, Event
@@ -36,10 +36,10 @@ class GovernanceHistory:
 
   async def history(
     self, start: datetime | None = None, end: datetime | None = None,
-  ) -> list[Record]:
+  ) -> list[HistoryRecord]:
     """Collect Community Treasury distributions from governance proposals."""
     proposals = await self.governance_proposals()
-    records: list[Record] = []
+    records: list[HistoryRecord] = []
     for proposal in proposals:
       record = self.parse_governance_proposal(proposal)
       if record is not None:
@@ -93,7 +93,7 @@ class GovernanceHistory:
       return payload
     return await asyncio.to_thread(fetch)
 
-  def parse_governance_proposal(self, proposal: dict[str, Any]) -> Record | None:
+  def parse_governance_proposal(self, proposal: dict[str, Any]) -> HistoryRecord | None:
     """Convert one governance proposal into a Community Treasury yield record."""
     status = proposal.get('status')
     if status not in {'PROPOSAL_STATUS_PASSED', '3'}:
@@ -121,7 +121,7 @@ class GovernanceHistory:
         ))
     if not observations:
       return None
-    return Record(
+    return HistoryRecord(
       observations=observations,
       provenance={'source': 'api', 'service': 'dydx', 'id': source_id('dydx')},
     )

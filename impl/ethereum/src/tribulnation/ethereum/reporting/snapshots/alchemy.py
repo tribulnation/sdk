@@ -7,7 +7,7 @@ from alchemy import Alchemy
 
 from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import (
-  Balances, Snapshot, SnapshotResult, Snapshots, SubaccountSnapshot, source_id,
+  Balances, Snapshot, SnapshotRecord, Snapshots, SubaccountSnapshot, source_id,
 )
 from tribulnation.ethereum.core import alchemy as alchemy_core
 from ..config import NATIVE_ASSET
@@ -62,7 +62,7 @@ class AlchemySnapshots(Snapshots):
       for token in chunk:
         yield token
 
-  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotResult:
+  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotRecord:
     balances = Balances()
     tokens = [token async for token in self.alchemy_portfolio_tokens()]
     for token in tokens:
@@ -72,7 +72,7 @@ class AlchemySnapshots(Snapshots):
       qty = token_qty(token['tokenBalance'], metadata.get('decimals'))
       if qty > 0 or not self.ignore_zero_value:
         balances[asset] = qty
-    return SnapshotResult(
+    return SnapshotRecord(
       snapshot=Snapshot(
         subaccounts=[SubaccountSnapshot(balances=balances)],
       ),

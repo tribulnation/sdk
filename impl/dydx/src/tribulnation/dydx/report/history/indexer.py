@@ -6,7 +6,7 @@ from decimal import Decimal
 import asyncio
 
 from tribulnation.sdk import SDK
-from tribulnation.sdk.reporting import FutureTrade, Fee, Funding, source_id, Record
+from tribulnation.sdk.reporting import FutureTrade, Fee, Funding, source_id, HistoryRecord
 from tribulnation.dydx.core import wrap_exceptions, USDC
 from dydx import Indexer, Dydx
 from dydx.indexer.data.get_fills import Fill
@@ -236,7 +236,7 @@ class IndexerHistory(SDK):
       for s in subaccounts
     ])
     return [
-      Record(observations=[o], provenance={'source': 'api', 'service': 'indexer', 'id': id})
+      HistoryRecord(observations=[o], provenance={'source': 'api', 'service': 'indexer', 'id': id})
       for nested in nested_observations
       for o in nested
     ]

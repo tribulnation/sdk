@@ -8,10 +8,12 @@ from .accounts import Account, Dydx, Evm, Binance, Bitget, Mexc, Hyperliquid
 if TYPE_CHECKING:
   from tribulnation.ethereum.reporting import EvmConfig
   from tribulnation.dydx.report import DydxConfig
+  from tribulnation.hyperliquid.report import HyperliquidConfig
 
   class Config(TypedDict, total=False):
     evm: EvmConfig
     dydx: DydxConfig
+    hyperliquid: HyperliquidConfig
 else:
   Config = dict
 
@@ -49,7 +51,15 @@ class ReportSDK:
     raise NotImplementedError('mexc reporting is not yet implemented.')
 
   def hyperliquid(self, account: Hyperliquid, id: str) -> Report:
-    raise NotImplementedError('hyperliquid reporting is not yet implemented.')
+    try:
+      from tribulnation.hyperliquid import Report as HyperliquidReport
+    except ImportError as e:
+      raise ImportError('hyperliquid sdk is not installed. Please install it with `pip install tribulnation-hyperliquid`.') from e
+    if (address := account.resolved_address) is None:
+      raise ValueError(f'Account {id} does not have a resolved address.')
+    config = dict(self.config.get('hyperliquid') or {})
+    config.setdefault('mainnet', account.venue == 'hyperliquid')
+    return HyperliquidReport.new(address, config=config)  # type: ignore[arg-type]
 
   def venue(self, id: str, /) -> Report:
     if (account := self.accounts.get(id)) is None:
@@ -65,7 +75,7 @@ class ReportSDK:
         return self.bitget(account, id)
       case 'mexc':
         return self.mexc(account, id)
-      case 'hyperliquid':
+      case 'hyperliquid' | 'hyperliquid_testnet':
         return self.hyperliquid(account, id)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')

@@ -1,7 +1,6 @@
 from typing_extensions import Annotated, Union, Sequence, Literal
 import pydantic
 
-from .snapshots import Snapshot
 from .exchange import (
   SpotTrade, SpotOrder, TradeLeg, Conversion, FeeLeg,
   FutureTrade, FutureOrder, FuturePositionSummary, RealizedPnl,
@@ -75,8 +74,7 @@ Observation = Annotated[
   pydantic.Discriminator('type')
 ]
 
-class Record(pydantic.BaseModel):
+class HistoryRecord(pydantic.BaseModel):
   model_config = pydantic.ConfigDict(extra='forbid')
   observations: Sequence[Observation] = []
-  snapshots: Sequence[Snapshot] = []
   provenance: Provenance

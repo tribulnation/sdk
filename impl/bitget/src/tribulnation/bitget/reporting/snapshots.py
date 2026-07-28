@@ -5,7 +5,7 @@ import asyncio
 
 from tribulnation.sdk.core import SDK
 from tribulnation.sdk.reporting import (
-  Snapshot, SnapshotResult, SubaccountSnapshot, Snapshots as _Snapshots,
+  Snapshot, SnapshotRecord, SubaccountSnapshot, Snapshots as _Snapshots,
   source_id, Position, Balances
 )
 
@@ -112,7 +112,7 @@ class Snapshots(SdkMixin, _Snapshots):
 
 
   @wrap_exceptions
-  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotResult:
+  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotRecord:
 
     if self.raise_if_copy:
       future_copy, spot_copy = await asyncio.gather(
@@ -142,7 +142,7 @@ class Snapshots(SdkMixin, _Snapshots):
         self.bot_balances('futures'),
       ),
     )
-    return SnapshotResult(
+    return SnapshotRecord(
       snapshot=Snapshot(subaccounts=[
         SubaccountSnapshot(subaccount='spot', balances=spot),
         SubaccountSnapshot(

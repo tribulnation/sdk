@@ -30,7 +30,7 @@ from .models import (
   ObservationType,
   Provenance,
   RealizedPnl,
-  Record,
+  HistoryRecord,
   Repay,
   SingleAssetObservation,
   SpotOrder,
@@ -44,7 +44,7 @@ from .models import (
   CosmosTx,
   CosmosBlockEvents,
 )
-from .snapshots import SnapshotResult, Snapshots
+from .snapshots import SnapshotRecord, Snapshots
 from .history import History
 from .sdk import Report
 from .config import (
@@ -60,7 +60,7 @@ __all__ = [
   'Snapshots',
   'Snapshot',
   'SubaccountSnapshot',
-  'SnapshotResult',
+  'SnapshotRecord',
   'Position',
   'History',
   'ApiProvenance',
@@ -92,7 +92,7 @@ __all__ = [
   'ObservationType',
   'Provenance',
   'RealizedPnl',
-  'Record',
+  'HistoryRecord',
   'Repay',
   'SingleAssetObservation',
   'SpotOrder',

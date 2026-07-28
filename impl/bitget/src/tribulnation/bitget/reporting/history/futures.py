@@ -5,7 +5,7 @@ from decimal import Decimal
 import warnings
 
 from tribulnation.sdk.core import SDK
-from tribulnation.sdk.reporting import FeeLeg, Observation, Record, SpotTrade, UnknownObservation
+from tribulnation.sdk.reporting import FeeLeg, Observation, HistoryRecord, SpotTrade, UnknownObservation
 from tribulnation.sdk.reporting import History as SdkHistory
 
 from bitget import Bitget
@@ -84,7 +84,7 @@ class FuturesHistory(TimezoneMixin, SdkHistory):
 
   async def history(
     self, start: datetime | None = None, end: datetime | None = None
-  ) -> AsyncIterable[Record]:
+  ) -> AsyncIterable[HistoryRecord]:
     """Fetch futures history records."""
     start, end = require_range(start, end)
     async for record in self.flows(start, end):

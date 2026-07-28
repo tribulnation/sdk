@@ -6,7 +6,7 @@ from collections import defaultdict
 import asyncio
 
 from tribulnation.sdk import SDK
-from tribulnation.sdk.reporting import CosmosTx, Record, source_id
+from tribulnation.sdk.reporting import CosmosTx, HistoryRecord, source_id
 from tribulnation.dydx.core import wrap_exceptions
 from dydx import Dydx
 from dydx.chain import Comet
@@ -323,6 +323,6 @@ class ChainHistory(SDK):
       height = int(tx['height']) # type: ignore
       time = await self.block_time(height)
       obs = parse_tx(tx, time=time)
-      return Record(observations=[obs], provenance={'source': 'api', 'service': 'chain', 'id': id})
+      return HistoryRecord(observations=[obs], provenance={'source': 'api', 'service': 'chain', 'id': id})
 
     return await asyncio.gather(*[parse_transaction(tx) for tx in transactions.values()])

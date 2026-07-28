@@ -6,7 +6,7 @@ import asyncio
 
 from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import (
-  Balances, Snapshot, SnapshotResult, SubaccountSnapshot, Snapshots as _Snapshots,
+  Balances, Snapshot, SnapshotRecord, SubaccountSnapshot, Snapshots as _Snapshots,
   source_id, Position,
 )
 
@@ -62,13 +62,13 @@ class Snapshots(_Snapshots, Mixin):
     return { symbol: Position.merge(positions) for symbol, positions in out.items() }
   
   @SDK.method
-  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotResult:
+  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotRecord:
     spot_balances, future_balances, future_positions = await asyncio.gather(
       self.spot_balances(),
       self.futures_balances(),
       self.futures_positions(),
     )
-    return SnapshotResult(
+    return SnapshotRecord(
       snapshot=Snapshot(subaccounts=[
         SubaccountSnapshot(subaccount='spot', balances=spot_balances),
         SubaccountSnapshot(

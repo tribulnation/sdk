@@ -10,7 +10,7 @@ from ethereum import NodeRpc
 from tribulnation.sdk import SDK, ApiError
 from tribulnation.sdk.core import managed_tasks
 from tribulnation.sdk.reporting import (
-  Balances, Snapshot, SnapshotResult, Snapshots, SubaccountSnapshot, source_id,
+  Balances, Snapshot, SnapshotRecord, Snapshots, SubaccountSnapshot, source_id,
 )
 from tribulnation.ethereum.core import rpc
 from ..config import NATIVE_ASSET
@@ -49,7 +49,7 @@ class NodeSnapshots(Snapshots):
       return None
 
   @rpc.wrap_exceptions
-  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotResult:
+  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotRecord:
     assets = assets or []
     balances = Balances({
       NATIVE_ASSET: await self.eth_balance(),
@@ -72,7 +72,7 @@ class NodeSnapshots(Snapshots):
         if balance is not None and (not self.ignore_zero_value or balance > 0):
           balances[contract] = balance
 
-    return SnapshotResult(
+    return SnapshotRecord(
       snapshot=Snapshot(subaccounts=[SubaccountSnapshot(balances=balances)]),
       provenance={'source': 'api', 'service': 'node_rpc', 'id': source_id('node_rpc')},
     )

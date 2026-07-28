@@ -8,7 +8,7 @@ from moralis.core import Chain
 
 from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import (
-  Balances, Snapshot, SnapshotResult, Snapshots, SubaccountSnapshot, source_id,
+  Balances, Snapshot, SnapshotRecord, Snapshots, SubaccountSnapshot, source_id,
 )
 from tribulnation.ethereum.core import moralis as moralis_core
 from ..config import NATIVE_ASSET
@@ -43,7 +43,7 @@ class MoralisSnapshots(Snapshots):
       for token in chunk:
         yield token
 
-  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotResult:
+  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotRecord:
     balances = Balances()
     async for token in self.moralis_token_balances():
       address = token['token_address']
@@ -56,7 +56,7 @@ class MoralisSnapshots(Snapshots):
         qty = Decimal(balance)
       if not self.ignore_zero_value or qty > 0:
         balances[asset] = qty
-    return SnapshotResult(
+    return SnapshotRecord(
       snapshot=Snapshot(
         subaccounts=[SubaccountSnapshot(balances=balances)],
       ),

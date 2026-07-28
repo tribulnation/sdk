@@ -5,7 +5,7 @@ import asyncio
 
 from tribulnation.sdk.core import SDK
 from tribulnation.sdk.reporting import (
-  Balances, Snapshot, SnapshotResult, Snapshots as _Snapshots, SubaccountSnapshot,
+  Balances, Snapshot, SnapshotRecord, Snapshots as _Snapshots, SubaccountSnapshot,
   source_id,
 )
 from tribulnation.bit2me.core import wrap_exceptions
@@ -61,13 +61,13 @@ class Snapshots(_Snapshots):
       out[asset] += Decimal(entry.get('balance', 0)) + Decimal(entry.get('blockedBalance', 0))
     return out
 
-  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotResult:
+  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotRecord:
     spot, earn, pocket = await asyncio.gather(
       self.spot_balances(),
       self.earn_balances(),
       self.pocket_balances(),
     )
-    return SnapshotResult(
+    return SnapshotRecord(
       snapshot=Snapshot(subaccounts=[
         SubaccountSnapshot(subaccount='spot', balances=spot),
         SubaccountSnapshot(subaccount='earn', balances=earn),

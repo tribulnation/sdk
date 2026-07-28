@@ -1,10 +1,10 @@
-from typing_extensions import AsyncIterable, Collection, TypedDict, Literal
+from typing_extensions import Collection, TypedDict, Literal
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 import asyncio
 
 from tribulnation.sdk.reporting import (
-  Report as _Report, Record, Snapshot, SnapshotResult, source_id,
+  Report as _Report, SnapshotRecord,
   ProvidersConfig
 )
 from dydx import Dydx
@@ -75,31 +75,5 @@ class Report(_Report):
     async for record in self.history_impl.history(start, end):
       yield record
 
-  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotResult:
+  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotRecord:
     return await self.snapshots_impl.snapshot(assets)
-
-  async def records(self, start: datetime | None = None, end: datetime | None = None) -> AsyncIterable[Record]:
-      start_time: datetime | None = None
-      async for record in self.history(start, end):
-        yield record
-        for obs in record.observations:
-          if obs.time is not None:
-            start_time = obs.time if start_time is None else min(start_time, obs.time)
-
-      if start is None and start_time is not None:
-        start_time = start_time.astimezone()
-        snapshot_time = start_time - timedelta(days=1)
-        yield Record(
-          snapshots=[Snapshot(time=snapshot_time)],
-          provenance={
-            'source': 'derived',
-            'id': source_id('dydx'),
-            'details': {
-              'note': 'dYdX full-history reports imply zero balances before the first observed transaction.',
-            }
-          },
-        )
-
-      if end is None:
-        result = await self.snapshot()
-        yield Record(snapshots=[result.snapshot], provenance=result.provenance)

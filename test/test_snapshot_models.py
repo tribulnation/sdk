@@ -4,7 +4,7 @@ import asyncio
 
 import pytest
 from tribulnation.sdk.reporting import (
-  Position, Record, Report, Snapshot, SnapshotResult, SubaccountSnapshot,
+  Position, HistoryRecord, Report, Snapshot, SnapshotRecord, SubaccountSnapshot,
 )
 
 
@@ -12,18 +12,18 @@ class StubReport(Report):
   snapshot_calls = 0
 
   async def history(self, start=None, end=None):
-    yield Record(provenance={'source': 'manual', 'id': 'history'})
+    yield HistoryRecord(provenance={'source': 'manual', 'id': 'history'})
 
   async def snapshot(self, assets=None):
     self.snapshot_calls += 1
-    return SnapshotResult(
+    return SnapshotRecord(
       snapshot=Snapshot(subaccounts=[SubaccountSnapshot(subaccount='spot')]),
       provenance={'source': 'api', 'service': 'stub', 'id': 'snapshot'},
     )
 
 
-async def collect_records(report: Report, *, end=None):
-  return [record async for record in report.records(end=end)]
+async def collect_history(report: Report, *, end=None):
+  return [record async for record in report.history(None, end)]
 
 
 def test_snapshot_aggregates_subaccount_state_and_round_trips_json():
@@ -63,17 +63,19 @@ def test_snapshot_defaults_are_not_shared():
   assert second.subaccounts[0].balances == {}
 
 
-def test_open_ended_report_wraps_snapshot_with_its_provenance():
+def test_history_never_fetches_a_snapshot():
   report = StubReport()
-  records = asyncio.run(collect_records(report))
-  assert len(records) == 2
-  assert records[-1].provenance['source'] == 'api'
-  assert records[-1].snapshots[0].subaccounts[0].subaccount == 'spot'
-  assert report.snapshot_calls == 1
-
-
-def test_bounded_report_does_not_fetch_snapshot():
-  report = StubReport()
-  records = asyncio.run(collect_records(report, end=datetime.now(timezone.utc)))
+  records = asyncio.run(collect_history(report))
   assert len(records) == 1
+  assert records[0].provenance['source'] == 'manual'
   assert report.snapshot_calls == 0
+  assert not hasattr(report, 'records')
+
+
+def test_snapshot_record_carries_a_single_snapshot_and_its_provenance():
+  report = StubReport()
+  result = asyncio.run(report.snapshot())
+  assert isinstance(result, SnapshotRecord)
+  assert result.provenance['source'] == 'api'
+  assert result.snapshot.subaccounts[0].subaccount == 'spot'
+  assert report.snapshot_calls == 1

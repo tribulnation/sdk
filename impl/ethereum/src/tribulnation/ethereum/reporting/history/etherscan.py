@@ -14,7 +14,7 @@ from etherscan.api.account.internal_transactions import InternalTransaction
 from etherscan.api.account.nft_transactions import NftTransaction
 
 from tribulnation.sdk.core import SDK, managed_tasks
-from tribulnation.sdk.reporting import History, Record, EvmTx, source_id
+from tribulnation.sdk.reporting import History, HistoryRecord, EvmTx, source_id
 from tribulnation.ethereum.core import Network, etherscan as etherscan_core, group_by, same_address
 from tribulnation.ethereum.reporting.util import AutoDetect, AUTO_DETECT, cached_etherscan
 from tribulnation.ethereum.reporting.history.mixin import HistoryMixin
@@ -323,4 +323,4 @@ class EtherscanHistory(HistoryMixin, History):
       for task in asyncio.as_completed(tasks):
         tx = await task
         if tx is not None:
-          yield Record(observations=[tx], provenance={'source': 'api', 'service': 'etherscan', 'id': id})
+          yield HistoryRecord(observations=[tx], provenance={'source': 'api', 'service': 'etherscan', 'id': id})

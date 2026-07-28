@@ -8,7 +8,7 @@ from google.cloud.bigquery import Client as BigQueryClient
 import requests
 
 from tribulnation.sdk import SDK, NetworkError
-from tribulnation.sdk.reporting import Bonus, Record, source_id, ProvidersConfig
+from tribulnation.sdk.reporting import Bonus, HistoryRecord, source_id, ProvidersConfig
 from tribulnation.dydx.core import parse_denom_amount
 from .window import in_window
 
@@ -149,7 +149,7 @@ class BigQueryHistory(SDK):
     rewards = await self.reward_distributions(start, end)
     id = source_id('bigquery')
     return [
-      Record(observations=[r], provenance={'source': 'api', 'service': 'bigquery', 'id': id})
+      HistoryRecord(observations=[r], provenance={'source': 'api', 'service': 'bigquery', 'id': id})
       for r in rewards
     ]
 

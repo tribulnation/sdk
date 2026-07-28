@@ -14,7 +14,7 @@ from moralis.evm.wallet.history import (
 )
 
 from tribulnation.sdk import SDK
-from tribulnation.sdk.reporting import History, Record, EvmTx, Fee, source_id
+from tribulnation.sdk.reporting import History, HistoryRecord, EvmTx, Fee, source_id
 from tribulnation.ethereum.core import Network, moralis as moralis_core, same_address
 from tribulnation.ethereum.reporting.history.mixin import HistoryMixin
 
@@ -189,4 +189,4 @@ class MoralisHistory(HistoryMixin, History):
     async for chunk in self.wallet_history(start=start, end=end):
       for tx in chunk:
         if evm_tx := await parse_limited(tx):
-          yield Record(observations=[evm_tx], provenance={'source': 'api', 'service': 'etherscan', 'id': id})
+          yield HistoryRecord(observations=[evm_tx], provenance={'source': 'api', 'service': 'etherscan', 'id': id})

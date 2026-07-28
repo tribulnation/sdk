@@ -2,12 +2,11 @@ from collections.abc import Iterable
 from typing import AsyncContextManager
 from typing_extensions import Collection
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from tribulnation.sdk.reporting import (
-  Report, History, Snapshots, Record,
-  EvmTx, Snapshot, SnapshotResult, ProvidersConfig,
-  source_id,
+  Report, History, Snapshots,
+  SnapshotRecord, ProvidersConfig,
 )
 from tribulnation.sdk.core import AsyncResources
 from tribulnation.ethereum.core import Network
@@ -51,34 +50,5 @@ class EthereumReport(AsyncResources, Report):
     async for record in self.history_impl.history(start, end):
       yield record
 
-  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotResult:
+  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotRecord:
     return await self.snapshots_impl.snapshot(assets)
-
-  async def records(self, start: datetime | None = None, end: datetime | None = None):
-    assets = set[str]()
-    start_time: datetime | None = None
-    async for record in self.history(start, end):
-      yield record
-      for obs in record.observations:
-        if obs.time is not None:
-          start_time = obs.time if start_time is None else min(start_time, obs.time)
-        if isinstance(obs, EvmTx):
-          for transfer in obs.transfers:
-            assets.add(transfer.asset)
-
-    if start is None and start_time is not None:
-      snapshot_time = start_time - timedelta(days=1)
-      yield Record(
-        snapshots=[Snapshot(time=snapshot_time)],
-        provenance={
-          'source': 'derived',
-          'id': source_id('derived'),
-          'details': {
-            'note': 'EVM full-history reports imply zero balances before the first observed transaction.',
-          },
-        },
-      )
-
-    if end is None:
-      result = await self.asset_snapshots_impl.snapshot(assets=sorted(assets))
-      yield Record(snapshots=[result.snapshot], provenance=result.provenance)

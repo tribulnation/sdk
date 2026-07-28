@@ -15,4 +15,4 @@ from .provenance import (
   Provenance, TabularProvenance, ApiProvenance,
   ManualProvenance, DerivedProvenance,
 )
-from .main import Observation, ObservationType, Record
+from .main import Observation, ObservationType, HistoryRecord
