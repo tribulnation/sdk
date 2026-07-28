@@ -7,15 +7,11 @@ HistorySource = Literal['etherscan', 'moralis']
 class SnapshotSourcesConfig(TypedDict, total=False):
   snapshot: SnapshotSource
   """Default: `alchemy`.
-  - Used by `snapshot(assets=None)`.
-  - Sources may combine asset discovery and balance retrieval in one call."""
-  snapshot_assets: SnapshotSource
-  """Default: `node`.
-  - Used by `snapshot(assets=...)`.
-  - `node` requires the asset contract set to be known."""
+  - Used by `snapshot()`, with or without an explicit asset set.
+  - Sources may combine asset discovery and balance retrieval in one call;
+    `node` cannot, and reports only the native asset unless assets are given."""
 
 DEFAULT_SNAPSHOT_SOURCE: SnapshotSource = 'alchemy'
-DEFAULT_SNAPSHOT_ASSETS_SOURCE: SnapshotSource = 'alchemy'
 
 class HistorySourcesConfig(TypedDict, total=False):
   history: HistorySource

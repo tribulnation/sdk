@@ -17,7 +17,6 @@ class EthereumReport(AsyncResources, Report):
   address: str
   history_impl: History
   snapshots_impl: Snapshots
-  asset_snapshots_impl: Snapshots
 
   @classmethod
   def new(cls, address: str, *, network: Network, config: EvmConfig | None = None, providers: ProvidersConfig | None = None):
@@ -35,16 +34,11 @@ class EthereumReport(AsyncResources, Report):
       address, network=network, source=sources.get('snapshot'),
       rpc_url=rpc_url, providers=providers,
     )
-    asset_snapshots_impl = EthereumSnapshots.new(
-      address, network=network, source=sources.get('snapshot_assets'),
-      rpc_url=rpc_url, providers=providers,
-    )
-    return cls(address=address, history_impl=history_impl, snapshots_impl=snapshots_impl, asset_snapshots_impl=asset_snapshots_impl)
+    return cls(address=address, history_impl=history_impl, snapshots_impl=snapshots_impl)
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield self.history_impl
     yield self.snapshots_impl
-    yield self.asset_snapshots_impl
 
   async def history(self, start: datetime | None = None, end: datetime | None = None):
     async for record in self.history_impl.history(start, end):
