@@ -102,9 +102,15 @@ async def test_unsubscribe_after_upstream_end_does_not_raise():
   await cm.__aexit__(None, None, None)
 
 
-async def test_unsubscribe_racing_with_upstream_failure_does_not_raise_attribute_error():
-  """`unsubscribe()` must not act on a stale `ctx` if a concurrent `step()` clears it first."""
+async def test_unsubscribe_racing_with_upstream_failure_unsubscribes_exactly_once():
+  """A departing subscriber racing the pump's own teardown must not double-unsubscribe.
+
+  Both the pump (when the upstream dies) and `subscribe()`'s teardown (when the
+  last subscriber leaves) can release `ctx`. Whichever wins, the upstream must
+  see exactly one `unsubscribe()` and `ctx` must end up cleared.
+  """
   upstream_may_end = asyncio.Event()
+  unsub_calls = 0
 
   async def subscribe_stream():
     async def gen():
@@ -112,7 +118,8 @@ async def test_unsubscribe_racing_with_upstream_failure_does_not_raise_attribute
       await upstream_may_end.wait()
       # generator returns here -> StopAsyncIteration on the next anext()
     async def unsub():
-      ...
+      nonlocal unsub_calls
+      unsub_calls += 1
     return Subscription.Context(gen(), unsub)
 
   sub = Subscription(subscribe_stream)
@@ -122,22 +129,21 @@ async def test_unsubscribe_racing_with_upstream_failure_does_not_raise_attribute
   first = await stream.__aiter__().__anext__()
   assert first == 1
 
-  # Simulate the consumer's own loop blocking inside step(), holding the lock
-  # on `anext()`, while something else concurrently calls unsubscribe().
-  step_task = asyncio.create_task(sub.step())
-  await asyncio.sleep(0)
+  # The upstream dies at the same time as the only subscriber walks away, so
+  # the pump's release path and the teardown path run concurrently.
   unsub_task = asyncio.create_task(cm.__aexit__(None, None, None))
   await asyncio.sleep(0)
+  upstream_may_end.set()
 
-  upstream_may_end.set()  # let anext() raise StopAsyncIteration, clearing ctx
+  await asyncio.wait_for(unsub_task, timeout=2)
 
-  await asyncio.wait_for(step_task, timeout=2)
-  await asyncio.wait_for(unsub_task, timeout=2)  # must not raise AttributeError
+  assert unsub_calls == 1
   assert sub.ctx is None
+  assert sub.pump is None
 
 
-async def test_new_subscriber_ctx_survives_concurrent_teardown_by_departing_subscriber():
-  """A subscriber joining mid-teardown must not have its ctx torn down under it."""
+async def test_ctx_survives_teardown_by_departing_subscriber_while_another_remains():
+  """A departing subscriber must not tear down the ctx another subscriber still uses."""
   upstream_may_continue = asyncio.Event()
   unsub_calls = 0
 
@@ -158,28 +164,24 @@ async def test_new_subscriber_ctx_survives_concurrent_teardown_by_departing_subs
   stream_a = await cm_a.__aenter__()
   assert (await stream_a.__aiter__().__anext__()) == 1
 
-  # A's loop calls step() for the next item and blocks on anext(), holding the lock.
-  step_task = asyncio.create_task(sub.step())
-  await asyncio.sleep(0)
-
-  # A unsubscribes (the only subscriber at this point) and blocks waiting for the lock.
-  unsub_task = asyncio.create_task(cm_a.__aexit__(None, None, None))
-  await asyncio.sleep(0)
-
-  # Before A's teardown can run, B subscribes and also queues up on the same lock.
+  # B joins the shared upstream that A established.
   cm_b = sub.subscribe()
-  subscribe_task = asyncio.create_task(cm_b.__aenter__())
-  await asyncio.sleep(0)
+  stream_b = await cm_b.__aenter__()
 
-  upstream_may_continue.set()  # let the in-flight anext() resolve
-
-  await asyncio.wait_for(step_task, timeout=2)
-  await asyncio.wait_for(unsub_task, timeout=2)
-  stream_b = await asyncio.wait_for(subscribe_task, timeout=2)
+  # A departs. It is *a* subscriber leaving, not the last one, so the shared
+  # upstream must stay up for B.
+  await asyncio.wait_for(cm_a.__aexit__(None, None, None), timeout=2)
 
   assert unsub_calls == 0, 'must not tear down the upstream ctx while B is still subscribed'
   assert sub.ctx is not None
-  assert (await stream_b.__aiter__().__anext__()) == 2
+
+  upstream_may_continue.set()
+  assert (await asyncio.wait_for(stream_b.__aiter__().__anext__(), timeout=2)) == 2
+
+  # B is the last one out, so now the upstream is released -- exactly once.
+  await asyncio.wait_for(cm_b.__aexit__(None, None, None), timeout=2)
+  assert unsub_calls == 1
+  assert sub.ctx is None
 
 
 async def test_upstream_failure_releases_registry_so_resubscribe_does_not_collide():

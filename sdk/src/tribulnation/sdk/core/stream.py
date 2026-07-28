@@ -1,5 +1,5 @@
 from typing_extensions import (
-  AsyncIterable, AsyncIterator, Awaitable,
+  AsyncIterable, AsyncIterator, AsyncGenerator, Awaitable,
   Generic, Literal, TypeVar, Callable
 )
 from contextlib import asynccontextmanager, suppress
@@ -178,9 +178,15 @@ class Subscription(Generic[T]):
 
     Runs as its own task, independent of any subscriber's lifecycle, so a
     subscriber's cancellation can never propagate into `ctx.iterator` and
-    take the shared upstream down for everyone else. `start()`/`subscribe()`
-    own `ctx`/`pump` entirely (via `Task.done()`) -- this only reads and
-    notifies.
+    take the shared upstream down for everyone else.
+
+    When the upstream dies on its own, the pump also *releases* `ctx`: it
+    unsubscribes and clears `ctx`/`pump` before notifying subscribers. A dead
+    upstream's registration must not outlive it -- otherwise the next
+    `start()` would call `subscribe_stream()` while the old registration is
+    still held (e.g. dYdX's "Channel ... already subscribed"), and nothing
+    would ever clean the orphan up. Cancellation is the other path: there the
+    canceller in `subscribe()` owns the teardown instead.
     """
     try:
       async for item in ctx.iterator:
@@ -196,6 +202,14 @@ class Subscription(Generic[T]):
       return
     except Exception as e:
       exc = e
+    # Release the dead upstream. Held under the lock so `start()` cannot
+    # re-subscribe until this registration is actually gone, and so the
+    # `subscribe()` teardown path can never unsubscribe the same ctx twice.
+    async with self.lock:
+      if self.ctx is ctx:
+        with suppress(Exception):
+          await ctx.unsubscribe()
+        self.ctx = self.pump = None
     for inbox in list(self.subscribers):
       inbox.fail(exc)
 
@@ -205,7 +219,7 @@ class Subscription(Generic[T]):
     *,
     queue_size: int = 1000,
     overflow: OverflowPolicy = 'fail',
-  ) -> AsyncIterator[AsyncIterable[T]]:
+  ) -> AsyncGenerator[AsyncIterable[T], None]:
     """Subscribe to the shared upstream with a bounded delivery inbox.
 
     - `queue_size`: max data items buffered for this subscriber before the
