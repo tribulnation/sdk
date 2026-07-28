@@ -44,15 +44,34 @@ class Snapshots(_Snapshots):
         out[currency] += Decimal(balance)
     return out
 
+  @SDK.method
+  @wrap_exceptions
+  async def pocket_balances(self) -> Balances:
+    """Balances held in Bit2Me Wallet pockets.
+
+    Wallet and Pro are separate products with separate balances -- funds move
+    between them through `/v1/trading/wallet/{deposit,withdraw}` -- so pockets
+    are not covered by `spot_balances`.
+    """
+    out = Balances()
+    pockets = await self.client.v1.wallet.pockets.get()
+    for entry in pockets:
+      if (asset := entry.get('currency')) is None:
+        continue
+      out[asset] += Decimal(entry.get('balance', 0)) + Decimal(entry.get('blockedBalance', 0))
+    return out
+
   async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotResult:
-    spot, earn = await asyncio.gather(
+    spot, earn, pocket = await asyncio.gather(
       self.spot_balances(),
       self.earn_balances(),
+      self.pocket_balances(),
     )
     return SnapshotResult(
       snapshot=Snapshot(subaccounts=[
         SubaccountSnapshot(subaccount='spot', balances=spot),
         SubaccountSnapshot(subaccount='earn', balances=earn),
+        SubaccountSnapshot(subaccount='pocket', balances=pocket),
       ]),
       provenance={'source': 'api', 'service': 'bit2me', 'id': source_id('bit2me')},
     )
