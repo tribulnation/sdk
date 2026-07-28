@@ -57,9 +57,7 @@ class ReportSDK:
       raise ImportError('hyperliquid sdk is not installed. Please install it with `pip install tribulnation-hyperliquid`.') from e
     if (address := account.resolved_address) is None:
       raise ValueError(f'Account {id} does not have a resolved address.')
-    config = dict(self.config.get('hyperliquid') or {})
-    config.setdefault('mainnet', account.venue == 'hyperliquid')
-    return HyperliquidReport.new(address, config=config)  # type: ignore[arg-type]
+    return HyperliquidReport.new(address, config=self.config.get('hyperliquid'))
 
   def venue(self, id: str, /) -> Report:
     if (account := self.accounts.get(id)) is None:
