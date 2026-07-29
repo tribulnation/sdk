@@ -6,5 +6,5 @@
   "skills/propose-commits/agents/openai.yaml": "e35b19639492e8fc0b29ab3a8c8e791f93612ba0c6d8d75ee21405d943a76475",
   "skills/review-code/SKILL.md": "8f9574fed7ceaa572e724a6a1b59cf8d1058413df8b92ac874ae09ed1fb5af41",
   "skills/review-code/agents/openai.yaml": "7d52325058f543bd8cbcf3796e125bf44d28c62df0f3aed6f20751e61882f469",
-  "tools/python/ruff.toml": "8f71ff76a5cad3cd9a1bf2887d9eb008736299dac3c16d70a9613aaa36c3747b"
+  "tools/python/ruff.toml": "71b93924893255f6741f3fb11aad3fb4d74bb93ee13da01aa63401349ea3f63f"
 }
