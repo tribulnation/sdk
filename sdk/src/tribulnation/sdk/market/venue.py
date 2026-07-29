@@ -25,13 +25,6 @@ class TradingVenue(SDK):
   """An abstract multi-exchange venue interface."""
   ExchangeDescription = ExchangeDescription
 
-  @SDK.method
-  async def __aenter__(self):
-    return self
-
-  @SDK.method
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    ...
 
   @property
   @abstractmethod

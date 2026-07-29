@@ -8,7 +8,7 @@ from .invocations import (
   SDK, full_jitter, log, retry,
 )
 from .concurrency import managed_tasks
-from .lifecycle import AsyncResourceState, AsyncResources
+from .lifecycle import AsyncResourceState, resource_state
 from .stream import Subscription, StreamInbox, OverflowPolicy
 from .paging import PaginatedResponse
 
@@ -18,7 +18,7 @@ __all__ = [
   'LogicError',
   'Context', 'Middleware', 'RetryJitter',
   'SDK', 'full_jitter', 'log', 'retry', 'managed_tasks',
-  'AsyncResourceState', 'AsyncResources',
+  'AsyncResourceState', 'resource_state',
   'Subscription', 'StreamInbox', 'OverflowPolicy',
   'PaginatedResponse',
 ]

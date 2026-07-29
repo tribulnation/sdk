@@ -1,7 +1,16 @@
-"""Lifecycle helpers for objects owning multiple async resources."""
+"""Lifecycle helpers for objects owning multiple async resources.
+
+`AsyncResourceState` is the engine; `SDK` (see `core/invocations/sdk.py`) exposes it through
+`resources()`/`__aenter__`/`__aexit__`.
+
+Nothing here may be a dataclass. `dataclasses` refuses to mix frozen and non-frozen classes
+in one hierarchy, so a dataclass field here would make frozen-ness contagious across every
+SDK subclass -- which is exactly what used to force venue mixins into a single frozen-ness.
+State therefore lives in `__dict__`, written directly so frozen instances can own it.
+"""
 
 from typing_extensions import Any, AsyncContextManager, Iterable
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from contextlib import AsyncExitStack
 
 
@@ -11,13 +20,27 @@ class AsyncResourceState:
   stack: AsyncExitStack | None = None
 
   async def enter(self, resources: Iterable[AsyncContextManager[Any]]) -> None:
-    """Enter resources in order and roll back partial acquisition."""
+    """Enter resources in order and roll back partial acquisition.
+
+    Resources repeated within one `resources()` are entered once: composing with
+    `yield from super().resources()` legitimately yields a shared client twice.
+    """
     if self.stack is not None:
-      raise RuntimeError('Async resources are already active')
+      raise RuntimeError(
+        'Async resources are already active. Entering an owner also enters everything it '
+        'exposes, so a child obtained from an entered parent is already live and must not '
+        'be entered again.'
+      )
     stack = AsyncExitStack()
     await stack.__aenter__()
     try:
+      seen = set[int]()
       for resource in resources:
+        # Identity, not equality: two equal-but-distinct clients are two resources.
+        # `stack` holds each entered resource's `__aexit__`, so no id can be recycled.
+        if id(resource) in seen:
+          continue
+        seen.add(id(resource))
         await stack.enter_async_context(resource)
     except BaseException:
       await stack.aclose()
@@ -33,22 +56,14 @@ class AsyncResourceState:
     return await stack.__aexit__(exc_type, exc_value, traceback)
 
 
-@dataclass(frozen=True)
-class AsyncResources:
-  """Mixin for objects declaring async resources through ``resources``."""
+def resource_state(obj: object) -> AsyncResourceState:
+  """Return `obj`'s resource state, creating it on first use.
 
-  _resource_state: AsyncResourceState = field(
-    default_factory=AsyncResourceState,
-    init=False, repr=False, compare=False,
-  )
+  Writes straight into `__dict__`, bypassing `__setattr__`, so frozen dataclasses can own
+  state without declaring a field -- the same mechanism `functools.cached_property` uses.
+  """
+  state = obj.__dict__.get('_resource_state')
+  if state is None:
+    state = obj.__dict__['_resource_state'] = AsyncResourceState()
+  return state
 
-  def resources(self) -> Iterable[AsyncContextManager[Any]]:
-    """Return resources to enter, in dependency order."""
-    raise NotImplementedError
-
-  async def __aenter__(self):
-    await self._resource_state.enter(self.resources())
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback) -> bool | None:
-    return await self._resource_state.exit(exc_type, exc_value, traceback)

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing_extensions import Callable, Awaitable, TypeVar, TYPE_CHECKING
+from typing_extensions import AsyncContextManager, Iterable, Callable, Awaitable, TypeVar, TYPE_CHECKING
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
@@ -125,12 +125,8 @@ class IndexerHistory(SDK):
   indexer: Indexer
   cache: HistoryCache | None = None
 
-  async def __aenter__(self):
-    await self.indexer.__aenter__()
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await self.indexer.__aexit__(exc_type, exc_value, traceback)
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    yield self.indexer
 
   @classmethod
   def of(cls, address: str, dydx: Dydx | None = None, cache: HistoryCache | None = None):

@@ -1,5 +1,6 @@
 from typing_extensions import Generic, TypeVar, AsyncIterable
 from dataclasses import dataclass, field
+from contextlib import asynccontextmanager
 import asyncio
 
 T = TypeVar('T')
@@ -37,3 +38,17 @@ class StreamManager(Generic[T]):
       if self.listener.done() and (exc := self.listener.exception()) is not None:
         raise exc
       yield await task
+
+
+@asynccontextmanager
+async def closing_streams(streams: 'dict[str, StreamManager]'):
+  """Close every stream open at exit time, whenever it was opened.
+
+  `streams` is held by reference and only iterated on exit, so streams opened lazily
+  inside the block are closed too -- which is why the owner cannot simply yield the
+  individual managers from `resources()`.
+  """
+  try:
+    yield streams
+  finally:
+    await asyncio.gather(*[s.close() for s in streams.values()], return_exceptions=True)

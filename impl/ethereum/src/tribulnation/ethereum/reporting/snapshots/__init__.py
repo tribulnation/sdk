@@ -1,4 +1,7 @@
-from typing_extensions import Collection as _Collection
+from typing_extensions import (
+  AsyncContextManager as _AsyncContextManager, Collection as _Collection,
+  Iterable as _Iterable,
+)
 from dataclasses import dataclass as _dataclass
 from tribulnation.sdk.reporting import (
   SnapshotRecord as _SnapshotRecord, Snapshots as _Snapshots,
@@ -11,12 +14,9 @@ from ..config import SnapshotSource, DEFAULT_SNAPSHOT_SOURCE
 class EthereumSnapshots(_Snapshots):
   impl: _Snapshots
 
-  async def __aenter__(self):
-    await self.impl.__aenter__()
-    return self
-    
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await self.impl.__aexit__(exc_type, exc_value, traceback)
+  def resources(self) -> _Iterable[_AsyncContextManager[object]]:
+    yield from super().resources()
+    yield self.impl
 
   async def snapshot(self, assets: _Collection[str] | None = None) -> _SnapshotRecord:
     return await self.impl.snapshot(assets)

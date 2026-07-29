@@ -1,4 +1,4 @@
-from typing_extensions import TypedDict, Callable, Awaitable, TypeVar
+from typing_extensions import AsyncContextManager, Iterable, TypedDict, Callable, Awaitable, TypeVar
 from dataclasses import dataclass, field
 import asyncio
 import pydantic
@@ -34,7 +34,7 @@ class Settings(TypedDict, total=False):
 settings_adapter = pydantic.TypeAdapter(Settings)
 
 @dataclass(kw_only=True)
-class Shared:
+class Shared(SDK):
   client: Dydx
   parent_subaccount: int = 0
   address: str
@@ -83,15 +83,11 @@ class Shared:
       self.depth_subscriptions[market] = Subscription.of(lambda: depth_stream(self.client.indexer, market))
     return self.depth_subscriptions[market]
 
-  async def __aenter__(self):
-    await self.client.__aenter__()
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await self.client.__aexit__(exc_type, exc_value, traceback)
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    yield self.client
 
 @dataclass(kw_only=True, frozen=True)
-class ExchangeMixin:
+class ExchangeMixin(SDK):
   shared: Shared
 
   @wrap_exceptions
@@ -119,12 +115,8 @@ class ExchangeMixin:
   def address(self):
     return self.shared.address
 
-  async def __aenter__(self):
-    await self.shared.__aenter__()
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await self.shared.__aexit__(exc_type, exc_value, traceback)
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    yield self.shared
 
   def subscribe_parent_subaccount(
     self, parent_subaccount: int, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail',
@@ -135,7 +127,7 @@ class ExchangeMixin:
     return self.shared.depth_subscription(market).subscribe(queue_size=queue_size, overflow=overflow)
 
 @dataclass(kw_only=True, frozen=True)
-class MarketMixin(SDK, ExchangeMixin):
+class MarketMixin(ExchangeMixin):
   perpetual_market: PerpetualMarket
   subaccount: int = 0
 

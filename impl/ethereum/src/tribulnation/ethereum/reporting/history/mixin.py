@@ -7,7 +7,7 @@ from web3 import Web3
 from web3.types import TxReceipt, TxData, _Hash32, Wei
 from ethereum import NodeRpc
 
-from tribulnation.sdk.core import AsyncResources, SDK, managed_tasks
+from tribulnation.sdk.core import SDK, managed_tasks
 from tribulnation.sdk.reporting import EvmTx, Fee
 from tribulnation.ethereum.core import rpc, wei2eth, same_address
 
@@ -51,7 +51,7 @@ TransferFields = TypedDict('TransferFields', {'value': str, 'to': str, 'from': s
 
 
 @dataclass(frozen=True, kw_only=True)
-class HistoryMixin(AsyncResources, SDK):
+class HistoryMixin(SDK):
   """Mixin for EVM history sources."""
   address: str
   node: NodeRpc

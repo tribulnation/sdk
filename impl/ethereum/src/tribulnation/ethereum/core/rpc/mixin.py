@@ -1,9 +1,12 @@
+from typing_extensions import AsyncContextManager, Iterable
 from dataclasses import dataclass
 
 from ethereum import NodeRpc
 
+from tribulnation.sdk import SDK
+
 @dataclass(kw_only=True)
-class Mixin:
+class Mixin(SDK):
   node: NodeRpc
   address: str
 
@@ -16,9 +19,6 @@ class Mixin:
     node = NodeRpc.at(rpc_url)
     return cls(node=node, address=address)
   
-  async def __aenter__(self):
-    await self.node.__aenter__()
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await self.node.__aexit__(exc_type, exc_value, traceback)
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    yield from super().resources()
+    yield self.node

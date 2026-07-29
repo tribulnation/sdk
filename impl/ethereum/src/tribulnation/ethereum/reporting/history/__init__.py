@@ -1,3 +1,4 @@
+from typing_extensions import AsyncContextManager as _AsyncContextManager, Iterable as _Iterable
 from dataclasses import dataclass as _dataclass
 from datetime import datetime as _datetime
 
@@ -9,12 +10,9 @@ from ..config import HistorySource, DEFAULT_HISTORY_SOURCES
 class EthereumHistory(_History):
   impl: _History
 
-  async def __aenter__(self):
-    await self.impl.__aenter__()
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await self.impl.__aexit__(exc_type, exc_value, traceback)
+  def resources(self) -> _Iterable[_AsyncContextManager[object]]:
+    yield from super().resources()
+    yield self.impl
 
   async def history(self, start: _datetime | None = None, end: _datetime | None = None):
     async for record in self.impl.history(start, end):

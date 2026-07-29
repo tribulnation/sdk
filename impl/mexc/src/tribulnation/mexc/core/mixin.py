@@ -1,13 +1,12 @@
-from typing_extensions import AsyncIterable, TypedDict
+from typing_extensions import Any, AsyncContextManager, Iterable, TypedDict
 from dataclasses import dataclass, field
-import asyncio
+
+from tribulnation.sdk import SDK
 
 from mexc import MEXC
 from mexc.futures.market.contract_info import ContractSpec, ContractSpecListItem
 from mexc.spot.market.exchange_info import SymbolInfo
-from mexc.spot.streams.core.proto import PrivateDealsV3Api as SpotTrade
-from mexc.futures.streams.user.my_trades import Deal as PerpTrade
-from .util import StreamManager
+from .util import StreamManager, closing_streams
 
 SpotInfo = SymbolInfo
 PerpInfo = ContractSpec | ContractSpecListItem
@@ -22,7 +21,7 @@ class Cache:
   perp_markets: dict[str, PerpInfo] = field(default_factory=dict)
 
 @dataclass(kw_only=True, frozen=True)
-class Mixin:
+class Mixin(SDK):
   client: MEXC
   settings: Settings = field(default_factory=Settings)
   streams: dict[str, StreamManager]
@@ -44,13 +43,12 @@ class Mixin:
     client = MEXC.new(api_key=api_key, api_secret=api_secret, validate=settings.get('validate', True))
     return cls(client=client, settings=settings, streams={})
 
-  async def __aenter__(self):
-    await self.client.__aenter__()
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await asyncio.gather(*[stream.close() for stream in self.streams.values()])
-    await self.client.__aexit__(exc_type, exc_value, traceback)
+  def resources(self) -> Iterable[AsyncContextManager[Any]]:
+    yield from super().resources()
+    yield self.client
+    # Streams are opened lazily during the block, so they cannot be named up front.
+    # Reverse-order exit closes them before the client, as the old `__aexit__` did.
+    yield closing_streams(self.streams)
 
   async def cached_spot_market(self, instrument: str, *, refetch: bool = False) -> SpotInfo:
     if refetch or instrument not in self.cache.spot_markets:

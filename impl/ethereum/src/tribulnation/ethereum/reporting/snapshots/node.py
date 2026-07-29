@@ -1,4 +1,4 @@
-from typing_extensions import Collection
+from typing_extensions import AsyncContextManager, Collection, Iterable
 from dataclasses import dataclass
 from decimal import Decimal
 import asyncio
@@ -24,12 +24,9 @@ class NodeSnapshots(Snapshots):
   ignore_zero_value: bool = True
   batch_size: int = 32
 
-  async def __aenter__(self):
-    await self.node.__aenter__()
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await self.node.__aexit__(exc_type, exc_value, traceback)
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    yield from super().resources()
+    yield self.node
 
   @SDK.method
   @rpc.wrap_exceptions

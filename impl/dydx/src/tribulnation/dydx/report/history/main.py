@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing_extensions import TYPE_CHECKING
+from typing_extensions import TYPE_CHECKING, AsyncContextManager, Iterable
 from dataclasses import dataclass
 from datetime import datetime
 import asyncio
@@ -23,18 +23,12 @@ class History(_History):
   indexer: IndexerHistory
   governance: GovernanceHistory
 
-  async def __aenter__(self):
-    await asyncio.gather(
-      self.chain.__aenter__(),
-      self.indexer.__aenter__(),
-    )
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await asyncio.gather(
-      self.chain.__aexit__(exc_type, exc_value, traceback),
-      self.indexer.__aexit__(exc_type, exc_value, traceback),
-    )
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    # Only these two own a connection; `bigquery` and `governance` deliberately own none.
+    # Sequential, not gathered: a gather that fails on the second entry orphans the first
+    # forever. Entering a client is local work, so ordered rollback is worth the wait.
+    yield self.chain
+    yield self.indexer
 
   @classmethod
   def of(

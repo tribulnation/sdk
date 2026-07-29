@@ -8,12 +8,11 @@ from tribulnation.sdk.reporting import (
   Report, History, Snapshots,
   SnapshotRecord, ProvidersConfig,
 )
-from tribulnation.sdk.core import AsyncResources
 from tribulnation.ethereum.core import Network
 from .config import EvmConfig
 
 @dataclass(frozen=True)
-class EthereumReport(AsyncResources, Report):
+class EthereumReport(Report):
   address: str
   history_impl: History
   snapshots_impl: Snapshots

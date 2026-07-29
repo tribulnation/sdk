@@ -38,13 +38,6 @@ def ticker_from_book(book: Book) -> Ticker:
 class Exchange(SDK):
   """An abstract multi-market exchange interface."""
 
-  @SDK.method
-  async def __aenter__(self):
-    return self
-
-  @SDK.method
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    ...
 
   @property
   def venue_id(self) -> str:

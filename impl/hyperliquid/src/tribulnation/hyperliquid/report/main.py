@@ -1,5 +1,5 @@
 """Hyperliquid reporting: history and snapshots."""
-from typing_extensions import Collection, TypedDict
+from typing_extensions import AsyncContextManager, Collection, Iterable, TypedDict
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -52,13 +52,13 @@ class Report(_Report):
       snapshots_impl=Snapshots(info, address),
     )
 
-  async def __aenter__(self):
-    # Both surfaces share one `Info`, so it is entered once via history.
-    await self.history_impl.__aenter__()
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    return await self.history_impl.__aexit__(exc_type, exc_value, traceback)
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    # Both surfaces share one `Info`; only `history_impl` owns it, so it is entered once.
+    # Identity de-duplication would not save us here -- it spans a single `resources()`
+    # call, not resources nested inside separate owners -- so `Snapshots` must keep
+    # declaring none for as long as it is handed a borrowed `Info`.
+    yield self.history_impl
+    yield self.snapshots_impl
 
   async def history(self, start: datetime | None = None, end: datetime | None = None):
     """Fetch the account's reporting history."""

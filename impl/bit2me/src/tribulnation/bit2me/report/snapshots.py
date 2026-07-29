@@ -1,4 +1,4 @@
-from typing_extensions import Collection
+from typing_extensions import AsyncContextManager, Collection, Iterable
 from dataclasses import dataclass
 from decimal import Decimal
 import asyncio
@@ -11,7 +11,7 @@ from tribulnation.sdk.reporting import (
 from tribulnation.bit2me.core import wrap_exceptions
 from bit2me import Bit2Me
 
-@dataclass
+@dataclass(frozen=True)
 class Snapshots(_Snapshots):
   client: Bit2Me
 
@@ -21,6 +21,10 @@ class Snapshots(_Snapshots):
     validate: bool = True
   ):
     return cls(client=Bit2Me.new(api_key=api_key, api_secret=api_secret, validate=validate))
+
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    yield from super().resources()
+    yield self.client
 
   @SDK.method
   @wrap_exceptions

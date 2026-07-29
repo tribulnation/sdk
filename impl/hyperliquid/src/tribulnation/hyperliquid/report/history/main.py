@@ -1,8 +1,7 @@
 """Hyperliquid reporting history."""
-from typing_extensions import TYPE_CHECKING, Sequence
+from typing_extensions import TYPE_CHECKING, AsyncContextManager, Iterable, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
-from decimal import Decimal
 import asyncio
 
 from tribulnation.sdk import SDK
@@ -67,12 +66,8 @@ class History(_History):
     watermark = self.cache.watermark(source, self.address)
     return GENESIS_MS if watermark is None else watermark
 
-  async def __aenter__(self):
-    await self.info.__aenter__()
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    return await self.info.__aexit__(exc_type, exc_value, traceback)
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    yield self.info
 
   async def resolve_assets(self) -> Assets:
     """Fetch and memoise the token index, needed to canonicalise asset ids."""

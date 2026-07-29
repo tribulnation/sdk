@@ -1,4 +1,4 @@
-from typing_extensions import TypedDict
+from typing_extensions import Any, AsyncContextManager, Iterable, TypedDict
 from dataclasses import dataclass, field
 import asyncio
 import os
@@ -62,7 +62,7 @@ def spot_meta_of(spot_index: int, /, *, spot_meta: SpotMetaResponse) -> SpotMeta
 
 
 @dataclass(kw_only=True)
-class Shared:
+class Shared(SDK):
   client: Hyperliquid
   maybe_address: str | None = None
 
@@ -90,14 +90,8 @@ class Shared:
   _perp_meta_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
   _fees_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
 
-  @wrap_exceptions
-  async def __aenter__(self):
-    await self.client.__aenter__()
-    return self
-
-  @wrap_exceptions
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await self.client.__aexit__(exc_type, exc_value, traceback)
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    yield self.client
 
   @wrap_exceptions
   async def load_spot_meta(self, *, refetch: bool = False) -> SpotMetaResponse:
@@ -217,7 +211,7 @@ class Shared:
     )
 
 @dataclass(frozen=True)
-class SharedMixin:
+class SharedMixin(SDK):
   shared: Shared
 
   @classmethod
@@ -250,12 +244,8 @@ class SharedMixin:
   def address(self) -> str:
     return self.shared.address
 
-  async def __aenter__(self):
-    await self.shared.__aenter__()
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await self.shared.__aexit__(exc_type, exc_value, traceback)
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    yield self.shared
 
   def subscribe_user_fills(self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'):
     return self.shared.user_fills_sub().subscribe(queue_size=queue_size, overflow=overflow)
@@ -270,7 +260,7 @@ class SpotMixin(SharedMixin):
 
 
 @dataclass(kw_only=True, frozen=True)
-class SpotMarketMixin(SDK, SpotMixin):
+class SpotMarketMixin(SpotMixin):
   meta: SpotMeta
 
   @property
@@ -330,7 +320,7 @@ class PerpMixin(SharedMixin):
       return self.dex['name']
 
 @dataclass(kw_only=True, frozen=True)
-class PerpMarketMixin(SDK, PerpMixin):
+class PerpMarketMixin(PerpMixin):
   meta: PerpMeta
 
   @property

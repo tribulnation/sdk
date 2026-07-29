@@ -1,7 +1,8 @@
-from typing_extensions import TypeVar
+from typing_extensions import Any, AsyncContextManager, Iterable, TypeVar
 from dataclasses import dataclass
 import inspect
 
+from tribulnation.sdk import SDK
 from tribulnation.sdk.core import ApiError, AuthError, Error, NetworkError, ValidationError
 
 from bitget import Bitget
@@ -45,7 +46,7 @@ def wrap_exceptions(fn: Fn) -> Fn:
     raise ValueError(f"Function {fn} is not a coroutine or generator function")
 
 @dataclass
-class SdkMixin:
+class SdkMixin(SDK):
   client: Bitget
   validate: bool = True
 
@@ -57,9 +58,6 @@ class SdkMixin:
     client = Bitget.new(access_key=access_key, secret_key=secret_key, passphrase=passphrase)
     return cls(client=client, validate=validate)
 
-  async def __aenter__(self):
-    await self.client.__aenter__()
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await self.client.__aexit__(exc_type, exc_value, traceback)
+  def resources(self) -> Iterable[AsyncContextManager[Any]]:
+    yield from super().resources()
+    yield self.client

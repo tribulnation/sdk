@@ -13,7 +13,7 @@ from tribulnation.sdk.reporting import (
 from tribulnation.mexc.core import Mixin, wrap_exceptions
 
 @dataclass(frozen=True)
-class Snapshots(_Snapshots, Mixin):
+class Snapshots(Mixin, _Snapshots):
   @SDK.method
   @wrap_exceptions
   async def spot_balances(self) -> Balances:

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing_extensions import Iterable, Callable, Awaitable, TypeVar, Protocol, TYPE_CHECKING
+from typing_extensions import AsyncContextManager, Iterable, Callable, Awaitable, TypeVar, Protocol, TYPE_CHECKING
 from dataclasses import dataclass, field
 from datetime import datetime
 from collections import defaultdict
@@ -79,12 +79,8 @@ class ChainHistory(SDK):
   cache: HistoryCache | None = None
   _block_times: dict[int, datetime] = field(default_factory=dict)
 
-  async def __aenter__(self):
-    await self.comet.__aenter__()
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await self.comet.__aexit__(exc_type, exc_value, traceback)
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    yield self.comet
 
   @classmethod
   def of(cls, address: str, dydx: Dydx, cache: HistoryCache | None = None):

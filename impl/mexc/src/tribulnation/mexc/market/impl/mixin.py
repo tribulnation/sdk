@@ -1,4 +1,4 @@
-from typing_extensions import TypedDict
+from typing_extensions import Any, AsyncContextManager, Iterable, TypedDict
 from dataclasses import dataclass, field
 import asyncio
 
@@ -97,7 +97,7 @@ class Shared:
     return self.my_trades_subscription
 
 @dataclass(frozen=True)
-class SharedMixin:
+class SharedMixin(SDK):
   shared: Shared
 
   @classmethod
@@ -112,19 +112,16 @@ class SharedMixin:
   def client(self) -> MEXC:
     return self.shared.client
 
-  async def __aenter__(self):
-    await self.shared.__aenter__()
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await self.shared.__aexit__(exc_type, exc_value, traceback)
+  def resources(self) -> Iterable[AsyncContextManager[Any]]:
+    yield from super().resources()
+    yield self.shared
 
 @dataclass(kw_only=True, frozen=True)
 class ExchangeMixin(SharedMixin):
   ...
 
 @dataclass(kw_only=True, frozen=True)
-class MarketMixin(SDK, ExchangeMixin):
+class MarketMixin(ExchangeMixin):
   meta: Meta
 
   @property

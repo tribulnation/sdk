@@ -1,4 +1,4 @@
-from typing_extensions import Collection
+from typing_extensions import AsyncContextManager, Collection, Iterable
 from dataclasses import dataclass, field
 from decimal import Decimal
 import asyncio
@@ -29,12 +29,8 @@ class Snapshots(_Snapshots):
   def indexer(self) -> Indexer:
     return self.client.indexer
 
-  async def __aenter__(self):
-    await self.client.__aenter__()
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await self.client.__aexit__(exc_type, exc_value, traceback)
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    yield self.client
 
   @SDK.method
   @wrap_exceptions

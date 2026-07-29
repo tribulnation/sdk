@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing_extensions import Collection, TypeVar, Callable, Awaitable
+from typing_extensions import AsyncContextManager, Collection, Iterable, TypeVar, Callable, Awaitable
 from dataclasses import dataclass, field
 
 from web3 import Web3
@@ -31,12 +31,9 @@ class AlchemySnapshots(Snapshots):
   network: str
   ignore_zero_value: bool = True
 
-  async def __aenter__(self):
-    await self.alchemy.__aenter__()
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await self.alchemy.__aexit__(exc_type, exc_value, traceback)
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    yield from super().resources()
+    yield self.alchemy
 
   @SDK.method
   @alchemy_core.wrap_exceptions

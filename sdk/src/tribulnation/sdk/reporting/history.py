@@ -11,10 +11,3 @@ class History(SDK):
   def history(self, start: datetime | None = None, end: datetime | None = None) -> AsyncIterable[HistoryRecord]:
     """Fetch your reporting history."""
 
-  @SDK.method
-  async def __aenter__(self):
-    return self
-
-  @SDK.method
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    ...

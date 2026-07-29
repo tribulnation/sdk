@@ -1,7 +1,6 @@
-from typing_extensions import Collection, TypedDict, Literal
+from typing_extensions import AsyncContextManager, Collection, Iterable, TypedDict, Literal
 from dataclasses import dataclass
 from datetime import datetime
-import asyncio
 
 from tribulnation.sdk.reporting import (
   Report as _Report, SnapshotRecord,
@@ -58,18 +57,11 @@ class Report(_Report):
       snapshots_impl=Snapshots.of(address),
     )
 
-  async def __aenter__(self):
-    await asyncio.gather(
-      self.history_impl.__aenter__(),
-      self.snapshots_impl.__aenter__(),
-    )
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await asyncio.gather(
-      self.history_impl.__aexit__(exc_type, exc_value, traceback),
-      self.snapshots_impl.__aexit__(exc_type, exc_value, traceback),
-    )
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    # Sequential, not gathered: a gather that fails on the second entry orphans the first
+    # forever. Entering a client is local work, so ordered rollback is worth the wait.
+    yield self.history_impl
+    yield self.snapshots_impl
 
   async def history(self, start: datetime | None = None, end: datetime | None = None):
     async for record in self.history_impl.history(start, end):

@@ -1,4 +1,4 @@
-from typing_extensions import Collection, TypeVar, Callable, Awaitable
+from typing_extensions import AsyncContextManager, Awaitable, Callable, Collection, Iterable, TypeVar
 from dataclasses import dataclass, field
 from decimal import Decimal
 
@@ -23,6 +23,10 @@ class MoralisSnapshots(Snapshots):
   chain: Chain
   moralis: Moralis = field(default_factory=Moralis.new)
   ignore_zero_value: bool = True
+
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    yield from super().resources()
+    yield self.moralis
 
   @SDK.method
   @moralis_core.wrap_exceptions

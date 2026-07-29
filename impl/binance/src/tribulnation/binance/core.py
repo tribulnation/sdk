@@ -1,7 +1,8 @@
-from typing_extensions import TypeVar
+from typing_extensions import AsyncContextManager, Iterable, TypeVar
 from dataclasses import dataclass
 import inspect
 
+from tribulnation.sdk import SDK
 from tribulnation.sdk.core.exc import ApiError, AuthError, Error, NetworkError, ValidationError
 from binance import Binance
 from binance.core import exc
@@ -44,7 +45,7 @@ def wrap_exceptions(fn: Fn) -> Fn:
     raise ValueError(f"Function {fn} is not a coroutine or generator function")
 
 @dataclass
-class SdkMixin:
+class SdkMixin(SDK):
   client: Binance
   validate: bool = True
 
@@ -56,9 +57,6 @@ class SdkMixin:
     client = Binance.new(api_key=api_key, api_secret=api_secret, validate=validate)
     return cls(client=client, validate=validate)
 
-  async def __aenter__(self):
-    await self.client.__aenter__()
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await self.client.__aexit__(exc_type, exc_value, traceback)
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    yield from super().resources()
+    yield self.client
