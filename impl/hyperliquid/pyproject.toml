@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tribulnation-hyperliquid"
-version = "0.5.6"
+version = "0.6.0"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
 description = "Tribulnation SDK implementation for Hyperliquid."
 dependencies = [
-  "tribulnation-sdk>=1.4.0", "typed-hyperliquid>=1.2.3",
+  "tribulnation-sdk>=1.7.0", "typed-hyperliquid>=1.2.3",
   "sqlalchemy>=2.0", "sqltypes>=0.1.11"
 ]
 requires-python = ">=3.10"
