@@ -1,0 +1,5 @@
+# vendored from workspace/.agents/skills/review-code/agents/openai.yaml — do not edit; run `python scripts/sync.py agents`
+interface:
+  display_name: "Review Code"
+  short_description: "Review Python code against local standards"
+  default_prompt: "Use $review-code to review the specified code against .agents/rules/python.md."

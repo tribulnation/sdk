@@ -1,0 +1,18 @@
+# vendored from workspace/.agents/tools/python/ruff.toml — do not edit; run `python scripts/sync.py agents`
+[tool.ruff]
+indent-width = 2
+target-version = "py311"
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = true
+
+[tool.ruff.lint]
+# Enable the flake8-tidy-imports rule set
+select = ["TID251"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"__future__.annotations" = { msg = "Do not use from __future__ import annotations. It breaks runtime type checking libraries like Pydantic or FastAPI." }

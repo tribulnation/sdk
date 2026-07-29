@@ -1,0 +1,5 @@
+# vendored from workspace/.agents/skills/propose-commits/agents/openai.yaml — do not edit; run `python scripts/sync.py agents`
+interface:
+  display_name: "Propose Commits"
+  short_description: "Group current changes into commit proposals"
+  default_prompt: "Use $propose-commits to inspect the current changes and propose sensible commits before making any commit."
