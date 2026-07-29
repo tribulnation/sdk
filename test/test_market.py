@@ -48,7 +48,10 @@ PLANS = [
   MarketTestPlan(
     venue='mexc',
     market_id='mexc:spot:BTCUSDT',
-    required_env=('MEXC_ACCESS_KEY', 'MEXC_SECRET_KEY'),
+    # The names the MEXC market impl actually reads (see mexc/market/impl/mixin.py).
+    # typed-dev's mexc/.env ships MEXC_ACCESS_KEY/MEXC_SECRET_KEY instead, so this
+    # plan skips unless those are aliased across -- see `ALIASES` in conftest.
+    required_env=('MEXC_API_KEY', 'MEXC_API_SECRET'),
     order_notional=Decimal('6'),
     fill_notional=Decimal('6'),
     fill_order_type='MARKET',
