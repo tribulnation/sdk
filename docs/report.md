@@ -21,7 +21,8 @@ report = ReportSDK({
 })
 
 for account, sdk in report.all.items():
-  result = await sdk.snapshot()
+  async with sdk:
+    result = await sdk.snapshot()
   snapshot = result.snapshot
   print(f'[{account}] ({snapshot.time:%Y-%m-%d %H:%M:%S}) from {result.provenance["source"]}')
   for subaccount in snapshot.subaccounts:
@@ -32,3 +33,11 @@ for account, sdk in report.all.items():
       print(f'> {instrument}: {position.size} @ {position.avg_price}')
   print()
 ```
+
+`report.all` is eager: it resolves every configured account at once, so a single
+venue without reporting wired raises and you get nothing. Reach for
+`report.venue(id)` when the workspace may contain one — see the
+[support matrix](support.md) for which venues are wired.
+
+Reports own network clients, so use them as async context managers. Entering one
+enters everything it owns and releases it on exit; see [lifecycle.md](lifecycle.md).

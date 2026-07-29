@@ -106,6 +106,8 @@ Same account-mapping shape as `MarketSDK`:
 - `EarnSDK`: yield instruments — [docs/earn.md](docs/earn.md)
 - `ReportSDK`: balance/position history, with provenance — [docs/report.md](docs/report.md)
 
+Every SDK object is an async context manager; declare what you own with `resources()`, never `__aenter__`. Details: [docs/lifecycle.md](docs/lifecycle.md).
+
 ## Error Handling
 
 All errors subclass `Error`: `NetworkError`, `ValidationError`, `ApiError` (`BadRequest`, `AuthError`, `RateLimited`), `LogicError`.
