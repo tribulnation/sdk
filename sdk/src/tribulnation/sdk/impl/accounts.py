@@ -90,6 +90,29 @@ class Mexc(BaseAccount):
 
 
 @_dataclass
+class Bit2Me(BaseAccount):
+  venue: _Literal['bit2me'] = 'bit2me'
+  api_key: str = '$BIT2ME_API_KEY'
+  """Bit2Me API key"""
+  api_secret: str = '$BIT2ME_SECRET_KEY'
+  """Bit2Me API secret (note: the client reads `BIT2ME_SECRET_KEY`, not `BIT2ME_API_SECRET`)"""
+  validate: bool = True
+  """Whether to type-validate incoming responses."""
+
+  @property
+  def resolved_api_key(self) -> str | None:
+    return resolve_env_var(self.api_key, require=not self.public)
+
+  @property
+  def resolved_api_secret(self) -> str | None:
+    return resolve_env_var(self.api_secret, require=not self.public)
+
+  def verify_env_vars(self):
+    self.resolved_api_key
+    self.resolved_api_secret
+
+
+@_dataclass
 class Bitget(BaseAccount):
   venue: _Literal['bitget'] = 'bitget'
   access_key: str = '$BITGET_ACCESS_KEY'
@@ -158,6 +181,6 @@ class Evm(BaseAccount):
 
 
 Account = _Annotated[
-  Dydx | Hyperliquid | Mexc | Bitget | Binance | Evm,
+  Dydx | Hyperliquid | Mexc | Bitget | Bit2Me | Binance | Evm,
   _pydantic.Discriminator ('venue')
 ]

@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 from tribulnation.sdk.reporting import Report
 from tribulnation.sdk.reporting.config import ProvidersConfig
-from .accounts import Account, Dydx, Evm, Binance, Bitget, Mexc, Hyperliquid
+from .accounts import Account, Dydx, Evm, Binance, Bitget, Bit2Me, Mexc, Hyperliquid
 
 if TYPE_CHECKING:
   from tribulnation.ethereum.reporting import EvmConfig
@@ -45,10 +45,30 @@ class ReportSDK:
     raise NotImplementedError('binance reporting is not yet implemented.')
 
   def bitget(self, account: Bitget, id: str) -> Report:
-    raise NotImplementedError('bitget reporting is not yet implemented.')
+    raise NotImplementedError(
+      'bitget reporting is not wired: the existing implementation targets classic '
+      'accounts, which the unified trading account (UTA) does not support.'
+    )
 
   def mexc(self, account: Mexc, id: str) -> Report:
-    raise NotImplementedError('mexc reporting is not yet implemented.')
+    try:
+      from tribulnation.mexc.reporting import Report as MexcReport
+    except ImportError as e:
+      raise ImportError('mexc sdk is not installed. Please install it with `pip install tribulnation-mexc`.') from e
+    return MexcReport.new(
+      account.resolved_api_key, account.resolved_api_secret,
+      settings={'validate': account.validate},
+    )
+
+  def bit2me(self, account: Bit2Me, id: str) -> Report:
+    try:
+      from tribulnation.bit2me.report import Report as Bit2MeReport
+    except ImportError as e:
+      raise ImportError('bit2me sdk is not installed. Please install it with `pip install tribulnation-bit2me`.') from e
+    return Bit2MeReport.new(
+      account.resolved_api_key, account.resolved_api_secret,
+      validate=account.validate,
+    )
 
   def hyperliquid(self, account: Hyperliquid, id: str) -> Report:
     try:
@@ -73,6 +93,8 @@ class ReportSDK:
         return self.bitget(account, id)
       case 'mexc':
         return self.mexc(account, id)
+      case 'bit2me':
+        return self.bit2me(account, id)
       case 'hyperliquid' | 'hyperliquid_testnet':
         return self.hyperliquid(account, id)
       case _:

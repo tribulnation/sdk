@@ -16,12 +16,12 @@ there are no Bybit, BingX or Kraken packages.
 | Exchange | Package | Market | Earn | Wallet | Snapshots | History |
 | --- | --- | --- | --- | --- | --- | --- |
 | Binance | `tribulnation-binance` | ❌ | 🔑 | 🔑 | ❌ | ❌ |
-| Bit2Me | `tribulnation-bit2me` | ❌ | ❌ | ❌ | 🔑\* | ❌ |
+| Bit2Me | `tribulnation-bit2me` | ❌ | ❌ | ❌ | 🔑 | ❌ |
 | Bitget | `tribulnation-bitget` | ❌ | 🔑 | 🔑 | 🔑\* | 🔑\* |
 | dYdX | `tribulnation-dydx` | ✅/🔑 | ❌ | ❌ | ✅ | ✅ |
 | Ethereum (EVM) | `tribulnation-ethereum` | ❌ | ❌ | ❌ | ✅ | ✅ |
 | Hyperliquid | `tribulnation-hyperliquid` | ✅/🔑 | ❌ | ❌ | ✅ | ✅ |
-| MEXC | `tribulnation-mexc` | ✅/🔑 | ✅ | 🔑 | 🔑\* | ❌ |
+| MEXC | `tribulnation-mexc` | ✅/🔑 | ✅ | 🔑 | 🔑 | ❌ |
 
 ## Notes per surface
 
@@ -40,11 +40,28 @@ account explicitly.
 
 **Snapshots / History** — `ReportSDK.venue()` resolves the EVM networks
 (`ethereum`, `arbitrum`, `polygon`, `bnb-chain`, `base`, `avalanche`, `optimism`),
-`dydx`/`dydx_testnet` and `hyperliquid`/`hyperliquid_testnet`. Both are address-based and need no exchange credentials (EVM history
-does need an RPC/explorer provider, configured via `ProvidersConfig`). The Binance, Bitget and
-MEXC branches raise `NotImplementedError`, and Bit2Me has no `Account` type at all — use
-`tribulnation.bitget.reporting.Reporting`, `tribulnation.mexc.reporting.Snapshots` or
-`tribulnation.bit2me.report.Snapshots` directly.
+`dydx`/`dydx_testnet`, `hyperliquid`/`hyperliquid_testnet`, plus the three CEXs
+`bit2me`, `bitget` and `mexc`. The chain-based venues are address-based and need no exchange
+credentials (EVM history does need an RPC/explorer provider, configured via
+`ProvidersConfig`); the CEXs all require API keys.
+
+The CEX branches return a per-venue `Report` (`tribulnation.bit2me.report.Report`,
+`tribulnation.mexc.reporting.Report`) that subclasses the venue's own `Snapshots`, so it
+serves `snapshot()` directly and raises `NotImplementedError` from `history()` — eagerly, at
+call time, not on first iteration.
+
+The Bitget and Binance branches both raise `NotImplementedError`. Binance has no reporting
+module at all. Bitget has a full `Reporting` (`Snapshots` **and** `History`), but it targets
+the classic-account endpoints that the unified trading account (UTA) does not support, so it
+is deliberately left out of the router pending a reimplementation; it stays importable as
+`tribulnation.bitget.reporting.Reporting` for callers still on a classic account.
+
+CEX credentials are read from the account's env vars — `BIT2ME_API_KEY`/`BIT2ME_SECRET_KEY`
+(note the asymmetric naming), `BITGET_ACCESS_KEY`/`BITGET_SECRET_KEY`/`BITGET_PASSPHRASE`,
+`MEXC_API_KEY`/`MEXC_API_SECRET` — and are passed to the venue client explicitly. Note that
+`public=True` does *not* make a CEX report usable without credentials: every endpoint is
+authenticated, and the underlying clients read `os.environ[...]`, so a missing variable
+surfaces as a `KeyError`. This matches `WalletSDK`/`EarnSDK`.
 
 Hyperliquid history reconstructs realized PnL by folding the account's complete fill
 stream, so it always replays from the beginning and `start` filters the output rather than
