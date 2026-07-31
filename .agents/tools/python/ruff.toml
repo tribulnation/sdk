@@ -15,3 +15,11 @@ select = ["TID251"]
 
 [lint.flake8-tidy-imports.banned-api]
 "__future__.annotations" = { msg = "Do not use from __future__ import annotations. It breaks runtime type checking libraries like Pydantic or FastAPI." }
+"typing" = { msg = "Import from typing_extensions instead of typing. It backports the newer typing features to every supported runtime, so the same annotation means the same thing everywhere." }
+
+# Generated protobuf is machine output, not hand-authored source: it is rewritten
+# wholesale by protoc/betterproto2, so a style rule cannot be satisfied there and a
+# violation is not a defect anyone can fix in the file. Every generated tree lives in a
+# `protos/` package, which is what this matches.
+[lint.per-file-ignores]
+"**/protos/**" = ["TID251"]

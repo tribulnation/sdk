@@ -1,6 +1,5 @@
 from collections.abc import Iterable
-from typing import AsyncContextManager
-from typing_extensions import Collection
+from typing_extensions import AsyncContextManager, Collection
 from dataclasses import dataclass
 from datetime import datetime
 

@@ -200,23 +200,20 @@ def http(
   `datetime.fromtimestamp(...)` calls through endpoint methods.
 
 
-### Misc
+### Tooling
 
-- Don't add extra empty lines after a class docstring. I.e:
+Formatting is `ruff format`'s job, not this document's. Where the two disagree,
+the formatter wins — it is what CI gates on, and a rule it overwrites on the next
+run is a rule nobody can follow.
 
-  ```python
-  # DO NOT
+The shared config is vendored at `.agents/tools/python/ruff.toml`. Use it rather
+than a local copy:
 
-  class MyClass:
-    """Docstring"""
+```sh
+ruff check --config .agents/tools/python/ruff.toml <paths>
+ruff format --config .agents/tools/python/ruff.toml <paths>
+```
 
-    field: int
-    ...
-
-  # BUT DO
-
-  class MyClass:
-    """Docstring"""
-    field: int
-    ...
-  ```
+A repo needing a rule the shared config lacks should add it to the canonical
+`workspace/.agents/tools/python/ruff.toml` and re-sync, so every repo gets it.
+A divergent local `ruff.toml` is drift.
