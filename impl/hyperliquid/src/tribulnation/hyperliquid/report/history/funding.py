@@ -1,15 +1,16 @@
 """Perpetual funding payments."""
-from typing_extensions import Iterable
+from typing_extensions import Iterable, Mapping
 from decimal import Decimal
 
 from tribulnation.sdk.reporting import Funding
 from hyperliquid.info.perps.user_funding import UserFundingEntry
 
-from .assets import USDC
+from ..subaccounts import UNIFIED
+from .assets import settlement_token
 from .window import parse_time
 
 
-def parse_funding(entry: UserFundingEntry, *, settle: str = USDC) -> Funding:
+def parse_funding(entry: UserFundingEntry, *, settle: str) -> Funding:
   """Convert a funding entry into a funding observation.
 
   Funding pays every open position on the same millisecond, so `hash` is shared
@@ -25,6 +26,7 @@ def parse_funding(entry: UserFundingEntry, *, settle: str = USDC) -> Funding:
   return Funding(
     id=f'funding:{entry["time"]}:{delta["coin"]}',
     time=parse_time(entry['time']),
+    subaccount=UNIFIED,
     instrument=delta['coin'],
     asset=settle,
     amount=Decimal(str(delta['usdc'])),
@@ -32,17 +34,20 @@ def parse_funding(entry: UserFundingEntry, *, settle: str = USDC) -> Funding:
 
 
 def parse_fundings(
-  entries: Iterable[UserFundingEntry], *, settle: dict[str, str] | None = None,
+  entries: Iterable[UserFundingEntry], *, settle: Mapping[str, str],
 ) -> list[Funding]:
   """Convert a funding stream into observations.
 
   Args:
     entries: Funding entries for the account.
-    settle: Optional instrument to settlement-token-index map, for HIP-3 dexes
-      whose collateral is not USDC. Defaults to USDC.
+    settle: Instrument to settlement-token-index map, covering every dex the
+      account traded. Required rather than defaulted: an absent entry is a gap
+      in the metadata, not a market that happens to settle in USDC.
+
+  Raises:
+    UnknownSettlementToken: If an instrument has no entry in `settle`.
   """
-  settle = settle or {}
   return [
-    parse_funding(entry, settle=settle.get(entry['delta']['coin'], USDC))
+    parse_funding(entry, settle=settlement_token(settle, entry['delta']['coin']))
     for entry in entries
   ]

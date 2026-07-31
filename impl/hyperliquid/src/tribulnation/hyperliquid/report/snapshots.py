@@ -11,6 +11,8 @@ from tribulnation.sdk.reporting import (
 from hyperliquid.info import Info
 from tribulnation.hyperliquid.core import wrap_exceptions
 
+from .subaccounts import STAKING, UNIFIED
+
 HYPE_ASSET = '150'
 
 @dataclass
@@ -58,6 +60,19 @@ class Snapshots(_Snapshots):
   async def dex_positions_and_pnl(
     self, dex: str | None,
   ) -> tuple[dict[str, Position], Balances]:
+    """Positions on one dex, and the unrealized PnL its spot balance carries.
+
+    On a unified account the spot balance of a collateral token is the whole
+    perp equity backing that token — **cross and isolated alike**, unrealized
+    PnL included. So every position's `unrealizedPnl` is subtracted to leave
+    collateral, and `leverage.rawUsd` is not added: isolated margin is an
+    allocation out of that same balance, not a bucket beside it.
+
+    Verified against a live account carrying an isolated position: over 2.5
+    minutes of price movement, `spot - sum(unrealizedPnl)` held at
+    `9027.73703382` while unrealized PnL moved by ~21, and dropping the isolated
+    leg from the sum made the result drift by exactly that leg's change.
+    """
     dex = dex or ''
     state, meta = await asyncio.gather(
       self.clearinghouse_state(dex),
@@ -76,10 +91,10 @@ class Snapshots(_Snapshots):
     )
     return positions, Balances({str(meta['collateralToken']): unrealized})
 
-
   @SDK.method
   @wrap_exceptions
   async def perp_positions_and_pnl(self) -> tuple[dict[str, Position], Balances]:
+    """Positions across every dex, and the unrealized PnL per collateral token."""
     dexs = await self.info.perp_dexs()
     results = await asyncio.gather(*[
       self.dex_positions_and_pnl(dex and dex['name'])
@@ -104,9 +119,9 @@ class Snapshots(_Snapshots):
     staking = {HYPE_ASSET: stake} if stake > 0 else {}
     snapshot = Snapshot(subaccounts=[
         SubaccountSnapshot(
-          subaccount='unified', balances=balances, positions=perp_positions,
+          subaccount=UNIFIED, balances=balances, positions=perp_positions,
         ),
-        SubaccountSnapshot(subaccount='staking', balances=staking),
+        SubaccountSnapshot(subaccount=STAKING, balances=staking),
       ])
     return SnapshotRecord(
       snapshot=snapshot,

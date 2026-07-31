@@ -30,6 +30,30 @@ class AmbiguousTokenName(Exception):
   """
 
 
+class UnknownSettlementToken(Exception):
+  """A traded market is absent from the dex metadata.
+
+  Falling back to USDC misattributes every realized-PnL and funding leg for the
+  market to the wrong asset, and does it silently: the totals still balance in
+  aggregate, so only a per-asset audit reveals it.
+  """
+
+
+def settlement_token(settle: Mapping[str, str], coin: str) -> str:
+  """Resolve a market's settlement token index, refusing to guess.
+
+  Raises:
+    UnknownSettlementToken: If `coin` has no entry, which means the dex metadata
+      it came from was never read.
+  """
+  if (token := settle.get(coin)) is None:
+    raise UnknownSettlementToken(
+      f'No settlement token for market {coin!r}. Its dex is missing from the '
+      'metadata, so its denomination is unknown.'
+    )
+  return token
+
+
 @dataclass(frozen=True)
 class Assets:
   """Resolves Hyperliquid asset identifiers to canonical token indices."""

@@ -20,16 +20,11 @@ from hyperliquid.info.perps.user_non_funding_ledger_updates import (
   LedgerDelta, UserNonFundingLedgerEntry,
 )
 
+from ..subaccounts import STAKING, UNIFIED
 from .assets import Assets, HYPE, USDC
 from .window import parse_time
 
 delta_adapter = pydantic.TypeAdapter(LedgerDelta)
-
-UNIFIED = 'unified'
-"""Subaccount label for the main balance, matching `report/snapshots.py`."""
-
-STAKING = 'staking'
-"""Subaccount label for staked balance, matching `report/snapshots.py`."""
 
 D = lambda v: Decimal(str(v))
 
@@ -50,7 +45,9 @@ def parse_delta(
 ) -> list[Observation]:
   """Map one validated ledger delta onto zero or more observations."""
   mine = str(delta.get('user', '')).lower() == address.lower()
-  base = {'id': id, 'time': time}
+  # Every ledger delta acts on the main pool. Staking is reached only through
+  # `cStakingTransfer`, which names both compartments in `src`/`dst` instead.
+  base = {'id': id, 'time': time, 'subaccount': UNIFIED}
 
   if delta['type'] == 'deposit':
     return [CryptoDeposit(**base, asset=USDC, amount=D(delta['usdc']))]

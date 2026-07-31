@@ -82,19 +82,22 @@ class History(_History):
 
     HIP-3 dexes settle in tokens other than USDC, so fees, funding and realized
     PnL for their markets are denominated differently.
+
+    A dex whose metadata cannot be read raises rather than being skipped. Its
+    markets would otherwise fall through to the USDC default at every lookup,
+    misattributing their PnL to an asset they never settled in.
     """
     dexes = await self.info.perp_dexs()
     out: dict[str, str] = {}
     for dex in dexes:
       name = dex and dex['name']
-      try:
-        meta, _ = await self.info.perp_meta_and_asset_ctxs(name or '')
-      except Exception:
-        continue
-      token = str(meta.get('collateralToken', 0))
-      prefix = f'{name}:' if name else ''
-      for asset in meta.get('universe', []):
-        out[f'{prefix}{asset["name"]}'] = token
+      meta, _ = await self.info.perp_meta_and_asset_ctxs(name or '')
+      token = str(meta['collateralToken'])
+      # Named dexes already qualify their universe entries (`flx:TSLA`); only the
+      # main dex uses bare names (`BTC`). Prefixing the dex name again yields
+      # `flx:flx:TSLA`, which no fill ever matches.
+      for asset in meta['universe']:
+        out[asset['name']] = token
     return out
 
   @SDK.method

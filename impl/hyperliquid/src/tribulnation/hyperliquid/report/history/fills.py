@@ -16,7 +16,7 @@ worked around here, so both are detected rather than absorbed:
 Where the fold cannot see back to position open, `realized_pnl` is `None`. An
 explicit unknown is correct; a fabricated number is not.
 """
-from typing_extensions import Iterable, Sequence, TypeAlias, Union
+from typing_extensions import Iterable, Mapping, Sequence, TypeAlias, Union
 from dataclasses import dataclass
 from decimal import Decimal
 
@@ -32,7 +32,8 @@ TWAP slices carry every field used here but are a distinct type — they lack
 together: the slices are real trades absent from `userFillsByTime`.
 """
 
-from .assets import Assets, USDC, is_spot
+from ..subaccounts import UNIFIED
+from .assets import Assets, is_spot, settlement_token
 from .window import parse_time
 
 ZERO = Decimal(0)
@@ -124,6 +125,7 @@ def parse_perp_fill(
   return FutureTrade(
     id=fill_id(fill, index),
     time=parse_time(fill['time']),
+    subaccount=UNIFIED,
     instrument=fill['coin'],
     settle=settle,
     size=signed_size(fill),
@@ -140,6 +142,7 @@ def parse_spot_fill(fill: AnyFill, *, index: int, assets: Assets) -> SpotTrade:
   return SpotTrade(
     id=fill_id(fill, index),
     time=parse_time(fill['time']),
+    subaccount=UNIFIED,
     base=base,
     quote=quote,
     pair=fill['coin'],
@@ -151,8 +154,7 @@ def parse_spot_fill(fill: AnyFill, *, index: int, assets: Assets) -> SpotTrade:
 
 
 def parse_fills(
-  fills: Iterable[AnyFill], *, assets: Assets,
-  settle: dict[str, str] | None = None,
+  fills: Iterable[AnyFill], *, assets: Assets, settle: Mapping[str, str],
 ) -> tuple[list[FutureTrade | SpotTrade], dict[str, Position]]:
   """Convert a fill stream into trade observations with exact realized PnL.
 
@@ -162,15 +164,18 @@ def parse_fills(
   Args:
     fills: Every fill for the account, in any order.
     assets: Token index resolver.
-    settle: Optional coin to settlement-token-index map, for HIP-3 dexes whose
-      collateral is not USDC. Defaults to USDC.
+    settle: Coin to settlement-token-index map, covering every dex the account
+      traded. Required rather than defaulted: an absent entry is a gap in the
+      metadata, not a market that happens to settle in USDC.
 
   Returns:
     The observations, and the final per-coin position state. A coin whose state
     has `complete=False` had fills missing before the first one seen, so its
     realized PnL is reported as None.
+
+  Raises:
+    UnknownSettlementToken: If a perp coin has no entry in `settle`.
   """
-  settle = settle or {}
   ordered = sorted(fills, key=sort_key)
   positions: dict[str, Position] = {}
   seen: dict[tuple[str, int], int] = {}
@@ -193,7 +198,7 @@ def parse_fills(
     pnl = realized_pnl(position, size, price)
     positions[coin] = advance(position, size, price)
     out.append(parse_perp_fill(
-      fill, index=index, pnl=pnl, settle=settle.get(coin, USDC), assets=assets,
+      fill, index=index, pnl=pnl, settle=settlement_token(settle, coin), assets=assets,
     ))
   return out, positions
 
