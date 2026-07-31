@@ -46,23 +46,22 @@ def entry_id(entry: Mapping[str, Any], index: int) -> str:
 
 
 def parse_delta(
-  delta: Any, *, id: str, time, address: str, assets: Assets,
+  delta: LedgerDelta, *, id: str, time, address: str, assets: Assets,
 ) -> list[Observation]:
   """Map one validated ledger delta onto zero or more observations."""
-  kind = delta['type']
   mine = str(delta.get('user', '')).lower() == address.lower()
   base = {'id': id, 'time': time}
 
-  if kind == 'deposit':
+  if delta['type'] == 'deposit':
     return [CryptoDeposit(**base, asset=USDC, amount=D(delta['usdc']))]
 
-  if kind == 'withdraw':
+  if delta['type'] == 'withdraw':
     return [CryptoWithdrawal(
       **base, asset=USDC, amount=D(delta['usdc']),
       fee=Fee(asset=USDC, amount=D(delta['fee'])),
     )]
 
-  if kind in ('spotTransfer', 'send'):
+  if delta['type'] == 'spotTransfer' or delta['type'] == 'send':
     token = assets.token(delta['token'])
     amount = D(delta['amount'])
     out: list[Observation] = [Transfer(
@@ -76,7 +75,7 @@ def parse_delta(
       out.append(FeeLeg(**base, asset=HYPE, amount=native, event_type='transfer'))
     return out
 
-  if kind in ('internalTransfer', 'subAccountTransfer'):
+  if delta['type'] == 'internalTransfer' or delta['type'] == 'subAccountTransfer':
     amount = D(delta['usdc'])
     out = [InternalTransfer(
       **base, asset=USDC, amount=abs(amount),
@@ -86,7 +85,7 @@ def parse_delta(
       out.append(FeeLeg(**base, asset=USDC, amount=fee, event_type='internal_transfer'))
     return out
 
-  if kind == 'accountClassTransfer':
+  if delta['type'] == 'accountClassTransfer':
     to_perp = bool(delta['toPerp'])
     return [InternalTransfer(
       **base, asset=USDC, amount=abs(D(delta['usdc'])),
@@ -94,7 +93,7 @@ def parse_delta(
       dst_account='perp' if to_perp else 'spot',
     )]
 
-  if kind == 'cStakingTransfer':
+  if delta['type'] == 'cStakingTransfer':
     deposit = bool(delta['isDeposit'])
     return [InternalTransfer(
       **base, asset=assets.token(delta['token']), amount=abs(D(delta['amount'])),
@@ -102,7 +101,7 @@ def parse_delta(
       dst_account=STAKING if deposit else UNIFIED,
     )]
 
-  if kind == 'vaultCreate':
+  if delta['type'] == 'vaultCreate':
     out = [InternalTransfer(
       **base, asset=USDC, amount=abs(D(delta['usdc'])),
       src_account=UNIFIED, dst_account=delta.get('vault'),
@@ -111,13 +110,13 @@ def parse_delta(
       out.append(FeeLeg(**base, asset=USDC, amount=fee, event_type='internal_transfer'))
     return out
 
-  if kind == 'vaultDeposit':
+  if delta['type'] == 'vaultDeposit':
     return [InternalTransfer(
       **base, asset=USDC, amount=abs(D(delta['usdc'])),
       src_account=UNIFIED, dst_account=delta.get('vault'),
     )]
 
-  if kind == 'vaultWithdraw':
+  if delta['type'] == 'vaultWithdraw':
     out = [InternalTransfer(
       **base, asset=USDC, amount=abs(D(delta['netWithdrawnUsd'])),
       src_account=delta.get('vault'), dst_account=UNIFIED,
@@ -127,25 +126,25 @@ def parse_delta(
         out.append(FeeLeg(**base, asset=USDC, amount=amount, event_type='internal_transfer'))
     return out
 
-  if kind == 'vaultDistribution':
+  if delta['type'] == 'vaultDistribution':
     return [Yield(**base, asset=USDC, amount=D(delta['usdc']))]
 
-  if kind == 'vaultLeaderCommission':
+  if delta['type'] == 'vaultLeaderCommission':
     return [Yield(**base, asset=USDC, amount=D(delta['usdc']))]
 
-  if kind == 'spotGenesis':
+  if delta['type'] == 'spotGenesis':
     return [Bonus(
       **base, asset=assets.token(delta['token']), amount=D(delta['amount']),
       category='spotGenesis',
     )]
 
-  if kind == 'rewardsClaim':
+  if delta['type'] == 'rewardsClaim':
     # `token` may be the empty string on legacy USDC claims.
     return [Yield(
       **base, asset=assets.token(delta['token'] or 'USDC'), amount=D(delta['amount']),
     )]
 
-  if kind == 'borrowLend':
+  if delta['type'] == 'borrowLend':
     token = assets.token(delta['token'])
     amount, interest = D(delta['amount']), D(delta.get('interestAmount', 0))
     out = []
@@ -157,13 +156,13 @@ def parse_delta(
       out.append(Yield(**base, asset=token, amount=interest))
     return out
 
-  if kind in ('activateDexAbstraction', 'accountActivationGas', 'deployGasAuction'):
+  if delta['type'] == 'activateDexAbstraction' or delta['type'] == 'accountActivationGas' or delta['type'] == 'deployGasAuction':
     return [FeeLeg(
       **base, asset=assets.token(delta['token']), amount=D(delta['amount']),
       event_type='unknown',
     )]
 
-  if kind == 'liquidation':
+  if delta['type'] == 'liquidation':
     # No balance impact of its own: the positions are closed by fills tagged
     # `dir: 'Liquidated …'`, which the fill stream already carries. Verified
     # that those fills exactly offset the reported `liquidatedPositions`.
