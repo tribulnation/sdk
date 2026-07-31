@@ -83,7 +83,7 @@ class ReportSDK:
     if (account := self.accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
     match account.venue:
-      case 'ethereum' | 'arbitrum' | 'polygon' | 'bnb-chain' | 'base' | 'avalanche' | 'optimism':
+      case 'ethereum' | 'arbitrum' | 'polygon' | 'bnb-chain' | 'base' | 'avalanche' | 'optimism' | 'hyperevm':
         return self.evm(account, id)
       case 'dydx' | 'dydx_testnet':
         return self.dydx(account, id)

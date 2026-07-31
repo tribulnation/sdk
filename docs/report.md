@@ -18,6 +18,7 @@ load_dotenv()
 report = ReportSDK({
   'ethereum': accounts.Evm('ethereum'),
   'polygon': accounts.Evm('polygon'),
+  'hyperevm': accounts.Evm('hyperevm'),
 })
 
 for account, sdk in report.all.items():

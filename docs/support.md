@@ -39,11 +39,14 @@ balances and order placement need credentials.
 account explicitly.
 
 **Snapshots / History** — `ReportSDK.venue()` resolves the EVM networks
-(`ethereum`, `arbitrum`, `polygon`, `bnb-chain`, `base`, `avalanche`, `optimism`),
+(`ethereum`, `arbitrum`, `polygon`, `bnb-chain`, `base`, `avalanche`, `optimism`, `hyperevm`),
 `dydx`/`dydx_testnet`, `hyperliquid`/`hyperliquid_testnet`, plus the three CEXs
 `bit2me`, `bitget` and `mexc`. The chain-based venues are address-based and need no exchange
 credentials (EVM history does need an RPC/explorer provider, configured via
 `ProvidersConfig`); the CEXs all require API keys.
+
+HyperEVM uses the `hyperevm` EVM venue id. The `hyperliquid` venue id remains the
+separate HyperCore account and report implementation.
 
 The CEX branches return a per-venue `Report` (`tribulnation.bit2me.report.Report`,
 `tribulnation.mexc.reporting.Report`) that subclasses the venue's own `Snapshots`, so it

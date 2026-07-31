@@ -166,7 +166,7 @@ class Binance(BaseAccount):
 
 @_dataclass
 class Evm(BaseAccount):
-  Venue = _Literal['ethereum', 'arbitrum', 'polygon', 'bnb-chain', 'base', 'avalanche', 'optimism']
+  Venue = _Literal['ethereum', 'arbitrum', 'polygon', 'bnb-chain', 'base', 'avalanche', 'optimism', 'hyperevm']
   
   venue: Venue
   address: str = '$EVM_ADDRESS'

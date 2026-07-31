@@ -8,4 +8,5 @@ ALCHEMY_NETWORKS: dict[Network, str] = {
   'base': 'base-mainnet',
   'avalanche': 'avax-mainnet',
   'optimism': 'opt-mainnet',
+  'hyperevm': 'hyperliquid-mainnet',
 }

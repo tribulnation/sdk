@@ -9,6 +9,7 @@ CHAIN_IDS: dict[Network, int] = {
   'base': 8453,
   'avalanche': 43114,
   'optimism': 10,
+  'hyperevm': 999,
 }
 
 RPC_ENV_VARS: dict[Network, str] = {
@@ -19,6 +20,7 @@ RPC_ENV_VARS: dict[Network, str] = {
   'base': 'BASE_RPC_URL',
   'avalanche': 'AVALANCHE_RPC_URL',
   'optimism': 'OPTIMISM_RPC_URL',
+  'hyperevm': 'HYPEREVM_RPC_URL',
 }
 
 POA_NETWORKS: set[Network] = {'bnb-chain', 'avalanche', 'optimism', 'polygon'}

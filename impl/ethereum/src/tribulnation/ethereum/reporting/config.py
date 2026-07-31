@@ -15,7 +15,7 @@ DEFAULT_SNAPSHOT_SOURCE: SnapshotSource = 'alchemy'
 
 class HistorySourcesConfig(TypedDict, total=False):
   history: HistorySource
-  """Default: `etherscan` for Ethereum, Arbitrum, and Polygon; `moralis` for the rest."""
+  """Default: `etherscan` for Ethereum, Arbitrum, Polygon, and HyperEVM; `moralis` for the rest."""
 
 DEFAULT_HISTORY_SOURCES: dict[Network, HistorySource] = {
   'ethereum': 'etherscan',
@@ -25,6 +25,7 @@ DEFAULT_HISTORY_SOURCES: dict[Network, HistorySource] = {
   'base': 'moralis',
   'avalanche': 'moralis',
   'optimism': 'moralis',
+  'hyperevm': 'etherscan',
 }
 
 class EvmSourcesConfig(SnapshotSourcesConfig, HistorySourcesConfig):
