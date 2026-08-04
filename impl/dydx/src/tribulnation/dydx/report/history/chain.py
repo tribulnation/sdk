@@ -1,16 +1,23 @@
 from __future__ import annotations
-from typing_extensions import AsyncContextManager, Iterable, Callable, Awaitable, TypeVar, Protocol, TYPE_CHECKING
+
+import asyncio
+from collections import defaultdict
+from collections.abc import Awaitable, Callable, Iterable
 from dataclasses import dataclass, field
 from datetime import datetime
-from collections import defaultdict
-import asyncio
+from typing import TYPE_CHECKING
 
+from tribulnation.dydx.core import wrap_exceptions
 from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import CosmosTx, HistoryRecord, source_id
-from tribulnation.dydx.core import wrap_exceptions
+from typing_extensions import (
+  AsyncContextManager,
+  TypeVar,
+)
+
 from dydx import Dydx
 from dydx.chain import Comet
-from dydx.chain.comet.types import TxResponse, Event, EventAttribute
+from dydx.chain.comet.types import Event, EventAttribute, TxResponse
 
 if TYPE_CHECKING:
   from .cache import HistoryCache
@@ -112,7 +119,9 @@ class ChainHistory(SDK):
     paging = self.comet.tx_search_paged(query, per_page=per_page)
     state = paging.init
     while state is not None:
-      page, state = await self.call(lambda: paging.next(state)) # type: ignore
+      page, state = await self.call(
+        lambda current_state=state: paging.next(current_state)
+      )  # type: ignore
       yield page
 
   async def latest_block(self) -> tuple[int, datetime]:
@@ -155,33 +164,26 @@ class ChainHistory(SDK):
 
   async def height_window(
     self, start: datetime | None, end: datetime | None,
-  ) -> tuple[int | None, int | None] | None:
-    """Resolve an inclusive datetime window to optional block bounds."""
+  ) -> tuple[int, int] | None:
+    """Resolve an inclusive datetime window to concrete block bounds."""
     if start is not None and end is not None and start > end:
       return None
-    if start is None and end is None:
-      return None, None
     latest_height, latest_time = await self.latest_block()
     start_height = (
       await self.height_at_or_after(
         start, latest_height=latest_height, latest_time=latest_time,
       )
-      if start is not None else None
+      if start is not None else 1
     )
     end_height = (
       await self.height_at_or_before(
         end, latest_height=latest_height, latest_time=latest_time,
       )
-      if end is not None else None
+      if end is not None else latest_height
     )
-    if start is not None and start_height is None:
+    if start_height is None or end_height is None:
       return None
-    if end is not None and end_height is None:
-      return None
-    if (
-      start_height is not None and end_height is not None
-      and start_height > end_height
-    ):
+    if start_height > end_height:
       return None
     return start_height, end_height
 
@@ -283,31 +285,25 @@ class ChainHistory(SDK):
         start_height=start_height, end_height=end_height,
       )
 
-    watermark = self.cache.chain_watermark(self.address)
-    if watermark is not None and end_height is not None and end_height <= watermark:
-      return self.cache.read_chain_txs(
-        self.address, start_height=start_height, end_height=end_height,
+    fetched: dict[str, TxResponse] = {}
+    for gap_start, gap_end in self.cache.chain_gaps(
+      self.address, start_height=start_height, end_height=end_height,
+    ):
+      gap_txs = await self._fetch_from_node(
+        start_height=gap_start, end_height=gap_end,
       )
-
-    fetch_start = watermark + 1 if watermark is not None else start_height
-    new_txs = await self._fetch_from_node(
-      start_height=fetch_start, end_height=end_height,
-    )
-
-    new_end = end_height if end_height is not None else (
-      max((int(tx['height']) for tx in new_txs.values()), default=watermark or 0)  # type: ignore
-    )
-    if new_txs or (end_height is not None and (watermark is None or end_height > watermark)):
-      self.cache.write_chain_txs(self.address, new_txs, end_height=new_end)
-
-    if watermark is not None and start_height is not None:
-      cached = self.cache.read_chain_txs(
-        self.address, start_height=start_height, end_height=watermark,
+      self.cache.write_chain_txs(
+        self.address,
+        gap_txs,
+        start_height=gap_start,
+        end_height=gap_end,
       )
-      return {**cached, **new_txs}
+      fetched.update(gap_txs)
 
-    return new_txs
-    
+    cached = self.cache.read_chain_txs(
+      self.address, start_height=start_height, end_height=end_height,
+    )
+    return {**cached, **fetched}
 
   async def history(
     self, start: datetime | None = None, end: datetime | None = None,
@@ -316,9 +312,15 @@ class ChainHistory(SDK):
     transactions = await self.fetch_transactions(start, end)
 
     async def parse_transaction(tx: TxResponse):
-      height = int(tx['height']) # type: ignore
+      """Parse one cached transaction with its block time."""
+      height = int(tx['height'])  # type: ignore
       time = await self.block_time(height)
       obs = parse_tx(tx, time=time)
-      return HistoryRecord(observations=[obs], provenance={'source': 'api', 'service': 'chain', 'id': id})
+      return HistoryRecord(
+        observations=[obs],
+        provenance={'source': 'api', 'service': 'chain', 'id': id},
+      )
 
-    return await asyncio.gather(*[parse_transaction(tx) for tx in transactions.values()])
+    return await asyncio.gather(
+      *[parse_transaction(tx) for tx in transactions.values()]
+    )
