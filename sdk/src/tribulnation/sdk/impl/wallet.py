@@ -19,7 +19,7 @@ class WalletSDK:
       from tribulnation.binance import Binance as BinanceClient
     except ImportError as e:
       raise ImportError('binance sdk is not installed. Please install it with `pip install tribulnation-binance`.') from e
-    return BinanceClient.new(api_key=account.resolved_api_key, api_secret=account.resolved_api_secret, validate=account.validate).wallet
+    return BinanceClient.new(api_key=account.resolved_api_key, secret_key=account.resolved_secret_key, validate=account.validate).wallet
 
   def bitget(self, account: Bitget) -> Wallet:
     try:

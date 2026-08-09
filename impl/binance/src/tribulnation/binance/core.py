@@ -51,10 +51,10 @@ class SdkMixin(SDK):
 
   @classmethod
   def new(
-    cls, api_key: str | None = None, api_secret: str | None = None, *,
+    cls, api_key: str | None = None, secret_key: str | None = None, *,
     validate: bool = True
   ):
-    client = Binance.new(api_key=api_key, api_secret=api_secret, validate=validate)
+    client = Binance.new(api_key=api_key, api_secret=secret_key, validate=validate)
     return cls(client=client, validate=validate)
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:

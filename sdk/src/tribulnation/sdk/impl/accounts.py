@@ -146,7 +146,7 @@ class Binance(BaseAccount):
   venue: _Literal['binance'] = 'binance'
   api_key: str = '$BINANCE_API_KEY'
   """Binance API key"""
-  api_secret: str = '$BINANCE_API_SECRET'
+  secret_key: str = '$BINANCE_SECRET_KEY'
   """Binance API secret"""
   validate: bool = True
   """Whether to type-validate incoming responses."""
@@ -156,12 +156,12 @@ class Binance(BaseAccount):
     return resolve_env_var(self.api_key, require=not self.public)
 
   @property
-  def resolved_api_secret(self) -> str | None:
-    return resolve_env_var(self.api_secret, require=not self.public)
+  def resolved_secret_key(self) -> str | None:
+    return resolve_env_var(self.secret_key, require=not self.public)
 
   def verify_env_vars(self):
     self.resolved_api_key
-    self.resolved_api_secret
+    self.resolved_secret_key
 
 
 @_dataclass
