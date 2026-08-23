@@ -15,7 +15,8 @@ class RetriableError(Exception):
 
 
 async def invoke_retry(
-  monkeypatch: pytest.MonkeyPatch, *,
+  monkeypatch: pytest.MonkeyPatch,
+  *,
   base_delay: float = 1,
   max_delay: float | None = None,
   jitter: Callable[[float], float] | None = None,
@@ -29,7 +30,14 @@ async def invoke_retry(
     sleeps.append(delay)
 
   def logger(
-    fn, ctx, *, args, kwargs, exception, retries, delay,
+    fn,
+    ctx,
+    *,
+    args,
+    kwargs,
+    exception,
+    retries,
+    delay,
   ):
     """Capture the effective delay passed to the retry logger."""
     logged.append(delay)
@@ -80,7 +88,10 @@ async def test_retry_applies_jitter_after_max_delay(
     return delay / 2
 
   sleeps, logged = await invoke_retry(
-    monkeypatch, base_delay=4, max_delay=5, jitter=half_jitter,
+    monkeypatch,
+    base_delay=4,
+    max_delay=5,
+    jitter=half_jitter,
   )
   assert caps == [5, 5]
   assert sleeps == [2.5, 2.5]
@@ -89,9 +100,11 @@ async def test_retry_applies_jitter_after_max_delay(
 
 @pytest.mark.parametrize('result', [-1, 3, math.inf, math.nan])
 async def test_retry_rejects_invalid_jitter(
-  monkeypatch: pytest.MonkeyPatch, result: float,
+  monkeypatch: pytest.MonkeyPatch,
+  result: float,
 ):
   """Jitter must return a finite delay within the supplied cap."""
+
   async def sleep(delay: float):
     """Fail if invalid jitter reaches the sleep boundary."""
     pytest.fail(f'unexpected sleep with {delay}')
@@ -120,8 +133,10 @@ def test_full_jitter_accepts_injected_randomness():
 
 async def test_context_retries_nested_task_without_restarting_generator():
   """Reporting contexts propagate into tasks and retry only atomic methods."""
+
   class Report(SDK):
     """Minimal report with an async history generator and atomic request."""
+
     history_calls: int
     request_calls: int
 
@@ -159,11 +174,14 @@ async def test_context_retries_nested_task_without_restarting_generator():
 
 
 async def test_default_retry_logger_excludes_sensitive_values(
-  monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+  monkeypatch: pytest.MonkeyPatch,
+  capsys: pytest.CaptureFixture[str],
 ):
   """Default retry logs contain metadata without arguments or exception text."""
+
   class SecretSelf:
     """Object whose representation contains a credential."""
+
     def __repr__(self) -> str:
       """Return a deliberately sensitive representation."""
       return 'SecretSelf(api_key=repr-secret)'

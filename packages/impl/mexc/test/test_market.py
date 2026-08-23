@@ -8,10 +8,17 @@ from typing_extensions import AsyncIterable
 import asyncio
 
 from mexc.spot.market.depth import OrderBook
-from mexc.spot.streams.core.proto import PublicAggreDepthsV3Api, PublicAggreDepthV3ApiItem
+from mexc.spot.streams.core.proto import (
+  PublicAggreDepthsV3Api,
+  PublicAggreDepthV3ApiItem,
+)
 import pytest
 
-from tribulnation.mexc.market.impl.depth import reconstruct_books, parse_snapshot, parse_update
+from tribulnation.mexc.market.impl.depth import (
+  reconstruct_books,
+  parse_snapshot,
+  parse_update,
+)
 from tribulnation.mexc.market.impl.mixin import Shared
 from tribulnation.sdk.core import Subscription
 from tribulnation.sdk.market import Book
@@ -55,6 +62,7 @@ def snapshot(
 
 class FakeDepthSource:
   """Controllable async source for MEXC depth stream messages."""
+
   def __init__(self):
     self.queue: asyncio.Queue[PublicAggreDepthsV3Api | None] = asyncio.Queue()
     self.unsubscribe_count = 0
@@ -80,6 +88,7 @@ class FakeDepthSource:
 
 class FakeMarketApi:
   """Fake typed-client market API with queued snapshots."""
+
   def __init__(self, snapshots: list[OrderBook]):
     self.snapshots = snapshots
     self.calls: list[tuple[str, int | None]] = []
@@ -95,12 +104,14 @@ class FakeMarketApi:
 @dataclass
 class FakeSpot:
   """Fake typed-client spot namespace."""
+
   market: FakeMarketApi
 
 
 @dataclass
 class FakeClient:
   """Fake typed MEXC client with optional context tracking."""
+
   spot: FakeSpot | None = None
   entered: int = 0
   exited: int = 0
@@ -113,11 +124,15 @@ class FakeClient:
     self.exited += 1
 
 
-def depth_subscription(client: FakeClient, symbol: str, source: FakeDepthSource) -> Subscription[Book]:
+def depth_subscription(
+  client: FakeClient, symbol: str, source: FakeDepthSource
+) -> Subscription[Book]:
   """Build the shared book subscription exactly as the mixin does in production:
   reconstruct once upstream, fan out full `Book` snapshots."""
+
   async def subscribe():
-    return reconstruct_books(client, symbol, source), source.unsubscribe # pyright: ignore[reportArgumentType]
+    return reconstruct_books(client, symbol, source), source.unsubscribe  # pyright: ignore[reportArgumentType]
+
   return Subscription.of(subscribe)
 
 
@@ -128,17 +143,21 @@ async def next_book(stream: AsyncIterable[Book]) -> Book:
 
 def test_mexc_depth_parsers() -> None:
   """Parse MEXC REST snapshots and stream deltas into SDK books."""
-  version, book = parse_snapshot(snapshot(
-    10,
-    bids=[('99.5', '2'), ('99.0', '1')],
-    asks=[('100.5', '3')],
-  ))
-  update = parse_update(depth_msg(
-    11,
-    12,
-    bids=[('99.5', '0'), ('99.8', '4')],
-    asks=[('100.5', '1')],
-  ))
+  version, book = parse_snapshot(
+    snapshot(
+      10,
+      bids=[('99.5', '2'), ('99.0', '1')],
+      asks=[('100.5', '3')],
+    )
+  )
+  update = parse_update(
+    depth_msg(
+      11,
+      12,
+      bids=[('99.5', '0'), ('99.8', '4')],
+      asks=[('100.5', '1')],
+    )
+  )
 
   assert version == 10
   assert book.best_bid.price == Decimal('99.5')
@@ -152,10 +171,12 @@ def test_mexc_depth_parsers() -> None:
 async def test_mexc_depth_stream_recovers_after_version_gap() -> None:
   """Resynchronize with a fresh snapshot after a MEXC depth version gap."""
   source = FakeDepthSource()
-  market_api = FakeMarketApi([
-    snapshot(11, bids=[('100', '3')], asks=[('101', '1')]),
-    snapshot(14, bids=[('98', '2')], asks=[('103', '5')]),
-  ])
+  market_api = FakeMarketApi(
+    [
+      snapshot(11, bids=[('100', '3')], asks=[('101', '1')]),
+      snapshot(14, bids=[('98', '2')], asks=[('103', '5')]),
+    ]
+  )
   sub = depth_subscription(FakeClient(spot=FakeSpot(market_api)), 'BTCUSDT', source)
 
   async with sub.subscribe(queue_size=1000, overflow='fail') as stream:
@@ -174,9 +195,11 @@ async def test_mexc_depth_stream_recovers_after_version_gap() -> None:
 async def test_mexc_depth_stream_unsubscribe_closes_source() -> None:
   """Tearing down the shared subscription unsubscribes the source exactly once."""
   source = FakeDepthSource()
-  market_api = FakeMarketApi([
-    snapshot(11, bids=[('100', '3')], asks=[('101', '1')]),
-  ])
+  market_api = FakeMarketApi(
+    [
+      snapshot(11, bids=[('100', '3')], asks=[('101', '1')]),
+    ]
+  )
   sub = depth_subscription(FakeClient(spot=FakeSpot(market_api)), 'BTCUSDT', source)
 
   async with sub.subscribe(queue_size=1, overflow='latest') as stream:
@@ -189,7 +212,7 @@ async def test_mexc_depth_stream_unsubscribe_closes_source() -> None:
 async def test_mexc_shared_context_keeps_streams_lazy() -> None:
   """Entering the SDK context must not enter the typed client's WS context."""
   client = FakeClient()
-  shared = Shared(client=client) # pyright: ignore[reportArgumentType]
+  shared = Shared(client=client)  # pyright: ignore[reportArgumentType]
 
   async with shared:
     assert client.entered == 0

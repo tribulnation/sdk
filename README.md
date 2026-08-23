@@ -135,6 +135,7 @@ docs/                # user-facing documentation
 packages/
 ├── sdk/
 │   ├── pkg/         # tribulnation-sdk
+│   ├── test/        # SDK unit and regression tests
 │   ├── README.md
 │   └── LICENSE
 ├── sdk-dev/         # internal sdk-dev CLI

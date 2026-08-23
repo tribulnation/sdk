@@ -6,6 +6,7 @@ import pytest
 
 from tribulnation.sdk.core import RateLimited, managed_tasks
 
+
 async def test_managed_tasks_preserves_direct_exception_and_cancels_sibling() -> None:
   """Preserve the awaited error while draining unfinished siblings."""
   error = RateLimited('limited')
@@ -32,6 +33,7 @@ async def test_managed_tasks_preserves_direct_exception_and_cancels_sibling() ->
   assert sibling_cancelled.is_set()
   assert all(task.done() for task in tasks)
 
+
 async def test_managed_tasks_supports_completion_order() -> None:
   """Expose owned tasks for completion-order consumption."""
   release = asyncio.Event()
@@ -53,6 +55,7 @@ async def test_managed_tasks_supports_completion_order() -> None:
       release.set()
 
   assert values == ['second', 'first']
+
 
 async def test_managed_tasks_propagates_outer_cancellation_after_cleanup() -> None:
   """Cancel child work before propagating outer cancellation."""
@@ -78,6 +81,7 @@ async def test_managed_tasks_propagates_outer_cancellation_after_cleanup() -> No
 
   assert child_cancelled.is_set()
 
+
 async def test_managed_tasks_drains_sibling_exceptions() -> None:
   """Retrieve sibling exceptions without loop-level warnings."""
   errors: list[dict[str, object]] = []
@@ -98,6 +102,7 @@ async def test_managed_tasks_drains_sibling_exceptions() -> None:
     loop.set_exception_handler(previous_handler)
 
   assert errors == []
+
 
 async def test_managed_tasks_cleans_up_on_async_generator_close() -> None:
   """Cancel remaining work when an async generator is closed early."""
@@ -125,6 +130,7 @@ async def test_managed_tasks_cleans_up_on_async_generator_close() -> None:
   await generator.aclose()
 
   assert sibling_cancelled.is_set()
+
 
 async def test_managed_tasks_accepts_no_awaitables() -> None:
   """Allow callers to own an empty task collection."""

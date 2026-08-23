@@ -27,6 +27,7 @@ class Resource:
 @dataclass(frozen=True)
 class Owner(SDK):
   resources_to_enter: tuple[Resource, ...]
+
   def resources(self):
     yield from self.resources_to_enter
 
@@ -39,16 +40,21 @@ async def test_async_resources_enter_and_exit_in_order():
     assert events == ['enter:one', 'enter:two']
 
   assert events == [
-    'enter:one', 'enter:two', 'exit:two', 'exit:one',
+    'enter:one',
+    'enter:two',
+    'exit:two',
+    'exit:one',
   ]
 
 
 async def test_async_resources_roll_back_partial_entry():
   events: list[str] = []
-  owner = Owner((
-    Resource('one', events),
-    Resource('two', events, fail=True),
-  ))
+  owner = Owner(
+    (
+      Resource('one', events),
+      Resource('two', events, fail=True),
+    )
+  )
 
   with pytest.raises(RuntimeError, match='two'):
     await owner.__aenter__()
@@ -74,8 +80,8 @@ async def test_async_resources_reject_reentry_and_exit_before_entry():
 
 async def test_bare_sdk_subclass_is_a_no_op_context_manager():
   """`SDK` alone is enterable and owns nothing."""
-  class Bare(SDK):
-    ...
+
+  class Bare(SDK): ...
 
   async with Bare() as bare:
     assert isinstance(bare, Bare)
@@ -87,6 +93,7 @@ async def test_sdk_subclass_enters_its_declared_resources():
   @dataclass
   class Owns(SDK):
     resource: Resource
+
     def resources(self):
       yield self.resource
 
@@ -108,8 +115,10 @@ async def test_report_subclassing_a_concrete_snapshots_still_enters_it():
   @dataclass
   class VenueSnapshots(Snapshots):
     resource: Resource
+
     def resources(self):
       yield self.resource
+
     async def snapshot(self, assets=None):
       raise NotImplementedError
 
@@ -130,12 +139,14 @@ async def test_resources_compose_through_super():
   @dataclass
   class Base(SDK):
     first: Resource
+
     def resources(self):
       yield self.first
 
   @dataclass
   class Derived(Base):
     second: Resource
+
     def resources(self):
       yield from super().resources()
       yield self.second
@@ -198,6 +209,7 @@ async def test_frozen_dataclass_sdk_subclass_owns_state():
   @dataclass(frozen=True)
   class Frozen(SDK):
     resource: Resource
+
     def resources(self):
       yield self.resource
 
@@ -213,8 +225,10 @@ async def test_non_frozen_dataclass_with_post_init_owns_state():
   @dataclass
   class Mutable(SDK):
     resource: Resource
+
     def __post_init__(self):
       self.derived = f'derived:{self.resource.name}'
+
     def resources(self):
       yield self.resource
 
@@ -227,9 +241,11 @@ async def test_non_frozen_dataclass_with_post_init_owns_state():
 
 async def test_exit_can_suppress_an_exception():
   """`AsyncExitStack` propagates a resource's suppression signal. Now uniform."""
+
   class Suppressing:
     async def __aenter__(self):
       return self
+
     async def __aexit__(self, exc_type, exc_value, traceback):
       return True
 

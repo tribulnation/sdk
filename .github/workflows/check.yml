@@ -30,7 +30,7 @@ jobs:
           fi
 
           git diff --name-only "$base" HEAD > /tmp/changed-files
-          if grep -Eq '^(packages/sdk/|requirements\.txt$|pyrightconfig\.json$|pytest\.ini$|ruff\.toml$|test/|\.agents/tools/python/ruff\.toml$|\.github/workflows/check\.yml$)' /tmp/changed-files; then
+          if grep -Eq '^(packages/sdk/|requirements\.txt$|pyrightconfig\.json$|pytest\.ini$|ruff\.toml$|\.agents/tools/python/ruff\.toml$|\.github/workflows/check\.yml$)' /tmp/changed-files; then
             {
               echo sdk
               find packages/impl -mindepth 1 -maxdepth 1 -type d ! -name '.*' -printf '%f\n'
@@ -86,4 +86,4 @@ jobs:
           python-version: '3.11'
 
       - run: pip install -r requirements.txt
-      - run: pytest -m "not live"
+      - run: pytest

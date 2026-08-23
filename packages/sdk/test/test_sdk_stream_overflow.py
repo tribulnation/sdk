@@ -1,4 +1,4 @@
-"""Unit + integration tests for bounded subscriber queues and overflow policies.
+"""Tests for bounded subscriber queues and overflow policies.
 
 Covers the per-subscriber delivery policies (`fail` / `latest` / `drop_oldest`)
 and the reserved-terminal-slot invariant that guarantees a stream's end/error is
@@ -28,6 +28,7 @@ async def collect(inbox):
 
 
 # --- StreamInbox unit tests (synchronous push, deterministic) ---------------
+
 
 def test_queue_size_must_be_positive():
   with pytest.raises(ValueError):
@@ -83,7 +84,7 @@ def test_terminal_is_idempotent_and_never_overflows_queue():
   inbox.push('a')
   inbox.fail(NetworkError('x'))
   inbox.fail(NetworkError('y'))  # already closed -> no-op, no raise
-  inbox.close()                  # ditto
+  inbox.close()  # ditto
   items = drain(inbox.queue)
   assert items[0] == 'a'
   assert isinstance(items[1], _Failed)
@@ -102,6 +103,7 @@ def test_push_after_close_is_rejected():
 
 
 # --- StreamInbox iteration (the reusable async-iterable interface) ----------
+
 
 async def test_close_ends_iteration_cleanly():
   inbox: StreamInbox[str] = StreamInbox.new(4, 'latest')
@@ -132,6 +134,7 @@ async def test_iteration_latches_terminal_and_does_not_hang():
 
 # --- Subscription integration tests -----------------------------------------
 
+
 def driven_subscription():
   """A `Subscription` whose upstream is fed manually via the returned queue.
 
@@ -146,8 +149,9 @@ def driven_subscription():
         if item is None:
           return
         yield item
-    async def unsubscribe():
-      ...
+
+    async def unsubscribe(): ...
+
     return Subscription.Context(gen(), unsubscribe)
 
   return Subscription(subscribe_stream), upstream

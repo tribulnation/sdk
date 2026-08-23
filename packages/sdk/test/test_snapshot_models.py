@@ -4,7 +4,12 @@ import asyncio
 
 import pytest
 from tribulnation.sdk.reporting import (
-  Position, HistoryRecord, Report, Snapshot, SnapshotRecord, SubaccountSnapshot,
+  Position,
+  HistoryRecord,
+  Report,
+  Snapshot,
+  SnapshotRecord,
+  SubaccountSnapshot,
 )
 
 
@@ -44,16 +49,20 @@ def test_snapshot_aggregates_subaccount_state_and_round_trips_json():
   )
 
   assert snapshot.balances == {'USDC': Decimal('5'), 'BTC': Decimal('0.1')}
-  assert snapshot.positions['BTC-USD'] == Position(size=Decimal('3'), avg_price=Decimal('120'))
+  assert snapshot.positions['BTC-USD'] == Position(
+    size=Decimal('3'), avg_price=Decimal('120')
+  )
   assert Snapshot.model_validate_json(snapshot.model_dump_json()) == snapshot
 
 
 def test_snapshot_rejects_duplicate_subaccount_identifiers():
   with pytest.raises(ValueError, match='must be unique'):
-    Snapshot(subaccounts=[
-      SubaccountSnapshot(subaccount='spot'),
-      SubaccountSnapshot(subaccount='spot'),
-    ])
+    Snapshot(
+      subaccounts=[
+        SubaccountSnapshot(subaccount='spot'),
+        SubaccountSnapshot(subaccount='spot'),
+      ]
+    )
 
 
 def test_snapshot_defaults_are_not_shared():
