@@ -35,8 +35,8 @@ class TZDateTime(TypeDecorator[datetime]):
     return datetime.fromisoformat(value)
 
 
-from dydx.chain.comet.types import TxResponse
-from dydx.indexer.data.get_fills import Fill
+from typed_dydx.chain.comet.types import TxResponse
+from typed_dydx.indexer.data.get_fills import Fill
 
 
 class Base(DeclarativeBase):

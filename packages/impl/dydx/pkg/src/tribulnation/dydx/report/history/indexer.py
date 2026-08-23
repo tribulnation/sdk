@@ -17,8 +17,8 @@ from tribulnation.sdk.reporting import (
   source_id,
 )
 
-from dydx import Dydx, Indexer
-from dydx.indexer.data.get_fills import Fill
+from typed_dydx import Dydx, Indexer
+from typed_dydx.indexer.data.get_fills import Fill
 
 from .window import in_window
 

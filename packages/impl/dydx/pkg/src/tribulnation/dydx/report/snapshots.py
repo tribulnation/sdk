@@ -12,7 +12,7 @@ from tribulnation.dydx.core import (
   parse_coin, parse_dec_coin, parse_dydx_quantums,
   DYDX, USDC, wrap_exceptions
 )
-from dydx import Dydx, Indexer
+from typed_dydx import Dydx, Indexer
 
 @dataclass(frozen=True)
 class Snapshots(_Snapshots):
@@ -35,7 +35,9 @@ class Snapshots(_Snapshots):
   @SDK.method
   @wrap_exceptions
   async def bank_module_balances(self) -> Balances:
-    bank_balances = await self.client.chain.bank.all_balances_paged(self.address)
+    bank_balances = await self.client.chain.bank.all_balances_paged(
+      self.address, resolve_denom=False,
+    )
     balances = Balances()
     for coin in bank_balances:
       asset, amount = parse_coin(coin)

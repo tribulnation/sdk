@@ -15,9 +15,9 @@ from typing_extensions import (
   TypeVar,
 )
 
-from dydx import Dydx
-from dydx.chain import Comet
-from dydx.chain.comet.types import Event, EventAttribute, TxResponse
+from typed_dydx import Dydx
+from typed_dydx.chain.comet import Comet
+from typed_dydx.chain.comet.types import Event, EventAttribute, TxResponse
 
 if TYPE_CHECKING:
   from .cache import HistoryCache

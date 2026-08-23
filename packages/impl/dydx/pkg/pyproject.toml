@@ -12,7 +12,7 @@ description = "Tribulnation SDK implementation for dYdX."
 license = "MIT"
 license-files = ["LICENSE"]
 dependencies = [
-  "tribulnation-sdk>=1.7.0", "typed-dydx>=2.0.5,<3", "google-cloud-bigquery~=3.41.0", "asyncer",
+  "tribulnation-sdk>=1.7.0", "typed-dydx>=3.0.0,<4", "google-cloud-bigquery~=3.41.0", "asyncer",
   "sqlalchemy>=2.0", "sqltypes"
 ]
 requires-python = ">=3.10"

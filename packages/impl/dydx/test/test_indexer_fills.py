@@ -3,10 +3,10 @@
 import asyncio
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
-from typing import Any, cast
+from typing_extensions import Any, cast
 
 import pytest
-from dydx.indexer.data.get_fills import Fill
+from typed_dydx.indexer.data.get_fills import Fill
 from sqlalchemy.orm import Session
 from tribulnation.dydx.report.history.cache import (
   CacheWatermark,

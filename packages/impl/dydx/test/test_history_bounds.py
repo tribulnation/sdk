@@ -2,7 +2,7 @@
 
 import asyncio
 from datetime import datetime, timedelta, timezone
-from typing import cast
+from typing_extensions import cast
 
 import pytest
 from sqlalchemy.orm import Session

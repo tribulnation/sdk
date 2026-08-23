@@ -10,8 +10,8 @@ from urllib.request import urlopen
 
 from tribulnation.sdk.reporting import HistoryRecord, Yield, source_id
 from tribulnation.dydx.core import parse_denom_amount
-from dydx import Dydx
-from dydx.chain.comet.types import BlockResultsResponse, Event
+from typed_dydx import Dydx
+from typed_dydx.chain.comet.types import BlockResultsResponse, Event
 from .window import in_window
 
 if TYPE_CHECKING:

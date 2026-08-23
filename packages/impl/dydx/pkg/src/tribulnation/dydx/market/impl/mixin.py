@@ -3,11 +3,11 @@ from dataclasses import dataclass, field
 import asyncio
 import pydantic
 
-from dydx.indexer.types import PerpetualMarket
-from dydx import Dydx
-from dydx.indexer.streams.parent_subaccounts import Notification as ParentSubaccountNotification
-from dydx.node.orders import Flags, TimeInForce
-from dydx.protos.dydxprotocol import feetiers as feetiers_proto
+from typed_dydx.indexer.types import PerpetualMarket
+from typed_dydx import Dydx
+from typed_dydx.indexer.streams.parent_subaccounts import Notification as ParentSubaccountNotification
+from typed_dydx.node.orders.types import Flags, TimeInForce
+from typed_dydx.protos.dydxprotocol import feetiers as feetiers_proto
 from tribulnation.sdk.core import SDK, Subscription, OverflowPolicy
 from tribulnation.dydx.core import wrap_exceptions
 from .depth import depth_stream, Book

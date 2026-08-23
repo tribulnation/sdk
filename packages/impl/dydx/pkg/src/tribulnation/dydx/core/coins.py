@@ -1,5 +1,5 @@
 from decimal import Decimal
-from dydx.protos.cosmos.base.v1beta1 import Coin, DecCoin
+from typed_dydx.protos.cosmos.base.v1beta1 import Coin, DecCoin
 from .constants import (
   DYDX_MAINNET_USDC_DENOM,
   DYDX_MAINNET_DYDX_DENOM,

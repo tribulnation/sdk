@@ -15,7 +15,7 @@ from tribulnation.sdk.reporting import (
 from tribulnation.sdk.reporting import Report as _Report
 from typing_extensions import AsyncContextManager, TypedDict
 
-from dydx import Dydx
+from typed_dydx import Dydx
 
 from .history import History
 from .history.indexer import ReplayPosition, replay_fills
@@ -129,10 +129,11 @@ class Report(_Report):
     fill_streams = await asyncio.gather(
       *[
         self.snapshot_fills(
-          subaccount=int(state.subaccount),
+          subaccount=int(subaccount),
           end=record.snapshot.time,
         )
         for state in perpetuals
+        if (subaccount := state.subaccount) is not None
       ]
     )
     replayed = {

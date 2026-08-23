@@ -2,8 +2,8 @@ from decimal import Decimal
 
 from tribulnation.sdk.market import Rules
 
-from dydx.indexer.types import PerpetualMarket
-from dydx.protos.dydxprotocol import feetiers as feetiers_proto
+from typed_dydx.indexer.types import PerpetualMarket
+from typed_dydx.protos.dydxprotocol import feetiers as feetiers_proto
 
 def fee_ppm(value: int) -> Decimal:
   """Convert dYdX fee parts-per-million into a decimal rate."""

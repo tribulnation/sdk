@@ -2,11 +2,14 @@ from typing_extensions import Literal, Sequence
 from decimal import Decimal
 import base64
 
-from dydx.indexer.data.list_parent_orders import Order as IndexerOrder
-from dydx.node.orders import OrderParams, TimeInForce, Flags
+from typed_dydx.indexer.data.list_parent_orders import Order as IndexerOrder
+from typed_dydx.node.orders.types import (
+  ConditionalOrderParams, Flags, LongTermOrderParams, OrderParams,
+  ShortTermOrderParams, TimeInForce,
+)
 from tribulnation.sdk.core import ValidationError
 from tribulnation.sdk.market import Order, OrderResponse, OrderState, Settings as MarketSettings
-from dydx.protos.dydxprotocol import clob, subaccounts
+from typed_dydx.protos.dydxprotocol import clob, subaccounts
 from tribulnation.dydx.core import wrap_exceptions
 from .mixin import MarketMixin, Settings, settings_adapter
 
@@ -104,14 +107,26 @@ def export_order(order: Order, settings: Settings) -> OrderParams:
   """Convert an SDK order into dYdX ergonomic order parameters."""
   signed_qty = Decimal(order['qty'])
   side = 'BUY' if signed_qty >= 0 else 'SELL'
-  return {
-    'side': side,
-    'price': Decimal(order['price']),
-    'size': abs(signed_qty),
-    'flags': _flags(order, settings),
-    'time_in_force': _time_in_force(order, settings),
-    'reduce_only': settings.get('reduce_only', False),
-  }
+  price = Decimal(order['price'])
+  size = abs(signed_qty)
+  time_in_force = _time_in_force(order, settings)
+  reduce_only = settings.get('reduce_only', False)
+  match _flags(order, settings):
+    case 'SHORT_TERM':
+      return ShortTermOrderParams(
+        side=side, price=price, size=size, time_in_force=time_in_force,
+        reduce_only=reduce_only, flags='SHORT_TERM',
+      )
+    case 'LONG_TERM':
+      return LongTermOrderParams(
+        side=side, price=price, size=size, time_in_force=time_in_force,
+        reduce_only=reduce_only, flags='LONG_TERM',
+      )
+    case 'CONDITIONAL':
+      return ConditionalOrderParams(
+        side=side, price=price, size=size, time_in_force=time_in_force,
+        reduce_only=reduce_only, flags='CONDITIONAL',
+      )
 
 async def with_expiry(self: MarketMixin, params: OrderParams, settings: Settings) -> OrderParams:
   """Apply SDK-configured dYdX order expiry deltas."""
@@ -120,13 +135,23 @@ async def with_expiry(self: MarketMixin, params: OrderParams, settings: Settings
     block = latest.block
     if block is None or block.header is None:
       raise ValidationError('Latest dYdX block response did not include a header')
-    return {**params, 'good_til_block': block.header.height + delta}
+    updated = params.copy()
+    updated['good_til_block'] = block.header.height + delta
+    return updated
   if params['flags'] in {'LONG_TERM', 'CONDITIONAL'} and (delta := settings.get('long_term_gtbt')) is not None:
     latest = await self.client.chain.tendermint.get_latest_block()
     block = latest.block
     if block is None or block.header is None or block.header.time is None:
       raise ValidationError('Latest dYdX block response did not include a timestamp')
-    return {**params, 'good_til_block_time': int(block.header.time.timestamp()) + delta}
+    good_til_block_time = int(block.header.time.timestamp()) + delta
+    if params['flags'] == 'LONG_TERM':
+      updated = params.copy()
+      updated['good_til_block_time'] = good_til_block_time
+      return updated
+    if params['flags'] == 'CONDITIONAL':
+      updated = params.copy()
+      updated['good_til_block_time'] = good_til_block_time
+      return updated
   return params
 
 @wrap_exceptions

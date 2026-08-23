@@ -6,7 +6,7 @@ import asyncio
 
 from tribulnation.sdk.core import managed_tasks
 from tribulnation.sdk.reporting import History as _History
-from dydx import Dydx
+from typed_dydx import Dydx
 from .bigquery import BigQueryClient, BigQueryHistory
 from .chain import ChainHistory
 from .indexer import IndexerHistory

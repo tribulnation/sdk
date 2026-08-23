@@ -1,3 +1,5 @@
+"""Tests for exporting SDK orders to dYdX order parameters."""
+
 from decimal import Decimal
 
 from tribulnation.dydx.market.impl.orders import export_order
