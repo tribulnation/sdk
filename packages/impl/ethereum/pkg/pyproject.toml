@@ -3,14 +3,23 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tribulnation-bitget"
-version = "0.6.0"
+name = "tribulnation-ethereum"
+version = "0.5.1"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
-description = "Tribulnation SDK implementation for Bitget."
+description = "Tribulnation SDK implementation for Ethereum."
+license = "MIT"
+license-files = ["LICENSE"]
 dependencies = [
-  "tribulnation-sdk>=1.7.0", "typed-bitget",
+  "tribulnation-sdk>=1.7.1",
+  "web3",
+  "httpx",
+  "pydantic",
+  "typed-ethereum>=0.1.11,<0.2",
+  "typed-alchemy>=1.0.3,<2",
+  "typed-etherscan>=0.2.1,<0.3",
+  "typed-moralis>=0.1.4,<0.2",
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}

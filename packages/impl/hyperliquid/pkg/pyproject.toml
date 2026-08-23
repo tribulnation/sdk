@@ -3,14 +3,17 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tribulnation-binance"
-version = "0.2.1"
+name = "tribulnation-hyperliquid"
+version = "0.6.1"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
-description = "Tribulnation SDK implementation for Binance."
+description = "Tribulnation SDK implementation for Hyperliquid."
+license = "MIT"
+license-files = ["LICENSE"]
 dependencies = [
-  "typed-binance", "tribulnation-sdk>=1.7.0"
+  "tribulnation-sdk>=1.7.0", "typed-hyperliquid==1.2.3",
+  "sqlalchemy>=2.0", "sqltypes>=0.1.11"
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}

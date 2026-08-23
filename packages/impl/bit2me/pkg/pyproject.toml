@@ -3,21 +3,16 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tribulnation-ethereum"
-version = "0.5.1"
+name = "tribulnation-bit2me"
+version = "0.4.0"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
-description = "Tribulnation SDK implementation for Ethereum."
+description = "Tribulnation SDK implementation for Bit2me."
+license = "MIT"
+license-files = ["LICENSE"]
 dependencies = [
-  "tribulnation-sdk>=1.7.1",
-  "web3",
-  "httpx",
-  "pydantic",
-  "typed-ethereum>=0.1.11",
-  "typed-alchemy",
-  "typed-etherscan",
-  "typed-moralis",
+  "tribulnation-sdk>=1.7.0", "typed-bit2me>=0.1.0,<0.2"
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}

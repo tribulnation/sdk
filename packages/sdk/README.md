@@ -138,7 +138,7 @@ packages/
 │   ├── README.md
 │   └── LICENSE
 ├── sdk-dev/         # internal sdk-dev CLI
-└── impl/            # exchange-specific implementations
+└── impl/            # exchange-specific implementations/
     └── <venue>/
         ├── pkg/     # tribulnation-<venue>
         ├── test/    # unit tests

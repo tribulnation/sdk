@@ -5,11 +5,11 @@ pyright
 python-dotenv
 pytest
 pytest-asyncio
--e packages/sdk
--e packages/impl/binance
--e packages/impl/bitget
--e packages/impl/mexc
--e packages/impl/ethereum
--e packages/impl/dydx
--e packages/impl/hyperliquid
--e packages/impl/bit2me
+-e packages/sdk/pkg
+-e packages/impl/binance/pkg
+-e packages/impl/bitget/pkg
+-e packages/impl/mexc/pkg
+-e packages/impl/ethereum/pkg
+-e packages/impl/dydx/pkg
+-e packages/impl/hyperliquid/pkg
+-e packages/impl/bit2me/pkg

@@ -5,6 +5,10 @@ node_modules
 __pycache__
 *.egg-info/
 *.py[cod]
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
 
 dev.ipynb
 dev

@@ -1,0 +1,18 @@
+PYTHON := justfile_directory() + "/../../../.venv/bin/python"
+
+help:
+  @just --list
+
+# Run type checking
+check:
+  pyright .
+
+# Build the package (into `dist/`)
+build:
+  rm -drf dist && \
+  pyright . && \
+  cp ../README.md . && \
+  cp ../LICENSE . && \
+  {{PYTHON}} -m build && \
+  rm README.md LICENSE && \
+  rm -drf build
