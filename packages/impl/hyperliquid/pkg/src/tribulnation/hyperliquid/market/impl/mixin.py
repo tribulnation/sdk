@@ -5,17 +5,15 @@ import os
 
 from tribulnation.sdk.core import SDK, Subscription, OverflowPolicy
 
-from hyperliquid import Hyperliquid, Wallet
-from hyperliquid.info.spot.spot_meta import SpotMetaResponse, SpotAssetInfo, SpotTokenInfo
-from hyperliquid.info.methods.user_fees import UserFeesResponse
-from hyperliquid.info.perps.perp_meta_and_asset_ctxs import (
-  PerpMeta as PerpMetaResponse,
-  PerpAssetCtx,
-  PerpAssetInfo,
+from typed_hyperliquid import Hyperliquid, Wallet
+from typed_hyperliquid.info.spot_meta import SpotMeta as SpotMetaResponse, SpotPair, SpotToken
+from typed_hyperliquid.info.user_fees import UserFeesResponse
+from typed_hyperliquid.info.perp_meta_and_asset_ctxs import (
+  PerpDexMeta, PerpAssetContext, PerpUniverseAsset,
 )
-from hyperliquid.info.perps.perp_dexs import PerpDex
-from hyperliquid.streams.user_fills import WsUserFills
-from hyperliquid.streams.l2_book import L2BookData
+from typed_hyperliquid.info.perp_dexs import PerpDex
+from typed_hyperliquid.streams.user_fills import UserFills
+from typed_hyperliquid.streams.l2_book import L2bookUpdate
 
 from tribulnation.hyperliquid.core import Settings, wrap_exceptions
 
@@ -24,16 +22,16 @@ class DEX(TypedDict):
   idx: int
 
 class SpotMeta(TypedDict):
-  asset_meta: SpotAssetInfo
-  base_meta: SpotTokenInfo
-  quote_meta: SpotTokenInfo
+  asset_meta: SpotPair
+  base_meta: SpotToken
+  quote_meta: SpotToken
 
 class PerpMeta(TypedDict):
   asset_idx: int
-  asset_meta: PerpAssetInfo
-  collateral_meta: SpotTokenInfo
+  asset_meta: PerpUniverseAsset
+  collateral_meta: SpotToken
 
-def find_asset_idx(name: str, perp_meta: PerpMetaResponse) -> int:
+def find_asset_idx(name: str, perp_meta: PerpDexMeta) -> int:
   for idx, asset in enumerate(perp_meta['universe']):
     if asset['name'] == name:
       return idx
@@ -77,13 +75,13 @@ class Shared(SDK):
   # Lightweight DEX directory: idx -> PerpDex | None (wire type allows None entries).
   perp_dexs: dict[int, PerpDex | None] | None = None
   # Perp meta keyed by dex index; None key is used for the 'no dex' case.
-  perp_metas: dict[int | None, PerpMetaResponse] = field(default_factory=dict)
-  perp_asset_ctxs: dict[int | None, list[PerpAssetCtx]] = field(default_factory=dict)
+  perp_metas: dict[int | None, PerpDexMeta] = field(default_factory=dict)
+  perp_asset_ctxs: dict[int | None, list[PerpAssetContext]] = field(default_factory=dict)
   user_fees: UserFeesResponse | None = None
 
   # Stream subscriptions.
-  user_fills_subscription: Subscription[WsUserFills] | None = None
-  l2_book_subscriptions: dict[str, Subscription[L2BookData]] = field(default_factory=dict)
+  user_fills_subscription: Subscription[UserFills] | None = None
+  l2_book_subscriptions: dict[str, Subscription[L2bookUpdate]] = field(default_factory=dict)
 
   # Locks for concurrent lazy loads.
   _spot_meta_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
@@ -121,7 +119,7 @@ class Shared(SDK):
     dex_name: str | None,
     *,
     refetch: bool = False,
-  ) -> tuple[int, PerpMetaResponse, list[PerpAssetCtx]]:
+  ) -> tuple[int, PerpDexMeta, list[PerpAssetContext]]:
     """
     Load perp meta + asset ctxs for a given dex name, caching per dex index.
     `dex_name = None` uses the default/no-dex universe.
@@ -138,7 +136,9 @@ class Shared(SDK):
     async with self._perp_meta_lock:
       if not refetch and key in self.perp_metas and key in self.perp_asset_ctxs:
         return key, self.perp_metas[key], self.perp_asset_ctxs[key]
-      perp_meta, asset_ctxs = await self.client.info.perp_meta_and_asset_ctxs(dex_name)
+      perp_meta, asset_ctxs = await self.client.info.perp_meta_and_asset_ctxs(
+        dex=dex_name,
+      )
       self.perp_metas[key] = perp_meta
       self.perp_asset_ctxs[key] = asset_ctxs
       return key, perp_meta, asset_ctxs
@@ -150,7 +150,7 @@ class Shared(SDK):
     async with self._fees_lock:
       if not refetch and self.user_fees is not None:
         return self.user_fees
-      self.user_fees = await self.client.info.user_fees(self.address)
+      self.user_fees = await self.client.info.user_fees(user=self.address)
       return self.user_fees
 
   async def resolve_dex_idx(self, dex_name: str | None, *, refetch: bool = False) -> int:
@@ -161,7 +161,7 @@ class Shared(SDK):
     idx, _, _ = await self.load_perp_meta_for_dex(dex_name, refetch=refetch)
     return idx
 
-  def user_fills_sub(self) -> Subscription[WsUserFills]:
+  def user_fills_sub(self) -> Subscription[UserFills]:
     if self.user_fills_subscription is None:
       async def subscribe_user_fills():
         stream = await self.client.streams.user_fills(self.address, aggregate_by_time=True)
@@ -169,7 +169,7 @@ class Shared(SDK):
       self.user_fills_subscription = Subscription.of(subscribe_user_fills)
     return self.user_fills_subscription
 
-  def l2_book_subscription(self, coin: str, /) -> Subscription[L2BookData]:
+  def l2_book_subscription(self, coin: str, /) -> Subscription[L2bookUpdate]:
     if coin not in self.l2_book_subscriptions:
       async def subscribe():
         stream = await self.client.streams.l2_book(coin)
@@ -222,7 +222,9 @@ class SharedMixin(SDK):
     if address is None:
       env_var = 'HYPERLIQUID_ADDRESS' if mainnet else 'HYPERLIQUID_TESTNET_ADDRESS'
       address = os.environ.get(env_var)
-    client = Hyperliquid.http(wallet, mainnet=mainnet, validate=validate, public=True)
+    client = Hyperliquid.new(
+      wallet, mainnet=mainnet, validate=validate, public=True,
+    )
     return cls(shared=Shared(client=client, maybe_address=address))
 
   @classmethod
@@ -233,7 +235,9 @@ class SharedMixin(SDK):
     if address is None:
       env_var = 'HYPERLIQUID_ADDRESS' if mainnet else 'HYPERLIQUID_TESTNET_ADDRESS'
       address = os.environ.get(env_var)
-    client = Hyperliquid.ws(wallet, mainnet=mainnet, validate=validate, public=True)
+    client = Hyperliquid.new(
+      wallet, mainnet=mainnet, validate=validate, public=True,
+    )
     return cls(shared=Shared(client=client, maybe_address=address))
 
   @property
@@ -268,7 +272,7 @@ class SpotMarketMixin(SpotMixin):
     return self.meta['asset_meta']['index']
 
   @property
-  def asset_meta(self) -> SpotAssetInfo:
+  def asset_meta(self) -> SpotPair:
     return self.meta['asset_meta']
 
   @property
@@ -328,7 +332,7 @@ class PerpMarketMixin(PerpMixin):
     return self.meta['asset_idx']
 
   @property
-  def asset_meta(self) -> PerpAssetInfo:
+  def asset_meta(self) -> PerpUniverseAsset:
     return self.meta['asset_meta']
 
   @property
@@ -336,7 +340,7 @@ class PerpMarketMixin(PerpMixin):
     return self.asset_meta['name']
 
   @property
-  def collateral_meta(self) -> SpotTokenInfo:
+  def collateral_meta(self) -> SpotToken:
     return self.meta['collateral_meta']
 
   @property
@@ -349,4 +353,3 @@ class PerpMarketMixin(PerpMixin):
     if (dex := self.dex_idx) is None:
       return self.asset_idx
     return 100000 + dex * 10000 + self.asset_idx
-

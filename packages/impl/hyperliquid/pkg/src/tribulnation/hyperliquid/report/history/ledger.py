@@ -8,7 +8,7 @@ unvalidated and validated individually, and a failure becomes an
 `UnknownObservation` carrying the raw payload. The unknown stays visible in the
 output instead of being silently dropped.
 """
-from typing_extensions import Any, Mapping
+from typing_extensions import Any, Mapping, TypeAlias
 from decimal import Decimal
 import pydantic
 
@@ -16,13 +16,29 @@ from tribulnation.sdk.reporting import (
   Borrow, Bonus, CryptoDeposit, CryptoWithdrawal, Fee, FeeLeg, InternalTransfer,
   Observation, Repay, Transfer, UnknownObservation, Yield,
 )
-from hyperliquid.info.perps.user_non_funding_ledger_updates import (
-  LedgerDelta, UserNonFundingLedgerEntry,
+from typed_hyperliquid.info.user_non_funding_ledger_updates import (
+  AccountActivationGasDelta, AccountClassTransferDelta,
+  ActivateDexAbstractionDelta, BorrowLendDelta, CstakingTransferDelta,
+  DeployGasAuctionDelta, DepositDelta, InternalTransferDelta, LiquidationDelta,
+  RewardsClaimDelta, SendDelta, SpotGenesisDelta, SpotTransferDelta,
+  SubAccountTransferDelta, UserNonFundingLedgerEntry, VaultCreateDelta,
+  VaultDepositDelta, VaultDistributionDelta, VaultLeaderCommissionDelta,
+  VaultWithdrawDelta, WithdrawDelta,
 )
 
 from ..subaccounts import STAKING, UNIFIED
 from .assets import Assets, HYPE, USDC
 from .window import parse_time
+
+LedgerDelta: TypeAlias = (
+  AccountActivationGasDelta | AccountClassTransferDelta
+  | ActivateDexAbstractionDelta | BorrowLendDelta | CstakingTransferDelta
+  | DeployGasAuctionDelta | DepositDelta | InternalTransferDelta
+  | LiquidationDelta | RewardsClaimDelta | SendDelta | SpotGenesisDelta
+  | SpotTransferDelta | SubAccountTransferDelta | VaultCreateDelta
+  | VaultDepositDelta | VaultDistributionDelta | VaultLeaderCommissionDelta
+  | VaultWithdrawDelta | WithdrawDelta
+)
 
 delta_adapter = pydantic.TypeAdapter(LedgerDelta)
 

@@ -12,7 +12,7 @@ Mixin = SpotMarketMixin | PerpMarketMixin
 
 @wrap_exceptions
 async def depth(self: Mixin) -> Book:
-  book = await self.client.info.l2_book(self.asset_name)
+  book = await self.client.info.l2_book(coin=self.asset_name)
   raw_bids, raw_asks = book["levels"]
   bids = [Book.Entry(price=Decimal(b["px"]), qty=Decimal(b["sz"])) for b in raw_bids]
   asks = [Book.Entry(price=Decimal(a["px"]), qty=Decimal(a["sz"])) for a in raw_asks]
@@ -42,4 +42,3 @@ async def depth_stream(self: Mixin, *, queue_size: int = 1, overflow: OverflowPo
         )
         yield book
     yield gen()
-

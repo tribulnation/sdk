@@ -1,0 +1,137 @@
+"""Tests for Hyperliquid ticker depth settings."""
+
+import asyncio
+from decimal import Decimal
+from types import SimpleNamespace
+
+import pytest
+from typing_extensions import Any, Awaitable, Callable, cast
+
+from tribulnation.sdk.market import Book
+
+
+def book() -> Book:
+  """Build a small deterministic order book."""
+  return Book(
+    bids=[Book.Entry(price=Decimal('99'), qty=Decimal('2'))],
+    asks=[Book.Entry(price=Decimal('101'), qty=Decimal('3'))],
+  )
+
+
+def tracking_fetch() -> tuple[Callable[..., Awaitable[Book]], Callable[[], int]]:
+  """Build a fetch function that reports peak concurrency."""
+  active = 0
+  peak = 0
+
+  async def fetch(*_args) -> Book:
+    nonlocal active, peak
+    active += 1
+    peak = max(peak, active)
+    await asyncio.sleep(0.01)
+    active -= 1
+    return book()
+
+  return fetch, lambda: peak
+
+
+@pytest.mark.parametrize(
+  ('settings', 'expected'),
+  [
+    ({}, 20),
+    ({'hyperliquid': {'tickers_fetch_depth': True, 'tickers_depth_concurrent': 2}}, 2),
+    ({'hyperliquid': {'tickers_fetch_depth': False}}, 0),
+  ],
+)
+async def test_perp_tickers_depth_concurrency(
+  monkeypatch, settings, expected: int
+) -> None:
+  """Apply Hyperliquid perp depth fetching and concurrency settings."""
+  from tribulnation.hyperliquid.market.impl import stats
+
+  count = 25
+  meta = {'universe': [{'name': f'COIN-{i}'} for i in range(count)]}
+  contexts = [{'midPx': '100', 'dayNtlVlm': '10'} for _ in range(count)]
+
+  class Shared:
+    async def load_perp_meta_for_dex(self, dex_name: str, *, refetch: bool = False):
+      assert dex_name == ''
+      assert refetch
+      return None, meta, contexts
+
+  fetch, peak = tracking_fetch()
+  monkeypatch.setattr(stats, 'fetch_l2_book', fetch)
+
+  target = cast(Any, SimpleNamespace(shared=Shared(), dex_name=''))
+  result = await stats.perp_tickers(target, settings=settings)
+
+  assert len(result) == count
+  assert peak() == expected
+  assert all(ticker.last == Decimal('100') for ticker in result.values())
+  assert all(ticker.base_volume_24h == Decimal('10') for ticker in result.values())
+  if expected:
+    assert all(ticker.ask == Decimal('101') for ticker in result.values())
+  else:
+    assert all(
+      ticker.bid is None
+      and ticker.ask is None
+      and ticker.bid_qty is None
+      and ticker.ask_qty is None
+      for ticker in result.values()
+    )
+
+
+@pytest.mark.parametrize(
+  ('settings', 'expected'),
+  [
+    ({}, 20),
+    ({'hyperliquid': {'tickers_fetch_depth': True, 'tickers_depth_concurrent': 2}}, 2),
+    ({'hyperliquid': {'tickers_fetch_depth': False}}, 0),
+  ],
+)
+async def test_spot_tickers_depth_concurrency(
+  monkeypatch, settings, expected: int
+) -> None:
+  """Apply Hyperliquid spot depth fetching and concurrency settings."""
+  from tribulnation.hyperliquid.market import spot_exchange
+
+  count = 25
+  spot_meta = {
+    'tokens': [
+      {'index': 0, 'name': 'USD'},
+      *({'index': i + 1, 'name': f'COIN-{i}'} for i in range(count)),
+    ],
+    'universe': [
+      {'index': i, 'tokens': [i + 1, 0], 'name': f'@{i}'} for i in range(count)
+    ],
+  }
+  contexts = [{'midPx': '100', 'dayNtlVlm': '10'} for _ in range(count)]
+
+  class Info:
+    async def spot_meta_and_asset_ctxs(self):
+      return spot_meta, contexts
+
+  fetch, peak = tracking_fetch()
+  monkeypatch.setattr(spot_exchange, 'fetch_l2_book', fetch)
+
+  target = cast(
+    Any,
+    SimpleNamespace(
+      shared=SimpleNamespace(client=SimpleNamespace(info=Info())),
+    ),
+  )
+  result = await spot_exchange.SpotExchange.tickers(target, settings=settings)
+
+  assert len(result) == count
+  assert peak() == expected
+  assert all(ticker.last == Decimal('100') for ticker in result.values())
+  assert all(ticker.base_volume_24h == Decimal('10') for ticker in result.values())
+  if expected:
+    assert all(ticker.bid_qty == Decimal('2') for ticker in result.values())
+  else:
+    assert all(
+      ticker.bid is None
+      and ticker.ask is None
+      and ticker.bid_qty is None
+      and ticker.ask_qty is None
+      for ticker in result.values()
+    )

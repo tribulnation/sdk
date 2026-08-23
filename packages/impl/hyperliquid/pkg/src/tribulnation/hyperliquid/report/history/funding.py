@@ -3,7 +3,7 @@ from typing_extensions import Iterable, Mapping
 from decimal import Decimal
 
 from tribulnation.sdk.reporting import Funding
-from hyperliquid.info.perps.user_funding import UserFundingEntry
+from typed_hyperliquid.info.user_funding import UserFundingEntry
 
 from ..subaccounts import UNIFIED
 from .assets import settlement_token

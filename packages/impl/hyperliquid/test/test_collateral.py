@@ -1,18 +1,11 @@
-"""Live Hyperliquid market tests."""
+"""Tests for Hyperliquid collateral calculations."""
 
-import os
 from decimal import Decimal
 
-import pytest
-
-from tribulnation.hyperliquid import HyperliquidMarket
 from tribulnation.hyperliquid.market.impl.collateral import (
   cross_collateral,
   isolated_collateral,
 )
-
-from conftest import load_venue_env
-from test_market import MarketTestPlan, test_market
 
 
 def _cross_state() -> dict:
@@ -50,7 +43,9 @@ def _isolated_position() -> dict:
 
 def test_cross_collateral_math() -> None:
   """Cross bucket reads straight from the venue summary; every field non-None."""
-  c = cross_collateral(_cross_state(), spot_equity=Decimal('1000'), free_collateral=Decimal('800'))
+  c = cross_collateral(
+    _cross_state(), spot_equity=Decimal('1000'), free_collateral=Decimal('800')
+  )
   assert c.equity == Decimal('1000')
   assert c.free_collateral == Decimal('800')
   assert c.initial_margin == Decimal('200')
@@ -64,7 +59,10 @@ def test_cross_collateral_non_positive_equity() -> None:
   """Zero equity => 0 leverage and +Infinity maintenance_ratio (no div-by-zero)."""
   state = _cross_state()
   state['crossMarginSummary'] = {
-    'accountValue': '0', 'totalMarginUsed': '0', 'totalNtlPos': '0', 'totalRawUsd': '0',
+    'accountValue': '0',
+    'totalMarginUsed': '0',
+    'totalNtlPos': '0',
+    'totalRawUsd': '0',
   }
   c = cross_collateral(state, spot_equity=Decimal('0'), free_collateral=Decimal('0'))
   assert c.leverage == Decimal('0')
@@ -75,46 +73,8 @@ def test_isolated_collateral_math() -> None:
   """Isolated bucket: equity=rawUsd+uPnL, mm=positionValue/(2*maxLev), all non-None."""
   pos = _isolated_position()
   i = isolated_collateral(pos, pos['leverage'])
-  assert i.equity == Decimal('620')            # 500 + 120
+  assert i.equity == Decimal('620')  # 500 + 120
   assert i.maintenance_margin == Decimal('50')  # 5000 / (2 * 50)
-  assert i.free_collateral == Decimal('120')    # max(620 - 500, 0)
+  assert i.free_collateral == Decimal('120')  # max(620 - 500, 0)
   assert i.leverage == Decimal('10')
   assert i.margin_mode == 'isolated'
-
-
-async def test_public_instance_constructs() -> None:
-  """A public/no-credential venue instance constructs without error.
-
-  Async because the constructor builds a websocket client that binds to the
-  ambient event loop; a sync test only passes when nothing has yet replaced
-  the default loop, which made it order-dependent in the full suite.
-  """
-  venue = HyperliquidMarket.http('0x0000000000000000000000000000000000000000')
-  assert venue.venue_id == 'hyperliquid'
-
-
-HYPERLIQUID_TESTNET_PLAN = MarketTestPlan(
-  venue='hyperliquid',
-  market_id='hyperliquid_testnet::BTC',
-  required_env=('HYPERLIQUID_TESTNET_ADDRESS', 'HYPERLIQUID_TESTNET_PRIVATE_KEY'),
-  order_notional=Decimal('50'),
-  fill_notional=Decimal('50'),
-)
-
-
-@pytest.mark.live
-@pytest.mark.trading
-async def test_hyperliquid_testnet_market_with_private_key() -> None:
-  """Run live Hyperliquid testnet conformance with an explicitly signed wallet."""
-  load_venue_env(
-    HYPERLIQUID_TESTNET_PLAN.venue,
-    required=HYPERLIQUID_TESTNET_PLAN.required_env,
-  )
-  venue = HyperliquidMarket.http(
-    os.environ['HYPERLIQUID_TESTNET_ADDRESS'],
-    wallet=os.environ['HYPERLIQUID_TESTNET_PRIVATE_KEY'],
-    mainnet=False,
-  )
-  market = await venue.perp_market(':BTC')
-  async with market:
-    await test_market(market, HYPERLIQUID_TESTNET_PLAN)

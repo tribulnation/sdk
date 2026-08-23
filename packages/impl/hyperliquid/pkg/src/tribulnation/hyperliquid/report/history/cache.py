@@ -30,6 +30,7 @@ decimals as strings, and the stored schema declares them as `Decimal`.
 """
 from typing_extensions import Any, Sequence
 from dataclasses import dataclass
+from datetime import datetime
 
 from sqlalchemy import Engine, create_engine, event, select
 from sqlalchemy.engine.interfaces import DBAPIConnection
@@ -37,9 +38,10 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
 from sqlalchemy.pool import ConnectionPoolEntry
 from sqltypes import ValidatedJSON
 
-from hyperliquid.info.methods.user_fills_by_time import UserFill
-from hyperliquid.info.perps.user_funding import UserFundingEntry
-from hyperliquid.info.perps.user_non_funding_ledger_updates import UserNonFundingLedgerEntry
+from typed_hyperliquid.core import timestamp_millis
+from typed_hyperliquid.info.user_fills_by_time import UserFill
+from typed_hyperliquid.info.user_funding import UserFundingEntry
+from typed_hyperliquid.info.user_non_funding_ledger_updates import UserNonFundingLedgerEntry
 
 from .fills import AnyFill
 
@@ -48,6 +50,11 @@ class Base(DeclarativeBase):
   """Declarative base for the Hyperliquid history cache."""
 
 cache_metadata = Base.metadata
+
+
+def dump_timestamp(value: datetime | int) -> int:
+  """Return a wire timestamp as integer milliseconds."""
+  return timestamp_millis.dump(value) if isinstance(value, datetime) else value
 
 
 class Fill(Base):
@@ -170,14 +177,14 @@ class HistoryCache:
     with Session(self.engine) as session:
       seen: dict[int, int] = {}
       for fill in fills:
-        time = fill['time']
+        time = dump_timestamp(fill['time'])
         sequence = seen[time] = seen.get(time, -1) + 1
         session.merge(Fill(
           address=address, source=source, time=time, sequence=sequence,
           hash=fill['hash'], tid=fill['tid'], data=fill,
         ))
       self._advance(session, source, address,
-                    max((f['time'] for f in fills), default=None))
+                    max((dump_timestamp(f['time']) for f in fills), default=None))
       session.commit()
 
   def read_funding(self, address: str) -> list[UserFundingEntry]:
@@ -193,11 +200,11 @@ class HistoryCache:
     with Session(self.engine) as session:
       for entry in entries:
         session.merge(Funding(
-          address=address, time=entry['time'],
+          address=address, time=dump_timestamp(entry['time']),
           coin=entry['delta']['coin'], data=entry,
         ))
       self._advance(session, 'funding', address,
-                    max((e['time'] for e in entries), default=None))
+                    max((dump_timestamp(e['time']) for e in entries), default=None))
       session.commit()
 
   def read_ledger(self, address: str) -> list[UserNonFundingLedgerEntry]:
@@ -214,12 +221,12 @@ class HistoryCache:
     with Session(self.engine) as session:
       seen: dict[int, int] = {}
       for entry in entries:
-        time = entry['time']
+        time = dump_timestamp(entry['time'])
         sequence = seen[time] = seen.get(time, -1) + 1
         session.merge(LedgerEntry(
           address=address, time=time, sequence=sequence,
           hash=entry['hash'], data=entry,
         ))
       self._advance(session, 'ledger', address,
-                    max((e['time'] for e in entries), default=None))
+                    max((dump_timestamp(e['time']) for e in entries), default=None))
       session.commit()

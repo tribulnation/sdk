@@ -77,7 +77,7 @@ class SpotMarket(SpotMarketMixin, Market):
 
   @wrap_exceptions
   async def available_notional(self) -> Decimal:
-    state = await self.client.info.spot_clearinghouse_state(self.address)
+    state = await self.client.info.spot_clearinghouse_state(user=self.address)
     for balance in state['balances']:
       if balance['token'] == self.quote_meta['index']:
         if balance['coin'] != self.quote_meta['name']:

@@ -11,8 +11,10 @@ from .mixin import SpotMarketMixin, PerpMarketMixin
 
 
 def _parse_time(value: Any) -> datetime:
-  from hyperliquid.core import timestamp as ts
-  return ts.parse(value).astimezone()
+  if isinstance(value, datetime):
+    return value.astimezone()
+  from typed_hyperliquid.core import timestamp_millis
+  return timestamp_millis.parse(value).astimezone()
 
 
 @asynccontextmanager
@@ -42,10 +44,9 @@ async def trades_stream(self: SpotMarketMixin | PerpMarketMixin, *, queue_size: 
 
 def trades_history(self: SpotMarketMixin | PerpMarketMixin, start: datetime, end: datetime) -> AsyncIterable[Sequence[Trade]]:
   async def gen():
-    from hyperliquid.core import timestamp as ts
-
-    start_ts, end_ts = ts.dump(start), ts.dump(end)
-    async for chunk in self.client.info.user_fills_by_time_paged(self.address, start_ts, end_time=end_ts):
+    async for chunk in self.client.info.user_fills_by_time_paged(
+      user=self.address, start_time=start, end_time=end,
+    ):
       trades: list[Trade] = []
       for f in chunk:
         if f.get("coin") != self.asset_name:
@@ -56,7 +57,7 @@ def trades_history(self: SpotMarketMixin | PerpMarketMixin, start: datetime, end
             id=str(f.get("tid")),
             price=Decimal(f["px"]),
             qty=Decimal(f["sz"]) * sign,
-            time=ts.parse(f["time"]).astimezone(),
+            time=f['time'].astimezone(),
             maker=not f.get("crossed", False),
             fee=Trade.Fee(amount=Decimal(f["fee"]), asset=f["feeToken"]),
             details=f,
@@ -66,4 +67,3 @@ def trades_history(self: SpotMarketMixin | PerpMarketMixin, start: datetime, end
         yield trades
 
   return gen()
-

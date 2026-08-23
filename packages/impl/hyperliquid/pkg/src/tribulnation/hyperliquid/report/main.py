@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from tribulnation.sdk.reporting import Report as _Report, SnapshotRecord
-from hyperliquid.info import Info
+from typed_hyperliquid.info import Info
 
 from .history import History
 from .snapshots import Snapshots

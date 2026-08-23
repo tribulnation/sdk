@@ -1,10 +1,10 @@
 from decimal import Decimal
 import asyncio
 
-from hyperliquid.info.perps.clearinghouse_state import (
-  ClearinghouseStateResponse,
-  Position,
-  LeverageIsolated,
+from typed_hyperliquid.info.clearinghouse_state import (
+  ClearinghouseState,
+  PerpPosition,
+  IsolatedLeverage,
 )
 
 from tribulnation.sdk.market import Collateral, PerpCollateral
@@ -15,7 +15,7 @@ from .mixin import PerpMixin, PerpMarketMixin, SpotMarketMixin
 
 
 def cross_collateral(
-  state: ClearinghouseStateResponse,
+  state: ClearinghouseState,
   *,
   spot_equity: Decimal,
   free_collateral: Decimal,
@@ -40,7 +40,9 @@ def cross_collateral(
   )
 
 
-def isolated_collateral(pos: Position, leverage: LeverageIsolated) -> PerpCollateral:
+def isolated_collateral(
+  pos: PerpPosition, leverage: IsolatedLeverage,
+) -> PerpCollateral:
   """The per-market ISOLATED margin bucket for a single position.
 
   HL exposes no per-position maintenance-margin field, so we reconstruct it
@@ -80,17 +82,17 @@ def isolated_collateral(pos: Position, leverage: LeverageIsolated) -> PerpCollat
 
 async def _unified_cross_collateral(self: PerpMixin) -> PerpCollateral:
   """Fetch the unified cross collateral, asserting unified account mode."""
-  mode = await self.client.info.user_abstraction(self.address)
+  mode = await self.client.info.user_abstraction(user=self.address)
   if mode != 'unifiedAccount':
     raise ApiError(f'Only unified accounts are supported, got mode={mode!r}')
 
   dex_name = self.dex_name
-  perp_meta, _ = await self.client.info.perp_meta_and_asset_ctxs(dex_name)
+  perp_meta, _ = await self.client.info.perp_meta_and_asset_ctxs(dex=dex_name)
   collateral_token_idx = perp_meta['collateralToken']
 
   state, spot_state = await asyncio.gather(
-    self.client.info.clearinghouse_state(self.address, dex=dex_name),
-    self.client.info.spot_clearinghouse_state(self.address),
+    self.client.info.clearinghouse_state(user=self.address, dex=dex_name),
+    self.client.info.spot_clearinghouse_state(user=self.address),
   )
 
   # Equity = total spot balance of the collateral token
@@ -123,7 +125,9 @@ async def perp_market_collateral(self: PerpMarketMixin) -> PerpCollateral:
   Cross positions (and no position) share the account cross pool; isolated
   positions get their own bucket.
   """
-  state = await self.client.info.clearinghouse_state(self.address, dex=self.dex_name)
+  state = await self.client.info.clearinghouse_state(
+    user=self.address, dex=self.dex_name,
+  )
   for entry in state['assetPositions']:
     pos = entry['position']
     if pos['coin'] == self.asset_name:
@@ -141,7 +145,7 @@ async def spot_market_collateral(self: SpotMarketMixin) -> Collateral:
   `equity = total` balance of the quote token; `free_collateral = total - hold`
   (the portion not locked by resting orders).
   """
-  state = await self.client.info.spot_clearinghouse_state(self.address)
+  state = await self.client.info.spot_clearinghouse_state(user=self.address)
   for balance in state['balances']:
     if balance['token'] == self.quote_meta['index']:
       total = Decimal(balance['total'])

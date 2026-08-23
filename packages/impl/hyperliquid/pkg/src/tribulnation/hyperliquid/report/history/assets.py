@@ -11,8 +11,8 @@ Names are resolved back to indices here.
 from typing_extensions import Mapping
 from dataclasses import dataclass
 
-from hyperliquid.info import Info
-from hyperliquid.info.spot.spot_meta import SpotMetaResponse
+from typed_hyperliquid.info import Info
+from typed_hyperliquid.info.spot_meta import SpotMeta
 
 USDC = '0'
 """Token index of USDC, the default quote and margin asset."""
@@ -65,7 +65,7 @@ class Assets:
   """Canonical spot pair name to `(base, quote)` token indices, e.g. `'PURR/USDC'`."""
 
   @classmethod
-  def of(cls, meta: SpotMetaResponse) -> 'Assets':
+  def of(cls, meta: SpotMeta) -> 'Assets':
     """Build an index from a `spotMeta` response.
 
     Raises:

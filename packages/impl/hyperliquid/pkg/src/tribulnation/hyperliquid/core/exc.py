@@ -2,7 +2,7 @@ from functools import wraps
 import inspect
 
 from tribulnation.sdk.core import NetworkError, ValidationError, ApiError, Error
-from hyperliquid import core
+from typed_hyperliquid import core
 
 def wrap_exceptions(fn):
   if inspect.iscoroutinefunction(fn):

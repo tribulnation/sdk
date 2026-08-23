@@ -3,19 +3,19 @@
 Neither endpoint accepts a time range or paginates, so both return the account's
 full history and are filtered client-side.
 """
-from typing_extensions import Iterable
+from typing_extensions import Any, Iterable, Mapping
 from decimal import Decimal
 
 from tribulnation.sdk.reporting import InternalTransfer, Observation, Yield
-from hyperliquid.info.methods.staking_rewards import StakingReward
-from hyperliquid.info.methods.staking_history import StakingHistoryEntry
+from typed_hyperliquid.info.staking_rewards import DelegatorReward
+from typed_hyperliquid.info.staking_history import DelegatorHistoryEvent
 
 from ..subaccounts import STAKING, UNIFIED
 from .assets import HYPE
 from .window import parse_time
 
 
-def parse_reward(reward: StakingReward, *, index: int) -> Yield:
+def parse_reward(reward: DelegatorReward, *, index: int) -> Yield:
   """Convert a staking reward into a yield observation.
 
   Scoped to the `staking` subaccount, not the spot wallet. Rewards accrue
@@ -32,13 +32,13 @@ def parse_reward(reward: StakingReward, *, index: int) -> Yield:
   )
 
 
-def parse_rewards(rewards: Iterable[StakingReward]) -> list[Yield]:
+def parse_rewards(rewards: Iterable[DelegatorReward]) -> list[Yield]:
   """Convert the staking reward stream into observations."""
   return [parse_reward(r, index=i) for i, r in enumerate(rewards)]
 
 
 def parse_history_entry(
-  entry: StakingHistoryEntry, *, index: int,
+  entry: DelegatorHistoryEvent, *, index: int,
 ) -> list[Observation]:
   """Convert one staking history record into observations.
 
@@ -49,7 +49,7 @@ def parse_history_entry(
   """
   id = f'staking:{entry.get("hash", "")}:{index}'
   time = parse_time(entry['time'])
-  delta = entry['delta']
+  delta: Mapping[str, Any] = entry['delta']
 
   if (delegate := delta.get('delegate')) is not None:
     undelegate = bool(delegate['isUndelegate'])
@@ -78,7 +78,7 @@ def parse_history_entry(
   return []
 
 
-def parse_history(entries: Iterable[StakingHistoryEntry]) -> list[Observation]:
+def parse_history(entries: Iterable[DelegatorHistoryEvent]) -> list[Observation]:
   """Convert the staking history stream into observations."""
   return [
     obs for index, entry in enumerate(entries)

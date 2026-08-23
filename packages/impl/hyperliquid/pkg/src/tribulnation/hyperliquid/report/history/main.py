@@ -7,7 +7,8 @@ import asyncio
 from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import History as _History, Observation, HistoryRecord
 from tribulnation.sdk.reporting.util import source_id
-from hyperliquid.info import Info
+from typed_hyperliquid.core import timestamp_millis
+from typed_hyperliquid.info import Info
 from tribulnation.hyperliquid.core import wrap_exceptions
 
 from .assets import Assets, USDC
@@ -53,7 +54,7 @@ class History(_History):
     """Create a history client over HTTP."""
     return cls(Info.http(validate=validate, mainnet=mainnet), address, cache=cache)
 
-  def since(self, source: str) -> int:
+  def since(self, source: str) -> datetime:
     """Return the timestamp to resume fetching a source from.
 
     Resumes *at* the watermark, not after it, so the boundary millisecond is
@@ -62,9 +63,9 @@ class History(_History):
     caused inside the client's own pagination.
     """
     if self.cache is None:
-      return GENESIS_MS
+      return timestamp_millis.parse(GENESIS_MS)
     watermark = self.cache.watermark(source, self.address)
-    return GENESIS_MS if watermark is None else watermark
+    return timestamp_millis.parse(GENESIS_MS if watermark is None else watermark)
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield self.info
@@ -91,7 +92,7 @@ class History(_History):
     out: dict[str, str] = {}
     for dex in dexes:
       name = dex and dex['name']
-      meta, _ = await self.info.perp_meta_and_asset_ctxs(name or '')
+      meta, _ = await self.info.perp_meta_and_asset_ctxs(dex=name or '')
       token = str(meta['collateralToken'])
       # Named dexes already qualify their universe entries (`flx:TSLA`); only the
       # main dex uses bare names (`BTC`). Prefixing the dex name again yields
@@ -112,9 +113,14 @@ class History(_History):
     workaround at this layer.
     """
     fresh: list[AnyFill] = []
-    async for page in self.info.user_fills_by_time_paged(self.address, self.since('fills')):
+    async for page in self.info.user_fills_by_time_paged(
+      user=self.address, start_time=self.since('fills'),
+    ):
       fresh.extend(page)
-    twap = [slice['fill'] for slice in await self.info.user_twap_slice_fills(self.address)]
+    twap = [
+      slice['fill']
+      for slice in await self.info.user_twap_slice_fills(user=self.address)
+    ]
 
     if self.cache is None:
       return [*fresh, *twap]
@@ -144,7 +150,9 @@ class History(_History):
     id = source_id(SERVICE)
     settle = await self.settlement()
     fresh = []
-    async for page in self.info.user_funding_paged(self.address, self.since('funding')):
+    async for page in self.info.user_funding_paged(
+      user=self.address, start_time=self.since('funding'),
+    ):
       fresh.extend(page)
     entries = fresh
     if self.cache is not None:
@@ -162,7 +170,9 @@ class History(_History):
     id = source_id(SERVICE)
     assets = await self.resolve_assets()
     fresh = []
-    async for page in self.info.user_non_funding_ledger_updates_paged(self.address, self.since('ledger')):
+    async for page in self.info.user_non_funding_ledger_updates_paged(
+      user=self.address, start_time=self.since('ledger'),
+    ):
       fresh.extend(page)
     entries = fresh
     if self.cache is not None:
@@ -179,8 +189,8 @@ class History(_History):
     """Fetch staking rewards and delegation history."""
     id = source_id(SERVICE)
     rewards, entries = await asyncio.gather(
-      self.info.staking_rewards(self.address),
-      self.info.staking_history(self.address),
+      self.info.staking_rewards(user=self.address),
+      self.info.staking_history(user=self.address),
     )
     observations = [*parse_rewards(rewards), *parse_history(entries)]
     return self.records(observations, start, end, id)

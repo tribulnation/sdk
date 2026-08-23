@@ -8,7 +8,7 @@ from tribulnation.sdk.reporting import (
   Balances, Position, Snapshot, SnapshotRecord, Snapshots as _Snapshots,
   SubaccountSnapshot,
 )
-from hyperliquid.info import Info
+from typed_hyperliquid.info import Info
 from tribulnation.hyperliquid.core import wrap_exceptions
 
 from .subaccounts import STAKING, UNIFIED
@@ -33,13 +33,13 @@ class Snapshots(_Snapshots):
   @SDK.method
   @wrap_exceptions
   async def stake_snapshot(self):
-    summary = await self.info.staking_summary(self.address)
+    summary = await self.info.staking_summary(user=self.address)
     return Decimal(summary['delegated']) + Decimal(summary['undelegated'])
 
   @SDK.method
   @wrap_exceptions
   async def spot_balances(self) -> Balances:
-    spot = await self.info.spot_clearinghouse_state(self.address)
+    spot = await self.info.spot_clearinghouse_state(user=self.address)
     return Balances({
       str(balance['token']): qty
       for balance in spot['balances']
@@ -49,13 +49,13 @@ class Snapshots(_Snapshots):
   @SDK.method
   @wrap_exceptions
   async def dex_meta(self, dex: str):
-    meta, _ = await self.info.perp_meta_and_asset_ctxs(dex)
+    meta, _ = await self.info.perp_meta_and_asset_ctxs(dex=dex)
     return meta
 
   @SDK.method
   @wrap_exceptions
   async def clearinghouse_state(self, dex: str):
-    return await self.info.clearinghouse_state(self.address, dex=dex)
+    return await self.info.clearinghouse_state(user=self.address, dex=dex)
 
   async def dex_positions_and_pnl(
     self, dex: str | None,

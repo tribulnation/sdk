@@ -65,7 +65,7 @@ async def perp_stats(
 @SDK.method
 @wrap_exceptions
 async def fetch_l2_book(self: PerpMixin, coin: str) -> Book:
-  raw = await self.shared.client.info.l2_book(coin)
+  raw = await self.shared.client.info.l2_book(coin=coin)
   bids_raw, asks_raw = raw['levels']
   return Book(
     bids=[Book.Entry(price=Decimal(b['px']), qty=Decimal(b['sz'])) for b in bids_raw[:1]],

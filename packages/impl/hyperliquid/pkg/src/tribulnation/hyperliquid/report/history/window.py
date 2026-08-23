@@ -10,13 +10,15 @@ def in_window(
     return True
   return (start is None or time >= start) and (end is None or time <= end)
 
-def parse_time(ms: int) -> datetime:
+def parse_time(value: datetime | int) -> datetime:
   """Convert a Hyperliquid millisecond timestamp to an aware datetime.
 
   Observation times are `pydantic.AwareDatetime`, so the result must carry a
   timezone. Hyperliquid timestamps are UTC.
   """
-  return datetime.fromtimestamp(ms / 1000, tz=timezone.utc)
+  if isinstance(value, datetime):
+    return value
+  return datetime.fromtimestamp(value / 1000, tz=timezone.utc)
 
 def dump_time(time: datetime | None, *, default: int) -> int:
   """Convert a datetime to a Hyperliquid millisecond timestamp."""

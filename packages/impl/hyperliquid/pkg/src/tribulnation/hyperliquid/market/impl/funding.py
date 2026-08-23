@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from tribulnation.sdk.market import FundingRate, NextFunding, FundingPayment
 
-from hyperliquid.core import timestamp as ts
+from typed_hyperliquid.core import timestamp_millis as ts
 from tribulnation.hyperliquid.core import wrap_exceptions
 from .mixin import PerpMarketMixin
 
@@ -25,13 +25,14 @@ async def next_funding(self: PerpMarketMixin) -> NextFunding:
 
 @wrap_exceptions
 async def funding_rates(self: PerpMarketMixin, start: datetime | None = None, end: datetime | None = None) -> AsyncIterable[Sequence[FundingRate]]:
-  start_ts = ts.dump(start) if start is not None else 0
-  end_ts = ts.dump(end) if end is not None else None
-  async for chunk in self.client.info.funding_history_paged(self.asset_name, start_ts, end_time=end_ts):
+  start_time = start if start is not None else ts.parse(0)
+  async for chunk in self.client.info.funding_history_paged(
+    coin=self.asset_name, start_time=start_time, end_time=end,
+  ):
     yield [
       FundingRate(
         rate=Decimal(entry["fundingRate"]),
-        time=ts.parse(entry["time"]).astimezone(),
+        time=entry['time'].astimezone(),
         premium=Decimal(premium) if (premium := entry.get("premium")) is not None else None,
       )
       for entry in chunk
@@ -40,16 +41,16 @@ async def funding_rates(self: PerpMarketMixin, start: datetime | None = None, en
 
 @wrap_exceptions
 async def funding_payments(self: PerpMarketMixin, start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingPayment]]:
-  start_ts, end_ts = ts.dump(start), ts.dump(end)
-  async for chunk in self.client.info.user_funding_paged(self.address, start_ts, end_time=end_ts):
+  async for chunk in self.client.info.user_funding_paged(
+    user=self.address, start_time=start, end_time=end,
+  ):
     payments: list[FundingPayment] = []
     for p in chunk:
       if p["delta"]["coin"] != self.asset_name:
         continue
-      t = ts.parse(p["time"]).astimezone()
+      t = p['time'].astimezone()
       if t < start or t > end:
         continue
       payments.append(FundingPayment(amount=Decimal(p["delta"]["usdc"]), time=t))
     if payments:
       yield payments
-

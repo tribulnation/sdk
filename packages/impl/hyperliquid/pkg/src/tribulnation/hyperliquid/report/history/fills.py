@@ -18,11 +18,12 @@ explicit unknown is correct; a fabricated number is not.
 """
 from typing_extensions import Iterable, Mapping, Sequence, TypeAlias, Union
 from dataclasses import dataclass
+from datetime import datetime
 from decimal import Decimal
 
 from tribulnation.sdk.reporting import Fee, FutureTrade, SpotTrade
-from hyperliquid.info.methods.user_fills_by_time import UserFill
-from hyperliquid.info.methods.user_twap_slice_fills import TwapFill
+from typed_hyperliquid.info.user_fills_by_time import UserFill
+from typed_hyperliquid.info.user_twap_slice_fills import TwapFill
 
 AnyFill: TypeAlias = Union[UserFill, TwapFill]
 """A fill from either stream.
@@ -45,7 +46,7 @@ def signed_size(fill: AnyFill) -> Decimal:
   return size if fill['side'] == 'B' else -size
 
 
-def sort_key(fill: AnyFill) -> int:
+def sort_key(fill: AnyFill) -> datetime:
   """Order fills by time only.
 
   Deliberately *not* a tiebreaker on `tid`. Many fills share a millisecond — up

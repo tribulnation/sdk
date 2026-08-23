@@ -14,6 +14,7 @@ live account holding an isolated position, `spot - sum(unrealizedPnl)` stayed at
 the isolated leg made it drift by exactly that leg's change. These tests pin the
 measured behaviour so the plausible-sounding version cannot be reintroduced.
 """
+
 from decimal import Decimal
 
 from tribulnation.hyperliquid.report.snapshots import Snapshots
@@ -26,12 +27,16 @@ def position(coin: str, *, upnl: str, isolated: str | None = None) -> dict:
   """One `assetPositions` entry; `isolated` supplies `rawUsd` when set."""
   leverage = (
     {'type': 'isolated', 'value': 5, 'rawUsd': isolated}
-    if isolated is not None else {'type': 'cross', 'value': 5}
+    if isolated is not None
+    else {'type': 'cross', 'value': 5}
   )
   return {
     'position': {
-      'coin': coin, 'szi': '1', 'entryPx': '100',
-      'unrealizedPnl': upnl, 'leverage': leverage,
+      'coin': coin,
+      'szi': '1',
+      'entryPx': '100',
+      'unrealizedPnl': upnl,
+      'leverage': leverage,
     }
   }
 
@@ -43,25 +48,25 @@ class StubInfo:
     self.positions = positions
     self.spot = spot
 
-  async def staking_summary(self, address: str):
+  async def staking_summary(self, *, user: str):
     return {'delegated': '0', 'undelegated': '0'}
 
-  async def spot_clearinghouse_state(self, address: str):
+  async def spot_clearinghouse_state(self, *, user: str):
     return {'balances': [{'coin': 'USDC', 'token': 0, 'total': self.spot}]}
 
   async def perp_dexs(self):
     return [None]
 
-  async def perp_meta_and_asset_ctxs(self, dex: str):
+  async def perp_meta_and_asset_ctxs(self, *, dex: str):
     return {'collateralToken': 0, 'universe': []}, []
 
-  async def clearinghouse_state(self, address: str, dex: str = ''):
+  async def clearinghouse_state(self, *, user: str, dex: str = ''):
     return {'assetPositions': self.positions}
 
 
 async def balances(positions: list[dict], *, spot: str = '1000') -> dict[str, Decimal]:
   record = await Snapshots(StubInfo(positions, spot=spot), '0xabc').snapshot()
-  unified, = [s for s in record.snapshot.subaccounts if s.subaccount == UNIFIED]
+  (unified,) = [s for s in record.snapshot.subaccounts if s.subaccount == UNIFIED]
   return unified.balances
 
 
@@ -91,12 +96,14 @@ async def test_balance_is_invariant_to_price_with_an_isolated_position():
 
 
 async def test_cross_and_isolated_pnl_both_count():
-  result = await balances([
-    position('BTC', upnl='40'),
-    position('ETH', upnl='-15', isolated='250'),
-  ])
+  result = await balances(
+    [
+      position('BTC', upnl='40'),
+      position('ETH', upnl='-15', isolated='250'),
+    ]
+  )
 
-  assert result[USDC] == Decimal('975')   # 1000 - 40 + 15
+  assert result[USDC] == Decimal('975')  # 1000 - 40 + 15
 
 
 async def test_staking_compartment_is_labelled():
