@@ -154,10 +154,11 @@ registry.toml        # implementation registry (support matrix, development stag
 - Unit Testing: `pytest`
 - Integration Testing: `sdk-dev test <venue>` (reads `sdk.test.toml` for credentials to use)
 - Status: `sdk-dev status` (lists all supported venues and their current development stage)
+- Release: `sdk-dev release <venue>` (creates a PR on `release/<venue>` with git tag)
 
 ### CI/CD
 
-- Deploying to PyPI: open a PR on a `release/sdk` or `release/<venue>` branch. The package will be published automatically on merge.
+- Deploying to PyPI: open a PR on a `release/sdk` or `release/<venue>` branch. This will create a git tag and the package will be published automatically on merge. Prefer using `sdk-dev release <venue>` to do this automatically.
 
 ## License
 
