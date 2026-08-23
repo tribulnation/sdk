@@ -1,0 +1,128 @@
+name: Release
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  check:
+    if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'release/')
+    runs-on: ubuntu-latest
+    outputs:
+      distribution: ${{ steps.package.outputs.distribution }}
+      package_path: ${{ steps.package.outputs.package_path }}
+      published: ${{ steps.pypi.outputs.published }}
+      slug: ${{ steps.package.outputs.slug }}
+      version: ${{ steps.package.outputs.version }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - id: package
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+          RELEASE_BRANCH: ${{ github.head_ref }}
+        run: |
+          slug="${RELEASE_BRANCH#release/}"
+          if ! [[ "$slug" =~ ^[a-z0-9-]+$ ]]; then
+            echo "Invalid release slug: $slug" >&2
+            exit 1
+          fi
+
+          if [ "$slug" = "sdk" ]; then
+            package_root="packages/sdk"
+          else
+            package_root="packages/impl/$slug"
+          fi
+          package_path="$package_root/pkg"
+          if [ ! -f "$package_path/pyproject.toml" ]; then
+            echo "Unknown release package: $slug" >&2
+            exit 1
+          fi
+          if git diff --quiet "$BASE_SHA" "$MERGE_SHA" -- "$package_root"; then
+            echo "Release PR did not change $package_root" >&2
+            exit 1
+          fi
+
+          distribution=$(grep -m1 '^name = ' "$package_path/pyproject.toml" | sed -E 's/name = "(.*)"/\1/')
+          version=$(grep -m1 '^version = ' "$package_path/pyproject.toml" | sed -E 's/version = "(.*)"/\1/')
+          echo "distribution=$distribution" >> "$GITHUB_OUTPUT"
+          echo "package_path=$package_path" >> "$GITHUB_OUTPUT"
+          echo "slug=$slug" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - id: pypi
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" "https://pypi.org/pypi/${{ steps.package.outputs.distribution }}/${{ steps.package.outputs.version }}/json")
+          case "$code" in
+            200) echo "published=true" >> "$GITHUB_OUTPUT" ;;
+            404) echo "published=false" >> "$GITHUB_OUTPUT" ;;
+            *)
+              echo "Unexpected PyPI response: HTTP $code" >&2
+              exit 1
+              ;;
+          esac
+
+  release:
+    needs: check
+    if: needs.check.outputs.published == 'false'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+          fetch-depth: 0
+          fetch-tags: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install -e packages/sdk/pkg
+      - if: needs.check.outputs.slug != 'sdk'
+        run: pip install -e ${{ needs.check.outputs.package_path }}
+      - run: pip install ruff pyright build
+      - run: ruff check --config ruff.toml ${{ needs.check.outputs.package_path }}/src
+      - run: pyright ${{ needs.check.outputs.package_path }}
+      - run: cp ${{ needs.check.outputs.package_path }}/../README.md ${{ needs.check.outputs.package_path }}/../LICENSE ${{ needs.check.outputs.package_path }}/
+      - run: python -m build ${{ needs.check.outputs.package_path }}
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: ${{ needs.check.outputs.package_path }}/dist
+
+      - id: previous_tag
+        run: |
+          previous=$(git tag -l '${{ needs.check.outputs.slug }}-v*' | sort -V | tail -1)
+          echo "previous=$previous" >> "$GITHUB_OUTPUT"
+
+      - run: git tag ${{ needs.check.outputs.slug }}-v${{ needs.check.outputs.version }}
+      - run: git push origin ${{ needs.check.outputs.slug }}-v${{ needs.check.outputs.version }}
+
+      - if: steps.previous_tag.outputs.previous != ''
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.check.outputs.slug }}-v${{ needs.check.outputs.version }}
+          previous_tag: ${{ steps.previous_tag.outputs.previous }}
+          generate_release_notes: true
+          body: |
+            Published to [PyPI](https://pypi.org/project/${{ needs.check.outputs.distribution }}/${{ needs.check.outputs.version }}/) as `${{ needs.check.outputs.distribution }}==${{ needs.check.outputs.version }}`.
+
+            ${{ github.event.pull_request.body }}
+
+      - if: steps.previous_tag.outputs.previous == ''
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.check.outputs.slug }}-v${{ needs.check.outputs.version }}
+          generate_release_notes: true
+          body: |
+            Published to [PyPI](https://pypi.org/project/${{ needs.check.outputs.distribution }}/${{ needs.check.outputs.version }}/) as `${{ needs.check.outputs.distribution }}==${{ needs.check.outputs.version }}`.
+
+            ${{ github.event.pull_request.body }}

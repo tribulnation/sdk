@@ -1,0 +1,89 @@
+name: Check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.diff.outputs.packages }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - id: diff
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="${{ github.event.pull_request.base.sha }}"
+          else
+            base="${{ github.event.before }}"
+          fi
+          if [ -z "$base" ] || ! git cat-file -e "$base" 2>/dev/null; then
+            base="$(git hash-object -t tree /dev/null)"
+          fi
+
+          git diff --name-only "$base" HEAD > /tmp/changed-files
+          if grep -Eq '^(packages/sdk/|requirements\.txt$|pyrightconfig\.json$|pytest\.ini$|ruff\.toml$|test/|\.agents/tools/python/ruff\.toml$|\.github/workflows/check\.yml$)' /tmp/changed-files; then
+            {
+              echo sdk
+              find packages/impl -mindepth 1 -maxdepth 1 -type d ! -name '.*' -printf '%f\n'
+            } | sort -u > /tmp/packages
+          else
+            awk -F/ '$1 == "packages" && $2 == "impl" && $3 !~ /^\./ { print $3 }' /tmp/changed-files | sort -u > /tmp/packages
+          fi
+
+          packages=$(jq -R -s -c 'split("\n")[:-1]' /tmp/packages)
+          echo "packages=$packages" >> "$GITHUB_OUTPUT"
+
+  package:
+    needs: changes
+    if: needs.changes.outputs.packages != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{ fromJSON(needs.changes.outputs.packages) }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - id: package
+        run: |
+          if [ "${{ matrix.package }}" = "sdk" ]; then
+            echo "path=packages/sdk/pkg" >> "$GITHUB_OUTPUT"
+          else
+            echo "path=packages/impl/${{ matrix.package }}/pkg" >> "$GITHUB_OUTPUT"
+          fi
+
+      - run: pip install -e packages/sdk/pkg
+      - if: matrix.package != 'sdk'
+        run: pip install -e ${{ steps.package.outputs.path }}
+      - run: pip install ruff pyright build
+      - run: ruff check --config ruff.toml ${{ steps.package.outputs.path }}/src
+      - run: pyright ${{ steps.package.outputs.path }}
+      - run: cp ${{ steps.package.outputs.path }}/../README.md ${{ steps.package.outputs.path }}/../LICENSE ${{ steps.package.outputs.path }}/
+      - run: python -m build ${{ steps.package.outputs.path }}
+
+  unit:
+    needs: changes
+    if: needs.changes.outputs.packages != '[]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install -r requirements.txt
+      - run: pytest -m "not live"
