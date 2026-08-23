@@ -1,6 +1,5 @@
 .env
 .venv
-.vscode
 .cursor
 node_modules
 __pycache__

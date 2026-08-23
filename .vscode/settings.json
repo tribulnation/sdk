@@ -1,0 +1,16 @@
+{
+  "python.defaultInterpreterPath": ".venv/bin/python",
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/.ruff_cache": true,
+    "**/.pytest_cache": true,
+    "**/.venv": true,
+    "CLAUDE.md": true,
+    "pyrightconfig.json": true,
+    "LICENSE": true,
+  }
+}
