@@ -1,9 +1,20 @@
 from typing_extensions import Mapping, TypedDict, TYPE_CHECKING
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from tribulnation.sdk.reporting import Report
 from tribulnation.sdk.reporting.config import ProvidersConfig
-from .accounts import Account, Dydx, Evm, Binance, Bitget, Bit2Me, Mexc, Hyperliquid
+from .accounts import (
+  Account,
+  Dydx,
+  Evm,
+  Binance,
+  Bitget,
+  Bit2Me,
+  Mexc,
+  Hyperliquid,
+  load_accounts,
+)
 
 if TYPE_CHECKING:
   from tribulnation.ethereum.reporting import EvmConfig
@@ -22,6 +33,15 @@ class ReportSDK:
   accounts: Mapping[str, Account]
   providers: ProvidersConfig | None = field(default=None, kw_only=True)
   config: 'Config' = field(default_factory=Config, kw_only=True)
+
+  @classmethod
+  def load(cls, path: Path | str = 'sdk.toml') -> 'ReportSDK':
+    """Construct a `ReportSDK` from a TOML file's `[accounts.<id>]` tables.
+
+    Args:
+      path: Path to a TOML file with an `[accounts]` table.
+    """
+    return cls(accounts=load_accounts(path))
 
   def evm(self, account: Evm, id: str) -> Report:
     try:

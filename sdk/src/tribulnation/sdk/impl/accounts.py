@@ -1,5 +1,7 @@
 from typing_extensions import Literal as _Literal, Annotated as _Annotated
 from dataclasses import dataclass as _dataclass
+from pathlib import Path as _Path
+import tomllib as _tomllib
 import pydantic as _pydantic
 
 
@@ -184,3 +186,38 @@ Account = _Annotated[
   Dydx | Hyperliquid | Mexc | Bitget | Bit2Me | Binance | Evm,
   _pydantic.Discriminator ('venue')
 ]
+
+
+def load_accounts(path: _Path | str) -> dict[str, Account]:
+  """Load and validate accounts from a TOML file's `[accounts.<id>]` tables.
+
+  Mirrors the fail-fast behavior expected of any accounts source: every parsed
+  account has `verify_env_vars()` called immediately, so a missing required
+  environment variable raises here rather than on first use.
+
+  Args:
+    path: Path to a TOML file with an `[accounts]` table, e.g.:
+      ```toml
+      [accounts.hl]
+      venue = "hyperliquid"
+      address = "$HYPERLIQUID_ADDRESS"
+      private_key = "$HYPERLIQUID_PRIVATE_KEY"
+      ```
+
+  Returns:
+    Accounts keyed by id, ready to pass as an SDK's `accounts` field.
+
+  Raises:
+    ValueError: If the file does not exist.
+  """
+  p = _Path(path)
+  if not p.exists():
+    raise ValueError(f'Config file not found at "{p}"')
+  with open(p, 'rb') as f:
+    data = _tomllib.load(f)
+  accounts = _pydantic.TypeAdapter(dict[str, Account]).validate_python(
+    data.get('accounts', {})
+  )
+  for acc in accounts.values():
+    acc.verify_env_vars()
+  return accounts

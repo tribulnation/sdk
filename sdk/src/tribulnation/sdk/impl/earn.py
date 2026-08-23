@@ -1,8 +1,9 @@
 from typing_extensions import Mapping
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from tribulnation.sdk.earn import Earn
-from .accounts import Account, Mexc, Bitget, Binance
+from .accounts import Account, Mexc, Bitget, Binance, load_accounts
 
 DEFAULT_ACCOUNTS: Mapping[str, Account] = {
   'mexc': Mexc(),
@@ -15,6 +16,15 @@ class EarnSDK:
   @property
   def all_accounts(self) -> Mapping[str, Account]:
     return {**DEFAULT_ACCOUNTS, **self.accounts}
+
+  @classmethod
+  def load(cls, path: Path | str = 'sdk.toml') -> 'EarnSDK':
+    """Construct an `EarnSDK` from a TOML file's `[accounts.<id>]` tables.
+
+    Args:
+      path: Path to a TOML file with an `[accounts]` table.
+    """
+    return cls(accounts=load_accounts(path))
 
   def binance(self, account: Binance) -> Earn:
     try:

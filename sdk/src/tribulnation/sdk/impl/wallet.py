@@ -1,8 +1,9 @@
 from typing_extensions import Mapping
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from tribulnation.sdk.wallet import Wallet
-from .accounts import Account, Mexc, Bitget, Binance
+from .accounts import Account, Mexc, Bitget, Binance, load_accounts
 
 DEFAULT_ACCOUNTS: Mapping[str, Account] = {}
 
@@ -13,6 +14,15 @@ class WalletSDK:
   @property
   def all_accounts(self) -> Mapping[str, Account]:
     return {**DEFAULT_ACCOUNTS, **self.accounts}
+
+  @classmethod
+  def load(cls, path: Path | str = 'sdk.toml') -> 'WalletSDK':
+    """Construct a `WalletSDK` from a TOML file's `[accounts.<id>]` tables.
+
+    Args:
+      path: Path to a TOML file with an `[accounts]` table.
+    """
+    return cls(accounts=load_accounts(path))
 
   def binance(self, account: Binance) -> Wallet:
     try:

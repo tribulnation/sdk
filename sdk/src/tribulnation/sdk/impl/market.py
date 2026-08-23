@@ -1,8 +1,9 @@
 from typing_extensions import Mapping, Sequence
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from tribulnation.sdk.market import TradingMarkets, TradingVenue
-from .accounts import Account, Dydx, Hyperliquid, Mexc
+from .accounts import Account, Dydx, Hyperliquid, Mexc, load_accounts
 
 DEFAULT_ACCOUNTS: Mapping[str, Account] = {
   'dydx': Dydx(public=True),
@@ -17,6 +18,15 @@ class MarketSDK(TradingMarkets):
   @property
   def all_accounts(self) -> Mapping[str, Account]:
     return {**DEFAULT_ACCOUNTS, **self.accounts}
+
+  @classmethod
+  def load(cls, path: Path | str = 'sdk.toml') -> 'MarketSDK':
+    """Construct a `MarketSDK` from a TOML file's `[accounts.<id>]` tables.
+
+    Args:
+      path: Path to a TOML file with an `[accounts]` table.
+    """
+    return cls(accounts=load_accounts(path))
 
   def dydx(self, account: Dydx) -> TradingVenue:
     try:
