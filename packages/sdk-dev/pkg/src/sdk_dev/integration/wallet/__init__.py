@@ -1,0 +1,1 @@
+"""Wallet integration test suite."""

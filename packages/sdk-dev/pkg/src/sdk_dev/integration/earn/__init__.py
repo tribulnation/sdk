@@ -1,0 +1,1 @@
+"""Earn integration test suite."""

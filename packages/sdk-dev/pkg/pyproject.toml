@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sdk-dev"
+version = "0.1.0"
+authors = [
+  {name="Marcel Claramunt", email="marcel@tribulnation.com"}
+]
+description = "Development CLI for the Tribulnation SDK"
+dependencies = [
+  "pytest",
+  "python-dotenv",
+  "typer",
+  "tribulnation-sdk",
+]
+requires-python = ">=3.10"
+readme = {file="README.md", content-type="text/markdown"}
+
+[project.urls]
+repo = "https://github.com/tribulnation/sdk.git"
+
+[project.scripts]
+sdk-dev = "sdk_dev.cli:app"

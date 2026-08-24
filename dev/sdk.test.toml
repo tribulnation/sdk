@@ -1,0 +1,62 @@
+[accounts.dydx]
+venue = "dydx_testnet"
+address = "$DYDX_TESTNET_ADDRESS"
+mnemonic = "$DYDX_TESTNET_MNEMONIC"
+
+[accounts.hyperliquid]
+venue = "hyperliquid_testnet"
+address = "$HYPERLIQUID_TESTNET_ADDRESS"
+private_key = "$HYPERLIQUID_TESTNET_PRIVATE_KEY"
+
+[accounts.mexc]
+venue = "mexc"
+api_key = "$MEXC_API_KEY"
+api_secret = "$MEXC_API_SECRET"
+
+[accounts.bit2me]
+venue = "bit2me"
+api_key = "$BIT2ME_API_KEY"
+api_secret = "$BIT2ME_SECRET_KEY"
+
+[accounts.bitget]
+venue = "bitget"
+access_key = "$BITGET_ACCESS_KEY"
+secret_key = "$BITGET_SECRET_KEY"
+passphrase = "$BITGET_PASSPHRASE"
+
+[accounts.binance]
+venue = "binance"
+api_key = "$BINANCE_API_KEY"
+secret_key = "$BINANCE_SECRET_KEY"
+
+[accounts.ethereum]
+venue = "ethereum"
+address = "$EVM_ADDRESS"
+
+[accounts.arbitrum]
+venue = "arbitrum"
+address = "$EVM_ADDRESS"
+
+[accounts.polygon]
+venue = "polygon"
+address = "$EVM_ADDRESS"
+
+[accounts.bnb-chain]
+venue = "bnb-chain"
+address = "$EVM_ADDRESS"
+
+[accounts.base]
+venue = "base"
+address = "$EVM_ADDRESS"
+
+[accounts.avalanche]
+venue = "avalanche"
+address = "$EVM_ADDRESS"
+
+[accounts.optimism]
+venue = "optimism"
+address = "$EVM_ADDRESS"
+
+[accounts.hyperevm]
+venue = "hyperevm"
+address = "$EVM_ADDRESS"
