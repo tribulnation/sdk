@@ -6,8 +6,9 @@ from tribulnation.sdk.earn import Earn
 from .accounts import Account, Mexc, Bitget, Binance, load_accounts
 
 DEFAULT_ACCOUNTS: Mapping[str, Account] = {
-  'mexc': Mexc(),
+  'mexc': Mexc(public=True),
 }
+
 
 @dataclass
 class EarnSDK:
@@ -30,26 +31,47 @@ class EarnSDK:
     try:
       from tribulnation.binance import Binance as BinanceClient
     except ImportError as e:
-      raise ImportError('binance sdk is not installed. Please install it with `pip install tribulnation-binance`.') from e
-    return BinanceClient.new(api_key=account.resolved_api_key, secret_key=account.resolved_secret_key, validate=account.validate).earn
+      raise ImportError(
+        'binance sdk is not installed. Please install it with `pip install tribulnation-binance`.'
+      ) from e
+    return BinanceClient.new(
+      api_key=account.resolved_api_key,
+      secret_key=account.resolved_secret_key,
+      validate=account.validate,
+    ).earn
 
   def bitget(self, account: Bitget) -> Earn:
     try:
       from tribulnation.bitget import Bitget as BitgetClient
     except ImportError as e:
-      raise ImportError('bitget sdk is not installed. Please install it with `pip install tribulnation-bitget`.') from e
-    return BitgetClient.new(access_key=account.resolved_access_key, secret_key=account.resolved_secret_key, passphrase=account.resolved_passphrase, validate=account.validate).earn
+      raise ImportError(
+        'bitget sdk is not installed. Please install it with `pip install tribulnation-bitget`.'
+      ) from e
+    return BitgetClient.new(
+      access_key=account.resolved_access_key,
+      secret_key=account.resolved_secret_key,
+      passphrase=account.resolved_passphrase,
+      validate=account.validate,
+    ).earn
 
   def mexc(self, account: Mexc) -> Earn:
     try:
       from tribulnation.mexc.earn import Earn as MexcEarn
     except ImportError as e:
-      raise ImportError('mexc sdk is not installed. Please install it with `pip install tribulnation-mexc`.') from e
+      raise ImportError(
+        'mexc sdk is not installed. Please install it with `pip install tribulnation-mexc`.'
+      ) from e
     return MexcEarn()
 
   @property
   def all(self) -> dict[str, Earn]:
-    return {id: self.venue(id) for id in self.all_accounts}
+    out: dict[str, Earn] = {}
+    for id, account in self.all_accounts.items():
+      try:
+        out[id] = self.venue(id)
+      except NotImplementedError:
+        ...
+    return out
 
   def venue(self, id: str, /) -> Earn:
     if (account := self.all_accounts.get(id)) is None:
@@ -62,7 +84,7 @@ class EarnSDK:
       case 'mexc':
         return self.mexc(account)
       case _:
-        raise ValueError(f'Unsupported venue: {account.venue}')
+        raise NotImplementedError(f'Unsupported venue: {account.venue}')
 
   def venues(self) -> list[str]:
     return list(self.all_accounts)
