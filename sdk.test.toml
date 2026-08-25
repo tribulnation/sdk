@@ -23,12 +23,14 @@ venue = "bitget"
 access_key = "$BITGET_CLASSIC_ACCESS_KEY"
 secret_key = "$BITGET_CLASSIC_SECRET_KEY"
 passphrase = "$BITGET_CLASSIC_PASSPHRASE"
+uta = false
 
 [accounts.bitget_uta]
 venue = "bitget"
 access_key = "$BITGET_UTA_ACCESS_KEY"
 secret_key = "$BITGET_UTA_SECRET_KEY"
 passphrase = "$BITGET_UTA_PASSPHRASE"
+uta = true
 
 [accounts.binance]
 venue = "binance"
