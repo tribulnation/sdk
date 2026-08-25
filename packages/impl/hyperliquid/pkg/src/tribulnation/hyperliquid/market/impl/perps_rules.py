@@ -18,11 +18,11 @@ async def rules(self: PerpMarketMixin, *, refetch: bool = False) -> Rules:
 
   tick_decimals = min(
     PRICE_MAX_DECIMALS,
-    FUTURES_PRICE_MAX_DECIMALS - self.asset_meta["szDecimals"],
+    FUTURES_PRICE_MAX_DECIMALS - self.asset_meta['szDecimals'],
   )
   tick_size = Decimal(10) ** -tick_decimals
 
-  lot_decimals = self.asset_meta["szDecimals"]
+  lot_decimals = self.asset_meta['szDecimals']
   lot_size = Decimal(10) ** -lot_decimals
 
   return Rules(
@@ -34,13 +34,12 @@ async def rules(self: PerpMarketMixin, *, refetch: bool = False) -> Rules:
     min_value=MIN_ORDER_VALUE,
     rel_min_price=MIN_RELATIVE_PRICE,
     rel_max_price=MAX_RELATIVE_PRICE,
-    maker_fee=Decimal(user_fees["userAddRate"]),
-    taker_fee=Decimal(user_fees["userCrossRate"]),
-    api=not self.asset_meta.get("isDelisted", False),
+    maker_fee=Decimal(user_fees['userAddRate']),
+    taker_fee=Decimal(user_fees['userCrossRate']),
+    api=not self.asset_meta.get('isDelisted', False),
     details={
-      "user_fees": user_fees,
-      "collateral_meta": self.collateral_meta,
-      "asset_meta": self.asset_meta,
+      'user_fees': user_fees,
+      'collateral_meta': self.collateral_meta,
+      'asset_meta': self.asset_meta,
     },
   )
-

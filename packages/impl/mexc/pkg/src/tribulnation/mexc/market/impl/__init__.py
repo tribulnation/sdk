@@ -4,4 +4,3 @@ from .rules import rules
 from .orders import open_orders, query_order, place_order, cancel_order
 from .trades import trades_history, trades_stream
 from .position import position
-

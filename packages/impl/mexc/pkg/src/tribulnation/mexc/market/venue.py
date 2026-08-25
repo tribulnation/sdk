@@ -3,6 +3,7 @@ from tribulnation.sdk.market import TradingVenue
 from .impl import SharedMixin
 from .spot_exchange import SpotExchange
 
+
 class MexcMarket(SharedMixin, TradingVenue):
   @property
   def venue_id(self) -> str:

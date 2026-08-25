@@ -16,8 +16,11 @@ from .mixin import ExchangeMixin
 FUNDING_INTERVAL = timedelta(hours=1)
 """dYdX settles funding every hour, on the hour."""
 
+
 @wrap_exceptions
-async def perp_stats(self: ExchangeMixin, markets: Collection[str] | None = None) -> Mapping[str, PerpStats]:
+async def perp_stats(
+  self: ExchangeMixin, markets: Collection[str] | None = None
+) -> Mapping[str, PerpStats]:
   """Fetch pricing and funding stats for every perp market in one call.
 
   The indexer's `/perpetualMarkets` payload already covers every market, so this
@@ -54,15 +57,20 @@ async def perp_stats(self: ExchangeMixin, markets: Collection[str] | None = None
     )
   return stats
 
+
 @SDK.method
 @wrap_exceptions
 async def fetch_order_book(self: ExchangeMixin, market_id: str):
   raw = await self.shared.client.indexer.data.get_order_book(market_id)
   return parse_book(raw)
 
+
 @wrap_exceptions
 async def tickers(
-  self: ExchangeMixin, markets: Collection[str] | None = None, *, settings: Settings = {},
+  self: ExchangeMixin,
+  markets: Collection[str] | None = None,
+  *,
+  settings: Settings = {},
 ) -> Mapping[str, Ticker]:
   """Fetch ticker snapshots for every perp market in one call.
 

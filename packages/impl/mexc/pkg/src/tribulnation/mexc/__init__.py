@@ -5,9 +5,9 @@ from .market import MexcMarket
 from .earn import Earn
 from .wallet import Wallet
 
+
 @_dataclass(frozen=True)
 class MEXC(_Mixin):
-
   @property
   def earn(self) -> Earn:
     return Earn()

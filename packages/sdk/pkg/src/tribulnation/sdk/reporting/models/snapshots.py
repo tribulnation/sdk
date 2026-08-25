@@ -3,6 +3,7 @@ from datetime import datetime
 from collections import defaultdict
 import pydantic
 
+
 class Position(pydantic.BaseModel):
   size: Decimal
   """Position size (of base units, positive or negative)"""
@@ -17,14 +18,19 @@ class Position(pydantic.BaseModel):
     avg_price = sum(p.size * p.avg_price for p in positions) / size
     return cls(size=size, avg_price=avg_price)
 
+
 class SubaccountSnapshot(pydantic.BaseModel):
   """Balances and positions scoped to one source-native account compartment."""
+
   subaccount: str | None = None
   balances: dict[str, Decimal] = pydantic.Field(default_factory=dict)
   positions: dict[str, Position] = pydantic.Field(default_factory=dict)
 
+
 class Snapshot(pydantic.BaseModel):
-  time: pydantic.AwareDatetime = pydantic.Field(default_factory=lambda: datetime.now().astimezone())
+  time: pydantic.AwareDatetime = pydantic.Field(
+    default_factory=lambda: datetime.now().astimezone()
+  )
   subaccounts: list[SubaccountSnapshot] = pydantic.Field(default_factory=list)
 
   @pydantic.model_validator(mode='after')
@@ -51,6 +57,5 @@ class Snapshot(pydantic.BaseModel):
       for instrument, position in subaccount.positions.items():
         positions[instrument].append(position)
     return {
-      instrument: Position.merge(parts)
-      for instrument, parts in positions.items()
+      instrument: Position.merge(parts) for instrument, parts in positions.items()
     }

@@ -10,11 +10,13 @@ from tribulnation.mexc.core import Mixin
 
 MEXC_EARN_URL = 'https://www.mexc.com/earn'
 
+
 class TieredSubsidyApr(pydantic.BaseModel):
   model_config = {'extra': 'ignore'}
   startQuantity: str
   endQuantity: Decimal | None
   apr: Decimal
+
 
 class FinancialProduct(pydantic.BaseModel):
   model_config = {'extra': 'ignore'}
@@ -22,7 +24,7 @@ class FinancialProduct(pydantic.BaseModel):
   financialType: Literal['FLEXIBLE', 'FIXED', 'BLC_EARN']
   investPeriodType: Literal['FLEXIBLE', 'FIXED']
   fixedInvestPeriodType: int | None = None
-  fixedInvestPeriodCount: int | None = None # days
+  fixedInvestPeriodCount: int | None = None  # days
   currencyId: str
   currency: str
   currencyIcon: str
@@ -60,11 +62,12 @@ class CurrencyGroup(pydantic.BaseModel):
   financialProductList: list[FinancialProduct]
   sort: int
 
+
 class FinancialProductsResponse(pydantic.BaseModel):
   model_config = {'extra': 'ignore'}
-  data: list[CurrencyGroup] 
+  data: list[CurrencyGroup]
   code: int = 0
-  msg: str = ""
+  msg: str = ''
   timestamp: int = 0
 
 
@@ -76,14 +79,17 @@ def parse_tags(product: FinancialProduct) -> Iterable[Instrument.Tag]:
   if product.memberType == 'EFTD':
     yield 'new-users'
 
+
 def parse_duration(product: FinancialProduct) -> timedelta | None:
   if product.fixedInvestPeriodCount is not None:
     return timedelta(days=product.fixedInvestPeriodCount)
+
 
 def parse_qty(qty: Decimal) -> Decimal | None:
   """Support for -1 indicating no limit"""
   if qty > 0:
     return qty
+
 
 def parse_group(group: CurrencyGroup) -> Iterable[Instrument]:
   for prod in group.financialProductList:
@@ -92,11 +98,11 @@ def parse_group(group: CurrencyGroup) -> Iterable[Instrument]:
       duration = parse_duration(prod)
       apr = (prod.baseApr + prod.subsidyApr) / 100
       min_qty = parse_qty(prod.minPledgeQuantity)
-      for tier in (prod.tieredSubsidyApr or []):
+      for tier in prod.tieredSubsidyApr or []:
         if tier.apr:
           yield Instrument(
             asset=group.currency,
-            apr=apr + tier.apr/100,
+            apr=apr + tier.apr / 100,
             yield_asset=prod.profitCurrency,
             min_qty=min_qty,
             max_qty=parse_qty(tier.endQuantity or prod.perPledgeMaxQuantity),
@@ -115,18 +121,25 @@ def parse_group(group: CurrencyGroup) -> Iterable[Instrument]:
         url=prod.shareUrl or MEXC_EARN_URL,
       )
 
+
 class Instruments(_Instruments):
   async def instruments(
-    self, *, tags: Collection[Instrument.Tag] | None = None,
+    self,
+    *,
+    tags: Collection[Instrument.Tag] | None = None,
     assets: Collection[str] | None = None,
   ) -> Sequence[Instrument]:
-    
+
     async with httpx.AsyncClient() as client:
-      r = await client.get('https://www.mexc.com/api/financialactivity/financial/products/list/V2')
+      r = await client.get(
+        'https://www.mexc.com/api/financialactivity/financial/products/list/V2'
+      )
     if r.status_code != 200:
       raise ApiError(f'MEXC API error: {r.status_code}')
     try:
-      response: FinancialProductsResponse = FinancialProductsResponse.model_validate(r.json())
+      response: FinancialProductsResponse = FinancialProductsResponse.model_validate(
+        r.json()
+      )
     except pydantic.ValidationError as e:
       raise ValidationError(*e.args) from e
 
@@ -136,6 +149,8 @@ class Instruments(_Instruments):
     out: list[Instrument] = []
     for group in response.data:
       for instr in parse_group(group):
-        if (assets is None or instr.asset in assets) and (tags is None or set(instr.tags).issubset(tags)):
+        if (assets is None or instr.asset in assets) and (
+          tags is None or set(instr.tags).issubset(tags)
+        ):
           out.append(instr)
     return out

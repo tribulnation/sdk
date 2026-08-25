@@ -5,20 +5,27 @@ import asyncio
 
 from tribulnation.sdk.core import SDK
 from tribulnation.sdk.reporting import (
-  Snapshot, SnapshotRecord, SubaccountSnapshot, Snapshots as _Snapshots,
-  source_id, Position, Balances
+  Snapshot,
+  SnapshotRecord,
+  SubaccountSnapshot,
+  Snapshots as _Snapshots,
+  source_id,
+  Position,
+  Balances,
 )
 
 from tribulnation.bitget.core import SdkMixin, wrap_exceptions
 
+
 @dataclass(kw_only=True)
 class Snapshots(SdkMixin, _Snapshots):
   """Bitget Snapshots
-  
+
   **Does not support**:
   - P2P trading
   - Copy trading
   """
+
   raise_if_copy: bool = False
   """Raise an error if copy trading is detected (since it cannot be reflected in the balances, thus yielding incorrect results)"""
 
@@ -28,7 +35,11 @@ class Snapshots(SdkMixin, _Snapshots):
     balances = await self.client.spot.account.assets()
     out = Balances()
     for balance in balances:
-      out[balance['coin']] += Decimal(balance['available']) + Decimal(balance['frozen']) + Decimal(balance['locked'])
+      out[balance['coin']] += (
+        Decimal(balance['available'])
+        + Decimal(balance['frozen'])
+        + Decimal(balance['locked'])
+      )
     return out
 
   @SDK.method
@@ -58,7 +69,7 @@ class Snapshots(SdkMixin, _Snapshots):
           size=asset['total'],
           avg_price=asset['openPriceAvg'],
         )
-    
+
     return positions
 
   @SDK.method
@@ -110,7 +121,6 @@ class Snapshots(SdkMixin, _Snapshots):
       out[balance['coin']] += balance['available'] + balance['frozen']
     return out
 
-
   @wrap_exceptions
   async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotRecord:
 
@@ -121,8 +131,9 @@ class Snapshots(SdkMixin, _Snapshots):
       )
       spot_copy = spot_copy['resultList']
       if len(future_copy) > 0 or len(spot_copy) > 0:
-        raise ValueError(f'{len(future_copy)} future copy traders and {len(spot_copy)} spot copy traders detected. Use with `raise_if_copy=False` to suppress this error at your own peril.')
-
+        raise ValueError(
+          f'{len(future_copy)} future copy traders and {len(spot_copy)} spot copy traders detected. Use with `raise_if_copy=False` to suppress this error at your own peril.'
+        )
 
     (
       (positions, spot, futures, crossed_margin, isolated_margin),
@@ -143,17 +154,21 @@ class Snapshots(SdkMixin, _Snapshots):
       ),
     )
     return SnapshotRecord(
-      snapshot=Snapshot(subaccounts=[
-        SubaccountSnapshot(subaccount='spot', balances=spot),
-        SubaccountSnapshot(
-          subaccount='futures', balances=futures, positions=positions,
-        ),
-        SubaccountSnapshot(subaccount='earn', balances=earn),
-        SubaccountSnapshot(subaccount='crossed_margin', balances=crossed_margin),
-        SubaccountSnapshot(subaccount='isolated_margin', balances=isolated_margin),
-        SubaccountSnapshot(subaccount='funding', balances=funding),
-        SubaccountSnapshot(subaccount='spot_bot', balances=spot_bot),
-        SubaccountSnapshot(subaccount='futures_bot', balances=futures_bot),
-      ]),
+      snapshot=Snapshot(
+        subaccounts=[
+          SubaccountSnapshot(subaccount='spot', balances=spot),
+          SubaccountSnapshot(
+            subaccount='futures',
+            balances=futures,
+            positions=positions,
+          ),
+          SubaccountSnapshot(subaccount='earn', balances=earn),
+          SubaccountSnapshot(subaccount='crossed_margin', balances=crossed_margin),
+          SubaccountSnapshot(subaccount='isolated_margin', balances=isolated_margin),
+          SubaccountSnapshot(subaccount='funding', balances=funding),
+          SubaccountSnapshot(subaccount='spot_bot', balances=spot_bot),
+          SubaccountSnapshot(subaccount='futures_bot', balances=futures_bot),
+        ]
+      ),
       provenance={'source': 'api', 'service': 'bitget', 'id': source_id('bitget')},
     )

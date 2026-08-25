@@ -10,9 +10,9 @@ from .exchange import Exchange
 # or `perp.<N>` (child). The `.`-qualifier keeps the top-level `<account>:<exchange>:<market>`
 # colon split (core `markets.py`) unaffected.
 
+
 @dataclass(frozen=True)
 class DydxMarket(ExchangeMixin, TradingVenue):
-
   @property
   def venue_id(self) -> str:
     return 'dydx'
@@ -28,7 +28,7 @@ class DydxMarket(ExchangeMixin, TradingVenue):
     if exchange_id == 'perp':
       return Exchange(shared=self.shared, subaccount=parent)
     if exchange_id.startswith('perp.'):
-      suffix = exchange_id[len('perp.'):]
+      suffix = exchange_id[len('perp.') :]
       try:
         subaccount = int(suffix)
       except ValueError:
@@ -42,7 +42,9 @@ class DydxMarket(ExchangeMixin, TradingVenue):
           f'(i.e. {parent}, {128 + parent}, {256 + parent}, ...).'
         )
       return Exchange(shared=self.shared, subaccount=subaccount)
-    raise ValueError(f'Invalid exchange ID: {exchange_id!r}. Only "perp" or "perp.<N>" are supported.')
+    raise ValueError(
+      f'Invalid exchange ID: {exchange_id!r}. Only "perp" or "perp.<N>" are supported.'
+    )
 
   async def perp_exchange(self, exchange_id: str, /):
     return await self.exchange(exchange_id)

@@ -1,4 +1,4 @@
 from .instruments import Instruments
 
-class Earn(Instruments):
-  ...
+
+class Earn(Instruments): ...

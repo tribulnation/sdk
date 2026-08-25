@@ -5,7 +5,11 @@ import asyncio
 
 from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import (
-  Balances, Position, Snapshot, SnapshotRecord, Snapshots as _Snapshots,
+  Balances,
+  Position,
+  Snapshot,
+  SnapshotRecord,
+  Snapshots as _Snapshots,
   SubaccountSnapshot,
 )
 from typed_hyperliquid.info import Info
@@ -14,6 +18,7 @@ from tribulnation.hyperliquid.core import wrap_exceptions
 from .subaccounts import STAKING, UNIFIED
 
 HYPE_ASSET = '150'
+
 
 @dataclass
 class Snapshots(_Snapshots):
@@ -24,7 +29,7 @@ class Snapshots(_Snapshots):
   def http(cls, address: str, *, validate: bool = True, mainnet: bool = True):
     info = Info.http(validate=validate, mainnet=mainnet)
     return cls(info, address)
-  
+
   @classmethod
   def ws(cls, address: str, *, validate: bool = True, mainnet: bool = True):
     info = Info.ws(validate=validate, mainnet=mainnet)
@@ -40,11 +45,13 @@ class Snapshots(_Snapshots):
   @wrap_exceptions
   async def spot_balances(self) -> Balances:
     spot = await self.info.spot_clearinghouse_state(user=self.address)
-    return Balances({
-      str(balance['token']): qty
-      for balance in spot['balances']
+    return Balances(
+      {
+        str(balance['token']): qty
+        for balance in spot['balances']
         if (qty := Decimal(balance['total'])) > 0
-    })
+      }
+    )
 
   @SDK.method
   @wrap_exceptions
@@ -58,7 +65,8 @@ class Snapshots(_Snapshots):
     return await self.info.clearinghouse_state(user=self.address, dex=dex)
 
   async def dex_positions_and_pnl(
-    self, dex: str | None,
+    self,
+    dex: str | None,
   ) -> tuple[dict[str, Position], Balances]:
     """Positions on one dex, and the unrealized PnL its spot balance carries.
 
@@ -96,10 +104,9 @@ class Snapshots(_Snapshots):
   async def perp_positions_and_pnl(self) -> tuple[dict[str, Position], Balances]:
     """Positions across every dex, and the unrealized PnL per collateral token."""
     dexs = await self.info.perp_dexs()
-    results = await asyncio.gather(*[
-      self.dex_positions_and_pnl(dex and dex['name'])
-      for dex in dexs
-    ])
+    results = await asyncio.gather(
+      *[self.dex_positions_and_pnl(dex and dex['name']) for dex in dexs]
+    )
     positions: dict[str, Position] = {}
     pnls = Balances()
     for pos, pnl in results:
@@ -117,13 +124,21 @@ class Snapshots(_Snapshots):
     for asset, pnl in perp_pnls.items():
       balances[asset] -= pnl
     staking = {HYPE_ASSET: stake} if stake > 0 else {}
-    snapshot = Snapshot(subaccounts=[
+    snapshot = Snapshot(
+      subaccounts=[
         SubaccountSnapshot(
-          subaccount=UNIFIED, balances=balances, positions=perp_positions,
+          subaccount=UNIFIED,
+          balances=balances,
+          positions=perp_positions,
         ),
         SubaccountSnapshot(subaccount=STAKING, balances=staking),
-      ])
+      ]
+    )
     return SnapshotRecord(
       snapshot=snapshot,
-      provenance={'source': 'api', 'service': 'hyperliquid', 'id': snapshot.time.isoformat()},
+      provenance={
+        'source': 'api',
+        'service': 'hyperliquid',
+        'id': snapshot.time.isoformat(),
+      },
     )

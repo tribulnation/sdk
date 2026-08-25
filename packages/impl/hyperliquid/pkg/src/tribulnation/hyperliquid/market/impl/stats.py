@@ -15,9 +15,13 @@ from .mixin import PerpMixin
 FUNDING_INTERVAL = timedelta(hours=1)
 """Hyperliquid settles funding every hour, on the hour."""
 
+
 @wrap_exceptions
 async def perp_stats(
-  self: PerpMixin, markets: Collection[str] | None = None, *, settings: Settings = {},
+  self: PerpMixin,
+  markets: Collection[str] | None = None,
+  *,
+  settings: Settings = {},
 ) -> Mapping[str, PerpStats]:
   """Fetch pricing and funding stats for the whole perp universe in one call.
 
@@ -35,7 +39,9 @@ async def perp_stats(
   References:
     - [Hyperliquid API docs](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-asset-contexts-includes-mark-price-current-funding-open-interest-etc)
   """
-  _, perp_meta, asset_ctxs = await self.shared.load_perp_meta_for_dex(self.dex_name, refetch=True)
+  _, perp_meta, asset_ctxs = await self.shared.load_perp_meta_for_dex(
+    self.dex_name, refetch=True
+  )
   now = datetime.now().astimezone()
   next_time = now.replace(minute=0, second=0, microsecond=0) + FUNDING_INTERVAL
   use_mark = settings.get('hyperliquid', {}).get('index_price', 'oracle') == 'mark'
@@ -54,7 +60,9 @@ async def perp_stats(
       funding=Decimal(ctx['funding']),
       next_funding_time=next_time,
       funding_interval=FUNDING_INTERVAL,
-      open_interest=Decimal(oi) if (oi := ctx.get('openInterest')) is not None else None,
+      open_interest=Decimal(oi)
+      if (oi := ctx.get('openInterest')) is not None
+      else None,
     )
 
   if wanted is not None and (missing := wanted - set(stats)):
@@ -68,14 +76,21 @@ async def fetch_l2_book(self: PerpMixin, coin: str) -> Book:
   raw = await self.shared.client.info.l2_book(coin=coin)
   bids_raw, asks_raw = raw['levels']
   return Book(
-    bids=[Book.Entry(price=Decimal(b['px']), qty=Decimal(b['sz'])) for b in bids_raw[:1]],
-    asks=[Book.Entry(price=Decimal(a['px']), qty=Decimal(a['sz'])) for a in asks_raw[:1]],
+    bids=[
+      Book.Entry(price=Decimal(b['px']), qty=Decimal(b['sz'])) for b in bids_raw[:1]
+    ],
+    asks=[
+      Book.Entry(price=Decimal(a['px']), qty=Decimal(a['sz'])) for a in asks_raw[:1]
+    ],
   )
 
 
 @wrap_exceptions
 async def perp_tickers(
-  self: PerpMixin, markets: Collection[str] | None = None, *, settings: Settings = {},
+  self: PerpMixin,
+  markets: Collection[str] | None = None,
+  *,
+  settings: Settings = {},
 ) -> Mapping[str, Ticker]:
   """Fetch ticker snapshots for the whole perp universe in one call.
 
@@ -88,7 +103,9 @@ async def perp_tickers(
   Returns:
     A mapping of asset name to its `Ticker`.
   """
-  _, perp_meta, asset_ctxs = await self.shared.load_perp_meta_for_dex(self.dex_name, refetch=True)
+  _, perp_meta, asset_ctxs = await self.shared.load_perp_meta_for_dex(
+    self.dex_name, refetch=True
+  )
   wanted = None if markets is None else set(markets)
 
   result: dict[str, Ticker] = {}

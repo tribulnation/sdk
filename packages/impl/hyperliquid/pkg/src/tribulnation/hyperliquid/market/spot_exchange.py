@@ -31,14 +31,17 @@ async def fetch_l2_book(self: SpotMixin, coin: str) -> Book:
   raw = await self.shared.client.info.l2_book(coin=coin)
   bids_raw, asks_raw = raw['levels']
   return Book(
-    bids=[Book.Entry(price=Decimal(b['px']), qty=Decimal(b['sz'])) for b in bids_raw[:1]],
-    asks=[Book.Entry(price=Decimal(a['px']), qty=Decimal(a['sz'])) for a in asks_raw[:1]],
+    bids=[
+      Book.Entry(price=Decimal(b['px']), qty=Decimal(b['sz'])) for b in bids_raw[:1]
+    ],
+    asks=[
+      Book.Entry(price=Decimal(a['px']), qty=Decimal(a['sz'])) for a in asks_raw[:1]
+    ],
   )
 
 
 @dataclass(frozen=True, kw_only=True)
 class SpotExchange(SpotMixin, _Exchange):
-
   @property
   def venue_id(self) -> str:
     return 'hyperliquid'
@@ -53,11 +56,16 @@ class SpotExchange(SpotMixin, _Exchange):
     for asset in meta['universe']:
       spot_index = asset['index']
       m = await self.shared.spot_meta_of(spot_index)
-      out.append(_market_id(m['base_meta']['name'], m['quote_meta']['name'], spot_index))
+      out.append(
+        _market_id(m['base_meta']['name'], m['quote_meta']['name'], spot_index)
+      )
     return out
 
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {},
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
   ) -> Mapping[str, Ticker]:
     """Fetch spot tickers, optionally enriched with per-market order books.
 
@@ -114,6 +122,6 @@ class SpotExchange(SpotMixin, _Exchange):
     meta = await self.shared.spot_meta_of(spot_index)
     if meta['base_meta']['name'] != base or meta['quote_meta']['name'] != quote:
       raise ValueError(
-        f"Spot market_id mismatch for idx={spot_index}: expected {base}/{quote}, got {meta['base_meta']['name']}/{meta['quote_meta']['name']}"
+        f'Spot market_id mismatch for idx={spot_index}: expected {base}/{quote}, got {meta["base_meta"]["name"]}/{meta["quote_meta"]["name"]}'
       )
     return SpotMarket(shared=self.shared, meta=meta)

@@ -1,5 +1,6 @@
 from typing_extensions import Literal, TypedDict
 
+
 class Settings(TypedDict, total=False):
   reduce_only: bool
   limit_tif: Literal['Alo', 'Ioc', 'Gtc']

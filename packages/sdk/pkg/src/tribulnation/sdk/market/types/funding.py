@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 YEAR_SECONDS = Decimal(365 * 24 * 3600)
 
+
 @dataclass(kw_only=True)
 class FundingRate:
   rate: Decimal
@@ -16,6 +17,7 @@ class FundingRate:
   `None` if the venue does not report it.
   """
 
+
 @dataclass(kw_only=True)
 class NextFunding(FundingRate):
   interval: timedelta
@@ -24,6 +26,7 @@ class NextFunding(FundingRate):
   def annualized(self) -> Decimal:
     """Annualized funding rate (in relative units, e.g. 0.01 = 1%)."""
     return self.rate * YEAR_SECONDS / Decimal(self.interval.total_seconds())
+
 
 @dataclass
 class FundingPayment:

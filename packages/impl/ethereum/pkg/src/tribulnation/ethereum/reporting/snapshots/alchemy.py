@@ -1,5 +1,12 @@
 from decimal import Decimal
-from typing_extensions import AsyncContextManager, Collection, Iterable, TypeVar, Callable, Awaitable
+from typing_extensions import (
+  AsyncContextManager,
+  Collection,
+  Iterable,
+  TypeVar,
+  Callable,
+  Awaitable,
+)
 from dataclasses import dataclass, field
 
 from web3 import Web3
@@ -7,22 +14,31 @@ from alchemy import Alchemy
 
 from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import (
-  Balances, Snapshot, SnapshotRecord, Snapshots, SubaccountSnapshot, source_id,
+  Balances,
+  Snapshot,
+  SnapshotRecord,
+  Snapshots,
+  SubaccountSnapshot,
+  source_id,
 )
 from tribulnation.ethereum.core import alchemy as alchemy_core
 from ..config import NATIVE_ASSET
 
 T = TypeVar('T')
 
+
 def hex_balance(value: str) -> int:
   """Parse an Alchemy hex-encoded balance."""
   return int(value, 16) if value.startswith('0x') else int(value)
 
+
 NATIVE_DECIMALS = 18
+
 
 def token_qty(value: str, decimals: int | None) -> Decimal:
   """Convert a raw integer token balance into display units."""
   return Decimal(hex_balance(value)) * (Decimal(10) ** -(decimals or NATIVE_DECIMALS))
+
 
 @dataclass(frozen=True, kw_only=True)
 class AlchemySnapshots(Snapshots):
@@ -42,16 +58,20 @@ class AlchemySnapshots(Snapshots):
     return await fn()
 
   async def alchemy_portfolio_tokens(self):
-    paging = self.alchemy.portfolio.tokens.paged({
-      'addresses': [{
-        'address': self.address,
-        'networks': [self.network],
-      }],
-      'withMetadata': True,
-      'withPrices': True,
-      'includeNativeTokens': True,
-      'includeErc20Tokens': True,
-    })
+    paging = self.alchemy.portfolio.tokens.paged(
+      {
+        'addresses': [
+          {
+            'address': self.address,
+            'networks': [self.network],
+          }
+        ],
+        'withMetadata': True,
+        'withPrices': True,
+        'includeNativeTokens': True,
+        'includeErc20Tokens': True,
+      }
+    )
     state = paging.init
     while state is not None:
       current = state

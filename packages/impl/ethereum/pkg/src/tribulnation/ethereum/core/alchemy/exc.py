@@ -15,6 +15,7 @@ from tribulnation.sdk.core import (
 
 Fn = TypeVar('Fn')
 
+
 def wrap_exceptions(fn: Fn) -> Fn:
   """
   Wrap unexpected exceptions from the Ethereum dependencies into trading-sdk
@@ -116,4 +117,6 @@ def wrap_exceptions(fn: Fn) -> Fn:
 
     return wrapper  # type: ignore[return-value]
 
-  raise ValueError(f"Function {fn} is not a supported callable type for wrap_exceptions")
+  raise ValueError(
+    f'Function {fn} is not a supported callable type for wrap_exceptions'
+  )

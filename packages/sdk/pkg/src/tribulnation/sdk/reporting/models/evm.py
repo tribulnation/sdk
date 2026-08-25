@@ -10,7 +10,9 @@ if TYPE_CHECKING:
 
 def to_checksum_address(address: str) -> str:
   from web3 import Web3
+
   return Web3.to_checksum_address(address)
+
 
 ChecksumAddress = Annotated[str, pydantic.AfterValidator(to_checksum_address)]
 
@@ -40,12 +42,19 @@ class Log(pydantic.BaseModel):
   #   transactionIndex: int
 
   def dump(
-    self, *, index: int = 0, block_number: int = 0, block_hash: str = '0x',
-    transaction_hash: str = '0x', transaction_index: int = 0, removed: bool = False,
+    self,
+    *,
+    index: int = 0,
+    block_number: int = 0,
+    block_hash: str = '0x',
+    transaction_hash: str = '0x',
+    transaction_index: int = 0,
+    removed: bool = False,
   ) -> 'LogReceipt':
-    from web3.types import HexBytes, ChecksumAddress, BlockNumber # type: ignore
+    from web3.types import HexBytes, ChecksumAddress, BlockNumber  # type: ignore
+
     return {
-      'address': ChecksumAddress(self.address), # type: ignore
+      'address': ChecksumAddress(self.address),  # type: ignore
       'blockHash': HexBytes(block_hash),
       'blockNumber': BlockNumber(block_number),
       'data': HexBytes(self.data),
@@ -60,13 +69,16 @@ class Log(pydantic.BaseModel):
   def parse_all(cls, logs: Sequence['LogReceipt']) -> list['Log']:
     return [cls.parse(log) for log in sorted(logs, key=lambda log: log['logIndex'])]
 
+
 class BaseEvmTransfer(pydantic.BaseModel):
   counterparty: ChecksumAddress
   change: Decimal
 
+
 class EvmTx(BaseObservation):
   """EVM-compatible blockchain transaction observation."""
-  model_config = {'ignored_types': (UnionType, type)} # type: ignore
+
+  model_config = {'ignored_types': (UnionType, type)}  # type: ignore
   type: Literal['evm_tx'] = 'evm_tx'
 
   Log = Log
@@ -74,7 +86,7 @@ class EvmTx(BaseObservation):
   class NativeTransfer(BaseEvmTransfer):
     kind: Literal['native'] = 'native'
     internal: bool
-    
+
     @property
     def asset(self):
       return 'native'
@@ -91,7 +103,6 @@ class EvmTx(BaseObservation):
     @property
     def asset(self):
       return f'{self.contract_address}:{self.token_id}'
-      
 
   Transfer = NativeTransfer | ERC20Transfer | NftTransfer
 

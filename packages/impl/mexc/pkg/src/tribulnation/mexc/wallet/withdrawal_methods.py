@@ -1,15 +1,21 @@
 from typing_extensions import Sequence, Collection
 from decimal import Decimal
 
-from tribulnation.sdk.wallet.withdrawal_methods import WithdrawalMethod, WithdrawalMethods as _WithdrawalMethods
+from tribulnation.sdk.wallet.withdrawal_methods import (
+  WithdrawalMethod,
+  WithdrawalMethods as _WithdrawalMethods,
+)
 
 from tribulnation.mexc.core import Mixin, wrap_exceptions
+
 
 class WithdrawalMethods(Mixin, _WithdrawalMethods):
   @wrap_exceptions
   async def withdrawal_methods(
-    self, *, assets: Collection[str] | None = None,
-    networks: Collection[str] | None = None
+    self,
+    *,
+    assets: Collection[str] | None = None,
+    networks: Collection[str] | None = None,
   ) -> Sequence[WithdrawalMethod]:
     currencies = await self.client.spot.wallet.currency_info()
 
@@ -24,14 +30,16 @@ class WithdrawalMethods(Mixin, _WithdrawalMethods):
           continue
         if networks is not None and network not in networks:
           continue
-        out.append(WithdrawalMethod(
-          network=network,
-          contract_address=m.get('contract'),
-          asset=asset,
-          fee=WithdrawalMethod.Fee(
+        out.append(
+          WithdrawalMethod(
+            network=network,
+            contract_address=m.get('contract'),
             asset=asset,
-            amount=Decimal(m.get('withdrawFee') or '0'),
-          ),
-        ))
+            fee=WithdrawalMethod.Fee(
+              asset=asset,
+              amount=Decimal(m.get('withdrawFee') or '0'),
+            ),
+          )
+        )
 
     return out

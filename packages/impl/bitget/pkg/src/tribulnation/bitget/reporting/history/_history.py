@@ -11,10 +11,11 @@ from .margin import MarginHistory
 
 from .util import TimezoneMixin, require_range
 
+
 @dataclass
 class History(TimezoneMixin, SdkMixin, SdkHistory):
   """Bitget Reporting History
-  
+
   **Does not support**:
   - P2P trading
   - Copy trading

@@ -1,4 +1,5 @@
 """MEXC reporting: snapshots only (history is not yet wired)."""
+
 from typing_extensions import AsyncIterable
 from dataclasses import dataclass
 from datetime import datetime
@@ -18,6 +19,8 @@ class Report(_Report, Snapshots):
   """
 
   def history(
-    self, start: datetime | None = None, end: datetime | None = None,
+    self,
+    start: datetime | None = None,
+    end: datetime | None = None,
   ) -> AsyncIterable[HistoryRecord]:
     raise NotImplementedError('mexc history is not yet wired into ReportSDK.')

@@ -2,11 +2,28 @@ from typing_extensions import Annotated, Union, Sequence, Literal
 import pydantic
 
 from .exchange import (
-  SpotTrade, SpotOrder, TradeLeg, Conversion, FeeLeg,
-  FutureTrade, FutureOrder, FuturePositionSummary, RealizedPnl,
-  Yield, Bonus, Funding, Borrow, Repay, UnknownObservation,
-  InternalTransfer, Transfer, CryptoDeposit, CryptoWithdrawal,
-  FiatDeposit, FiatWithdrawal, FiatConversion,
+  SpotTrade,
+  SpotOrder,
+  TradeLeg,
+  Conversion,
+  FeeLeg,
+  FutureTrade,
+  FutureOrder,
+  FuturePositionSummary,
+  RealizedPnl,
+  Yield,
+  Bonus,
+  Funding,
+  Borrow,
+  Repay,
+  UnknownObservation,
+  InternalTransfer,
+  Transfer,
+  CryptoDeposit,
+  CryptoWithdrawal,
+  FiatDeposit,
+  FiatWithdrawal,
+  FiatConversion,
 )
 from .blockchain import CryptoTransaction
 from .evm import EvmTx
@@ -71,8 +88,9 @@ Observation = Annotated[
     CosmosBlockEvents,
     UnknownObservation,
   ],
-  pydantic.Discriminator('type')
+  pydantic.Discriminator('type'),
 ]
+
 
 class HistoryRecord(pydantic.BaseModel):
   model_config = pydantic.ConfigDict(extra='forbid')

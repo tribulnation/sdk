@@ -15,6 +15,7 @@ from .governance import GovernanceHistory
 if TYPE_CHECKING:
   from .cache import HistoryCache
 
+
 @dataclass(kw_only=True)
 class History(_History):
   address: str
@@ -32,7 +33,9 @@ class History(_History):
 
   @classmethod
   def of(
-    cls, address: str, *,
+    cls,
+    address: str,
+    *,
     bigquery: BigQueryClient | None = None,
     dydx: Dydx | None = None,
     cache: HistoryCache | None = None,
@@ -58,7 +61,7 @@ class History(_History):
     ]
     if self.bigquery is not None:
       coros += (self.bigquery.history(start, end),)
-    
+
     async with managed_tasks(coros) as tasks:
       for task in asyncio.as_completed(tasks):
         page = await task

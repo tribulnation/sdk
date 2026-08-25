@@ -5,6 +5,7 @@ from decimal import Decimal
 
 from tribulnation.sdk.core import SDK
 
+
 @dataclass(kw_only=True)
 class DepositMethod:
   @dataclass
@@ -18,11 +19,14 @@ class DepositMethod:
   contract_address: str | None = None
   min_confirmations: int | None = None
 
+
 class DepositMethods(SDK):
   @SDK.method
   @abstractmethod
   async def deposit_methods(
-    self, *, assets: Collection[str] | None = None,
+    self,
+    *,
+    assets: Collection[str] | None = None,
   ) -> Sequence[DepositMethod]:
     """Get deposit methods.
 

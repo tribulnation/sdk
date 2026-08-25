@@ -16,6 +16,7 @@ worked around here, so both are detected rather than absorbed:
 Where the fold cannot see back to position open, `realized_pnl` is `None`. An
 explicit unknown is correct; a fabricated number is not.
 """
+
 from typing_extensions import Iterable, Mapping, Sequence, TypeAlias, Union
 from dataclasses import dataclass
 from datetime import datetime
@@ -73,6 +74,7 @@ def fill_id(fill: AnyFill, occurrence: int) -> str:
 @dataclass
 class Position:
   """Running position state for one perp coin."""
+
   size: Decimal = ZERO
   """Signed position size."""
   entry: Decimal | None = None
@@ -111,16 +113,21 @@ def advance(position: Position, size: Decimal, price: Decimal) -> Position:
     else:
       entry = (before * position.entry + size * price) / after
   elif abs(size) < abs(before):
-    entry = position.entry          # Reducing: cost basis is unchanged.
+    entry = position.entry  # Reducing: cost basis is unchanged.
   elif after == ZERO:
-    entry = None                    # Flat.
+    entry = None  # Flat.
   else:
-    entry = price                   # Flipped: the remainder opens at this price.
+    entry = price  # Flipped: the remainder opens at this price.
   return Position(size=after, entry=entry, complete=position.complete)
 
 
 def parse_perp_fill(
-  fill: AnyFill, *, index: int, pnl: Decimal | None, settle: str, assets: Assets,
+  fill: AnyFill,
+  *,
+  index: int,
+  pnl: Decimal | None,
+  settle: str,
+  assets: Assets,
 ) -> FutureTrade:
   """Convert a perp fill into a future trade observation."""
   return FutureTrade(
@@ -155,7 +162,10 @@ def parse_spot_fill(fill: AnyFill, *, index: int, assets: Assets) -> SpotTrade:
 
 
 def parse_fills(
-  fills: Iterable[AnyFill], *, assets: Assets, settle: Mapping[str, str],
+  fills: Iterable[AnyFill],
+  *,
+  assets: Assets,
+  settle: Mapping[str, str],
 ) -> tuple[list[FutureTrade | SpotTrade], dict[str, Position]]:
   """Convert a fill stream into trade observations with exact realized PnL.
 
@@ -198,9 +208,15 @@ def parse_fills(
     size, price = signed_size(fill), Decimal(fill['px'])
     pnl = realized_pnl(position, size, price)
     positions[coin] = advance(position, size, price)
-    out.append(parse_perp_fill(
-      fill, index=index, pnl=pnl, settle=settlement_token(settle, coin), assets=assets,
-    ))
+    out.append(
+      parse_perp_fill(
+        fill,
+        index=index,
+        pnl=pnl,
+        settle=settlement_token(settle, coin),
+        assets=assets,
+      )
+    )
   return out, positions
 
 

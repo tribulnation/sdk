@@ -41,7 +41,8 @@ def cross_collateral(
 
 
 def isolated_collateral(
-  pos: PerpPosition, leverage: IsolatedLeverage,
+  pos: PerpPosition,
+  leverage: IsolatedLeverage,
 ) -> PerpCollateral:
   """The per-market ISOLATED margin bucket for a single position.
 
@@ -109,7 +110,9 @@ async def _unified_cross_collateral(self: PerpMixin) -> PerpCollateral:
       free_collateral = Decimal(available)
       break
 
-  return cross_collateral(state, spot_equity=spot_equity, free_collateral=free_collateral)
+  return cross_collateral(
+    state, spot_equity=spot_equity, free_collateral=free_collateral
+  )
 
 
 @wrap_exceptions
@@ -126,7 +129,8 @@ async def perp_market_collateral(self: PerpMarketMixin) -> PerpCollateral:
   positions get their own bucket.
   """
   state = await self.client.info.clearinghouse_state(
-    user=self.address, dex=self.dex_name,
+    user=self.address,
+    dex=self.dex_name,
   )
   for entry in state['assetPositions']:
     pos = entry['position']

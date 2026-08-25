@@ -17,6 +17,7 @@ from contextlib import AsyncExitStack
 @dataclass
 class AsyncResourceState:
   """Mutable state for one declarative async resource owner."""
+
   stack: AsyncExitStack | None = None
 
   async def enter(self, resources: Iterable[AsyncContextManager[Any]]) -> None:
@@ -66,4 +67,3 @@ def resource_state(obj: object) -> AsyncResourceState:
   if state is None:
     state = obj.__dict__['_resource_state'] = AsyncResourceState()
   return state
-

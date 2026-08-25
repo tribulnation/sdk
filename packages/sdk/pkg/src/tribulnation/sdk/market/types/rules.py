@@ -4,9 +4,11 @@ from decimal import Decimal
 
 from tribulnation.sdk.util import ceil2tick, trunc2tick, round2tick
 
+
 @dataclass(kw_only=True)
 class Rules:
   """Market rules type."""
+
   base: str
   """Base asset of the instrument."""
   quote: str
@@ -64,13 +66,13 @@ class Rules:
     if self.min_value is not None:
       min_qty = max(min_qty, self.min_value / price)
     return ceil2tick(min_qty, self.step_size)
-  
+
   def trunc_qty(self, base_qty: Decimal, *, price: Decimal) -> Decimal | None:
     """Truncate the (base asset) quantity to the nearest step size. Returns `None` if the quantity is too small."""
     qty = trunc2tick(base_qty, self.step_size)
     if qty > self.min_qty(price):
       return qty
-    
+
   def round_qty(self, base_qty: Decimal, *, price: Decimal) -> Decimal | None:
     """Round the (base asset) quantity to the nearest step size."""
     qty = round2tick(base_qty, self.step_size)
@@ -88,11 +90,11 @@ class Rules:
   def ceil_price(self, price: Decimal) -> Decimal:
     """Ceil the price to the nearest tick size."""
     return ceil2tick(price, self.tick_size)
-  
+
   def amount2qty(self, quote_amount: Decimal, *, price: Decimal) -> Decimal | None:
     """Convert a quote amount to a base quantity, truncating to the nearest step size. Returns `None` if the quantity is too small."""
     return self.trunc_qty(quote_amount / price, price=price)
-  
+
   def qty2amount(self, base_qty: Decimal, *, price: Decimal) -> Decimal:
     """Convert a base quantity to a quote amount."""
     return base_qty * price

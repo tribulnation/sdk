@@ -1,4 +1,12 @@
-from typing_extensions import Any, Iterator, Callable, TypeVar, ParamSpec, Awaitable, overload
+from typing_extensions import (
+  Any,
+  Iterator,
+  Callable,
+  TypeVar,
+  ParamSpec,
+  Awaitable,
+  overload,
+)
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, replace
@@ -25,6 +33,7 @@ class Context:
 
   def logged(self, *, log_self: bool = False) -> 'Context':
     from . import middleware
+
     return self.add(middleware.log(log_self=log_self))
 
   def retried(
@@ -36,23 +45,30 @@ class Context:
     jitter: RetryJitter | None = None,
   ) -> 'Context':
     from . import middleware
-    return self.add(middleware.retry(
-      *exceptions,
-      max_retries=max_retries,
-      base_delay=base_delay,
-      max_delay=max_delay,
-      jitter=jitter,
-    ))
-  
-  @overload
-  async def call(self, fn: Callable[Ps, Awaitable[T]], *args: Ps.args, **kwargs: Ps.kwargs) -> T:
-    ...
+
+    return self.add(
+      middleware.retry(
+        *exceptions,
+        max_retries=max_retries,
+        base_delay=base_delay,
+        max_delay=max_delay,
+        jitter=jitter,
+      )
+    )
 
   @overload
-  async def call(self, fn: Callable[Ps, T], *args: Ps.args, **kwargs: Ps.kwargs) -> T:
-    ...
+  async def call(
+    self, fn: Callable[Ps, Awaitable[T]], *args: Ps.args, **kwargs: Ps.kwargs
+  ) -> T: ...
 
-  async def call(self, fn: Callable[Ps, Any], *args: Ps.args, **kwargs: Ps.kwargs) -> Any:
+  @overload
+  async def call(
+    self, fn: Callable[Ps, T], *args: Ps.args, **kwargs: Ps.kwargs
+  ) -> T: ...
+
+  async def call(
+    self, fn: Callable[Ps, Any], *args: Ps.args, **kwargs: Ps.kwargs
+  ) -> Any:
     with self.use():
       result = fn(*args, **kwargs)
       if inspect.isawaitable(result):

@@ -6,6 +6,7 @@ from .impl import SharedMixin
 from .perps_exchange import PerpExchange
 from .spot_exchange import SpotExchange
 
+
 @dataclass(frozen=True)
 class HyperliquidMarket(SharedMixin, TradingVenue):
   @property

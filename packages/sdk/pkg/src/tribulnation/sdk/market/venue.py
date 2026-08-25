@@ -1,4 +1,11 @@
-from typing_extensions import Any, AsyncIterable, AsyncIterator, Sequence, Literal, TypedDict
+from typing_extensions import (
+  Any,
+  AsyncIterable,
+  AsyncIterator,
+  Sequence,
+  Literal,
+  TypedDict,
+)
 from abc import abstractmethod
 from contextlib import asynccontextmanager
 from datetime import datetime
@@ -6,10 +13,14 @@ from datetime import datetime
 from tribulnation.sdk.core import SDK, PaginatedResponse, OverflowPolicy
 from .types import (
   Book,
-  Collateral, PerpCollateral,
+  Collateral,
+  PerpCollateral,
   NextFunding,
-  Order, OrderResponse, OrderState,
-  Position, PerpPosition,
+  Order,
+  OrderResponse,
+  OrderState,
+  Position,
+  PerpPosition,
   Trade,
   Rules,
 )
@@ -17,24 +28,25 @@ from .settings import Settings
 from .market import Market, PerpMarket
 from .exchange import Exchange, PerpExchange
 
+
 class ExchangeDescription(TypedDict):
   id: str
   type: Literal['spot', 'perp']
 
+
 class TradingVenue(SDK):
   """An abstract multi-exchange venue interface."""
-  ExchangeDescription = ExchangeDescription
 
+  ExchangeDescription = ExchangeDescription
 
   @property
   @abstractmethod
-  def venue_id(self) -> str:
-    ...
+  def venue_id(self) -> str: ...
 
   @property
   def id(self) -> str:
     return self.venue_id
-  
+
   @SDK.method
   @abstractmethod
   async def exchange(self, exchange_id: str, /) -> Exchange:
@@ -47,7 +59,7 @@ class TradingVenue(SDK):
 
   async def market(self, exchange_market_id: str, /) -> Market:
     """Fetch a market by ID.
-    
+
     - `exchange_market_id`: `<exchange_id>:<market_id>`
     """
     exchange_id, market_id = exchange_market_id.split(':', 1)
@@ -63,8 +75,13 @@ class TradingVenue(SDK):
   @SDK.method
   @asynccontextmanager
   async def depth_stream(
-    self, market_id: str, /, *, levels: int | None = None,
-    queue_size: int = 1, overflow: OverflowPolicy = 'latest',
+    self,
+    market_id: str,
+    /,
+    *,
+    levels: int | None = None,
+    queue_size: int = 1,
+    overflow: OverflowPolicy = 'latest',
   ) -> AsyncIterator[AsyncIterable[Book]]:
     """Subscribe to the market order book.
 
@@ -72,13 +89,15 @@ class TradingVenue(SDK):
     with a larger `queue_size` to capture every book).
     """
     market = await self.market(market_id)
-    async with market.depth_stream(levels=levels, queue_size=queue_size, overflow=overflow) as stream:
+    async with market.depth_stream(
+      levels=levels, queue_size=queue_size, overflow=overflow
+    ) as stream:
       yield stream
-  
+
   @SDK.method
   async def rules(self, market_id: str, /, *, refetch: bool = False) -> Rules:
     """Fetch the market rules.
-    
+
     - `refetch`: if `True`, fetch the rules even if they are already cached.
     """
     market = await self.market(market_id)
@@ -107,7 +126,12 @@ class TradingVenue(SDK):
   @SDK.method
   @asynccontextmanager
   async def trades_stream(
-    self, market_id: str, /, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail',
+    self,
+    market_id: str,
+    /,
+    *,
+    queue_size: int = 1000,
+    overflow: OverflowPolicy = 'fail',
   ) -> AsyncIterator[AsyncIterable[Trade]]:
     """Subscribe to your real-time trades.
 
@@ -140,7 +164,7 @@ class TradingVenue(SDK):
   @SDK.method
   async def available_notional(self, market_id: str, /):
     """Fetch the max. notional position you can open.
-    
+
     - For spot, returns the free quote token balance
     - For futures, returns the available collateral times the maximum leverage
     """
@@ -148,7 +172,9 @@ class TradingVenue(SDK):
     return await market.available_notional()
 
   @SDK.method
-  async def place_order(self, market_id: str, /, order: Order, *, settings: Settings = {}) -> OrderResponse:
+  async def place_order(
+    self, market_id: str, /, order: Order, *, settings: Settings = {}
+  ) -> OrderResponse:
     """Place an order in the market.
 
     See ``Market.place_order`` for SDK order type semantics.
@@ -157,19 +183,25 @@ class TradingVenue(SDK):
     return await market.place_order(order, settings=settings)
 
   @SDK.method
-  async def cancel_order(self, market_id: str, /, id: str, *, settings: Settings = {}) -> Any:
+  async def cancel_order(
+    self, market_id: str, /, id: str, *, settings: Settings = {}
+  ) -> Any:
     """Cancel an order in the market."""
     market = await self.market(market_id)
     return await market.cancel_order(id, settings=settings)
 
   @SDK.method
-  async def cancel_orders(self, market_id: str, /, ids: Sequence[str], *, settings: Settings = {}) -> Any:
+  async def cancel_orders(
+    self, market_id: str, /, ids: Sequence[str], *, settings: Settings = {}
+  ) -> Any:
     """Cancel multiple orders in the market."""
     market = await self.market(market_id)
     return await market.cancel_orders(ids, settings=settings)
 
   @SDK.method
-  async def cancel_open_orders(self, market_id: str, /, *, settings: Settings = {}) -> Any:
+  async def cancel_open_orders(
+    self, market_id: str, /, *, settings: Settings = {}
+  ) -> Any:
     """Cancel all open orders in the market."""
     market = await self.market(market_id)
     return await market.cancel_open_orders(settings=settings)
@@ -177,12 +209,14 @@ class TradingVenue(SDK):
   @SDK.method
   async def perp_exchange(self, exchange_id: str, /) -> PerpExchange:
     """Fetch a perpetual exchange by ID."""
-    raise NotImplementedError(f'Perp exchanges are not supported by this venue [{self.id}].')
+    raise NotImplementedError(
+      f'Perp exchanges are not supported by this venue [{self.id}].'
+    )
 
   @SDK.method
   async def perp_market(self, exchange_market_id: str, /) -> PerpMarket:
     """Fetch a market by ID.
-    
+
     - `exchange_market_id`: `<exchange_id>:<market_id>`
     """
     exchange_id, market_id = exchange_market_id.split(':', 1)
@@ -203,7 +237,9 @@ class TradingVenue(SDK):
 
   @SDK.method
   @PaginatedResponse.lift
-  async def funding_rates(self, market_id: str, /, start: datetime | None = None, end: datetime | None = None):
+  async def funding_rates(
+    self, market_id: str, /, start: datetime | None = None, end: datetime | None = None
+  ):
     """Fetch the market's historical funding rates.
 
     Args:

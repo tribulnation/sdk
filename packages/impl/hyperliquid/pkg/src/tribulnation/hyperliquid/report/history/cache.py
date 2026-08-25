@@ -28,6 +28,7 @@ returns. Handing in raw payloads still round-trips correctly, because pydantic
 coerces on the way back, but it emits serializer warnings: the raw form carries
 decimals as strings, and the stored schema declares them as `Decimal`.
 """
+
 from typing_extensions import Any, Sequence
 from dataclasses import dataclass
 from datetime import datetime
@@ -41,13 +42,16 @@ from sqltypes import ValidatedJSON
 from typed_hyperliquid.core import timestamp_millis
 from typed_hyperliquid.info.user_fills_by_time import UserFill
 from typed_hyperliquid.info.user_funding import UserFundingEntry
-from typed_hyperliquid.info.user_non_funding_ledger_updates import UserNonFundingLedgerEntry
+from typed_hyperliquid.info.user_non_funding_ledger_updates import (
+  UserNonFundingLedgerEntry,
+)
 
 from .fills import AnyFill
 
 
 class Base(DeclarativeBase):
   """Declarative base for the Hyperliquid history cache."""
+
 
 cache_metadata = Base.metadata
 
@@ -69,6 +73,7 @@ class Fill(Base):
   None of Hyperliquid's own identifiers can substitute. `tid` is a sentinel 0 on
   dust conversions, and many fills share both a millisecond and a hash.
   """
+
   __tablename__ = 'fills'
   address: Mapped[str] = mapped_column(primary_key=True)
   source: Mapped[str] = mapped_column(primary_key=True)
@@ -88,6 +93,7 @@ class Fill(Base):
 
 class Funding(Base):
   """One cached funding payment."""
+
   __tablename__ = 'funding'
   address: Mapped[str] = mapped_column(primary_key=True)
   time: Mapped[int] = mapped_column(primary_key=True, index=True)
@@ -101,17 +107,21 @@ class LedgerEntry(Base):
   `(time, hash)` is not unique — a single transaction can emit several deltas,
   one per margin bucket — so the position within the response is part of the key.
   """
+
   __tablename__ = 'ledger_entries'
   address: Mapped[str] = mapped_column(primary_key=True)
   time: Mapped[int] = mapped_column(primary_key=True, index=True)
   sequence: Mapped[int] = mapped_column(primary_key=True)
   """Position within the millisecond, in API order."""
   hash: Mapped[str] = mapped_column()
-  data: Mapped[UserNonFundingLedgerEntry] = mapped_column(ValidatedJSON(UserNonFundingLedgerEntry))  # type: ignore[type-var]
+  data: Mapped[UserNonFundingLedgerEntry] = mapped_column(
+    ValidatedJSON(UserNonFundingLedgerEntry)
+  )  # type: ignore[type-var]
 
 
 class Watermark(Base):
   """How far a source has been fetched for one address."""
+
   __tablename__ = 'cache_watermarks'
   source: Mapped[str] = mapped_column(primary_key=True)
   address: Mapped[str] = mapped_column(primary_key=True)
@@ -122,6 +132,7 @@ class Watermark(Base):
 @dataclass
 class HistoryCache:
   """SQLAlchemy-backed archive of raw Hyperliquid responses."""
+
   engine: Engine
   no_cache_reads: bool = False
   """Bypass reads while still writing. Refreshes the archive; never clears it."""
@@ -131,11 +142,13 @@ class HistoryCache:
     """Open (and create if needed) a cache database."""
     engine = create_engine(url)
     if engine.dialect.name == 'sqlite':
+
       @event.listens_for(engine, 'connect')
       def set_wal(conn: DBAPIConnection, record: ConnectionPoolEntry) -> None:
         cursor = conn.cursor()
         cursor.execute('PRAGMA journal_mode=WAL')
         cursor.close()
+
     cache_metadata.create_all(engine)
     return cls(engine=engine, no_cache_reads=no_cache_reads)
 
@@ -147,7 +160,9 @@ class HistoryCache:
       row = session.get(Watermark, (source, address))
       return row.time if row is not None else None
 
-  def _advance(self, session: Session, source: str, address: str, time: int | None) -> None:
+  def _advance(
+    self, session: Session, source: str, address: str, time: int | None
+  ) -> None:
     """Move a watermark forward. Never backwards — that would refetch and, worse,
     imply history is missing that the archive actually holds."""
     row = session.get(Watermark, (source, address))
@@ -161,13 +176,19 @@ class HistoryCache:
     if self.no_cache_reads:
       return []
     with Session(self.engine) as session:
-      stmt = (select(Fill)
-              .where(Fill.address == address, Fill.source == source)
-              .order_by(Fill.time, Fill.sequence))
+      stmt = (
+        select(Fill)
+        .where(Fill.address == address, Fill.source == source)
+        .order_by(Fill.time, Fill.sequence)
+      )
       return [row.data for row in session.scalars(stmt)]
 
   def write_fills(
-    self, address: str, fills: Sequence['AnyFill'], *, source: str = 'fills',
+    self,
+    address: str,
+    fills: Sequence['AnyFill'],
+    *,
+    source: str = 'fills',
   ) -> None:
     """Merge fills into the archive and advance the watermark.
 
@@ -179,12 +200,23 @@ class HistoryCache:
       for fill in fills:
         time = dump_timestamp(fill['time'])
         sequence = seen[time] = seen.get(time, -1) + 1
-        session.merge(Fill(
-          address=address, source=source, time=time, sequence=sequence,
-          hash=fill['hash'], tid=fill['tid'], data=fill,
-        ))
-      self._advance(session, source, address,
-                    max((dump_timestamp(f['time']) for f in fills), default=None))
+        session.merge(
+          Fill(
+            address=address,
+            source=source,
+            time=time,
+            sequence=sequence,
+            hash=fill['hash'],
+            tid=fill['tid'],
+            data=fill,
+          )
+        )
+      self._advance(
+        session,
+        source,
+        address,
+        max((dump_timestamp(f['time']) for f in fills), default=None),
+      )
       session.commit()
 
   def read_funding(self, address: str) -> list[UserFundingEntry]:
@@ -199,12 +231,20 @@ class HistoryCache:
     """Merge funding payments into the archive and advance the watermark."""
     with Session(self.engine) as session:
       for entry in entries:
-        session.merge(Funding(
-          address=address, time=dump_timestamp(entry['time']),
-          coin=entry['delta']['coin'], data=entry,
-        ))
-      self._advance(session, 'funding', address,
-                    max((dump_timestamp(e['time']) for e in entries), default=None))
+        session.merge(
+          Funding(
+            address=address,
+            time=dump_timestamp(entry['time']),
+            coin=entry['delta']['coin'],
+            data=entry,
+          )
+        )
+      self._advance(
+        session,
+        'funding',
+        address,
+        max((dump_timestamp(e['time']) for e in entries), default=None),
+      )
       session.commit()
 
   def read_ledger(self, address: str) -> list[UserNonFundingLedgerEntry]:
@@ -212,21 +252,35 @@ class HistoryCache:
     if self.no_cache_reads:
       return []
     with Session(self.engine) as session:
-      stmt = (select(LedgerEntry).where(LedgerEntry.address == address)
-              .order_by(LedgerEntry.time, LedgerEntry.sequence))
+      stmt = (
+        select(LedgerEntry)
+        .where(LedgerEntry.address == address)
+        .order_by(LedgerEntry.time, LedgerEntry.sequence)
+      )
       return [row.data for row in session.scalars(stmt)]
 
-  def write_ledger(self, address: str, entries: Sequence[UserNonFundingLedgerEntry]) -> None:
+  def write_ledger(
+    self, address: str, entries: Sequence[UserNonFundingLedgerEntry]
+  ) -> None:
     """Merge ledger entries into the archive and advance the watermark."""
     with Session(self.engine) as session:
       seen: dict[int, int] = {}
       for entry in entries:
         time = dump_timestamp(entry['time'])
         sequence = seen[time] = seen.get(time, -1) + 1
-        session.merge(LedgerEntry(
-          address=address, time=time, sequence=sequence,
-          hash=entry['hash'], data=entry,
-        ))
-      self._advance(session, 'ledger', address,
-                    max((dump_timestamp(e['time']) for e in entries), default=None))
+        session.merge(
+          LedgerEntry(
+            address=address,
+            time=time,
+            sequence=sequence,
+            hash=entry['hash'],
+            data=entry,
+          )
+        )
+      self._advance(
+        session,
+        'ledger',
+        address,
+        max((dump_timestamp(e['time']) for e in entries), default=None),
+      )
       session.commit()

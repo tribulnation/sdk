@@ -6,10 +6,16 @@ import os
 from tribulnation.sdk.core import SDK, Subscription, OverflowPolicy
 
 from typed_hyperliquid import Hyperliquid, Wallet
-from typed_hyperliquid.info.spot_meta import SpotMeta as SpotMetaResponse, SpotPair, SpotToken
+from typed_hyperliquid.info.spot_meta import (
+  SpotMeta as SpotMetaResponse,
+  SpotPair,
+  SpotToken,
+)
 from typed_hyperliquid.info.user_fees import UserFeesResponse
 from typed_hyperliquid.info.perp_meta_and_asset_ctxs import (
-  PerpDexMeta, PerpAssetContext, PerpUniverseAsset,
+  PerpDexMeta,
+  PerpAssetContext,
+  PerpUniverseAsset,
 )
 from typed_hyperliquid.info.perp_dexs import PerpDex
 from typed_hyperliquid.streams.user_fills import UserFills
@@ -17,25 +23,30 @@ from typed_hyperliquid.streams.l2_book import L2bookUpdate
 
 from tribulnation.hyperliquid.core import Settings, wrap_exceptions
 
+
 class DEX(TypedDict):
   name: str
   idx: int
+
 
 class SpotMeta(TypedDict):
   asset_meta: SpotPair
   base_meta: SpotToken
   quote_meta: SpotToken
 
+
 class PerpMeta(TypedDict):
   asset_idx: int
   asset_meta: PerpUniverseAsset
   collateral_meta: SpotToken
+
 
 def find_asset_idx(name: str, perp_meta: PerpDexMeta) -> int:
   for idx, asset in enumerate(perp_meta['universe']):
     if asset['name'] == name:
       return idx
   raise ValueError(f'Perp {name} not found')
+
 
 def find_dex_idx(name: str, dexs: list[PerpDex | None]) -> int:
   for idx, obj in enumerate(dexs):
@@ -46,7 +57,9 @@ def find_dex_idx(name: str, dexs: list[PerpDex | None]) -> int:
 
 def spot_meta_of(spot_index: int, /, *, spot_meta: SpotMetaResponse) -> SpotMeta:
   # Canonical spot id uses `spotMeta.universe[].index`.
-  pos = next((i for i, a in enumerate(spot_meta['universe']) if a['index'] == spot_index), None)
+  pos = next(
+    (i for i, a in enumerate(spot_meta['universe']) if a['index'] == spot_index), None
+  )
   if pos is None:
     raise ValueError(f'Spot index {spot_index} not found in spot_meta universe')
   asset_meta = spot_meta['universe'][pos]
@@ -76,16 +89,24 @@ class Shared(SDK):
   perp_dexs: dict[int, PerpDex | None] | None = None
   # Perp meta keyed by dex index; None key is used for the 'no dex' case.
   perp_metas: dict[int | None, PerpDexMeta] = field(default_factory=dict)
-  perp_asset_ctxs: dict[int | None, list[PerpAssetContext]] = field(default_factory=dict)
+  perp_asset_ctxs: dict[int | None, list[PerpAssetContext]] = field(
+    default_factory=dict
+  )
   user_fees: UserFeesResponse | None = None
 
   # Stream subscriptions.
   user_fills_subscription: Subscription[UserFills] | None = None
-  l2_book_subscriptions: dict[str, Subscription[L2bookUpdate]] = field(default_factory=dict)
+  l2_book_subscriptions: dict[str, Subscription[L2bookUpdate]] = field(
+    default_factory=dict
+  )
 
   # Locks for concurrent lazy loads.
-  _spot_meta_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
-  _perp_meta_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
+  _spot_meta_lock: asyncio.Lock = field(
+    default_factory=asyncio.Lock, init=False, repr=False
+  )
+  _perp_meta_lock: asyncio.Lock = field(
+    default_factory=asyncio.Lock, init=False, repr=False
+  )
   _fees_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:
@@ -153,7 +174,9 @@ class Shared(SDK):
       self.user_fees = await self.client.info.user_fees(user=self.address)
       return self.user_fees
 
-  async def resolve_dex_idx(self, dex_name: str | None, *, refetch: bool = False) -> int:
+  async def resolve_dex_idx(
+    self, dex_name: str | None, *, refetch: bool = False
+  ) -> int:
     """
     Convenience wrapper that just returns the dex index for a given dex name.
     Uses the same caching as `load_perp_meta_for_dex`.
@@ -163,17 +186,23 @@ class Shared(SDK):
 
   def user_fills_sub(self) -> Subscription[UserFills]:
     if self.user_fills_subscription is None:
+
       async def subscribe_user_fills():
-        stream = await self.client.streams.user_fills(self.address, aggregate_by_time=True)
+        stream = await self.client.streams.user_fills(
+          self.address, aggregate_by_time=True
+        )
         return stream, stream.unsubscribe
+
       self.user_fills_subscription = Subscription.of(subscribe_user_fills)
     return self.user_fills_subscription
 
   def l2_book_subscription(self, coin: str, /) -> Subscription[L2bookUpdate]:
     if coin not in self.l2_book_subscriptions:
+
       async def subscribe():
         stream = await self.client.streams.l2_book(coin)
         return stream, stream.unsubscribe
+
       self.l2_book_subscriptions[coin] = Subscription.of(subscribe)
     return self.l2_book_subscriptions[coin]
 
@@ -210,33 +239,49 @@ class Shared(SDK):
       collateral_meta=tokens_by_index[collateral_idx],
     )
 
+
 @dataclass(frozen=True)
 class SharedMixin(SDK):
   shared: Shared
 
   @classmethod
   def http(
-    cls, address: str | None = None, *, wallet: Wallet | None = None,
-    mainnet: bool = True, validate: bool = True,
+    cls,
+    address: str | None = None,
+    *,
+    wallet: Wallet | None = None,
+    mainnet: bool = True,
+    validate: bool = True,
   ):
     if address is None:
       env_var = 'HYPERLIQUID_ADDRESS' if mainnet else 'HYPERLIQUID_TESTNET_ADDRESS'
       address = os.environ.get(env_var)
     client = Hyperliquid.new(
-      wallet, mainnet=mainnet, validate=validate, public=True,
+      wallet,
+      mainnet=mainnet,
+      validate=validate,
+      public=True,
     )
     return cls(shared=Shared(client=client, maybe_address=address))
 
   @classmethod
   def ws(
-    cls, address: str | None = None, *, wallet: Wallet | None = None,
-    mainnet: bool = True, validate: bool = True, public: bool = False,
+    cls,
+    address: str | None = None,
+    *,
+    wallet: Wallet | None = None,
+    mainnet: bool = True,
+    validate: bool = True,
+    public: bool = False,
   ):
     if address is None:
       env_var = 'HYPERLIQUID_ADDRESS' if mainnet else 'HYPERLIQUID_TESTNET_ADDRESS'
       address = os.environ.get(env_var)
     client = Hyperliquid.new(
-      wallet, mainnet=mainnet, validate=validate, public=True,
+      wallet,
+      mainnet=mainnet,
+      validate=validate,
+      public=True,
     )
     return cls(shared=Shared(client=client, maybe_address=address))
 
@@ -251,16 +296,23 @@ class SharedMixin(SDK):
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield self.shared
 
-  def subscribe_user_fills(self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'):
-    return self.shared.user_fills_sub().subscribe(queue_size=queue_size, overflow=overflow)
+  def subscribe_user_fills(
+    self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'
+  ):
+    return self.shared.user_fills_sub().subscribe(
+      queue_size=queue_size, overflow=overflow
+    )
 
-  def subscribe_l2_book(self, coin: str, /, *, queue_size: int = 1, overflow: OverflowPolicy = 'latest'):
-    return self.shared.l2_book_subscription(coin).subscribe(queue_size=queue_size, overflow=overflow)
+  def subscribe_l2_book(
+    self, coin: str, /, *, queue_size: int = 1, overflow: OverflowPolicy = 'latest'
+  ):
+    return self.shared.l2_book_subscription(coin).subscribe(
+      queue_size=queue_size, overflow=overflow
+    )
 
 
 @dataclass(kw_only=True, frozen=True)
-class SpotMixin(SharedMixin):
-  ...
+class SpotMixin(SharedMixin): ...
 
 
 @dataclass(kw_only=True, frozen=True)
@@ -306,7 +358,7 @@ class PerpMixin(SharedMixin):
 
   @classmethod
   async def fetch(cls, shared: Shared, *, dex: str | None = None):
-    if dex: # we treat '' and None equivalently
+    if dex:  # we treat '' and None equivalently
       dex_idx = await shared.resolve_dex_idx(dex)
       dex_obj: DEX | None = {'name': dex, 'idx': dex_idx}
     else:
@@ -322,6 +374,7 @@ class PerpMixin(SharedMixin):
   def dex_name(self) -> str | None:
     if self.dex is not None:
       return self.dex['name']
+
 
 @dataclass(kw_only=True, frozen=True)
 class PerpMarketMixin(PerpMixin):

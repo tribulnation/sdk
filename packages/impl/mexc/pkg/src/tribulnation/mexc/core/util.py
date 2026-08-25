@@ -5,6 +5,7 @@ import asyncio
 
 T = TypeVar('T')
 
+
 @dataclass
 class StreamManager(Generic[T]):
   listener: asyncio.Task
@@ -13,6 +14,7 @@ class StreamManager(Generic[T]):
   @classmethod
   def of(cls, stream: AsyncIterable[T]):
     subscribers: list[asyncio.Queue[T]] = []
+
     async def listener():
       async for msg in stream:
         for queue in subscribers:
@@ -30,7 +32,7 @@ class StreamManager(Generic[T]):
   async def subscribe(self) -> AsyncIterable[T]:
     queue = asyncio.Queue[T]()
     self.subscribers.append(queue)
-    
+
     while True:
       # propagate exceptions raised in the listener
       task = asyncio.create_task(queue.get())

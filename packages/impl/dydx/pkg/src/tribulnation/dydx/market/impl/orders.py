@@ -4,11 +4,20 @@ import base64
 
 from typed_dydx.indexer.data.list_parent_orders import Order as IndexerOrder
 from typed_dydx.node.orders.types import (
-  ConditionalOrderParams, Flags, LongTermOrderParams, OrderParams,
-  ShortTermOrderParams, TimeInForce,
+  ConditionalOrderParams,
+  Flags,
+  LongTermOrderParams,
+  OrderParams,
+  ShortTermOrderParams,
+  TimeInForce,
 )
 from tribulnation.sdk.core import ValidationError
-from tribulnation.sdk.market import Order, OrderResponse, OrderState, Settings as MarketSettings
+from tribulnation.sdk.market import (
+  Order,
+  OrderResponse,
+  OrderState,
+  Settings as MarketSettings,
+)
 from typed_dydx.protos.dydxprotocol import clob, subaccounts
 from tribulnation.dydx.core import wrap_exceptions
 from .mixin import MarketMixin, Settings, settings_adapter
@@ -44,6 +53,7 @@ def _protobuf_id(order: IndexerOrder, *, address: str) -> clob.OrderId:
     ),
   )
 
+
 def serialize_id(order_id: clob.OrderId) -> str:
   """Serialize a dYdX protocol order ID for the SDK order API."""
   return base64.b64encode(bytes(order_id)).decode()
@@ -52,6 +62,7 @@ def serialize_id(order_id: clob.OrderId) -> str:
 def parse_id(id: str) -> clob.OrderId:
   """Parse an SDK order ID into a dYdX protocol order ID."""
   return clob.OrderId.FromString(base64.b64decode(id))
+
 
 def parse_state(order: IndexerOrder, *, address: str) -> OrderState:
   sign = _sign(order['side'])
@@ -64,10 +75,21 @@ def parse_state(order: IndexerOrder, *, address: str) -> OrderState:
     details=order,
   )
 
+
 @wrap_exceptions
 async def list_orders(
-  self: MarketMixin, *,
-  status: Literal['OPEN', 'FILLED', 'CANCELED', 'BEST_EFFORT_CANCELED', 'UNTRIGGERED', 'BEST_EFFORT_OPENED', 'PENDING'] | None = None,
+  self: MarketMixin,
+  *,
+  status: Literal[
+    'OPEN',
+    'FILLED',
+    'CANCELED',
+    'BEST_EFFORT_CANCELED',
+    'UNTRIGGERED',
+    'BEST_EFFORT_OPENED',
+    'PENDING',
+  ]
+  | None = None,
 ) -> list[OrderState]:
   address = self.address
   orders = await self.indexer.data.list_parent_orders(
@@ -82,6 +104,7 @@ async def list_orders(
     orders = [order for order in orders if order['subaccountNumber'] == self.subaccount]
   return [parse_state(order, address=address) for order in orders]
 
+
 def _default_tif(order: Order) -> TimeInForce:
   if order['type'] == 'POST_ONLY':
     return 'POST_ONLY'
@@ -90,14 +113,17 @@ def _default_tif(order: Order) -> TimeInForce:
   else:
     return 'GOOD_TIL_TIME'
 
+
 def _time_in_force(order: Order, settings: Settings) -> TimeInForce:
   return settings.get('tif', _default_tif(order))
+
 
 def _default_flags(order: Order) -> Flags:
   if order['type'] == 'MARKET':
     return 'SHORT_TERM'
   else:
     return 'LONG_TERM'
+
 
 def _flags(order: Order, settings: Settings) -> Flags:
   return settings.get('flags', _default_flags(order))
@@ -114,23 +140,41 @@ def export_order(order: Order, settings: Settings) -> OrderParams:
   match _flags(order, settings):
     case 'SHORT_TERM':
       return ShortTermOrderParams(
-        side=side, price=price, size=size, time_in_force=time_in_force,
-        reduce_only=reduce_only, flags='SHORT_TERM',
+        side=side,
+        price=price,
+        size=size,
+        time_in_force=time_in_force,
+        reduce_only=reduce_only,
+        flags='SHORT_TERM',
       )
     case 'LONG_TERM':
       return LongTermOrderParams(
-        side=side, price=price, size=size, time_in_force=time_in_force,
-        reduce_only=reduce_only, flags='LONG_TERM',
+        side=side,
+        price=price,
+        size=size,
+        time_in_force=time_in_force,
+        reduce_only=reduce_only,
+        flags='LONG_TERM',
       )
     case 'CONDITIONAL':
       return ConditionalOrderParams(
-        side=side, price=price, size=size, time_in_force=time_in_force,
-        reduce_only=reduce_only, flags='CONDITIONAL',
+        side=side,
+        price=price,
+        size=size,
+        time_in_force=time_in_force,
+        reduce_only=reduce_only,
+        flags='CONDITIONAL',
       )
 
-async def with_expiry(self: MarketMixin, params: OrderParams, settings: Settings) -> OrderParams:
+
+async def with_expiry(
+  self: MarketMixin, params: OrderParams, settings: Settings
+) -> OrderParams:
   """Apply SDK-configured dYdX order expiry deltas."""
-  if params['flags'] == 'SHORT_TERM' and (delta := settings.get('short_term_gtb')) is not None:
+  if (
+    params['flags'] == 'SHORT_TERM'
+    and (delta := settings.get('short_term_gtb')) is not None
+  ):
     latest = await self.client.chain.tendermint.get_latest_block()
     block = latest.block
     if block is None or block.header is None:
@@ -138,7 +182,10 @@ async def with_expiry(self: MarketMixin, params: OrderParams, settings: Settings
     updated = params.copy()
     updated['good_til_block'] = block.header.height + delta
     return updated
-  if params['flags'] in {'LONG_TERM', 'CONDITIONAL'} and (delta := settings.get('long_term_gtbt')) is not None:
+  if (
+    params['flags'] in {'LONG_TERM', 'CONDITIONAL'}
+    and (delta := settings.get('long_term_gtbt')) is not None
+  ):
     latest = await self.client.chain.tendermint.get_latest_block()
     block = latest.block
     if block is None or block.header is None or block.header.time is None:
@@ -154,8 +201,11 @@ async def with_expiry(self: MarketMixin, params: OrderParams, settings: Settings
       return updated
   return params
 
+
 @wrap_exceptions
-async def place_order(self: MarketMixin, order: Order, *, settings: MarketSettings = {}) -> OrderResponse:
+async def place_order(
+  self: MarketMixin, order: Order, *, settings: MarketSettings = {}
+) -> OrderResponse:
   s = settings_adapter.validate_python(settings.get('dydx', {}))
   response = await self.client.node.place_order(
     self.perpetual_market,
@@ -170,12 +220,16 @@ async def place_order(self: MarketMixin, order: Order, *, settings: MarketSettin
     details=response,
   )
 
+
 @wrap_exceptions
 async def cancel_order(self: MarketMixin, id: str, *, settings: MarketSettings = {}):
   return await self.client.node.cancel_order(parse_id(id))
 
+
 @wrap_exceptions
-async def cancel_orders(self: MarketMixin, ids: Sequence[str], *, settings: MarketSettings = {}):
+async def cancel_orders(
+  self: MarketMixin, ids: Sequence[str], *, settings: MarketSettings = {}
+):
   order_ids = [parse_id(id) for id in ids]
   short_term = [order_id for order_id in order_ids if order_id.order_flags == 0]
   long_term = [order_id for order_id in order_ids if order_id.order_flags != 0]
@@ -190,11 +244,13 @@ async def cancel_orders(self: MarketMixin, ids: Sequence[str], *, settings: Mark
 
   return results
 
+
 @wrap_exceptions
 async def query_order(self: MarketMixin, id: str) -> OrderState | None:
   for order in await list_orders(self):
     if order.id == id:
       return order
+
 
 @wrap_exceptions
 async def open_orders(self: MarketMixin) -> Sequence[OrderState]:

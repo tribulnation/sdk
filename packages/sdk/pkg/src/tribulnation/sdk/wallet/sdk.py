@@ -1,5 +1,5 @@
 from .deposit_methods import DepositMethods
 from .withdrawal_methods import WithdrawalMethods
 
-class Wallet(WithdrawalMethods, DepositMethods):
-  ...
+
+class Wallet(WithdrawalMethods, DepositMethods): ...

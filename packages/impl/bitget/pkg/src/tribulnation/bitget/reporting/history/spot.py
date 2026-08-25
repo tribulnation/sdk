@@ -25,9 +25,11 @@ from .util import (
   signed_size,
 )
 
+
 @dataclass(kw_only=True)
 class SpotHistory(TimezoneMixin, SdkHistory):
   """Bitget spot account history."""
+
   client: Bitget
   symbols_cache: dict[str, Symbol] | None = field(kw_only=True, default=None)
 
@@ -35,13 +37,17 @@ class SpotHistory(TimezoneMixin, SdkHistory):
   async def symbols(self) -> dict[str, Symbol]:
     """Fetch and cache Bitget spot symbol metadata."""
     if self.symbols_cache is None:
-      self.symbols_cache = {s['symbol']: s for s in await self.client.spot.public.symbols()}
+      self.symbols_cache = {
+        s['symbol']: s for s in await self.client.spot.public.symbols()
+      }
     return self.symbols_cache
 
   @SDK.method
   async def flows(self, start: datetime, end: datetime):
     """Fetch spot tax rows as unknown observations."""
-    async for chunk in self.client.common.tax.spot_transaction_records_paged(start=start, end=end):
+    async for chunk in self.client.common.tax.spot_transaction_records_paged(
+      start=start, end=end
+    ):
       for tx in chunk:
         observations: list[Observation] = [
           UnknownObservation(
@@ -53,15 +59,17 @@ class SpotHistory(TimezoneMixin, SdkHistory):
           )
         ]
         if (fee := abs(tx['fee'])) > 0:
-          observations.append(FeeLeg(
-            id=f"{tx['id']}:fee",
-            asset=tx['coin'],
-            amount=-fee,
-            time=self.add_tz(tx['ts']),
-            event_type='unknown',
-            event_id=tx['id'],
-            subaccount='spot',
-          ))
+          observations.append(
+            FeeLeg(
+              id=f'{tx["id"]}:fee',
+              asset=tx['coin'],
+              amount=-fee,
+              time=self.add_tz(tx['ts']),
+              event_type='unknown',
+              event_id=tx['id'],
+              subaccount='spot',
+            )
+          )
         yield api_record_many(
           observations,
           endpoint='spot_transaction_records',
@@ -76,17 +84,24 @@ class SpotHistory(TimezoneMixin, SdkHistory):
       for fill in chunk:
         base = symbols[fill['symbol']]['baseCoin']
         quote = symbols[fill['symbol']]['quoteCoin']
-        yield api_record(SpotTrade(
-          id=fill['tradeId'],
-          time=self.add_tz(fill['cTime']),
-          base=base, quote=quote,
-          pair=fill['symbol'],
-          size=signed_size(fill['size'], fill['side']),
-          price=fill['priceAvg'],
-          order_id=fill['orderId'],
-          fee=nonzero_fee(fill['feeDetail']['totalFee'], fill['feeDetail']['feeCoin']),
-          subaccount='spot',
-        ), endpoint='spot_fills', response=fill)
+        yield api_record(
+          SpotTrade(
+            id=fill['tradeId'],
+            time=self.add_tz(fill['cTime']),
+            base=base,
+            quote=quote,
+            pair=fill['symbol'],
+            size=signed_size(fill['size'], fill['side']),
+            price=fill['priceAvg'],
+            order_id=fill['orderId'],
+            fee=nonzero_fee(
+              fill['feeDetail']['totalFee'], fill['feeDetail']['feeCoin']
+            ),
+            subaccount='spot',
+          ),
+          endpoint='spot_fills',
+          response=fill,
+        )
 
   @SDK.method
   async def deposits(self, start: datetime, end: datetime):
@@ -95,16 +110,20 @@ class SpotHistory(TimezoneMixin, SdkHistory):
       for deposit in chunk:
         if deposit['dest'] != 'on_chain' or deposit['status'] != 'success':
           continue
-        yield api_record(CryptoDeposit(
-          id=deposit['tradeId'],
-          time=self.add_tz(deposit['cTime']),
-          asset=deposit['coin'],
-          amount=deposit['size'],
-          network=deposit['chain'],
-          tx_id=deposit['tradeId'],
-          subaccount='spot',
-        ), endpoint='spot_deposits', response=deposit)
-  
+        yield api_record(
+          CryptoDeposit(
+            id=deposit['tradeId'],
+            time=self.add_tz(deposit['cTime']),
+            asset=deposit['coin'],
+            amount=deposit['size'],
+            network=deposit['chain'],
+            tx_id=deposit['tradeId'],
+            subaccount='spot',
+          ),
+          endpoint='spot_deposits',
+          response=deposit,
+        )
+
   @SDK.method
   async def withdrawals(self, start: datetime, end: datetime):
     """Fetch successful on-chain spot withdrawals."""
@@ -112,18 +131,22 @@ class SpotHistory(TimezoneMixin, SdkHistory):
       for withdrawal in chunk:
         if withdrawal['dest'] != 'on_chain' or withdrawal['status'] != 'success':
           continue
-        
-        yield api_record(CryptoWithdrawal(
-          id=withdrawal['tradeId'],
-          time=self.add_tz(withdrawal['cTime']),
-          asset=withdrawal['coin'],
-          amount=-withdrawal['size'],
-          network=withdrawal['chain'],
-          tx_id=withdrawal['tradeId'],
-          dst_address=withdrawal['toAddress'],
-          fee=nonzero_fee(withdrawal['fee'], withdrawal['coin']),
-          subaccount='spot',
-        ), endpoint='spot_withdrawals', response=withdrawal)
+
+        yield api_record(
+          CryptoWithdrawal(
+            id=withdrawal['tradeId'],
+            time=self.add_tz(withdrawal['cTime']),
+            asset=withdrawal['coin'],
+            amount=-withdrawal['size'],
+            network=withdrawal['chain'],
+            tx_id=withdrawal['tradeId'],
+            dst_address=withdrawal['toAddress'],
+            fee=nonzero_fee(withdrawal['fee'], withdrawal['coin']),
+            subaccount='spot',
+          ),
+          endpoint='spot_withdrawals',
+          response=withdrawal,
+        )
 
   @SDK.method
   async def history(

@@ -7,6 +7,7 @@ from tribulnation.sdk.market import FundingRate, NextFunding, FundingPayment
 from tribulnation.dydx.core import wrap_exceptions
 from .mixin import MarketMixin
 
+
 @wrap_exceptions
 async def next_funding(self: MarketMixin) -> NextFunding:
   market = await self.indexer.data.get_market(self.market)
@@ -18,11 +19,16 @@ async def next_funding(self: MarketMixin) -> NextFunding:
     interval=timedelta(hours=1),
   )
 
+
 @wrap_exceptions
-async def funding_rates(self: MarketMixin, start: datetime | None = None, end: datetime | None = None) -> AsyncIterable[Sequence[FundingRate]]:
+async def funding_rates(
+  self: MarketMixin, start: datetime | None = None, end: datetime | None = None
+) -> AsyncIterable[Sequence[FundingRate]]:
   start = start.astimezone() if start is not None else None
   end = end.astimezone() if end is not None else None
-  paging = self.indexer.data.get_historical_funding_paged(self.market, effective_before_or_at=end)
+  paging = self.indexer.data.get_historical_funding_paged(
+    self.market, effective_before_or_at=end
+  )
   state = paging.init
   while state is not None:
     next_state = state
@@ -37,8 +43,11 @@ async def funding_rates(self: MarketMixin, start: datetime | None = None, end: d
     elif start is not None:
       break
 
+
 @wrap_exceptions
-async def funding_payments(self: MarketMixin, start: datetime, end: datetime) -> AsyncIterable[Sequence[FundingPayment]]:
+async def funding_payments(
+  self: MarketMixin, start: datetime, end: datetime
+) -> AsyncIterable[Sequence[FundingPayment]]:
   start = start.astimezone()
   end = end.astimezone()
   address = self.address

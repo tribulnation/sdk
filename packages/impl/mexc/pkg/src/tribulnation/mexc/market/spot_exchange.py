@@ -7,9 +7,9 @@ from tribulnation.mexc.core.exc import wrap_exceptions
 from .impl import ExchangeMixin
 from .spot_market import SpotMarket
 
+
 @dataclass(frozen=True, kw_only=True)
 class SpotExchange(ExchangeMixin, Exchange):
-
   @property
   def venue_id(self) -> str:
     return 'mexc'
@@ -29,7 +29,10 @@ class SpotExchange(ExchangeMixin, Exchange):
 
   @wrap_exceptions
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {},
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
   ) -> Mapping[str, Ticker]:
     """Fetch best bid/ask for every spot symbol in one call.
 

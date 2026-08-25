@@ -5,11 +5,16 @@ import asyncio
 
 from tribulnation.sdk.core import SDK
 from tribulnation.sdk.reporting import (
-  Balances, Snapshot, SnapshotRecord, Snapshots as _Snapshots, SubaccountSnapshot,
+  Balances,
+  Snapshot,
+  SnapshotRecord,
+  Snapshots as _Snapshots,
+  SubaccountSnapshot,
   source_id,
 )
 from tribulnation.bit2me.core import wrap_exceptions
 from bit2me import Bit2Me
+
 
 @dataclass(frozen=True)
 class Snapshots(_Snapshots):
@@ -17,10 +22,15 @@ class Snapshots(_Snapshots):
 
   @classmethod
   def new(
-    cls, api_key: str | None = None, api_secret: str | None = None, *,
-    validate: bool = True
+    cls,
+    api_key: str | None = None,
+    api_secret: str | None = None,
+    *,
+    validate: bool = True,
   ):
-    return cls(client=Bit2Me.new(api_key=api_key, api_secret=api_secret, validate=validate))
+    return cls(
+      client=Bit2Me.new(api_key=api_key, api_secret=api_secret, validate=validate)
+    )
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield from super().resources()
@@ -34,7 +44,9 @@ class Snapshots(_Snapshots):
     for entry in balances:
       if (asset := entry.get('currency')) is None:
         continue
-      balance = Decimal(entry.get('balance', 0)) + Decimal(entry.get('blockedBalance', 0))
+      balance = Decimal(entry.get('balance', 0)) + Decimal(
+        entry.get('blockedBalance', 0)
+      )
       out[asset] += balance
     return out
 
@@ -44,7 +56,9 @@ class Snapshots(_Snapshots):
     out = Balances()
     wallets = await self.client.v2.earn.wallets()
     for entry in wallets.get('data', []):
-      if (balance := entry.get('balance')) is not None and (currency := entry.get('currency')) is not None:
+      if (balance := entry.get('balance')) is not None and (
+        currency := entry.get('currency')
+      ) is not None:
         out[currency] += Decimal(balance)
     return out
 
@@ -62,7 +76,9 @@ class Snapshots(_Snapshots):
     for entry in pockets:
       if (asset := entry.get('currency')) is None:
         continue
-      out[asset] += Decimal(entry.get('balance', 0)) + Decimal(entry.get('blockedBalance', 0))
+      out[asset] += Decimal(entry.get('balance', 0)) + Decimal(
+        entry.get('blockedBalance', 0)
+      )
     return out
 
   async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotRecord:
@@ -72,10 +88,12 @@ class Snapshots(_Snapshots):
       self.pocket_balances(),
     )
     return SnapshotRecord(
-      snapshot=Snapshot(subaccounts=[
-        SubaccountSnapshot(subaccount='spot', balances=spot),
-        SubaccountSnapshot(subaccount='earn', balances=earn),
-        SubaccountSnapshot(subaccount='pocket', balances=pocket),
-      ]),
+      snapshot=Snapshot(
+        subaccounts=[
+          SubaccountSnapshot(subaccount='spot', balances=spot),
+          SubaccountSnapshot(subaccount='earn', balances=earn),
+          SubaccountSnapshot(subaccount='pocket', balances=pocket),
+        ]
+      ),
       provenance={'source': 'api', 'service': 'bit2me', 'id': source_id('bit2me')},
     )

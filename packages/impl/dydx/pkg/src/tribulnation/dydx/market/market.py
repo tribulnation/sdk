@@ -1,4 +1,10 @@
-from typing_extensions import Any, AsyncContextManager, AsyncIterable, AsyncIterator, Sequence
+from typing_extensions import (
+  Any,
+  AsyncContextManager,
+  AsyncIterable,
+  AsyncIterator,
+  Sequence,
+)
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import datetime
@@ -23,7 +29,7 @@ from tribulnation.sdk.market import (
 )
 
 from tribulnation.dydx.core import wrap_exceptions
-from .impl import  (
+from .impl import (
   MarketMixin,
   max_leverage,
   parse_book,
@@ -39,9 +45,9 @@ from .impl import  (
   cancel_orders,
 )
 
+
 @dataclass(frozen=True)
 class Market(MarketMixin, PerpMarket):
-
   @property
   def market_id(self) -> str:
     return self.market
@@ -61,10 +67,15 @@ class Market(MarketMixin, PerpMarket):
 
   @asynccontextmanager
   async def depth_stream(
-    self, *, levels: int | None = None,
-    queue_size: int = 1, overflow: OverflowPolicy = 'latest',
+    self,
+    *,
+    levels: int | None = None,
+    queue_size: int = 1,
+    overflow: OverflowPolicy = 'latest',
   ) -> AsyncIterator[AsyncIterable[Book]]:
-    async with self.subscribe_depth(self.market, queue_size=queue_size, overflow=overflow) as stream:
+    async with self.subscribe_depth(
+      self.market, queue_size=queue_size, overflow=overflow
+    ) as stream:
       yield stream
 
   async def rules(self, *, refetch: bool = False) -> Rules:
@@ -77,7 +88,10 @@ class Market(MarketMixin, PerpMarket):
     return await open_orders(self)
 
   def trades_stream(
-    self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail',
+    self,
+    *,
+    queue_size: int = 1000,
+    overflow: OverflowPolicy = 'fail',
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
     return trades_stream(self, queue_size=queue_size, overflow=overflow)
 
@@ -90,30 +104,30 @@ class Market(MarketMixin, PerpMarket):
     # Scope to the addressed subaccount. The parent exchange (subaccount == parent) keeps
     # the parent-aggregate view; a child exchange filters down to just that child.
     market_positions = [
-      p for p in positions
-      if p['market'] == self.market and p['status'] == 'OPEN'
-      and (self.subaccount == self.shared.parent_subaccount or p['subaccountNumber'] == self.subaccount)
+      p
+      for p in positions
+      if p['market'] == self.market
+      and p['status'] == 'OPEN'
+      and (
+        self.subaccount == self.shared.parent_subaccount
+        or p['subaccountNumber'] == self.subaccount
+      )
     ]
     if not market_positions:
       return PerpPosition()
 
     for p in market_positions:
-      assert (
-        (Decimal(p['size']) > 0 and p['side'] == 'LONG') or
-        (Decimal(p['size']) < 0 and p['side'] == 'SHORT')
+      assert (Decimal(p['size']) > 0 and p['side'] == 'LONG') or (
+        Decimal(p['size']) < 0 and p['side'] == 'SHORT'
       )
 
-    signed_sizes = [
-      Decimal(p['size'])
-      for p in market_positions
-    ]
+    signed_sizes = [Decimal(p['size']) for p in market_positions]
     net_size = sum(signed_sizes, Decimal(0))
     if net_size == 0:
       return PerpPosition()
 
     total_notional = sum(
-      Decimal(p['size']) * Decimal(p['entryPrice'])
-      for p in market_positions
+      Decimal(p['size']) * Decimal(p['entryPrice']) for p in market_positions
     )
     total_size = sum(Decimal(p['size']) for p in market_positions)
     avg_entry = total_notional / total_size if total_size != 0 else Decimal(0)
@@ -123,14 +137,18 @@ class Market(MarketMixin, PerpMarket):
   @wrap_exceptions
   async def available_notional(self) -> Decimal:
     sub, market = await asyncio.gather(
-      self.indexer.data.get_subaccount(address=self.address, subaccount=self.subaccount),
-      self.indexer.data.get_market(self.market)
+      self.indexer.data.get_subaccount(
+        address=self.address, subaccount=self.subaccount
+      ),
+      self.indexer.data.get_market(self.market),
     )
     collateral = Decimal(sub['subaccount']['freeCollateral'])
     leverage = max_leverage(market)
-    return collateral*leverage
+    return collateral * leverage
 
-  async def place_order(self, order: Order, *, settings: Settings = {}) -> OrderResponse:
+  async def place_order(
+    self, order: Order, *, settings: Settings = {}
+  ) -> OrderResponse:
     return await place_order(self, order, settings=settings)
 
   async def query_order(self, id: str) -> OrderState | None:
@@ -154,14 +172,19 @@ class Market(MarketMixin, PerpMarket):
     # dYdX has no per-market margin mode: a market's collateral bucket is exactly its
     # exchange's subaccount pool, which the market inherits. Delegate to the exchange.
     from .exchange import Exchange
+
     exchange = Exchange(shared=self.shared, subaccount=self.subaccount)
     return await exchange.perp_collateral()
 
   async def next_funding(self) -> NextFunding:
     return await next_funding(self)
 
-  def funding_rates(self, start: datetime | None = None, end: datetime | None = None) -> PaginatedResponse[FundingRate]:
+  def funding_rates(
+    self, start: datetime | None = None, end: datetime | None = None
+  ) -> PaginatedResponse[FundingRate]:
     return PaginatedResponse(funding_rates(self, start, end))
 
-  def funding_payments(self, start: datetime, end: datetime) -> PaginatedResponse[FundingPayment]:
+  def funding_payments(
+    self, start: datetime, end: datetime
+  ) -> PaginatedResponse[FundingPayment]:
     return PaginatedResponse(funding_payments(self, start, end))

@@ -9,11 +9,14 @@ from binance.simple_earn.flexible.list import FlexibleProduct
 from binance.simple_earn.fixed.list import LockedProduct, LockedProductDetail
 from tribulnation.binance.core import SdkMixin, wrap_exceptions
 
+
 def earn_url(asset: str) -> str:
   return f'https://www.binance.com/en/earn/simple-earn?asset={asset}'
 
+
 tier_regex = re.compile(r'^[^-\s]+-([0-9]+(?:\.[0-9]+)?)([A-Za-z0-9]+)$')
 """Regex for parsing tier labels like '0-1BNB' -> upper bound (e.g. 1)."""
+
 
 def parse_flexible_tier(label: str, asset: str) -> Decimal:
   m = tier_regex.match(label.strip())
@@ -21,6 +24,7 @@ def parse_flexible_tier(label: str, asset: str) -> Decimal:
   amount_str, symbol = m.groups()
   assert symbol == asset
   return Decimal(amount_str)
+
 
 def parse_flexible(prod: FlexibleProduct) -> Iterable[Instrument]:
   if not prod['isSoldOut'] and prod['canPurchase'] and prod['status'] == 'PURCHASING':
@@ -45,6 +49,7 @@ def parse_flexible(prod: FlexibleProduct) -> Iterable[Instrument]:
       id=prod['productId'],
     )
 
+
 def parse_locked_yield_assets(detail: LockedProductDetail) -> set[str]:
   yield_assets = set[str]()
   if a := detail.get('rewardAsset'):
@@ -55,6 +60,7 @@ def parse_locked_yield_assets(detail: LockedProductDetail) -> set[str]:
     yield_assets.add(a)
   return yield_assets
 
+
 def parse_locked_apr(detail: LockedProductDetail) -> Decimal:
   apr = Decimal(0)
   if a := detail.get('apr'):
@@ -64,6 +70,7 @@ def parse_locked_apr(detail: LockedProductDetail) -> Decimal:
   if a := detail.get('boostRewardApr'):
     apr += a
   return apr
+
 
 def parse_locked(prod: LockedProduct) -> Iterable[Instrument]:
   detail = prod['detail']
@@ -85,8 +92,8 @@ def parse_locked(prod: LockedProduct) -> Iterable[Instrument]:
       id=prod['projectId'],
     )
 
-class Instruments(SdkMixin, _Instruments):
 
+class Instruments(SdkMixin, _Instruments):
   @SDK.method
   @wrap_exceptions
   async def _flexible_list_page(self, page: int, size: int):
@@ -99,7 +106,7 @@ class Instruments(SdkMixin, _Instruments):
       if not r['rows']:
         break
       yield r['rows']
-      if r['total'] <= current*size:
+      if r['total'] <= current * size:
         break
       current += 1
 
@@ -115,13 +122,15 @@ class Instruments(SdkMixin, _Instruments):
       if not r['rows']:
         break
       yield r['rows']
-      if r['total'] <= current*size:
+      if r['total'] <= current * size:
         break
       current += 1
 
   @SDK.method
   async def instruments(
-    self, *, tags: Collection[Instrument.Tag] | None = None,
+    self,
+    *,
+    tags: Collection[Instrument.Tag] | None = None,
     assets: Collection[str] | None = None,
   ) -> Sequence[Instrument]:
 

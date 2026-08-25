@@ -1,10 +1,19 @@
 from .types import (
-  Book, Collateral, PerpCollateral,
-  FundingRate, NextFunding, FundingPayment,
-  Order, OrderResponse, OrderState,
-  Position, PerpPosition,
-  PerpStats, Ticker,
-  Trade, Rules,
+  Book,
+  Collateral,
+  PerpCollateral,
+  FundingRate,
+  NextFunding,
+  FundingPayment,
+  Order,
+  OrderResponse,
+  OrderState,
+  Position,
+  PerpPosition,
+  PerpStats,
+  Ticker,
+  Trade,
+  Rules,
 )
 from .settings import Settings
 from .market import Market, PerpMarket

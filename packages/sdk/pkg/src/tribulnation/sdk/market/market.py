@@ -1,4 +1,10 @@
-from typing_extensions import Any, AsyncContextManager, AsyncIterable, AsyncIterator, Sequence
+from typing_extensions import (
+  Any,
+  AsyncContextManager,
+  AsyncIterable,
+  AsyncIterator,
+  Sequence,
+)
 from abc import abstractmethod
 from datetime import datetime
 from decimal import Decimal
@@ -7,30 +13,33 @@ import asyncio
 from tribulnation.sdk.core import SDK, PaginatedResponse, OverflowPolicy
 from .types import (
   Book,
-  Collateral, PerpCollateral,
-  FundingRate, NextFunding, FundingPayment,
-  Order, OrderResponse, OrderState,
-  Position, PerpPosition,
+  Collateral,
+  PerpCollateral,
+  FundingRate,
+  NextFunding,
+  FundingPayment,
+  Order,
+  OrderResponse,
+  OrderState,
+  Position,
+  PerpPosition,
   Trade,
   Rules,
 )
 from .settings import Settings
 
+
 class Market(SDK):
   """An abstract market interface."""
 
+  @property
+  def market_id(self) -> str: ...
 
   @property
-  def market_id(self) -> str:
-    ...
+  def exchange_id(self) -> str: ...
 
   @property
-  def exchange_id(self) -> str:
-    ...
-
-  @property
-  def venue_id(self) -> str:
-    ...
+  def venue_id(self) -> str: ...
 
   @property
   def id(self) -> str:
@@ -40,11 +49,14 @@ class Market(SDK):
   @abstractmethod
   async def depth(self, *, levels: int | None = None) -> Book:
     """Fetch the market order book."""
-  
+
   @SDK.method
   def depth_stream(
-    self, *, levels: int | None = None,
-    queue_size: int = 1, overflow: OverflowPolicy = 'latest',
+    self,
+    *,
+    levels: int | None = None,
+    queue_size: int = 1,
+    overflow: OverflowPolicy = 'latest',
   ) -> AsyncContextManager[AsyncIterable[Book]]:
     """Subscribe to the market order book.
 
@@ -65,7 +77,7 @@ class Market(SDK):
   @abstractmethod
   async def rules(self, *, refetch: bool = False) -> Rules:
     """Fetch the market rules.
-    
+
     - `refetch`: if `True`, fetch the rules even if they are already cached.
     """
 
@@ -90,7 +102,10 @@ class Market(SDK):
   @SDK.method
   @abstractmethod
   def trades_stream(
-    self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail',
+    self,
+    *,
+    queue_size: int = 1000,
+    overflow: OverflowPolicy = 'fail',
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
     """Subscribe to your real-time trades.
 
@@ -110,20 +125,24 @@ class Market(SDK):
   @SDK.method
   async def collateral(self) -> Collateral:
     """Fetch the collateral bucket backing this market."""
-    raise NotImplementedError(f'Collateral is not supported by this market [{self.id}].')
+    raise NotImplementedError(
+      f'Collateral is not supported by this market [{self.id}].'
+    )
 
   @SDK.method
   @abstractmethod
   async def available_notional(self) -> Decimal:
     """Fetch the max. notional position you can open.
-    
+
     - For spot, returns the free quote token balance
     - For futures, returns the available collateral times the maximum leverage
     """
 
   @SDK.method
   @abstractmethod
-  async def place_order(self, order: Order, *, settings: Settings = {}) -> OrderResponse:
+  async def place_order(
+    self, order: Order, *, settings: Settings = {}
+  ) -> OrderResponse:
     """Place an order in the market.
 
     ``order["qty"]`` is signed in base units: positive buys and negative sells.
@@ -150,9 +169,13 @@ class Market(SDK):
     """
 
   @SDK.method
-  async def place_orders(self, orders: Sequence[Order], *, settings: Settings = {}) -> Sequence[OrderResponse]:
+  async def place_orders(
+    self, orders: Sequence[Order], *, settings: Settings = {}
+  ) -> Sequence[OrderResponse]:
     """Place multiple orders in the market."""
-    return await asyncio.gather(*[self.place_order(order, settings=settings) for order in orders])
+    return await asyncio.gather(
+      *[self.place_order(order, settings=settings) for order in orders]
+    )
 
   @SDK.method
   @abstractmethod
@@ -162,17 +185,22 @@ class Market(SDK):
   @SDK.method
   async def cancel_orders(self, ids: Sequence[str], *, settings: Settings = {}) -> Any:
     """Cancel multiple orders in the market."""
-    return await asyncio.gather(*[self.cancel_order(id, settings=settings) for id in ids])
+    return await asyncio.gather(
+      *[self.cancel_order(id, settings=settings) for id in ids]
+    )
 
   @SDK.method
   async def cancel_open_orders(self, *, settings: Settings = {}) -> Any:
     """Cancel all open orders in the market."""
     open_orders = await self.open_orders()
-    return await self.cancel_orders([order.id for order in open_orders], settings=settings)
+    return await self.cancel_orders(
+      [order.id for order in open_orders], settings=settings
+    )
 
 
 class PerpMarket(Market):
   """An abstract perpetual market interface."""
+
   @SDK.method
   @abstractmethod
   async def index(self, *, settings: Settings = {}) -> Decimal:
@@ -185,7 +213,9 @@ class PerpMarket(Market):
 
   @SDK.method
   @abstractmethod
-  def funding_rates(self, start: datetime | None = None, end: datetime | None = None) -> PaginatedResponse[FundingRate]:
+  def funding_rates(
+    self, start: datetime | None = None, end: datetime | None = None
+  ) -> PaginatedResponse[FundingRate]:
     """Fetch the market's historical funding rates.
 
     Args:
@@ -195,7 +225,9 @@ class PerpMarket(Market):
 
   @SDK.method
   @abstractmethod
-  def funding_payments(self, start: datetime, end: datetime) -> PaginatedResponse[FundingPayment]:
+  def funding_payments(
+    self, start: datetime, end: datetime
+  ) -> PaginatedResponse[FundingPayment]:
     """Fetch your funding payments history."""
 
   @SDK.method
@@ -216,4 +248,6 @@ class PerpMarket(Market):
   @SDK.method
   async def perp_collateral(self) -> PerpCollateral:
     """Fetch the perpetual collateral bucket backing this market."""
-    raise NotImplementedError(f'Collateral is not supported by this market [{self.id}].')
+    raise NotImplementedError(
+      f'Collateral is not supported by this market [{self.id}].'
+    )

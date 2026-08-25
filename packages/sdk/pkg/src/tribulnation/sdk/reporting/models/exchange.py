@@ -32,8 +32,10 @@ ExchangeObservationType = Literal[
   'unknown',
 ]
 
+
 class SpotTrade(BaseObservation):
   """An exchange of an asset for another, with an optional fee."""
+
   type: Literal['spot_trade'] = 'spot_trade'
   base: str | None = None
   """Raw base asset identifier, if provided by the source."""
@@ -53,8 +55,10 @@ class SpotTrade(BaseObservation):
   def __str__(self) -> str:
     return f'SpotTrade({self.size or "?"} @ {self.price or "?"} {self.base or "?"}/{self.quote or "?"}, {self.time}, fee: {self.fee or "-"})'
 
+
 class FutureTrade(BaseObservation):
   """A futures or perpetual fill that changes derivative exposure."""
+
   type: Literal['future_trade'] = 'future_trade'
   instrument: str
   """Raw futures or perpetual instrument identifier."""
@@ -77,8 +81,10 @@ class FutureTrade(BaseObservation):
   fee: Fee | None = None
   """Fee paid, if any."""
 
+
 class FutureOrder(BaseObservation):
   """A futures or perpetual order that can contextualize fill-level trades."""
+
   type: Literal['future_order'] = 'future_order'
   order_id: str | None = None
   """Raw order identifier, if provided by the source."""
@@ -103,8 +109,10 @@ class FutureOrder(BaseObservation):
   fee: Fee | None = None
   """Fee paid, if any."""
 
+
 class RealizedPnl(BaseObservation):
   """A source-provided realized PnL settlement observation."""
+
   type: Literal['realized_pnl'] = 'realized_pnl'
   instrument: str | None = None
   """Raw futures or perpetual instrument identifier."""
@@ -123,8 +131,10 @@ class RealizedPnl(BaseObservation):
   def balance_change(self) -> Decimal:
     return self.amount
 
+
 class FuturePositionSummary(BaseObservation):
   """Aggregate futures position evidence without direct ledger impact."""
+
   type: Literal['future_position_summary'] = 'future_position_summary'
   position_id: str | None = None
   """Raw futures position identifier, if provided by the source."""
@@ -167,8 +177,10 @@ class FuturePositionSummary(BaseObservation):
   position_pnl: Decimal | None = None
   """Signed source-reported net position PnL, if provided."""
 
+
 class SpotOrder(BaseObservation):
   """A spot order (executed or not) for an asset pair, with an optional fee."""
+
   type: Literal['spot_order'] = 'spot_order'
   order_id: str | None = None
   """Raw order identifier, if provided by the source."""
@@ -189,8 +201,10 @@ class SpotOrder(BaseObservation):
   fee: Fee | None = None
   """Fee paid, if any."""
 
+
 class TradeLeg(BaseObservation):
   """A source balance leg that can support a trade or conversion batch."""
+
   type: Literal['trade_leg'] = 'trade_leg'
   asset: str
   """Raw asset identifier, as provided by the source."""
@@ -213,23 +227,29 @@ class TradeLeg(BaseObservation):
   def __str__(self) -> str:
     return f'TradeLeg({self.amount} {self.asset}, {self.time}, event_type: {self.event_type or "?"}, label: {self.label or "?"})'
 
+
 class ConversionLeg(pydantic.BaseModel):
   """A source-preserving leg inside a canonical conversion batch."""
+
   asset: str
   """Raw asset identifier, as provided by the source."""
   amount: Decimal
   """Signed asset balance change."""
 
+
 class Conversion(BaseObservation):
   """Canonical grouped conversion without reliable pair/order identity."""
+
   type: Literal['conversion'] = 'conversion'
   legs: Sequence[ConversionLeg]
   """Signed source legs included in deterministic source order."""
   fee: Fee | None = None
   """Fee paid, if any."""
 
+
 class FeeLeg(BaseObservation):
   """A fee leg of an event."""
+
   type: Literal['fee'] = 'fee'
   asset: str
   """Raw fee asset identifier, as provided by the source."""
@@ -247,6 +267,7 @@ class FeeLeg(BaseObservation):
   def __str__(self) -> str:
     return f'FeeLeg({self.amount} {self.asset}, {self.time:%Y-%m-%d %H:%M:%S}, event_type: {self.event_type or "?"}, event_id: {self.event_id or "?"})'
 
+
 class SingleAssetObservation(BaseObservation):
   amount: Decimal
   """Signed amount of the observation, in the asset's base units."""
@@ -258,33 +279,43 @@ class SingleAssetObservation(BaseObservation):
     return self.amount
 
   def __str__(self) -> str:
-    type = self.type # type: ignore
+    type = self.type  # type: ignore
     return f'{type}: {self.amount} {self.asset} [{self.time:%Y-%m-%d %H:%M:%S}]'
+
 
 class UnknownObservation(SingleAssetObservation):
   """A source observation whose economic meaning is intentionally unclassified."""
+
   type: Literal['unknown'] = 'unknown'
+
 
 class Yield(SingleAssetObservation):
   """Inflow from staking, lending, etc."""
+
   type: Literal['yield'] = 'yield'
+
 
 class Bonus(SingleAssetObservation):
   """Promotional credit, grant, recycle, expiry, revocation, or reversal."""
+
   type: Literal['bonus'] = 'bonus'
   category: str | None = None
   """Raw source category/action, if provided by the source."""
 
+
 class Funding(SingleAssetObservation):
   """Funding received or paid for a perpetual contract position."""
+
   type: Literal['funding'] = 'funding'
   instrument: str | None = None
   """Raw futures or perpetual instrument identifier, if provided by the source."""
   position_id: str | None = None
   """Raw futures position identifier, if provided by the source."""
 
+
 class Borrow(SingleAssetObservation):
   """Inflow from a loan."""
+
   type: Literal['borrow'] = 'borrow'
   amount: Decimal
   """Raw borrowed amount."""
@@ -293,8 +324,10 @@ class Borrow(SingleAssetObservation):
   def balance_change(self) -> Decimal:
     return abs(self.amount)
 
+
 class Repay(SingleAssetObservation):
   """Outflow to repay a loan."""
+
   type: Literal['repay'] = 'repay'
   amount: Decimal
   """Raw repaid amount."""
@@ -303,8 +336,10 @@ class Repay(SingleAssetObservation):
   def balance_change(self) -> Decimal:
     return -abs(self.amount)
 
+
 class InternalTransfer(SingleAssetObservation):
   """Movement between compartments inside the current venue account scope."""
+
   type: Literal['internal_transfer'] = 'internal_transfer'
   amount: Decimal = pydantic.Field(..., ge=0)
   """Raw moved amount. Direction is described by src_account and dst_account."""
@@ -313,8 +348,10 @@ class InternalTransfer(SingleAssetObservation):
   dst_account: str | None = None
   """Destination compartment inside the current venue account scope, if known."""
 
+
 class Transfer(SingleAssetObservation):
   """Movement into or out of the current venue account scope."""
+
   type: Literal['transfer'] = 'transfer'
   amount: Decimal
   """Signed balance change from the current account perspective."""
@@ -324,6 +361,7 @@ class Transfer(SingleAssetObservation):
   """Raw destination account label, if provided by the source."""
   fee: Fee | None = None
   """Fee paid, if any."""
+
 
 class BaseCryptoTransfer(SingleAssetObservation):
   network: str | None = None
@@ -337,14 +375,18 @@ class BaseCryptoTransfer(SingleAssetObservation):
   fee: Fee | None = None
   """Fee paid, if any."""
 
+
 class CryptoDeposit(BaseCryptoTransfer):
   """Inflow from depositing a crypto asset into an account."""
+
   type: Literal['crypto_deposit'] = 'crypto_deposit'
   amount: Decimal = pydantic.Field(..., ge=0)
   """Deposited amount."""
 
+
 class CryptoWithdrawal(BaseCryptoTransfer):
   """Outflow from withdrawing a crypto asset from an account."""
+
   type: Literal['crypto_withdrawal'] = 'crypto_withdrawal'
   amount: Decimal
   """Raw withdrawn amount."""
@@ -353,18 +395,23 @@ class CryptoWithdrawal(BaseCryptoTransfer):
   def balance_change(self) -> Decimal:
     return -abs(self.amount)
 
+
 class BaseFiatTransfer(SingleAssetObservation):
   fee: Fee | None = None
   """Fee paid, if any."""
 
+
 class FiatDeposit(BaseFiatTransfer):
   """Inflow from depositing a fiat asset into an account."""
+
   type: Literal['fiat_deposit'] = 'fiat_deposit'
   amount: Decimal = pydantic.Field(..., ge=0)
   """Deposited amount."""
 
+
 class FiatWithdrawal(BaseFiatTransfer):
   """Outflow from withdrawing a fiat asset from an account."""
+
   type: Literal['fiat_withdrawal'] = 'fiat_withdrawal'
   amount: Decimal
   """Raw withdrawn amount."""
@@ -373,8 +420,10 @@ class FiatWithdrawal(BaseFiatTransfer):
   def balance_change(self) -> Decimal:
     return -abs(self.amount)
 
+
 class FiatConversion(SingleAssetObservation):
   """Crypto balance change caused by an external fiat buy or sell."""
+
   type: Literal['fiat_conversion'] = 'fiat_conversion'
   amount: Decimal
   """Signed crypto account change. Positive means fiat buy; negative means fiat sell."""

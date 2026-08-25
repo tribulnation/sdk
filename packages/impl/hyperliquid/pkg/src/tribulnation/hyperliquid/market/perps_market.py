@@ -46,7 +46,7 @@ from .impl import (
 class PerpMarket(PerpMarketMixin, _PerpMarket):
   @property
   def venue_id(self) -> str:
-    return "hyperliquid"
+    return 'hyperliquid'
 
   @property
   def exchange_id(self) -> str:
@@ -61,8 +61,11 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
     return await depth(self)
 
   def depth_stream(
-    self, *, levels: int | None = None,
-    queue_size: int = 1, overflow: OverflowPolicy = 'latest',
+    self,
+    *,
+    levels: int | None = None,
+    queue_size: int = 1,
+    overflow: OverflowPolicy = 'latest',
   ) -> AsyncContextManager[AsyncIterable[Book]]:
     return depth_stream(self, queue_size=queue_size, overflow=overflow)
 
@@ -71,14 +74,19 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
     return await perps_rules(self, refetch=refetch)
 
   @PaginatedResponse.lift
-  def trades_history(self, start: datetime, end: datetime) -> AsyncIterable[Sequence[Trade]]:
+  def trades_history(
+    self, start: datetime, end: datetime
+  ) -> AsyncIterable[Sequence[Trade]]:
     return trades_history(self, start, end)
 
   async def open_orders(self) -> Sequence[OrderState]:
     return await open_orders(self)
 
   def trades_stream(
-    self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail',
+    self,
+    *,
+    queue_size: int = 1000,
+    overflow: OverflowPolicy = 'fail',
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
     return trades_stream(self, queue_size=queue_size, overflow=overflow)
 
@@ -94,7 +102,9 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
     for balance in state['balances']:
       if balance['token'] == self.collateral_meta['index']:
         if balance['coin'] != self.collateral_name:
-          raise LogicError(f'Found balance with matching index {balance["token"]}, but wrong coin "{balance["coin"]}" != "{self.collateral_name}"')
+          raise LogicError(
+            f'Found balance with matching index {balance["token"]}, but wrong coin "{balance["coin"]}" != "{self.collateral_name}"'
+          )
         total = Decimal(balance['total'])
         locked = Decimal(balance['hold'])
         collateral = total - locked
@@ -103,7 +113,9 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
 
     return Decimal(0)
 
-  async def place_order(self, order: Order, *, settings: Settings = {}) -> OrderResponse:
+  async def place_order(
+    self, order: Order, *, settings: Settings = {}
+  ) -> OrderResponse:
     return await place_order(self, order, settings=settings)
 
   async def query_order(self, id: str) -> OrderState | None:
@@ -118,8 +130,12 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
   async def next_funding(self) -> NextFunding:
     return await next_funding(self)
 
-  def funding_rates(self, start: datetime | None = None, end: datetime | None = None) -> PaginatedResponse[FundingRate]:
+  def funding_rates(
+    self, start: datetime | None = None, end: datetime | None = None
+  ) -> PaginatedResponse[FundingRate]:
     return PaginatedResponse(funding_rates(self, start, end))
 
-  def funding_payments(self, start: datetime, end: datetime) -> PaginatedResponse[FundingPayment]:
+  def funding_payments(
+    self, start: datetime, end: datetime
+  ) -> PaginatedResponse[FundingPayment]:
     return PaginatedResponse(funding_payments(self, start, end))

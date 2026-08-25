@@ -2,9 +2,11 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
 
+
 @dataclass(kw_only=True)
 class PerpStats:
   """A perpetual market's pricing and funding snapshot."""
+
   index: Decimal
   """Index (oracle) price."""
   mark: Decimal | None = None

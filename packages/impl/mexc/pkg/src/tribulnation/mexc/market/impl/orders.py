@@ -12,9 +12,12 @@ from tribulnation.sdk.market import Order, OrderResponse, OrderState, Settings
 from tribulnation.mexc.core.exc import wrap_exceptions
 from .mixin import MarketMixin
 
-OrderStatus = Literal['NEW', 'PARTIALLY_FILLED', 'FILLED', 'CANCELED', 'PARTIALLY_CANCELED']
+OrderStatus = Literal[
+  'NEW', 'PARTIALLY_FILLED', 'FILLED', 'CANCELED', 'PARTIALLY_CANCELED'
+]
 OrderSide = Literal['BUY', 'SELL']
 MexcOrderType = Literal['LIMIT', 'MARKET', 'LIMIT_MAKER']
+
 
 class DumpedOrder(TypedDict):
   side: Required[OrderSide]
@@ -22,18 +25,19 @@ class DumpedOrder(TypedDict):
   quantity: Required[str]
   price: NotRequired[str]
 
+
 def _active(status: str) -> bool:
   match status:
-    case "NEW" | "PARTIALLY_FILLED":
+    case 'NEW' | 'PARTIALLY_FILLED':
       return True
-    case "FILLED" | "CANCELED" | "PARTIALLY_CANCELED":
+    case 'FILLED' | 'CANCELED' | 'PARTIALLY_CANCELED':
       return False
     case _:
-      raise ValidationError(f"Unknown order status: {status}")
+      raise ValidationError(f'Unknown order status: {status}')
 
 
 def _required(order: OpenOrder | MexcOrderStatus, key: str) -> str:
-  value = order.get(key) # type: ignore[call-overload]
+  value = order.get(key)  # type: ignore[call-overload]
   if value is None:
     raise ValidationError(f'Missing order field: {key}')
   return str(value)
@@ -60,11 +64,21 @@ def _dump_order(order: Order) -> DumpedOrder:
     case 'MARKET':
       return {'type_': 'MARKET', 'side': side, 'quantity': qty}
     case 'LIMIT':
-      return {'type_': 'LIMIT', 'side': side, 'price': str(order['price']), 'quantity': qty}
+      return {
+        'type_': 'LIMIT',
+        'side': side,
+        'price': str(order['price']),
+        'quantity': qty,
+      }
     case 'POST_ONLY':
-      return {'type_': 'LIMIT_MAKER', 'side': side, 'price': str(order['price']), 'quantity': qty}
+      return {
+        'type_': 'LIMIT_MAKER',
+        'side': side,
+        'price': str(order['price']),
+        'quantity': qty,
+      }
     case _:
-      raise ValidationError(f"Unknown order type: {order['type']}")
+      raise ValidationError(f'Unknown order type: {order["type"]}')
 
 
 @wrap_exceptions
@@ -89,7 +103,9 @@ async def query_order(self: MarketMixin, id: str) -> OrderState | None:
 
 
 @wrap_exceptions
-async def place_order(self: MarketMixin, order: Order, *, settings: Settings = {}) -> OrderResponse:
+async def place_order(
+  self: MarketMixin, order: Order, *, settings: Settings = {}
+) -> OrderResponse:
   dumped = _dump_order(order)
   r: PlaceOrderResponse = await self.client.spot.trade.place_order(
     symbol=self.instrument,
@@ -104,7 +120,9 @@ async def place_order(self: MarketMixin, order: Order, *, settings: Settings = {
 
 
 @wrap_exceptions
-async def cancel_order(self: MarketMixin, id: str, *, settings: Settings = {}) -> CancelOrderResponse:
+async def cancel_order(
+  self: MarketMixin, id: str, *, settings: Settings = {}
+) -> CancelOrderResponse:
   return await self.client.spot.trade.cancel_order(
     symbol=self.instrument,
     order_id=id,

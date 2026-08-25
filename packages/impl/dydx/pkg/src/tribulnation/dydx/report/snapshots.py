@@ -5,14 +5,24 @@ import asyncio
 
 from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import (
-  Snapshots as _Snapshots, Snapshot, SnapshotRecord, SubaccountSnapshot,
-  Balances, Position, source_id
+  Snapshots as _Snapshots,
+  Snapshot,
+  SnapshotRecord,
+  SubaccountSnapshot,
+  Balances,
+  Position,
+  source_id,
 )
 from tribulnation.dydx.core import (
-  parse_coin, parse_dec_coin, parse_dydx_quantums,
-  DYDX, USDC, wrap_exceptions
+  parse_coin,
+  parse_dec_coin,
+  parse_dydx_quantums,
+  DYDX,
+  USDC,
+  wrap_exceptions,
 )
 from typed_dydx import Dydx, Indexer
+
 
 @dataclass(frozen=True)
 class Snapshots(_Snapshots):
@@ -36,7 +46,8 @@ class Snapshots(_Snapshots):
   @wrap_exceptions
   async def bank_module_balances(self) -> Balances:
     bank_balances = await self.client.chain.bank.all_balances_paged(
-      self.address, resolve_denom=False,
+      self.address,
+      resolve_denom=False,
     )
     balances = Balances()
     for coin in bank_balances:
@@ -44,11 +55,12 @@ class Snapshots(_Snapshots):
       balances[asset] += amount
     return balances
 
-
   @SDK.method
   @wrap_exceptions
   async def active_delegations(self) -> Balances:
-    delegations = await self.client.chain.staking.delegator_delegations_paged(self.address)
+    delegations = await self.client.chain.staking.delegator_delegations_paged(
+      self.address
+    )
     balances = Balances()
     for d in delegations:
       if d.balance is not None:
@@ -56,33 +68,38 @@ class Snapshots(_Snapshots):
         balances[asset] += amount
     return balances
 
-
   @SDK.method
   @wrap_exceptions
   async def unbonding_delegations(self) -> Balances:
-    unbonding_delegations = await self.client.chain.staking.delegator_unbonding_delegations_paged(self.address)
+    unbonding_delegations = (
+      await self.client.chain.staking.delegator_unbonding_delegations_paged(
+        self.address
+      )
+    )
     balances = Balances()
     for u in unbonding_delegations:
       for e in u.entries:
         balances[DYDX] += parse_dydx_quantums(e.balance)
     return balances
-    
-    
+
   @SDK.method
   @wrap_exceptions
   async def unclaimed_delegation_rewards(self) -> Balances:
-    rewards = await self.client.chain.distribution.delegation_total_rewards(self.address)
+    rewards = await self.client.chain.distribution.delegation_total_rewards(
+      self.address
+    )
     balances = Balances()
     for r in rewards.total:
       asset, amount = parse_dec_coin(r)
       balances[asset] += amount
     return balances
 
-
   @SDK.method
   @wrap_exceptions
   async def perpetual_subaccounts(self) -> list[SubaccountSnapshot]:
-    subaccounts = (await self.client.indexer.data.get_subaccounts(self.address))['subaccounts']
+    subaccounts = (await self.client.indexer.data.get_subaccounts(self.address))[
+      'subaccounts'
+    ]
     out: list[SubaccountSnapshot] = []
     for sub in subaccounts:
       unrealized = Decimal(0)
@@ -95,16 +112,20 @@ class Snapshots(_Snapshots):
           avg_price=Decimal(position['entryPrice']),
         )
       collateral = Decimal(sub['equity']) - unrealized
-      out.append(SubaccountSnapshot(
-        subaccount=str(sub['subaccountNumber']),
-        balances=Balances({USDC: collateral}),
-        positions=positions,
-      ))
+      out.append(
+        SubaccountSnapshot(
+          subaccount=str(sub['subaccountNumber']),
+          balances=Balances({USDC: collateral}),
+          positions=positions,
+        )
+      )
     return out
 
   @SDK.method
   @wrap_exceptions
-  async def perpetual_collateral_and_positions(self) -> tuple[Decimal, dict[str, Position]]:
+  async def perpetual_collateral_and_positions(
+    self,
+  ) -> tuple[Decimal, dict[str, Position]]:
     """Return the aggregate perpetual state retained for direct SDK callers."""
     subaccounts = await self.perpetual_subaccounts()
     collateral = sum(
@@ -116,8 +137,7 @@ class Snapshots(_Snapshots):
       for instrument, position in state.positions.items():
         positions.setdefault(instrument, []).append(position)
     return collateral, {
-      instrument: Position.merge(parts)
-      for instrument, parts in positions.items()
+      instrument: Position.merge(parts) for instrument, parts in positions.items()
     }
 
   async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotRecord:

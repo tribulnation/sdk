@@ -1,4 +1,11 @@
-from typing_extensions import Any, AsyncIterable, AsyncIterator, Collection, Mapping, Sequence
+from typing_extensions import (
+  Any,
+  AsyncIterable,
+  AsyncIterator,
+  Collection,
+  Mapping,
+  Sequence,
+)
 from abc import abstractmethod
 from contextlib import asynccontextmanager
 from datetime import datetime
@@ -6,16 +13,22 @@ from datetime import datetime
 from tribulnation.sdk.core import SDK, PaginatedResponse, OverflowPolicy
 from .types import (
   Book,
-  Collateral, PerpCollateral,
+  Collateral,
+  PerpCollateral,
   NextFunding,
-  Order, OrderResponse, OrderState,
-  Position, PerpPosition,
-  PerpStats, Ticker,
+  Order,
+  OrderResponse,
+  OrderState,
+  Position,
+  PerpPosition,
+  PerpStats,
+  Ticker,
   Trade,
   Rules,
 )
 from .settings import Settings
 from .market import Market, PerpMarket
+
 
 def ticker_from_book(book: Book) -> Ticker:
   """Derive a `Ticker` from the top of an order book.
@@ -35,17 +48,15 @@ def ticker_from_book(book: Book) -> Ticker:
     ask_qty=ask.qty if ask is not None else None,
   )
 
+
 class Exchange(SDK):
   """An abstract multi-market exchange interface."""
 
+  @property
+  def venue_id(self) -> str: ...
 
   @property
-  def venue_id(self) -> str:
-    ...
-
-  @property
-  def exchange_id(self) -> str:
-    ...
+  def exchange_id(self) -> str: ...
 
   @property
   def id(self) -> str:
@@ -58,7 +69,7 @@ class Exchange(SDK):
   @abstractmethod
   async def markets(self) -> Sequence[str]:
     """List available markets."""
-  
+
   @SDK.method
   async def depth(self, market_id: str, /, *, levels: int | None = None) -> Book:
     """Fetch the market order book."""
@@ -68,8 +79,13 @@ class Exchange(SDK):
   @SDK.method
   @asynccontextmanager
   async def depth_stream(
-    self, market_id: str, /, *, levels: int | None = None,
-    queue_size: int = 1, overflow: OverflowPolicy = 'latest',
+    self,
+    market_id: str,
+    /,
+    *,
+    levels: int | None = None,
+    queue_size: int = 1,
+    overflow: OverflowPolicy = 'latest',
   ) -> AsyncIterator[AsyncIterable[Book]]:
     """Subscribe to the market order book.
 
@@ -77,12 +93,17 @@ class Exchange(SDK):
     with a larger `queue_size` to capture every book).
     """
     market = await self.market(market_id)
-    async with market.depth_stream(levels=levels, queue_size=queue_size, overflow=overflow) as stream:
+    async with market.depth_stream(
+      levels=levels, queue_size=queue_size, overflow=overflow
+    ) as stream:
       yield stream
-  
+
   @SDK.method
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {},
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
   ) -> Mapping[str, Ticker]:
     """Fetch a ticker snapshot for many markets at once.
 
@@ -127,7 +148,12 @@ class Exchange(SDK):
   @SDK.method
   @asynccontextmanager
   async def trades_stream(
-    self, market_id: str, /, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail',
+    self,
+    market_id: str,
+    /,
+    *,
+    queue_size: int = 1000,
+    overflow: OverflowPolicy = 'fail',
   ) -> AsyncIterator[AsyncIterable[Trade]]:
     """Subscribe to your real-time trades.
 
@@ -153,12 +179,14 @@ class Exchange(SDK):
     if market_id is not None:
       market = await self.market(market_id)
       return await market.collateral()
-    raise NotImplementedError(f'Collateral is not supported by this exchange [{self.id}].')
+    raise NotImplementedError(
+      f'Collateral is not supported by this exchange [{self.id}].'
+    )
 
   @SDK.method
   async def available_notional(self, market_id: str, /):
     """Fetch the max. notional position you can open.
-    
+
     - For spot, returns the free quote token balance
     - For futures, returns the available collateral times the maximum leverage
     """
@@ -166,7 +194,9 @@ class Exchange(SDK):
     return await market.available_notional()
 
   @SDK.method
-  async def place_order(self, market_id: str, /, order: Order, *, settings: Settings = {}) -> OrderResponse:
+  async def place_order(
+    self, market_id: str, /, order: Order, *, settings: Settings = {}
+  ) -> OrderResponse:
     """Place an order in the market.
 
     See ``Market.place_order`` for SDK order type semantics.
@@ -175,19 +205,25 @@ class Exchange(SDK):
     return await market.place_order(order, settings=settings)
 
   @SDK.method
-  async def cancel_order(self, market_id: str, /, id: str, *, settings: Settings = {}) -> Any:
+  async def cancel_order(
+    self, market_id: str, /, id: str, *, settings: Settings = {}
+  ) -> Any:
     """Cancel an order in the market."""
     market = await self.market(market_id)
     return await market.cancel_order(id, settings=settings)
 
   @SDK.method
-  async def cancel_orders(self, market_id: str, /, ids: Sequence[str], *, settings: Settings = {}) -> Any:
+  async def cancel_orders(
+    self, market_id: str, /, ids: Sequence[str], *, settings: Settings = {}
+  ) -> Any:
     """Cancel multiple orders in the market."""
     market = await self.market(market_id)
     return await market.cancel_orders(ids, settings=settings)
 
   @SDK.method
-  async def cancel_open_orders(self, market_id: str, /, *, settings: Settings = {}) -> Any:
+  async def cancel_open_orders(
+    self, market_id: str, /, *, settings: Settings = {}
+  ) -> Any:
     """Cancel all open orders in the market."""
     market = await self.market(market_id)
     return await market.cancel_open_orders(settings=settings)
@@ -195,6 +231,7 @@ class Exchange(SDK):
 
 class PerpExchange(Exchange):
   """An abstract perpetual exchange interface."""
+
   @SDK.method
   @abstractmethod
   async def market(self, market_id: str, /) -> PerpMarket:
@@ -214,7 +251,10 @@ class PerpExchange(Exchange):
 
   @SDK.method
   async def perp_stats(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {},
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
   ) -> Mapping[str, PerpStats]:
     """Fetch a pricing and funding snapshot for many markets at once.
 
@@ -225,11 +265,15 @@ class PerpExchange(Exchange):
     Returns:
       A mapping of market ID to its `PerpStats`.
     """
-    raise NotImplementedError(f'perp_stats is not supported by this exchange [{self.id}].')
+    raise NotImplementedError(
+      f'perp_stats is not supported by this exchange [{self.id}].'
+    )
 
   @SDK.method
   @PaginatedResponse.lift
-  async def funding_rates(self, market_id: str, /, start: datetime | None = None, end: datetime | None = None):
+  async def funding_rates(
+    self, market_id: str, /, start: datetime | None = None, end: datetime | None = None
+  ):
     """Fetch the market's historical funding rates.
 
     Args:
@@ -270,4 +314,6 @@ class PerpExchange(Exchange):
     if market_id is not None:
       market = await self.market(market_id)
       return await market.perp_collateral()
-    raise NotImplementedError(f'Collateral is not supported by this exchange [{self.id}].')
+    raise NotImplementedError(
+      f'Collateral is not supported by this exchange [{self.id}].'
+    )

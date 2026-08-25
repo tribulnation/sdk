@@ -3,9 +3,10 @@ from decimal import Decimal
 from tribulnation.sdk.core import ApiError
 from typed_dydx.indexer.types import PerpetualMarket
 
+
 def effective_imf(market: PerpetualMarket):
   """Compute the effective Initial Margin Fraction (IMF) of the given market.
-  
+
   See the [docs](https://docs.dydx.xyz/concepts/trading/margin#margining) for details
   """
   price = market.get('oraclePrice')
@@ -16,13 +17,20 @@ def effective_imf(market: PerpetualMarket):
   open_notional_upper_cap = market.get('openInterestUpperCap')
   base_IMF = market['initialMarginFraction']
 
-  if open_notional_lower_cap is None or open_notional_upper_cap is None or open_notional_upper_cap == open_notional_lower_cap:
+  if (
+    open_notional_lower_cap is None
+    or open_notional_upper_cap is None
+    or open_notional_upper_cap == open_notional_lower_cap
+  ):
     return base_IMF
-  
-  scaling_factor = (open_notional - open_notional_lower_cap) / (open_notional_upper_cap - open_notional_lower_cap)
+
+  scaling_factor = (open_notional - open_notional_lower_cap) / (
+    open_notional_upper_cap - open_notional_lower_cap
+  )
   IMF_increase = scaling_factor * (1 - base_IMF)
   effective_IMF = min(base_IMF + max(IMF_increase, 0), 1)
   return Decimal(effective_IMF)
+
 
 def effective_mmf(market: PerpetualMarket):
   """Compute the effective Maintenance Margin Fraction (MMF) of the given market.
@@ -45,6 +53,7 @@ def effective_mmf(market: PerpetualMarket):
   if base_imf == 0:
     return base_mmf
   return effective_imf(market) * base_mmf / base_imf
+
 
 def max_leverage(market: PerpetualMarket):
   """Return the maximum leverage implied by market margin metadata."""

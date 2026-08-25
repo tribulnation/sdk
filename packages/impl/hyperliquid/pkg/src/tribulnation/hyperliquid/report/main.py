@@ -1,4 +1,5 @@
 """Hyperliquid reporting: history and snapshots."""
+
 from typing_extensions import AsyncContextManager, Collection, Iterable, TypedDict
 from dataclasses import dataclass
 from datetime import datetime
@@ -12,6 +13,7 @@ from .snapshots import Snapshots
 
 class HyperliquidConfig(TypedDict, total=False):
   """Hyperliquid reporting configuration."""
+
   cache: str
   """SQLAlchemy URL for the history archive, e.g. `sqlite:///hyperliquid.db`.
 
@@ -28,12 +30,15 @@ class HyperliquidConfig(TypedDict, total=False):
 @dataclass(kw_only=True)
 class Report(_Report):
   """Combined history and snapshots for one Hyperliquid account."""
+
   history_impl: History
   snapshots_impl: Snapshots
 
   @classmethod
   def new(
-    cls, address: str, *,
+    cls,
+    address: str,
+    *,
     config: HyperliquidConfig | None = None,
     validate: bool = True,
   ):
@@ -42,8 +47,9 @@ class Report(_Report):
     mainnet = config.get('mainnet', True)
 
     cache = None
-    if (url := config.get('cache')):
+    if url := config.get('cache'):
       from .history.cache import HistoryCache
+
       cache = HistoryCache.connect(url, no_cache_reads=config.get('no_cache', False))
 
     info = Info.http(validate=validate, mainnet=mainnet)

@@ -1,4 +1,11 @@
-from typing_extensions import AsyncContextManager, Awaitable, Callable, Collection, Iterable, TypeVar
+from typing_extensions import (
+  AsyncContextManager,
+  Awaitable,
+  Callable,
+  Collection,
+  Iterable,
+  TypeVar,
+)
 from dataclasses import dataclass, field
 from decimal import Decimal
 
@@ -8,7 +15,12 @@ from moralis.core import Chain
 
 from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import (
-  Balances, Snapshot, SnapshotRecord, Snapshots, SubaccountSnapshot, source_id,
+  Balances,
+  Snapshot,
+  SnapshotRecord,
+  Snapshots,
+  SubaccountSnapshot,
+  source_id,
 )
 from tribulnation.ethereum.core import moralis as moralis_core
 from ..config import NATIVE_ASSET
@@ -16,6 +28,7 @@ from ..config import NATIVE_ASSET
 T = TypeVar('T')
 
 NATIVE_DECIMALS = 18
+
 
 @dataclass
 class MoralisSnapshots(Snapshots):
@@ -51,7 +64,9 @@ class MoralisSnapshots(Snapshots):
     balances = Balances()
     async for token in self.moralis_token_balances():
       address = token['token_address']
-      asset = NATIVE_ASSET if token.get('native_token') else Web3.to_checksum_address(address)
+      asset = (
+        NATIVE_ASSET if token.get('native_token') else Web3.to_checksum_address(address)
+      )
       balance = token.get('balance_formatted')
       if balance is None:
         decimals = token.get('decimals') or NATIVE_DECIMALS

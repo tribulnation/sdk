@@ -27,7 +27,7 @@ class ValueFields(TypedDict):
 
 def tx_value(tx: ValueFields | TxData) -> Decimal:
   """Return the value of a transaction."""
-  value = tx['value'] # type: ignore
+  value = tx['value']  # type: ignore
   return wei2eth(Decimal(value))
 
 
@@ -53,10 +53,12 @@ TransferFields = TypedDict('TransferFields', {'value': str, 'to': str, 'from': s
 @dataclass(frozen=True, kw_only=True)
 class HistoryMixin(SDK):
   """Mixin for EVM history sources."""
+
   address: str
   node: NodeRpc
   rpc_url: str
   eoa_cache: dict[str, bool] = field(default_factory=dict)
+
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield self.node
 
@@ -83,7 +85,9 @@ class HistoryMixin(SDK):
     input, to = tx.get('input'), tx.get('to')
     if input is None:
       hash = (hash := tx.get('hash')) and hash.to_0x_hex()
-      raise ValueError(f'No input or to address in transaction: {hash}. Input: {input}. To: {to}')
+      raise ValueError(
+        f'No input or to address in transaction: {hash}. Input: {input}. To: {to}'
+      )
     return EvmTx.Execution(
       to=to and Web3.to_checksum_address(to),
       eoa=await self.is_eoa_cached(to) if to else False,
@@ -96,13 +100,13 @@ class HistoryMixin(SDK):
   @rpc.wrap_exceptions
   async def get_tx_receipt(self, hash: _Hash32 | str) -> TxReceipt:
     """Fetch a transaction receipt from the configured node."""
-    return await self.w3.eth.get_transaction_receipt(hash) # type: ignore
+    return await self.w3.eth.get_transaction_receipt(hash)  # type: ignore
 
   @SDK.method
   @rpc.wrap_exceptions
   async def get_tx(self, hash: _Hash32 | str) -> TxData:
     """Fetch a transaction by hash from the configured node."""
-    return await self.w3.eth.get_transaction(hash) # type: ignore
+    return await self.w3.eth.get_transaction(hash)  # type: ignore
 
   async def get_tx_data(self, hash: _Hash32 | str) -> tuple[TxData, TxReceipt]:
     """Fetch a transaction and its receipt without leaving sibling tasks behind."""
@@ -114,11 +118,13 @@ class HistoryMixin(SDK):
   def parse_fee(self, tx: TxData, receipt: TxReceipt) -> Fee | None:
     """Parse the transaction fee if the sender matches the configured address."""
     if (from_ := tx.get('from')) and same_address(from_, self.address):
-      return Fee(amount=tx_fee(receipt), asset='native') # type: ignore
+      return Fee(amount=tx_fee(receipt), asset='native')  # type: ignore
 
-  def parse_native_transfer(self, tx: ValueFields | TxData, *, internal: bool) -> EvmTx.NativeTransfer | None:
+  def parse_native_transfer(
+    self, tx: ValueFields | TxData, *, internal: bool
+  ) -> EvmTx.NativeTransfer | None:
     """Parse a native transfer from a transaction."""
-    to, from_ = tx['to'], tx['from'] # type: ignore
+    to, from_ = tx['to'], tx['from']  # type: ignore
     if (value := tx_value(tx)) > 0:
       if same_address(to, self.address):
         amount = value
@@ -134,7 +140,9 @@ class HistoryMixin(SDK):
         internal=internal,
       )
 
-  def parse_native_transfers(self, tx: ValueFields | TxData) -> list[EvmTx.NativeTransfer]:
+  def parse_native_transfers(
+    self, tx: ValueFields | TxData
+  ) -> list[EvmTx.NativeTransfer]:
     """Parse native transfers from a transaction."""
     if transfer := self.parse_native_transfer(tx, internal=False):
       return [transfer]

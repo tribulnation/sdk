@@ -10,12 +10,13 @@ from .mixin import SpotMarketMixin, PerpMarketMixin
 
 Mixin = SpotMarketMixin | PerpMarketMixin
 
+
 @wrap_exceptions
 async def depth(self: Mixin) -> Book:
   book = await self.client.info.l2_book(coin=self.asset_name)
-  raw_bids, raw_asks = book["levels"]
-  bids = [Book.Entry(price=Decimal(b["px"]), qty=Decimal(b["sz"])) for b in raw_bids]
-  asks = [Book.Entry(price=Decimal(a["px"]), qty=Decimal(a["sz"])) for a in raw_asks]
+  raw_bids, raw_asks = book['levels']
+  bids = [Book.Entry(price=Decimal(b['px']), qty=Decimal(b['sz'])) for b in raw_bids]
+  asks = [Book.Entry(price=Decimal(a['px']), qty=Decimal(a['sz'])) for a in raw_asks]
   return Book(
     bids=sorted(bids, key=lambda e: e.price, reverse=True),
     asks=sorted(asks, key=lambda e: e.price),
@@ -23,22 +24,32 @@ async def depth(self: Mixin) -> Book:
 
 
 @asynccontextmanager
-async def depth_stream(self: Mixin, *, queue_size: int = 1, overflow: OverflowPolicy = 'latest'):
-  async with self.subscribe_l2_book(self.asset_name, queue_size=queue_size, overflow=overflow) as l2:
+async def depth_stream(
+  self: Mixin, *, queue_size: int = 1, overflow: OverflowPolicy = 'latest'
+):
+  async with self.subscribe_l2_book(
+    self.asset_name, queue_size=queue_size, overflow=overflow
+  ) as l2:
+
     async def gen() -> AsyncIterable[Book]:
       async for update in l2:
-        raw_bids, raw_asks = update["levels"]
+        raw_bids, raw_asks = update['levels']
         # Hyperliquid `l2Book` is a snapshot-per-message feed.
         book = Book(
           bids=sorted(
-            [Book.Entry(price=Decimal(b["px"]), qty=Decimal(b["sz"])) for b in raw_bids],
+            [
+              Book.Entry(price=Decimal(b['px']), qty=Decimal(b['sz'])) for b in raw_bids
+            ],
             key=lambda e: e.price,
             reverse=True,
           ),
           asks=sorted(
-            [Book.Entry(price=Decimal(a["px"]), qty=Decimal(a["sz"])) for a in raw_asks],
+            [
+              Book.Entry(price=Decimal(a['px']), qty=Decimal(a['sz'])) for a in raw_asks
+            ],
             key=lambda e: e.price,
           ),
         )
         yield book
+
     yield gen()

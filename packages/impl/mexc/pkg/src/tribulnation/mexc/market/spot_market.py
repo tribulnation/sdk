@@ -32,9 +32,9 @@ from .impl import (
   cancel_order,
 )
 
+
 @dataclass(frozen=True, kw_only=True)
 class SpotMarket(MarketMixin, Market):
-
   @property
   def venue_id(self) -> str:
     return 'mexc'
@@ -51,8 +51,11 @@ class SpotMarket(MarketMixin, Market):
     return await depth(self, levels=levels)
 
   def depth_stream(
-    self, *, levels: int | None = None,
-    queue_size: int = 1, overflow: OverflowPolicy = 'latest',
+    self,
+    *,
+    levels: int | None = None,
+    queue_size: int = 1,
+    overflow: OverflowPolicy = 'latest',
   ) -> AsyncContextManager[AsyncIterable[Book]]:
     return depth_stream(self, levels=levels, queue_size=queue_size, overflow=overflow)
 
@@ -69,7 +72,10 @@ class SpotMarket(MarketMixin, Market):
     return PaginatedResponse(trades_history(self, start, end))
 
   def trades_stream(
-    self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail',
+    self,
+    *,
+    queue_size: int = 1000,
+    overflow: OverflowPolicy = 'fail',
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
     return trades_stream(self, queue_size=queue_size, overflow=overflow)
 
@@ -94,7 +100,9 @@ class SpotMarket(MarketMixin, Market):
         return Collateral(equity=free + locked, free_collateral=free)
     return Collateral(equity=Decimal(0), free_collateral=Decimal(0))
 
-  async def place_order(self, order: Order, *, settings: Settings = {}) -> OrderResponse:
+  async def place_order(
+    self, order: Order, *, settings: Settings = {}
+  ) -> OrderResponse:
     return await place_order(self, order, settings=settings)
 
   async def cancel_order(self, id: str, *, settings: Settings = {}):

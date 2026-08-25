@@ -28,6 +28,7 @@ if TYPE_CHECKING:
 else:
   Config = dict
 
+
 @dataclass
 class ReportSDK:
   accounts: Mapping[str, Account]
@@ -47,19 +48,30 @@ class ReportSDK:
     try:
       from tribulnation.ethereum.reporting import EthereumReport
     except ImportError as e:
-      raise ImportError('ethereum sdk is not installed. Please install it with `pip install tribulnation-ethereum`.') from e
+      raise ImportError(
+        'ethereum sdk is not installed. Please install it with `pip install tribulnation-ethereum`.'
+      ) from e
     if (address := account.resolved_address) is None:
       raise ValueError(f'Account {id} does not have a resolved address.')
-    return EthereumReport.new(address, network=account.venue, providers=self.providers, config=self.config.get('evm'))
+    return EthereumReport.new(
+      address,
+      network=account.venue,
+      providers=self.providers,
+      config=self.config.get('evm'),
+    )
 
   def dydx(self, account: Dydx, id: str) -> Report:
     try:
       from tribulnation.dydx import Report as DydxReport
     except ImportError as e:
-      raise ImportError('dydx sdk is not installed. Please install it with `pip install tribulnation-dydx`.') from e
+      raise ImportError(
+        'dydx sdk is not installed. Please install it with `pip install tribulnation-dydx`.'
+      ) from e
     if (address := account.resolved_address) is None:
       raise ValueError(f'Account {id} does not have a resolved address.')
-    return DydxReport.new(address, providers=self.providers, config=self.config.get('dydx'))
+    return DydxReport.new(
+      address, providers=self.providers, config=self.config.get('dydx')
+    )
 
   def binance(self, account: Binance, id: str) -> Report:
     raise NotImplementedError('binance reporting is not yet implemented.')
@@ -74,9 +86,12 @@ class ReportSDK:
     try:
       from tribulnation.mexc.reporting import Report as MexcReport
     except ImportError as e:
-      raise ImportError('mexc sdk is not installed. Please install it with `pip install tribulnation-mexc`.') from e
+      raise ImportError(
+        'mexc sdk is not installed. Please install it with `pip install tribulnation-mexc`.'
+      ) from e
     return MexcReport.new(
-      account.resolved_api_key, account.resolved_api_secret,
+      account.resolved_api_key,
+      account.resolved_api_secret,
       settings={'validate': account.validate},
     )
 
@@ -84,9 +99,12 @@ class ReportSDK:
     try:
       from tribulnation.bit2me.report import Report as Bit2MeReport
     except ImportError as e:
-      raise ImportError('bit2me sdk is not installed. Please install it with `pip install tribulnation-bit2me`.') from e
+      raise ImportError(
+        'bit2me sdk is not installed. Please install it with `pip install tribulnation-bit2me`.'
+      ) from e
     return Bit2MeReport.new(
-      account.resolved_api_key, account.resolved_api_secret,
+      account.resolved_api_key,
+      account.resolved_api_secret,
       validate=account.validate,
     )
 
@@ -94,7 +112,9 @@ class ReportSDK:
     try:
       from tribulnation.hyperliquid import Report as HyperliquidReport
     except ImportError as e:
-      raise ImportError('hyperliquid sdk is not installed. Please install it with `pip install tribulnation-hyperliquid`.') from e
+      raise ImportError(
+        'hyperliquid sdk is not installed. Please install it with `pip install tribulnation-hyperliquid`.'
+      ) from e
     if (address := account.resolved_address) is None:
       raise ValueError(f'Account {id} does not have a resolved address.')
     return HyperliquidReport.new(address, config=self.config.get('hyperliquid'))
@@ -103,7 +123,16 @@ class ReportSDK:
     if (account := self.accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
     match account.venue:
-      case 'ethereum' | 'arbitrum' | 'polygon' | 'bnb-chain' | 'base' | 'avalanche' | 'optimism' | 'hyperevm':
+      case (
+        'ethereum'
+        | 'arbitrum'
+        | 'polygon'
+        | 'bnb-chain'
+        | 'base'
+        | 'avalanche'
+        | 'optimism'
+        | 'hyperevm'
+      ):
         return self.evm(account, id)
       case 'dydx' | 'dydx_testnet':
         return self.dydx(account, id)

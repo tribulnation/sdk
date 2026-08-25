@@ -1,4 +1,5 @@
 """Perpetual funding payments."""
+
 from typing_extensions import Iterable, Mapping
 from decimal import Decimal
 
@@ -34,7 +35,9 @@ def parse_funding(entry: UserFundingEntry, *, settle: str) -> Funding:
 
 
 def parse_fundings(
-  entries: Iterable[UserFundingEntry], *, settle: Mapping[str, str],
+  entries: Iterable[UserFundingEntry],
+  *,
+  settle: Mapping[str, str],
 ) -> list[Funding]:
   """Convert a funding stream into observations.
 

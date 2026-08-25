@@ -1,4 +1,12 @@
-from typing_extensions import Any, AsyncContextManager, Callable, Iterable, ParamSpec, TypeVar, overload
+from typing_extensions import (
+  Any,
+  AsyncContextManager,
+  Callable,
+  Iterable,
+  ParamSpec,
+  TypeVar,
+  overload,
+)
 import functools
 import inspect
 
@@ -9,13 +17,17 @@ T = TypeVar('T', covariant=True)
 Ps = ParamSpec('Ps')
 Fn = TypeVar('Fn', bound=Callable[..., Any])
 
+
 class Method:
   def __init__(self, name: str):
     self.name = name
 
 
 def _decorate_method(
-  fn: Fn, /, *, name: str | None = None,
+  fn: Fn,
+  /,
+  *,
+  name: str | None = None,
 ) -> Fn:
   """Wrap `fn` so invoking it opens a child `Context` span and applies its middleware.
 
@@ -37,6 +49,7 @@ def _decorate_method(
     return active, invoke
 
   if inspect.isasyncgenfunction(fn):
+
     @functools.wraps(fn)
     async def asyncgen_wrapper(*args, **kwargs):
       active, invoke = prepare()
@@ -54,6 +67,7 @@ def _decorate_method(
     wrapper = asyncgen_wrapper
 
   elif inspect.iscoroutinefunction(fn):
+
     @functools.wraps(fn)
     async def coroutine_wrapper(*args, **kwargs):
       active, invoke = prepare()
@@ -68,6 +82,7 @@ def _decorate_method(
     wrapper = coroutine_wrapper
 
   else:
+
     @functools.wraps(fn)
     def sync_wrapper(*args, **kwargs):
       active, invoke = prepare()
@@ -82,23 +97,25 @@ def _decorate_method(
     wrapper = sync_wrapper
 
   setattr(wrapper, '__sdk_method__', Method(name))
-  return wrapper # type: ignore[return-value]
+  return wrapper  # type: ignore[return-value]
 
 
 class SDK:
   @overload
   @classmethod
-  def method(cls, fn: Fn, /) -> Fn:
-    ...
+  def method(cls, fn: Fn, /) -> Fn: ...
 
   @overload
   @classmethod
-  def method(cls, /, *, name: str | None = None) -> Callable[[Fn], Fn]:
-    ...
+  def method(cls, /, *, name: str | None = None) -> Callable[[Fn], Fn]: ...
 
   @classmethod
   def method(
-    cls, fn: Fn | None = None, /, *, name: str | None = None,
+    cls,
+    fn: Fn | None = None,
+    /,
+    *,
+    name: str | None = None,
   ) -> Fn | Callable[[Fn], Fn]:
     if fn is None:
       return lambda fn: cls._decorate_method(fn, name=name)
@@ -146,4 +163,8 @@ class SDK:
           method = getattr(base_value, '__sdk_method__', None)
           if isinstance(method, Method):
             break
-        setattr(cls, name, _decorate_method(value, name=method.name if method is not None else name))
+        setattr(
+          cls,
+          name,
+          _decorate_method(value, name=method.name if method is not None else name),
+        )

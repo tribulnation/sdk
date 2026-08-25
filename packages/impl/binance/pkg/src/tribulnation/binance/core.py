@@ -3,14 +3,22 @@ from dataclasses import dataclass
 import inspect
 
 from tribulnation.sdk import SDK
-from tribulnation.sdk.core.exc import ApiError, AuthError, Error, NetworkError, ValidationError
+from tribulnation.sdk.core.exc import (
+  ApiError,
+  AuthError,
+  Error,
+  NetworkError,
+  ValidationError,
+)
 from binance import Binance
 from binance.core import exc
 
 Fn = TypeVar('Fn')
 
+
 def wrap_exceptions(fn: Fn) -> Fn:
   if inspect.iscoroutinefunction(fn):
+
     async def awrapper(*args, **kwargs):
       try:
         return await fn(*args, **kwargs)
@@ -24,8 +32,10 @@ def wrap_exceptions(fn: Fn) -> Fn:
         raise ValidationError(*e.args) from e
       except exc.Error as e:
         raise Error(*e.args) from e
-    return awrapper # type: ignore
+
+    return awrapper  # type: ignore
   elif inspect.isasyncgenfunction(fn):
+
     async def agen_wrapper(*args, **kwargs):
       try:
         async for item in fn(*args, **kwargs):
@@ -40,9 +50,11 @@ def wrap_exceptions(fn: Fn) -> Fn:
         raise ValidationError(*e.args) from e
       except exc.Error as e:
         raise Error(*e.args) from e
-    return agen_wrapper # type: ignore
+
+    return agen_wrapper  # type: ignore
   else:
-    raise ValueError(f"Function {fn} is not a coroutine or generator function")
+    raise ValueError(f'Function {fn} is not a coroutine or generator function')
+
 
 @dataclass
 class SdkMixin(SDK):
@@ -51,8 +63,11 @@ class SdkMixin(SDK):
 
   @classmethod
   def new(
-    cls, api_key: str | None = None, secret_key: str | None = None, *,
-    validate: bool = True
+    cls,
+    api_key: str | None = None,
+    secret_key: str | None = None,
+    *,
+    validate: bool = True,
   ):
     client = Binance.new(api_key=api_key, api_secret=secret_key, validate=validate)
     return cls(client=client, validate=validate)

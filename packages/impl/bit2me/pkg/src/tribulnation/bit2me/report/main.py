@@ -9,8 +9,9 @@ from .snapshots import Snapshots
 
 @dataclass(frozen=True, kw_only=True)
 class Report(_Report, Snapshots):
-
   def history(
-    self, start: datetime | None = None, end: datetime | None = None,
+    self,
+    start: datetime | None = None,
+    end: datetime | None = None,
   ) -> AsyncIterable[HistoryRecord]:
     raise NotImplementedError('bit2me history is not yet wired into ReportSDK.')

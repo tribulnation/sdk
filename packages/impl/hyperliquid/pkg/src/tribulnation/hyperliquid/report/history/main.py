@@ -1,4 +1,5 @@
 """Hyperliquid reporting history."""
+
 from typing_extensions import TYPE_CHECKING, AsyncContextManager, Iterable, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -35,6 +36,7 @@ class History(_History):
   so `start` filters the output but never the fetch — a position opened before
   the window has no recoverable cost basis otherwise.
   """
+
   info: Info
   address: str
   assets: Assets | None = field(default=None, repr=False)
@@ -48,7 +50,11 @@ class History(_History):
 
   @classmethod
   def http(
-    cls, address: str, *, validate: bool = True, mainnet: bool = True,
+    cls,
+    address: str,
+    *,
+    validate: bool = True,
+    mainnet: bool = True,
     cache: 'HistoryCache | None' = None,
   ):
     """Create a history client over HTTP."""
@@ -114,7 +120,8 @@ class History(_History):
     """
     fresh: list[AnyFill] = []
     async for page in self.info.user_fills_by_time_paged(
-      user=self.address, start_time=self.since('fills'),
+      user=self.address,
+      start_time=self.since('fills'),
     ):
       fresh.extend(page)
     twap = [
@@ -134,10 +141,12 @@ class History(_History):
     cached = self.cache.read_fills(self.address, source='fills')
     cached_twap = self.cache.read_fills(self.address, source='twap')
     if not cached and not cached_twap:
-      return [*fresh, *twap]      # no_cache_reads is write-only
+      return [*fresh, *twap]  # no_cache_reads is write-only
     return [*cached, *cached_twap]
 
-  async def trades(self, start: datetime | None, end: datetime | None) -> list[HistoryRecord]:
+  async def trades(
+    self, start: datetime | None, end: datetime | None
+  ) -> list[HistoryRecord]:
     """Fetch fills and convert them to trade observations."""
     id = source_id(SERVICE)
     assets, settle = await asyncio.gather(self.resolve_assets(), self.settlement())
@@ -145,13 +154,16 @@ class History(_History):
     observations, _ = parse_fills(fills, assets=assets, settle=settle)
     return self.records(observations, start, end, id)
 
-  async def funding(self, start: datetime | None, end: datetime | None) -> list[HistoryRecord]:
+  async def funding(
+    self, start: datetime | None, end: datetime | None
+  ) -> list[HistoryRecord]:
     """Fetch funding payments and convert them to observations."""
     id = source_id(SERVICE)
     settle = await self.settlement()
     fresh = []
     async for page in self.info.user_funding_paged(
-      user=self.address, start_time=self.since('funding'),
+      user=self.address,
+      start_time=self.since('funding'),
     ):
       fresh.extend(page)
     entries = fresh
@@ -161,7 +173,9 @@ class History(_History):
       entries = self.cache.read_funding(self.address) or fresh
     return self.records(parse_fundings(entries, settle=settle), start, end, id)
 
-  async def ledger(self, start: datetime | None, end: datetime | None) -> list[HistoryRecord]:
+  async def ledger(
+    self, start: datetime | None, end: datetime | None
+  ) -> list[HistoryRecord]:
     """Fetch non-funding ledger updates and convert them to observations.
 
     The un-paged call silently truncates at 2000 entries, keeping the oldest, so
@@ -171,7 +185,8 @@ class History(_History):
     assets = await self.resolve_assets()
     fresh = []
     async for page in self.info.user_non_funding_ledger_updates_paged(
-      user=self.address, start_time=self.since('ledger'),
+      user=self.address,
+      start_time=self.since('ledger'),
     ):
       fresh.extend(page)
     entries = fresh
@@ -180,12 +195,15 @@ class History(_History):
         self.cache.write_ledger(self.address, fresh)
       entries = self.cache.read_ledger(self.address) or fresh
     observations = [
-      obs for index, entry in enumerate(entries)
+      obs
+      for index, entry in enumerate(entries)
       for obs in parse_entry(entry, index=index, address=self.address, assets=assets)
     ]
     return self.records(observations, start, end, id)
 
-  async def staking(self, start: datetime | None, end: datetime | None) -> list[HistoryRecord]:
+  async def staking(
+    self, start: datetime | None, end: datetime | None
+  ) -> list[HistoryRecord]:
     """Fetch staking rewards and delegation history."""
     id = source_id(SERVICE)
     rewards, entries = await asyncio.gather(
@@ -196,8 +214,11 @@ class History(_History):
     return self.records(observations, start, end, id)
 
   def records(
-    self, observations: Sequence[Observation],
-    start: datetime | None, end: datetime | None, id: str,
+    self,
+    observations: Sequence[Observation],
+    start: datetime | None,
+    end: datetime | None,
+    id: str,
   ) -> list[HistoryRecord]:
     """Wrap observations in records, dropping those outside the window."""
     return [

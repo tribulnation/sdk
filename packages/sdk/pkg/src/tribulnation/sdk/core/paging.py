@@ -1,10 +1,19 @@
 from dataclasses import dataclass
-from typing_extensions import AsyncIterable, Sequence, TypeVar, Generic, Awaitable, Callable, ParamSpec
+from typing_extensions import (
+  AsyncIterable,
+  Sequence,
+  TypeVar,
+  Generic,
+  Awaitable,
+  Callable,
+  ParamSpec,
+)
 from functools import wraps
 
 T = TypeVar('T')
 U = TypeVar('U')
 P = ParamSpec('P')
+
 
 @dataclass
 class PaginatedResponse(AsyncIterable[Sequence[T]], Awaitable[Sequence[T]], Generic[T]):
@@ -28,8 +37,11 @@ class PaginatedResponse(AsyncIterable[Sequence[T]], Awaitable[Sequence[T]], Gene
     return self.sync().__await__()
 
   @classmethod
-  def lift(cls, fn: Callable[P, AsyncIterable[Sequence[U]]]) -> 'Callable[P, PaginatedResponse[U]]':
+  def lift(
+    cls, fn: Callable[P, AsyncIterable[Sequence[U]]]
+  ) -> 'Callable[P, PaginatedResponse[U]]':
     @wraps(fn)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> PaginatedResponse[U]:
-      return cls(fn(*args, **kwargs)) # type: ignore
+      return cls(fn(*args, **kwargs))  # type: ignore
+
     return wrapper

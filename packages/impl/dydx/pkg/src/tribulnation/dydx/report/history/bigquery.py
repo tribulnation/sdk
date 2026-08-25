@@ -15,11 +15,14 @@ from .window import in_window
 if TYPE_CHECKING:
   from .cache import HistoryCache, BigQueryReward
 
-def estimate_query_cost(client: bigquery.Client, query: str, price_per_tib: float = 6.25) -> dict:
+
+def estimate_query_cost(
+  client: bigquery.Client, query: str, price_per_tib: float = 6.25
+) -> dict:
   """Estimate BigQuery on-demand cost without executing the query."""
   config = bigquery.QueryJobConfig(
-  dry_run=True,
-  use_query_cache=False,
+    dry_run=True,
+    use_query_cache=False,
   )
   job = client.query(query, job_config=config)
 
@@ -27,11 +30,12 @@ def estimate_query_cost(client: bigquery.Client, query: str, price_per_tib: floa
   tib_processed = bytes_processed / 1024**4
 
   return {
-    "bytes_processed": bytes_processed,
-    "gib_processed": bytes_processed / 1024**3,
-    "tib_processed": tib_processed,
-    "estimated_cost_usd": tib_processed * price_per_tib,
+    'bytes_processed': bytes_processed,
+    'gib_processed': bytes_processed / 1024**3,
+    'tib_processed': tib_processed,
+    'estimated_cost_usd': tib_processed * price_per_tib,
   }
+
 
 def run_query_with_cost(
   client: bigquery.Client,
@@ -44,11 +48,9 @@ def run_query_with_cost(
 
   if max_cost_usd is not None:
     if max_cost_usd < 0:
-      raise ValueError("max_cost_usd must be non-negative")
+      raise ValueError('max_cost_usd must be non-negative')
 
-    maximum_bytes_billed = int(
-      max_cost_usd / price_per_tib * 1024**4
-    )
+    maximum_bytes_billed = int(max_cost_usd / price_per_tib * 1024**4)
 
   config = bigquery.QueryJobConfig(
     maximum_bytes_billed=maximum_bytes_billed,
@@ -61,21 +63,21 @@ def run_query_with_cost(
   bytes_billed = query_job.total_bytes_billed or 0
 
   cost_info = {
-    "job_id": query_job.job_id,
-    "cache_hit": bool(query_job.cache_hit),
-    "bytes_processed": bytes_processed,
-    "gib_processed": bytes_processed / 1024**3,
-    "bytes_billed": bytes_billed,
-    "tib_billed": bytes_billed / 1024**4,
-    "estimated_cost_usd": (
-      bytes_billed / 1024**4 * price_per_tib
-    ),
-    "slot_millis": query_job.slot_millis,
+    'job_id': query_job.job_id,
+    'cache_hit': bool(query_job.cache_hit),
+    'bytes_processed': bytes_processed,
+    'gib_processed': bytes_processed / 1024**3,
+    'bytes_billed': bytes_billed,
+    'tib_billed': bytes_billed / 1024**4,
+    'estimated_cost_usd': (bytes_billed / 1024**4 * price_per_tib),
+    'slot_millis': query_job.slot_millis,
   }
 
-  return list(results), cost_info # type: ignore
+  return list(results), cost_info  # type: ignore
+
 
 run_query_with_cost_async = asyncify(run_query_with_cost)
+
 
 def parse_row(row: bigquery.Row | BigQueryReward) -> Bonus:
   asset, amount = parse_denom_amount(row.token_denom, row.token_amount)
@@ -84,7 +86,7 @@ def parse_row(row: bigquery.Row | BigQueryReward) -> Bonus:
     asset=asset,
     amount=amount,
   )
-  
+
 
 @dataclass
 class BigQueryHistory(SDK):
@@ -94,7 +96,12 @@ class BigQueryHistory(SDK):
   cache: HistoryCache | None = None
 
   @classmethod
-  def of(cls, address: str, client: bigquery.Client | None = None, cache: HistoryCache | None = None):
+  def of(
+    cls,
+    address: str,
+    client: bigquery.Client | None = None,
+    cache: HistoryCache | None = None,
+  ):
     if client is None:
       client = bigquery_client()
     if client is not None:
@@ -102,15 +109,16 @@ class BigQueryHistory(SDK):
 
   @SDK.method
   async def reward_distributions(
-    self, start: datetime | None = None, end: datetime | None = None,
+    self,
+    start: datetime | None = None,
+    end: datetime | None = None,
   ):
     """Fetch trading reward distributions from BigQuery."""
     if self.cache is not None and self.cache.bigquery_has_cache(self.address):
       cached_rows = self.cache.read_bigquery_rewards(self.address)
       rewards = [parse_row(row) for row in cached_rows]
       return [
-        reward for reward in rewards
-        if in_window(reward.time, start=start, end=end)
+        reward for reward in rewards if in_window(reward.time, start=start, end=end)
       ]
 
     query = f"""
@@ -125,43 +133,53 @@ class BigQueryHistory(SDK):
         recipient = '{self.address}'
     """
     try:
-      results, _ = await run_query_with_cost_async(self.client, query, max_cost_usd=self.max_cost_usd)
+      results, _ = await run_query_with_cost_async(
+        self.client, query, max_cost_usd=self.max_cost_usd
+      )
     except requests.ConnectionError as e:
       raise NetworkError(*e.args) from e
 
     if self.cache is not None:
       self.cache.write_bigquery_rewards(
         self.address,
-        [(row['block_timestamp'], row['token_denom'], str(row['token_amount'])) for row in results],
+        [
+          (row['block_timestamp'], row['token_denom'], str(row['token_amount']))
+          for row in results
+        ],
       )
 
     rewards = [parse_row(row) for row in results]
     return [
-      reward
-      for reward in rewards
-      if in_window(reward.time, start=start, end=end)
+      reward for reward in rewards if in_window(reward.time, start=start, end=end)
     ]
 
-  
   async def history(
-    self, start: datetime | None = None, end: datetime | None = None,
+    self,
+    start: datetime | None = None,
+    end: datetime | None = None,
   ):
     rewards = await self.reward_distributions(start, end)
     id = source_id('bigquery')
     return [
-      HistoryRecord(observations=[r], provenance={'source': 'api', 'service': 'bigquery', 'id': id})
+      HistoryRecord(
+        observations=[r], provenance={'source': 'api', 'service': 'bigquery', 'id': id}
+      )
       for r in rewards
     ]
 
 
 def bigquery_client(providers: ProvidersConfig | None = None) -> BigQueryClient | None:
   from google.auth.exceptions import DefaultCredentialsError
+
   provider = (providers or {}).get('bigquery')
   try:
     if provider is None:
       return bigquery.Client()
     from google.oauth2 import service_account
-    credentials = service_account.Credentials.from_service_account_file(provider['credentials_path'])
+
+    credentials = service_account.Credentials.from_service_account_file(
+      provider['credentials_path']
+    )
     return bigquery.Client(credentials=credentials)
   except DefaultCredentialsError:
     ...

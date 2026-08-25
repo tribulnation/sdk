@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
+
 @dataclass(kw_only=True)
 class Ticker:
   """A market's top-of-book and last-trade snapshot.
@@ -8,6 +9,7 @@ class Ticker:
   Deliberately excludes 24h open/high/low/change: they are derivable from a
   sampled series, and storing them freezes the venue's windowing choices.
   """
+
   last: Decimal | None = None
   """Last traded price."""
   bid: Decimal | None = None

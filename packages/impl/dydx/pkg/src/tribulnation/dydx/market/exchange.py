@@ -19,6 +19,7 @@ from .market import Market
 # every account-scoped method keys off the same bucket. The old suffix `parse_market_id`
 # has been retired (grep-confirmed: no callers used the suffix form).
 
+
 @dataclass(frozen=True)
 class Exchange(ExchangeMixin, PerpExchange):
   subaccount: int = 0
@@ -40,7 +41,10 @@ class Exchange(ExchangeMixin, PerpExchange):
     return list(markets)
 
   async def perp_stats(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {},
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
   ) -> Mapping[str, PerpStats]:
     """Fetch pricing and funding stats for every perp market in one call.
 
@@ -55,7 +59,10 @@ class Exchange(ExchangeMixin, PerpExchange):
     return await perp_stats(self, markets)
 
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {},
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
   ) -> Mapping[str, Ticker]:
     return await tickers(self, markets, settings=settings)
 
@@ -67,7 +74,11 @@ class Exchange(ExchangeMixin, PerpExchange):
     The market inherits this exchange's `subaccount`.
     """
     markets = await self.shared.load_markets()
-    return Market(shared=self.shared, perpetual_market=markets[market_id], subaccount=self.subaccount)
+    return Market(
+      shared=self.shared,
+      perpetual_market=markets[market_id],
+      subaccount=self.subaccount,
+    )
 
   @wrap_exceptions
   async def perp_collateral(self, market_id: str | None = None, /) -> PerpCollateral:

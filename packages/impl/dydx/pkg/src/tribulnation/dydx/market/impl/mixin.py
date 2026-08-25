@@ -1,11 +1,20 @@
-from typing_extensions import AsyncContextManager, Iterable, TypedDict, Callable, Awaitable, TypeVar
+from typing_extensions import (
+  AsyncContextManager,
+  Iterable,
+  TypedDict,
+  Callable,
+  Awaitable,
+  TypeVar,
+)
 from dataclasses import dataclass, field
 import asyncio
 import pydantic
 
 from typed_dydx.indexer.types import PerpetualMarket
 from typed_dydx import Dydx
-from typed_dydx.indexer.streams.parent_subaccounts import Notification as ParentSubaccountNotification
+from typed_dydx.indexer.streams.parent_subaccounts import (
+  Notification as ParentSubaccountNotification,
+)
 from typed_dydx.node.orders.types import Flags, TimeInForce
 from typed_dydx.protos.dydxprotocol import feetiers as feetiers_proto
 from tribulnation.sdk.core import SDK, Subscription, OverflowPolicy
@@ -14,6 +23,7 @@ from .depth import depth_stream, Book
 from .rules import parse_rules, Rules
 
 T = TypeVar('T')
+
 
 @pydantic.with_config({'extra': 'forbid'})
 class Settings(TypedDict, total=False):
@@ -31,7 +41,9 @@ class Settings(TypedDict, total=False):
   """GTBT delta for long-term orders. The GTBT will be `current_block().time.seconds + long_term_gtbt`"""
   reduce_only: bool
 
+
 settings_adapter = pydantic.TypeAdapter(Settings)
+
 
 @dataclass(kw_only=True)
 class Shared(SDK):
@@ -40,7 +52,9 @@ class Shared(SDK):
   address: str
   perpetual_markets: dict[str, PerpetualMarket] | None = None
   fee_tier: feetiers_proto.PerpetualFeeTier | None = None
-  parent_subaccount_subscriptions: dict[int, Subscription[ParentSubaccountNotification]] = field(default_factory=dict)
+  parent_subaccount_subscriptions: dict[
+    int, Subscription[ParentSubaccountNotification]
+  ] = field(default_factory=dict)
   depth_subscriptions: dict[str, Subscription[Book]] = field(default_factory=dict)
 
   @wrap_exceptions
@@ -50,7 +64,9 @@ class Shared(SDK):
     return self.perpetual_markets
 
   @wrap_exceptions
-  async def load_fee_tier(self, *, refetch: bool = False) -> feetiers_proto.PerpetualFeeTier:
+  async def load_fee_tier(
+    self, *, refetch: bool = False
+  ) -> feetiers_proto.PerpetualFeeTier:
     if refetch or self.fee_tier is None:
       response = await self.client.chain.feetiers.user_fee_tier(self.address)
       if response.tier is None:
@@ -67,24 +83,35 @@ class Shared(SDK):
 
   def parent_account_subscription(self, parent_subaccount: int):
     if parent_subaccount not in self.parent_subaccount_subscriptions:
+
       @wrap_exceptions
       async def subscribe():
-        stream = await self.client.indexer.streams.parent_subaccounts(self.address, subaccount=parent_subaccount)
+        stream = await self.client.indexer.streams.parent_subaccounts(
+          self.address, subaccount=parent_subaccount
+        )
+
         @wrap_exceptions
         async def parsed_stream():
           async for msg in stream:
             yield msg
+
         return parsed_stream(), stream.unsubscribe
-      self.parent_subaccount_subscriptions[parent_subaccount] = Subscription.of(subscribe)
+
+      self.parent_subaccount_subscriptions[parent_subaccount] = Subscription.of(
+        subscribe
+      )
     return self.parent_subaccount_subscriptions[parent_subaccount]
 
   def depth_subscription(self, market: str):
     if market not in self.depth_subscriptions:
-      self.depth_subscriptions[market] = Subscription.of(lambda: depth_stream(self.client.indexer, market))
+      self.depth_subscriptions[market] = Subscription.of(
+        lambda: depth_stream(self.client.indexer, market)
+      )
     return self.depth_subscriptions[market]
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield self.client
+
 
 @dataclass(kw_only=True, frozen=True)
 class ExchangeMixin(SDK):
@@ -95,14 +122,30 @@ class ExchangeMixin(SDK):
     return await fn()
 
   @classmethod
-  def new(cls, mnemonic: str | None = None, *, address: str | None = None, mainnet: bool = True, validate: bool = True, parent_subaccount: int = 0):
-    client = Dydx.mainnet(mnemonic, indexer={'validate': validate}, public=mnemonic is None) if mainnet else Dydx.testnet(mnemonic, indexer={'validate': validate}, public=mnemonic is None)
+  def new(
+    cls,
+    mnemonic: str | None = None,
+    *,
+    address: str | None = None,
+    mainnet: bool = True,
+    validate: bool = True,
+    parent_subaccount: int = 0,
+  ):
+    client = (
+      Dydx.mainnet(mnemonic, indexer={'validate': validate}, public=mnemonic is None)
+      if mainnet
+      else Dydx.testnet(
+        mnemonic, indexer={'validate': validate}, public=mnemonic is None
+      )
+    )
     if address is None:
       if mnemonic is None:
         raise ValueError('Either address or mnemonic must be provided')
       address = client.node.require_wallet().address
-    return cls(shared=Shared(client=client, address=address, parent_subaccount=parent_subaccount))
-    
+    return cls(
+      shared=Shared(client=client, address=address, parent_subaccount=parent_subaccount)
+    )
+
   @property
   def client(self):
     return self.shared.client
@@ -119,12 +162,23 @@ class ExchangeMixin(SDK):
     yield self.shared
 
   def subscribe_parent_subaccount(
-    self, parent_subaccount: int, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail',
+    self,
+    parent_subaccount: int,
+    *,
+    queue_size: int = 1000,
+    overflow: OverflowPolicy = 'fail',
   ):
-    return self.shared.parent_account_subscription(parent_subaccount).subscribe(queue_size=queue_size, overflow=overflow)
+    return self.shared.parent_account_subscription(parent_subaccount).subscribe(
+      queue_size=queue_size, overflow=overflow
+    )
 
-  def subscribe_depth(self, market: str, *, queue_size: int = 1, overflow: OverflowPolicy = 'latest'):
-    return self.shared.depth_subscription(market).subscribe(queue_size=queue_size, overflow=overflow)
+  def subscribe_depth(
+    self, market: str, *, queue_size: int = 1, overflow: OverflowPolicy = 'latest'
+  ):
+    return self.shared.depth_subscription(market).subscribe(
+      queue_size=queue_size, overflow=overflow
+    )
+
 
 @dataclass(kw_only=True, frozen=True)
 class MarketMixin(ExchangeMixin):

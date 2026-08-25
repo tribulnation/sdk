@@ -9,6 +9,7 @@ __all__ = [
   'Mixin',
   'Settings',
   'StreamManager',
-  'spot_name', 'perp_name',
+  'spot_name',
+  'perp_name',
   'MIN_ORDER_VALUE',
 ]

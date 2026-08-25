@@ -5,6 +5,7 @@ from decimal import Decimal
 
 from tribulnation.sdk.core import SDK
 
+
 @dataclass(kw_only=True)
 class WithdrawalMethod:
   @dataclass
@@ -20,12 +21,15 @@ class WithdrawalMethod:
   fee: Fee | None = None
   contract_address: str | None = None
 
+
 class WithdrawalMethods(SDK):
   @SDK.method
   @abstractmethod
   async def withdrawal_methods(
-    self, *, assets: Collection[str] | None = None,
-    networks: Collection[str] | None = None
+    self,
+    *,
+    assets: Collection[str] | None = None,
+    networks: Collection[str] | None = None,
   ) -> Sequence[WithdrawalMethod]:
     """Get withdrawal methods.
 

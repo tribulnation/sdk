@@ -4,8 +4,10 @@ from .rules import parse_rules
 from .mixin import ExchangeMixin, MarketMixin, Settings
 from .orders import (
   place_order,
-  cancel_order, cancel_orders,
-  query_order, open_orders,
+  cancel_order,
+  cancel_orders,
+  query_order,
+  open_orders,
 )
 from .funding import next_funding, funding_rates, funding_payments
 from .stats import perp_stats, tickers

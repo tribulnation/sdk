@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 
 GOVERNANCE_API_URL = 'https://dydx-dao-api.polkachu.com'
 
+
 def proposal_amount(coin: dict) -> tuple[str, Decimal] | None:
   """Convert a proposal coin object into asset and amount."""
   denom = coin.get('denom')
@@ -28,14 +29,18 @@ def proposal_amount(coin: dict) -> tuple[str, Decimal] | None:
   denom_str = str(denom)
   return parse_denom_amount(denom_str, int(amount))
 
+
 @dataclass
 class GovernanceHistory:
   """Governance-backed dYdX history methods."""
+
   address: str
   cache: HistoryCache | None = None
 
   async def history(
-    self, start: datetime | None = None, end: datetime | None = None,
+    self,
+    start: datetime | None = None,
+    end: datetime | None = None,
   ) -> list[HistoryRecord]:
     """Collect Community Treasury distributions from governance proposals."""
     proposals = await self.governance_proposals()
@@ -80,10 +85,13 @@ class GovernanceHistory:
 
     return proposals
 
-  async def governance_json(self, path: str, *, params: dict[str, str]) -> dict[str, Any]:
+  async def governance_json(
+    self, path: str, *, params: dict[str, str]
+  ) -> dict[str, Any]:
     """Fetch one governance REST JSON payload."""
     query = urlencode(params)
     url = f'{GOVERNANCE_API_URL}{path}?{query}'
+
     def fetch() -> dict[str, Any]:
       """Run the blocking REST call in a worker thread."""
       with urlopen(url) as response:
@@ -91,6 +99,7 @@ class GovernanceHistory:
       if not isinstance(payload, dict):
         raise ValueError(f'Expected governance JSON object from {url}.')
       return payload
+
     return await asyncio.to_thread(fetch)
 
   def parse_governance_proposal(self, proposal: dict[str, Any]) -> HistoryRecord | None:
@@ -113,12 +122,14 @@ class GovernanceHistory:
         if parsed is None:
           continue
         asset, amount = parsed
-        observations.append(Yield(
-          id=f'gov:{proposal_id}:{message_index}:{coin_index}',
-          time=time,
-          asset=asset,
-          amount=amount,
-        ))
+        observations.append(
+          Yield(
+            id=f'gov:{proposal_id}:{message_index}:{coin_index}',
+            time=time,
+            asset=asset,
+            amount=amount,
+          )
+        )
     if not observations:
       return None
     return HistoryRecord(

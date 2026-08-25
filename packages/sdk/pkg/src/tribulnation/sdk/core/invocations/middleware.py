@@ -1,4 +1,12 @@
-from typing_extensions import TYPE_CHECKING, Any, Awaitable, Callable, Protocol, TypeVar, cast
+from typing_extensions import (
+  TYPE_CHECKING,
+  Any,
+  Awaitable,
+  Callable,
+  Protocol,
+  TypeVar,
+  cast,
+)
 import asyncio
 import functools
 import inspect
@@ -13,12 +21,12 @@ RetryJitter = Callable[[float], float]
 
 
 class Middleware(Protocol):
-  def __call__(self, fn: Fn, ctx: 'Context') -> Fn:
-    ...
+  def __call__(self, fn: Fn, ctx: 'Context') -> Fn: ...
 
 
 def get_sdk_self(args: tuple[Any, ...]) -> Any | None:
   from .sdk import SDK
+
   if args and isinstance(args[0], SDK):
     return args[0]
 
@@ -35,6 +43,7 @@ def log(*, log_self: bool = False) -> Middleware:
       print(f'Calling "{path}" with args: {log_args}, kwargs: {kwargs}')
 
     if inspect.isasyncgenfunction(fn):
+
       @functools.wraps(fn)
       async def asyncgen_wrapper(*args: Any, **kwargs: Any):
         write(args, kwargs)
@@ -44,6 +53,7 @@ def log(*, log_self: bool = False) -> Middleware:
       return cast(Fn, asyncgen_wrapper)
 
     if inspect.iscoroutinefunction(fn):
+
       @functools.wraps(fn)
       async def coroutine_wrapper(*args: Any, **kwargs: Any) -> Any:
         write(args, kwargs)
@@ -72,8 +82,7 @@ class RetryLogger(Protocol):
     exception: Exception,
     retries: int,
     delay: float,
-  ) -> None:
-    ...
+  ) -> None: ...
 
 
 def default_retry_logger(
@@ -87,11 +96,15 @@ def default_retry_logger(
   delay: float,
 ) -> None:
   path = '.'.join(ctx.path)
-  print(f'Retry {retries} for {path} after {type(exception).__name__}; sleeping {delay:.2f}s')
+  print(
+    f'Retry {retries} for {path} after {type(exception).__name__}; sleeping {delay:.2f}s'
+  )
 
 
 def full_jitter(
-  delay: float, *, random: Callable[[], float] = random.random,
+  delay: float,
+  *,
+  random: Callable[[], float] = random.random,
 ) -> float:
   """Return a uniformly jittered delay between zero and the given delay."""
   return delay * random()
@@ -132,7 +145,15 @@ def retry(
                 f'Retry jitter returned {delay!r}; expected a finite delay between 0 and {cap}',
               )
           if log is not None:
-            log(fn, ctx, args=args, kwargs=kwargs, exception=e, retries=retries, delay=delay)
+            log(
+              fn,
+              ctx,
+              args=args,
+              kwargs=kwargs,
+              exception=e,
+              retries=retries,
+              delay=delay,
+            )
           await asyncio.sleep(delay)
 
     return cast(Fn, coroutine_wrapper)

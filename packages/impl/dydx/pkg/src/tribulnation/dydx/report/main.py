@@ -52,11 +52,10 @@ def normalize_perpetual_collateral(
       start=Decimal(0),
     )
     balances = dict(state.balances)
-    balances[USDC] = (
-      balances.get(USDC, Decimal(0)) + replayed_basis - reported_basis
-    )
+    balances[USDC] = balances.get(USDC, Decimal(0)) + replayed_basis - reported_basis
     subaccounts.append(state.model_copy(update={'balances': balances}))
   return snapshot.model_copy(update={'subaccounts': subaccounts})
+
 
 @dataclass(kw_only=True)
 class Report(_Report):
@@ -65,7 +64,9 @@ class Report(_Report):
 
   @classmethod
   def new(
-    cls, address: str, *,
+    cls,
+    address: str,
+    *,
     config: DydxConfig | None = None,
     providers: ProvidersConfig | None = None,
   ):
@@ -74,13 +75,15 @@ class Report(_Report):
     require_bigquery = config.get('require_bigquery', False)
 
     cache = None
-    if (cache_url := config.get('cache')):
+    if cache_url := config.get('cache'):
       from .history.cache import HistoryCache
+
       no_cache = config.get('no_cache', False)
       cache = HistoryCache.connect(cache_url, no_cache_reads=no_cache)
 
-    if (bigquery := providers.get('bigquery')):
+    if bigquery := providers.get('bigquery'):
       from .history.bigquery import bigquery_client
+
       bigquery = bigquery_client(providers)
 
     archive_node = config.get('archive_node')
@@ -93,8 +96,11 @@ class Report(_Report):
 
     return cls(
       history_impl=History.of(
-        address, dydx=dydx, bigquery=bigquery,
-        cache=cache, require_bigquery=require_bigquery,
+        address,
+        dydx=dydx,
+        bigquery=bigquery,
+        cache=cache,
+        require_bigquery=require_bigquery,
       ),
       snapshots_impl=Snapshots.of(address),
     )

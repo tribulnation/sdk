@@ -5,6 +5,7 @@ from tribulnation.sdk.market import Rules
 from tribulnation.mexc.core import MIN_ORDER_VALUE, wrap_exceptions
 from .mixin import MarketMixin
 
+
 @wrap_exceptions
 async def rules(self: MarketMixin, *, refetch: bool = False) -> Rules:
   if refetch:
@@ -26,7 +27,7 @@ async def rules(self: MarketMixin, *, refetch: bool = False) -> Rules:
     if filter.get('filterType') == 'PERCENT_PRICE_BY_SIDE':
       new_min_price = Decimal(1) - Decimal(str(filter.get('askMultiplierDown') or '0'))
       rel_min_price = max(rel_min_price or Decimal('-inf'), new_min_price)
-      
+
       new_max_price = Decimal(1) + Decimal(str(filter.get('bidMultiplierUp') or '0'))
       rel_max_price = min(rel_max_price or Decimal('inf'), new_max_price)
 

@@ -10,10 +10,16 @@ from ethereum import NodeRpc
 from tribulnation.sdk import SDK, ApiError
 from tribulnation.sdk.core import managed_tasks
 from tribulnation.sdk.reporting import (
-  Balances, Snapshot, SnapshotRecord, Snapshots, SubaccountSnapshot, source_id,
+  Balances,
+  Snapshot,
+  SnapshotRecord,
+  Snapshots,
+  SubaccountSnapshot,
+  source_id,
 )
 from tribulnation.ethereum.core import rpc
 from ..config import NATIVE_ASSET
+
 
 @dataclass(frozen=True, kw_only=True)
 class NodeSnapshots(Snapshots):
@@ -48,11 +54,14 @@ class NodeSnapshots(Snapshots):
   @rpc.wrap_exceptions
   async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotRecord:
     assets = assets or []
-    balances = Balances({
-      NATIVE_ASSET: await self.eth_balance(),
-    })
+    balances = Balances(
+      {
+        NATIVE_ASSET: await self.eth_balance(),
+      }
+    )
 
     semaphore = asyncio.Semaphore(self.batch_size)
+
     async def limited_token_balance(contract: str):
       async with semaphore:
         return await self.token_balance(contract), contract

@@ -13,6 +13,7 @@ from mexc.spot.streams.core.proto import PrivateDealsV3Api
 from tribulnation.mexc.core.exc import wrap_exceptions
 from .mixin import MarketMixin
 
+
 def _parse_trade(t: AccountTrade) -> Trade:
   sign = 1 if t.get('isBuyer') else -1
   fee = None
@@ -25,7 +26,9 @@ def _parse_trade(t: AccountTrade) -> Trade:
     id=str(t.get('id')),
     price=Decimal(t.get('price') or '0'),
     qty=Decimal(t.get('qty') or '0') * sign,
-    time=time.astimezone() if isinstance(time, datetime) else ts.parse(time).astimezone(),
+    time=time.astimezone()
+    if isinstance(time, datetime)
+    else ts.parse(time).astimezone(),
     maker=bool(t.get('isMaker')),
     fee=fee,
     details=t,
@@ -34,8 +37,11 @@ def _parse_trade(t: AccountTrade) -> Trade:
 
 @asynccontextmanager
 @wrap_exceptions
-async def trades_stream(self: MarketMixin, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'):
+async def trades_stream(
+  self: MarketMixin, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'
+):
   async with self.subscribe_my_trades(queue_size=queue_size, overflow=overflow) as s:
+
     @wrap_exceptions
     async def gen() -> AsyncIterable[Trade]:
       async for msg in s:
@@ -44,8 +50,8 @@ async def trades_stream(self: MarketMixin, *, queue_size: int = 1000, overflow: 
           continue
         # No symbol field in the proto; it is carried by wrapper in some streams, but not here.
         # So we yield as-is and rely on upstream filtering by subscription (user stream is account-wide).
-        side = "BUY" if msg.trade_type == 1 else "SELL"
-        sign = 1 if side == "BUY" else -1
+        side = 'BUY' if msg.trade_type == 1 else 'SELL'
+        sign = 1 if side == 'BUY' else -1
         yield Trade(
           id=msg.trade_id,
           price=Decimal(msg.price),
@@ -55,11 +61,14 @@ async def trades_stream(self: MarketMixin, *, queue_size: int = 1000, overflow: 
           fee=Trade.Fee(asset=msg.fee_currency, amount=Decimal(msg.fee_amount)),
           details=msg,
         )
+
     yield gen()
 
 
 @wrap_exceptions
-async def trades_history(self: MarketMixin, start: datetime, end: datetime) -> AsyncIterable[Sequence[Trade]]:
+async def trades_history(
+  self: MarketMixin, start: datetime, end: datetime
+) -> AsyncIterable[Sequence[Trade]]:
   trades = await self.client.spot.account.trades(
     symbol=self.instrument,
     start_time=start,

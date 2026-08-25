@@ -3,6 +3,7 @@ import pydantic
 
 from .common import BaseObservation
 
+
 class CosmosAttrs(pydantic.BaseModel):
   attrs: dict[str, list[str]]
 
@@ -10,10 +11,11 @@ class CosmosAttrs(pydantic.BaseModel):
     return self.attrs.get(key)
 
   def get(self, key: str) -> str | None:
-    if (vals := self.attrs.get(key)):
+    if vals := self.attrs.get(key):
       if len(vals) > 1:
         raise ValueError(f'Multiple values for key {key}')
       return vals[0]
+
 
 class CosmosEvent(pydantic.BaseModel):
   model_config = {'ignored_types': (type,)}
@@ -34,14 +36,16 @@ class CosmosEvent(pydantic.BaseModel):
     if value is None:
       raise KeyError(key)
     return value
-  
+
+
 class CosmosMessage(pydantic.BaseModel):
   idx: int
   action: str | None = None
   sender: str | None = None
   module: str | None = None
   events: list[CosmosEvent]
-    
+
+
 class CosmosTx(BaseObservation):
   model_config = {'ignored_types': (type,)}
   type: Literal['cosmos_tx'] = 'cosmos_tx'

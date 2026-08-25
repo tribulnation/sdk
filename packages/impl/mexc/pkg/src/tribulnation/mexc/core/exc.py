@@ -7,11 +7,13 @@ from tribulnation.sdk.core import NetworkError, ValidationError, ApiError, Error
 
 from mexc import core
 
+
 def wrap_exceptions(fn):
 
   if inspect.iscoroutinefunction(fn):
+
     @wraps(fn)
-    async def wrapper(*args, **kwargs): # type: ignore
+    async def wrapper(*args, **kwargs):  # type: ignore
       try:
         return await fn(*args, **kwargs)
       except httpx.HTTPError as e:
@@ -24,10 +26,11 @@ def wrap_exceptions(fn):
         raise ApiError(*e.args) from e
       except core.Error as e:
         raise Error(*e.args) from e
-      
+
   elif inspect.isasyncgenfunction(fn):
+
     @wraps(fn)
-    async def wrapper(*args, **kwargs): # type: ignore
+    async def wrapper(*args, **kwargs):  # type: ignore
       try:
         async for item in fn(*args, **kwargs):
           yield item
@@ -42,6 +45,7 @@ def wrap_exceptions(fn):
       except core.Error as e:
         raise Error(*e.args) from e
   else:
+
     @wraps(fn)
     def wrapper(*args, **kwargs):
       try:
@@ -56,4 +60,5 @@ def wrap_exceptions(fn):
         raise ApiError(*e.args) from e
       except core.Error as e:
         raise Error(*e.args) from e
+
   return wrapper

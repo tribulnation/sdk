@@ -53,8 +53,11 @@ class SpotMarket(SpotMarketMixin, Market):
     return await depth(self)
 
   def depth_stream(
-    self, *, levels: int | None = None,
-    queue_size: int = 1, overflow: OverflowPolicy = 'latest',
+    self,
+    *,
+    levels: int | None = None,
+    queue_size: int = 1,
+    overflow: OverflowPolicy = 'latest',
   ) -> AsyncContextManager[AsyncIterable[Book]]:
     return depth_stream(self, queue_size=queue_size, overflow=overflow)
 
@@ -65,7 +68,10 @@ class SpotMarket(SpotMarketMixin, Market):
     return await open_orders(self)
 
   def trades_stream(
-    self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail',
+    self,
+    *,
+    queue_size: int = 1000,
+    overflow: OverflowPolicy = 'fail',
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
     return trades_stream(self, queue_size=queue_size, overflow=overflow)
 
@@ -81,7 +87,9 @@ class SpotMarket(SpotMarketMixin, Market):
     for balance in state['balances']:
       if balance['token'] == self.quote_meta['index']:
         if balance['coin'] != self.quote_meta['name']:
-          raise LogicError(f'Found balance with matching index {balance["token"]}, but wrong coin "{balance["coin"]}" != "{self.quote_name}"')
+          raise LogicError(
+            f'Found balance with matching index {balance["token"]}, but wrong coin "{balance["coin"]}" != "{self.quote_name}"'
+          )
         total = Decimal(balance['total'])
         locked = Decimal(balance['hold'])
         return total - locked
@@ -95,7 +103,9 @@ class SpotMarket(SpotMarketMixin, Market):
     return await query_order(self, id)
 
   @wrap_exceptions
-  async def place_order(self, order: Order, *, settings: Settings = {}) -> OrderResponse:
+  async def place_order(
+    self, order: Order, *, settings: Settings = {}
+  ) -> OrderResponse:
     return await place_order(self, order, settings=settings)
 
   @wrap_exceptions

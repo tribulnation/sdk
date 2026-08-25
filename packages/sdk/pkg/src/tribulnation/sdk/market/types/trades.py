@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from datetime import datetime
 
+
 @dataclass(kw_only=True)
 class Trade:
   @dataclass(kw_only=True)

@@ -4,14 +4,17 @@ import pydantic
 
 from .common import BaseObservation, Fee
 
+
 class CryptoTransfer(pydantic.BaseModel):
   """A crypto asset transferred within a blockchain transaction."""
+
   asset: str
   """Raw asset identifier/address."""
   change: Decimal
   """Signed amount being transferred."""
   counterparty: str | None = None
   """Counterparty address, if known."""
+
 
 class CryptoTransaction(BaseObservation):
   type: Literal['crypto_transaction'] = 'crypto_transaction'

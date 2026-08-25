@@ -1,6 +1,12 @@
 from typing_extensions import (
-  AsyncIterable, AsyncIterator, AsyncGenerator, Awaitable,
-  Generic, Literal, TypeVar, Callable
+  AsyncIterable,
+  AsyncIterator,
+  AsyncGenerator,
+  Awaitable,
+  Generic,
+  Literal,
+  TypeVar,
+  Callable,
 )
 from contextlib import asynccontextmanager, suppress
 from dataclasses import dataclass, field
@@ -23,23 +29,27 @@ OverflowPolicy = Literal['fail', 'latest']
   use `queue_size=1` and each new item simply replaces the stale one.
 """
 
+
 @dataclass
 class _Closed:
   """Sentinel marking a clean end of stream (`StreamInbox.close`)."""
 
+
 @dataclass
 class _Failed:
   """Sentinel marking an errored end of stream (`StreamInbox.fail`)."""
+
   exc: Exception
+
 
 @dataclass
 class StreamInbox(Generic[T]):
   """A bounded, closeable async inbox: push items in, iterate them out.
 
   ```python
-  inbox.push(item)   # feed data (subject to the overflow policy)
-  inbox.close()      # clean end -> the async-for stops
-  inbox.fail(exc)    # error end -> the async-for raises exc
+  inbox.push(item)  # feed data (subject to the overflow policy)
+  inbox.close()  # clean end -> the async-for stops
+  inbox.fail(exc)  # error end -> the async-for raises exc
   async for item in inbox:
     ...
   ```
@@ -51,6 +61,7 @@ class StreamInbox(Generic[T]):
   stream therefore never has to drop buffered data to make room (which would
   violate the "no silent drops" guarantee of the `fail` policy).
   """
+
   queue: asyncio.Queue['T | _Failed | _Closed']
   queue_size: int
   overflow: OverflowPolicy
@@ -58,7 +69,9 @@ class StreamInbox(Generic[T]):
   _end: '_Closed | _Failed | None' = field(init=False, default=None)
 
   @classmethod
-  def new(cls, queue_size: int = 1000, overflow: OverflowPolicy = 'fail') -> 'StreamInbox[T]':
+  def new(
+    cls, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'
+  ) -> 'StreamInbox[T]':
     if queue_size < 1:
       raise ValueError('queue_size must be >= 1')
     # +1 slot reserved for the terminal marker (see class docstring).
@@ -123,6 +136,7 @@ class StreamInbox(Generic[T]):
       raise self._end.exc
     raise StopAsyncIteration
 
+
 @dataclass
 class Subscription(Generic[T]):
   """Fan out a stream to multiple subscribers.
@@ -141,6 +155,7 @@ class Subscription(Generic[T]):
   Each subscriber's inbox is bounded (see `StreamInbox` / `OverflowPolicy`): a
   slow or dead consumer can never accumulate unbounded depth/trade backlog.
   """
+
   @dataclass
   class Context(Generic[U]):
     iterator: AsyncIterator[U]
@@ -155,12 +170,17 @@ class Subscription(Generic[T]):
 
   @classmethod
   def of(
-    cls, subscribe: Callable[[], Awaitable[tuple[AsyncIterable[T], Callable[[], Awaitable]]]]
+    cls,
+    subscribe: Callable[
+      [], Awaitable[tuple[AsyncIterable[T], Callable[[], Awaitable]]]
+    ],
   ) -> 'Subscription[T]':
     """Build a `Subscription` from a callback returning `(iterable, unsubscribe)`."""
+
     async def subscribe_stream():
       iterable, unsubscribe = await subscribe()
       return cls.Context(aiter(iterable), unsubscribe)
+
     return cls(subscribe_stream)
 
   async def start(self):

@@ -4,6 +4,7 @@ from .earn import Earn
 from .reporting import Reporting
 from .wallet import Wallet
 
+
 @_dataclass
 class Bitget(SdkMixin):
   earn: Earn = _field(init=False)

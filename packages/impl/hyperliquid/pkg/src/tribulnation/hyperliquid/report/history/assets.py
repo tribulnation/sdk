@@ -8,6 +8,7 @@ The API is inconsistent about which form it uses: spot pairs and perp collateral
 are given as indices, but fill `feeToken` and ledger `token` are given as names.
 Names are resolved back to indices here.
 """
+
 from typing_extensions import Mapping
 from dataclasses import dataclass
 
@@ -57,6 +58,7 @@ def settlement_token(settle: Mapping[str, str], coin: str) -> str:
 @dataclass(frozen=True)
 class Assets:
   """Resolves Hyperliquid asset identifiers to canonical token indices."""
+
   by_name: Mapping[str, str]
   """Token name to token index, e.g. `'USDC' -> '0'`."""
   pairs: Mapping[int, tuple[str, str]]
@@ -74,7 +76,7 @@ class Assets:
     seen: dict[str, list[int]] = {}
     for token in meta['tokens']:
       seen.setdefault(token['name'], []).append(token['index'])
-    if (dupes := {n: v for n, v in seen.items() if len(v) > 1}):
+    if dupes := {n: v for n, v in seen.items() if len(v) > 1}:
       raise AmbiguousTokenName(f'Token names are not unique: {dupes}')
     by_name = {name: str(idx[0]) for name, idx in seen.items()}
 

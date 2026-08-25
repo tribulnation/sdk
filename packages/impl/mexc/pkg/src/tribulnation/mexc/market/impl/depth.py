@@ -16,7 +16,9 @@ from .mixin import MarketMixin
 
 @wrap_exceptions
 async def depth(self: MarketMixin, *, levels: int | None = None) -> Book:
-  r = await self.client.spot.market.depth(symbol=self.instrument, validate=self.shared.validate, limit=levels)
+  r = await self.client.spot.market.depth(
+    symbol=self.instrument, validate=self.shared.validate, limit=levels
+  )
   return Book(
     asks=[Book.Entry(price=Decimal(p), qty=Decimal(q)) for p, q in r['asks']],
     bids=[Book.Entry(price=Decimal(p), qty=Decimal(q)) for p, q in r['bids']],
@@ -29,25 +31,33 @@ class DepthUpdate:
   to_version: int
   book: Book
 
+
 def parse_snapshot(reply: OrderBook) -> tuple[int, Book]:
   return int(reply['lastUpdateId']), Book(
     asks=[Book.Entry(price=Decimal(p), qty=Decimal(q)) for p, q in reply['asks']],
     bids=[Book.Entry(price=Decimal(p), qty=Decimal(q)) for p, q in reply['bids']],
   )
 
+
 def parse_update(msg: PublicAggreDepthsV3Api) -> DepthUpdate:
   return DepthUpdate(
     from_version=int(msg.from_version),
     to_version=int(msg.to_version),
     book=Book(
-      asks=[Book.Entry(price=Decimal(a.price), qty=Decimal(a.quantity)) for a in msg.asks],
-      bids=[Book.Entry(price=Decimal(b.price), qty=Decimal(b.quantity)) for b in msg.bids],
+      asks=[
+        Book.Entry(price=Decimal(a.price), qty=Decimal(a.quantity)) for a in msg.asks
+      ],
+      bids=[
+        Book.Entry(price=Decimal(b.price), qty=Decimal(b.quantity)) for b in msg.bids
+      ],
     ),
   )
+
 
 def drain_updates(queue: asyncio.Queue[DepthUpdate], cache: list[DepthUpdate]) -> None:
   while not queue.empty():
     cache.append(queue.get_nowait())
+
 
 async def receive_update(
   queue: asyncio.Queue[DepthUpdate],
@@ -135,7 +145,9 @@ async def reconstruct_books(
   collector = asyncio.create_task(collect())
   try:
     while True:
-      version, book = await synchronized_book(client, symbol, queue, collector, levels=levels)
+      version, book = await synchronized_book(
+        client, symbol, queue, collector, levels=levels
+      )
       yield book.copy()
 
       while True:

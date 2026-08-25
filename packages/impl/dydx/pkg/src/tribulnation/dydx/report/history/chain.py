@@ -24,11 +24,13 @@ if TYPE_CHECKING:
 
 T = TypeVar('T')
 
+
 def parse_attrs(attrs: Iterable[EventAttribute]):
   out = defaultdict[str, list[str]](list)
   for a in attrs:
     out[a['key']].append(a['value'])
   return CosmosTx.Event.Attrs(attrs=dict(out))
+
 
 def parse_event(event: Event):
   attrs = parse_attrs(event['attributes'])
@@ -40,8 +42,11 @@ def parse_event(event: Event):
     attrs=attrs,
   )
 
+
 def parse_message(idx: int, event_group: list[CosmosTx.Event]):
-  actions = [e for e in event_group if e.type == 'message' and e.get('action') is not None]
+  actions = [
+    e for e in event_group if e.type == 'message' and e.get('action') is not None
+  ]
   if not actions:
     raise ValueError('No message action')
   if len(actions) > 1:
@@ -54,11 +59,12 @@ def parse_message(idx: int, event_group: list[CosmosTx.Event]):
     module=action.get('module'),
     events=event_group,
   )
-    
+
+
 def parse_tx(tx: TxResponse, *, time: datetime):
-  hash = tx['hash'] # type: ignore
-  height = int(tx['height']) # type: ignore
-  raw_events = tx['tx_result']['events'] # type: ignore
+  hash = tx['hash']  # type: ignore
+  height = int(tx['height'])  # type: ignore
+  raw_events = tx['tx_result']['events']  # type: ignore
   events = [parse_event(e) for e in raw_events]
   tx_events: list[CosmosTx.Event] = []
   msg_events = defaultdict[int, list[CosmosTx.Event]](list)
@@ -70,11 +76,7 @@ def parse_tx(tx: TxResponse, *, time: datetime):
 
   messages = [parse_message(idx, e) for idx, e in sorted(msg_events.items())]
   return CosmosTx(
-    tx_id=hash,
-    height=height,
-    time=time,
-    tx_events=tx_events,
-    messages=messages
+    tx_id=hash, height=height, time=time, tx_events=tx_events, messages=messages
   )
 
 
@@ -82,7 +84,9 @@ def parse_tx(tx: TxResponse, *, time: datetime):
 class ChainHistory(SDK):
   address: str
   comet: Comet
-  chain_semaphore: asyncio.Semaphore = field(default_factory=lambda: asyncio.Semaphore(4))
+  chain_semaphore: asyncio.Semaphore = field(
+    default_factory=lambda: asyncio.Semaphore(4)
+  )
   cache: HistoryCache | None = None
   _block_times: dict[int, datetime] = field(default_factory=dict)
 
@@ -114,7 +118,6 @@ class ChainHistory(SDK):
       self.cache.set(height, time)
     return time
 
-
   async def tx_search(self, query: str, *, per_page: int | None = None):
     paging = self.comet.tx_search_paged(query, per_page=per_page)
     state = paging.init
@@ -131,7 +134,11 @@ class ChainHistory(SDK):
     return int(header['height']), header['time']
 
   async def height_at_or_after(
-    self, time: datetime, *, latest_height: int, latest_time: datetime,
+    self,
+    time: datetime,
+    *,
+    latest_height: int,
+    latest_time: datetime,
   ) -> int | None:
     """Find the first block whose timestamp is at or after a timestamp."""
     if time > latest_time:
@@ -146,7 +153,11 @@ class ChainHistory(SDK):
     return low
 
   async def height_at_or_before(
-    self, time: datetime, *, latest_height: int, latest_time: datetime,
+    self,
+    time: datetime,
+    *,
+    latest_height: int,
+    latest_time: datetime,
   ) -> int | None:
     """Find the last block whose timestamp is at or before a timestamp."""
     if time >= latest_time:
@@ -163,7 +174,9 @@ class ChainHistory(SDK):
     return low
 
   async def height_window(
-    self, start: datetime | None, end: datetime | None,
+    self,
+    start: datetime | None,
+    end: datetime | None,
   ) -> tuple[int, int] | None:
     """Resolve an inclusive datetime window to concrete block bounds."""
     if start is not None and end is not None and start > end:
@@ -171,15 +184,21 @@ class ChainHistory(SDK):
     latest_height, latest_time = await self.latest_block()
     start_height = (
       await self.height_at_or_after(
-        start, latest_height=latest_height, latest_time=latest_time,
+        start,
+        latest_height=latest_height,
+        latest_time=latest_time,
       )
-      if start is not None else 1
+      if start is not None
+      else 1
     )
     end_height = (
       await self.height_at_or_before(
-        end, latest_height=latest_height, latest_time=latest_time,
+        end,
+        latest_height=latest_height,
+        latest_time=latest_time,
       )
-      if end is not None else latest_height
+      if end is not None
+      else latest_height
     )
     if start_height is None or end_height is None:
       return None
@@ -188,7 +207,11 @@ class ChainHistory(SDK):
     return start_height, end_height
 
   def bounded_query(
-    self, query: str, *, start_height: int | None, end_height: int | None,
+    self,
+    query: str,
+    *,
+    start_height: int | None,
+    end_height: int | None,
   ) -> str:
     """Add optional block-height predicates to a Comet query."""
     clauses = [query]
@@ -199,7 +222,10 @@ class ChainHistory(SDK):
     return ' AND '.join(clauses)
 
   async def coin_spent_transactions(
-    self, *, start_height: int | None, end_height: int | None,
+    self,
+    *,
+    start_height: int | None,
+    end_height: int | None,
   ):
     txs: list[TxResponse] = []
     query = self.bounded_query(
@@ -212,7 +238,10 @@ class ChainHistory(SDK):
     return txs
 
   async def coin_received_transactions(
-    self, *, start_height: int | None, end_height: int | None,
+    self,
+    *,
+    start_height: int | None,
+    end_height: int | None,
   ):
     txs: list[TxResponse] = []
     query = self.bounded_query(
@@ -225,7 +254,10 @@ class ChainHistory(SDK):
     return txs
 
   async def fee_payer_transactions(
-    self, *, start_height: int | None, end_height: int | None,
+    self,
+    *,
+    start_height: int | None,
+    end_height: int | None,
   ):
     txs: list[TxResponse] = []
     query = self.bounded_query(
@@ -238,7 +270,10 @@ class ChainHistory(SDK):
     return txs
 
   async def settled_funding_transactions(
-    self, *, start_height: int | None, end_height: int | None,
+    self,
+    *,
+    start_height: int | None,
+    end_height: int | None,
   ):
     txs: list[TxResponse] = []
     query = self.bounded_query(
@@ -251,20 +286,27 @@ class ChainHistory(SDK):
     return txs
 
   async def _fetch_from_node(
-    self, *, start_height: int | None, end_height: int | None,
+    self,
+    *,
+    start_height: int | None,
+    end_height: int | None,
   ) -> dict[str, TxResponse]:
     spent_txs, received_txs, fee_payer_txs, settled_funding_txs = await asyncio.gather(
       self.coin_spent_transactions(
-        start_height=start_height, end_height=end_height,
+        start_height=start_height,
+        end_height=end_height,
       ),
       self.coin_received_transactions(
-        start_height=start_height, end_height=end_height,
+        start_height=start_height,
+        end_height=end_height,
       ),
       self.fee_payer_transactions(
-        start_height=start_height, end_height=end_height,
+        start_height=start_height,
+        end_height=end_height,
       ),
       self.settled_funding_transactions(
-        start_height=start_height, end_height=end_height,
+        start_height=start_height,
+        end_height=end_height,
       ),
     )
     return {
@@ -273,7 +315,9 @@ class ChainHistory(SDK):
     }
 
   async def fetch_transactions(
-    self, start: datetime | None = None, end: datetime | None = None,
+    self,
+    start: datetime | None = None,
+    end: datetime | None = None,
   ) -> dict[str, TxResponse]:
     """Fetch account transactions within an inclusive time window."""
     if (window := await self.height_window(start, end)) is None:
@@ -282,15 +326,19 @@ class ChainHistory(SDK):
 
     if self.cache is None:
       return await self._fetch_from_node(
-        start_height=start_height, end_height=end_height,
+        start_height=start_height,
+        end_height=end_height,
       )
 
     fetched: dict[str, TxResponse] = {}
     for gap_start, gap_end in self.cache.chain_gaps(
-      self.address, start_height=start_height, end_height=end_height,
+      self.address,
+      start_height=start_height,
+      end_height=end_height,
     ):
       gap_txs = await self._fetch_from_node(
-        start_height=gap_start, end_height=gap_end,
+        start_height=gap_start,
+        end_height=gap_end,
       )
       self.cache.write_chain_txs(
         self.address,
@@ -301,12 +349,16 @@ class ChainHistory(SDK):
       fetched.update(gap_txs)
 
     cached = self.cache.read_chain_txs(
-      self.address, start_height=start_height, end_height=end_height,
+      self.address,
+      start_height=start_height,
+      end_height=end_height,
     )
     return {**cached, **fetched}
 
   async def history(
-    self, start: datetime | None = None, end: datetime | None = None,
+    self,
+    start: datetime | None = None,
+    end: datetime | None = None,
   ):
     id = source_id('chain')
     transactions = await self.fetch_transactions(start, end)

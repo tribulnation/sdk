@@ -1,6 +1,7 @@
 from decimal import Decimal
 import pydantic
 
+
 class Fee(pydantic.BaseModel):
   amount: Decimal
   """Raw amount paid."""
@@ -13,6 +14,7 @@ class Fee(pydantic.BaseModel):
 
   def __str__(self) -> str:
     return f'Fee({self.amount} {self.asset})'
+
 
 class BaseObservation(pydantic.BaseModel):
   id: str | None = None

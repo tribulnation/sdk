@@ -5,11 +5,15 @@ from tribulnation.sdk.market import Rules
 from typed_dydx.indexer.types import PerpetualMarket
 from typed_dydx.protos.dydxprotocol import feetiers as feetiers_proto
 
+
 def fee_ppm(value: int) -> Decimal:
   """Convert dYdX fee parts-per-million into a decimal rate."""
   return Decimal(value) / Decimal(1_000_000)
 
-def parse_rules(market: PerpetualMarket, fees: feetiers_proto.PerpetualFeeTier) -> Rules:
+
+def parse_rules(
+  market: PerpetualMarket, fees: feetiers_proto.PerpetualFeeTier
+) -> Rules:
   """Convert dYdX market and fee-tier metadata into SDK trading rules."""
   base, quote = market['ticker'].split('-')
   return Rules(

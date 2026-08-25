@@ -9,9 +9,12 @@ from tribulnation.sdk.core import PaginatedResponse, OverflowPolicy
 from tribulnation.dydx.core import wrap_exceptions
 from .mixin import MarketMixin
 
+
 @PaginatedResponse.lift
 @wrap_exceptions
-async def trades_history(self: MarketMixin, start: datetime, end: datetime) -> AsyncIterable[Sequence[Trade]]:
+async def trades_history(
+  self: MarketMixin, start: datetime, end: datetime
+) -> AsyncIterable[Sequence[Trade]]:
   start = start.astimezone()
   end = end.astimezone()
 
@@ -37,25 +40,32 @@ async def trades_history(self: MarketMixin, start: datetime, end: datetime) -> A
         if fill['market'] != self.market or not within(fill['createdAt']):
           continue
         sign = 1 if fill['side'] == 'BUY' else -1
-        trades.append(Trade(
-          id=fill['id'],
-          price=Decimal(fill['price']),
-          qty=Decimal(fill['size']) * sign,
-          time=fill['createdAt'],
-          maker=fill['liquidity'] == 'MAKER',
-          fee=Trade.Fee(asset='USDC', amount=Decimal(fill['fee'])),
-          details=fill,
-        ))
+        trades.append(
+          Trade(
+            id=fill['id'],
+            price=Decimal(fill['price']),
+            qty=Decimal(fill['size']) * sign,
+            time=fill['createdAt'],
+            maker=fill['liquidity'] == 'MAKER',
+            fee=Trade.Fee(asset='USDC', amount=Decimal(fill['fee'])),
+            details=fill,
+          )
+        )
       if trades:
         yield trades
 
 
 @asynccontextmanager
 @wrap_exceptions
-async def trades_stream(self: MarketMixin, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'):
+async def trades_stream(
+  self: MarketMixin, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'
+):
   async with self.subscribe_parent_subaccount(
-    self.shared.parent_subaccount, queue_size=queue_size, overflow=overflow,
+    self.shared.parent_subaccount,
+    queue_size=queue_size,
+    overflow=overflow,
   ) as parent_subaccounts:
+
     @wrap_exceptions
     async def gen() -> AsyncIterable[Trade]:
       async for log in parent_subaccounts:
@@ -75,4 +85,5 @@ async def trades_stream(self: MarketMixin, *, queue_size: int = 1000, overflow: 
             fee=None,
             details=fill,
           )
+
     yield gen()

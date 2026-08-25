@@ -13,8 +13,10 @@ from tribulnation.mexc.core.exc import wrap_exceptions
 
 SpotInfo = SymbolInfo
 
+
 class Meta(TypedDict):
   info: SpotInfo
+
 
 @dataclass(kw_only=True)
 class Shared:
@@ -26,7 +28,9 @@ class Shared:
   my_trades_subscription: Subscription[PrivateDealsV3Api] | None = None
   depth_subscriptions: dict[str, Subscription[Book]] = field(default_factory=dict)
 
-  _markets_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
+  _markets_lock: asyncio.Lock = field(
+    default_factory=asyncio.Lock, init=False, repr=False
+  )
 
   @classmethod
   def new(
@@ -38,6 +42,7 @@ class Shared:
     recv_window: int | None = None,
   ):
     import os
+
     api_key = api_key or os.environ.get('MEXC_API_KEY') or ''
     api_secret = api_secret or os.environ.get('MEXC_API_SECRET') or ''
     client = MEXC.new(api_key=api_key, api_secret=api_secret, validate=validate)
@@ -67,42 +72,62 @@ class Shared:
         return self.spot_markets
       info = await self.client.spot.market.exchange_info(validate=self.validate)
       markets = {
-        market['symbol']: market
-        for market in info['symbols']
-        if 'symbol' in market
+        market['symbol']: market for market in info['symbols'] if 'symbol' in market
       }
       self.spot_markets = markets
       return self.spot_markets
 
   def depth_subscription(self, symbol: str):
     if symbol not in self.depth_subscriptions:
+
       @wrap_exceptions
       async def subscribe():
         # Local import avoids a circular import (depth.py imports MarketMixin).
         from .depth import reconstruct_books
-        stream = await self.client.spot.streams.market.depth_updates(symbol, aggregation='10ms')
+
+        stream = await self.client.spot.streams.market.depth_updates(
+          symbol, aggregation='10ms'
+        )
         # Reconstruct the book once here so the shared subscription fans out
         # full snapshots rather than raw diffs.
         return reconstruct_books(self.client, symbol, stream.stream), stream.unsubscribe
+
       self.depth_subscriptions[symbol] = Subscription.of(subscribe)
     return self.depth_subscriptions[symbol]
 
   def my_trades_sub(self) -> Subscription[PrivateDealsV3Api]:
     if self.my_trades_subscription is None:
+
       @wrap_exceptions
       async def subscribe():
         stream = await self.client.spot.streams.user.trades()
         return stream.stream, stream.unsubscribe
+
       self.my_trades_subscription = Subscription.of(subscribe)
     return self.my_trades_subscription
+
 
 @dataclass(frozen=True)
 class SharedMixin(SDK):
   shared: Shared
 
   @classmethod
-  def new(cls, api_key: str | None = None, api_secret: str | None = None, *, validate: bool = True, recv_window: int | None = None):
-    return cls(shared=Shared.new(api_key=api_key, api_secret=api_secret, validate=validate, recv_window=recv_window))
+  def new(
+    cls,
+    api_key: str | None = None,
+    api_secret: str | None = None,
+    *,
+    validate: bool = True,
+    recv_window: int | None = None,
+  ):
+    return cls(
+      shared=Shared.new(
+        api_key=api_key,
+        api_secret=api_secret,
+        validate=validate,
+        recv_window=recv_window,
+      )
+    )
 
   @classmethod
   def public(cls, *, validate: bool = True):
@@ -116,9 +141,10 @@ class SharedMixin(SDK):
     yield from super().resources()
     yield self.shared
 
+
 @dataclass(kw_only=True, frozen=True)
-class ExchangeMixin(SharedMixin):
-  ...
+class ExchangeMixin(SharedMixin): ...
+
 
 @dataclass(kw_only=True, frozen=True)
 class MarketMixin(ExchangeMixin):
@@ -135,8 +161,16 @@ class MarketMixin(ExchangeMixin):
       raise ValueError('MEXC spot market metadata is missing symbol')
     return symbol
 
-  def subscribe_depth(self, *, queue_size: int = 1, overflow: OverflowPolicy = 'latest'):
-    return self.shared.depth_subscription(self.instrument).subscribe(queue_size=queue_size, overflow=overflow)
+  def subscribe_depth(
+    self, *, queue_size: int = 1, overflow: OverflowPolicy = 'latest'
+  ):
+    return self.shared.depth_subscription(self.instrument).subscribe(
+      queue_size=queue_size, overflow=overflow
+    )
 
-  def subscribe_my_trades(self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'):
-    return self.shared.my_trades_sub().subscribe(queue_size=queue_size, overflow=overflow)
+  def subscribe_my_trades(
+    self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'
+  ):
+    return self.shared.my_trades_sub().subscribe(
+      queue_size=queue_size, overflow=overflow
+    )

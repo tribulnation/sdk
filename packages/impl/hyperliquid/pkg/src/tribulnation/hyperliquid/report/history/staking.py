@@ -3,6 +3,7 @@
 Neither endpoint accepts a time range or paginates, so both return the account's
 full history and are filtered client-side.
 """
+
 from typing_extensions import Any, Iterable, Mapping
 from decimal import Decimal
 
@@ -38,7 +39,9 @@ def parse_rewards(rewards: Iterable[DelegatorReward]) -> list[Yield]:
 
 
 def parse_history_entry(
-  entry: DelegatorHistoryEvent, *, index: int,
+  entry: DelegatorHistoryEvent,
+  *,
+  index: int,
 ) -> list[Observation]:
   """Convert one staking history record into observations.
 
@@ -53,27 +56,44 @@ def parse_history_entry(
 
   if (delegate := delta.get('delegate')) is not None:
     undelegate = bool(delegate['isUndelegate'])
-    return [InternalTransfer(
-      id=id, time=time, asset=HYPE, amount=abs(Decimal(str(delegate['amount']))),
-      src_account=delegate['validator'] if undelegate else STAKING,
-      dst_account=STAKING if undelegate else delegate['validator'],
-    )]
+    return [
+      InternalTransfer(
+        id=id,
+        time=time,
+        asset=HYPE,
+        amount=abs(Decimal(str(delegate['amount']))),
+        src_account=delegate['validator'] if undelegate else STAKING,
+        dst_account=STAKING if undelegate else delegate['validator'],
+      )
+    ]
 
   if (withdrawal := delta.get('withdrawal')) is not None:
     # Reported twice, once per phase. Only the finalized leg moves the balance;
     # emitting both would double-count.
     if withdrawal['phase'] != 'finalized':
       return []
-    return [InternalTransfer(
-      id=id, time=time, asset=HYPE, amount=abs(Decimal(str(withdrawal['amount']))),
-      src_account=STAKING, dst_account=UNIFIED,
-    )]
+    return [
+      InternalTransfer(
+        id=id,
+        time=time,
+        asset=HYPE,
+        amount=abs(Decimal(str(withdrawal['amount']))),
+        src_account=STAKING,
+        dst_account=UNIFIED,
+      )
+    ]
 
   if (deposit := delta.get('cDeposit')) is not None:
-    return [InternalTransfer(
-      id=id, time=time, asset=HYPE, amount=abs(Decimal(str(deposit['amount']))),
-      src_account=UNIFIED, dst_account=STAKING,
-    )]
+    return [
+      InternalTransfer(
+        id=id,
+        time=time,
+        asset=HYPE,
+        amount=abs(Decimal(str(deposit['amount']))),
+        src_account=UNIFIED,
+        dst_account=STAKING,
+      )
+    ]
 
   return []
 
@@ -81,6 +101,7 @@ def parse_history_entry(
 def parse_history(entries: Iterable[DelegatorHistoryEvent]) -> list[Observation]:
   """Convert the staking history stream into observations."""
   return [
-    obs for index, entry in enumerate(entries)
+    obs
+    for index, entry in enumerate(entries)
     for obs in parse_history_entry(entry, index=index)
   ]

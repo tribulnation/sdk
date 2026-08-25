@@ -27,6 +27,7 @@ if TYPE_CHECKING:
 
 T = TypeVar('T')
 
+
 def fill_signed_size(fill: Fill) -> Decimal:
   """Return the signed position change for a dYdX fill."""
   return Decimal(fill['size']) if fill['side'] == 'BUY' else -Decimal(fill['size'])
@@ -258,17 +259,21 @@ class IndexerHistory(SDK):
   # HERE FOR COMPLETENESS, BUT WE PREFER TO USE THE CHAIN HISTORY TO GET FUNDINGS (THIS HAS ROUNDING ERRORS)
   async def fundings(self, *, subaccount: int):
     indexer_fundings: list[Funding] = []
-    paging = self.indexer.data.get_funding_payments_paged(self.address, subaccount=subaccount)
+    paging = self.indexer.data.get_funding_payments_paged(
+      self.address, subaccount=subaccount
+    )
     state = paging.init
     while state is not None:
-      page, state = await self.call(lambda: paging.next(state)) # type: ignore
+      page, state = await self.call(lambda: paging.next(state))  # type: ignore
       for f in page:
-        indexer_fundings.append(Funding(
-          time=f['createdAt'],
-          instrument=f['ticker'],
-          amount=f['payment'],
-          asset='USDC'
-        ))
+        indexer_fundings.append(
+          Funding(
+            time=f['createdAt'],
+            instrument=f['ticker'],
+            amount=f['payment'],
+            asset='USDC',
+          )
+        )
 
     return sorted(indexer_fundings, key=lambda f: f.time or datetime.min)
 
