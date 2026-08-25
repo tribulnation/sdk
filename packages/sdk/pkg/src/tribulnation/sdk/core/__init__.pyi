@@ -7,6 +7,8 @@ from .exc import (
   AuthError,
   RateLimited,
   LogicError,
+  translate_exception,
+  exception_wrapper,
 )
 from .invocations import (
   Context,
@@ -31,6 +33,8 @@ __all__ = [
   'AuthError',
   'RateLimited',
   'LogicError',
+  'translate_exception',
+  'exception_wrapper',
   'Context',
   'Middleware',
   'RetryJitter',
