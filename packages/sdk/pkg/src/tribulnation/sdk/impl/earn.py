@@ -3,10 +3,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tribulnation.sdk.earn import Earn
-from .accounts import Account, Mexc, Bitget, Binance, load_accounts
+from .accounts import Account, Mexc, Bitget, Binance, Bit2Me, load_accounts
 
 DEFAULT_ACCOUNTS: Mapping[str, Account] = {
   'mexc': Mexc(public=True),
+  'bit2me': Bit2Me(public=True),
 }
 
 
@@ -64,6 +65,19 @@ class EarnSDK:
       ) from e
     return MexcEarn()
 
+  def bit2me(self, account: Bit2Me) -> Earn:
+    try:
+      from tribulnation.bit2me.earn import Earn as Bit2MeEarn
+    except ImportError as e:
+      raise ImportError(
+        'bit2me sdk is not installed. Please install it with `pip install tribulnation-bit2me`.'
+      ) from e
+    return Bit2MeEarn.new(
+      api_key=account.resolved_api_key,
+      api_secret=account.resolved_api_secret,
+      validate=account.validate,
+    )
+
   @property
   def all(self) -> dict[str, Earn]:
     out: dict[str, Earn] = {}
@@ -84,6 +98,8 @@ class EarnSDK:
         return self.bitget(account)
       case 'mexc':
         return self.mexc(account)
+      case 'bit2me':
+        return self.bit2me(account)
       case _:
         raise NotImplementedError(f'Unsupported venue: {account.venue}')
 
