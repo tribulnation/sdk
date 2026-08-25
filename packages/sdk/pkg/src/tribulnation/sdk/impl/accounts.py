@@ -8,6 +8,7 @@ import pydantic as _pydantic
 def resolve_env_var(value: str | None, *, require: bool) -> str | None:
   """Resolve an environment variable if the value is in the form $ENV_VAR."""
   import os
+
   if value is not None and value.startswith('$'):
     var = value.removeprefix('$')
     if (resolved := os.getenv(var)) is None and require:
@@ -15,10 +16,12 @@ def resolve_env_var(value: str | None, *, require: bool) -> str | None:
     return resolved
   return value
 
+
 @_dataclass(kw_only=True)
 class BaseAccount:
   public: bool = False
   """Whether to allow public usage (i.e. whether unset credentials are OK)."""
+
   def verify_env_vars(self):
     """Verify that all required environment variables are set."""
     raise NotImplementedError('Subclasses must implement verify_env_vars()')
@@ -85,7 +88,7 @@ class Mexc(BaseAccount):
   @property
   def resolved_api_secret(self) -> str | None:
     return resolve_env_var(self.api_secret, require=not self.public)
-  
+
   def verify_env_vars(self):
     self.resolved_api_key
     self.resolved_api_secret
@@ -143,6 +146,7 @@ class Bitget(BaseAccount):
     self.resolved_secret_key
     self.resolved_passphrase
 
+
 @_dataclass
 class Binance(BaseAccount):
   venue: _Literal['binance'] = 'binance'
@@ -168,8 +172,17 @@ class Binance(BaseAccount):
 
 @_dataclass
 class Evm(BaseAccount):
-  Venue = _Literal['ethereum', 'arbitrum', 'polygon', 'bnb-chain', 'base', 'avalanche', 'optimism', 'hyperevm']
-  
+  Venue = _Literal[
+    'ethereum',
+    'arbitrum',
+    'polygon',
+    'bnb-chain',
+    'base',
+    'avalanche',
+    'optimism',
+    'hyperevm',
+  ]
+
   venue: Venue
   address: str = '$EVM_ADDRESS'
   """Wallet address (`0x...`)"""
@@ -177,14 +190,14 @@ class Evm(BaseAccount):
   @property
   def resolved_address(self) -> str | None:
     return resolve_env_var(self.address, require=not self.public)
-  
+
   def verify_env_vars(self):
     self.resolved_address
 
 
 Account = _Annotated[
   Dydx | Hyperliquid | Mexc | Bitget | Bit2Me | Binance | Evm,
-  _pydantic.Discriminator ('venue')
+  _pydantic.Discriminator('venue'),
 ]
 
 
