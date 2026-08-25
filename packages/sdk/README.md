@@ -22,23 +22,29 @@ See the [support matrix](docs/support.md) for details on extras.
 from dotenv import load_dotenv
 from tribulnation.sdk import MarketSDK, accounts
 
-load_dotenv() # load credentials from .env file
+load_dotenv()  # load credentials from .env file
 
-sdk = MarketSDK({
-  'mexc_account1': accounts.Mexc(api_key='$MEXC_API_KEY', api_secret='$MEXC_API_SECRET'),
-  # 'dydx', 'hyperliquid', and 'mexc' are available by default, even without listing them here
-})
+sdk = MarketSDK(
+  {
+    'mexc_account1': accounts.Mexc(
+      api_key='$MEXC_API_KEY', api_secret='$MEXC_API_SECRET'
+    ),
+    # 'dydx', 'hyperliquid', and 'mexc' are available by default, even without listing them here
+  }
+)
 mexc = await sdk.market('mexc_account1:spot:BTCUSDT')
 dydx = await sdk.market('dydx:perp:BTC-USD')
 
 async with mexc.trades_stream() as my_trades:
   async for my_trade in my_trades:
     print(f'Hedging {my_trade}')
-    await dydx.place_order({
-      'type': 'LIMIT',
-      'qty': -my_trade.qty,
-      'price': my_trade.price,
-    })
+    await dydx.place_order(
+      {
+        'type': 'LIMIT',
+        'qty': -my_trade.qty,
+        'price': my_trade.price,
+      }
+    )
 ```
 
 `accounts.<Venue>()` reads credentials from environment variables named after each field (`accounts.Mexc()` reads `$MEXC_API_KEY`/`$MEXC_API_SECRET`) — pass explicit values or other `$VAR` names to override.
@@ -93,9 +99,14 @@ Full reference: [docs/market/index.md](docs/market/index.md), with per-venue not
 Mutating methods also take an optional `settings` dict for venue-specific options, keyed by venue:
 
 ```python
-await dydx.place_order({
-  'type': 'LIMIT', 'qty': 0.01, 'price': 60_000,
-}, settings={'dydx': {'order_flags': 'SHORT_TERM', 'short_term_gtb': 2}})
+await dydx.place_order(
+  {
+    'type': 'LIMIT',
+    'qty': 0.01,
+    'price': 60_000,
+  },
+  settings={'dydx': {'order_flags': 'SHORT_TERM', 'short_term_gtb': 2}},
+)
 ```
 
 ## Other SDKs
@@ -121,7 +132,9 @@ from tribulnation.sdk import Context, NetworkError, RateLimited
 
 ctx = Context().retried(NetworkError, RateLimited, max_retries=5).logged()
 with ctx.use():
-  await sdk.place_order('mexc_account1:spot:BTCUSDT', {'type': 'LIMIT', 'qty': 0.01, 'price': 60_000})
+  await sdk.place_order(
+    'mexc_account1:spot:BTCUSDT', {'type': 'LIMIT', 'qty': 0.01, 'price': 60_000}
+  )
 ```
 
 Retries back off exponentially and only wrap plain async calls, not streams or paginated history. Nested SDK calls each re-apply the active context, so retries can compound across scoping layers. Details: [docs/context.md](docs/context.md).

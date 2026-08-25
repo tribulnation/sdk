@@ -17,5 +17,7 @@ from tribulnation.sdk import Context, NetworkError, RateLimited
 
 ctx = Context().retried(NetworkError, RateLimited, max_retries=5).logged()
 with ctx.use():
-  await sdk.place_order('mexc_account1:spot:BTCUSDT', {'type': 'LIMIT', 'qty': 0.01, 'price': 60_000})
+  await sdk.place_order(
+    'mexc_account1:spot:BTCUSDT', {'type': 'LIMIT', 'qty': 0.01, 'price': 60_000}
+  )
 ```

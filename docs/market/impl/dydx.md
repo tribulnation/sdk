@@ -116,19 +116,21 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-market = MarketSDK({
-  'dydx-account1': accounts.Dydx(),
-})
-
-await market.place_order('dydx-account1:perp:BTC-USD', {
-  'price': 10,
-  'qty': 0.00001,
-  'type': 'LIMIT'
-}, settings={
-  'dydx': {
-    'limit_tif': 'IMMEDIATE_OR_CANCEL',
-    'order_flags': 'SHORT_TERM',
-    'short_term_gtb': 2
+market = MarketSDK(
+  {
+    'dydx-account1': accounts.Dydx(),
   }
-})
+)
+
+await market.place_order(
+  'dydx-account1:perp:BTC-USD',
+  {'price': 10, 'qty': 0.00001, 'type': 'LIMIT'},
+  settings={
+    'dydx': {
+      'limit_tif': 'IMMEDIATE_OR_CANCEL',
+      'order_flags': 'SHORT_TERM',
+      'short_term_gtb': 2,
+    }
+  },
+)
 ```

@@ -156,7 +156,7 @@ An `Order` is a `TypedDict`:
 
 ```python
 {
-  'qty': Num,    # signed base units: positive buys, negative sells
+  'qty': Num,  # signed base units: positive buys, negative sells
   'price': Num,  # always required by the SDK order shape
   'type': 'MARKET' | 'LIMIT' | 'POST_ONLY',
 }
@@ -319,10 +319,14 @@ from tribulnation.sdk import MarketSDK, accounts
 
 load_dotenv()  # load credentials from .env
 
-sdk = MarketSDK({
-  'mexc_account1': accounts.Mexc(api_key='$MEXC_API_KEY', api_secret='$MEXC_API_SECRET'),
-  # 'dydx', 'hyperliquid', and 'mexc' are available by default even without listing them
-})
+sdk = MarketSDK(
+  {
+    'mexc_account1': accounts.Mexc(
+      api_key='$MEXC_API_KEY', api_secret='$MEXC_API_SECRET'
+    ),
+    # 'dydx', 'hyperliquid', and 'mexc' are available by default even without listing them
+  }
+)
 
 mexc = await sdk.market('mexc_account1:spot:BTCUSDT')
 dydx = await sdk.market('dydx:perp:BTC-USD')
@@ -330,11 +334,13 @@ dydx = await sdk.market('dydx:perp:BTC-USD')
 async with mexc.trades_stream() as my_trades:
   async for my_trade in my_trades:
     print(f'Hedging {my_trade}')
-    await dydx.place_order({
-      'type': 'LIMIT',
-      'qty': -my_trade.qty,
-      'price': my_trade.price,
-    })
+    await dydx.place_order(
+      {
+        'type': 'LIMIT',
+        'qty': -my_trade.qty,
+        'price': my_trade.price,
+      }
+    )
 ```
 
 ## Context, logging & retries

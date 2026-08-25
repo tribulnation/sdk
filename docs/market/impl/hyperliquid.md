@@ -104,7 +104,13 @@ await sdk.index('hl::BTC')
 # spot
 book = await sdk.depth('hl:spot:BTC/USDC:0')
 
-await sdk.place_order('hl::ETH', {
-  'type': 'LIMIT', 'qty': 0.01, 'price': 1000,
-}, settings={'hyperliquid': {'limit_tif': 'Alo', 'reduce_only': False}})
+await sdk.place_order(
+  'hl::ETH',
+  {
+    'type': 'LIMIT',
+    'qty': 0.01,
+    'price': 1000,
+  },
+  settings={'hyperliquid': {'limit_tif': 'Alo', 'reduce_only': False}},
+)
 ```

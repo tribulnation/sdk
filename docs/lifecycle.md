@@ -20,6 +20,7 @@ something, override that:
 ```python
 from tribulnation.sdk import SDK
 
+
 @dataclass(frozen=True)
 class Snapshots(SDK):
   client: VenueClient
@@ -34,8 +35,8 @@ compose:
 ```python
 class Report(_Report, Snapshots):
   def resources(self):
-    yield from super().resources()   # the client, from Snapshots
-    yield self.extra_stream          # plus our own
+    yield from super().resources()  # the client, from Snapshots
+    yield self.extra_stream  # plus our own
 ```
 
 Overriding `__aenter__` instead would not compose. A class combining two SDK
@@ -55,7 +56,7 @@ Objects obtained from an entered parent are already live:
 ```python
 async with venue:
   market = await venue.perp_market('BTC')
-  await market.depth()        # correct -- already entered
+  await market.depth()  # correct -- already entered
 ```
 
 Re-entering one is an error:
@@ -63,7 +64,7 @@ Re-entering one is an error:
 ```python
 async with venue:
   market = await venue.perp_market('BTC')
-  async with market:          # RuntimeError: resources are already active
+  async with market:  # RuntimeError: resources are already active
     ...
 ```
 
@@ -82,8 +83,8 @@ the same client will enter it twice, through two separate stacks:
 ```python
 class Outer(SDK):
   def resources(self):
-    yield Inner()      # Inner also yields `shared`
-    yield shared       # entered twice
+    yield Inner()  # Inner also yields `shared`
+    yield shared  # entered twice
 ```
 
 Share a client by having exactly one owner declare it and the others borrow it.
@@ -119,6 +120,7 @@ async def closing_streams(streams: dict[str, StreamManager]):
     yield streams
   finally:
     await asyncio.gather(*[s.close() for s in streams.values()], return_exceptions=True)
+
 
 def resources(self):
   yield self.client

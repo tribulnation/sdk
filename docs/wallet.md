@@ -13,10 +13,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-wallet = WalletSDK({
-  'binance': accounts.Binance(),
-  'bitget': accounts.Bitget()
-})
+wallet = WalletSDK({'binance': accounts.Binance(), 'bitget': accounts.Bitget()})
 
 for account, sdk in wallet.all.items():
   print(f'[{account}]')

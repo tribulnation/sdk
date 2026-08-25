@@ -54,7 +54,12 @@ load_dotenv()
 sdk = MarketSDK({'mexc_account1': accounts.Mexc()})
 
 book = await sdk.depth('mexc_account1:spot:BTCUSDT')
-await sdk.place_order('mexc_account1:spot:BTCUSDT', {
-  'type': 'LIMIT', 'qty': 0.001, 'price': 60_000,
-})
+await sdk.place_order(
+  'mexc_account1:spot:BTCUSDT',
+  {
+    'type': 'LIMIT',
+    'qty': 0.001,
+    'price': 60_000,
+  },
+)
 ```

@@ -14,10 +14,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-earn = EarnSDK({
-  'binance': accounts.Binance(),
-  'mexc': accounts.Mexc()
-})
+earn = EarnSDK({'binance': accounts.Binance(), 'mexc': accounts.Mexc()})
 
 for account, sdk in earn.all.items():
   print(f'[{account}]')

@@ -15,17 +15,21 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-report = ReportSDK({
-  'ethereum': accounts.Evm('ethereum'),
-  'polygon': accounts.Evm('polygon'),
-  'hyperevm': accounts.Evm('hyperevm'),
-})
+report = ReportSDK(
+  {
+    'ethereum': accounts.Evm('ethereum'),
+    'polygon': accounts.Evm('polygon'),
+    'hyperevm': accounts.Evm('hyperevm'),
+  }
+)
 
 for account, sdk in report.all.items():
   async with sdk:
     result = await sdk.snapshot()
   snapshot = result.snapshot
-  print(f'[{account}] ({snapshot.time:%Y-%m-%d %H:%M:%S}) from {result.provenance["source"]}')
+  print(
+    f'[{account}] ({snapshot.time:%Y-%m-%d %H:%M:%S}) from {result.provenance["source"]}'
+  )
   for subaccount in snapshot.subaccounts:
     print(f'> account: {subaccount.subaccount}')
     for asset, balance in subaccount.balances.items():
