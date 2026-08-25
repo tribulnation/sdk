@@ -48,12 +48,13 @@ class SdkMixin(SDK):
     secret_key: str | None = None,
     passphrase: str | None = None,
     *,
+    uta: bool | None = None,
     validate: bool = True,
   ):
     client = Bitget.new(
       access_key=access_key, secret_key=secret_key, passphrase=passphrase
     )
-    return cls(client=client, validate=validate)
+    return cls(client=client, uta=uta, validate=validate)
 
   def resources(self) -> Iterable[AsyncContextManager[Any]]:
     yield from super().resources()

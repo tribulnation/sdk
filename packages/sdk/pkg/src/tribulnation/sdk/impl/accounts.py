@@ -128,6 +128,8 @@ class Bitget(BaseAccount):
   """Bitget API passphrase"""
   validate: bool = True
   """Whether to type-validate incoming responses."""
+  uta: bool | None = None
+  """Is this account in UTA mode? If None, it will be auto-detected on first use."""
 
   @property
   def resolved_access_key(self) -> str | None:

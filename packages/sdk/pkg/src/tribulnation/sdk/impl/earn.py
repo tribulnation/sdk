@@ -51,6 +51,7 @@ class EarnSDK:
       access_key=account.resolved_access_key,
       secret_key=account.resolved_secret_key,
       passphrase=account.resolved_passphrase,
+      uta=account.uta,
       validate=account.validate,
     ).earn
 
