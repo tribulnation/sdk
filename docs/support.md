@@ -38,6 +38,18 @@ balances and order placement need credentials.
 `DEFAULT_ACCOUNTS` is empty: every wallet surface requires credentials, so you must pass an
 account explicitly.
 
+Bit2Me has no Wallet implementation, deliberately: its only asset/network catalogue
+(`v2/currency/assets`) lists a single display network per asset (e.g. USDC shows
+`ETHEREUM (ERC20)`), but deposit addresses for that same asset can be minted on other
+networks too — confirmed live, `v2/wallet/pocket/{id}/{network}/address` happily mints USDC
+addresses on `polygon` and `solana` as well. There is no endpoint that enumerates the full
+network set for an asset, so `deposit_methods()`/`withdrawal_methods()` built on the
+catalogue would silently under-report networks for any multi-chain asset. Per-transaction
+withdrawal fees have the same shape of problem: `POST /v1/wallet/transaction/proforma` does
+return a real fee, but only as a live quote for one already-funded pocket and destination,
+not as a listable table — so there's no accurate way to answer either "which networks" or
+"what fee" in bulk. Left unimplemented rather than shipped incomplete.
+
 **Snapshots / History** — `ReportSDK.venue()` resolves the EVM networks
 (`ethereum`, `arbitrum`, `polygon`, `bnb-chain`, `base`, `avalanche`, `optimism`, `hyperevm`),
 `dydx`/`dydx_testnet`, `hyperliquid`/`hyperliquid_testnet`, plus the three CEXs
