@@ -173,6 +173,13 @@ class Binance(BaseAccount):
 
 
 @_dataclass
+class Coinbase(BaseAccount):
+  venue: _Literal['coinbase'] = 'coinbase'
+  key_name: str = '$COINBASE_API_KEY_NAME'
+  private_key: str = '$COINBASE_PRIVATE_KEY'
+
+
+@_dataclass
 class Evm(BaseAccount):
   Venue = _Literal[
     'ethereum',
@@ -198,7 +205,7 @@ class Evm(BaseAccount):
 
 
 Account = _Annotated[
-  Dydx | Hyperliquid | Mexc | Bitget | Bit2Me | Binance | Evm,
+  Dydx | Hyperliquid | Mexc | Bitget | Bit2Me | Binance | Coinbase | Evm,
   _pydantic.Discriminator('venue'),
 ]
 
