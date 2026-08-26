@@ -8,6 +8,7 @@ from typed_binance import Binance
 
 wrap_exceptions = exception_wrapper()
 
+
 @dataclass
 class SdkMixin(SDK):
   client: Binance
