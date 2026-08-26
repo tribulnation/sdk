@@ -13,7 +13,8 @@ from tribulnation.sdk.reporting import (
   source_id,
 )
 from tribulnation.bit2me.core import wrap_exceptions
-from bit2me import Bit2Me
+
+from typed_bit2me import Bit2Me
 
 
 @dataclass(frozen=True)
