@@ -6,18 +6,18 @@ from tribulnation.sdk.wallet.withdrawal_methods import (
   WithdrawalMethods as _WithdrawalMethods,
 )
 from tribulnation.bitget.core import SdkMixin, wrap_exceptions
-from bitget.spot.public.coins import CoinChain, CoinInfo
+from typed_bitget.classic.spot.coins import SpotCoinChain, SpotCoin
 
 
 def _to_decimal(v: Decimal | str) -> Decimal:
   return v if isinstance(v, Decimal) else Decimal(str(v))
 
 
-def _withdrawable(chain: CoinChain) -> bool:
+def _withdrawable(chain: SpotCoinChain) -> bool:
   return chain['withdrawable']
 
 
-def _parse_coins_response(raw: list[CoinInfo]) -> Sequence[WithdrawalMethod]:
+def _parse_coins_response(raw: list[SpotCoin]) -> Sequence[WithdrawalMethod]:
   out: list[WithdrawalMethod] = []
   for coin_info in raw:
     coin = coin_info['coin']
@@ -50,12 +50,15 @@ class WithdrawalMethods(SdkMixin, _WithdrawalMethods):
     assets: Collection[str] | None = None,
     networks: Collection[str] | None = None,
   ) -> Sequence[WithdrawalMethod]:
-    r = await self.client.spot.public.coins()
-    parsed = _parse_coins_response(r)
-    if assets is not None:
-      assets_set = set(assets)
-      parsed = [p for p in parsed if p.asset in assets_set]
-    if networks is not None:
-      networks_set = set(networks)
-      parsed = [p for p in parsed if p.network in networks_set]
-    return parsed
+    if await self.is_uta():
+      raise NotImplementedError('Withdrawal methods are not supported in UTA mode.')
+    else:
+      r = await self.client.classic.spot.coins()
+      parsed = _parse_coins_response(r)
+      if assets is not None:
+        assets_set = set(assets)
+        parsed = [p for p in parsed if p.asset in assets_set]
+      if networks is not None:
+        networks_set = set(networks)
+        parsed = [p for p in parsed if p.network in networks_set]
+      return parsed
