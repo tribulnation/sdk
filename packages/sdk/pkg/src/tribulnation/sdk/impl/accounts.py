@@ -178,6 +178,18 @@ class Coinbase(BaseAccount):
   key_name: str = '$COINBASE_API_KEY_NAME'
   private_key: str = '$COINBASE_PRIVATE_KEY'
 
+  @property
+  def resolved_key_name(self) -> str | None:
+    return resolve_env_var(self.key_name, require=not self.public)
+
+  @property
+  def resolved_private_key(self) -> str | None:
+    return resolve_env_var(self.private_key, require=not self.public)
+
+  def verify_env_vars(self):
+    self.resolved_key_name
+    self.resolved_private_key
+
 
 @_dataclass
 class Evm(BaseAccount):
