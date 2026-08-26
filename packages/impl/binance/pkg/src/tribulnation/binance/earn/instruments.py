@@ -5,8 +5,8 @@ import re
 
 from tribulnation.sdk.core import SDK, LogicError
 from tribulnation.sdk.earn.instruments import Instrument, Instruments as _Instruments
-from binance.simple_earn.flexible.list import FlexibleProduct
-from binance.simple_earn.fixed.list import LockedProduct, LockedProductDetail
+from typed_binance.spot.http.simple_earn.flexible.list import FlexibleProduct
+from typed_binance.spot.http.simple_earn.locked.list import LockedProduct, LockedProductDetail
 from tribulnation.binance.core import SdkMixin, wrap_exceptions
 
 
@@ -27,9 +27,9 @@ def parse_flexible_tier(label: str, asset: str) -> Decimal:
 
 
 def parse_flexible(prod: FlexibleProduct) -> Iterable[Instrument]:
-  if not prod['isSoldOut'] and prod['canPurchase'] and prod['status'] == 'PURCHASING':
-    base_apr = prod['latestAnnualPercentageRate']
-    min_qty = prod['minPurchaseAmount']
+  if not prod.get('isSoldOut') and prod.get('canPurchase') and prod.get('status') == 'PURCHASING':
+    base_apr = prod.get('latestAnnualPercentageRate', Decimal('0'))
+    min_qty = prod.get('minPurchaseAmount')
     for tier, apr in prod.get('tierAnnualPercentageRate', {}).items():
       max_qty = parse_flexible_tier(tier, prod['asset'])
       yield Instrument(
@@ -38,7 +38,7 @@ def parse_flexible(prod: FlexibleProduct) -> Iterable[Instrument]:
         min_qty=min_qty,
         max_qty=max_qty,
         apr=base_apr + apr,
-        id=prod['productId'],
+        id=prod.get('productId'),
       )
 
     yield Instrument(
@@ -97,7 +97,7 @@ class Instruments(SdkMixin, _Instruments):
   @SDK.method
   @wrap_exceptions
   async def _flexible_list_page(self, page: int, size: int):
-    return await self.client.simple_earn.flexible.list(current=page, size=size)
+    return await self.client.spot.http.simple_earn.flexible.list(current=page, size=size)
 
   async def _flexible_list(self, size: int = 100):
     current = 1
@@ -113,7 +113,7 @@ class Instruments(SdkMixin, _Instruments):
   @SDK.method
   @wrap_exceptions
   async def _fixed_list_page(self, page: int, size: int):
-    return await self.client.simple_earn.fixed.list(current=page, size=size)
+    return await self.client.spot.http.simple_earn.locked.list(current=page, size=size)
 
   async def _fixed_list(self, size: int = 100):
     current = 1
