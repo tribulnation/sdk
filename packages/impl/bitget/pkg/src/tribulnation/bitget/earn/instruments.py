@@ -1,29 +1,30 @@
 from typing_extensions import Collection, Sequence, Iterable
 from datetime import timedelta
+from decimal import Decimal
 
 from tribulnation.sdk.earn.instruments import Instrument, Instruments as _Instruments
-from bitget.earn.savings.products import Product
+from typed_bitget.classic.earn.savings.products import SavingsProduct
 from tribulnation.bitget.core import SdkMixin, wrap_exceptions
 
 BITGET_SAVINGS_URL = 'https://www.bitget.com/earning/savings'
 
 
-def parse_product(prod: Product) -> Iterable[Instrument]:
+def parse_product(prod: SavingsProduct) -> Iterable[Instrument]:
   if prod['status'] != 'in_progress':
     return []
   coin = prod['coin']
   period_type = prod['periodType']
   apy_list = prod['apyList']
 
-  if period_type == 'fixed':
-    duration = timedelta(days=int(prod['period']))
+  if period_type == 'fixed' and (period := prod.get('period')) is not None:
+    duration = timedelta(days=int(period))
   else:
     duration = None
 
   for tier in apy_list:
-    apr = tier['currentApy'] / 100
-    min_qty = tier['minStepVal']
-    max_qty = tier['maxStepVal']
+    apr = Decimal(tier['currentApy']) / 100
+    min_qty = Decimal(tier['minStepVal'])
+    max_qty = Decimal(tier['maxStepVal'])
     yield Instrument(
       tags=[period_type],
       asset=coin,
@@ -43,12 +44,15 @@ class Instruments(SdkMixin, _Instruments):
     tags: Collection[Instrument.Tag] | None = None,
     assets: Collection[str] | None = None,
   ) -> Sequence[Instrument]:
-    out: list[Instrument] = []
-    r = await self.client.earn.savings.products()
-    for prod in r:
-      for inst in parse_product(prod):
-        if (assets is None or inst.asset in assets) and (
-          tags is None or set(inst.tags).issubset(tags)
-        ):
-          out.append(inst)
-    return out
+    if await self.is_uta():
+      raise NotImplementedError('The UTA API does not support listing earn instruments.')
+    else:
+      out: list[Instrument] = []
+      r = await self.client.classic.earn.savings.products()
+      for prod in r:
+        for inst in parse_product(prod):
+          if (assets is None or inst.asset in assets) and (
+            tags is None or set(inst.tags).issubset(tags)
+          ):
+            out.append(inst)
+      return out
