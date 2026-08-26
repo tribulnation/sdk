@@ -1,60 +1,12 @@
-from typing_extensions import AsyncContextManager, Iterable, TypeVar
+from typing_extensions import AsyncContextManager, Iterable
 from dataclasses import dataclass
-import inspect
 
 from tribulnation.sdk import SDK
-from tribulnation.sdk.core.exc import (
-  ApiError,
-  AuthError,
-  Error,
-  NetworkError,
-  ValidationError,
-)
-from binance import Binance
-from binance.core import exc
+from tribulnation.sdk.core import exception_wrapper
 
-Fn = TypeVar('Fn')
+from typed_binance import Binance
 
-
-def wrap_exceptions(fn: Fn) -> Fn:
-  if inspect.iscoroutinefunction(fn):
-
-    async def awrapper(*args, **kwargs):
-      try:
-        return await fn(*args, **kwargs)
-      except exc.ApiError as e:
-        raise ApiError(*e.args) from e
-      except exc.AuthError as e:
-        raise AuthError(*e.args) from e
-      except exc.NetworkError as e:
-        raise NetworkError(*e.args) from e
-      except exc.ValidationError as e:
-        raise ValidationError(*e.args) from e
-      except exc.Error as e:
-        raise Error(*e.args) from e
-
-    return awrapper  # type: ignore
-  elif inspect.isasyncgenfunction(fn):
-
-    async def agen_wrapper(*args, **kwargs):
-      try:
-        async for item in fn(*args, **kwargs):
-          yield item
-      except exc.ApiError as e:
-        raise ApiError(*e.args) from e
-      except exc.AuthError as e:
-        raise AuthError(*e.args) from e
-      except exc.NetworkError as e:
-        raise NetworkError(*e.args) from e
-      except exc.ValidationError as e:
-        raise ValidationError(*e.args) from e
-      except exc.Error as e:
-        raise Error(*e.args) from e
-
-    return agen_wrapper  # type: ignore
-  else:
-    raise ValueError(f'Function {fn} is not a coroutine or generator function')
-
+wrap_exceptions = exception_wrapper()
 
 @dataclass
 class SdkMixin(SDK):
@@ -69,7 +21,7 @@ class SdkMixin(SDK):
     *,
     validate: bool = True,
   ):
-    client = Binance.new(api_key=api_key, api_secret=secret_key, validate=validate)
+    client = Binance.new(api_key=api_key, secret_key=secret_key, validate=validate)
     return cls(client=client, validate=validate)
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:
