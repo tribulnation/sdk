@@ -6,9 +6,11 @@ from tribulnation.sdk.wallet.deposit_methods import (
 )
 from tribulnation.binance.core import SdkMixin
 
+from typed_binance.spot.http.wallet.capital.config.get_all import CoinConfig
+
 
 def _parse_coins_response_deposits(
-  raw: list,
+  raw: list[CoinConfig],
   *,
   assets: Collection[str] | None = None,
 ) -> list[DepositMethod]:
@@ -18,7 +20,7 @@ def _parse_coins_response_deposits(
     coin = coin_info['coin']
     if assets_set is not None and coin not in assets_set:
       continue
-    for net in coin_info.get('networkList') or []:
+    for net in coin_info.get('networkList', []):
       if not net.get('depositEnable', False):
         continue
       network = net['network']
@@ -44,5 +46,5 @@ class DepositMethods(SdkMixin, _DepositMethods):
     *,
     assets: Collection[str] | None = None,
   ) -> Sequence[DepositMethod]:
-    r = await self.client.wallet.capital.coins()
+    r = await self.client.spot.http.wallet.capital.config.get_all()
     return _parse_coins_response_deposits(r, assets=assets)
