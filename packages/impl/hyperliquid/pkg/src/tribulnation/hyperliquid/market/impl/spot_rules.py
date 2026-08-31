@@ -28,9 +28,13 @@ async def rules(self: SpotMarketMixin, *, refetch: bool = False) -> Rules:
   lot_size = Decimal(10) ** -lot_decimals
 
   return Rules(
-    base=self.base_name,
-    quote=self.quote_name,
-    fee_asset=self.quote_name,
+    # Numeric token-index strings, not names — agrees with the raw form
+    # report/history/assets.py already resolves to elsewhere in this package (see
+    # Shared.resolve_asset_index's docstring). `base_name`/`quote_name` stay name-based
+    # for their other uses (market-id formatting, matching a fill's raw `coin` field).
+    base=str(self.meta['base_meta']['index']),
+    quote=str(self.meta['quote_meta']['index']),
+    fee_asset=str(self.meta['quote_meta']['index']),
     tick_size=tick_size,
     step_size=lot_size,
     min_value=MIN_ORDER_VALUE,

@@ -218,6 +218,23 @@ class Shared(SDK):
     return spot_meta_of(spot_index, spot_meta=spot_meta)
 
   @wrap_exceptions
+  async def resolve_asset_index(self, name: str, /, *, refetch: bool = False) -> str:
+    """Resolve a token name to its index, falling back to the raw name if unknown.
+
+    `Rules`/`Trade.fee` need a raw asset identifier that agrees with the rest of the
+    SDK's Hyperliquid surface (report/history/assets.py resolves the same way, for the
+    same reason: `Snapshots` keys balances by numeric token index, not name — see that
+    module's docstring). Unlike `base_name`/`quote_name`/`asset_name` on the mixins below,
+    which stay name-based on purpose (matching a fill's raw `coin` field, building a
+    human-readable market id), this is only for values handed to the caller as data.
+    """
+    spot_meta = await self.load_spot_meta(refetch=refetch)
+    for token in spot_meta['tokens']:
+      if token['name'] == name:
+        return str(token['index'])
+    return name
+
+  @wrap_exceptions
   async def perp_meta_of(
     self,
     market: str,

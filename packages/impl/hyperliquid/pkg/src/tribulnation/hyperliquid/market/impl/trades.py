@@ -45,7 +45,10 @@ async def trades_stream(
               qty=Decimal(f['sz']) * sign,
               time=_parse_time(f['time']),
               maker=not f.get('crossed', False),
-              fee=Trade.Fee(amount=Decimal(f['fee']), asset=f['feeToken'])
+              fee=Trade.Fee(
+                amount=Decimal(f['fee']),
+                asset=await self.shared.resolve_asset_index(f['feeToken']),
+              )
               if f.get('fee') is not None
               else None,
               details=f,
@@ -75,7 +78,10 @@ def trades_history(
             qty=Decimal(f['sz']) * sign,
             time=f['time'].astimezone(),
             maker=not f.get('crossed', False),
-            fee=Trade.Fee(amount=Decimal(f['fee']), asset=f['feeToken']),
+            fee=Trade.Fee(
+              amount=Decimal(f['fee']),
+              asset=await self.shared.resolve_asset_index(f['feeToken']),
+            ),
             details=f,
           )
         )
