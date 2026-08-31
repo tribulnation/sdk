@@ -3,12 +3,13 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tribulnation.sdk.market import TradingMarkets, TradingVenue
-from .accounts import Account, Dydx, Hyperliquid, Mexc, load_accounts
+from .accounts import Account, Binance, Dydx, Hyperliquid, Mexc, load_accounts
 
 DEFAULT_ACCOUNTS: Mapping[str, Account] = {
   'dydx': Dydx(public=True),
   'hyperliquid': Hyperliquid(public=True),
   'mexc': Mexc(public=True),
+  'binance': Binance(public=True),
 }
 
 
@@ -69,7 +70,20 @@ class MarketSDK(TradingMarkets):
       validate=account.validate,
     )
 
-  async def venue(self, id: str, /) -> TradingVenue:
+  def binance(self, account: Binance) -> TradingVenue:
+    try:
+      from tribulnation.binance import BinanceMarket
+    except ImportError as e:
+      raise ImportError(
+        'binance market is not installed. Please install it with `pip install tribulnation-binance`.'
+      ) from e
+    return BinanceMarket.new(
+      api_key=account.resolved_api_key,
+      secret_key=account.resolved_secret_key,
+      validate=account.validate,
+    )
+
+  def _venue(self, id: str, /) -> TradingVenue:
     if (account := self.all_accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
     match account.venue:
@@ -79,8 +93,17 @@ class MarketSDK(TradingMarkets):
         return self.hyperliquid(account)
       case 'mexc':
         return self.mexc(account)
+      case 'binance':
+        return self.binance(account)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 
+  async def venue(self, id: str, /) -> TradingVenue:
+    return self._venue(id)
+
   async def venues(self) -> Sequence[str]:
     return list(self.all_accounts)
+
+  @property
+  def all(self) -> dict[str, TradingVenue]:
+    return {id: self._venue(id) for id in self.all_accounts}
