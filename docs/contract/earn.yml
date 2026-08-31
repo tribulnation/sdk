@@ -1,0 +1,78 @@
+# Interface contract for EarnSDK. `instruments` is the only real method today —
+# `subscribe`/`redeem` were an earlier aspirational sketch and were dropped since they
+# don't exist on the real class; re-add them here once they're actually implemented.
+#
+# `example`/`catalogue` blocks are Jinja templates (sdk_dev.contract), not literal
+# Python — see market.yml's header for the full mechanism. This file's own example
+# genuinely loops `for venue, sdk in earn.all.items()`, matching `EarnSDK.load()`'s real
+# `.all` behavior (every selected venue plus its free defaults) — so unlike Market's
+# single-active-venue templates, this one loops `{% for venue in accounts %}` and its
+# call text needs no substitution at all (no per-venue literal in it to begin with).
+
+component:
+  title: Earn
+  tagline: Yield-bearing instruments across venues, filterable by tag or asset.
+  # supportedVenues/defaultVenues: NOT declared here — computed by `sdk-dev docs sync`
+  # from every packages/impl/*/impl.toml's `[support.earn]` table. EarnSDK's router also
+  # wires 'bit2me' (with a public default account), but bit2me/impl.toml deliberately
+  # doesn't declare `[support.earn]` yet — see that file's comment for why.
+  #
+  # No per-method `public` override needed here (unlike market.yml): instruments is the
+  # only method, and it's genuinely public for every venue that's a default at all.
+
+methods:
+  instruments:
+    signature: "instruments(tags=None, assets=None) -> Sequence[Instrument]"
+    description: List available earn instruments. Filters match *any* given tag or asset, not all. apr is a fraction of 1.
+    example:
+      accountVenues: [binance, mexc]
+      constants:
+        binance:
+          instruments:
+            - {asset: USDT, apr: '0.0432'}
+            - {asset: BTC, apr: '0.0085'}
+        mexc:
+          instruments:
+            - {asset: USDT, apr: '0.0310'}
+            - {asset: BTC, apr: '0.0062'}
+        bitget:
+          instruments:
+            - {asset: USDT, apr: '0.0290'}
+            - {asset: BTC, apr: '0.0071'}
+      callTemplate: |
+        from tribulnation.sdk import EarnSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        earn = EarnSDK.load('sdk.toml')
+        instruments_by_venue = {}
+        for venue, sdk in earn.all.items():
+          instruments = await sdk.instruments(tags=['flexible'])
+          instruments_by_venue[venue] = instruments
+          for i in instruments[:2]:
+            print(venue, i.asset, f'{i.apr:.2%}')
+      resultTemplate: |
+        {% for venue in accounts %}
+        {% for i in constants[venue].instruments %}
+        {{ venue }} {{ i.asset }} {{ '%.2f'|format(i.apr|float * 100) }}%
+
+        {% endfor %}
+        {% endfor %}
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue, instruments in instruments_by_venue.items():
+          for i in instruments[:2]:
+            asset_id = catalogue.asset_translations[venue][i.asset]
+            print(venue, asset_id, f'{i.apr:.2%}')
+      resultTemplate: |
+        {% for venue in accounts %}
+        {% for i in constants[venue].instruments %}
+        {{ venue }} {{ catalogue.asset_translations[venue][i.asset] }} {{ '%.2f'|format(i.apr|float * 100) }}%
+        {% endfor %}
+        {% endfor %}

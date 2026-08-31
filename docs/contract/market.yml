@@ -1,0 +1,1026 @@
+# Interface contract for MarketSDK — every signature/description here is checked
+# against the real source at authoring time, not the other way around.
+#
+# `example`/`catalogue` blocks are Jinja templates (sdk_dev.contract), not literal
+# Python — `sdk-dev docs sync` renders each method once per reachable non-empty subset
+# of the venues it can genuinely be called against, so the wizard always shows a script
+# and result that match whatever the reader picked, instead of one hardcoded venue.
+# Every template sees three globals: `accounts` (the venues in this rendering, in
+# `accountVenues`' own preferred order — Market's examples are single-market, so they
+# just use `accounts[0]`), `constants` (this method's own small per-venue mapping of
+# illustrative numbers — a market id, a fake price, a fake order id: no real source to
+# compute them from), and `catalogue` (the real, loaded `tribulnation.catalogue.Catalogue` —
+# so a translated id is computed, never hand-typed, and can't silently drift from it).
+#
+# `example.accountVenues`: the venue slug(s) this method's own example was originally
+# written against — first in `accounts`' preferred order, and the venues a consumer
+# should default the sdk.toml wizard to even before the reader picks anything.
+#
+# `component.supportedVenues`/`defaultVenues`: NOT declared here — computed by
+# `sdk-dev docs sync` (sdk_dev.support) from every packages/impl/*/impl.toml's
+# `[support.market]` table. Per-method venue eligibility narrows that further to
+# whichever of those venues this method's own `constants` covers (sdk_dev.support's
+# `method_universe` ∩ `example.constants.keys()`) — e.g. no perp method below declares
+# `constants.mexc` (mexc has no perp markets), so mexc never appears in a perp method's
+# picker even though mexc/impl.toml grants `[support.market]` in general.
+#
+# `group`: optional display grouping (Market is the only component with more than a
+# handful of methods). Display order follows first-appearance order in this file.
+#
+# `catalogue`: an optional second call/result pair showing how the `tribulnation-catalogue`
+# package resolves this method's raw venue-native strings into canonical cross-venue ids.
+# Most methods below show a venue-independent comparison (which raw id does BTC/USDT use
+# on mexc vs. okx vs. kraken — venues outside the SDK entirely, verified against the real
+# catalogue but not template-computed since they don't depend on `accounts` at all);
+# `rules` and `trades_history` instead translate the call's own result, so their
+# templates genuinely use `accounts[0]`/`constants`/`catalogue` together.
+
+component:
+  title: Market
+  tagline: Order books, rules, orders, positions, funding — for a single instrument.
+  # Every example below calls straight off `sdk` (MarketSDK/TradingMarkets) with the
+  # full 'account:exchange:market' id — the one mental model a first-time reader needs.
+  # Exchange/TradingVenue/Market objects (hold one, skip re-parsing the id on every call)
+  # are real and documented, but stay out of this widget on purpose — see
+  # reference/market.md's "Object hierarchy" and "Market-ID grammar" sections.
+  note: "Every method below also works scoped to a venue, exchange, or single market object once you're holding one — same call, less id to repeat. Full picture in the {reference}."
+
+methods:
+  depth:
+    group: Public market data
+    signature: "depth(id, *, levels=None) -> Book"
+    description: The order book — bids and asks, best first.
+    example:
+      accountVenues: [mexc]
+      constants:
+        mexc: {market_id: 'mexc:spot:BTCUSDT', bid: '60123.00', ask: '60124.10'}
+        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', bid: '60095.20', ask: '60096.50'}
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        book = await sdk.depth('{{ constants[accounts[0]].market_id }}', levels=5)
+        print(book.best_bid, book.best_ask)
+      resultTemplate: |
+        (Decimal('{{ constants[accounts[0]].bid }}'), Decimal('{{ constants[accounts[0]].ask }}'))
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['mexc', 'okx', 'kraken']:
+          for raw_id, info in catalogue.spot_instruments[venue].items():
+            if info['base'] == 'bitcoin' and info['quote'] == 'tether':
+              print(venue, '->', raw_id)
+              break
+      resultTemplate: |
+        mexc   -> BTCUSDT
+        okx    -> BTC-USDT
+        kraken -> XBTUSDT
+
+  depth_stream:
+    group: Public market data
+    signature: "depth_stream(id, *, levels=None, queue_size=1, overflow='latest') -> AsyncContextManager[AsyncIterable[Book]]"
+    description: Subscribe to live order books — a bounded, overflow-aware stream.
+    example:
+      accountVenues: [mexc]
+      constants:
+        mexc:
+          market_id: 'mexc:spot:BTCUSDT'
+          ticks:
+            - {bid: '60123.40', ask: '60124.00'}
+            - {bid: '60123.50', ask: '60124.00'}
+            - {bid: '60122.90', ask: '60123.60'}
+            - {bid: '60123.10', ask: '60123.90'}
+        hyperliquid:
+          market_id: 'hyperliquid:spot:UBTC/USDC:142'
+          ticks:
+            - {bid: '60095.60', ask: '60096.20'}
+            - {bid: '60095.70', ask: '60096.20'}
+            - {bid: '60095.10', ask: '60095.80'}
+            - {bid: '60095.30', ask: '60096.10'}
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        async with sdk.depth_stream('{{ constants[accounts[0]].market_id }}') as books:
+          async for book in books:
+            print(book.best_bid, book.best_ask)
+      resultTemplate: |
+        {% for t in constants[accounts[0]].ticks %}
+        (Decimal('{{ t.bid }}'), Decimal('{{ t.ask }}'))
+
+        {% endfor %}
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['mexc', 'okx', 'kraken']:
+          for raw_id, info in catalogue.spot_instruments[venue].items():
+            if info['base'] == 'bitcoin' and info['quote'] == 'tether':
+              print(venue, '->', raw_id)
+              break
+      resultTemplate: |
+        mexc   -> BTCUSDT
+        okx    -> BTC-USDT
+        kraken -> XBTUSDT
+
+  rules:
+    group: Public market data
+    signature: "rules(id, *, refetch=False) -> Rules"
+    description: Tick/step size, fees, min/max, and rounding helpers — cached after the first call.
+    # Hyperliquid's spot Rules.base/.quote/.fee_asset used to come back as raw SYMBOL
+    # NAMES ('UBTC', 'USDC' — confirmed real pair, not 'BTC': the catalogue's own
+    # data/instruments/spot/hyperliquid.json keys the real BTC/USDC pair
+    # 'UBTC/USDC:142'), which didn't match catalogue.asset_translations['hyperliquid']
+    # (numeric-token-index keyed, e.g. '197'->'bitcoin' — the form wallet/report already
+    # used for this same venue). Fixed at the source instead of papering over it here:
+    # packages/impl/hyperliquid/.../market/impl/spot_rules.py now resolves base/quote/
+    # fee_asset to the same numeric index report/history/assets.py already used, via a
+    # new Shared.resolve_asset_index() (mixin.py) — so `constants.hyperliquid.base`/`.quote`
+    # below (index-keyed) genuinely resolve through `catalogue.asset_translations`, no
+    # catalogue changes needed. tick_size/step_size are genuinely computed from a live
+    # szDecimals value and maker_fee/taker_fee genuinely come from a live API call in
+    # that same impl file — no static example exists anywhere to quote, so the numbers
+    # below are illustrative, exactly as illustrative as every other Decimal in this file.
+    example:
+      accountVenues: [mexc]
+      constants:
+        mexc:
+          market_id: 'mexc:spot:BTCUSDT'
+          base: BTC
+          quote: USDT
+          tick_size: '0.10'
+          step_size: '0.00001'
+          maker_fee: '0.0002'
+          taker_fee: '0.0004'
+        hyperliquid:
+          market_id: 'hyperliquid:spot:UBTC/USDC:142'
+          base: '197'
+          quote: '0'
+          tick_size: '0.001'
+          step_size: '0.00001'
+          maker_fee: '0.0002'
+          taker_fee: '0.00035'
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        rules = await sdk.rules('{{ constants[accounts[0]].market_id }}')
+        price = rules.round_price(60123.456)
+      resultTemplate: |
+        Rules(
+          base='{{ constants[accounts[0]].base }}', quote='{{ constants[accounts[0]].quote }}',
+          tick_size=Decimal('{{ constants[accounts[0]].tick_size }}'), step_size=Decimal('{{ constants[accounts[0]].step_size }}'),
+          maker_fee=Decimal('{{ constants[accounts[0]].maker_fee }}'), taker_fee=Decimal('{{ constants[accounts[0]].taker_fee }}'),
+        )
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        base_id = catalogue.asset_translations['{{ accounts[0] }}'][rules.base]
+        quote_id = catalogue.asset_translations['{{ accounts[0] }}'][rules.quote]
+        print(base_id, '/', quote_id)
+      resultTemplate: |
+        {{ catalogue.asset_translations[accounts[0]][constants[accounts[0]].base] }} / {{ catalogue.asset_translations[accounts[0]][constants[accounts[0]].quote] }}
+
+  tickers:
+    group: Bulk market data
+    signature: "tickers(id, markets=None) -> Mapping[str, Ticker]"
+    description: Top-of-book snapshot for every market on this exchange, in one bulk call — defined on Exchange, not a single Market.
+    example:
+      accountVenues: [mexc]
+      # Exchange-level id (no market segment) — this method is defined on Exchange, not a
+      # single Market, per docs/market/index.md's grammar table.
+      constants:
+        mexc:
+          exchange_id: 'mexc:spot'
+          markets:
+            - {key: BTCUSDT, last: '60123.40', bid: '60123.00', ask: '60124.10'}
+            - {key: ETHUSDT, last: '3210.50', bid: '3210.20', ask: '3210.80'}
+        hyperliquid:
+          exchange_id: 'hyperliquid:spot'
+          markets:
+            - {key: 'UBTC/USDC:142', last: '60095.90', bid: '60095.20', ask: '60096.50'}
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        snapshot = await sdk.tickers('{{ constants[accounts[0]].exchange_id }}')
+      resultTemplate: |
+        {% for m in constants[accounts[0]].markets %}
+        '{{ m.key }}': Ticker(last=Decimal('{{ m.last }}'), bid=Decimal('{{ m.bid }}'), ask=Decimal('{{ m.ask }}')),
+        {% endfor %}
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['mexc', 'okx', 'kraken']:
+          for raw_id, info in catalogue.spot_instruments[venue].items():
+            if info['base'] == 'bitcoin' and info['quote'] == 'tether':
+              print(venue, '->', raw_id)
+              break
+      resultTemplate: |
+        mexc   -> BTCUSDT
+        okx    -> BTC-USDT
+        kraken -> XBTUSDT
+
+  perp_stats:
+    group: Bulk market data
+    signature: "perp_stats(id, markets=None) -> Mapping[str, PerpStats]"
+    description: Index/mark price, predicted funding, and open interest for every perp market — one consistent cross-section, not a per-market loop.
+    example:
+      accountVenues: [dydx]
+      # Exchange-level id — same reasoning as tickers' constants above. Hyperliquid's
+      # default perp DEX has an empty exchange_id (docs/market/index.md:54), so its
+      # exchange-level id is a bare trailing colon: 'hyperliquid:'.
+      constants:
+        dydx:
+          exchange_id: 'dydx:perp'
+          key: BTC-USD
+          index: '60120.00'
+          mark: '60125.50'
+          funding: '0.0001'
+          open_interest: '812.4'
+        hyperliquid:
+          exchange_id: 'hyperliquid:'
+          key: BTC
+          index: '60110.50'
+          mark: '60116.00'
+          funding: '0.00012'
+          open_interest: '634.9'
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        stats = await sdk.perp_stats('{{ constants[accounts[0]].exchange_id }}')
+      resultTemplate: |
+        {'{{ constants[accounts[0]].key }}': PerpStats(index=Decimal('{{ constants[accounts[0]].index }}'), mark=Decimal('{{ constants[accounts[0]].mark }}'),
+                               funding=Decimal('{{ constants[accounts[0]].funding }}'), open_interest=Decimal('{{ constants[accounts[0]].open_interest }}'))}
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['dydx', 'hyperliquid']:
+          for raw_id, info in catalogue.perpetual_instruments[venue].items():
+            if info['base'] == 'bitcoin':
+              market_id = f'dydx:perp:{raw_id}' if venue == 'dydx' else f'hyperliquid::{raw_id}'
+              print(venue, '->', market_id)
+              break
+      resultTemplate: |
+        dydx -> dydx:perp:BTC-USD
+        hyperliquid -> hyperliquid::BTC
+
+  query_order:
+    group: Your account data
+    signature: "query_order(id, order_id) -> OrderState | None"
+    description: State of one order by id. The base implementation only finds open orders unless the venue overrides it.
+    public: false
+    example:
+      accountVenues: [mexc]
+      constants:
+        mexc: {market_id: 'mexc:spot:BTCUSDT', order_id: '4834937', price: '59500', qty: '0.01'}
+        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id: '184920371', price: '59480', qty: '0.02'}
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        state = await sdk.query_order('{{ constants[accounts[0]].market_id }}', '{{ constants[accounts[0]].order_id }}')
+      resultTemplate: |
+        OrderState(id='{{ constants[accounts[0]].order_id }}', price=Decimal('{{ constants[accounts[0]].price }}'), qty=Decimal('{{ constants[accounts[0]].qty }}'),
+                   filled_qty=Decimal('0'), active=True)
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['mexc', 'okx', 'kraken']:
+          for raw_id, info in catalogue.spot_instruments[venue].items():
+            if info['base'] == 'bitcoin' and info['quote'] == 'tether':
+              print(venue, '->', raw_id)
+              break
+      resultTemplate: |
+        mexc   -> BTCUSDT
+        okx    -> BTC-USDT
+        kraken -> XBTUSDT
+
+  open_orders:
+    group: Your account data
+    signature: "open_orders(id) -> Sequence[OrderState]"
+    description: Your currently-open orders on this market.
+    public: false
+    example:
+      accountVenues: [mexc]
+      constants:
+        mexc: {market_id: 'mexc:spot:BTCUSDT', order_id: '4834937', price: '59500', qty: '0.01'}
+        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id: '184920371', price: '59480', qty: '0.02'}
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        orders = await sdk.open_orders('{{ constants[accounts[0]].market_id }}')
+      resultTemplate: |
+        [OrderState(id='{{ constants[accounts[0]].order_id }}', price=Decimal('{{ constants[accounts[0]].price }}'),
+                     qty=Decimal('{{ constants[accounts[0]].qty }}'), filled_qty=Decimal('0'), active=True)]
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['mexc', 'okx', 'kraken']:
+          for raw_id, info in catalogue.spot_instruments[venue].items():
+            if info['base'] == 'bitcoin' and info['quote'] == 'tether':
+              print(venue, '->', raw_id)
+              break
+      resultTemplate: |
+        mexc   -> BTCUSDT
+        okx    -> BTC-USDT
+        kraken -> XBTUSDT
+
+  trades_history:
+    group: Your account data
+    signature: "trades_history(id, start, end) -> PaginatedResponse[Trade]"
+    description: Your fills over a window, paginated — async-iterate the pages or await the whole thing.
+    public: false
+    # Trade.fee.asset on Hyperliquid (spot and perp both — trades.py handles both mixins)
+    # used to be a raw symbol name rather than a numeric token index — same real mismatch
+    # as rules.base/.quote, fixed the same way, at the source: trades.py now resolves
+    # feeToken through the same Shared.resolve_asset_index() rules.py uses (see that
+    # method's comment above). `constants.hyperliquid.fee_asset` below is that resolved
+    # index, so it genuinely round-trips through `catalogue.asset_translations`.
+    example:
+      accountVenues: [mexc]
+      constants:
+        mexc: {market_id: 'mexc:spot:BTCUSDT', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: USDT}
+        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', price1: '60095.60', qty1: '0.01', price2: '60040.00', qty2: '-0.02', fee_asset: '0'}
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        trades = []
+        async for page in sdk.trades_history('{{ constants[accounts[0]].market_id }}', start, end):
+          for trade in page:
+            trades.append(trade)
+            print(trade.price, trade.qty)
+      resultTemplate: |
+        {{ constants[accounts[0]].price1 }} {{ constants[accounts[0]].qty1 }}
+        {{ constants[accounts[0]].price2 }} {{ constants[accounts[0]].qty2 }}
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for trade in trades:
+          if trade.fee:
+            print(trade.price, catalogue.asset_translations['{{ accounts[0] }}'][trade.fee.asset])
+      resultTemplate: |
+        {{ constants[accounts[0]].price1 }} {{ catalogue.asset_translations[accounts[0]][constants[accounts[0]].fee_asset] }}
+
+  trades_stream:
+    group: Your account data
+    signature: "trades_stream(id, *, queue_size=1000, overflow='fail') -> AsyncContextManager[AsyncIterable[Trade]]"
+    description: Your live fills — a bounded queue that fails loudly rather than silently dropping one.
+    public: false
+    example:
+      accountVenues: [mexc]
+      constants:
+        mexc:
+          market_id: 'mexc:spot:BTCUSDT'
+          ticks:
+            - {price: '60123.40', qty: '0.01'}
+            - {price: '60124.00', qty: '-0.02'}
+            - {price: '60125.10', qty: '0.05'}
+        hyperliquid:
+          market_id: 'hyperliquid:spot:UBTC/USDC:142'
+          ticks:
+            - {price: '60096.80', qty: '0.01'}
+            - {price: '60097.40', qty: '-0.02'}
+            - {price: '60098.50', qty: '0.05'}
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        async with sdk.trades_stream('{{ constants[accounts[0]].market_id }}') as trades:
+          async for trade in trades:
+            print(trade.price, trade.qty)
+      resultTemplate: |
+        {% for t in constants[accounts[0]].ticks %}
+        {{ t.price }} {{ t.qty }}
+
+        {% endfor %}
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['mexc', 'okx', 'kraken']:
+          for raw_id, info in catalogue.spot_instruments[venue].items():
+            if info['base'] == 'bitcoin' and info['quote'] == 'tether':
+              print(venue, '->', raw_id)
+              break
+      resultTemplate: |
+        mexc   -> BTCUSDT
+        okx    -> BTC-USDT
+        kraken -> XBTUSDT
+
+  position:
+    group: Your account data
+    signature: "position(id) -> Position"
+    description: Your open position size, in signed base units.
+    public: false
+    example:
+      accountVenues: [mexc]
+      constants:
+        mexc: {market_id: 'mexc:spot:BTCUSDT', size: '0.014'}
+        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', size: '0.5'}
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        pos = await sdk.position('{{ constants[accounts[0]].market_id }}')
+      resultTemplate: |
+        Position(size=Decimal('{{ constants[accounts[0]].size }}'))
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['mexc', 'okx', 'kraken']:
+          for raw_id, info in catalogue.spot_instruments[venue].items():
+            if info['base'] == 'bitcoin' and info['quote'] == 'tether':
+              print(venue, '->', raw_id)
+              break
+      resultTemplate: |
+        mexc   -> BTCUSDT
+        okx    -> BTC-USDT
+        kraken -> XBTUSDT
+
+  collateral:
+    group: Your account data
+    signature: "collateral(id) -> Collateral"
+    description: The collateral bucket backing this market — equity and free (withdrawable) collateral.
+    public: false
+    example:
+      accountVenues: [mexc]
+      constants:
+        mexc: {market_id: 'mexc:spot:BTCUSDT', equity: '10240.55', free: '8120.00'}
+        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', equity: '9875.20', free: '7640.00'}
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        c = await sdk.collateral('{{ constants[accounts[0]].market_id }}')
+      resultTemplate: |
+        Collateral(equity=Decimal('{{ constants[accounts[0]].equity }}'), free_collateral=Decimal('{{ constants[accounts[0]].free }}'))
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['mexc', 'okx', 'kraken']:
+          for raw_id, info in catalogue.spot_instruments[venue].items():
+            if info['base'] == 'bitcoin' and info['quote'] == 'tether':
+              print(venue, '->', raw_id)
+              break
+      resultTemplate: |
+        mexc   -> BTCUSDT
+        okx    -> BTC-USDT
+        kraken -> XBTUSDT
+
+  available_notional:
+    group: Your account data
+    signature: "available_notional(id) -> Decimal"
+    description: The max notional you could open right now — free balance for spot, available collateral × max leverage for perps.
+    public: false
+    example:
+      accountVenues: [mexc]
+      constants:
+        mexc: {market_id: 'mexc:spot:BTCUSDT', notional: '8120.00'}
+        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', notional: '7640.00'}
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        notional = await sdk.available_notional('{{ constants[accounts[0]].market_id }}')
+      resultTemplate: |
+        Decimal('{{ constants[accounts[0]].notional }}')
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['mexc', 'okx', 'kraken']:
+          for raw_id, info in catalogue.spot_instruments[venue].items():
+            if info['base'] == 'bitcoin' and info['quote'] == 'tether':
+              print(venue, '->', raw_id)
+              break
+      resultTemplate: |
+        mexc   -> BTCUSDT
+        okx    -> BTC-USDT
+        kraken -> XBTUSDT
+
+  place_order:
+    group: Trading
+    signature: "place_order(id, order, *, settings={}) -> OrderResponse"
+    description: "Submit an order. type is 'MARKET' | 'LIMIT' | 'POST_ONLY' — a venue-agnostic contract."
+    public: false
+    example:
+      accountVenues: [mexc]
+      constants:
+        mexc: {market_id: 'mexc:spot:BTCUSDT', order_id: '4834937'}
+        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id: '184920371'}
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        order = {'type': 'LIMIT', 'qty': 0.01, 'price': 60_000}
+        response = await sdk.place_order('{{ constants[accounts[0]].market_id }}', order)
+      resultTemplate: |
+        OrderResponse(id='{{ constants[accounts[0]].order_id }}', details={...})
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['mexc', 'okx', 'kraken']:
+          for raw_id, info in catalogue.spot_instruments[venue].items():
+            if info['base'] == 'bitcoin' and info['quote'] == 'tether':
+              print(venue, '->', raw_id)
+              break
+      resultTemplate: |
+        mexc   -> BTCUSDT
+        okx    -> BTC-USDT
+        kraken -> XBTUSDT
+
+  place_orders:
+    group: Trading
+    signature: "place_orders(id, orders, *, settings={}) -> Sequence[OrderResponse]"
+    description: Concurrent place_order calls — one response per order, same order as the input.
+    public: false
+    example:
+      accountVenues: [mexc]
+      constants:
+        mexc: {market_id: 'mexc:spot:BTCUSDT', order_id1: '4834937', order_id2: '4834938'}
+        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id1: '184920371', order_id2: '184920372'}
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        orders = [
+          {'type': 'LIMIT', 'qty': 0.01, 'price': 60_000},
+          {'type': 'LIMIT', 'qty': 0.01, 'price': 59_500},
+        ]
+        responses = await sdk.place_orders('{{ constants[accounts[0]].market_id }}', orders)
+      resultTemplate: |
+        [OrderResponse(id='{{ constants[accounts[0]].order_id1 }}', details={...}), OrderResponse(id='{{ constants[accounts[0]].order_id2 }}', details={...})]
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['mexc', 'okx', 'kraken']:
+          for raw_id, info in catalogue.spot_instruments[venue].items():
+            if info['base'] == 'bitcoin' and info['quote'] == 'tether':
+              print(venue, '->', raw_id)
+              break
+      resultTemplate: |
+        mexc   -> BTCUSDT
+        okx    -> BTC-USDT
+        kraken -> XBTUSDT
+
+  cancel_order:
+    group: Trading
+    signature: "cancel_order(id, order_id, *, settings={})"
+    description: Cancel one order by id.
+    public: false
+    example:
+      accountVenues: [mexc]
+      constants:
+        mexc: {market_id: 'mexc:spot:BTCUSDT', order_id: '4834937'}
+        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id: '184920371'}
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        await sdk.cancel_order('{{ constants[accounts[0]].market_id }}', '{{ constants[accounts[0]].order_id }}')
+      resultTemplate: |
+        None
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['mexc', 'okx', 'kraken']:
+          for raw_id, info in catalogue.spot_instruments[venue].items():
+            if info['base'] == 'bitcoin' and info['quote'] == 'tether':
+              print(venue, '->', raw_id)
+              break
+      resultTemplate: |
+        mexc   -> BTCUSDT
+        okx    -> BTC-USDT
+        kraken -> XBTUSDT
+
+  cancel_orders:
+    group: Trading
+    signature: "cancel_orders(id, order_ids, *, settings={})"
+    description: Concurrent cancel_order calls.
+    public: false
+    example:
+      accountVenues: [mexc]
+      constants:
+        mexc: {market_id: 'mexc:spot:BTCUSDT', order_id1: '4834937', order_id2: '4834938'}
+        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id1: '184920371', order_id2: '184920372'}
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        await sdk.cancel_orders('{{ constants[accounts[0]].market_id }}', ['{{ constants[accounts[0]].order_id1 }}', '{{ constants[accounts[0]].order_id2 }}'])
+      resultTemplate: |
+        None
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['mexc', 'okx', 'kraken']:
+          for raw_id, info in catalogue.spot_instruments[venue].items():
+            if info['base'] == 'bitcoin' and info['quote'] == 'tether':
+              print(venue, '->', raw_id)
+              break
+      resultTemplate: |
+        mexc   -> BTCUSDT
+        okx    -> BTC-USDT
+        kraken -> XBTUSDT
+
+  cancel_open_orders:
+    group: Trading
+    signature: "cancel_open_orders(id, *, settings={})"
+    description: Cancels everything open_orders() returns for this market.
+    public: false
+    example:
+      accountVenues: [mexc]
+      constants:
+        mexc: {market_id: 'mexc:spot:BTCUSDT'}
+        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142'}
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        await sdk.cancel_open_orders('{{ constants[accounts[0]].market_id }}')
+      resultTemplate: |
+        None
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['mexc', 'okx', 'kraken']:
+          for raw_id, info in catalogue.spot_instruments[venue].items():
+            if info['base'] == 'bitcoin' and info['quote'] == 'tether':
+              print(venue, '->', raw_id)
+              break
+      resultTemplate: |
+        mexc   -> BTCUSDT
+        okx    -> BTC-USDT
+        kraken -> XBTUSDT
+
+  index:
+    group: Perpetual-only
+    signature: "index(id, *, settings={}) -> Decimal"
+    description: The index/oracle price for this perp market.
+    example:
+      accountVenues: [dydx]
+      constants:
+        dydx: {market_id: 'dydx:perp:BTC-USD', index: '60120.00'}
+        hyperliquid: {market_id: 'hyperliquid::BTC', index: '60110.50'}
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        price = await sdk.index('{{ constants[accounts[0]].market_id }}')
+      resultTemplate: |
+        Decimal('{{ constants[accounts[0]].index }}')
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['dydx', 'hyperliquid']:
+          for raw_id, info in catalogue.perpetual_instruments[venue].items():
+            if info['base'] == 'bitcoin':
+              market_id = f'dydx:perp:{raw_id}' if venue == 'dydx' else f'hyperliquid::{raw_id}'
+              print(venue, '->', market_id)
+              break
+      resultTemplate: |
+        dydx -> dydx:perp:BTC-USD
+        hyperliquid -> hyperliquid::BTC
+
+  next_funding:
+    group: Perpetual-only
+    signature: "next_funding(id) -> NextFunding"
+    description: The upcoming funding rate, time, and interval.
+    example:
+      accountVenues: [dydx]
+      constants:
+        dydx: {market_id: 'dydx:perp:BTC-USD', rate: '0.0001', annualized: '0.1095'}
+        hyperliquid: {market_id: 'hyperliquid::BTC', rate: '0.00012', annualized: '0.1314'}
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        funding = await sdk.next_funding('{{ constants[accounts[0]].market_id }}')
+        print(funding.rate, funding.annualized)
+      resultTemplate: |
+        NextFunding(rate=Decimal('{{ constants[accounts[0]].rate }}'), interval=timedelta(hours=8))
+        {{ constants[accounts[0]].annualized }}  # annualized
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['dydx', 'hyperliquid']:
+          for raw_id, info in catalogue.perpetual_instruments[venue].items():
+            if info['base'] == 'bitcoin':
+              market_id = f'dydx:perp:{raw_id}' if venue == 'dydx' else f'hyperliquid::{raw_id}'
+              print(venue, '->', market_id)
+              break
+      resultTemplate: |
+        dydx -> dydx:perp:BTC-USD
+        hyperliquid -> hyperliquid::BTC
+
+  funding_rates:
+    group: Perpetual-only
+    signature: "funding_rates(id, start, end=None) -> PaginatedResponse[FundingRate]"
+    description: The market's public funding rate history — end=None means everything since start.
+    example:
+      accountVenues: [dydx]
+      constants:
+        dydx: {market_id: 'dydx:perp:BTC-USD', rate1: '0.0001', rate2: '0.00012'}
+        hyperliquid: {market_id: 'hyperliquid::BTC', rate1: '0.00012', rate2: '0.00011'}
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        async for page in sdk.funding_rates('{{ constants[accounts[0]].market_id }}', start):
+          for rate in page:
+            print(rate.time, rate.rate)
+      resultTemplate: |
+        2025-01-03 16:00:00 {{ constants[accounts[0]].rate1 }}
+        2025-01-03 08:00:00 {{ constants[accounts[0]].rate2 }}
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['dydx', 'hyperliquid']:
+          for raw_id, info in catalogue.perpetual_instruments[venue].items():
+            if info['base'] == 'bitcoin':
+              market_id = f'dydx:perp:{raw_id}' if venue == 'dydx' else f'hyperliquid::{raw_id}'
+              print(venue, '->', market_id)
+              break
+      resultTemplate: |
+        dydx -> dydx:perp:BTC-USD
+        hyperliquid -> hyperliquid::BTC
+
+  funding_payments:
+    group: Perpetual-only
+    signature: "funding_payments(id, start, end) -> PaginatedResponse[FundingPayment]"
+    description: Your own settled funding cashflows — paid (positive) or received (negative).
+    public: false
+    example:
+      accountVenues: [dydx]
+      constants:
+        dydx: {market_id: 'dydx:perp:BTC-USD', amount1: '-1.24', amount2: '0.86'}
+        hyperliquid: {market_id: 'hyperliquid::BTC', amount1: '-1.05', amount2: '0.74'}
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        async for page in sdk.funding_payments('{{ constants[accounts[0]].market_id }}', start, end):
+          for payment in page:
+            print(payment.time, payment.amount)
+      resultTemplate: |
+        2025-01-03 16:00:00 {{ constants[accounts[0]].amount1 }}
+        2025-01-03 08:00:00 {{ constants[accounts[0]].amount2 }}
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['dydx', 'hyperliquid']:
+          for raw_id, info in catalogue.perpetual_instruments[venue].items():
+            if info['base'] == 'bitcoin':
+              market_id = f'dydx:perp:{raw_id}' if venue == 'dydx' else f'hyperliquid::{raw_id}'
+              print(venue, '->', market_id)
+              break
+      resultTemplate: |
+        dydx -> dydx:perp:BTC-USD
+        hyperliquid -> hyperliquid::BTC
+
+  perp_position:
+    group: Perpetual-only
+    signature: "perp_position(id) -> PerpPosition"
+    description: Your position size plus average entry price.
+    public: false
+    example:
+      accountVenues: [dydx]
+      constants:
+        dydx: {market_id: 'dydx:perp:BTC-USD', size: '0.5', entry_price: '58230.10'}
+        hyperliquid: {market_id: 'hyperliquid::BTC', size: '0.3', entry_price: '58190.40'}
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        pos = await sdk.perp_position('{{ constants[accounts[0]].market_id }}')
+      resultTemplate: |
+        PerpPosition(size=Decimal('{{ constants[accounts[0]].size }}'), entry_price=Decimal('{{ constants[accounts[0]].entry_price }}'))
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['dydx', 'hyperliquid']:
+          for raw_id, info in catalogue.perpetual_instruments[venue].items():
+            if info['base'] == 'bitcoin':
+              market_id = f'dydx:perp:{raw_id}' if venue == 'dydx' else f'hyperliquid::{raw_id}'
+              print(venue, '->', market_id)
+              break
+      resultTemplate: |
+        dydx -> dydx:perp:BTC-USD
+        hyperliquid -> hyperliquid::BTC
+
+  perp_collateral:
+    group: Perpetual-only
+    signature: "perp_collateral(id) -> PerpCollateral"
+    description: The perpetual collateral bucket backing this market — equity, margin, and liquidation distance.
+    public: false
+    example:
+      accountVenues: [dydx]
+      constants:
+        dydx: {market_id: 'dydx:perp:BTC-USD', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
+        hyperliquid: {market_id: 'hyperliquid::BTC', equity: '9875.20', leverage: '1.85', maintenance_ratio: '0.201'}
+      callTemplate: |
+        from tribulnation.sdk import MarketSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        sdk = MarketSDK.load('sdk.toml')
+
+        c = await sdk.perp_collateral('{{ constants[accounts[0]].market_id }}')
+        print(c.maintenance_ratio)
+      resultTemplate: |
+        PerpCollateral(equity=Decimal('{{ constants[accounts[0]].equity }}'), leverage=Decimal('{{ constants[accounts[0]].leverage }}'), ...)
+        {{ constants[accounts[0]].maintenance_ratio }}  # maintenance_ratio -- liquidation at 1.0
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['dydx', 'hyperliquid']:
+          for raw_id, info in catalogue.perpetual_instruments[venue].items():
+            if info['base'] == 'bitcoin':
+              market_id = f'dydx:perp:{raw_id}' if venue == 'dydx' else f'hyperliquid::{raw_id}'
+              print(venue, '->', market_id)
+              break
+      resultTemplate: |
+        dydx -> dydx:perp:BTC-USD
+        hyperliquid -> hyperliquid::BTC

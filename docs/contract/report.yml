@@ -1,0 +1,136 @@
+# Interface contract for ReportSDK.
+#
+# `example`/`catalogue` blocks are Jinja templates (sdk_dev.contract), not literal
+# Python — see market.yml's header for the full mechanism. Both methods below genuinely
+# loop `for venue, sdk in report.all.items():` (`async with sdk: ...` per venue —
+# ReportSDK owns network clients, unlike Earn/Wallet), so their call text needs no
+# substitution at all.
+#
+# `example.constants` is kept to `hyperliquid` alone for now (not dydx/ethereum, despite both
+# being real, credential-only `[support.report]` venues per their own impl.toml):
+# `ReportSDK.load()` only populates `accounts`, not `providers`/`config`, so ethereum
+# (which needs a `ProvidersConfig`) can't be fully configured through sdk.toml alone —
+# that's a real constraint, unrelated to this file's own templating. dydx has no such
+# constraint and could gain its own `constants` entry later; it's left out here only because
+# its own raw balance/position-keying convention hasn't been verified against source the
+# way hyperliquid's was (see `snapshot`'s own comment) — better to omit than guess.
+
+component:
+  title: Report
+  tagline: Historical transactions and current balances/positions, with provenance.
+  # supportedVenues/defaultVenues: NOT declared here — computed by `sdk-dev docs sync`
+  # from every packages/impl/*/impl.toml's `[support.report]` table. ReportSDK has no
+  # DEFAULT_ACCOUNTS concept at all, so every impl.toml marks `auth = true` here — every
+  # venue always needs a real toml entry. bitget/impl.toml deliberately doesn't declare
+  # `[support.report]` (real module, not wired into the router — see that file).
+
+methods:
+  snapshot:
+    signature: "snapshot(assets?) -> SnapshotRecord"
+    description: Current balances and positions, tagged with a Provenance (api/tabular/manual/derived).
+    # Hyperliquid keys balances by numeric spot-token index ('0' is USDC) but positions by
+    # the plain perp coin symbol ('BTC') — two different raw id schemes on the *same*
+    # venue (confirmed against packages/impl/hyperliquid/.../report/{snapshots,
+    # history/assets}.py, whose own docstring spells this out). The catalogue block
+    # resolves both, computed from the real `catalogue` global rather than hand-typed.
+    example:
+      accountVenues: [hyperliquid]
+      constants:
+        hyperliquid:
+          balance_asset: '0'
+          balance: '12045.30'
+          position_coin: BTC
+          position_size: '0.5'
+          position_avg_price: '58230.10'
+      callTemplate: |
+        from tribulnation.sdk import ReportSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        report = ReportSDK.load('sdk.toml')
+        snapshots_by_venue = {}
+        for venue, sdk in report.all.items():
+          async with sdk:
+            result = await sdk.snapshot()
+          snapshots_by_venue[venue] = result.snapshot.subaccounts[0]
+          print(venue, snapshots_by_venue[venue].balances, snapshots_by_venue[venue].positions)
+      resultTemplate: |
+        {% for venue in accounts %}
+        {{ venue }} {'{{ constants[venue].balance_asset }}': Decimal('{{ constants[venue].balance }}')} {'{{ constants[venue].position_coin }}': Position(size=Decimal('{{ constants[venue].position_size }}'), avg_price=Decimal('{{ constants[venue].position_avg_price }}'))}
+
+        {% endfor %}
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue, sub in snapshots_by_venue.items():
+          for token, balance in sub.balances.items():
+            print(venue, catalogue.asset_translations[venue][token], '->', balance)
+          for coin, position in sub.positions.items():
+            underlying = catalogue.perpetual_instruments[venue][coin]['base']
+            print(venue, underlying, '->', position.size, '@', position.avg_price)
+      resultTemplate: |
+        {% for venue in accounts %}
+        {{ venue }} {{ catalogue.asset_translations[venue][constants[venue].balance_asset] }} -> {{ constants[venue].balance }}
+        {{ venue }} {{ catalogue.perpetual_instruments[venue][constants[venue].position_coin]['base'] }} -> {{ constants[venue].position_size }} @ {{ constants[venue].position_avg_price }}
+        {% endfor %}
+
+  history:
+    signature: "history(start?, end?) -> AsyncIterable[HistoryRecord]"
+    description: Transaction history as a stream of HistoryRecords, over a window.
+    # HistoryRecord only carries `observations`/`provenance` — each observation (not the
+    # record) has its own `.type`/`.time` (confirmed against reporting/models/main.py and
+    # reporting/models/common.py's BaseObservation).
+    example:
+      accountVenues: [hyperliquid]
+      constants:
+        hyperliquid:
+          trade_time: '2025-01-03 14:22:10+00:00'
+          funding_time: '2025-01-03 16:00:00+00:00'
+          trade_instrument: BTC
+          funding_asset: '0'
+      callTemplate: |
+        from tribulnation.sdk import ReportSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        report = ReportSDK.load('sdk.toml')
+        records_by_venue = {}
+        for venue, sdk in report.all.items():
+          async with sdk:
+            records_by_venue[venue] = [r async for r in sdk.history(start, end)]
+          for record in records_by_venue[venue]:
+            for obs in record.observations:
+              print(venue, obs.type, obs.time)
+      resultTemplate: |
+        {% for venue in accounts %}
+        {{ venue }} future_trade {{ constants[venue].trade_time }}
+        {{ venue }} funding      {{ constants[venue].funding_time }}
+
+        {% endfor %}
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue, records in records_by_venue.items():
+          for record in records:
+            for obs in record.observations:
+              if obs.type == 'future_trade':
+                underlying = catalogue.perpetual_instruments[venue][obs.instrument]['base']
+                print(venue, 'trade  ', '->', underlying)
+              elif obs.type == 'funding':
+                asset_id = catalogue.asset_translations[venue][obs.asset]
+                print(venue, 'funding', '->', asset_id)
+      resultTemplate: |
+        {% for venue in accounts %}
+        {{ venue }} trade   -> {{ catalogue.perpetual_instruments[venue][constants[venue].trade_instrument]['base'] }}
+        {{ venue }} funding -> {{ catalogue.asset_translations[venue][constants[venue].funding_asset] }}
+        {% endfor %}

@@ -1,0 +1,119 @@
+# Interface contract for WalletSDK.
+#
+# `example`/`catalogue` blocks are Jinja templates (sdk_dev.contract), not literal
+# Python — see market.yml's header for the full mechanism. Both methods below genuinely
+# loop `for venue, sdk in wallet.all.items()`, so their call text needs no substitution
+# at all; only the result (a dict keyed by whichever venues were selected) is templated.
+
+component:
+  title: Wallet
+  tagline: Deposit and withdrawal details — networks, fees, minimums.
+  # supportedVenues/defaultVenues: NOT declared here — computed by `sdk-dev docs sync`
+  # from every packages/impl/*/impl.toml's `[support.wallet]` table. WalletSDK.
+  # DEFAULT_ACCOUNTS is empty for every venue, so every impl.toml marks `auth = true`
+  # here — every venue always needs a real toml entry.
+
+methods:
+  deposit_methods:
+    signature: "deposit_methods(assets=None) -> Sequence[DepositMethod]"
+    description: Deposit addresses' networks and minimum confirmations, per asset.
+    # Binance's raw network field really is 'TRX'/'ETH' (confirmed against
+    # packages/impl/binance/.../wallet/deposit_methods.py, which passes the venue's own
+    # field straight through) — Bitget's is 'TRC20'/'ERC20' for the same chains (confirmed
+    # against its own deposit_methods.py). Fetching both venues in the example itself puts
+    # that mismatch on screen before any translation — the catalogue block below then only
+    # has to resolve it, not first go prove it.
+    example:
+      accountVenues: [binance, bitget]
+      constants:
+        binance:
+          methods:
+            - {network: TRX, min_confirmations: 1}
+            - {network: ETH, min_confirmations: 12}
+        bitget:
+          methods:
+            - {network: TRC20, min_confirmations: 1}
+            - {network: ERC20, min_confirmations: 8}
+      callTemplate: |
+        from tribulnation.sdk import WalletSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        wallet = WalletSDK.load('sdk.toml')
+        methods_by_venue = {}
+        for venue, sdk in wallet.all.items():
+          methods_by_venue[venue] = await sdk.deposit_methods(assets=['USDT'])
+      resultTemplate: |
+        {
+        {% for venue in accounts %}
+          '{{ venue }}': [{% for m in constants[venue].methods %}DepositMethod(asset='USDT', network='{{ m.network }}', min_confirmations={{ m.min_confirmations }}){% if not loop.last %}, {% endif %}{% endfor %}],
+        {% endfor %}
+        }
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue, ms in methods_by_venue.items():
+          for m in ms:
+            asset_id = catalogue.asset_translations[venue][m.asset]
+            network_id = catalogue.network_translations[venue][m.network]
+            print(venue, '->', asset_id, 'on', network_id)
+      resultTemplate: |
+        {% for venue in accounts %}
+        {% for m in constants[venue].methods %}
+        {{ venue }} -> {{ catalogue.asset_translations[venue]['USDT'] }} on {{ catalogue.network_translations[venue][m.network] }}
+        {% endfor %}
+        {% endfor %}
+
+  withdrawal_methods:
+    signature: "withdrawal_methods(assets=None, networks=None) -> Sequence[WithdrawalMethod]"
+    description: Fees and networks available for withdrawing an asset.
+    example:
+      accountVenues: [binance, bitget]
+      constants:
+        binance:
+          methods:
+            - {network: TRX, fee: '1.0'}
+            - {network: ETH, fee: '8.5'}
+        bitget:
+          methods:
+            - {network: TRC20, fee: '1.0'}
+            - {network: ERC20, fee: '6.0'}
+      callTemplate: |
+        from tribulnation.sdk import WalletSDK
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        wallet = WalletSDK.load('sdk.toml')
+        methods_by_venue = {}
+        for venue, sdk in wallet.all.items():
+          methods_by_venue[venue] = await sdk.withdrawal_methods(assets=['USDT'])
+      resultTemplate: |
+        {
+        {% for venue in accounts %}
+          '{{ venue }}': [{% for m in constants[venue].methods %}WithdrawalMethod(asset='USDT', network='{{ m.network }}', fee=Decimal('{{ m.fee }}')){% if not loop.last %}, {% endif %}{% endfor %}],
+        {% endfor %}
+        }
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue, ms in methods_by_venue.items():
+          for m in ms:
+            asset_id = catalogue.asset_translations[venue][m.asset]
+            network_id = catalogue.network_translations[venue][m.network]
+            print(venue, '->', asset_id, 'on', network_id, '- fee', m.fee)
+      resultTemplate: |
+        {% for venue in accounts %}
+        {% for m in constants[venue].methods %}
+        {{ venue }} -> {{ catalogue.asset_translations[venue]['USDT'] }} on {{ catalogue.network_translations[venue][m.network] }} - fee {{ m.fee }}
+        {% endfor %}
+        {% endfor %}
