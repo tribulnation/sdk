@@ -1,0 +1,27 @@
+# auth = false means this surface has a real credential-free DEFAULT_ACCOUNTS entry —
+# auth = true means every call always needs a real accounts.Mexc() entry.
+
+[support.market]
+support = "full"
+auth = false
+# MarketSDK.DEFAULT_ACCOUNTS includes 'mexc' (Mexc(public=True)) — but that only covers
+# purely public market-data methods; account-scoped/trading methods still need real
+# credentials regardless (see docs/contract/market.yml's per-method `public: false`).
+
+[support.earn]
+support = "full"
+auth = false
+# EarnSDK.mexc() ignores the account entirely (MexcEarn() takes no credentials) — genuinely
+# free even without a DEFAULT_ACCOUNTS entry backing it.
+
+[support.wallet]
+support = "full"
+auth = true
+# WalletSDK never has a DEFAULT_ACCOUNTS entry for any venue.
+
+[support.report]
+support = "partial"
+methods = ["snapshot"]
+auth = true
+# MexcReport serves snapshot() directly but raises NotImplementedError from history() —
+# the underlying Reporting class targets a different (classic-account) shape.

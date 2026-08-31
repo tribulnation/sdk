@@ -1,0 +1,17 @@
+# auth = false means this surface has a real credential-free DEFAULT_ACCOUNTS entry —
+# auth = true means every call always needs a real accounts.Bitget() entry.
+
+[support.earn]
+support = "full"
+auth = true
+
+[support.wallet]
+support = "full"
+auth = true
+
+# Report isn't listed here on purpose: `tribulnation.bitget.reporting.Reporting` is a real,
+# full implementation (Snapshots and History both), but it targets classic-account
+# endpoints the unified trading account (UTA) doesn't support, so it's deliberately left
+# out of ReportSDK's router pending a reimplementation — `ReportSDK.venue()` raises
+# NotImplementedError for bitget. Still importable directly for callers on a classic
+# account; add `[support.report]` here once it's wired into the router for real.

@@ -1,0 +1,17 @@
+# auth = false means this surface has a real credential-free DEFAULT_ACCOUNTS entry (see
+# tribulnation.sdk.impl.<surface>.DEFAULT_ACCOUNTS) — auth = true means every call always
+# needs a real accounts.Binance() entry, no free default exists.
+#
+# Market isn't listed here on purpose: MarketSDK.binance() is real code
+# (packages/impl/binance/pkg/src/tribulnation/binance/market/), but it's still
+# untracked/WIP as of this writing — not ready to announce publicly yet. Add
+# `[support.market]` once it's ready; its absence is what keeps binance out of the /sdk
+# wizard's Market venue picker.
+
+[support.earn]
+support = "full"
+auth = true
+
+[support.wallet]
+support = "full"
+auth = true

@@ -1,0 +1,9 @@
+# auth = false means this surface has a real credential-free DEFAULT_ACCOUNTS entry —
+# auth = true means every call always needs a real accounts.Evm('ethereum') entry.
+
+[support.report]
+support = "full"
+auth = true
+# ReportSDK never has a DEFAULT_ACCOUNTS entry for any venue — EVM history/snapshots don't
+# need exchange credentials (just a real address), but the SDK still requires an explicit
+# accounts.Evm() entry rather than a free default.

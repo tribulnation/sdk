@@ -1,0 +1,14 @@
+# auth = false means this surface has a real credential-free DEFAULT_ACCOUNTS entry —
+# auth = true means every call always needs a real accounts.Dydx() entry.
+
+[support.market]
+support = "full"
+auth = false
+# MarketSDK.DEFAULT_ACCOUNTS includes 'dydx' (Dydx(public=True)) — but that only covers
+# purely public market-data methods; account-scoped/trading methods still need real
+# credentials regardless (see docs/contract/market.yml's per-method `public: false`).
+
+[support.report]
+support = "full"
+auth = true
+# ReportSDK never has a DEFAULT_ACCOUNTS entry for any venue.

@@ -1,0 +1,19 @@
+# auth = false means this surface has a real credential-free DEFAULT_ACCOUNTS entry —
+# auth = true means every call always needs a real accounts.Bit2Me() entry.
+
+[support.report]
+support = "partial"
+methods = ["snapshot"]
+auth = true
+# Bit2MeReport serves snapshot() directly but raises NotImplementedError from history()
+# (same shape as MEXC's report support — see mexc/impl.toml).
+
+# Earn isn't listed here on purpose: EarnSDK.bit2me() is real and has a real
+# DEFAULT_ACCOUNTS entry (public=True) — but it hasn't been checked/announced yet, matching
+# the same "wired but not ready" gate as market.yml's binance note. Add `[support.earn]`
+# once it's ready.
+#
+# Wallet has no bit2me implementation at all, deliberately: its catalogue can't reliably
+# enumerate every network a deposit address might mint on, or return per-transaction
+# withdrawal fees in bulk — see docs/support.md's own note on this. Left unimplemented
+# rather than shipped incomplete.

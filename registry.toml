@@ -1,0 +1,75 @@
+# The public venue registry: which venues appear in the /sdk site's venue picker and logo
+# wall, in what order, under what display name, with which PyPI/icon URLs — mirrors
+# typed-dev's own registry.toml (ADR 0016) exactly: hand-authored and trusted outright,
+# array order IS display order, never auto-sorted downstream.
+#
+# This is presentation metadata only — "which venues exist and how do we show them," not
+# "what does a given venue's package actually support." That second question is
+# packages/impl/<slug>/impl.toml's job, one per package.
+#
+# icon points at a theme-adaptive SVG on catalogue.tribulnation.com (light/dark handled by
+# an embedded `prefers-color-scheme` media query in the SVG itself), same as typed-dev's own
+# convention. `name` defaults to slug.capitalize() when omitted.
+
+[[venues]]
+slug = "dydx"
+name = "dYdX"
+tier = "production"
+repo = "https://github.com/tribulnationx/sdk"
+path = "packages/impl/dydx"
+pypi = "https://pypi.org/project/tribulnation-dydx/"
+icon = "https://catalogue.tribulnation.com/icons/asset/dydx.svg"
+
+[[venues]]
+slug = "hyperliquid"
+name = "Hyperliquid"
+tier = "production"
+repo = "https://github.com/tribulnationx/sdk"
+path = "packages/impl/hyperliquid"
+pypi = "https://pypi.org/project/tribulnation-hyperliquid/"
+icon = "https://catalogue.tribulnation.com/icons/asset/hyperliquid.svg"
+
+[[venues]]
+slug = "mexc"
+name = "MEXC"
+tier = "production"
+repo = "https://github.com/tribulnationx/sdk"
+path = "packages/impl/mexc"
+pypi = "https://pypi.org/project/tribulnation-mexc/"
+icon = "https://catalogue.tribulnation.com/icons/platform/mexc.svg"
+
+[[venues]]
+slug = "binance"
+name = "Binance"
+tier = "production"
+repo = "https://github.com/tribulnationx/sdk"
+path = "packages/impl/binance"
+pypi = "https://pypi.org/project/tribulnation-binance/"
+icon = "https://catalogue.tribulnation.com/icons/platform/binance.svg"
+
+[[venues]]
+slug = "bitget"
+name = "Bitget"
+tier = "production"
+repo = "https://github.com/tribulnationx/sdk"
+path = "packages/impl/bitget"
+pypi = "https://pypi.org/project/tribulnation-bitget/"
+icon = "https://catalogue.tribulnation.com/icons/asset/bitget-token.svg"
+
+[[venues]]
+slug = "bit2me"
+name = "Bit2Me"
+tier = "production"
+repo = "https://github.com/tribulnationx/sdk"
+path = "packages/impl/bit2me"
+pypi = "https://pypi.org/project/tribulnation-bit2me/"
+icon = "https://catalogue.tribulnation.com/icons/asset/bit2me.svg"
+
+[[venues]]
+slug = "ethereum"
+name = "Ethereum (EVM)"
+tier = "production"
+repo = "https://github.com/tribulnationx/sdk"
+path = "packages/impl/ethereum"
+pypi = "https://pypi.org/project/tribulnation-ethereum/"
+icon = "https://catalogue.tribulnation.com/icons/asset/ethereum.svg"
