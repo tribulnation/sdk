@@ -15,10 +15,18 @@ from sdk_dev.accounts import generate_accounts_toml
 from sdk_dev.contract import load_contract_file, render_contract_file
 from sdk_dev.schema import generate_schema
 from sdk_dev.registry import load_registry
-from sdk_dev.repo import CONTRACT_DIR, IMPL_DIR, REGISTRY_PATH, NotACheckout, repo_root
+from sdk_dev.repo import (
+  CONTRACT_DIR,
+  DOCS_DIR,
+  IMPL_DIR,
+  REGISTRY_PATH,
+  NotACheckout,
+  repo_root,
+)
 from sdk_dev.support import load_impl_files, load_support_matrix, method_universe
 
 DEFAULT_LANDING_PATH = 'refs/landing'
+LANDING_DOCS_DEST = 'content/docs/sdk'
 LANDING_DEST = 'content/docs/sdk/contract'
 ACCOUNTS_FILENAME = 'accounts.json'
 SCHEMA_FILENAME = 'schema.json'
@@ -115,10 +123,17 @@ def sync(
   ] = None,
 ):
   """
-  Render docs/contract/*.yml + accounts.json/schema.json/registry.json/support.json into
-  a local `landing` checkout, for the /sdk docs site.
+  Sync docs/** (the SDK's real prose docs, mirroring `typed-dev docs sync`'s `clients/
+  <client>/docs/**` copy) plus docs/contract/*.yml + accounts.json/schema.json/
+  registry.json/support.json into a local `landing` checkout, for the /sdk docs site.
 
-  Every output file is pure derived data — nothing to hand-maintain, so nothing to
+  `docs/` itself (`index.md`, `quickstart.yaml`, `support.md`, `reference/**`) is copied
+  straight from disk into <landing>/content/docs/sdk/, replacing whatever was there —
+  the same plain mirror `typed-dev docs sync` does per client, so there is exactly one
+  place these pages are ever hand-edited. `docs/contract/` is excluded from that copy: it
+  gets rendered instead of copied (see below).
+
+  Every other output file is pure derived data — nothing to hand-maintain, so nothing to
   commit: everything is generated straight into
   <landing>/content/docs/sdk/contract/ on every sync, never written into this repo's own
   docs/contract/ (which stays 100% hand-authored .yml, safe to `git add` wholesale):
@@ -184,17 +199,20 @@ def sync(
     typer.echo(f'{e}', err=True)
     raise typer.Exit(code=1)
 
+  docs_dest = landing_root / LANDING_DOCS_DEST
+  if docs_dest.is_dir():
+    shutil.rmtree(docs_dest)
+  shutil.copytree(root / DOCS_DIR, docs_dest, ignore=shutil.ignore_patterns('contract'))
+
   dest_dir = landing_root / LANDING_DEST
-  if dest_dir.is_dir():
-    shutil.rmtree(dest_dir)
   dest_dir.mkdir(parents=True)
 
   for filename, data in generated.items():
     (dest_dir / filename).write_text(json.dumps(data, indent=2) + '\n')
 
   typer.echo(
-    f'Synced {len(generated)} file(s) to {dest_dir.relative_to(landing_root)}: '
-    f'{", ".join(sorted(generated))}'
+    f'Synced docs/** and {len(generated)} generated file(s) to '
+    f'{docs_dest.relative_to(landing_root)}: {", ".join(sorted(generated))}'
   )
   typer.echo(
     f'\nNext:\n  cd {landing_root}\n  node scripts/render-docs.mjs\n  yarn dev'

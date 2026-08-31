@@ -4,6 +4,7 @@ by every `sdk-dev` command that reads them (`docs sync`, `docs check`, `support`
 
 from pathlib import Path
 
+DOCS_DIR = 'docs'
 CONTRACT_DIR = 'docs/contract'
 IMPL_DIR = 'packages/impl'
 REGISTRY_PATH = 'registry.toml'
