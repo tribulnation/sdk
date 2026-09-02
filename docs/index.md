@@ -2,24 +2,6 @@
 
 > One interface, every venue. Async, fully typed, decimal-precision Python for crypto trading and data.
 
-```python
-from dotenv import load_dotenv
-from tribulnation.sdk import MarketSDK, accounts
-
-load_dotenv()  # load credentials from .env file
-
-sdk = MarketSDK({
-  'mexc_account1': accounts.Mexc(api_key='$MEXC_API_KEY', api_secret='$MEXC_API_SECRET'),
-  # 'dydx', 'hyperliquid', and 'mexc' are available by default, even without listing them here
-})
-async with sdk.trades_stream('mexc_account1:spot:BTCUSDT') as my_trades:
-  async for my_trade in my_trades:
-    print(f'Hedging {my_trade}')
-    await sdk.place_order('dydx:perp:BTC-USD', {
-      'type': 'LIMIT', 'qty': -my_trade.qty, 'price': my_trade.price
-    })
-```
-
 ## Why the SDK?
 
 - **🎯 Swap venues by changing a string**: `Market`, `Wallet`, `Earn` and `Report` are abstract interfaces, so code written against them runs unchanged on every implemented venue, and on several accounts per venue side by side.
@@ -34,6 +16,35 @@ pip install tribulnation-sdk[dydx,hyperliquid,mexc]
 ```
 
 Extras select which venue packages get installed. See the [support matrix](support.md) for what's actually implemented per venue.
+
+## Quick Start
+
+**1. Define accounts** in `sdk.toml`:
+
+```toml
+[accounts.mexc_account1]
+venue = "mexc"
+api_key = "$MEXC_API_KEY"
+api_secret = "$MEXC_API_SECRET"
+```
+
+`$VAR` values resolve from the environment, and a missing one fails at load time rather than on first use. Public venues (`dydx`, `hyperliquid`, `mexc`) work without an entry.
+
+**2. Trade**:
+
+```python
+from tribulnation.sdk import MarketSDK
+
+sdk = MarketSDK.load('sdk.toml')
+async with sdk.trades_stream('mexc_account1:spot:BTCUSDT') as my_trades:
+  async for my_trade in my_trades:
+    print(f'Hedging {my_trade}')
+    await sdk.place_order('dydx:perp:BTC-USD', {
+      'type': 'LIMIT', 'qty': -my_trade.qty, 'price': my_trade.price
+    })
+```
+
+Or construct in code: `MarketSDK({'mexc_account1': accounts.Mexc()})`. Each `accounts.<Venue>()` field defaults to `$VENUE_FIELD`, e.g. `accounts.Mexc()` reads `$MEXC_API_KEY` and `$MEXC_API_SECRET`.
 
 ## Market IDs & Scoping
 
