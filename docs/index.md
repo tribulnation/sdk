@@ -1,0 +1,72 @@
+# Tribulnation SDK
+
+> One interface, every venue. Async, fully typed, decimal-precision Python for crypto trading and data.
+
+```python
+from dotenv import load_dotenv
+from tribulnation.sdk import MarketSDK, accounts
+
+load_dotenv()  # load credentials from .env file
+
+sdk = MarketSDK({
+  'mexc_account1': accounts.Mexc(api_key='$MEXC_API_KEY', api_secret='$MEXC_API_SECRET'),
+  # 'dydx', 'hyperliquid', and 'mexc' are available by default, even without listing them here
+})
+async with sdk.trades_stream('mexc_account1:spot:BTCUSDT') as my_trades:
+  async for my_trade in my_trades:
+    print(f'Hedging {my_trade}')
+    await sdk.place_order('dydx:perp:BTC-USD', {
+      'type': 'LIMIT', 'qty': -my_trade.qty, 'price': my_trade.price
+    })
+```
+
+## Why the SDK?
+
+- **🎯 Swap venues by changing a string**: `Market`, `Wallet`, `Earn` and `Report` are abstract interfaces, so code written against them runs unchanged on every implemented venue, and on several accounts per venue side by side.
+- **🛡️ Validated at the edge**: every implementation sits on our [Typed](/typed) clients, so venue responses are typed and validated before they reach you.
+- **🔢 No raw primitives**: prices, sizes and fees are `Decimal`, timestamps are `datetime`, never `float` or epoch ints.
+- **📊 Beyond trading**: `Report` reads balance and position history from exchanges *and* chains, `Earn` covers yield instruments, `Wallet` covers deposits and withdrawals.
+
+## Installation
+
+```bash
+pip install tribulnation-sdk[dydx,hyperliquid,mexc]
+```
+
+Extras select which venue packages get installed. See the [support matrix](support.md) for what's actually implemented per venue.
+
+## Market IDs & Scoping
+
+`<account_id>:<exchange_id>:<market_id>`, e.g. `mexc_account1:spot:BTCUSDT`. `account_id` is the key you registered in `accounts` (not necessarily the venue's own name), so you can run several accounts on one venue side by side. Equivalent ways to reach a market:
+
+```python
+await sdk.depth('mexc_account1:spot:BTCUSDT')
+
+venue = await sdk.venue('mexc_account1')
+await venue.depth('spot:BTCUSDT')
+
+exchange = await venue.exchange('spot')
+await exchange.depth('BTCUSDT')
+
+market = await exchange.market('BTCUSDT')
+await market.depth()
+```
+
+Hold a `Market` reference in hot loops; use the scoped one-shot calls otherwise.
+
+## Error Handling
+
+All errors subclass `Error`: `NetworkError`, `ValidationError`, `ApiError` (`BadRequest`, `AuthError`, `RateLimited`), `LogicError`.
+
+## Reference
+
+- [Market](reference/market.md) — order books, rules, orders, positions, funding
+- [Earn](reference/earn.md) — yield-bearing instruments across venues
+- [Wallet](reference/wallet.md) — deposit/withdrawal methods
+- [Report](reference/report.md) — balance/position history, with provenance
+- [Lifecycle](reference/lifecycle.md) — every SDK object is an async context manager
+- [Context, Logging & Retries](reference/context.md) — opt-in logging and retries
+
+## Support Matrix
+
+Not every venue implements every surface yet. See the [support matrix](support.md) for what's actually wired, per venue and per surface.
