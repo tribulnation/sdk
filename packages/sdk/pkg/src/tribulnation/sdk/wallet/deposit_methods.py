@@ -28,7 +28,8 @@ class DepositMethods(SDK):
     *,
     assets: Collection[str] | None = None,
   ) -> Sequence[DepositMethod]:
-    """Get deposit methods.
+    """Fetch the ways to deposit: one entry per asset and network.
 
-    - `assets`: optional filter by asset.
+    Args:
+      assets: Keep methods for these assets only.
     """

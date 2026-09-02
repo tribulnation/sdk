@@ -1,10 +1,12 @@
 from typing_extensions import (
   Any,
   AsyncIterable,
-  AsyncIterator,
+  AsyncGenerator,
   Sequence,
   Literal,
   TypedDict,
+  Collection,
+  Mapping,
 )
 from abc import abstractmethod
 from contextlib import asynccontextmanager
@@ -23,6 +25,7 @@ from .types import (
   PerpPosition,
   Trade,
   Rules,
+  Ticker,
 )
 from .settings import Settings
 from .market import Market, PerpMarket
@@ -82,7 +85,7 @@ class TradingVenue(SDK):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
-  ) -> AsyncIterator[AsyncIterable[Book]]:
+  ) -> AsyncGenerator[AsyncIterable[Book]]:
     """Subscribe to the market order book.
 
     See `Market.depth_stream` for `queue_size`/`overflow` (e.g. `overflow='fail'`
@@ -93,6 +96,26 @@ class TradingVenue(SDK):
       levels=levels, queue_size=queue_size, overflow=overflow
     ) as stream:
       yield stream
+
+  @SDK.method
+  async def tickers(
+    self,
+    exchange: str,
+    *,
+    markets: Collection[str] | None = None,
+    settings: Settings = {},
+  ) -> Mapping[str, Ticker]:
+    """Fetch a ticker snapshot for many markets at once.
+
+    Args:
+      markets: Market IDs to fetch. `None` fetches every market of the exchange.
+      settings: Venue-specific ticker settings.
+
+    Returns:
+      A mapping of market ID to its `Ticker`.
+    """
+    sdk = await self.exchange(exchange)
+    return await sdk.tickers(markets=markets, settings=settings)
 
   @SDK.method
   async def rules(self, market_id: str, /, *, refetch: bool = False) -> Rules:
@@ -132,7 +155,7 @@ class TradingVenue(SDK):
     *,
     queue_size: int = 1000,
     overflow: OverflowPolicy = 'fail',
-  ) -> AsyncIterator[AsyncIterable[Trade]]:
+  ) -> AsyncGenerator[AsyncIterable[Trade]]:
     """Subscribe to your real-time trades.
 
     See `Market.trades_stream` for `queue_size`/`overflow`.

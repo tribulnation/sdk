@@ -38,8 +38,12 @@ class Instruments(SDK):
     tags: Collection[InstrumentTag] | None = None,
     assets: Collection[str] | None = None,
   ) -> Sequence[Instrument]:
-    """Fetch instruments from the exchange.
+    """Fetch the venue's yield-bearing instruments.
 
-    - `tags`: Filter by tags. Returns all assets matching at least one of the tags.
-    - `assets`: Filter by (subscription) assets.
+    Filters match any of the given tags or assets, not all. `apr` is a fraction of 1,
+    not a percentage: `0.01` is 1%.
+
+    Args:
+      tags: Keep instruments carrying at least one of these tags.
+      assets: Keep instruments subscribed with one of these assets.
     """

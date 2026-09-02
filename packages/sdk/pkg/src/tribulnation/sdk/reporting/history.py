@@ -12,4 +12,9 @@ class History(SDK):
   def history(
     self, start: datetime | None = None, end: datetime | None = None
   ) -> AsyncIterable[HistoryRecord]:
-    """Fetch your reporting history."""
+    """Stream your transaction history as `HistoryRecord`s, each with its `Provenance`.
+
+    Args:
+      start: Start of the window (inclusive). `None` starts from the earliest available.
+      end: End of the window (inclusive). `None` means everything since `start`.
+    """

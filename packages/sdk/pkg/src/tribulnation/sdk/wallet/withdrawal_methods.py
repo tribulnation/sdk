@@ -31,8 +31,9 @@ class WithdrawalMethods(SDK):
     assets: Collection[str] | None = None,
     networks: Collection[str] | None = None,
   ) -> Sequence[WithdrawalMethod]:
-    """Get withdrawal methods.
+    """Fetch the ways to withdraw: one entry per asset and network, with its fee.
 
-    - `assets`: optional filter by asset.
-    - `networks`: optional filter by network.
+    Args:
+      assets: Keep methods for these assets only.
+      networks: Keep methods on these networks only.
     """

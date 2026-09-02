@@ -18,4 +18,9 @@ class Snapshots(SDK):
   async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotRecord:
     """Fetch the current balances and positions of the account.
 
-    - `assets` is used for asset discovery in venues that don't support full enumeration (e.g. EVM blockchains). For others (e.g. CEXs) it's ignored"""
+    The record carries a `Provenance` tracing where it came from.
+
+    Args:
+      assets: Assets to look for, on venues that can't enumerate holdings themselves
+        (EVM chains). Ignored where enumeration is native (CEXs).
+    """
