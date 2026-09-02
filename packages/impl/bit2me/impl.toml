@@ -5,6 +5,7 @@
 support = "partial"
 methods = ["snapshot"]
 auth = true
+note = "`history()` raises `NotImplementedError`."
 # Bit2MeReport serves snapshot() directly but raises NotImplementedError from history()
 # (same shape as MEXC's report support — see mexc/impl.toml).
 
@@ -12,8 +13,13 @@ auth = true
 # DEFAULT_ACCOUNTS entry (public=True) — but it hasn't been checked/announced yet, matching
 # the same "wired but not ready" gate as market.yml's binance note. Add `[support.earn]`
 # once it's ready.
-#
-# Wallet has no bit2me implementation at all, deliberately: its catalogue can't reliably
-# enumerate every network a deposit address might mint on, or return per-transaction
-# withdrawal fees in bulk — see docs/support.md's own note on this. Left unimplemented
-# rather than shipped incomplete.
+
+[support.wallet]
+support = "none"
+auth = true
+note = "No wallet implementation: Bit2Me's asset catalogue lists a single display network per asset while deposit addresses can be minted on others, and withdrawal fees are only quoted per transaction, so `deposit_methods()`/`withdrawal_methods()` would silently under-report. Left out rather than shipped incomplete."
+# Deliberate. The only asset/network catalogue (`v2/currency/assets`) shows e.g. USDC as
+# `ETHEREUM (ERC20)` only, yet `v2/wallet/pocket/{id}/{network}/address` happily mints USDC
+# addresses on `polygon` and `solana` too (confirmed live), and no endpoint enumerates the
+# full network set. Fees have the same shape: `POST /v1/wallet/transaction/proforma`
+# returns a real fee, but only as a live quote for one funded pocket and destination.

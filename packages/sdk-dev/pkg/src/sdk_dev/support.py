@@ -11,7 +11,7 @@ from pathlib import Path
 import tomllib
 
 import pydantic
-from typing_extensions import Literal
+from typing_extensions import Literal, NotRequired, TypedDict
 
 
 class ImplSurfaceSupport(pydantic.BaseModel):
@@ -19,9 +19,23 @@ class ImplSurfaceSupport(pydantic.BaseModel):
 
   model_config = pydantic.ConfigDict(extra='forbid')
 
-  support: Literal['full', 'partial']
+  support: Literal['full', 'partial', 'none']
+  """`none` announces a deliberate gap: the venue is excluded from the surface exactly as
+  if the table were absent, but its `note` still reaches the support matrix."""
   auth: bool
   methods: list[str] | None = None
+  note: str | None = None
+  """One user-facing sentence rendered as a footnote under the support matrix — a caveat
+  the data alone can't express (a module that exists but isn't wired, a naming quirk)."""
+
+
+class SurfaceSupport(TypedDict):
+  """One surface's row set in the support matrix."""
+
+  supportedVenues: list[str]
+  defaultVenues: list[str]
+  notes: NotRequired[dict[str, str]]
+  """Per-venue footnotes, keyed by slug — including `support = "none"` venues."""
 
 
 class ImplFile(pydantic.BaseModel):
@@ -79,17 +93,17 @@ def method_universe(
   eligible = []
   for slug, data in impl_files.items():
     entry = data.support.get(surface)
-    if entry is None:
+    if entry is None or entry.support == 'none':
       continue
     if entry.support == 'full' or (entry.methods and method in entry.methods):
       eligible.append(slug)
   return eligible
 
 
-def load_support_matrix(impl_dir: Path) -> dict[str, dict[str, list[str]]]:
+def load_support_matrix(impl_dir: Path) -> dict[str, SurfaceSupport]:
   """
-  Build `{surface: {supportedVenues: [...], defaultVenues: [...]}}` from every
-  `packages/impl/*/impl.toml` under `impl_dir`.
+  Build `{surface: {supportedVenues: [...], defaultVenues: [...], notes: {...}}}` from
+  every `packages/impl/*/impl.toml` under `impl_dir`.
 
   Args:
     impl_dir: Path to the sdk repo's `packages/impl` directory.
@@ -104,10 +118,14 @@ def load_support_matrix(impl_dir: Path) -> dict[str, dict[str, list[str]]]:
   Raises:
     pydantic.ValidationError: some impl.toml doesn't match `ImplFile`'s shape.
   """
-  matrix: dict[str, dict[str, list[str]]] = {}
+  matrix: dict[str, SurfaceSupport] = {}
   for slug, data in load_impl_files(impl_dir).items():
     for surface, entry in data.support.items():
       bucket = matrix.setdefault(surface, {'supportedVenues': [], 'defaultVenues': []})
+      if entry.note:
+        bucket.setdefault('notes', {})[slug] = entry.note
+      if entry.support == 'none':
+        continue
       bucket['supportedVenues'].append(slug)
       if not entry.auth:
         bucket['defaultVenues'].append(slug)

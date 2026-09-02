@@ -4,6 +4,7 @@
 [support.report]
 support = "full"
 auth = true
+note = "History needs an RPC/explorer provider (`ProvidersConfig`). HyperEVM is the `hyperevm` venue id; `hyperliquid` is the separate HyperCore account."
 # ReportSDK never has a DEFAULT_ACCOUNTS entry for any venue — EVM history/snapshots don't
 # need exchange credentials (just a real address), but the SDK still requires an explicit
 # accounts.Evm() entry rather than a free default.

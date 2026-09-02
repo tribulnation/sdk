@@ -34,4 +34,6 @@ def support():
       auth = 'auth' if entry.auth else 'no auth'
       methods = f' ({", ".join(entry.methods)})' if entry.methods else ''
       typer.echo(f'  {slug:<12} {entry.support}{methods}, {auth}')
+      if entry.note:
+        typer.echo(f'  {"":<12} {entry.note}')
     typer.echo()

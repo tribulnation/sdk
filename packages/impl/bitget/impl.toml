@@ -9,9 +9,8 @@ auth = true
 support = "full"
 auth = true
 
-# Report isn't listed here on purpose: `tribulnation.bitget.reporting.Reporting` is a real,
-# full implementation (Snapshots and History both), but it targets classic-account
-# endpoints the unified trading account (UTA) doesn't support, so it's deliberately left
-# out of ReportSDK's router pending a reimplementation — `ReportSDK.venue()` raises
-# NotImplementedError for bitget. Still importable directly for callers on a classic
-# account; add `[support.report]` here once it's wired into the router for real.
+[support.report]
+support = "none"
+auth = true
+note = "`tribulnation.bitget.reporting.Reporting` implements snapshots and history, but against classic-account endpoints the unified trading account (UTA) doesn't support, so it isn't wired into `ReportSDK`. Import it directly if you're on a classic account."
+# Flip to `full` once it's reimplemented against UTA and wired into the router.

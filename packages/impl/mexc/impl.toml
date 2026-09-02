@@ -23,5 +23,6 @@ auth = true
 support = "partial"
 methods = ["snapshot"]
 auth = true
+note = "`history()` raises `NotImplementedError`; the underlying `Reporting` targets classic accounts."
 # MexcReport serves snapshot() directly but raises NotImplementedError from history() —
 # the underlying Reporting class targets a different (classic-account) shape.

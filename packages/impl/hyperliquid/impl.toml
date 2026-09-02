@@ -11,4 +11,5 @@ auth = false
 [support.report]
 support = "full"
 auth = true
+note = "History replays the account's full fill stream, and the venue only serves the 10000 most recent fills, so configure `cache` (a SQLAlchemy URL) to keep a durable archive."
 # ReportSDK never has a DEFAULT_ACCOUNTS entry for any venue.
