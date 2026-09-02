@@ -96,9 +96,7 @@ def default_retry_logger(
   delay: float,
 ) -> None:
   path = '.'.join(ctx.path)
-  print(
-    f'Retry {retries} for {path} after {type(exception).__name__}; sleeping {delay:.2f}s'
-  )
+  print(f'Retry {retries} for {path} after {exception!r}; sleeping {delay:.2f}s')
 
 
 def full_jitter(
