@@ -1,6 +1,6 @@
 from typing_extensions import (
   Any,
-  Iterator,
+  Generator,
   Callable,
   TypeVar,
   ParamSpec,
@@ -76,7 +76,7 @@ class Context:
       return result
 
   @contextmanager
-  def use(self) -> Iterator['Context']:
+  def use(self) -> Generator['Context']:
     token = Context.set_current(self)
     try:
       yield self
