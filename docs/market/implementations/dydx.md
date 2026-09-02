@@ -5,29 +5,15 @@
 See the [generic market interface](../index.md) for the shared method surface. This page
 covers only what is dYdX-specific.
 
-## Account configuration
+## Account
 
-`accounts.Dydx` (from `tribulnation.sdk`):
-
-| Field | Default | Notes |
-| --- | --- | --- |
-| `venue` | `'dydx'` | `'dydx'` = mainnet, `'dydx_testnet'` = testnet. |
-| `address` | `'$DYDX_ADDRESS'` | Account address (`dydx1…`). |
-| `mnemonic` | `'$DYDX_MNEMONIC'` | Account mnemonic (12–24 words). Used to sign. |
-| `parent_subaccount` | `0` | dYdX parent subaccount number (see below). |
-| `public` | `False` | If `True`, missing credentials are tolerated (read-only). |
-
-String fields of the form `$NAME` are resolved from the environment (`accounts.Dydx()`
-reads `$DYDX_ADDRESS`/`$DYDX_MNEMONIC`); pass literals or other `$VAR` names to override.
-Selecting testnet vs mainnet is driven purely by `venue` — `MarketSDK` builds the client
-with `mainnet=(venue == 'dydx')`.
-
-The built-in default account `dydx` is `accounts.Dydx(public=True)` (public/read-only).
+`venue` selects the network: `dydx` is mainnet, `dydx_testnet` is testnet. The built-in `dydx` account is `accounts.Dydx(public=True)`, read-only.
 
 **Either `address` or `mnemonic` must resolve to a value.** The address is required for all
 indexer reads (subaccount, positions, orders, collateral). The mnemonic is only needed for
 signing (placing/canceling orders). When both are provided, `address` is used directly;
 when only `mnemonic` is given, the address is derived from it at construction time.
+`parent_subaccount` picks the parent subaccount (see below).
 
 ## Exchange & ID conventions
 

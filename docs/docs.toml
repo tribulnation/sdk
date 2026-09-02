@@ -1,0 +1,19 @@
+# Sidebar order for the docs site. Structure still comes from the directory tree — this
+# file only orders siblings, one table per directory. `index.md` is always first; pages
+# not listed follow the listed ones, alphabetically, so a new page shows up without an
+# entry here. A directory entry is its sub-tree, ordered by its own table below.
+
+[nav]
+order = ["context.md", "lifecycle.md", "market", "earn", "wallet", "report"]
+
+[nav.market]
+order = ["methods.md", "identifiers.md", "hierarchy.md", "collateral.md", "streaming.md", "implementations"]
+
+[nav.market.implementations]
+order = ["dydx.md", "hyperliquid.md", "mexc.md"]
+
+[nav.report]
+order = ["methods.md", "implementations"]
+
+[nav.report.implementations]
+order = ["dydx.md", "ethereum.md"]

@@ -2,10 +2,9 @@
 
 > `Wallet` queries deposit/withdrawal details
 
-- `deposit_methods(assets=None)`
-- `withdrawal_methods(assets=None, networks=None)`
+Method reference: [Methods](methods.md).
 
-**Example:**
+## Example
 
 ```python
 from tribulnation.sdk import WalletSDK, accounts

@@ -15,7 +15,7 @@
 pip install tribulnation-sdk[dydx,hyperliquid,mexc]
 ```
 
-Extras select which venue packages get installed. See the [support matrix](support.md) for what's actually implemented per venue.
+Extras select which venue packages get installed. See the [support matrix](https://tribulnation.com/sdk/docs/support) for what's actually implemented per venue.
 
 ## Quick Start
 
@@ -71,13 +71,13 @@ All errors subclass `Error`: `NetworkError`, `ValidationError`, `ApiError` (`Bad
 
 ## Reference
 
-- [Market](reference/market.md) — order books, rules, orders, positions, funding
-- [Earn](reference/earn.md) — yield-bearing instruments across venues
-- [Wallet](reference/wallet.md) — deposit/withdrawal methods
-- [Report](reference/report.md) — balance/position history, with provenance
-- [Lifecycle](reference/lifecycle.md) — every SDK object is an async context manager
-- [Context, Logging & Retries](reference/context.md) — opt-in logging and retries
+- [Lifecycle](lifecycle.md) — every SDK object is an async context manager
+- [Context, Logging & Retries](context.md) — opt-in logging and retries
+- [Market](market/index.md) — order books, rules, orders, positions, funding; see also [Market Identifiers](market/identifiers.md) and [Collateral & Risk Management](market/collateral.md)
+- [Earn](earn/index.md) — yield-bearing instruments across venues
+- [Wallet](wallet/index.md) — deposit/withdrawal methods
+- [Report](report/index.md) — balance/position history, with provenance
 
 ## Support Matrix
 
-Not every venue implements every surface yet. See the [support matrix](support.md) for what's actually wired, per venue and per surface.
+Not every venue implements every surface yet. See the [support matrix](https://tribulnation.com/sdk/docs/support) for what's actually wired, per venue and per surface.

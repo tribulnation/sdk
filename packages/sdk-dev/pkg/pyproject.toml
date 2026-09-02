@@ -18,6 +18,7 @@ dependencies = [
   "pydantic",
   "pyyaml",
   "jinja2",
+  "griffe",
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}

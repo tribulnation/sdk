@@ -16,6 +16,14 @@
 # way hyperliquid's was (see `snapshot`'s own comment) — better to omit than guess.
 
 component:
+  preamble: |
+    from tribulnation.sdk import ReportSDK
+    from dotenv import load_dotenv
+
+    load_dotenv()
+
+    report = ReportSDK.load('sdk.toml')
+  ref: tribulnation.sdk.reporting.sdk:Report
   title: Report
   tagline: Historical transactions and current balances/positions, with provenance.
   # supportedVenues/defaultVenues: NOT declared here — computed by `sdk-dev docs sync`
@@ -26,8 +34,6 @@ component:
 
 methods:
   snapshot:
-    signature: "snapshot(assets?) -> SnapshotRecord"
-    description: Current balances and positions, tagged with a Provenance (api/tabular/manual/derived).
     # Hyperliquid keys balances by numeric spot-token index ('0' is USDC) but positions by
     # the plain perp coin symbol ('BTC') — two different raw id schemes on the *same*
     # venue (confirmed against packages/impl/hyperliquid/.../report/{snapshots,
@@ -43,12 +49,6 @@ methods:
           position_size: '0.5'
           position_avg_price: '58230.10'
       callTemplate: |
-        from tribulnation.sdk import ReportSDK
-        from dotenv import load_dotenv
-
-        load_dotenv()
-
-        report = ReportSDK.load('sdk.toml')
         snapshots_by_venue = {}
         for venue, sdk in report.all.items():
           async with sdk:
@@ -80,8 +80,6 @@ methods:
         {% endfor %}
 
   history:
-    signature: "history(start?, end?) -> AsyncIterable[HistoryRecord]"
-    description: Transaction history as a stream of HistoryRecords, over a window.
     # HistoryRecord only carries `observations`/`provenance` — each observation (not the
     # record) has its own `.type`/`.time` (confirmed against reporting/models/main.py and
     # reporting/models/common.py's BaseObservation).
@@ -94,12 +92,6 @@ methods:
           trade_instrument: BTC
           funding_asset: '0'
       callTemplate: |
-        from tribulnation.sdk import ReportSDK
-        from dotenv import load_dotenv
-
-        load_dotenv()
-
-        report = ReportSDK.load('sdk.toml')
         records_by_venue = {}
         for venue, sdk in report.all.items():
           async with sdk:

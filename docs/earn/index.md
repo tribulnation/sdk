@@ -2,11 +2,9 @@
 
 > `Earn` lists yield-bearing instruments across venues.
 
-- `instruments(tags=None, assets=None)` — filters match *any* given tag or asset, not all
+Method reference: [Methods](methods.md).
 
-`apr` is a fraction of 1, not a percentage (`0.01` = 1%).
-
-**Example:**
+## Example
 
 ```python
 from tribulnation.sdk import EarnSDK, accounts

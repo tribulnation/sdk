@@ -5,23 +5,11 @@
 See the [generic market interface](../index.md) for the shared method surface. This page
 covers only what is Hyperliquid-specific.
 
-## Account configuration
+## Account
 
-`accounts.Hyperliquid` (from `tribulnation.sdk`):
-
-| Field | Default | Notes |
-| --- | --- | --- |
-| `venue` | `'hyperliquid'` | `'hyperliquid'` = mainnet, `'hyperliquid_testnet'` = testnet. |
-| `address` | `'$HYPERLIQUID_ADDRESS'` | Wallet address (`0x…`). Read-only if no private key is given. |
-| `private_key` | `'$HYPERLIQUID_PRIVATE_KEY'` | Wallet private key (`0x…`), used to sign. |
-| `public` | `False` | If `True`, missing credentials are tolerated (read-only). |
-
-`$NAME` fields resolve from the environment (`accounts.Hyperliquid()` reads
-`$HYPERLIQUID_ADDRESS`/`$HYPERLIQUID_PRIVATE_KEY`). Mainnet vs testnet is driven by
-`venue`; `MarketSDK` builds the HTTP client with `mainnet=(venue == 'hyperliquid')`.
-
-The built-in default account `hyperliquid` is `accounts.Hyperliquid(public=True)`
-(public/read-only).
+`venue` selects the network: `hyperliquid` is mainnet, `hyperliquid_testnet` is testnet. An
+`address` without a `private_key` is read-only. The built-in `hyperliquid` account is
+`accounts.Hyperliquid(public=True)`, read-only.
 
 ## Exchanges & ID conventions
 

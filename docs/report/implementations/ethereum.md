@@ -1,4 +1,4 @@
-# Ethereum Reporting
+# Ethereum Report
 
 HyperEVM mainnet uses the `hyperevm` network id and chain id `999`. Its default
 history provider is Etherscan and its default snapshot provider is Alchemy. Set

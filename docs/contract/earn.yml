@@ -10,6 +10,14 @@
 # call text needs no substitution at all (no per-venue literal in it to begin with).
 
 component:
+  preamble: |
+    from tribulnation.sdk import EarnSDK
+    from dotenv import load_dotenv
+
+    load_dotenv()
+
+    earn = EarnSDK.load('sdk.toml')
+  ref: tribulnation.sdk.earn.sdk:Earn
   title: Earn
   tagline: Yield-bearing instruments across venues, filterable by tag or asset.
   # supportedVenues/defaultVenues: NOT declared here — computed by `sdk-dev docs sync`
@@ -22,8 +30,6 @@ component:
 
 methods:
   instruments:
-    signature: "instruments(tags=None, assets=None) -> Sequence[Instrument]"
-    description: List available earn instruments. Filters match *any* given tag or asset, not all. apr is a fraction of 1.
     example:
       accountVenues: [binance, mexc]
       constants:
@@ -40,12 +46,6 @@ methods:
             - {asset: USDT, apr: '0.0290'}
             - {asset: BTC, apr: '0.0071'}
       callTemplate: |
-        from tribulnation.sdk import EarnSDK
-        from dotenv import load_dotenv
-
-        load_dotenv()
-
-        earn = EarnSDK.load('sdk.toml')
         instruments_by_venue = {}
         for venue, sdk in earn.all.items():
           instruments = await sdk.instruments(tags=['flexible'])

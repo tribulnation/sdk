@@ -5,23 +5,10 @@
 See the [generic market interface](../index.md) for the shared method surface. This page
 covers only what is MEXC-specific.
 
-## Account configuration
+## Account
 
-`accounts.Mexc` (from `tribulnation.sdk`):
-
-| Field | Default | Notes |
-| --- | --- | --- |
-| `venue` | `'mexc'` | Only mainnet; no testnet. |
-| `api_key` | `'$MEXC_API_KEY'` | MEXC API key. |
-| `api_secret` | `'$MEXC_API_SECRET'` | MEXC API secret. |
-| `validate` | `True` | Type-validate incoming API responses (pydantic). |
-| `public` | `False` | If `True`, missing credentials are tolerated (read-only). |
-
-`$NAME` fields resolve from the environment (`accounts.Mexc()` reads
-`$MEXC_API_KEY`/`$MEXC_API_SECRET`). `MarketSDK` builds the client with
-`MexcMarket.new(api_key=…, api_secret=…, validate=account.validate)`.
-
-The built-in default account `mexc` is `accounts.Mexc(public=True)` (public/read-only).
+Mainnet only, no testnet. `validate` toggles pydantic validation of API responses. The
+built-in `mexc` account is `accounts.Mexc(public=True)`, read-only.
 
 ## Exchange & ID conventions
 

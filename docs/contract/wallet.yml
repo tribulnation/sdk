@@ -6,6 +6,14 @@
 # at all; only the result (a dict keyed by whichever venues were selected) is templated.
 
 component:
+  preamble: |
+    from tribulnation.sdk import WalletSDK
+    from dotenv import load_dotenv
+
+    load_dotenv()
+
+    wallet = WalletSDK.load('sdk.toml')
+  ref: tribulnation.sdk.wallet.sdk:Wallet
   title: Wallet
   tagline: Deposit and withdrawal details — networks, fees, minimums.
   # supportedVenues/defaultVenues: NOT declared here — computed by `sdk-dev docs sync`
@@ -15,8 +23,6 @@ component:
 
 methods:
   deposit_methods:
-    signature: "deposit_methods(assets=None) -> Sequence[DepositMethod]"
-    description: Deposit addresses' networks and minimum confirmations, per asset.
     # Binance's raw network field really is 'TRX'/'ETH' (confirmed against
     # packages/impl/binance/.../wallet/deposit_methods.py, which passes the venue's own
     # field straight through) — Bitget's is 'TRC20'/'ERC20' for the same chains (confirmed
@@ -35,12 +41,6 @@ methods:
             - {network: TRC20, min_confirmations: 1}
             - {network: ERC20, min_confirmations: 8}
       callTemplate: |
-        from tribulnation.sdk import WalletSDK
-        from dotenv import load_dotenv
-
-        load_dotenv()
-
-        wallet = WalletSDK.load('sdk.toml')
         methods_by_venue = {}
         for venue, sdk in wallet.all.items():
           methods_by_venue[venue] = await sdk.deposit_methods(assets=['USDT'])
@@ -70,8 +70,6 @@ methods:
         {% endfor %}
 
   withdrawal_methods:
-    signature: "withdrawal_methods(assets=None, networks=None) -> Sequence[WithdrawalMethod]"
-    description: Fees and networks available for withdrawing an asset.
     example:
       accountVenues: [binance, bitget]
       constants:
@@ -84,12 +82,6 @@ methods:
             - {network: TRC20, fee: '1.0'}
             - {network: ERC20, fee: '6.0'}
       callTemplate: |
-        from tribulnation.sdk import WalletSDK
-        from dotenv import load_dotenv
-
-        load_dotenv()
-
-        wallet = WalletSDK.load('sdk.toml')
         methods_by_venue = {}
         for venue, sdk in wallet.all.items():
           methods_by_venue[venue] = await sdk.withdrawal_methods(assets=['USDT'])

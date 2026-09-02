@@ -19,7 +19,7 @@
 pip install tribulnation-sdk[dydx,hyperliquid,mexc]
 ```
 
-Extras select which venue packages get installed. See the [support matrix](docs/support.md) for what's actually implemented per venue.
+Extras select which venue packages get installed. See the [support matrix](https://tribulnation.com/sdk/docs/support) for what's actually implemented per venue.
 
 ## Quick Start
 
@@ -75,20 +75,20 @@ All errors subclass `Error`: `NetworkError`, `ValidationError`, `ApiError` (`Bad
 
 ## Documentation
 
-- [Market](docs/reference/market.md) — order books, rules, orders, positions, funding
-- [Earn](docs/reference/earn.md) — yield-bearing instruments across venues
-- [Wallet](docs/reference/wallet.md) — deposit/withdrawal methods
-- [Report](docs/reference/report.md) — balance/position history, with provenance
-- [Lifecycle](docs/reference/lifecycle.md) — every SDK object is an async context manager
-- [Context, Logging & Retries](docs/reference/context.md) — opt-in logging and retries
-- [Support matrix](docs/support.md) — what's wired, per venue and per surface
+- [Lifecycle](docs/lifecycle.md) — every SDK object is an async context manager
+- [Context, Logging & Retries](docs/context.md) — opt-in logging and retries
+- [Market](docs/market/index.md) — order books, rules, orders, positions, funding; see also [Market Identifiers](docs/market/identifiers.md) and [Collateral & Risk Management](docs/market/collateral.md)
+- [Earn](docs/earn/index.md) — yield-bearing instruments across venues
+- [Wallet](docs/wallet/index.md) — deposit/withdrawal methods
+- [Report](docs/report/index.md) — balance/position history, with provenance
+- [Support matrix](https://tribulnation.com/sdk/docs/support) — what's wired, per venue and per surface
 
 ## Development
 
 ### Repository Layout
 
 ```
-docs/                # user-facing documentation
+docs/                # user-facing documentation (docs/contract/*.yml + docs/<surface>/methods.md feed the docs site)
 packages/
 ├── sdk/
 │   ├── pkg/         # tribulnation-sdk
@@ -100,7 +100,6 @@ packages/
     └── <venue>/
         ├── pkg/     # tribulnation-<venue>
         ├── test/    # unit tests
-        ├── docs/    # venue-specific docs
         ├── README.md
         └── LICENSE
 dev/

@@ -3,6 +3,7 @@ into a local `landing` checkout (`sync`).
 """
 
 from pathlib import Path
+from typing_extensions import NamedTuple
 import json
 import shutil
 
@@ -13,8 +14,11 @@ from typing_extensions import Annotated
 
 from sdk_dev.accounts import generate_accounts_toml
 from sdk_dev.contract import load_contract_file, render_contract_file
+from sdk_dev.nav import check_nav
+from sdk_dev.reference import METHODS_MARKER, render_methods_markdown
 from sdk_dev.schema import generate_schema
 from sdk_dev.registry import load_registry
+from sdk_dev.source import Source, SourceLookupError
 from sdk_dev.repo import (
   CONTRACT_DIR,
   DOCS_DIR,
@@ -32,12 +36,32 @@ ACCOUNTS_FILENAME = 'accounts.json'
 SCHEMA_FILENAME = 'schema.json'
 REGISTRY_FILENAME = 'registry.json'
 SUPPORT_FILENAME = 'support.json'
+GENERATION_ERRORS = (
+  pydantic.ValidationError,
+  jinja2.TemplateError,
+  SourceLookupError,
+  FileNotFoundError,
+  ValueError,
+)
 
 
-def _build_generated(root: Path) -> dict[str, dict]:
+METHODS_PAGE = 'methods.md'
+
+
+class Generated(NamedTuple):
+  """Everything `sync` writes that isn't a verbatim copy of `docs/`."""
+
+  json: dict[str, dict]
+  """`{filename: data}` for every generated JSON file."""
+  methods: dict[str, str]
+  """`{surface: markdown}` replacing the `<!-- methods -->` marker in each
+  `docs/<surface>/methods.md`."""
+
+
+def _build_generated(root: Path) -> Generated:
   """
   Validate and render every schema-governed source under `root` into the JSON payloads
-  `sync` writes out.
+  `sync` writes out, plus the methods markdown spliced into each surface page.
 
   Each `docs/contract/<stem>.yml` is rendered into `<stem>.json` — its own filename is
   never checked against a hardcoded surface list; whatever `<stem>` is, it's matched
@@ -49,29 +73,39 @@ def _build_generated(root: Path) -> dict[str, dict]:
   Args:
     root: The sdk repo root, from `repo_root()`.
 
-  Returns:
-    `{filename: data}` for every generated JSON file — accounts/schema/registry/support,
-    plus one `<stem>.json` per `docs/contract/*.yml`.
-
   Raises:
     pydantic.ValidationError: some source file doesn't match its schema.
     jinja2.TemplateError: a `call`/`result` template doesn't compile, or references a
       fact or catalogue entry that doesn't exist.
+    SourceLookupError: a contract method has no matching method in the source.
+    FileNotFoundError: a contract file has no `docs/<surface>/methods.md`, or that page
+      lacks the `<!-- methods -->` marker.
+    ValueError: `docs/docs.toml` names a page or directory that doesn't exist.
   """
   from tribulnation.catalogue import Catalogue
 
   impl_files = load_impl_files(root / IMPL_DIR)
   catalogue = Catalogue.load()
+  check_nav(root / DOCS_DIR)
+  registry = load_registry(str(root / REGISTRY_PATH))
+  venue_names = {slug: entry['name'] for slug, entry in registry.items()}
+  source = Source()
 
   generated: dict[str, dict] = {
     ACCOUNTS_FILENAME: generate_accounts_toml(),
     SCHEMA_FILENAME: generate_schema(),
-    REGISTRY_FILENAME: load_registry(str(root / REGISTRY_PATH)),
+    REGISTRY_FILENAME: registry,
     SUPPORT_FILENAME: load_support_matrix(root / IMPL_DIR),
   }
+  methods_md: dict[str, str] = {}
   for src_file in sorted((root / CONTRACT_DIR).glob('*.yml')):
     surface = src_file.stem
     contract = load_contract_file(src_file)
+    page = root / DOCS_DIR / surface / METHODS_PAGE
+    if not page.is_file():
+      raise FileNotFoundError(f'{src_file.name}: no methods page at {page}')
+    if METHODS_MARKER not in page.read_text():
+      raise FileNotFoundError(f'{page}: missing the {METHODS_MARKER} marker')
     universes = {
       name: [
         v
@@ -80,17 +114,27 @@ def _build_generated(root: Path) -> dict[str, dict]:
       ]
       for name, method in contract.methods.items()
     }
-    generated[f'{surface}.json'] = render_contract_file(
-      contract, universes=universes, catalogue=catalogue
+    source_methods = {
+      name: source.method(method.ref or contract.component.ref, name)
+      for name, method in contract.methods.items()
+    }
+    rendered = render_contract_file(
+      contract, universes=universes, catalogue=catalogue, source=source_methods
     )
-  return generated
+    generated[f'{surface}.json'] = rendered
+    methods_md[surface] = render_methods_markdown(
+      contract, rendered=rendered, source=source_methods, venue_names=venue_names
+    )
+  return Generated(generated, methods_md)
 
 
 def check():
   """
   Validate and render docs/contract/*.yml, registry.toml, and every
-  packages/impl/*/impl.toml against their schemas, without syncing anything. Exits
-  non-zero on the first schema violation or template error found.
+  packages/impl/*/impl.toml against their schemas, without syncing anything. Also checks
+  every contract method exists in the source, every surface page carries the methods
+  marker, and docs/docs.toml only names pages that exist. Exits non-zero on the first
+  problem found.
   """
   try:
     root = repo_root()
@@ -104,12 +148,12 @@ def check():
   impl_files = sorted((root / IMPL_DIR).glob('*/impl.toml'))
   try:
     _build_generated(root)
-  except (pydantic.ValidationError, jinja2.TemplateError) as e:
+  except GENERATION_ERRORS as e:
     typer.echo(f'{e}', err=True)
     raise typer.Exit(code=1)
 
   typer.echo(
-    f'OK — {len(yml_files)} contract file(s) rendered, registry.toml, '
+    f'OK — {len(yml_files)} contract file(s) rendered against the source, registry.toml, '
     f'{len(impl_files)} impl.toml file(s) all valid.'
   )
 
@@ -127,11 +171,16 @@ def sync(
   <client>/docs/**` copy) plus docs/contract/*.yml + accounts.json/schema.json/
   registry.json/support.json into a local `landing` checkout, for the /sdk docs site.
 
-  `docs/` itself (`index.md`, `quickstart.yaml`, `support.md`, `reference/**`) is copied
-  straight from disk into <landing>/content/docs/sdk/, replacing whatever was there —
-  the same plain mirror `typed-dev docs sync` does per client, so there is exactly one
-  place these pages are ever hand-edited. `docs/contract/` is excluded from that copy: it
-  gets rendered instead of copied (see below).
+  `docs/` itself (`index.md`, `lifecycle.md`, `context.md`, one folder per surface) is copied
+  straight from disk into <landing>/content/docs/sdk/, replacing whatever was there — the
+  same plain mirror `typed-dev docs sync` does per client, so there is exactly one place
+  these pages are ever hand-edited. Two exceptions: `docs/contract/` gets rendered instead
+  of copied (see below), and each `docs/<surface>/methods.md` has its
+  `<!-- methods -->` marker replaced by the method reference rendered from
+  `docs/contract/<surface>.yml` plus the source (`sdk_dev.reference`) — the repo copy keeps
+  only the marker, so nothing generated is ever committed here.
+
+  There is no support-matrix page in `docs/`: the site renders it from support.json.
 
   Every other output file is pure derived data — nothing to hand-maintain, so nothing to
   commit: everything is generated straight into
@@ -155,7 +204,7 @@ def sync(
       authored venue list (display name, icon, pypi, tier), mirroring typed-dev's own
       registry.toml/registry.json split.
     - support.json, from every packages/impl/*/impl.toml (sdk_dev.support) — which
-      venues offer a given surface at all, and which of those are credential-free
+      venues offer a given surface at all, per-venue `notes` footnotes, and which are credential-free
       (`auth: false` in `impl.toml` — a real fact about `DEFAULT_ACCOUNTS`, not derived
       from it, since a venue can have a default account that still needs real
       credentials). Feeds the wizard's sdk.toml generation (skip an entry for a venue
@@ -195,7 +244,7 @@ def sync(
 
   try:
     generated = _build_generated(root)
-  except (pydantic.ValidationError, jinja2.TemplateError) as e:
+  except GENERATION_ERRORS as e:
     typer.echo(f'{e}', err=True)
     raise typer.Exit(code=1)
 
@@ -203,16 +252,20 @@ def sync(
   if docs_dest.is_dir():
     shutil.rmtree(docs_dest)
   shutil.copytree(root / DOCS_DIR, docs_dest, ignore=shutil.ignore_patterns('contract'))
+  for surface, markdown in generated.methods.items():
+    page = docs_dest / surface / METHODS_PAGE
+    page.write_text(page.read_text().replace(METHODS_MARKER, markdown))
 
   dest_dir = landing_root / LANDING_DEST
   dest_dir.mkdir(parents=True)
 
-  for filename, data in generated.items():
+  for filename, data in generated.json.items():
     (dest_dir / filename).write_text(json.dumps(data, indent=2) + '\n')
 
   typer.echo(
-    f'Synced docs/** and {len(generated)} generated file(s) to '
-    f'{docs_dest.relative_to(landing_root)}: {", ".join(sorted(generated))}'
+    f'Synced docs/** ({len(generated.methods)} surface page(s) expanded) and '
+    f'{len(generated.json)} generated file(s) to '
+    f'{docs_dest.relative_to(landing_root)}: {", ".join(sorted(generated.json))}'
   )
   typer.echo(
     f'\nNext:\n  cd {landing_root}\n  node scripts/render-docs.mjs\n  yarn dev'
