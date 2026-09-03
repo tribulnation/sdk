@@ -1,3 +1,15 @@
+<!-- github-only -->
+<table><tr>
+<td align="center"><a href="../index.md">Docs</a></td>
+<td align="center"><b>Market</b></td>
+<td align="center"><a href="../earn/index.md">Earn</a></td>
+<td align="center"><a href="../wallet/index.md">Wallet</a></td>
+<td align="center"><a href="../report/index.md">Report</a></td>
+<td align="center"><a href="../reference/index.md">Reference</a></td>
+<td align="center"><a href="https://tribulnation.com/sdk/docs/support">Support matrix</a></td>
+</tr></table>
+<!-- /github-only -->
+
 # Collateral & Risk Management
 
 `collateral()` answers a different question from `available_notional()`: not "how much can I
@@ -55,3 +67,11 @@ The returned types (`tribulnation.sdk.market`):
 Note: `initial_ratio` reaching 1.0 does **not** mean liquidation — it means you can't open
 new positions. Between `initial_ratio = 1` and `maintenance_ratio = 1` there is a buffer
 (typically ~2x, since MMF ≈ IMF/2). `maintenance_ratio` is the actual liquidation signal.
+
+<!-- next -->
+
+---
+
+← [Methods](methods.md) · **Next:** [Streaming](streaming.md) →
+
+<!-- /next -->

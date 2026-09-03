@@ -1,3 +1,15 @@
+<!-- github-only -->
+<table><tr>
+<td align="center"><a href="../index.md">Docs</a></td>
+<td align="center"><b>Market</b></td>
+<td align="center"><a href="../earn/index.md">Earn</a></td>
+<td align="center"><a href="../wallet/index.md">Wallet</a></td>
+<td align="center"><a href="../report/index.md">Report</a></td>
+<td align="center"><a href="../reference/index.md">Reference</a></td>
+<td align="center"><a href="https://tribulnation.com/sdk/docs/support">Support matrix</a></td>
+</tr></table>
+<!-- /github-only -->
+
 # Hierarchy & Scoping
 
 The markets implementation is structured following the market IDs: `account` → `venue` → `exchange` → `market`.
@@ -68,3 +80,11 @@ await exchange.next_funding('BTCUSDT')
 market = await sdk.perp_market('mexc:perp:BTCUSDT') # raises NotImplementedError if you pass a non-perpetual market ID
 await market.next_funding()
 ```
+
+<!-- next -->
+
+---
+
+← [Market Identifiers](identifiers.md) · **Next:** [Methods](methods.md) →
+
+<!-- /next -->

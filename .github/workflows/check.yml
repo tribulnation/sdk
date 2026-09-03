@@ -74,6 +74,25 @@ jobs:
       - run: cp ${{ steps.package.outputs.path }}/../README.md ${{ steps.package.outputs.path }}/../LICENSE ${{ steps.package.outputs.path }}/
       - run: python -m build ${{ steps.package.outputs.path }}
 
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install -e packages/sdk/pkg
+      - run: pip install -e packages/sdk-dev/pkg
+
+      # Validates docs/contract/*.yml, registry.toml and every impl.toml, that every
+      # contract method still exists in the source, and that the blocks generated into
+      # docs/** are up to date. Ungated by `changes`: its inputs are the docs, the
+      # sdk source, every impl.toml and registry.toml, so almost any commit can break it.
+      - name: Check docs are in sync
+        run: sdk-dev docs check
+
   unit:
     needs: changes
     if: needs.changes.outputs.packages != '[]'

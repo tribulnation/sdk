@@ -1,3 +1,15 @@
+<!-- github-only -->
+<table><tr>
+<td align="center"><a href="../index.md">Docs</a></td>
+<td align="center"><b>Market</b></td>
+<td align="center"><a href="../earn/index.md">Earn</a></td>
+<td align="center"><a href="../wallet/index.md">Wallet</a></td>
+<td align="center"><a href="../report/index.md">Report</a></td>
+<td align="center"><a href="../reference/index.md">Reference</a></td>
+<td align="center"><a href="https://tribulnation.com/sdk/docs/support">Support matrix</a></td>
+</tr></table>
+<!-- /github-only -->
+
 # Market
 
 > [!NOTE]
@@ -17,3 +29,11 @@ book = await sdk.depth('hyperliquid::BTC')
 ```
 
 What is this `hyperliquid::BTC` string? It's a market identifier: let's see how that works next.
+
+<!-- next -->
+
+---
+
+← [Tribulnation SDK](../index.md) · **Next:** [Market Identifiers](identifiers.md) →
+
+<!-- /next -->

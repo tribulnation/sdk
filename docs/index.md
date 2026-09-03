@@ -1,3 +1,15 @@
+<!-- github-only -->
+<table><tr>
+<td align="center"><b>Docs</b></td>
+<td align="center"><a href="market/index.md">Market</a></td>
+<td align="center"><a href="earn/index.md">Earn</a></td>
+<td align="center"><a href="wallet/index.md">Wallet</a></td>
+<td align="center"><a href="report/index.md">Report</a></td>
+<td align="center"><a href="reference/index.md">Reference</a></td>
+<td align="center"><a href="https://tribulnation.com/sdk/docs/support">Support matrix</a></td>
+</tr></table>
+<!-- /github-only -->
+
 # Tribulnation SDK
 
 > One interface, every venue. Async, fully typed, decimal-precision Python for crypto trading and data.
@@ -65,3 +77,11 @@ You can read more about Market IDs and methods in the [Market](market/index.md) 
 ## Support Matrix
 
 Not every venue implements every surface yet. See the [support matrix](https://tribulnation.com/sdk/docs/support) for what's actually wired, per venue and per surface.
+
+<!-- next -->
+
+---
+
+**Next:** [Market](market/index.md) →
+
+<!-- /next -->

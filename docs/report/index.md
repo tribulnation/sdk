@@ -1,3 +1,15 @@
+<!-- github-only -->
+<table><tr>
+<td align="center"><a href="../index.md">Docs</a></td>
+<td align="center"><a href="../market/index.md">Market</a></td>
+<td align="center"><a href="../earn/index.md">Earn</a></td>
+<td align="center"><a href="../wallet/index.md">Wallet</a></td>
+<td align="center"><b>Report</b></td>
+<td align="center"><a href="../reference/index.md">Reference</a></td>
+<td align="center"><a href="https://tribulnation.com/sdk/docs/support">Support matrix</a></td>
+</tr></table>
+<!-- /github-only -->
+
 # Report
 
 > `Report` provides method to retrieve historical transactions and current balances/positions.
@@ -47,3 +59,11 @@ venue without reporting wired raises and you get nothing. Reach for
 
 Reports own network clients, so use them as async context managers. Entering one
 enters everything it owns and releases it on exit; see [Async Usage](../reference/async-usage.md).
+
+<!-- next -->
+
+---
+
+← [Wallet Methods](../wallet/methods.md) · **Next:** [Methods](methods.md) →
+
+<!-- /next -->

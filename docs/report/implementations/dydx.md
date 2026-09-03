@@ -1,3 +1,15 @@
+<!-- github-only -->
+<table><tr>
+<td align="center"><a href="../../index.md">Docs</a></td>
+<td align="center"><a href="../../market/index.md">Market</a></td>
+<td align="center"><a href="../../earn/index.md">Earn</a></td>
+<td align="center"><a href="../../wallet/index.md">Wallet</a></td>
+<td align="center"><b>Report</b></td>
+<td align="center"><a href="../../reference/index.md">Reference</a></td>
+<td align="center"><a href="https://tribulnation.com/sdk/docs/support">Support matrix</a></td>
+</tr></table>
+<!-- /github-only -->
+
 # dYdX Report
 
 ## History
@@ -55,3 +67,11 @@ withdrawals, `coin_spent`, and `coin_received`.
 When archive-node sources overlap, fetch each discovery query once and route
 transactions by event type. Deduplicate records by the stable transaction hash
 plus event index, not by the source query that found the transaction.
+
+<!-- next -->
+
+---
+
+← [Implementations](index.md) · **Next:** [Ethereum Report](ethereum.md) →
+
+<!-- /next -->

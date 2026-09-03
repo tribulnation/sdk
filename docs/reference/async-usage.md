@@ -1,3 +1,15 @@
+<!-- github-only -->
+<table><tr>
+<td align="center"><a href="../index.md">Docs</a></td>
+<td align="center"><a href="../market/index.md">Market</a></td>
+<td align="center"><a href="../earn/index.md">Earn</a></td>
+<td align="center"><a href="../wallet/index.md">Wallet</a></td>
+<td align="center"><a href="../report/index.md">Report</a></td>
+<td align="center"><b>Reference</b></td>
+<td align="center"><a href="https://tribulnation.com/sdk/docs/support">Support matrix</a></td>
+</tr></table>
+<!-- /github-only -->
+
 # Async Usage
 
 > [!NOTE]
@@ -77,3 +89,11 @@ See [Streaming](../market/streaming.md) for buffering and overflow behaviour.
   [issue #2](https://github.com/tribulnation/sdk/issues/2).
 - Writing your own SDK object, or a venue implementation? Owning resources is covered in
   [CONTRIBUTING.md](https://github.com/tribulnation/sdk/blob/main/CONTRIBUTING.md#writing-sdk-objects).
+
+<!-- next -->
+
+---
+
+← [Reference](index.md) · **Next:** [Error Handling](error-handling.md) →
+
+<!-- /next -->

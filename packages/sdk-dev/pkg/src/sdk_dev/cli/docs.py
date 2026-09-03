@@ -14,6 +14,7 @@ from typing_extensions import Annotated
 
 from sdk_dev.accounts import generate_accounts_toml
 from sdk_dev.contract import load_contract_file, render_contract_file
+from sdk_dev.github import stale_pages, write_pages
 from sdk_dev.nav import check_nav
 from sdk_dev.reference import METHODS_MARKER, render_methods_markdown
 from sdk_dev.schema import generate_schema
@@ -80,13 +81,20 @@ def _build_generated(root: Path) -> Generated:
     SourceLookupError: a contract method has no matching method in the source.
     FileNotFoundError: a contract file has no `docs/<surface>/methods.md`, or that page
       lacks the `<!-- methods -->` marker.
-    ValueError: `docs/docs.toml` names a page or directory that doesn't exist.
+    ValueError: `docs/docs.yml` names a page or directory that doesn't exist, or a
+      page's generated blocks are out of date.
   """
   from tribulnation.catalogue import Catalogue
 
   impl_files = load_impl_files(root / IMPL_DIR)
   catalogue = Catalogue.load()
   check_nav(root / DOCS_DIR)
+  stale = stale_pages(root / DOCS_DIR)
+  if stale:
+    listed = ', '.join(str(path) for path in stale)
+    raise ValueError(
+      f'stale generated block in {listed}. Run `sdk-dev docs check --fix` to rewrite them.'
+    )
   registry = load_registry(str(root / REGISTRY_PATH))
   venue_names = {slug: entry['name'] for slug, entry in registry.items()}
   source = Source()
@@ -128,13 +136,25 @@ def _build_generated(root: Path) -> Generated:
   return Generated(generated, methods_md)
 
 
-def check():
+def check(
+  fix: Annotated[
+    bool,
+    typer.Option(
+      '--fix',
+      help='Rewrite the generated blocks in docs/ instead of failing on a stale one.',
+    ),
+  ] = False,
+):
   """
   Validate and render docs/contract/*.yml, registry.toml, and every
   packages/impl/*/impl.toml against their schemas, without syncing anything. Also checks
   every contract method exists in the source, every surface page carries the methods
-  marker, and docs/docs.toml only names pages that exist. Exits non-zero on the first
-  problem found.
+  marker, docs/docs.yml only names pages that exist, and every page's generated blocks
+  are up to date. Exits non-zero on the first problem found.
+
+  Args:
+    fix: Rewrite the GitHub-only blocks in docs/ (`sdk_dev.github`) before validating,
+      instead of reporting them.
   """
   try:
     root = repo_root()
@@ -143,6 +163,10 @@ def check():
       f'{e}\nRun `sdk-dev docs check` from inside the sdk repo checkout.', err=True
     )
     raise typer.Exit(code=1)
+
+  if fix:
+    for path in write_pages(root / DOCS_DIR):
+      typer.echo(f'rewrote {DOCS_DIR}/{path}')
 
   yml_files = sorted((root / CONTRACT_DIR).glob('*.yml'))
   impl_files = sorted((root / IMPL_DIR).glob('*/impl.toml'))
@@ -171,7 +195,7 @@ def sync(
   <client>/docs/**` copy) plus docs/contract/*.yml + accounts.json/schema.json/
   registry.json/support.json into a local `landing` checkout, for the /sdk docs site.
 
-  `docs/` itself (`index.md`, `lifecycle.md`, `context.md`, one folder per surface) is copied
+  `docs/` itself (`index.md`, one folder per surface, `reference/`) is copied
   straight from disk into <landing>/content/docs/sdk/, replacing whatever was there — the
   same plain mirror `typed-dev docs sync` does per client, so there is exactly one place
   these pages are ever hand-edited. Two exceptions: `docs/contract/` gets rendered instead
@@ -179,6 +203,11 @@ def sync(
   `<!-- methods -->` marker replaced by the method reference rendered from
   `docs/contract/<surface>.yml` plus the source (`sdk_dev.reference`) — the repo copy keeps
   only the marker, so nothing generated is ever committed here.
+
+  The one thing committed here *and* generated are the GitHub-only blocks
+  (`sdk_dev.github`): each page's `<!-- next -->` footer, and the pointer to this site
+  left where `<!-- methods -->` expands. They're copied over like any other prose and
+  dropped by the site's renderer, which has both already.
 
   There is no support-matrix page in `docs/`: the site renders it from support.json.
 

@@ -1,3 +1,15 @@
+<!-- github-only -->
+<table><tr>
+<td align="center"><a href="../index.md">Docs</a></td>
+<td align="center"><b>Market</b></td>
+<td align="center"><a href="../earn/index.md">Earn</a></td>
+<td align="center"><a href="../wallet/index.md">Wallet</a></td>
+<td align="center"><a href="../report/index.md">Report</a></td>
+<td align="center"><a href="../reference/index.md">Reference</a></td>
+<td align="center"><a href="https://tribulnation.com/sdk/docs/support">Support matrix</a></td>
+</tr></table>
+<!-- /github-only -->
+
 # Methods
 
 Every method below is defined on `Market`; the perpetual-only group needs a `PerpMarket`.
@@ -10,6 +22,12 @@ from tribulnation.sdk import MarketSDK
 sdk = MarketSDK.load('sdk.toml')
 ```
 
+<!-- github-only -->
+
+> The method reference is generated from the source, so it only appears on the docs
+> site: [tribulnation.com/sdk/docs/market/methods](https://tribulnation.com/sdk/docs/market/methods).
+
+<!-- /github-only -->
 <!-- methods -->
 
 ## Orders
@@ -62,3 +80,11 @@ Returned types live under `tribulnation.sdk.market`:
   sampled series, and storing them would freeze the venue's windowing choices.
 - **`PerpStats`** — `index` (required) plus optional `mark`, `funding` (predicted rate for
   the next settlement), `next_funding_time`, `funding_interval`, `open_interest`.
+
+<!-- next -->
+
+---
+
+← [Hierarchy & Scoping](hierarchy.md) · **Next:** [Collateral & Risk Management](collateral.md) →
+
+<!-- /next -->

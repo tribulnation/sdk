@@ -1,3 +1,15 @@
+<!-- github-only -->
+<table><tr>
+<td align="center"><a href="../index.md">Docs</a></td>
+<td align="center"><b>Market</b></td>
+<td align="center"><a href="../earn/index.md">Earn</a></td>
+<td align="center"><a href="../wallet/index.md">Wallet</a></td>
+<td align="center"><a href="../report/index.md">Report</a></td>
+<td align="center"><a href="../reference/index.md">Reference</a></td>
+<td align="center"><a href="https://tribulnation.com/sdk/docs/support">Support matrix</a></td>
+</tr></table>
+<!-- /github-only -->
+
 # Market Identifiers
 
 A market is addressed by a colon-delimited string, parsed left-to-right, one segment per
@@ -37,3 +49,11 @@ Then the following are valid market identifiers:
 See the [venue-specific guidance](implementations/index.md) for full details.
 
 Shorter forms work once you have scoped down on a venue: let's see this next.
+
+<!-- next -->
+
+---
+
+← [Market](index.md) · **Next:** [Hierarchy & Scoping](hierarchy.md) →
+
+<!-- /next -->
