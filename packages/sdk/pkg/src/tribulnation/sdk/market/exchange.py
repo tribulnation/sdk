@@ -1,7 +1,7 @@
 from typing_extensions import (
   Any,
   AsyncIterable,
-  AsyncIterator,
+  AsyncGenerator,
   Collection,
   Mapping,
   Sequence,
@@ -86,7 +86,7 @@ class Exchange(SDK):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
-  ) -> AsyncIterator[AsyncIterable[Book]]:
+  ) -> AsyncGenerator[AsyncIterable[Book]]:
     """Subscribe to the market order book.
 
     See `Market.depth_stream` for `queue_size`/`overflow` (e.g. `overflow='fail'`
@@ -154,7 +154,7 @@ class Exchange(SDK):
     *,
     queue_size: int = 1000,
     overflow: OverflowPolicy = 'fail',
-  ) -> AsyncIterator[AsyncIterable[Trade]]:
+  ) -> AsyncGenerator[AsyncIterable[Trade]]:
     """Subscribe to your real-time trades.
 
     See `Market.trades_stream` for `queue_size`/`overflow`.
