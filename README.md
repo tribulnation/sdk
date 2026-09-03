@@ -48,79 +48,22 @@ async with sdk.trades_stream('mexc_account1:spot:BTCUSDT') as my_trades:
     })
 ```
 
-Or construct in code: `MarketSDK({'mexc_account1': accounts.Mexc()})`. Each `accounts.<Venue>()` field defaults to `$VENUE_FIELD`, e.g. `accounts.Mexc()` reads `$MEXC_API_KEY` and `$MEXC_API_SECRET`.
-
-## Market IDs & Scoping
-
-`<account_id>:<exchange_id>:<market_id>`, e.g. `mexc_account1:spot:BTCUSDT`. `account_id` is the key you registered in `accounts` (not necessarily the venue's own name), so you can run several accounts on one venue side by side. Equivalent ways to reach a market:
-
-```python
-await sdk.depth('mexc_account1:spot:BTCUSDT')
-
-venue = await sdk.venue('mexc_account1')
-await venue.depth('spot:BTCUSDT')
-
-exchange = await venue.exchange('spot')
-await exchange.depth('BTCUSDT')
-
-market = await exchange.market('BTCUSDT')
-await market.depth()
-```
-
-Hold a `Market` reference in hot loops; use the scoped one-shot calls otherwise.
-
-## Error Handling
-
-All errors subclass `Error`: `NetworkError`, `ValidationError`, `ApiError` (`BadRequest`, `AuthError`, `RateLimited`), `LogicError`.
+You can read more about Market IDs and methods in the [Market](docs/market/index.md) section.
 
 ## Documentation
 
-- [Lifecycle](docs/lifecycle.md) — every SDK object is an async context manager
-- [Context, Logging & Retries](docs/context.md) — opt-in logging and retries
-- [Market](docs/market/index.md) — order books, rules, orders, positions, funding; see also [Market Identifiers](docs/market/identifiers.md) and [Collateral & Risk Management](docs/market/collateral.md)
+- [Market](docs/market/index.md) — order books, rules, orders, positions, funding
 - [Earn](docs/earn/index.md) — yield-bearing instruments across venues
 - [Wallet](docs/wallet/index.md) — deposit/withdrawal methods
 - [Report](docs/report/index.md) — balance/position history, with provenance
+- [Async Usage](docs/reference/async-usage.md) — one-shot calls and `async with`
+- [Error Handling](docs/reference/error-handling.md) — the `Error` hierarchy, shared across venues
+- [Context, Logging & Retries](docs/reference/context.md) — opt-in logging and retries
 - [Support matrix](https://tribulnation.com/sdk/docs/support) — what's wired, per venue and per surface
 
-## Development
+## Contributing
 
-### Repository Layout
-
-```
-docs/                # user-facing documentation (docs/contract/*.yml + docs/<surface>/methods.md feed the docs site)
-packages/
-├── sdk/
-│   ├── pkg/         # tribulnation-sdk
-│   ├── test/        # SDK unit and regression tests
-│   ├── README.md
-│   └── LICENSE
-├── sdk-dev/         # internal sdk-dev CLI
-└── impl/            # exchange-specific implementations
-    └── <venue>/
-        ├── pkg/     # tribulnation-<venue>
-        ├── test/    # unit tests
-        ├── README.md
-        └── LICENSE
-dev/
-  adr/               # Architecture Decision Records
-  TODO.md            # short-term task tracker
-registry.toml        # implementation registry (support matrix, development stage)
-```
-
-### Commands
-
-- Linting: `ruff check` (reads `ruff.toml`)
-- Formatting: `ruff format` (reads `ruff.toml`)
-- Type Checking: `pyright` (reads `pyrightconfig.json`)
-- Unit Testing: `pytest`
-- Integration Testing: `sdk-dev test <venue>` (reads `sdk.test.toml` for credentials to use)
-- Status: `sdk-dev status` (lists all supported venues and their current development stage)
-- Release: `sdk-dev release <venue>` (creates a PR on `release/<venue>` with git tag)
-
-### CI/CD
-
-- Deploying to PyPI: open a PR on a `release/sdk` or `release/<venue>` branch. This will create a git tag and the package will be published automatically on merge. Prefer using `sdk-dev release <venue>` to do this automatically.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the repository layout, commands, and release flow.
 
 ## License
 

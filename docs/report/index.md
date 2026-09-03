@@ -46,4 +46,4 @@ venue without reporting wired raises and you get nothing. Reach for
 [support matrix](https://tribulnation.com/sdk/docs/support) for which venues are wired.
 
 Reports own network clients, so use them as async context managers. Entering one
-enters everything it owns and releases it on exit; see [Lifecycle](../lifecycle.md).
+enters everything it owns and releases it on exit; see [Async Usage](../reference/async-usage.md).

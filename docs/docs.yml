@@ -2,23 +2,30 @@
 # only orders siblings. `index.md` is always first; anything not listed follows the
 # listed entries, alphabetically. A directory is a bare entry when its own contents
 # need no ordering, or a key with its own list when they do.
+#
+# This is also the reading order behind every page's next/previous footer, so after
+# changing anything here run `sdk-dev docs check --fix` to rewrite them.
 
-- context.md
-- lifecycle.md
 - market:
-    - methods.md
     - identifiers.md
     - hierarchy.md
+    - methods.md
     - collateral.md
     - streaming.md
     - implementations:
         - dydx.md
         - hyperliquid.md
         - mexc.md
-- earn
-- wallet
+- earn:
+    - methods.md
+- wallet:
+    - methods.md
 - report:
     - methods.md
     - implementations:
         - dydx.md
         - ethereum.md
+- reference:
+    - async-usage.md
+    - error-handling.md
+    - context.md

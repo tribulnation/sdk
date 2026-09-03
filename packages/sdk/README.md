@@ -117,7 +117,7 @@ Same account-mapping shape as `MarketSDK`:
 - `EarnSDK`: yield instruments — [docs/earn.md](docs/earn.md)
 - `ReportSDK`: balance/position history, with provenance — [docs/report.md](docs/report.md)
 
-Every SDK object is an async context manager; declare what you own with `resources()`, never `__aenter__`. Details: [docs/lifecycle.md](docs/lifecycle.md).
+Every SDK object is an async context manager: call methods on it directly, or enter it with `async with` to close its connections at a point you choose. Details: [Async Usage](https://github.com/tribulnation/sdk/blob/main/docs/reference/async-usage.md).
 
 ## Error Handling
 
@@ -137,47 +137,7 @@ with ctx.use():
   )
 ```
 
-Retries back off exponentially and only wrap plain async calls, not streams or paginated history. Nested SDK calls each re-apply the active context, so retries can compound across scoping layers. Details: [docs/context.md](docs/context.md).
-
-## Internal Docs
-
-### Repository Layout
-
-```
-docs/                # user-facing documentation
-packages/
-├── sdk/
-│   ├── pkg/         # tribulnation-sdk
-│   ├── test/        # SDK unit and regression tests
-│   ├── README.md
-│   └── LICENSE
-├── sdk-dev/         # internal sdk-dev CLI
-└── impl/            # exchange-specific implementations/
-    └── <venue>/
-        ├── pkg/     # tribulnation-<venue>
-        ├── test/    # unit tests
-        ├── docs/    # venue-specific docs
-        ├── README.md
-        └── LICENSE
-dev/
-  adr/               # Architecture Decision Records
-  TODO.md            # short-term task tracker
-registry.toml        # implementation registry (support matrix, development stage)
-```
-
-### Commands
-
-- Linting: `ruff check` (reads `ruff.toml`)
-- Formatting: `ruff format` (reads `ruff.toml`)
-- Type Checking: `pyright` (reads `pyrightconfig.json`)
-- Unit Testing: `pytest`
-- Integration Testing: `sdk-dev test <venue>` (reads `sdk.test.toml` for credentials to use)
-- Status: `sdk-dev status` (lists all supported venues and their current development stage)
-- Release: `sdk-dev release <venue>` (creates a PR on `release/<venue>` with git tag)
-
-### CI/CD
-
-- Deploying to PyPI: open a PR on a `release/sdk` or `release/<venue>` branch. This will create a git tag and the package will be published automatically on merge. Prefer using `sdk-dev release <venue>` to do this automatically.
+Retries back off exponentially and only wrap plain async calls, not streams or paginated history. Nested SDK calls each re-apply the active context, so retries can compound across scoping layers. Details: [Context, Logging & Retries](https://github.com/tribulnation/sdk/blob/main/docs/reference/context.md).
 
 ## License
 

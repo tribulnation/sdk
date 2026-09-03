@@ -30,6 +30,8 @@ api_secret = "$MEXC_API_SECRET"
 
 `$VAR` values resolve from the environment, and a missing one fails at load time rather than on first use. Public venues (`dydx`, `hyperliquid`, `mexc`) work without an entry.
 
+Or construct in code: `MarketSDK({'mexc_account1': accounts.Mexc()})` — each `accounts.<Venue>()` field defaults to `$VENUE_FIELD`, e.g. `accounts.Mexc()` reads `$MEXC_API_KEY` and `$MEXC_API_SECRET`.
+
 **2. Trade**:
 
 ```python
@@ -44,39 +46,21 @@ async with sdk.trades_stream('mexc_account1:spot:BTCUSDT') as my_trades:
     })
 ```
 
-Or construct in code: `MarketSDK({'mexc_account1': accounts.Mexc()})`. Each `accounts.<Venue>()` field defaults to `$VENUE_FIELD`, e.g. `accounts.Mexc()` reads `$MEXC_API_KEY` and `$MEXC_API_SECRET`.
+You can read more about Market IDs and methods in the [Market](market/index.md) section.
 
-## Market IDs & Scoping
 
-`<account_id>:<exchange_id>:<market_id>`, e.g. `mexc_account1:spot:BTCUSDT`. `account_id` is the key you registered in `accounts` (not necessarily the venue's own name), so you can run several accounts on one venue side by side. Equivalent ways to reach a market:
+## Surfaces
 
-```python
-await sdk.depth('mexc_account1:spot:BTCUSDT')
-
-venue = await sdk.venue('mexc_account1')
-await venue.depth('spot:BTCUSDT')
-
-exchange = await venue.exchange('spot')
-await exchange.depth('BTCUSDT')
-
-market = await exchange.market('BTCUSDT')
-await market.depth()
-```
-
-Hold a `Market` reference in hot loops; use the scoped one-shot calls otherwise.
-
-## Error Handling
-
-All errors subclass `Error`: `NetworkError`, `ValidationError`, `ApiError` (`BadRequest`, `AuthError`, `RateLimited`), `LogicError`.
+- [Market](market/index.md): trading and market data
+- [Earn](earn/index.md): yield-bearing instruments
+- [Wallet](wallet/index.md): deposit/withdrawal methods
+- [Report](report/index.md): current balances and historical transactions
 
 ## Reference
 
-- [Lifecycle](lifecycle.md) — every SDK object is an async context manager
-- [Context, Logging & Retries](context.md) — opt-in logging and retries
-- [Market](market/index.md) — order books, rules, orders, positions, funding; see also [Market Identifiers](market/identifiers.md) and [Collateral & Risk Management](market/collateral.md)
-- [Earn](earn/index.md) — yield-bearing instruments across venues
-- [Wallet](wallet/index.md) — deposit/withdrawal methods
-- [Report](report/index.md) — balance/position history, with provenance
+- [Async Usage](reference/async-usage.md): one-shot calls and `async with`
+- [Error Handling](reference/error-handling.md): the `Error` hierarchy, shared across venues
+- [Context, Logging & Retries](reference/context.md): opt-in logging and retries
 
 ## Support Matrix
 
