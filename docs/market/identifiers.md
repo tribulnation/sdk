@@ -1,42 +1,39 @@
 # Market Identifiers
 
-IDs are colon-delimited and parsed left-to-right, one segment per scoping layer:
+A market is addressed by a colon-delimited string, parsed left-to-right, one segment per
+scoping level:
 
-| Called on | ID shape |
-| --- | --- |
-| `TradingMarkets` (`MarketSDK`) | `<account_id>:<exchange_id>:<market_id>` |
-| `TradingVenue` | `<exchange_id>:<market_id>` |
-| `Exchange` / `PerpExchange` | `<market_id>` |
-
-- **`account_id`** is the *key you registered in `accounts`* — not the venue's own name.
-  Register `accounts.Dydx()` under `'dydx-1'` and the account ID is `dydx-1`. This lets you
-  run several accounts on one venue side by side. The three built-in public accounts
-  (`dydx`, `hyperliquid`, `mexc`) are always present unless you override those keys.
-- **`exchange_id`** selects the market type on the venue: `perp` on dYdX, `spot` on MEXC,
-  `spot` or a perp DEX name (empty string = the default perp DEX) on Hyperliquid.
-- **`market_id`** is the venue-native instrument identifier and may itself contain colons
-  (dYdX subaccount suffix, Hyperliquid spot index). Only the first two colons are
-  significant to `TradingMarkets`; the rest is handed to the exchange verbatim
-  (`id.split(':', 2)`).
-
-Examples: `mexc_account1:spot:BTCUSDT`, `dydx:perp:BTC-USD`, `hyperliquid:spot:BTC/USDC:0`.
-
-Equivalent ways to reach the same market:
-
-```python
-await sdk.depth('mexc_account1:spot:BTCUSDT')
-
-venue = await sdk.venue('mexc_account1')
-await venue.depth('spot:BTCUSDT')
-
-exchange = await venue.exchange('spot')
-await exchange.depth('BTCUSDT')
-
-market = await exchange.market('BTCUSDT')
-await market.depth()
+```
+<account_id>:<exchange_id>:<market_id>
+     |             |            |
+     |             |            +-- the venue-native instrument identifier, e.g. `BTCUSDT`
+     |             |
+     |             +-- the product category within the venue, e.g. `spot`, `perp`, `usdm`, etc.
+     |
+     +-- the account key you registered in `accounts`, e.g. `dydx-1`, `mexc_account1`
 ```
 
-Hold a `Market` reference in hot loops; use the scoped one-shot calls otherwise.
+For example, say you have this `sdk.toml`:
 
-Note: a `Market` object's own `id` property is `f'{venue_id}:{exchange_id}:{market_id}'` and
-uses the *venue's* canonical name (e.g. `dydx`), not the account key you looked it up by.
+```toml
+[accounts.mexc_account1]
+venue = "mexc"
+
+[accounts.hl]
+venue = "hyperliquid"
+
+[accounts.binance] # already exists by default
+venue = "binance"
+```
+
+Then the following are valid market identifiers:
+
+- `hl:spot:HYPE/USDC:107`: a spot market on Hyperliquid
+- `hl::BTC-USD`: a perpetual market on Hyperliquid's default DEX (`''`)
+- `hl:xyz:xyz:CL`: a perpetual market on Hyperliquid's `xyz` DEX
+- `mexc_account1:spot:BTCUSDT`: a spot market on MEXC (with a custom account name `mexc_account1`)
+- `binance:usdm:ETHUSDC`: a USD-M perpetual market on Binance
+
+See the [venue-specific guidance](implementations/index.md) for full details.
+
+Shorter forms work once you have scoped down on a venue: let's see this next.

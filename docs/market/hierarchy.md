@@ -1,43 +1,70 @@
 # Hierarchy & Scoping
 
-Every call ultimately runs against a `Market`. The other classes just narrow an ID one
-segment at a time and delegate:
+The markets implementation is structured following the market IDs: `account` → `venue` → `exchange` → `market`.
 
+| Level | Instantiation | Example |
+| --- | --- | --- |
+| Top-level | `sdk = MarketSDK()` | `sdk.depth('mexc:spot:BTCUSDT')` |
+| Venue | `venue = await sdk.venue('mexc')` | `venue.depth('spot:BTCUSDT')` |
+| Exchange | `exchange = await sdk.exchange('mexc:spot')` | `exchange.depth('BTCUSDT')` |
+| Market | `market = await exchange.market('mexc:spot:BTCUSDT')` | `market.depth()` |
+
+## Examples
+
+**Top-level**: For example, if you're working across multiple venues, you'd likely work at the top level:
+
+```python
+sdk = MarketSDK()
+
+mexc_book, binance_book = await asyncio.gather(
+  sdk.depth('mexc:spot:BTCUSDT'),
+  sdk.depth('binance:usdm:BTCUSDT'),
+)
+if mexc_book.best_bid.price > binance_book.best_ask.price:
+  print('Arbitrage opportunity!')
 ```
-TradingMarkets   (MarketSDK)        keyed by your account IDs
-  └─ TradingVenue                   one account on one venue
-       └─ Exchange / PerpExchange   one market type (spot/perp) on that venue
-            └─ Market / PerpMarket   one instrument
+
+**Exchange**: If you're managing collateral within a same exchange, you'll want to scope to the exchange level:
+
+```python
+exchange = await sdk.perp_exchange('mexc:perp')
+collateral = await exchange.collateral()
+if collateral.maintenance_margin > 0.5*collateral.equity:
+  print('You are near liquidation!')
 ```
 
-- `TradingMarkets` — the top-level collection you construct (`MarketSDK`). Maps your
-  configured account IDs to venues.
-- `TradingVenue` — a single configured account on a single venue. Exposes `exchange()`,
-  `perp_exchange()`, `exchanges()`.
-- `Exchange` / `PerpExchange` — a market *type* on a venue (e.g. dYdX `perp`, MEXC `spot`).
-  Exposes `market()`, `markets()`. `PerpExchange` additionally yields `PerpMarket`s.
-- `Market` / `PerpMarket` — a single instrument. This is where the real work happens; all
-  the query/trade methods are defined here, and everything above forwards to them.
+**Market**: If instead you're doing many operations on a single venue, you may scope down instead:
 
-`Exchange`, `TradingVenue`, and `TradingMarkets` each re-expose the full `Market` method
-surface (`depth`, `place_order`, …) with a leading `market_id` argument, so you can make
-one-shot scoped calls without holding a `Market`. They are pure convenience wrappers: each
-resolves the market and calls the identical method on it.
+```python
+market = await sdk.market('mexc:spot:BTCUSDT')
+rules, book = await asyncio.gather(
+  market.rules(),
+  market.depth(),
+)
+```
 
-`collateral()` / `perp_collateral()` are special: they support **both** exchange-level (no
-market) and market-level calls via optional `market_id`. See
-[Collateral & account risk](collateral.md).
+## Perpetuals
 
-## Resolving IDs
+Perpetual markets are scope similarly, just use different methods:
 
-- `TradingMarkets.venue(account_id)` → `TradingVenue`
-- `TradingMarkets.exchange('<account_id>:<exchange_id>')` → `Exchange`
-- `TradingMarkets.perp_exchange('<account_id>:<exchange_id>')` → `PerpExchange`
-- `TradingMarkets.market('<account_id>:<exchange_id>:<market_id>')` → `Market`
-- `TradingMarkets.perp_market(...)` / `TradingVenue.perp_market(...)` → `PerpMarket`
-- `TradingMarkets.venues()` → the list of configured account IDs (built-ins included)
-- `TradingVenue.exchanges()` → `[{'id': ..., 'type': 'spot' | 'perp'}, ...]`
-- `Exchange.markets()` → list of available `market_id`s
+**Top/Venue level**:
 
-Venues without perpetual support raise `NotImplementedError` from `perp_exchange()` (and
-therefore from `perp_market`, `index`, `next_funding`, `funding_*`, `perp_position`).
+```python
+await sdk.next_funding('mexc:perp:BTCUSDT') # raises NotImplementedError if the market isn't a perpetual
+venue = await sdk.venue('mexc')
+await venue.next_funding('perp:BTCUSDT') # raises NotImplementedError if the market isn't a perpetual
+```
+
+**Exchange**:
+
+```python
+exchange = await sdk.perp_exchange('mexc:perp') # raises NotImplementedError if you pass a non-perpetual exchange ID
+await exchange.next_funding('BTCUSDT')
+```
+
+**Market**:
+
+```python
+market = await sdk.perp_market('mexc:perp:BTCUSDT') # raises NotImplementedError if you pass a non-perpetual market ID
+await market.next_funding()
+```
