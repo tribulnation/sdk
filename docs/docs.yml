@@ -1,0 +1,24 @@
+# Sidebar order for the docs site. Structure comes from the directory tree; this file
+# only orders siblings. `index.md` is always first; anything not listed follows the
+# listed entries, alphabetically. A directory is a bare entry when its own contents
+# need no ordering, or a key with its own list when they do.
+
+- context.md
+- lifecycle.md
+- market:
+    - methods.md
+    - identifiers.md
+    - hierarchy.md
+    - collateral.md
+    - streaming.md
+    - implementations:
+        - dydx.md
+        - hyperliquid.md
+        - mexc.md
+- earn
+- wallet
+- report:
+    - methods.md
+    - implementations:
+        - dydx.md
+        - ethereum.md

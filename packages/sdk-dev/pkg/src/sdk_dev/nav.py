@@ -1,72 +1,104 @@
-"""Validates `docs/docs.toml`, the sidebar-order file the docs site reads: one `[nav...]`
-table per directory, each with an `order` list of sibling files and directories. The
-site tolerates nothing missing, so a stale entry is caught here before a sync.
+"""Reads `docs/docs.yml`, the sidebar order the docs site renders: a tree of entries
+mirroring `docs/` itself, one entry per page or directory. `check_nav` validates it —
+the site tolerates nothing missing, so a stale entry is caught here before a sync — and
+`reading_order` flattens it into the page sequence behind the prev/next footers
+(`sdk_dev.footers`).
+
+The file only orders siblings; the structure is still the directory tree. `index.md`
+comes first in its directory, then the entries listed here in order, then whatever
+wasn't listed, alphabetically. So a new page needs an entry only to sit somewhere other
+than the end.
 """
 
 from pathlib import Path
-import tomllib
 
-import pydantic
+import yaml
 
-NAV_FILENAME = 'docs.toml'
-
-
-class NavTable(pydantic.BaseModel):
-  """One directory's entry: which siblings come first, in what order."""
-
-  model_config = pydantic.ConfigDict(extra='forbid')
-
-  title: str | None = None
-  """Sidebar label for this directory; defaults to its name, title-cased."""
-  order: list[str] = []
-  """Sibling files (`foo.md`) and directories (`foo`) in display order. `index.md` is
-  implicit and always first."""
+NAV_FILENAME = 'docs.yml'
 
 
 def check_nav(docs_dir: Path) -> int:
   """
-  Validate `docs_dir/docs.toml` against the directory tree.
+  Validate `docs_dir/docs.yml` against the directory tree.
 
   Args:
     docs_dir: The sdk repo's `docs/` directory.
 
   Returns:
-    The number of directory tables validated.
+    The number of pages it orders.
 
   Raises:
-    ValueError: a table names a directory or entry that doesn't exist, an entry is
-      listed twice, or a table has a key other than `title`/`order`.
+    ValueError: the file isn't a tree of entries, an entry names something that doesn't
+      exist, an entry is listed twice, or `index.md` is listed explicitly.
+  """
+  return len(reading_order(docs_dir))
+
+
+def reading_order(docs_dir: Path) -> list[Path]:
+  """
+  Every page under `docs_dir`, in the order the docs site lists them in its sidebar.
+
+  Mirrors the landing's own tree walk (`scripts/render-docs.mjs`, `readTree` +
+  `discoverPages`) — the site's page sequence is the one readers see, so it's the one
+  the footers have to agree with. Directories holding no markdown at all (`contract/`,
+  which is rendered rather than copied) drop out, exactly as they do there.
+
+  Args:
+    docs_dir: The sdk repo's `docs/` directory.
+
+  Returns:
+    Page paths relative to `docs_dir`.
   """
   path = docs_dir / NAV_FILENAME
-  if not path.is_file():
-    return 0
-  with open(path, 'rb') as f:
-    raw = tomllib.load(f)
-  nav = raw.get('nav')
-  if not isinstance(nav, dict) or set(raw) != {'nav'}:
-    raise ValueError(f'{path}: expected a single top-level [nav] table')
-  return _check_table(path, nav, docs_dir, 'nav')
+  entries = []
+  if path.is_file():
+    entries = yaml.safe_load(path.read_text()) or []
+    if not isinstance(entries, list):
+      raise ValueError(f'{path}: expected a list of entries at the top level')
+  return _walk(docs_dir, entries, Path('.'))
 
 
-def _check_table(path: Path, raw: dict, directory: Path, key: str) -> int:
-  """Validate one directory's table and recurse into its sub-directory tables."""
-  own = {k: v for k, v in raw.items() if not isinstance(v, dict)}
-  try:
-    table = NavTable.model_validate(own)
-  except pydantic.ValidationError as e:
-    raise ValueError(f'{path}: [{key}]: {e}') from e
-  if len(set(table.order)) != len(table.order):
-    raise ValueError(f'{path}: [{key}]: duplicate entry in `order`')
-  for entry in table.order:
-    if entry == 'index.md':
-      raise ValueError(f'{path}: [{key}]: `index.md` is implicit, leave it out')
-    target = directory / entry
-    if not (target.is_file() if entry.endswith('.md') else target.is_dir()):
-      raise ValueError(f'{path}: [{key}]: {entry!r} does not exist in {directory}')
-  count = 1
-  for name, sub in raw.items():
-    if isinstance(sub, dict):
-      if not (directory / name).is_dir():
-        raise ValueError(f'{path}: [{key}.{name}]: no such directory in {directory}')
-      count += _check_table(path, sub, directory / name, f'{key}.{name}')
-  return count
+def _walk(directory: Path, entries: list, prefix: Path) -> list[Path]:
+  """One directory's pages in sidebar order, each sub-directory's inlined where listed."""
+  listed = _listed(directory, entries, prefix)
+  contents = sorted(directory.iterdir(), key=lambda entry: entry.name)
+  files = [e.name for e in contents if e.is_file() and e.suffix == '.md']
+  names = list(listed)
+  names += [name for name in files if name != 'index.md' and name not in listed]
+  names += [e.name for e in contents if e.is_dir() and e.name not in listed]
+  found = [prefix / 'index.md'] if 'index.md' in files else []
+  for name in names:
+    if name.endswith('.md'):
+      found.append(prefix / name)
+    else:
+      found += _walk(directory / name, listed.get(name, []), prefix / name)
+  return found
+
+
+def _listed(directory: Path, entries: list, prefix: Path) -> dict[str, list]:
+  """One directory's entries, validated: `{name: its own entries}`, in listed order."""
+  where = f'{NAV_FILENAME}: {prefix}' if str(prefix) != '.' else NAV_FILENAME
+  listed: dict[str, list] = {}
+  for entry in entries:
+    if isinstance(entry, str):
+      name, own = entry, []
+    elif isinstance(entry, dict) and len(entry) == 1:
+      ((name, own),) = entry.items()
+      own = own or []
+      if not isinstance(name, str) or not isinstance(own, list):
+        raise ValueError(
+          f'{where}: {entry!r} should be `<directory>:` with its own list'
+        )
+    else:
+      raise ValueError(
+        f'{where}: expected a page name or `<directory>:` with its own list, got {entry!r}'
+      )
+    if name == 'index.md':
+      raise ValueError(f'{where}: `index.md` is implicit, leave it out')
+    if name in listed:
+      raise ValueError(f'{where}: {name!r} is listed twice')
+    target = directory / name
+    if not (target.is_file() if name.endswith('.md') else target.is_dir()):
+      raise ValueError(f'{where}: {name!r} does not exist')
+    listed[name] = own
+  return listed
