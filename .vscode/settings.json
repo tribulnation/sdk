@@ -10,7 +10,6 @@
     "**/.pytest_cache": true,
     "**/.venv": true,
     "CLAUDE.md": true,
-    "pyrightconfig.json": true,
     "LICENSE": true,
   }
 }
