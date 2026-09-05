@@ -1,4 +1,5 @@
 from typing_extensions import (
+  Any,
   AsyncIterable,
   AsyncIterator,
   AsyncGenerator,
@@ -159,20 +160,22 @@ class Subscription(Generic[T]):
   @dataclass
   class Context(Generic[U]):
     iterator: AsyncIterator[U]
-    unsubscribe: Callable[[], Awaitable]
+    unsubscribe: Callable[[], Awaitable[Any]]
 
   subscribe_stream: Callable[[], Awaitable[Context[T]]]
 
   lock: asyncio.Lock = field(init=False, default_factory=asyncio.Lock)
   ctx: Context[T] | None = field(init=False, default=None)
   pump: 'asyncio.Task[None] | None' = field(init=False, default=None)
-  subscribers: list[StreamInbox[T]] = field(init=False, default_factory=list)
+  subscribers: list[StreamInbox[T]] = field(
+    init=False, default_factory=list['StreamInbox[T]']
+  )
 
   @classmethod
   def of(
     cls,
     subscribe: Callable[
-      [], Awaitable[tuple[AsyncIterable[T], Callable[[], Awaitable]]]
+      [], Awaitable[tuple[AsyncIterable[T], Callable[[], Awaitable[Any]]]]
     ],
   ) -> 'Subscription[T]':
     """Build a `Subscription` from a callback returning `(iterable, unsubscribe)`."""
@@ -246,7 +249,7 @@ class Subscription(Generic[T]):
       `overflow` policy kicks in.
     - `overflow`: what happens when the buffer is full (see `OverflowPolicy`).
     """
-    inbox: StreamInbox[T] = StreamInbox.new(queue_size, overflow)
+    inbox = StreamInbox[T].new(queue_size, overflow)
     self.subscribers.append(inbox)
     await self.start()
 

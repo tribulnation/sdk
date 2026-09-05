@@ -21,9 +21,9 @@ class Book:
     def __format__(self, fmt: str) -> str:
       return f'[{self.price:{fmt}}] {self.qty:{fmt}} (${self.notional:{fmt}})'
 
-  bids: list[Entry] = field(default_factory=list)
+  bids: list[Entry] = field(default_factory=list[Entry])
   """Bids, sorted by price descending (best bid first)."""
-  asks: list[Entry] = field(default_factory=list)
+  asks: list[Entry] = field(default_factory=list[Entry])
   """Asks, sorted by price ascending (best ask first)."""
 
   def __post_init__(self):

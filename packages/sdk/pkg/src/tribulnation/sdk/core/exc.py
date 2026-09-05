@@ -1,9 +1,9 @@
-from typing_extensions import Callable, TypeVar
+from typing_extensions import Any, Callable, Generator, TypeVar
 from functools import wraps
 import inspect
 import typed_core
 
-Fn = TypeVar('Fn')
+Fn = TypeVar('Fn', bound=Callable[..., Any])
 
 
 class Error(Exception):
@@ -104,7 +104,7 @@ def exception_wrapper(
     if inspect.iscoroutinefunction(fn):
 
       @wraps(fn)
-      async def awrapper(*args, **kwargs):
+      async def awrapper(*args: Any, **kwargs: Any):
         try:
           return await fn(*args, **kwargs)
         except Exception as e:
@@ -118,7 +118,7 @@ def exception_wrapper(
     if inspect.isasyncgenfunction(fn):
 
       @wraps(fn)
-      async def agen_wrapper(*args, **kwargs):
+      async def agen_wrapper(*args: Any, **kwargs: Any):
         try:
           async for item in fn(*args, **kwargs):
             yield item
@@ -133,7 +133,7 @@ def exception_wrapper(
     if inspect.isgeneratorfunction(fn):
 
       @wraps(fn)
-      def gen_wrapper(*args, **kwargs):
+      def gen_wrapper(*args: Any, **kwargs: Any) -> Generator[Any, Any, Any]:
         try:
           yield from fn(*args, **kwargs)
         except Exception as e:
@@ -147,7 +147,7 @@ def exception_wrapper(
     if inspect.isfunction(fn) or inspect.ismethod(fn):
 
       @wraps(fn)
-      def wrapper(*args, **kwargs):
+      def wrapper(*args: Any, **kwargs: Any):
         try:
           return fn(*args, **kwargs)
         except Exception as e:

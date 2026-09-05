@@ -31,7 +31,9 @@ class Snapshot(pydantic.BaseModel):
   time: pydantic.AwareDatetime = pydantic.Field(
     default_factory=lambda: datetime.now().astimezone()
   )
-  subaccounts: list[SubaccountSnapshot] = pydantic.Field(default_factory=list)
+  subaccounts: list[SubaccountSnapshot] = pydantic.Field(
+    default_factory=list[SubaccountSnapshot]
+  )
 
   @pydantic.model_validator(mode='after')
   def unique_subaccounts(self):

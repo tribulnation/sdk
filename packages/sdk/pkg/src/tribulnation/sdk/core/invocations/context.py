@@ -8,7 +8,7 @@ from typing_extensions import (
   overload,
 )
 from contextlib import contextmanager
-from contextvars import ContextVar
+from contextvars import ContextVar, Token
 from dataclasses import dataclass, replace
 import inspect
 
@@ -92,5 +92,5 @@ class Context:
     return _current_ctx.set(ctx)
 
   @staticmethod
-  def reset_current(token) -> None:
+  def reset_current(token: Token['Context | None']) -> None:
     _current_ctx.reset(token)

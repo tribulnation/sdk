@@ -9,6 +9,7 @@ from typing_extensions import (
 )
 import functools
 import inspect
+from types import TracebackType
 
 from .context import Context
 from ..lifecycle import resource_state
@@ -51,7 +52,7 @@ def _decorate_method(
   if inspect.isasyncgenfunction(fn):
 
     @functools.wraps(fn)
-    async def asyncgen_wrapper(*args, **kwargs):
+    async def asyncgen_wrapper(*args: Any, **kwargs: Any):
       active, invoke = prepare()
       if active is None:
         async for item in invoke(*args, **kwargs):
@@ -69,7 +70,7 @@ def _decorate_method(
   elif inspect.iscoroutinefunction(fn):
 
     @functools.wraps(fn)
-    async def coroutine_wrapper(*args, **kwargs):
+    async def coroutine_wrapper(*args: Any, **kwargs: Any):
       active, invoke = prepare()
       if active is None:
         return await invoke(*args, **kwargs)
@@ -84,7 +85,7 @@ def _decorate_method(
   else:
 
     @functools.wraps(fn)
-    def sync_wrapper(*args, **kwargs):
+    def sync_wrapper(*args: Any, **kwargs: Any):
       active, invoke = prepare()
       if active is None:
         return invoke(*args, **kwargs)
@@ -143,7 +144,12 @@ class SDK:
     return self
 
   @_decorate_method
-  async def __aexit__(self, exc_type, exc_value, traceback) -> bool | None:
+  async def __aexit__(
+    self,
+    exc_type: type[BaseException] | None,
+    exc_value: BaseException | None,
+    traceback: TracebackType | None,
+  ) -> bool | None:
     return await resource_state(self).exit(exc_type, exc_value, traceback)
 
   def __init_subclass__(cls, **kwargs: Any) -> None:

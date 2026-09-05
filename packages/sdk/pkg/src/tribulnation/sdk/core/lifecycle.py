@@ -12,6 +12,7 @@ State therefore lives in `__dict__`, written directly so frozen instances can ow
 from typing_extensions import Any, AsyncContextManager, Iterable
 from dataclasses import dataclass
 from contextlib import AsyncExitStack
+from types import TracebackType
 
 
 @dataclass
@@ -48,7 +49,12 @@ class AsyncResourceState:
       raise
     self.stack = stack
 
-  async def exit(self, exc_type, exc_value, traceback) -> bool | None:
+  async def exit(
+    self,
+    exc_type: type[BaseException] | None,
+    exc_value: BaseException | None,
+    traceback: TracebackType | None,
+  ) -> bool | None:
     """Exit all resources in reverse order."""
     if self.stack is None:
       raise RuntimeError('Async resources are not active')

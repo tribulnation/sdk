@@ -13,7 +13,7 @@ DEFAULT_ACCOUNTS: Mapping[str, Account] = {
 
 @dataclass
 class EarnSDK:
-  accounts: Mapping[str, Account] = field(default_factory=dict)
+  accounts: Mapping[str, Account] = field(default_factory=dict[str, Account])
 
   @property
   def all_accounts(self) -> Mapping[str, Account]:

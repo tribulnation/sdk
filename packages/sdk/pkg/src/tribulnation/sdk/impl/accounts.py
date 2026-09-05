@@ -22,7 +22,7 @@ class BaseAccount:
   public: bool = False
   """Whether to allow public usage (i.e. whether unset credentials are OK)."""
 
-  def verify_env_vars(self):
+  def verify_env_vars(self) -> None:
     """Verify that all required environment variables are set."""
     raise NotImplementedError('Subclasses must implement verify_env_vars()')
 
