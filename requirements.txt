@@ -14,3 +14,5 @@ pytest-asyncio
 -e packages/impl/dydx/pkg
 -e packages/impl/hyperliquid/pkg
 -e packages/impl/bit2me/pkg
+-e packages/impl/bybit/pkg
+-e packages/impl/coinbase/pkg

@@ -19,7 +19,7 @@ The markets implementation is structured following the market IDs: `account` →
 | Top-level | `sdk = MarketSDK()` | `sdk.depth('mexc:spot:BTCUSDT')` |
 | Venue | `venue = await sdk.venue('mexc')` | `venue.depth('spot:BTCUSDT')` |
 | Exchange | `exchange = await sdk.exchange('mexc:spot')` | `exchange.depth('BTCUSDT')` |
-| Market | `market = await exchange.market('mexc:spot:BTCUSDT')` | `market.depth()` |
+| Market | `market = await sdk.market('mexc:spot:BTCUSDT')` | `market.depth()` |
 
 ## Examples
 
