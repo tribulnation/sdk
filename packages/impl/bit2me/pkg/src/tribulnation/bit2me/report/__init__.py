@@ -1,7 +1,5 @@
-from .snapshots import Snapshots
-from .main import Report
+"""Bit2Me's reporting surface: balance snapshots and transaction history."""
 
-__all__ = [
-  'Snapshots',
-  'Report',
-]
+from .history import History
+from .main import Report
+from .snapshots import Snapshots

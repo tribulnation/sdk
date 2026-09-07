@@ -1,4 +1,6 @@
-from typing_extensions import AsyncContextManager, Collection, Iterable
+"""Bit2Me implementation of the `snapshot` reporting endpoint."""
+
+from typing_extensions import Collection
 from dataclasses import dataclass
 from decimal import Decimal
 import asyncio
@@ -12,77 +14,68 @@ from tribulnation.sdk.reporting import (
   SubaccountSnapshot,
   source_id,
 )
-from tribulnation.bit2me.core import wrap_exceptions
+from tribulnation.bit2me.core import Mixin
 
-from typed_bit2me import Bit2Me
+EARN_WALLETS_PAGE = 100
+"""Earn wallets fetched per page. One page holds every wallet an account has in
+practice; the walk below still pages, since the endpoint reports a `total`."""
 
 
-@dataclass(frozen=True)
-class Snapshots(_Snapshots):
-  client: Bit2Me
+@dataclass(frozen=True, kw_only=True)
+class Snapshots(_Snapshots, Mixin):
+  """Bit2Me implementation of `Snapshots`.
 
-  @classmethod
-  def new(
-    cls,
-    api_key: str | None = None,
-    api_secret: str | None = None,
-    *,
-    validate: bool = True,
-  ):
-    return cls(
-      client=Bit2Me.new(api_key=api_key, api_secret=api_secret, validate=validate)
-    )
-
-  def resources(self) -> Iterable[AsyncContextManager[object]]:
-    yield from super().resources()
-    yield self.client
+  Bit2Me splits balances across three sub-products with no shared ledger: the
+  Trading Spot wallet, Earn, and Wallet pockets. Funds cross between them only
+  through explicit transfers (`/v1/trading/wallet/{deposit,withdraw}` between spot
+  and pockets, `/v1/earn/movements` between earn and pockets), so they are not three
+  views of one balance and each becomes its own `SubaccountSnapshot`.
+  """
 
   @SDK.method
-  @wrap_exceptions
   async def spot_balances(self) -> Balances:
+    """Balances held in the Trading Spot wallet, including amounts blocked in orders."""
     out = Balances()
-    balances = await self.client.v1.trading.balance()
-    for entry in balances:
-      if (asset := entry.get('currency')) is None:
-        continue
-      balance = Decimal(entry.get('balance', 0)) + Decimal(
-        entry.get('blockedBalance', 0)
+    for entry in await self.call_bit2me(self.client.v1.trading.balance):
+      out[entry['currency']] += Decimal(str(entry['balance'])) + Decimal(
+        str(entry['blockedBalance'])
       )
-      out[asset] += balance
     return out
 
   @SDK.method
-  @wrap_exceptions
   async def earn_balances(self) -> Balances:
+    """Balances held in Earn wallets."""
     out = Balances()
-    wallets = await self.client.v2.earn.wallets()
-    for entry in wallets.get('data', []):
-      if (balance := entry.get('balance')) is not None and (
-        currency := entry.get('currency')
-      ) is not None:
-        out[currency] += Decimal(balance)
-    return out
+    offset = 0
+    while True:
+      current = offset
+      page = await self.call_bit2me(
+        lambda: self.client.v2.earn.wallets(offset=current, limit=EARN_WALLETS_PAGE)
+      )
+      entries = page.get('data', [])
+      for entry in entries:
+        out[entry['currency']] += Decimal(str(entry['balance']))
+      offset += len(entries)
+      if not entries or offset >= (page.get('total') or 0):
+        return out
 
   @SDK.method
-  @wrap_exceptions
   async def pocket_balances(self) -> Balances:
-    """Balances held in Bit2Me Wallet pockets.
-
-    Wallet and Pro are separate products with separate balances -- funds move
-    between them through `/v1/trading/wallet/{deposit,withdraw}` -- so pockets
-    are not covered by `spot_balances`.
-    """
+    """Balances held in Bit2Me Wallet pockets, including blocked amounts."""
     out = Balances()
-    pockets = await self.client.v1.wallet.pockets.get()
-    for entry in pockets:
-      if (asset := entry.get('currency')) is None:
-        continue
-      out[asset] += Decimal(entry.get('balance', 0)) + Decimal(
-        entry.get('blockedBalance', 0)
+    for entry in await self.call_bit2me(self.client.v1.wallet.pockets.get):
+      out[entry['currency']] += Decimal(str(entry['balance'])) + Decimal(
+        str(entry['blockedBalance'])
       )
     return out
 
   async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotRecord:
+    """Fetch the account's balances across all three compartments.
+
+    Args:
+      assets: Ignored. Each of the three endpoints enumerates every asset it holds
+        in one call, so there is no discovery gap for the hint to fill.
+    """
     spot, earn, pocket = await asyncio.gather(
       self.spot_balances(),
       self.earn_balances(),

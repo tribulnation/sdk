@@ -1,17 +1,17 @@
-from typing_extensions import AsyncIterable
+"""Bit2Me reporting: history and snapshots over one client."""
+
 from dataclasses import dataclass
-from datetime import datetime
 
-from tribulnation.sdk.reporting import HistoryRecord, Report as _Report
+from tribulnation.sdk.reporting import Report as _Report
 
+from .history import History
 from .snapshots import Snapshots
 
 
 @dataclass(frozen=True, kw_only=True)
-class Report(_Report, Snapshots):
-  def history(
-    self,
-    start: datetime | None = None,
-    end: datetime | None = None,
-  ) -> AsyncIterable[HistoryRecord]:
-    raise NotImplementedError('bit2me history is not yet wired into ReportSDK.')
+class Report(_Report, History, Snapshots):
+  """Combined history and snapshots for one Bit2Me account.
+
+  Both halves are built on the same `Mixin`, so they share one client field and
+  `resources()` enters it once.
+  """
