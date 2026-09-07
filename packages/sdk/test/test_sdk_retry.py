@@ -173,11 +173,23 @@ async def test_context_retries_nested_task_without_restarting_generator():
   assert report.request_calls == 2
 
 
-async def test_default_retry_logger_excludes_sensitive_values(
+async def test_default_retry_logger_excludes_call_arguments(
   monkeypatch: pytest.MonkeyPatch,
   capsys: pytest.CaptureFixture[str],
 ):
-  """Default retry logs contain metadata without arguments or exception text."""
+  """Default retry logs carry metadata and the exception, never the call's arguments.
+
+  The logger is handed `args`/`kwargs` as well, and those are where an API key most
+  obviously sits: the receiver is a client holding one, and a secret can be passed
+  positionally. Neither is ever printed.
+
+  The exception itself *is* printed, deliberately, since its type and message are the
+  point of a retry log. That its message may carry a credential of its own is a
+  typed-core defect, not this logger's to paper over: the transport interpolates the
+  whole request URL, so an Alchemy key ends up in the string before the SDK ever sees
+  it, and it reaches tracebacks and callers' own handlers regardless of what we print
+  here. See `typed-client-issues.md`, typed-core.
+  """
 
   class SecretSelf:
     """Object whose representation contains a credential."""
@@ -194,11 +206,11 @@ async def test_default_retry_logger_excludes_sensitive_values(
   calls = 0
 
   async def target(self: SecretSelf, secret: str):
-    """Fail once with a sensitive exception message."""
+    """Fail once, with an exception the log is expected to describe."""
     nonlocal calls
     calls += 1
     if calls == 1:
-      raise RetriableError('https://alchemy.example/v2/secret-key')
+      raise RetriableError('upstream said no')
     return 'ok'
 
   wrapped = retry(
@@ -210,8 +222,8 @@ async def test_default_retry_logger_excludes_sensitive_values(
 
   output = capsys.readouterr().out
   assert output == (
-    'Retry 1 for report.history.get_tx after RetriableError; sleeping 2.00s\n'
+    "Retry 1 for report.history.get_tx after RetriableError('upstream said no'); "
+    'sleeping 2.00s\n'
   )
   assert 'repr-secret' not in output
   assert 'argument-secret' not in output
-  assert 'secret-key' not in output

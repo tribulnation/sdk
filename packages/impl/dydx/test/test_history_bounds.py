@@ -267,7 +267,7 @@ def test_chain_cache_ignores_legacy_watermark(tmp_path):
         address='dydx1test',
         tx_hash='legacy',
         height=6,
-        data={'hash': 'legacy', 'height': '6'},
+        data={'hash': 'legacy', 'height': 6},
       )
     )
     session.commit()
@@ -276,7 +276,9 @@ def test_chain_cache_ignores_legacy_watermark(tmp_path):
   transactions = asyncio.run(history.fetch_transactions(None, None))
 
   assert cache.chain_coverage(history.address) == [(1, 16)]
-  assert transactions['legacy']['height'] == '6'
+  # `data` is a ValidatedJSON(TxResponse) column, and typed-dydx types Comet's `height`
+  # as an int, so a cached row reads back normalized however it was written.
+  assert transactions['legacy']['height'] == 6
   assert len(comet.queries) == 4
   assert all(
     'tx.height >= 1' in query and 'tx.height <= 16' in query

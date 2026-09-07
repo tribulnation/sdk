@@ -7,8 +7,8 @@ from decimal import Decimal
 from typing_extensions import AsyncIterable
 import asyncio
 
-from mexc.spot.market.depth import OrderBook
-from mexc.spot.streams.core.proto import (
+from typed_mexc.spot.http.market.depth import OrderBook
+from typed_mexc.spot.streams.core.proto import (
   PublicAggreDepthsV3Api,
   PublicAggreDepthV3ApiItem,
 )
