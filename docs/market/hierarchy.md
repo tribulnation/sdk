@@ -85,6 +85,6 @@ await market.next_funding()
 
 ---
 
-← [Market Identifiers](identifiers.md) · **Next:** [Methods](methods.md) →
+← [Market Identifiers](identifiers.md) · **Next:** [Your First Order](first-order.md) →
 
 <!-- /next -->

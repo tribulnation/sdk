@@ -9,9 +9,11 @@
 - market:
     - identifiers.md
     - hierarchy.md
-    - methods.md
+    - first-order.md
     - collateral.md
     - streaming.md
+    - types.md
+    - methods.md
     - implementations:
         - dydx.md
         - hyperliquid.md

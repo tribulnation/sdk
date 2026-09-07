@@ -24,6 +24,6 @@ Per-method differences are on the [Methods](../methods.md) page, under each meth
 
 ---
 
-← [Streaming](../streaming.md) · **Next:** [dYdX Market](dydx.md) →
+← [Methods](../methods.md) · **Next:** [dYdX Market](dydx.md) →
 
 <!-- /next -->
