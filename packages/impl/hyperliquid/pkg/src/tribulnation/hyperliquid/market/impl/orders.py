@@ -8,10 +8,9 @@ from tribulnation.sdk.market import (
   OrderState,
   Settings as MarketSettings,
 )
-from tribulnation.sdk.util import fmt_num
 
-from typed_hyperliquid.exchange.cancel import CancelRequestItemParameterCancelsItem
-from typed_hyperliquid.exchange.order import HyperliquidOrderParameterOrdersItem
+from typed_hyperliquid.exchange.cancel import CancelRequestItem
+from typed_hyperliquid.exchange.order import HyperliquidOrder
 from typed_hyperliquid.info.order_status import OrderFound, OrderNotFound
 
 from tribulnation.hyperliquid.core import Settings, round_price, wrap_exceptions
@@ -27,7 +26,7 @@ def _export_order(
   self: SpotMarketMixin | PerpMarketMixin,
   o: Order,
   settings: Settings,
-) -> HyperliquidOrderParameterOrdersItem:
+) -> HyperliquidOrder:
   if o['type'] == 'LIMIT':
     tif = settings.get('limit_tif', 'Gtc')
   elif o['type'] == 'MARKET':
@@ -42,8 +41,8 @@ def _export_order(
   return {
     'a': self.asset_id,
     'b': qty >= 0,
-    'p': fmt_num(price),
-    's': fmt_num(abs(qty)),
+    'p': price,
+    's': abs(qty),
     'r': settings.get('reduce_only', False),
     't': {'limit': {'tif': tif}},
   }
@@ -84,41 +83,41 @@ async def place_order(
 ) -> OrderResponse:
   s: Settings = settings.get('hyperliquid', {})
   wire = _export_order(self, order, s)
-  result = await self.client.exchange.http.order(orders=[wire], grouping='na')
-  if result['status'] != 'ok':
-    raise ApiError(result)
+  result = await self.client.exchange.order(orders=[wire], grouping='na')
+  response = result['response']
+  # `status` and `response` are declared independently, so only the payload's own
+  # shape tells a rejection apart from a result.
+  if isinstance(response, str):
+    raise ApiError(response)
 
-  statuses = result['response']['data']['statuses']
+  statuses = response['data']['statuses']
   if not statuses:
     raise ApiError({'error': 'empty status list', 'details': result})
 
   stat = statuses[0]
-  if (err := stat.get('error')) is not None:
-    raise ApiError(err)
-  if (resting := stat.get('resting')) is not None:
-    return OrderResponse(id=str(resting['oid']), details=stat)
-  if (filled := stat.get('filled')) is not None:
-    return OrderResponse(id=str(filled['oid']), details=stat)
-  raise ApiError({'error': 'unknown order status', 'details': stat})
+  if 'error' in stat:
+    raise ApiError(stat['error'])
+  if 'resting' in stat:
+    return OrderResponse(id=str(stat['resting']['oid']), details=stat)
+  return OrderResponse(id=str(stat['filled']['oid']), details=stat)
 
 
 @wrap_exceptions
 async def cancel_order(
   self: SpotMarketMixin | PerpMarketMixin, id: str, *, settings: MarketSettings = {}
 ) -> Any:
-  cancel: CancelRequestItemParameterCancelsItem = {'a': self.asset_id, 'o': int(id)}
-  result = await self.client.exchange.http.cancel(cancels=[cancel])
-  if result['status'] != 'ok':
-    raise ApiError(result)
-  statuses = result['response']['data']['statuses']
+  cancel: CancelRequestItem = {'a': self.asset_id, 'o': int(id)}
+  result = await self.client.exchange.cancel(cancels=[cancel])
+  response = result['response']
+  if isinstance(response, str):
+    raise ApiError(response)
+  statuses = response['data']['statuses']
   if not statuses:
     raise ApiError({'error': 'empty status list', 'details': result})
   s = statuses[0]
   if s == 'success':
     return s
-  if isinstance(s, dict) and (err := s.get('error')) is not None:
-    raise ApiError(err)
-  raise ApiError({'error': 'unknown cancel status', 'details': s})
+  raise ApiError(s['error'])
 
 
 @wrap_exceptions

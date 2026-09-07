@@ -14,6 +14,8 @@ from .snapshots import Snapshots
 class HyperliquidConfig(TypedDict, total=False):
   """Hyperliquid reporting configuration."""
 
+  mainnet: bool
+  """Read mainnet when true (the default), testnet when false."""
   cache: str
   """SQLAlchemy URL for the history archive, e.g. `sqlite:///hyperliquid.db`.
 

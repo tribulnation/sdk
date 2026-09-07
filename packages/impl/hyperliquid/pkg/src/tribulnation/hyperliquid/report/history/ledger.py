@@ -10,6 +10,7 @@ output instead of being silently dropped.
 """
 
 from typing_extensions import Any, Mapping, TypeAlias
+from datetime import datetime
 from decimal import Decimal
 import pydantic
 
@@ -32,7 +33,7 @@ from typed_hyperliquid.info.user_non_funding_ledger_updates import (
   AccountClassTransferDelta,
   ActivateDexAbstractionDelta,
   BorrowLendDelta,
-  CstakingTransferDelta,
+  CStakingTransferDelta,
   DeployGasAuctionDelta,
   DepositDelta,
   InternalTransferDelta,
@@ -60,7 +61,7 @@ LedgerDelta: TypeAlias = (
   | AccountClassTransferDelta
   | ActivateDexAbstractionDelta
   | BorrowLendDelta
-  | CstakingTransferDelta
+  | CStakingTransferDelta
   | DeployGasAuctionDelta
   | DepositDelta
   | InternalTransferDelta
@@ -78,9 +79,12 @@ LedgerDelta: TypeAlias = (
   | WithdrawDelta
 )
 
-delta_adapter = pydantic.TypeAdapter(LedgerDelta)
+delta_adapter: pydantic.TypeAdapter[LedgerDelta] = pydantic.TypeAdapter(LedgerDelta)
 
-D = lambda v: Decimal(str(v))
+
+def D(v: object) -> Decimal:
+  """`Decimal` of any wire number, exact for the strings the client leaves unparsed."""
+  return Decimal(str(v))
 
 
 def entry_id(entry: Mapping[str, Any], index: int) -> str:
@@ -98,7 +102,7 @@ def parse_delta(
   delta: LedgerDelta,
   *,
   id: str,
-  time,
+  time: datetime,
   address: str,
   assets: Assets,
 ) -> list[Observation]:
@@ -106,7 +110,7 @@ def parse_delta(
   mine = str(delta.get('user', '')).lower() == address.lower()
   # Every ledger delta acts on the main pool. Staking is reached only through
   # `cStakingTransfer`, which names both compartments in `src`/`dst` instead.
-  base = {'id': id, 'time': time, 'subaccount': UNIFIED}
+  base: dict[str, Any] = {'id': id, 'time': time, 'subaccount': UNIFIED}
 
   if delta['type'] == 'deposit':
     return [CryptoDeposit(**base, asset=USDC, amount=D(delta['usdc']))]

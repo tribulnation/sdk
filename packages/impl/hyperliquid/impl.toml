@@ -14,6 +14,31 @@ auth = true
 note = "History replays the account's full fill stream, and the venue only serves the 10000 most recent fills, so configure `cache` (a SQLAlchemy URL) to keep a durable archive."
 # ReportSDK never has a DEFAULT_ACCOUNTS entry for any venue.
 
+[support.earn]
+support = "none"
+auth = true
+note = "Hyperliquid offers nothing shaped like the Earn contract. Its three yield-bearing surfaces are a spot-token borrow/lend money market, vaults, and native HYPE staking — a floating-rate lending position, an equity stake in someone's trading strategy, and protocol-level delegation respectively. None of them is a yield product a caller subscribes to, so reporting them as `Instrument`s would misdescribe what they are."
+# Deliberate, and not a wiring gap: `poc/earn.ipynb` maps all three onto `tribulnation.sdk.earn`
+# live against testnet, so the question was never whether it can be done. Each surface fails
+# the contract in its own way:
+#   1. Borrow/lend. `allBorrowLendReserveStates` enumerates every spot token with an active
+#      reserve and quotes a real `supplyYearlyRate` per token, so it maps onto `Instrument`
+#      cleanly and is the one part the PoC exercises unfiltered and filtered by `assets`. But
+#      supplying into a money market is a lending position whose rate floats with utilisation,
+#      not a product with a term the caller subscribes to and redeems.
+#   2. Vaults. `vaultDetails.apr` is a live rate, but it is a vault manager's realized trading
+#      performance, not a rate the venue offers — and it isn't enumerable either:
+#      `userVaultEquities` only reaches vaults the account already holds equity in (an empty,
+#      accurate result on the PoC's account), and `typed_hyperliquid` has no "list every vault"
+#      or vault-leaderboard endpoint, so `instruments()` could never return the catalogue. A
+#      real integration would need an external vault registry to discover them.
+#   3. HYPE staking. Delegation-based, and no endpoint anywhere in `typed_hyperliquid` returns a
+#      rate: `staking_summary`/`staking_delegations`/`staking_history`/`staking_rewards` all
+#      report genuine state, none of them a yield. `Instrument.apr` is required, so it could
+#      only be listed by fabricating a number.
+# The PoC keeps staking out of `instruments()` for exactly that reason and covers it as an
+# account-scoped supplementary read instead — the shape the venue actually has.
+
 [ids]
 asset = "index"
 note = "The spot token index as a decimal string (`'0'` is USDC, `'150'` is HYPE), never the token name; spot market ids are `<base>/<quote>:<spot index>`, perpetual market ids the coin name, prefixed `<dex>:` off the default dex."

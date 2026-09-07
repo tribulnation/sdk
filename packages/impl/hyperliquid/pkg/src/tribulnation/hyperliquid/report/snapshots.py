@@ -17,6 +17,10 @@ from tribulnation.hyperliquid.core import wrap_exceptions
 
 from .subaccounts import STAKING, UNIFIED
 
+DEX_CONCURRENCY = 3
+"""How many dexs are read at once: every dex costs two info calls, and the venue
+rate-limits an address-scoped burst across a dozen dexs."""
+
 HYPE_ASSET = '150'
 
 
@@ -104,9 +108,13 @@ class Snapshots(_Snapshots):
   async def perp_positions_and_pnl(self) -> tuple[dict[str, Position], Balances]:
     """Positions across every dex, and the unrealized PnL per collateral token."""
     dexs = await self.info.perp_dexs()
-    results = await asyncio.gather(
-      *[self.dex_positions_and_pnl(dex and dex['name']) for dex in dexs]
-    )
+    limit = asyncio.Semaphore(DEX_CONCURRENCY)
+
+    async def bounded(dex: str | None):
+      async with limit:
+        return await self.dex_positions_and_pnl(dex)
+
+    results = await asyncio.gather(*[bounded(dex and dex['name']) for dex in dexs])
     positions: dict[str, Position] = {}
     pnls = Balances()
     for pos, pnl in results:

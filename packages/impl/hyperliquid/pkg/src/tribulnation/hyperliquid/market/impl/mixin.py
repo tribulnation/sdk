@@ -19,7 +19,7 @@ from typed_hyperliquid.info.perp_meta_and_asset_ctxs import (
 )
 from typed_hyperliquid.info.perp_dexs import PerpDex
 from typed_hyperliquid.streams.user_fills import UserFills
-from typed_hyperliquid.streams.l2_book import L2bookUpdate
+from typed_hyperliquid.streams.l2_book import L2BookUpdate
 
 from tribulnation.hyperliquid.core import Settings, wrap_exceptions
 
@@ -88,16 +88,18 @@ class Shared(SDK):
   # Lightweight DEX directory: idx -> PerpDex | None (wire type allows None entries).
   perp_dexs: dict[int, PerpDex | None] | None = None
   # Perp meta keyed by dex index; None key is used for the 'no dex' case.
-  perp_metas: dict[int | None, PerpDexMeta] = field(default_factory=dict)
+  perp_metas: dict[int | None, PerpDexMeta] = field(
+    default_factory=dict[int | None, PerpDexMeta]
+  )
   perp_asset_ctxs: dict[int | None, list[PerpAssetContext]] = field(
-    default_factory=dict
+    default_factory=dict[int | None, list[PerpAssetContext]]
   )
   user_fees: UserFeesResponse | None = None
 
   # Stream subscriptions.
   user_fills_subscription: Subscription[UserFills] | None = None
-  l2_book_subscriptions: dict[str, Subscription[L2bookUpdate]] = field(
-    default_factory=dict
+  l2_book_subscriptions: dict[str, Subscription[L2BookUpdate]] = field(
+    default_factory=dict[str, Subscription[L2BookUpdate]]
   )
 
   # Locks for concurrent lazy loads.
@@ -196,7 +198,7 @@ class Shared(SDK):
       self.user_fills_subscription = Subscription.of(subscribe_user_fills)
     return self.user_fills_subscription
 
-  def l2_book_subscription(self, coin: str, /) -> Subscription[L2bookUpdate]:
+  def l2_book_subscription(self, coin: str, /) -> Subscription[L2BookUpdate]:
     if coin not in self.l2_book_subscriptions:
 
       async def subscribe():

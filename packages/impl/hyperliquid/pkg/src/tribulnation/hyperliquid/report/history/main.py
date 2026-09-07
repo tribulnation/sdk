@@ -10,6 +10,10 @@ from tribulnation.sdk.reporting import History as _History, Observation, History
 from tribulnation.sdk.reporting.util import source_id
 from typed_hyperliquid.core import timestamp_millis
 from typed_hyperliquid.info import Info
+from typed_hyperliquid.info.user_funding import UserFundingEntry
+from typed_hyperliquid.info.user_non_funding_ledger_updates import (
+  UserNonFundingLedgerEntry,
+)
 from tribulnation.hyperliquid.core import wrap_exceptions
 
 from .assets import Assets, USDC
@@ -160,7 +164,7 @@ class History(_History):
     """Fetch funding payments and convert them to observations."""
     id = source_id(SERVICE)
     settle = await self.settlement()
-    fresh = []
+    fresh: list[UserFundingEntry] = []
     async for page in self.info.user_funding_paged(
       user=self.address,
       start_time=self.since('funding'),
@@ -183,7 +187,7 @@ class History(_History):
     """
     id = source_id(SERVICE)
     assets = await self.resolve_assets()
-    fresh = []
+    fresh: list[UserNonFundingLedgerEntry] = []
     async for page in self.info.user_non_funding_ledger_updates_paged(
       user=self.address,
       start_time=self.since('ledger'),
@@ -210,7 +214,7 @@ class History(_History):
       self.info.staking_rewards(user=self.address),
       self.info.staking_history(user=self.address),
     )
-    observations = [*parse_rewards(rewards), *parse_history(entries)]
+    observations: list[Observation] = [*parse_rewards(rewards), *parse_history(entries)]
     return self.records(observations, start, end, id)
 
   def records(
