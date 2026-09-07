@@ -70,7 +70,9 @@ class ReportSDK:
     if (address := account.resolved_address) is None:
       raise ValueError(f'Account {id} does not have a resolved address.')
     return DydxReport.new(
-      address, providers=self.providers, config=self.config.get('dydx')
+      address,
+      providers=self.providers,
+      config={**(self.config.get('dydx') or {}), 'mainnet': account.venue == 'dydx'},
     )
 
   def binance(self, account: Binance, id: str) -> Report:
@@ -117,7 +119,13 @@ class ReportSDK:
       ) from e
     if (address := account.resolved_address) is None:
       raise ValueError(f'Account {id} does not have a resolved address.')
-    return HyperliquidReport.new(address, config=self.config.get('hyperliquid'))
+    return HyperliquidReport.new(
+      address,
+      config={
+        **(self.config.get('hyperliquid') or {}),
+        'mainnet': account.venue == 'hyperliquid',
+      },
+    )
 
   def venue(self, id: str, /) -> Report:
     if (account := self.accounts.get(id)) is None:
