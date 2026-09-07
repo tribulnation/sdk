@@ -1,3 +1,4 @@
+from abc import ABC
 from typing_extensions import (
   Any,
   AsyncContextManager,
@@ -101,7 +102,15 @@ def _decorate_method(
   return wrapper  # type: ignore[return-value]
 
 
-class SDK:
+class SDK(ABC):
+  """Root of every SDK surface.
+
+  An `ABC` so `@abstractmethod` actually bites: a surface that declares a method must
+  implement it, and one that can't serve it says so by raising in its own body rather
+  than inheriting a stub. Without `ABCMeta` neither Python nor pyright enforces that, and
+  an unimplemented method silently returns `None`.
+  """
+
   @overload
   @classmethod
   def method(cls, fn: Fn, /) -> Fn: ...

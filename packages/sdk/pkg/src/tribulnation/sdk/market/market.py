@@ -51,6 +51,7 @@ class Market(SDK):
     """Fetch the market order book."""
 
   @SDK.method
+  @abstractmethod
   def depth_stream(
     self,
     *,
@@ -67,11 +68,7 @@ class Market(SDK):
       keeps only the newest book (a slow consumer skips stale books); pass
       `overflow='fail'` with a larger `queue_size` to capture every book
       instead (e.g. to record a full depth history).
-
-    `queue_size`/`overflow` are ignored by this polling default, which has no
-    shared upstream to fan out; venue subscriptions honor them.
     """
-    ...
 
   @SDK.method
   @abstractmethod
@@ -123,11 +120,9 @@ class Market(SDK):
     """Fetch your open position in the market."""
 
   @SDK.method
+  @abstractmethod
   async def collateral(self) -> Collateral:
     """Fetch the collateral bucket backing this market."""
-    raise NotImplementedError(
-      f'Collateral is not supported by this market [{self.id}].'
-    )
 
   @SDK.method
   @abstractmethod
@@ -246,8 +241,6 @@ class PerpMarket(Market):
     return await self.perp_collateral()
 
   @SDK.method
+  @abstractmethod
   async def perp_collateral(self) -> PerpCollateral:
     """Fetch the perpetual collateral bucket backing this market."""
-    raise NotImplementedError(
-      f'Collateral is not supported by this market [{self.id}].'
-    )

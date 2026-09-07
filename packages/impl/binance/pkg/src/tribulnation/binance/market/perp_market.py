@@ -20,16 +20,14 @@ from tribulnation.sdk.market import (
   Order,
   OrderResponse,
   OrderState,
+  PerpCollateral,
   PerpPosition,
   Rules,
   Settings,
   Trade,
 )
 
-from typed_binance.usdm_futures.http.market.premium_index import (
-  MarkPriceInfo0,
-  MarkPriceInfoItem,
-)
+from typed_binance.schemas import MarkPriceInfo
 from typed_binance.usdm_futures.public_streams.partial_depth import PartialDepthEvent
 
 from tribulnation.binance.util import windows
@@ -79,8 +77,8 @@ def stream_levels(levels: int | None) -> Literal[5, 10, 20]:
 
 
 def one_mark_price(
-  response: MarkPriceInfo0 | list[MarkPriceInfoItem],
-) -> MarkPriceInfo0 | MarkPriceInfoItem:
+  response: MarkPriceInfo | list[MarkPriceInfo],
+) -> MarkPriceInfo:
   """Unwrap `premium_index`, which answers with a list when no symbol is given."""
   if not isinstance(response, list):
     return response
@@ -232,3 +230,6 @@ class PerpMarket(SharedMixin, _PerpMarket):
 
   async def perp_position(self) -> PerpPosition:
     raise futures_permission_error('perp_position', self.id)
+
+  async def perp_collateral(self) -> PerpCollateral:
+    raise futures_permission_error('perp_collateral', self.id)

@@ -99,6 +99,7 @@ class Exchange(SDK):
       yield stream
 
   @SDK.method
+  @abstractmethod
   async def tickers(
     self,
     markets: Collection[str] | None = None,
@@ -114,7 +115,6 @@ class Exchange(SDK):
     Returns:
       A mapping of market ID to its `Ticker`.
     """
-    raise NotImplementedError(f'tickers is not supported by this exchange [{self.id}].')
 
   @SDK.method
   async def rules(self, market_id: str, /, *, refetch: bool = False) -> Rules:
@@ -250,6 +250,7 @@ class PerpExchange(Exchange):
     return await market.next_funding()
 
   @SDK.method
+  @abstractmethod
   async def perp_stats(
     self,
     markets: Collection[str] | None = None,
@@ -265,9 +266,6 @@ class PerpExchange(Exchange):
     Returns:
       A mapping of market ID to its `PerpStats`.
     """
-    raise NotImplementedError(
-      f'perp_stats is not supported by this exchange [{self.id}].'
-    )
 
   @SDK.method
   @PaginatedResponse.lift

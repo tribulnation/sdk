@@ -1,9 +1,9 @@
-from typing_extensions import Sequence
+from typing_extensions import Collection, Mapping, Sequence
 from dataclasses import dataclass
 
-from tribulnation.sdk.market import Exchange, Market
+from tribulnation.sdk.market import Exchange, Market, Settings, Ticker
 
-from .impl import SharedMixin
+from .impl import SharedMixin, not_implemented
 from .spot_market import SpotMarket
 
 
@@ -28,3 +28,8 @@ class SpotExchange(SharedMixin, Exchange):
     if market_id not in symbols:
       raise ValueError(f'Unknown Binance spot market: {market_id!r}')
     return SpotMarket(shared=self.shared, symbol=market_id)
+
+  async def tickers(
+    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+  ) -> Mapping[str, Ticker]:
+    raise not_implemented('tickers', self.id)

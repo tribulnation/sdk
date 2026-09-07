@@ -1,9 +1,19 @@
-from typing_extensions import Sequence
+from typing_extensions import Collection, Mapping, Sequence
 from dataclasses import dataclass
 
-from tribulnation.sdk.market import PerpExchange as _PerpExchange
+from tribulnation.sdk.market import (
+  PerpExchange as _PerpExchange,
+  PerpStats,
+  Settings,
+  Ticker,
+)
 
-from .impl import SharedMixin, wrap_exceptions
+from .impl import (
+  SharedMixin,
+  futures_permission_error,
+  not_implemented,
+  wrap_exceptions,
+)
 from .perp_market import PerpMarket
 
 
@@ -30,3 +40,13 @@ class PerpExchange(SharedMixin, _PerpExchange):
 
   async def market(self, market_id: str, /) -> PerpMarket:
     return PerpMarket(shared=self.shared, symbol=market_id)
+
+  async def tickers(
+    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+  ) -> Mapping[str, Ticker]:
+    raise not_implemented('tickers', self.id)
+
+  async def perp_stats(
+    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+  ) -> Mapping[str, PerpStats]:
+    raise futures_permission_error('perp_stats', self.id)
