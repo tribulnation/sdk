@@ -31,27 +31,31 @@ carry `Condition` and `Samples` rather than a fix.
 
 1. typed-dev fixes and releases. It does not edit this file; disagreement with an entry
    goes in typed-dev's own commit message or docs.
-2. The sdk side re-runs the cells named under `Blocks` against the released client. When
+3. The sdk side re-runs the cells named under `Blocks` against the released client. When
    they pass, the entry is deleted, not marked fixed; git history is the record.
-3. New entries are added only from a PoC that hit the defect live, in the format above.
+4. New entries are added only from a PoC that hit the defect live, in the format above.
    The rules are in `.agents/skills/sdk-poc/SKILL.md`.
 
 ## Priority
 
-By what a fix unblocks on the sdk side, most first:
+By what a fix unblocks on the sdk side, most first, except that a defect leaking
+credentials comes first regardless:
 
-1. typed-etherscan `erc20_transfers_paged`/`erc721_transfers_paged` require
+1. typed-core `NetworkError` messages embed the request URL: an Alchemy API key, or a
+   Binance private-stream `listenKey`, reaches every log, traceback and crash report a
+   consumer keeps.
+2. typed-etherscan `erc20_transfers_paged`/`erc721_transfers_paged` require
    `contractaddress`: a regression; two spec `required` lists; restores `history()` on
    four chains.
-2. typed-hyperliquid `AssetPosition.liquidationPx` is `null`: breaks `Report.snapshot()`
+3. typed-hyperliquid `AssetPosition.liquidationPx` is `null`: breaks `Report.snapshot()`
    on any mainnet account holding such a position.
-3. typed-core `ValidationError` carries no message: cheap, and makes every future
+4. typed-core `ValidationError` carries no message: cheap, and makes every future
    finding legible at the sdk boundary.
-4. codegen `number` fields with an epoch format render as `float`: Kraken's whole history
+5. codegen `number` fields with an epoch format render as `float`: Kraken's whole history
    surface.
-5. typed-bit2me `float` money fields (both entries): silent precision loss in shipped
+6. typed-bit2me `float` money fields (both entries): silent precision loss in shipped
    balances today.
-6. Everything else is typing quality; nothing shipped is wrong because of it.
+7. Everything else is typing quality; nothing shipped is wrong because of it.
 
 ## Environment
 
@@ -278,6 +282,61 @@ detail lives in `str(e)` and `e.errors()`), so every typed-core validation failu
 - Blocks: nothing runs wrong, but every SDK impl that translates client errors
   (`packages/impl/*/core/exc.py`) forwards an empty message
 - Suggestion (unverified): `ValidationError(str(e))`, or carry `e.errors()`
+
+### `NetworkError` messages embed the full request URL, API key included
+
+The HTTP transport interpolates the whole URL into the message, and the websocket one does
+the same with its socket URL. Where a credential lives *in* the URL, it is then part of the
+exception string, and travels wherever that string goes: a caller's own
+`except NetworkError as e: print(e)`, a traceback, a crash reporter, any retry log. Two
+clients put one there:
+
+- typed-alchemy appends the app API key as the final path segment
+  (`core/auth.py:39` `api_key_url`), so every Alchemy request and RPC URL carries it;
+- typed-binance embeds a live `listenKey` in the private-stream socket path
+  (`core/transport/ws/private_stream.py:78`, `url=f'{self.base_url}/{listen_key}'`), which
+  is a session token for that account's private stream.
+
+The rest are unaffected and worth stating so the blast radius is clear: typed-etherscan
+attaches its key as a `params=` query entry (`core/rest.py:118`), which httpx adds after
+the interpolated `url`, and typed-moralis sends an `X-API-Key` header
+(`core/rest.py:38`). Neither reaches the message.
+
+The transport is the one layer that knows which substring is the credential, so it is the
+only one that can remove it without guessing at a pattern.
+
+`public/typed/packages/core/src/typed_core/http.py:66-68`:
+
+```python
+    except httpx.HTTPError as e:
+      req = f'{method} {url}'
+      raise NetworkError(f'Error sending request to {req}', *e.args) from e
+```
+
+`public/typed/packages/core/src/typed_core/ws/socket.py:151`:
+
+```python
+        raise NetworkError(f'Failed to connect to {self.url}') from e
+```
+
+- Kind: wrong-type (the exception's message contract)
+- Observed: `NetworkError('Error sending request to POST
+  https://eth-mainnet.g.alchemy.invalid/v2/FAKE-KEY-abc123', '[Errno -2] Name or service
+  not known')`, and `tribulnation.sdk.core.exc.translate_exception` forwards it verbatim
+- Condition: every `httpx.HTTPError` raised against an Alchemy URL; the websocket site is
+  the same construction, not separately triggered
+- Samples: reproduced offline against an unroutable host with a fabricated key, so no live
+  credential was involved; the URL shape is Alchemy's own
+- Blocks: nothing runs wrong. `packages/sdk/test/test_sdk_retry.py`'s
+  `test_default_retry_logger_excludes_call_arguments` documents the gap and drops the
+  assertion that the sdk's retry log stays credential-free, since it cannot hold while the
+  message carries one
+- Suggestion (unverified): have the client hand its known credential values to the
+  transport, and replace those exact substrings with `[REDACTED]` before building the
+  message. An exact match on a known value, not a pattern; and a placeholder rather than a
+  deletion, so the URL stays legible and a reader can see something was removed instead of
+  wondering why the path looks truncated. Failing that, interpolate only the method and
+  `scheme://host`, which loses little since the endpoint is clear from the call site
 
 ## typed-binance
 
