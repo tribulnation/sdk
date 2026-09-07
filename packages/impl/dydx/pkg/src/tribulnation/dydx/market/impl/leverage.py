@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from tribulnation.sdk.core import ApiError
-from typed_dydx.indexer.types import PerpetualMarket
+from typed_dydx.indexer.schemas import PerpetualMarket
 
 
 def effective_imf(market: PerpetualMarket):

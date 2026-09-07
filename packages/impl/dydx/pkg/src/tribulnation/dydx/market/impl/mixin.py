@@ -10,10 +10,10 @@ from dataclasses import dataclass, field
 import asyncio
 import pydantic
 
-from typed_dydx.indexer.types import PerpetualMarket
+from typed_dydx.indexer.schemas import PerpetualMarket
 from typed_dydx import Dydx
-from typed_dydx.indexer.streams.parent_subaccounts import (
-  Notification as ParentSubaccountNotification,
+from typed_dydx.indexer.schemas import (
+  SubaccountsNotification as ParentSubaccountNotification,
 )
 from typed_dydx.node.orders.types import Flags, TimeInForce
 from typed_dydx.protos.dydxprotocol import feetiers as feetiers_proto

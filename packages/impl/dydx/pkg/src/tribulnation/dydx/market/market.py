@@ -2,7 +2,7 @@ from typing_extensions import (
   Any,
   AsyncContextManager,
   AsyncIterable,
-  AsyncIterator,
+  AsyncGenerator,
   Sequence,
 )
 from contextlib import asynccontextmanager
@@ -72,7 +72,7 @@ class Market(MarketMixin, PerpMarket):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
-  ) -> AsyncIterator[AsyncIterable[Book]]:
+  ) -> AsyncGenerator[AsyncIterable[Book]]:
     async with self.subscribe_depth(
       self.market, queue_size=queue_size, overflow=overflow
     ) as stream:

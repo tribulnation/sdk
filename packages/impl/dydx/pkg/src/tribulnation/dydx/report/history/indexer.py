@@ -18,7 +18,7 @@ from tribulnation.sdk.reporting import (
 )
 
 from typed_dydx import Dydx, Indexer
-from typed_dydx.indexer.data.get_fills import Fill
+from typed_dydx.indexer.schemas import Fill
 
 from .window import in_window
 
@@ -164,7 +164,7 @@ class IndexerHistory(SDK):
   def of(
     cls, address: str, dydx: Dydx | None = None, cache: 'HistoryCache | None' = None
   ):
-    indexer = dydx and dydx.indexer or Indexer()
+    indexer = dydx and dydx.indexer or Indexer.mainnet()
     return cls(address=address, indexer=indexer, cache=cache)
 
   @SDK.method
@@ -180,7 +180,7 @@ class IndexerHistory(SDK):
   ) -> list[Fill]:
     response_order: list[Fill] = []
     paging = self.indexer.data.get_fills_paged(
-      self.address,
+      address=self.address,
       subaccount=subaccount,
       created_before_or_at=end,
     )
@@ -260,7 +260,7 @@ class IndexerHistory(SDK):
   async def fundings(self, *, subaccount: int):
     indexer_fundings: list[Funding] = []
     paging = self.indexer.data.get_funding_payments_paged(
-      self.address, subaccount=subaccount
+      address=self.address, subaccount=subaccount
     )
     state = paging.init
     while state is not None:

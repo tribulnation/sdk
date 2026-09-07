@@ -2,7 +2,7 @@ from typing_extensions import Literal, Sequence
 from decimal import Decimal
 import base64
 
-from typed_dydx.indexer.data.list_parent_orders import Order as IndexerOrder
+from typed_dydx.indexer.schemas import Order as IndexerOrder
 from typed_dydx.node.orders.types import (
   ConditionalOrderParams,
   Flags,
@@ -43,14 +43,14 @@ def _sign(side: str | None) -> int:
 
 def _protobuf_id(order: IndexerOrder, *, address: str) -> clob.OrderId:
   """Build a protocol order ID for an indexer order."""
+  subaccount = order.get('subaccountNumber')
+  if subaccount is None:
+    raise ValidationError(f'Order {order["id"]} carries no subaccountNumber')
   return clob.OrderId(
     client_id=int(order['clientId']),
     order_flags=int(order['orderFlags']),
     clob_pair_id=int(order['clobPairId']),
-    subaccount_id=subaccounts.SubaccountId(
-      owner=address,
-      number=int(order['subaccountNumber']),
-    ),
+    subaccount_id=subaccounts.SubaccountId(owner=address, number=int(subaccount)),
   )
 
 
@@ -101,7 +101,7 @@ async def list_orders(
   # Scope to the addressed subaccount. The parent exchange (subaccount == parent) keeps
   # the parent-aggregate view; a child exchange filters down to just that child.
   if self.subaccount != self.shared.parent_subaccount:
-    orders = [order for order in orders if order['subaccountNumber'] == self.subaccount]
+    orders = [o for o in orders if o.get('subaccountNumber') == self.subaccount]
   return [parse_state(order, address=address) for order in orders]
 
 

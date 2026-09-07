@@ -23,6 +23,9 @@ from .snapshots import Snapshots
 
 
 class DydxConfig(TypedDict, total=False):
+  mainnet: bool
+  """Read mainnet when true (the default), testnet when false. An `archive_node` is
+  mainnet-only and takes precedence."""
   require_bigquery: bool
   archive_node: Literal['kingnodes', 'polkachu']
   cache: str
@@ -91,8 +94,10 @@ class Report(_Report):
       dydx = Dydx.kingnodes_archive(public=True)
     elif archive_node == 'polkachu':
       dydx = Dydx.polkachu_archive(public=True)
+    elif config.get('mainnet', True):
+      dydx = Dydx.mainnet(public=True)
     else:
-      dydx = None
+      dydx = Dydx.testnet(public=True)
 
     return cls(
       history_impl=History.of(
@@ -102,7 +107,7 @@ class Report(_Report):
         cache=cache,
         require_bigquery=require_bigquery,
       ),
-      snapshots_impl=Snapshots.of(address),
+      snapshots_impl=Snapshots.of(address, dydx),
     )
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:

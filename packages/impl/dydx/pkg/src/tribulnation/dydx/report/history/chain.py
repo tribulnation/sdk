@@ -17,7 +17,7 @@ from typing_extensions import (
 
 from typed_dydx import Dydx
 from typed_dydx.chain.comet import Comet
-from typed_dydx.chain.comet.types import Event, EventAttribute, TxResponse
+from typed_dydx.chain.comet.schemas import Event, EventAttribute, TxResponse
 
 if TYPE_CHECKING:
   from .cache import HistoryCache

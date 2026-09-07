@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from tribulnation.sdk.market import Rules
 
-from typed_dydx.indexer.types import PerpetualMarket
+from typed_dydx.indexer.schemas import PerpetualMarket
 from typed_dydx.protos.dydxprotocol import feetiers as feetiers_proto
 
 
