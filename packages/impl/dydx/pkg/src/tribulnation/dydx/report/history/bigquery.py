@@ -1,4 +1,3 @@
-from __future__ import annotations
 from typing_extensions import TYPE_CHECKING
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -79,7 +78,7 @@ def run_query_with_cost(
 run_query_with_cost_async = asyncify(run_query_with_cost)
 
 
-def parse_row(row: bigquery.Row | BigQueryReward) -> Bonus:
+def parse_row(row: 'bigquery.Row | BigQueryReward') -> Bonus:
   asset, amount = parse_denom_amount(row.token_denom, row.token_amount)
   return Bonus(
     time=row.block_timestamp,
@@ -93,14 +92,14 @@ class BigQueryHistory(SDK):
   address: str
   client: bigquery.Client = field(default_factory=bigquery.Client)
   max_cost_usd: float = 0.10
-  cache: HistoryCache | None = None
+  cache: 'HistoryCache | None' = None
 
   @classmethod
   def of(
     cls,
     address: str,
     client: bigquery.Client | None = None,
-    cache: HistoryCache | None = None,
+    cache: 'HistoryCache | None' = None,
   ):
     if client is None:
       client = bigquery_client()

@@ -1,16 +1,14 @@
-from __future__ import annotations
-
 import asyncio
 from collections import defaultdict
 from collections.abc import Awaitable, Callable, Iterable
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import TYPE_CHECKING
 
 from tribulnation.dydx.core import wrap_exceptions
 from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import CosmosTx, HistoryRecord, source_id
 from typing_extensions import (
+  TYPE_CHECKING,
   AsyncContextManager,
   TypeVar,
 )
@@ -87,14 +85,14 @@ class ChainHistory(SDK):
   chain_semaphore: asyncio.Semaphore = field(
     default_factory=lambda: asyncio.Semaphore(4)
   )
-  cache: HistoryCache | None = None
+  cache: 'HistoryCache | None' = None
   _block_times: dict[int, datetime] = field(default_factory=dict)
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield self.comet
 
   @classmethod
-  def of(cls, address: str, dydx: Dydx, cache: HistoryCache | None = None):
+  def of(cls, address: str, dydx: Dydx, cache: 'HistoryCache | None' = None):
     return cls(address=address, comet=dydx.chain.comet, cache=cache)
 
   @SDK.method

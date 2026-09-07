@@ -45,7 +45,9 @@ class Instruments(SdkMixin, _Instruments):
     assets: Collection[str] | None = None,
   ) -> Sequence[Instrument]:
     if await self.is_uta():
-      raise NotImplementedError('The UTA API does not support listing earn instruments.')
+      raise NotImplementedError(
+        'The UTA API does not support listing earn instruments.'
+      )
     else:
       out: list[Instrument] = []
       r = await self.client.classic.earn.savings.products()

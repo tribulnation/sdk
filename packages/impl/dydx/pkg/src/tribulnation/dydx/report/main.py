@@ -3,7 +3,6 @@ from collections.abc import Collection, Iterable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import Literal
 
 from tribulnation.dydx.core import USDC
 from tribulnation.sdk.reporting import (
@@ -13,7 +12,7 @@ from tribulnation.sdk.reporting import (
   SubaccountSnapshot,
 )
 from tribulnation.sdk.reporting import Report as _Report
-from typing_extensions import AsyncContextManager, TypedDict
+from typing_extensions import AsyncContextManager, Literal, TypedDict
 
 from typed_dydx import Dydx
 

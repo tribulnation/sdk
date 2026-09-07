@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 from itertools import pairwise
-from typing import TYPE_CHECKING, TypeVar
 
 from tribulnation.dydx.core import USDC, wrap_exceptions
 from tribulnation.sdk import SDK
@@ -16,6 +15,7 @@ from tribulnation.sdk.reporting import (
   HistoryRecord,
   source_id,
 )
+from typing_extensions import TYPE_CHECKING, TypeVar
 
 from typed_dydx import Dydx, Indexer
 from typed_dydx.indexer.schemas import Fill

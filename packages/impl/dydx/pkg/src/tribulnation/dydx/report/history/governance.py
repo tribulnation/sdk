@@ -1,4 +1,3 @@
-from __future__ import annotations
 from typing_extensions import Any, TYPE_CHECKING
 from dataclasses import dataclass
 import asyncio
@@ -35,7 +34,7 @@ class GovernanceHistory:
   """Governance-backed dYdX history methods."""
 
   address: str
-  cache: HistoryCache | None = None
+  cache: 'HistoryCache | None' = None
 
   async def history(
     self,

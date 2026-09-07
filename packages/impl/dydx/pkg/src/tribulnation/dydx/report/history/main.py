@@ -1,4 +1,3 @@
-from __future__ import annotations
 from typing_extensions import TYPE_CHECKING, AsyncContextManager, Iterable
 from dataclasses import dataclass
 from datetime import datetime
@@ -38,7 +37,7 @@ class History(_History):
     *,
     bigquery: BigQueryClient | None = None,
     dydx: Dydx | None = None,
-    cache: HistoryCache | None = None,
+    cache: 'HistoryCache | None' = None,
     require_bigquery: bool = True,
   ):
     if dydx is None:
