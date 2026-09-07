@@ -73,3 +73,21 @@ repo = "https://github.com/tribulnationx/sdk"
 path = "packages/impl/ethereum"
 pypi = "https://pypi.org/project/tribulnation-ethereum/"
 icon = "https://catalogue.tribulnation.com/icons/asset/ethereum.svg"
+
+[[venues]]
+slug = "coinbase"
+name = "Coinbase"
+tier = "production"
+repo = "https://github.com/tribulnationx/sdk"
+path = "packages/impl/coinbase"
+pypi = "https://pypi.org/project/tribulnation-coinbase/"
+icon = "https://catalogue.tribulnation.com/icons/platform/coinbase.svg"
+
+[[venues]]
+slug = "bybit"
+name = "Bybit"
+tier = "production"
+repo = "https://github.com/tribulnationx/sdk"
+path = "packages/impl/bybit"
+pypi = "https://pypi.org/project/tribulnation-bybit/"
+icon = "https://catalogue.tribulnation.com/icons/platform/bybit.svg"
