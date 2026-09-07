@@ -1,6 +1,16 @@
 {
+  // No implicit Any where the real type is knowable. The parameter rules flag the cause
+  // (an unannotated parameter); the Unknown* rules flag each place that Any then spreads
+  // to. The count is a backlog to drive to zero, not a gate expected to be green today.
   "typeCheckingMode": "standard",
   "pythonVersion": "3.11",
   "venvPath": ".",
-  "venv": ".venv"
+  "venv": ".venv",
+
+  "reportMissingParameterType": "error",
+  "reportUnknownParameterType": "error",
+  "reportUnknownArgumentType": "error",
+  "reportUnknownVariableType": "error",
+  "reportUnknownMemberType": "error",
+  "reportUnknownLambdaType": "error"
 }
