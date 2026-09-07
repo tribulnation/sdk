@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tribulnation.sdk.wallet import Wallet
-from .accounts import Account, Mexc, Bitget, Binance, load_accounts
+from .accounts import Account, Bit2Me, Bybit, Mexc, Bitget, Binance, load_accounts
 
 DEFAULT_ACCOUNTS: Mapping[str, Account] = {}
 
@@ -66,6 +66,32 @@ class WalletSDK:
       settings={'validate': account.validate},
     ).wallet
 
+  def bybit(self, account: Bybit) -> Wallet:
+    try:
+      from tribulnation.bybit import Wallet as BybitWallet
+    except ImportError as e:
+      raise ImportError(
+        'bybit sdk is not installed. Please install it with `pip install tribulnation-bybit`.'
+      ) from e
+    return BybitWallet.new(
+      account.resolved_api_key,
+      account.resolved_api_secret,
+      settings={'validate': account.validate},
+    )
+
+  def bit2me(self, account: Bit2Me) -> Wallet:
+    try:
+      from tribulnation.bit2me import Wallet as Bit2MeWallet
+    except ImportError as e:
+      raise ImportError(
+        'bit2me sdk is not installed. Please install it with `pip install tribulnation-bit2me`.'
+      ) from e
+    return Bit2MeWallet.new(
+      account.resolved_api_key,
+      account.resolved_api_secret,
+      validate=account.validate,
+    )
+
   @property
   def all(self) -> dict[str, Wallet]:
     return {id: self.venue(id) for id in self.all_accounts}
@@ -80,6 +106,10 @@ class WalletSDK:
         return self.bitget(account)
       case 'mexc':
         return self.mexc(account)
+      case 'bybit':
+        return self.bybit(account)
+      case 'bit2me':
+        return self.bit2me(account)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 

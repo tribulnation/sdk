@@ -27,7 +27,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
     implementations = {
       account_id: wallet.venue(account_id)
       for account_id, account in wallet.all_accounts.items()
-      if account.venue in {'binance', 'bitget', 'mexc'}
+      if account.venue in {'binance', 'bitget', 'mexc', 'bybit', 'bit2me'}
     }
     metafunc.config.stash[IMPLEMENTATIONS] = implementations
   metafunc.parametrize(

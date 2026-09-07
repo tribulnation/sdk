@@ -1,10 +1,9 @@
 # auth = false means this surface has a real credential-free DEFAULT_ACCOUNTS entry —
 # auth = true means every call always needs a real accounts.Coinbase() entry.
 #
-# Every surface here is auth = true: `tribulnation.sdk.impl.accounts` has no Coinbase
-# account type yet, so nothing is wired into any *SDK router and `DEFAULT_ACCOUNTS` has
-# no entry. Construct the surfaces directly (`CoinbaseMarket.new()`, `Report.new()`,
-# `Earn.new()`) until that lands.
+# Every surface here is auth = true: `accounts.Coinbase` carries a CDP key, and none of the
+# routers has a credential-free default for it (`EarnSDK`, `ReportSDK` and `MarketSDK` all
+# build from the account).
 #
 # One client fronts two Coinbase products, and which one a method reads is a real
 # distinction, not an implementation detail: `app` is the retail Coinbase App tier

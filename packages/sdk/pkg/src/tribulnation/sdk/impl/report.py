@@ -1,4 +1,4 @@
-from typing_extensions import Mapping, TypedDict, TYPE_CHECKING
+from typing_extensions import Mapping, Sequence, TypedDict, TYPE_CHECKING
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -11,10 +11,22 @@ from .accounts import (
   Binance,
   Bitget,
   Bit2Me,
+  Bybit,
+  Coinbase,
   Mexc,
   Hyperliquid,
   load_accounts,
 )
+
+
+class BinanceConfig(TypedDict, total=False):
+  """Binance reporting configuration."""
+
+  spot_markets: Sequence[str]
+  """Spot symbols `history()` sweeps for fills; Binance has no account-wide fills feed."""
+  usdm_markets: Sequence[str]
+  """USD-M perpetual symbols `history()` sweeps for fills."""
+
 
 if TYPE_CHECKING:
   from tribulnation.ethereum.reporting import EvmConfig
@@ -25,6 +37,7 @@ if TYPE_CHECKING:
     evm: EvmConfig
     dydx: DydxConfig
     hyperliquid: HyperliquidConfig
+    binance: BinanceConfig
 else:
   Config = dict
 
@@ -76,7 +89,42 @@ class ReportSDK:
     )
 
   def binance(self, account: Binance, id: str) -> Report:
-    raise NotImplementedError('binance reporting is not yet implemented.')
+    try:
+      from tribulnation.binance import Reporting as BinanceReport
+    except ImportError as e:
+      raise ImportError(
+        'binance sdk is not installed. Please install it with `pip install tribulnation-binance`.'
+      ) from e
+    config = self.config.get('binance') or {}
+    return BinanceReport.new(
+      account.resolved_api_key,
+      account.resolved_secret_key,
+      validate=account.validate,
+      spot_markets=config.get('spot_markets', ()),
+      usdm_markets=config.get('usdm_markets', ()),
+    )
+
+  def coinbase(self, account: Coinbase, id: str) -> Report:
+    try:
+      from tribulnation.coinbase import Report as CoinbaseReport
+    except ImportError as e:
+      raise ImportError(
+        'coinbase sdk is not installed. Please install it with `pip install tribulnation-coinbase`.'
+      ) from e
+    return CoinbaseReport.new(account.resolved_key_name, account.resolved_private_key)
+
+  def bybit(self, account: Bybit, id: str) -> Report:
+    try:
+      from tribulnation.bybit import Report as BybitReport
+    except ImportError as e:
+      raise ImportError(
+        'bybit sdk is not installed. Please install it with `pip install tribulnation-bybit`.'
+      ) from e
+    return BybitReport.new(
+      account.resolved_api_key,
+      account.resolved_api_secret,
+      settings={'validate': account.validate},
+    )
 
   def bitget(self, account: Bitget, id: str) -> Report:
     raise NotImplementedError(
@@ -152,6 +200,10 @@ class ReportSDK:
         return self.mexc(account, id)
       case 'bit2me':
         return self.bit2me(account, id)
+      case 'coinbase':
+        return self.coinbase(account, id)
+      case 'bybit':
+        return self.bybit(account, id)
       case 'hyperliquid' | 'hyperliquid_testnet':
         return self.hyperliquid(account, id)
       case _:

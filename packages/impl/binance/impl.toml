@@ -39,9 +39,8 @@ support = "partial"
 auth = true
 methods = ["snapshot", "history"]
 note = "`history()` requires both `start` and `end`: no Binance endpoint serves all time, and each stops at a different retention horizon. Fills are per symbol with no account-wide equivalent, so pass `spot_markets`/`usdm_markets` to sweep them. Margin, COIN-M futures, Options, Portfolio Margin, Earn events and Convert/Pay/Fiat history are not covered."
-# ReportSDK never has a DEFAULT_ACCOUNTS entry for any venue. ReportSDK.binance() itself
-# still raises NotImplementedError — tribulnation.binance.reporting.Reporting is real and
-# live-tested, but the router in packages/sdk hasn't been pointed at it yet.
+# ReportSDK never has a DEFAULT_ACCOUNTS entry for any venue. The fill sweeps come from
+# `ReportSDK.config['binance']` (`spot_markets`/`usdm_markets`).
 
 [ids]
 asset = "symbol"

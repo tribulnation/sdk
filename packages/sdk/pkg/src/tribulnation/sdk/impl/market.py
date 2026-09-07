@@ -3,13 +3,24 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tribulnation.sdk.market import TradingMarkets, TradingVenue
-from .accounts import Account, Binance, Dydx, Hyperliquid, Mexc, load_accounts
+from .accounts import (
+  Account,
+  Binance,
+  Bit2Me,
+  Bybit,
+  Coinbase,
+  Dydx,
+  Hyperliquid,
+  Mexc,
+  load_accounts,
+)
 
 DEFAULT_ACCOUNTS: Mapping[str, Account] = {
   'dydx': Dydx(public=True),
   'hyperliquid': Hyperliquid(public=True),
   'mexc': Mexc(public=True),
   'binance': Binance(public=True),
+  'bit2me': Bit2Me(public=True),
 }
 
 
@@ -83,6 +94,42 @@ class MarketSDK(TradingMarkets):
       validate=account.validate,
     )
 
+  def coinbase(self, account: Coinbase) -> TradingVenue:
+    try:
+      from tribulnation.coinbase import CoinbaseMarket
+    except ImportError as e:
+      raise ImportError(
+        'coinbase market is not installed. Please install it with `pip install tribulnation-coinbase`.'
+      ) from e
+    return CoinbaseMarket.new(account.resolved_key_name, account.resolved_private_key)
+
+  def bybit(self, account: Bybit) -> TradingVenue:
+    try:
+      from tribulnation.bybit import BybitMarket
+    except ImportError as e:
+      raise ImportError(
+        'bybit market is not installed. Please install it with `pip install tribulnation-bybit`.'
+      ) from e
+    return BybitMarket.new(
+      account.resolved_api_key,
+      account.resolved_api_secret,
+      settings={'validate': account.validate},
+    )
+
+  def bit2me(self, account: Bit2Me) -> TradingVenue:
+    try:
+      from tribulnation.bit2me import Bit2MeMarket
+    except ImportError as e:
+      raise ImportError(
+        'bit2me market is not installed. Please install it with `pip install tribulnation-bit2me`.'
+      ) from e
+    return Bit2MeMarket.new(
+      account.resolved_api_key,
+      account.resolved_api_secret,
+      public=account.public,
+      validate=account.validate,
+    )
+
   def _venue(self, id: str, /) -> TradingVenue:
     if (account := self.all_accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
@@ -95,6 +142,12 @@ class MarketSDK(TradingMarkets):
         return self.mexc(account)
       case 'binance':
         return self.binance(account)
+      case 'coinbase':
+        return self.coinbase(account)
+      case 'bybit':
+        return self.bybit(account)
+      case 'bit2me':
+        return self.bit2me(account)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 

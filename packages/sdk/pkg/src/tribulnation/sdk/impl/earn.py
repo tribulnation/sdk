@@ -3,7 +3,16 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tribulnation.sdk.earn import Earn
-from .accounts import Account, Mexc, Bitget, Binance, Bit2Me, load_accounts
+from .accounts import (
+  Account,
+  Bybit,
+  Coinbase,
+  Mexc,
+  Bitget,
+  Binance,
+  Bit2Me,
+  load_accounts,
+)
 
 DEFAULT_ACCOUNTS: Mapping[str, Account] = {
   'mexc': Mexc(public=True),
@@ -78,6 +87,28 @@ class EarnSDK:
       validate=account.validate,
     )
 
+  def coinbase(self, account: Coinbase) -> Earn:
+    try:
+      from tribulnation.coinbase import Earn as CoinbaseEarn
+    except ImportError as e:
+      raise ImportError(
+        'coinbase sdk is not installed. Please install it with `pip install tribulnation-coinbase`.'
+      ) from e
+    return CoinbaseEarn.new(account.resolved_key_name, account.resolved_private_key)
+
+  def bybit(self, account: Bybit) -> Earn:
+    try:
+      from tribulnation.bybit import Earn as BybitEarn
+    except ImportError as e:
+      raise ImportError(
+        'bybit sdk is not installed. Please install it with `pip install tribulnation-bybit`.'
+      ) from e
+    return BybitEarn.new(
+      account.resolved_api_key,
+      account.resolved_api_secret,
+      settings={'validate': account.validate},
+    )
+
   @property
   def all(self) -> dict[str, Earn]:
     out: dict[str, Earn] = {}
@@ -100,6 +131,10 @@ class EarnSDK:
         return self.mexc(account)
       case 'bit2me':
         return self.bit2me(account)
+      case 'coinbase':
+        return self.coinbase(account)
+      case 'bybit':
+        return self.bybit(account)
       case _:
         raise NotImplementedError(f'Unsupported venue: {account.venue}')
 

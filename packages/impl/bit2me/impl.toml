@@ -16,30 +16,20 @@ auth = true
 note = "`history()` covers spot trades, on-chain deposits/withdrawals and Earn rewards. Internal transfers between the spot/earn/pocket compartments, fiat funding, loans and Social Pay are separate ledgers and aren't mapped."
 # ReportSDK never has a DEFAULT_ACCOUNTS entry for any venue.
 
-# Wallet isn't listed here on purpose — and no longer because it can't be built. It can:
-# `tribulnation.bit2me.wallet.Wallet` enumerates asset/network deposit and withdrawal
-# methods for real. What used to block it was the asset catalogue (`v2/currency/assets`),
-# whose `network` is one display string per asset; `v1/wallet/currency/{symbol}/network`
-# now answers with the true per-asset chain list (ETH on 7 networks, USDT on 10), and its
-# `id` is the same machine slug the withdrawal proforma expects. Fees are real too, quoted
-# through `POST /v1/wallet/transaction/proforma` for every network the caller configures a
-# destination address for (`quote_addresses`) — that is still the only place Bit2Me
-# publishes a withdrawal fee at all, so the enumeration is complete either way but the fees
-# are opt-in.
-#
-# What is missing is the router: `tribulnation.sdk.impl.wallet.WalletSDK` has no `bit2me()`
-# method, so `WalletSDK.venue('bit2me')` raises and announcing the surface here would put a
-# venue in the /sdk wizard's Wallet picker that the wizard cannot then build. Add
-# `[support.wallet]` (`support = "full"`, `auth = true`) in the same change that wires that
-# router method.
+[support.wallet]
+support = "full"
+auth = true
+note = "Deposit and withdrawal methods come from the per-asset chain list (`v1/wallet/currency/{symbol}/network`). Withdrawal fees are quoted live through the proforma endpoint, only for the networks a destination address is configured for (`quote_addresses`), because that is the only place Bit2Me publishes one."
+# The asset catalogue (`v2/currency/assets`) shows one display network per asset and was
+# the old blocker; the per-asset network endpoint answers with the true chain list (ETH on
+# 7 networks, USDT on 10) whose `id` is the slug the withdrawal proforma expects.
 
-# Market is in the same position: `tribulnation.bit2me.market.Bit2MeMarket` is a complete
-# spot venue (depth + stream, tickers, rules, orders, trades + stream, position,
-# collateral), but `MarketSDK` has no `bit2me()` method and `accounts.Bit2Me` isn't in its
-# match. Two caveats to record here when it is announced: `rules().maker_fee`/`taker_fee`
-# are always `0` because no Bit2Me endpoint publishes a fee rate ahead of a fill, and
-# `tickers()` carries no `bid_qty`/`ask_qty` because `v2/trading/tickers` quotes prices
-# only.
+[support.market]
+support = "full"
+auth = false
+note = "Spot only. `rules().maker_fee`/`taker_fee` are always `0` because no Bit2Me endpoint publishes a fee rate ahead of a fill, and `tickers()` carries no `bid_qty`/`ask_qty` because `v2/trading/tickers` quotes prices only."
+# MarketSDK.DEFAULT_ACCOUNTS includes 'bit2me' (Bit2Me(public=True)): markets, depth,
+# tickers and rules are public; account-scoped methods still need real credentials.
 
 [ids]
 asset = "symbol"
