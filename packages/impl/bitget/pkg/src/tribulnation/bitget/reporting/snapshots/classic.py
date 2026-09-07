@@ -32,7 +32,7 @@ class Snapshots(SdkMixin, _Snapshots):
   @SDK.method
   @wrap_exceptions
   async def spot_balances(self) -> Balances:
-    balances = await self.client.spot.account.assets()
+    balances = await self.client.classic.spot.account.assets()
     out = Balances()
     for balance in balances:
       out[balance['coin']] += (
@@ -47,7 +47,7 @@ class Snapshots(SdkMixin, _Snapshots):
   async def futures_balances(self) -> Balances:
     balances = Balances()
     for asset_type in ('USDT-FUTURES', 'USDC-FUTURES', 'COIN-FUTURES'):
-      accounts = await self.client.futures.account.account_list(asset_type)
+      accounts = await self.client.classic.mix.account.list(product_type=asset_type)
       for a in accounts:
         balances[a['marginCoin']] += Decimal(a['available'])
 
@@ -62,12 +62,12 @@ class Snapshots(SdkMixin, _Snapshots):
   async def futures_positions(self) -> dict[str, Position]:
     positions: dict[str, Position] = {}
     for asset_type in ('USDT-FUTURES', 'USDC-FUTURES', 'COIN-FUTURES'):
-      assets = await self.client.futures.position.all_positions(asset_type)
+      assets = await self.client.classic.mix.position.list(product_type=asset_type)
       for asset in assets:
         assert not asset['symbol'] in positions
         positions[asset['symbol']] = Position(
-          size=asset['total'],
-          avg_price=asset['openPriceAvg'],
+          size=Decimal(asset['total']),
+          avg_price=Decimal(asset['openPriceAvg']),
         )
 
     return positions
@@ -75,7 +75,7 @@ class Snapshots(SdkMixin, _Snapshots):
   @SDK.method
   @wrap_exceptions
   async def earn_balances(self) -> Balances:
-    balances = await self.client.earn.account.assets()
+    balances = await self.client.classic.earn.account_assets()
     out = Balances()
     for balance in balances:
       out[balance['coin']] += Decimal(balance['amount'])
@@ -84,7 +84,7 @@ class Snapshots(SdkMixin, _Snapshots):
   @SDK.method
   @wrap_exceptions
   async def cross_margin_balances(self) -> Balances:
-    balances = await self.client.margin.cross.account.assets()
+    balances = await self.client.classic.margin.cross.account.assets()
     out = Balances()
     for balance in balances:
       out[balance['coin']] += Decimal(balance['net'])
@@ -93,7 +93,7 @@ class Snapshots(SdkMixin, _Snapshots):
   @SDK.method
   @wrap_exceptions
   async def isolated_margin_balances(self) -> Balances:
-    balances = await self.client.margin.isolated.account.assets()
+    balances = await self.client.classic.margin.isolated.account.assets()
     out = Balances()
     for balance in balances:
       out[balance['coin']] += Decimal(balance['net'])
@@ -103,7 +103,7 @@ class Snapshots(SdkMixin, _Snapshots):
   @wrap_exceptions
   async def bot_balances(self, account_type: Literal['spot', 'futures']) -> Balances:
     out = Balances()
-    balances = await self.client.common.assets.bot(account_type)
+    balances = await self.client.classic.common.assets.bot(account_type)
     for balance in balances:
       if balance['equity']:
         total = balance['equity']

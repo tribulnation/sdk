@@ -11,8 +11,8 @@ from tribulnation.sdk.reporting import (
   UnknownObservation,
 )
 from tribulnation.sdk.reporting import History as SdkHistory
-from bitget import Bitget
-from bitget.spot.public.symbols import Symbol
+from typed_bitget import Bitget
+from typed_bitget.classic.spot.symbols import SpotSymbol
 
 from .util import (
   TimezoneMixin,
@@ -29,10 +29,10 @@ class MarginHistory(TimezoneMixin, SdkHistory):
   """Bitget margin account history."""
 
   client: Bitget
-  symbols_cache: dict[str, Symbol] | None = field(kw_only=True, default=None)
+  symbols_cache: dict[str, SpotSymbol] | None = field(kw_only=True, default=None)
 
   @property
-  async def symbols(self) -> dict[str, Symbol]:
+  async def symbols(self) -> dict[str, SpotSymbol]:
     """Fetch and cache Bitget spot symbol metadata."""
     if self.symbols_cache is None:
       self.symbols_cache = {

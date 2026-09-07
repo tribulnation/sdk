@@ -12,7 +12,7 @@ description = "Tribulnation SDK implementation for Bitget."
 license = "MIT"
 license-files = ["LICENSE"]
 dependencies = [
-  "tribulnation-sdk>=1.7.0", "typed-bitget>=0.1.4,<0.2",
+  "tribulnation-sdk>=1.7.0", "typed-bitget>=0.4.0",
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}

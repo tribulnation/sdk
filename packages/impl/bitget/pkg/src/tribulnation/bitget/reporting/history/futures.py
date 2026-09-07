@@ -14,8 +14,7 @@ from tribulnation.sdk.reporting import (
 )
 from tribulnation.sdk.reporting import History as SdkHistory
 
-from bitget import Bitget
-from bitget.futures.trade.fills import fill_direction
+from typed_bitget import Bitget
 
 from .util import (
   TimezoneMixin,
@@ -36,9 +35,7 @@ class FuturesHistory(TimezoneMixin, SdkHistory):
   @SDK.method
   async def flows(self, start: datetime, end: datetime):
     """Fetch futures tax rows as unknown observations."""
-    async for chunk in self.client.common.tax.futures_transaction_records_paged(
-      start=start, end=end
-    ):
+    async for chunk in self.client.classic.tax.futures_records_paged(start=start, end=end):
       for tx in chunk:
         observations: list[Observation] = [
           UnknownObservation(
