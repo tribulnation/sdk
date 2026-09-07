@@ -23,7 +23,7 @@ class Snapshots(Mixin, _Snapshots):
   @SDK.method
   @wrap_exceptions
   async def spot_balances(self) -> Balances:
-    r = await self.client.spot.account.info(recv_window=self.recvWindow)
+    r = await self.client.spot.http.account.info(recv_window=self.recvWindow)
     return Balances(
       {
         b.get('asset') or '': Decimal(b.get('free') or '0')
@@ -35,7 +35,7 @@ class Snapshots(Mixin, _Snapshots):
   @SDK.method
   @wrap_exceptions
   async def futures_balances(self) -> Balances:
-    r = await self.client.futures.account.assets()
+    r = await self.client.futures.http.account.assets()
     data = r.get('data')
     if data is None:
       raise ValueError('MEXC futures assets response did not include data')
@@ -50,7 +50,7 @@ class Snapshots(Mixin, _Snapshots):
   @SDK.method
   @wrap_exceptions
   async def futures_positions(self):
-    response = await self.client.futures.position.open()
+    response = await self.client.futures.http.position.open()
     data = response.get('data')
     if data is None:
       raise ValueError('MEXC futures positions response did not include data')
@@ -60,7 +60,9 @@ class Snapshots(Mixin, _Snapshots):
       symbol = pos.get('symbol')
       if symbol is None:
         continue
-      contract_response = await self.client.futures.market.contract_info(symbol=symbol)
+      contract_response = await self.client.futures.http.market.contract_info(
+        symbol=symbol
+      )
       contract = contract_response.get('data')
       if contract is None:
         raise ValueError(

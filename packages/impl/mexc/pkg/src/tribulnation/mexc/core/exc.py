@@ -5,7 +5,7 @@ import pydantic
 
 from tribulnation.sdk.core import NetworkError, ValidationError, ApiError, Error
 
-from mexc import core
+from typed_core import exceptions as core
 
 
 def wrap_exceptions(fn):

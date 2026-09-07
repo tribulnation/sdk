@@ -6,9 +6,9 @@ from decimal import Decimal
 from tribulnation.sdk.market import Trade
 from tribulnation.sdk.core import OverflowPolicy
 
-from mexc.core import timestamp as ts
-from mexc.spot.account.trades import AccountTrade
-from mexc.spot.streams.core.proto import PrivateDealsV3Api
+from typed_mexc.core import timestamp_millis as ts
+from typed_mexc.spot.http.account.trades import AccountTrade
+from typed_mexc.spot.streams.core.proto import PrivateDealsV3Api
 
 from tribulnation.mexc.core.exc import wrap_exceptions
 from .mixin import MarketMixin
@@ -69,7 +69,7 @@ async def trades_stream(
 async def trades_history(
   self: MarketMixin, start: datetime, end: datetime
 ) -> AsyncIterable[Sequence[Trade]]:
-  trades = await self.client.spot.account.trades(
+  trades = await self.client.spot.http.account.trades(
     symbol=self.instrument,
     start_time=start,
     end_time=end,

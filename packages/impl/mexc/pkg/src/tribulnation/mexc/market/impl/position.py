@@ -8,7 +8,7 @@ from .mixin import MarketMixin
 
 @wrap_exceptions
 async def position(self: MarketMixin) -> Position:
-  r = await self.client.spot.account.info(
+  r = await self.client.spot.http.account.info(
     recv_window=self.shared.recv_window, validate=self.shared.validate
   )
   for b in r.get('balances', []):

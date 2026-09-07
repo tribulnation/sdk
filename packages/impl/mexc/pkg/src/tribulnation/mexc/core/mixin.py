@@ -3,13 +3,13 @@ from dataclasses import dataclass, field
 
 from tribulnation.sdk import SDK
 
-from mexc import MEXC
-from mexc.futures.market.contract_info import ContractSpec, ContractSpecListItem
-from mexc.spot.market.exchange_info import SymbolInfo
+from typed_mexc import MEXC
+from typed_mexc.schemas import ContractSpec
+from typed_mexc.spot.http.market.exchange_info import SymbolInfo
 from .util import StreamManager, closing_streams
 
 SpotInfo = SymbolInfo
-PerpInfo = ContractSpec | ContractSpecListItem
+PerpInfo = ContractSpec
 
 
 class Settings(TypedDict, total=False):
@@ -62,7 +62,7 @@ class Mixin(SDK):
     self, instrument: str, *, refetch: bool = False
   ) -> SpotInfo:
     if refetch or instrument not in self.cache.spot_markets:
-      info = await self.client.spot.market.exchange_info()
+      info = await self.client.spot.http.market.exchange_info()
       self.cache.spot_markets = {
         market['symbol']: market for market in info['symbols'] if 'symbol' in market
       }
@@ -72,7 +72,7 @@ class Mixin(SDK):
     self, instrument: str, *, refetch: bool = False
   ) -> PerpInfo:
     if refetch or instrument not in self.cache.perp_markets:
-      info = await self.client.futures.market.contract_info(symbol=instrument)
+      info = await self.client.futures.http.market.contract_info(symbol=instrument)
       data = info.get('data')
       if data is None:
         raise ValueError(

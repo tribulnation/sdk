@@ -84,7 +84,7 @@ class SpotMarket(MarketMixin, Market):
 
   @wrap_exceptions
   async def available_notional(self):
-    r = await self.client.spot.account.info(recv_window=self.shared.recv_window)
+    r = await self.client.spot.http.account.info(recv_window=self.shared.recv_window)
     for b in r.get('balances', []):
       if b.get('asset') == self.info.get('quoteAsset'):
         return Decimal(b.get('free') or '0')
@@ -92,7 +92,7 @@ class SpotMarket(MarketMixin, Market):
 
   @wrap_exceptions
   async def collateral(self) -> Collateral:
-    r = await self.client.spot.account.info(recv_window=self.shared.recv_window)
+    r = await self.client.spot.http.account.info(recv_window=self.shared.recv_window)
     for b in r.get('balances', []):
       if b.get('asset') == self.info.get('quoteAsset'):
         free = Decimal(b.get('free') or '0')

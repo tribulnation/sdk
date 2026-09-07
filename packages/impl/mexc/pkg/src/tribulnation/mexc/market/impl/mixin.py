@@ -5,9 +5,9 @@ import asyncio
 from tribulnation.sdk.core import SDK, Subscription, OverflowPolicy
 from tribulnation.sdk.market import Book
 
-from mexc import MEXC
-from mexc.spot.market.exchange_info import SymbolInfo
-from mexc.spot.streams.core.proto import PrivateDealsV3Api
+from typed_mexc import MEXC
+from typed_mexc.spot.http.market.exchange_info import SymbolInfo
+from typed_mexc.spot.streams.core.proto import PrivateDealsV3Api
 
 from tribulnation.mexc.core.exc import wrap_exceptions
 
@@ -50,7 +50,7 @@ class Shared:
 
   @classmethod
   def public(cls, *, validate: bool = True):
-    client = MEXC.public(validate=validate)
+    client = MEXC.new(public=True, validate=validate)
     return cls(client=client, validate=validate)
 
   @wrap_exceptions
@@ -70,7 +70,7 @@ class Shared:
     async with self._markets_lock:
       if not refetch and self.spot_markets is not None:
         return self.spot_markets
-      info = await self.client.spot.market.exchange_info(validate=self.validate)
+      info = await self.client.spot.http.market.exchange_info(validate=self.validate)
       markets = {
         market['symbol']: market for market in info['symbols'] if 'symbol' in market
       }
@@ -85,12 +85,10 @@ class Shared:
         # Local import avoids a circular import (depth.py imports MarketMixin).
         from .depth import reconstruct_books
 
-        stream = await self.client.spot.streams.market.depth_updates(
-          symbol, aggregation='10ms'
-        )
+        stream = await self.client.spot.streams.market.depth_updates('10ms', symbol)
         # Reconstruct the book once here so the shared subscription fans out
         # full snapshots rather than raw diffs.
-        return reconstruct_books(self.client, symbol, stream.stream), stream.unsubscribe
+        return reconstruct_books(self.client, symbol, stream), stream.unsubscribe
 
       self.depth_subscriptions[symbol] = Subscription.of(subscribe)
     return self.depth_subscriptions[symbol]

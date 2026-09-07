@@ -41,7 +41,9 @@ class SpotExchange(ExchangeMixin, Exchange):
       settings: Accepted for interface compatibility and ignored because MEXC
         returns all best bids and asks in one request.
     """
-    items = await self.client.spot.market.book_ticker(validate=self.shared.validate)
+    items = await self.client.spot.http.market.book_ticker(
+      validate=self.shared.validate
+    )
     if not isinstance(items, list):
       items = [items]
     wanted = None if markets is None else set(markets)

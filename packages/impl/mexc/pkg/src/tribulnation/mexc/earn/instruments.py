@@ -1,12 +1,12 @@
 from typing_extensions import Sequence, Literal, Iterable, Collection
 from datetime import timedelta
 from decimal import Decimal
-import pydantic
-import httpx
 
-from tribulnation.sdk.core import ValidationError, ApiError
+import pydantic
+from typed_core import HttpClient
+
+from tribulnation.sdk.core import ValidationError, ApiError, exception_wrapper
 from tribulnation.sdk.earn.instruments import Instrument, Instruments as _Instruments
-from tribulnation.mexc.core import Mixin
 
 MEXC_EARN_URL = 'https://www.mexc.com/earn'
 
@@ -122,7 +122,11 @@ def parse_group(group: CurrencyGroup) -> Iterable[Instrument]:
       )
 
 
+wrap_exceptions = exception_wrapper()
+
+
 class Instruments(_Instruments):
+  @wrap_exceptions
   async def instruments(
     self,
     *,
@@ -130,9 +134,9 @@ class Instruments(_Instruments):
     assets: Collection[str] | None = None,
   ) -> Sequence[Instrument]:
 
-    async with httpx.AsyncClient() as client:
-      r = await client.get(
-        'https://www.mexc.com/api/financialactivity/financial/products/list/V2'
+    async with HttpClient() as client:
+      r = await client.request(
+        'GET', 'https://www.mexc.com/api/financialactivity/financial/products/list/V2'
       )
     if r.status_code != 200:
       raise ApiError(f'MEXC API error: {r.status_code}')

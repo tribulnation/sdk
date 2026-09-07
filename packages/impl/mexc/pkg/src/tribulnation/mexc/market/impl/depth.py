@@ -7,16 +7,16 @@ from contextlib import asynccontextmanager, suppress
 from tribulnation.sdk.market import Book
 from tribulnation.sdk.core import NetworkError, OverflowPolicy
 from tribulnation.mexc.core.exc import wrap_exceptions
-from mexc import MEXC
-from mexc.spot.market.depth import OrderBook
-from mexc.spot.streams.core.proto import PublicAggreDepthsV3Api
+from typed_mexc import MEXC
+from typed_mexc.spot.http.market.depth import OrderBook
+from typed_mexc.spot.streams.core.proto import PublicAggreDepthsV3Api
 
 from .mixin import MarketMixin
 
 
 @wrap_exceptions
 async def depth(self: MarketMixin, *, levels: int | None = None) -> Book:
-  r = await self.client.spot.market.depth(
+  r = await self.client.spot.http.market.depth(
     symbol=self.instrument, validate=self.shared.validate, limit=levels
   )
   return Book(
@@ -95,7 +95,7 @@ async def synchronized_book(
   while True:
     first = cache[0]
     version, book = parse_snapshot(
-      await client.spot.market.depth(symbol=symbol, limit=levels)
+      await client.spot.http.market.depth(symbol=symbol, limit=levels)
     )
     drain_updates(queue, cache)
 
