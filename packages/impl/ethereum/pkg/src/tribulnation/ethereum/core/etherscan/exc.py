@@ -2,7 +2,7 @@ import inspect
 from functools import wraps
 from typing_extensions import TypeVar, Any, AsyncIterable
 
-from etherscan import core
+from typed_etherscan import core
 
 from tribulnation.sdk.core import (
   NetworkError,

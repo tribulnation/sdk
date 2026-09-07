@@ -58,7 +58,7 @@ class EthereumHistory(_History):
     rpc_url: str | None = None,
     api_key: str | None = None,
   ):
-    from moralis import Moralis
+    from typed_moralis import Moralis
     from tribulnation.ethereum.core import rpc, MORALIS_CHAINS
     from .moralis import MoralisHistory
 

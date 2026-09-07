@@ -16,10 +16,10 @@ dependencies = [
   "web3",
   "httpx",
   "pydantic",
-  "typed-ethereum>=0.1.11,<0.2",
-  "typed-alchemy>=1.0.3,<2",
-  "typed-etherscan>=0.2.1,<0.3",
-  "typed-moralis>=0.1.4,<0.2",
+  "typed-ethereum",
+  "typed-alchemy>=3.0.0",
+  "typed-etherscan>=0.4.0",
+  "typed-moralis>=0.3.0",
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}

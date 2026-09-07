@@ -1,5 +1,5 @@
 from typing_extensions import Literal
-from ethereum import Network
+from typed_ethereum import Network
 
 CHAIN_IDS: dict[Network, int] = {
   'ethereum': 1,

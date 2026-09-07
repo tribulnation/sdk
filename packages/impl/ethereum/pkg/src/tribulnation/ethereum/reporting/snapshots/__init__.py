@@ -40,7 +40,7 @@ class EthereumSnapshots(_Snapshots):
     network: Network,
     api_key: str | None = None,
   ):
-    from alchemy import Alchemy
+    from typed_alchemy import Alchemy
     from tribulnation.ethereum.core.alchemy import ALCHEMY_NETWORKS
     from .alchemy import AlchemySnapshots
 
@@ -53,7 +53,7 @@ class EthereumSnapshots(_Snapshots):
 
   @classmethod
   def moralis(cls, address: str, *, network: Network, api_key: str | None = None):
-    from moralis import Moralis
+    from typed_moralis import Moralis
     from tribulnation.ethereum.core.moralis import MORALIS_CHAINS
     from .moralis import MoralisSnapshots
 

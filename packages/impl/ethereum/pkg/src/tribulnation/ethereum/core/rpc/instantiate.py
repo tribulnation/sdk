@@ -1,6 +1,6 @@
 from typing_extensions import Literal
 import os
-from ethereum import NodeRpc, Network, PUBLIC_NODE_URLS, ALCHEMY_NODE_URLS
+from typed_ethereum import NodeRpc, Network, PUBLIC_NODE_URLS, ALCHEMY_NODE_URLS
 from tribulnation.ethereum.core import POA_NETWORKS, RPC_ENV_VARS
 
 

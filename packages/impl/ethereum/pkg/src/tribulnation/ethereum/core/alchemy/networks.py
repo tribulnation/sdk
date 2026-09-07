@@ -1,4 +1,4 @@
-from ethereum import Network
+from typed_ethereum import Network
 
 ALCHEMY_NETWORKS: dict[Network, str] = {
   'ethereum': 'eth-mainnet',

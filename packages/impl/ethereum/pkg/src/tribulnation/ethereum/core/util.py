@@ -21,7 +21,8 @@ def gwei2eth(gwei: Decimal | int | Gwei) -> Decimal:
 
 
 def group_by(xs: Iterable[T], key: Callable[[T], K]) -> dict[K, list[T]]:
-  d = defaultdict(list)
+  """Group `xs` by `key`, keeping first-seen order within each group."""
+  d: defaultdict[K, list[T]] = defaultdict(list)
   for x in xs:
     d[key(x)].append(x)
   return d

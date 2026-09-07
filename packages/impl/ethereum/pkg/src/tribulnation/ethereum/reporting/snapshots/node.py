@@ -5,7 +5,7 @@ import asyncio
 
 from web3 import Web3
 from web3.exceptions import BadFunctionCallOutput, ContractLogicError
-from ethereum import NodeRpc
+from typed_ethereum import NodeRpc
 
 from tribulnation.sdk import SDK, ApiError
 from tribulnation.sdk.core import managed_tasks

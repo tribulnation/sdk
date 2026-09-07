@@ -10,7 +10,7 @@ def clamp(x: int, lo: int, hi: int) -> int:
 
 @dataclass
 class BlockByTime(Mixin):
-  block2time: dict[int, int] = field(default_factory=dict)
+  block2time: dict[int, int] = field(default_factory=dict[int, int])
 
   async def cached_block_time(self, block_id: int) -> int:
     ts = self.block2time.get(block_id)

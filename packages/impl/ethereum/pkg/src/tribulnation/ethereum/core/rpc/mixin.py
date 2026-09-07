@@ -1,7 +1,7 @@
 from typing_extensions import AsyncContextManager, Iterable
 from dataclasses import dataclass
 
-from ethereum import NodeRpc
+from typed_ethereum import NodeRpc
 
 from tribulnation.sdk import SDK
 
