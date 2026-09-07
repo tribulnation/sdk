@@ -14,3 +14,7 @@ support = "none"
 auth = true
 note = "`tribulnation.bitget.reporting.Reporting` implements snapshots and history, but against classic-account endpoints the unified trading account (UTA) doesn't support, so it isn't wired into `ReportSDK`. Import it directly if you're on a classic account."
 # Flip to `full` once it's reimplemented against UTA and wired into the router.
+
+[ids]
+asset = "symbol"
+note = "The venue's coin name (`BTC`, `USDT`); market ids are concatenated pair symbols (`BTCUSDT`)."

@@ -23,3 +23,7 @@ note = "No wallet implementation: Bit2Me's asset catalogue lists a single displa
 # addresses on `polygon` and `solana` too (confirmed live), and no endpoint enumerates the
 # full network set. Fees have the same shape: `POST /v1/wallet/transaction/proforma`
 # returns a real fee, but only as a live quote for one funded pocket and destination.
+
+[ids]
+asset = "symbol"
+note = "The venue's ticker symbol (`BTC`, `EUR`); market ids are `<base>/<quote>` (`BTC/EUR`)."

@@ -15,3 +15,7 @@ auth = true
 [support.wallet]
 support = "full"
 auth = true
+
+[ids]
+asset = "symbol"
+note = "The venue's ticker symbol for spot, futures and earn alike (`BTC`, `USDT`); market ids are the venue's concatenated pair symbols (`BTCUSDT`)."

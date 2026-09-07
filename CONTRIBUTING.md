@@ -32,6 +32,9 @@ registry.toml         # public venue registry (display name, icon, PyPI, tier)
   `sdk-dev poc surface <venue> [--grep regex]` lists the typed client's endpoints;
   `sdk-dev poc check [venue...]` type-checks and lints them; `sdk-dev poc run <notebook>
   --cells 1,3,7-9` executes chosen cells. The rules are in `.agents/skills/sdk-poc/`
+- Catalogue coverage: `sdk-dev catalogue check` verifies the catalogue's translation keys
+  follow each `impl.toml`'s `[ids]` form; `sdk-dev catalogue coverage [surface...]` runs the
+  live surfaces and lists the IDs the catalogue cannot translate yet
 - Docs: `sdk-dev docs check` (`--fix` rewrites the generated GitHub-only blocks; CI runs
   the check on every push); `just docs-refresh` renders them into a local landing checkout
 

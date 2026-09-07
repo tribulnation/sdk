@@ -38,12 +38,28 @@ class SurfaceSupport(TypedDict):
   """Per-venue footnotes, keyed by slug — including `support = "none"` venues."""
 
 
+class ImplIds(pydantic.BaseModel):
+  """The `[ids]` table: the venue-native ID forms the package emits, which the
+  catalogue's translation keys for this platform must share."""
+
+  model_config = pydantic.ConfigDict(extra='forbid')
+
+  asset: Literal['symbol', 'index', 'address']
+  """What an asset ID is: the venue's ticker symbol, a numeric token index, or a
+  contract address (`native` for the chain's own coin)."""
+  market: str | None = None
+  """What a market ID looks like, in prose, e.g. `<base>/<quote>:<spot index>`."""
+  note: str | None = None
+
+
 class ImplFile(pydantic.BaseModel):
-  """The full shape of a package's `impl.toml` — a bare `support` table of tables."""
+  """The full shape of a package's `impl.toml` — a `support` table of tables plus the
+  optional `ids` table."""
 
   model_config = pydantic.ConfigDict(extra='forbid')
 
   support: dict[str, ImplSurfaceSupport] = {}
+  ids: ImplIds | None = None
 
 
 def load_impl_files(impl_dir: Path) -> dict[str, ImplFile]:
@@ -90,7 +106,7 @@ def method_universe(
     this method in its `methods` list. This is the outer bound on which venues a
     method's `.yml` template can be rendered for — see `sdk_dev.contract.render_method`.
   """
-  eligible = []
+  eligible: list[str] = []
   for slug, data in impl_files.items():
     entry = data.support.get(surface)
     if entry is None or entry.support == 'none':

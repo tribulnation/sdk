@@ -12,3 +12,7 @@ auth = false
 support = "full"
 auth = true
 # ReportSDK never has a DEFAULT_ACCOUNTS entry for any venue.
+
+[ids]
+asset = "symbol"
+note = "The venue's token denom symbol (`USDC`); market ids are `<base>-<quote>` tickers (`BTC-USD`)."

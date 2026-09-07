@@ -26,3 +26,7 @@ auth = true
 note = "`history()` raises `NotImplementedError`; the underlying `Reporting` targets classic accounts."
 # MexcReport serves snapshot() directly but raises NotImplementedError from history() —
 # the underlying Reporting class targets a different (classic-account) shape.
+
+[ids]
+asset = "symbol"
+note = "The venue's coin name (`BTC`, `USDT`); spot market ids are concatenated pair symbols (`BTCUSDT`), futures `<base>_<quote>` (`BTC_USDT`)."
