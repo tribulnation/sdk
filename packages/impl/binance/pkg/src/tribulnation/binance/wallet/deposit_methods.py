@@ -1,50 +1,56 @@
-from typing_extensions import Sequence, Collection
+"""Binance deposit methods, one per coin and network."""
 
+from typing_extensions import Collection, Sequence
+
+from tribulnation.sdk.core import SDK
 from tribulnation.sdk.wallet.deposit_methods import (
   DepositMethod,
   DepositMethods as _DepositMethods,
 )
-from tribulnation.binance.core import SdkMixin
-
 from typed_binance.spot.http.wallet.capital.config.get_all import CoinConfig
 
+from tribulnation.binance.core import SdkMixin
 
-def _parse_coins_response_deposits(
-  raw: list[CoinConfig],
-  *,
-  assets: Collection[str] | None = None,
+
+def parse_coin(
+  coin: CoinConfig, *, assets: Collection[str] | None = None
 ) -> list[DepositMethod]:
-  assets_set = set(assets) if assets is not None else None
-  out: list[DepositMethod] = []
-  for coin_info in raw:
-    coin = coin_info['coin']
-    if assets_set is not None and coin not in assets_set:
-      continue
-    for net in coin_info.get('networkList', []):
-      if not net.get('depositEnable', False):
-        continue
-      network = net['network']
-      contract = net.get('contractAddress')
-      contract_address = str(contract) if contract is not None else None
-      min_conf = net.get('minConfirm')
-      min_confirmations: int | None = int(min_conf) if min_conf is not None else None
-      out.append(
-        DepositMethod(
-          asset=coin,
-          network=network,
-          fee=None,
-          contract_address=contract_address,
-          min_confirmations=min_confirmations,
-        )
-      )
-  return out
+  """Map one coin's network list onto its enabled deposit methods.
+
+  `fee` is always `None`: Binance charges nothing to deposit, and the response carries
+  no deposit fee field.
+  """
+  if assets is not None and coin['coin'] not in assets:
+    return []
+  return [
+    DepositMethod(
+      asset=coin['coin'],
+      network=network['network'],
+      fee=None,
+      contract_address=network.get('contractAddress'),
+      min_confirmations=network['minConfirm'],
+    )
+    for network in coin['networkList']
+    if network['depositEnable']
+  ]
 
 
 class DepositMethods(SdkMixin, _DepositMethods):
+  """Binance deposit methods."""
+
+  @SDK.method
   async def deposit_methods(
     self,
     *,
     assets: Collection[str] | None = None,
   ) -> Sequence[DepositMethod]:
-    r = await self.client.spot.http.wallet.capital.config.get_all()
-    return _parse_coins_response_deposits(r, assets=assets)
+    """Fetch every enabled deposit coin/network pair.
+
+    `capital.config.get_all` is the one call Binance exposes for per-network deposit
+    configuration; it needs no pagination and takes no filters, so `assets` is applied
+    client-side.
+    """
+    coins = await self.call_binance(
+      lambda: self.client.spot.http.wallet.capital.config.get_all()
+    )
+    return [m for coin in coins for m in parse_coin(coin, assets=assets)]

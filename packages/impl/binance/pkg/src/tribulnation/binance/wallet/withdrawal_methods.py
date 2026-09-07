@@ -1,59 +1,58 @@
-from decimal import Decimal
-from typing_extensions import Sequence, Collection
+"""Binance withdrawal methods, one per coin and network."""
 
+from typing_extensions import Collection, Sequence
+
+from tribulnation.sdk.core import SDK
 from tribulnation.sdk.wallet.withdrawal_methods import (
   WithdrawalMethod,
   WithdrawalMethods as _WithdrawalMethods,
 )
-from tribulnation.binance.core import SdkMixin
-
 from typed_binance.spot.http.wallet.capital.config.get_all import CoinConfig
 
-
-def _to_decimal(v: Decimal | str) -> Decimal:
-  return v if isinstance(v, Decimal) else Decimal(str(v))
+from tribulnation.binance.core import SdkMixin
 
 
-def _parse_coins_response_withdrawals(
-  raw: list[CoinConfig],
+def parse_coin(
+  coin: CoinConfig,
   *,
   assets: Collection[str] | None = None,
   networks: Collection[str] | None = None,
 ) -> list[WithdrawalMethod]:
-  assets_set = set(assets) if assets is not None else None
-  networks_set = set(networks) if networks is not None else None
-  out: list[WithdrawalMethod] = []
-  for coin_info in raw:
-    coin = coin_info['coin']
-    if assets_set is not None and coin not in assets_set:
-      continue
-    for net in coin_info.get('networkList', []):
-      if not net.get('withdrawEnable', False):
-        continue
-      network = net['network']
-      if networks_set is not None and network not in networks_set:
-        continue
-      fee_amount = _to_decimal(net['withdrawFee'])
-      fee = WithdrawalMethod.Fee(asset=coin, amount=fee_amount)
-      contract = net.get('contractAddress')
-      contract_address = str(contract) if contract is not None else None
-      out.append(
-        WithdrawalMethod(
-          asset=coin,
-          contract_address=contract_address,
-          network=network,
-          fee=fee,
-        )
-      )
-  return out
+  """Map one coin's network list onto its enabled withdrawal methods."""
+  if assets is not None and coin['coin'] not in assets:
+    return []
+  return [
+    WithdrawalMethod(
+      asset=coin['coin'],
+      network=network['network'],
+      fee=WithdrawalMethod.Fee(asset=coin['coin'], amount=network['withdrawFee']),
+      contract_address=network.get('contractAddress'),
+    )
+    for network in coin['networkList']
+    if network['withdrawEnable']
+    and (networks is None or network['network'] in networks)
+  ]
 
 
 class WithdrawalMethods(SdkMixin, _WithdrawalMethods):
+  """Binance withdrawal methods."""
+
+  @SDK.method
   async def withdrawal_methods(
     self,
     *,
     assets: Collection[str] | None = None,
     networks: Collection[str] | None = None,
   ) -> Sequence[WithdrawalMethod]:
-    r = await self.client.spot.http.wallet.capital.config.get_all()
-    return _parse_coins_response_withdrawals(r, assets=assets, networks=networks)
+    """Fetch every enabled withdrawal coin/network pair, with its network fee.
+
+    `capital.config.get_all` is the one call Binance exposes for per-network withdrawal
+    configuration; it needs no pagination and takes no filters, so `assets`/`networks`
+    are applied client-side.
+    """
+    coins = await self.call_binance(
+      lambda: self.client.spot.http.wallet.capital.config.get_all()
+    )
+    return [
+      m for coin in coins for m in parse_coin(coin, assets=assets, networks=networks)
+    ]

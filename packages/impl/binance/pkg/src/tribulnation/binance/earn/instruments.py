@@ -1,161 +1,251 @@
-from typing_extensions import Collection, Sequence, Iterable
+"""Binance Earn instruments, merged from every rate-bearing product family."""
+
+from typing_extensions import Any, Collection, Coroutine, Sequence
+from dataclasses import dataclass
 from datetime import timedelta
 from decimal import Decimal
-import re
+import asyncio
 
-from tribulnation.sdk.core import SDK, LogicError
-from tribulnation.sdk.earn.instruments import Instrument, Instruments as _Instruments
-from typed_binance.spot.http.simple_earn.flexible.list import FlexibleProduct
-from typed_binance.spot.http.simple_earn.locked.list import (
-  LockedProduct,
-  LockedProductDetail,
+from tribulnation.sdk.core import SDK
+from tribulnation.sdk.earn.instruments import (
+  Instrument,
+  InstrumentTag,
+  Instruments as _Instruments,
 )
-from tribulnation.binance.core import SdkMixin, wrap_exceptions
+from typed_binance.spot.http.simple_earn.flexible.list import FlexibleProduct
+from typed_binance.spot.http.simple_earn.locked.list import LockedProduct
+from typed_binance.spot.http.staking.on_chain_yields.locked.list import (
+  OnChainYieldsLockedProduct,
+)
+from typed_binance.spot.http.staking.soft.list import SoftStakingProduct
+
+from tribulnation.binance.core import SdkMixin
+
+EARN_URL = 'https://www.binance.com/earn'
+"""Landing page for every Earn product family; Binance exposes no per-product URL."""
+
+PAGE_SIZE = 100
+"""Rows per page for the product-list cursors."""
 
 
-def earn_url(asset: str) -> str:
-  return f'https://www.binance.com/en/earn/simple-earn?asset={asset}'
+def wanted(
+  tags: Collection[InstrumentTag] | None, family: Sequence[InstrumentTag]
+) -> bool:
+  """Whether a product family can contribute under the requested tag filter."""
+  return tags is None or bool(set(tags) & set(family))
 
 
-tier_regex = re.compile(r'^[^-\s]+-([0-9]+(?:\.[0-9]+)?)([A-Za-z0-9]+)$')
-"""Regex for parsing tier labels like '0-1BNB' -> upper bound (e.g. 1)."""
+def parse_flexible(product: FlexibleProduct) -> Instrument | None:
+  """Map one Simple Earn flexible product onto an `Instrument`.
+
+  Reports the flat `latestAnnualPercentageRate`. `tierAnnualPercentageRate` (an APR per
+  balance bracket) is left out: it describes how the rate decays with position size, not
+  separate instruments to subscribe to.
+  """
+  if product['isSoldOut'] or not product['canPurchase']:
+    return None
+  return Instrument(
+    tags=['flexible'],
+    asset=product['asset'],
+    apr=product['latestAnnualPercentageRate'],
+    min_qty=product['minPurchaseAmount'],
+    url=EARN_URL,
+    id=product['productId'],
+  )
 
 
-def parse_flexible_tier(label: str, asset: str) -> Decimal:
-  m = tier_regex.match(label.strip())
-  assert m is not None
-  amount_str, symbol = m.groups()
-  assert symbol == asset
-  return Decimal(amount_str)
+def parse_locked(product: LockedProduct) -> Instrument | None:
+  """Map one Simple Earn locked product onto an `Instrument`.
+
+  Products with no `detail.apr` are skipped: Binance's promotional "boost-only" listings
+  carry only `extraRewardAsset`/`extraRewardAPR` on top of a base rate that does not
+  exist for them, and reporting `apr=0` would describe them as zero-yield rather than as
+  what they are.
+  """
+  detail = product['detail']
+  base_apr = detail.get('apr')
+  if detail['isSoldOut'] or base_apr is None:
+    return None
+  reward_asset = detail.get('rewardAsset')
+  return Instrument(
+    tags=['fixed'],
+    asset=detail['asset'],
+    apr=Decimal(base_apr) + Decimal(detail.get('extraRewardAPR') or 0),
+    yield_asset=reward_asset if reward_asset != detail['asset'] else None,
+    min_qty=Decimal(product['quota']['minimum']),
+    # This account's remaining subscription cap, not a venue-wide product maximum --
+    # the closest thing Binance exposes.
+    max_qty=Decimal(product['quota']['totalPersonalQuota']),
+    duration=timedelta(days=detail['duration']),
+    url=EARN_URL,
+    id=product['projectId'],
+  )
 
 
-def parse_flexible(prod: FlexibleProduct) -> Iterable[Instrument]:
-  if (
-    not prod.get('isSoldOut')
-    and prod.get('canPurchase')
-    and prod.get('status') == 'PURCHASING'
-  ):
-    base_apr = prod.get('latestAnnualPercentageRate', Decimal('0'))
-    min_qty = prod.get('minPurchaseAmount')
-    for tier, apr in prod.get('tierAnnualPercentageRate', {}).items():
-      max_qty = parse_flexible_tier(tier, prod['asset'])
-      yield Instrument(
-        tags=['flexible'],
-        asset=prod['asset'],
-        min_qty=min_qty,
-        max_qty=max_qty,
-        apr=base_apr + apr,
-        id=prod.get('productId'),
-      )
+def parse_soft_staking(product: SoftStakingProduct) -> Instrument:
+  """Map one Soft Staking product onto an `Instrument`.
 
-    yield Instrument(
-      tags=['flexible'],
-      asset=prod['asset'],
-      apr=base_apr,
-      min_qty=min_qty,
-      id=prod['productId'],
-    )
+  `id` is left unset: Soft Staking has no per-product identifier, and is subscribed to
+  with an account-wide on/off toggle rather than per product.
+  """
+  return Instrument(
+    tags=['staking', 'flexible'],
+    asset=product['asset'],
+    apr=product['apr'],
+    min_qty=product['minAmount'],
+    max_qty=product['maxCap'],
+    url=EARN_URL,
+  )
 
 
-def parse_locked_yield_assets(detail: LockedProductDetail) -> set[str]:
-  yield_assets = set[str]()
-  if a := detail.get('rewardAsset'):
-    yield_assets.add(a)
-  if a := detail.get('boostRewardAsset'):
-    yield_assets.add(a)
-  if a := detail.get('extraRewardAsset'):
-    yield_assets.add(a)
-  return yield_assets
+def parse_on_chain_yields(product: OnChainYieldsLockedProduct) -> Instrument | None:
+  """Map one On-chain Yields locked product onto an `Instrument`."""
+  detail = product['detail']
+  if detail['isSoldOut']:
+    return None
+  reward_asset = detail['rewardAsset']
+  return Instrument(
+    tags=['staking', 'fixed'],
+    asset=detail['asset'],
+    apr=Decimal(detail['apr']),
+    yield_asset=reward_asset if reward_asset != detail['asset'] else None,
+    min_qty=Decimal(product['quota']['minimum']),
+    max_qty=Decimal(product['quota']['totalPersonalQuota']),
+    duration=timedelta(days=detail['duration']),
+    url=EARN_URL,
+    id=product['projectId'],
+  )
 
 
-def parse_locked_apr(detail: LockedProductDetail) -> Decimal:
-  apr = Decimal(0)
-  if a := detail.get('apr'):
-    apr += a
-  if a := detail.get('extraRewardAPR'):
-    apr += a
-  if a := detail.get('boostRewardApr'):
-    apr += a
-  return apr
-
-
-def parse_locked(prod: LockedProduct) -> Iterable[Instrument]:
-  detail = prod['detail']
-  if not detail['isSoldOut'] and detail['status'] == 'PURCHASING':
-    asset = detail['asset']
-    apr = parse_locked_apr(detail)
-    yield_assets = parse_locked_yield_assets(detail)
-    if len(yield_assets) > 1:
-      raise LogicError(f'Multiple yield assets: {yield_assets}, instrument: {prod}')
-    yield_asset = yield_assets.pop()
-    yield Instrument(
-      tags=['fixed'],
-      asset=asset,
-      apr=apr,
-      yield_asset=yield_asset,
-      min_qty=prod['quota']['minimum'],
-      max_qty=prod['quota']['totalPersonalQuota'],
-      duration=timedelta(days=detail['duration']),
-      id=prod['projectId'],
-    )
-
-
+@dataclass
 class Instruments(SdkMixin, _Instruments):
+  """Binance Earn instruments.
+
+  Merges Simple Earn (flexible and locked), Soft Staking, On-chain Yields, BFUSD and
+  RWUSD.
+
+  **Does not support**:
+  - ETH/SOL staking: neither exposes a product catalogue or a rate, only per-account
+    quotas and holdings, so there is no `apr` to report.
+  - Dual Investment: `product_list` has no filter-free listing mode, and a position
+    settles in either the invested or the exercised asset depending on where spot lands
+    at expiry, so neither `asset` nor `yield_asset` is knowable up front.
+  - Mining and Yield Arena: hashrate payouts and giveaway promotions respectively,
+    neither of which is a subscribed-amount-times-rate instrument.
+  """
+
   @SDK.method
-  @wrap_exceptions
-  async def _flexible_list_page(self, page: int, size: int):
-    return await self.client.spot.http.simple_earn.flexible.list(
-      current=page, size=size
+  async def flexible_instruments(self) -> list[Instrument]:
+    """Fetch every available Simple Earn flexible product."""
+    paging = self.client.spot.http.simple_earn.flexible.list_paged(size=PAGE_SIZE)
+    state = paging.init
+    out: list[Instrument] = []
+    while state is not None:
+      chunk, state = await self.call_binance(lambda: paging.next(state))  # type: ignore
+      out.extend(i for p in chunk if (i := parse_flexible(p)) is not None)
+    return out
+
+  @SDK.method
+  async def locked_instruments(self) -> list[Instrument]:
+    """Fetch every available Simple Earn locked product."""
+    paging = self.client.spot.http.simple_earn.locked.list_paged(size=PAGE_SIZE)
+    state = paging.init
+    out: list[Instrument] = []
+    while state is not None:
+      chunk, state = await self.call_binance(lambda: paging.next(state))  # type: ignore
+      out.extend(i for p in chunk if (i := parse_locked(p)) is not None)
+    return out
+
+  @SDK.method
+  async def soft_staking_instruments(self) -> list[Instrument]:
+    """Fetch every available Soft Staking product."""
+    paging = self.client.spot.http.staking.soft.list_paged(size=PAGE_SIZE)
+    state = paging.init
+    out: list[Instrument] = []
+    while state is not None:
+      chunk, state = await self.call_binance(lambda: paging.next(state))  # type: ignore
+      out.extend(parse_soft_staking(p) for p in chunk)
+    return out
+
+  @SDK.method
+  async def on_chain_yields_instruments(self) -> list[Instrument]:
+    """Fetch every available On-chain Yields locked product."""
+    paging = self.client.spot.http.staking.on_chain_yields.locked.list_paged(
+      size=PAGE_SIZE
     )
-
-  async def _flexible_list(self, size: int = 100):
-    current = 1
-    while True:
-      r = await self._flexible_list_page(current, size)
-      if not r['rows']:
-        break
-      yield r['rows']
-      if r['total'] <= current * size:
-        break
-      current += 1
+    state = paging.init
+    out: list[Instrument] = []
+    while state is not None:
+      chunk, state = await self.call_binance(lambda: paging.next(state))  # type: ignore
+      out.extend(i for p in chunk if (i := parse_on_chain_yields(p)) is not None)
+    return out
 
   @SDK.method
-  @wrap_exceptions
-  async def _fixed_list_page(self, page: int, size: int):
-    return await self.client.spot.http.simple_earn.locked.list(current=page, size=size)
+  async def bfusd_instruments(self) -> list[Instrument]:
+    """Fetch BFUSD's current rate as a single flexible instrument.
 
-  async def _fixed_list(self, size: int = 100):
-    current = 1
-    while True:
-      r = await self._fixed_list_page(current, size)
-      if not r['rows']:
-        break
-      yield r['rows']
-      if r['total'] <= current * size:
-        break
-      current += 1
+    BFUSD has no product catalogue; its only rate is the newest `rate_history` row.
+    """
+    page = await self.call_binance(
+      lambda: self.client.spot.http.bfusd.history.rate_history(size=1)
+    )
+    rows = page.get('rows') or []
+    if not rows or (rate := rows[0].get('annualPercentageRate')) is None:
+      return []
+    return [
+      Instrument(
+        tags=['flexible'],
+        asset='USDT',
+        apr=Decimal(rate),
+        yield_asset='BFUSD',
+        url=EARN_URL,
+      )
+    ]
+
+  @SDK.method
+  async def rwusd_instruments(self) -> list[Instrument]:
+    """Fetch RWUSD's current rate, once per asset it can be subscribed with."""
+    page = await self.call_binance(
+      lambda: self.client.spot.http.rwusd.history.rate_history(size=1)
+    )
+    rows = page.get('rows') or []
+    if not rows or (rate := rows[0].get('annualPercentageRate')) is None:
+      return []
+    return [
+      Instrument(
+        tags=['flexible'],
+        asset=asset,
+        apr=Decimal(rate),
+        yield_asset='RWUSD',
+        url=EARN_URL,
+      )
+      for asset in ('USDT', 'USDC')
+    ]
 
   @SDK.method
   async def instruments(
     self,
     *,
-    tags: Collection[Instrument.Tag] | None = None,
+    tags: Collection[InstrumentTag] | None = None,
     assets: Collection[str] | None = None,
   ) -> Sequence[Instrument]:
+    """Fetch every Binance Earn instrument, filtered by tag and asset."""
+    families: list[Coroutine[Any, Any, list[Instrument]]] = []
+    if wanted(tags, ['flexible']):
+      families.append(self.flexible_instruments())
+      families.append(self.bfusd_instruments())
+      families.append(self.rwusd_instruments())
+    if wanted(tags, ['fixed']):
+      families.append(self.locked_instruments())
+    if wanted(tags, ['staking', 'flexible']):
+      families.append(self.soft_staking_instruments())
+    if wanted(tags, ['staking', 'fixed']):
+      families.append(self.on_chain_yields_instruments())
 
-    out: list[Instrument] = []
-
-    if tags is None or 'flexible' in tags:
-      async for chunk in self._flexible_list():
-        for prod in chunk:
-          for inst in parse_flexible(prod):
-            if assets is None or inst.asset in assets:
-              out.append(inst)
-
-    if tags is None or 'fixed' in tags:
-      async for chunk in self._fixed_list():
-        for prod in chunk:
-          for inst in parse_locked(prod):
-            if assets is None or inst.asset in assets:
-              out.append(inst)
+    groups = await asyncio.gather(*families)
+    out = [instrument for group in groups for instrument in group]
+    if tags is not None:
+      out = [i for i in out if set(i.tags) & set(tags)]
+    if assets is not None:
+      out = [i for i in out if i.asset in assets]
     return out

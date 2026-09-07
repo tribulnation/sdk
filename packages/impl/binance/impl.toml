@@ -1,20 +1,47 @@
 # auth = false means this surface has a real credential-free DEFAULT_ACCOUNTS entry (see
 # tribulnation.sdk.impl.<surface>.DEFAULT_ACCOUNTS) — auth = true means every call always
 # needs a real accounts.Binance() entry, no free default exists.
-#
-# Market isn't listed here on purpose: MarketSDK.binance() is real code
-# (packages/impl/binance/pkg/src/tribulnation/binance/market/), but it's still
-# untracked/WIP as of this writing — not ready to announce publicly yet. Add
-# `[support.market]` once it's ready; its absence is what keeps binance out of the /sdk
-# wizard's Market venue picker.
 
 [support.earn]
 support = "full"
 auth = true
+note = "Merges Simple Earn (flexible and locked), Soft Staking, On-chain Yields, BFUSD and RWUSD. ETH/SOL staking is left out because Binance publishes no rate for it, and Dual Investment because a position settles in either the invested or the exercised asset, so its yield asset isn't knowable up front."
 
 [support.wallet]
 support = "full"
 auth = true
+
+[support.market]
+support = "partial"
+auth = false
+methods = [
+  "depth",
+  "depth_stream",
+  "rules",
+  "query_order",
+  "open_orders",
+  "trades_history",
+  "trades_stream",
+  "position",
+  "collateral",
+  "available_notional",
+  "index",
+  "next_funding",
+  "funding_rates",
+]
+note = "Read-only: order placement and cancellation are not implemented. The USD-M futures exchange serves only public market data (`depth`, `depth_stream`, `index`, `next_funding`, `funding_rates`) — every private futures endpoint returned 401 against the test account, which Binance gates behind a separate API-key flag, so they raise rather than ship unverified."
+# MarketSDK.DEFAULT_ACCOUNTS includes 'binance' (Binance(public=True)) — but that only
+# covers purely public market-data methods; account-scoped methods still need real
+# credentials regardless (see docs/contract/market.yml's per-method `public: false`).
+
+[support.report]
+support = "partial"
+auth = true
+methods = ["snapshot", "history"]
+note = "`history()` requires both `start` and `end`: no Binance endpoint serves all time, and each stops at a different retention horizon. Fills are per symbol with no account-wide equivalent, so pass `spot_markets`/`usdm_markets` to sweep them. Margin, COIN-M futures, Options, Portfolio Margin, Earn events and Convert/Pay/Fiat history are not covered."
+# ReportSDK never has a DEFAULT_ACCOUNTS entry for any venue. ReportSDK.binance() itself
+# still raises NotImplementedError — tribulnation.binance.reporting.Reporting is real and
+# live-tested, but the router in packages/sdk hasn't been pointed at it yet.
 
 [ids]
 asset = "symbol"
