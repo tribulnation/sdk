@@ -1,0 +1,52 @@
+# auth = false means this surface has a real credential-free DEFAULT_ACCOUNTS entry —
+# auth = true means every call always needs a real accounts.Bybit() entry.
+
+# Every surface below is implemented and exercised live, and every one is declared
+# `none` for the same single reason: `tribulnation-sdk` has no `accounts.Bybit`, and
+# none of `MarketSDK`/`EarnSDK`/`WalletSDK`/`ReportSDK` has a `bybit()` router method.
+# Announcing a surface the routers cannot build would put Bybit in the wizard's venue
+# picker and have it generate an `[accounts.bybit]` table that `load_accounts` rejects.
+# Same shape as bitget's report gate: the code is there, the wiring is not. Flip each
+# table to the support level named in its note once that wiring lands — no change to
+# this package is needed for it.
+
+[support.market]
+support = "none"
+auth = true
+note = "`tribulnation.bybit.BybitMarket` serves both the `spot` and `perp` exchanges, but isn't wired into `MarketSDK`. Import it directly meanwhile."
+# Would be `full`. Bybit v5 is one API discriminated by `category`, so both exchanges
+# run off one client. `perp` lists linear perpetuals only — the 40 dated `LinearFutures`
+# contracts the same category carries pay no funding and settle on a delivery date, so
+# nothing about the PerpMarket contract describes them.
+
+[support.earn]
+support = "none"
+auth = true
+note = "`tribulnation.bybit.Earn` covers fixed-term savings, flexible savings and on-chain staking, but isn't wired into `EarnSDK`. Import it directly meanwhile."
+# Would be `full`. All three catalogues are public, but the client still refuses to
+# build without credentials unless `public=True` is passed, so `auth = true` holds.
+# Two Earn lines stay unmapped on purpose: Hold-to-Earn has no subscription step,
+# min/max stake or id to act against, and Dual Asset (Bybit's `one-time` analogue)
+# carries no yield in its catalogue — only in a per-product quote call.
+
+[support.wallet]
+support = "none"
+auth = true
+note = "`tribulnation.bybit.Wallet` serves both deposit and withdrawal methods off `asset.coin_info`, but isn't wired into `WalletSDK`. Import it directly meanwhile."
+# Would be `full`. One authenticated call enumerates every coin/chain pair with fees,
+# minimums, contract addresses and per-side availability. `DepositMethod.fee` is always
+# `None`: Bybit charges no deposit fee and reports no field for one.
+
+[support.report]
+support = "none"
+auth = true
+note = "`tribulnation.bybit.Report` serves `snapshot()` and `history()`, but isn't wired into `ReportSDK`. Import it directly meanwhile."
+# Would be `partial`. `snapshot()` is complete — the unified account is one pool, so a
+# single SubaccountSnapshot covers it. `history()` covers spot fills, linear funding
+# settlements, and crypto deposits/withdrawals; derivatives fills and closed PnL,
+# internal UID-to-UID transfers, Earn subscribe/redeem events, bonus/airdrop credits and
+# fiat on/off-ramp are not covered, though Bybit exposes the endpoints.
+
+[ids]
+asset = "symbol"
+note = "The venue's coin name (`BTC`, `USDT`); market ids are concatenated pair symbols (`BTCUSDT`)."
