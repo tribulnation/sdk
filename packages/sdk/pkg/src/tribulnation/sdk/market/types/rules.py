@@ -91,10 +91,10 @@ class Rules:
     """Ceil the price to the nearest tick size."""
     return ceil2tick(price, self.tick_size)
 
-  def amount2qty(self, quote_amount: Decimal, *, price: Decimal) -> Decimal | None:
-    """Convert a quote amount to a base quantity, truncating to the nearest step size. Returns `None` if the quantity is too small."""
-    return self.trunc_qty(quote_amount / price, price=price)
+  def notional2qty(self, notional: Decimal, *, price: Decimal) -> Decimal | None:
+    """Convert a notional value (in quote units) to a base quantity, truncating to the nearest step size. Returns `None` if the quantity is too small."""
+    return self.trunc_qty(notional / price, price=price)
 
-  def qty2amount(self, base_qty: Decimal, *, price: Decimal) -> Decimal:
-    """Convert a base quantity to a quote amount."""
+  def qty2notional(self, base_qty: Decimal, *, price: Decimal) -> Decimal:
+    """Convert a base quantity to its notional value, in quote units."""
     return base_qty * price
