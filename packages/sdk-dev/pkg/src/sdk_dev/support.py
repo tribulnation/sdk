@@ -29,13 +29,25 @@ class ImplSurfaceSupport(pydantic.BaseModel):
   the data alone can't express (a module that exists but isn't wired, a naming quirk)."""
 
 
+class VenueSupport(TypedDict):
+  """One venue's `[support.<surface>]` table, as the docs site publishes it."""
+
+  support: Literal['full', 'partial', 'none']
+  auth: bool
+  methods: NotRequired[list[str]]
+  """Which methods a `partial` surface implements; absent when it implements all of
+  them, or when the package hasn't enumerated them."""
+  note: NotRequired[str]
+
+
 class SurfaceSupport(TypedDict):
   """One surface's row set in the support matrix."""
 
   supportedVenues: list[str]
   defaultVenues: list[str]
-  notes: NotRequired[dict[str, str]]
-  """Per-venue footnotes, keyed by slug — including `support = "none"` venues."""
+  venues: dict[str, VenueSupport]
+  """Every venue declaring this surface, keyed by slug — `support = "none"` included,
+  since a deliberate gap is still something the matrix has to say out loud."""
 
 
 class ImplIds(pydantic.BaseModel):
@@ -118,7 +130,7 @@ def method_universe(
 
 def load_support_matrix(impl_dir: Path) -> dict[str, SurfaceSupport]:
   """
-  Build `{surface: {supportedVenues: [...], defaultVenues: [...], notes: {...}}}` from
+  Build `{surface: {supportedVenues: [...], defaultVenues: [...], venues: {...}}}` from
   every `packages/impl/*/impl.toml` under `impl_dir`.
 
   Args:
@@ -137,9 +149,15 @@ def load_support_matrix(impl_dir: Path) -> dict[str, SurfaceSupport]:
   matrix: dict[str, SurfaceSupport] = {}
   for slug, data in load_impl_files(impl_dir).items():
     for surface, entry in data.support.items():
-      bucket = matrix.setdefault(surface, {'supportedVenues': [], 'defaultVenues': []})
+      bucket = matrix.setdefault(
+        surface, {'supportedVenues': [], 'defaultVenues': [], 'venues': {}}
+      )
+      venue: VenueSupport = {'support': entry.support, 'auth': entry.auth}
+      if entry.methods:
+        venue['methods'] = entry.methods
       if entry.note:
-        bucket.setdefault('notes', {})[slug] = entry.note
+        venue['note'] = entry.note
+      bucket['venues'][slug] = venue
       if entry.support == 'none':
         continue
       bucket['supportedVenues'].append(slug)

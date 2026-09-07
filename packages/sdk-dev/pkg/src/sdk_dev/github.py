@@ -16,6 +16,7 @@ import re
 
 from sdk_dev.nav import reading_order
 from sdk_dev.reference import METHODS_MARKER
+from sdk_dev.streams import STREAMS_END, STREAMS_START
 
 MARKER_START = '<!-- next -->'
 MARKER_END = '<!-- /next -->'
@@ -34,6 +35,12 @@ NOTE_RE = re.compile(
 NAV_RE = re.compile(
   rf'\A{re.escape(GITHUB_START)}.*?{re.escape(GITHUB_END)}\n*', re.DOTALL
 )
+STREAMS_RE = re.compile(
+  rf'({re.escape(STREAMS_START)}\n).*?(\n{re.escape(STREAMS_END)})', re.DOTALL
+)
+"""The streaming-support table, rewritten in place between its own markers. Unlike the
+method reference this one is committed: it is small, and a GitHub reader deciding whether
+a venue streams shouldn't have to leave the page to find out."""
 HOME_LABEL = 'Docs'
 """Bar label for `docs/index.md`, whose own heading names the project rather than a
 section."""
@@ -53,12 +60,14 @@ class Page(NamedTuple):
   """The page's `#` heading."""
 
 
-def render_pages(docs_dir: Path) -> dict[Path, str]:
+def render_pages(docs_dir: Path, *, streams: str | None = None) -> dict[Path, str]:
   """
   The full text every page under `docs_dir` should have, generated blocks included.
 
   Args:
     docs_dir: The sdk repo's `docs/` directory.
+    streams: The streaming-support table (`sdk_dev.streams`), substituted into whichever
+      page carries the `<!-- streams -->` markers. `None` leaves those blocks alone.
 
   Returns:
     `{path relative to docs_dir: text}`, in reading order.
@@ -75,24 +84,25 @@ def render_pages(docs_dir: Path) -> dict[Path, str]:
     text = apply_note(
       BLOCK_RE.sub('\n\n', (docs_dir / page.path).read_text()), page.path
     )
+    text = apply_streams(text, streams)
     body = apply_nav(text, page.path, sections).rstrip()
     rendered[page.path] = f'{body}\n\n{footer}\n' if footer else f'{body}\n'
   return rendered
 
 
-def stale_pages(docs_dir: Path) -> list[Path]:
+def stale_pages(docs_dir: Path, *, streams: str | None = None) -> list[Path]:
   """Pages whose generated blocks are out of date, in reading order."""
   return [
     path
-    for path, text in render_pages(docs_dir).items()
+    for path, text in render_pages(docs_dir, streams=streams).items()
     if (docs_dir / path).read_text() != text
   ]
 
 
-def write_pages(docs_dir: Path) -> list[Path]:
+def write_pages(docs_dir: Path, *, streams: str | None = None) -> list[Path]:
   """Rewrite every stale page under `docs_dir`. Returns the pages changed."""
   changed = []
-  for path, text in render_pages(docs_dir).items():
+  for path, text in render_pages(docs_dir, streams=streams).items():
     if (docs_dir / path).read_text() != text:
       (docs_dir / path).write_text(text)
       changed.append(path)
@@ -136,6 +146,17 @@ def nav_cell(path: Path, section: Page) -> str:
   if _section(path) == _section(section.path):
     return f'<b>{section.title}</b>'
   return f'<a href="{relative_href(path, section.path)}">{section.title}</a>'
+
+
+def apply_streams(text: str, streams: str | None) -> str:
+  """
+  Rewrite the streaming-support table between its markers, on the page that has them.
+
+  Pages without the markers are left alone, so this costs nothing on the other 20-odd.
+  """
+  if streams is None:
+    return text
+  return STREAMS_RE.sub(lambda m: f'{m.group(1)}{streams}{m.group(2)}', text)
 
 
 def apply_note(text: str, path: Path) -> str:

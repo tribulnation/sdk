@@ -16,6 +16,29 @@
 [support.market]
 support = "partial"
 auth = true
+methods = [
+  "depth",
+  "depth_stream",
+  "rules",
+  "tickers",
+  "perp_stats",
+  "query_order",
+  "open_orders",
+  "trades_history",
+  "trades_stream",
+  "position",
+  "collateral",
+  "available_notional",
+  "place_order",
+  "place_orders",
+  "cancel_order",
+  "cancel_orders",
+  "cancel_open_orders",
+  "index",
+  "next_funding",
+  "perp_position",
+  "perp_collateral",
+]
 note = "Spot is complete. INTX perpetuals serve market data, orders and funding state, but `funding_rates()`/`funding_payments()` raise `NotImplementedError` (Coinbase publishes no funding history at all), and `perp_position()`/`perp_collateral()` need a key scoped to an INTX portfolio — a retail key gets `PERMISSION_DENIED`."
 # Two exchanges: `spot` (Advanced Trade SPOT products) and `intx` (perpetual swaps).
 # `trades_stream` is best-effort on both: the `user` channel carries order-level

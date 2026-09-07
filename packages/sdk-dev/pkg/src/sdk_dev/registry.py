@@ -7,6 +7,7 @@ order preserved as display order.
 import tomllib
 
 import pydantic
+from typing_extensions import Any
 
 
 class RegistryVenue(pydantic.BaseModel):
@@ -31,7 +32,7 @@ class RegistryFile(pydantic.BaseModel):
   venues: list[RegistryVenue] = []
 
 
-def load_registry(path: str) -> dict[str, dict]:
+def load_registry(path: str) -> dict[str, dict[str, Any]]:
   """
   Parse `registry.toml` into a `{slug: entry}` dict, JSON-serializable as-is.
 
@@ -49,7 +50,7 @@ def load_registry(path: str) -> dict[str, dict]:
   with open(path, 'rb') as f:
     raw = tomllib.load(f)
   data = RegistryFile.model_validate(raw)
-  entries: dict[str, dict] = {}
+  entries: dict[str, dict[str, Any]] = {}
   for venue in data.venues:
     entry = venue.model_dump(exclude={'slug'}, exclude_none=True)
     entry.setdefault('name', venue.slug.capitalize())

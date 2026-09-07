@@ -20,6 +20,7 @@ from sdk_dev.reference import METHODS_MARKER, render_methods_markdown
 from sdk_dev.schema import generate_schema
 from sdk_dev.registry import load_registry
 from sdk_dev.source import Source, SourceLookupError
+from sdk_dev.streams import render_streams_markdown
 from sdk_dev.repo import (
   CONTRACT_DIR,
   DOCS_DIR,
@@ -89,14 +90,15 @@ def _build_generated(root: Path) -> Generated:
   impl_files = load_impl_files(root / IMPL_DIR)
   catalogue = Catalogue.load()
   check_nav(root / DOCS_DIR)
-  stale = stale_pages(root / DOCS_DIR)
+  registry = load_registry(str(root / REGISTRY_PATH))
+  venue_names = {slug: entry['name'] for slug, entry in registry.items()}
+  streams = render_streams_markdown(impl_files, venue_names=venue_names)
+  stale = stale_pages(root / DOCS_DIR, streams=streams)
   if stale:
     listed = ', '.join(str(path) for path in stale)
     raise ValueError(
       f'stale generated block in {listed}. Run `sdk-dev docs check --fix` to rewrite them.'
     )
-  registry = load_registry(str(root / REGISTRY_PATH))
-  venue_names = {slug: entry['name'] for slug, entry in registry.items()}
   source = Source()
 
   generated: dict[str, dict] = {
@@ -165,7 +167,12 @@ def check(
     raise typer.Exit(code=1)
 
   if fix:
-    for path in write_pages(root / DOCS_DIR):
+    impl_files = load_impl_files(root / IMPL_DIR)
+    registry = load_registry(str(root / REGISTRY_PATH))
+    streams = render_streams_markdown(
+      impl_files, venue_names={slug: e['name'] for slug, e in registry.items()}
+    )
+    for path in write_pages(root / DOCS_DIR, streams=streams):
       typer.echo(f'rewrote {DOCS_DIR}/{path}')
 
   yml_files = sorted((root / CONTRACT_DIR).glob('*.yml'))
@@ -233,7 +240,8 @@ def sync(
       authored venue list (display name, icon, pypi, tier), mirroring typed-dev's own
       registry.toml/registry.json split.
     - support.json, from every packages/impl/*/impl.toml (sdk_dev.support) — which
-      venues offer a given surface at all, per-venue `notes` footnotes, and which are credential-free
+      venues offer a given surface at all, each one's own `[support.<surface>]` table
+      (`support`, `auth`, `methods`, `note`) under `venues`, and which are credential-free
       (`auth: false` in `impl.toml` — a real fact about `DEFAULT_ACCOUNTS`, not derived
       from it, since a venue can have a default account that still needs real
       credentials). Feeds the wizard's sdk.toml generation (skip an entry for a venue
