@@ -173,6 +173,29 @@ class Binance(BaseAccount):
 
 
 @_dataclass
+class Bybit(BaseAccount):
+  venue: _Literal['bybit'] = 'bybit'
+  api_key: str = '$BYBIT_API_KEY'
+  """Bybit API key"""
+  api_secret: str = '$BYBIT_API_SECRET'
+  """Bybit API secret"""
+  validate: bool = True
+  """Whether to type-validate incoming responses."""
+
+  @property
+  def resolved_api_key(self) -> str | None:
+    return resolve_env_var(self.api_key, require=not self.public)
+
+  @property
+  def resolved_api_secret(self) -> str | None:
+    return resolve_env_var(self.api_secret, require=not self.public)
+
+  def verify_env_vars(self):
+    self.resolved_api_key
+    self.resolved_api_secret
+
+
+@_dataclass
 class Coinbase(BaseAccount):
   venue: _Literal['coinbase'] = 'coinbase'
   key_name: str = '$COINBASE_API_KEY_NAME'
@@ -217,7 +240,7 @@ class Evm(BaseAccount):
 
 
 Account = _Annotated[
-  Dydx | Hyperliquid | Mexc | Bitget | Bit2Me | Binance | Coinbase | Evm,
+  Dydx | Hyperliquid | Mexc | Bitget | Bit2Me | Binance | Bybit | Coinbase | Evm,
   _pydantic.Discriminator('venue'),
 ]
 

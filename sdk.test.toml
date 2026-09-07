@@ -18,6 +18,11 @@ venue = "bit2me"
 api_key = "$BIT2ME_API_KEY"
 api_secret = "$BIT2ME_SECRET_KEY"
 
+[accounts.bybit]
+venue = "bybit"
+api_key = "$BYBIT_API_KEY"
+api_secret = "$BYBIT_API_SECRET"
+
 [accounts.bitget_classic]
 venue = "bitget"
 access_key = "$BITGET_CLASSIC_ACCESS_KEY"
