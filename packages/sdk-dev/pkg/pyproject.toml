@@ -19,6 +19,8 @@ dependencies = [
   "pyyaml",
   "jinja2",
   "griffe",
+  "nbclient",
+  "nbformat",
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}

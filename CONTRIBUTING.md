@@ -28,6 +28,10 @@ registry.toml         # public venue registry (display name, icon, PyPI, tier)
 - Unit tests: `pytest`
 - Integration tests, against live APIs: `sdk-dev test earn|wallet|etc.` (credentials from `sdk.test.toml`)
 - Support matrix: `sdk-dev support`
+- PoC notebooks: `sdk-dev poc scaffold <venue> <surface>` writes the skeleton;
+  `sdk-dev poc surface <venue> [--grep regex]` lists the typed client's endpoints;
+  `sdk-dev poc check [venue...]` type-checks and lints them; `sdk-dev poc run <notebook>
+  --cells 1,3,7-9` executes chosen cells. The rules are in `.agents/skills/sdk-poc/`
 - Docs: `sdk-dev docs check` (`--fix` rewrites the generated GitHub-only blocks; CI runs
   the check on every push); `just docs-refresh` renders them into a local landing checkout
 
