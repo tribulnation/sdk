@@ -1,0 +1,75 @@
+# auth = false means this surface has a real credential-free DEFAULT_ACCOUNTS entry —
+# auth = true means every call always needs a real accounts.Coinbase() entry.
+#
+# Every surface here is auth = true: `tribulnation.sdk.impl.accounts` has no Coinbase
+# account type yet, so nothing is wired into any *SDK router and `DEFAULT_ACCOUNTS` has
+# no entry. Construct the surfaces directly (`CoinbaseMarket.new()`, `Report.new()`,
+# `Earn.new()`) until that lands.
+#
+# One client fronts two Coinbase products, and which one a method reads is a real
+# distinction, not an implementation detail: `app` is the retail Coinbase App tier
+# (v2 accounts plus Advanced Trade) that these credentials belong to, and `exchange` is
+# Coinbase Exchange, reached only over its unauthenticated routes. Exchange describes a
+# different product, so it backs a method only where the answer is genuinely venue-wide
+# — the wrapped-asset catalogue under earn — and never where the caller would read it
+# as a statement about this account.
+
+[support.market]
+support = "partial"
+auth = true
+note = "Spot is complete. INTX perpetuals serve market data, orders and funding state, but `funding_rates()`/`funding_payments()` raise `NotImplementedError` (Coinbase publishes no funding history at all), and `perp_position()`/`perp_collateral()` need a key scoped to an INTX portfolio — a retail key gets `PERMISSION_DENIED`."
+# Two exchanges: `spot` (Advanced Trade SPOT products) and `intx` (perpetual swaps).
+# `trades_stream` is best-effort on both: the `user` channel carries order-level
+# cumulative quantities rather than itemized fills, so it loses per-fill maker/taker and
+# fee. `trades_history` is the reliable source for those.
+
+[support.report]
+support = "full"
+auth = true
+note = "History merges the v2 per-account transaction stream with Advanced Trade fills; rows carrying one signed leg and no paired asset (legacy `trade`/`buy`/`sell`, `staking_reward`, `earn_payout`, ...) are reported as `UnknownObservation` rather than guessed into a trade shape."
+# `snapshot()` reports v2 wallets and v3 brokerage accounts as separate subaccounts —
+# the same asset appears in both, so summing them would double-count — plus the CFM
+# futures book. INTX perpetual positions are deliberately left out of the snapshot: they
+# need an INTX-scoped key, and a retail key gets PERMISSION_DENIED rather than an empty
+# book, which would turn every snapshot into an error. Read them from
+# `PerpMarket.perp_position` instead.
+
+[support.earn]
+support = "partial"
+methods = ["instruments"]
+auth = true
+note = "`instruments()` reports the only two APRs Coinbase publishes — Coinbase Exchange's wrapped-asset catalogue (CBETH) and the rewards blob attached to assets the account already holds. Neither is a browsable Earn product list, and there is no subscribe/redeem call anywhere on this tier."
+# Deliberate, and the ceiling rather than a gap to fill later. Coinbase's App tier has no
+# earn/staking product API. The Staking API (docs.cdp.coinbase.com/staking) does accept
+# this tier's CDP API Key — verified live, 200 not 403 — but every endpoint
+# (list-validators, get-staking-context, fetch-staking-rewards, stake/build) is scoped to
+# an externally-supplied onchain address the caller holds the key to, and none exposes an
+# APY or a catalogue independent of one. USDC Rewards is documented as
+# non-custodial-wallet-only, with custodial (Coinbase App) support "coming soon".
+
+[support.wallet]
+support = "none"
+auth = true
+note = "No wallet implementation: the Coinbase App tier publishes no per-asset network catalogue and no withdrawal-fee source, and crypto sends take an arbitrary destination so there is nothing for `withdrawal_methods()` to enumerate beyond the fiat rails. Coinbase Exchange has a catalogue but describes a different product and over-lists what this account can reach. Left out rather than shipped incomplete."
+# Deliberate. Three independent gaps, any one fatal:
+#   1. No network catalogue. `GET /v2/currencies/crypto` is 409 entries of code/name/
+#      color/exponent/type/address_regex/asset_id — no network. Across all 76 App
+#      endpoints `network` appears only on individual resources (an address's `network`,
+#      a transaction's `network.network_name`), never as a per-asset list. The only
+#      App-native way to discover one is `accounts.addresses.create`, a mutating POST
+#      that mints one address at a time.
+#   2. No fee source. Nothing on the App surface prices a withdrawal before it happens;
+#      `fee` appears only retrospectively (V2Transfer.fee, network.transaction_fee), and
+#      not as a schedule. `exchange.http.withdrawals.fee_estimate` prices a withdrawal
+#      out of a Coinbase Exchange account, which an App key does not have.
+#   3. Nothing to enumerate. A crypto withdrawal is an arbitrary-destination send
+#      (`accounts.transactions.create`, type `send`); only the fiat payment methods are
+#      enumerable, one rail of two.
+# Borrowing Exchange's `GET /currencies/{id}.supported_networks` is the tempting
+# shortcut and is wrong in a way the caller cannot detect: the route is account-blind by
+# construction and over-lists (it offers PYUSD on ethereum and solana, where this App
+# wallet returns 400 "not eligible"; 505 Exchange currencies against App's 409).
+
+[ids]
+asset = "symbol"
+note = "The venue's currency code (`BTC`, `USD`); market ids are `<base>-<quote>` product ids (`BTC-USD`, `BTC-PERP-INTX`)."

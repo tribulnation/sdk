@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tribulnation-coinbase"
+version = "0.1.0"
+authors = [
+  {name="Marcel Claramunt", email="marcel@tribulnation.com"}
+]
+description = "Tribulnation SDK implementation for Coinbase."
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = [
+  "tribulnation-sdk>=1.7.0", "typed-coinbase>=0.4.0",
+]
+requires-python = ">=3.10"
+readme = {file="README.md", content-type="text/markdown"}
+
+[project.urls]
+Repository = "https://github.com/tribulnation/sdk.git"
