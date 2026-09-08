@@ -80,5 +80,5 @@ async def candles(
     limit=CANDLES_PAGE,
     validate=self.shared.validate,
   )
-  async for rows in paging:
+  async for rows in paging.via(self.call_mexc):
     yield [parse_candle(r) for r in rows]

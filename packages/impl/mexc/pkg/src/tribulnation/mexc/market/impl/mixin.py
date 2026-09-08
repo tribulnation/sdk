@@ -1,4 +1,12 @@
-from typing_extensions import Any, AsyncContextManager, Iterable, TypedDict
+from typing_extensions import (
+  Any,
+  AsyncContextManager,
+  Awaitable,
+  Callable,
+  Iterable,
+  TypeVar,
+  TypedDict,
+)
 from dataclasses import dataclass, field
 from types import TracebackType
 import asyncio
@@ -13,6 +21,7 @@ from typed_mexc.spot.streams.core.proto import PrivateDealsV3Api
 from tribulnation.mexc.core.exc import wrap_exceptions
 
 SpotInfo = SymbolInfo
+T = TypeVar('T')
 
 
 class Meta(TypedDict):
@@ -116,6 +125,12 @@ class Shared:
 @dataclass(frozen=True)
 class SharedMixin(SDK):
   shared: Shared
+
+  @SDK.method
+  @wrap_exceptions
+  async def call_mexc(self, fn: Callable[[], Awaitable[T]]) -> T:
+    """Translate one MEXC request so retry middleware can retry a single page."""
+    return await fn()
 
   @classmethod
   def new(
