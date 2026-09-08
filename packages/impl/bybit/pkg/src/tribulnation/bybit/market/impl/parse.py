@@ -41,8 +41,11 @@ def parse_order(order: OpenOrder) -> OrderState:
   )
 
 
-def parse_execution(execution: Execution) -> Trade:
-  """Map one REST execution onto a `Trade`.
+def parse_execution(execution: 'Execution | ExecutionUpdate') -> Trade:
+  """Map one execution onto a `Trade`, from either the REST endpoint or the stream.
+
+  The two shapes agree on every field read here, sizes and fees included, so one
+  mapping serves both.
 
   `execFee` is required and already a parsed `Decimal`, so it is read with no
   truthiness guard: a zero fee is a real fee, and 40 of the 55 spot fills on the
@@ -57,24 +60,6 @@ def parse_execution(execution: Execution) -> Trade:
     maker=execution['isMaker'],
     fee=Trade.Fee(amount=execution['execFee'], asset=execution['feeCurrency']),
     details=execution,
-  )
-
-
-def parse_execution_update(update: ExecutionUpdate) -> Trade:
-  """Map one streamed execution onto a `Trade`.
-
-  The WebSocket channel sends `execFee` and the sizes unparsed, unlike the REST
-  endpoint's `Decimal`s -- otherwise the same shape, zero fees included.
-  """
-  qty = Decimal(update['execQty'])
-  return Trade(
-    id=update['execId'],
-    price=Decimal(update['execPrice']),
-    qty=qty if update['side'] == 'Buy' else -qty,
-    time=update['execTime'],
-    maker=update['isMaker'],
-    fee=Trade.Fee(amount=Decimal(update['execFee']), asset=update['feeCurrency']),
-    details=update,
   )
 
 

@@ -35,7 +35,7 @@ async def snapshot(
     balances[coin['coin']] = num(coin['walletBalance'])
   positions: dict[str, Position] = {}
   for p in await self.linear_positions():
-    size = Decimal(p['size'])
+    size = p['size']
     positions[p['symbol']] = Position(
       size=size if p['side'] == 'Buy' else -size,
       avg_price=num(p['avgPrice']),

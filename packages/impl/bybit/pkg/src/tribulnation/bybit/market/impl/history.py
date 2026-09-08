@@ -6,12 +6,12 @@ in place instead of restarting from page 1.
 """
 
 from typing_extensions import AsyncIterator, Sequence
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 
 from tribulnation.sdk.market import FundingPayment, FundingRate, Trade
 
-from tribulnation.bybit.core import MILLISECOND, TRADE_WINDOW, windows
+from tribulnation.bybit.core import TRADE_WINDOW, windows
 from .mixin import MarketMixin
 from .parse import parse_execution
 
@@ -48,33 +48,25 @@ async def funding_rates(
 ) -> AsyncIterator[Sequence[FundingRate]]:
   """Walk this market's settled funding rates, newest page first.
 
-  `market.funding_history` has no cursor: it answers one time window with at most
-  `limit` rows, newest first. Each page therefore moves the window's upper bound to
-  just before the oldest row it returned, and a short page ends the walk.
+  `market.funding_history` has no cursor -- it answers one time window with at most
+  `limit` rows -- so the client's pager walks it backwards by moving the upper bound.
+
+  An open upper bound is resolved to now rather than passed on: Bybit rejects a
+  `startTime` sent without an `endTime` outright (`10001: Time Is Invalid`), while it
+  answers an `endTime` with no `startTime` normally.
   """
-  upper = end
-  while True:
-    page = await self.call_bybit(
-      lambda: self.client.market.funding_history(
-        'linear',
-        symbol=self.symbol,
-        start_time=start,
-        end_time=upper,
-        limit=FUNDING_PAGE,
-        validate=self.validate,
-      )
-    )
-    rows = page['list']
-    if not rows:
-      return
+  paging = self.client.market.funding_history_paged(
+    'linear',
+    symbol=self.symbol,
+    start_time=start,
+    end_time=end if end is not None else datetime.now(timezone.utc),
+    limit=FUNDING_PAGE,
+    validate=self.validate,
+  )
+  async for rows in paging.via(self.call_bybit):
     yield [
       FundingRate(rate=r['fundingRate'], time=r['fundingRateTimestamp']) for r in rows
     ]
-    if len(rows) < FUNDING_PAGE:
-      return
-    upper = min(r['fundingRateTimestamp'] for r in rows) - MILLISECOND
-    if start is not None and upper < start:
-      return
 
 
 async def funding_payments(

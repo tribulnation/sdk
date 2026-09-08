@@ -101,8 +101,8 @@ def parse_easy_onchain(
     tags=tags,
     asset=product['coin'],
     apr=parse_percent(product['estimateApr']),
-    min_qty=Decimal(product['minStakeAmount']),
-    max_qty=Decimal(product['maxStakeAmount']),
+    min_qty=product['minStakeAmount'],
+    max_qty=product['maxStakeAmount'],
     duration=timedelta(days=term) if term else None,
     id=product['productId'],
   )

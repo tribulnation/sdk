@@ -140,7 +140,7 @@ class PerpMarket(MarketMixin, _PerpMarket):
     if not rows or not rows[0]['side']:
       return PerpPosition()
     row = rows[0]
-    size = Decimal(row['size'])
+    size = row['size']
     return PerpPosition(
       size=size if row['side'] == 'Buy' else -size,
       entry_price=num(row['avgPrice']),
