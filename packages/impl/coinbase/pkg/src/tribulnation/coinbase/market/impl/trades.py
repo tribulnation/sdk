@@ -3,7 +3,6 @@
 from typing_extensions import AsyncIterable, Sequence
 from contextlib import asynccontextmanager
 from datetime import datetime
-from decimal import Decimal
 
 from tribulnation.sdk.core import OverflowPolicy
 from tribulnation.sdk.market import Trade
@@ -13,29 +12,17 @@ from typed_coinbase.app.advanced_trade.http.orders.historical.fills import Fill
 from .mixin import MarketMixin
 
 
-def parse_fill(fill: Fill, *, quote: str) -> Trade | None:
-  """Map one Advanced Trade fill onto a `Trade`.
-
-  Returns `None` for a fill with no `trade_time`: the field is optional upstream and
-  `Trade.time` is required, so there is nothing honest to put there.
-  """
-  time = fill.get('trade_time')
-  if time is None:
-    return None
-  sign = 1 if fill.get('side') == 'BUY' else -1
-  commission = fill.get('commission')
-  fee = (
-    Trade.Fee(amount=commission, asset=quote)
-    if commission is not None and commission != 0
-    else None
-  )
+def parse_fill(fill: Fill, *, quote: str) -> Trade:
+  """Map one Advanced Trade fill onto a `Trade`."""
+  sign = 1 if fill['side'] == 'BUY' else -1
+  commission = fill['commission']
   return Trade(
-    id=fill.get('trade_id'),
-    price=fill.get('price') or Decimal(0),
-    qty=sign * (fill.get('size') or Decimal(0)),
-    time=time,
-    maker=fill.get('liquidity_indicator') == 'MAKER',
-    fee=fee,
+    id=fill['trade_id'],
+    price=fill['price'],
+    qty=sign * fill['size'],
+    time=fill['trade_time'],
+    maker=fill['liquidity_indicator'] == 'MAKER',
+    fee=Trade.Fee(amount=commission, asset=quote) if commission else None,
     details=fill,
   )
 
@@ -51,8 +38,7 @@ async def trades_history(
   )
   quote = self.quote_asset
   async for page in paging.via(self.call_app):
-    trades = [parse_fill(fill, quote=quote) for fill in page]
-    yield [trade for trade in trades if trade is not None]
+    yield [parse_fill(fill, quote=quote) for fill in page]
 
 
 @asynccontextmanager

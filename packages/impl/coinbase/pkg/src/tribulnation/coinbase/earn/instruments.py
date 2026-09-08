@@ -22,7 +22,6 @@ is documented as non-custodial-wallet-only, with custodial support "coming soon"
 
 from typing_extensions import Collection, Sequence
 from dataclasses import dataclass
-from decimal import Decimal
 
 from tribulnation.sdk.core import SDK
 from tribulnation.sdk.earn.instruments import (
@@ -75,10 +74,7 @@ class Instruments(Mixin, _Instruments):
         continue
       out.append(
         Instrument(
-          tags=list(TAGS),
-          asset=detail['id'],
-          apr=Decimal(detail['apy']),
-          id=detail['id'],
+          tags=list(TAGS), asset=detail['id'], apr=detail['apy'], id=detail['id']
         )
       )
     return out

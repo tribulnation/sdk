@@ -7,7 +7,6 @@ from datetime import datetime, timedelta, timezone
 from typing_extensions import AsyncIterable
 
 from typed_coinbase import Coinbase
-from typed_coinbase.core import timestamp_iso
 from typed_coinbase.schemas import (
   LimitLimitGtcConfiguration,
   MarketMarketIocConfiguration,
@@ -171,30 +170,18 @@ async def trades_history(
     start_sequence_timestamp=start,
     end_sequence_timestamp=end,
   )
+  quote = product_id.split('-')[1]
   out: list[Trade] = []
   for f in raw['fills']:
-    trade_time = f.get('trade_time')
-    if trade_time is None:
-      # `trade_time` is NotRequired; a fill without one has no usable time -- skip
-      # rather than guess (`Trade.time` is required).
-      continue
-    sign = 1 if f.get('side') == 'BUY' else -1
-    size = f.get('size')
-    qty = Decimal(size) if size else Decimal(0)
-    commission = f.get('commission')
-    fee = None
-    if commission and Decimal(commission) != 0:
-      quote = product_id.split('-')[1]
-      fee = Trade.Fee(amount=Decimal(commission), asset=quote)
-    price = f.get('price')
+    commission = f['commission']
     out.append(
       Trade(
-        id=f.get('trade_id'),
-        price=Decimal(price) if price else Decimal(0),
-        qty=sign * qty,
-        time=trade_time,
-        maker=f.get('liquidity_indicator') == 'MAKER',
-        fee=fee,
+        id=f['trade_id'],
+        price=f['price'],
+        qty=(1 if f['side'] == 'BUY' else -1) * f['size'],
+        time=f['trade_time'],
+        maker=f['liquidity_indicator'] == 'MAKER',
+        fee=Trade.Fee(amount=commission, asset=quote) if commission else None,
         details=f,
       )
     )
@@ -358,10 +345,13 @@ await cancel_order('BTC-USD', '00000000-0000-0000-0000-000000000000')
 # `collateral`, so the cells below call `perpetuals.*` and record the real 403.
 #
 # Funding is partly reachable, through the product catalog rather than a funding endpoint.
-# `products.get`'s `future_product_details` — an untyped `dict[str, Any]` on the response —
-# carries `perpetual_details.funding_rate`, `perpetual_details.funding_time` and a
+# `products.get`'s `future_product_details` carries `funding_rate`, `funding_time` and a
 # `funding_interval` of `3600s` on all three `*-PERP-INTX` products, so `next_funding` is
-# implemented from it below. `funding_time` is the settlement that just happened, not the
+# implemented from it below. Those three are read off `future_product_details` itself, not
+# off its nested `perpetual_details`: all 131 INTX perpetuals populate both with the same
+# values (checked live), while the 100 FCM-managed CDE contracts the same catalogue lists
+# carry no `perpetual_details` at all and publish funding on the parent only. The parent is
+# the read that holds on both. `funding_time` is the settlement that just happened, not the
 # next one — polled across an hour boundary it held 15:00:00Z for the whole of 15:00-16:00
 # and flipped to 16:00:00Z six seconds after the hour — so the cell adds one interval. The same blob carries `index_price`, used by `index`. What is
 # missing is history: no funding-rate history and no funding-payment ledger exists anywhere
@@ -408,9 +398,10 @@ async def perp_rules(product_id: str, *, refetch: bool = False) -> Rules:
   tier = fees.get('fee_tier') or {}
   # Perpetuals leave `base_display_symbol`/`base_currency_id` empty (verified live) --
   # the underlying asset code only shows up under `future_product_details.contract_code`.
-  base = product['base_display_symbol'] or product.get(
-    'future_product_details', {}
-  ).get('contract_code', '')
+  details = product.get('future_product_details')
+  base = product['base_display_symbol']
+  if not base and details is not None:
+    base = details.get('contract_code') or ''
   return Rules(
     base=base,
     quote=product['quote_display_symbol'],
@@ -472,29 +463,18 @@ async def perp_trades_history(
     start_sequence_timestamp=start,
     end_sequence_timestamp=end,
   )
+  quote = product_id.split('-')[1]
   out: list[Trade] = []
   for f in raw['fills']:
-    trade_time = f.get('trade_time')
-    if trade_time is None:
-      # `trade_time` is NotRequired; a fill without one has no usable time -- skip
-      # rather than guess (`Trade.time` is required).
-      continue
-    sign = 1 if f.get('side') == 'BUY' else -1
-    size = f.get('size')
-    qty = Decimal(size) if size else Decimal(0)
-    commission = f.get('commission')
-    fee = None
-    if commission and Decimal(commission) != 0:
-      fee = Trade.Fee(amount=Decimal(commission), asset=product_id.split('-')[1])
-    price = f.get('price')
+    commission = f['commission']
     out.append(
       Trade(
-        id=f.get('trade_id'),
-        price=Decimal(price) if price else Decimal(0),
-        qty=sign * qty,
-        time=trade_time,
-        maker=f.get('liquidity_indicator') == 'MAKER',
-        fee=fee,
+        id=f['trade_id'],
+        price=f['price'],
+        qty=(1 if f['side'] == 'BUY' else -1) * f['size'],
+        time=f['trade_time'],
+        maker=f['liquidity_indicator'] == 'MAKER',
+        fee=Trade.Fee(amount=commission, asset=quote) if commission else None,
         details=f,
       )
     )
@@ -523,11 +503,14 @@ result
 
 # %%
 async def index(product_id: str, *, settings: Settings = {}) -> Decimal:
-  # INTX's index price lives in the product catalog's untyped `future_product_details`
-  # blob, alongside the funding fields used by `next_funding` below.
+  # INTX's index price lives in the product catalogue's `future_product_details`,
+  # alongside the funding fields `next_funding` reads below.
   product = await client.app.advanced_trade.http.products.get(product_id)
-  details = product.get('future_product_details') or {}
-  return Decimal(details['index_price'])
+  details = product.get('future_product_details')
+  price = details.get('index_price') if details else None
+  if not price:
+    raise RuntimeError(f'Coinbase publishes no index price for {product_id}')
+  return price
 
 
 {product_id: await index(product_id) for product_id in MARKETS['perp']}
@@ -536,18 +519,24 @@ async def index(product_id: str, *, settings: Settings = {}) -> Decimal:
 # %%
 async def next_funding(product_id: str) -> NextFunding:
   product = await client.app.advanced_trade.http.products.get(product_id)
-  details = product.get('future_product_details') or {}
-  perpetual = details['perpetual_details']
-  interval = timedelta(seconds=int(str(details['funding_interval']).removesuffix('s')))
-  # The catalog's `funding_time` is the settlement that just happened, not the one coming:
-  # polled across an hour boundary it read 15:00:00Z (rate -0.000002) for the whole of
-  # 15:00-16:00 and flipped to 16:00:00Z (rate -0.000004) six seconds after 16:00.
-  # `NextFunding.time` wants the upcoming payment, hence one interval later.
-  return NextFunding(
-    rate=Decimal(perpetual['funding_rate']),
-    time=timestamp_iso.parse(perpetual['funding_time']) + interval,
-    interval=interval,
-  )
+  details = product.get('future_product_details')
+  if not details:
+    raise RuntimeError(f'Coinbase reports no perpetual detail for {product_id}')
+  # Funding is published on `future_product_details` itself, not on the nested
+  # `perpetual_details`: an INTX perpetual fills in both, with the same values, but an
+  # FCM-managed CDE contract sends no `perpetual_details` at all -- so the parent is the
+  # read that holds on both.
+  rate = details.get('funding_rate')
+  raw_interval = details.get('funding_interval')
+  settled = details.get('funding_time')
+  if not rate or not raw_interval or settled is None:
+    raise RuntimeError(f'Coinbase publishes no funding state for {product_id}')
+  interval = timedelta(seconds=int(raw_interval.removesuffix('s')))
+  # The catalogue's `funding_time` is the settlement that just happened, not the one
+  # coming: polled across an hour boundary it read 15:00:00Z (rate -0.000002) for the
+  # whole of 15:00-16:00 and flipped to 16:00:00Z (rate -0.000004) six seconds after
+  # 16:00. `NextFunding.time` wants the upcoming payment, hence one interval later.
+  return NextFunding(rate=rate, time=settled + interval, interval=interval)
 
 
 {product_id: await next_funding(product_id) for product_id in MARKETS['perp']}
@@ -709,7 +698,7 @@ await perp_cancel_order('BTC-PERP-INTX', '00000000-0000-0000-0000-000000000000')
 # | `depth`, `depth_stream`, `open_orders`, `trades_history`, `trades_stream` | Fully supported, live-tested (same code paths as spot, against `*-PERP-INTX` products). |
 # | `rules` | Fully supported, live-tested: product catalogue plus `fees.transaction_summary(product_venue='INTX')`, both validated. |
 # | `index` | Fully supported, live-tested: `products.get`'s `future_product_details.index_price` carries INTX's index price on all three perpetuals. |
-# | `next_funding` | Fully supported, live-tested: `future_product_details` carries `perpetual_details.funding_rate`/`.funding_time` and `funding_interval` (`3600s`) -- no funding endpoint needed. `funding_time` is the *last* settlement (verified by polling across an hour boundary), so the next payment is one interval later. |
+# | `next_funding` | Fully supported, live-tested: `future_product_details` carries `funding_rate`, `funding_time` and `funding_interval` (`3600s`) on the object itself -- no funding endpoint needed, and no read through the nested `perpetual_details`, which only INTX perpetuals fill in. `funding_time` is the *last* settlement (verified by polling across an hour boundary), so the next payment is one interval later. |
 # | `funding_rates`, `funding_payments` | Not supported: the catalog exposes only the *current* funding state; no funding-rate history and no funding-payment ledger exists anywhere in `typed_coinbase` for INTX perpetuals. |
 # | `perp_position`, `perp_collateral`, `available_notional` | Not attempted: written but not executed, since this key's permissions refuse them -- re-confirmed against `perpetuals.positions.list`, `.portfolio_summary` and `.balances`, all three `AuthError(403, PERMISSION_DENIED)` on a `portfolio_type: 'DEFAULT'` key -- and additionally deprecated in the client itself (INTX perpetuals retiring 2026-09-09). |
 # | `place_order`, `cancel_order` | Written, intentionally not executed (state-mutating). |

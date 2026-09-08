@@ -86,33 +86,22 @@ def parse_transaction(tx: Transaction) -> Observation:
   return UnknownObservation(id=tx['id'], time=time, asset=asset, amount=amount)
 
 
-def parse_fill(fill: Fill) -> SpotTrade | None:
-  """Map one Advanced Trade fill onto a `SpotTrade`, keyed by its order.
-
-  Returns `None` for a fill naming neither a product nor an order: without both there
-  is nothing to reconcile it against the v2 row it duplicates.
-  """
-  product_id = fill.get('product_id')
-  order_id = fill.get('order_id')
-  if not product_id or not order_id:
-    return None
+def parse_fill(fill: Fill) -> SpotTrade:
+  """Map one Advanced Trade fill onto a `SpotTrade`, keyed by its order."""
+  product_id = fill['product_id']
   base, _, quote = product_id.partition('-')
-  size = fill.get('size')
-  if size is not None and fill.get('side') == 'SELL':
-    size = -size
-  commission = fill.get('commission')
+  size = -fill['size'] if fill['side'] == 'SELL' else fill['size']
+  commission = fill['commission']
   return SpotTrade(
-    id=fill.get('trade_id'),
-    time=fill.get('trade_time'),
+    id=fill['trade_id'],
+    time=fill['trade_time'],
     base=base,
     quote=quote,
     pair=product_id,
     size=size,
-    price=fill.get('price'),
-    order_id=order_id,
-    fee=Fee(amount=commission, asset=quote)
-    if commission is not None and commission != 0
-    else None,
+    price=fill['price'],
+    order_id=fill['order_id'],
+    fee=Fee(amount=commission, asset=quote) if commission else None,
   )
 
 
@@ -140,12 +129,8 @@ class History(Mixin, _History):
       end_sequence_timestamp=end,
       product_types=['SPOT'],
     )
-    out: dict[str, SpotTrade] = {}
-    for fill in await paging.via(self.call_app):
-      trade = parse_fill(fill)
-      if trade is not None and trade.order_id is not None:
-        out[trade.order_id] = trade
-    return out
+    fills = await paging.via(self.call_app)
+    return {fill['order_id']: parse_fill(fill) for fill in fills}
 
   def record(self, observations: Sequence[Observation]) -> HistoryRecord:
     """Wrap observations in a record carrying this venue's provenance."""

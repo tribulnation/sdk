@@ -1,13 +1,12 @@
 """Product-catalogue reads shared by both Advanced Trade exchanges."""
 
-from typing_extensions import Any, Collection, Literal, Mapping
-from decimal import Decimal
+from typing_extensions import Collection, Literal, Mapping
 
 from tribulnation.sdk.market import PerpStats, Ticker
 
 from typed_coinbase.schemas import Product
 
-from .funding import funding_interval, next_funding_time
+from .funding import funding_interval, funding_rate, next_funding_time
 from .mixin import ExchangeMixin
 from .numbers import parse_optional_decimal
 
@@ -54,21 +53,23 @@ def parse_ticker(product: Product) -> Ticker:
 def parse_perp_stats(product: Product) -> PerpStats | None:
   """Map one INTX perpetual's catalogue entry onto a `PerpStats`.
 
-  Returns `None` for a product carrying no `future_product_details` -- everything a
-  `PerpStats` needs lives in that blob.
+  Returns `None` for a product carrying no `future_product_details`, or none whose
+  details name an index price: everything a `PerpStats` needs lives in that object,
+  and `index` is the one field it has no optional form for.
   """
-  details: dict[str, Any] | None = product.get('future_product_details')
+  details = product.get('future_product_details')
   if not details:
     return None
-  perpetual: dict[str, Any] = details['perpetual_details']
-  open_interest = perpetual.get('open_interest')
+  index = parse_optional_decimal(details.get('index_price'))
+  if index is None:
+    return None
   return PerpStats(
-    index=Decimal(details['index_price']),
+    index=index,
     mark=parse_optional_decimal(product.get('mid_market_price')),
-    funding=Decimal(perpetual['funding_rate']),
+    funding=funding_rate(details),
     next_funding_time=next_funding_time(details),
     funding_interval=funding_interval(details),
-    open_interest=Decimal(open_interest) if open_interest else None,
+    open_interest=details.get('open_interest'),
   )
 
 
