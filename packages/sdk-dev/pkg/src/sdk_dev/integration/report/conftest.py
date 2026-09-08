@@ -3,6 +3,10 @@
 Every account in the configuration whose venue's `impl.toml` declares
 `[support.report]` other than `none` is exercised; the venue-to-package mapping mirrors
 `ReportSDK.venue`, since the router is the only other place that knows it.
+
+Every account is built and read on one event loop kept for the whole session, the way
+a consumer iterating `report.all` would: some clients bind a lock or a semaphore to
+the loop they first run on, and one `asyncio.run` per account trips over that.
 """
 
 from datetime import datetime, timedelta, timezone
@@ -19,6 +23,7 @@ from ..support import describe_exception
 from .support import ReportResult
 
 SDK: pytest.StashKey[ReportSDK] = pytest.StashKey()
+LOOP: pytest.StashKey[asyncio.AbstractEventLoop] = pytest.StashKey()
 HISTORY_WINDOW = timedelta(days=30)
 MEXC_SPOT_MARKETS_ENV = 'SDK_DEV_MEXC_SPOT_MARKETS'
 """Comma-separated spot symbols the MEXC fill sweep looks at; MEXC has no account-wide
@@ -78,13 +83,30 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
   metafunc.parametrize('report_account', ids, ids=ids, scope='module')
 
 
+def loop_of(config: pytest.Config) -> asyncio.AbstractEventLoop:
+  """The session's one event loop, created on first use and closed at exit."""
+  loop = config.stash.get(LOOP, None)
+  if loop is None:
+    loop = asyncio.new_event_loop()
+    config.stash[LOOP] = loop
+  return loop
+
+
+def pytest_unconfigure(config: pytest.Config):
+  """Close the session's event loop, if one was ever needed."""
+  if (loop := config.stash.get(LOOP, None)) is not None:
+    loop.close()
+
+
 async def read_report(
-  report: Report, *, venue: str, start: datetime, end: datetime
+  sdk: ReportSDK, id: str, *, venue: str, start: datetime, end: datetime
 ) -> ReportResult:
-  """Read one snapshot and one history window, keeping the two failures apart."""
+  """Build one account's report and read a snapshot and a history window, keeping
+  the two failures apart."""
   snapshot = snapshot_failure = records = history_failure = None
   with Context().retried(NetworkError, RateLimited, max_retries=5).use():
     try:
+      report: Report = sdk.venue(id)
       async with report:
         try:
           snapshot = await report.snapshot()
@@ -95,7 +117,7 @@ async def read_report(
         except Exception as exception:
           history_failure = describe_exception(exception)
     except Exception as exception:
-      # Entering the report (or leaving it) failed; neither read can be trusted.
+      # Building, entering or leaving the report failed; neither read can be trusted.
       failure = describe_exception(exception)
       snapshot_failure = snapshot_failure or failure
       history_failure = history_failure or failure
@@ -117,15 +139,6 @@ def report_result(report_account: str, pytestconfig: pytest.Config) -> ReportRes
   venue = sdk.accounts[report_account].venue
   end = datetime.now(timezone.utc)
   start = end - HISTORY_WINDOW
-  try:
-    report = sdk.venue(report_account)
-  except Exception as exception:
-    failure = describe_exception(exception)
-    return ReportResult(
-      venue=venue,
-      start=start,
-      end=end,
-      snapshot_failure=failure,
-      history_failure=failure,
-    )
-  return asyncio.run(read_report(report, venue=venue, start=start, end=end))
+  return loop_of(pytestconfig).run_until_complete(
+    read_report(sdk, report_account, venue=venue, start=start, end=end)
+  )
