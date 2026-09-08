@@ -34,9 +34,8 @@ binance = ["tribulnation-binance"]
 bitget = ["tribulnation-bitget"]
 bit2me = ["tribulnation-bit2me"]
 ethereum = ["tribulnation-ethereum"]
-kraken = ["tribulnation-kraken"]
 bybit = ["tribulnation-bybit"]
-bingx = ["tribulnation-bingx"]
+coinbase = ["tribulnation-coinbase"]
 
 [project.urls]
 Github = "https://github.com/tribulnation/sdk.git"
