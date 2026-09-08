@@ -21,11 +21,17 @@ auth = true
 
 [support.report]
 support = "partial"
-methods = ["snapshot"]
 auth = true
-note = "`history()` raises `NotImplementedError`; the underlying `Reporting` targets classic accounts."
-# MexcReport serves snapshot() directly but raises NotImplementedError from history() —
-# the underlying Reporting class targets a different (classic-account) shape.
+methods = ["snapshot", "history"]
+note = "`history()` covers spot fills (per symbol: pass `spot_markets`, MEXC has no account-wide fills feed), crypto deposits/withdrawals and futures funding settlements, and requires `start`. Futures fills and closed positions, spot-futures and sub-account transfers, dust conversions and affiliate rebates are not covered, though MEXC exposes the endpoints; margin has no surface in the typed client."
+# `snapshot()` reads spot balances plus futures assets and open positions, as two
+# SubaccountSnapshots. `history()` covers spot fills (per symbol, from
+# `ReportSDK.config['mexc']['spot_markets']`), crypto deposits/withdrawals (90-day
+# query cap, so windows are sliced) and futures funding settlements (page-based, no time
+# filter, so every page is read and the window applied client-side). Every one of those
+# endpoints needs an API key with spot trade-read, wallet-read and futures-read scopes;
+# the repo's test key has none of them (`700007`/`701`/`703`), so `sdk-dev test report
+# mexc` is the gate before trusting a release.
 
 [ids]
 asset = "symbol"

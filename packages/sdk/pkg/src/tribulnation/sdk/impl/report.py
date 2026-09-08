@@ -28,6 +28,13 @@ class BinanceConfig(TypedDict, total=False):
   """USD-M perpetual symbols `history()` sweeps for fills."""
 
 
+class MexcConfig(TypedDict, total=False):
+  """MEXC reporting configuration."""
+
+  spot_markets: Sequence[str]
+  """Spot symbols `history()` sweeps for fills; MEXC has no account-wide fills feed."""
+
+
 if TYPE_CHECKING:
   from tribulnation.ethereum.reporting import EvmConfig
   from tribulnation.dydx.report import DydxConfig
@@ -38,6 +45,7 @@ if TYPE_CHECKING:
     dydx: DydxConfig
     hyperliquid: HyperliquidConfig
     binance: BinanceConfig
+    mexc: MexcConfig
 else:
   Config = dict
 
@@ -139,10 +147,12 @@ class ReportSDK:
       raise ImportError(
         'mexc sdk is not installed. Please install it with `pip install tribulnation-mexc`.'
       ) from e
+    config = self.config.get('mexc') or {}
     return MexcReport.new(
       account.resolved_api_key,
       account.resolved_api_secret,
       settings={'validate': account.validate},
+      spot_markets=config.get('spot_markets', ()),
     )
 
   def bit2me(self, account: Bit2Me, id: str) -> Report:

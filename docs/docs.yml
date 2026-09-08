@@ -27,6 +27,7 @@
     - implementations:
         - dydx.md
         - ethereum.md
+        - mexc.md
 - reference:
     - async-usage.md
     - error-handling.md

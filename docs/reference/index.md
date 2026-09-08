@@ -20,6 +20,6 @@
 
 ---
 
-← [Ethereum Report](../report/implementations/ethereum.md) · **Next:** [Async Usage](async-usage.md) →
+← [MEXC Report](../report/implementations/mexc.md) · **Next:** [Async Usage](async-usage.md) →
 
 <!-- /next -->
