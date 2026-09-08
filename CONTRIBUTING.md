@@ -28,10 +28,12 @@ registry.toml         # public venue registry (display name, icon, PyPI, tier)
 - Unit tests: `pytest`
 - Integration tests, against live APIs: `sdk-dev test earn|wallet|etc.` (credentials from `sdk.test.toml`)
 - Support matrix: `sdk-dev support`
-- PoC notebooks: `sdk-dev poc scaffold <venue> <surface>` writes the skeleton;
-  `sdk-dev poc surface <venue> [--grep regex]` lists the typed client's endpoints;
-  `sdk-dev poc check [venue...]` type-checks and lints them; `sdk-dev poc run <notebook>
-  --cells 1,3,7-9` executes chosen cells. The rules are in `.agents/skills/sdk-poc/`
+- PoC scripts (`poc/*.py`, notebooks in jupytext's percent format): `sdk-dev poc scaffold
+  <venue> <surface>` writes the skeleton; `sdk-dev poc surface <venue> [--grep regex]`
+  lists the typed client's endpoints; `sdk-dev poc check [venue...]` type-checks and
+  lints them; `sdk-dev poc run <script> --cells 1,3,7-9` executes chosen cells into the
+  paired `.ipynb` beside the script, which is gitignored because cells print live account
+  data. The rules are in `.agents/skills/sdk-poc/`
 - Catalogue coverage: `sdk-dev catalogue check` verifies the catalogue's translation keys
   follow each `impl.toml`'s `[ids]` form; `sdk-dev catalogue coverage [surface...]` runs the
   live surfaces and lists the IDs the catalogue cannot translate yet

@@ -18,6 +18,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      # The PoCs are the poc/*.py scripts. The notebooks `sdk-dev poc run` writes beside
+      # them hold what each cell printed against a live account, and never reach the repo.
+      - name: No PoC notebooks committed
+        run: '! git ls-files -- "packages/impl/*.ipynb" | grep .'
+
       - id: diff
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then

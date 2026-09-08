@@ -18,7 +18,7 @@ note = "History replays the account's full fill stream, and the venue only serve
 support = "none"
 auth = true
 note = "Hyperliquid offers nothing shaped like the Earn contract. Its three yield-bearing surfaces are a spot-token borrow/lend money market, vaults, and native HYPE staking — a floating-rate lending position, an equity stake in someone's trading strategy, and protocol-level delegation respectively. None of them is a yield product a caller subscribes to, so reporting them as `Instrument`s would misdescribe what they are."
-# Deliberate, and not a wiring gap: `poc/earn.ipynb` maps all three onto `tribulnation.sdk.earn`
+# Deliberate, and not a wiring gap: `poc/earn.py` maps all three onto `tribulnation.sdk.earn`
 # live against testnet, so the question was never whether it can be done. Each surface fails
 # the contract in its own way:
 #   1. Borrow/lend. `allBorrowLendReserveStates` enumerates every spot token with an active
