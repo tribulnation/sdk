@@ -79,6 +79,14 @@ Collateral never aggregates — it is always scoped to the addressed subaccount'
 Type mapping: `POST_ONLY` orders always use TIF `POST_ONLY`; `MARKET` uses `market_tif`;
 `LIMIT` uses `limit_tif`.
 
+## Candles
+
+`candles` serves every `CandleInterval` (`CANDLE_INTERVALS` is the full set) from the
+indexer, oldest first in pages of 999. The indexer answers newest-first, so with a `start`
+the range is swept in forward windows; with `start=None` the whole history is fetched
+before the first page is yielded. `volume` is `baseTokenVolume`, `quote_volume` is
+`usdVolume`, and `trades` is reported.
+
 ## Venue-specific semantics
 
 - **`available_notional`** = subaccount `freeCollateral` × the market's maximum leverage,

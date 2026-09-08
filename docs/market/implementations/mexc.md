@@ -41,6 +41,10 @@ built-in `mexc` account is `accounts.Mexc(public=True)`, read-only.
   used, an aggressive limit at the supplied `price` is placed instead.
 - `place_order`/`cancel_order` take no MEXC-specific `settings` keys today (there is no
   MEXC entry in the shared `Settings` TypedDict).
+- `candles` serves every `CandleInterval` (`CANDLE_INTERVALS` is the full set; the hour is
+  MEXC's `60m`) in pages of 500, the cap the venue really serves whatever `limit` says. An
+  explicit `start` is required: without one MEXC answers its latest page rather than its
+  earliest, and an epoch-zero start answers nothing.
 
 ## Example
 

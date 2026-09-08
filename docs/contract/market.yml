@@ -185,6 +185,46 @@ methods:
       resultTemplate: |
         {{ catalogue.asset_translations[accounts[0]][constants[accounts[0]].base] }} / {{ catalogue.asset_translations[accounts[0]][constants[accounts[0]].quote] }}
 
+  candles:
+    group: Public market data
+    venues:
+      binance: Spot only, 1000 per page. The USD-M kline endpoint has no paged walk in the typed client yet, so the futures market raises `NotImplementedError`.
+      bybit: Answers newest-first; served oldest-first in pages of 999. An open `start` buffers the whole history before the first page.
+      coinbase: "`start` is required: Coinbase answers at most one page per request (300 candles on INTX, 350 on spot) and publishes no listing date. Pages of 299, and `quote_volume` is `None`; hours with no trades are absent rather than zero."
+      dydx: Answers newest-first; served oldest-first in pages of 999. An open `start` buffers the whole history before the first page.
+      mexc: "`start` is required: an unbounded request answers the latest page, not the earliest. Pages of 500, the cap MEXC really serves."
+    example:
+      accountVenues: [mexc]
+      constants:
+        mexc: {market_id: 'mexc:spot:BTCUSDT', open1: '60123.40', close1: '60150.00', open2: '60150.00', close2: '60098.20'}
+        binance: {market_id: 'binance:spot:BTCUSDT', open1: '60124.10', close1: '60151.30', open2: '60151.30', close2: '60099.00'}
+        bybit: {market_id: 'bybit:spot:BTCUSDT', open1: '60122.80', close1: '60149.50', open2: '60149.50', close2: '60097.60'}
+        coinbase: {market_id: 'coinbase:spot:BTC-USD', open1: '60120.55', close1: '60148.02', open2: '60148.02', close2: '60096.11'}
+        dydx: {market_id: 'dydx:perp:BTC-USD', open1: '60118.00', close1: '60146.00', open2: '60146.00', close2: '60094.00'}
+      callTemplate: |
+        async for page in sdk.candles('{{ constants[accounts[0]].market_id }}', '1h', start, end):
+          for candle in page:
+            print(candle.time, candle.open, candle.close)
+      resultTemplate: |
+        2025-01-03 08:00:00+00:00 {{ constants[accounts[0]].open1 }} {{ constants[accounts[0]].close1 }}
+        2025-01-03 09:00:00+00:00 {{ constants[accounts[0]].open2 }} {{ constants[accounts[0]].close2 }}
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['mexc', 'okx', 'kraken']:
+          for raw_id, info in catalogue.spot_instruments[venue].items():
+            if info['base'] == 'bitcoin' and info['quote'] == 'tether':
+              print(venue, '->', raw_id)
+              break
+      resultTemplate: |
+        mexc   -> BTCUSDT
+        okx    -> BTC-USDT
+        kraken -> XBTUSDT
+
   tickers:
     group: Bulk market data
     example:
