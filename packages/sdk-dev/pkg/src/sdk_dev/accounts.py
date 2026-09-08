@@ -30,6 +30,7 @@ def generate_accounts_toml() -> dict[str, str]:
     Dydx,
     Evm,
     Hyperliquid,
+    Kraken,
     Mexc,
   )
 
@@ -40,6 +41,7 @@ def generate_accounts_toml() -> dict[str, str]:
     'binance': Binance,
     'bitget': Bitget,
     'bit2me': Bit2Me,
+    'kraken': Kraken,
     'ethereum': Evm,
   }
 

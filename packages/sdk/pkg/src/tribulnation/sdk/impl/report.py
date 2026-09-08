@@ -13,6 +13,7 @@ from .accounts import (
   Bit2Me,
   Bybit,
   Coinbase,
+  Kraken,
   Mexc,
   Hyperliquid,
   load_accounts,
@@ -158,6 +159,19 @@ class ReportSDK:
       validate=account.validate,
     )
 
+  def kraken(self, account: Kraken, id: str) -> Report:
+    try:
+      from tribulnation.kraken import Report as KrakenReport
+    except ImportError as e:
+      raise ImportError(
+        'kraken sdk is not installed. Please install it with `pip install tribulnation-kraken`.'
+      ) from e
+    return KrakenReport.new(
+      account.resolved_api_key,
+      account.resolved_private_key,
+      validate=account.validate,
+    )
+
   def hyperliquid(self, account: Hyperliquid, id: str) -> Report:
     try:
       from tribulnation.hyperliquid import Report as HyperliquidReport
@@ -206,6 +220,8 @@ class ReportSDK:
         return self.bybit(account, id)
       case 'hyperliquid' | 'hyperliquid_testnet':
         return self.hyperliquid(account, id)
+      case 'kraken':
+        return self.kraken(account, id)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 

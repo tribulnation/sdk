@@ -1,4 +1,4 @@
-from .accounts import Account, Dydx, Hyperliquid, Mexc, Bitget, Bit2Me, Binance, Evm
+from .accounts import Account, Dydx, Hyperliquid, Mexc, Bitget, Bit2Me, Binance, Kraken, Evm
 from .market import MarketSDK
 from .earn import EarnSDK
 from .wallet import WalletSDK
@@ -12,6 +12,7 @@ __all__ = [
   'Bitget',
   'Bit2Me',
   'Binance',
+  'Kraken',
   'Evm',
   'MarketSDK',
   'EarnSDK',

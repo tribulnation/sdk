@@ -215,6 +215,29 @@ class Coinbase(BaseAccount):
 
 
 @_dataclass
+class Kraken(BaseAccount):
+  venue: _Literal['kraken'] = 'kraken'
+  api_key: str = '$KRAKEN_API_KEY'
+  """Kraken API key"""
+  private_key: str = '$KRAKEN_PRIVATE_KEY'
+  """Kraken private key (the API secret; the client reads `KRAKEN_PRIVATE_KEY`)"""
+  validate: bool = True
+  """Whether to type-validate incoming responses."""
+
+  @property
+  def resolved_api_key(self) -> str | None:
+    return resolve_env_var(self.api_key, require=not self.public)
+
+  @property
+  def resolved_private_key(self) -> str | None:
+    return resolve_env_var(self.private_key, require=not self.public)
+
+  def verify_env_vars(self):
+    self.resolved_api_key
+    self.resolved_private_key
+
+
+@_dataclass
 class Evm(BaseAccount):
   Venue = _Literal[
     'ethereum',
@@ -240,7 +263,16 @@ class Evm(BaseAccount):
 
 
 Account = _Annotated[
-  Dydx | Hyperliquid | Mexc | Bitget | Bit2Me | Binance | Bybit | Coinbase | Evm,
+  Dydx
+  | Hyperliquid
+  | Mexc
+  | Bitget
+  | Bit2Me
+  | Binance
+  | Bybit
+  | Coinbase
+  | Kraken
+  | Evm,
   _pydantic.Discriminator('venue'),
 ]
 

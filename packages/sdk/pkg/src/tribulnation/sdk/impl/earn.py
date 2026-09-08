@@ -7,6 +7,7 @@ from .accounts import (
   Account,
   Bybit,
   Coinbase,
+  Kraken,
   Mexc,
   Bitget,
   Binance,
@@ -96,6 +97,20 @@ class EarnSDK:
       ) from e
     return CoinbaseEarn.new(account.resolved_key_name, account.resolved_private_key)
 
+  def kraken(self, account: Kraken) -> Earn:
+    try:
+      from tribulnation.kraken import Earn as KrakenEarn
+    except ImportError as e:
+      raise ImportError(
+        'kraken sdk is not installed. Please install it with `pip install tribulnation-kraken`.'
+      ) from e
+    return KrakenEarn.new(
+      account.resolved_api_key,
+      account.resolved_private_key,
+      public=account.public,
+      validate=account.validate,
+    )
+
   def bybit(self, account: Bybit) -> Earn:
     try:
       from tribulnation.bybit import Earn as BybitEarn
@@ -135,6 +150,8 @@ class EarnSDK:
         return self.coinbase(account)
       case 'bybit':
         return self.bybit(account)
+      case 'kraken':
+        return self.kraken(account)
       case _:
         raise NotImplementedError(f'Unsupported venue: {account.venue}')
 

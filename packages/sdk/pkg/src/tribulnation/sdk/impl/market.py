@@ -11,6 +11,7 @@ from .accounts import (
   Coinbase,
   Dydx,
   Hyperliquid,
+  Kraken,
   Mexc,
   load_accounts,
 )
@@ -21,6 +22,7 @@ DEFAULT_ACCOUNTS: Mapping[str, Account] = {
   'mexc': Mexc(public=True),
   'binance': Binance(public=True),
   'bit2me': Bit2Me(public=True),
+  'kraken': Kraken(public=True),
 }
 
 
@@ -130,6 +132,20 @@ class MarketSDK(TradingMarkets):
       validate=account.validate,
     )
 
+  def kraken(self, account: Kraken) -> TradingVenue:
+    try:
+      from tribulnation.kraken import KrakenMarket
+    except ImportError as e:
+      raise ImportError(
+        'kraken market is not installed. Please install it with `pip install tribulnation-kraken`.'
+      ) from e
+    return KrakenMarket.new(
+      account.resolved_api_key,
+      account.resolved_private_key,
+      public=account.public,
+      validate=account.validate,
+    )
+
   def _venue(self, id: str, /) -> TradingVenue:
     if (account := self.all_accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
@@ -148,6 +164,8 @@ class MarketSDK(TradingMarkets):
         return self.bybit(account)
       case 'bit2me':
         return self.bit2me(account)
+      case 'kraken':
+        return self.kraken(account)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 
