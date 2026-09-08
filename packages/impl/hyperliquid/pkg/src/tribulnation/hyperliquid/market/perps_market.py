@@ -5,6 +5,8 @@ from decimal import Decimal
 
 from tribulnation.sdk.core import PaginatedResponse, LogicError, OverflowPolicy
 from tribulnation.sdk.market import (
+  Candle,
+  CandleInterval,
   PerpMarket as _PerpMarket,
   Book,
   Order,
@@ -78,6 +80,18 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
     self, start: datetime, end: datetime
   ) -> AsyncIterable[Sequence[Trade]]:
     return trades_history(self, start, end)
+
+  def candles(
+    self,
+    interval: CandleInterval,
+    start: datetime | None = None,
+    end: datetime | None = None,
+  ) -> PaginatedResponse[Candle]:
+    raise NotImplementedError(
+      f'candles is not implemented for this market [{self.id}]: typed_hyperliquid '
+      'declares no paged walk for `info.candle_snapshot`, which answers at most 5000 '
+      'candles per call, so the series cannot be swept through the client.'
+    )
 
   async def open_orders(self) -> Sequence[OrderState]:
     return await open_orders(self)
