@@ -457,8 +457,8 @@ await perp_cancel_order('BTCUSDT', '123456')
 #
 # `mix.position.list` returns no open positions for any product type and the USDT-FUTURES
 # equity is 0.0042 USDT, so the account-scoped mappings are demonstrated, not numerically
-# exercised. `classic.mix.order.fills` and `classic.mix.account.get` validate on this
-# one-way, mixed-margin-mode account (`tradeSide` admits `buy_single`/`sell_single`; the
-# `*UnrealizedPL` fields admit `''`). `classic.mix.order.open`'s `tradeSide` still uses the
-# narrow `MixTradeSide` alias, so `open_orders` validates only because there are no open
-# orders -- tracked in `typed-client-issues.md`.
+# exercised. `classic.mix.order.fills`, `classic.mix.order.open` and
+# `classic.mix.account.get` validate on this one-way, mixed-margin-mode account: the shared
+# `MixTradeSide` alias now admits `buy_single`/`sell_single` on every response referencing
+# it, and the `*UnrealizedPL` fields admit `''`. `open_orders` still has no open order to
+# validate against, so its `tradeSide` is confirmed from the declaration, not the wire.

@@ -275,11 +275,6 @@ async def depth_stream(
   ticker: str, *, count: int = 3, timeout: float = 15.0
 ) -> list[Book]:
   """Subscribe to the order book and collect up to `count` updated snapshots."""
-  raise NotImplementedError(
-    'blocked: typed_dydx validates the v4_orderbook subscription reply against the '
-    'notification type (OrderbookMessageContents), so entering the stream raises '
-    'ValidationError before the first message'
-  )
   books: list[Book] = []
   async with client.indexer.streams.orders(id=ticker) as stream:
     book = parse_book(stream.reply)
@@ -294,7 +289,9 @@ async def depth_stream(
   return books
 
 
-# not executed: blocked by typed-dydx "Stream subscription replies are validated with the channel's notification type"
+# not executed: unblocked -- typed_dydx now returns the subscribe reply raw instead of
+# validating it against the notification type -- but this pass was not allowed to open a
+# live WebSocket subscription, so the mapping stays written and unrun
 await depth_stream('BTC-USD')
 
 
@@ -636,7 +633,7 @@ await cancel_orders(['id-1', 'id-2'])
 # %% [markdown]
 # ## Coverage assessment
 #
-# **Full bar one cell**, executed live against `BTC-USD`, `ETH-USD`, and `SOL-USD` on the
+# **Full bar one unrun cell**, executed live against `BTC-USD`, `ETH-USD`, and `SOL-USD` on the
 # testnet account -- every cell above hand-maps a raw `typed_dydx` response onto a
 # `tribulnation.sdk.market` type directly, with no `tribulnation.dydx` import at all:
 #
@@ -660,13 +657,14 @@ await cancel_orders(['id-1', 'id-2'])
 #   is computed as the top of the next hour rather than read -- there is no separate
 #   "next funding timestamp" field to read); `funding_rates`/`funding_payments` both
 #   returned real historical entries.
-# - `depth_stream` is **blocked** on typed-dydx "Stream subscription replies are
-#   validated with the channel's notification type": `StreamsMixin.subscribe` validates
-#   the `v4_orderbook` reply (`{"price", "size"}` objects, `OrderbookReplyContents`)
-#   against the notification type (`[price, size]` tuples, `OrderbookMessageContents`),
-#   so entering the stream raises `ValidationError` before the first message. The mapping
-#   is written; its body raises `NotImplementedError` and the cell is not executed until
-#   the client takes a `reply_type`.
+# - `depth_stream` is written and no longer blocked, but is **not executed** here.
+#   `StreamsMixin.subscribe` used to validate the `v4_orderbook` reply (`{"price", "size"}`
+#   objects) against the notification type (`[price, size]` tuples), so entering the stream
+#   raised `ValidationError` before the first message; typed-dydx now returns the reply raw
+#   into the `Any` slot `Stream[T, Any, Unsubscribed]` already declares, which is what
+#   `parse_book(stream.reply)` reads. Pushed messages are still validated as
+#   `OrderbookMessageContents`. Opening a live subscription was out of scope for the pass
+#   that unblocked it, so the mapping stays unverified against the venue.
 # - `Market.position()`/`Market.collateral()` (the base, non-perp-named methods) are not
 #   exercised as separate cells -- `PerpMarket` implements them as trivial delegators to
 #   `perp_position()`/`perp_collateral()`, both already exercised above; this notebook's

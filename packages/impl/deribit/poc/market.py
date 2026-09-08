@@ -38,9 +38,13 @@ MARKETS = {
 
 # `typed_deribit.schemas.InstrumentInfo.base_currency` / `.quote_currency` /
 # `.settlement_currency` / `.price_index` are all declared plain `str`, but
-# `get_account_summary`/`get_positions`/`get_index_price` each expect a specific Literal --
-# the values are always members of these sets in practice, so `cast` bridges the gap rather
-# than widening our own currency/index-name params to `str`.
+# `get_account_summary`/`get_positions`/`get_index_price` each expect a specific Literal.
+# The `str` is the correct side: a probe of 5,550 live instruments found 44 distinct
+# `base_currency` values and 54 distinct `price_index` values, most of them outside those
+# Literals, so it is the consumers that are too narrow (`get_index_price` alone accepts 344
+# index names by the venue's own `get_index_price_names`). A request param is serialized,
+# not validated, so `cast` only bridges the static gap; it never rejects a value the venue
+# would have accepted. The instruments below all stay inside the Literals.
 AccountCurrency: TypeAlias = Literal[
   'BTC', 'ETH', 'STETH', 'ETHW', 'USDC', 'USDT', 'EURR', 'SOL', 'XRP', 'USYC', 'PAXG', 'BNB', 'USDE',
 ]
@@ -573,7 +577,7 @@ await cancel_order('BTC-PERPETUAL', '123456')
 # **Full**, executed live against `BTC_USDC`, `ETH_USDC`, and `SOL_USDC`:
 # - Every read-only/public `Market` method above ran live and returned real data (or a real empty result, not fabricated). 19 active spot instruments exist across the currencies observed (`BTC`, `ETH`, `SOL`, `BNB`, `XRP`, `PAXG`, `STETH`, `USYC`, `BUIDL`, `USDC`, `USDT`, `USDE`); only the three headline pairs are mapped here.
 # - Deribit spot has **no margin position** -- `private/get_position` rejects spot instrument names outright (`-32602 Invalid params {'reason': 'spot instrument not allowed', 'param': 'instrument_name'}`). Spot fills settle directly to ordinary per-currency wallet balances, so `position`/`collateral`/`available_notional` all read `private/get_account_summary` instead (base currency for `position`, quote currency for `collateral`), mirroring how spot is mapped on other venues.
-# - `public/get_order_book` and `public/get_instrument` both validate on spot now: `OrderBookSnapshot.open_interest` and `InstrumentInfo.settlement_period` are `NotRequired`, `counter_currency` carries every spot quote currency, and `BookStats.high`/`low`/`price_change` are nullable. `BookSummary.open_interest` (`get_book_summary_*`) is still required and absent on spot, but nothing here reads it.
+# - `public/get_order_book` and `public/get_instrument` both validate on spot now: `OrderBookSnapshot.open_interest` and `InstrumentInfo.settlement_period` are `NotRequired`, `counter_currency` carries every spot quote currency, and `BookStats.high`/`low`/`price_change` are nullable. `BookSummary.open_interest` (`get_book_summary_*`) is `NotRequired` too now, confirmed by typed-dev against 25 spot rows; nothing here reads it either way.
 # - `fee_asset` on `rules` is a best guess (quote currency): spot instrument responses carry no `settlement_currency` to read it from the way perpetuals do. Spot commissions are real -- `SOL_USDC` reports `maker_commission = 0.0002` / `taker_commission = 0.0005`, while `BTC_USDC` and `ETH_USDC` are both `0.0` -- but with no spot fill on this account the currency the fee is actually charged in stays unconfirmed.
 # - `open_orders` and `trades_history` came back empty for all three markets (no resting orders, no historical fills) -- genuine testnet-account state, not a mapping gap.
 
