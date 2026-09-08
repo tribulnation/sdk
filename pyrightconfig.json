@@ -6,6 +6,9 @@
   "pythonVersion": "3.11",
   "venvPath": ".",
   "venv": ".venv",
+  // The PoC scripts under poc/ are notebooks in text form (top-level await, names
+  // redefined per cell); `sdk-dev poc check` type-checks them with the right pragmas.
+  "exclude": ["**/poc/**", "**/node_modules", "**/__pycache__", "**/.*"],
 
   "reportMissingParameterType": "error",
   "reportUnknownParameterType": "error",

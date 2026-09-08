@@ -8,6 +8,7 @@ import json
 
 import pytest
 
+from sdk_dev.poc import read
 from sdk_dev.scaffold import (
   SURFACES,
   SurfaceMethod,
@@ -106,17 +107,17 @@ def test_imports_resolve_names_to_their_modules():
   assert wallet == ['from tribulnation.sdk.wallet.deposit_methods import DepositMethod']
 
 
-def test_write_creates_the_notebook_once(tmp_path: Path):
-  """A second scaffold must not clobber a notebook someone has started filling in."""
+def test_write_creates_the_script_once(tmp_path: Path):
+  """A second scaffold must not clobber a script someone has started filling in."""
   poc = tmp_path / 'poc'
   path = write(
     poc, 'venue', 'wallet', client_module='typed_venue', client_class='Venue'
   )
-  assert path == poc / 'wallet.ipynb'
+  assert path == poc / 'wallet.py'
+  assert path.read_text().startswith('# %%'), 'no jupytext header'
 
   cells: list[dict[str, str]] = [
-    {'type': c['cell_type'], 'source': ''.join(c['source'])}
-    for c in json.loads(path.read_text())['cells']
+    {'type': c['cell_type'], 'source': c['source']} for c in read(path)['cells']
   ]
   code = [c['source'] for c in cells if c['type'] == 'code']
   assert 'from typed_venue import Venue' in code[0]
@@ -140,4 +141,4 @@ def test_write_creates_the_notebook_once(tmp_path: Path):
     client_class='Venue',
     name='uta',
   )
-  assert nested == poc / 'wallet' / 'uta.ipynb'
+  assert nested == poc / 'wallet' / 'uta.py'

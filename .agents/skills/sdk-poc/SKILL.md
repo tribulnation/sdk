@@ -1,34 +1,43 @@
 ---
 name: sdk-poc
-description: Build or extend a venue PoC notebook under packages/impl/<venue>/poc/ that maps a typed client (typed_<venue>) onto an SDK surface (earn, wallet, report, market). Use whenever asked to map, prototype, PoC or verify a venue against the SDK, or to turn a PoC into an implementation. Sets the rules on live execution, forbidden workarounds, and how typed-client issues are reported.
+description: Build or extend a venue PoC script under packages/impl/<venue>/poc/ that maps a typed client (typed_<venue>) onto an SDK surface (earn, wallet, report, market). Use whenever asked to map, prototype, PoC or verify a venue against the SDK, or to turn a PoC into an implementation. Sets the rules on live execution, forbidden workarounds, and how typed-client issues are reported.
 ---
 
 # SDK PoC
 
-A PoC notebook proves, method by method, that a typed client can serve an SDK surface:
+A PoC script proves, method by method, that a typed client can serve an SDK surface:
 each abstract method is mapped onto real client calls and executed against the live
-venue, and the result is kept in the notebook. It is also how bugs in the typed clients
-are found, so what it reports back matters as much as what it maps.
+venue. It is also how bugs in the typed clients are found, so what it reports back
+matters as much as what it maps.
+
+A PoC is a `poc/<surface>.py` in jupytext's percent format: plain Python where each
+`# %%` line starts a cell (`# %% [markdown]` for prose), which editors run cell by cell.
+The script holds no outputs. `sdk-dev poc run` executes cells into a paired
+`poc/<surface>.ipynb` beside it, which is gitignored: cells print live account data,
+and one once printed an API key. Read the pair for what a cell returned; edit the script.
 
 Two things a PoC never does: paper over a typed-client failure, or invent a number the
 venue doesn't publish. A method is mapped from the venue's own figure or it is not mapped.
 
 ## Workflow
 
-1. Scaffold, unless the notebook exists: `sdk-dev poc scaffold <venue> <surface>`
+1. Scaffold, unless the script exists: `sdk-dev poc scaffold <venue> <surface>`
    (`--name <mode>` nests it under `poc/<surface>/`, `--exchange spot` for a spot-only
    venue, `--client module:Class` when the client isn't `typed_<venue>`). This writes
    one cell per abstract method with the signature copied from the SDK. Keep the
    structure; fill the bodies.
 2. Enumerate before mapping: `sdk-dev poc surface <venue> [namespace...] [--grep regex]`
-   lists every endpoint with its path, signature and summary. The notebook's Surface cell
+   lists every endpoint with its path, signature and summary. The script's Surface cell
    does the same; adjust its filter until every endpoint the mapping uses appears in it.
    Pick from this list. Do not map from memory of the client, and do not settle for a
    nearby endpoint when the list has a direct one (an order-book midpoint is not an
    index price when `symbol_price` exists).
-3. Map one method per cell, then run it: `sdk-dev poc run <notebook> --cells N`. The
-   cell's last expression displays the result, so the output is the evidence. Run the
-   setup cell first in the same invocation (`--cells 1,5`).
+3. Map one method per cell, then run it: `sdk-dev poc run <script> --cells N`. The
+   cell's last expression displays the result, and the paired notebook is where to read
+   it. Run the setup cell first in the same invocation (`--cells 1,5`). Cells count among
+   code cells only, 1-based, in file order. Display what the mapping needs and nothing
+   more: an endpoint that echoes credentials or account identifiers gets its result
+   narrowed to the fields under test.
 4. When a call fails validation, or the client has no endpoint the venue documents,
    stop mapping that method. Leave its body raising `NotImplementedError`, record the
    issue in `typed-client-issues.md` (format below), and mark the method `blocked` in
@@ -49,14 +58,17 @@ venue doesn't publish. A method is mapped from the venue's own figure or it is n
 ## Rules
 
 - **No `validate=False`.** A validation failure is the finding. Report it, don't
-  bypass it. The lint fails the notebook on it.
+  bypass it. The lint fails the script on it.
 - **No stand-ins.** A method maps to the venue's own figure or it is `not supported`.
   Derived approximations (midpoint for index, `equity - available` for margin, a
   free-text filter guessed from a field's naming) are workarounds with a quieter
   symptom and are treated the same way.
-- **Every cell runs, or says why not.** A code cell with no execution and no
-  `# not executed: <reason>` line fails the lint. Order-placing and other
-  state-changing cells are written and never run; the scaffold marks them.
+- **Every cell runs, or says why not.** A code cell whose paired run is missing, or
+  whose source changed since it last ran, fails the lint unless it carries a
+  `# not executed: <reason>` line. Order-placing and other state-changing cells are
+  written and never run; the scaffold marks them. The lint checks this against the
+  paired notebook, so it holds on the machine that ran the PoC; a fresh clone has no
+  pair and skips it.
 - **Trading methods are mapped only for venues we trade on.** Otherwise leave
   `place_order`/`cancel_*` cells as scaffolded and mark them `not attempted`.
 - **Don't decide what the client's type should be.** Report what the venue sent and
@@ -108,11 +120,11 @@ the evidence, and what in this repo waits on it:
 - Observed: `''`; isolated symbols send a number
 - Condition: `marginMode == 'crossed'`
 - Samples: BTCUSDT (isolated) validates; ETHUSDT and SOLUSDT (crossed) fail
-- Blocks: `poc/market/classic.ipynb` cell 19 (`perp_collateral`)
+- Blocks: `poc/market/classic.py` cell 19 (`perp_collateral`)
 - Suggestion (unverified): discriminate on `marginMode`
 ~~~
 
-`Blocks` names the notebook cells to re-run once the fix lands. It may also name `pkg/`
+`Blocks` names the script cells to re-run once the fix lands. It may also name `pkg/`
 code, but only where that code transcribes the venue's own figure through a too-loose
 declared type (a `Decimal(str(x))` over a `float` field, a read through `dict[str, Any]`,
 a cast bridging a `str` producer to a `Literal` consumer): a typing gap the fix simplifies

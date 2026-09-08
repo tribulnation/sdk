@@ -1,7 +1,7 @@
-"""CLI entry points for the venue PoC notebooks: listing a typed client's endpoints
-(`poc surface`), scaffolding a notebook (`poc scaffold`), type-checking and linting the
-notebooks (`poc check`) and executing chosen cells against the live venue APIs
-(`poc run`).
+"""CLI entry points for the venue PoC scripts: listing a typed client's endpoints
+(`poc surface`), scaffolding a script (`poc scaffold`), type-checking and linting the
+scripts (`poc check`) and executing chosen cells against the live venue APIs into the
+script's paired notebook (`poc run`).
 """
 
 from pathlib import Path
@@ -15,19 +15,24 @@ import typer
 from sdk_dev import scaffold as scaffolding
 from sdk_dev.poc import (
   IGNORED,
+  PRAGMAS,
   Rendered,
+  executed,
   lint,
   locate,
-  notebooks,
+  pair,
   parse_cells,
+  read,
   render,
+  runs,
   scratch_name,
+  scripts,
 )
 from sdk_dev.repo import IMPL_DIR, NotACheckout, repo_root
 from sdk_dev.surface import ClientLookupError, load_client, methods
 from sdk_dev.surface import render as render_surface
 
-app = typer.Typer(help='Work with the venue PoC notebooks.')
+app = typer.Typer(help='Work with the venue PoC scripts.')
 
 
 def _diagnostics(root: Path, files: list[Path]) -> list[dict]:
@@ -72,8 +77,9 @@ def check(
   ] = None,
 ):
   """
-  Type-check and lint every PoC notebook under `packages/impl/*/poc/`, reporting each
-  error against the cell it came from.
+  Type-check and lint every PoC script under `packages/impl/*/poc/`, reporting each
+  error against its line and the cell it came from. The execution rules apply to the
+  scripts whose paired notebook is present, that is, the ones run on this machine.
   """
   try:
     root = repo_root()
@@ -84,23 +90,19 @@ def check(
     raise typer.Exit(code=1)
 
   impl_dir = root / IMPL_DIR
-  found = notebooks(impl_dir, venues)
+  found = scripts(impl_dir, venues)
   if not found:
-    typer.echo('No PoC notebooks found.', err=True)
+    typer.echo('No PoC scripts found.', err=True)
     raise typer.Exit(code=1)
 
   rendered: dict[str, tuple[Path, Rendered]] = {}
   with tempfile.TemporaryDirectory() as tmp:
     scratch = Path(tmp)
-    for notebook in found:
-      try:
-        result = render(notebook)
-      except ValueError as e:
-        typer.echo(f'{e}', err=True)
-        raise typer.Exit(code=1)
-      name = scratch_name(notebook, impl_dir)
+    for script in found:
+      name = scratch_name(script, impl_dir)
+      result = render(script)
       (scratch / name).write_text(result.source)
-      rendered[name] = (notebook, result)
+      rendered[name] = (script, result)
 
     try:
       diagnostics = _diagnostics(root, sorted(scratch / name for name in rendered))
@@ -121,22 +123,31 @@ def check(
     where = locate(rendered[name][1], entry['range']['start']['line'] + 1)
     rule = f' ({entry["rule"]})' if entry.get('rule') else ''
     errors[name].append((where.cell, where.line, f'{message}{rule}'))
-  for name, (notebook, _) in rendered.items():
-    errors[name] += [(f.cell, f.line, f.message) for f in lint(notebook)]
+  unrun = 0
+  for name, (script, _) in rendered.items():
+    try:
+      errors[name] += [(f.cell, f.line, f.message) for f in lint(script)]
+    except ValueError as e:
+      typer.echo(f'{e}', err=True)
+      raise typer.Exit(code=1)
+    unrun += not pair(script).is_file()
 
   total = 0
-  for name, (notebook, _) in rendered.items():
+  for name, (script, result) in rendered.items():
+    markers = {c.number: c.start - len(PRAGMAS) for c in result.cells}
     found_errors = [
-      f'  cell {cell}, line {line}: {message}'
+      (markers.get(cell, -len(PRAGMAS)) + line, f'cell {cell}, line {line}: {message}')
       for cell, line, message in sorted(errors[name])
     ]
     total += len(found_errors)
     if found_errors:
-      typer.echo(f'{notebook.relative_to(root)}')
-      for line in found_errors:
-        typer.echo(line)
+      typer.echo(f'{script.relative_to(root)}')
+      for at, message in sorted(found_errors):
+        typer.echo(f'  L{at} {message}')
 
-  checked = f'{len(rendered)} notebook{"" if len(rendered) == 1 else "s"}'
+  checked = f'{len(rendered)} script{"" if len(rendered) == 1 else "s"}'
+  if unrun:
+    typer.echo(f'{unrun} of {checked} never run here; execution rules not checked.')
   if total:
     typer.echo(f'\n{total} error{"" if total == 1 else "s"} in {checked}.')
     raise typer.Exit(code=1)
@@ -207,8 +218,8 @@ def scaffold(
     str | None,
     typer.Option(
       '--name',
-      help='Nest the notebook as `poc/<surface>/<name>.ipynb`, for venues that need one '
-      'notebook per account mode.',
+      help='Nest the script as `poc/<surface>/<name>.py`, for venues that need one '
+      'script per account mode.',
     ),
   ] = None,
   exchange: Annotated[
@@ -221,7 +232,7 @@ def scaffold(
   client: Annotated[str | None, typer.Option('--client', help=CLIENT_HELP)] = None,
 ):
   """
-  Write a PoC notebook skeleton for one venue and surface, one cell per abstract method
+  Write a PoC script skeleton for one venue and surface, one cell per abstract method
   with its signature copied from the SDK.
   """
   if surface not in scaffolding.SURFACES:
@@ -252,36 +263,51 @@ def scaffold(
 
 @app.command('run')
 def run(
-  notebook: Annotated[Path, typer.Argument(help='Path to the .ipynb file.')],
+  script: Annotated[Path, typer.Argument(help='Path to the PoC `.py` script.')],
   cells: Annotated[
     str,
     typer.Option(
       '--cells',
       help='Which code cells to execute, 1-based: e.g. "1,3,7-9". Required — there is '
-      'no run-everything shorthand, because PoC notebooks hold order-placing cells that '
+      'no run-everything shorthand, because PoC scripts hold order-placing cells that '
       'must not fire against a live account.',
     ),
   ],
   timeout: Annotated[int, typer.Option(help='Per-cell timeout in seconds.')] = 120,
 ):
   """
-  Execute selected code cells against the live venue API and store their outputs back
-  into the notebook.
+  Execute selected code cells against the live venue API and store their outputs in
+  the script's paired notebook, `<script>.ipynb`, which is gitignored.
 
-  Every selected cell runs in one kernel session, in notebook order, so cells may build
-  on names the earlier ones defined. Cells that aren't selected keep whatever outputs
-  they already had.
+  Every selected cell runs in one kernel session, in script order, so cells may build
+  on names the earlier ones defined. Cells that aren't selected keep the outputs of
+  their last run, as long as their source hasn't changed since.
   """
   import nbformat
   from nbclient import NotebookClient
   from nbclient.exceptions import CellExecutionError
 
-  if not notebook.is_file():
-    typer.echo(f'{notebook}: no such notebook.', err=True)
+  if not script.is_file():
+    typer.echo(f'{script}: no such script.', err=True)
+    raise typer.Exit(code=1)
+  if script.suffix != '.py':
+    typer.echo(
+      f'{script}: PoCs are `.py` scripts; `poc run` writes the `.ipynb`.', err=True
+    )
     raise typer.Exit(code=1)
 
-  nb = nbformat.read(notebook, as_version=4)
+  try:
+    nb = read(script)
+    previous = runs(script) or []
+  except ValueError as e:
+    typer.echo(f'{e}', err=True)
+    raise typer.Exit(code=1)
   code = [i for i, cell in enumerate(nb.cells) if cell.cell_type == 'code']
+  for number, index in enumerate(code):
+    run = previous[number] if number < len(previous) else None
+    if executed(nb.cells[index].source, run) and run is not None:
+      nb.cells[index].outputs = run.get('outputs', [])
+      nb.cells[index].execution_count = run.get('execution_count')
   try:
     selected = parse_cells(cells, len(code))
   except ValueError as e:
@@ -293,7 +319,7 @@ def run(
     timeout=timeout,
     kernel_name='python3',
     allow_errors=True,
-    resources={'metadata': {'path': str(notebook.parent)}},
+    resources={'metadata': {'path': str(script.parent)}},
   )
   failed: list[int] = []
   with client.setup_kernel():
@@ -315,7 +341,7 @@ def run(
       else:
         typer.echo('ok')
 
-  nbformat.write(nb, notebook)
+  nbformat.write(nb, pair(script))  # pyright: ignore[reportUnknownMemberType]
   ran = f'{len(selected)} cell{"" if len(selected) == 1 else "s"}'
   if failed:
     typer.echo(f'\n{ran} run, {len(failed)} raised: {", ".join(map(str, failed))}.')

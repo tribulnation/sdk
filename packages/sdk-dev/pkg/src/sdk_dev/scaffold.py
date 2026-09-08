@@ -1,6 +1,7 @@
-"""Notebook skeletons for a venue PoC: the cells the `sdk-poc` skill expects, with one
+"""Script skeletons for a venue PoC: the cells the `sdk-poc` skill expects, with one
 cell per method of the SDK surface being mapped and the abstract signature of each
-copied from the SDK source, so the notebook can't drift from the interface it maps.
+copied from the SDK source, so the script can't drift from the interface it maps. The
+skeleton is built as a notebook and written in jupytext's percent format.
 
 Nothing here knows a venue. The surface's methods come from griffe over
 `tribulnation.sdk`, the client class name is handed in by the caller, and every body is
@@ -8,13 +9,14 @@ Nothing here knows a venue. The surface's methods come from griffe over
 """
 
 from pathlib import Path
-from typing_extensions import Any, Literal, NamedTuple, Sequence
+from typing_extensions import Any, Literal, NamedTuple, Sequence, cast
 import importlib
-import json
 import re
-import uuid
 
+from nbformat import NotebookNode
 import griffe
+import jupytext
+import nbformat
 
 from sdk_dev.surface import Parameter, parameters, returns, signature, summary
 
@@ -403,12 +405,7 @@ def markdown_cell(source: str) -> dict[str, Any]:
   Args:
     source: The cell text.
   """
-  return {
-    'cell_type': 'markdown',
-    'id': uuid.uuid4().hex[:8],
-    'metadata': {},
-    'source': source,
-  }
+  return {'cell_type': 'markdown', 'metadata': {}, 'source': source}
 
 
 def code_cell(source: str) -> dict[str, Any]:
@@ -420,7 +417,6 @@ def code_cell(source: str) -> dict[str, Any]:
   """
   return {
     'cell_type': 'code',
-    'id': uuid.uuid4().hex[:8],
     'metadata': {},
     'source': source,
     'outputs': [],
@@ -486,34 +482,22 @@ def notebook(
     )
   )
   cells.append(code_cell(catalogue_cell(surface_name, venue)))
-  return {
-    'cells': cells,
-    'metadata': {
-      'kernelspec': {
-        'display_name': 'Python 3',
-        'language': 'python',
-        'name': 'python3',
-      },
-      'language_info': {'name': 'python'},
-    },
-    'nbformat': 4,
-    'nbformat_minor': 5,
-  }
+  return {'cells': cells, 'metadata': {}, 'nbformat': 4, 'nbformat_minor': 4}
 
 
-def notebook_path(poc_dir: Path, surface_name: str, name: str | None) -> Path:
+def script_path(poc_dir: Path, surface_name: str, name: str | None) -> Path:
   """
-  Where a scaffolded notebook goes: `poc/<surface>.ipynb`, or `poc/<surface>/<name>.ipynb`
-  when a venue needs several notebooks for one surface (Bitget's account modes).
+  Where a scaffolded script goes: `poc/<surface>.py`, or `poc/<surface>/<name>.py` when
+  a venue needs several scripts for one surface (Bitget's account modes).
 
   Args:
     poc_dir: The venue's `poc/` directory.
     surface_name: A `SURFACES` key.
-    name: The nested notebook name, if any.
+    name: The nested script name, if any.
   """
   if name is None:
-    return poc_dir / f'{surface_name}.ipynb'
-  return poc_dir / surface_name / f'{name}.ipynb'
+    return poc_dir / f'{surface_name}.py'
+  return poc_dir / surface_name / f'{name}.py'
 
 
 def write(
@@ -527,7 +511,7 @@ def write(
   exchange: ExchangeKind = 'perp',
 ) -> Path:
   """
-  Write the scaffolded notebook.
+  Write the scaffolded script, in percent format with no metadata header.
 
   Args:
     poc_dir: The venue's `poc/` directory, created if missing.
@@ -535,13 +519,13 @@ def write(
     surface_name: A `SURFACES` key.
     client_module: The typed client package.
     client_class: Its root class.
-    name: Nest the notebook as `poc/<surface>/<name>.ipynb`.
+    name: Nest the script as `poc/<surface>/<name>.py`.
     exchange: For `market`, whether to map the spot or the perpetual exchange interface.
 
   Raises:
-    FileExistsError: the notebook already exists; it is never overwritten.
+    FileExistsError: the script already exists; it is never overwritten.
   """
-  path = notebook_path(poc_dir, surface_name, name)
+  path = script_path(poc_dir, surface_name, name)
   if path.exists():
     raise FileExistsError(f'{path} already exists')
   path.parent.mkdir(parents=True, exist_ok=True)
@@ -552,5 +536,11 @@ def write(
     client_class=client_class,
     exchange=exchange,
   )
-  path.write_text(json.dumps(nb, indent=1) + '\n')
+  node = cast(NotebookNode, nbformat.from_dict(nb))  # pyright: ignore[reportUnknownMemberType]
+  node.metadata['jupytext'] = {
+    'notebook_metadata_filter': '-all',
+    'cell_metadata_filter': '-all',
+  }
+  text = cast(str, jupytext.writes(node, fmt='py:percent'))  # pyright: ignore[reportUnknownMemberType]
+  path.write_text(text)
   return path
