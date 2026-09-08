@@ -1,6 +1,6 @@
 """Tests for retry timing, logging, and invocation-context propagation."""
 
-from typing_extensions import AsyncIterator, Callable
+from typing_extensions import AsyncIterator, Awaitable, Callable
 import asyncio
 import math
 
@@ -30,14 +30,14 @@ async def invoke_retry(
     sleeps.append(delay)
 
   def logger(
-    fn,
-    ctx,
+    fn: Callable[..., Awaitable[object]],
+    ctx: Context,
     *,
-    args,
-    kwargs,
-    exception,
-    retries,
-    delay,
+    args: tuple[object, ...],
+    kwargs: dict[str, object],
+    exception: Exception,
+    retries: int,
+    delay: float,
   ):
     """Capture the effective delay passed to the retry logger."""
     logged.append(delay)

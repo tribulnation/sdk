@@ -8,20 +8,25 @@ always delivered promptly without silently dropping buffered data.
 import asyncio
 
 import pytest
+from typing_extensions import AsyncGenerator, AsyncIterable, TypeVar
 
 from tribulnation.sdk.core import NetworkError, Subscription
 from tribulnation.sdk.core.stream import StreamInbox, _Failed, _Closed
 
+T = TypeVar('T')
 
-def drain(queue: asyncio.Queue):
-  out = []
+
+def drain(
+  queue: 'asyncio.Queue[T | _Failed | _Closed]',
+) -> 'list[T | _Failed | _Closed]':
+  out: list[T | _Failed | _Closed] = []
   while not queue.empty():
     out.append(queue.get_nowait())
   return out
 
 
-async def collect(inbox):
-  out = []
+async def collect(inbox: AsyncIterable[T]) -> list[T]:
+  out: list[T] = []
   async for item in inbox:
     out.append(item)
   return out
@@ -36,7 +41,7 @@ def test_queue_size_must_be_positive():
 
 
 def test_fail_overflow_queues_failed_and_keeps_buffer():
-  inbox = StreamInbox.new(2, 'fail')
+  inbox: StreamInbox[str] = StreamInbox[str].new(2, 'fail')
   assert inbox.push('a') is True
   assert inbox.push('b') is True
   # Data buffer full -> next item overflows: inbox is failed and closed.
@@ -50,7 +55,7 @@ def test_fail_overflow_queues_failed_and_keeps_buffer():
 
 
 def test_latest_overflow_keeps_only_newest():
-  inbox = StreamInbox.new(1, 'latest')
+  inbox: StreamInbox[str] = StreamInbox[str].new(1, 'latest')
   assert inbox.push('a') is True
   assert inbox.push('b') is True  # replaces the stale 'a'
   assert inbox.push('c') is True  # replaces the stale 'b'
@@ -58,7 +63,7 @@ def test_latest_overflow_keeps_only_newest():
 
 
 def test_latest_keeps_rolling_window_of_newest():
-  inbox = StreamInbox.new(3, 'latest')
+  inbox: StreamInbox[str] = StreamInbox[str].new(3, 'latest')
   for x in 'abc':
     assert inbox.push(x) is True
   assert inbox.push('d') is True  # drops the oldest ('a') to fit the newest
@@ -68,7 +73,7 @@ def test_latest_keeps_rolling_window_of_newest():
 def test_terminal_delivered_into_reserved_slot_when_buffer_full():
   # A full data buffer must not block the terminal marker, and must not force
   # any buffered item to be dropped to make room.
-  inbox = StreamInbox.new(2, 'fail')
+  inbox: StreamInbox[str] = StreamInbox[str].new(2, 'fail')
   assert inbox.push('a') is True
   assert inbox.push('b') is True
   assert inbox.queue.qsize() == 2  # data buffer full; reserved slot still free
@@ -80,7 +85,7 @@ def test_terminal_delivered_into_reserved_slot_when_buffer_full():
 
 
 def test_terminal_is_idempotent_and_never_overflows_queue():
-  inbox = StreamInbox.new(1, 'fail')
+  inbox: StreamInbox[str] = StreamInbox[str].new(1, 'fail')
   inbox.push('a')
   inbox.fail(NetworkError('x'))
   inbox.fail(NetworkError('y'))  # already closed -> no-op, no raise
@@ -92,7 +97,7 @@ def test_terminal_is_idempotent_and_never_overflows_queue():
 
 
 def test_push_after_close_is_rejected():
-  inbox = StreamInbox.new(4, 'latest')
+  inbox: StreamInbox[str] = StreamInbox[str].new(4, 'latest')
   inbox.push('a')
   inbox.close()
   assert inbox.push('b') is False
@@ -106,7 +111,7 @@ def test_push_after_close_is_rejected():
 
 
 async def test_close_ends_iteration_cleanly():
-  inbox: StreamInbox[str] = StreamInbox.new(4, 'latest')
+  inbox: StreamInbox[str] = StreamInbox[str].new(4, 'latest')
   inbox.push('a')
   inbox.push('b')
   inbox.close()
@@ -114,10 +119,10 @@ async def test_close_ends_iteration_cleanly():
 
 
 async def test_fail_raises_after_buffered_items():
-  inbox: StreamInbox[str] = StreamInbox.new(4, 'latest')
+  inbox: StreamInbox[str] = StreamInbox[str].new(4, 'latest')
   inbox.push('a')
   inbox.fail(NetworkError('boom'))
-  seen = []
+  seen: list[str] = []
   with pytest.raises(NetworkError):
     async for item in inbox:
       seen.append(item)
@@ -125,7 +130,7 @@ async def test_fail_raises_after_buffered_items():
 
 
 async def test_iteration_latches_terminal_and_does_not_hang():
-  inbox: StreamInbox[str] = StreamInbox.new(4, 'latest')
+  inbox: StreamInbox[str] = StreamInbox[str].new(4, 'latest')
   inbox.close()
   assert await asyncio.wait_for(collect(inbox), timeout=2) == []
   # Re-iterating a closed inbox keeps raising StopAsyncIteration, never hangs.
@@ -135,22 +140,22 @@ async def test_iteration_latches_terminal_and_does_not_hang():
 # --- Subscription integration tests -----------------------------------------
 
 
-def driven_subscription():
+def driven_subscription() -> 'tuple[Subscription[str], asyncio.Queue[str | None]]':
   """A `Subscription` whose upstream is fed manually via the returned queue.
 
   Push items to drive the pump; push `None` to end the upstream.
   """
-  upstream: asyncio.Queue = asyncio.Queue()
+  upstream: asyncio.Queue[str | None] = asyncio.Queue()
 
-  async def subscribe_stream():
-    async def gen():
+  async def subscribe_stream() -> 'Subscription.Context[str]':
+    async def gen() -> AsyncGenerator[str, None]:
       while True:
         item = await upstream.get()
         if item is None:
           return
         yield item
 
-    async def unsubscribe(): ...
+    async def unsubscribe() -> None: ...
 
     return Subscription.Context(gen(), unsubscribe)
 
@@ -171,7 +176,7 @@ async def test_fail_subscriber_gets_buffer_then_networkerror():
     upstream.put_nowait(x)
   await _settle()
 
-  items = []
+  items: list[str] = []
   with pytest.raises(NetworkError):
     async for it in stream:
       items.append(it)

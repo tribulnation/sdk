@@ -1,11 +1,13 @@
 """Tests for dYdX reporting client lifecycle."""
 
-import asyncio
-
+from types import TracebackType
 from typing_extensions import Any, cast
+import asyncio
 
 from tribulnation.dydx.report.main import Report
 from tribulnation.dydx.report.snapshots import Snapshots
+
+ExitCall = tuple[type[BaseException] | None, BaseException | None, TracebackType | None]
 
 
 class FakeContext:
@@ -13,13 +15,18 @@ class FakeContext:
 
   def __init__(self):
     self.entered = 0
-    self.exits = []
+    self.exits: list[ExitCall] = []
 
   async def __aenter__(self):
     self.entered += 1
     return self
 
-  async def __aexit__(self, exc_type, exc_value, traceback):
+  async def __aexit__(
+    self,
+    exc_type: type[BaseException] | None,
+    exc_value: BaseException | None,
+    traceback: TracebackType | None,
+  ):
     self.exits.append((exc_type, exc_value, traceback))
 
 
