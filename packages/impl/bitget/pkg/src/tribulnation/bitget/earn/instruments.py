@@ -11,7 +11,7 @@ BITGET_SAVINGS_URL = 'https://www.bitget.com/earning/savings'
 
 def parse_product(prod: SavingsProduct) -> Iterable[Instrument]:
   if prod['status'] != 'in_progress':
-    return []
+    return
   coin = prod['coin']
   period_type = prod['periodType']
   apy_list = prod['apyList']
