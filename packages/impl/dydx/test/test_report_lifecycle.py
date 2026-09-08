@@ -1,9 +1,11 @@
 """Tests for dYdX reporting client lifecycle."""
 
 from types import TracebackType
-from typing_extensions import Any, cast
+from typing_extensions import cast
 import asyncio
 
+from typed_dydx import Dydx
+from tribulnation.dydx.report.history import History
 from tribulnation.dydx.report.main import Report
 from tribulnation.dydx.report.snapshots import Snapshots
 
@@ -33,7 +35,7 @@ class FakeContext:
 def test_snapshots_owns_client_lifecycle():
   """Snapshots enters and exits its dYdX client."""
   client = FakeContext()
-  snapshots = Snapshots(address='dydx1test', client=cast(Any, client))
+  snapshots = Snapshots(address='dydx1test', client=cast(Dydx, client))
 
   async def use_snapshots():
     async with snapshots:
@@ -50,8 +52,8 @@ def test_report_manages_implementations_on_exception():
   history = FakeContext()
   snapshots = FakeContext()
   report = Report(
-    history_impl=cast(Any, history),
-    snapshots_impl=cast(Any, snapshots),
+    history_impl=cast(History, history),
+    snapshots_impl=cast(Snapshots, snapshots),
   )
 
   async def use_report():
