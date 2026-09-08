@@ -74,7 +74,7 @@ Hold a `Market` reference in hot loops; use the scoped one-shot calls otherwise.
   - `depth() -> Book`
   - `depth_stream() -> AsyncContextManager[AsyncIterable[Book]]`
   - `rules() -> Rules`: tick/step size, fees, min/max, rounding helpers
-  - `candles(interval, start=None, end=None) -> AsyncIterable[Sequence[Candle]]`: trade candles, oldest first; `CANDLE_INTERVALS` says which widths a venue serves
+  - `candles(interval, start, end) -> PaginatedResponse[Candle]`: trade candles opening in `[start, end)`, with timezone-aware bounds and no ordering guarantee; `CANDLE_INTERVALS` says which widths a venue serves
 - User data:
   - `query_order(id) -> OrderState | None`
   - `open_orders() -> Sequence[OrderState]`

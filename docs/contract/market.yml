@@ -189,10 +189,10 @@ methods:
     group: Public market data
     venues:
       binance: Spot only, 1000 per page. The USD-M kline endpoint has no paged walk in the typed client yet, so the futures market raises `NotImplementedError`.
-      bybit: Answers newest-first; served oldest-first in pages of 999. An open `start` buffers the whole history before the first page.
-      coinbase: "`start` is required: Coinbase answers at most one page per request (300 candles on INTX, 350 on spot) and publishes no listing date. Pages of 299, and `quote_volume` is `None`; hours with no trades are absent rather than zero."
-      dydx: Answers newest-first; served oldest-first in pages of 999. An open `start` buffers the whole history before the first page.
-      mexc: "`start` is required: an unbounded request answers the latest page, not the earliest. Pages of 500, the cap MEXC really serves."
+      bybit: Native newest-first pages, filtered to required `[start, end)` bounds without buffering the full history.
+      coinbase: "Required `[start, end)` bounds, swept in windows of 299 candle opens because the venue caps each range. Native row order; `quote_volume` is `None`, and hours with no trades are absent rather than zero."
+      dydx: Native newest-first pages, filtered to required `[start, end)` bounds without buffering the full history.
+      mexc: "Required `[start, end)` bounds. Pages of 500, the cap MEXC really serves."
     example:
       accountVenues: [mexc]
       constants:

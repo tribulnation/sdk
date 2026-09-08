@@ -52,7 +52,9 @@ async def test_rate_limited_second_page_retries_in_place(
     },
   )
   with Context().retried(RateLimited, max_retries=1, base_delay=0).use():
-    pages = [page async for page in market.candles('1m', start)]
+    pages = [
+      page async for page in market.candles('1m', start, start + timedelta(minutes=501))
+    ]
 
   assert [len(page) for page in pages] == [500, 1]
   assert [c.time for page in pages for c in page] == [

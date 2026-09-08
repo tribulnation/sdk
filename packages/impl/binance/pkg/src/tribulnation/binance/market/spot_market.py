@@ -153,22 +153,19 @@ class SpotMarket(SharedMixin, Market):
   def candles(
     self,
     interval: CandleInterval,
-    start: datetime | None = None,
-    end: datetime | None = None,
+    start: datetime,
+    end: datetime,
   ) -> PaginatedResponse[Candle]:
-    """Fetch historical trade candles, one page per `klines` request.
-
-    Binance walks forwards and bounds both ends on open time inclusively, which is
-    the contract's own shape, so the client's paged walk is yielded as it comes. An
-    open `start` is answered from the venue's earliest kline.
-    """
-    self.check_interval(interval)
+    """Fetch Binance's native pages, filtering to the requested `[start, end)`."""
+    self.check_candles(interval, start, end)
     return PaginatedResponse(self.walk_candles(interval, start, end))
 
   async def walk_candles(
-    self, interval: CandleInterval, start: datetime | None, end: datetime | None
+    self, interval: CandleInterval, start: datetime, end: datetime
   ) -> AsyncIterator[Sequence[Candle]]:
     """The pages behind `candles`."""
+    if start == end:
+      return
     paging = self.client.spot.http.market.klines_paged(
       symbol=self.symbol,
       interval=interval,
@@ -177,7 +174,7 @@ class SpotMarket(SharedMixin, Market):
       limit=CANDLES_PAGE,
     ).via(self.call_binance)
     async for rows in paging:
-      yield [
+      page = [
         Candle(
           time=r[0],
           open=r[1],
@@ -189,7 +186,10 @@ class SpotMarket(SharedMixin, Market):
           trades=r[8],
         )
         for r in rows
+        if start <= r[0] < end
       ]
+      if page:
+        yield page
 
   @wrap_exceptions
   async def open_orders(self) -> Sequence[OrderState]:

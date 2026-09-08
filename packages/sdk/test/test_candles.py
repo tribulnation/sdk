@@ -40,7 +40,7 @@ class FakeMarket(Market):
 
   CANDLE_INTERVALS = frozenset[CandleInterval]({'1h'})
 
-  calls: list[tuple[CandleInterval, datetime | None, datetime | None]]
+  calls: list[tuple[CandleInterval, datetime, datetime]]
 
   @property
   def market_id(self) -> str:
@@ -57,10 +57,10 @@ class FakeMarket(Market):
   def candles(
     self,
     interval: CandleInterval,
-    start: datetime | None = None,
-    end: datetime | None = None,
+    start: datetime,
+    end: datetime,
   ) -> PaginatedResponse[Candle]:
-    self.check_interval(interval)
+    self.check_candles(interval, start, end)
     self.calls.append((interval, start, end))
 
     async def pages() -> AsyncIterable[Sequence[Candle]]:
@@ -169,48 +169,54 @@ def test_check_interval_names_the_market_and_what_it_serves():
   """An interval outside `CANDLE_INTERVALS` is refused before any request."""
   market, *_ = fixture()
   with pytest.raises(ValueError, match=r"'5m'.*fake:spot:BTCUSDT.*1h"):
-    market.candles('5m')
+    market.candles('5m', T0, T0 + HOUR)
   assert market.calls == []
 
 
 async def test_market_candles_is_awaitable_and_iterable():
   """The market's own response flattens on await and pages on iteration."""
   market, *_ = fixture()
-  assert await market.candles('1h', T0, T0 + 2 * HOUR) == [c for p in PAGES for c in p]
-  pages = [page async for page in market.candles('1h')]
+  assert await market.candles('1h', T0, T0 + 3 * HOUR) == [c for p in PAGES for c in p]
+  pages = [page async for page in market.candles('1h', T0, T0 + 3 * HOUR)]
   assert pages == PAGES
-  assert market.calls == [('1h', T0, T0 + 2 * HOUR), ('1h', None, None)]
+  assert market.calls == [('1h', T0, T0 + 3 * HOUR)] * 2
 
 
 async def test_exchange_lifts_candles_with_a_leading_market_id():
   """`Exchange.candles` routes to the market and keeps the pages intact."""
   market, exchange, *_ = fixture()
-  pages = [page async for page in exchange.candles('BTCUSDT', '1h', T0)]
+  pages = [page async for page in exchange.candles('BTCUSDT', '1h', T0, T0 + 3 * HOUR)]
   assert pages == PAGES
-  assert await exchange.candles('BTCUSDT', '1h') == [c for p in PAGES for c in p]
-  assert market.calls == [('1h', T0, None), ('1h', None, None)]
+  assert await exchange.candles('BTCUSDT', '1h', T0, T0 + 3 * HOUR) == [
+    c for p in PAGES for c in p
+  ]
+  assert market.calls == [('1h', T0, T0 + 3 * HOUR)] * 2
 
 
 async def test_venue_and_root_lift_candles_the_same_way():
   """`TradingVenue` and `TradingMarkets` mirror the method with the longer ids."""
   market, _, venue, root = fixture()
-  assert [p async for p in venue.candles('spot:BTCUSDT', '1h', end=T0)] == PAGES
-  assert [p async for p in root.candles('fake:spot:BTCUSDT', '1h', T0, T0)] == PAGES
-  assert market.calls == [('1h', None, T0), ('1h', T0, T0)]
+  assert [
+    p async for p in venue.candles('spot:BTCUSDT', '1h', T0, T0 + 3 * HOUR)
+  ] == PAGES
+  assert [
+    p async for p in root.candles('fake:spot:BTCUSDT', '1h', T0, T0 + 3 * HOUR)
+  ] == PAGES
+  assert market.calls == [('1h', T0, T0 + 3 * HOUR)] * 2
 
 
 async def test_lifted_interval_errors_surface_on_iteration():
   """The mirrors look the market up lazily, so the refusal arrives on first use."""
   _, exchange, *_ = fixture()
   with pytest.raises(ValueError, match="'1d'"):
-    await exchange.candles('BTCUSDT', '1d')
+    await exchange.candles('BTCUSDT', '1d', T0, T0 + HOUR)
 
 
 def test_candle_windows_are_aligned_and_abut():
   """Windows hold at most `size` candles, share no open time, and leave no gap."""
   windows = list(candle_windows(T0, T0 + 1049 * HOUR, '1h', size=1000))
   assert windows == [
-    (T0, T0 + 999 * HOUR),
+    (T0, T0 + 1000 * HOUR),
     (T0 + 1000 * HOUR, T0 + 1049 * HOUR),
   ]
 
@@ -224,12 +230,39 @@ def test_candle_windows_keep_a_misaligned_start_off_the_grid_boundary():
   start = T0 + timedelta(minutes=30)
   windows = list(candle_windows(start, T0 + 12 * HOUR, '4h', size=2))
   assert windows == [
-    (start, T0 + 4 * HOUR),
+    (start, T0 + 8 * HOUR),
     (T0 + 8 * HOUR, T0 + 12 * HOUR),
   ]
 
 
 def test_candle_windows_clip_to_the_end_and_cover_a_single_candle():
-  """`end` bounds the last window, and `start == end` is one window of one candle."""
-  assert list(candle_windows(T0, T0, '1d', size=10)) == [(T0, T0)]
-  assert list(candle_windows(T0, T0 - HOUR, '1d', size=10)) == []
+  """The exclusive end clips a window; equal bounds describe an empty range."""
+  assert list(candle_windows(T0, T0 + HOUR, '1d', size=10)) == [(T0, T0 + HOUR)]
+  assert list(candle_windows(T0, T0, '1d', size=10)) == []
+
+
+@pytest.mark.parametrize(
+  ('start', 'end', 'message'),
+  [
+    (T0, T0 - HOUR, 'must not precede'),
+    (T0.replace(tzinfo=None), T0, 'timezone-aware'),
+    (T0, T0.replace(tzinfo=None), 'timezone-aware'),
+  ],
+)
+def test_invalid_bounds_are_rejected_before_requests(
+  start: datetime, end: datetime, message: str
+):
+  """Markets and time windows refuse reversed or ambiguous bounds consistently."""
+  market, *_ = fixture()
+  with pytest.raises(ValueError, match=message):
+    market.candles('1h', start, end)
+  with pytest.raises(ValueError, match=message):
+    list(candle_windows(start, end, '1h', size=10))
+  assert market.calls == []
+
+
+@pytest.mark.parametrize('size', [0, -1])
+def test_window_size_must_be_positive(size: int):
+  """Invalid page sizes cannot create an infinite walk."""
+  with pytest.raises(ValueError, match='must be positive'):
+    list(candle_windows(T0, T0 + HOUR, '1h', size=size))

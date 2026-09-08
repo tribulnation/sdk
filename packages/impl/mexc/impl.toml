@@ -4,7 +4,7 @@
 [support.market]
 support = "full"
 auth = false
-note = "`candles` needs an explicit `start` (an unbounded request answers the latest page, not the earliest) and pages 500 at a time, the cap MEXC really serves whatever `limit` says."
+note = "`candles` uses required `[start, end)` bounds and pages 500 at a time, the cap MEXC really serves whatever `limit` says."
 # MarketSDK.DEFAULT_ACCOUNTS includes 'mexc' (Mexc(public=True)) — but that only covers
 # purely public market-data methods; account-scoped/trading methods still need real
 # credentials regardless (see docs/contract/market.yml's per-method `public: false`).

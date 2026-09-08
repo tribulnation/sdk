@@ -51,21 +51,25 @@ class Candle:
 def candle_windows(
   start: datetime, end: datetime, interval: CandleInterval, *, size: int
 ) -> Iterator[tuple[datetime, datetime]]:
-  """Split `[start, end]` into consecutive windows holding at most `size` candles each.
+  """Split `[start, end)` into adjacent windows holding at most `size` candle opens.
 
-  Bounds are inclusive open times: a window `(lower, upper)` covers the candles opening
-  at `lower <= time <= upper`, and the next window opens one candle after `upper`. The
+  A window `(lower, upper)` covers `lower <= time < upper`; the next starts at `upper`. The
   windows are aligned to the interval's own grid, so a `start` falling inside a candle
-  never causes a candle to straddle two windows. This is how an implementation turns a
-  venue that answers newest-first, or refuses more than one page per request, into the
-  ascending, non-overlapping pages the contract promises.
+  never causes a candle to straddle two windows. Use windows when a venue refuses
+  requests covering more than one page's worth of time.
 
   Args:
     start: Open time of the first candle wanted (inclusive).
-    end: Open time of the last candle wanted (inclusive).
+    end: Exclusive upper bound on opening time.
     interval: Candle width, which fixes the grid the windows align to.
     size: Most candles one window may hold, typically the venue's page cap.
   """
+  if size < 1:
+    raise ValueError('Candle window size must be positive')
+  if start.utcoffset() is None or end.utcoffset() is None:
+    raise ValueError('Candle bounds must be timezone-aware')
+  if end < start:
+    raise ValueError('Candle end must not precede start')
   width = candle_width(interval)
   span = width * size
   start = start.astimezone(timezone.utc)
@@ -73,7 +77,7 @@ def candle_windows(
   grid = start - (start - EPOCH) % width
   lower = start
   page = 1
-  while lower <= end:
-    yield lower, min(grid + span * page - width, end)
+  while lower < end:
+    yield lower, min(grid + span * page, end)
     lower = grid + span * page
     page += 1

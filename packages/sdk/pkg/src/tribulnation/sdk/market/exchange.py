@@ -133,8 +133,8 @@ class Exchange(SDK):
     market_id: str,
     /,
     interval: CandleInterval,
-    start: datetime | None = None,
-    end: datetime | None = None,
+    start: datetime,
+    end: datetime,
   ):
     """Fetch the market's historical trade candles.
 

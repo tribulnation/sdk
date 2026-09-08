@@ -72,8 +72,8 @@ class SpotMarket(MarketMixin, Market):
   def candles(
     self,
     interval: CandleInterval,
-    start: datetime | None = None,
-    end: datetime | None = None,
+    start: datetime,
+    end: datetime,
   ) -> PaginatedResponse[Candle]:
     raise NotImplementedError(
       f'candles is not implemented for this market [{self.id}]: typed_bit2me types '

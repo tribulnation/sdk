@@ -57,28 +57,21 @@ def parse_candle(row: KlineRow) -> Candle:
 async def candles(
   self: MarketMixin,
   interval: CandleInterval,
-  start: datetime | None,
-  end: datetime | None,
+  start: datetime,
+  end: datetime,
 ) -> AsyncIterable[Sequence[Candle]]:
-  """Walk this symbol's trade candles, oldest page first.
-
-  MEXC walks forwards on its own, but bounds `endTime` exclusively on open time, so
-  the contract's inclusive `end` is passed one millisecond later. An open `start` is
-  refused: without a `startTime` the venue answers its most recent page, and an
-  epoch-zero one answers nothing at all, so there is no way to ask for the earliest.
-  """
-  if start is None:
-    raise ValueError(
-      f'MEXC serves candles only from an explicit start [{self.instrument}]: an '
-      'unbounded request answers the latest page, not the earliest.'
-    )
+  """Yield native pages, filtering to `[start, end)` after millisecond wire rounding."""
+  if start == end:
+    return
   paging = self.client.spot.http.market.candles_paged(
     self.instrument,
     interval=MEXC_INTERVALS[interval],
     start_time=start,
-    end_time=end + MILLISECOND if end is not None else None,
+    end_time=end + MILLISECOND,
     limit=CANDLES_PAGE,
     validate=self.shared.validate,
   )
   async for rows in paging.via(self.call_mexc):
-    yield [parse_candle(r) for r in rows]
+    page = [parse_candle(r) for r in rows if start <= r[0] < end]
+    if page:
+      yield page

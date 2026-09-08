@@ -90,10 +90,10 @@ class Market(MarketMixin, PerpMarket):
   def candles(
     self,
     interval: CandleInterval,
-    start: datetime | None = None,
-    end: datetime | None = None,
+    start: datetime,
+    end: datetime,
   ) -> PaginatedResponse[Candle]:
-    self.check_interval(interval)
+    self.check_candles(interval, start, end)
     return PaginatedResponse(candles(self, interval, start, end))
 
   def trades_history(self, start: datetime, end: datetime) -> PaginatedResponse[Trade]:

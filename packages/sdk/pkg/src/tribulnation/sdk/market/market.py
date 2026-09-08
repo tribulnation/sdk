@@ -102,24 +102,32 @@ class Market(SDK):
         f'CANDLE_INTERVALS: {served}.'
       )
 
+  def check_candles(self, interval: CandleInterval, start: datetime, end: datetime):
+    """Validate an interval and its explicit, timezone-aware candle bounds."""
+    self.check_interval(interval)
+    if start.utcoffset() is None or end.utcoffset() is None:
+      raise ValueError('Candle bounds must be timezone-aware')
+    if end < start:
+      raise ValueError('Candle end must not precede start')
+
   @SDK.method
   @abstractmethod
   def candles(
     self,
     interval: CandleInterval,
-    start: datetime | None = None,
-    end: datetime | None = None,
+    start: datetime,
+    end: datetime,
   ) -> PaginatedResponse[Candle]:
     """Fetch the market's historical trade candles.
 
-    Pages are ascending by open time, non-overlapping, and the venue's own size.
+    Each opening timestamp appears at most once. Ordering within and across pages
+    follows the venue; page sizes are not fixed. Empty intervals are not filled in.
 
     Args:
       interval: Candle width. Must be one of `CANDLE_INTERVALS`, else `ValueError`.
-      start: Open time of the first candle (inclusive). `None` fetches from the
-        earliest the venue still holds.
-      end: Open time of the last candle (inclusive). `None` means up to now, and the
-        last candle may then be still forming.
+      start: Inclusive lower bound on opening time, as a timezone-aware datetime.
+      end: Exclusive upper bound on opening time, as a timezone-aware datetime.
+        A returned candle can still be forming. Equal bounds produce no candles.
     """
 
   @SDK.method

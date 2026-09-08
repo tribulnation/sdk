@@ -53,7 +53,7 @@ async def fetch_candles(
   """Fetch `count` hourly candles from `START`, page by page, retrying transient failures."""
   with Context().retried(NetworkError, RateLimited, max_retries=5).use():
     async with sdk:
-      end = START + (count - 1) * HOUR
+      end = START + count * HOUR
       return [page async for page in sdk.candles(market, '1h', START, end)]
 
 

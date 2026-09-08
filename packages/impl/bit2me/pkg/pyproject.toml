@@ -12,7 +12,7 @@ description = "Tribulnation SDK implementation for Bit2Me."
 license = "MIT"
 license-files = ["LICENSE"]
 dependencies = [
-  "tribulnation-sdk>=1.8.0", "typed-bit2me>=0.4.0"
+"tribulnation-sdk>=2.0.0", "typed-bit2me>=0.4.0"
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}

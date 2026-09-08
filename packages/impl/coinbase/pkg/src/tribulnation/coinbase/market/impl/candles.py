@@ -1,7 +1,7 @@
 """Historical trade candles for one product, read off the public catalog."""
 
 from typing_extensions import AsyncIterable, Literal, Mapping, Sequence
-from datetime import datetime, timezone
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from tribulnation.sdk.market import Candle, CandleInterval, candle_windows
@@ -60,37 +60,27 @@ def parse_candle(row: CandleRow) -> Candle:
 async def candles(
   self: MarketMixin,
   interval: CandleInterval,
-  start: datetime | None,
-  end: datetime | None,
+  start: datetime,
+  end: datetime,
 ) -> AsyncIterable[Sequence[Candle]]:
-  """Walk this product's trade candles, oldest page first.
+  """Read bounded windows in native order, filtering each to `[lower, upper)`.
 
-  Coinbase answers newest-first and only one page per range, so the range is swept in
-  forward windows of one page each, every window read through the client's own walk
-  (so a short response is confirmed rather than trusted), reversed, and trimmed to the
-  contract's own bounds: the venue takes whole seconds, so a `start` inside one is
-  rounded down on the wire. An open `start` is refused, since the venue serves no
-  range wider than a page and publishes no listing date to count forward from. An open
-  `end` is resolved to now. Buckets with no trades are absent, not zero.
+  Coinbase refuses large ranges, so windows remain necessary even without sorting.
+  Buckets with no trades are absent, not zero.
   """
-  if start is None:
-    raise ValueError(
-      f'Coinbase serves candles only from an explicit start [{self.product_id}]: it '
-      'answers one page per request and publishes no listing date.'
-    )
-  if end is None:
-    end = datetime.now(timezone.utc)
   granularity = GRANULARITIES[interval]
-  # One candle short of the cap, so the client's walk sees a short page and never
-  # spends a request confirming a window is exhausted.
+  # Reserve one slot for a boundary bucket, whether the venue includes it or the
+  # whole-second wire precision broadens the range. Each window fits one response.
   for lower, upper in candle_windows(start, end, interval, size=CANDLES_PAGE - 1):
-    paging = self.app.advanced_trade.http.products.public.candles_paged(
-      self.product_id,
-      start=lower,
-      end=upper,
-      granularity=granularity,
-      limit=CANDLES_PAGE,
+    response = await self.call_app(
+      lambda: self.app.advanced_trade.http.products.public.candles(
+        self.product_id,
+        start=lower,
+        end=upper + timedelta(seconds=1),
+        granularity=granularity,
+        limit=CANDLES_PAGE,
+      )
     )
-    rows = [r for r in await paging.via(self.call_app) if lower <= r['start'] <= upper]
-    if rows:
-      yield [parse_candle(r) for r in sorted(rows, key=lambda r: r['start'])]
+    page = [parse_candle(r) for r in response['candles'] if lower <= r['start'] < upper]
+    if page:
+      yield page

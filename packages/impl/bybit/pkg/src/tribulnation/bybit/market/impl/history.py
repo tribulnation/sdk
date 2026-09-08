@@ -15,7 +15,6 @@ from tribulnation.sdk.market import (
   FundingPayment,
   FundingRate,
   Trade,
-  candle_windows,
 )
 from typed_bybit.schemas import KlineInterval
 
@@ -67,46 +66,26 @@ def parse_candle(row: KlineRow) -> Candle:
 async def candles(
   self: MarketMixin,
   interval: CandleInterval,
-  start: datetime | None,
-  end: datetime | None,
+  start: datetime,
+  end: datetime,
 ) -> AsyncIterator[Sequence[Candle]]:
-  """Walk this market's trade candles, oldest page first.
-
-  Bybit answers newest-first, and at the start edge by bucket overlap: a candle
-  already open at `start` is served too. With a `start`, the range is swept in forward
-  windows of one page each, every window read through the client's own walk (so a
-  short response is confirmed rather than trusted), reversed, and trimmed to the
-  contract's own bounds. Without one, the whole backwards walk is buffered before the
-  first page is yielded: ascending order needs the earliest page first, and only the
-  venue knows where that is. An open `end` is resolved to now.
-  """
-  kline = KLINE_INTERVALS[interval]
-  if end is None:
-    end = datetime.now(timezone.utc)
-
-  def walk(lower: datetime | None, upper: datetime):
-    """The client's newest-first walk over `[lower, upper]`, one request per page."""
-    return self.client.market.kline_paged(
-      self.category,
-      symbol=self.symbol,
-      interval=kline,
-      start=lower,
-      end=upper,
-      limit=CANDLES_PAGE,
-      validate=self.validate,
-    ).via(self.call_bybit)
-
-  if start is None:
-    pages = [rows async for rows in walk(None, end)]
-    for rows in reversed(pages):
-      yield [parse_candle(r) for r in reversed(rows)]
+  """Yield Bybit's native pages, trimming overlapping buckets to `[start, end)`."""
+  if start == end:
     return
-  # One candle short of the cap, so the client's walk sees a short page and never
-  # spends a request confirming a window is exhausted.
-  for lower, upper in candle_windows(start, end, interval, size=CANDLES_PAGE - 1):
-    rows = [r for r in await walk(lower, upper) if lower <= r[0] <= upper]
-    if rows:
-      yield [parse_candle(r) for r in sorted(rows, key=lambda r: r[0])]
+  kline = KLINE_INTERVALS[interval]
+  paging = self.client.market.kline_paged(
+    self.category,
+    symbol=self.symbol,
+    interval=kline,
+    start=start,
+    end=end,
+    limit=CANDLES_PAGE,
+    validate=self.validate,
+  ).via(self.call_bybit)
+  async for rows in paging:
+    page = [parse_candle(r) for r in rows if start <= r[0] < end]
+    if page:
+      yield page
 
 
 async def trades_history(

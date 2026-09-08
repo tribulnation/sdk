@@ -82,9 +82,9 @@ Type mapping: `POST_ONLY` orders always use TIF `POST_ONLY`; `MARKET` uses `mark
 ## Candles
 
 `candles` serves every `CandleInterval` (`CANDLE_INTERVALS` is the full set) from the
-indexer, oldest first in pages of 999. The indexer answers newest-first, so with a `start`
-the range is swept in forward windows; with `start=None` the whole history is fetched
-before the first page is yielded. `volume` is `baseTokenVolume`, `quote_volume` is
+indexer in its native newest-first pages without buffering the whole history. Both
+timezone-aware bounds are required: `start <= candle.time < end`. The SDK does not
+guarantee ordering. `volume` is `baseTokenVolume`, `quote_volume` is
 `usdVolume`, and `trades` is reported.
 
 ## Venue-specific semantics

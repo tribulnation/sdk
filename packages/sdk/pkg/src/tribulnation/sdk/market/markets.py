@@ -203,27 +203,25 @@ class TradingMarkets(SDK):
     market_id: str,
     /,
     interval: CandleInterval,
-    start: datetime | None = None,
-    end: datetime | None = None,
+    start: datetime,
+    end: datetime,
   ) -> AsyncIterable[Sequence[Candle]]:
     """Fetch the market's historical trade candles, paginated: async-iterate the pages.
 
-    Pages are ascending by open time and non-overlapping, whichever way the venue
-    answers; each page is the venue's own size. `Candle.time` is always the open time;
+    Ordering within and across pages follows the venue. Opening timestamps are not
+    repeated across pages; page sizes can vary. `Candle.time` is always the open time;
     prices and volumes are `Decimal`, `quote_volume` and `trades` are `None` where the
     venue reports none. Only trade candles: mark and index series are not exposed. A
-    candle is complete once `time + interval` is in the past.
+    candle may still be forming; an elapsed interval does not guarantee immutable data.
 
     Each implementation declares the widths it serves in `Market.CANDLE_INTERVALS`;
     any other `interval` raises `ValueError` before a request is made.
 
     Args:
       interval: Candle width, one of `'1m'`, `'5m'`, `'15m'`, `'1h'`, `'4h'`, `'1d'`.
-      start: Open time of the first candle (inclusive). `None` fetches from the
-        earliest the venue still holds; venues that cannot serve an open start raise
-        `ValueError` and say so.
-      end: Open time of the last candle (inclusive). `None` means up to now, and the
-        last candle may then be still forming.
+      start: Inclusive lower bound on opening time, as a timezone-aware datetime.
+      end: Exclusive upper bound on opening time, as a timezone-aware datetime.
+        Equal bounds produce no candles.
     """
     market = await self.market(market_id)
     async for page in market.candles(interval, start, end):

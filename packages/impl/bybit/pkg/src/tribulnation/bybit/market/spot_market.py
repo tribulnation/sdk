@@ -111,11 +111,11 @@ class SpotMarket(MarketMixin, Market):
   def candles(
     self,
     interval: CandleInterval,
-    start: datetime | None = None,
-    end: datetime | None = None,
+    start: datetime,
+    end: datetime,
   ) -> PaginatedResponse[Candle]:
-    """Fetch the market's historical trade candles, oldest page first."""
-    self.check_interval(interval)
+    """Fetch historical trade candles in Bybit's native page order."""
+    self.check_candles(interval, start, end)
     return PaginatedResponse(candles(self, interval, start, end))
 
   async def open_orders(self) -> Sequence[OrderState]:
