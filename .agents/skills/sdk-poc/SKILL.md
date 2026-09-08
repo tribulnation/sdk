@@ -86,9 +86,11 @@ venue doesn't publish. A method is mapped from the venue's own figure or it is n
 
 Issues live in `typed-client-issues.md` at the repo root: open defects only, grouped by
 client under `## typed-<venue>` (`## codegen` for the generator), each titled by the
-declaration it concerns. No numbering. An entry is deleted, not marked fixed, once the
-client fix is released and the cells it blocked have been re-run clean; git history is
-the record. Four kinds, each needing different evidence:
+declaration it concerns. No numbering. The round trip is: fix in typed-dev, re-run the
+cells the entry blocked here against typed-dev's `main` (the venv installs every
+`typed_*` client editable from that checkout), and delete the entry once they run clean.
+An entry is deleted, never marked fixed, and never on the strength of a fix claim alone;
+git history is the record. Four kinds, each needing different evidence:
 
 1. **wrong-type**: the venue always sends a value the declared type rejects (a string
    for a `Decimal`, an object for a list). One sample settles it.

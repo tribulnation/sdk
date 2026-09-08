@@ -1,15 +1,15 @@
 # Typed client issues
 
 Open defects in the `typed_*` clients and in the generator that produces them, found by
-running the PoC scripts under `packages/impl/*/poc/` against the live venues. This file
-is the hand-over from the sdk repo to typed-dev: it is meant to be read there without
-anything else from here.
+running the PoC scripts under `packages/impl/*/poc/` against the live venues. One
+orchestrator runs this repo and typed-dev, and this file is the single ledger between
+them: a defect is opened here, fixed on typed-dev's `main`, verified here, and deleted
+from here. It is written to be read from typed-dev without anything else from this repo.
 
-This is round two. The first report's 42 entries were answered in typed-dev's
+This is round two. The first report's 42 entries were answered on typed-dev's
 `sdk-issues` branch, now merged to its `main`, and every answer was re-verified here
 against the merged client. What follows is what is left: the entries that stayed open, the
-defects the fix pass introduced, and what we found while checking. `typed-client-issues-reply.md`
-holds typed-dev's own answers, entry for entry.
+defects the fix pass introduced, and what we found while checking.
 
 ## How to read an entry
 
@@ -34,16 +34,22 @@ carry `Condition` and `Samples` rather than a fix.
 
 ## The round trip
 
-1. typed-dev fixes and releases. It does not edit this file; disagreement with an entry
-   goes in typed-dev's own commit message or docs.
-2. The sdk side re-runs the cells named under `Blocks` against the released client. When
-   they pass, the entry is deleted, not marked fixed; git history is the record.
-3. New entries are added only from a PoC that hit the defect live, in the format above.
+1. Fix in typed-dev, landing on its `main`. Disagreement with an entry goes in that
+   commit's message, not in this file.
+2. Re-run the cells named under `Blocks` here, against typed-dev's `main`. The sdk venv
+   installs every `typed_*` client editable from `clients/<venue>/pkg` in that checkout,
+   so a merged fix is what the cells exercise the moment it lands; a PyPI release is a
+   separate, later gate and is not what closes an entry.
+3. When the cells pass, delete the entry. It is never marked fixed; git history is the
+   record.
+4. New entries are added only from a PoC that hit the defect live, in the format above.
    The rules are in `.agents/skills/sdk-poc/SKILL.md`.
 
-Round one taught us a fourth step: **re-verify the answers, do not just read them.** Doing
-that caught three claims in the reply that did not hold, three mistakes of our own, and
-two regressions the fix pass introduced. All six are below.
+Step 2 is a rule, not a formality: **re-run the blocked cells, never trust a fix claim.**
+A commit message saying an entry is fixed closes nothing; the cells it names running
+clean do. Round one's re-verification caught three claims in typed-dev's answers that
+did not hold, three mistakes of our own, and two regressions the fix pass introduced.
+All six are below.
 
 ## Priority
 
@@ -68,17 +74,20 @@ credentials comes first regardless:
 
 ## Environment
 
-- typed-dev `main` @ `81b2acd89` (the `sdk-issues` merge, PR #175). The sdk venv installs
-  every `typed_*` client editable from `clients/<venue>/pkg` in that checkout, plus
-  typed-core from `public/typed/packages/core`, so what lands there is what the PoCs run
-  against immediately.
-- **typed-core is 0.8.0 and no client version moved.** binance is still 2.0.0, bit2me
-  0.4.0, bitget 0.4.0, bybit 0.3.0, coinbase 0.4.0, deribit 0.3.0, dydx 4.0.0,
-  etherscan 0.4.0, hyperliquid 3.0.0, mexc 3.0.0, alchemy 3.0.0, moralis 0.3.0 -- the same
-  numbers as before the pass, on materially different behaviour and, in bit2me's case, a
-  removed public module. The impls floor exactly those numbers, so a release resolving
-  against PyPI would pick up the unfixed clients. Each touched client needs a bump before
-  anything ships.
+- typed-dev `main` @ `ed529c2fa`. The sdk venv installs every `typed_*` client editable
+  from `clients/<venue>/pkg` in that checkout, plus typed-core from
+  `public/typed/packages/core`, so what lands there is what the PoCs run against
+  immediately.
+- **typed-core is 0.8.0 on PyPI.** 0.8.1 is merged on typed-dev's `main` and is what the
+  venv runs, but it is not visible on PyPI yet.
+- **No client version moved.** binance is still 2.0.0, bit2me 0.4.0, bitget 0.4.0, bybit
+  0.3.0, coinbase 0.4.0, deribit 0.3.0, dydx 4.0.0, etherscan 0.4.0, hyperliquid 3.0.0,
+  mexc 3.0.0, alchemy 3.0.0, moralis 0.3.0 -- the same numbers as before the pass, on
+  materially different behaviour and, in bit2me's case, a removed public module. Each
+  touched client needs a bump before anything ships. Meanwhile the impls floor on numbers
+  PyPI does not have: typed-binance's floor is 2.0.0 against 1.1.0 published, typed-dydx
+  4.0.0 against 3.0.0, typed-hyperliquid 3.0.0 against 2.0.0. A release of any impl is
+  blocked on the typed clients releasing first.
 
 ## Corrections to the previous report
 
