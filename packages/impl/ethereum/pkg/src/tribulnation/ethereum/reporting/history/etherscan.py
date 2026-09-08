@@ -1,21 +1,13 @@
 """Etherscan-backed EVM history: the account feeds give the transfers and block times,
 the node gives each transaction's receipt, input and bytecode check.
-
-The ERC-20 and ERC-721 feeds are blocked: `typed_etherscan` requires `contractaddress`
-on `erc20_transfers_paged`/`erc721_transfers_paged`, so an account-wide token feed
-cannot be requested through the typed client (see `typed-client-issues.md`). Until that
-is fixed, `history()` raises rather than yield transactions with their token legs
-missing.
 """
 
 from collections.abc import Iterable
 from typing_extensions import (
-  Any,
   AsyncContextManager,
   Awaitable,
   Callable,
   Literal,
-  Mapping,
   TypeVar,
 )
 from dataclasses import dataclass, field
@@ -25,9 +17,9 @@ import asyncio
 
 from web3 import Web3
 from typed_etherscan import Etherscan
-from typed_etherscan.core import timestamp_seconds
 from typed_etherscan.account.transactions import AccountTransaction as NativeTransaction
 from typed_etherscan.account.erc20_transfers import Erc20Transfer as TokenTransaction
+from typed_etherscan.account.erc721_transfers import Erc721Transfer as NftTransaction
 from typed_etherscan.account.internal_transactions import InternalTransaction
 
 from tribulnation.sdk.core import SDK, ApiError, managed_tasks
@@ -43,42 +35,13 @@ from tribulnation.ethereum.reporting.history.mixin import HistoryMixin
 
 T = TypeVar('T')
 
-NftTransaction = dict[str, Any]
-"""An Etherscan ERC-721 transfer row.
-
-`typed_etherscan.account.erc721_transfers` types its rows as bare `dict[str, Any]`,
-with no item model to import.
-"""
-
-TOKEN_FEEDS_BLOCKED = (
-  'typed_etherscan requires `contractaddress` on `erc20_transfers_paged` and '
-  '`erc721_transfers_paged`, so an account-wide token feed cannot be requested; '
-  'see typed-client-issues.md'
-)
-
-
-def required(row: Mapping[str, Any], name: str) -> Any:
-  """Read a field the client declares `NotRequired[Any]` but Etherscan always sends.
-
-  Raises:
-    ValueError: The field really was absent, a wire surprise rather than the routine
-      case the declared type implies.
-  """
-  value = row.get(name)
-  if value is None:
-    raise ValueError(f'{name!r} missing from an Etherscan row: {row}')
-  return value
-
-
-def block_time(row: Mapping[str, Any]) -> datetime:
-  """Parse a feed row's `timeStamp`, UTC epoch seconds as a decimal string."""
-  return timestamp_seconds.parse(int(required(row, 'timeStamp')))
+FeedRow = NativeTransaction | TokenTransaction | NftTransaction | InternalTransaction
+"""A row of any of the four account feeds; all of them carry `hash` and `timeStamp`."""
 
 
 def token_value(tx: TokenTransaction) -> Decimal:
   """Return an ERC-20 transfer value in display units."""
-  decimals = int(required(tx, 'tokenDecimal'))
-  return Decimal(required(tx, 'value')) * (Decimal(10) ** -decimals)
+  return Decimal(tx['value']) * (Decimal(10) ** -tx['tokenDecimal'])
 
 
 TransactionGroups = dict[
@@ -182,23 +145,31 @@ class EtherscanHistory(HistoryMixin, History):
   async def token_transactions(
     self, start_block: int, end_block: int
   ) -> list[TokenTransaction]:
-    """Fetch ERC-20 token transactions from Etherscan.
-
-    Raises:
-      NotImplementedError: Blocked on the typed client, see the module docstring.
-    """
-    raise NotImplementedError(TOKEN_FEEDS_BLOCKED)
+    """Fetch ERC-20 token transactions from Etherscan, over every contract."""
+    paging = self.etherscan.account.erc20_transfers_paged(
+      address=self.address,
+      chainid=self.chainid,
+      startblock=start_block,
+      endblock=end_block,
+      offset=self.page_size,
+      sort='asc',
+    )
+    return list(await paging.via(self.call_etherscan))
 
   @SDK.method
   async def nft_transactions(
     self, start_block: int, end_block: int
   ) -> list[NftTransaction]:
-    """Fetch ERC-721 token transactions from Etherscan.
-
-    Raises:
-      NotImplementedError: Blocked on the typed client, see the module docstring.
-    """
-    raise NotImplementedError(TOKEN_FEEDS_BLOCKED)
+    """Fetch ERC-721 token transactions from Etherscan, over every contract."""
+    paging = self.etherscan.account.erc721_transfers_paged(
+      address=self.address,
+      chainid=self.chainid,
+      startblock=start_block,
+      endblock=end_block,
+      offset=self.page_size,
+      sort='asc',
+    )
+    return list(await paging.via(self.call_etherscan))
 
   @SDK.method
   async def internal_transactions(
@@ -261,12 +232,10 @@ class EtherscanHistory(HistoryMixin, History):
       all_token_txs = await token_task
       all_nft_txs = await nft_task
       all_internal_txs = await internal_task
-    grouped_native = group_by(all_native, lambda tx: str(required(tx, 'hash')))
-    grouped_token_txs = group_by(all_token_txs, lambda tx: str(required(tx, 'hash')))
-    grouped_nft_txs = group_by(all_nft_txs, lambda tx: str(required(tx, 'hash')))
-    grouped_internal_txs = group_by(
-      all_internal_txs, lambda tx: str(required(tx, 'hash'))
-    )
+    grouped_native = group_by(all_native, lambda tx: tx['hash'])
+    grouped_token_txs = group_by(all_token_txs, lambda tx: tx['hash'])
+    grouped_nft_txs = group_by(all_nft_txs, lambda tx: tx['hash'])
+    grouped_internal_txs = group_by(all_internal_txs, lambda tx: tx['hash'])
     hashes: set[str] = (
       set(grouped_native)
       | set(grouped_token_txs)
@@ -290,9 +259,9 @@ class EtherscanHistory(HistoryMixin, History):
     transfers: list[EvmTx.NativeTransfer] = []
     for tx in internal_txs:
       transfer = self.parse_native_transfer(
-        from_=required(tx, 'from'),
-        to=required(tx, 'to'),
-        wei=int(required(tx, 'value')),
+        from_=tx['from'],
+        to=tx['to'],
+        wei=tx['value'],
         internal=True,
       )
       if transfer is not None:
@@ -302,7 +271,7 @@ class EtherscanHistory(HistoryMixin, History):
   def parse_token_tx(self, token_tx: TokenTransaction) -> EvmTx.ERC20Transfer | None:
     """Parse an ERC-20 Etherscan row into an SDK ERC-20 transfer."""
     value = token_value(token_tx)
-    to, from_ = required(token_tx, 'to'), required(token_tx, 'from')
+    to, from_ = token_tx['to'], token_tx['from']
     if same_address(to, self.address):
       amount, counterparty = value, from_
     elif same_address(from_, self.address):
@@ -310,7 +279,7 @@ class EtherscanHistory(HistoryMixin, History):
     else:
       return None
     return EvmTx.ERC20Transfer(
-      asset=Web3.to_checksum_address(required(token_tx, 'contractAddress')),
+      asset=Web3.to_checksum_address(token_tx['contractAddress']),
       change=amount,
       counterparty=counterparty,
     )
@@ -325,7 +294,7 @@ class EtherscanHistory(HistoryMixin, History):
 
   def parse_nft_tx(self, nft_tx: NftTransaction) -> EvmTx.NftTransfer | None:
     """Parse an ERC-721 Etherscan row into an SDK NFT transfer."""
-    to, from_ = required(nft_tx, 'to'), required(nft_tx, 'from')
+    to, from_ = nft_tx['to'], nft_tx['from']
     if same_address(to, self.address):
       sign, counterparty = 1, from_
     elif same_address(from_, self.address):
@@ -333,8 +302,8 @@ class EtherscanHistory(HistoryMixin, History):
     else:
       return None
     return EvmTx.NftTransfer(
-      contract_address=required(nft_tx, 'contractAddress'),
-      token_id=required(nft_tx, 'tokenID'),
+      contract_address=nft_tx['contractAddress'],
+      token_id=str(nft_tx['tokenID']),
       change=Decimal(sign),
       counterparty=counterparty,
     )
@@ -361,8 +330,8 @@ class EtherscanHistory(HistoryMixin, History):
     """
     if len(native) > 1:
       raise ValueError('Multiple native transactions')
-    any_tx: Mapping[str, Any] = (native + token + nft + internal)[0]
-    time = block_time(any_tx)
+    rows: list[FeedRow] = [*native, *token, *nft, *internal]
+    time = rows[0]['timeStamp']
     tx, receipt = await self.get_tx_data(hash)
 
     transfers: list[EvmTx.Transfer] = []
