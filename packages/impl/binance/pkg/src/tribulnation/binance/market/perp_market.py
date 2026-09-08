@@ -30,8 +30,6 @@ from tribulnation.sdk.market import (
 from typed_binance.schemas import MarkPriceInfo
 from typed_binance.usdm_futures.public_streams.partial_depth import PartialDepthEvent
 
-from tribulnation.binance.util import windows
-
 from .impl import (
   SharedMixin,
   wrap_exceptions,
@@ -49,9 +47,6 @@ REST_DEPTH_LEVELS: tuple[Literal[5, 10, 20, 50, 100, 500, 1000], ...] = (
   1000,
 )
 """Depth values Binance's USD-M futures REST order book accepts (`limit`)."""
-
-FUNDING_RATES_WINDOW = timedelta(days=30)
-"""Window per `fundingRate` call. Comfortably under its 1000-row cap even at hourly funding."""
 
 DEFAULT_STREAM_SPEED: Literal[100, 250, 500] = 100
 """Partial-depth push interval, in milliseconds."""
@@ -136,8 +131,8 @@ class PerpMarket(SharedMixin, _PerpMarket):
 
     def to_book(event: PartialDepthEvent) -> Book:
       return Book(
-        bids=[Book.Entry(Decimal(p), Decimal(q)) for p, q in event['b']],
-        asks=[Book.Entry(Decimal(p), Decimal(q)) for p, q in event['a']],
+        bids=[Book.Entry(price, qty) for price, qty in event['b']],
+        asks=[Book.Entry(price, qty) for price, qty in event['a']],
       )
 
     return self.client.usdm_futures.public_streams.partial_depth(
@@ -170,30 +165,15 @@ class PerpMarket(SharedMixin, _PerpMarket):
   ):
     """Fetch historical funding rates.
 
-    With both bounds, walks the range one 30-day page at a time; with either omitted,
-    makes a single call, matching the venue's own "most recent 200" behavior for an
-    unbounded query.
+    The client's own walk advances `start_time` to each full page's latest settlement
+    and stops on the first short one, so an unbounded query still costs a single call:
+    the venue's own most-recent slice comes back under the 1000-row cap.
     """
-    if start is None or end is None:
-      raw = await self.call_binance(
-        lambda: self.client.usdm_futures.http.market.funding_rate(
-          symbol=self.symbol, start_time=start, end_time=end, limit=1000
-        )
-      )
-      if raw:
-        yield [FundingRate(rate=r['fundingRate'], time=r['fundingTime']) for r in raw]
-      return
-    for window_start, window_end in windows(start, end, FUNDING_RATES_WINDOW):
-      raw = await self.call_binance(
-        lambda: self.client.usdm_futures.http.market.funding_rate(
-          symbol=self.symbol,
-          start_time=window_start,
-          end_time=window_end,
-          limit=1000,
-        )
-      )
-      if raw:
-        yield [FundingRate(rate=r['fundingRate'], time=r['fundingTime']) for r in raw]
+    paging = self.client.usdm_futures.http.market.funding_rate_paged(
+      self.symbol, start_time=start, end_time=end, limit=1000
+    ).via(self.call_binance)
+    async for rows in paging:
+      yield [FundingRate(rate=r['fundingRate'], time=r['fundingTime']) for r in rows]
 
   async def rules(self, *, refetch: bool = False) -> Rules:
     raise futures_permission_error('rules', self.id)

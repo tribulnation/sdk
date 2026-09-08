@@ -124,8 +124,8 @@ async def easy_onchain_instruments(
         asset=p['coin'],
         # `estimateApr` is percent-formatted, e.g. "2.12%", like the fixed-saving APYs.
         apr=Decimal(p['estimateApr'].rstrip('%')) / 100,
-        min_qty=Decimal(p['minStakeAmount']),
-        max_qty=Decimal(p['maxStakeAmount']),
+        min_qty=p['minStakeAmount'],
+        max_qty=p['maxStakeAmount'],
         duration=timedelta(days=term) if term else None,
         id=p['productId'],
       )

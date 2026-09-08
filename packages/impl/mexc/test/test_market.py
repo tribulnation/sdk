@@ -1,9 +1,9 @@
 """Deterministic MEXC market implementation tests."""
 
-from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
+from types import TracebackType
 from typing_extensions import AsyncIterable
 import asyncio
 
@@ -102,10 +102,17 @@ class FakeMarketApi:
 
 
 @dataclass
-class FakeSpot:
-  """Fake typed-client spot namespace."""
+class FakeHttp:
+  """Fake typed-client spot REST namespace."""
 
   market: FakeMarketApi
+
+
+@dataclass
+class FakeSpot:
+  """Fake typed-client spot namespace, shaped like typed-mexc 3.0's `spot.http.market`."""
+
+  http: FakeHttp
 
 
 @dataclass
@@ -120,7 +127,12 @@ class FakeClient:
     self.entered += 1
     return self
 
-  async def __aexit__(self, exc_type, exc_value, traceback):
+  async def __aexit__(
+    self,
+    exc_type: type[BaseException] | None,
+    exc_value: BaseException | None,
+    traceback: TracebackType | None,
+  ):
     self.exited += 1
 
 
@@ -133,7 +145,7 @@ def depth_subscription(
   async def subscribe():
     return reconstruct_books(client, symbol, source), source.unsubscribe  # pyright: ignore[reportArgumentType]
 
-  return Subscription.of(subscribe)
+  return Subscription[Book].of(subscribe)
 
 
 async def next_book(stream: AsyncIterable[Book]) -> Book:
@@ -177,7 +189,9 @@ async def test_mexc_depth_stream_recovers_after_version_gap() -> None:
       snapshot(14, bids=[('98', '2')], asks=[('103', '5')]),
     ]
   )
-  sub = depth_subscription(FakeClient(spot=FakeSpot(market_api)), 'BTCUSDT', source)
+  sub = depth_subscription(
+    FakeClient(spot=FakeSpot(FakeHttp(market_api))), 'BTCUSDT', source
+  )
 
   async with sub.subscribe(queue_size=1000, overflow='fail') as stream:
     await source.send(depth_msg(11, 11, bids=[('100', '3')]))
@@ -200,7 +214,9 @@ async def test_mexc_depth_stream_unsubscribe_closes_source() -> None:
       snapshot(11, bids=[('100', '3')], asks=[('101', '1')]),
     ]
   )
-  sub = depth_subscription(FakeClient(spot=FakeSpot(market_api)), 'BTCUSDT', source)
+  sub = depth_subscription(
+    FakeClient(spot=FakeSpot(FakeHttp(market_api))), 'BTCUSDT', source
+  )
 
   async with sub.subscribe(queue_size=1, overflow='latest') as stream:
     await source.send(depth_msg(11, 11, bids=[('100', '3')]))

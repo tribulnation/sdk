@@ -5,22 +5,32 @@ from datetime import datetime, timezone
 from decimal import Decimal
 
 from tribulnation.bybit.market.impl import parse_execution
+from typed_bybit.private.execution import ExecutionUpdate
 from typed_bybit.trade.trade_history import Execution
+
+ROW: dict[str, Any] = {
+  'execId': '1',
+  'execQty': Decimal('200'),
+  'execPrice': Decimal('0.9997'),
+  'execTime': datetime(2025, 7, 23, 17, 42, 37, tzinfo=timezone.utc),
+  'side': 'Buy',
+  'isMaker': True,
+  'execFee': Decimal(0),
+  'feeCurrency': 'USDC',
+}
+"""One spot fill, with only the fields the mapping reads."""
 
 
 def execution(**overrides: Any) -> Execution:
-  """One spot fill, with only the fields the mapping reads."""
-  row: dict[str, Any] = {
-    'execId': '1',
-    'execQty': Decimal('200'),
-    'execPrice': Decimal('0.9997'),
-    'execTime': datetime(2025, 7, 23, 17, 42, 37, tzinfo=timezone.utc),
-    'side': 'Buy',
-    'isMaker': True,
-    'execFee': Decimal(0),
-    'feeCurrency': 'USDC',
-  }
-  return cast(Execution, {**row, **overrides})
+  """That fill as the REST endpoint reports it."""
+  return cast(Execution, {**ROW, **overrides})
+
+
+def execution_update(**overrides: Any) -> ExecutionUpdate:
+  """That fill as the private `execution` stream pushes it."""
+  return cast(
+    ExecutionUpdate, {**ROW, 'category': 'spot', 'symbol': 'BTCUSDC', **overrides}
+  )
 
 
 def test_a_zero_execution_fee_is_reported_not_dropped():
@@ -34,3 +44,17 @@ def test_a_zero_execution_fee_is_reported_not_dropped():
   assert trade.fee is not None
   assert trade.fee.amount == Decimal(0)
   assert trade.fee.asset == 'USDC'
+
+
+def test_a_streamed_fill_maps_the_same_as_its_rest_twin():
+  """One mapping serves both shapes only while they agree field for field.
+
+  The stream once sent its sizes and fees as unparsed strings, which needed a second
+  mapping; should they diverge again, the sizes come back multiplied by nothing and
+  the difference is invisible until a number is wrong downstream.
+  """
+  rest = parse_execution(execution())
+  streamed = parse_execution(execution_update())
+  assert (streamed.id, streamed.price, streamed.qty) == (rest.id, rest.price, rest.qty)
+  assert (streamed.time, streamed.maker) == (rest.time, rest.maker)
+  assert streamed.fee == rest.fee

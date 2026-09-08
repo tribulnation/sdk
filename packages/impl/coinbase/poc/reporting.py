@@ -129,30 +129,20 @@ async def fills_as_trades(start: datetime, end: datetime) -> dict[str, SpotTrade
     limit=250,
   )
   for fill in fills['fills']:
-    product_id = fill.get('product_id')
-    order_id = fill.get('order_id')
-    if not product_id or not order_id:
-      continue
+    product_id = fill['product_id']
     base, _, quote = product_id.partition('-')
-    size_raw = fill.get('size')
-    size = Decimal(size_raw) if size_raw else None
-    if size is not None and fill.get('side') == 'SELL':
-      size = -size
-    commission = fill.get('commission')
-    fee = None
-    if commission and Decimal(commission) != 0:
-      fee = Fee(amount=Decimal(commission), asset=quote)
-    price = fill.get('price')
-    out[order_id] = SpotTrade(
-      id=fill.get('trade_id'),
-      time=fill.get('trade_time'),
+    size = -fill['size'] if fill['side'] == 'SELL' else fill['size']
+    commission = fill['commission']
+    out[fill['order_id']] = SpotTrade(
+      id=fill['trade_id'],
+      time=fill['trade_time'],
       base=base,
       quote=quote,
       pair=product_id,
       size=size,
-      price=Decimal(price) if price else None,
-      order_id=order_id,
-      fee=fee,
+      price=fill['price'],
+      order_id=fill['order_id'],
+      fee=Fee(amount=commission, asset=quote) if commission else None,
     )
   return out
 

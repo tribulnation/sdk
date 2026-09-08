@@ -237,3 +237,23 @@ async def test_upstream_failure_releases_registry_so_resubscribe_does_not_collid
   # fresh subscription instead of hitting "already subscribed".
   stream_b = await sub.subscribe().__aenter__()
   assert (await stream_b.__aiter__().__anext__()) == 1
+
+
+async def test_subscribe_does_not_swallow_the_body_exception_after_the_pump_dies():
+  """An error raised inside the `async with` survives the teardown that follows it.
+
+  The pump releases `ctx`/`pump` when the upstream ends on its own, which used to send
+  `subscribe`'s `finally` down a `return` branch. A `return` inside `finally` discards the
+  in-flight exception, and in an `@asynccontextmanager` that reads as "handled", so the
+  caller's own error vanished and surfaced later as an unrelated `UnboundLocalError`.
+  """
+  sub = Subscription(make_ctx_factory([1]))
+
+  with pytest.raises(RuntimeError, match='raised by the body'):
+    async with sub.subscribe() as stream:
+      async for _ in stream:
+        break
+      # Let the pump finish and release the upstream before we raise.
+      await asyncio.sleep(0)
+      await asyncio.sleep(0)
+      raise RuntimeError('raised by the body')

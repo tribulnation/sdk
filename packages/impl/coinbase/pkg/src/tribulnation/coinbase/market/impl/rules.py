@@ -18,7 +18,9 @@ def base_asset(product: Product) -> str:
   """
   if product['base_display_symbol']:
     return product['base_display_symbol']
-  details = product.get('future_product_details') or {}
+  details = product.get('future_product_details')
+  if details is None:
+    return ''
   return details.get('contract_code') or ''
 
 

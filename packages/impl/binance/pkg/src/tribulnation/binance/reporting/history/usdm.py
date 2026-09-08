@@ -3,7 +3,6 @@
 from typing_extensions import AsyncIterator, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from decimal import Decimal
 
 from tribulnation.sdk.core import SDK
 from tribulnation.sdk.reporting import (
@@ -46,28 +45,28 @@ BONUS_TYPES = (
 """Income types that are promotional credits or rebates rather than trading flows."""
 
 
-def parse_income(row: UsdMFuturesIncome) -> Observation | None:
+def parse_income(row: UsdMFuturesIncome) -> Observation:
   """Map one `fapi/v1/income` row onto the observation it carries.
 
   Every income type Binance can send is accounted for: the ones with a definite economic
   shape get their own observation, and the rest become an `UnknownObservation` rather
-  than being dropped.
+  than being dropped. `symbol` and `tradeId` are `''` rather than absent on account-level
+  income, so both are read as "empty means none".
   """
-  asset = row.get('asset')
-  income = row.get('income')
-  if asset is None or income is None:
-    return None
-  id = str(tran_id) if (tran_id := row.get('tranId')) is not None else None
-  time = row.get('time')
-  amount = Decimal(income)
-  type = row.get('incomeType')
+  id = str(row['tranId'])
+  time = row['time']
+  asset = row['asset']
+  amount = row['income']
+  symbol = row['symbol'] or None
+  trade_id = row['tradeId'] or None
+  type = row['incomeType']
   if type == 'FUNDING_FEE':
     return Funding(
       id=id,
       time=time,
       asset=asset,
       amount=amount,
-      instrument=row.get('symbol'),
+      instrument=symbol,
       subaccount=SUBACCOUNT,
     )
   if type == 'REALIZED_PNL':
@@ -76,8 +75,8 @@ def parse_income(row: UsdMFuturesIncome) -> Observation | None:
       time=time,
       asset=asset,
       amount=amount,
-      instrument=row.get('symbol'),
-      trade_id=row.get('tradeId'),
+      instrument=symbol,
+      trade_id=trade_id,
       subaccount=SUBACCOUNT,
     )
   if type == 'COMMISSION':
@@ -87,7 +86,7 @@ def parse_income(row: UsdMFuturesIncome) -> Observation | None:
       asset=asset,
       amount=amount,
       event_type='future_trade',
-      event_id=row.get('tradeId'),
+      event_id=trade_id,
       subaccount=SUBACCOUNT,
     )
   if type in ('TRANSFER', 'INTERNAL_TRANSFER'):
@@ -152,29 +151,19 @@ class UsdmHistory(SdkMixin):
           )
         )
         for fill in fills:
-          trade_id = fill.get('id')
-          price = fill.get('price')
-          qty = fill.get('qty')
-          if trade_id is None or price is None or qty is None:
-            continue
-          size = Decimal(qty)
-          realized_pnl = fill.get('realizedPnl')
-          order_id = fill.get('orderId')
-          commission = fill.get('commission')
-          commission_asset = fill.get('commissionAsset')
+          size = fill['qty']
           yield record(
             FutureTrade(
-              id=str(trade_id),
-              time=fill.get('time'),
-              instrument=fill.get('symbol') or symbol,
+              id=str(fill['id']),
+              time=fill['time'],
+              instrument=fill['symbol'],
+              # COIN-M's settlement asset, absent from the USD-M response.
               settle=fill.get('marginAsset'),
-              size=size if fill.get('side') == 'BUY' else -size,
-              price=Decimal(price),
-              realized_pnl=Decimal(realized_pnl) if realized_pnl is not None else None,
-              order_id=str(order_id) if order_id is not None else None,
-              fee=nonzero_fee(Decimal(commission), commission_asset)
-              if commission is not None and commission_asset is not None
-              else None,
+              size=size if fill['side'] == 'BUY' else -size,
+              price=fill['price'],
+              realized_pnl=fill['realizedPnl'],
+              order_id=str(fill['orderId']),
+              fee=nonzero_fee(fill['commission'], fill['commissionAsset']),
               subaccount=SUBACCOUNT,
             ),
             id=id,
@@ -190,19 +179,11 @@ class UsdmHistory(SdkMixin):
     promotional credit, for all symbols at once.
     """
     for window_start, window_end in windows(start, end, INCOME_WINDOW):
-      page = 1
-      while True:
-        rows = await self.call_binance(
-          lambda: self.client.usdm_futures.http.account.income(
-            start_time=window_start,
-            end_time=window_end,
-            page=page,
-            limit=PAGE_SIZE,
-          )
-        )
+      paging = self.client.usdm_futures.http.account.income_paged(
+        start_time=window_start,
+        end_time=window_end,
+        limit=PAGE_SIZE,
+      ).via(self.call_binance)
+      async for rows in paging:
         for row in rows:
-          if (observation := parse_income(row)) is not None:
-            yield record(observation, id=id)
-        if len(rows) < PAGE_SIZE:
-          break
-        page += 1
+          yield record(parse_income(row), id=id)

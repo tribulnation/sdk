@@ -38,6 +38,9 @@ class DepositMethods(Mixin, _DepositMethods):
       for chain in row['chains']:
         if chain['chainDeposit'] != '1':
           continue
+        # `confirmation` is declared `int`, but 15 of the 793 coins send `''` on a
+        # chain with deposits disabled, which fails validation before this runs. The
+        # guard is what will keep working once the client admits that sentinel.
         confirmations = chain['confirmation']
         out.append(
           DepositMethod(

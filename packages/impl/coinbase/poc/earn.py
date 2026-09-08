@@ -1,5 +1,4 @@
 # %%
-from decimal import Decimal
 from typing_extensions import Collection
 
 from typed_coinbase import Coinbase
@@ -160,11 +159,11 @@ async def instruments(
     currency = account['currency']
     rewards = currency.get('rewards')
     code = currency['code']
-    if not rewards or 'apy' not in rewards or code in seen:
+    if not rewards or code in seen:
       continue
     seen.add(code)
     out.append(
-      Instrument(tags=['staking', 'flexible'], asset=code, apr=Decimal(rewards['apy']))
+      Instrument(tags=['staking', 'flexible'], asset=code, apr=rewards['apy'])
     )
 
   # `GET /wrapped-assets` omits the per-asset detail the single-asset route carries, so
@@ -174,6 +173,8 @@ async def instruments(
   wrapped = await client.exchange.http.wrapped_assets.list()
   for entry in wrapped['wrapped_assets']:
     detail = await client.exchange.http.wrapped_assets.get(entry['id'])
+    # `apy` and `redeem_time_estimate_days` are `Literal[''] | Decimal`: the list route
+    # blanks both, the single-asset route fills them in.
     apy = detail['apy']
     if not apy or detail['id'] in seen:
       continue
@@ -182,7 +183,7 @@ async def instruments(
       Instrument(
         tags=['staking', 'flexible'],
         asset=detail['id'],
-        apr=Decimal(apy),
+        apr=apy,
         id=detail['id'],
       )
     )

@@ -73,7 +73,7 @@ async def trades_history(
     rows = page.get('data', [])
     yield [parse_trade(row) for row in rows]
     offset += len(rows)
-    if not rows or offset >= int(page.get('total') or 0):
+    if not rows or offset >= (page.get('total') or 0):
       return
 
 

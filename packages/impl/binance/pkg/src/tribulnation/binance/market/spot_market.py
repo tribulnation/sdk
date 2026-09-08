@@ -145,6 +145,8 @@ class SpotMarket(SharedMixin, Market):
     raw = await self.client.spot.http.account.open_orders(symbol=self.symbol)
     out: list[OrderState] = []
     for o in raw:
+      # `account.open_orders` still declares its decimal strings as bare `str`, unlike
+      # the fill and balance endpoints, so these three stay wrapped.
       orig_qty = Decimal(o['origQty'])
       executed_qty = Decimal(o['executedQty'])
       sign = 1 if o['side'] == 'BUY' else -1

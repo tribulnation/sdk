@@ -19,16 +19,11 @@ def _parse_trade(t: AccountTrade) -> Trade:
   fee = None
   if (a := t.get('commissionAsset')) and (c := t.get('commission')):
     fee = Trade.Fee(asset=a, amount=Decimal(c))
-  time = t.get('time')
-  if time is None:
-    raise ValueError('Missing trade time')
   return Trade(
     id=str(t.get('id')),
     price=Decimal(t.get('price') or '0'),
     qty=Decimal(t.get('qty') or '0') * sign,
-    time=time.astimezone()
-    if isinstance(time, datetime)
-    else ts.parse(time).astimezone(),
+    time=t['time'].astimezone(),
     maker=bool(t.get('isMaker')),
     fee=fee,
     details=t,

@@ -61,12 +61,16 @@ class SpotExchange(VenueMixin, Exchange):
     wanted = None if markets is None else set(markets)
     return {
       t['symbol']: Ticker(
-        last=num(t['lastPrice']),
+        last=t['lastPrice'],
+        # Both sides of the quote are `''` on a pair with nothing resting on that
+        # side -- 2 pairs with no bid and 3 with no ask, of 538 (2026-09-07). The
+        # client declares the sentinel on the bid half only, so the ask reads go
+        # through `num()` too rather than assume a number that isn't always there.
         bid=num(t['bid1Price']),
         ask=num(t['ask1Price']),
         bid_qty=num(t['bid1Size']),
         ask_qty=num(t['ask1Size']),
-        base_volume_24h=num(t['volume24h']),
+        base_volume_24h=t['volume24h'],
       )
       for t in tickers['list']
       if wanted is None or t['symbol'] in wanted

@@ -83,9 +83,7 @@ class WithdrawalMethods(_WithdrawalMethods, Networks):
       quoted = (proforma.get('fee') or {}).get('network')
       if quoted is None:
         return None
-      return WithdrawalMethod.Fee(
-        asset=quoted['currency'], amount=Decimal(str(quoted['amount']))
-      )
+      return WithdrawalMethod.Fee(asset=quoted['currency'], amount=quoted['amount'])
     except AuthError:
       # Caught before `ApiError`, which it subclasses. A 403 here means this key
       # reads both catalogues fine but lacks the wallet-withdrawal permission the

@@ -12,14 +12,16 @@ from typed_bit2me.trading_ws.order_book import OrderBookUpdate
 if TYPE_CHECKING:
   from .mixin import MarketMixin
 
-Level = tuple[float, float] | tuple[float, float, float]
 
-
-def parse_levels(rows: Sequence[Level]) -> list[Book.Entry]:
+def parse_levels(
+  rows: Sequence[tuple[float, float] | tuple[float, float, float]],
+) -> list[Book.Entry]:
   """Read `[price, amount]` levels, by index.
 
-  Most markets send two-element rows, but the thin and stablecoin pairs send
-  `[price, amount, notional]` triples, so unpacking would fail on those.
+  A row is `[price, amount]` or `[price, amount, notional]`, and which one is not a
+  property of the market: the same symbol can serve triples over REST while pushing
+  pairs over the socket. Reading the first two by index covers both shapes; narrowing
+  on the symbol would not.
   """
   return [
     Book.Entry(price=Decimal(str(row[0])), qty=Decimal(str(row[1]))) for row in rows

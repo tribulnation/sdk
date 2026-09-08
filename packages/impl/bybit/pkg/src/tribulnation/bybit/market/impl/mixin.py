@@ -35,7 +35,7 @@ DEFAULT_DEPTH: Depth = 50
 """Depth the shared order book subscription runs at."""
 
 INSTRUMENTS_PAGE = 1000
-"""Rows per `market.instruments` page; Bybit's documented maximum."""
+"""Rows per `market.instruments_paged` page; Bybit's documented maximum."""
 
 T = TypeVar('T')
 
@@ -61,10 +61,12 @@ async def merged_books(
   """Fold Bybit's snapshot-then-deltas order book pushes into whole books.
 
   Bybit pushes one full snapshot on subscribe and then only the changed levels, with
-  a zero size meaning the level was removed -- `Book.update`'s exact contract. The
-  push carries no snapshot/delta discriminator of its own (the client drops the
-  frame's `type`), so a re-snapshot is recognised by Bybit's documented `u == 1`
-  marker, which it sends when the feed restarts mid-subscription.
+  a zero size meaning the level was removed -- `Book.update`'s exact contract. A
+  re-snapshot mid-subscription is recognised by the push's own `type`, which the
+  client's core forwards from the frame onto the payload. It is declared
+  `NotRequired` only because the spec's replay gate cannot see a field the transport
+  merges in; a push arriving without one falls back to Bybit's documented `u == 1`
+  marker.
 
   Each yielded book is a copy, so a book already handed to a subscriber is never
   mutated by a later push.
@@ -72,7 +74,9 @@ async def merged_books(
   book = Book()
   async for update in updates:
     delta = parse_book(update['b'], update['a'])
-    if update['u'] == 1:
+    kind = update.get('type')
+    snapshot = kind == 'snapshot' if kind is not None else update['u'] == 1
+    if snapshot:
       book = delta
     else:
       book.update(delta)
@@ -149,25 +153,21 @@ class VenueMixin(Mixin):
     async with self.cache.perp_lock:
       if self.cache.perp and not refetch:
         return self.cache.perp
+      paging = self.client.market.instruments_paged(
+        'linear', limit=INSTRUMENTS_PAGE, validate=self.validate
+      )
       instruments: dict[str, ContractInstrument] = {}
-      cursor: str | None = None
-      while True:
-        info = await self.call_bybit(
-          lambda: self.client.market.instruments(
-            'linear', limit=INSTRUMENTS_PAGE, cursor=cursor, validate=self.validate
-          )
-        )
-        assert info['category'] == 'linear'
+      # The pager's item type is the same undiscriminated three-way union the unpaged
+      # call returns; `contractType` is required on the contract shape and absent from
+      # the other two, which is what narrows a row to it.
+      async for rows in paging.via(self.call_bybit):
         instruments.update(
           {
             i['symbol']: i
-            for i in info['list']
-            if i['contractType'] == 'LinearPerpetual'
+            for i in rows
+            if 'contractType' in i and i['contractType'] == 'LinearPerpetual'
           }
         )
-        cursor = info['nextPageCursor']
-        if not cursor:
-          break
       self.cache.perp = instruments
       return self.cache.perp
 

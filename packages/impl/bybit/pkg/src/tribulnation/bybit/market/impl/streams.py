@@ -7,7 +7,7 @@ from tribulnation.sdk.core import OverflowPolicy
 from tribulnation.sdk.market import Book, Trade
 
 from .mixin import MarketMixin
-from .parse import parse_execution_update
+from .parse import parse_execution
 
 
 @asynccontextmanager
@@ -51,6 +51,6 @@ async def trades_stream(
           and execution['symbol'] == self.symbol
           and execution['execType'] == 'Trade'
         ):
-          yield parse_execution_update(execution)
+          yield parse_execution(execution)
 
     yield trades()

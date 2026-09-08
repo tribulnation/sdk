@@ -258,12 +258,19 @@ class Subscription(Generic[T]):
     finally:
       self._discard(inbox)
       async with self.lock:
-        if self.subscribers or self.pump is None or self.ctx is None:
-          return
-        pump, ctx = self.pump, self.ctx
-        self.pump = self.ctx = None
-      pump.cancel()
-      with suppress(asyncio.CancelledError):
-        await pump
-      with suppress(Exception):
-        await ctx.unsubscribe()
+        # Nothing to tear down when someone else is still subscribed, or when the pump
+        # already released the upstream on its way out. Never `return` from here: a
+        # `return` inside `finally` discards the exception the body raised, which in an
+        # `@asynccontextmanager` makes `__aexit__` report it as handled and swallows it.
+        last_out = (
+          not self.subscribers and self.pump is not None and self.ctx is not None
+        )
+        pump, ctx = (self.pump, self.ctx) if last_out else (None, None)
+        if last_out:
+          self.pump = self.ctx = None
+      if pump is not None and ctx is not None:
+        pump.cancel()
+        with suppress(asyncio.CancelledError):
+          await pump
+        with suppress(Exception):
+          await ctx.unsubscribe()

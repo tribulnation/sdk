@@ -68,19 +68,31 @@ async def depth(symbol: str, *, levels: int | None = None) -> Book:
 def depth_stream(symbol: str, *, depth: Literal[1, 50, 200] = 50):
   # Bybit's WS orderbook channel pushes one full snapshot on subscribe, then
   # incremental deltas: only the changed price levels, with qty "0" meaning the
-  # level was removed. Merge every push into a running `Book` via `Book.update`
-  # (adds/replaces changed levels, drops zero-qty ones) instead of treating each
-  # push as if it were a complete book -- a delta only has a handful of levels,
-  # not the full depth. `.copy()` each yielded book so earlier snapshots handed to
-  # callers aren't mutated by later pushes into the same running `book`.
+  # level was removed. Merge a delta into a running `Book` via `Book.update`
+  # (adds/replaces changed levels, drops zero-qty ones) instead of treating it as
+  # if it were a complete book -- a delta only has a handful of levels, not the
+  # full depth -- and replace the running book outright on a snapshot, which Bybit
+  # re-sends mid-subscription when the feed restarts. `.copy()` each yielded book
+  # so earlier snapshots handed to callers aren't mutated by later pushes into the
+  # same running `book`.
   book = Book()
 
   def to_book(update: OrderbookUpdate) -> Book:
+    nonlocal book
     delta = Book(
       bids=[Book.Entry(p, q) for p, q in update['b']],
       asks=[Book.Entry(p, q) for p, q in update['a']],
     )
-    book.update(delta)
+    # The push's own `type` tells the two apart: the client's core forwards it from
+    # the frame onto the payload. It is declared `NotRequired` only because the
+    # spec's replay gate cannot see a field the transport merges in, so fall back to
+    # Bybit's documented `u == 1` marker if a push ever arrives without it.
+    kind = update.get('type')
+    snapshot = kind == 'snapshot' if kind is not None else update['u'] == 1
+    if snapshot:
+      book = delta
+    else:
+      book.update(delta)
     return book.copy()
 
   return client.spot.orderbook(depth, symbol=symbol).map(to_book)
@@ -195,18 +207,18 @@ def trades_stream(symbol: str, *, category: str = 'spot'):
     for e in execs:
       if e['category'] != category or e['symbol'] != symbol or e['execType'] != 'Trade':
         continue
-      qty = Decimal(e['execQty'])
+      qty = e['execQty']
       out.append(
         Trade(
           id=e['execId'],
-          price=Decimal(e['execPrice']),
+          price=e['execPrice'],
           qty=qty if e['side'] == 'Buy' else -qty,
           time=e['execTime'],
           maker=e['isMaker'],
-          # `execFee` is required here too, and arrives as an unparsed `str` on the WS
-          # channel rather than the REST endpoint's `Decimal` -- see `trades_history`
-          # above for why a zero fee must not collapse to `None`.
-          fee=Trade.Fee(amount=Decimal(e['execFee']), asset=e['feeCurrency']),
+          # The stream's numeric fields match the REST `Execution` field for field,
+          # parsed `Decimal`s included -- see `trades_history` above for why a zero
+          # fee must not collapse to `None`.
+          fee=Trade.Fee(amount=e['execFee'], asset=e['feeCurrency']),
           details=e,
         )
       )
@@ -337,15 +349,26 @@ async def depth(symbol: str, *, levels: int | None = None) -> Book:
 # %%
 def depth_stream(symbol: str, *, depth: Literal[1, 50, 200, 1000] = 50):
   # Same snapshot-then-deltas merge as the spot `depth_stream` above -- see its
-  # comment for why treating every push as a full book is wrong.
+  # comment for why treating a delta as a full book is wrong, and where the
+  # snapshot/delta discriminator comes from.
   book = Book()
 
   def to_book(update: LinearOrderbookUpdate) -> Book:
+    nonlocal book
     delta = Book(
       bids=[Book.Entry(p, q) for p, q in update['b']],
       asks=[Book.Entry(p, q) for p, q in update['a']],
     )
-    book.update(delta)
+    # The push's own `type` tells the two apart: the client's core forwards it from
+    # the frame onto the payload. It is declared `NotRequired` only because the
+    # spec's replay gate cannot see a field the transport merges in, so fall back to
+    # Bybit's documented `u == 1` marker if a push ever arrives without it.
+    kind = update.get('type')
+    snapshot = kind == 'snapshot' if kind is not None else update['u'] == 1
+    if snapshot:
+      book = delta
+    else:
+      book.update(delta)
     return book.copy()
 
   return client.linear.orderbook(depth, symbol=symbol).map(to_book)
@@ -553,10 +576,10 @@ async def perp_position(symbol: str) -> PerpPosition:
   # numeric field an empty string.
   if row is None or not row['side']:
     return PerpPosition()
-  size = Decimal(row['size'])
+  size = row['size']
   return PerpPosition(
     size=size if row['side'] == 'Buy' else -size,
-    entry_price=Decimal(row['avgPrice']) if row['avgPrice'] else Decimal(0),
+    entry_price=row['avgPrice'] if row['avgPrice'] != '' else Decimal(0),
   )
 
 

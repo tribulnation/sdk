@@ -79,12 +79,12 @@ class PerpExchange(VenueMixin, _PerpExchange):
     )
     return {
       t['symbol']: Ticker(
-        last=num(t['lastPrice']),
-        bid=num(t['bid1Price']),
-        ask=num(t['ask1Price']),
-        bid_qty=num(t['bid1Size']),
-        ask_qty=num(t['ask1Size']),
-        base_volume_24h=num(t['volume24h']),
+        last=t['lastPrice'],
+        bid=t['bid1Price'],
+        ask=t['ask1Price'],
+        bid_qty=t['bid1Size'],
+        ask_qty=t['ask1Size'],
+        base_volume_24h=t['volume24h'],
       )
       for t in rows
       if t['symbol'] in wanted
@@ -116,11 +116,12 @@ class PerpExchange(VenueMixin, _PerpExchange):
       next_funding_time = t['nextFundingTime']
       stats[symbol] = PerpStats(
         index=t['indexPrice'],
-        mark=num(t['markPrice']),
+        mark=t['markPrice'],
+        # Only a dated future reports `fundingRate=''`, and `markets()` lists none.
         funding=num(t['fundingRate']),
         next_funding_time=None if next_funding_time == '0' else next_funding_time,
         funding_interval=timedelta(minutes=instruments[symbol]['fundingInterval']),
-        open_interest=num(t['openInterest']),
+        open_interest=t['openInterest'],
       )
     return stats
 

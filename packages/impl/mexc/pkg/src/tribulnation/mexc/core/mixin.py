@@ -19,15 +19,15 @@ class Settings(TypedDict, total=False):
 
 @dataclass
 class Cache:
-  spot_markets: dict[str, SpotInfo] = field(default_factory=dict)
-  perp_markets: dict[str, PerpInfo] = field(default_factory=dict)
+  spot_markets: dict[str, SpotInfo] = field(default_factory=dict[str, SpotInfo])
+  perp_markets: dict[str, PerpInfo] = field(default_factory=dict[str, PerpInfo])
 
 
 @dataclass(kw_only=True, frozen=True)
 class Mixin(SDK):
   client: MEXC
   settings: Settings = field(default_factory=Settings)
-  streams: dict[str, StreamManager]
+  streams: dict[str, StreamManager[Any]]
   cache: Cache = field(default_factory=Cache)
 
   @property

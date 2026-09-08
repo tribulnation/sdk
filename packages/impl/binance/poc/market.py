@@ -491,8 +491,10 @@ async def funding_rates(
   start: datetime | None = None,
   end: datetime | None = None,
 ) -> list[FundingRate]:
-  raw = await client.usdm_futures.http.market.funding_rate(
-    symbol=symbol, start_time=start, end_time=end
+  # `funding_rate_paged` walks `start_time` forward to each full page's latest
+  # settlement and stops on the first short page; awaiting it flattens the walk.
+  raw = await client.usdm_futures.http.market.funding_rate_paged(
+    symbol, start_time=start, end_time=end, limit=1000
   )
   return [FundingRate(rate=r['fundingRate'], time=r['fundingTime']) for r in raw]
 
