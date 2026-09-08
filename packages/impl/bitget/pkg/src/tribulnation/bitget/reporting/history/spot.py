@@ -38,15 +38,15 @@ class SpotHistory(TimezoneMixin, SdkHistory):
     """Fetch and cache Bitget spot symbol metadata."""
     if self.symbols_cache is None:
       self.symbols_cache = {
-        s['symbol']: s for s in await self.client.spot.public.symbols()
+        s['symbol']: s for s in await self.client.classic.spot.symbols()
       }
     return self.symbols_cache
 
   @SDK.method
   async def flows(self, start: datetime, end: datetime):
     """Fetch spot tax rows as unknown observations."""
-    async for chunk in self.client.common.tax.spot_transaction_records_paged(
-      start=start, end=end
+    async for chunk in self.client.classic.tax.spot_records_paged(
+      start_time=start, end_time=end
     ):
       for tx in chunk:
         observations: list[Observation] = [

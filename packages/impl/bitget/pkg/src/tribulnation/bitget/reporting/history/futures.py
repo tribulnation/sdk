@@ -36,7 +36,7 @@ class FuturesHistory(TimezoneMixin, SdkHistory):
   async def flows(self, start: datetime, end: datetime):
     """Fetch futures tax rows as unknown observations."""
     async for chunk in self.client.classic.tax.futures_records_paged(
-      start=start, end=end
+      start_time=start, end_time=end
     ):
       for tx in chunk:
         observations: list[Observation] = [

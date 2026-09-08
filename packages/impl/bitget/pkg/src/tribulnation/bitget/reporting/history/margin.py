@@ -36,7 +36,7 @@ class MarginHistory(TimezoneMixin, SdkHistory):
     """Fetch and cache Bitget spot symbol metadata."""
     if self.symbols_cache is None:
       self.symbols_cache = {
-        s['symbol']: s for s in await self.client.spot.public.symbols()
+        s['symbol']: s for s in await self.client.classic.spot.symbols()
       }
     return self.symbols_cache
 
@@ -45,8 +45,8 @@ class MarginHistory(TimezoneMixin, SdkHistory):
     self, margin_type: Literal['isolated', 'crossed'], start: datetime, end: datetime
   ):
     """Fetch margin tax rows as unknown observations."""
-    async for chunk in self.client.common.tax.margin_transaction_records_paged(
-      margin_type, start=start, end=end
+    async for chunk in self.client.classic.tax.margin_records_paged(
+      margin_type, start_time=start, end_time=end
     ):
       for tx in chunk:
         subaccount = f'{margin_type}_margin'
@@ -88,10 +88,10 @@ class MarginHistory(TimezoneMixin, SdkHistory):
     """Fetch margin fills for one symbol as trade observations."""
     symbols = await self.symbols
     if margin_type == 'isolated':
-      fn = self.client.margin.isolated.trade.fills_paged
+      fn = self.client.classic.margin.isolated.order.fills_paged
     else:
-      fn = self.client.margin.cross.trade.fills_paged
-    async for chunk in fn(symbol, start=start, end=end):
+      fn = self.client.classic.margin.cross.order.fills_paged
+    async for chunk in fn(symbol=symbol, start_time=start, end_time=end):
       for fill in chunk:
         subaccount = f'{margin_type}_margin'
         base = symbols[symbol]['baseCoin']

@@ -103,19 +103,19 @@ class Snapshots(SdkMixin, _Snapshots):
   @wrap_exceptions
   async def bot_balances(self, account_type: Literal['spot', 'futures']) -> Balances:
     out = Balances()
-    balances = await self.client.classic.common.assets.bot(account_type)
+    balances = await self.client.classic.common.bot_assets(account_type)
     for balance in balances:
-      if balance['equity']:
-        total = balance['equity']
+      if equity := Decimal(balance['equity']):
+        total = equity
       else:
-        total = balance['available'] + (balance['frozen'] or 0)
+        total = Decimal(balance['available']) + Decimal(balance['frozen'] or 0)
       out[balance['coin']] += total
     return out
 
   @SDK.method
   @wrap_exceptions
   async def funding_balances(self) -> Balances:
-    balances = await self.client.common.assets.funding()
+    balances = await self.client.classic.common.funding_assets()
     out = Balances()
     for balance in balances:
       out[balance['coin']] += balance['available'] + balance['frozen']
@@ -126,8 +126,8 @@ class Snapshots(SdkMixin, _Snapshots):
 
     if self.raise_if_copy:
       future_copy, spot_copy = await asyncio.gather(
-        self.client.copy.futures.follower.my_traders(),
-        self.client.copy.spot.follower.my_traders(),
+        self.client.classic.copytrading.mix.follower.traders(),
+        self.client.classic.copytrading.spot.follower.traders(),
       )
       spot_copy = spot_copy['resultList']
       if len(future_copy) > 0 or len(spot_copy) > 0:
