@@ -1,4 +1,4 @@
-from typing_extensions import Generic, TypeVar, AsyncIterable
+from typing_extensions import Any, AsyncIterable, Generic, TypeVar
 from dataclasses import dataclass, field
 from contextlib import asynccontextmanager
 import asyncio
@@ -8,7 +8,7 @@ T = TypeVar('T')
 
 @dataclass
 class StreamManager(Generic[T]):
-  listener: asyncio.Task
+  listener: asyncio.Task[None]
   subscribers: list[asyncio.Queue[T]]
 
   @classmethod
@@ -43,7 +43,7 @@ class StreamManager(Generic[T]):
 
 
 @asynccontextmanager
-async def closing_streams(streams: 'dict[str, StreamManager]'):
+async def closing_streams(streams: 'dict[str, StreamManager[Any]]'):
   """Close every stream open at exit time, whenever it was opened.
 
   `streams` is held by reference and only iterated on exit, so streams opened lazily

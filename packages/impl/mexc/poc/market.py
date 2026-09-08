@@ -426,12 +426,6 @@ perp_open_orders_result
 async def perp_trades_history(
   symbol: str, start: datetime, end: datetime
 ) -> list[Trade]:
-  raise NotImplementedError(
-    'blocked: typed_mexc declares OrderDeal with both isTaker and taker (requiredness '
-    'inverted between order_deals and deal_details) and timestamp as int | str, so '
-    'neither the maker flag nor the fill time can be read without guessing the wire '
-    'shape'
-  )
   raw = (
     await client.futures.http.trade.order_deals(
       symbol=symbol,
@@ -451,7 +445,7 @@ async def perp_trades_history(
         price=Decimal(str(d['price'])),
         qty=sign * vol,
         time=d['timestamp'],
-        maker=not d['isTaker'],
+        maker=not d['taker'],
         fee=Trade.Fee(amount=Decimal(str(d['fee'])), asset=d['feeCurrency'])
         if d['fee']
         else None,
@@ -461,11 +455,15 @@ async def perp_trades_history(
   return out
 
 
-# not executed: blocked by typed-mexc "OrderDeal declares two spellings of the taker flag" and
-# "Futures timestamps are declared int | str"; the API key also lacks futures read scope (703)
 end = datetime.now(timezone.utc)
 start = end - timedelta(hours=24)
-{symbol: await perp_trades_history(symbol, start, end) for symbol in MARKETS['perp']}
+try:
+  perp_trades_history_result = {
+    symbol: await perp_trades_history(symbol, start, end) for symbol in MARKETS['perp']
+  }
+except ApiError as e:
+  perp_trades_history_result = e
+perp_trades_history_result
 
 
 # %% [markdown]
@@ -784,18 +782,17 @@ await perp_cancel_order('123456')
 # connects and simply observes no fills in the window, mirroring spot's `trades_stream`
 # above. `place_order`/`cancel_order` are written but never executed.
 #
-# Two methods are not mapped:
-# 1. `perp_trades_history` is **blocked** on typed-mexc "OrderDeal declares two spellings
-#    of the taker flag" and "Futures timestamps are declared `int | str`": `order_deals`
-#    requires `isTaker` and makes `taker` optional while `deal_details` does the opposite,
-#    and `timestamp` is `int | str`, so the maker flag and fill time cannot be read without
-#    guessing the wire shape. Its body raises `NotImplementedError` until the client
-#    settles both; the API key's missing futures read scope (`703`) would block a live
-#    check anyway.
-# 2. `perp_collateral` is **not supported**: MEXC reports no maintenance-margin figure
-#    (neither `futures.http.account.assets` nor `futures.http.position.open` carries one),
-#    and `PerpCollateral.maintenance_margin` is required. `position.leverage` exposes the
-#    account's current `mmr`, but a figure computed from it would be derived, not read.
+# `perp_trades_history` was blocked on typed-mexc's two `OrderDeal` declarations (the
+# taker flag under two spellings, `timestamp` as `int | str`). typed-mexc 3.0 settles both
+# -- `taker` is required and `timestamp` is an epoch-millis `datetime` -- so the mapping is
+# written and runs; it returns the same `703` as the other account-scoped futures reads, so
+# its rows stay unverified rather than blocked.
+#
+# One method is not mapped: `perp_collateral` is **not supported**, because MEXC reports no
+# maintenance-margin figure (neither `futures.http.account.assets` nor
+# `futures.http.position.open` carries one) and `PerpCollateral.maintenance_margin` is
+# required. `position.leverage` exposes the account's current `mmr`, but a figure computed
+# from it would be derived, not read.
 #
 # One unverified assumption remains: `funding_payments`' sign (`positive = paid`) is
 # asserted by symmetry with `typed_binance`'s equivalent `income` field, not confirmed

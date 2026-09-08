@@ -1,5 +1,6 @@
 from typing_extensions import Any, AsyncContextManager, Iterable, TypedDict
 from dataclasses import dataclass, field
+from types import TracebackType
 import asyncio
 
 from tribulnation.sdk.core import SDK, Subscription, OverflowPolicy
@@ -26,7 +27,9 @@ class Shared:
 
   spot_markets: dict[str, SpotInfo] | None = None
   my_trades_subscription: Subscription[PrivateDealsV3Api] | None = None
-  depth_subscriptions: dict[str, Subscription[Book]] = field(default_factory=dict)
+  depth_subscriptions: dict[str, Subscription[Book]] = field(
+    default_factory=dict[str, Subscription[Book]]
+  )
 
   _markets_lock: asyncio.Lock = field(
     default_factory=asyncio.Lock, init=False, repr=False
@@ -58,7 +61,12 @@ class Shared:
     return self
 
   @wrap_exceptions
-  async def __aexit__(self, exc_type, exc_value, traceback):
+  async def __aexit__(
+    self,
+    exc_type: type[BaseException] | None,
+    exc_value: BaseException | None,
+    traceback: TracebackType | None,
+  ):
     # We intentionally don't enter/exit the typed client's WS contexts here.
     # WS connections are opened lazily when the specific stream subscriptions are used.
     return None
