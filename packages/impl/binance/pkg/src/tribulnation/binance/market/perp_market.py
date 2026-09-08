@@ -14,6 +14,8 @@ from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
   PerpMarket as _PerpMarket,
   Book,
+  Candle,
+  CandleInterval,
   FundingPayment,
   FundingRate,
   NextFunding,
@@ -174,6 +176,18 @@ class PerpMarket(SharedMixin, _PerpMarket):
     ).via(self.call_binance)
     async for rows in paging:
       yield [FundingRate(rate=r['fundingRate'], time=r['fundingTime']) for r in rows]
+
+  def candles(
+    self,
+    interval: CandleInterval,
+    start: datetime | None = None,
+    end: datetime | None = None,
+  ) -> PaginatedResponse[Candle]:
+    raise NotImplementedError(
+      f'candles is not implemented for this market [{self.id}]: typed_binance '
+      'declares no paged walk for `usdm_futures.http.market.klines` and types its '
+      'open time as a bare int, so the series cannot be swept through the client.'
+    )
 
   async def rules(self, *, refetch: bool = False) -> Rules:
     raise futures_permission_error('rules', self.id)

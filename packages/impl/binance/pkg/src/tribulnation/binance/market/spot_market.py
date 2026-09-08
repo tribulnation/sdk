@@ -16,6 +16,8 @@ from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
   Market,
   Book,
+  Candle,
+  CandleInterval,
   Collateral,
   Order,
   OrderResponse,
@@ -35,6 +37,12 @@ from .impl import SharedMixin, wrap_exceptions, not_implemented
 
 TRADES_WINDOW = timedelta(hours=24)
 """`myTrades` refuses a window wider than 24h."""
+
+CANDLES_PAGE = 1000
+"""Rows per `klines` page; Binance's documented maximum."""
+
+CANDLE_INTERVALS = frozenset[CandleInterval]({'1m', '5m', '15m', '1h', '4h', '1d'})
+"""Every contract interval is a Binance `klines` interval under the same name."""
 
 
 def stream_levels(levels: int | None) -> Literal[5, 10, 20]:
@@ -65,6 +73,8 @@ async def trades_only(
 @dataclass(frozen=True, kw_only=True)
 class SpotMarket(SharedMixin, Market):
   """A Binance spot market."""
+
+  CANDLE_INTERVALS = CANDLE_INTERVALS
 
   symbol: str
 
@@ -139,6 +149,47 @@ class SpotMarket(SharedMixin, Market):
       api=sym['isSpotTradingAllowed'],
       details=sym,
     )
+
+  def candles(
+    self,
+    interval: CandleInterval,
+    start: datetime | None = None,
+    end: datetime | None = None,
+  ) -> PaginatedResponse[Candle]:
+    """Fetch historical trade candles, one page per `klines` request.
+
+    Binance walks forwards and bounds both ends on open time inclusively, which is
+    the contract's own shape, so the client's paged walk is yielded as it comes. An
+    open `start` is answered from the venue's earliest kline.
+    """
+    self.check_interval(interval)
+    return PaginatedResponse(self.walk_candles(interval, start, end))
+
+  async def walk_candles(
+    self, interval: CandleInterval, start: datetime | None, end: datetime | None
+  ) -> AsyncIterator[Sequence[Candle]]:
+    """The pages behind `candles`."""
+    paging = self.client.spot.http.market.klines_paged(
+      symbol=self.symbol,
+      interval=interval,
+      start_time=start,
+      end_time=end,
+      limit=CANDLES_PAGE,
+    ).via(self.call_binance)
+    async for rows in paging:
+      yield [
+        Candle(
+          time=r[0],
+          open=r[1],
+          high=r[2],
+          low=r[3],
+          close=r[4],
+          volume=r[5],
+          quote_volume=r[7],
+          trades=r[8],
+        )
+        for r in rows
+      ]
 
   @wrap_exceptions
   async def open_orders(self) -> Sequence[OrderState]:
