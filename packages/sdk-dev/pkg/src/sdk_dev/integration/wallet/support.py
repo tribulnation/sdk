@@ -13,5 +13,9 @@ class WalletResult:
 
   deposit_methods: Sequence[DepositMethod] | None = None
   deposit_failure: str | None = None
+  deposit_unsupported: str | None = None
+  """Set when the implementation declares the method unsupported, so the suite skips
+  rather than fails: an `impl.toml` gap, not a live defect."""
   withdrawal_methods: Sequence[WithdrawalMethod] | None = None
   withdrawal_failure: str | None = None
+  withdrawal_unsupported: str | None = None

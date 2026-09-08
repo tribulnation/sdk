@@ -27,7 +27,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
     implementations = {
       account_id: wallet.venue(account_id)
       for account_id, account in wallet.all_accounts.items()
-      if account.venue in {'binance', 'bitget', 'mexc', 'bybit', 'bit2me'}
+      if account.venue in {'binance', 'bitget', 'mexc', 'bybit', 'bit2me', 'kraken'}
     }
     metafunc.config.stash[IMPLEMENTATIONS] = implementations
   metafunc.parametrize(
@@ -42,24 +42,32 @@ async def fetch_wallet(wallet_sdk: Wallet) -> WalletResult:
   """Fetch wallet methods, preserving independent endpoint failures."""
   deposit_methods: Sequence[DepositMethod] | None = None
   deposit_failure: str | None = None
+  deposit_unsupported: str | None = None
   withdrawal_methods: Sequence[WithdrawalMethod] | None = None
   withdrawal_failure: str | None = None
+  withdrawal_unsupported: str | None = None
 
   with Context().retried(NetworkError, RateLimited, max_retries=5).use():
     try:
       deposit_methods = await wallet_sdk.deposit_methods()
+    except NotImplementedError as exception:
+      deposit_unsupported = str(exception)
     except Exception as exception:
       deposit_failure = describe_exception(exception)
     try:
       withdrawal_methods = await wallet_sdk.withdrawal_methods()
+    except NotImplementedError as exception:
+      withdrawal_unsupported = str(exception)
     except Exception as exception:
       withdrawal_failure = describe_exception(exception)
 
   return WalletResult(
     deposit_methods=deposit_methods,
     deposit_failure=deposit_failure,
+    deposit_unsupported=deposit_unsupported,
     withdrawal_methods=withdrawal_methods,
     withdrawal_failure=withdrawal_failure,
+    withdrawal_unsupported=withdrawal_unsupported,
   )
 
 
