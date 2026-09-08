@@ -24,7 +24,7 @@ eligible (from `sdk_dev.support`'s `impl.toml` data) and passes that in as `univ
 
 from itertools import combinations
 from pathlib import Path
-from typing_extensions import Any
+from typing_extensions import Any, Mapping, NotRequired, TypedDict
 import re
 
 import jinja2
@@ -101,6 +101,49 @@ class ContractFile(pydantic.BaseModel):
   methods: dict[str, ContractMethod]
 
 
+class RenderedSubset(TypedDict):
+  """One method rendered for one selection of venues."""
+
+  call: str
+  """The full runnable script: the component's preamble plus `snippet`."""
+  snippet: str
+  """The method's own lines alone."""
+  result: list[str]
+  """The illustrative output, in reveal chunks."""
+  catalogueCall: NotRequired[str]
+  catalogueResult: NotRequired[str]
+  """The `catalogue:` block's call and output, as single static strings."""
+
+
+class RenderedMethodFlags(TypedDict, total=False):
+  """A method's optional metadata, present only when the contract sets it."""
+
+  group: str
+  public: bool
+
+
+class RenderedMethod(RenderedMethodFlags):
+  """One method as the /sdk site consumes it."""
+
+  signature: str
+  description: str
+  semantics: str
+  venueNotes: dict[str, str]
+  accountVenues: list[str]
+  """The method's own initial venue selection."""
+  venues: list[str]
+  """Every venue the picker offers for this method."""
+  subsets: dict[str, RenderedSubset]
+  """`render_method`'s output, keyed by the selected venues' sorted, comma-joined slugs."""
+
+
+class RenderedContract(TypedDict):
+  """One contract file as the /sdk site consumes it, JSON-serializable as-is."""
+
+  component: dict[str, Any]
+  methods: dict[str, RenderedMethod]
+
+
 def load_contract_file(path: Path) -> ContractFile:
   """
   Parse and validate one `docs/contract/*.yml` file against `ContractFile`.
@@ -124,7 +167,7 @@ def _venue_order(preferred: list[str], universe: list[str]) -> list[str]:
   return ordered
 
 
-def _render_lines(template: jinja2.Template, ctx: dict[str, Any]) -> list[str]:
+def _render_lines(template: jinja2.Template, ctx: Mapping[str, Any]) -> list[str]:
   """
   Render `template` and split it into reveal items — chunks separated by a blank line.
 
@@ -141,7 +184,7 @@ def _render_lines(template: jinja2.Template, ctx: dict[str, Any]) -> list[str]:
 
 def render_method(
   method: ContractMethod, *, preamble: str, universe: list[str], catalogue: Any
-) -> dict[str, dict]:
+) -> dict[str, RenderedSubset]:
   """
   Render `method`'s templates once per reachable non-empty subset of `universe`.
 
@@ -178,17 +221,17 @@ def render_method(
     JINJA_ENV.from_string(method.catalogue.resultTemplate) if method.catalogue else None
   )
 
-  rendered: dict[str, dict] = {}
+  rendered: dict[str, RenderedSubset] = {}
   for size in range(1, len(ordered) + 1):
     for combo in combinations(ordered, size):
       accounts = list(combo)
-      ctx = {
+      ctx: dict[str, Any] = {
         'accounts': accounts,
         'constants': method.example.constants,
         'catalogue': catalogue,
       }
       snippet = call_tpl.render(ctx).strip('\n')
-      entry: dict[str, Any] = {
+      entry: RenderedSubset = {
         'call': preamble_tpl.render(ctx).strip('\n') + '\n\n' + snippet,
         'snippet': snippet,
         'result': _render_lines(result_tpl, ctx),
@@ -208,7 +251,7 @@ def render_contract_file(
   universes: dict[str, list[str]],
   catalogue: Any,
   source: dict[str, SourceMethod],
-) -> dict:
+) -> RenderedContract:
   """
   Render every method in `contract` into the JSON shape the /sdk site consumes.
 
@@ -227,24 +270,29 @@ def render_contract_file(
     method); `accountVenues` is the method's own initial/default selection; `subsets` is
     `render_method`'s output.
   """
+  methods: dict[str, RenderedMethod] = {}
+  for name, method in contract.methods.items():
+    flags: RenderedMethodFlags = {}
+    if method.group is not None:
+      flags['group'] = method.group
+    if method.public is not None:
+      flags['public'] = method.public
+    methods[name] = {
+      **flags,
+      **source[name],
+      'venueNotes': method.venues,
+      'accountVenues': method.example.accountVenues,
+      'venues': universes[name],
+      'subsets': render_method(
+        method,
+        preamble=contract.component.preamble,
+        universe=universes[name],
+        catalogue=catalogue,
+      ),
+    }
   return {
     'component': contract.component.model_dump(
       exclude={'ref', 'preamble'}, exclude_none=True
     ),
-    'methods': {
-      name: {
-        **method.model_dump(include={'group', 'public'}, exclude_none=True),
-        **source[name],
-        'venueNotes': method.venues,
-        'accountVenues': method.example.accountVenues,
-        'venues': universes[name],
-        'subsets': render_method(
-          method,
-          preamble=contract.component.preamble,
-          universe=universes[name],
-          catalogue=catalogue,
-        ),
-      }
-      for name, method in contract.methods.items()
-    },
+    'methods': methods,
   }

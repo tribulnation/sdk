@@ -2,12 +2,14 @@
 
 from tribulnation.sdk import ApiError
 
+from sdk_dev.narrow import is_mapping
+
 
 def describe_exception(exception: Exception) -> str:
   """Describe an exception without exposing client or credential details."""
   if isinstance(exception, ApiError) and exception.args:
-    payload = exception.args[0]
-    if isinstance(payload, dict):
+    payload: object = exception.args[0]
+    if is_mapping(payload):
       code = payload.get('code')
       message = payload.get('msg')
       if code is not None and message is not None:

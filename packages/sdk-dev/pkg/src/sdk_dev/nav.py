@@ -11,8 +11,11 @@ than the end.
 """
 
 from pathlib import Path
+from typing_extensions import Sequence
 
 import yaml
+
+from sdk_dev.narrow import is_list, is_mapping
 
 NAV_FILENAME = 'docs.yml'
 
@@ -50,15 +53,16 @@ def reading_order(docs_dir: Path) -> list[Path]:
     Page paths relative to `docs_dir`.
   """
   path = docs_dir / NAV_FILENAME
-  entries = []
+  entries: Sequence[object] = []
   if path.is_file():
-    entries = yaml.safe_load(path.read_text()) or []
-    if not isinstance(entries, list):
+    loaded: object = yaml.safe_load(path.read_text()) or []
+    if not is_list(loaded):
       raise ValueError(f'{path}: expected a list of entries at the top level')
+    entries = loaded
   return _walk(docs_dir, entries, Path('.'))
 
 
-def _walk(directory: Path, entries: list, prefix: Path) -> list[Path]:
+def _walk(directory: Path, entries: Sequence[object], prefix: Path) -> list[Path]:
   """One directory's pages in sidebar order, each sub-directory's inlined where listed."""
   listed = _listed(directory, entries, prefix)
   contents = sorted(directory.iterdir(), key=lambda entry: entry.name)
@@ -75,20 +79,24 @@ def _walk(directory: Path, entries: list, prefix: Path) -> list[Path]:
   return found
 
 
-def _listed(directory: Path, entries: list, prefix: Path) -> dict[str, list]:
+def _listed(
+  directory: Path, entries: Sequence[object], prefix: Path
+) -> dict[str, Sequence[object]]:
   """One directory's entries, validated: `{name: its own entries}`, in listed order."""
   where = f'{NAV_FILENAME}: {prefix}' if str(prefix) != '.' else NAV_FILENAME
-  listed: dict[str, list] = {}
+  listed: dict[str, Sequence[object]] = {}
   for entry in entries:
+    own: Sequence[object] = []
     if isinstance(entry, str):
-      name, own = entry, []
-    elif isinstance(entry, dict) and len(entry) == 1:
-      ((name, own),) = entry.items()
-      own = own or []
-      if not isinstance(name, str) or not isinstance(own, list):
+      name = entry
+    elif is_mapping(entry) and len(entry) == 1:
+      ((key, value),) = entry.items()
+      value = value or own
+      if not isinstance(key, str) or not is_list(value):
         raise ValueError(
           f'{where}: {entry!r} should be `<directory>:` with its own list'
         )
+      name, own = key, value
     else:
       raise ValueError(
         f'{where}: expected a page name or `<directory>:` with its own list, got {entry!r}'

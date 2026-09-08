@@ -3,7 +3,7 @@ into a local `landing` checkout (`sync`).
 """
 
 from pathlib import Path
-from typing_extensions import NamedTuple
+from typing_extensions import Mapping, NamedTuple
 import json
 import shutil
 
@@ -53,7 +53,7 @@ METHODS_PAGE = 'methods.md'
 class Generated(NamedTuple):
   """Everything `sync` writes that isn't a verbatim copy of `docs/`."""
 
-  json: dict[str, dict]
+  json: dict[str, Mapping[str, object]]
   """`{filename: data}` for every generated JSON file."""
   methods: dict[str, str]
   """`{surface: markdown}` replacing the `<!-- methods -->` marker in each
@@ -101,7 +101,7 @@ def _build_generated(root: Path) -> Generated:
     )
   source = Source()
 
-  generated: dict[str, dict] = {
+  generated: dict[str, Mapping[str, object]] = {
     ACCOUNTS_FILENAME: generate_accounts_toml(),
     SCHEMA_FILENAME: generate_schema(),
     REGISTRY_FILENAME: registry,
