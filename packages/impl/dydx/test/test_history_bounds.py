@@ -4,21 +4,24 @@ import asyncio
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from types import TracebackType
-from typing_extensions import cast
+from typing_extensions import Self, TypedDict, cast
 
 import pytest
 from sqlalchemy.orm import Session
+from tribulnation.dydx.report.history.bigquery import BigQueryHistory
 from tribulnation.dydx.report.history.cache import (
   CacheWatermark,
   ChainTransaction,
   HistoryCache,
 )
 from tribulnation.dydx.report.history.chain import ChainHistory
+from tribulnation.dydx.report.history.governance import GovernanceHistory
+from tribulnation.dydx.report.history.indexer import IndexerHistory
 from tribulnation.dydx.report.history.main import History
 from tribulnation.dydx.report.history.window import in_window
 from tribulnation.sdk.reporting import HistoryRecord
+from typed_dydx.chain.comet import Comet
 from typed_dydx.chain.comet.schemas import TxResponse
-from typing_extensions import Any, Self, TypedDict
 
 BASE_TIME = datetime(2025, 1, 1, tzinfo=timezone.utc)
 
@@ -107,7 +110,7 @@ def chain_history(comet: FakeComet) -> ChainHistory:
   """
   return ChainHistory(
     address='dydx1test',
-    comet=cast(Any, comet),
+    comet=cast(Comet, comet),
   )
 
 
@@ -118,7 +121,7 @@ def cached_chain_history(
   """Create chain history around a Comet stub and persistent cache."""
   return ChainHistory(
     address='dydx1test',
-    comet=cast(Any, comet),
+    comet=cast(Comet, comet),
     cache=cache,
   )
 
@@ -363,10 +366,10 @@ def test_aggregate_history_forwards_bounds_to_every_provider():
   providers = [HistoryProvider() for _ in range(4)]
   report = History(
     address='dydx1test',
-    chain=cast(Any, providers[0]),
-    indexer=cast(Any, providers[1]),
-    governance=cast(Any, providers[2]),
-    bigquery=cast(Any, providers[3]),
+    chain=cast(ChainHistory, providers[0]),
+    indexer=cast(IndexerHistory, providers[1]),
+    governance=cast(GovernanceHistory, providers[2]),
+    bigquery=cast(BigQueryHistory, providers[3]),
   )
   start = BASE_TIME
   end = BASE_TIME + timedelta(days=1)
