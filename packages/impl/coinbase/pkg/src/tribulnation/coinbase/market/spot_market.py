@@ -8,6 +8,8 @@ from decimal import Decimal
 from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
   Book,
+  Candle,
+  CandleInterval,
   Collateral,
   Market,
   Order,
@@ -25,6 +27,8 @@ from . import impl
 @dataclass(frozen=True, kw_only=True)
 class SpotMarket(impl.MarketMixin, Market):
   """A spot pair on Coinbase Advanced Trade, e.g. `BTC-USD`."""
+
+  CANDLE_INTERVALS = impl.CANDLE_INTERVALS
 
   @property
   def exchange_id(self) -> str:
@@ -46,6 +50,15 @@ class SpotMarket(impl.MarketMixin, Market):
 
   async def rules(self, *, refetch: bool = False) -> Rules:
     return await impl.rules(self, 'spot', refetch=refetch)
+
+  def candles(
+    self,
+    interval: CandleInterval,
+    start: datetime | None = None,
+    end: datetime | None = None,
+  ) -> PaginatedResponse[Candle]:
+    self.check_interval(interval)
+    return PaginatedResponse(impl.candles(self, interval, start, end))
 
   async def open_orders(self) -> Sequence[OrderState]:
     return await impl.open_orders(self)

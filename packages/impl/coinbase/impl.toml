@@ -38,8 +38,9 @@ methods = [
   "next_funding",
   "perp_position",
   "perp_collateral",
+  "candles",
 ]
-note = "Spot is complete. INTX perpetuals serve market data, orders and funding state, but `funding_rates()`/`funding_payments()` raise `NotImplementedError` (Coinbase publishes no funding history at all), and `perp_position()`/`perp_collateral()` need a key scoped to an INTX portfolio — a retail key gets `PERMISSION_DENIED`."
+note = "Spot is complete. INTX perpetuals serve market data, orders and funding state, but `funding_rates()`/`funding_payments()` raise `NotImplementedError` (Coinbase publishes no funding history at all), and `perp_position()`/`perp_collateral()` need a key scoped to an INTX portfolio — a retail key gets `PERMISSION_DENIED`. `candles` needs an explicit `start` (Coinbase answers at most one page per request and publishes no listing date), pages 299 at a time (INTX answers at most 300 per request, spot 350) and carries no `quote_volume`."
 # Two exchanges: `spot` (Advanced Trade SPOT products) and `intx` (perpetual swaps).
 # `trades_stream` is best-effort on both: the `user` channel carries order-level
 # cumulative quantities rather than itemized fills, so it loses per-fill maker/taker and

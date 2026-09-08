@@ -7,6 +7,7 @@ from .account import (
   perp_position,
   position,
 )
+from .candles import CANDLE_INTERVALS, candles
 from .catalogue import filtered, list_products, parse_perp_stats, tickers
 from .depth import depth, depth_stream
 from .funding import index, next_funding
