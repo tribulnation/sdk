@@ -5,11 +5,19 @@ request that failed rather than the whole sweep -- a throttled page 7 of 12 retr
 in place instead of restarting from page 1.
 """
 
-from typing_extensions import AsyncIterator, Sequence
+from typing_extensions import AsyncIterator, Mapping, Sequence
 from datetime import datetime, timezone
 from decimal import Decimal
 
-from tribulnation.sdk.market import FundingPayment, FundingRate, Trade
+from tribulnation.sdk.market import (
+  Candle,
+  CandleInterval,
+  FundingPayment,
+  FundingRate,
+  Trade,
+  candle_windows,
+)
+from typed_bybit.schemas import KlineInterval
 
 from tribulnation.bybit.core import TRADE_WINDOW, windows
 from .mixin import MarketMixin
@@ -17,6 +25,88 @@ from .parse import parse_execution
 
 FUNDING_PAGE = 200
 """Rows per `market.funding_history` page; Bybit's documented maximum."""
+
+CANDLES_PAGE = 1000
+"""Rows per `market.kline` page; Bybit's documented maximum."""
+
+KLINE_INTERVALS: Mapping[CandleInterval, KlineInterval] = {
+  '1m': '1',
+  '5m': '5',
+  '15m': '15',
+  '1h': '60',
+  '4h': '240',
+  '1d': 'D',
+}
+"""Bybit's name for each contract interval: minutes, or `D` for a day."""
+
+CANDLE_INTERVALS = frozenset(KLINE_INTERVALS)
+"""Every contract interval has a Bybit kline interval."""
+
+KlineRow = tuple[datetime, str, str, str, str, str, str]
+"""One `market.kline` row: open time, open, high, low, close, volume, turnover."""
+
+
+def parse_candle(row: KlineRow) -> Candle:
+  """Map one kline row onto a `Candle`.
+
+  `volume` is the base coin and `turnover` the quote coin on both spot and linear,
+  which is the contract's own pairing.
+  """
+  time, open, high, low, close, volume, turnover = row
+  return Candle(
+    time=time,
+    open=Decimal(open),
+    high=Decimal(high),
+    low=Decimal(low),
+    close=Decimal(close),
+    volume=Decimal(volume),
+    quote_volume=Decimal(turnover),
+  )
+
+
+async def candles(
+  self: MarketMixin,
+  interval: CandleInterval,
+  start: datetime | None,
+  end: datetime | None,
+) -> AsyncIterator[Sequence[Candle]]:
+  """Walk this market's trade candles, oldest page first.
+
+  Bybit answers newest-first, and at the start edge by bucket overlap: a candle
+  already open at `start` is served too. With a `start`, the range is swept in forward
+  windows of one page each, every window read through the client's own walk (so a
+  short response is confirmed rather than trusted), reversed, and trimmed to the
+  contract's own bounds. Without one, the whole backwards walk is buffered before the
+  first page is yielded: ascending order needs the earliest page first, and only the
+  venue knows where that is. An open `end` is resolved to now.
+  """
+  kline = KLINE_INTERVALS[interval]
+  if end is None:
+    end = datetime.now(timezone.utc)
+
+  def walk(lower: datetime | None, upper: datetime):
+    """The client's newest-first walk over `[lower, upper]`, one request per page."""
+    return self.client.market.kline_paged(
+      self.category,
+      symbol=self.symbol,
+      interval=kline,
+      start=lower,
+      end=upper,
+      limit=CANDLES_PAGE,
+      validate=self.validate,
+    ).via(self.call_bybit)
+
+  if start is None:
+    pages = [rows async for rows in walk(None, end)]
+    for rows in reversed(pages):
+      yield [parse_candle(r) for r in reversed(rows)]
+    return
+  # One candle short of the cap, so the client's walk sees a short page and never
+  # spends a request confirming a window is exhausted.
+  for lower, upper in candle_windows(start, end, interval, size=CANDLES_PAGE - 1):
+    rows = [r for r in await walk(lower, upper) if lower <= r[0] <= upper]
+    if rows:
+      yield [parse_candle(r) for r in sorted(rows, key=lambda r: r[0])]
 
 
 async def trades_history(

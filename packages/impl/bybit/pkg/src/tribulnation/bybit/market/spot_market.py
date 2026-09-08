@@ -8,6 +8,8 @@ from decimal import Decimal
 from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
   Book,
+  Candle,
+  CandleInterval,
   Collateral,
   Market,
   Order,
@@ -21,8 +23,10 @@ from tribulnation.sdk.market import (
 
 from tribulnation.bybit.core import num
 from .impl import (
+  CANDLE_INTERVALS,
   Category,
   MarketMixin,
+  candles,
   depth_stream,
   open_orders,
   order_request,
@@ -35,6 +39,8 @@ from .impl import (
 @dataclass(kw_only=True, frozen=True)
 class SpotMarket(MarketMixin, Market):
   """One Bybit spot pair, e.g. `BTCUSDT`."""
+
+  CANDLE_INTERVALS = CANDLE_INTERVALS
 
   @property
   def category(self) -> Category:
@@ -101,6 +107,16 @@ class SpotMarket(MarketMixin, Market):
       api=info['status'] == 'Trading',
       details=info,
     )
+
+  def candles(
+    self,
+    interval: CandleInterval,
+    start: datetime | None = None,
+    end: datetime | None = None,
+  ) -> PaginatedResponse[Candle]:
+    """Fetch the market's historical trade candles, oldest page first."""
+    self.check_interval(interval)
+    return PaginatedResponse(candles(self, interval, start, end))
 
   async def open_orders(self) -> Sequence[OrderState]:
     """Fetch your currently open orders."""
