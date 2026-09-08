@@ -1,6 +1,7 @@
-from typing_extensions import Any, AsyncIterable, Generic, TypeVar
+from typing_extensions import Any, AsyncIterable, Generic, Iterator, TypeVar
 from dataclasses import dataclass, field
 from contextlib import asynccontextmanager
+from datetime import datetime, timedelta
 import asyncio
 
 T = TypeVar('T')
@@ -54,3 +55,22 @@ async def closing_streams(streams: 'dict[str, StreamManager[Any]]'):
     yield streams
   finally:
     await asyncio.gather(*[s.close() for s in streams.values()], return_exceptions=True)
+
+
+MILLISECOND = timedelta(milliseconds=1)
+
+
+def windows(
+  start: datetime, end: datetime, span: timedelta
+) -> Iterator[tuple[datetime, datetime]]:
+  """Split `[start, end]` into consecutive sub-windows of at most `span`.
+
+  MEXC caps how wide one history query may be -- 90 days for deposit and withdrawal
+  records -- and `myTrades` answers at most `limit` fills per call with no cursor, so
+  a sweep walks the window in slices narrow enough for one page to hold them.
+  """
+  lower = start
+  while lower <= end:
+    upper = min(lower + span, end)
+    yield lower, upper
+    lower = upper + MILLISECOND
