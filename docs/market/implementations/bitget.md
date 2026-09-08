@@ -57,6 +57,15 @@ dropped).
   serves a fixed depth of 1, 5, 15, 50 or 100 levels, so a request is served by the next
   size up and trimmed. **`depth_stream`** folds the `books` channel (a full snapshot, then
   deltas) into whole books; `levels` trims each delivered book.
+- **`candles`** serves every `CandleInterval` (`CANDLE_INTERVALS` is the full set) on both
+  exchanges, oldest page first; an open `start` buffers the whole backwards walk before
+  the first page, since Bitget answers newest-first. `perp` reads the futures history
+  endpoint in pages of 198 (two short of the 200-row cap the venue enforces, whatever the
+  client declares, since Bitget counts a window's span in candle closes) back to the
+  contract's listing. `spot` reads the recent endpoint in pages of 1000, which only
+  keeps about two months of hourly candles (less at finer intervals): the spot history
+  endpoint has no paged walk in the typed client yet, so a `start` past that horizon yields
+  fewer candles than the window holds.
 - **`perp_stats`** joins the futures ticker listing (index, mark, current rate, open
   interest) with the funding-rate listing (next settlement time and interval) -- two calls
   for the whole universe. Funding intervals vary per contract (1, 4 or 8 hours).

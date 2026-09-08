@@ -15,17 +15,27 @@ import asyncio
 
 import pytest
 
-from typing_extensions import Any, Awaitable, Callable, cast
+from typing_extensions import Any, Awaitable, Callable, Sequence, cast
 
 from tribulnation.sdk import AuthError, Context, MarketSDK, NetworkError, RateLimited
 from tribulnation.sdk.impl.accounts import Bitget
-from tribulnation.sdk.market import Book, PerpCollateral, Rules, Ticker
+from tribulnation.sdk.core import PaginatedResponse
+from tribulnation.sdk.market import Book, Candle, PerpCollateral, Rules, Ticker
 from ..support import describe_exception
 from .conftest import SDK
 
 VENUE = 'bitget'
 SYMBOL = 'BTCUSDT'
 OTHER = 'ETHUSDT'
+
+SPOT_CANDLES_PAGE = 999
+"""Candles per page the spot implementation yields."""
+
+CANDLES_END = (datetime.now(timezone.utc) - timedelta(days=1)).replace(
+  minute=0, second=0, microsecond=0
+)
+"""Open time of the last hourly spot candle asked for: a closed candle, a day ago, so the
+counts are exact and the window stays inside the recent endpoint's two-month horizon."""
 
 STREAM_TIMEOUT = 20
 """Seconds to wait for a stream to deliver its first item, or to confirm a subscription."""
@@ -123,6 +133,14 @@ class Results:
       )
 
 
+HOUR = timedelta(hours=1)
+
+
+async def pages(paging: PaginatedResponse[Candle]) -> list[Sequence[Candle]]:
+  """Every page of a candle walk, as yielded."""
+  return [page async for page in paging]
+
+
 async def collect(sdk: MarketSDK, account_id: str, public: bool, results: Results):
   """Run every method against one account."""
   venue = await sdk.venue(account_id)
@@ -141,6 +159,18 @@ async def collect(sdk: MarketSDK, account_id: str, public: bool, results: Result
     await results.attempt('spot.tickers', spot.tickers)
     await results.attempt('spot.tickers.some', lambda: spot.tickers([SYMBOL, OTHER]))
     await results.attempt('spot.rules', spot_market.rules)
+    await results.attempt(
+      'spot.candles',
+      lambda: pages(spot_market.candles('1h', CANDLES_END - 71 * HOUR, CANDLES_END)),
+    )
+    await results.attempt(
+      'spot.candles.straddle',
+      lambda: pages(
+        spot_market.candles(
+          '1h', CANDLES_END - (SPOT_CANDLES_PAGE + 49) * HOUR, CANDLES_END
+        )
+      ),
+    )
     await results.first('spot.depth_stream', spot_market.depth_stream)
     # Public: perp.
     await results.attempt('perp.markets', perp.markets)
@@ -245,6 +275,36 @@ def test_spot_rules(bitget: Results):
   assert rules.tick_size > 0 and rules.step_size > 0
   assert rules.taker_fee >= rules.maker_fee >= 0
   assert rules.api
+
+
+def check_spot_candles(result: list[Sequence[Candle]], *, count: int):
+  """The spot candle contract over a recent window: exact count, ascending, aligned."""
+  candles = [c for page in result for c in page]
+  assert len(candles) == count, f'expected {count} candles, got {len(candles)}'
+  first = CANDLES_END - (count - 1) * HOUR
+  assert [c.time for c in candles] == [first + k * HOUR for k in range(count)]
+  for page in result:
+    assert page, 'an empty page was yielded'
+  for previous, page in zip(result, result[1:]):
+    assert previous[-1].time < page[0].time, 'pages overlap or are out of order'
+  for candle in candles:
+    assert candle.low <= candle.open <= candle.high
+    assert candle.low <= candle.close <= candle.high
+    assert isinstance(candle.volume, Decimal) and isinstance(
+      candle.quote_volume, Decimal
+    )
+
+
+def test_spot_candles(bitget: Results):
+  """Three days of hourly spot candles, ending a day ago, come back exact."""
+  check_spot_candles(bitget.check('spot.candles'), count=72)
+
+
+def test_spot_candles_straddling_two_pages(bitget: Results):
+  """A window one page plus fifty candles wide yields two pages, every candle once."""
+  result = bitget.check('spot.candles.straddle')
+  assert len(result) >= 2, 'the window did not straddle two pages'
+  check_spot_candles(result, count=SPOT_CANDLES_PAGE + 50)
 
 
 def test_spot_depth_stream(bitget: Results):

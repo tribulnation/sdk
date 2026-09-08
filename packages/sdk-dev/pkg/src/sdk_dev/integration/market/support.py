@@ -37,6 +37,9 @@ class CandleCase:
 
 CASES: Mapping[str, Sequence[CandleCase]] = {
   'binance': [CandleCase(market_id='spot:BTCUSDT', page=1000)],
+  # Spot is left out: its recent endpoint does not reach `START`; `bitget.py` covers it
+  # over a recent window instead.
+  'bitget': [CandleCase(market_id='perp:BTCUSDT', page=198)],
   'bybit': [
     CandleCase(market_id='spot:BTCUSDT', page=999),
     CandleCase(market_id='perp:BTCUSDT', page=999),

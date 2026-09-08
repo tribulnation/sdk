@@ -8,6 +8,8 @@ from decimal import Decimal
 from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
   Book,
+  Candle,
+  CandleInterval,
   FundingPayment,
   FundingRate,
   NextFunding,
@@ -23,11 +25,13 @@ from tribulnation.sdk.market import (
 )
 
 from .impl import (
+  CANDLE_INTERVALS,
   PERP,
   MarketMixin,
   Product,
   classic_mix_account,
   depth_stream,
+  perp_candles,
   funding_rates,
   open_orders,
   parse_book,
@@ -44,6 +48,8 @@ from .impl.account import not_supported_classic_collateral
 @dataclass(kw_only=True, frozen=True)
 class PerpMarket(MarketMixin, _PerpMarket):
   """One Bitget USDT-margined perpetual contract, e.g. `BTCUSDT`."""
+
+  CANDLE_INTERVALS = CANDLE_INTERVALS
 
   @property
   def product(self) -> Product:
@@ -96,6 +102,16 @@ class PerpMarket(MarketMixin, _PerpMarket):
     """
     contracts = await self.perp_contracts(refetch=refetch)
     return parse_perp_rules(contracts[self.symbol])
+
+  def candles(
+    self,
+    interval: CandleInterval,
+    start: datetime | None = None,
+    end: datetime | None = None,
+  ) -> PaginatedResponse[Candle]:
+    """Fetch the market's historical trade candles, oldest page first."""
+    self.check_interval(interval)
+    return PaginatedResponse(perp_candles(self, interval, start, end))
 
   async def open_orders(self) -> Sequence[OrderState]:
     """Fetch your currently open orders."""

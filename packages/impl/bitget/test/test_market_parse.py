@@ -12,6 +12,7 @@ from tribulnation.bitget.market.impl import (
   parse_spot_ticker,
   perp_depth_limit,
 )
+from tribulnation.bitget.market.impl.candles import parse_perp_candle, parse_spot_candle
 from tribulnation.bitget.market.impl.parse import (
   parse_classic_stream_fill,
   parse_mix_fill,
@@ -439,3 +440,26 @@ def test_a_uta_fee_keeps_its_sign_and_a_streamed_fill_maps_like_its_rest_twin():
     cast(Fill, {**UTA_FILL, 'tradeScope': 'MAKER', 'createdTime': T})
   )
   assert upper.maker
+
+
+def test_candle_rows_keep_the_base_and_quote_volumes():
+  """A spot row carries the volume three ways and a futures row two; the base coin
+  and the quote coin are kept, the USDT conversion between them dropped."""
+  spot = parse_spot_candle(
+    (
+      T,
+      Decimal(1),
+      Decimal(3),
+      Decimal(0),
+      Decimal(2),
+      Decimal(10),
+      Decimal(15),
+      Decimal(20),
+    )
+  )
+  assert (spot.time, spot.open, spot.high, spot.low, spot.close) == (T, 1, 3, 0, 2)
+  assert (spot.volume, spot.quote_volume) == (Decimal(10), Decimal(20))
+  perp = parse_perp_candle(
+    (T, Decimal(1), Decimal(3), Decimal(0), Decimal(2), Decimal(10), Decimal(20))
+  )
+  assert (perp.volume, perp.quote_volume) == (Decimal(10), Decimal(20))

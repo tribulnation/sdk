@@ -5,11 +5,11 @@
 support = "partial"
 auth = false
 methods = [
-  "depth", "depth_stream", "tickers", "rules", "perp_stats", "query_order", "open_orders",
+  "depth", "depth_stream", "tickers", "rules", "candles", "perp_stats", "query_order", "open_orders",
   "trades_history", "trades_stream", "position", "collateral", "available_notional",
   "index", "next_funding", "funding_rates", "perp_position", "perp_collateral",
 ]
-note = "Read-only: `place_order`/`cancel_*` raise `NotImplementedError` (not a venue we trade on). `funding_payments` is unsupported on either account mode, since Bitget publishes no closed set of futures ledger types to filter a settlement on. On a Classic account `perp_collateral` and the exchange-level spot `collateral` are unsupported too (the futures wallet reports no margin requirement, the spot wallet no pool)."
+note = "Read-only: `place_order`/`cancel_*` raise `NotImplementedError` (not a venue we trade on). `funding_payments` is unsupported on either account mode, since Bitget publishes no closed set of futures ledger types to filter a settlement on. On a Classic account `perp_collateral` and the exchange-level spot `collateral` are unsupported too (the futures wallet reports no margin requirement, the spot wallet no pool). `candles` serves every contract interval on both exchanges, oldest first; perp pages 198 candles back to the contract's listing, spot pages 1000 but only reaches the venue's recent horizon (about two months of hourly candles), since the spot history endpoint has no paged walk in the typed client yet."
 # MarketSDK.DEFAULT_ACCOUNTS includes 'bitget' (Bitget(public=True)) — public market data
 # (markets, depth, depth_stream, tickers, rules, perp_stats, index, next_funding,
 # funding_rates) comes from the venue's public endpoints and is the same whatever the
