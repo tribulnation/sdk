@@ -349,6 +349,24 @@ declarations do not, so the two types are still not interchangeable in general.
 - Blocks: nothing -- `parse_execution` reads none of the three, which is what let
   `parse_execution_update` collapse into it this round
 
+### `market.kline` rows keep decimal strings as `str`
+
+Same defect class as the `transaction_log` entry above, on the candle row the sdk's new
+`Market.candles` reads.
+
+`market/kline.py:19`:
+
+```python
+  list: list[tuple[TimestampMillis, str, str, str, str, str, str]]
+```
+
+- Kind: wrong-type
+- Observed: decimal strings on the wire (`'63069.8'`, `'644.072'`, `'40611254.6565'`),
+  spot and linear BTCUSDT, 2026-09-08
+- Condition: always
+- Blocks: the `Decimal(...)` wraps in `pkg/.../market/impl/history.py` `parse_candle`
+- Suggestion (unverified): `format: decimal-string` on the six price/volume positions
+
 ## typed-bitget
 
 ### `MixTradeSide` is four values against the stream's own 22
@@ -413,6 +431,38 @@ same `price`/`qty` shapes `spot.account.open_orders` returns as `str`.
   `pkg/.../reporting/snapshots.py:117-123`, each now carrying a comment saying why it
   survives, and `poc/reporting.py` cell 13
 - Suggestion (unverified): `format: decimal-string`, as the sibling endpoints got
+
+### `usdm_futures.http.market.klines` has no paged walk and types its open time as a bare `int`
+
+The spot twin (`spot/http/market/klines.py`) has both a `klines_paged` walk and a
+`SpotCandle` whose open and close times are `TimestampMillis`; the USD-M endpoint has
+neither, so the sdk cannot sweep futures candles through the client.
+
+`usdm_futures/http/market/klines.py:38-51`:
+
+```python
+Response = list[
+  tuple[
+    int,
+    Decimal,
+    ...
+    int,
+```
+
+`clients/binance/spec/endpoints/usdm_futures/http/market/klines/endpoint.json` declares
+no `pagination` block, and its `openTime`/`closeTime` items are `type: integer` with no
+`format: epoch-millis`.
+
+- Kind: missing-endpoint (walk) and wrong-type (open and close time)
+- Observed: verified against the declaration only; the endpoint is public and answers
+  the same row shape as spot
+- Condition: always
+- What the walk needs: the spot declaration verbatim -- `seek` on `[-1][0]`, bounds
+  `startTime`/`endTime` (both inclusive on open time), anchor `start`, `limit` as size
+  (default 500, maximum 1500 here rather than 1000), rows oldest first
+- Blocks: `packages/impl/binance/pkg/.../market/perp_market.py` `candles`, which raises
+  `NotImplementedError`; the sdk-dev market suite has no `binance:usdm` case
+- Suggestion (unverified): copy spot's `pagination` block and `format: epoch-millis`
 
 ## typed-etherscan
 
@@ -512,6 +562,35 @@ roughly 20 lines with no codegen change. The sdk side still reads `ApiError.args
 can be read at all, so the shape would land somewhere real. Awaiting a decision here before
 we answer.
 
+### `v1.trading.candles` rows are `list[float]` and the endpoint has no paged walk
+
+Prices arrive as JSON numbers and the client keeps them as `float`, so no `Decimal` can
+be read off a row without going through a binary float first. The endpoint also declares
+no `pagination` block, and both bounds plus `limit` are required.
+
+`v1/trading/candles.py:20`:
+
+```python
+TradingCandlesResponse = list[list[float]]
+```
+
+`clients/bit2me/spec/endpoints/v1/trading/candles/endpoint.json` types the row as a
+homogeneous `number` array (its own note defers `prefixItems`) and declares no
+`pagination`.
+
+- Kind: wrong-type (prices) and missing-endpoint (walk)
+- Observed: `[1777593600000.0, 65085.1, 65293.5, 65074.7, 65167.4, 5.01206556]` for
+  BTC/EUR, 60-minute, 2026-09-08 -- six floats per row, the epoch included
+- Condition: always
+- What the walk needs: `startTime`/`endTime` both required, `limit` required (maximum
+  1000), `interval` in minutes, rows oldest first with the forming candle last; a `seek`
+  on `[-1][0]` anchored at `start` with `limit` as size
+- Blocks: `packages/impl/bit2me/pkg/.../market/spot_market.py` `candles`, which raises
+  `NotImplementedError`; the sdk-dev market suite has no `bit2me` case
+- Suggestion (unverified): `prefixItems` with `format: epoch-millis` on the first and
+  `format: decimal-string`-equivalent parsing of the numbers on the rest, plus a
+  `pagination` block
+
 ## typed-dydx
 
 ### Stream subscription replies are validated with the channel's notification type
@@ -547,3 +626,119 @@ still unreferenced, and typing them properly needs a `reply` schema on the strea
 model, a generated `reply_type` and a parameterised second argument to `StreamManager`. The
 reply asks whether we want that scheduled. Awaiting a decision here before we answer;
 the entry stays open either way, since the generated types are still unused.
+
+## typed-coinbase
+
+### `products.public.candles` answers at most 300 candles for INTX perpetuals, dropping the oldest
+
+The declaration and the venue's docs cap a request at 350 candles, and spot honours it:
+a 349-candle window of `BTC-USD` answers 349 rows. An INTX product answers the newest
+300 of the same window, whatever `limit` says, and drops the rest silently. With
+`limit=350` the generated walk reads those 300 rows as a short page and stops, so a
+349-candle window of `BTC-PERP-INTX` loses 49 candles without an error.
+
+`app/advanced_trade/http/products/public/candles.py:65`:
+
+```python
+    cap: int | None = min(limit, 350) if limit is not None else 350
+```
+
+- Kind: wrong-type (the declared size maximum, on one product family)
+- Observed: `BTC-PERP-INTX`, `ONE_HOUR`, 349-candle windows from 2026-05-01 and
+  2026-08-01 with `limit` 350, 300 and omitted: 300 rows each time, the oldest missing;
+  320-candle window: 300 rows. `BTC-USD` over the same windows: every candle
+- Condition: INTX products (`*-PERP-INTX`); spot products answer the documented 350
+- Blocks: nothing -- `pkg/.../coinbase/market/impl/candles.py` windows 299 candles with
+  `limit=300` for every product
+- Suggestion (unverified): declare the size maximum as 300, or per product family
+
+### `Candle.open`/`high`/`low`/`close` are `str` beside a `Decimal` `volume`
+
+`schemas.py:59-67`:
+
+```python
+  low: str
+  high: str
+  open: str
+  close: str
+  volume: Decimal
+```
+
+- Kind: wrong-type
+- Observed: decimal strings on the wire (`'62930.17'`, `'63075'`), `BTC-USD` and
+  `BTC-PERP-INTX`, 2026-09-08
+- Condition: always
+- Blocks: the `Decimal(...)` wraps in `pkg/.../coinbase/market/impl/candles.py`
+  `parse_candle`
+- Suggestion (unverified): `format: decimal-string`, as `volume` already has
+
+## typed-hyperliquid
+
+### `info.candle_snapshot` has no paged walk and types `t`/`T` as bare `int`
+
+`info/candle_snapshot.py:8,38`:
+
+```python
+  T: int
+  ...
+  t: int
+```
+
+Both are documented "in milliseconds since epoch" but carry no `format: epoch-millis`,
+so they render as bare ints rather than `TimestampMillis`.
+`clients/hyperliquid/spec/endpoints/info/candle_snapshot/endpoint.json` declares no
+`pagination` block; its note rules one out because no fixed `step` stays correct across
+every `interval`.
+
+- Kind: missing-endpoint (walk) and wrong-type (open and close time)
+- Observed: verified against the declaration only
+- Condition: always
+- What the walk needs: no `step` at all -- the `seek` on `[-1].t` anchored at `start`
+  that binance and mexc klines already use, with both bounds required (the venue
+  includes any candle whose span overlaps the range, per the spec's own note), a size of
+  5000 (the most one call answers, and the most the venue holds per interval), rows
+  oldest first
+- Blocks: `packages/impl/hyperliquid/pkg/.../market/spot_market.py` and
+  `perps_market.py` `candles`, which raise `NotImplementedError`; the sdk-dev market
+  suite has no `hyperliquid` case
+- Suggestion (unverified): `format: epoch-millis` on `t`/`T` and a `seek` pagination
+  block on `[-1].t`
+
+## typed-mexc
+
+### `spot.http.market.candles`' declared `limit` maximum of 1000 is 500 on the wire
+
+MEXC documents `limit` as "Default 500; max 1000", and the declaration follows it, but
+the venue answers 500 rows whatever `limit` says. The generated walk sizes a page by the
+`limit` it sent, so with `limit=1000` it reads the 500-row page as short and stops after
+one page, silently ending the sweep.
+
+`spot/http/market/candles.py:60`:
+
+```python
+    cap: int | None = min(limit, 1000) if limit is not None else 500
+```
+
+- Kind: wrong-type (the declared size maximum)
+- Observed: `BTCUSDT`, `60m`, a 1200-hour window from 2026-05-01: 500 rows with `limit`
+  500, 600, 1000 and omitted; `candles_paged` with `limit=1000` over 1050 candles yielded
+  one page of 500 and stopped, with `limit=500` three pages of 500, 499 and 51
+- Condition: always
+- Blocks: nothing -- `pkg/.../mexc/market/impl/candles.py` passes `limit=500`
+- Suggestion (unverified): declare the size maximum as 500
+
+### `spot.http.market.candles` rows keep decimal strings as `str`
+
+`spot/http/market/candles.py:23`:
+
+```python
+Response = list[tuple[TimestampMillis, str, str, str, str, str, TimestampMillis, str]]
+```
+
+- Kind: wrong-type
+- Observed: decimal strings on the wire (`'76348.07'`, `'157.78038937'`), `BTCUSDT`,
+  2026-09-08
+- Condition: always
+- Blocks: the `Decimal(...)` wraps in `pkg/.../mexc/market/impl/candles.py`
+  `parse_candle`
+- Suggestion (unverified): `format: decimal-string` on the six price/volume positions
