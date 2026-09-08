@@ -34,7 +34,7 @@ def parse_fee(row: WalletTransaction) -> Fee | None:
   asset = network.get('currency')
   if amount is None or asset is None:
     return None
-  return Fee(amount=Decimal(str(amount)), asset=asset)
+  return Fee(amount=amount, asset=asset)
 
 
 def parse_deposit(row: WalletTransaction) -> CryptoDeposit | None:
@@ -51,7 +51,7 @@ def parse_deposit(row: WalletTransaction) -> CryptoDeposit | None:
     id=row.get('id'),
     time=time,
     asset=asset,
-    amount=Decimal(str(destination.get('amount', 0))),
+    amount=destination.get('amount', Decimal(0)),
     # On a deposit the blockchain side is the origin, but it carries neither
     # `address` nor `addressNetwork` -- both sit on the crediting pocket instead,
     # so the network is read off the destination and the sender is never reported.
@@ -78,7 +78,7 @@ def parse_withdrawal(row: WalletTransaction) -> CryptoWithdrawal | None:
     id=row.get('id'),
     time=time,
     asset=asset,
-    amount=-Decimal(str(origin.get('amount', 0))),
+    amount=-origin.get('amount', Decimal(0)),
     network=destination.get('addressNetwork'),
     tx_id=(row.get('transaction') or {}).get('hash'),
     src_address=origin.get('address'),

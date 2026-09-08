@@ -54,7 +54,7 @@ class Snapshots(_Snapshots, Mixin):
       )
       entries = page.get('data', [])
       for entry in entries:
-        out[entry['currency']] += Decimal(str(entry['balance']))
+        out[entry['currency']] += entry['balance']
       offset += len(entries)
       if not entries or offset >= (page.get('total') or 0):
         return out
@@ -64,9 +64,7 @@ class Snapshots(_Snapshots, Mixin):
     """Balances held in Bit2Me Wallet pockets, including blocked amounts."""
     out = Balances()
     for entry in await self.call_bit2me(self.client.v1.wallet.pockets.get):
-      out[entry['currency']] += Decimal(str(entry['balance'])) + Decimal(
-        str(entry['blockedBalance'])
-      )
+      out[entry['currency']] += entry['balance'] + entry['blockedBalance']
     return out
 
   async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotRecord:

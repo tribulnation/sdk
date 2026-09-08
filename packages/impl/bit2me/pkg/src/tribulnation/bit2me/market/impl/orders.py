@@ -31,7 +31,7 @@ def parse_order(order: Bit2MeOrder) -> OrderState:
   return OrderState(
     id=id,
     price=Decimal(str(price)) if price is not None else Decimal(0),
-    qty=sign * Decimal(str(order.get('amount', 0))),
+    qty=sign * order.get('amount', Decimal(0)),
     filled_qty=sign * Decimal(str(order.get('filledAmount', 0))),
     # A stop-limit order sits `inactive` until its stop price is reached: not yet in
     # the book, but not finished with either.

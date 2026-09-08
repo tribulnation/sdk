@@ -7,11 +7,12 @@ from tribulnation.bit2me.market.impl.depth import parse_levels
 
 
 def test_a_three_element_level_is_read_by_index():
-  """26 of Bit2Me's 290 markets send `[price, amount, notional]`, not a pair.
+  """Some order-book rows are `[price, amount, notional]`, not a pair.
 
-  Unpacking the row raised `ValueError` on every one of them -- the thin and
-  stablecoin pairs (B2M/EUR, HTX/USDC, BTC/EURCV, ...). The three majors any live
-  check would reach all send two-element rows, so the fault never shows up there.
+  Unpacking such a row raises `ValueError`. Which shape arrives is not a property of
+  the market: `B2M/EUR` has been seen serving triples over REST while pushing pairs
+  over the socket in the same minute, so only the row's own length decides. The three
+  majors any live check would reach send pairs, so the fault never shows up there.
   """
   levels = parse_levels([(0.0052283, 76289.74336778, 398.86566524976416)])
   assert levels == [

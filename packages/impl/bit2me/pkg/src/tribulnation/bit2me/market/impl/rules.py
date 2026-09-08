@@ -32,9 +32,7 @@ def parse_rules(info: MarketInfo) -> Rules:
     quote=quote,
     fee_asset=quote,
     tick_size=Decimal(str(tick_size)) if tick_size is not None else Decimal(0),
-    step_size=Decimal(1).scaleb(-int(precision))
-    if precision is not None
-    else Decimal(0),
+    step_size=Decimal(1).scaleb(-precision) if precision is not None else Decimal(0),
     fixed_min_qty=Decimal(str(min_amount)) if min_amount is not None else None,
     max_qty=Decimal(str(max_amount)) if max_amount is not None else None,
     fixed_min_price=Decimal(str(min_price)) if min_price is not None else None,

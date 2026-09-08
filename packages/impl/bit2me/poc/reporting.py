@@ -61,7 +61,7 @@ async def earn_balances(*, assets: list[str] | None = None) -> dict[str, Decimal
     asset = entry.get('currency')
     if asset is None or (assets is not None and asset not in assets):
       continue
-    out[asset] = out.get(asset, Decimal(0)) + Decimal(str(entry.get('balance', 0)))
+    out[asset] = out.get(asset, Decimal(0)) + entry.get('balance', Decimal(0))
   return out
 
 
@@ -75,9 +75,7 @@ async def pocket_balances(*, assets: list[str] | None = None) -> dict[str, Decim
     asset = entry.get('currency')
     if asset is None or (assets is not None and asset not in assets):
       continue
-    total = Decimal(str(entry.get('balance', 0))) + Decimal(
-      str(entry.get('blockedBalance', 0))
-    )
+    total = entry.get('balance', Decimal(0)) + entry.get('blockedBalance', Decimal(0))
     out[asset] = out.get(asset, Decimal(0)) + total
   return out
 
@@ -202,14 +200,14 @@ async def crypto_deposits(start: datetime, end: datetime) -> list[CryptoDeposit]
           id=tx.get('id'),
           time=time,
           asset=asset,
-          amount=Decimal(str(dest.get('amount', 0))),
+          amount=dest.get('amount', Decimal(0)),
           # On a deposit the blockchain side is the *origin*, but it carries neither
           # `address` nor `addressNetwork` -- both sit on the crediting pocket instead.
           network=dest.get('addressNetwork'),
           tx_id=(tx.get('transaction') or {}).get('hash'),
           src_address=origin.get('address'),
           dst_address=dest.get('address'),
-          fee=Fee(amount=Decimal(str(fee_amount)), asset=fee_currency)
+          fee=Fee(amount=fee_amount, asset=fee_currency)
           if fee_amount and fee_currency
           else None,
         )
@@ -253,12 +251,12 @@ async def crypto_withdrawals(start: datetime, end: datetime) -> list[CryptoWithd
           id=tx.get('id'),
           time=time,
           asset=asset,
-          amount=-Decimal(str(origin.get('amount', 0))),
+          amount=-origin.get('amount', Decimal(0)),
           network=dest.get('addressNetwork'),
           tx_id=(tx.get('transaction') or {}).get('hash'),
           src_address=origin.get('address'),
           dst_address=dest.get('address'),
-          fee=Fee(amount=Decimal(str(fee_amount)), asset=fee_currency)
+          fee=Fee(amount=fee_amount, asset=fee_currency)
           if fee_amount and fee_currency
           else None,
         )
@@ -299,7 +297,7 @@ async def earn_yield(start: datetime, end: datetime) -> list[Yield]:
           id=m.get('movementId'),
           time=time,
           asset=currency,
-          amount=Decimal(str(value)),
+          amount=value,
         )
       )
   return out

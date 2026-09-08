@@ -8,7 +8,6 @@ There is no cross-wallet movements endpoint, so the walk is per Earn wallet:
 from typing_extensions import Sequence
 from dataclasses import dataclass
 from datetime import datetime
-from decimal import Decimal
 import asyncio
 
 from tribulnation.sdk.core import SDK
@@ -40,7 +39,7 @@ def parse_reward(movement: DataItem) -> Yield | None:
     id=movement.get('movementId'),
     time=time,
     asset=currency,
-    amount=Decimal(str(value)),
+    amount=value,
   )
 
 

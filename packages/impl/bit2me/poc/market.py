@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 
 from typed_bit2me import Bit2Me
 from typed_bit2me.v1.trading.orders.create import LimitOrderRequest, MarketOrderRequest
-from typed_bit2me.types import OrderSide
+from typed_bit2me.schemas import OrderSide
 from typed_bit2me.trading_ws.my_trades import MyTradeUpdate
 from typed_bit2me.trading_ws.order_book import OrderBookUpdate
 from dotenv import load_dotenv
@@ -50,9 +50,9 @@ async def depth(symbol: str, *, levels: int | None = None) -> Book:
   if levels is not None:
     bids = bids[:levels]
     asks = asks[:levels]
-  # Rows are `[price, amount]` on most markets but `[price, amount, price * amount]` on 26
-  # of the 290 (the thin/stablecoin pairs), so read the first two by index rather than
-  # unpacking.
+  # A row is `[price, amount]` or `[price, amount, price * amount]`, and which one is not
+  # a property of the market: the same symbol can serve triples here while pushing pairs
+  # over the socket. So read the first two by index rather than unpacking.
   return Book(
     bids=[Book.Entry(Decimal(str(r[0])), Decimal(str(r[1]))) for r in bids],
     asks=[Book.Entry(Decimal(str(r[0])), Decimal(str(r[1]))) for r in asks],
@@ -66,9 +66,11 @@ async def depth(symbol: str, *, levels: int | None = None) -> Book:
 @asynccontextmanager
 async def depth_stream(symbol: str):
   def to_book(update: OrderBookUpdate) -> Book:
+    # Same two row shapes as the REST book above, on the same markets or not: read the
+    # first two elements by index, never narrow on the symbol.
     return Book(
-      bids=[Book.Entry(Decimal(str(p)), Decimal(str(q))) for p, q in update['bids']],
-      asks=[Book.Entry(Decimal(str(p)), Decimal(str(q))) for p, q in update['asks']],
+      bids=[Book.Entry(Decimal(str(r[0])), Decimal(str(r[1]))) for r in update['bids']],
+      asks=[Book.Entry(Decimal(str(r[0])), Decimal(str(r[1]))) for r in update['asks']],
     )
 
   # `trading_ws` is a single multiplexed connection: opening it (unlike e.g. Binance's
@@ -103,7 +105,7 @@ async def rules(symbol: str, *, refetch: bool = False) -> Rules:
     quote=quote,
     fee_asset=quote,
     tick_size=Decimal(str(tick_size)) if tick_size is not None else Decimal(0),
-    step_size=Decimal(1).scaleb(-int(amount_precision))
+    step_size=Decimal(1).scaleb(-amount_precision)
     if amount_precision is not None
     else Decimal(0),
     fixed_min_qty=Decimal(str(min_amount)) if min_amount is not None else None,
@@ -157,7 +159,7 @@ async def open_orders(symbol: str) -> list[OrderState]:
   raw = await client.v1.trading.orders.list(status='open', symbol=symbol)
   out: list[OrderState] = []
   for o in raw:
-    qty = Decimal(str(o.get('amount', 0)))
+    qty = o.get('amount', Decimal(0))
     filled = Decimal(str(o.get('filledAmount', 0)))
     sign = 1 if o.get('side') == 'buy' else -1
     price = o.get('price')
