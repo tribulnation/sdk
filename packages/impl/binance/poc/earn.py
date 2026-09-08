@@ -63,7 +63,7 @@ async def locked_instruments(*, asset: str | None = None) -> list[Instrument]:
       # extraRewardAsset/extraRewardAPR. Skipped rather than forced into `apr`, since
       # there's no base rate to report -- see the coverage note below.
       continue
-    apr = Decimal(base_apr) + Decimal(detail.get('extraRewardAPR') or 0)
+    apr = base_apr + (detail.get('extraRewardAPR') or 0)
     reward_asset = detail.get('rewardAsset')
     out.append(
       Instrument(
@@ -71,10 +71,10 @@ async def locked_instruments(*, asset: str | None = None) -> list[Instrument]:
         asset=detail['asset'],
         apr=apr,
         yield_asset=reward_asset if reward_asset != detail['asset'] else None,
-        min_qty=Decimal(p['quota']['minimum']),
+        min_qty=p['quota']['minimum'],
         # `totalPersonalQuota` is this account's remaining subscription cap for the
         # product, not a venue-wide product maximum -- best-effort fit for `max_qty`.
-        max_qty=Decimal(p['quota']['totalPersonalQuota']),
+        max_qty=p['quota']['totalPersonalQuota'],
         duration=timedelta(days=detail['duration']),
         url=BINANCE_EARN_URL,
         id=p['projectId'],
@@ -129,10 +129,10 @@ async def on_chain_yields_instruments(*, asset: str | None = None) -> list[Instr
       Instrument(
         tags=['staking', 'fixed'],
         asset=detail['asset'],
-        apr=Decimal(detail['apr']),
+        apr=detail['apr'],
         yield_asset=reward_asset if reward_asset != detail['asset'] else None,
-        min_qty=Decimal(p['quota']['minimum']),
-        max_qty=Decimal(p['quota']['totalPersonalQuota']),
+        min_qty=p['quota']['minimum'],
+        max_qty=p['quota']['totalPersonalQuota'],
         duration=timedelta(days=detail['duration']),
         url=BINANCE_EARN_URL,
         id=p['projectId'],
@@ -160,7 +160,7 @@ async def bfusd_instrument() -> Instrument | None:
   return Instrument(
     tags=['flexible'],
     asset='USDT',
-    apr=Decimal(rate),
+    apr=rate,
     yield_asset='BFUSD',
     url=BINANCE_EARN_URL,
   )
@@ -186,7 +186,7 @@ async def rwusd_instruments() -> list[Instrument]:
     Instrument(
       tags=['flexible'],
       asset=asset,
-      apr=Decimal(rate),
+      apr=rate,
       yield_asset='RWUSD',
       url=BINANCE_EARN_URL,
     )
@@ -332,7 +332,8 @@ len(usdt), len(usdc), usdc[:5]
 # `detail.apr`/`detail.rewardAsset` entirely, carrying only `extraRewardAsset`/
 # `extraRewardAPR` on top of a base rate that doesn't exist for that listing.
 # `typed_binance` types both `LockedProductDetail.rewardAsset` and `.apr` as
-# `NotRequired[str]`, so those rows validate cleanly rather than 500ing: the unfiltered
+# `NotRequired` (`str` and `Decimal` respectively), so those rows validate cleanly
+# rather than 500ing: the unfiltered
 # listing behind `instruments()` really does carry them (8 of 123 locked products at the
 # time of this run). `locked_instruments` above still treats a missing `apr` as "not a real
 # base-rate product" and skips it, since an `Instrument` with `apr=0` would misrepresent

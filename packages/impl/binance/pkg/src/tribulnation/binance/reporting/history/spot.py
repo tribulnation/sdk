@@ -3,7 +3,6 @@
 from typing_extensions import AsyncIterator, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from decimal import Decimal
 
 from tribulnation.sdk.core import SDK
 from tribulnation.sdk.reporting import (
@@ -29,7 +28,7 @@ PAGE_SIZE = 100
 """Rows per page for the transfer-history cursor (its documented maximum)."""
 
 CAPITAL_PAGE_SIZE = 1000
-"""Rows per page for deposit/withdrawal history, which pages by `offset` instead."""
+"""Rows per page for deposit/withdrawal history (their documented maximum)."""
 
 DEPOSIT_SUCCESS = 1
 """`DepositRecord.status` for a credited deposit."""
@@ -128,17 +127,13 @@ class SpotHistory(SdkMixin):
     Binance charges nothing for a deposit, and the endpoint carries no fee field.
     """
     for window_start, window_end in windows(start, end, CAPITAL_WINDOW):
-      offset = 0
-      while True:
-        rows = await self.call_binance(
-          lambda: self.client.spot.http.wallet.capital.deposit.history(
-            start_time=window_start,
-            end_time=window_end,
-            status=DEPOSIT_SUCCESS,
-            offset=offset,
-            limit=CAPITAL_PAGE_SIZE,
-          )
-        )
+      paging = self.client.spot.http.wallet.capital.deposit.history_paged(
+        start_time=window_start,
+        end_time=window_end,
+        status=DEPOSIT_SUCCESS,
+        limit=CAPITAL_PAGE_SIZE,
+      ).via(self.call_binance)
+      async for rows in paging:
         for deposit in rows:
           yield record(
             CryptoDeposit(
@@ -153,9 +148,6 @@ class SpotHistory(SdkMixin):
             ),
             id=id,
           )
-        if len(rows) < CAPITAL_PAGE_SIZE:
-          break
-        offset += CAPITAL_PAGE_SIZE
 
   @SDK.method
   async def crypto_withdrawals(
@@ -167,17 +159,13 @@ class SpotHistory(SdkMixin):
     they are skipped rather than reported as on-chain withdrawals.
     """
     for window_start, window_end in windows(start, end, CAPITAL_WINDOW):
-      offset = 0
-      while True:
-        rows = await self.call_binance(
-          lambda: self.client.spot.http.wallet.capital.withdraw.history(
-            start_time=window_start,
-            end_time=window_end,
-            status=WITHDRAWAL_COMPLETED,
-            offset=offset,
-            limit=CAPITAL_PAGE_SIZE,
-          )
-        )
+      paging = self.client.spot.http.wallet.capital.withdraw.history_paged(
+        start_time=window_start,
+        end_time=window_end,
+        status=WITHDRAWAL_COMPLETED,
+        limit=CAPITAL_PAGE_SIZE,
+      ).via(self.call_binance)
+      async for rows in paging:
         for withdrawal in rows:
           if withdrawal['transferType'] == 1:
             continue
@@ -195,9 +183,6 @@ class SpotHistory(SdkMixin):
             ),
             id=id,
           )
-        if len(rows) < CAPITAL_PAGE_SIZE:
-          break
-        offset += CAPITAL_PAGE_SIZE
 
   @SDK.method
   async def internal_transfers(
@@ -208,17 +193,15 @@ class SpotHistory(SdkMixin):
       src, dst = split_transfer_type(type)
       paging = self.client.spot.http.wallet.asset.transfer.history_paged(
         type, start_time=start, end_time=end, size=PAGE_SIZE
-      )
-      state = paging.init
-      while state is not None:
-        chunk, state = await self.call_binance(lambda: paging.next(state))  # type: ignore
+      ).via(self.call_binance)
+      async for chunk in paging:
         for transfer in chunk:
           yield record(
             InternalTransfer(
               id=str(transfer['tranId']),
               time=transfer['timestamp'],
               asset=transfer['asset'],
-              amount=abs(Decimal(transfer['amount'])),
+              amount=abs(transfer['amount']),
               src_account=src,
               dst_account=dst,
             ),

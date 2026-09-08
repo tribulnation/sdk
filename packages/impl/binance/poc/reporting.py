@@ -272,7 +272,7 @@ async def internal_transfers(start: datetime, end: datetime) -> list[Transfer]:
       type=type, start_time=start, end_time=end
     )
     for t in page.get('rows') or []:
-      signed = Decimal(t['amount']) if type == 'FUNDING_MAIN' else -Decimal(t['amount'])
+      signed = t['amount'] if type == 'FUNDING_MAIN' else -t['amount']
       out.append(
         Transfer(
           id=str(t['tranId']),
@@ -444,9 +444,7 @@ async def snapshot(assets: list[str] | None = None) -> SnapshotRecord:
     [] if isinstance(spot_info, AuthError) else spot_info['balances']
   )
   futures_asset_rows: list[UsdMFuturesAccountV3Asset] = (
-    []
-    if isinstance(futures_account, AuthError)
-    else futures_account.get('assets') or []
+    [] if isinstance(futures_account, AuthError) else futures_account['assets']
   )
   futures_position_rows: list[FuturesPositionRiskV3Row] = (
     [] if isinstance(futures_positions, AuthError) else futures_positions
@@ -466,12 +464,12 @@ async def snapshot(assets: list[str] | None = None) -> SnapshotRecord:
   }
 
   futures_balances = {
-    a['asset']: Decimal(a['walletBalance'])
+    a['asset']: a['walletBalance']
     for a in futures_asset_rows
-    if 'asset' in a
-    and 'walletBalance' in a
-    and (assets is None or a['asset'] in assets)
+    if assets is None or a['asset'] in assets
   }
+  # `position_risk_v3` still declares its decimal strings as bare `str`, unlike the rest
+  # of the USD-M account family, so these stay wrapped.
   futures_positions_by_symbol = {
     p['symbol']: Position(
       size=Decimal(p['positionAmt']), avg_price=Decimal(p.get('entryPrice') or 0)
@@ -484,13 +482,13 @@ async def snapshot(assets: list[str] | None = None) -> SnapshotRecord:
   for p in flexible_rows:
     if assets is not None and p['asset'] not in assets:
       continue
-    earn_balances[p['asset']] = earn_balances.get(p['asset'], Decimal(0)) + Decimal(
-      p['totalAmount']
+    earn_balances[p['asset']] = (
+      earn_balances.get(p['asset'], Decimal(0)) + p['totalAmount']
     )
   for p in locked_rows:
     if assets is not None and p['asset'] not in assets:
       continue
-    held = Decimal(p['amount']) + Decimal(p['redeemingAmt'])
+    held = p['amount'] + p['redeemingAmt']
     earn_balances[p['asset']] = earn_balances.get(p['asset'], Decimal(0)) + held
 
   return SnapshotRecord(

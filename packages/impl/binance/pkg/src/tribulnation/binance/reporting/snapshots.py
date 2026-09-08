@@ -77,23 +77,21 @@ class Snapshots(SdkMixin, _Snapshots):
   async def earn_balances(self, assets: Collection[str] | None = None) -> Balances:
     """Fetch Simple Earn holdings, flexible and locked."""
     out = Balances()
-    flexible = self.client.spot.http.simple_earn.flexible.position_paged(size=PAGE_SIZE)
-    state = flexible.init
-    while state is not None:
-      chunk, state = await self.call_binance(lambda: flexible.next(state))  # type: ignore
+    flexible = self.client.spot.http.simple_earn.flexible.position_paged(
+      size=PAGE_SIZE
+    ).via(self.call_binance)
+    async for chunk in flexible:
       for position in chunk:
         if keep(assets, position['asset']):
-          out[position['asset']] += Decimal(position['totalAmount'])
+          out[position['asset']] += position['totalAmount']
 
-    locked = self.client.spot.http.simple_earn.locked.position_paged(size=PAGE_SIZE)
-    state = locked.init
-    while state is not None:
-      chunk, state = await self.call_binance(lambda: locked.next(state))  # type: ignore
+    locked = self.client.spot.http.simple_earn.locked.position_paged(
+      size=PAGE_SIZE
+    ).via(self.call_binance)
+    async for chunk in locked:
       for position in chunk:
         if keep(assets, position['asset']):
-          out[position['asset']] += Decimal(position['amount']) + Decimal(
-            position['redeemingAmt']
-          )
+          out[position['asset']] += position['amount'] + position['redeemingAmt']
     return out
 
   @SDK.method
@@ -103,11 +101,9 @@ class Snapshots(SdkMixin, _Snapshots):
       lambda: self.client.usdm_futures.http.account.account_v3()
     )
     out = Balances()
-    for row in account.get('assets') or []:
-      asset = row.get('asset')
-      balance = row.get('walletBalance')
-      if asset is not None and balance is not None and keep(assets, asset):
-        out[asset] += Decimal(balance)
+    for row in account['assets']:
+      if keep(assets, row['asset']):
+        out[row['asset']] += row['walletBalance']
     return out
 
   @SDK.method
@@ -118,6 +114,8 @@ class Snapshots(SdkMixin, _Snapshots):
     )
     out: dict[str, Position] = {}
     for row in rows:
+      # `position_risk_v3` still declares its decimal strings as bare `str`, unlike the
+      # rest of the USD-M account family, so these two stay wrapped.
       size = Decimal(row['positionAmt'])
       if size == 0:
         continue

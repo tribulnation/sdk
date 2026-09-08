@@ -46,12 +46,15 @@ def boost_only_product() -> LockedProduct:
     'status': 'PURCHASING',
     'subscriptionStartTime': TIME,
     'extraRewardAsset': 'BNB',
-    'extraRewardAPR': '0.01',
+    'extraRewardAPR': Decimal('0.01'),
   }
   return {
     'projectId': 'Bnb*90',
     'detail': detail,
-    'quota': {'totalPersonalQuota': '1000000', 'minimum': '0.05'},
+    'quota': {
+      'totalPersonalQuota': Decimal('1000000'),
+      'minimum': Decimal('0.05'),
+    },
   }
 
 

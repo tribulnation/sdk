@@ -3,7 +3,6 @@
 from typing_extensions import Any, Collection, Coroutine, Sequence
 from dataclasses import dataclass
 from datetime import timedelta
-from decimal import Decimal
 import asyncio
 
 from tribulnation.sdk.core import SDK
@@ -70,12 +69,12 @@ def parse_locked(product: LockedProduct) -> Instrument | None:
   return Instrument(
     tags=['fixed'],
     asset=detail['asset'],
-    apr=Decimal(base_apr) + Decimal(detail.get('extraRewardAPR') or 0),
+    apr=base_apr + (detail.get('extraRewardAPR') or 0),
     yield_asset=reward_asset if reward_asset != detail['asset'] else None,
-    min_qty=Decimal(product['quota']['minimum']),
+    min_qty=product['quota']['minimum'],
     # This account's remaining subscription cap, not a venue-wide product maximum --
     # the closest thing Binance exposes.
-    max_qty=Decimal(product['quota']['totalPersonalQuota']),
+    max_qty=product['quota']['totalPersonalQuota'],
     duration=timedelta(days=detail['duration']),
     url=EARN_URL,
     id=product['projectId'],
@@ -107,10 +106,10 @@ def parse_on_chain_yields(product: OnChainYieldsLockedProduct) -> Instrument | N
   return Instrument(
     tags=['staking', 'fixed'],
     asset=detail['asset'],
-    apr=Decimal(detail['apr']),
+    apr=detail['apr'],
     yield_asset=reward_asset if reward_asset != detail['asset'] else None,
-    min_qty=Decimal(product['quota']['minimum']),
-    max_qty=Decimal(product['quota']['totalPersonalQuota']),
+    min_qty=product['quota']['minimum'],
+    max_qty=product['quota']['totalPersonalQuota'],
     duration=timedelta(days=detail['duration']),
     url=EARN_URL,
     id=product['projectId'],
@@ -196,7 +195,7 @@ class Instruments(SdkMixin, _Instruments):
       Instrument(
         tags=['flexible'],
         asset='USDT',
-        apr=Decimal(rate),
+        apr=rate,
         yield_asset='BFUSD',
         url=EARN_URL,
       )
@@ -215,7 +214,7 @@ class Instruments(SdkMixin, _Instruments):
       Instrument(
         tags=['flexible'],
         asset=asset,
-        apr=Decimal(rate),
+        apr=rate,
         yield_asset='RWUSD',
         url=EARN_URL,
       )
