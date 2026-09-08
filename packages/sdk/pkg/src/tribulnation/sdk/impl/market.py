@@ -7,6 +7,7 @@ from .accounts import (
   Account,
   Binance,
   Bit2Me,
+  Bitget,
   Bybit,
   Coinbase,
   Dydx,
@@ -21,6 +22,7 @@ DEFAULT_ACCOUNTS: Mapping[str, Account] = {
   'mexc': Mexc(public=True),
   'binance': Binance(public=True),
   'bit2me': Bit2Me(public=True),
+  'bitget': Bitget(public=True),
 }
 
 
@@ -116,6 +118,22 @@ class MarketSDK(TradingMarkets):
       settings={'validate': account.validate},
     )
 
+  def bitget(self, account: Bitget) -> TradingVenue:
+    try:
+      from tribulnation.bitget import BitgetMarket
+    except ImportError as e:
+      raise ImportError(
+        'bitget market is not installed. Please install it with `pip install tribulnation-bitget`.'
+      ) from e
+    return BitgetMarket.new(
+      account.resolved_access_key,
+      account.resolved_secret_key,
+      account.resolved_passphrase,
+      uta=account.uta,
+      public=account.public,
+      validate=account.validate,
+    )
+
   def bit2me(self, account: Bit2Me) -> TradingVenue:
     try:
       from tribulnation.bit2me import Bit2MeMarket
@@ -148,6 +166,8 @@ class MarketSDK(TradingMarkets):
         return self.bybit(account)
       case 'bit2me':
         return self.bit2me(account)
+      case 'bitget':
+        return self.bitget(account)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 
