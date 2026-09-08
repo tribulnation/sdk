@@ -84,13 +84,10 @@ async def place_order(
   s: Settings = settings.get('hyperliquid', {})
   wire = _export_order(self, order, s)
   result = await self.client.exchange.order(orders=[wire], grouping='na')
-  response = result['response']
-  # `status` and `response` are declared independently, so only the payload's own
-  # shape tells a rejection apart from a result.
-  if isinstance(response, str):
-    raise ApiError(response)
+  if result['status'] == 'err':
+    raise ApiError(result['response'])
 
-  statuses = response['data']['statuses']
+  statuses = result['response']['data']['statuses']
   if not statuses:
     raise ApiError({'error': 'empty status list', 'details': result})
 
@@ -108,10 +105,9 @@ async def cancel_order(
 ) -> Any:
   cancel: CancelRequestItem = {'a': self.asset_id, 'o': int(id)}
   result = await self.client.exchange.cancel(cancels=[cancel])
-  response = result['response']
-  if isinstance(response, str):
-    raise ApiError(response)
-  statuses = response['data']['statuses']
+  if result['status'] == 'err':
+    raise ApiError(result['response'])
+  statuses = result['response']['data']['statuses']
   if not statuses:
     raise ApiError({'error': 'empty status list', 'details': result})
   s = statuses[0]

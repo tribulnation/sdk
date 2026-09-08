@@ -334,10 +334,9 @@ async def place_order(
     't': {'limit': {'tif': tif}},
   }
   result = await client.exchange.order(orders=[wire], grouping='na')
-  response = result['response']
-  if isinstance(response, str):
-    raise RuntimeError(f'order action rejected: {response}')
-  status = response['data']['statuses'][0]
+  if result['status'] == 'err':
+    raise RuntimeError(f'order action rejected: {result["response"]}')
+  status = result['response']['data']['statuses'][0]
   if 'resting' in status:
     return OrderResponse(id=str(status['resting']['oid']), details=status)
   if 'filled' in status:
@@ -357,10 +356,9 @@ async def cancel_order(coin: str, id: str, *, settings: Settings = {}):
   pair = next(p for p in spot_meta['universe'] if p['name'] == coin)
   asset_id = 10000 + pair['index']
   result = await client.exchange.cancel(cancels=[{'a': asset_id, 'o': int(id)}])
-  response = result['response']
-  if isinstance(response, str):
-    raise RuntimeError(f'cancel action rejected: {response}')
-  return response['data']['statuses'][0]
+  if result['status'] == 'err':
+    raise RuntimeError(f'cancel action rejected: {result["response"]}')
+  return result['response']['data']['statuses'][0]
 
 
 # Not executed here -- would cancel a real order on the testnet account.
@@ -573,10 +571,9 @@ async def perp_place_order(
     't': {'limit': {'tif': tif}},
   }
   result = await client.exchange.order(orders=[wire], grouping='na')
-  response = result['response']
-  if isinstance(response, str):
-    raise RuntimeError(f'order action rejected: {response}')
-  status = response['data']['statuses'][0]
+  if result['status'] == 'err':
+    raise RuntimeError(f'order action rejected: {result["response"]}')
+  status = result['response']['data']['statuses'][0]
   if 'resting' in status:
     return OrderResponse(id=str(status['resting']['oid']), details=status)
   if 'filled' in status:
@@ -608,10 +605,9 @@ async def perp_cancel_order(
   else:
     asset_id = asset_idx
   result = await client.exchange.cancel(cancels=[{'a': asset_id, 'o': int(id)}])
-  response = result['response']
-  if isinstance(response, str):
-    raise RuntimeError(f'cancel action rejected: {response}')
-  return response['data']['statuses'][0]
+  if result['status'] == 'err':
+    raise RuntimeError(f'cancel action rejected: {result["response"]}')
+  return result['response']['data']['statuses'][0]
 
 
 # Not executed here -- would cancel a real order on the testnet account.

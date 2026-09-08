@@ -15,57 +15,124 @@ the isolated leg made it drift by exactly that leg's change. These tests pin the
 measured behaviour so the plausible-sounding version cannot be reintroduced.
 """
 
+from datetime import datetime, timezone
 from decimal import Decimal
+
+from typing_extensions import cast
+
+from typed_hyperliquid.info import Info
+from typed_hyperliquid.info.clearinghouse_state import (
+  AssetPosition,
+  ClearinghouseState,
+)
+from typed_hyperliquid.info.perp_dexs import PerpDex
+from typed_hyperliquid.info.perp_meta_and_asset_ctxs import (
+  PerpAssetContext,
+  PerpDexMeta,
+)
+from typed_hyperliquid.info.spot_clearinghouse_state import SpotClearinghouseState
+from typed_hyperliquid.info.staking_summary import DelegatorSummary
 
 from tribulnation.hyperliquid.report.snapshots import Snapshots
 from tribulnation.hyperliquid.report.subaccounts import STAKING, UNIFIED
 
 USDC = '0'
 
+TIME = datetime(2026, 3, 20, tzinfo=timezone.utc)
+"""Snapshot time; nothing under test reads it."""
 
-def position(coin: str, *, upnl: str, isolated: str | None = None) -> dict:
+
+def position(coin: str, *, upnl: str, isolated: str | None = None) -> AssetPosition:
   """One `assetPositions` entry; `isolated` supplies `rawUsd` when set."""
-  leverage = (
-    {'type': 'isolated', 'value': 5, 'rawUsd': isolated}
-    if isolated is not None
-    else {'type': 'cross', 'value': 5}
-  )
   return {
+    'type': 'oneWay',
     'position': {
       'coin': coin,
-      'szi': '1',
-      'entryPx': '100',
-      'unrealizedPnl': upnl,
-      'leverage': leverage,
-    }
+      'cumFunding': {
+        'allTime': Decimal(0),
+        'sinceChange': Decimal(0),
+        'sinceOpen': Decimal(0),
+      },
+      'entryPx': Decimal('100'),
+      'leverage': {'type': 'isolated', 'value': 5, 'rawUsd': Decimal(isolated)}
+      if isolated is not None
+      else {'type': 'cross', 'value': 5},
+      'liquidationPx': None,
+      'marginUsed': Decimal(0),
+      'maxLeverage': 5,
+      'positionValue': Decimal(0),
+      'returnOnEquity': Decimal(0),
+      'szi': Decimal('1'),
+      'unrealizedPnl': Decimal(upnl),
+    },
   }
 
 
 class StubInfo:
   """Minimal `Info` surface for snapshot assembly, main dex only."""
 
-  def __init__(self, positions: list[dict], *, spot: str = '1000'):
+  def __init__(self, positions: list[AssetPosition], *, spot: str = '1000'):
     self.positions = positions
     self.spot = spot
 
-  async def staking_summary(self, *, user: str):
-    return {'delegated': '0', 'undelegated': '0'}
+  async def staking_summary(self, *, user: str) -> DelegatorSummary:
+    return {
+      'delegated': Decimal(0),
+      'nPendingWithdrawals': 0,
+      'totalPendingWithdrawal': Decimal(0),
+      'undelegated': Decimal(0),
+    }
 
-  async def spot_clearinghouse_state(self, *, user: str):
-    return {'balances': [{'coin': 'USDC', 'token': 0, 'total': self.spot}]}
+  async def spot_clearinghouse_state(self, *, user: str) -> SpotClearinghouseState:
+    return {
+      'balances': [
+        {
+          'coin': 'USDC',
+          'token': 0,
+          'hold': Decimal(0),
+          'total': Decimal(self.spot),
+          'entryNtl': Decimal(0),
+        }
+      ]
+    }
 
-  async def perp_dexs(self):
+  async def perp_dexs(self) -> list[PerpDex | None]:
     return [None]
 
-  async def perp_meta_and_asset_ctxs(self, *, dex: str):
-    return {'collateralToken': 0, 'universe': []}, []
+  async def perp_meta_and_asset_ctxs(
+    self, *, dex: str
+  ) -> tuple[PerpDexMeta, list[PerpAssetContext]]:
+    return {'collateralToken': 0, 'marginTables': [], 'universe': []}, []
 
-  async def clearinghouse_state(self, *, user: str, dex: str = ''):
-    return {'assetPositions': self.positions}
+  async def clearinghouse_state(
+    self, *, user: str, dex: str = ''
+  ) -> ClearinghouseState:
+    return {
+      'assetPositions': self.positions,
+      'crossMaintenanceMarginUsed': Decimal(0),
+      'crossMarginSummary': {
+        'accountValue': Decimal(0),
+        'totalMarginUsed': Decimal(0),
+        'totalNtlPos': Decimal(0),
+        'totalRawUsd': Decimal(0),
+      },
+      'marginSummary': {
+        'accountValue': Decimal(0),
+        'totalMarginUsed': Decimal(0),
+        'totalNtlPos': Decimal(0),
+        'totalRawUsd': Decimal(0),
+      },
+      'time': TIME,
+      'withdrawable': Decimal(0),
+    }
 
 
-async def balances(positions: list[dict], *, spot: str = '1000') -> dict[str, Decimal]:
-  record = await Snapshots(StubInfo(positions, spot=spot), '0xabc').snapshot()
+async def balances(
+  positions: list[AssetPosition], *, spot: str = '1000'
+) -> dict[str, Decimal]:
+  """Assemble a snapshot over a stubbed client and return the unified balances."""
+  info = cast(Info, StubInfo(positions, spot=spot))
+  record = await Snapshots(info, '0xabc').snapshot()
   (unified,) = [s for s in record.snapshot.subaccounts if s.subaccount == UNIFIED]
   return unified.balances
 
@@ -107,6 +174,6 @@ async def test_cross_and_isolated_pnl_both_count():
 
 
 async def test_staking_compartment_is_labelled():
-  record = await Snapshots(StubInfo([]), '0xabc').snapshot()
+  record = await Snapshots(cast(Info, StubInfo([])), '0xabc').snapshot()
 
   assert [s.subaccount for s in record.snapshot.subaccounts] == [UNIFIED, STAKING]
