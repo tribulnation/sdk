@@ -36,6 +36,7 @@ from .impl import (
   trades_history,
   trades_stream,
 )
+from .impl.candles import CANDLE_INTERVALS, candles
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -75,11 +76,11 @@ class SpotMarket(MarketMixin, Market):
     start: datetime,
     end: datetime,
   ) -> PaginatedResponse[Candle]:
-    raise NotImplementedError(
-      f'candles is not implemented for this market [{self.id}]: typed_bit2me types '
-      '`v1.trading.candles` rows as `list[float]` and declares no paged walk for it, '
-      'so neither the prices nor the sweep can come through the client.'
-    )
+    """Fetch trade candles, continuing through empty time windows."""
+    self.check_candles(interval, start, end)
+    return PaginatedResponse(candles(self, interval, start, end))
+
+  CANDLE_INTERVALS = CANDLE_INTERVALS
 
   async def open_orders(self) -> Sequence[OrderState]:
     return await open_orders(self)

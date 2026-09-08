@@ -28,6 +28,7 @@ note = "Deposit and withdrawal methods come from the per-asset chain list (`v1/w
 support = "partial"
 auth = false
 methods = [
+  "candles",
   "depth",
   "depth_stream",
   "rules",
@@ -45,7 +46,7 @@ methods = [
   "cancel_orders",
   "cancel_open_orders",
 ]
-note = "Spot only. `candles` raises `NotImplementedError`: the typed client types `v1/trading/candle` rows as floats and declares no paged walk for it. `rules().maker_fee`/`taker_fee` are always `0` because no Bit2Me endpoint publishes a fee rate ahead of a fill, and `tickers()` carries no `bid_qty`/`ask_qty` because `v2/trading/tickers` quotes prices only."
+note = "Spot only. `candles` sweeps bounded time windows, continuing through empty slots without synthesizing candles; JSON-number prices are converted through their decimal string representation. `rules().maker_fee`/`taker_fee` are always `0` because no Bit2Me endpoint publishes a fee rate ahead of a fill, and `tickers()` carries no `bid_qty`/`ask_qty` because `v2/trading/tickers` quotes prices only."
 # MarketSDK.DEFAULT_ACCOUNTS includes 'bit2me' (Bit2Me(public=True)): markets, depth,
 # tickers and rules are public; account-scoped methods still need real credentials.
 

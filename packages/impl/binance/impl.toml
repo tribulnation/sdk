@@ -30,7 +30,7 @@ methods = [
   "funding_rates",
   "candles",
 ]
-note = "Read-only: order placement and cancellation are not implemented. The USD-M futures exchange serves only public market data (`depth`, `depth_stream`, `index`, `next_funding`, `funding_rates`) — every private futures endpoint returned 401 against the test account, which Binance gates behind a separate API-key flag, so they raise rather than ship unverified. `candles` serves spot only, every contract interval, 1000 per page; the USD-M kline endpoint has no paged walk in the typed client yet."
+note = "Read-only: order placement and cancellation are not implemented. The USD-M futures exchange serves only public market data (`depth`, `depth_stream`, `index`, `next_funding`, `funding_rates`, `candles`) — every private futures endpoint returned 401 against the test account, which Binance gates behind a separate API-key flag, so they raise rather than ship unverified. `candles` serves spot and USD-M, every contract interval, 1000 per page with `[start, end)` filtering."
 # MarketSDK.DEFAULT_ACCOUNTS includes 'binance' (Binance(public=True)) — but that only
 # covers purely public market-data methods; account-scoped methods still need real
 # credentials regardless (see docs/contract/market.yml's per-method `public: false`).

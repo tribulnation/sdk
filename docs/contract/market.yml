@@ -188,7 +188,9 @@ methods:
   candles:
     group: Public market data
     venues:
-      binance: Spot only, 1000 per page. The USD-M kline endpoint has no paged walk in the typed client yet, so the futures market raises `NotImplementedError`.
+      binance: Spot and USD-M, every contract interval, 1000 per page with `[start, end)` filtering.
+      bit2me: Bounded windows continue through empty slots; no synthetic candles. Native order, JSON-number prices converted to decimals.
+      hyperliquid: Spot and perpetuals in native order. Only the latest 5000 candles per interval are retained by the venue; quote volume is not reported.
       bybit: Native newest-first pages, filtered to required `[start, end)` bounds without buffering the full history.
       coinbase: "Required `[start, end)` bounds, swept in windows of 299 candle opens because the venue caps each range. Native row order; `quote_volume` is `None`, and hours with no trades are absent rather than zero."
       dydx: Native newest-first pages, filtered to required `[start, end)` bounds without buffering the full history.

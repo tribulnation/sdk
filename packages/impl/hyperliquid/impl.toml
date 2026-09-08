@@ -5,6 +5,7 @@
 support = "partial"
 auth = false
 methods = [
+  "candles",
   "depth",
   "depth_stream",
   "rules",
@@ -29,7 +30,7 @@ methods = [
   "perp_position",
   "perp_collateral",
 ]
-note = "`candles` raises `NotImplementedError`: `info.candle_snapshot` answers at most 5000 candles per call and the typed client declares no paged walk for it yet."
+note = "`candles` serves spot and perpetuals in native order within `[start, end)`. Hyperliquid retains only the latest 5000 candles per interval; pagination does not recover expired history. Quote volume is not reported."
 # MarketSDK.DEFAULT_ACCOUNTS includes 'hyperliquid' (Hyperliquid(public=True)) — but that
 # only covers purely public market-data methods; account-scoped/trading methods still need
 # real credentials regardless (see docs/contract/market.yml's per-method `public: false`).

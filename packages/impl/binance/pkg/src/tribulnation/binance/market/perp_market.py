@@ -3,6 +3,7 @@
 from typing_extensions import (
   AsyncContextManager,
   AsyncIterable,
+  AsyncIterator,
   Literal,
   Sequence,
 )
@@ -96,6 +97,8 @@ class PerpMarket(SharedMixin, _PerpMarket):
 
   symbol: str
 
+  CANDLE_INTERVALS = frozenset[CandleInterval]({'1m', '5m', '15m', '1h', '4h', '1d'})
+
   @property
   def venue_id(self) -> str:
     return 'binance'
@@ -183,11 +186,43 @@ class PerpMarket(SharedMixin, _PerpMarket):
     start: datetime,
     end: datetime,
   ) -> PaginatedResponse[Candle]:
-    raise NotImplementedError(
-      f'candles is not implemented for this market [{self.id}]: typed_binance '
-      'declares no paged walk for `usdm_futures.http.market.klines` and types its '
-      'open time as a bare int, so the series cannot be swept through the client.'
-    )
+    """Fetch USD-M trade candles, preserving the venue's native page order."""
+    self.check_candles(interval, start, end)
+    return PaginatedResponse(self.walk_candles(interval, start, end))
+
+  async def walk_candles(
+    self,
+    interval: CandleInterval,
+    start: datetime,
+    end: datetime,
+  ) -> AsyncIterator[Sequence[Candle]]:
+    """Fetch and retry individual pages within the requested half-open range."""
+    if start == end:
+      return
+    paging = self.client.usdm_futures.http.market.klines_paged(
+      self.symbol,
+      interval=interval,
+      start_time=start,
+      end_time=end,
+      limit=1000,
+    ).via(self.call_binance)
+    async for rows in paging:
+      page = [
+        Candle(
+          time=r[0],
+          open=r[1],
+          high=r[2],
+          low=r[3],
+          close=r[4],
+          volume=r[5],
+          quote_volume=r[7],
+          trades=r[8],
+        )
+        for r in rows
+        if start <= r[0] < end
+      ]
+      if page:
+        yield page
 
   async def rules(self, *, refetch: bool = False) -> Rules:
     raise futures_permission_error('rules', self.id)

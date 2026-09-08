@@ -20,6 +20,7 @@ from tribulnation.sdk.market import (
 )
 
 from tribulnation.hyperliquid.core import wrap_exceptions
+from .impl.candles import CANDLE_INTERVALS, candles
 
 from .impl import (
   SpotMarketMixin,
@@ -72,11 +73,11 @@ class SpotMarket(SpotMarketMixin, Market):
     start: datetime,
     end: datetime,
   ) -> PaginatedResponse[Candle]:
-    raise NotImplementedError(
-      f'candles is not implemented for this market [{self.id}]: typed_hyperliquid '
-      'declares no paged walk for `info.candle_snapshot`, which answers at most 5000 '
-      'candles per call, so the series cannot be swept through the client.'
-    )
+    """Fetch trade candles in the requested half-open range."""
+    self.check_candles(interval, start, end)
+    return PaginatedResponse(candles(self, interval, start, end))
+
+  CANDLE_INTERVALS = CANDLE_INTERVALS
 
   async def open_orders(self) -> Sequence[OrderState]:
     return await open_orders(self)
