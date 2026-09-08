@@ -49,6 +49,7 @@ would raise instead.
 | Hyperliquid | ✅ | ✅ |
 | MEXC | ✅ | ✅ |
 | Binance | ✅ | ✅ |
+| Bitget | ✅ | ✅ |
 | Bit2Me | ✅ | ✅ |
 | Coinbase | ✅ | ✅ |
 | Bybit | ✅ | ✅ |

@@ -71,6 +71,6 @@ await sdk.place_order(
 
 ---
 
-← [Hyperliquid Market](hyperliquid.md) · **Next:** [Earn](../../earn/index.md) →
+← [Hyperliquid Market](hyperliquid.md) · **Next:** [Bitget Market](bitget.md) →
 
 <!-- /next -->

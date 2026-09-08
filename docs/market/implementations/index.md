@@ -19,6 +19,7 @@ Per-method differences are on the [Methods](../methods.md) page, under each meth
 - [dYdX](dydx.md) — perpetuals only; subaccounts as the exchange qualifier
 - [Hyperliquid](hyperliquid.md) — spot and perpetuals, several exchanges under one venue
 - [MEXC](mexc.md) — spot only
+- [Bitget](bitget.md) — spot and USDT-margined perpetuals, read-only; Classic and UTA accounts
 
 <!-- next -->
 

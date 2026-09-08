@@ -40,6 +40,6 @@ for account, sdk in earn.all.items():
 
 ---
 
-← [MEXC Market](../market/implementations/mexc.md) · **Next:** [Methods](methods.md) →
+← [Bitget Market](../market/implementations/bitget.md) · **Next:** [Methods](methods.md) →
 
 <!-- /next -->

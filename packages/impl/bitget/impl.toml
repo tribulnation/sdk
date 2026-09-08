@@ -1,6 +1,23 @@
 # auth = false means this surface has a real credential-free DEFAULT_ACCOUNTS entry —
 # auth = true means every call always needs a real accounts.Bitget() entry.
 
+[support.market]
+support = "partial"
+auth = false
+methods = [
+  "depth", "depth_stream", "tickers", "rules", "perp_stats", "query_order", "open_orders",
+  "trades_history", "trades_stream", "position", "collateral", "available_notional",
+  "index", "next_funding", "funding_rates", "perp_position", "perp_collateral",
+]
+note = "Read-only: `place_order`/`cancel_*` raise `NotImplementedError` (not a venue we trade on). `funding_payments` is unsupported on either account mode, since Bitget publishes no closed set of futures ledger types to filter a settlement on. On a Classic account `perp_collateral` and the exchange-level spot `collateral` are unsupported too (the futures wallet reports no margin requirement, the spot wallet no pool)."
+# MarketSDK.DEFAULT_ACCOUNTS includes 'bitget' (Bitget(public=True)) — public market data
+# (markets, depth, depth_stream, tickers, rules, perp_stats, index, next_funding,
+# funding_rates) comes from the venue's public endpoints and is the same whatever the
+# account's mode. Account-scoped reads dispatch on the mode (Classic vs UTA), detected
+# on first use. `perp` lists the USDT-margined perpetuals only (the product line can also
+# carry delivery contracts, which pay no funding). `query_order` is the base scan of
+# `open_orders`: the order-info endpoints exist but were never exercised against an order.
+
 [support.earn]
 support = "full"
 auth = true
