@@ -19,6 +19,7 @@ Per-method differences are on the [Methods](../methods.md) page, under each meth
 - [dYdX](dydx.md) — perpetuals only; subaccounts as the exchange qualifier
 - [Hyperliquid](hyperliquid.md) — spot and perpetuals, several exchanges under one venue
 - [MEXC](mexc.md) — spot only
+- [Kraken](kraken.md) — spot only, read only; altname market ids
 
 <!-- next -->
 

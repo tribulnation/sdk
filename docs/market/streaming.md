@@ -51,6 +51,7 @@ would raise instead.
 | Binance | ✅ | ✅ |
 | Bit2Me | ✅ | ✅ |
 | Coinbase | ✅ | ✅ |
+| Kraken | ✅ | ✅ |
 | Bybit | ✅ | ✅ |
 <!-- /streams -->
 

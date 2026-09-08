@@ -40,6 +40,6 @@ for account, sdk in earn.all.items():
 
 ---
 
-← [MEXC Market](../market/implementations/mexc.md) · **Next:** [Methods](methods.md) →
+← [Kraken Market](../market/implementations/kraken.md) · **Next:** [Methods](methods.md) →
 
 <!-- /next -->
