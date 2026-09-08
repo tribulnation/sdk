@@ -54,8 +54,10 @@ class Shared(SDK):
   fee_tier: feetiers_proto.PerpetualFeeTier | None = None
   parent_subaccount_subscriptions: dict[
     int, Subscription[ParentSubaccountNotification]
-  ] = field(default_factory=dict)
-  depth_subscriptions: dict[str, Subscription[Book]] = field(default_factory=dict)
+  ] = field(default_factory=dict[int, Subscription[ParentSubaccountNotification]])
+  depth_subscriptions: dict[str, Subscription[Book]] = field(
+    default_factory=dict[str, Subscription[Book]]
+  )
 
   @wrap_exceptions
   async def load_markets(self, *, refetch: bool = False) -> dict[str, PerpetualMarket]:

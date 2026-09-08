@@ -1,4 +1,4 @@
-from typing_extensions import Literal, Sequence
+from typing_extensions import Literal, Sequence, TypedDict
 from decimal import Decimal
 import base64
 
@@ -18,9 +18,19 @@ from tribulnation.sdk.market import (
   OrderState,
   Settings as MarketSettings,
 )
+from typed_dydx.protos.cosmos.tx.v1beta1 import BroadcastTxResponse
 from typed_dydx.protos.dydxprotocol import clob, subaccounts
 from tribulnation.dydx.core import wrap_exceptions
 from .mixin import MarketMixin, Settings, settings_adapter
+
+
+class CancelResults(TypedDict, total=False):
+  """Broadcast responses of a batch cancel, by the order flavour each went through."""
+
+  short_term: BroadcastTxResponse
+  """The single batch transaction cancelling every short-term order."""
+  long_term: list[BroadcastTxResponse]
+  """One transaction per long-term order, in the order given."""
 
 
 def _active(status: str) -> bool:
@@ -229,12 +239,12 @@ async def cancel_order(self: MarketMixin, id: str, *, settings: MarketSettings =
 @wrap_exceptions
 async def cancel_orders(
   self: MarketMixin, ids: Sequence[str], *, settings: MarketSettings = {}
-):
+) -> CancelResults:
   order_ids = [parse_id(id) for id in ids]
   short_term = [order_id for order_id in order_ids if order_id.order_flags == 0]
   long_term = [order_id for order_id in order_ids if order_id.order_flags != 0]
 
-  results: dict = {}
+  results: CancelResults = {}
   if short_term:
     results['short_term'] = await self.client.node.batch_cancel_orders(short_term)
   if long_term:

@@ -1,4 +1,4 @@
-from typing_extensions import Any, TYPE_CHECKING
+from typing_extensions import TYPE_CHECKING
 from dataclasses import dataclass
 import asyncio
 from datetime import datetime
@@ -6,6 +6,8 @@ from decimal import Decimal
 import json
 from urllib.parse import urlencode
 from urllib.request import urlopen
+
+from pydantic import JsonValue, TypeAdapter
 
 from tribulnation.sdk.reporting import HistoryRecord, Yield, source_id
 from tribulnation.dydx.core import parse_denom_amount
@@ -18,12 +20,17 @@ if TYPE_CHECKING:
 
 GOVERNANCE_API_URL = 'https://dydx-dao-api.polkachu.com'
 
+JsonObject = dict[str, JsonValue]
+"""A decoded JSON object, as the governance REST API serves them."""
 
-def proposal_amount(coin: dict) -> tuple[str, Decimal] | None:
+json_adapter: TypeAdapter[JsonValue] = TypeAdapter(JsonValue)
+
+
+def proposal_amount(coin: JsonObject) -> tuple[str, Decimal] | None:
   """Convert a proposal coin object into asset and amount."""
   denom = coin.get('denom')
   amount = coin.get('amount')
-  if denom is None or amount is None:
+  if denom is None or not isinstance(amount, (str, int, float)):
     return None
   denom_str = str(denom)
   return parse_denom_amount(denom_str, int(amount))
@@ -56,12 +63,12 @@ class GovernanceHistory:
           records.append(record.model_copy(update={'observations': observations}))
     return records
 
-  async def governance_proposals(self) -> list[dict[str, Any]]:
+  async def governance_proposals(self) -> list[JsonObject]:
     """Fetch dYdX governance proposals from the public DAO REST API."""
     if self.cache is not None and self.cache.governance_has_cache():
       return self.cache.read_governance_proposals()
 
-    proposals: list[dict[str, Any]] = []
+    proposals: list[JsonObject] = []
     next_key: str | None = None
     while True:
       params = {'pagination.limit': '100'}
@@ -84,24 +91,22 @@ class GovernanceHistory:
 
     return proposals
 
-  async def governance_json(
-    self, path: str, *, params: dict[str, str]
-  ) -> dict[str, Any]:
+  async def governance_json(self, path: str, *, params: dict[str, str]) -> JsonObject:
     """Fetch one governance REST JSON payload."""
     query = urlencode(params)
     url = f'{GOVERNANCE_API_URL}{path}?{query}'
 
-    def fetch() -> dict[str, Any]:
+    def fetch() -> JsonObject:
       """Run the blocking REST call in a worker thread."""
       with urlopen(url) as response:
-        payload = json.loads(response.read().decode())
+        payload = json_adapter.validate_python(json.loads(response.read().decode()))
       if not isinstance(payload, dict):
         raise ValueError(f'Expected governance JSON object from {url}.')
       return payload
 
     return await asyncio.to_thread(fetch)
 
-  def parse_governance_proposal(self, proposal: dict[str, Any]) -> HistoryRecord | None:
+  def parse_governance_proposal(self, proposal: JsonObject) -> HistoryRecord | None:
     """Convert one governance proposal into a Community Treasury yield record."""
     status = proposal.get('status')
     if status not in {'PROPOSAL_STATUS_PASSED', '3'}:
@@ -143,7 +148,7 @@ class GovernanceHistory:
       events.extend(tx_result.get('events', []))
     return events
 
-  def governance_proposal_time(self, proposal: dict[str, Any]) -> datetime | None:
+  def governance_proposal_time(self, proposal: JsonObject) -> datetime | None:
     """Return the best available execution proxy timestamp for a proposal."""
     for key in ('voting_end_time', 'submit_time'):
       value = proposal.get(key)
@@ -151,11 +156,11 @@ class GovernanceHistory:
         return datetime.fromisoformat(str(value))
     return None
 
-  def proposal_id(self, proposal: dict[str, Any]) -> str:
+  def proposal_id(self, proposal: JsonObject) -> str:
     """Return the stable proposal identifier."""
     return str(proposal.get('id') or proposal.get('proposal_id') or 'unknown')
 
-  def proposal_messages(self, proposal: dict[str, Any]) -> list[dict[str, Any]]:
+  def proposal_messages(self, proposal: JsonObject) -> list[JsonObject]:
     """Return proposal messages from either Cosmos gov response shape."""
     messages = proposal.get('messages')
     if isinstance(messages, list):
@@ -167,7 +172,7 @@ class GovernanceHistory:
         return [item for item in nested if isinstance(item, dict)]
     return []
 
-  def message_coins(self, message: dict[str, Any]) -> list[dict[str, object]]:
+  def message_coins(self, message: JsonObject) -> list[JsonObject]:
     """Return coin objects from a governance send message."""
     amount = message.get('amount') or message.get('coins') or message.get('coin')
     if isinstance(amount, list):
