@@ -17,7 +17,7 @@ from typed_dydx.indexer.schemas import (
 )
 from typed_dydx.node.orders.types import Flags, TimeInForce
 from typed_dydx.protos.dydxprotocol import feetiers as feetiers_proto
-from tribulnation.sdk.core import SDK, Subscription, OverflowPolicy
+from tribulnation.sdk.core import SDK, Subscription, OverflowPolicy, AuthError
 from tribulnation.dydx.core import wrap_exceptions
 from .depth import depth_stream, Book
 from .rules import parse_rules, Rules
@@ -49,13 +49,19 @@ settings_adapter = pydantic.TypeAdapter(Settings)
 class Shared(SDK):
   client: Dydx
   parent_subaccount: int = 0
-  address: str
+  address: str | None
   perpetual_markets: dict[str, PerpetualMarket] | None = None
   fee_tier: feetiers_proto.PerpetualFeeTier | None = None
   parent_subaccount_subscriptions: dict[
     int, Subscription[ParentSubaccountNotification]
   ] = field(default_factory=dict)
   depth_subscriptions: dict[str, Subscription[Book]] = field(default_factory=dict)
+
+  def require_address(self) -> str:
+    """Require an account only when an account-scoped operation uses it."""
+    if self.address is None:
+      raise AuthError('An address or mnemonic is required for account-scoped dYdX data')
+    return self.address
 
   @wrap_exceptions
   async def load_markets(self, *, refetch: bool = False) -> dict[str, PerpetualMarket]:
@@ -68,7 +74,7 @@ class Shared(SDK):
     self, *, refetch: bool = False
   ) -> feetiers_proto.PerpetualFeeTier:
     if refetch or self.fee_tier is None:
-      response = await self.client.chain.feetiers.user_fee_tier(self.address)
+      response = await self.client.chain.feetiers.user_fee_tier(self.require_address())
       if response.tier is None:
         raise ValueError('dYdX fee tier response did not include a tier')
       self.fee_tier = response.tier
@@ -87,7 +93,7 @@ class Shared(SDK):
       @wrap_exceptions
       async def subscribe():
         stream = await self.client.indexer.streams.parent_subaccounts(
-          self.address, subaccount=parent_subaccount
+          self.require_address(), subaccount=parent_subaccount
         )
 
         @wrap_exceptions
@@ -138,9 +144,7 @@ class ExchangeMixin(SDK):
         mnemonic, indexer={'validate': validate}, public=mnemonic is None
       )
     )
-    if address is None:
-      if mnemonic is None:
-        raise ValueError('Either address or mnemonic must be provided')
+    if address is None and mnemonic is not None:
       address = client.node.require_wallet().address
     return cls(
       shared=Shared(client=client, address=address, parent_subaccount=parent_subaccount)
@@ -156,7 +160,7 @@ class ExchangeMixin(SDK):
 
   @property
   def address(self):
-    return self.shared.address
+    return self.shared.require_address()
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield self.shared

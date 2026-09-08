@@ -75,9 +75,12 @@ class MarketSDK(TradingMarkets):
       raise ImportError(
         'mexc market is not installed. Please install it with `pip install tribulnation-mexc`.'
       ) from e
+    api_key, api_secret = account.resolved_api_key, account.resolved_api_secret
+    if account.public and api_key is None and api_secret is None:
+      return MexcMarket.public(validate=account.validate)
     return MexcMarket.new(
-      api_key=account.resolved_api_key,
-      api_secret=account.resolved_api_secret,
+      api_key=api_key,
+      api_secret=api_secret,
       validate=account.validate,
     )
 
@@ -88,9 +91,11 @@ class MarketSDK(TradingMarkets):
       raise ImportError(
         'binance market is not installed. Please install it with `pip install tribulnation-binance`.'
       ) from e
+    api_key, secret_key = account.resolved_api_key, account.resolved_secret_key
     return BinanceMarket.new(
-      api_key=account.resolved_api_key,
-      secret_key=account.resolved_secret_key,
+      api_key=api_key,
+      secret_key=secret_key,
+      public=account.public and api_key is None and secret_key is None,
       validate=account.validate,
     )
 
@@ -101,7 +106,12 @@ class MarketSDK(TradingMarkets):
       raise ImportError(
         'coinbase market is not installed. Please install it with `pip install tribulnation-coinbase`.'
       ) from e
-    return CoinbaseMarket.new(account.resolved_key_name, account.resolved_private_key)
+    key_name, private_key = account.resolved_key_name, account.resolved_private_key
+    return CoinbaseMarket.new(
+      key_name,
+      private_key,
+      public=account.public and key_name is None and private_key is None,
+    )
 
   def bybit(self, account: Bybit) -> TradingVenue:
     try:
@@ -110,9 +120,11 @@ class MarketSDK(TradingMarkets):
       raise ImportError(
         'bybit market is not installed. Please install it with `pip install tribulnation-bybit`.'
       ) from e
+    api_key, api_secret = account.resolved_api_key, account.resolved_api_secret
     return BybitMarket.new(
-      account.resolved_api_key,
-      account.resolved_api_secret,
+      api_key,
+      api_secret,
+      public=account.public and api_key is None and api_secret is None,
       settings={'validate': account.validate},
     )
 
