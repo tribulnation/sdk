@@ -1,4 +1,5 @@
 from .book import Book
+from .candles import Candle, CandleInterval, candle_width, candle_windows
 from .collateral import Collateral, PerpCollateral
 from .funding import FundingRate, NextFunding, FundingPayment
 from .orders import Order, OrderResponse, OrderState

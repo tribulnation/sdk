@@ -1,5 +1,9 @@
 from .types import (
   Book,
+  Candle,
+  CandleInterval,
+  candle_width,
+  candle_windows,
   Collateral,
   PerpCollateral,
   FundingRate,

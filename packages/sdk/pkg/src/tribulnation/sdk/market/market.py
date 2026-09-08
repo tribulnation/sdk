@@ -3,6 +3,7 @@ from typing_extensions import (
   AsyncContextManager,
   AsyncIterable,
   AsyncIterator,
+  ClassVar,
   Sequence,
 )
 from abc import abstractmethod
@@ -13,6 +14,8 @@ import asyncio
 from tribulnation.sdk.core import SDK, PaginatedResponse, OverflowPolicy
 from .types import (
   Book,
+  Candle,
+  CandleInterval,
   Collateral,
   PerpCollateral,
   FundingRate,
@@ -31,6 +34,10 @@ from .settings import Settings
 
 class Market(SDK):
   """An abstract market interface."""
+
+  CANDLE_INTERVALS: ClassVar[frozenset[CandleInterval]] = frozenset()
+  """Candle widths this market serves. Check it before calling `candles`; an interval
+  outside it raises `ValueError` without a request being made."""
 
   @property
   def market_id(self) -> str: ...
@@ -85,6 +92,35 @@ class Market(SDK):
     for order in open_orders:
       if order.id == id:
         return order
+
+  def check_interval(self, interval: CandleInterval):
+    """Raise `ValueError` unless `interval` is one of `CANDLE_INTERVALS`."""
+    if interval not in self.CANDLE_INTERVALS:
+      served = ', '.join(sorted(self.CANDLE_INTERVALS)) or 'none'
+      raise ValueError(
+        f'{interval!r} candles are not served by this market [{self.id}]; '
+        f'CANDLE_INTERVALS: {served}.'
+      )
+
+  @SDK.method
+  @abstractmethod
+  def candles(
+    self,
+    interval: CandleInterval,
+    start: datetime | None = None,
+    end: datetime | None = None,
+  ) -> PaginatedResponse[Candle]:
+    """Fetch the market's historical trade candles.
+
+    Pages are ascending by open time, non-overlapping, and the venue's own size.
+
+    Args:
+      interval: Candle width. Must be one of `CANDLE_INTERVALS`, else `ValueError`.
+      start: Open time of the first candle (inclusive). `None` fetches from the
+        earliest the venue still holds.
+      end: Open time of the last candle (inclusive). `None` means up to now, and the
+        last candle may then be still forming.
+    """
 
   @SDK.method
   @abstractmethod

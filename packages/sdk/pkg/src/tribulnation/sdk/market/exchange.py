@@ -13,6 +13,7 @@ from datetime import datetime
 from tribulnation.sdk.core import SDK, PaginatedResponse, OverflowPolicy
 from .types import (
   Book,
+  CandleInterval,
   Collateral,
   PerpCollateral,
   NextFunding,
@@ -124,6 +125,24 @@ class Exchange(SDK):
     """
     market = await self.market(market_id)
     return await market.rules(refetch=refetch)
+
+  @SDK.method
+  @PaginatedResponse.lift
+  async def candles(
+    self,
+    market_id: str,
+    /,
+    interval: CandleInterval,
+    start: datetime | None = None,
+    end: datetime | None = None,
+  ):
+    """Fetch the market's historical trade candles.
+
+    See `Market.candles` for the paging contract and `Market.CANDLE_INTERVALS`.
+    """
+    market = await self.market(market_id)
+    async for page in market.candles(interval, start, end):
+      yield page
 
   @SDK.method
   async def query_order(self, market_id: str, /, id: str) -> OrderState | None:
