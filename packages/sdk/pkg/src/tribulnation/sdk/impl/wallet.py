@@ -3,7 +3,18 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tribulnation.sdk.wallet import Wallet
-from .accounts import Account, Bit2Me, Bybit, Mexc, Bitget, Binance, load_accounts
+from .accounts import (
+  Account,
+  Bit2Me,
+  Bybit,
+  Kraken,
+  Kucoin,
+  Deribit,
+  Mexc,
+  Bitget,
+  Binance,
+  load_accounts,
+)
 
 DEFAULT_ACCOUNTS: Mapping[str, Account] = {}
 
@@ -92,6 +103,50 @@ class WalletSDK:
       validate=account.validate,
     )
 
+  def kucoin(self, account: Kucoin) -> Wallet:
+    """Build Kucoin's wallet surface with the account credentials."""
+    try:
+      from tribulnation.kucoin import Wallet as KucoinWallet
+    except ImportError as exception:
+      raise ImportError('Install tribulnation-kucoin to use this venue.') from exception
+    return KucoinWallet.new(
+      account.resolved_api_key,
+      account.resolved_api_secret,
+      account.resolved_api_passphrase,
+      public=account.public,
+      validate=account.validate,
+    )
+
+  def deribit(self, account: Deribit) -> Wallet:
+    """Build Deribit's wallet surface in the explicitly selected environment."""
+    try:
+      from tribulnation.deribit import Wallet as DeribitWallet
+    except ImportError as exception:
+      raise ImportError(
+        'Install tribulnation-deribit to use this venue.'
+      ) from exception
+    return DeribitWallet.new(
+      account.resolved_client_id,
+      account.resolved_client_secret,
+      public=account.public,
+      validate=account.validate,
+      testnet=account.venue == 'deribit_testnet',
+    )
+
+  def kraken(self, account: Kraken) -> Wallet:
+    try:
+      from tribulnation.kraken import Wallet as KrakenWallet
+    except ImportError as e:
+      raise ImportError(
+        'kraken sdk is not installed. Please install it with `pip install tribulnation-kraken`.'
+      ) from e
+    return KrakenWallet.new(
+      account.resolved_api_key,
+      account.resolved_private_key,
+      public=account.public,
+      validate=account.validate,
+    )
+
   @property
   def all(self) -> dict[str, Wallet]:
     return {id: self.venue(id) for id in self.all_accounts}
@@ -110,6 +165,12 @@ class WalletSDK:
         return self.bybit(account)
       case 'bit2me':
         return self.bit2me(account)
+      case 'kraken':
+        return self.kraken(account)
+      case 'kucoin':
+        return self.kucoin(account)
+      case 'deribit' | 'deribit_testnet':
+        return self.deribit(account)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 

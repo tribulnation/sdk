@@ -63,20 +63,22 @@ async def receive_update(
   queue: asyncio.Queue[DepthUpdate],
   collector: asyncio.Task[None],
 ) -> DepthUpdate:
+  """Read the next diff, releasing the child read if reconstruction is cancelled."""
   if not queue.empty():
     return queue.get_nowait()
 
   pending_update = asyncio.create_task(queue.get())
-  done, _ = await asyncio.wait(
-    {pending_update, collector},
-    return_when=asyncio.FIRST_COMPLETED,
-  )
-  if pending_update in done:
-    return pending_update.result()
-
-  pending_update.cancel()
-  with suppress(asyncio.CancelledError):
-    await pending_update
+  try:
+    done, _ = await asyncio.wait(
+      {pending_update, collector},
+      return_when=asyncio.FIRST_COMPLETED,
+    )
+    if pending_update in done:
+      return pending_update.result()
+  finally:
+    pending_update.cancel()
+    with suppress(asyncio.CancelledError):
+      await pending_update
   exc = collector.exception()
   if exc is not None:
     raise exc

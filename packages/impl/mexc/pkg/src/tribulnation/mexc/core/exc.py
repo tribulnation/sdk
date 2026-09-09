@@ -17,7 +17,12 @@ import inspect
 import httpx
 import pydantic
 
-from tribulnation.sdk.core import NetworkError, ValidationError, ApiError, Error
+from tribulnation.sdk.core import (
+  NetworkError,
+  ValidationError,
+  Error,
+  translate_exception,
+)
 
 from typed_core import exceptions as core
 
@@ -39,10 +44,9 @@ def translate(e: 'httpx.HTTPError | pydantic.ValidationError | core.Error') -> E
     return NetworkError(*e.args)
   if isinstance(e, pydantic.ValidationError):
     return ValidationError(*e.args)
-  if isinstance(e, core.NetworkError):
-    return NetworkError(*e.args)
-  if isinstance(e, core.ApiError):
-    return ApiError(*e.args)
+  translated = translate_exception(e)
+  if translated is not None:
+    return translated
   return Error(*e.args)
 
 

@@ -215,6 +215,96 @@ class Coinbase(BaseAccount):
 
 
 @_dataclass
+class Kraken(BaseAccount):
+  venue: _Literal['kraken'] = 'kraken'
+  api_key: str = '$KRAKEN_API_KEY'
+  """Kraken API key"""
+  private_key: str = '$KRAKEN_PRIVATE_KEY'
+  """Kraken private key (the API secret; the client reads `KRAKEN_PRIVATE_KEY`)"""
+  validate: bool = True
+  """Whether to type-validate incoming responses."""
+
+  @property
+  def resolved_api_key(self) -> str | None:
+    return resolve_env_var(self.api_key, require=not self.public)
+
+  @property
+  def resolved_private_key(self) -> str | None:
+    return resolve_env_var(self.private_key, require=not self.public)
+
+  def verify_env_vars(self):
+    self.resolved_api_key
+    self.resolved_private_key
+
+
+@_dataclass
+class Kucoin(BaseAccount):
+  """Kucoin Classic API account."""
+
+  venue: _Literal['kucoin'] = 'kucoin'
+  api_key: str = '$KUCOIN_API_KEY'
+  api_secret: str = '$KUCOIN_API_SECRET'
+  api_passphrase: str = '$KUCOIN_API_PASSPHRASE'
+  validate: bool = True
+
+  @property
+  def resolved_api_key(self) -> str | None:
+    """Resolve the API key without requiring credentials for public reads."""
+    return resolve_env_var(self.api_key, require=not self.public)
+
+  @property
+  def resolved_api_secret(self) -> str | None:
+    """Resolve the signing secret."""
+    return resolve_env_var(self.api_secret, require=not self.public)
+
+  @property
+  def resolved_api_passphrase(self) -> str | None:
+    """Resolve the API passphrase."""
+    return resolve_env_var(self.api_passphrase, require=not self.public)
+
+  def verify_env_vars(self):
+    """Validate every required credential before constructing a client."""
+    self.resolved_api_key
+    self.resolved_api_secret
+    self.resolved_api_passphrase
+
+
+@_dataclass
+class Deribit(BaseAccount):
+  """Deribit account with separate mainnet and testnet credential defaults."""
+
+  venue: _Literal['deribit', 'deribit_testnet'] = 'deribit'
+  client_id: str | None = None
+  client_secret: str | None = None
+  validate: bool = True
+
+  @property
+  def resolved_client_id(self) -> str | None:
+    """Select the credential default for this account's environment."""
+    default = (
+      '$TEST_DERIBIT_CLIENT_ID'
+      if self.venue == 'deribit_testnet'
+      else '$DERIBIT_CLIENT_ID'
+    )
+    return resolve_env_var(self.client_id or default, require=not self.public)
+
+  @property
+  def resolved_client_secret(self) -> str | None:
+    """Never fall back from a missing mainnet secret to a testnet secret."""
+    default = (
+      '$TEST_DERIBIT_CLIENT_SECRET'
+      if self.venue == 'deribit_testnet'
+      else '$DERIBIT_CLIENT_SECRET'
+    )
+    return resolve_env_var(self.client_secret or default, require=not self.public)
+
+  def verify_env_vars(self):
+    """Validate the credentials for the selected environment."""
+    self.resolved_client_id
+    self.resolved_client_secret
+
+
+@_dataclass
 class Evm(BaseAccount):
   Venue = _Literal[
     'ethereum',
@@ -240,7 +330,18 @@ class Evm(BaseAccount):
 
 
 Account = _Annotated[
-  Dydx | Hyperliquid | Mexc | Bitget | Bit2Me | Binance | Bybit | Coinbase | Evm,
+  Dydx
+  | Hyperliquid
+  | Mexc
+  | Bitget
+  | Bit2Me
+  | Binance
+  | Bybit
+  | Coinbase
+  | Kraken
+  | Kucoin
+  | Deribit
+  | Evm,
   _pydantic.Discriminator('venue'),
 ]
 

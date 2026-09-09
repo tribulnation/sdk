@@ -14,6 +14,8 @@ from decimal import Decimal
 from tribulnation.sdk.core import SDK, PaginatedResponse, OverflowPolicy
 from .types import (
   Book,
+  Candle,
+  CandleInterval,
   Collateral,
   PerpCollateral,
   FundingRate,
@@ -193,6 +195,37 @@ class TradingMarkets(SDK):
     """
     market = await self.market(market_id)
     return await market.rules(refetch=refetch)
+
+  @SDK.method
+  @PaginatedResponse.lift
+  async def candles(
+    self,
+    market_id: str,
+    /,
+    interval: CandleInterval,
+    start: datetime,
+    end: datetime,
+  ) -> AsyncIterable[Sequence[Candle]]:
+    """Fetch the market's historical trade candles, paginated: async-iterate the pages.
+
+    Ordering within and across pages follows the venue. Opening timestamps are not
+    repeated across pages; page sizes can vary. `Candle.time` is always the open time;
+    prices and volumes are `Decimal`, `quote_volume` and `trades` are `None` where the
+    venue reports none. Only trade candles: mark and index series are not exposed. A
+    candle may still be forming; an elapsed interval does not guarantee immutable data.
+
+    Each implementation declares the widths it serves in `Market.CANDLE_INTERVALS`;
+    any other `interval` raises `ValueError` before a request is made.
+
+    Args:
+      interval: Candle width, one of `'1m'`, `'5m'`, `'15m'`, `'1h'`, `'4h'`, `'1d'`.
+      start: Inclusive lower bound on opening time, as a timezone-aware datetime.
+      end: Exclusive upper bound on opening time, as a timezone-aware datetime.
+        Equal bounds produce no candles.
+    """
+    market = await self.market(market_id)
+    async for page in market.candles(interval, start, end):
+      yield page
 
   @SDK.method
   async def query_order(self, market_id: str, /, id: str) -> OrderState | None:

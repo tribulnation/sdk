@@ -3,17 +3,20 @@
 from typing_extensions import (
   AsyncContextManager,
   AsyncIterable,
+  AsyncIterator,
   Literal,
   Sequence,
 )
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
   PerpMarket as _PerpMarket,
   Book,
+  Candle,
+  CandleInterval,
   FundingPayment,
   FundingRate,
   NextFunding,
@@ -86,13 +89,14 @@ def one_mark_price(
 class PerpMarket(SharedMixin, _PerpMarket):
   """A Binance USD-M futures market.
 
-  Only the public endpoints (`depth`, `depth_stream`, `index`, `next_funding`,
-  `funding_rates`) are implemented: every private USD-M Futures endpoint returned 401
-  (`Invalid API-key, IP, or permissions`) against the tested account -- Binance blocks
-  USD-M Futures for EEA accounts under MiCA. See `futures_permission_error`.
+  Public depth, candles, index and funding data are implemented. Private USD-M
+  trading and account data are outside this implementation's spot-side account
+  scope; the configured account cannot access them. See `futures_permission_error`.
   """
 
   symbol: str
+
+  CANDLE_INTERVALS = frozenset[CandleInterval]({'1m', '5m', '15m', '1h', '4h', '1d'})
 
   @property
   def venue_id(self) -> str:
@@ -165,15 +169,66 @@ class PerpMarket(SharedMixin, _PerpMarket):
   ):
     """Fetch historical funding rates.
 
-    The client's own walk advances `start_time` to each full page's latest settlement
-    and stops on the first short one, so an unbounded query still costs a single call:
-    the venue's own most-recent slice comes back under the 1000-row cap.
+    An omitted start begins one millisecond after the epoch, before Binance existed.
+    The venue treats zero as an omitted bound and returns a recent slice instead.
+    The typed client's walk then advances through every retained page.
     """
+    earliest = datetime(1970, 1, 1, microsecond=1000, tzinfo=timezone.utc)
+    lower = max(start, earliest) if start is not None else earliest
+    if end is not None and end < lower:
+      return
     paging = self.client.usdm_futures.http.market.funding_rate_paged(
-      self.symbol, start_time=start, end_time=end, limit=1000
+      self.symbol,
+      start_time=lower,
+      end_time=end,
+      limit=1000,
     ).via(self.call_binance)
     async for rows in paging:
       yield [FundingRate(rate=r['fundingRate'], time=r['fundingTime']) for r in rows]
+
+  def candles(
+    self,
+    interval: CandleInterval,
+    start: datetime,
+    end: datetime,
+  ) -> PaginatedResponse[Candle]:
+    """Fetch USD-M trade candles, preserving the venue's native page order."""
+    self.check_candles(interval, start, end)
+    return PaginatedResponse(self.walk_candles(interval, start, end))
+
+  async def walk_candles(
+    self,
+    interval: CandleInterval,
+    start: datetime,
+    end: datetime,
+  ) -> AsyncIterator[Sequence[Candle]]:
+    """Fetch and retry individual pages within the requested half-open range."""
+    if start == end:
+      return
+    paging = self.client.usdm_futures.http.market.klines_paged(
+      self.symbol,
+      interval=interval,
+      start_time=start,
+      end_time=end,
+      limit=1000,
+    ).via(self.call_binance)
+    async for rows in paging:
+      page = [
+        Candle(
+          time=r[0],
+          open=r[1],
+          high=r[2],
+          low=r[3],
+          close=r[4],
+          volume=r[5],
+          quote_volume=r[7],
+          trades=r[8],
+        )
+        for r in rows
+        if start <= r[0] < end
+      ]
+      if page:
+        yield page
 
   async def rules(self, *, refetch: bool = False) -> Rules:
     raise futures_permission_error('rules', self.id)

@@ -1,4 +1,4 @@
-from typing_extensions import Mapping, Sequence, TypedDict, TYPE_CHECKING
+from typing_extensions import Mapping, TypedDict, TYPE_CHECKING
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -13,19 +13,13 @@ from .accounts import (
   Bit2Me,
   Bybit,
   Coinbase,
+  Kraken,
+  Kucoin,
+  Deribit,
   Mexc,
   Hyperliquid,
   load_accounts,
 )
-
-
-class BinanceConfig(TypedDict, total=False):
-  """Binance reporting configuration."""
-
-  spot_markets: Sequence[str]
-  """Spot symbols `history()` sweeps for fills; Binance has no account-wide fills feed."""
-  usdm_markets: Sequence[str]
-  """USD-M perpetual symbols `history()` sweeps for fills."""
 
 
 if TYPE_CHECKING:
@@ -37,7 +31,6 @@ if TYPE_CHECKING:
     evm: EvmConfig
     dydx: DydxConfig
     hyperliquid: HyperliquidConfig
-    binance: BinanceConfig
 else:
   Config = dict
 
@@ -95,13 +88,10 @@ class ReportSDK:
       raise ImportError(
         'binance sdk is not installed. Please install it with `pip install tribulnation-binance`.'
       ) from e
-    config = self.config.get('binance') or {}
     return BinanceReport.new(
       account.resolved_api_key,
       account.resolved_secret_key,
       validate=account.validate,
-      spot_markets=config.get('spot_markets', ()),
-      usdm_markets=config.get('usdm_markets', ()),
     )
 
   def coinbase(self, account: Coinbase, id: str) -> Report:
@@ -158,6 +148,49 @@ class ReportSDK:
       validate=account.validate,
     )
 
+  def kucoin(self, account: Kucoin, id: str) -> Report:
+    """Build Kucoin's report surface with the account credentials."""
+    try:
+      from tribulnation.kucoin import Report as KucoinReport
+    except ImportError as exception:
+      raise ImportError('Install tribulnation-kucoin to use this venue.') from exception
+    return KucoinReport.new(
+      account.resolved_api_key,
+      account.resolved_api_secret,
+      account.resolved_api_passphrase,
+      public=account.public,
+      validate=account.validate,
+    )
+
+  def deribit(self, account: Deribit, id: str) -> Report:
+    """Build Deribit's report surface in the explicitly selected environment."""
+    try:
+      from tribulnation.deribit import Report as DeribitReport
+    except ImportError as exception:
+      raise ImportError(
+        'Install tribulnation-deribit to use this venue.'
+      ) from exception
+    return DeribitReport.new(
+      account.resolved_client_id,
+      account.resolved_client_secret,
+      public=account.public,
+      validate=account.validate,
+      testnet=account.venue == 'deribit_testnet',
+    )
+
+  def kraken(self, account: Kraken, id: str) -> Report:
+    try:
+      from tribulnation.kraken import Report as KrakenReport
+    except ImportError as e:
+      raise ImportError(
+        'kraken sdk is not installed. Please install it with `pip install tribulnation-kraken`.'
+      ) from e
+    return KrakenReport.new(
+      account.resolved_api_key,
+      account.resolved_private_key,
+      validate=account.validate,
+    )
+
   def hyperliquid(self, account: Hyperliquid, id: str) -> Report:
     try:
       from tribulnation.hyperliquid import Report as HyperliquidReport
@@ -206,6 +239,12 @@ class ReportSDK:
         return self.bybit(account, id)
       case 'hyperliquid' | 'hyperliquid_testnet':
         return self.hyperliquid(account, id)
+      case 'kraken':
+        return self.kraken(account, id)
+      case 'kucoin':
+        return self.kucoin(account, id)
+      case 'deribit' | 'deribit_testnet':
+        return self.deribit(account, id)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 

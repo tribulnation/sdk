@@ -20,6 +20,6 @@
 
 ---
 
-← [Ethereum Report](../report/implementations/ethereum.md) · **Next:** [Async Usage](async-usage.md) →
+← [Kraken Report](../report/implementations/kraken.md) · **Next:** [Async Usage](async-usage.md) →
 
 <!-- /next -->

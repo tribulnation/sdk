@@ -64,6 +64,9 @@ mark is unavailable; the default `'oracle'` always returns the oracle price.
 
 - Spot and perp markets are separate objects (`SpotMarket` / `PerpMarket`) with their own
   rules and position logic. Only `PerpMarket` exposes funding and `index()`.
+- `candles` raises `NotImplementedError` on both, and `CANDLE_INTERVALS` is empty:
+  `info.candle_snapshot` answers at most 5000 candles per call and the typed client
+  declares no paged walk for it yet, so the series cannot be swept through the client.
 - Perp `available_notional`/leverage and spot balances are computed against
   Hyperliquid-native metadata (asset/collateral tokens, user fees), cached venue-wide and
   refreshed lazily.

@@ -7,6 +7,9 @@ from .accounts import (
   Account,
   Bybit,
   Coinbase,
+  Kraken,
+  Kucoin,
+  Deribit,
   Mexc,
   Bitget,
   Binance,
@@ -96,6 +99,50 @@ class EarnSDK:
       ) from e
     return CoinbaseEarn.new(account.resolved_key_name, account.resolved_private_key)
 
+  def kucoin(self, account: Kucoin) -> Earn:
+    """Build Kucoin's earn surface with the account credentials."""
+    try:
+      from tribulnation.kucoin import Earn as KucoinEarn
+    except ImportError as exception:
+      raise ImportError('Install tribulnation-kucoin to use this venue.') from exception
+    return KucoinEarn.new(
+      account.resolved_api_key,
+      account.resolved_api_secret,
+      account.resolved_api_passphrase,
+      public=account.public,
+      validate=account.validate,
+    )
+
+  def deribit(self, account: Deribit) -> Earn:
+    """Build Deribit's earn surface in the explicitly selected environment."""
+    try:
+      from tribulnation.deribit import Earn as DeribitEarn
+    except ImportError as exception:
+      raise ImportError(
+        'Install tribulnation-deribit to use this venue.'
+      ) from exception
+    return DeribitEarn.new(
+      account.resolved_client_id,
+      account.resolved_client_secret,
+      public=account.public,
+      validate=account.validate,
+      testnet=account.venue == 'deribit_testnet',
+    )
+
+  def kraken(self, account: Kraken) -> Earn:
+    try:
+      from tribulnation.kraken import Earn as KrakenEarn
+    except ImportError as e:
+      raise ImportError(
+        'kraken sdk is not installed. Please install it with `pip install tribulnation-kraken`.'
+      ) from e
+    return KrakenEarn.new(
+      account.resolved_api_key,
+      account.resolved_private_key,
+      public=account.public,
+      validate=account.validate,
+    )
+
   def bybit(self, account: Bybit) -> Earn:
     try:
       from tribulnation.bybit import Earn as BybitEarn
@@ -135,6 +182,12 @@ class EarnSDK:
         return self.coinbase(account)
       case 'bybit':
         return self.bybit(account)
+      case 'kraken':
+        return self.kraken(account)
+      case 'kucoin':
+        return self.kucoin(account)
+      case 'deribit' | 'deribit_testnet':
+        return self.deribit(account)
       case _:
         raise NotImplementedError(f'Unsupported venue: {account.venue}')
 

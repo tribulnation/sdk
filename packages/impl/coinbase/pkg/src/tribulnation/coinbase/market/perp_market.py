@@ -8,6 +8,8 @@ from decimal import Decimal
 from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
   Book,
+  Candle,
+  CandleInterval,
   FundingPayment,
   FundingRate,
   NextFunding,
@@ -34,6 +36,8 @@ class PerpMarket(impl.MarketMixin, _PerpMarket):
   live `PERMISSION_DENIED` from those two.
   """
 
+  CANDLE_INTERVALS = impl.CANDLE_INTERVALS
+
   @property
   def exchange_id(self) -> str:
     return impl.INTX_EXCHANGE_ID
@@ -55,6 +59,15 @@ class PerpMarket(impl.MarketMixin, _PerpMarket):
   async def rules(self, *, refetch: bool = False) -> Rules:
     return await impl.rules(self, 'intx', refetch=refetch)
 
+  def candles(
+    self,
+    interval: CandleInterval,
+    start: datetime,
+    end: datetime,
+  ) -> PaginatedResponse[Candle]:
+    self.check_candles(interval, start, end)
+    return PaginatedResponse(impl.candles(self, interval, start, end))
+
   async def open_orders(self) -> Sequence[OrderState]:
     return await impl.open_orders(self)
 
@@ -75,10 +88,8 @@ class PerpMarket(impl.MarketMixin, _PerpMarket):
   def funding_rates(
     self, start: datetime | None = None, end: datetime | None = None
   ) -> PaginatedResponse[FundingRate]:
-    raise NotImplementedError(
-      f'Coinbase publishes no funding-rate history for INTX perpetuals [{self.id}]; '
-      'only the current rate, from the product catalogue (see `next_funding`).'
-    )
+    """Read public INTX settlement history with inclusive optional time bounds."""
+    return PaginatedResponse(impl.funding_rates(self, start, end))
 
   def funding_payments(
     self, start: datetime, end: datetime

@@ -24,22 +24,25 @@ def generate_accounts_toml() -> dict[str, str]:
     Raw TOML text per venue slug, e.g. `mexc: '[accounts.mexc]\\nvenue = "mexc"\\n...'`.
   """
   from tribulnation.sdk.impl.accounts import (
+    BaseAccount,
     Binance,
     Bit2Me,
     Bitget,
     Dydx,
     Evm,
     Hyperliquid,
+    Kraken,
     Mexc,
   )
 
-  classes = {
+  classes: dict[str, type[BaseAccount]] = {
     'dydx': Dydx,
     'hyperliquid': Hyperliquid,
     'mexc': Mexc,
     'binance': Binance,
     'bitget': Bitget,
     'bit2me': Bit2Me,
+    'kraken': Kraken,
     'ethereum': Evm,
   }
 

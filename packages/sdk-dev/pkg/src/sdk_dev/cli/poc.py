@@ -5,11 +5,11 @@ script's paired notebook (`poc run`).
 """
 
 from pathlib import Path
-from typing_extensions import Annotated
-import json
+from typing_extensions import Annotated, NotRequired, TypedDict
 import subprocess
 import tempfile
 
+import pydantic
 import typer
 
 from sdk_dev import scaffold as scaffolding
@@ -35,7 +35,40 @@ from sdk_dev.surface import render as render_surface
 app = typer.Typer(help='Work with the venue PoC scripts.')
 
 
-def _diagnostics(root: Path, files: list[Path]) -> list[dict]:
+class Position(TypedDict):
+  """A zero-based position in a file, as pyright reports it."""
+
+  line: int
+  character: int
+
+
+class Range(TypedDict):
+  """The span a diagnostic covers."""
+
+  start: Position
+  end: Position
+
+
+class Diagnostic(TypedDict):
+  """One entry of pyright's `--outputjson` report."""
+
+  file: str
+  severity: str
+  message: str
+  range: Range
+  rule: NotRequired[str]
+
+
+class Report(TypedDict):
+  """The part of pyright's `--outputjson` report `poc check` reads."""
+
+  generalDiagnostics: list[Diagnostic]
+
+
+report_adapter = pydantic.TypeAdapter(Report)
+
+
+def _diagnostics(root: Path, files: list[Path]) -> list[Diagnostic]:
   """
   Run pyright over `files` and return its diagnostics.
 
@@ -64,8 +97,8 @@ def _diagnostics(root: Path, files: list[Path]) -> list[dict]:
   except OSError as e:
     raise RuntimeError(f'could not run pyright: {e}') from e
   try:
-    return json.loads(result.stdout)['generalDiagnostics']
-  except (json.JSONDecodeError, KeyError) as e:
+    return report_adapter.validate_json(result.stdout)['generalDiagnostics']
+  except pydantic.ValidationError as e:
     raise RuntimeError(f'pyright produced no report: {result.stderr.strip()}') from e
 
 
@@ -121,7 +154,7 @@ def check(
     if message in IGNORED:
       continue
     where = locate(rendered[name][1], entry['range']['start']['line'] + 1)
-    rule = f' ({entry["rule"]})' if entry.get('rule') else ''
+    rule = f' ({rule_name})' if (rule_name := entry.get('rule')) else ''
     errors[name].append((where.cell, where.line, f'{message}{rule}'))
   unrun = 0
   for name, (script, _) in rendered.items():

@@ -5,9 +5,10 @@ from decimal import Decimal
 from types import SimpleNamespace
 
 import pytest
-from typing_extensions import Any, Awaitable, Callable, cast
+from typing_extensions import Awaitable, Callable, TypedDict, cast
 
-from tribulnation.sdk.market import Book
+from tribulnation.dydx.market.impl.mixin import ExchangeMixin
+from tribulnation.sdk.market import Book, Settings
 
 
 def book() -> Book:
@@ -23,7 +24,7 @@ def tracking_fetch() -> tuple[Callable[..., Awaitable[Book]], Callable[[], int]]
   active = 0
   peak = 0
 
-  async def fetch(*_args) -> Book:
+  async def fetch(*_args: object) -> Book:
     nonlocal active, peak
     active += 1
     peak = max(peak, active)
@@ -34,6 +35,13 @@ def tracking_fetch() -> tuple[Callable[..., Awaitable[Book]], Callable[[], int]]
   return fetch, lambda: peak
 
 
+class MarketFields(TypedDict):
+  """The subset of `PerpetualMarket` fields `stats.tickers` reads."""
+
+  oraclePrice: str
+  volume24H: str
+
+
 @pytest.mark.parametrize(
   ('settings', 'expected'),
   [
@@ -42,30 +50,32 @@ def tracking_fetch() -> tuple[Callable[..., Awaitable[Book]], Callable[[], int]]
     ({'dydx': {'tickers_fetch_depth': False}}, 0),
   ],
 )
-async def test_tickers_depth_concurrency(monkeypatch, settings, expected: int) -> None:
+async def test_tickers_depth_concurrency(
+  monkeypatch: pytest.MonkeyPatch, settings: Settings, expected: int
+) -> None:
   """Apply dYdX depth fetching and concurrency settings."""
   from tribulnation.dydx.market.impl import stats
 
   count = 25
-  markets = {
+  markets: dict[str, MarketFields] = {
     f'MARKET-{i}': {'oraclePrice': '100', 'volume24H': '10'} for i in range(count)
   }
 
   class Shared:
-    async def load_markets(self, *, refetch: bool = False):
+    async def load_markets(self, *, refetch: bool = False) -> dict[str, MarketFields]:
       assert refetch
       return markets
 
   fetch, peak = tracking_fetch()
   monkeypatch.setattr(stats, 'fetch_order_book', fetch)
 
-  target = cast(Any, SimpleNamespace(shared=Shared()))
+  target = cast(ExchangeMixin, SimpleNamespace(shared=Shared()))
   result = await stats.tickers(target, settings=settings)
 
   assert len(result) == count
   assert peak() == expected
-  assert all(ticker.last == Decimal('100') for ticker in result.values())
-  assert all(ticker.base_volume_24h == Decimal('10') for ticker in result.values())
+  assert all(ticker.last is None for ticker in result.values())
+  assert all(ticker.base_volume_24h is None for ticker in result.values())
   if expected:
     assert all(ticker.bid == Decimal('99') for ticker in result.values())
   else:

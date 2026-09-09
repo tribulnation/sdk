@@ -40,6 +40,33 @@ registry.toml         # public venue registry (display name, icon, PyPI, tier)
 - Docs: `sdk-dev docs check` (`--fix` rewrites the generated GitHub-only blocks; CI runs
   the check on every push); `just docs-refresh` renders them into a local landing checkout
 
+## Live conformance checks
+
+1. Run `sdk-dev test market|earn|wallet|report [venue-or-account] --accounts sdk.test.toml`.
+   The optional selector matches an exact venue slug or account id, including aliases
+   that do not contain the venue name. Without it, every eligible configured account
+   (and available public default) is selected. Support comes from `impl.toml`.
+2. These suites do not place/cancel orders, transfer funds, or subscribe/redeem Earn
+   positions. Market checks cover reference-market discovery, books and public streams,
+   rules, tickers, funding data, and candles. Current account-derived fee tiers and
+   Coinbase's authenticated catalogue paths skip on public-only accounts; configure
+   a private account to verify those reads. Account-specific Bitget checks remain
+   read-only. Earn enumerates instruments; Wallet enumerates methods; Report reads a
+   snapshot and the last 30 days. Binance and MEXC discover their own spot markets;
+   their per-symbol history sweeps can require many requests.
+3. Missing configured credential environment variables and declared unsupported methods
+   are visible skips, not verification. Rejected credentials, unexpected
+   `NotImplementedError`, malformed responses and transport failures remain failures.
+   An all-skipped run is not evidence of release readiness.
+4. Candle windows roll with time and check timezone awareness, half-open bounds,
+   uniqueness, alignment and value types. They impose no response ordering or synthetic
+   rows for empty venue intervals. Exact page-boundary completeness is covered by
+   deterministic unit fixtures; live cross-page checks apply only where retention
+   allows them. Hyperliquid's retained history fits one response, so its cross-page
+   test explicitly skips.
+5. Each suite uses one session event loop and owned async contexts. Error summaries
+   omit raw exception payloads, which can contain credentials or account records.
+
 ## Writing SDK objects
 
 `SDK` implements `__aenter__`/`__aexit__` once, in terms of `resources()`. Entering an

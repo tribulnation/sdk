@@ -41,6 +41,7 @@ class Shared:
     api_key: str | None = None,
     secret_key: str | None = None,
     *,
+    public: bool = False,
     validate: bool = True,
   ):
     """Create a `Shared` backed by a new Binance client.
@@ -48,9 +49,12 @@ class Shared:
     Args:
       api_key: Binance API key. Defaults to `BINANCE_API_KEY`.
       secret_key: Binance API secret. Defaults to `BINANCE_SECRET_KEY`.
+      public: Construct a credential-free client.
       validate: Validate responses against the typed client's schemas.
     """
-    client = Binance.new(api_key=api_key, secret_key=secret_key, validate=validate)
+    client = Binance.new(
+      api_key=api_key, secret_key=secret_key, public=public, validate=validate
+    )
     return cls(client=client, validate=validate)
 
   @wrap_exceptions
@@ -82,6 +86,7 @@ class SharedMixin(SDK):
     api_key: str | None = None,
     secret_key: str | None = None,
     *,
+    public: bool = False,
     validate: bool = True,
   ):
     """Create a market object backed by a new Binance client.
@@ -89,10 +94,13 @@ class SharedMixin(SDK):
     Args:
       api_key: Binance API key. Defaults to `BINANCE_API_KEY`.
       secret_key: Binance API secret. Defaults to `BINANCE_SECRET_KEY`.
+      public: Construct a credential-free client.
       validate: Validate responses against the typed client's schemas.
     """
     return cls(
-      shared=Shared.new(api_key=api_key, secret_key=secret_key, validate=validate)
+      shared=Shared.new(
+        api_key=api_key, secret_key=secret_key, public=public, validate=validate
+      )
     )
 
   @property

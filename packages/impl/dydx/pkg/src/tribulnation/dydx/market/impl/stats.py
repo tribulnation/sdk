@@ -88,12 +88,13 @@ async def tickers(
 
   result: dict[str, Ticker] = {}
   for ticker_name in wanted:
-    if (market := perpetual_markets.get(ticker_name)) is None:
+    if ticker_name not in perpetual_markets:
       raise ValueError(f'Market not found: {ticker_name}')
-    price = market.get('oraclePrice')
     result[ticker_name] = Ticker(
-      last=Decimal(price) if price is not None else None,
-      base_volume_24h=Decimal(market['volume24H']),
+      # The market catalogue's oracle price is not a last traded price.
+      last=None,
+      # The indexer sums quoteAmount into volume24H; it is not base volume.
+      base_volume_24h=None,
     )
 
   venue_settings = settings.get('dydx', {})

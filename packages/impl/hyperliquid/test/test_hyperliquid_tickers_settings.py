@@ -43,7 +43,8 @@ def tracking_fetch() -> tuple[Callable[..., Awaitable[Book]], Callable[[], int]]
 def perp_context() -> PerpAssetContext:
   """One perp asset context, priced at 100 with 10 of daily volume."""
   return {
-    'dayNtlVlm': Decimal('10'),
+    'dayNtlVlm': Decimal('1000'),
+    'dayBaseVlm': Decimal('10'),
     'funding': Decimal(0),
     'impactPxs': None,
     'markPx': Decimal('100'),
@@ -61,7 +62,8 @@ def spot_context() -> SpotAssetCtx:
     'markPx': Decimal('100'),
     'midPx': Decimal('100'),
     'prevDayPx': Decimal('100'),
-    'dayNtlVlm': Decimal('10'),
+    'dayNtlVlm': Decimal('1000'),
+    'dayBaseVlm': Decimal('10'),
   }
 
 
@@ -88,6 +90,7 @@ async def test_perp_tickers_depth_concurrency(
     ],
   }
   contexts = [perp_context() for _ in range(count)]
+  del contexts[0]['dayBaseVlm']
 
   class Shared:
     async def load_perp_meta_for_dex(self, dex_name: str, *, refetch: bool = False):
@@ -103,8 +106,10 @@ async def test_perp_tickers_depth_concurrency(
 
   assert len(result) == count
   assert peak() == expected
-  assert all(ticker.last == Decimal('100') for ticker in result.values())
-  assert all(ticker.base_volume_24h == Decimal('10') for ticker in result.values())
+  assert all(ticker.last is None for ticker in result.values())
+  assert [ticker.base_volume_24h for ticker in result.values()] == [None] + [
+    Decimal('10')
+  ] * (count - 1)
   if expected:
     assert all(ticker.ask == Decimal('101') for ticker in result.values())
   else:
@@ -152,6 +157,7 @@ async def test_spot_tickers_depth_concurrency(
     ],
   }
   contexts = [spot_context() for _ in range(count)]
+  del contexts[0]['dayBaseVlm']
 
   class Info:
     async def spot_meta_and_asset_ctxs(self):
@@ -170,8 +176,10 @@ async def test_spot_tickers_depth_concurrency(
 
   assert len(result) == count
   assert peak() == expected
-  assert all(ticker.last == Decimal('100') for ticker in result.values())
-  assert all(ticker.base_volume_24h == Decimal('10') for ticker in result.values())
+  assert all(ticker.last is None for ticker in result.values())
+  assert [ticker.base_volume_24h for ticker in result.values()] == [None] + [
+    Decimal('10')
+  ] * (count - 1)
   if expected:
     assert all(ticker.bid_qty == Decimal('2') for ticker in result.values())
   else:

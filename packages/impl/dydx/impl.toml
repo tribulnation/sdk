@@ -4,6 +4,7 @@
 [support.market]
 support = "full"
 auth = false
+note = "`candles` serves every contract interval in the indexer's native newest-first pages, filtered to the required `[start, end)` range."
 # MarketSDK.DEFAULT_ACCOUNTS includes 'dydx' (Dydx(public=True)) — but that only covers
 # purely public market-data methods; account-scoped/trading methods still need real
 # credentials regardless (see docs/contract/market.yml's per-method `public: false`).

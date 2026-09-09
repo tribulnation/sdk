@@ -17,6 +17,8 @@ auth = false
 methods = [
   "depth",
   "depth_stream",
+  "tickers",
+  "perp_stats",
   "rules",
   "query_order",
   "open_orders",
@@ -28,8 +30,9 @@ methods = [
   "index",
   "next_funding",
   "funding_rates",
+  "candles",
 ]
-note = "Read-only: order placement and cancellation are not implemented. The USD-M futures exchange serves only public market data (`depth`, `depth_stream`, `index`, `next_funding`, `funding_rates`) — every private futures endpoint returned 401 against the test account, which Binance gates behind a separate API-key flag, so they raise rather than ship unverified."
+note = "Read-only: order placement and cancellation are not implemented. USD-M serves public depth, streams, tickers, perp_stats, index, next_funding, funding_rates and candles. Bulk snapshots cover active perpetuals only, not dated futures. perp_stats combines bulk pricing/funding with one public open-interest read per market (at most five concurrent); component observations are not atomic. Private futures methods remain unsupported and Report remains spot-side only. Candles serve spot and USD-M, every contract interval, 1000 per page with [start, end) filtering."
 # MarketSDK.DEFAULT_ACCOUNTS includes 'binance' (Binance(public=True)) — but that only
 # covers purely public market-data methods; account-scoped methods still need real
 # credentials regardless (see docs/contract/market.yml's per-method `public: false`).
@@ -38,9 +41,9 @@ note = "Read-only: order placement and cancellation are not implemented. The USD
 support = "partial"
 auth = true
 methods = ["snapshot", "history"]
-note = "`history()` requires both `start` and `end`: no Binance endpoint serves all time, and each stops at a different retention horizon. Fills are per symbol with no account-wide equivalent, so pass `spot_markets`/`usdm_markets` to sweep them. Margin, COIN-M futures, Options, Portfolio Margin, Earn events and Convert/Pay/Fiat history are not covered."
-# ReportSDK never has a DEFAULT_ACCOUNTS entry for any venue. The fill sweeps come from
-# `ReportSDK.config['binance']` (`spot_markets`/`usdm_markets`).
+note = "Spot-side only: snapshots include Spot, Funding and Simple Earn balances; history includes spot fills, deposits/withdrawals and Spot/Funding transfers. No futures endpoints are called and no empty futures compartment is emitted. Supported-source errors propagate. History end defaults to now; omitted start uses 90 days for capital, six calendar months for transfers and retained ID history for automatically discovered spot symbols. API history is best-effort; retention, delisted symbols and endpoint caps leave gaps for file ingestion. Futures, margin, Options, Portfolio Margin, Earn events and Convert/Pay/Fiat history are excluded."
+# ReportSDK never has a DEFAULT_ACCOUNTS entry for any venue.
+# No caller-supplied traded-symbol configuration is required.
 
 [ids]
 asset = "symbol"

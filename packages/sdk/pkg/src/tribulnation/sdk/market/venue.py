@@ -7,6 +7,7 @@ from typing_extensions import (
   TypedDict,
   Collection,
   Mapping,
+  NotRequired,
 )
 from abc import abstractmethod
 from contextlib import asynccontextmanager
@@ -15,6 +16,7 @@ from datetime import datetime
 from tribulnation.sdk.core import SDK, PaginatedResponse, OverflowPolicy
 from .types import (
   Book,
+  CandleInterval,
   Collateral,
   PerpCollateral,
   NextFunding,
@@ -33,8 +35,15 @@ from .exchange import Exchange, PerpExchange
 
 
 class ExchangeDescription(TypedDict):
+  """One SDK exchange/product family, identified within its owning venue."""
+
   id: str
+  """Opaque stable ID, including the empty string; never a display label."""
   type: Literal['spot', 'perp']
+  name: str
+  """Nonempty human-readable name within the venue; not an identity or guarantee."""
+  url: NotRequired[str]
+  """Optional official HTTPS landing page; omitted when no reliable URL is known."""
 
 
 class TradingVenue(SDK):
@@ -125,6 +134,24 @@ class TradingVenue(SDK):
     """
     market = await self.market(market_id)
     return await market.rules(refetch=refetch)
+
+  @SDK.method
+  @PaginatedResponse.lift
+  async def candles(
+    self,
+    market_id: str,
+    /,
+    interval: CandleInterval,
+    start: datetime,
+    end: datetime,
+  ):
+    """Fetch the market's historical trade candles.
+
+    See `Market.candles` for the paging contract and `Market.CANDLE_INTERVALS`.
+    """
+    market = await self.market(market_id)
+    async for page in market.candles(interval, start, end):
+      yield page
 
   @SDK.method
   async def query_order(self, market_id: str, /, id: str) -> OrderState | None:

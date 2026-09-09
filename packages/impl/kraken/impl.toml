@@ -1,0 +1,50 @@
+# auth = false means this surface has a real credential-free DEFAULT_ACCOUNTS entry —
+# auth = true means every call always needs a real accounts.Kraken() entry.
+
+[support.earn]
+support = "full"
+auth = true
+note = "`instruments()` reads `Earn/Strategies`, which needs an API key. `apr` is the midpoint of Kraken's `low`/`high` estimate, so a range collapses to one number; `min_qty` is never set because Kraken's `user_min_allocation` is in USD, not the asset; `max_qty` is the native-asset `user_cap`. Account-wide Kraken Rewards (`lock_type = flex`, not allocatable) are listed as `flexible` alongside the allocatable `instant` strategies."
+# Every strategy's asset comes back as a display name (`BTC`) and is emitted as the
+# internal id every other surface uses (`XXBT`), through the venue's own `Assets` join
+# on `altname` -- see `[ids]`.
+
+[support.report]
+support = "full"
+auth = true
+note = "`history()` is the account ledger, one record per row: a spot trade is two `TradeLeg` rows sharing a `refid`, and `margin`/`adjustment`/`rollover`/`settled`/`sale`/`conversion`/`nft*` rows land as `UnknownObservation`. `snapshot()` is `Balance`, Earn balances included under their suffixed ids (`XXBT.F`)."
+# ReportSDK never has a DEFAULT_ACCOUNTS entry for any venue.
+
+[support.wallet]
+support = "partial"
+auth = true
+methods = ["withdrawal_methods"]
+note = "`deposit_methods` raises `NotImplementedError`: Kraken's `DepositMethods` answers one asset at a time with a method name (`Bitcoin Lightning`, `kBTC - Optimism (Unified)`) and no network field. `withdrawal_methods` maps `WithdrawMethods` fully, with Kraken's display network names (`Bitcoin`, `Arbitrum One`, a bank rail for fiat) and a flat fee per row."
+
+[support.market]
+support = "partial"
+auth = false
+methods = [
+  "depth",
+  "depth_stream",
+  "rules",
+  "tickers",
+  "candles",
+  "query_order",
+  "open_orders",
+  "trades_history",
+  "trades_stream",
+  "position",
+  "collateral",
+  "available_notional",
+]
+note = "Spot only; we do not trade on Kraken, so `place_order`/`cancel_order` raise `NotImplementedError`. `candles` serves all six contract intervals with required aware, half-open bounds and native response order. Kraken retains only the latest 720 candles per interval: older requested data is unavailable, and `since` cannot page past that limit. `rules()` fees are the base tier of the pair's own `AssetPairs` schedule, and `0` when the listing answers an empty one, as it has been observed doing. `depth_stream` subscribes at the smallest of Kraken's fixed depths (10/25/100/500/1000) holding `levels` and trims to it."
+# MarketSDK.DEFAULT_ACCOUNTS includes 'kraken' (Kraken(public=True)): markets, depth,
+# depth_stream, tickers and rules are public; account-scoped methods need real
+# credentials. Kraken Futures is a separate product with its own keys and is not
+# wrapped by typed_kraken, so there is no perp exchange.
+
+[ids]
+asset = "symbol"
+market = "The REST pair altname (`XBTUSD`, `ETHUSDC`)."
+note = "Kraken's internal asset id (`XXBT`, `XETH`, `ZUSD`, `USDC`, `SOL`): what `Balance`, `Ledgers`, `TradesHistory`, `WithdrawMethods` and the default `AssetPairs`/`Assets` listings name assets by. `Earn/Strategies` answers in display names (`BTC`) and is re-keyed to the internal id through the venue's own `Assets` join on `altname`. Networks are Kraken's display network names (`Bitcoin`, `Arbitrum One`)."

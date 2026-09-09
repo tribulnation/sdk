@@ -114,8 +114,9 @@ async def perp_tickers(
     if wanted is not None and name not in wanted:
       continue
     result[name] = Ticker(
-      last=Decimal(px) if (px := ctx.get('midPx')) is not None else None,
-      base_volume_24h=Decimal(ctx['dayNtlVlm']),
+      # Asset contexts publish a midpoint, not the last traded price.
+      last=None,
+      base_volume_24h=ctx.get('dayBaseVlm'),
     )
 
   if wanted is not None and (missing := wanted - set(result)):

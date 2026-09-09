@@ -42,4 +42,7 @@ class BybitMarket(VenueMixin, TradingVenue):
 
   async def exchanges(self) -> list[TradingVenue.ExchangeDescription]:
     """List available exchanges."""
-    return [{'id': 'spot', 'type': 'spot'}, {'id': 'perp', 'type': 'perp'}]
+    return [
+      {'id': 'spot', 'type': 'spot', 'name': 'Spot'},
+      {'id': 'perp', 'type': 'perp', 'name': 'Linear Perpetuals'},
+    ]

@@ -1,3 +1,5 @@
+"""Best-effort history from Bitget's Classic futures endpoints."""
+
 from typing_extensions import AsyncIterable
 from dataclasses import dataclass
 from datetime import datetime
@@ -23,6 +25,7 @@ from .util import (
   nonzero_fee,
   require_range,
   signed_size,
+  windows,
 )
 
 
@@ -36,7 +39,7 @@ class FuturesHistory(TimezoneMixin, SdkHistory):
   async def flows(self, start: datetime, end: datetime):
     """Fetch futures tax rows as unknown observations."""
     async for chunk in self.client.classic.tax.futures_records_paged(
-      start=start, end=end
+      start_time=start, end_time=end
     ):
       for tx in chunk:
         observations: list[Observation] = [
@@ -69,31 +72,33 @@ class FuturesHistory(TimezoneMixin, SdkHistory):
   @SDK.method
   async def trades(self, start: datetime, end: datetime):
     """Fetch futures fills as trade observations."""
-    async for chunk in self.client.futures.trade.all_fills_paged(start=start, end=end):
+    async for chunk in self.client.classic.mix.order.fill_history_paged(
+      product_type='USDT-FUTURES', start_time=start, end_time=end
+    ):
       for fill in chunk:
         if len(fill['feeDetail']) > 1:
           warnings.warn(
-            f'UNEXPECTED: Multiple fee details for fill {fill["tradeId"]}: {fill["feeDetail"]}'
+            'Bitget futures fill has multiple fee details; aggregate fee is unknown.'
           )
           fee = None
           fee_asset = None
         elif (
           not fill['feeDetail']
-          or (fee := abs(fill['feeDetail'][0]['totalFee'] or Decimal(0))) == 0
+          or (fee := abs(Decimal(fill['feeDetail'][0]['totalFee']))) == 0
         ):
           fee = None
           fee_asset = None
         else:
           fee_asset = fill['feeDetail'][0]['feeCoin']
 
-        side = fill_direction(fill)
+        side = fill['side']
         yield api_record(
           SpotTrade(
             id=fill['tradeId'],
             time=self.add_tz(fill['cTime']),
             pair=fill['symbol'],
-            size=signed_size(fill['baseVolume'], side),
-            price=fill['price'],
+            size=signed_size(Decimal(fill['baseVolume']), side),
+            price=Decimal(fill['price']),
             order_id=fill['orderId'],
             fee=None
             if fee is None or fee_asset is None
@@ -109,7 +114,8 @@ class FuturesHistory(TimezoneMixin, SdkHistory):
   ) -> AsyncIterable[HistoryRecord]:
     """Fetch futures history records."""
     start, end = require_range(start, end)
-    async for record in self.flows(start, end):
-      yield record
-    async for record in self.trades(start, end):
-      yield record
+    for lower, upper in windows(start, end):
+      async for record in self.flows(lower, upper):
+        yield record
+      async for record in self.trades(lower, upper):
+        yield record

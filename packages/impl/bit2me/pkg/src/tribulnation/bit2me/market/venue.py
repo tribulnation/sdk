@@ -27,4 +27,4 @@ class Bit2MeMarket(SharedMixin, TradingVenue):
     return SpotExchange(shared=self.shared)
 
   async def exchanges(self) -> Sequence[TradingVenue.ExchangeDescription]:
-    return [{'id': 'spot', 'type': 'spot'}]
+    return [{'id': 'spot', 'type': 'spot', 'name': 'Spot'}]

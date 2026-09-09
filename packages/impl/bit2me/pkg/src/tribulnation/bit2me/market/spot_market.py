@@ -8,6 +8,8 @@ from decimal import Decimal
 from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
   Book,
+  Candle,
+  CandleInterval,
   Collateral,
   Market,
   Order,
@@ -34,6 +36,7 @@ from .impl import (
   trades_history,
   trades_stream,
 )
+from .impl.candles import CANDLE_INTERVALS, candles
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -66,6 +69,18 @@ class SpotMarket(MarketMixin, Market):
 
   async def rules(self, *, refetch: bool = False) -> Rules:
     return await rules(self, refetch=refetch)
+
+  def candles(
+    self,
+    interval: CandleInterval,
+    start: datetime,
+    end: datetime,
+  ) -> PaginatedResponse[Candle]:
+    """Fetch trade candles, continuing through empty time windows."""
+    self.check_candles(interval, start, end)
+    return PaginatedResponse(candles(self, interval, start, end))
+
+  CANDLE_INTERVALS = CANDLE_INTERVALS
 
   async def open_orders(self) -> Sequence[OrderState]:
     return await open_orders(self)

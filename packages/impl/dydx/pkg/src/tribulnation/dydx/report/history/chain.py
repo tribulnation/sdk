@@ -86,7 +86,7 @@ class ChainHistory(SDK):
     default_factory=lambda: asyncio.Semaphore(4)
   )
   cache: 'HistoryCache | None' = None
-  _block_times: dict[int, datetime] = field(default_factory=dict)
+  _block_times: dict[int, datetime] = field(default_factory=dict[int, datetime])
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield self.comet

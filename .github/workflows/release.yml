@@ -86,9 +86,10 @@ jobs:
         with:
           python-version: '3.11'
 
-      - run: pip install -e packages/sdk/pkg
-      - if: needs.check.outputs.slug != 'sdk'
-        run: pip install -e ${{ needs.check.outputs.package_path }}
+      # SDK routers type-check against the local implementation packages. Installing
+      # the complete candidate also avoids requiring implementations to be published
+      # before the SDK version they depend on.
+      - run: pip install -r requirements.txt
       - run: pip install ruff pyright build
       - run: ruff check --config ruff.toml ${{ needs.check.outputs.package_path }}/src
       - run: pyright ${{ needs.check.outputs.package_path }}

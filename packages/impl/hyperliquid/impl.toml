@@ -2,8 +2,35 @@
 # auth = true means every call always needs a real accounts.Hyperliquid() entry.
 
 [support.market]
-support = "full"
+support = "partial"
 auth = false
+methods = [
+  "candles",
+  "depth",
+  "depth_stream",
+  "rules",
+  "tickers",
+  "perp_stats",
+  "query_order",
+  "open_orders",
+  "trades_history",
+  "trades_stream",
+  "position",
+  "collateral",
+  "available_notional",
+  "place_order",
+  "place_orders",
+  "cancel_order",
+  "cancel_orders",
+  "cancel_open_orders",
+  "index",
+  "next_funding",
+  "funding_rates",
+  "funding_payments",
+  "perp_position",
+  "perp_collateral",
+]
+note = "`candles` serves spot and perpetuals in native order within `[start, end)`. Hyperliquid retains only the latest 5000 candles per interval; pagination does not recover expired history. Quote volume is not reported."
 # MarketSDK.DEFAULT_ACCOUNTS includes 'hyperliquid' (Hyperliquid(public=True)) — but that
 # only covers purely public market-data methods; account-scoped/trading methods still need
 # real credentials regardless (see docs/contract/market.yml's per-method `public: false`).

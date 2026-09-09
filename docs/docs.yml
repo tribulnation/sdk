@@ -18,6 +18,8 @@
         - dydx.md
         - hyperliquid.md
         - mexc.md
+        - bitget.md
+        - kraken.md
 - earn:
     - methods.md
 - wallet:
@@ -27,6 +29,8 @@
     - implementations:
         - dydx.md
         - ethereum.md
+        - mexc.md
+        - kraken.md
 - reference:
     - async-usage.md
     - error-handling.md

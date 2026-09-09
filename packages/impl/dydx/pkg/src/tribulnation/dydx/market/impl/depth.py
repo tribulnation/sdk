@@ -32,7 +32,7 @@ def parse_book(book: OrderBook) -> Book:
 @wrap_exceptions
 async def depth_stream(
   indexer: Indexer, market: str
-) -> tuple[AsyncIterable[Book], Callable[[], Awaitable]]:
+) -> tuple[AsyncIterable[Book], Callable[[], Awaitable[object]]]:
   stream = await indexer.streams.orders(id=market)
   book = parse_book(stream.reply)
 

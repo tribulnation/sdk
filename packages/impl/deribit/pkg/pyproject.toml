@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tribulnation-deribit"
+version = "0.2.0"
+description = "Tribulnation SDK implementation for Deribit."
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+readme = {file="README.md", content-type="text/markdown"}
+dependencies = ["tribulnation-sdk>=2.0.0", "typed-deribit>=0.3.0"]
+
+[project.urls]
+Repository = "https://github.com/tribulnation/sdk.git"

@@ -4,6 +4,7 @@ Regression tests for the `StopAsyncIteration` -> `RuntimeError` leak and the
 non-idempotent `unsubscribe()` described in `sdk_stop_iteration_bug.md`.
 """
 
+from typing_extensions import AsyncIterable, AsyncIterator, Awaitable, Callable
 import asyncio
 
 import pytest
@@ -11,15 +12,17 @@ import pytest
 from tribulnation.sdk.core import NetworkError, Subscription
 
 
-def make_ctx_factory(items: list[object], *, on_unsubscribe=None):
+def make_ctx_factory(
+  items: list[int], *, on_unsubscribe: Callable[[], None] | None = None
+) -> Callable[[], Awaitable[Subscription.Context[int]]]:
   """Build a `subscribe_stream` callable whose upstream yields `items` then ends."""
 
-  async def subscribe_stream():
-    async def gen():
+  async def subscribe_stream() -> Subscription.Context[int]:
+    async def gen() -> AsyncIterator[int]:
       for item in items:
         yield item
 
-    async def unsubscribe():
+    async def unsubscribe() -> None:
       if on_unsubscribe is not None:
         on_unsubscribe()
 
@@ -28,8 +31,8 @@ def make_ctx_factory(items: list[object], *, on_unsubscribe=None):
   return subscribe_stream
 
 
-async def collect(stream):
-  items = []
+async def collect(stream: AsyncIterable[int]) -> list[int]:
+  items: list[int] = []
   async for item in stream:
     items.append(item)
   return items
@@ -41,7 +44,7 @@ async def test_upstream_exhaustion_raises_network_error_not_stop_async_iteration
   cm = sub.subscribe()
   stream = await cm.__aenter__()
 
-  items = []
+  items: list[int] = []
   with pytest.raises(NetworkError):
     async for item in stream:
       items.append(item)
@@ -57,8 +60,8 @@ async def test_multiple_subscribers_all_unblocked_on_upstream_end():
   stream_a = await sub.subscribe().__aenter__()
   stream_b = await sub.subscribe().__aenter__()
 
-  async def collect_expecting_failure(stream):
-    items = []
+  async def collect_expecting_failure(stream: AsyncIterable[int]) -> list[int]:
+    items: list[int] = []
     with pytest.raises(NetworkError):
       async for item in stream:
         items.append(item)

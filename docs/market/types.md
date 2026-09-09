@@ -63,6 +63,22 @@ raises, rather than quietly placing a different order.
 > sampled series, and storing them would freeze each venue's windowing choices into the
 > type.
 
+## Candles
+
+- `Candle`: `time` (the open time, timezone-aware, never the close), `open`, `high`, `low`
+  and `close`, plus optional `volume` (base units), `quote_volume` (quote turnover) and
+  `trades`. Each optional field is `None` where the venue reports nothing for it: Coinbase,
+  for one, publishes no quote volume.
+- `CandleInterval`: `'1m' | '5m' | '15m' | '1h' | '4h' | '1d'`. Each implementation
+  declares the subset it serves in `Market.CANDLE_INTERVALS`, so you can pick one without a
+  failed request; any other interval raises `ValueError` before anything is sent. Venue
+  extras (`1s`, `3d`, `1w`) are not exposed.
+
+> [!NOTE]
+> There is no `closed` flag: a candle is complete once `time + interval` is in the past.
+> Only trade candles are served; mark- and index-price series are a different thing and
+> would be a separate method, not a flag.
+
 ## Positions and collateral
 
 - `Position`: `size`, in signed base units. `PerpPosition` adds `entry_price`.

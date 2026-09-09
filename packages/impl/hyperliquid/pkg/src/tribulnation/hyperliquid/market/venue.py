@@ -29,11 +29,13 @@ class HyperliquidMarket(SharedMixin, TradingVenue):
 
   async def exchanges(self) -> list[TradingVenue.ExchangeDescription]:
     out: list[TradingVenue.ExchangeDescription] = [
-      {'id': 'spot', 'type': 'spot'},
-      {'id': '', 'type': 'perp'},
+      {'id': 'spot', 'type': 'spot', 'name': 'Spot'},
+      {'id': '', 'type': 'perp', 'name': 'Perpetuals'},
     ]
     dexs = await self.shared.load_perp_dexs()
     for dex in dexs.values():
       if dex is not None:
-        out.append({'id': dex['name'], 'type': 'perp'})
+        out.append(
+          {'id': dex['name'], 'type': 'perp', 'name': dex['fullName'] or dex['name']}
+        )
     return out

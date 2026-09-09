@@ -11,6 +11,7 @@ def test_dydx_market_orders_default_to_ioc():
     {},
   )
 
+  assert 'time_in_force' in order
   assert order['time_in_force'] == 'IMMEDIATE_OR_CANCEL'
 
 
@@ -20,6 +21,7 @@ def test_dydx_market_tif_can_be_overridden():
     {'tif': 'FILL_OR_KILL'},
   )
 
+  assert 'time_in_force' in order
   assert order['time_in_force'] == 'FILL_OR_KILL'
 
 
@@ -29,4 +31,5 @@ def test_dydx_limit_orders_keep_good_til_time_default():
     {},
   )
 
+  assert 'time_in_force' in order
   assert order['time_in_force'] == 'GOOD_TIL_TIME'

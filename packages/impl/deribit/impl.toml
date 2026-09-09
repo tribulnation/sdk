@@ -1,0 +1,26 @@
+[support.report]
+support = "partial"
+auth = true
+methods = ["history", "snapshot"]
+note = "Discovers currencies and all accessible subaccounts. History defaults to 30 days and pages the transaction log; deposits, withdrawals and transfers are classified, while trades, mixed PnL/funding settlements and other rows retain their signed balance changes as UnknownObservation. Snapshot uses cash balances (not equity) and signed base-unit positions. Removed currencies absent from discovery may require file ingestion."
+
+[support.wallet]
+support = "full"
+auth = true
+note = "Public currency/network metadata supports public=True. Withdrawal fees and confirmation requirements are currency-level, not network-specific quotes; token contracts are unavailable. No credential-free default account is installed."
+
+[support.earn]
+support = "partial"
+auth = true
+methods = ["instruments"]
+note = "Public seven-day SMA APRs on automatically discovered reward-bearing balances, not subscribable products or an account-eligibility guarantee. Supports public=True; no credential-free default account is installed."
+
+[support.market]
+support = "none"
+auth = true
+note = "Market implementation is not yet packaged; the prototype is not a supported SDK surface."
+
+[ids]
+asset = "symbol"
+market = "Deribit native instrument names."
+note = "Native currency symbols and published network names. Subaccounts use stable numeric account ids rather than mutable usernames."

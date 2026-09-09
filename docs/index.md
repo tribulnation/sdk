@@ -40,7 +40,7 @@ api_key = "$MEXC_API_KEY"
 api_secret = "$MEXC_API_SECRET"
 ```
 
-`$VAR` values resolve from the environment, and a missing one fails at load time rather than on first use. Public venues (`dydx`, `hyperliquid`, `mexc`) work without an entry.
+`$VAR` values resolve from the environment, and a missing one fails at load time rather than on first use. Public data needs no entry: `MarketSDK` ships public accounts named `binance`, `bit2me`, `dydx`, `hyperliquid` and `mexc`, and `EarnSDK` ships `bit2me` and `mexc`; an `[accounts.<id>]` table under the same name overrides the default.
 
 Or construct in code: `MarketSDK({'mexc_account1': accounts.Mexc()})` — each `accounts.<Venue>()` field defaults to `$VENUE_FIELD`, e.g. `accounts.Mexc()` reads `$MEXC_API_KEY` and `$MEXC_API_SECRET`.
 

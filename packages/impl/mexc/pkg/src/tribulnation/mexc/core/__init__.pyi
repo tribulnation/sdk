@@ -2,13 +2,14 @@ from .exc import wrap_exceptions
 from .mixin import Mixin, Settings
 from .naming import spot_name, perp_name
 from .constants import MIN_ORDER_VALUE
-from .util import StreamManager
+from .util import StreamManager, windows
 
 __all__ = [
   'wrap_exceptions',
   'Mixin',
   'Settings',
   'StreamManager',
+  'windows',
   'spot_name',
   'perp_name',
   'MIN_ORDER_VALUE',

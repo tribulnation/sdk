@@ -14,7 +14,11 @@ class History(SDK):
   ) -> AsyncIterable[HistoryRecord]:
     """Stream your transaction history as `HistoryRecord`s, each with its `Provenance`.
 
+    API history is best-effort, not a completeness guarantee. Implementations accept
+    either omitted bound and document their endpoint-specific default lookbacks.
+    Retention, discovery and endpoint limits may leave gaps for file ingestion.
+
     Args:
-      start: Start of the window (inclusive). `None` starts from the earliest available.
-      end: End of the window (inclusive). `None` means everything since `start`.
+      start: Inclusive lower bound. `None` uses the venue's documented default lookback.
+      end: Inclusive upper bound. `None` uses now or the venue's latest available data.
     """

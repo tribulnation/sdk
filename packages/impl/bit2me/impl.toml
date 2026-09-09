@@ -25,9 +25,28 @@ note = "Deposit and withdrawal methods come from the per-asset chain list (`v1/w
 # 7 networks, USDT on 10) whose `id` is the slug the withdrawal proforma expects.
 
 [support.market]
-support = "full"
+support = "partial"
 auth = false
-note = "Spot only. `rules().maker_fee`/`taker_fee` are always `0` because no Bit2Me endpoint publishes a fee rate ahead of a fill, and `tickers()` carries no `bid_qty`/`ask_qty` because `v2/trading/tickers` quotes prices only."
+methods = [
+  "candles",
+  "depth",
+  "depth_stream",
+  "rules",
+  "tickers",
+  "query_order",
+  "open_orders",
+  "trades_history",
+  "trades_stream",
+  "position",
+  "collateral",
+  "available_notional",
+  "place_order",
+  "place_orders",
+  "cancel_order",
+  "cancel_orders",
+  "cancel_open_orders",
+]
+note = "Spot only. `candles` sweeps bounded time windows, continuing through empty slots without synthesizing candles; JSON-number prices are converted through their decimal string representation. `rules().maker_fee`/`taker_fee` are always `0` because no Bit2Me endpoint publishes a fee rate ahead of a fill, and `tickers()` carries no `bid_qty`/`ask_qty` because `v2/trading/tickers` quotes prices only."
 # MarketSDK.DEFAULT_ACCOUNTS includes 'bit2me' (Bit2Me(public=True)): markets, depth,
 # tickers and rules are public; account-scoped methods still need real credentials.
 

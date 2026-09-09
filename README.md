@@ -32,7 +32,7 @@ api_key = "$MEXC_API_KEY"
 api_secret = "$MEXC_API_SECRET"
 ```
 
-`$VAR` values resolve from the environment, and a missing one fails at load time rather than on first use. Public venues (`dydx`, `hyperliquid`, `mexc`) work without an entry.
+`$VAR` values resolve from the environment, and a missing one fails at load time rather than on first use. Public data needs no entry: `MarketSDK` ships public accounts named `binance`, `bit2me`, `bitget`, `bybit`, `dydx`, `hyperliquid`, `kraken` and `mexc`, and `EarnSDK` ships `bit2me` and `mexc`; an `[accounts.<id>]` table under the same name overrides the default.
 
 **2. Trade**:
 

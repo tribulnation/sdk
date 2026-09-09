@@ -202,6 +202,12 @@ class Mixin(SDK):
     """
     return await fn()
 
+  @SDK.method
+  @wrap_exceptions
+  async def call_international(self, fn: Callable[[], Awaitable[T]]) -> T:
+    """Read one credential-free International Exchange page under SDK middleware."""
+    return await fn()
+
   def subscribe_book(
     self,
     product_id: str,

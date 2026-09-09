@@ -6,6 +6,7 @@ a hand-typed schema could.
 """
 
 import pydantic
+from pydantic.json_schema import JsonSchemaValue
 
 SCHEMA_TITLE = 'sdk.toml'
 SCHEMA_DESCRIPTION = (
@@ -14,7 +15,7 @@ SCHEMA_DESCRIPTION = (
 )
 
 
-def generate_schema() -> dict:
+def generate_schema() -> JsonSchemaValue:
   """
   Build the full JSON Schema document for `sdk.toml`'s `[accounts.<id>]` tables.
 

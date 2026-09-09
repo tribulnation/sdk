@@ -1,4 +1,12 @@
-from typing_extensions import Any, AsyncContextManager, Iterable, TypedDict
+from typing_extensions import (
+  Any,
+  AsyncContextManager,
+  Awaitable,
+  Callable,
+  Iterable,
+  TypedDict,
+  TypeVar,
+)
 from dataclasses import dataclass, field
 import asyncio
 import os
@@ -22,6 +30,8 @@ from typed_hyperliquid.streams.user_fills import UserFills
 from typed_hyperliquid.streams.l2_book import L2BookUpdate
 
 from tribulnation.hyperliquid.core import Settings, wrap_exceptions
+
+T = TypeVar('T')
 
 
 class DEX(TypedDict):
@@ -262,6 +272,12 @@ class Shared(SDK):
 @dataclass(frozen=True)
 class SharedMixin(SDK):
   shared: Shared
+
+  @SDK.method
+  @wrap_exceptions
+  async def call_hyperliquid(self, fn: Callable[[], Awaitable[T]]) -> T:
+    """Run one retriable request without restarting an entire history walk."""
+    return await fn()
 
   @classmethod
   def http(

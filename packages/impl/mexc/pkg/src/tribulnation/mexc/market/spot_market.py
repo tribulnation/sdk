@@ -7,6 +7,8 @@ from tribulnation.sdk.core import PaginatedResponse, OverflowPolicy
 from tribulnation.sdk.market import (
   Market,
   Book,
+  Candle,
+  CandleInterval,
   Collateral,
   Order,
   OrderResponse,
@@ -19,7 +21,9 @@ from tribulnation.sdk.market import (
 
 from tribulnation.mexc.core.exc import wrap_exceptions
 from .impl import (
+  CANDLE_INTERVALS,
   MarketMixin,
+  candles,
   depth,
   depth_stream,
   rules,
@@ -35,6 +39,8 @@ from .impl import (
 
 @dataclass(frozen=True, kw_only=True)
 class SpotMarket(MarketMixin, Market):
+  CANDLE_INTERVALS = CANDLE_INTERVALS
+
   @property
   def venue_id(self) -> str:
     return 'mexc'
@@ -61,6 +67,15 @@ class SpotMarket(MarketMixin, Market):
 
   async def rules(self, *, refetch: bool = False) -> Rules:
     return await rules(self, refetch=refetch)
+
+  def candles(
+    self,
+    interval: CandleInterval,
+    start: datetime,
+    end: datetime,
+  ) -> PaginatedResponse[Candle]:
+    self.check_candles(interval, start, end)
+    return PaginatedResponse(candles(self, interval, start, end))
 
   async def open_orders(self) -> Sequence[OrderState]:
     return await open_orders(self)

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tribulnation-binance"
-version = "0.2.1"
+version = "0.3.0"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
@@ -12,7 +12,7 @@ description = "Tribulnation SDK implementation for Binance."
 license = "MIT"
 license-files = ["LICENSE"]
 dependencies = [
-  "typed-binance>=2.0.0", "tribulnation-sdk>=1.7.0"
+"typed-binance>=2.0.0", "tribulnation-sdk>=2.0.0"
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}
