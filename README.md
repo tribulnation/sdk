@@ -65,6 +65,9 @@ You can read more about Market IDs and methods in the [Market](docs/market/index
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the repository layout, commands, and release flow.
 
+Maintainer guides and architecture decisions are in the separate
+[developer documentation](dev-docs/README.md).
+
 ## License
 
 [MIT](LICENSE)

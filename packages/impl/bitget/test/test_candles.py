@@ -42,7 +42,7 @@ class Harness:
     return (*values, Decimal(5)) if self.spot else values
 
 
-@pytest.fixture(params=['spot', 'perp'])
+@pytest.fixture(params=['spot', 'usdt', 'usdc', 'coin-classic'])
 def harness(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch):
   """Exercise both endpoint families through their generated pagination."""
   endpoint = AsyncMock()
@@ -51,7 +51,16 @@ def harness(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setattr(Candles, 'candles', endpoint)
     return Harness(SpotMarket(account=account, symbol='BTCUSDT'), endpoint, 999, True)
   monkeypatch.setattr(History, 'history', endpoint)
-  return Harness(PerpMarket(account=account, symbol='BTCUSDT'), endpoint, 198, False)
+  from tribulnation.bitget.market.impl.parse import PERP_PRODUCTS
+
+  product = PERP_PRODUCTS[request.param]
+  symbol = {'usdt': 'BTCUSDT', 'usdc': 'BTCPERP', 'coin-classic': 'BTCUSD'}[request.param]
+  return Harness(
+    PerpMarket(account=account, symbol=symbol, perp_product=product),
+    endpoint,
+    198,
+    False,
+  )
 
 
 async def test_half_open_windows_preserve_native_order(harness: Harness):
@@ -69,6 +78,11 @@ async def test_half_open_windows_preserve_native_order(harness: Harness):
     [START + (n + 1) * MINUTE, START + n * MINUTE],
   ]
   assert harness.request.await_count == 2
+  if isinstance(harness.market, PerpMarket):
+    assert all(
+      call.kwargs['product_type'] == harness.market.product
+      for call in harness.request.await_args_list
+    )
 
 
 async def test_trading_is_unimplemented_offline(harness: Harness):

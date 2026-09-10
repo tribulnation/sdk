@@ -7,6 +7,15 @@ import pytest
 from typed_binance.spot.http.market.ticker_24hr import Ticker24hr
 
 from tribulnation.binance import BinanceMarket
+from tribulnation.binance.market.impl.mixin import Shared
+
+
+@pytest.fixture(autouse=True)
+def symbols(monkeypatch: pytest.MonkeyPatch) -> AsyncMock:
+  """Keep public discovery deterministic without real exchange requests."""
+  request = AsyncMock(return_value={'BTCUSDT': {}, 'ETHUSDT': {}})
+  monkeypatch.setattr(Shared, 'load_spot_symbols', request)
+  return request
 
 
 def ticker(symbol: str, **overrides: Decimal) -> dict[str, str | Decimal]:
@@ -26,7 +35,7 @@ def ticker(symbol: str, **overrides: Decimal) -> dict[str, str | Decimal]:
 async def test_bulk_spot_tickers_preserve_decimal_fields(
   monkeypatch: pytest.MonkeyPatch,
 ):
-  """One public request yields every symbol without per-market requests."""
+  """One bulk ticker request yields resolvable symbols without per-market requests."""
   request = AsyncMock(return_value=[ticker('BTCUSDT'), ticker('ETHUSDT')])
   monkeypatch.setattr(Ticker24hr, 'ticker_24hr', request)
   async with BinanceMarket.new(public=True) as sdk:
@@ -38,13 +47,30 @@ async def test_bulk_spot_tickers_preserve_decimal_fields(
   request.assert_awaited_once_with(type='FULL')
 
 
-async def test_empty_selection_avoids_network(monkeypatch: pytest.MonkeyPatch):
+async def test_empty_selection_avoids_network(
+  monkeypatch: pytest.MonkeyPatch, symbols: AsyncMock
+):
   """An empty requested subset means no markets, not all markets."""
   request = AsyncMock()
   monkeypatch.setattr(Ticker24hr, 'ticker_24hr', request)
   async with BinanceMarket.new(public=True) as sdk:
     assert await (await sdk.exchange('spot')).tickers([]) == {}
   request.assert_not_awaited()
+  symbols.assert_not_awaited()
+
+
+async def test_retired_ticker_ids_are_not_returned(monkeypatch: pytest.MonkeyPatch):
+  """Every ticker ID can be resolved through the same cached market discovery."""
+  monkeypatch.setattr(
+    Ticker24hr,
+    'ticker_24hr',
+    AsyncMock(return_value=[ticker('BTCUSDT'), ticker('NBTUSDT')]),
+  )
+  async with BinanceMarket.new(public=True) as sdk:
+    exchange = await sdk.exchange('spot')
+    assert set(await exchange.tickers()) == {'BTCUSDT'}
+    with pytest.raises(ValueError, match='not found'):
+      await exchange.tickers(['NBTUSDT'])
 
 
 async def test_subset_and_unavailable_book(monkeypatch: pytest.MonkeyPatch):

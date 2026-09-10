@@ -1,4 +1,4 @@
-"""Bitget's USDT-margined perpetual market."""
+"""Bitget perpetual markets, addressed by product line and native symbol."""
 
 from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
 from dataclasses import dataclass
@@ -28,7 +28,6 @@ from .impl import (
   CANDLE_INTERVALS,
   PERP,
   MarketMixin,
-  Product,
   classic_mix_account,
   depth_stream,
   perp_candles,
@@ -43,17 +42,20 @@ from .impl import (
   uta_perp_collateral,
 )
 from .impl.account import not_supported_classic_collateral
+from .impl.parse import PerpProduct, perp_exchange_id
 
 
 @dataclass(kw_only=True, frozen=True)
 class PerpMarket(MarketMixin, _PerpMarket):
-  """One Bitget USDT-margined perpetual contract, e.g. `BTCUSDT`."""
+  """One Bitget perpetual contract; USDC and coin products are public-data only."""
+
+  perp_product: PerpProduct = PERP
 
   CANDLE_INTERVALS = CANDLE_INTERVALS
 
   @property
-  def product(self) -> Product:
-    return PERP
+  def product(self) -> PerpProduct:
+    return self.perp_product
 
   @property
   def market_id(self) -> str:
@@ -61,7 +63,7 @@ class PerpMarket(MarketMixin, _PerpMarket):
 
   @property
   def exchange_id(self) -> str:
-    return 'perp'
+    return perp_exchange_id(self.product)
 
   @property
   def venue_id(self) -> str:
@@ -76,7 +78,7 @@ class PerpMarket(MarketMixin, _PerpMarket):
     book = await self.call(
       lambda: self.client.classic.mix.market.orderbook(
         self.symbol,
-        product_type=PERP,
+        product_type=self.product,
         limit=perp_depth_limit(levels),
         validate=self.validate,
       )
@@ -100,8 +102,8 @@ class PerpMarket(MarketMixin, _PerpMarket):
     Args:
       refetch: Refetch the catalogue instead of reading the cached one.
     """
-    contracts = await self.perp_contracts(refetch=refetch)
-    return parse_perp_rules(contracts[self.symbol])
+    contracts = await self.perp_contracts(self.product, refetch=refetch)
+    return parse_perp_rules(contracts[self.symbol], product=self.product)
 
   def candles(
     self,
@@ -132,6 +134,7 @@ class PerpMarket(MarketMixin, _PerpMarket):
 
   async def perp_position(self) -> PerpPosition:
     """Fetch your open position in the market."""
+    self.require_account_surface()
     return await perp_position(self, self.symbol)
 
   async def perp_collateral(self) -> PerpCollateral:
@@ -141,6 +144,7 @@ class PerpMarket(MarketMixin, _PerpMarket):
     margin mode configured for this symbol. A Classic account reports no margin
     requirement figures at all, so it raises `NotImplementedError`.
     """
+    self.require_account_surface()
     if await self.is_uta():
       return await uta_perp_collateral(self, self.symbol)
     raise not_supported_classic_collateral()
@@ -151,7 +155,8 @@ class PerpMarket(MarketMixin, _PerpMarket):
     Classic reads the futures wallet's `available`; UTA the unified pool's effective
     equity.
     """
-    contracts = await self.perp_contracts()
+    self.require_account_surface()
+    contracts = await self.perp_contracts(self.product)
     max_leverage = contracts[self.symbol]['maxLever']
     if await self.is_uta():
       collateral = await uta_perp_collateral(self, self.symbol)
@@ -163,7 +168,7 @@ class PerpMarket(MarketMixin, _PerpMarket):
     """Fetch the market index price."""
     prices = await self.call(
       lambda: self.client.classic.mix.market.symbol_price(
-        self.symbol, product_type=PERP, validate=self.validate
+        self.symbol, product_type=self.product, validate=self.validate
       )
     )
     return prices[0]['indexPrice']
@@ -177,7 +182,7 @@ class PerpMarket(MarketMixin, _PerpMarket):
     """
     rates = await self.call(
       lambda: self.client.uta.market.funding_rate.current(
-        PERP, symbol=self.symbol, validate=self.validate
+        self.product, symbol=self.symbol, validate=self.validate
       )
     )
     rate = rates[0]

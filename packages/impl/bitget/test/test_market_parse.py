@@ -191,7 +191,11 @@ def test_spot_rules_derive_sizes_from_decimal_place_counts():
     Decimal('0.98'),
     Decimal('1.02'),
   )
-  assert (rules.maker_fee, rules.taker_fee) == (Decimal('0.002'), Decimal('0.002'))
+  assert rules.fees is not None
+  assert (rules.fees.maker_buy, rules.fees.taker_sell) == (
+    Decimal('0.002'),
+    Decimal('0.002'),
+  )
   assert rules.api and rules.fee_asset == 'USDT'
   halted = parse_spot_rules(cast(SpotSymbol, {**SPOT_SYMBOL, 'status': 'halt'}))
   assert not halted.api
@@ -200,15 +204,24 @@ def test_spot_rules_derive_sizes_from_decimal_place_counts():
 def test_perp_rules_scale_the_tick_by_the_price_end_step():
   """The tick is `priceEndStep` units of the last decimal place. Every live contract
   has a step of 1 today, so the multiplier is only visible on a synthetic row."""
-  rules = parse_perp_rules(cast(MixContract, CONTRACT))
+  rules = parse_perp_rules(
+    cast(MixContract, {**CONTRACT, 'feeRateUpRatio': Decimal(0)})
+  )
   assert rules.tick_size == Decimal('0.1')
   assert rules.step_size == Decimal('0.0001')
   assert rules.fixed_min_qty == Decimal('0.0001')
   assert rules.max_qty == Decimal(1200)
   assert rules.min_value == Decimal(5)
-  assert (rules.maker_fee, rules.taker_fee) == (Decimal('0.0002'), Decimal('0.0006'))
-  coarse = parse_perp_rules(cast(MixContract, {**CONTRACT, 'priceEndStep': 5}))
+  assert rules.fees is not None
+  assert (rules.fees.maker_buy, rules.fees.taker_sell) == (
+    Decimal('0.0002'),
+    Decimal('0.0006'),
+  )
+  coarse = parse_perp_rules(
+    cast(MixContract, {**CONTRACT, 'priceEndStep': 5, 'feeRateUpRatio': Decimal('0.1')})
+  )
   assert coarse.tick_size == Decimal('0.5')
+  assert coarse.fees is None
 
 
 def test_open_orders_are_signed_by_side_in_every_shape():

@@ -96,8 +96,6 @@ async def rules(symbol: str) -> Rules:
   # quote/base precision and quantity-precision fields it does report.
   base_size_precision = sym.get('baseSizePrecision')
   return Rules(
-    base=sym['baseAsset'],
-    quote=sym['quoteAsset'],
     fee_asset=sym['quoteAsset'],
     tick_size=Decimal(1).scaleb(-sym['quoteAssetPrecision']),
     step_size=Decimal(str(base_size_precision))
@@ -367,8 +365,6 @@ async def perp_rules(symbol: str) -> Rules:
     f'no contract spec for {symbol}: {raw}'
   )
   return Rules(
-    base=spec['baseCoin'],
-    quote=spec['quoteCoin'],
     fee_asset=spec['settleCoin'],
     tick_size=Decimal(str(spec['priceUnit'])),
     step_size=Decimal(str(spec['volUnit'])),

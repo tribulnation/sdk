@@ -36,14 +36,17 @@ rules = await sdk.rules('mexc_account1:spot:BTCUSDT')
 
 ```
 Rules(
-  base='BTC', quote='USDT',
+  fee_asset='USDT',
   tick_size=Decimal('0.10'), step_size=Decimal('0.00001'),
-  maker_fee=Decimal('0.0002'), taker_fee=Decimal('0.0004'),
+  fees=None,  # Unknown public schedule; query fees() for account rates.
 )
 ```
 
 Prices have to be a multiple of `tick_size`, quantities a multiple of `step_size`, and both
 have minimums. You don't have to do that arithmetic yourself: `Rules` has helpers for it.
+
+Base and quote identities come from the Catalogue instrument you selected, not
+from `Rules`. `fee_asset` identifies the actual currency used for fees.
 
 ## 2. Size the order
 

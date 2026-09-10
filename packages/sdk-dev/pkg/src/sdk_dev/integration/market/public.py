@@ -1,4 +1,4 @@
-"""Read-only market checks; account-derived fees require a configured private account."""
+"""Read-only market checks, independent of personal trading fee tiers."""
 
 from collections.abc import Awaitable, Callable, Sequence
 from dataclasses import dataclass, field
@@ -51,16 +51,11 @@ READS = (
 )
 TIMEOUT = 30
 AUTHENTICATED_READS: dict[str, frozenset[str]] = {
-  'binance': frozenset({'rules'}),
-  'bybit': frozenset({'rules'}),
-  'dydx': frozenset({'rules'}),
-  'hyperliquid': frozenset({'rules'}),
   'coinbase': frozenset(
     {'markets', 'rules', 'tickers', 'index', 'next_funding', 'perp_stats'}
   ),
 }
-"""Current SDK paths, not upstream capabilities: rules fetch user fee tiers;
-Coinbase catalogue/funding paths still use authenticated Advanced Trade products.
+"""Coinbase catalogue/funding paths still use authenticated Advanced Trade products.
 Do not infer this from a caught AuthError: an unexpected rejection stays a failure.
 """
 
@@ -154,15 +149,9 @@ async def collect_public(sdk: MarketSDK, id: str) -> PublicResults:
           and name not in support.methods
         ):
           result.skips[name] = f'{name} is not declared in impl.toml'
-        elif venue_slug == 'binance' and exchange_id == 'usdm' and name == 'rules':
-          result.skips[name] = 'USD-M rules are explicitly unsupported (impl.toml note)'
-        elif (
-          venue_slug == 'mexc'
-          and exchange_id == 'perp'
-          and name in ('rules', 'depth_stream')
-        ):
+        elif venue_slug == 'mexc' and exchange_id == 'perp' and name == 'depth_stream':
           result.skips[name] = (
-            'MEXC perpetual rules/streams are explicitly unsupported (impl.toml note)'
+            'MEXC perpetual streams are explicitly unsupported (impl.toml note)'
           )
         elif needs_account(
           venue_slug, name, public=sdk.all_accounts[account_id].public
@@ -236,7 +225,15 @@ def test_public_read(public_result: PublicResults, public_market: str, method: s
     check_book(value)
   elif method == 'rules':
     assert isinstance(value, Rules)
-    assert value.base and value.quote
+    if value.fees is not None:
+      for rate in (
+        value.fees.maker_buy,
+        value.fees.maker_sell,
+        value.fees.taker_buy,
+        value.fees.taker_sell,
+      ):
+        assert isinstance(rate, Decimal) and rate.is_finite()
+    assert value.fee_asset
     assert value.tick_size.is_finite() and value.tick_size > 0
     assert value.step_size.is_finite() and value.step_size > 0
   elif method == 'tickers':

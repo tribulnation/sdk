@@ -15,6 +15,7 @@ from tribulnation.sdk.core import SDK, exception_wrapper
 
 from typed_binance import Binance
 from typed_binance.spot.http.market.exchange_info import SpotSymbol
+from typed_binance.usdm_futures.http.market.exchange_info import ExchangeSymbol
 
 wrap_exceptions = exception_wrapper()
 
@@ -34,6 +35,25 @@ class Shared:
   spot_symbols_lock: asyncio.Lock = field(
     default_factory=asyncio.Lock, init=False, repr=False
   )
+
+  perp_symbols: dict[str, ExchangeSymbol] | None = None
+  perp_symbols_lock: asyncio.Lock = field(
+    default_factory=asyncio.Lock, init=False, repr=False
+  )
+
+  @wrap_exceptions
+  async def load_perp_symbols(
+    self, *, refetch: bool = False
+  ) -> dict[str, ExchangeSymbol]:
+    """Share a public USD-M metadata snapshot across all market rule reads."""
+    if not refetch and self.perp_symbols is not None:
+      return self.perp_symbols
+    async with self.perp_symbols_lock:
+      if not refetch and self.perp_symbols is not None:
+        return self.perp_symbols
+      info = await self.client.usdm_futures.http.market.exchange_info()
+      self.perp_symbols = {row['symbol']: row for row in info['symbols']}
+      return self.perp_symbols
 
   @classmethod
   def new(

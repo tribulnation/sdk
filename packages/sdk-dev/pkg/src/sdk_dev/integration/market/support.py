@@ -40,7 +40,9 @@ CASES: Mapping[str, Sequence[CandleCase]] = {
   ],
   'bitget': [
     CandleCase(market_id='spot:BTCUSDT', page=999),
-    CandleCase(market_id='perp:BTCUSDT', page=198),
+    CandleCase(market_id='usdt:BTCUSDT', page=198),
+    CandleCase(market_id='usdc:BTCPERP', page=198),
+    CandleCase(market_id='coin-classic:BTCUSD', page=198),
   ],
   'bit2me': [CandleCase(market_id='spot:BTC/EUR', page=998)],
   # The retained 5000 opens fit one response; asking for 5050 cannot prove paging.
