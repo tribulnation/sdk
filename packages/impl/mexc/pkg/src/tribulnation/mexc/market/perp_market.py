@@ -22,6 +22,7 @@ from tribulnation.sdk.market import (
   PerpMarket as BasePerpMarket,
   PerpPosition,
   Rules,
+  Fees,
   Settings,
   Trade,
 )
@@ -228,8 +229,34 @@ class PerpMarket(ExchangeMixin, BasePerpMarket):
     raise unsupported('depth_stream')
 
   async def rules(self, *, refetch: bool = False) -> Rules:
-    """Account-specific perpetual rules/fees are not implemented."""
-    raise unsupported('rules')
+    """Read public linear contract specifications, converting lots to base units."""
+    contracts = await self.shared.load_perp_markets(refetch=refetch)
+    info = contracts[self.market_id]
+    size = Decimal(str(info['contractSize']))
+    # API schedule checked 2026-09-10; applies only to API-enabled contracts,
+    # excluding Innovation Zone. Never use the contract's web/app fee fields.
+    # June's table is corroborated by the later August article (its example is stale):
+    # https://www.mexc.com/announcements/article/updates-to-api-futures-trading-fees-jun-1-2026-17827791535742
+    # https://www.mexc.com/en-GB/learn/article/mexc-review-2026-3-000-tokens-0-maker-fees-and-one-big-catch/1
+    return Rules(
+      fee_asset=info['settleCoin'],
+      tick_size=Decimal(str(info['priceUnit'])),
+      step_size=Decimal(str(info['volUnit'])) * size,
+      fixed_min_qty=Decimal(str(info['minVol'])) * size,
+      max_qty=Decimal(str(info['maxVol'])) * size,
+      fees=Fees.symmetric(maker=Decimal('0.0006'), taker=Decimal('0.0008'))
+      if info['apiAllowed'] and info['state'] == 0
+      else None,
+      api=info['apiAllowed'] and info['state'] == 0,
+      details=info,
+    )
+
+  async def fees(self, *, refetch: bool = False) -> Fees:
+    """Reject fee responses whose applicability to API orders is unverified."""
+    raise NotImplementedError(
+      'MEXC personal perpetual API fees are unverified: the legacy fee endpoint '
+      'does not identify API-channel rates or separate conditional adjustments'
+    )
 
   async def open_orders(self) -> Sequence[OrderState]:
     """Private perpetual orders are not implemented."""

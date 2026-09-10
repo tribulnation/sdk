@@ -86,8 +86,6 @@ async def rules(symbol: str, *, refetch: bool = False) -> Rules:
   account = await client.spot.http.account.info()
   commission = account['commissionRates']
   return Rules(
-    base=sym['baseAsset'],
-    quote=sym['quoteAsset'],
     fee_asset=sym['quoteAsset'],
     tick_size=price_filter['tickSize'] if price_filter else Decimal(0),
     step_size=lot_size['stepSize'] if lot_size else Decimal(0),
@@ -340,8 +338,6 @@ async def rules(symbol: str, *, refetch: bool = False) -> Rules:
   min_notional = filters.get('MIN_NOTIONAL')
   fee = await client.usdm_futures.http.trading.trading_fee(symbol=symbol)
   return Rules(
-    base=sym['baseAsset'],
-    quote=sym['quoteAsset'],
     fee_asset=sym['marginAsset'],
     tick_size=(price_filter.get('tickSize') if price_filter else None) or Decimal(0),
     step_size=(lot_size.get('stepSize') if lot_size else None) or Decimal(0),

@@ -34,10 +34,10 @@ class PerpExchange(SharedMixin, _PerpExchange):
 
   @wrap_exceptions
   async def markets(self) -> Sequence[str]:
-    info = await self.client.usdm_futures.http.market.exchange_info()
+    symbols = await self.shared.load_perp_symbols()
     return [
       s['symbol']
-      for s in info['symbols']
+      for s in symbols.values()
       if s['contractType'] == 'PERPETUAL' and s['status'] == 'TRADING'
     ]
 

@@ -19,7 +19,7 @@ from typed_hyperliquid.info.spot_meta import (
   SpotPair,
   SpotToken,
 )
-from typed_hyperliquid.info.user_fees import UserFeesResponse
+from typed_hyperliquid.info.user_fees import FeeSchedule, UserFeesResponse
 from typed_hyperliquid.info.perp_meta_and_asset_ctxs import (
   PerpDexMeta,
   PerpAssetContext,
@@ -105,6 +105,7 @@ class Shared(SDK):
     default_factory=dict[int | None, list[PerpAssetContext]]
   )
   user_fees: UserFeesResponse | None = None
+  standard_fee_schedule: FeeSchedule | None = None
 
   # Stream subscriptions.
   user_fills_subscription: Subscription[UserFills] | None = None
@@ -185,6 +186,14 @@ class Shared(SDK):
         return self.user_fees
       self.user_fees = await self.client.info.user_fees(user=self.address)
       return self.user_fees
+
+  @wrap_exceptions
+  async def load_standard_fee_schedule(self, *, refetch: bool = False) -> FeeSchedule:
+    """Read only the public schedule, using a fixed non-account lookup address."""
+    if self.standard_fee_schedule is None or refetch:
+      response = await self.client.info.user_fees(user='0x' + '0' * 40)
+      self.standard_fee_schedule = response['feeSchedule']
+    return self.standard_fee_schedule
 
   async def resolve_dex_idx(
     self, dex_name: str | None, *, refetch: bool = False

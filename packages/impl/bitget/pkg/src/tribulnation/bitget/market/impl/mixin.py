@@ -1,7 +1,7 @@
 """Shared state for the Bitget market surface: instrument catalogues and live streams.
 
 Bitget's public market data is one API whatever the account's mode, so the venue, its
-two exchanges and every market are built off the same client and share one cache of
+four exchanges and every market are built off the same client and share one cache of
 catalogues, one set of order book subscriptions and one account-mode detection.
 """
 
@@ -20,7 +20,7 @@ from dataclasses import dataclass, field
 import asyncio
 
 from tribulnation.sdk.core import SDK, OverflowPolicy, Subscription
-from tribulnation.sdk.market import Book
+from tribulnation.sdk.market import Book, Fees
 from typed_bitget import Bitget
 from typed_bitget.classic.mix.market.contracts import MixContract
 from typed_bitget.classic.spot.symbols import SpotSymbol
@@ -29,7 +29,7 @@ from typed_bitget.classic_streams.orderbook import OrderBookPush
 from typed_bitget.uta_streams.fill import FillUpdate
 
 from tribulnation.bitget.core import SdkMixin, wrap_exceptions
-from .parse import PERP, Product, parse_book
+from .parse import PERP, PerpProduct, Product, parse_book
 
 T = TypeVar('T')
 
@@ -80,7 +80,9 @@ class Cache:
   """Catalogues and subscriptions shared by every market built off one client."""
 
   spot: dict[str, SpotSymbol] = field(default_factory=dict[str, SpotSymbol])
-  perp: dict[str, MixContract] = field(default_factory=dict[str, MixContract])
+  perp: dict[PerpProduct, dict[str, MixContract]] = field(
+    default_factory=dict[PerpProduct, dict[str, MixContract]]
+  )
   depth: dict[str, Subscription[Book]] = field(
     default_factory=dict[str, Subscription[Book]]
   )
@@ -181,8 +183,10 @@ class VenueMixin(SDK):
       self.cache.spot = {s['symbol']: s for s in symbols}
       return self.cache.spot
 
-  async def perp_contracts(self, *, refetch: bool = False) -> Mapping[str, MixContract]:
-    """Fetch every USDT-margined *perpetual* contract, keyed by symbol.
+  async def perp_contracts(
+    self, product: PerpProduct = PERP, *, refetch: bool = False
+  ) -> Mapping[str, MixContract]:
+    """Fetch one product line's perpetual contracts, keyed by native symbol.
 
     The product line can also carry dated delivery contracts (`symbolType ==
     'delivery'`); they settle on a date and pay no funding, so nothing about
@@ -191,18 +195,20 @@ class VenueMixin(SDK):
     Args:
       refetch: Refresh the catalogue even when one is already cached.
     """
-    if self.cache.perp and not refetch:
-      return self.cache.perp
+    if product in self.cache.perp and not refetch:
+      return self.cache.perp[product]
     async with self.cache.perp_lock:
-      if self.cache.perp and not refetch:
-        return self.cache.perp
+      if product in self.cache.perp and not refetch:
+        return self.cache.perp[product]
       contracts = await self.call(
-        lambda: self.client.classic.mix.market.contracts(PERP, validate=self.validate)
+        lambda: self.client.classic.mix.market.contracts(
+          product, validate=self.validate
+        )
       )
-      self.cache.perp = {
+      self.cache.perp[product] = {
         c['symbol']: c for c in contracts if c['symbolType'] == 'perpetual'
       }
-      return self.cache.perp
+      return self.cache.perp[product]
 
   def depth_subscription(self, product: Product, symbol: str) -> Subscription[Book]:
     """Get (or open) the shared full-depth order book subscription for one symbol.
@@ -272,6 +278,38 @@ class MarketMixin(VenueMixin):
 
   symbol: str
 
+  def require_account_surface(self):
+    """Keep newly added public products out of unqualified account-data adapters."""
+    if self.product not in ('SPOT', PERP):
+      raise NotImplementedError(
+        'Bitget USDC and coin futures support public market data only.'
+      )
+
+  async def fees(self, *, refetch: bool = False) -> Fees:
+    """Read this account's symbol-specific rates, in its actual account mode.
+
+    Each endpoint returns applicable rates, not the public contract's base tier.
+    Rates are fetched on every call; no optional fee-token discount is applied here.
+    """
+    self.require_account_surface()
+    if await self.is_uta():
+      rates = await self.call(
+        lambda: self.client.uta.account.fee_rate(
+          self.product,
+          symbol=self.symbol,
+          validate=self.validate,
+        )
+      )
+    else:
+      rates = await self.call(
+        lambda: self.client.classic.common.trade_rate(
+          self.symbol,
+          business_type='spot' if self.product == 'SPOT' else 'mix',
+          validate=self.validate,
+        )
+      )
+    return Fees.symmetric(maker=rates['makerFeeRate'], taker=rates['takerFeeRate'])
+
   @property
   def product(self) -> Product:
     """The Bitget product line this market is addressed under."""
@@ -289,6 +327,7 @@ class MarketMixin(VenueMixin):
     self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'
   ):
     """Subscribe to this market's Classic-mode fill stream."""
+    self.require_account_surface()
     return self.classic_fill_subscription(self.product, self.symbol).subscribe(
       queue_size=queue_size, overflow=overflow
     )
@@ -297,6 +336,7 @@ class MarketMixin(VenueMixin):
     self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'
   ):
     """Subscribe to the account-wide UTA-mode fill stream."""
+    self.require_account_surface()
     return self.uta_fill_subscription().subscribe(
       queue_size=queue_size, overflow=overflow
     )

@@ -24,6 +24,7 @@ from tribulnation.sdk.market import (
   OrderState,
   Position,
   Rules,
+  Fees,
   Settings,
   Trade,
 )
@@ -133,21 +134,35 @@ class SpotMarket(SharedMixin, Market):
     notional = next(
       (f for f in filters if f['filterType'] == 'NOTIONAL'), None
     ) or next((f for f in filters if f['filterType'] == 'MIN_NOTIONAL'), None)
-    account = await self.client.spot.http.account.info()
-    commission = account['commissionRates']
     return Rules(
-      base=sym['baseAsset'],
-      quote=sym['quoteAsset'],
       fee_asset=sym['quoteAsset'],
       tick_size=price_filter['tickSize'] if price_filter else Decimal(0),
       step_size=lot_size['stepSize'] if lot_size else Decimal(0),
       fixed_min_qty=lot_size['minQty'] if lot_size else None,
       min_value=notional['minNotional'] if notional else None,
       max_qty=lot_size['maxQty'] if lot_size else None,
-      maker_fee=commission['maker'],
-      taker_fee=commission['taker'],
+      # Public tier defaults do not identify per-symbol promotions or taxes.
+      fees=None,
       api=sym['isSpotTradingAllowed'],
       details=sym,
+    )
+
+  @wrap_exceptions
+  async def fees(self, *, refetch: bool = False) -> Fees:
+    """Combine standard, tax and special rates, excluding optional BNB payment."""
+    commission = await self.client.spot.http.account.commission(self.symbol)
+    if commission['symbol'] != self.symbol:
+      raise ValueError('Binance spot account fee response returned the wrong symbol')
+    groups = (
+      commission['standardCommission'],
+      commission['taxCommission'],
+      commission['specialCommission'],
+    )
+    return Fees(
+      maker_buy=sum((g['maker'] + g['buyer'] for g in groups), Decimal(0)),
+      maker_sell=sum((g['maker'] + g['seller'] for g in groups), Decimal(0)),
+      taker_buy=sum((g['taker'] + g['buyer'] for g in groups), Decimal(0)),
+      taker_sell=sum((g['taker'] + g['seller'] for g in groups), Decimal(0)),
     )
 
   def candles(

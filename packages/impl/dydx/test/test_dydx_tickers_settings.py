@@ -5,6 +5,7 @@ from decimal import Decimal
 from types import SimpleNamespace
 
 import pytest
+from unittest.mock import AsyncMock
 from typing_extensions import Awaitable, Callable, TypedDict, cast
 
 from tribulnation.dydx.market.impl.mixin import ExchangeMixin
@@ -40,6 +41,34 @@ class MarketFields(TypedDict):
 
   oraclePrice: str
   volume24H: str
+
+
+@pytest.mark.parametrize('method', ['tickers', 'perp_stats'])
+async def test_empty_selection_never_calls_indexer(method: str):
+  """Explicitly empty bulk reads do not spend API quota or fail during an outage."""
+  from tribulnation.dydx.market.impl import stats
+
+  load = AsyncMock(side_effect=AssertionError('unexpected indexer request'))
+  target = cast(
+    ExchangeMixin, SimpleNamespace(shared=SimpleNamespace(load_markets=load))
+  )
+  assert await getattr(stats, method)(target, markets=[]) == {}
+  load.assert_not_awaited()
+
+
+@pytest.mark.parametrize('concurrency', [0, -1])
+async def test_invalid_ticker_concurrency_rejected(concurrency: int):
+  """Zero concurrency must fail instead of deadlocking the entire ticker call."""
+  from tribulnation.dydx.market.impl import stats
+
+  load = AsyncMock(return_value={'BTC-USD': {}})
+  target = cast(
+    ExchangeMixin, SimpleNamespace(shared=SimpleNamespace(load_markets=load))
+  )
+  with pytest.raises(ValueError, match='must be positive'):
+    await stats.tickers(
+      target, settings={'dydx': {'tickers_depth_concurrent': concurrency}}
+    )
 
 
 @pytest.mark.parametrize(
