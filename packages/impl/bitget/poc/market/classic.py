@@ -77,8 +77,6 @@ async def rules(symbol: str, *, refetch: bool = False) -> Rules:
   raw = await client.classic.spot.symbols(symbol=symbol)
   sym = raw[0]
   return Rules(
-    base=sym['baseCoin'],
-    quote=sym['quoteCoin'],
     fee_asset=sym['quoteCoin'],
     tick_size=Decimal(10) ** -int(sym['pricePrecision']),
     step_size=Decimal(10) ** -int(sym['quantityPrecision']),
@@ -238,8 +236,6 @@ async def perp_rules(symbol: str, *, refetch: bool = False) -> Rules:
   raw = await client.classic.mix.market.contracts(product_type=PRODUCT_TYPE, symbol=symbol)
   c = raw[0]
   return Rules(
-    base=c['baseCoin'],
-    quote=c['quoteCoin'],
     fee_asset=c['quoteCoin'],
     tick_size=Decimal(10) ** -int(c['pricePlace']),
     step_size=c['sizeMultiplier'],

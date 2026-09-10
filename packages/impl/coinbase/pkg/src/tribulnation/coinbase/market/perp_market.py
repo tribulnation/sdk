@@ -20,6 +20,7 @@ from tribulnation.sdk.market import (
   PerpMarket as _PerpMarket,
   PerpPosition,
   Rules,
+  Fees,
   Settings,
   Trade,
 )
@@ -57,7 +58,11 @@ class PerpMarket(impl.MarketMixin, _PerpMarket):
     )
 
   async def rules(self, *, refetch: bool = False) -> Rules:
-    return await impl.rules(self, 'intx', refetch=refetch)
+    return await impl.rules(self, refetch=refetch)
+
+  async def fees(self, *, refetch: bool = False) -> Fees:
+    """Fetch the configured account's current trading rates."""
+    return await impl.fees(self, 'intx', refetch=refetch)
 
   def candles(
     self,

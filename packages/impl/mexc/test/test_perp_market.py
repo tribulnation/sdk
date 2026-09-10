@@ -10,6 +10,7 @@ import pytest
 from typed_mexc.schemas import ContractSpec, ContractTicker, FuturesCandle
 from tribulnation.mexc import MexcMarket
 from tribulnation.mexc.market.perp_market import PerpMarket
+from tribulnation.sdk.market import Fees
 
 START = datetime(2026, 9, 1, tzinfo=timezone.utc)
 
@@ -22,8 +23,16 @@ def contract(symbol: str = 'BTC_USDT', *, settlement: str = 'USDT') -> ContractS
       'symbol': symbol,
       'settleCoin': settlement,
       'quoteCoin': 'USDT',
+      'baseCoin': 'BTC',
       'contractSize': 0.0001,
       'apiAllowed': False,
+      'state': 0,
+      'priceUnit': 0.1,
+      'volUnit': 1.0,
+      'minVol': 2.0,
+      'maxVol': 10000.0,
+      'makerFeeRate': 0.0,
+      'takerFeeRate': 0.0,
     },
   )
 
@@ -406,3 +415,57 @@ async def test_private_perpetual_methods_remain_unimplemented(venue: MexcMarket)
     await market.place_order(
       {'type': 'LIMIT', 'qty': Decimal('1'), 'price': Decimal('1')}
     )
+
+
+async def test_perpetual_rules_convert_contract_lots(venue: MexcMarket):
+  """Public specs use base quantities and do not mistake web fees for API rates."""
+  async with venue:
+    market = await (await venue.perp_exchange('perp')).market('BTC_USDT')
+    rules = await market.rules()
+    assert rules.fee_asset == 'USDT'
+    assert rules.tick_size == Decimal('0.1')
+    assert rules.step_size == Decimal('0.0001')
+    assert rules.fixed_min_qty == Decimal('0.0002')
+    assert rules.max_qty == 1
+    assert rules.api is False
+    assert rules.fees is None
+
+
+@pytest.mark.parametrize('enabled,state', [(True, 0), (False, 0), (True, 4)])
+async def test_perpetual_standard_fees_are_api_scoped(
+  venue: MexcMarket,
+  monkeypatch: pytest.MonkeyPatch,
+  enabled: bool,
+  state: int,
+):
+  """Only active API-enabled contracts receive the API schedule, never web fees."""
+  info = dict(contract(), apiAllowed=enabled, state=state)
+  monkeypatch.setattr(
+    venue.client.futures.http.market,
+    'contract_info',
+    AsyncMock(
+      return_value={'success': True, 'data': [info]},
+    ),
+  )
+  private = AsyncMock(side_effect=AssertionError('Private fee endpoint called'))
+  monkeypatch.setattr(venue.client.futures.http.account, 'tiered_fee_rate', private)
+  async with venue:
+    market = await (await venue.perp_exchange('perp')).market('BTC_USDT')
+    rules = await market.rules()
+  expected = Fees.symmetric(maker=Decimal('0.0006'), taker=Decimal('0.0008'))
+  assert rules.fees == (expected if enabled and state == 0 else None)
+  private.assert_not_awaited()
+
+
+async def test_perpetual_personal_fees_do_not_guess_api_channel(
+  venue: MexcMarket,
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """Legacy account rates must not masquerade as verified API execution fees."""
+  private = AsyncMock(side_effect=AssertionError('Legacy fee endpoint called'))
+  monkeypatch.setattr(venue.client.futures.http.account, 'tiered_fee_rate', private)
+  async with venue:
+    market = await (await venue.perp_exchange('perp')).market('BTC_USDT')
+    with pytest.raises(NotImplementedError, match='API fees are unverified'):
+      await market.fees()
+  private.assert_not_awaited()

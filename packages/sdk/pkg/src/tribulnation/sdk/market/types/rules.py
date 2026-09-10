@@ -3,16 +3,12 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from tribulnation.sdk.util import ceil2tick, trunc2tick, round2tick
+from .fees import Fees
 
 
 @dataclass(kw_only=True)
 class Rules:
-  """Market rules type."""
-
-  base: str
-  """Base asset of the instrument."""
-  quote: str
-  """Quote asset of the instrument."""
+  """Trading constraints; base and quote identities belong to the Catalogue."""
   fee_asset: str
   """Asset used for fees/funding payments."""
   tick_size: Decimal
@@ -33,10 +29,12 @@ class Rules:
   """Maximum price of the order (in quote units), relative to the current price (e.g. 1.05 = 5% above the current price)."""
   fixed_max_price: Decimal | None = None
   """Maximum price of the order (in quote units)."""
-  maker_fee: Decimal
-  """Maker fee of the order (in quote units)."""
-  taker_fee: Decimal
-  """Taker fee of the order (in quote units)."""
+  fees: Fees | None = None
+  """Combined standard non-VIP API rates, or an unknown schedule.
+
+  Never account-specific; excludes optional fee-payment discounts.
+  Use `Market.fees()` for the configured account's combined rates.
+  """
   api: bool
   """Whether the instrument can be traded via API."""
   details: Any = None

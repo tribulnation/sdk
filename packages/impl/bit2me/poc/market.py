@@ -101,8 +101,6 @@ async def rules(symbol: str, *, refetch: bool = False) -> Rules:
   min_price = info.get('minPrice')
   max_price = info.get('maxPrice')
   return Rules(
-    base=base,
-    quote=quote,
     fee_asset=quote,
     tick_size=Decimal(str(tick_size)) if tick_size is not None else Decimal(0),
     step_size=Decimal(1).scaleb(-amount_precision)
