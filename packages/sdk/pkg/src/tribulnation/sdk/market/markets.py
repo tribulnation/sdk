@@ -28,6 +28,7 @@ from .types import (
   PerpPosition,
   Trade,
   Rules,
+  Fees,
   Ticker,
   PerpStats,
 )
@@ -195,6 +196,12 @@ class TradingMarkets(SDK):
     """
     market = await self.market(market_id)
     return await market.rules(refetch=refetch)
+
+  @SDK.method
+  async def fees(self, market_id: str, /, *, refetch: bool = False) -> Fees:
+    """Fetch the selected market's account rates without a standard-rate fallback."""
+    market = await self.market(market_id)
+    return await market.fees(refetch=refetch)
 
   @SDK.method
   @PaginatedResponse.lift

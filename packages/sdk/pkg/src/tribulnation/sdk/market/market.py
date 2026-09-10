@@ -28,6 +28,7 @@ from .types import (
   PerpPosition,
   Trade,
   Rules,
+  Fees,
 )
 from .settings import Settings
 
@@ -80,10 +81,21 @@ class Market(SDK):
   @SDK.method
   @abstractmethod
   async def rules(self, *, refetch: bool = False) -> Rules:
-    """Fetch the market rules.
+    """Fetch market specifications and standard rates, without account-fee reads.
 
     - `refetch`: if `True`, fetch the rules even if they are already cached.
     """
+
+  @SDK.method
+  async def fees(self, *, refetch: bool = False) -> Fees:
+    """Fetch combined account rates for maker/taker buys and sells.
+
+    Includes applicable side and market adjustments, but excludes optional
+    fee-payment discounts. Never falls back to standard or partial base rates.
+    Unsupported implementations raise `NotImplementedError`. Authentication
+    failures and missing account rates propagate instead of returning zero.
+    """
+    raise NotImplementedError(f'Account trading fees are not implemented: {self.id}')
 
   @SDK.method
   async def query_order(self, id: str) -> OrderState | None:

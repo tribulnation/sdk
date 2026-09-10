@@ -10,7 +10,7 @@ from datetime import datetime
 from tribulnation.sdk.market import FundingRate, Trade
 
 from .mixin import MarketMixin
-from .parse import PERP, parse_mix_fill, parse_spot_fill, parse_uta_fill
+from .parse import parse_mix_fill, parse_spot_fill, parse_uta_fill
 from .util import HISTORY_WINDOW, PAGE, windows
 
 
@@ -21,6 +21,7 @@ async def trades_history(
 
   UTA's fill history has no symbol filter, so its rows are narrowed here.
   """
+  self.require_account_surface()
   uta = await self.is_uta()
   for lower, upper in windows(start, end, HISTORY_WINDOW):
     if uta:
@@ -73,8 +74,11 @@ async def funding_rates(
   The endpoint pages by number, not by time, so the window is applied here: pages are
   read newest-first and the walk stops once a page reaches back past `start`.
   """
+  product = self.product
+  if product == 'SPOT':
+    raise ValueError('Funding rates require a futures product')
   paging = self.client.classic.mix.market.funding.rate_history_paged(
-    self.symbol, product_type=PERP, page_size=PAGE, validate=self.validate
+    self.symbol, product_type=product, page_size=PAGE, validate=self.validate
   )
   async for rows in paging.via(self.call):
     yield [
