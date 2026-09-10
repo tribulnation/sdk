@@ -77,8 +77,6 @@ async def rules(symbol: str, *, refetch: bool = False) -> Rules:
   raw = await client.uta.market.instruments(category='SPOT', symbol=symbol)
   s = raw[0]
   return Rules(
-    base=s['baseCoin'],
-    quote=s['quoteCoin'],
     fee_asset=s['quoteCoin'],
     tick_size=Decimal(10) ** -int(s['pricePrecision']),
     step_size=Decimal(10) ** -int(s['quantityPrecision']),
@@ -233,8 +231,6 @@ async def perp_rules(symbol: str, *, refetch: bool = False) -> Rules:
   raw = await client.uta.market.instruments(category=PERP_CATEGORY, symbol=symbol)
   s = raw[0]
   return Rules(
-    base=s['baseCoin'],
-    quote=s['quoteCoin'],
     fee_asset=s['quoteCoin'],
     tick_size=Decimal(10) ** -int(s['pricePrecision']),
     step_size=Decimal(10) ** -int(s['quantityPrecision']),

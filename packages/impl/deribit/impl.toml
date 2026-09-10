@@ -6,12 +6,12 @@ note = "Discovers currencies and all accessible subaccounts. History defaults to
 
 [support.wallet]
 support = "full"
-auth = true
+auth = false
 note = "Public currency/network metadata supports public=True. Withdrawal fees and confirmation requirements are currency-level, not network-specific quotes; token contracts are unavailable. No credential-free default account is installed."
 
 [support.earn]
 support = "partial"
-auth = true
+auth = false
 methods = ["instruments"]
 note = "Public seven-day SMA APRs on automatically discovered reward-bearing balances, not subscribable products or an account-eligibility guarantee. Supports public=True; no credential-free default account is installed."
 

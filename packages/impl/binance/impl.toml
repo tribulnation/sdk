@@ -20,6 +20,7 @@ methods = [
   "tickers",
   "perp_stats",
   "rules",
+  "fees",
   "query_order",
   "open_orders",
   "trades_history",
@@ -32,7 +33,7 @@ methods = [
   "funding_rates",
   "candles",
 ]
-note = "Read-only: order placement and cancellation are not implemented. USD-M serves public depth, streams, tickers, perp_stats, index, next_funding, funding_rates and candles. Bulk snapshots cover active perpetuals only, not dated futures. perp_stats combines bulk pricing/funding with one public open-interest read per market (at most five concurrent); component observations are not atomic. Private futures methods remain unsupported and Report remains spot-side only. Candles serve spot and USD-M, every contract interval, 1000 per page with [start, end) filtering."
+note = "Read-only: order placement and cancellation are not implemented. USD-M serves public rules, depth, streams, tickers, perp_stats, index, next_funding, funding_rates and candles. Bulk snapshots cover active perpetuals only, not dated futures. perp_stats combines bulk pricing/funding with one public open-interest read per market (at most five concurrent); component observations are not atomic. Personal fees combine spot standard/tax/special and buy/sell components; USD-M fees require account permission and use symmetric ordinary-order commissions. Optional BNB payment discounts and RPI orders are excluded. Public standard fees cover only USDT crypto perpetuals; spot, USDC and TradFi schedules remain unknown. Other private futures methods remain unsupported and Report remains spot-side only. Candles serve spot and USD-M, every contract interval, 1000 per page with [start, end) filtering."
 # MarketSDK.DEFAULT_ACCOUNTS includes 'binance' (Binance(public=True)) — but that only
 # covers purely public market-data methods; account-scoped methods still need real
 # credentials regardless (see docs/contract/market.yml's per-method `public: false`).

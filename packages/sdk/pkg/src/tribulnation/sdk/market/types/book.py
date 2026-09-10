@@ -1,6 +1,7 @@
 from typing_extensions import Sequence, overload
 from dataclasses import dataclass, field
 from decimal import Decimal
+from .fees import Fees
 
 
 @dataclass(kw_only=True)
@@ -102,11 +103,20 @@ class Book:
       asks=self.asks + [e for other in others for e in other.asks],
     )
 
-  def with_fees(self, fee: Decimal) -> 'Book':
-    """Lower bids and raise asks to account for fees."""
+  def with_fees(self, fee: Decimal | Fees, *, maker: bool = False) -> 'Book':
+    """Adjust bids for selling and asks for buying, using the selected liquidity role.
+
+    A Decimal retains the symmetric-rate shorthand. This adjusts quoted notional
+    costs, not fee-asset settlement quantities or rounding.
+    """
+    if isinstance(fee, Fees):
+      buy = fee.maker_buy if maker else fee.taker_buy
+      sell = fee.maker_sell if maker else fee.taker_sell
+    else:
+      buy = sell = fee
     return Book(
-      bids=[Book.Entry(e.price * (1 - fee), e.qty) for e in self.bids],
-      asks=[Book.Entry(e.price * (1 + fee), e.qty) for e in self.asks],
+      bids=[Book.Entry(e.price * (1 - sell), e.qty) for e in self.bids],
+      asks=[Book.Entry(e.price * (1 + buy), e.qty) for e in self.asks],
     )
 
   def limit(self, levels: int) -> 'Book':
@@ -259,12 +269,9 @@ def fill(entries: list[Book.Entry], *, qty: Decimal) -> Decimal | None:
     return notional / orig_qty
 
 
-def with_fees(self: 'Book', fee: Decimal) -> 'Book':
+def with_fees(self: 'Book', fee: Decimal | Fees, *, maker: bool = False) -> 'Book':
   """Lower bids and raise asks to account for fees."""
-  return Book(
-    bids=[Book.Entry(e.price * (1 - fee), e.qty) for e in self.bids],
-    asks=[Book.Entry(e.price * (1 + fee), e.qty) for e in self.asks],
-  )
+  return self.with_fees(fee, maker=maker)
 
 
 def fmt_book(self: 'Book', fmt: str) -> str:

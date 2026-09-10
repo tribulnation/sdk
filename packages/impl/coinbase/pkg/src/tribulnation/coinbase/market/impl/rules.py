@@ -1,8 +1,6 @@
 """Trading rules for one Advanced Trade product."""
 
-from decimal import Decimal
-
-from tribulnation.sdk.market import Rules
+from tribulnation.sdk.market import Fees, Rules
 
 from typed_coinbase.schemas import Product
 
@@ -25,29 +23,37 @@ def base_asset(product: Product) -> str:
 
 
 @wrap_exceptions
-async def rules(
-  self: MarketMixin, scope: FeeScope, /, *, refetch: bool = False
-) -> Rules:
-  """Fetch the product's trading rules and the account's current fee tier.
+async def rules(self: MarketMixin, *, refetch: bool = False) -> Rules:
+  """Fetch product rules without reading the account's fee tier.
 
   Args:
-    scope: Which fee schedule prices this product.
-    refetch: Fetch even when the product and fee tier are already cached.
+    refetch: Fetch even when the product is already cached.
   """
   product = await self.shared.load_product(self.product_id, refetch=refetch)
-  tier = await self.shared.load_fee_tier(scope, refetch=refetch)
   quote = product['quote_display_symbol']
   return Rules(
-    base=base_asset(product),
-    quote=quote,
     fee_asset=quote,
     tick_size=product['quote_increment'],
     step_size=product['base_increment'],
     fixed_min_qty=product['base_min_size'],
     min_value=product['quote_min_size'],
     max_qty=product['base_max_size'],
-    maker_fee=tier.get('maker_fee_rate') or Decimal(0),
-    taker_fee=tier.get('taker_fee_rate') or Decimal(0),
+    fees=None,
     api=not product['trading_disabled'],
     details=product,
   )
+
+
+@wrap_exceptions
+async def fees(self: MarketMixin, scope: FeeScope, *, refetch: bool = False) -> Fees:
+  """Fetch combined account rates only where product adjustments are resolved."""
+  if scope == 'spot':
+    raise NotImplementedError(
+      'Coinbase spot fee tiers do not resolve product-specific stablepair pricing'
+    )
+  tier = await self.shared.load_fee_tier(scope, refetch=refetch)
+  maker = tier.get('maker_fee_rate')
+  taker = tier.get('taker_fee_rate')
+  if maker is None or taker is None:
+    raise ValueError('Coinbase account fee tier is missing rates')
+  return Fees.symmetric(maker=maker, taker=taker)

@@ -36,6 +36,8 @@ async def perp_stats(
   References:
     - [dYdX API docs](https://docs.dydx.xyz/types/perpetual_market)
   """
+  if markets is not None and not markets:
+    return {}
   perpetual_markets = await self.shared.load_markets(refetch=True)
   now = datetime.now().astimezone()
   next_time = now.replace(minute=0, second=0, microsecond=0) + FUNDING_INTERVAL
@@ -72,7 +74,7 @@ async def tickers(
   *,
   settings: Settings = {},
 ) -> Mapping[str, Ticker]:
-  """Fetch ticker snapshots for every perp market in one call.
+  """Fetch ticker snapshots, optionally enriching them with per-market order books.
 
   Args:
     markets: Market tickers to keep. `None` keeps every market.
@@ -83,6 +85,8 @@ async def tickers(
   Returns:
     A mapping of market ticker to its `Ticker`.
   """
+  if markets is not None and not markets:
+    return {}
   perpetual_markets = await self.shared.load_markets(refetch=True)
   wanted = list(perpetual_markets) if markets is None else list(markets)
 
@@ -102,6 +106,8 @@ async def tickers(
     return result
 
   concurrency = venue_settings.get('tickers_depth_concurrent', 20)
+  if concurrency < 1:
+    raise ValueError('dydx.tickers_depth_concurrent must be positive')
   sem = asyncio.Semaphore(concurrency)
 
   async def _enrich(market_id: str) -> None:
@@ -113,7 +119,9 @@ async def tickers(
         t.bid, t.ask = bbo.bid, bbo.ask
         t.bid_qty, t.ask_qty = bbo.bid_qty, bbo.ask_qty
       except Exception as exc:
-        logging.warning('tickers: %s book fetch failed: %s', market_id, exc)
+        logging.warning(
+          'tickers: %s book fetch failed (%s)', market_id, type(exc).__name__
+        )
 
   await asyncio.gather(*(_enrich(m) for m in wanted))
   return result
