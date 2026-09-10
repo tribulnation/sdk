@@ -110,8 +110,6 @@ async def rules(product_id: str, *, refetch: bool = False) -> Rules:
   maker_fee_rate = tier.get('maker_fee_rate')
   taker_fee_rate = tier.get('taker_fee_rate')
   return Rules(
-    base=product['base_display_symbol'],
-    quote=product['quote_display_symbol'],
     fee_asset=product['quote_display_symbol'],
     tick_size=Decimal(product['quote_increment']),
     step_size=Decimal(product['base_increment']),
@@ -403,8 +401,6 @@ async def perp_rules(product_id: str, *, refetch: bool = False) -> Rules:
   if not base and details is not None:
     base = details.get('contract_code') or ''
   return Rules(
-    base=base,
-    quote=product['quote_display_symbol'],
     fee_asset=product['quote_display_symbol'],
     tick_size=Decimal(product['quote_increment']),
     step_size=Decimal(product['base_increment']),

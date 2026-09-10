@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from tribulnation.sdk.market import Rules
+from tribulnation.sdk.market import Fees, Rules
 
 from tribulnation.mexc.core import MIN_ORDER_VALUE, wrap_exceptions
 from .mixin import MarketMixin
@@ -32,14 +32,11 @@ async def rules(self: MarketMixin, *, refetch: bool = False) -> Rules:
       rel_max_price = min(rel_max_price or Decimal('inf'), new_max_price)
 
   return Rules(
-    base=info.get('baseAsset') or '',
-    quote=info.get('quoteAsset') or '',
     fee_asset=info.get('quoteAsset') or '',
     tick_size=Decimal(1) / (Decimal(10) ** quote_precision),
     step_size=base_step,
     api=bool(info.get('isSpotTradingAllowed', True)),
-    maker_fee=Decimal(str(info.get('makerCommission') or '0')),
-    taker_fee=Decimal(str(info.get('takerCommission') or '0')),
+    fees=Fees.symmetric(maker=info['makerCommission'], taker=info['takerCommission']),
     min_value=MIN_ORDER_VALUE,
     rel_min_price=rel_min_price,
     rel_max_price=rel_max_price,

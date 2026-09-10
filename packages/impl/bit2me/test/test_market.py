@@ -4,6 +4,7 @@ from decimal import Decimal
 
 from tribulnation.sdk.market import Book
 from tribulnation.bit2me.market.impl.depth import parse_levels
+from tribulnation.bit2me.market.impl.rules import standard_fees
 
 
 def test_a_three_element_level_is_read_by_index():
@@ -18,3 +19,15 @@ def test_a_three_element_level_is_read_by_index():
   assert levels == [
     Book.Entry(price=Decimal('0.0052283'), qty=Decimal('76289.74336778'))
   ]
+
+
+def test_standard_fees_distinguish_documented_pair_classes():
+  """Stable-base markets have a separate fee tier; unknown classes stay unknown."""
+  crypto = standard_fees('BTC', 'EUR')
+  stable = standard_fees('USDC', 'EUR')
+  assert crypto is not None and stable is not None
+  assert crypto.maker_buy == crypto.maker_sell == Decimal('0.005')
+  assert crypto.taker_buy == crypto.taker_sell == Decimal('0.006')
+  assert stable.maker_buy == stable.maker_sell == Decimal(0)
+  assert stable.taker_buy == stable.taker_sell == Decimal('0.0001')
+  assert standard_fees('UNCLASSIFIED', 'EUR') is None

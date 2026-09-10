@@ -18,6 +18,7 @@ from .types import (
   Ticker,
   Trade,
   Rules,
+  Fees,
 )
 from .settings import Settings
 from .market import Market, PerpMarket
