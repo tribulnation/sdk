@@ -12,6 +12,7 @@ async def open_orders(self: MarketMixin) -> list[OrderState]:
 
   Every page is its own `call`, so a throttled page retries alone.
   """
+  self.require_account_surface()
   out: list[OrderState] = []
   if await self.is_uta():
     paging = self.client.uta.trade.order.unfilled_paged(

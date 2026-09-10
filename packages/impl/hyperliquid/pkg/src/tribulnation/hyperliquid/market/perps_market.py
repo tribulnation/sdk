@@ -15,6 +15,7 @@ from tribulnation.sdk.market import (
   PerpCollateral,
   PerpPosition,
   Rules,
+  Fees,
   Settings,
   Trade,
   FundingRate,
@@ -81,6 +82,12 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
     self, start: datetime, end: datetime
   ) -> AsyncIterable[Sequence[Trade]]:
     return trades_history(self, start, end)
+
+  async def fees(self, *, refetch: bool = False) -> Fees:
+    """Fetch complete rates for supported perpetual market configurations."""
+    from .impl.fees import personal_perp_fees
+
+    return await personal_perp_fees(self, refetch=refetch)
 
   def candles(
     self,

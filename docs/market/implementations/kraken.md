@@ -33,8 +33,9 @@ without credentials; balances, open orders, fills and the fills stream need an A
   The venue also names the same pair `XXBTZUSD` (the `AssetPairs` key) and `BTC/USD`
   (the WebSocket v2 symbol); both are looked up internally and never exposed.
 - Full SDK ID: `kraken:spot:XBTUSD` (or `<your-account-key>:spot:XBTUSD`).
-- `Rules.base`/`quote` are Kraken's internal asset ids (`XXBT`, `ZUSD`), the same form
-  balances, ledgers and withdrawal methods answer in.
+- `Rules.fee_asset` uses Kraken's internal asset ID (e.g. `ZUSD`), the same form
+  balances, ledgers and withdrawal methods answer in. Base/quote identities come
+  from the Catalogue instrument.
 - `Exchange.markets()` returns every altname in `AssetPairs`, whatever its status.
 
 ## Venue-specific semantics

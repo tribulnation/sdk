@@ -37,14 +37,16 @@ class SpotExchange(SharedMixin, Exchange):
   async def tickers(
     self, markets: Collection[str] | None = None, *, settings: Settings = {}
   ) -> Mapping[str, Ticker]:
-    """Read all spot tickers in one public request, optionally selecting market IDs.
+    """Read spot tickers using bulk public data and cached market discovery.
 
     The FULL bulk response carries both top-of-book quantities and 24-hour
     base volume. Zero-sized book sides are absent, not executable zero quotes.
-    No futures endpoints or credentials are used.
+    Retired symbols absent from discovery are omitted. No futures endpoints or
+    credentials are used.
     """
     if markets is not None and not markets:
       return {}
+    symbols = await self.shared.load_spot_symbols()
     response = await self.client.spot.http.market.ticker_24hr(type='FULL')
     if not isinstance(response, list):
       raise ValueError('Binance bulk ticker response must be a list')
@@ -54,6 +56,8 @@ class SpotExchange(SharedMixin, Exchange):
     result: dict[str, Ticker] = {}
     for row in rows:
       symbol = row['symbol']
+      if symbol not in symbols:
+        continue
       if selected is not None and symbol not in selected:
         continue
       bid_qty, ask_qty = Decimal(row['bidQty']), Decimal(row['askQty'])
