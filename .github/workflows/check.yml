@@ -67,6 +67,9 @@ jobs:
         run: pip install -r requirements.txt
       - if: matrix.package != 'sdk' && matrix.package != 'sdk-dev'
         run: pip install -e ${{ steps.package.outputs.path }}
+      # Shared Market.Settings references both optional venue settings types.
+      - if: matrix.package == 'dydx' || matrix.package == 'hyperliquid'
+        run: pip install -e packages/impl/dydx/pkg -e packages/impl/hyperliquid/pkg
       - run: pip install ruff pyright build
       - run: ruff check --config ruff.toml ${{ steps.package.outputs.path }}/src
       - run: pyright ${{ steps.package.outputs.path }}
@@ -105,3 +108,30 @@ jobs:
 
       - run: pip install -r requirements.txt
       - run: pytest
+
+  release_evidence:
+    if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'release/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/checkout@v5
+        with:
+          repository: tribulnation/catalogue
+          ref: main
+          path: release-catalogue
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install candidate with recorded dependency versions
+        run: |
+          constraints=()
+          for report in release-evidence/*/dependency-pins.txt; do
+            if [ -f "$report" ]; then
+              constraints+=(-c "$report")
+            fi
+          done
+          pip install "${constraints[@]}" -r requirements.txt
+      - name: Verify local evidence without exchange credentials
+        env:
+          RELEASE_BRANCH: ${{ github.head_ref }}
+        run: sdk-dev results release "${RELEASE_BRANCH#release/}" --catalogue release-catalogue/data

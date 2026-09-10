@@ -15,6 +15,7 @@ from tribulnation.sdk.market import (
   OrderState,
   Position,
   Rules,
+  Fees,
   Settings,
   Trade,
 )
@@ -66,6 +67,12 @@ class SpotMarket(SpotMarketMixin, Market):
 
   async def rules(self, *, refetch: bool = False) -> Rules:
     return await spot_rules(self, refetch=refetch)
+
+  async def fees(self, *, refetch: bool = False) -> Fees:
+    """Decline incomplete spot rates until quote-token adjustments are resolvable."""
+    raise NotImplementedError(
+      'Hyperliquid spot fees require verified quote-token and stable-pair metadata'
+    )
 
   def candles(
     self,

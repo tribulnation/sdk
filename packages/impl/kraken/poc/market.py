@@ -102,8 +102,6 @@ async def rules(symbol: str, *, refetch: bool = False) -> Rules:
   ordermin = pair.get('ordermin')
   costmin = pair.get('costmin')
   return Rules(
-    base=pair.get('base', ''),
-    quote=pair.get('quote', ''),
     fee_asset=pair.get('quote', ''),
     tick_size=tick_size
     if tick_size is not None
@@ -150,7 +148,8 @@ async def open_orders(symbol: str) -> list[OrderState]:
 
 # %%
 async def trades_history(symbol: str, start: datetime, end: datetime) -> list[Trade]:
-  quote = (await rules(symbol)).quote
+  pairs = await client.spot.market_data.asset_pairs(pair=symbol)
+  quote = next(iter(pairs.values()))['quote']
   raw = await client.spot.account.trades_history(
     pair=symbol,
     start=int(start.timestamp()),
@@ -224,7 +223,8 @@ result
 
 # %%
 async def position(symbol: str) -> Position:
-  base = (await rules(symbol)).base
+  pairs = await client.spot.market_data.asset_pairs(pair=symbol)
+  base = next(iter(pairs.values()))['base']
   balances = await client.spot.account.balance()
   size = Decimal(balances.get(base, '0'))
   return Position(size=size)
@@ -235,7 +235,8 @@ async def position(symbol: str) -> Position:
 
 # %%
 async def collateral(symbol: str) -> Collateral:
-  quote = (await rules(symbol)).quote
+  pairs = await client.spot.market_data.asset_pairs(pair=symbol)
+  quote = next(iter(pairs.values()))['quote']
   balances = await client.spot.account.balance_ex()
   info = balances.get(quote) or {}
   balance = Decimal(info.get('balance', '0'))
@@ -379,8 +380,6 @@ async def rules(symbol: str, *, refetch: bool = False) -> Rules:
   tiers: list[dict[str, Any]] = schedule.get('tiers') or []
   base_tier = tiers[0] if tiers else None
   return Rules(
-    base=instr['base'],
-    quote=instr['quote'],
     fee_asset=instr['quote'],
     tick_size=Decimal(str(instr['tickSize'])),
     step_size=Decimal(1) / 10 ** instr.get('contractValueTradePrecision', 0),

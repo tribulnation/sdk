@@ -116,6 +116,17 @@ class Shared(SDK):
           product_venue='INTX',
         )
       )
+      if summary.get('has_cost_plus_commission'):
+        raise NotImplementedError(
+          'Coinbase cost-plus commissions need product-level pricing'
+        )
+      tax = summary.get('goods_and_services_tax')
+      if tax is not None and tax.get('type') != 'INCLUSIVE':
+        # Upstream exposes a rate but does not specify its unit in this endpoint.
+        # Do not guess percent versus fraction or silently omit an exclusive tax.
+        raise NotImplementedError(
+          'Coinbase exclusive or unspecified GST needs verified composition'
+        )
       tier = summary.get('fee_tier') or FeeTierFeeTier()
       self.fee_tiers[scope] = tier
       return tier
