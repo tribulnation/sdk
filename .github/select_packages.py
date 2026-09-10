@@ -11,6 +11,7 @@ SHARED = {
   'ruff.toml',
   '.agents/tools/python/ruff.toml',
   '.github/workflows/check.yml',
+  '.github/workflows/release.yml',
   '.github/select_packages.py',
 }
 """Changes that require checking every buildable package."""

@@ -2,7 +2,7 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: accepted
+1. Status: accepted; amended by [ADR 0004](0004-empty-book-consistency-coverage.md), [ADR 0006](0006-release-evidence-scope.md) and [ADR 0009](0009-catalogue-owned-asset-identity.md)
 2. Date: 2026-09-10
 
 ## Context

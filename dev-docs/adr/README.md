@@ -25,4 +25,13 @@ not a changelog or a substitute for API documentation and tests.
 | --- | --- | --- |
 | [0001](0001-public-rules-and-account-fees.md) | Separate public market rules from quoted account base fees | Superseded by 0002 |
 | [0002](0002-combined-side-specific-fees.md) | Combined maker/taker and buy/sell rates, without optional payment discounts | Accepted |
-| [0003](0003-local-consistency-release-evidence.md) | Local consistency checks and offline release evidence | Accepted |
+| [0003](0003-local-consistency-release-evidence.md) | Local consistency checks and offline release evidence | Accepted; amended by 0004, 0006, 0009 |
+| [0004](0004-empty-book-consistency-coverage.md) | Empty books without invented price coverage | Amended by 0011 |
+| [0005](0005-bitget-product-identities.md) | Explicit Bitget futures product identities | Accepted; amended by 0008 |
+| [0006](0006-release-evidence-scope.md) | Separate exact coverage and add non-market release evidence | Accepted; amended by 0009 |
+| [0007](0007-dydx-quote-asset.md) | dYdX quote and fee assets are USDC | Accepted; quote field removed by 0009 |
+| [0008](0008-bitget-classic-and-uta-coin.md) | Coexisting Classic and UTA Bitget coin perpetuals | Accepted; UTA support deferred by 0010 |
+| [0009](0009-catalogue-owned-asset-identity.md) | Catalogue-owned instrument asset identity | Accepted |
+| [0010](0010-defer-bitget-uta-coin.md) | Defer Bitget UTA coin support | Accepted |
+| [0011](0011-liquidity-independent-consistency.md) | Compare available quote sides without guaranteeing liquidity | Accepted |
+| [0012](0012-deribit-public-mainnet-private-testnet.md) | Deribit mainnet public metadata and testnet private Report evidence | Accepted |

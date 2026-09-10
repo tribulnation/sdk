@@ -105,3 +105,30 @@ jobs:
 
       - run: pip install -r requirements.txt
       - run: pytest
+
+  release_evidence:
+    if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'release/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/checkout@v5
+        with:
+          repository: tribulnation/catalogue
+          ref: main
+          path: release-catalogue
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install candidate with recorded dependency versions
+        run: |
+          constraints=()
+          for report in release-evidence/*/dependency-pins.txt; do
+            if [ -f "$report" ]; then
+              constraints+=(-c "$report")
+            fi
+          done
+          pip install "${constraints[@]}" -r requirements.txt
+      - name: Verify local evidence without exchange credentials
+        env:
+          RELEASE_BRANCH: ${{ github.head_ref }}
+        run: sdk-dev results release "${RELEASE_BRANCH#release/}" --catalogue release-catalogue/data

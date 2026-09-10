@@ -1,7 +1,8 @@
 # Local release evidence
 
 Store reviewed, sanitized consistency reports under `<venue>/`. Generate them
-locally with `sdk-dev test consistency`; do not hand-author passing results.
+locally with `sdk-dev test consistency` (market packages) or `sdk-dev test surfaces`
+(non-market packages); do not hand-author passing results.
 The runner requires a new directory, so archive or remove a superseded report
 explicitly before recording its replacement. Keep failed diagnostic runs outside
 this release directory until reviewed.

@@ -20,5 +20,5 @@ from .mixin import (
 )
 from .numbers import parse_optional_decimal
 from .orders import cancel_order, open_orders, place_order
-from .rules import rules
+from .rules import fees, rules
 from .trades import trades_history, trades_stream
