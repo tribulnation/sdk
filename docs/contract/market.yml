@@ -130,47 +130,30 @@ methods:
 
   rules:
     group: Public market data
-    # Hyperliquid's spot Rules.base/.quote/.fee_asset used to come back as raw SYMBOL
-    # NAMES ('UBTC', 'USDC' — confirmed real pair, not 'BTC': the catalogue's own
-    # data/instruments/spot/hyperliquid.json keys the real BTC/USDC pair
-    # 'UBTC/USDC:142'), which didn't match catalogue.asset_translations['hyperliquid']
-    # (numeric-token-index keyed, e.g. '197'->'bitcoin' — the form wallet/report already
-    # used for this same venue). Fixed at the source instead of papering over it here:
-    # packages/impl/hyperliquid/.../market/impl/spot_rules.py now resolves base/quote/
-    # fee_asset to the same numeric index report/history/assets.py already used, via a
-    # new Shared.resolve_asset_index() (mixin.py) — so `constants.hyperliquid.base`/`.quote`
-    # below (index-keyed) genuinely resolve through `catalogue.asset_translations`, no
-    # catalogue changes needed. tick_size/step_size are genuinely computed from a live
-    # szDecimals value and maker_fee/taker_fee genuinely come from a live API call in
-    # that same impl file — no static example exists anywhere to quote, so the numbers
-    # below are illustrative, exactly as illustrative as every other Decimal in this file.
+    # Asset identity comes from the Catalogue; rules contain trading constraints.
     example:
       accountVenues: [mexc]
       constants:
         mexc:
           market_id: 'mexc:spot:BTCUSDT'
-          base: BTC
-          quote: USDT
+          instrument_id: BTCUSDT
+          fee_asset: USDT
           tick_size: '0.10'
           step_size: '0.00001'
-          maker_fee: '0.0002'
-          taker_fee: '0.0004'
         hyperliquid:
           market_id: 'hyperliquid:spot:UBTC/USDC:142'
-          base: '197'
-          quote: '0'
+          instrument_id: 'UBTC/USDC:142'
+          fee_asset: '0'
           tick_size: '0.001'
           step_size: '0.00001'
-          maker_fee: '0.0002'
-          taker_fee: '0.00035'
       callTemplate: |
         rules = await sdk.rules('{{ constants[accounts[0]].market_id }}')
         price = rules.round_price(60123.456)
       resultTemplate: |
         Rules(
-          base='{{ constants[accounts[0]].base }}', quote='{{ constants[accounts[0]].quote }}',
+          fee_asset='{{ constants[accounts[0]].fee_asset }}',
           tick_size=Decimal('{{ constants[accounts[0]].tick_size }}'), step_size=Decimal('{{ constants[accounts[0]].step_size }}'),
-          maker_fee=Decimal('{{ constants[accounts[0]].maker_fee }}'), taker_fee=Decimal('{{ constants[accounts[0]].taker_fee }}'),
+          fees=None,
         )
     catalogue:
       callTemplate: |
@@ -179,11 +162,33 @@ methods:
         from tribulnation.catalogue import Catalogue
 
         catalogue = Catalogue.load()  # cached locally, no credentials needed
-        base_id = catalogue.asset_translations['{{ accounts[0] }}'][rules.base]
-        quote_id = catalogue.asset_translations['{{ accounts[0] }}'][rules.quote]
+        instrument = catalogue.spot_instruments['{{ accounts[0] }}']['{{ constants[accounts[0]].instrument_id }}']
+        base_id, quote_id = instrument['base'], instrument['quote']
         print(base_id, '/', quote_id)
       resultTemplate: |
-        {{ catalogue.asset_translations[accounts[0]][constants[accounts[0]].base] }} / {{ catalogue.asset_translations[accounts[0]][constants[accounts[0]].quote] }}
+        {{ catalogue.spot_instruments[accounts[0]][constants[accounts[0]].instrument_id].base }} / {{ catalogue.spot_instruments[accounts[0]][constants[accounts[0]].instrument_id].quote }}
+
+  fees:
+    group: Account trading data
+    public: false
+    venues:
+      binance: Combined spot standard/tax/special commissions; USD-M ordinary-order rates. Optional BNB payment discounts and RPI orders excluded.
+      bitget: Symbol-scoped Classic or UTA account rates.
+      bybit: Symbol-scoped account rates, including the account's applicable fee tier.
+      coinbase: INTX only; cost-plus and unresolved GST adjustments are unsupported. Spot pricing remains unsupported.
+      dydx: Account tier, market fee holidays and staking adjustments with protocol rounding.
+      hyperliquid: Native USDC perpetuals only; HIP-3 and spot require additional verified fee metadata.
+      kraken: Account TradeVolume schedule, converted from percent to fractions.
+      mexc: Spot only with MX deduction disabled; personal perpetual fees are unsupported.
+    example:
+      accountVenues: [binance]
+      constants:
+        binance: {market_id: 'binance:spot:BTCUSDT'}
+      callTemplate: |
+        fees = await sdk.fees('{{ constants[accounts[0]].market_id }}')
+        print(fees.taker_buy, fees.taker_sell)
+      resultTemplate: |
+        Decimal('0.001') Decimal('0.001')
 
   candles:
     group: Public market data
@@ -378,12 +383,7 @@ methods:
   trades_history:
     group: Your account data
     public: false
-    # Trade.fee.asset on Hyperliquid (spot and perp both — trades.py handles both mixins)
-    # used to be a raw symbol name rather than a numeric token index — same real mismatch
-    # as rules.base/.quote, fixed the same way, at the source: trades.py now resolves
-    # feeToken through the same Shared.resolve_asset_index() rules.py uses (see that
-    # method's comment above). `constants.hyperliquid.fee_asset` below is that resolved
-    # index, so it genuinely round-trips through `catalogue.asset_translations`.
+    # Hyperliquid fee tokens use numeric indices, matching wallet/report balances.
     example:
       accountVenues: [mexc]
       constants:

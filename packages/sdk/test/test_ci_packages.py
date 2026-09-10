@@ -17,7 +17,7 @@ select_packages = cast(
 @pytest.fixture
 def repository(tmp_path: Path) -> Path:
   """A small checkout with two installable implementations and one PoC."""
-  for name in ('sdk', 'sdk-dev', 'impl/bybit', 'impl/mexc'):
+  for name in ('sdk', 'sdk-dev', 'impl/bybit', 'impl/mexc', 'impl/.template'):
     package = tmp_path / 'packages' / name / 'pkg'
     package.mkdir(parents=True)
     (package / 'pyproject.toml').touch()
@@ -38,6 +38,11 @@ def test_sdk_change_selects_only_buildable_packages(repository: Path):
 def test_changed_poc_does_not_create_an_install_job(repository: Path):
   """A sketch has no package manifest and cannot be installed."""
   assert select_packages(repository, ['packages/impl/kucoin/poc/market.py']) == []
+
+
+def test_scaffold_manifest_does_not_create_a_release_job(repository: Path):
+  """A hidden scaffold is not a distributable implementation."""
+  assert select_packages(repository, ['packages/impl/.template/pkg/pyproject.toml']) == []
 
 
 def test_venue_change_selects_only_that_package(repository: Path):

@@ -3,7 +3,7 @@
 from typing_extensions import TYPE_CHECKING
 from decimal import Decimal
 
-from tribulnation.sdk.market import Rules
+from tribulnation.sdk.market import Fees, Rules
 
 from typed_kraken.spot.market_data.asset_pairs import AssetPair
 
@@ -16,7 +16,7 @@ def first_tier(schedule: list[tuple[float, float]] | None) -> Decimal | None:
   fraction of 1. `None` when the pair carries no schedule."""
   if not schedule:
     return None
-  return Decimal(str(schedule[0][1])) / 100
+  return Decimal(str(min(schedule, key=lambda tier: tier[0])[1])) / 100
 
 
 def parse_rules(info: AssetPair) -> Rules:
@@ -31,11 +31,11 @@ def parse_rules(info: AssetPair) -> Rules:
   """
   fees = info.get('fees')
   fees_maker = info.get('fees_maker') or fees
+  maker = first_tier(fees_maker)
+  taker = first_tier(fees)
   tick_size = info.get('tick_size')
   quote = info.get('quote', '')
   return Rules(
-    base=info.get('base', ''),
-    quote=quote,
     fee_asset=quote,
     tick_size=tick_size
     if tick_size is not None
@@ -43,8 +43,9 @@ def parse_rules(info: AssetPair) -> Rules:
     step_size=Decimal(1).scaleb(-info.get('lot_decimals', 0)),
     fixed_min_qty=info.get('ordermin'),
     min_value=info.get('costmin'),
-    maker_fee=first_tier(fees_maker) or Decimal(0),
-    taker_fee=first_tier(fees) or Decimal(0),
+    fees=Fees.symmetric(maker=maker, taker=taker)
+    if maker is not None and taker is not None
+    else None,
     api=info.get('status') == 'online',
     details=info,
   )

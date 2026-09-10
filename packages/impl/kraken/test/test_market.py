@@ -42,9 +42,10 @@ XBTUSD: AssetPair = {
 def test_rules_read_the_base_fee_tier_as_a_fraction():
   """Kraken quotes each tier in percent; the SDK wants a fraction of 1."""
   rules = parse_rules(XBTUSD)
-  assert rules.base == 'XXBT' and rules.quote == 'ZUSD' and rules.fee_asset == 'ZUSD'
-  assert rules.maker_fee == Decimal('0.0025')
-  assert rules.taker_fee == Decimal('0.004')
+  assert rules.fee_asset == 'ZUSD'
+  assert rules.fees is not None
+  assert rules.fees.maker_buy == rules.fees.maker_sell == Decimal('0.0025')
+  assert rules.fees.taker_buy == rules.fees.taker_sell == Decimal('0.004')
   assert rules.tick_size == Decimal('0.1')
   assert rules.step_size == Decimal('1E-8')
   assert rules.fixed_min_qty == Decimal('0.00005')
@@ -52,13 +53,13 @@ def test_rules_read_the_base_fee_tier_as_a_fraction():
   assert rules.api is True
 
 
-def test_rules_fall_back_to_the_taker_schedule_and_to_zero():
-  """A pair on a flat schedule reports it under `fees` only; an empty schedule, which
-  the listing has been observed answering, comes out as `0` rather than failing."""
+def test_rules_flat_schedule_and_unknown_fees():
+  """Flat schedules use `fees`; an absent schedule is unknown, never free."""
   flat = parse_rules({**XBTUSD, 'fees_maker': []})
-  assert flat.maker_fee == flat.taker_fee == Decimal('0.004')
+  assert flat.fees is not None
+  assert flat.fees.maker_buy == flat.fees.taker_sell == Decimal('0.004')
   empty = parse_rules({**XBTUSD, 'fees': [], 'fees_maker': []})
-  assert empty.maker_fee == empty.taker_fee == Decimal(0)
+  assert empty.fees is None
 
 
 def test_rules_tick_size_falls_back_to_pair_decimals():

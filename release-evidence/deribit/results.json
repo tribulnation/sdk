@@ -1,0 +1,96 @@
+{
+  "payload": {
+    "account_venue": "deribit",
+    "checks": [
+      {
+        "failed": 0,
+        "id": "wallet.test_deposit_methods_can_be_fetched",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "failed": 0,
+        "id": "wallet.test_deposit_methods_not_empty",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "failed": 0,
+        "id": "wallet.test_withdrawal_methods_can_be_fetched",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "failed": 0,
+        "id": "wallet.test_withdrawal_methods_not_empty",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "failed": 0,
+        "id": "earn.test_instruments_can_be_fetched",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "failed": 0,
+        "id": "earn.test_instruments_not_empty",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "failed": 0,
+        "id": "report.test_snapshot_can_be_fetched",
+        "network": "testnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "failed": 0,
+        "id": "report.test_snapshot_time_is_tz_aware",
+        "network": "testnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "failed": 0,
+        "id": "report.test_snapshot_balances_are_finite_decimals",
+        "network": "testnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "failed": 0,
+        "id": "report.test_history_can_be_fetched",
+        "network": "testnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "failed": 0,
+        "id": "report.test_history_times_are_tz_aware_and_within_bounds",
+        "network": "testnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "failed": 0,
+        "id": "report.test_history_provenance_is_valid",
+        "network": "testnet",
+        "passed": 1,
+        "skipped": 0
+      }
+    ],
+    "completed": true,
+    "private_account_venue": "deribit_testnet",
+    "scope": "surfaces",
+    "venue": "deribit",
+    "version": 2
+  }
+}

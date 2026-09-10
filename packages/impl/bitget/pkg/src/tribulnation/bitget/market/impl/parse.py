@@ -4,7 +4,15 @@ from typing_extensions import Literal, Sequence
 from datetime import datetime, timedelta
 from decimal import Decimal
 
-from tribulnation.sdk.market import Book, OrderState, PerpStats, Rules, Ticker, Trade
+from tribulnation.sdk.market import (
+  Book,
+  Fees,
+  OrderState,
+  PerpStats,
+  Rules,
+  Ticker,
+  Trade,
+)
 from typed_bitget.classic.mix.market.contracts import MixContract
 from typed_bitget.classic.mix.order.fills import MixOrderFill
 from typed_bitget.classic.mix.order.open import MixOpenOrder
@@ -21,15 +29,31 @@ from typed_bitget.uta_streams.fill import FillUpdate
 
 from .util import dec
 
-Product = Literal['SPOT', 'USDT-FUTURES']
-"""The two Bitget product lines this package maps onto SDK exchanges.
+PerpProduct = Literal['USDT-FUTURES', 'USDC-FUTURES', 'COIN-FUTURES']
+"""Native futures product lines, excluding dated contracts during discovery."""
 
-The same two strings name a Classic v2 `productType`/`instType` and a UTA v3
+Product = Literal['SPOT', 'USDT-FUTURES', 'USDC-FUTURES', 'COIN-FUTURES']
+"""Bitget product lines used to address public endpoints.
+
+The same strings name a Classic v2 `productType`/`instType` and a UTA v3
 `category`, so one alias serves both account modes.
 """
 
 PERP: Literal['USDT-FUTURES'] = 'USDT-FUTURES'
-"""The futures product line the `perp` exchange covers: USDT-margined contracts."""
+"""The USDT-margined product behind the `usdt` exchange."""
+
+PERP_PRODUCTS: dict[str, PerpProduct] = {
+  'usdt': PERP,
+  'usdc': 'USDC-FUTURES',
+  'coin-classic': 'COIN-FUTURES',
+}
+"""Stable SDK exchange IDs mapped to native product types."""
+
+
+def perp_exchange_id(product: PerpProduct) -> str:
+  """Resolve the exchange identity without deriving it from a symbol suffix."""
+  return next(key for key, value in PERP_PRODUCTS.items() if value == product)
+
 
 MARGIN_COIN = 'USDT'
 """Margin coin of every `USDT-FUTURES` contract (confirmed live: 780 of 780)."""
@@ -131,8 +155,6 @@ def parse_spot_rules(symbol: SpotSymbol) -> Rules:
   quote coin.
   """
   return Rules(
-    base=symbol['baseCoin'],
-    quote=symbol['quoteCoin'],
     fee_asset=symbol['quoteCoin'],
     tick_size=Decimal(10) ** -symbol['pricePrecision'],
     step_size=Decimal(10) ** -symbol['quantityPrecision'],
@@ -141,14 +163,13 @@ def parse_spot_rules(symbol: SpotSymbol) -> Rules:
     max_qty=symbol['maxTradeAmount'],
     rel_min_price=1 - symbol['sellLimitPriceRatio'],
     rel_max_price=1 + symbol['buyLimitPriceRatio'],
-    maker_fee=symbol['makerFeeRate'],
-    taker_fee=symbol['takerFeeRate'],
+    fees=Fees.symmetric(maker=symbol['makerFeeRate'], taker=symbol['takerFeeRate']),
     api=symbol['status'] == 'online',
     details=symbol,
   )
 
 
-def parse_perp_rules(contract: MixContract) -> Rules:
+def parse_perp_rules(contract: MixContract, *, product: PerpProduct = PERP) -> Rules:
   """Map one futures contract's trading rules onto `Rules`.
 
   The tick is `priceEndStep` ticks of `10 ** -pricePlace` (every live contract has
@@ -156,18 +177,23 @@ def parse_perp_rules(contract: MixContract) -> Rules:
   venue's own `sizeMultiplier`.
   """
   return Rules(
-    base=contract['baseCoin'],
-    quote=contract['quoteCoin'],
-    fee_asset=contract['quoteCoin'],
+    fee_asset=contract['baseCoin']
+    if product == 'COIN-FUTURES'
+    else contract['quoteCoin'],
     tick_size=contract['priceEndStep'] * Decimal(10) ** -contract['pricePlace'],
     step_size=contract['sizeMultiplier'],
     fixed_min_qty=contract['minTradeNum'],
-    min_value=contract['minTradeUSDT'],
+    # This endpoint denominates its minimum in USDT, not the contract's quote.
+    # Do not assume USDT, USDC and USD are interchangeable units.
+    min_value=contract['minTradeUSDT'] if product == PERP else None,
     max_qty=Decimal(contract['maxOrderQty']),
     rel_min_price=1 - contract['sellLimitPriceRatio'],
     rel_max_price=1 + contract['buyLimitPriceRatio'],
-    maker_fee=contract['makerFeeRate'],
-    taker_fee=contract['takerFeeRate'],
+    # The public markup field is not documented as already included in these rates.
+    # Do not claim a combined rate while its composition remains unresolved.
+    fees=Fees.symmetric(maker=contract['makerFeeRate'], taker=contract['takerFeeRate'])
+    if contract['feeRateUpRatio'] == 0
+    else None,
     api=contract['symbolStatus'] == 'normal',
     details=contract,
   )

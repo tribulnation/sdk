@@ -26,6 +26,7 @@ from tribulnation.sdk.market import (
   PerpMarket,
   PerpPosition,
   Rules,
+  Fees,
   Settings,
   Trade,
 )
@@ -86,6 +87,10 @@ class Market(MarketMixin, PerpMarket):
 
   async def rules(self, *, refetch: bool = False) -> Rules:
     return await self.shared.rules(self.market, refetch=refetch)
+
+  async def fees(self, *, refetch: bool = False) -> Fees:
+    """Read account fees including referral-tier, staking and market discounts."""
+    return await self.shared.fees(self.perpetual_market, personal=True, refetch=refetch)
 
   def candles(
     self,

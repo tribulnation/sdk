@@ -127,8 +127,6 @@ async def rules(coin: str) -> Rules:
   # spot prices round to 5 significant figures, capped at 8 decimals minus the asset's size decimals.
   tick_decimals = min(5, 8 - base_meta['szDecimals'])
   return Rules(
-    base=base_meta['name'],
-    quote=quote_meta['name'],
     fee_asset=quote_meta['name'],
     tick_size=Decimal(10) ** -tick_decimals,
     step_size=Decimal(10) ** -base_meta['szDecimals'],
@@ -395,8 +393,6 @@ async def perp_rules(coin: str, *, dex: str | None = None) -> Rules:
   # Perp prices round to 5 significant figures, capped at 6 decimals minus size decimals.
   tick_decimals = min(5, 6 - asset['szDecimals'])
   return Rules(
-    base=coin,
-    quote=collateral_meta['name'],
     fee_asset=collateral_meta['name'],
     tick_size=Decimal(10) ** -tick_decimals,
     step_size=Decimal(10) ** -asset['szDecimals'],

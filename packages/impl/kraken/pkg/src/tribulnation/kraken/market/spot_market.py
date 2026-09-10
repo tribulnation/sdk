@@ -11,6 +11,7 @@ from tribulnation.sdk.market import (
   Candle,
   CandleInterval,
   Collateral,
+  Fees,
   Market,
   Order,
   OrderResponse,
@@ -70,6 +71,33 @@ class SpotMarket(MarketMixin, Market):
 
   async def rules(self, *, refetch: bool = False) -> Rules:
     return await rules(self, refetch=refetch)
+
+  async def fees(self, *, refetch: bool = False) -> Fees:
+    """Fetch the current account's per-pair schedule, converting percent to fractions.
+
+    Kraken returns one shared rate for pairs without a maker/taker distinction.
+    A missing maker entry on a pair with a split public schedule is not a flat fee.
+    """
+    response = await self.call_kraken(
+      lambda: self.client.spot.account.trade_volume(self.altname)
+    )
+    key = self.meta['pair']['key']
+    taker_rows = response.get('fees') or {}
+    maker_rows = response.get('fees_maker') or {}
+    taker = taker_rows.get(key)
+    maker = maker_rows.get(key)
+    if taker is None:
+      raise ValueError('Kraken account fees omitted the requested pair')
+    if maker is None:
+      if self.info.get('fees_maker'):
+        raise ValueError('Kraken account fees omitted the maker rate')
+      maker_rate = taker['fee']
+    else:
+      maker_rate = maker['fee']
+    return Fees.symmetric(
+      maker=Decimal(maker_rate) / 100,
+      taker=Decimal(taker['fee']) / 100,
+    )
 
   def candles(
     self,
