@@ -91,8 +91,6 @@ async def rules(symbol: str, *, refetch: bool = False) -> Rules:
   )
   fee = fees[0]
   return Rules(
-    base=sym['baseCurrency'],
-    quote=sym['quoteCurrency'],
     fee_asset=sym['feeCurrency'],
     tick_size=Decimal(sym['priceIncrement']),
     step_size=Decimal(sym['baseIncrement']),
@@ -326,8 +324,6 @@ books
 async def rules(symbol: str, *, refetch: bool = False) -> Rules:
   sym = await client.futures.symbol(symbol)
   return Rules(
-    base=sym['baseCurrency'],
-    quote=sym['quoteCurrency'],
     fee_asset=sym['settleCurrency'],
     tick_size=Decimal(str(sym['tickSize'])),
     step_size=Decimal(sym['lotSize']),

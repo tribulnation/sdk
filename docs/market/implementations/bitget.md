@@ -12,7 +12,7 @@
 
 # Bitget Market
 
-> Spot **and** USDT-margined perpetuals, read-only. `tribulnation-bitget`, venue name
+> Spot and USDT-, USDC- and coin-margined perpetuals, read-only. `tribulnation-bitget`, venue name
 > `bitget`.
 
 See the [generic market interface](../index.md) for the shared method surface. This page
@@ -24,18 +24,29 @@ covers only what is Bitget-specific.
 the account is a Unified Trading Account (`True`), a Classic account (`False`), or should
 be auto-detected on the first account-scoped call (`None`, the default). `validate`
 toggles pydantic validation of API responses. The built-in `bitget` account is
-`accounts.Bitget(public=True)`: every public method works on it, every account-scoped
-method raises `AuthError`.
+`accounts.Bitget(public=True)`: every public method works on it, implemented account-scoped methods raise `AuthError`.
+USDC and coin futures expose public data only; their account methods raise
+`NotImplementedError`, including when credentials are configured.
 
 ## Exchanges & ID conventions
 
 | `exchange_id` | Type | What it is |
 | --- | --- | --- |
 | `spot` | spot | Every spot pair. |
-| `perp` | perp | Every USDT-margined perpetual contract (`USDT-FUTURES`). |
+| `usdt` | perp | USDT-margined perpetuals (`USDT-FUTURES`). |
+| `usdc` | perp | USDC-margined perpetuals (`USDC-FUTURES`). |
+| `coin-classic` | perp | Classic coin-margined perpetuals (`COIN-FUTURES`). |
 
-Market IDs are Bitget's concatenated symbols on both exchanges, e.g. `BTCUSDT`. Full SDK
-ID: `bitget:spot:BTCUSDT` or `bitget:perp:BTCUSDT` (or `<your-account-key>:perp:BTCUSDT`).
+UTA `coin` (`BTCUSD_CM`, etc.) is not supported or listed in discovery. Requesting
+it raises `NotImplementedError`: native USD-sized quantities do not fit the current
+SDK base-unit rules. See [issue #32](https://github.com/tribulnation/sdk/issues/32).
+Catalogue entries remain active; this is an SDK capability deferral.
+
+Market IDs are Bitget's Classic API symbols: `BTCUSDT` on `spot` and `usdt`,
+`BTCPERP` on `usdc`, and `BTCUSD` on `coin-classic` (not the web/UTA symbol `BTCUSD_CM`).
+Full SDK IDs include `bitget:usdt:BTCUSDT`, `bitget:usdc:BTCPERP`, and
+`bitget:coin-classic:BTCUSD`; a configured account key can replace `bitget`.
+The former USDT exchange ID `perp` is replaced by `usdt`, without an alias.
 `Exchange.markets()` returns the symbols of the public catalogue: every spot pair, and
 every perpetual of the product line (delivery contracts, which pay no funding, are
 dropped).
@@ -45,22 +56,26 @@ dropped).
 - **Public data is mode-independent.** `markets`, `depth`, `depth_stream`, `tickers`,
   `rules`, `perp_stats`, `index`, `next_funding` and `funding_rates` read the venue's public
   endpoints, so they answer the same on a Classic account, a UTA account and the built-in
-  public one. Account-scoped reads dispatch on the account's mode.
+  public one. Account-scoped reads on `spot` and `usdt` dispatch on the account's mode;
+  `usdc` and `coin-classic` account reads are not implemented.
 - **Trading is not implemented.** `place_order`, `cancel_order`, `cancel_orders` and
   `cancel_open_orders` raise `NotImplementedError`: Bitget is not a venue we trade on.
 - **`rules`** come from the public symbol and contract catalogues, cached after the first
   call. Bitget publishes decimal-place counts rather than tick sizes, so `tick_size` and
   `step_size` are derived from them (`priceEndStep * 10 ** -pricePlace` on perps). The fee
-  rates are the venue's default tier, not the account's. `min_value` is Bitget's
-  USDT-denominated minimum notional, reported whatever the quote coin.
-- **`depth`** on `spot` takes any `levels` (150 a side by default); on `perp` the venue
+  rates are the venue's default tier, not the account's; nonzero `feeRateUpRatio`
+  leaves public contract fees unknown until its composition is verified. Coin futures
+  use the base coin as `fee_asset`; other products use the quote coin. Futures
+  `min_value` is reported only for `usdt`: Bitget's `minTradeUSDT` cannot be reported
+  as USD or USDC without conversion, so it is `None` for `usdc` and `coin-classic`.
+- **`depth`** on `spot` takes any `levels` (150 a side by default); on futures the venue
   serves a fixed depth of 1, 5, 15, 50 or 100 levels, so a request is served by the next
   size up and trimmed. **`depth_stream`** folds the `books` channel (a full snapshot, then
   deltas) into whole books; `levels` trims each delivered book.
-- **`candles`** serves every `CandleInterval` (`CANDLE_INTERVALS` is the full set) on both
+- **`candles`** serves every `CandleInterval` (`CANDLE_INTERVALS` is the full set) on all four
   exchanges, with required timezone-aware `start` and `end` bounds. Opening timestamps
   are filtered to `[start, end)`; responses retain their native order with no ordering
-  guarantee across windows. `perp` reads the futures history endpoint in windows of
+  guarantee across windows. Each futures product reads the futures history endpoint in windows of
   198 opens (leaving two slots under the 200-row cap for boundary handling), back to
   the contract's listing. `spot` reads the recent endpoint in windows of 999 opens, which only
   keeps about two months of hourly candles (less at finer intervals): the spot history
@@ -91,7 +106,7 @@ dropped).
   `imr`, `mmr`, `leverage`), with `margin_mode` read from the account's per-symbol
   settings (`cross` when the symbol has none, and always for the exchange-level pool).
   On Classic it is unsupported: the futures wallet reports no initial or maintenance
-  margin. **`available_notional`** on `perp` is the free margin times the contract's
+  margin. **`available_notional`** on `usdt` is the free margin times the contract's
   maximum leverage (`available` of the futures wallet on Classic, `effEquity` on UTA).
 - **Fees** on trades are reported the SDK's way, positive when charged: Classic signs a
   fee charged negative and is flipped, UTA already agrees. A fill charged in several
@@ -111,10 +126,10 @@ sdk = MarketSDK({'bg': accounts.Bitget()})
 # public, works on the built-in `bitget` account too
 book = await sdk.depth('bg:spot:BTCUSDT', levels=5)
 tickers = await sdk.tickers('bg:spot')
-stats = await sdk.perp_stats('bg:perp', markets=['BTCUSDT', 'ETHUSDT'])
+stats = await sdk.perp_stats('bg:usdt', markets=['BTCUSDT', 'ETHUSDT'])
 
 # account-scoped, dispatched on the account's Classic/UTA mode
-position = await sdk.perp_position('bg:perp:BTCUSDT')
+position = await sdk.perp_position('bg:usdt:BTCUSDT')
 ```
 
 <!-- next -->
