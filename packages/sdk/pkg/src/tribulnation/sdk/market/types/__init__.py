@@ -8,3 +8,4 @@ from .stats import PerpStats
 from .ticker import Ticker
 from .trades import Trade
 from .rules import Rules
+from .fees import Fees

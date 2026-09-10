@@ -4,7 +4,7 @@
 [support.market]
 support = "full"
 auth = false
-note = "`candles` serves every contract interval in the indexer's native newest-first pages, filtered to the required `[start, end)` range."
+note = "`candles` serves every contract interval in the indexer's native newest-first pages, filtered to the required `[start, end)` range. Public rules include active market fee holidays; personal fees also include referral tier overrides and staking discounts, with protocol PPM rounding. Fee holiday reads use Typed's generated public gRPC method until a convenience wrapper is available."
 # MarketSDK.DEFAULT_ACCOUNTS includes 'dydx' (Dydx(public=True)) — but that only covers
 # purely public market-data methods; account-scoped/trading methods still need real
 # credentials regardless (see docs/contract/market.yml's per-method `public: false`).

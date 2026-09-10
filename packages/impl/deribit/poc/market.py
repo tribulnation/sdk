@@ -108,8 +108,6 @@ async def rules(instrument_name: str, *, refetch: bool = False) -> Rules:
   # Spot has no `settlement_currency` (a futures/options-only field); Deribit charges spot
   # fees in the quote currency, so that's used as the best-guess `fee_asset`.
   return Rules(
-    base=instr['base_currency'],
-    quote=instr['quote_currency'],
     fee_asset=instr['quote_currency'],
     tick_size=Decimal(str(instr['tick_size'])),
     step_size=Decimal(str(instr['min_trade_amount'])),
@@ -317,8 +315,6 @@ async def rules(instrument_name: str, *, refetch: bool = False) -> Rules:
   instr = await public_client.market_data.get_instrument(instrument_name=instrument_name)
   fee_asset = instr.get('settlement_currency', instr['base_currency'])
   return Rules(
-    base=instr['base_currency'],
-    quote=instr['quote_currency'],
     fee_asset=fee_asset,
     tick_size=Decimal(str(instr['tick_size'])),
     step_size=Decimal(str(instr['min_trade_amount'])),

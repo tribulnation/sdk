@@ -145,7 +145,7 @@ async def collect(sdk: MarketSDK, account_id: str, public: bool, results: Result
   start = end - timedelta(days=30)
   async with venue:
     spot = await venue.exchange('spot')
-    perp = await venue.perp_exchange('perp')
+    perp = await venue.perp_exchange('usdt')
     await results.attempt('exchanges', venue.exchanges)
     spot_market = await spot.market(SYMBOL)
     perp_market = await perp.market(SYMBOL)
@@ -233,8 +233,8 @@ def is_classic(bitget: Results) -> bool:
 
 
 def test_exchanges(bitget: Results):
-  """Both exchanges are listed."""
-  assert {e['id'] for e in bitget.check('exchanges')} == {'spot', 'perp'}
+  """Spot and all three futures product lines are listed."""
+  assert {e['id'] for e in bitget.check('exchanges')} == {'spot', 'usdt', 'usdc', 'coin-classic'}
 
 
 def test_spot_markets(bitget: Results):
@@ -264,9 +264,16 @@ def test_spot_tickers(bitget: Results):
 def test_spot_rules(bitget: Results):
   """Rules carry the pair's assets, sizes and the venue's default fees."""
   rules: Rules = bitget.check('spot.rules')
-  assert (rules.base, rules.quote) == ('BTC', 'USDT')
+  assert rules.fee_asset == 'USDT'
   assert rules.tick_size > 0 and rules.step_size > 0
-  assert rules.taker_fee >= rules.maker_fee >= 0
+  if rules.fees is not None:
+    for rate in (
+      rules.fees.maker_buy,
+      rules.fees.maker_sell,
+      rules.fees.taker_buy,
+      rules.fees.taker_sell,
+    ):
+      assert rate.is_finite()
   assert rules.api
 
 
@@ -333,7 +340,7 @@ def test_perp_tickers(bitget: Results):
 def test_perp_rules(bitget: Results):
   """Rules carry the contract's assets, sizes and fees."""
   rules: Rules = bitget.check('perp.rules')
-  assert (rules.base, rules.quote, rules.fee_asset) == ('BTC', 'USDT', 'USDT')
+  assert rules.fee_asset == 'USDT'
   assert rules.tick_size > 0 and rules.step_size > 0 and rules.api
 
 

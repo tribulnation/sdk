@@ -11,6 +11,7 @@ SHARED = {
   'ruff.toml',
   '.agents/tools/python/ruff.toml',
   '.github/workflows/check.yml',
+  '.github/workflows/release.yml',
   '.github/select_packages.py',
 }
 """Changes that require checking every buildable package."""
@@ -21,7 +22,7 @@ def select_packages(root: Path, changed: list[str]) -> list[str]:
   available = {
     path.parent.parent.name
     for path in (root / 'packages' / 'impl').glob('*/pkg/pyproject.toml')
-    if path.is_file()
+    if path.is_file() and not path.parent.parent.name.startswith('.')
   }
   available.update(
     name

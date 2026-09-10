@@ -1,4 +1,4 @@
-"""Bitget's perpetual exchange: every USDT-margined perpetual contract."""
+"""Bitget's perpetual exchanges, with separate discovery for each product line."""
 
 from typing_extensions import Collection, Mapping, Sequence
 from dataclasses import dataclass
@@ -20,12 +20,15 @@ from .impl import (
   uta_perp_collateral,
 )
 from .impl.account import not_supported_classic_collateral
+from .impl.parse import PerpProduct, perp_exchange_id
 from .perp_market import PerpMarket
 
 
 @dataclass(kw_only=True, frozen=True)
 class PerpExchange(VenueMixin, _PerpExchange):
-  """Bitget USDT-margined perpetuals."""
+  """One native futures product, with dated delivery contracts excluded."""
+
+  product: PerpProduct = PERP
 
   @property
   def venue_id(self) -> str:
@@ -33,18 +36,23 @@ class PerpExchange(VenueMixin, _PerpExchange):
 
   @property
   def exchange_id(self) -> str:
-    return 'perp'
+    return perp_exchange_id(self.product)
 
   async def markets(self) -> Sequence[str]:
     """List available perpetual contracts."""
-    return list(await self.perp_contracts())
+    return list(await self.perp_contracts(self.product))
 
   async def market(self, market_id: str, /) -> PerpMarket:
     """Fetch a perpetual contract by symbol, e.g. `BTCUSDT`."""
-    contracts = await self.perp_contracts()
+    contracts = await self.perp_contracts(self.product)
     if market_id not in contracts:
       raise ValueError(f'Unknown Bitget perpetual market: {market_id!r}')
-    return PerpMarket(account=self.account, cache=self.cache, symbol=market_id)
+    return PerpMarket(
+      account=self.account,
+      cache=self.cache,
+      symbol=market_id,
+      perp_product=self.product,
+    )
 
   async def tickers(
     self,
@@ -59,11 +67,15 @@ class PerpExchange(VenueMixin, _PerpExchange):
       settings: Accepted for interface compatibility and ignored -- Bitget serves the
         whole book of tickers in one request either way.
     """
+    if markets is not None and not markets:
+      return {}
     rows, contracts = await asyncio.gather(
       self.call(
-        lambda: self.client.classic.mix.market.tickers(PERP, validate=self.validate)
+        lambda: self.client.classic.mix.market.tickers(
+          self.product, validate=self.validate
+        )
       ),
-      self.perp_contracts(),
+      self.perp_contracts(self.product),
     )
     wanted = contracts.keys() if markets is None else contracts.keys() & set(markets)
     return {t['symbol']: parse_perp_ticker(t) for t in rows if t['symbol'] in wanted}
@@ -86,16 +98,20 @@ class PerpExchange(VenueMixin, _PerpExchange):
       settings: Accepted for interface compatibility and ignored -- Bitget reports the
         index price directly, so there is no oracle-vs-mark choice to make.
     """
+    if markets is not None and not markets:
+      return {}
     rows, rates, contracts = await asyncio.gather(
       self.call(
-        lambda: self.client.classic.mix.market.tickers(PERP, validate=self.validate)
+        lambda: self.client.classic.mix.market.tickers(
+          self.product, validate=self.validate
+        )
       ),
       self.call(
         lambda: self.client.uta.market.funding_rate.current(
-          PERP, validate=self.validate
+          self.product, validate=self.validate
         )
       ),
-      self.perp_contracts(),
+      self.perp_contracts(self.product),
     )
     funding = {r['symbol']: r for r in rates}
     wanted = contracts.keys() if markets is None else contracts.keys() & set(markets)
@@ -113,6 +129,10 @@ class PerpExchange(VenueMixin, _PerpExchange):
     A Classic account reports no margin requirement figures at all, so it raises
     `NotImplementedError`.
     """
+    if self.product != PERP:
+      raise NotImplementedError(
+        'Bitget USDC and coin futures support public market data only.'
+      )
     if market_id is not None:
       market = await self.market(market_id)
       return await market.perp_collateral()

@@ -130,6 +130,34 @@ async def test_capital_pages_keep_direction_fees_and_internal_movements():
   assert withdrawals.await_args_list[1].kwargs['current_page'] == 2
 
 
+async def test_wide_fill_interval_is_not_repeated_as_retention_windows():
+  """One requested interval per symbol preserves bounds and filters fallback rows."""
+  start, end = NOW - timedelta(days=60), NOW - timedelta(days=30)
+  outside = fill(1, 'BTC-USDT')
+  inside = fill(2, 'BTC-USDT')
+  inside['createdAt'] = start
+  request = AsyncMock(return_value={'items': [outside, inside], 'lastId': 0})
+  client = cast(
+    KuCoin,
+    SimpleNamespace(
+      spot=SimpleNamespace(
+        all_symbols=AsyncMock(return_value=[{'symbol': 'BTC-USDT'}]),
+        orders_hf=SimpleNamespace(get_trade_history=request),
+      )
+    ),
+  )
+  rows = [row async for row in Report(client=client).spot_trades(start, end)]
+  assert len(rows) == 1
+  assert rows[0].observations[0].time == start
+  request.assert_awaited_once_with(
+    symbol='BTC-USDT',
+    start_at=start,
+    end_at=end,
+    last_id=None,
+    limit=100,
+  )
+
+
 async def test_history_defaults_preserve_each_sources_window(
   monkeypatch: pytest.MonkeyPatch,
 ):
