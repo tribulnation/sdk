@@ -216,7 +216,7 @@ def test_public_outcomes_continue_after_a_failure():
 
 def test_account_dependent_market_reads_are_explicit():
   """Fee/catalogue requirements are known before calls; other AuthErrors still fail."""
-  assert public.needs_account('bybit', 'rules', public=True)
+  assert not public.needs_account('bybit', 'rules', public=True)
   assert not public.needs_account('bybit', 'rules', public=False)
   assert not public.needs_account('bybit', 'depth', public=True)
   assert not public.needs_account('kraken', 'rules', public=True)

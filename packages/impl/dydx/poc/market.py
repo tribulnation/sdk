@@ -305,8 +305,6 @@ async def rules(ticker: str) -> Rules:
   m = market_info[ticker]
   base, quote = m['ticker'].split('-')
   return Rules(
-    base=base,
-    quote=quote,
     fee_asset=quote,
     tick_size=Decimal(m['tickSize']),
     step_size=Decimal(m['stepSize']),

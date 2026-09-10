@@ -121,8 +121,6 @@ async def rules(symbol: str, *, refetch: bool = False) -> Rules:
   fee = await client.account.fee_rate(category='spot', symbol=symbol)
   rate = fee['list'][0] if fee['list'] else None
   return Rules(
-    base=sym['baseCoin'],
-    quote=sym['quoteCoin'],
     fee_asset=sym['quoteCoin'],
     tick_size=price_filter['tickSize'],
     step_size=lot['basePrecision'],
@@ -393,8 +391,6 @@ async def rules(symbol: str, *, refetch: bool = False) -> Rules:
   fee = await client.account.fee_rate(category='linear', symbol=symbol)
   rate = fee['list'][0] if fee['list'] else None
   return Rules(
-    base=sym['baseCoin'],
-    quote=sym['quoteCoin'],
     fee_asset=sym['settleCoin'],
     tick_size=price_filter['tickSize'],
     step_size=lot['qtyStep'],

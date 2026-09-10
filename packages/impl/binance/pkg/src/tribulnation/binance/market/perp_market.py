@@ -26,6 +26,7 @@ from tribulnation.sdk.market import (
   PerpCollateral,
   PerpPosition,
   Rules,
+  Fees,
   Settings,
   Trade,
 )
@@ -231,7 +232,57 @@ class PerpMarket(SharedMixin, _PerpMarket):
         yield page
 
   async def rules(self, *, refetch: bool = False) -> Rules:
-    raise futures_permission_error('rules', self.id)
+    """Read public USD-M filters; price/quantity precision are not increments."""
+    symbols = await self.shared.load_perp_symbols(refetch=refetch)
+    info = symbols[self.symbol]
+    filters = {item['filterType']: item for item in info['filters']}
+    price = filters['PRICE_FILTER']
+    lot = filters['LOT_SIZE']
+    percent = filters.get('PERCENT_PRICE')
+    notional = filters.get('MIN_NOTIONAL')
+    tick_size = price.get('tickSize')
+    step_size = lot.get('stepSize')
+    if tick_size is None or step_size is None or tick_size <= 0 or step_size <= 0:
+      raise ValueError(
+        'Binance futures filters lack positive price/quantity increments'
+      )
+    # Regular, non-discounted USDT crypto perpetual schedule, checked 2026-09-10:
+    # https://www.binance.com/en-BH/fee/futureFee
+    # Do not extend this rate to USDC, TradFi or other products by guessing.
+    standard = (
+      info['quoteAsset'] == 'USDT'
+      and info['underlyingType'] == 'COIN'
+      and info['contractType'] == 'PERPETUAL'
+    )
+    return Rules(
+      fee_asset=info['marginAsset'],
+      tick_size=tick_size,
+      step_size=step_size,
+      fixed_min_qty=lot.get('minQty') or None,
+      max_qty=lot.get('maxQty') or None,
+      fixed_min_price=price.get('minPrice') or None,
+      fixed_max_price=price.get('maxPrice') or None,
+      min_value=notional.get('notional') if notional is not None else None,
+      rel_min_price=percent.get('multiplierDown') if percent is not None else None,
+      rel_max_price=percent.get('multiplierUp') if percent is not None else None,
+      fees=Fees.symmetric(maker=Decimal('0.0002'), taker=Decimal('0.0005'))
+      if standard
+      else None,
+      api=info['status'] == 'TRADING',
+      details=info,
+    )
+
+  @wrap_exceptions
+  async def fees(self, *, refetch: bool = False) -> Fees:
+    """Read ordinary-order account commissions, excluding RPI and BNB payment."""
+    rates = await self.client.usdm_futures.http.trading.trading_fee(self.symbol)
+    maker = rates.get('makerCommissionRate')
+    taker = rates.get('takerCommissionRate')
+    if (
+      rates.get('symbol', self.symbol) != self.symbol or maker is None or taker is None
+    ):
+      raise ValueError('Binance futures account fee response is missing matching rates')
+    return Fees.symmetric(maker=maker, taker=taker)
 
   async def open_orders(self) -> Sequence[OrderState]:
     raise futures_permission_error('open_orders', self.id)

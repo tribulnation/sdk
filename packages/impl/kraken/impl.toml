@@ -28,6 +28,7 @@ methods = [
   "depth",
   "depth_stream",
   "rules",
+  "fees",
   "tickers",
   "candles",
   "query_order",
@@ -38,7 +39,7 @@ methods = [
   "collateral",
   "available_notional",
 ]
-note = "Spot only; we do not trade on Kraken, so `place_order`/`cancel_order` raise `NotImplementedError`. `candles` serves all six contract intervals with required aware, half-open bounds and native response order. Kraken retains only the latest 720 candles per interval: older requested data is unavailable, and `since` cannot page past that limit. `rules()` fees are the base tier of the pair's own `AssetPairs` schedule, and `0` when the listing answers an empty one, as it has been observed doing. `depth_stream` subscribes at the smallest of Kraken's fixed depths (10/25/100/500/1000) holding `levels` and trims to it."
+note = "Spot only; we do not trade on Kraken, so `place_order`/`cancel_order` raise `NotImplementedError`. `candles` serves all six contract intervals with required aware, half-open bounds and native response order. Kraken retains only the latest 720 candles per interval: older requested data is unavailable, and `since` cannot page past that limit. `rules().fees` is the lowest-volume tier of the pair's public schedule, or None for absent rates; `fees()` reads the account's TradeVolume schedule. `depth_stream` subscribes at the smallest of Kraken's fixed depths (10/25/100/500/1000) holding `levels` and trims to it."
 # MarketSDK.DEFAULT_ACCOUNTS includes 'kraken' (Kraken(public=True)): markets, depth,
 # depth_stream, tickers and rules are public; account-scoped methods need real
 # credentials. Kraken Futures is a separate product with its own keys and is not

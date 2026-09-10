@@ -48,6 +48,7 @@ async def trades_stream(
   and symbol, UTA v3 serves the whole unified account on one channel that is narrowed
   to this market here.
   """
+  self.require_account_surface()
   if await self.is_uta():
     async with self.subscribe_uta_fills(
       queue_size=queue_size, overflow=overflow

@@ -18,7 +18,7 @@ from tribulnation.sdk.reporting import (
   Transfer,
   source_id,
 )
-from .core import Mixin, windows
+from .core import Mixin
 
 
 def record(observation: Observation, kind: str) -> HistoryRecord:
@@ -56,31 +56,37 @@ class Report(Mixin, BaseReport):
   async def spot_trades(
     self, start: datetime, end: datetime
   ) -> AsyncIterator[HistoryRecord]:
-    """Sweep every discovered symbol; Kucoin requires a symbol on HF fills."""
+    """Sweep every symbol once, paginating the requested interval.
+
+    The endpoint applies its own retention fallback. Splitting an older interval
+    into seven-day windows repeats the retained data instead of extending backfill.
+
+    References:
+      - https://www.kucoin.com/docs-new/rest/spot-trading/orders/get-trade-history
+    """
     symbols = await self.call(self.client.spot.all_symbols)
     for symbol in symbols:
       seen: set[int] = set()
-      for lower, upper in windows(start, end, timedelta(days=7)):
-        cursor = None
-        cursors: set[int] = set()
-        while True:
-          page = await self.call(
-            lambda: self.client.spot.orders_hf.get_trade_history(
-              symbol=symbol['symbol'],
-              start_at=lower,
-              end_at=upper,
-              last_id=cursor,
-              limit=100,
-            )
+      cursor = None
+      cursors: set[int] = set()
+      while True:
+        page = await self.call(
+          lambda: self.client.spot.orders_hf.get_trade_history(
+            symbol=symbol['symbol'],
+            start_at=start,
+            end_at=end,
+            last_id=cursor,
+            limit=100,
           )
-          for row in page['items']:
-            if row['id'] not in seen and start <= row['createdAt'] <= end:
-              seen.add(row['id'])
-              yield record(parse_spot(row), f'spot:{row["symbol"]}')
-          cursor = page['lastId']
-          if not cursor or cursor in cursors:
-            break
-          cursors.add(cursor)
+        )
+        for row in page['items']:
+          if row['id'] not in seen and start <= row['createdAt'] <= end:
+            seen.add(row['id'])
+            yield record(parse_spot(row), f'spot:{row["symbol"]}')
+        cursor = page['lastId']
+        if not cursor or cursor in cursors:
+          break
+        cursors.add(cursor)
 
   async def capital(
     self, start: datetime, end: datetime
