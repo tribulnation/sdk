@@ -95,7 +95,5 @@ def test_mexc_history_sources(report_result: ReportResult):
   if report_result.records is None:
     pytest.skip('History fetch test failed for this account')
   seen = {o.type for record in report_result.records for o in record.observations}
-  if not seen:
-    pytest.skip('The account has no MEXC history in the last 30 days')
   unexpected = seen - MEXC_SOURCES
   assert not unexpected, f'Unimplemented MEXC sources emitted: {sorted(unexpected)}'
