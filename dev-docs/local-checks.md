@@ -67,21 +67,22 @@ This suite does not call personal `fees()`, place orders, transfer funds, or cla
 every discovery-only instrument received a depth comparison. The report preserves
 its inventory so that sample coverage is inspectable. Existing `sdk-dev test
 market|earn|wallet|report` suites and adapter regression tests remain complementary;
-a consistency report does not replace their verification.
+a consistency report does not replace their verification. The release gate now
+requires a separate recorded run of all applicable read suites as described below.
 
 ## Publication gate
 
-Reviewed reports belong in `release-evidence/<venue>/`. Verify a candidate with:
+Reviewed reports belong in `release-evidence/<venue>/surfaces/` and, for market
+implementations, also `release-evidence/<venue>/consistency/`. Verify a candidate with:
 
 ```sh
 sdk-dev results release sdk --catalogue /path/to/catalogue/data
 ```
 
-1. Core SDK releases require reports for every declared implementation. Market
-   implementations require their market consistency report; non-market packages
-   require the supported read suites described below. A report of the wrong scope
-   cannot substitute for required evidence. Do not interpret a market report as
-   verification of Wallet/Earn/Report.
+1. Core SDK releases require all supported read-suite reports for every declared
+   implementation. Market implementations additionally require market consistency.
+   Individual implementation releases require both applicable scopes for that
+   implementation. A report of the wrong scope cannot substitute for required evidence.
 2. Reports expire after seven days and must match current relevant SDK, adapter,
    test, support and dependency inputs, plus the Catalogue data. Git commit identity
    alone is insufficient. Reports and generated documentation are not source inputs.
@@ -97,23 +98,37 @@ sdk-dev results release sdk --catalogue /path/to/catalogue/data
 5. A passing report is necessary, not release approval. Merge and publication
    still require explicit approval and the other release checks.
 
-## Non-market packages
+## All supported read-only suites
 
 ```sh
-sdk-dev test surfaces ethereum --accounts sdk.test.toml --account my-ethereum \
-  --catalogue /path/to/catalogue/data --output /path/to/new-run
-sdk-dev results verify /path/to/new-run --catalogue /path/to/catalogue/data
+sdk-dev test surfaces binance --accounts sdk.test.toml --account my-binance \
+  --catalogue /path/to/catalogue/data --output /path/to/new-run/surfaces
+sdk-dev test consistency binance --accounts sdk.test.toml --account my-binance \
+  --catalogue /path/to/catalogue/data --output /path/to/new-run/consistency
+sdk-dev results verify /path/to/new-run/surfaces --catalogue /path/to/catalogue/data
+sdk-dev results verify /path/to/new-run/consistency --catalogue /path/to/catalogue/data
 ```
 
-This records the existing Wallet/Earn/Report suites for supported read methods.
-It stores fixed test names and outcome counts only, not account IDs, balances,
-records or error text. Missing credentials, skips, setup/teardown failures and
-incomplete inventories block qualification. No trading or transfers are tested.
+This records the existing market, Wallet/Earn/Report and applicable Bitget-specific
+read-only suites. Non-market implementations need only `surfaces`. Standalone
+`sdk-dev test market|wallet|earn|report|bitget` remains useful for diagnostics but
+does not write qualification evidence; `surfaces` is the recording wrapper.
+
+It stores public test/market/method identities, per-case outcomes and explicit
+exclusion codes, not account IDs, balances, records or error text. Missing
+credentials, unexpected skips, setup/teardown failures and incomplete inventories
+block qualification. Every supported market reference case must pass candles,
+rules, public depth/streams, ticker and applicable perpetual reads. The declared
+unsupported MEXC perpetual stream, spot-only methods and single-page retention
+cases are excluded, not passed. Bitget additionally requires its existing private
+read tests and mode detection, with an explicit expected `uta` account setting.
+No trading or transfers are tested.
 An empty or incomplete history is valid: the suite checks successful reads,
 returned-record bounds and provenance, not historical completeness.
 
 One report qualifies the selected mainnet account, not all account configurations,
-chains or providers. See [ADR 0006](adr/0006-release-evidence-scope.md) for scope.
+chains or providers. See [ADR 0013](adr/0013-all-read-suites-release-gate.md) for scope.
+Read reports use payload version 3; old non-market-only reports are not reusable.
 
 Deribit additionally supports the explicitly approved split qualification:
 

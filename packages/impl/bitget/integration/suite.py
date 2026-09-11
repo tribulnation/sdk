@@ -18,7 +18,18 @@ from .conftest import ACCOUNTS_CONFIG_ENV
 def bitget_accounts() -> dict[str, Bitget]:
   """Bitget accounts from the accounts config with a declared expected `uta` mode."""
   path = os.environ.get(ACCOUNTS_CONFIG_ENV, 'sdk.test.toml')
-  accounts = load_accounts(path)
+  selector = os.environ.get('SDK_DEV_ACCOUNT_ID')
+  if selector is None:
+    accounts = load_accounts(path)
+  else:
+    from pathlib import Path
+    from sdk_dev.cli.results import configured_sdk
+
+    accounts = {
+      id: account
+      for id, account in configured_sdk(Path(path)).accounts.items()
+      if id == selector
+    }
   return {
     account_id: account
     for account_id, account in accounts.items()
