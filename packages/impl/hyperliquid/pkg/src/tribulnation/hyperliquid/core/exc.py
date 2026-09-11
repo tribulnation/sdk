@@ -13,6 +13,7 @@ from typing_extensions import (
 from functools import wraps
 from types import CoroutineType
 import inspect
+from typed_core.exceptions import RateLimited as ClientRateLimited
 
 from tribulnation.sdk.core import (
   NetworkError,
@@ -38,7 +39,11 @@ def _api_error(e: 'core.ApiError') -> ApiError:
   Args:
     e: The client's API error.
   """
-  cls = RateLimited if e.args and e.args[0] == 429 else ApiError
+  cls = (
+    RateLimited
+    if isinstance(e, ClientRateLimited) or (e.args and e.args[0] == 429)
+    else ApiError
+  )
   return cls(*e.args)
 
 
