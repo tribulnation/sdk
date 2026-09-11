@@ -5,6 +5,18 @@
 Run exchange-dependent checks locally; CI only verifies recorded evidence. These
 are maintainer-recorded drift checks, not independent proof of execution.
 
+For the qualification environment, install the portable `crcmod` build before the
+candidate requirements (using that environment's Python):
+
+```sh
+CC=/bin/false python -m pip install --force-reinstall --no-cache-dir --no-binary=crcmod crcmod==1.7
+```
+
+Upstream falls back to its pure-Python implementation when its optional C extension
+cannot compile. CI uses this same build recipe. This avoids comparing a locally
+pure build with a CI-compiled extension; installed contents are still fingerprinted.
+Run this before recording evidence, never modify dependencies during a live run.
+
 ## Run and verify
 
 ```sh
