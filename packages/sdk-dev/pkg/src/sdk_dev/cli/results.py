@@ -8,7 +8,7 @@ import tomllib
 from dotenv import load_dotenv
 import pydantic
 import typer
-from typing_extensions import Annotated
+from typing_extensions import Annotated, Literal
 
 from tribulnation.catalogue import Catalogue
 from tribulnation.sdk import MarketSDK
@@ -117,7 +117,14 @@ def test_consistency(
   )
 
 
-def verify_one(root: Path, report: Path, catalogue: Path, *, venue: str | None = None):
+def verify_one(
+  root: Path,
+  report: Path,
+  catalogue: Path,
+  *,
+  venue: str | None = None,
+  scope: Literal['surfaces', 'consistency'] | None = None,
+):
   """Verify both content provenance and the independently reconstructed check inventory."""
   from sdk_dev.consistency import verify_payload
   from sdk_dev.evidence import verify_report
@@ -125,14 +132,11 @@ def verify_one(root: Path, report: Path, catalogue: Path, *, venue: str | None =
   payload = verify_report(root, report, catalogue)
   if venue is not None and payload.get('venue') != venue:
     raise ValueError('Report venue does not match the release package')
-  if venue is not None:
-    impl = load_impl_files(root / 'packages/impl')[venue]
-    support = impl.support.get('market')
-    market = support is not None and support.support != 'none'
-    if market == (payload.get('scope') == 'surfaces'):
-      raise ValueError('Report scope does not match the release package policy')
+  actual = 'surfaces' if payload.get('scope') == 'surfaces' else 'consistency'
+  if scope is not None and actual != scope:
+    raise ValueError(f'{venue}: expected {scope} evidence')
   if payload.get('scope') == 'surfaces':
-    from sdk_dev.surface_evidence import verify_payload as verify_surfaces
+    from sdk_dev.read_evidence import verify_payload as verify_surfaces
 
     verify_surfaces(payload, root=root)
   else:
@@ -156,9 +160,9 @@ def test_surfaces(
     ),
   ] = None,
 ):
-  """Record read-only Wallet/Earn/Report checks without saving private records."""
+  """Record all supported read-only suites without saving private records."""
   from sdk_dev.evidence import capture, write_report
-  from sdk_dev.surface_evidence import collect, collect_deribit, verify_payload
+  from sdk_dev.read_evidence import collect, collect_deribit, verify_payload
 
   try:
     if output.exists():
@@ -173,7 +177,7 @@ def test_surfaces(
     root = repo_root()
     started = datetime.now(timezone.utc)
     before = capture(root, venue, catalogue)
-    typer.echo(f'Checking {venue}: declared Wallet/Earn/Report reads…')
+    typer.echo(f'Checking {venue}: all supported read-only suites…')
     payload = (
       collect(venue, selected, accounts)
       if testnet_account is None
@@ -235,6 +239,17 @@ def required_venues(root: Path, package: str) -> list[str]:
   raise ValueError('No consistency release-evidence policy for this package yet')
 
 
+def required_scopes(root: Path, venue: str) -> list[Literal['surfaces', 'consistency']]:
+  """All packages need read suites; market packages additionally need consistency."""
+  impl = load_impl_files(root / 'packages/impl')[venue]
+  support = impl.support.get('market')
+  return (
+    ['surfaces', 'consistency']
+    if support is not None and support.support != 'none'
+    else ['surfaces']
+  )
+
+
 @app.command('release')
 def release(
   package: str,
@@ -247,7 +262,9 @@ def release(
   try:
     root = repo_root()
     for venue in required_venues(root, package):
-      verify_one(root, reports / venue, catalogue, venue=venue)
+      for scope in required_scopes(root, venue):
+        report = reports / venue / scope
+        verify_one(root, report, catalogue, venue=venue, scope=scope)
       typer.echo(f'{venue}: verified')
   except Exception as exception:
     typer.echo(f'Release blocked: {exception}', err=True)
