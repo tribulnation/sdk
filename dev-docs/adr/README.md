@@ -35,3 +35,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0010](0010-defer-bitget-uta-coin.md) | Defer Bitget UTA coin support | Accepted |
 | [0011](0011-liquidity-independent-consistency.md) | Compare available quote sides without guaranteeing liquidity | Accepted |
 | [0012](0012-deribit-public-mainnet-private-testnet.md) | Deribit mainnet public metadata and testnet private Report evidence | Accepted |
+| [0013](0013-all-read-suites-release-gate.md) | Require all supported read-only suites alongside market consistency | Accepted; amends 0003 and 0006 |
