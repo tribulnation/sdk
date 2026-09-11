@@ -165,6 +165,10 @@ def candidate_files(root: Path, venue: str) -> dict[str, Path]:
       files[name] = path
   support = root / f'packages/impl/{venue}/impl.toml'
   files[support.relative_to(root).as_posix()] = support
+  integration = root / f'packages/impl/{venue}/integration'
+  if integration.is_dir():
+    for path in tree_files(integration).values():
+      files[path.relative_to(root).as_posix()] = path
   return files
 
 
@@ -435,8 +439,21 @@ def verify_report(root: Path, report: Path, catalogue: Path) -> dict[str, object
     raise ValueError('Evidence inputs changed during the run')
   if paths['dependency-pins.txt'].read_text() != dependency_pins(manifest.before):
     raise ValueError('Evidence dependency pins were modified')
-  if capture(root, manifest.before.venue, catalogue) != manifest.before:
-    raise ValueError('Evidence does not match current code, dependencies or Catalogue')
+  current = capture(root, manifest.before.venue, catalogue)
+  if current != manifest.before:
+    changed = [
+      name
+      for name in ('python', 'source_sha256', 'catalogue_sha256')
+      if getattr(current, name) != getattr(manifest.before, name)
+    ]
+    changed += [
+      f'dependency:{name}'
+      for name in sorted(
+        current.dependencies.keys() | manifest.before.dependencies.keys()
+      )
+      if current.dependencies.get(name) != manifest.before.dependencies.get(name)
+    ]
+    raise ValueError('Evidence does not match current inputs: ' + ', '.join(changed))
   results = Results.model_validate_json(body)
   if results.payload.get('venue') != manifest.before.venue:
     raise ValueError('Evidence payload venue does not match its snapshot')

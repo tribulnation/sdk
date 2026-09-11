@@ -14,7 +14,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from tribulnation.sdk import Context, NetworkError, RateLimited, Report, ReportSDK
-from ..accounts import load_accounts, selected_accounts, require_credentials
+from ..accounts import load_accounts, selected_accounts, require_report_credentials
 from ..support import describe_exception
 from ..runtime import loop_of
 from .support import ReportResult
@@ -79,7 +79,7 @@ async def read_report(
 def report_result(report_account: str, pytestconfig: pytest.Config) -> ReportResult:
   """Read and cache one account's snapshot and last-30-days history for the module."""
   sdk = pytestconfig.stash[SDK]
-  require_credentials(sdk.accounts[report_account], auth=True)
+  require_report_credentials(sdk.accounts[report_account])
   venue = sdk.accounts[report_account].venue
   end = datetime.now(timezone.utc)
   start = end - HISTORY_WINDOW
