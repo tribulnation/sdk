@@ -11,10 +11,11 @@
 1. Required Typed packages are already published and were used for qualification. Publish tribulnation-sdk 2.0.0 before this implementation.
 2. This PR is stacked on release/sdk so its own diff contains only this package's release handoff. After SDK #19 merges, retarget to main if GitHub has not done so automatically, refresh the branch and check CI before merging.
 3. Merging release/binance into main triggers publication of tribulnation-binance 0.3.0. No merge or publication has occurred during PR preparation.
-4. Catalogue [#104](https://github.com/tribulnation/catalogue/pull/104) must merge before the offline evidence gate can pass against Catalogue main. Check remote CI and obtain explicit release approval before merging. Terminal rollout and exact Catalogue coverage remain separate.
+4. Catalogue #104 has merged. Fresh evidence under the stronger all-read-suite policy must pass before release; previous narrower evidence is insufficient.
 
 ## Qualification
 
-1. Mainnet market consistency passes for the declared SDK scope: exchange/native-ID consistency and sampled available quote sides. Empty books are not price evidence or a liquidity guarantee; explicit Catalogue delistings exclude quote checks only. This does not assert exact Catalogue coverage.
-2. Sanitized local results, content fingerprints and published dependency pins are committed under [release-evidence/binance](https://github.com/tribulnation/sdk/tree/release/sdk/release-evidence/binance). All 12 reports independently verify in a second clean environment.
-3. The shared candidate passes 682 unit/regression tests; local type checking, lint and docs checks pass. Release CI verifies evidence again, and publication checks the exact merged commit.
+1. ADR 0013 requires all supported read-only suites through sdk-dev test surfaces, plus sdk-dev test consistency for market implementations. The two reports cannot substitute for each other.
+2. Record fresh evidence under release-evidence/binance/surfaces/ and, where applicable, consistency/. Historical reports directly under the venue directory do not qualify this release.
+3. Fresh complete live qualification remains pending. Missing credentials, unexpected skips, failures and mismatched fingerprints block release. The approved Deribit mainnet-public/testnet-Report split is unchanged; it does not establish mainnet private-account behavior.
+4. Obtain explicit approval before merging or publishing; passing CI alone is not authorization.
