@@ -95,6 +95,10 @@ jobs:
       # SDK routers type-check against the local implementation packages. Installing
       # the complete candidate also avoids requiring implementations to be published
       # before the SDK version they depend on.
+      - name: Install reproducible crcmod runtime
+        env:
+          CC: /bin/false
+        run: pip install --no-cache-dir --no-binary=crcmod crcmod==1.7
       - name: Install candidate with recorded dependency versions
         run: |
           constraints=()
