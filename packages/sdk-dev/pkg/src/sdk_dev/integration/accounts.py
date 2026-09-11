@@ -8,7 +8,7 @@ import pydantic
 import pytest
 from typing_extensions import cast
 
-from tribulnation.sdk.impl.accounts import Account
+from tribulnation.sdk.impl.accounts import Account, Dydx, Hyperliquid
 from sdk_dev.repo import IMPL_DIR, repo_root
 from sdk_dev.support import ImplSurfaceSupport, load_impl_files
 
@@ -79,3 +79,16 @@ def require_credentials(account: Account, *, auth: bool = False):
     account.verify_env_vars()
   except ValueError:
     pytest.skip('Missing required credential environment variable for this account')
+
+
+def require_report_credentials(account: Account):
+  """Public chain/indexer reports need an address, never a signing secret."""
+  if isinstance(account, (Dydx, Hyperliquid)):
+    try:
+      address = account.resolved_address
+    except ValueError:
+      address = None
+    if not address:
+      pytest.skip('Report checks require a configured address')
+    return
+  require_credentials(account, auth=True)

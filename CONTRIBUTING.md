@@ -63,7 +63,8 @@ one, with links and status updates in both the record and index.
 For the fingerprinted local consistency suite and offline release verifier, see
 [Local SDK checks](dev-docs/local-checks.md). Run `sdk-dev test consistency`
 to capture both results and fingerprints; do not generate checksums as an
-independent attestation step. The existing suites below remain complementary.
+independent attestation step. Releases additionally require `sdk-dev test surfaces`
+to record every applicable read-only suite below, even for market implementations.
 
 1. Run `sdk-dev test market|earn|wallet|report [venue-or-account] --accounts sdk.test.toml`.
    The optional selector matches an exact venue slug or account id, including aliases
@@ -168,8 +169,9 @@ Bump `version` in the package's `pkg/pyproject.toml` on a branch named `release/
 `release/<venue>`, and open a PR touching that package. Merging it tags the commit and
 publishes to PyPI (`.github/workflows/release.yml`).
 
-Publication additionally requires matching, passing local consistency reports in
-`release-evidence/<venue>/`; missing evidence blocks both release PR verification
+Publication additionally requires matching, passing local read-suite reports in
+`release-evidence/<venue>/surfaces/` and market consistency reports in
+`release-evidence/<venue>/consistency/`; missing evidence blocks both release PR verification
 and publication. The publication job checks the exact merged commit. Passing
 evidence does not constitute approval to merge or publish.
 

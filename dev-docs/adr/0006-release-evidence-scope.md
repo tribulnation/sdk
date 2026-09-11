@@ -2,7 +2,7 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: accepted; translated rules retired by [ADR 0009](0009-catalogue-owned-asset-identity.md); Deribit scope amended by [ADR 0012](0012-deribit-public-mainnet-private-testnet.md)
+1. Status: accepted; translated rules retired by [ADR 0009](0009-catalogue-owned-asset-identity.md); Deribit scope amended by [ADR 0012](0012-deribit-public-mainnet-private-testnet.md); either/or scope superseded by [ADR 0013](0013-all-read-suites-release-gate.md)
 2. Date: 2026-09-10
 3. Amends: [ADR 0003](0003-local-consistency-release-evidence.md).
 

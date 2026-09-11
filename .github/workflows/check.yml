@@ -125,7 +125,7 @@ jobs:
       - name: Install candidate with recorded dependency versions
         run: |
           constraints=()
-          for report in release-evidence/*/dependency-pins.txt; do
+          for report in release-evidence/*/*/dependency-pins.txt; do
             if [ -f "$report" ]; then
               constraints+=(-c "$report")
             fi
