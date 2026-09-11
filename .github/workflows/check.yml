@@ -122,6 +122,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      # crcmod 1.7 optionally builds a host-specific C extension. Match the
+      # portable pure-Python build used by local qualification, without waiving hashes.
+      - name: Install reproducible crcmod runtime
+        env:
+          CC: /bin/false
+        run: pip install --no-cache-dir --no-binary=crcmod crcmod==1.7
       - name: Install candidate with recorded dependency versions
         run: |
           constraints=()
