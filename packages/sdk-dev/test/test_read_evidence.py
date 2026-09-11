@@ -234,3 +234,24 @@ def test_recording_worker_does_not_export_crashes(monkeypatch: pytest.MonkeyPatc
   assert 'PRIVATE' not in str(payload)
   with pytest.raises(ValueError):
     evidence.verify_payload(payload, root=repo_root())
+
+
+def test_public_address_reports_do_not_require_signing_secrets(
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """Read-only Report qualification needs an address, not trading authority."""
+  from sdk_dev.integration.accounts import require_report_credentials
+  from tribulnation.sdk.impl.accounts import Dydx, Hyperliquid, Binance
+
+  monkeypatch.delenv('UNSET_REPORT_ADDRESS', raising=False)
+  for account in (
+    Dydx(address='dydx1test', public=True),
+    Hyperliquid(address='0xtest', public=True),
+  ):
+    require_report_credentials(account)
+  with pytest.raises(pytest.skip.Exception):
+    require_report_credentials(
+      Hyperliquid(address='$UNSET_REPORT_ADDRESS', public=True)
+    )
+  with pytest.raises(pytest.skip.Exception):
+    require_report_credentials(Binance(public=True))

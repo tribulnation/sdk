@@ -123,6 +123,8 @@ unsupported MEXC perpetual stream, spot-only methods and single-page retention
 cases are excluded, not passed. Bitget additionally requires its existing private
 read tests and mode detection, with an explicit expected `uta` account setting.
 No trading or transfers are tested.
+Hyperliquid and dYdX Report reads require a configured mainnet address only; a
+`public = true` account with that address needs no private key or mnemonic.
 An empty or incomplete history is valid: the suite checks successful reads,
 returned-record bounds and provenance, not historical completeness.
 
