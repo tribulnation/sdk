@@ -333,6 +333,123 @@ async def test_depth_mismatch_retries_and_missing_quotes_block(
     verify_payload(result.model_dump(mode='json'), catalogue=catalogue, root=root)
 
 
+@pytest.fixture
+async def bit2me_sdk(
+  root: Path, sdk: MarketSDK, catalogue: Catalogue, monkeypatch: pytest.MonkeyPatch
+) -> MarketSDK:
+  """Exercise the actual approved venue and exchange without widening policy."""
+  directory = root / 'packages/impl/bit2me'
+  directory.mkdir()
+  (directory / 'impl.toml').write_text(
+    (root / 'packages/impl/fixture/impl.toml').read_text()
+  )
+  monkeypatch.setitem(consistency.CASES, 'bit2me', [])
+  monkeypatch.setattr(sdk.all_accounts['local'], 'venue', 'bit2me')
+  owner = await sdk.venue('local')
+  exchange = await owner.exchange('')
+  market = await exchange.market('BTC/USD')
+  for obj in (owner, exchange, market):
+    monkeypatch.setattr(obj, 'venue_id', 'bit2me')
+  for obj in (exchange, market):
+    monkeypatch.setattr(obj, 'exchange_id', 'spot')
+  cast(AsyncMock, owner.exchanges).return_value = [
+    {'id': 'spot', 'type': 'spot', 'name': 'Bit2Me'}
+  ]
+  catalogue.spot_instruments['bit2me'] = catalogue.spot_instruments.pop('fixture')
+  catalogue.spot_instruments['bit2me']['BTC/USD']['exchange'] = 'spot'
+  cast(AsyncMock, market.depth).return_value = Book(
+    bids=[Book.Entry(Decimal(50), Decimal(1))],
+    asks=[Book.Entry(Decimal(51), Decimal(1))],
+  )
+  return sdk
+
+
+@pytest.mark.parametrize('price', [Decimal(99), Decimal(0), None])
+async def test_bit2me_native_discrepancy_is_visible_not_passing(
+  price: Decimal | None, root: Path, bit2me_sdk: MarketSDK, catalogue: Catalogue
+):
+  """Native stale, zero and absent quotes retain three failed comparison brackets."""
+  exchange = await (await bit2me_sdk.venue('local')).exchange('spot')
+
+  async def tickers(markets: list[str] | None = None) -> dict[str, Ticker]:
+    """Preserve upstream quote values and exact selection semantics."""
+    return {
+      key: Ticker(bid=price, ask=price)
+      for key in (['BTC/USD'] if markets is None else markets)
+    }
+
+  cast(AsyncMock, exchange.tickers).side_effect = tickers
+  report = Payload.model_validate(
+    await collect(bit2me_sdk, 'local', 'bit2me', catalogue)
+  )
+  quote = next(check for check in report.checks if check.quotes)
+  assert (quote.status, quote.code) == ('limitation', 'native_ticker_quotes')
+  assert len(quote.quotes) == 3
+  assert all(consistency.bracket_result(row) is False for row in quote.quotes)
+  verify_payload(report.model_dump(mode='json'), catalogue=catalogue, root=root)
+  quote.status, quote.code = 'pass', 'ok'
+  with pytest.raises(ValueError, match='bracket'):
+    verify_payload(report.model_dump(mode='json'), catalogue=catalogue, root=root)
+
+
+async def test_bit2me_limitation_cannot_hide_other_failures(
+  root: Path, bit2me_sdk: MarketSDK, catalogue: Catalogue
+):
+  """Offline policy independently rejects corrupted or out-of-scope waivers."""
+  report = Payload.model_validate(
+    await collect(bit2me_sdk, 'local', 'bit2me', catalogue)
+  )
+  quote = next(check for check in report.checks if check.quotes)
+  assert not consistency.native_ticker_limitation(
+    'bit2me',
+    quote.model_copy(update={'id': check_id('ticker_depth', 'other', 'BTC/USD')}),
+  )
+  for field, value in (
+    ('ticker_ids_match', False),
+    ('elapsed_seconds', 16.0),
+    ('before_bid', None),
+    ('before_bid', '0'),
+    ('after_ask', 'NaN'),
+    ('before_bid', '999'),
+    ('bid', '-1'),
+    ('ask', 'not-a-price'),
+    ('ask', 'Infinity'),
+    ('attempt', 2),
+  ):
+    original = quote.quotes[0]
+    quote.quotes[0] = original.model_copy(update={field: value})
+    with pytest.raises(ValueError):
+      verify_payload(report.model_dump(mode='json'), catalogue=catalogue, root=root)
+    quote.quotes[0] = original
+  for code in ('request_failed', 'dependency_failed'):
+    invalid = report.model_copy(deep=True)
+    row = next(check for check in invalid.checks if check.quotes)
+    row.status = 'fail'
+    row.code = code
+    with pytest.raises(ValueError):
+      verify_payload(invalid.model_dump(mode='json'), catalogue=catalogue, root=root)
+  for other in (check for check in report.checks if not check.quotes):
+    original_status, original_code = other.status, other.code
+    other.status, other.code = 'limitation', 'native_ticker_quotes'
+    with pytest.raises(ValueError):
+      verify_payload(report.model_dump(mode='json'), catalogue=catalogue, root=root)
+    other.status, other.code = original_status, original_code
+  quote.quotes.pop()
+  with pytest.raises(ValueError):
+    verify_payload(report.model_dump(mode='json'), catalogue=catalogue, root=root)
+
+
+async def test_other_venues_cannot_claim_bit2me_limitation(
+  root: Path, sdk: MarketSDK, catalogue: Catalogue
+):
+  """A limitation label does not waive comparison policy for another venue."""
+  report = Payload.model_validate(await payload(sdk, catalogue))
+  quote = next(check for check in report.checks if check.quotes)
+  quote.status, quote.code = 'limitation', 'native_ticker_quotes'
+  with pytest.raises(ValueError):
+    verify_payload(report.model_dump(mode='json'), catalogue=catalogue, root=root)
+
+
 async def test_unexpected_unsupported_is_failure_not_exclusion(
   root: Path, sdk: MarketSDK, catalogue: Catalogue
 ):
