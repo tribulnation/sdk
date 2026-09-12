@@ -18,14 +18,14 @@ from .integration.market.support import CASES
 from .repo import repo_root
 from .support import load_impl_files
 
-VERSION = 3
+VERSION = 4
 REQUEST_TIMEOUT = 120
 BRACKET_SECONDS = 15
 TOLERANCE = Decimal('0.005')
 RETRIES = 3
 T = TypeVar('T')
 Kind = Literal['spot', 'perp']
-Status = Literal['pass', 'fail', 'unavailable', 'excluded', 'deferred']
+Status = Literal['pass', 'fail', 'unavailable', 'excluded', 'deferred', 'limitation']
 
 # Kraken Futures and Bitget UTA coin are explicitly deferred products.
 # Keep its Catalogue rows visible as exclusions; never infer scope from discovery
@@ -78,6 +78,7 @@ class Check(StrictModel):
     'dependency_failed',
     'coverage_deferred',
     'delisted',
+    'native_ticker_quotes',
   ]
   quotes: list[QuoteObservation] = Field(default_factory=list[QuoteObservation])
 
@@ -85,7 +86,7 @@ class Check(StrictModel):
 class Payload(StrictModel):
   """One mainnet venue's discovery and deterministic check inventory."""
 
-  version: Literal[3] = VERSION
+  version: Literal[4] = VERSION
   venue: str
   account_id: str
   discovery: list[Discovery]
@@ -275,6 +276,13 @@ def verify_payload(
     if enabled(method, supported):
       if (
         method == 'depth+tickers'
+        and check.status == 'limitation'
+        and check.code == 'native_ticker_quotes'
+        and native_ticker_limitation(report.venue, check)
+      ):
+        continue
+      if (
+        method == 'depth+tickers'
         and check.status == 'unavailable'
         and check.code == 'empty_book'
         and empty_book_observations(check.quotes)
@@ -310,6 +318,49 @@ def verify_payload(
 async def request(awaitable: Awaitable[T]) -> T:
   """Bound each read without exposing upstream exception payloads."""
   return await asyncio.wait_for(awaitable, timeout=REQUEST_TIMEOUT)
+
+
+def native_ticker_limitation(venue: str, check: Check) -> bool:
+  """Recognize only Bit2Me native quote discrepancies against valid live books.
+
+  ADR 0014 permits stale, zero or missing native ticker sides, not wrong IDs,
+  failed requests, incomplete/slow brackets or malformed/negative prices.
+  """
+  parts: list[object] = json.loads(check.id)
+  if (
+    venue != 'bit2me'
+    or not isinstance(parts, list)
+    or len(parts) != 3
+    or parts[:2] != ['ticker_depth', 'spot']
+    or len(check.quotes) != RETRIES
+  ):
+    return False
+  for attempt, row in enumerate(check.quotes, start=1):
+    if (
+      row.attempt != attempt
+      or not row.ticker_ids_match
+      or row.elapsed_seconds > BRACKET_SECONDS
+      or bracket_result(row) is not False
+    ):
+      return False
+    try:
+      for bid, ask in (
+        (row.before_bid, row.before_ask),
+        (row.after_bid, row.after_ask),
+      ):
+        if bid is None or ask is None:
+          return False
+        lower, upper = Decimal(bid), Decimal(ask)
+        if not lower.is_finite() or not upper.is_finite() or not 0 < lower <= upper:
+          return False
+      for value in (row.bid, row.ask):
+        if value is not None:
+          price = Decimal(value)
+          if not price.is_finite() or price < 0:
+            return False
+    except InvalidOperation:
+      return False
+  return True
 
 
 def empty_book_observations(rows: list[QuoteObservation]) -> bool:
@@ -559,6 +610,14 @@ async def collect(
         'depth+tickers',
         quotes=observations,
       )
+      check = report.checks[-1]
+      if (
+        check.status == 'fail'
+        and check.code == 'mismatch'
+        and native_ticker_limitation(venue, check)
+      ):
+        check.status = 'limitation'
+        check.code = 'native_ticker_quotes'
 
   for kind, market_id, row in catalogue_rows(catalogue, venue):
     exchange_id = row.get('exchange')
