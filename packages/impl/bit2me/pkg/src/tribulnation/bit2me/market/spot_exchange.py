@@ -62,8 +62,9 @@ class SpotExchange(ExchangeMixin, Exchange):
       markets: Symbols to keep. `None` keeps every symbol.
       settings: Accepted for interface compatibility and ignored.
 
-    Bit2Me's bulk cache can lag its symbol-specific quotes. An explicit selection
-    uses one request per distinct symbol instead of filtering that stale bulk cache.
+    An explicit selection uses one native ticker request per distinct symbol.
+    Both endpoints can return stale or zero bid/ask despite a live order book.
+    Native values are preserved; use `depth()` when current book quotes are needed.
     """
     wanted = None if markets is None else set(markets)
     if wanted is None:

@@ -394,6 +394,18 @@ def write_report(
       '\nQualification: Wallet/Earn public metadata on mainnet; private Report '
       'functionality on testnet only. Mainnet private-account behavior is unverified.\n'
     )
+  checks = results.payload.get('checks')
+  if isinstance(checks, list):
+    limitations = sum(
+      isinstance(check, dict) and check.get('status') == 'limitation'
+      for check in checks
+    )
+    if limitations:
+      summary += (
+        f'\nKnown upstream limitations: {limitations} quote comparisons did not pass. '
+        'See results.json for retained brackets. ADR 0014 permits only Bit2Me '
+        'native ticker/depth discrepancies; all other required checks still apply.\n'
+      )
   summary = summary.encode()
   manifest = Manifest(
     before=before,

@@ -52,7 +52,7 @@ sdk-dev results verify /path/to/new-run \
 6. Kraken Futures and Bitget UTA `coin` are explicitly excluded capabilities, not
    passing checks or missing-market coverage. Bitget Classic `coin-classic` remains
    in scope. See [issue #32](https://github.com/tribulnation/sdk/issues/32).
-7. Payload version 3 rejects the retired asset-observation and two-sided-only policies. Fresh reports
+7. Market payload version 4 includes the explicit Bit2Me native-ticker limitation and rejects older policies. Fresh reports
    are required after this policy change; old reports cannot be relabeled as passing.
 
 ## Quote comparison and scope
@@ -74,6 +74,16 @@ prices, slow brackets and request errors remain blocking. Explicit Catalogue del
 are `excluded/delisted` quote checks, matched by venue/kind/exchange/native ID; discovery
 and SDK identity checks remain required. Never infer delisting from an empty book.
 See [ADR 0011](adr/0011-liquidity-independent-consistency.md).
+
+Bit2Me `spot` has one reviewed upstream limitation: its native ticker bid/ask can
+be stale or zero even with a live book, including symbol-specific reads. Keep native
+values and request `depth()` explicitly when current book quotes are needed.
+Three timely, exact-ID discrepancies against valid two-sided books are recorded as
+`limitation/native_ticker_quotes`, not passes, but do not block release. Public
+brackets and a warning in the evidence summary remain visible. Request errors,
+wrong IDs, invalid books, malformed/negative prices and other checks still block.
+See [ADR 0014](adr/0014-bit2me-native-ticker-limitation.md); this is not a general
+venue exemption or permission to relabel old reports.
 
 This suite does not call personal `fees()`, place orders, transfer funds, or claim
 every discovery-only instrument received a depth comparison. The report preserves
