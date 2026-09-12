@@ -5,6 +5,8 @@
 1. Requires tribulnation-sdk >=2.0.0 and the Typed dependency floors declared in this package.
 2. Adopts bounded candles and exchange metadata, corrects unknown last-trade/volume semantics, and makes native requests participate in SDK retries.
 3. Review the coherent implementation changes in [SDK 2](https://github.com/tribulnation/sdk/pull/19). This package release follows that source change; it does not change the agreed runtime contract again.
+4. Block timestamp reads now share the existing four-request chain concurrency bound.
+   Archive-backed history is retained; there is no pruning fallback or silent truncation.
 
 ## Publication order
 
@@ -17,5 +19,9 @@
 
 1. ADR 0013 requires all supported read-only suites through sdk-dev test surfaces, plus sdk-dev test consistency for market implementations. The two reports cannot substitute for each other.
 2. Record fresh evidence under release-evidence/dydx/surfaces/ and, where applicable, consistency/. Historical reports directly under the venue directory do not qualify this release.
-3. Fresh complete live qualification remains pending. Missing credentials, unexpected skips, failures and mismatched fingerprints block release. The approved Deribit mainnet-public/testnet-Report split is unchanged; it does not establish mainnet private-account behavior.
+3. Fresh all-read and consistency qualification completed on mainnet on September 12,
+   including Report snapshot and archive-backed history. Both reports verify against
+   the reconstructed release candidate. All 725 candidate unit/regression tests pass.
+   Missing credentials, unexpected skips, failures and mismatched fingerprints still
+   block release; passing this selected account does not qualify every account/provider.
 4. Obtain explicit approval before merging or publishing; passing CI alone is not authorization.
