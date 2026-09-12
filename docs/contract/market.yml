@@ -2,9 +2,8 @@
 # names the class, and `sdk-dev` reads each method from the source (sdk_dev.source).
 #
 # `example`/`catalogue` blocks are Jinja templates (sdk_dev.contract), not literal
-# Python — `sdk-dev docs sync` renders each method once per reachable non-empty subset
-# of the venues it can genuinely be called against, so the wizard always shows a script
-# and result that match whatever the reader picked, instead of one hardcoded venue.
+# Python — `sdk-dev docs sync` renders each method once per supported venue.
+# The wizard selects one venue's complete example, without mixed-subset payloads.
 # Every template sees three globals: `accounts` (the venues in this rendering, in
 # `accountVenues`' own preferred order — Market's examples are single-market, so they
 # just use `accounts[0]`), `constants` (this method's own small per-venue mapping of
@@ -18,10 +17,9 @@
 #
 # `component.supportedVenues`/`defaultVenues`: NOT declared here — computed by
 # `sdk-dev docs sync` (sdk_dev.support) from every packages/impl/*/impl.toml's
-# `[support.market]` table. Per-method venue eligibility narrows that further to
-# whichever of those venues this method's own `constants` covers (sdk_dev.support's
-# `method_universe` ∩ `example.constants.keys()`). Examples are representative, not
-# exhaustive; the support matrix is authoritative. Use supported exchange IDs.
+# `[support.market]` table. Per-method eligibility comes from `method_universe`,
+# not from example availability. Every eligible venue has constants; examples use a supported
+# product line without claiming every exchange supports the same methods.
 #
 # `group`: optional display grouping (Market is the only component with more than a
 # handful of methods). Display order follows first-appearance order in this file.
@@ -36,12 +34,16 @@
 
 component:
   preamble: |
+    from datetime import datetime, timedelta, timezone
+    from decimal import Decimal
     from tribulnation.sdk import MarketSDK
     from dotenv import load_dotenv
 
     load_dotenv()
 
     sdk = MarketSDK.load('sdk.toml')
+    end = datetime.now(timezone.utc)
+    start = end - timedelta(days=1)
   ref: tribulnation.sdk.market.markets:TradingMarkets
   title: Market
   tagline: Order books, rules, orders, positions, funding — for a single instrument.
@@ -62,11 +64,18 @@ methods:
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', bid: '60095.20', ask: '60096.50'}
         binance: {market_id: 'binance:spot:BTCUSDT', bid: '60123.00', ask: '60124.10'}
         bit2me: {market_id: 'bit2me:spot:BTC/EUR', bid: '60123.00', ask: '60124.10'}
+        bitget: {market_id: 'bitget:spot:BTCUSDT', bid: '60123.00', ask: '60124.10'}
+        bybit: {market_id: 'bybit:spot:BTCUSDT', bid: '60123.00', ask: '60124.10'}
+        coinbase: {market_id: 'coinbase:spot:BTC-USD', bid: '60123.00', ask: '60124.10'}
+        dydx: {market_id: 'dydx:perp:BTC-USD', bid: '60123.00', ask: '60124.10'}
+        kraken: {market_id: 'kraken:spot:XBTUSD', bid: '60123.00', ask: '60124.10'}
       callTemplate: |
         book = await sdk.depth('{{ constants[accounts[0]].market_id }}', levels=5)
-        print(book.best_bid, book.best_ask)
+        bid = book.best_bid.price if book.bids else None
+        ask = book.best_ask.price if book.asks else None
+        print(bid, ask)
       resultTemplate: |
-        (Decimal('{{ constants[accounts[0]].bid }}'), Decimal('{{ constants[accounts[0]].ask }}'))
+        {{ constants[accounts[0]].bid }} {{ constants[accounts[0]].ask }}
     catalogue:
       callTemplate: |
         # pip install tribulnation-catalogue
@@ -104,13 +113,21 @@ methods:
             - {bid: '60095.10', ask: '60095.80'}
             - {bid: '60095.30', ask: '60096.10'}
         bybit: {market_id: 'bybit:spot:BTCUSDT', ticks: [{bid: '60123.40', ask: '60124.00'}, {bid: '60123.50', ask: '60124.00'}, {bid: '60122.90', ask: '60123.60'}, {bid: '60123.10', ask: '60123.90'}]}
+        binance: {market_id: 'binance:spot:BTCUSDT', ticks: [{bid: '60123.40', ask: '60124.00'}, {bid: '60123.50', ask: '60124.00'}, {bid: '60122.90', ask: '60123.60'}, {bid: '60123.10', ask: '60123.90'}]}
+        bit2me: {market_id: 'bit2me:spot:BTC/EUR', ticks: [{bid: '60123.40', ask: '60124.00'}, {bid: '60123.50', ask: '60124.00'}, {bid: '60122.90', ask: '60123.60'}, {bid: '60123.10', ask: '60123.90'}]}
+        bitget: {market_id: 'bitget:spot:BTCUSDT', ticks: [{bid: '60123.40', ask: '60124.00'}, {bid: '60123.50', ask: '60124.00'}, {bid: '60122.90', ask: '60123.60'}, {bid: '60123.10', ask: '60123.90'}]}
+        coinbase: {market_id: 'coinbase:spot:BTC-USD', ticks: [{bid: '60123.40', ask: '60124.00'}, {bid: '60123.50', ask: '60124.00'}, {bid: '60122.90', ask: '60123.60'}, {bid: '60123.10', ask: '60123.90'}]}
+        dydx: {market_id: 'dydx:perp:BTC-USD', ticks: [{bid: '60123.40', ask: '60124.00'}, {bid: '60123.50', ask: '60124.00'}, {bid: '60122.90', ask: '60123.60'}, {bid: '60123.10', ask: '60123.90'}]}
+        kraken: {market_id: 'kraken:spot:XBTUSD', ticks: [{bid: '60123.40', ask: '60124.00'}, {bid: '60123.50', ask: '60124.00'}, {bid: '60122.90', ask: '60123.60'}, {bid: '60123.10', ask: '60123.90'}]}
       callTemplate: |
         async with sdk.depth_stream('{{ constants[accounts[0]].market_id }}') as books:
           async for book in books:
-            print(book.best_bid, book.best_ask)
+            bid = book.best_bid.price if book.bids else None
+            ask = book.best_ask.price if book.asks else None
+            print(bid, ask)
       resultTemplate: |
         {% for t in constants[accounts[0]].ticks %}
-        (Decimal('{{ t.bid }}'), Decimal('{{ t.ask }}'))
+        {{ t.bid }} {{ t.ask }}
 
         {% endfor %}
     catalogue:
@@ -150,15 +167,17 @@ methods:
           step_size: '0.00001'
         bitget: {market_id: 'bitget:spot:BTCUSDT', instrument_id: 'BTCUSDT', fee_asset: 'USDT', tick_size: '0.10', step_size: '0.00001', kind: 'spot'}
         kraken: {market_id: 'kraken:spot:XBTUSD', instrument_id: 'XBTUSD', fee_asset: 'ZUSD', tick_size: '0.10', step_size: '0.00001', kind: 'spot'}
+        binance: {market_id: 'binance:spot:BTCUSDT', instrument_id: 'BTCUSDT', fee_asset: 'USDT', tick_size: '0.10', step_size: '0.00001'}
+        bit2me: {market_id: 'bit2me:spot:BTC/EUR', instrument_id: 'BTC/EUR', fee_asset: 'EUR', tick_size: '0.10', step_size: '0.00001'}
+        bybit: {market_id: 'bybit:spot:BTCUSDT', instrument_id: 'BTCUSDT', fee_asset: 'USDT', tick_size: '0.10', step_size: '0.00001'}
+        coinbase: {market_id: 'coinbase:spot:BTC-USD', instrument_id: 'BTC-USD', fee_asset: 'USD', tick_size: '0.10', step_size: '0.00001'}
+        dydx: {market_id: 'dydx:perp:BTC-USD', instrument_id: 'BTC-USD', fee_asset: 'USDC', tick_size: '0.10', step_size: '0.00001'}
       callTemplate: |
         rules = await sdk.rules('{{ constants[accounts[0]].market_id }}')
-        price = rules.round_price(60123.456)
+        price = rules.round_price(Decimal('60123.456'))
+        print(rules.tick_size, rules.step_size)
       resultTemplate: |
-        Rules(
-          fee_asset='{{ constants[accounts[0]].fee_asset }}',
-          tick_size=Decimal('{{ constants[accounts[0]].tick_size }}'), step_size=Decimal('{{ constants[accounts[0]].step_size }}'),
-          fees=None,
-        )
+        {{ constants[accounts[0]].tick_size }} {{ constants[accounts[0]].step_size }}
     catalogue:
       callTemplate: |
         # pip install tribulnation-catalogue
@@ -200,6 +219,10 @@ methods:
         coinbase: {market_id: 'coinbase:intx:BTC-PERP-INTX'}
         hyperliquid: {market_id: 'hyperliquid::BTC'}
         kraken: {market_id: 'kraken:spot:XBTUSD'}
+        bitget: {market_id: 'bitget:spot:BTCUSDT'}
+        bybit: {market_id: 'bybit:spot:BTCUSDT'}
+        dydx: {market_id: 'dydx:perp:BTC-USD'}
+        mexc: {market_id: 'mexc:spot:BTCUSDT'}
       callTemplate: |
         fees = await sdk.fees('{{ constants[accounts[0]].market_id }}')
         print(fees.taker_buy, fees.taker_sell)
@@ -226,6 +249,10 @@ methods:
         bybit: {market_id: 'bybit:spot:BTCUSDT', open1: '60122.80', close1: '60149.50', open2: '60149.50', close2: '60097.60'}
         coinbase: {market_id: 'coinbase:spot:BTC-USD', open1: '60120.55', close1: '60148.02', open2: '60148.02', close2: '60096.11'}
         dydx: {market_id: 'dydx:perp:BTC-USD', open1: '60118.00', close1: '60146.00', open2: '60146.00', close2: '60094.00'}
+        bit2me: {market_id: 'bit2me:spot:BTC/EUR', open1: '60123.40', close1: '60150.00', open2: '60150.00', close2: '60098.20'}
+        bitget: {market_id: 'bitget:spot:BTCUSDT', open1: '60123.40', close1: '60150.00', open2: '60150.00', close2: '60098.20'}
+        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', open1: '60123.40', close1: '60150.00', open2: '60150.00', close2: '60098.20'}
+        kraken: {market_id: 'kraken:spot:XBTUSD', open1: '60123.40', close1: '60150.00', open2: '60150.00', close2: '60098.20'}
       callTemplate: |
         async for page in sdk.candles('{{ constants[accounts[0]].market_id }}', '1h', start, end):
           for candle in page:
@@ -267,6 +294,12 @@ methods:
           markets:
             - {key: 'UBTC/USDC:142', last: '60095.90', bid: '60095.20', ask: '60096.50'}
         coinbase: {exchange_id: 'coinbase:spot', markets: [{key: 'BTC-USD', last: '60123.40', bid: '60123.00', ask: '60124.10'}]}
+        binance: {exchange_id: 'binance:spot', markets: [{key: 'BTCUSDT', last: '60123.40', bid: '60123.00', ask: '60124.10'}]}
+        bit2me: {exchange_id: 'bit2me:spot', markets: [{key: 'BTC/EUR', last: '60123.40', bid: '60123.00', ask: '60124.10'}]}
+        bitget: {exchange_id: 'bitget:spot', markets: [{key: 'BTCUSDT', last: '60123.40', bid: '60123.00', ask: '60124.10'}]}
+        bybit: {exchange_id: 'bybit:spot', markets: [{key: 'BTCUSDT', last: '60123.40', bid: '60123.00', ask: '60124.10'}]}
+        dydx: {exchange_id: 'dydx:perp', markets: [{key: 'BTC-USD', last: '60123.40', bid: '60123.00', ask: '60124.10'}]}
+        kraken: {exchange_id: 'kraken:spot', markets: [{key: 'XBTUSD', last: '60123.40', bid: '60123.00', ask: '60124.10'}]}
       callTemplate: |
         snapshot = await sdk.tickers('{{ constants[accounts[0]].exchange_id }}')
       resultTemplate: |
@@ -322,6 +355,9 @@ methods:
           open_interest: '634.9'
         binance: {exchange_id: 'binance:usdm', key: 'BTCUSDT', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: '812.4'}
         bitget: {exchange_id: 'bitget:usdt', key: 'BTCUSDT', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: '812.4'}
+        bybit: {exchange_id: 'bybit:perp', key: 'BTCUSDT', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: '812.4'}
+        coinbase: {exchange_id: 'coinbase:intx', key: 'BTC-PERP-INTX', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: '812.4'}
+        mexc: {exchange_id: 'mexc:perp', key: 'BTC_USDT', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: '812.4'}
       callTemplate: |
         stats = await sdk.perp_stats('{{ constants[accounts[0]].exchange_id }}')
       resultTemplate: |
@@ -354,6 +390,13 @@ methods:
       constants:
         mexc: {market_id: 'mexc:spot:BTCUSDT', order_id: '4834937', price: '59500', qty: '0.01'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id: '184920371', price: '59480', qty: '0.02'}
+        binance: {market_id: 'binance:spot:BTCUSDT', order_id: '4834937', price: '59500', qty: '0.01'}
+        bit2me: {market_id: 'bit2me:spot:BTC/EUR', order_id: '00000000-0000-4000-8000-000000000001', price: '59500', qty: '0.01'}
+        bitget: {market_id: 'bitget:spot:BTCUSDT', order_id: '4834937', price: '59500', qty: '0.01'}
+        bybit: {market_id: 'bybit:spot:BTCUSDT', order_id: '00000000-0000-4000-8000-000000000001', price: '59500', qty: '0.01'}
+        coinbase: {market_id: 'coinbase:spot:BTC-USD', order_id: '00000000-0000-4000-8000-000000000001', price: '59500', qty: '0.01'}
+        dydx: {market_id: 'dydx:perp:BTC-USD', order_id: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAQAAABhA', price: '59500', qty: '0.01'}
+        kraken: {market_id: 'kraken:spot:XBTUSD', order_id: 'OABC12-DE345-FGHI61', price: '59500', qty: '0.01'}
       callTemplate: |
         state = await sdk.query_order('{{ constants[accounts[0]].market_id }}', '{{ constants[accounts[0]].order_id }}')
       resultTemplate: |
@@ -385,6 +428,12 @@ methods:
         mexc: {market_id: 'mexc:spot:BTCUSDT', order_id: '4834937', price: '59500', qty: '0.01'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id: '184920371', price: '59480', qty: '0.02'}
         binance: {market_id: 'binance:spot:BTCUSDT', order_id: '4834937', price: '59500', qty: '0.01'}
+        bit2me: {market_id: 'bit2me:spot:BTC/EUR', order_id: '00000000-0000-4000-8000-000000000001', price: '59500', qty: '0.01'}
+        bitget: {market_id: 'bitget:spot:BTCUSDT', order_id: '4834937', price: '59500', qty: '0.01'}
+        bybit: {market_id: 'bybit:spot:BTCUSDT', order_id: '00000000-0000-4000-8000-000000000001', price: '59500', qty: '0.01'}
+        coinbase: {market_id: 'coinbase:spot:BTC-USD', order_id: '00000000-0000-4000-8000-000000000001', price: '59500', qty: '0.01'}
+        dydx: {market_id: 'dydx:perp:BTC-USD', order_id: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAQAAABhA', price: '59500', qty: '0.01'}
+        kraken: {market_id: 'kraken:spot:XBTUSD', order_id: 'OABC12-DE345-FGHI61', price: '59500', qty: '0.01'}
       callTemplate: |
         orders = await sdk.open_orders('{{ constants[accounts[0]].market_id }}')
       resultTemplate: |
@@ -417,6 +466,12 @@ methods:
         mexc: {market_id: 'mexc:spot:BTCUSDT', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: USDT}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', price1: '60095.60', qty1: '0.01', price2: '60040.00', qty2: '-0.02', fee_asset: '0'}
         coinbase: {market_id: 'coinbase:spot:BTC-USD', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'USD'}
+        binance: {market_id: 'binance:spot:BTCUSDT', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'USDT'}
+        bit2me: {market_id: 'bit2me:spot:BTC/EUR', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'EUR'}
+        bitget: {market_id: 'bitget:spot:BTCUSDT', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'USDT'}
+        bybit: {market_id: 'bybit:spot:BTCUSDT', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'USDT'}
+        dydx: {market_id: 'dydx:perp:BTC-USD', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'USDC'}
+        kraken: {market_id: 'kraken:spot:XBTUSD', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'ZUSD'}
       callTemplate: |
         trades = []
         async for page in sdk.trades_history('{{ constants[accounts[0]].market_id }}', start, end):
@@ -459,6 +514,12 @@ methods:
             - {price: '60097.40', qty: '-0.02'}
             - {price: '60098.50', qty: '0.05'}
         bybit: {market_id: 'bybit:spot:BTCUSDT', ticks: [{price: '60123.40', qty: '0.01'}, {price: '60124.00', qty: '-0.02'}, {price: '60125.10', qty: '0.05'}]}
+        binance: {market_id: 'binance:spot:BTCUSDT', ticks: [{price: '60123.40', qty: '0.01'}, {price: '60124.00', qty: '-0.02'}, {price: '60125.10', qty: '0.05'}]}
+        bit2me: {market_id: 'bit2me:spot:BTC/EUR', ticks: [{price: '60123.40', qty: '0.01'}, {price: '60124.00', qty: '-0.02'}, {price: '60125.10', qty: '0.05'}]}
+        bitget: {market_id: 'bitget:spot:BTCUSDT', ticks: [{price: '60123.40', qty: '0.01'}, {price: '60124.00', qty: '-0.02'}, {price: '60125.10', qty: '0.05'}]}
+        coinbase: {market_id: 'coinbase:spot:BTC-USD', ticks: [{price: '60123.40', qty: '0.01'}, {price: '60124.00', qty: '-0.02'}, {price: '60125.10', qty: '0.05'}]}
+        dydx: {market_id: 'dydx:perp:BTC-USD', ticks: [{price: '60123.40', qty: '0.01'}, {price: '60124.00', qty: '-0.02'}, {price: '60125.10', qty: '0.05'}]}
+        kraken: {market_id: 'kraken:spot:XBTUSD', ticks: [{price: '60123.40', qty: '0.01'}, {price: '60124.00', qty: '-0.02'}, {price: '60125.10', qty: '0.05'}]}
       callTemplate: |
         async with sdk.trades_stream('{{ constants[accounts[0]].market_id }}') as trades:
           async for trade in trades:
@@ -494,6 +555,12 @@ methods:
         mexc: {market_id: 'mexc:spot:BTCUSDT', size: '0.014'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', size: '0.5'}
         kraken: {market_id: 'kraken:spot:XBTUSD', size: '0.014'}
+        binance: {market_id: 'binance:spot:BTCUSDT', size: '0.014'}
+        bit2me: {market_id: 'bit2me:spot:BTC/EUR', size: '0.014'}
+        bitget: {market_id: 'bitget:spot:BTCUSDT', size: '0.014'}
+        bybit: {market_id: 'bybit:spot:BTCUSDT', size: '0.014'}
+        coinbase: {market_id: 'coinbase:spot:BTC-USD', size: '0.014'}
+        dydx: {market_id: 'dydx:perp:BTC-USD', size: '0.014'}
       callTemplate: |
         pos = await sdk.position('{{ constants[accounts[0]].market_id }}')
       resultTemplate: |
@@ -524,6 +591,12 @@ methods:
         mexc: {market_id: 'mexc:spot:BTCUSDT', equity: '10240.55', free: '8120.00'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', equity: '9875.20', free: '7640.00'}
         bit2me: {market_id: 'bit2me:spot:BTC/EUR', equity: '10240.55', free: '8120.00'}
+        binance: {market_id: 'binance:spot:BTCUSDT', equity: '10240.55', free: '8120.00'}
+        bitget: {market_id: 'bitget:spot:BTCUSDT', equity: '10240.55', free: '8120.00'}
+        bybit: {market_id: 'bybit:spot:BTCUSDT', equity: '10240.55', free: '8120.00'}
+        coinbase: {market_id: 'coinbase:spot:BTC-USD', equity: '10240.55', free: '8120.00'}
+        dydx: {market_id: 'dydx:perp:BTC-USD', equity: '10240.55', free: '8120.00'}
+        kraken: {market_id: 'kraken:spot:XBTUSD', equity: '10240.55', free: '8120.00'}
       callTemplate: |
         c = await sdk.collateral('{{ constants[accounts[0]].market_id }}')
       resultTemplate: |
@@ -554,6 +627,12 @@ methods:
         mexc: {market_id: 'mexc:spot:BTCUSDT', notional: '8120.00'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', notional: '7640.00'}
         bitget: {market_id: 'bitget:spot:BTCUSDT', notional: '8120.00'}
+        binance: {market_id: 'binance:spot:BTCUSDT', notional: '8120.00'}
+        bit2me: {market_id: 'bit2me:spot:BTC/EUR', notional: '8120.00'}
+        bybit: {market_id: 'bybit:spot:BTCUSDT', notional: '8120.00'}
+        coinbase: {market_id: 'coinbase:spot:BTC-USD', notional: '8120.00'}
+        dydx: {market_id: 'dydx:perp:BTC-USD', notional: '8120.00'}
+        kraken: {market_id: 'kraken:spot:XBTUSD', notional: '8120.00'}
       callTemplate: |
         notional = await sdk.available_notional('{{ constants[accounts[0]].market_id }}')
       resultTemplate: |
@@ -583,8 +662,10 @@ methods:
       constants:
         mexc: {market_id: 'mexc:spot:BTCUSDT', order_id: '4834937'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id: '184920371'}
-        bybit: {market_id: 'bybit:spot:BTCUSDT', order_id: '4834937'}
+        bybit: {market_id: 'bybit:spot:BTCUSDT', order_id: '00000000-0000-4000-8000-000000000001'}
         coinbase: {market_id: 'coinbase:spot:BTC-USD', order_id: '00000000-0000-4000-8000-000000000001'}
+        bit2me: {market_id: 'bit2me:spot:BTC/EUR', order_id: '00000000-0000-4000-8000-000000000001'}
+        dydx: {market_id: 'dydx:perp:BTC-USD', order_id: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAQAAABhA'}
       callTemplate: |
         order = {'type': 'LIMIT', 'qty': 0.01, 'price': 60_000}
         response = await sdk.place_order('{{ constants[accounts[0]].market_id }}', order)
@@ -613,10 +694,11 @@ methods:
     example:
       accountVenues: [hyperliquid]
       constants:
-        mexc: {market_id: 'mexc:spot:BTCUSDT', order_id1: '4834937', order_id2: '4834938'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id1: '184920371', order_id2: '184920372'}
-        bybit: {market_id: 'bybit:spot:BTCUSDT', order_id1: '4834937', order_id2: '4834938'}
+        bybit: {market_id: 'bybit:spot:BTCUSDT', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
         coinbase: {market_id: 'coinbase:spot:BTC-USD', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
+        bit2me: {market_id: 'bit2me:spot:BTC/EUR', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
+        dydx: {market_id: 'dydx:perp:BTC-USD', order_id1: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAQAAABhA', order_id2: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAgAAABhA'}
       callTemplate: |
         orders = [
           {'type': 'LIMIT', 'qty': 0.01, 'price': 60_000},
@@ -650,12 +732,15 @@ methods:
       constants:
         mexc: {market_id: 'mexc:spot:BTCUSDT', order_id: '4834937'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id: '184920371'}
-        bybit: {market_id: 'bybit:spot:BTCUSDT', order_id: '4834937'}
+        bybit: {market_id: 'bybit:spot:BTCUSDT', order_id: '00000000-0000-4000-8000-000000000001'}
         coinbase: {market_id: 'coinbase:spot:BTC-USD', order_id: '00000000-0000-4000-8000-000000000001'}
+        bit2me: {market_id: 'bit2me:spot:BTC/EUR', order_id: '00000000-0000-4000-8000-000000000001'}
+        dydx: {market_id: 'dydx:perp:BTC-USD', order_id: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAQAAABhA'}
       callTemplate: |
         await sdk.cancel_order('{{ constants[accounts[0]].market_id }}', '{{ constants[accounts[0]].order_id }}')
+        print('Cancellation request completed')
       resultTemplate: |
-        None
+        Cancellation request completed
     catalogue:
       callTemplate: |
         # pip install tribulnation-catalogue
@@ -681,12 +766,15 @@ methods:
       constants:
         mexc: {market_id: 'mexc:spot:BTCUSDT', order_id1: '4834937', order_id2: '4834938'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id1: '184920371', order_id2: '184920372'}
-        bybit: {market_id: 'bybit:spot:BTCUSDT', order_id1: '4834937', order_id2: '4834938'}
+        bybit: {market_id: 'bybit:spot:BTCUSDT', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
         coinbase: {market_id: 'coinbase:spot:BTC-USD', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
+        bit2me: {market_id: 'bit2me:spot:BTC/EUR', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
+        dydx: {market_id: 'dydx:perp:BTC-USD', order_id1: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAQAAABhA', order_id2: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAgAAABhA'}
       callTemplate: |
         await sdk.cancel_orders('{{ constants[accounts[0]].market_id }}', ['{{ constants[accounts[0]].order_id1 }}', '{{ constants[accounts[0]].order_id2 }}'])
+        print('Cancellation request completed')
       resultTemplate: |
-        None
+        Cancellation request completed
     catalogue:
       callTemplate: |
         # pip install tribulnation-catalogue
@@ -714,10 +802,13 @@ methods:
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142'}
         bybit: {market_id: 'bybit:spot:BTCUSDT'}
         coinbase: {market_id: 'coinbase:spot:BTC-USD'}
+        bit2me: {market_id: 'bit2me:spot:BTC/EUR'}
+        dydx: {market_id: 'dydx:perp:BTC-USD'}
       callTemplate: |
         await sdk.cancel_open_orders('{{ constants[accounts[0]].market_id }}')
+        print('Cancellation request completed')
       resultTemplate: |
-        None
+        Cancellation request completed
     catalogue:
       callTemplate: |
         # pip install tribulnation-catalogue
@@ -744,6 +835,9 @@ methods:
         hyperliquid: {market_id: 'hyperliquid::BTC', index: '60110.50'}
         bybit: {market_id: 'bybit:perp:BTCUSDT', index: '60120.00'}
         mexc: {market_id: 'mexc:perp:BTC_USDT', index: '60120.00'}
+        binance: {market_id: 'binance:usdm:BTCUSDT', index: '60120.00'}
+        bitget: {market_id: 'bitget:usdt:BTCUSDT', index: '60120.00'}
+        coinbase: {market_id: 'coinbase:intx:BTC-PERP-INTX', index: '60120.00'}
       callTemplate: |
         price = await sdk.index('{{ constants[accounts[0]].market_id }}')
       resultTemplate: |
@@ -773,6 +867,10 @@ methods:
         dydx: {market_id: 'dydx:perp:BTC-USD', rate: '0.0001', annualized: '0.876'}
         hyperliquid: {market_id: 'hyperliquid::BTC', rate: '0.00012', annualized: '1.0512'}
         coinbase: {market_id: 'coinbase:intx:BTC-PERP-INTX', rate: '0.0001', annualized: '0.876'}
+        binance: {market_id: 'binance:usdm:BTCUSDT', rate: '0.0001', annualized: '0.1095'}
+        bitget: {market_id: 'bitget:usdt:BTCUSDT', rate: '0.0001', annualized: '0.1095'}
+        bybit: {market_id: 'bybit:perp:BTCUSDT', rate: '0.0001', annualized: '0.1095'}
+        mexc: {market_id: 'mexc:perp:BTC_USDT', rate: '0.0001', annualized: '0.1095'}
       callTemplate: |
         funding = await sdk.next_funding('{{ constants[accounts[0]].market_id }}')
         print(funding.rate, funding.annualized)
@@ -804,6 +902,9 @@ methods:
         hyperliquid: {market_id: 'hyperliquid::BTC', rate1: '0.00012', rate2: '0.00011'}
         bybit: {market_id: 'bybit:perp:BTCUSDT', rate1: '0.0001', rate2: '0.00012'}
         mexc: {market_id: 'mexc:perp:BTC_USDT', rate1: '0.0001', rate2: '0.00012'}
+        binance: {market_id: 'binance:usdm:BTCUSDT', rate1: '0.0001', rate2: '0.00012'}
+        bitget: {market_id: 'bitget:usdt:BTCUSDT', rate1: '0.0001', rate2: '0.00012'}
+        coinbase: {market_id: 'coinbase:intx:BTC-PERP-INTX', rate1: '0.0001', rate2: '0.00012'}
       callTemplate: |
         async for page in sdk.funding_rates('{{ constants[accounts[0]].market_id }}', start, end):
           for rate in page:
@@ -870,6 +971,8 @@ methods:
         dydx: {market_id: 'dydx:perp:BTC-USD', size: '0.5', entry_price: '58230.10'}
         hyperliquid: {market_id: 'hyperliquid::BTC', size: '0.3', entry_price: '58190.40'}
         bitget: {market_id: 'bitget:usdt:BTCUSDT', size: '0.5', entry_price: '58230.10'}
+        bybit: {market_id: 'bybit:perp:BTCUSDT', size: '0.5', entry_price: '58230.10'}
+        coinbase: {market_id: 'coinbase:intx:BTC-PERP-INTX', size: '0.5', entry_price: '58230.10'}
       callTemplate: |
         pos = await sdk.perp_position('{{ constants[accounts[0]].market_id }}')
       resultTemplate: |
@@ -900,6 +1003,8 @@ methods:
         dydx: {market_id: 'dydx:perp:BTC-USD', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
         hyperliquid: {market_id: 'hyperliquid::BTC', equity: '9875.20', leverage: '1.85', maintenance_ratio: '0.201'}
         coinbase: {market_id: 'coinbase:intx:BTC-PERP-INTX', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
+        bitget: {market_id: 'bitget:usdt:BTCUSDT', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
+        bybit: {market_id: 'bybit:perp:BTCUSDT', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
       callTemplate: |
         c = await sdk.perp_collateral('{{ constants[accounts[0]].market_id }}')
         print(c.maintenance_ratio)

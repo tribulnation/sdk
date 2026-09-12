@@ -1,15 +1,11 @@
 """Jinja-templated `docs/contract/*.yml` — one rendering mechanism for every method in
 every file, no filename ever hardcoded. `call`/`result` (and the optional `catalogue`
 block's own call/result) are Jinja source, not literal Python: `sdk-dev docs sync`
-renders each method once per reachable non-empty subset of the venues it can genuinely
-be called against, so the wizard always shows text that matches whatever the reader
-picked, instead of a single hardcoded combination.
+renders each method once per supported venue. The picker can select several packages,
+but presents one complete, independently runnable venue example at a time (ADR 0015).
 
 Three globals are available to every template:
-  - `accounts`: the venues in this particular rendering, in the method's own preferred
-    order (`accountVenues` first, then any other selected venue in registry order) —
-    Market's single-active-venue examples just use `accounts[0]`; Earn/Wallet/Report's
-    `for venue, sdk in x.all.items()`-shaped examples loop `{% for venue in accounts %}`.
+  - `accounts`: the singleton list `[venue]` for this rendering.
   - `constants`: a `{venue: {...}}` mapping of the illustrative numbers (an APR, a
     balance, a fee) that have no real source to compute from — declared once per venue,
     by the `.yml` author.
@@ -22,7 +18,6 @@ Three globals are available to every template:
 eligible (from `sdk_dev.support`'s `impl.toml` data) and passes that in as `universe`.
 """
 
-from itertools import combinations
 from pathlib import Path
 from typing_extensions import Any, Mapping, NotRequired, TypedDict
 import re
@@ -102,7 +97,7 @@ class ContractFile(pydantic.BaseModel):
 
 
 class RenderedSubset(TypedDict):
-  """One method rendered for one selection of venues."""
+  """One method rendered for exactly one supported venue."""
 
   call: str
   """The full runnable script: the component's preamble plus `snippet`."""
@@ -134,7 +129,7 @@ class RenderedMethod(RenderedMethodFlags):
   venues: list[str]
   """Every venue the picker offers for this method."""
   subsets: dict[str, RenderedSubset]
-  """`render_method`'s output, keyed by the selected venues' sorted, comma-joined slugs."""
+  """One example per venue slug; the legacy field name never implies combinations."""
 
 
 class RenderedContract(TypedDict):
@@ -161,7 +156,7 @@ def load_contract_file(path: Path) -> ContractFile:
 
 def _venue_order(preferred: list[str], universe: list[str]) -> list[str]:
   """`preferred` (a method's own `accountVenues`) first, then every other venue in
-  `universe`'s own order — the order templates see `accounts` in for any subset."""
+  `universe`'s own order — the order venue examples are generated."""
   ordered = [v for v in preferred if v in universe]
   ordered += [v for v in universe if v not in ordered]
   return ordered
@@ -186,7 +181,7 @@ def render_method(
   method: ContractMethod, *, preamble: str, universe: list[str], catalogue: Any
 ) -> dict[str, RenderedSubset]:
   """
-  Render `method`'s templates once per reachable non-empty subset of `universe`.
+  Render `method`'s templates once per supported venue, with linear output size.
 
   Args:
     method: The method to render.
@@ -197,11 +192,8 @@ def render_method(
       template as the `catalogue` global.
 
   Returns:
-    `{subset_key: {call, snippet, result, catalogueCall?, catalogueResult?}}` —
-    `subset_key` is the selected venues' slugs, sorted and comma-joined, so the frontend
-    can compute the same key from whatever it has selected without needing to know this
-    function's internal venue ordering. `call` is the full runnable script (preamble plus
-    `snippet`); `snippet` is the method's own lines alone. `result` is a list of reveal
+    `{venue: {call, snippet, result, catalogueCall?, catalogueResult?}}` — each
+    entry is a complete single-venue script. `result` is a list of reveal
     chunks (for the wizard's staggered "run example" reveal); `catalogueResult`, like the
     primary `call`, is a single rendered string — the catalogue block is shown as one
     static block, never staggered.
@@ -210,6 +202,14 @@ def render_method(
     jinja2.TemplateError: a template doesn't compile, or (given `StrictUndefined`)
       references a fact or catalogue entry that doesn't exist.
   """
+  missing = sorted(set(universe) - method.example.constants.keys())
+  if missing:
+    raise ValueError(
+      f'missing example constants for supported venues: {", ".join(missing)}'
+    )
+  invalid = sorted(set(method.example.accountVenues) - set(universe))
+  if invalid:
+    raise ValueError(f'unsupported default example venues: {", ".join(invalid)}')
   ordered = _venue_order(method.example.accountVenues, universe)
   preamble_tpl = JINJA_ENV.from_string(preamble)
   call_tpl = JINJA_ENV.from_string(method.example.callTemplate)
@@ -222,26 +222,25 @@ def render_method(
   )
 
   rendered: dict[str, RenderedSubset] = {}
-  for size in range(1, len(ordered) + 1):
-    for combo in combinations(ordered, size):
-      accounts = list(combo)
-      ctx: dict[str, Any] = {
-        'accounts': accounts,
-        'constants': method.example.constants,
-        'catalogue': catalogue,
-      }
-      snippet = call_tpl.render(ctx).strip('\n')
-      entry: RenderedSubset = {
-        'call': preamble_tpl.render(ctx).strip('\n') + '\n\n' + snippet,
-        'snippet': snippet,
-        'result': _render_lines(result_tpl, ctx),
-      }
-      if catalogue_call_tpl is not None and catalogue_result_tpl is not None:
-        entry['catalogueCall'] = catalogue_call_tpl.render(ctx).strip('\n')
-        # Unlike `result`, the catalogue block is shown as one static block, never a
-        # staggered reveal — so its own render stays a single string, no chunk split.
-        entry['catalogueResult'] = catalogue_result_tpl.render(ctx).strip('\n')
-      rendered[','.join(sorted(accounts))] = entry
+  for venue in ordered:
+    accounts = [venue]
+    ctx: dict[str, Any] = {
+      'accounts': accounts,
+      'constants': method.example.constants,
+      'catalogue': catalogue,
+    }
+    snippet = call_tpl.render(ctx).strip('\n')
+    entry: RenderedSubset = {
+      'call': preamble_tpl.render(ctx).strip('\n') + '\n\n' + snippet,
+      'snippet': snippet,
+      'result': _render_lines(result_tpl, ctx),
+    }
+    if catalogue_call_tpl is not None and catalogue_result_tpl is not None:
+      entry['catalogueCall'] = catalogue_call_tpl.render(ctx).strip('\n')
+      # Unlike `result`, the catalogue block is shown as one static block, never a
+      # staggered reveal — so its own render stays a single string, no chunk split.
+      entry['catalogueResult'] = catalogue_result_tpl.render(ctx).strip('\n')
+    rendered[venue] = entry
   return rendered
 
 
@@ -277,18 +276,22 @@ def render_contract_file(
       flags['group'] = method.group
     if method.public is not None:
       flags['public'] = method.public
+    try:
+      examples = render_method(
+        method,
+        preamble=contract.component.preamble,
+        universe=universes[name],
+        catalogue=catalogue,
+      )
+    except ValueError as error:
+      raise ValueError(f'{contract.component.title}.{name}: {error}') from error
     methods[name] = {
       **flags,
       **source[name],
       'venueNotes': method.venues,
       'accountVenues': method.example.accountVenues,
       'venues': universes[name],
-      'subsets': render_method(
-        method,
-        preamble=contract.component.preamble,
-        universe=universes[name],
-        catalogue=catalogue,
-      ),
+      'subsets': examples,
     }
   return {
     'component': contract.component.model_dump(

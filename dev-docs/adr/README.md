@@ -37,3 +37,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0012](0012-deribit-public-mainnet-private-testnet.md) | Deribit mainnet public metadata and testnet private Report evidence | Accepted |
 | [0013](0013-all-read-suites-release-gate.md) | Require all supported read-only suites alongside market consistency | Accepted; amends 0003 and 0006 |
 | [0014](0014-bit2me-native-ticker-limitation.md) | Preserve Bit2Me native tickers with a visible upstream quote limitation | Accepted; amends 0003 and 0011 |
+| [0015](0015-single-venue-doc-examples.md) | Linear per-venue documentation examples without hidden support | Accepted |

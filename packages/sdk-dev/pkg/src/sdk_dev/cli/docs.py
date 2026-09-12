@@ -35,6 +35,7 @@ DEFAULT_LANDING_PATH = 'refs/landing'
 LANDING_DOCS_DEST = 'content/docs/sdk'
 LANDING_DEST = 'content/docs/sdk/contract'
 ACCOUNTS_FILENAME = 'accounts.json'
+PUBLIC_ACCOUNTS_FILENAME = 'public_accounts.json'
 SCHEMA_FILENAME = 'schema.json'
 REGISTRY_FILENAME = 'registry.json'
 SUPPORT_FILENAME = 'support.json'
@@ -69,8 +70,8 @@ def _build_generated(root: Path) -> Generated:
   never checked against a hardcoded surface list; whatever `<stem>` is, it's matched
   against every `impl.toml`'s `[support.<stem>]` table (`sdk_dev.support`) to work out,
   per method, which venues it can genuinely be rendered for (that surface's impl.toml
-  eligibility, narrowed further to whichever of those venues the method's own `constants`
-  actually covers — see `sdk_dev.contract` for the rendering itself).
+  eligibility; every eligible venue must have example constants or validation fails —
+  see `sdk_dev.contract` for the singleton rendering itself).
 
   Args:
     root: The sdk repo root, from `repo_root()`.
@@ -103,6 +104,7 @@ def _build_generated(root: Path) -> Generated:
 
   generated: dict[str, Mapping[str, object]] = {
     ACCOUNTS_FILENAME: generate_accounts_toml(),
+    PUBLIC_ACCOUNTS_FILENAME: generate_accounts_toml(public=True),
     SCHEMA_FILENAME: generate_schema(),
     REGISTRY_FILENAME: registry,
     SUPPORT_FILENAME: load_support_matrix(root / IMPL_DIR),
@@ -117,12 +119,8 @@ def _build_generated(root: Path) -> Generated:
     if METHODS_MARKER not in page.read_text():
       raise FileNotFoundError(f'{page}: missing the {METHODS_MARKER} marker')
     universes = {
-      name: [
-        v
-        for v in method_universe(impl_files, surface, name)
-        if v in method.example.constants
-      ]
-      for name, method in contract.methods.items()
+      name: method_universe(impl_files, surface, name)
+      for name in contract.methods
     }
     source_methods = {
       name: source.method(method.ref or contract.component.ref, name)
@@ -223,17 +221,19 @@ def sync(
   <landing>/content/docs/sdk/contract/ on every sync, never written into this repo's own
   docs/contract/ (which stays 100% hand-authored .yml, safe to `git add` wholesale):
     - <stem>.json, one per docs/contract/<stem>.yml (sdk_dev.contract) — every method's
-      `call`/`result` (and optional `catalogue` block) rendered once per reachable
-      non-empty subset of the venues it can genuinely be called against, so the wizard
-      always shows text matching whatever the reader picked. Venue eligibility per
+      `call`/`result` (and optional `catalogue` block) rendered once per supported
+      venue, so the wizard shows a complete script for its active venue tab.
+      Venue eligibility per
       method comes from every packages/impl/*/impl.toml's `[support.<stem>]` table
-      (sdk_dev.support), narrowed to whichever of those venues the method's own `constants`
-      covers — a venue only ever reaches the wizard once its package's impl.toml says
-      it's ready *and* the method has real illustrative data for it.
+      (sdk_dev.support). Missing illustrative constants for any eligible venue fail
+      validation rather than silently removing it from the picker (ADR 0015).
     - accounts.json, one `[accounts.<slug>]` TOML block per venue, from the real
       `Account` dataclasses (sdk_dev.accounts) — every field whose *default* is a
       `$ENV_VAR` placeholder is a credential worth showing; everything else (`public`,
       `validate`, ...) isn't. Feeds the wizard's generated sdk.toml.
+    - public_accounts.json, explicit `public = true` configurations from the same
+      dataclasses, with no credential placeholders. Public eligibility remains a
+      separate decision from implementation auth metadata and the selected method.
     - schema.json, the JSON Schema for that same sdk.toml (sdk_dev.schema) — also from
       the real `Account` union, so the two can't disagree with each other.
     - registry.json, from the repo-root registry.toml (sdk_dev.registry) — the hand-

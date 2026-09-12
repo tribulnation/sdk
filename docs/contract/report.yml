@@ -1,134 +1,77 @@
-# Interface contract for ReportSDK.
-#
-# `example`/`catalogue` blocks are Jinja templates (sdk_dev.contract), not literal
-# Python — see market.yml's header for the full mechanism. Both methods below genuinely
-# loop `for venue, sdk in report.all.items():` (`async with sdk: ...` per venue —
-# ReportSDK owns network clients, unlike Earn/Wallet), so their call text needs no
-# substitution at all.
-#
-# Examples use representative perpetual accounts, not the complete Report support
-# matrix. CEX spot-only reports need not emit perpetual trades or funding records.
-
+# Singleton examples do not assume shared subaccount or observation shapes.
 component:
   preamble: |
+    from datetime import datetime, timedelta, timezone
     from tribulnation.sdk import ReportSDK
     from dotenv import load_dotenv
 
     load_dotenv()
-
     report = ReportSDK.load('sdk.toml')
+    end = datetime.now(timezone.utc)
+    start = end - timedelta(days=30)
   ref: tribulnation.sdk.reporting.sdk:Report
   title: Report
   tagline: Historical transactions and current balances/positions, with provenance.
-  note: "Balances and history below are illustrative. Returned subaccounts and observation types vary by implementation: Binance and KuCoin reports are spot-side only. API history retention varies; dYdX full history requires an archive provider. See the support matrix for all Report implementations."
-  # supportedVenues/defaultVenues: NOT declared here — computed by `sdk-dev docs sync`
-  # from every packages/impl/*/impl.toml's `[support.report]` table. ReportSDK has no
-  # DEFAULT_ACCOUNTS concept at all, so every impl.toml marks `auth = true` here — every
-  # venue always needs a real toml entry. Public mainnet addresses suffice for
-  # Hyperliquid and dYdX; exchange account reports require their API credentials.
+  note: "Counts are illustrative, not completeness or non-empty-account guarantees. Binance and KuCoin reports are spot-side only; other implementations expose different subaccounts and observations. Each script reads only its named account."
 
 methods:
   snapshot:
-    # Hyperliquid keys balances by numeric spot-token index ('0' is USDC) but positions by
-    # the plain perp coin symbol ('BTC') — two different raw id schemes on the *same*
-    # venue (confirmed against packages/impl/hyperliquid/.../report/{snapshots,
-    # history/assets}.py, whose own docstring spells this out). The catalogue block
-    # resolves both, computed from the real `catalogue` global rather than hand-typed.
+    venues:
+      binance: Spot, Funding and Simple Earn only; no futures compartment.
+      kucoin: Classic main/trade and Earn only; futures and legacy margin compartments excluded.
+      deribit: Accessible subaccounts; cash balances and signed base-unit positions, not equity-as-cash.
+      ethereum: Requires an address and configured data providers; provider settings can be supplied in Python.
     example:
       accountVenues: [hyperliquid]
       constants:
-        hyperliquid:
-          balance_asset: '0'
-          balance: '12045.30'
-          position_coin: BTC
-          position_size: '0.5'
-          position_avg_price: '58230.10'
-        dydx:
-          balance_asset: USDC
-          balance: '12045.30'
-          position_coin: BTC-USD
-          position_size: '0.5'
-          position_avg_price: '58230.10'
+        binance: {subaccounts: 1, balances: 2}
+        bit2me: {subaccounts: 1, balances: 2}
+        bybit: {subaccounts: 1, balances: 2}
+        coinbase: {subaccounts: 1, balances: 2}
+        deribit: {subaccounts: 1, balances: 2}
+        dydx: {subaccounts: 1, balances: 2}
+        ethereum: {subaccounts: 1, balances: 2}
+        hyperliquid: {subaccounts: 1, balances: 2}
+        kraken: {subaccounts: 1, balances: 2}
+        kucoin: {subaccounts: 1, balances: 2}
+        mexc: {subaccounts: 1, balances: 2}
       callTemplate: |
-        snapshots_by_venue = {}
-        for venue, sdk in report.all.items():
-          async with sdk:
-            result = await sdk.snapshot()
-          snapshots_by_venue[venue] = result.snapshot
-          print(venue, snapshots_by_venue[venue].balances, snapshots_by_venue[venue].positions)
+        sdk = report.venue('{{ accounts[0] }}')
+        async with sdk:
+          record = await sdk.snapshot()
+        snapshot = record.snapshot
+        print('{{ accounts[0] }}', len(snapshot.subaccounts), 'subaccounts',
+              len(snapshot.balances), 'balance assets')
       resultTemplate: |
-        {% for venue in accounts %}
-        {{ venue }} {'{{ constants[venue].balance_asset }}': Decimal('{{ constants[venue].balance }}')} {'{{ constants[venue].position_coin }}': Position(size=Decimal('{{ constants[venue].position_size }}'), avg_price=Decimal('{{ constants[venue].position_avg_price }}'))}
-
-        {% endfor %}
-    catalogue:
-      callTemplate: |
-        # pip install tribulnation-catalogue
-
-        from tribulnation.catalogue import Catalogue
-
-        catalogue = Catalogue.load()  # cached locally, no credentials needed
-        for venue, sub in snapshots_by_venue.items():
-          for token, balance in sub.balances.items():
-            print(venue, catalogue.asset_translations[venue][token], '->', balance)
-          for coin, position in sub.positions.items():
-            underlying = catalogue.perpetual_instruments[venue][coin]['base']
-            print(venue, underlying, '->', position.size, '@', position.avg_price)
-      resultTemplate: |
-        {% for venue in accounts %}
-        {{ venue }} {{ catalogue.asset_translations[venue][constants[venue].balance_asset] }} -> {{ constants[venue].balance }}
-        {{ venue }} {{ catalogue.perpetual_instruments[venue][constants[venue].position_coin]['base'] }} -> {{ constants[venue].position_size }} @ {{ constants[venue].position_avg_price }}
-        {% endfor %}
+        {{ accounts[0] }} {{ constants[accounts[0]].subaccounts }} subaccounts {{ constants[accounts[0]].balances }} balance assets
 
   history:
-    # HistoryRecord only carries `observations`/`provenance` — each observation (not the
-    # record) has its own `.type`/`.time` (confirmed against reporting/models/main.py and
-    # reporting/models/common.py's BaseObservation).
+    venues:
+      binance: Best-effort spot-side API history; retention, delisted markets and excluded sources may require file ingestion.
+      kucoin: Classic spot fills and successful capital events; native retention limits apply.
+      dydx: Full older chain history requires an archive provider, not a shorter fallback window.
+      ethereum: Requires configured data providers; chain history and interpretation depend on provider/configuration.
+      deribit: Transaction-log rows include unknown observations for unsupported trade/settlement interpretations.
     example:
       accountVenues: [hyperliquid]
       constants:
-        hyperliquid:
-          trade_time: '2025-01-03 14:22:10+00:00'
-          funding_time: '2025-01-03 16:00:00+00:00'
-          trade_instrument: BTC
-          funding_asset: '0'
-        dydx:
-          trade_time: '2025-01-03 14:22:10+00:00'
-          funding_time: '2025-01-03 16:00:00+00:00'
-          trade_instrument: BTC-USD
-          funding_asset: USDC
+        binance: {count: 2}
+        bit2me: {count: 2}
+        bybit: {count: 2}
+        coinbase: {count: 2}
+        deribit: {count: 2}
+        dydx: {count: 2}
+        ethereum: {count: 2}
+        hyperliquid: {count: 2}
+        kraken: {count: 2}
+        kucoin: {count: 2}
+        mexc: {count: 2}
       callTemplate: |
-        records_by_venue = {}
-        for venue, sdk in report.all.items():
-          async with sdk:
-            records_by_venue[venue] = [r async for r in sdk.history(start, end)]
-          for record in records_by_venue[venue]:
-            for obs in record.observations:
-              print(venue, obs.type, obs.time)
+        sdk = report.venue('{{ accounts[0] }}')
+        count = 0
+        async with sdk:
+          async for record in sdk.history(start, end):
+            count += 1
+        print('{{ accounts[0] }}', count, 'records')
       resultTemplate: |
-        {% for venue in accounts %}
-        {{ venue }} future_trade {{ constants[venue].trade_time }}
-        {{ venue }} funding      {{ constants[venue].funding_time }}
-
-        {% endfor %}
-    catalogue:
-      callTemplate: |
-        # pip install tribulnation-catalogue
-
-        from tribulnation.catalogue import Catalogue
-
-        catalogue = Catalogue.load()  # cached locally, no credentials needed
-        for venue, records in records_by_venue.items():
-          for record in records:
-            for obs in record.observations:
-              if obs.type == 'future_trade':
-                underlying = catalogue.perpetual_instruments[venue][obs.instrument]['base']
-                print(venue, 'trade  ', '->', underlying)
-              elif obs.type == 'funding':
-                asset_id = catalogue.asset_translations[venue][obs.asset]
-                print(venue, 'funding', '->', asset_id)
-      resultTemplate: |
-        {% for venue in accounts %}
-        {{ venue }} trade   -> {{ catalogue.perpetual_instruments[venue][constants[venue].trade_instrument]['base'] }}
-        {{ venue }} funding -> {{ catalogue.asset_translations[venue][constants[venue].funding_asset] }}
-        {% endfor %}
+        {{ accounts[0] }} {{ constants[accounts[0]].count }} records

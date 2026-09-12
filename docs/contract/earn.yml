@@ -1,82 +1,38 @@
-# Interface contract for EarnSDK. `instruments` is the only real method today —
-# `subscribe`/`redeem` were an earlier aspirational sketch and were dropped since they
-# don't exist on the real class; re-add them here once they're actually implemented.
-#
-# `example`/`catalogue` blocks are Jinja templates (sdk_dev.contract), not literal
-# Python — see market.yml's header for the full mechanism. This file's own example
-# genuinely loops `for venue, sdk in earn.all.items()`, matching `EarnSDK.load()`'s real
-# `.all` behavior (every selected venue plus its free defaults) — so unlike Market's
-# single-active-venue templates, this one loops `{% for venue in accounts %}` and its
-# call text needs no substitution at all (no per-venue literal in it to begin with).
-
+# Singleton examples: each script resolves only its rendered account.
 component:
   preamble: |
     from tribulnation.sdk import EarnSDK
     from dotenv import load_dotenv
 
     load_dotenv()
-
     earn = EarnSDK.load('sdk.toml')
   ref: tribulnation.sdk.earn.sdk:Earn
   title: Earn
   tagline: Yield-bearing instruments across venues, filterable by tag or asset.
-  note: "APR values and returned rows are illustrative, not live quotes or account-eligibility guarantees. Deribit reports trailing seven-day reward APRs rather than subscribable Earn products. See the support matrix for every supported venue."
-  # supportedVenues/defaultVenues: NOT declared here — computed by `sdk-dev docs sync`
-  # from every packages/impl/*/impl.toml's `[support.earn]` table. The wizard's
-  # representative examples are not the complete support matrix.
-  #
-  # No per-method `public` override needed here (unlike market.yml): instruments is the
-  # only method, and it's genuinely public for every venue that's a default at all.
+  note: "Counts are illustrative, not current availability, APRs or account-eligibility guarantees. Deribit reports trailing reward APRs, not subscribable products. The selected example reads only one configured account."
 
 methods:
   instruments:
+    venues:
+      deribit: Public trailing seven-day SMA APRs for discovered reward-bearing balances, not subscribable products.
+      kraken: Authenticated Earn strategies; published APR ranges are reduced to their midpoint.
+      kucoin: Savings, promotions, staking, KCS and ETH staking; structured dual investment is excluded.
     example:
-      accountVenues: [binance, mexc]
+      accountVenues: [binance]
       constants:
-        binance:
-          instruments:
-            - {asset: USDT, apr: '0.0432'}
-            - {asset: BTC, apr: '0.0085'}
-        mexc:
-          instruments:
-            - {asset: USDT, apr: '0.0310'}
-            - {asset: BTC, apr: '0.0062'}
-        bitget:
-          instruments:
-            - {asset: USDT, apr: '0.0290'}
-            - {asset: BTC, apr: '0.0071'}
-        deribit:
-          instruments:
-            - {asset: USDC, apr: '0.0250'}
+        binance: {count: 2}
+        bit2me: {count: 2}
+        bitget: {count: 2}
+        bybit: {count: 2}
+        coinbase: {count: 2}
+        deribit: {count: 2}
+        kraken: {count: 2}
+        kucoin: {count: 2}
+        mexc: {count: 2}
       callTemplate: |
-        instruments_by_venue = {}
-        for venue, sdk in earn.all.items():
-          async with sdk:
-            instruments = await sdk.instruments()
-          instruments_by_venue[venue] = instruments
-          for i in instruments[:2]:
-            print(venue, i.asset, f'{i.apr:.2%}')
+        sdk = earn.venue('{{ accounts[0] }}')
+        async with sdk:
+          instruments = await sdk.instruments()
+        print('{{ accounts[0] }}', len(instruments), 'instruments')
       resultTemplate: |
-        {% for venue in accounts %}
-        {% for i in constants[venue].instruments %}
-        {{ venue }} {{ i.asset }} {{ '%.2f'|format(i.apr|float * 100) }}%
-
-        {% endfor %}
-        {% endfor %}
-    catalogue:
-      callTemplate: |
-        # pip install tribulnation-catalogue
-
-        from tribulnation.catalogue import Catalogue
-
-        catalogue = Catalogue.load()  # cached locally, no credentials needed
-        for venue, instruments in instruments_by_venue.items():
-          for i in instruments[:2]:
-            asset_id = catalogue.asset_translations[venue][i.asset]
-            print(venue, asset_id, f'{i.apr:.2%}')
-      resultTemplate: |
-        {% for venue in accounts %}
-        {% for i in constants[venue].instruments %}
-        {{ venue }} {{ catalogue.asset_translations[venue][i.asset] }} {{ '%.2f'|format(i.apr|float * 100) }}%
-        {% endfor %}
-        {% endfor %}
+        {{ accounts[0] }} {{ constants[accounts[0]].count }} instruments
