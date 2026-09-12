@@ -2,7 +2,7 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: accepted
+1. Status: accepted; amended by [ADR 0014](0014-bit2me-native-ticker-limitation.md)
 2. Date: 2026-09-10
 3. Amends: ADRs 0003 and 0004; supersedes the two-sided coverage requirement.
 

@@ -10,7 +10,10 @@ the loop they first run on, and one `asyncio.run` per account trips over that.
 """
 
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
+import tomllib
 
+import pydantic
 import pytest
 
 from tribulnation.sdk import Context, NetworkError, RateLimited, Report, ReportSDK
@@ -25,7 +28,22 @@ HISTORY_WINDOW = timedelta(days=30)
 
 def load_sdk(config: pytest.Config) -> ReportSDK:
   """Build the report router; implementations discover their own history markets."""
-  return ReportSDK(accounts=load_accounts(config))
+  sdk = ReportSDK(accounts=load_accounts(config))
+  account_path = config.getoption('accounts_config')
+  if not isinstance(account_path, str):
+    raise ValueError('Report tests require an accounts configuration path')
+  path = Path(account_path).expanduser()
+  with path.open('rb') as source:
+    settings = tomllib.load(source).get('report', {})
+  if settings:
+    if set(settings) != {'dydx'}:
+      raise ValueError('Supported Report test configuration: report.dydx')
+    from tribulnation.dydx.report import DydxConfig
+
+    sdk.config['dydx'] = pydantic.TypeAdapter(DydxConfig).validate_python(
+      settings['dydx']
+    )
+  return sdk
 
 
 def pytest_generate_tests(metafunc: pytest.Metafunc):
