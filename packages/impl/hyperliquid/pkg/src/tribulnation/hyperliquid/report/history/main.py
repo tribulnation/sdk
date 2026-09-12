@@ -1,6 +1,13 @@
 """Hyperliquid reporting history."""
 
-from typing_extensions import TYPE_CHECKING, AsyncContextManager, Iterable, Sequence
+from typing_extensions import (
+  TYPE_CHECKING,
+  AsyncContextManager,
+  Iterable,
+  Sequence,
+  TypeVar,
+)
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 import asyncio
@@ -30,6 +37,7 @@ GENESIS_MS = 1672531200000
 """2023-01-01, safely before Hyperliquid mainnet launch."""
 
 SERVICE = 'hyperliquid'
+T = TypeVar('T')
 
 
 @dataclass
@@ -80,6 +88,12 @@ class History(_History):
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield self.info
 
+  @SDK.method
+  @wrap_exceptions
+  async def call(self, fetch: Callable[[], Awaitable[T]]) -> T:
+    """Retry individual reads through the caller's SDK context, not whole walks."""
+    return await fetch()
+
   async def resolve_assets(self) -> Assets:
     """Fetch and memoise the token index, needed to canonicalise asset ids."""
     if self.assets is None:
@@ -98,11 +112,13 @@ class History(_History):
     markets would otherwise fall through to the USDC default at every lookup,
     misattributing their PnL to an asset they never settled in.
     """
-    dexes = await self.info.perp_dexs()
+    dexes = await self.call(self.info.perp_dexs)
     out: dict[str, str] = {}
     for dex in dexes:
       name = dex and dex['name']
-      meta, _ = await self.info.perp_meta_and_asset_ctxs(dex=name or '')
+      meta, _ = await self.call(
+        lambda: self.info.perp_meta_and_asset_ctxs(dex=name or '')
+      )
       token = str(meta['collateralToken'])
       # Named dexes already qualify their universe entries (`flx:TSLA`); only the
       # main dex uses bare names (`BTC`). Prefixing the dex name again yields
@@ -126,11 +142,13 @@ class History(_History):
     async for page in self.info.user_fills_by_time_paged(
       user=self.address,
       start_time=self.since('fills'),
-    ):
+    ).via(self.call):
       fresh.extend(page)
     twap = [
       slice['fill']
-      for slice in await self.info.user_twap_slice_fills(user=self.address)
+      for slice in await self.call(
+        lambda: self.info.user_twap_slice_fills(user=self.address)
+      )
     ]
 
     if self.cache is None:
@@ -168,7 +186,7 @@ class History(_History):
     async for page in self.info.user_funding_paged(
       user=self.address,
       start_time=self.since('funding'),
-    ):
+    ).via(self.call):
       fresh.extend(page)
     entries = fresh
     if self.cache is not None:
@@ -191,7 +209,7 @@ class History(_History):
     async for page in self.info.user_non_funding_ledger_updates_paged(
       user=self.address,
       start_time=self.since('ledger'),
-    ):
+    ).via(self.call):
       fresh.extend(page)
     entries = fresh
     if self.cache is not None:
@@ -211,8 +229,8 @@ class History(_History):
     """Fetch staking rewards and delegation history."""
     id = source_id(SERVICE)
     rewards, entries = await asyncio.gather(
-      self.info.staking_rewards(user=self.address),
-      self.info.staking_history(user=self.address),
+      self.call(lambda: self.info.staking_rewards(user=self.address)),
+      self.call(lambda: self.info.staking_history(user=self.address)),
     )
     observations: list[Observation] = [*parse_rewards(rewards), *parse_history(entries)]
     return self.records(observations, start, end, id)

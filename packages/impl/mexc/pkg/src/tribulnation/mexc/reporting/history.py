@@ -10,6 +10,7 @@ window its own way and every row lands in its own record with an `ApiProvenance`
 from typing_extensions import AsyncIterator, Sequence
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
+from tribulnation.sdk import SDK
 
 from tribulnation.sdk.reporting import (
   ApiProvenance,
@@ -33,9 +34,8 @@ from tribulnation.mexc.core import Mixin, windows, wrap_exceptions
 SERVICE = 'mexc'
 """`ApiProvenance.service` for every record this module emits."""
 
-TRADES_WINDOW = timedelta(days=1)
-"""One `myTrades` call per symbol per day: the endpoint has no cursor, so a window
-must be narrow enough for `TRADES_LIMIT` fills to hold it."""
+TRADES_WINDOW = timedelta(days=30)
+"""Start with the documented month-wide window; split responses that hit the cap."""
 
 TRADES_LIMIT = 1000
 """The most fills one `myTrades` call answers, per MEXC's docs."""
@@ -181,17 +181,36 @@ async def spot_trades(
   """Yield one record per spot fill in the window, for every discovered symbol."""
   for symbol in symbols:
     info = await self.cached_spot_market(symbol)
-    for lower, upper in windows(start, end, TRADES_WINDOW):
-      fills = await self.client.spot.http.account.trades(
-        symbol=symbol,
-        start_time=lower,
-        end_time=upper,
-        limit=TRADES_LIMIT,
-        recv_window=self.recvWindow,
-      )
+    pending = list(reversed(list(windows(start, end, TRADES_WINDOW))))
+    while pending:
+      lower, upper = pending.pop()
+      fills = await spot_trade_window(self, symbol, lower, upper)
+      milliseconds = (upper - lower) // timedelta(milliseconds=1)
+      if len(fills) >= TRADES_LIMIT and milliseconds > 0:
+        middle = lower + timedelta(milliseconds=milliseconds // 2)
+        pending.extend(((middle + timedelta(milliseconds=1), upper), (lower, middle)))
+        continue
       for t in fills:
         trade = parse_spot_trade(t, base=info['baseAsset'], quote=info['quoteAsset'])
         yield record(trade, id=f'spot-trade-{symbol}-{trade.id}')
+
+
+@SDK.method
+@wrap_exceptions
+async def spot_trade_window(
+  self: Mixin,
+  symbol: str,
+  start: datetime,
+  end: datetime,
+) -> list[AccountTrade]:
+  """Retry one read window without restarting an already consumed history sweep."""
+  return await self.client.spot.http.account.trades(
+    symbol=symbol,
+    start_time=start,
+    end_time=end,
+    limit=TRADES_LIMIT,
+    recv_window=self.recvWindow,
+  )
 
 
 @wrap_exceptions
