@@ -20,10 +20,10 @@ component:
   ref: tribulnation.sdk.earn.sdk:Earn
   title: Earn
   tagline: Yield-bearing instruments across venues, filterable by tag or asset.
+  note: "APR values and returned rows are illustrative, not live quotes or account-eligibility guarantees. Deribit reports trailing seven-day reward APRs rather than subscribable Earn products. See the support matrix for every supported venue."
   # supportedVenues/defaultVenues: NOT declared here — computed by `sdk-dev docs sync`
-  # from every packages/impl/*/impl.toml's `[support.earn]` table. EarnSDK's router also
-  # wires 'bit2me' (with a public default account), but bit2me/impl.toml deliberately
-  # doesn't declare `[support.earn]` yet — see that file's comment for why.
+  # from every packages/impl/*/impl.toml's `[support.earn]` table. The wizard's
+  # representative examples are not the complete support matrix.
   #
   # No per-method `public` override needed here (unlike market.yml): instruments is the
   # only method, and it's genuinely public for every venue that's a default at all.
@@ -45,10 +45,14 @@ methods:
           instruments:
             - {asset: USDT, apr: '0.0290'}
             - {asset: BTC, apr: '0.0071'}
+        deribit:
+          instruments:
+            - {asset: USDC, apr: '0.0250'}
       callTemplate: |
         instruments_by_venue = {}
         for venue, sdk in earn.all.items():
-          instruments = await sdk.instruments(tags=['flexible'])
+          async with sdk:
+            instruments = await sdk.instruments()
           instruments_by_venue[venue] = instruments
           for i in instruments[:2]:
             print(venue, i.asset, f'{i.apr:.2%}')

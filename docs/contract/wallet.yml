@@ -16,10 +16,10 @@ component:
   ref: tribulnation.sdk.wallet.sdk:Wallet
   title: Wallet
   tagline: Deposit and withdrawal details — networks, fees, minimums.
+  note: "Fees and confirmation counts are illustrative, not current transaction quotes. Native network IDs differ by venue. Kraken implements withdrawal methods only; the support matrix lists all supported implementations."
   # supportedVenues/defaultVenues: NOT declared here — computed by `sdk-dev docs sync`
-  # from every packages/impl/*/impl.toml's `[support.wallet]` table. WalletSDK.
-  # DEFAULT_ACCOUNTS is empty for every venue, so every impl.toml marks `auth = true`
-  # here — every venue always needs a real toml entry.
+  # from every packages/impl/*/impl.toml's `[support.wallet]` table. Some venue
+  # metadata supports public=True without an automatically installed default.
 
 methods:
   deposit_methods:
@@ -40,10 +40,14 @@ methods:
           methods:
             - {network: TRC20, min_confirmations: 1}
             - {network: ERC20, min_confirmations: 8}
+        kucoin:
+          methods:
+            - {network: eth, min_confirmations: 12}
       callTemplate: |
         methods_by_venue = {}
         for venue, sdk in wallet.all.items():
-          methods_by_venue[venue] = await sdk.deposit_methods(assets=['USDT'])
+          async with sdk:
+            methods_by_venue[venue] = await sdk.deposit_methods(assets=['USDT'])
       resultTemplate: |
         {
         {% for venue in accounts %}
@@ -81,10 +85,14 @@ methods:
           methods:
             - {network: TRC20, fee: '1.0'}
             - {network: ERC20, fee: '6.0'}
+        kraken:
+          methods:
+            - {network: Ethereum, fee: '5.0'}
       callTemplate: |
         methods_by_venue = {}
         for venue, sdk in wallet.all.items():
-          methods_by_venue[venue] = await sdk.withdrawal_methods(assets=['USDT'])
+          async with sdk:
+            methods_by_venue[venue] = await sdk.withdrawal_methods(assets=['USDT'])
       resultTemplate: |
         {
         {% for venue in accounts %}

@@ -6,14 +6,8 @@
 # ReportSDK owns network clients, unlike Earn/Wallet), so their call text needs no
 # substitution at all.
 #
-# `example.constants` is kept to `hyperliquid` alone for now (not dydx/ethereum, despite both
-# being real, credential-only `[support.report]` venues per their own impl.toml):
-# `ReportSDK.load()` only populates `accounts`, not `providers`/`config`, so ethereum
-# (which needs a `ProvidersConfig`) can't be fully configured through sdk.toml alone —
-# that's a real constraint, unrelated to this file's own templating. dydx has no such
-# constraint and could gain its own `constants` entry later; it's left out here only because
-# its own raw balance/position-keying convention hasn't been verified against source the
-# way hyperliquid's was (see `snapshot`'s own comment) — better to omit than guess.
+# Examples use representative perpetual accounts, not the complete Report support
+# matrix. CEX spot-only reports need not emit perpetual trades or funding records.
 
 component:
   preamble: |
@@ -26,11 +20,12 @@ component:
   ref: tribulnation.sdk.reporting.sdk:Report
   title: Report
   tagline: Historical transactions and current balances/positions, with provenance.
+  note: "Balances and history below are illustrative. Returned subaccounts and observation types vary by implementation: Binance and KuCoin reports are spot-side only. API history retention varies; dYdX full history requires an archive provider. See the support matrix for all Report implementations."
   # supportedVenues/defaultVenues: NOT declared here — computed by `sdk-dev docs sync`
   # from every packages/impl/*/impl.toml's `[support.report]` table. ReportSDK has no
   # DEFAULT_ACCOUNTS concept at all, so every impl.toml marks `auth = true` here — every
-  # venue always needs a real toml entry. bitget/impl.toml deliberately doesn't declare
-  # `[support.report]` (real module, not wired into the router — see that file).
+  # venue always needs a real toml entry. Public mainnet addresses suffice for
+  # Hyperliquid and dYdX; exchange account reports require their API credentials.
 
 methods:
   snapshot:
@@ -48,12 +43,18 @@ methods:
           position_coin: BTC
           position_size: '0.5'
           position_avg_price: '58230.10'
+        dydx:
+          balance_asset: USDC
+          balance: '12045.30'
+          position_coin: BTC-USD
+          position_size: '0.5'
+          position_avg_price: '58230.10'
       callTemplate: |
         snapshots_by_venue = {}
         for venue, sdk in report.all.items():
           async with sdk:
             result = await sdk.snapshot()
-          snapshots_by_venue[venue] = result.snapshot.subaccounts[0]
+          snapshots_by_venue[venue] = result.snapshot
           print(venue, snapshots_by_venue[venue].balances, snapshots_by_venue[venue].positions)
       resultTemplate: |
         {% for venue in accounts %}
@@ -91,6 +92,11 @@ methods:
           funding_time: '2025-01-03 16:00:00+00:00'
           trade_instrument: BTC
           funding_asset: '0'
+        dydx:
+          trade_time: '2025-01-03 14:22:10+00:00'
+          funding_time: '2025-01-03 16:00:00+00:00'
+          trade_instrument: BTC-USD
+          funding_asset: USDC
       callTemplate: |
         records_by_venue = {}
         for venue, sdk in report.all.items():
