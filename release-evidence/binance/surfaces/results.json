@@ -1,0 +1,341 @@
+{
+  "payload": {
+    "account_venue": "binance",
+    "bitget_uta": null,
+    "checks": [
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "wallet.test_deposit_methods_can_be_fetched[null, null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "wallet.test_deposit_methods_not_empty[null, null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "wallet.test_withdrawal_methods_can_be_fetched[null, null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "wallet.test_withdrawal_methods_not_empty[null, null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "earn.test_instruments_can_be_fetched[null, null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "earn.test_instruments_not_empty[null, null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "report.test_snapshot_can_be_fetched[null, null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "report.test_snapshot_time_is_tz_aware[null, null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "report.test_snapshot_balances_are_finite_decimals[null, null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "report.test_history_can_be_fetched[null, null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "report.test_history_times_are_tz_aware_and_within_bounds[null, null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "report.test_history_provenance_is_valid[null, null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "not_applicable",
+        "failed": 0,
+        "id": "report.test_mexc_history_sources[null, null]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_candle_values_are_decimals_and_ordered[\"spot:BTCUSDT\", null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_candles_are_unique_aligned_and_bounded[\"spot:BTCUSDT\", null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_candles_can_be_fetched[\"spot:BTCUSDT\", null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_window_straddling_two_pages_respects_contract[\"spot:BTCUSDT\", null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"spot:BTCUSDT\", \"exchanges\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"spot:BTCUSDT\", \"markets\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"spot:BTCUSDT\", \"depth\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"spot:BTCUSDT\", \"depth_stream\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"spot:BTCUSDT\", \"rules\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"spot:BTCUSDT\", \"tickers\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "spot_only",
+        "failed": 0,
+        "id": "market.test_public_read[\"spot:BTCUSDT\", \"index\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "spot_only",
+        "failed": 0,
+        "id": "market.test_public_read[\"spot:BTCUSDT\", \"next_funding\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "spot_only",
+        "failed": 0,
+        "id": "market.test_public_read[\"spot:BTCUSDT\", \"funding_rates\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "spot_only",
+        "failed": 0,
+        "id": "market.test_public_read[\"spot:BTCUSDT\", \"perp_stats\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_candle_values_are_decimals_and_ordered[\"usdm:BTCUSDT\", null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_candles_are_unique_aligned_and_bounded[\"usdm:BTCUSDT\", null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_candles_can_be_fetched[\"usdm:BTCUSDT\", null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_window_straddling_two_pages_respects_contract[\"usdm:BTCUSDT\", null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"usdm:BTCUSDT\", \"exchanges\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"usdm:BTCUSDT\", \"markets\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"usdm:BTCUSDT\", \"depth\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"usdm:BTCUSDT\", \"depth_stream\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"usdm:BTCUSDT\", \"rules\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"usdm:BTCUSDT\", \"tickers\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"usdm:BTCUSDT\", \"index\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"usdm:BTCUSDT\", \"next_funding\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"usdm:BTCUSDT\", \"funding_rates\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"usdm:BTCUSDT\", \"perp_stats\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      }
+    ],
+    "completed": true,
+    "private_account_venue": null,
+    "scope": "surfaces",
+    "venue": "binance",
+    "version": 3
+  }
+}
