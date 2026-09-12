@@ -298,9 +298,8 @@ def report(client: Any, **overrides: Any) -> Report:
   return Report(client=client, streams={}, cache=cache, **overrides)
 
 
-async def test_spot_fills_are_swept_per_symbol_in_daily_windows():
-  """Three daily slices tile a 3-day window; each is one call per symbol, and the base
-  and quote come from the cached exchange info."""
+async def test_sparse_spot_history_uses_one_window_per_symbol():
+  """Sparse history needs one query, with asset identities from exchange info."""
   account = FakeSpotAccount()
   client = SimpleNamespace(spot=SimpleNamespace(http=SimpleNamespace(account=account)))
   start = datetime(2025, 3, 1, tzinfo=UTC)
@@ -308,13 +307,67 @@ async def test_spot_fills_are_swept_per_symbol_in_daily_windows():
   records = [
     r async for r in history.spot_trades(report(client), ['BTCUSDT'], start, end)
   ]
-  assert [c[0] for c in account.calls] == ['BTCUSDT'] * 3
+  assert [c[0] for c in account.calls] == ['BTCUSDT']
   assert account.calls[0][1] == start and account.calls[-1][2] == end
-  assert len(records) == 3
+  assert len(records) == 1
   first = records[0].observations[0]
   assert isinstance(first, SpotTrade) and (first.base, first.quote) == ('BTC', 'USDT')
   assert records[0].provenance['id'] == 'spot-trade-BTCUSDT-1'
   assert records[0].provenance['source'] == 'api'
+
+
+async def test_capped_spot_windows_split_without_duplicates(
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """A capped parent is replaced by adjacent inclusive millisecond subwindows."""
+  monkeypatch.setattr(history, 'TRADES_LIMIT', 2)
+  start = datetime(2025, 3, 1, tzinfo=UTC)
+  end = start + timedelta(milliseconds=7)
+  rows = [
+    trade(id=str(i), time=ms(start + timedelta(milliseconds=i))) for i in (0, 3, 4, 7)
+  ]
+
+  async def fetch(**kwargs: Any) -> list[AccountTrade]:
+    """Simulate an inclusive upstream time query capped at two rows."""
+    return [r for r in rows if kwargs['start_time'] <= r['time'] <= kwargs['end_time']][
+      :2
+    ]
+
+  account = SimpleNamespace(trades=AsyncMock(side_effect=fetch))
+  client = SimpleNamespace(spot=SimpleNamespace(http=SimpleNamespace(account=account)))
+  records = [
+    r async for r in history.spot_trades(report(client), ['BTCUSDT'], start, end)
+  ]
+  assert [r.observations[0].id for r in records] == ['0', '3', '4', '7']
+  assert account.trades.await_count == 7
+
+
+async def test_saturated_single_millisecond_terminates(monkeypatch: pytest.MonkeyPatch):
+  """An indivisible cap stays best-effort instead of recursing indefinitely."""
+  monkeypatch.setattr(history, 'TRADES_LIMIT', 1)
+  start = datetime(2025, 3, 1, tzinfo=UTC)
+  account = FakeSpotAccount()
+  client = SimpleNamespace(spot=SimpleNamespace(http=SimpleNamespace(account=account)))
+  records = [
+    r async for r in history.spot_trades(report(client), ['BTCUSDT'], start, start)
+  ]
+  assert len(records) == len(account.calls) == 1
+
+
+async def test_spot_window_retries_without_restarting_sweep():
+  """A transient read failure repeats only its current request."""
+  from tribulnation.sdk import Context, RateLimited
+  from typed_core.exceptions import RateLimited as TypedRateLimited
+
+  start = datetime(2025, 3, 1, tzinfo=UTC)
+  account = SimpleNamespace(trades=AsyncMock(side_effect=[TypedRateLimited(429), []]))
+  client = SimpleNamespace(spot=SimpleNamespace(http=SimpleNamespace(account=account)))
+  with Context().retried(RateLimited, max_retries=1).use():
+    assert [
+      r async for r in history.spot_trades(report(client), ['BTCUSDT'], start, start)
+    ] == []
+  assert account.trades.await_count == 2
+  assert account.trades.await_args_list[0] == account.trades.await_args_list[1]
 
 
 async def test_funding_is_windowed_client_side_across_every_page():
