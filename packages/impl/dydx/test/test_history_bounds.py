@@ -149,6 +149,39 @@ def test_chain_resolves_inclusive_time_window_and_reuses_cache():
   assert comet.block_calls[len(first_calls) :] == [16]
 
 
+async def test_block_times_share_the_chain_request_limit():
+  """Parallel timestamp parsing cannot bypass the existing four-request bound."""
+
+  class SlowComet(FakeComet):
+    """Track concurrent public reads while yielding to all competing tasks."""
+
+    active = 0
+    peak = 0
+
+    async def block(self, height: int | None = None) -> FakeBlockResponse:
+      """Keep every requested height and expose concurrent network work."""
+      self.active += 1
+      self.peak = max(self.peak, self.active)
+      try:
+        await asyncio.sleep(0.001)
+        return await super().block(height)
+      finally:
+        self.active -= 1
+
+  comet = SlowComet()
+  history = chain_history(comet)
+  timestamps, _ = await asyncio.gather(
+    asyncio.gather(*(history.block_time(height) for height in range(1, 21))),
+    asyncio.gather(*(history.call(lambda: comet.block()) for _ in range(4))),
+  )
+  assert timestamps == [BASE_TIME + timedelta(minutes=h) for h in range(1, 21)]
+  assert len(comet.block_calls) == 24
+  assert comet.peak == 4
+  assert comet.active == 0
+  assert await history.block_time(1) == BASE_TIME + timedelta(minutes=1)
+  assert len(comet.block_calls) == 24
+
+
 def test_chain_resolves_open_time_bounds_to_genesis_and_latest():
   """Open datetime bounds resolve to concrete chain heights."""
   comet = FakeComet()

@@ -68,6 +68,32 @@ def test_roundtrip_and_external_pins(candidate: tuple[Path, Path], tmp_path: Pat
   assert (output / 'dependency-pins.txt').read_text() == 'example-package==1.2.3\n'
 
 
+def test_summary_keeps_known_limitations_visible(
+  candidate: tuple[Path, Path], tmp_path: Path
+):
+  """Release eligibility must not present waived quote discrepancies as passes."""
+  root, catalogue = candidate
+  snapshot = evidence.capture(root, 'binance', catalogue).model_copy(
+    update={'venue': 'bit2me'}
+  )
+  now = datetime.now(timezone.utc)
+  output = tmp_path / 'limited-report'
+  evidence.write_report(
+    output,
+    before=snapshot,
+    after=snapshot,
+    payload={
+      'venue': 'bit2me',
+      'checks': [{'status': 'limitation', 'code': 'native_ticker_quotes'}],
+    },
+    started=now - timedelta(seconds=1),
+    finished=now,
+  )
+  summary = (output / 'summary.md').read_text()
+  assert '1 quote comparisons did not pass' in summary
+  assert 'ADR 0014' in summary
+
+
 @pytest.mark.parametrize(
   'filename', ['results.json', 'summary.md', 'dependency-pins.txt']
 )
