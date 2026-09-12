@@ -29,6 +29,16 @@ Bit2Me splits balances across three sub-products with no shared ledger — Tradi
 Earn, and Wallet pockets — so `Report.snapshot()` returns one subaccount per compartment
 rather than a single merged balance.
 
+## Native ticker quotes
+
+`tickers()` preserves Bit2Me's native values. Its bid/ask can be stale or zero even
+when the order book is live, including when requesting an individual market.
+Do not treat those values as a reliable current executable spread; explicitly
+request the market's `depth()` when current book quotes are needed. The SDK does
+not replace ticker quotes with depth or add book requests to bulk ticker reads.
+
+## Withdrawal quotes
+
 Withdrawal fees are only ever quoted, never published: Bit2Me has no fee schedule, and
 `POST /v1/wallet/transaction/proforma` prices one withdrawal to one destination. So
 `Wallet` enumerates every asset and network unconditionally, and fills in fees for the
