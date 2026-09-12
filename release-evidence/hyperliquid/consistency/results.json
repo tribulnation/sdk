@@ -1,0 +1,4223 @@
+{
+  "payload": {
+    "account_id": "hyperliquid",
+    "checks": [
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AAVE\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ACE\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ADA\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AERO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ALGO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"APE\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"APT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ARB\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ASTER\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ATOM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AVAX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AVNT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AXS\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BCH\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BIO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BLAST\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BLUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BNB\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BSV\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CAKE\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CELO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"COMP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CRV\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"DOGE\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"DOT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"DYDX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"DYM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"EIGEN\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ENA\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ENS\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ETC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ETH\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ETHFI\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"FARTCOIN\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"FET\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"FIL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"GALA\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"GMT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"GMX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"GRASS\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"HBAR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"HYPE\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ICP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"IMX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"INJ\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"IO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"IOTA\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"JTO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"JUP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"KAS\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LAYER\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LDO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LINEA\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LINK\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LIT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MNT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MON\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MORPHO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"NEAR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"NEO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"NIL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"NOT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ONDO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"OP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ORDI\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PAXG\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PENDLE\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PENGU\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PNUT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"POL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PUMP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PURR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PYTH\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"RENDER\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"REZ\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"RUNE\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"S\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SAND\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SEI\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SKY\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SNX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SOL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"STRK\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"STX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SUI\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SYRUP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TAO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TIA\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TON\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TRUMP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TRX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"UNI\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"USUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"VIRTUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"VVV\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"W\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"WIF\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"WLD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"WLFI\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"XLM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"XMR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"XPL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"XRP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ZEC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ZK\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ZRO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"kBONK\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"kFLOKI\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"kPEPE\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"kSHIB\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:CL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:SILVER\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"HYPE/USDC:107\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"HYPE/USDE:255\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"HYPE/USDT0:207\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"MON/USDC:129\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"PEPE/USDC:11\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"PURR/USDC:0\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"UBTC/USDC:142\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"UENA/USDC:206\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"UETH/USDC:151\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"UFART/USDC:162\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"USDE/USDC:150\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"USDT0/USDC:166\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"UXPL/USDC:210\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"XAUT0/USDC:182\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"XAUT0/USDT0:209\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AAVE\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ACE\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ADA\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AERO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ALGO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"APE\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"APT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ARB\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ASTER\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ATOM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AVAX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AVNT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AXS\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BCH\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BIO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BLAST\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BLUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BNB\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BSV\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CAKE\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CELO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"COMP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CRV\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"DOGE\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"DOT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"DYDX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"DYM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"EIGEN\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ENA\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ENS\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ETC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ETH\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ETHFI\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"FARTCOIN\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"FET\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"FIL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"GALA\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"GMT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"GMX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"GRASS\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"HBAR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"HYPE\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ICP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"IMX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"INJ\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"IO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"IOTA\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"JTO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"JUP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"KAS\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LAYER\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LDO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LINEA\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LINK\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LIT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MNT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MON\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MORPHO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"NEAR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"NEO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"NIL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"NOT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ONDO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"OP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ORDI\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PAXG\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PENDLE\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PENGU\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PNUT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"POL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PUMP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PURR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PYTH\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"RENDER\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"REZ\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"RUNE\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"S\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SAND\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SEI\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SKY\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SNX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SOL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"STRK\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"STX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SUI\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SYRUP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TAO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TIA\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TON\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TRUMP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TRX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"UNI\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"USUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"VIRTUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"VVV\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"W\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"WIF\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"WLD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"WLFI\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"XLM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"XMR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"XPL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"XRP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ZEC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ZK\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ZRO\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"kBONK\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"kFLOKI\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"kPEPE\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"kSHIB\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:CL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:SILVER\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"HYPE/USDC:107\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"HYPE/USDE:255\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"HYPE/USDT0:207\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"MON/USDC:129\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"PEPE/USDC:11\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"PURR/USDC:0\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"UBTC/USDC:142\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"UENA/USDC:206\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"UETH/USDC:151\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"UFART/USDC:162\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"USDE/USDC:150\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"USDT0/USDC:166\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"UXPL/USDC:210\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"XAUT0/USDC:182\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"XAUT0/USDT0:209\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"discovery\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"exchange_identity\",\"\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"exchange_identity\",\"abcd\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"exchange_identity\",\"cash\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"exchange_identity\",\"flx\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"exchange_identity\",\"hyna\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"exchange_identity\",\"io\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"exchange_identity\",\"km\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"exchange_identity\",\"mkts\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"exchange_identity\",\"para\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"exchange_identity\",\"spot\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"exchange_identity\",\"vntl\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"exchange_identity\",\"xyz\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"abcd\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"cash\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"flx\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"hyna\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"io\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"km\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"mkts\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"para\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"spot\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"vntl\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"xyz\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"abcd\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"abcd\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"abcd\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"cash\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"cash\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"cash\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"flx\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"flx\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"flx\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"hyna\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"hyna\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"hyna\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"io\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"io\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"io\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"km\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"km\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"km\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"mkts\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"mkts\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"mkts\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"para\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"para\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"para\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"vntl\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"vntl\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"vntl\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"xyz\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"xyz\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"xyz\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"setup\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"\",\"0G\"]",
+        "quotes": [
+          {
+            "after_ask": "0.19008",
+            "after_bid": "0.19001",
+            "ask": "0.19008",
+            "attempt": 1,
+            "before_ask": "0.19017",
+            "before_bid": "0.19003",
+            "bid": "0.18999",
+            "elapsed_seconds": 2.7760840770006325,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"\",\"2Z\"]",
+        "quotes": [
+          {
+            "after_ask": "0.047199",
+            "after_bid": "0.047192",
+            "ask": "0.047201",
+            "attempt": 1,
+            "before_ask": "0.047202",
+            "before_bid": "0.047201",
+            "bid": "0.04719",
+            "elapsed_seconds": 2.394587785999647,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"\",\"AAVE\"]",
+        "quotes": [
+          {
+            "after_ask": "126.54",
+            "after_bid": "126.52",
+            "ask": "126.54",
+            "attempt": 1,
+            "before_ask": "126.54",
+            "before_bid": "126.52",
+            "bid": "126.52",
+            "elapsed_seconds": 2.677691449000122,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"\",\"BTC\"]",
+        "quotes": [
+          {
+            "after_ask": "77320.0",
+            "after_bid": "77319.0",
+            "ask": "77320.0",
+            "attempt": 1,
+            "before_ask": "77320.0",
+            "before_bid": "77319.0",
+            "bid": "77319.0",
+            "elapsed_seconds": 5.119407657999545,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"abcd\",\"abcd:USA500\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 3.763310227999682,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.840996995999376,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 3.4407092150004246,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"cash\",\"cash:AMZN\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 3.2580205519998344,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 5.284138628999244,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 3.499192850000327,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"cash\",\"cash:BTC\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.303021646000161,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.3636023040007785,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.561484111000027,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"cash\",\"cash:CAR\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.7894617689998995,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 3.469820631999937,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.914635029999772,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"flx\",\"flx:BTC\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.8233635639999193,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.780938084000809,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.4459010540003874,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"flx\",\"flx:COIN\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.0142525709998154,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 3.0509993790001317,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 1.8898631479996766,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"flx\",\"flx:COPPER\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.0698924690004787,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.3363659159995223,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.602100498999789,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"hyna\",\"hyna:1000PEPE\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 3.2008732799995414,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.001668189999691,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 1.9079749279999305,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"hyna\",\"hyna:ADA\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.3195068160002847,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.981476909999401,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.6542344730005425,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"hyna\",\"hyna:BASED\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.1905719189999218,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.6034492010003305,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 3.1095050679996348,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"io\",\"io:ANTH\"]",
+        "quotes": [
+          {
+            "after_ask": "2173.0",
+            "after_bid": "2172.7",
+            "ask": "2173.0",
+            "attempt": 1,
+            "before_ask": "2173.0",
+            "before_bid": "2172.7",
+            "bid": "2172.7",
+            "elapsed_seconds": 2.0229775150000933,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"io\",\"io:EWY\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 3.029455640999913,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.254884635000053,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.7566551400004755,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"io\",\"io:GPRO\"]",
+        "quotes": [
+          {
+            "after_ask": "1.3746",
+            "after_bid": "1.3733",
+            "ask": "1.3746",
+            "attempt": 1,
+            "before_ask": "1.3746",
+            "before_bid": "1.3733",
+            "bid": "1.3733",
+            "elapsed_seconds": 2.22022383500007,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"km\",\"km:AAPL\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.1767579469997145,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.170249019000039,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.673116508000021,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"km\",\"km:BABA\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 1.9907293060005031,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.2085066359995835,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.667784524000126,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"km\",\"km:BMNR\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 1.8979596919998585,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.1598508950000905,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 1.9739728459999242,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"mkts\",\"mkts:AAPL\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.814460180000424,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 4.036937027000022,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 3.7660139849995176,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"mkts\",\"mkts:BABA\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.328266194999742,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.795083158000125,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.4913902030002646,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"mkts\",\"mkts:BMNR\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.724399970000377,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 4.07762699199975,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 3.2390955280006892,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"para\",\"para:10Y\"]",
+        "quotes": [
+          {
+            "after_ask": "4.986",
+            "after_bid": "4.9831",
+            "ask": "4.986",
+            "attempt": 1,
+            "before_ask": "4.986",
+            "before_bid": "4.9831",
+            "bid": "4.9831",
+            "elapsed_seconds": 4.1636311519996525,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"para\",\"para:2Y\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.963477287000387,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.7879253979999703,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.9470353630003956,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"para\",\"para:30Y\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.5854880639999465,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.7267015690003973,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.0543544749998546,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"spot\",\"AAPL/USDC:268\"]",
+        "quotes": [
+          {
+            "after_ask": "345.7",
+            "after_bid": "295.68",
+            "ask": "345.7",
+            "attempt": 1,
+            "before_ask": "345.7",
+            "before_bid": "295.68",
+            "bid": "295.68",
+            "elapsed_seconds": 2.5898181379998277,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"spot\",\"AAPLX/USDC:713\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": "10.0",
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": "10.0",
+            "bid": "10.0",
+            "elapsed_seconds": 3.315408008999839,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"spot\",\"AAVE0/USDC:227\"]",
+        "quotes": [
+          {
+            "after_ask": "126.92",
+            "after_bid": "126.3",
+            "ask": "126.92",
+            "attempt": 1,
+            "before_ask": "126.92",
+            "before_bid": "126.3",
+            "bid": "126.3",
+            "elapsed_seconds": 3.6888711250003325,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"spot\",\"UBTC/USDC:142\"]",
+        "quotes": [
+          {
+            "after_ask": "77350.0",
+            "after_bid": "77349.0",
+            "ask": "77352.0",
+            "attempt": 1,
+            "before_ask": "77355.0",
+            "before_bid": "77354.0",
+            "bid": "77348.0",
+            "elapsed_seconds": 3.6950115570007256,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"vntl\",\"vntl:ANTHROPIC\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 3.0330601229998138,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 3.740986320999582,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 1.2954855690004479,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"vntl\",\"vntl:BIOTECH\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.415251489000184,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.2575521409999055,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.293759401999523,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"vntl\",\"vntl:DEFENSE\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 1.88812831299947,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.555302220000158,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.3259992319999583,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"xyz\",\"xyz:AAOI\"]",
+        "quotes": [
+          {
+            "after_ask": "104.77",
+            "after_bid": "104.74",
+            "ask": "104.77",
+            "attempt": 1,
+            "before_ask": "104.77",
+            "before_bid": "104.74",
+            "bid": "104.74",
+            "elapsed_seconds": 2.714836344000105,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"xyz\",\"xyz:AAPL\"]",
+        "quotes": [
+          {
+            "after_ask": "333.17",
+            "after_bid": "333.15",
+            "ask": "333.17",
+            "attempt": 1,
+            "before_ask": "333.17",
+            "before_bid": "333.15",
+            "bid": "333.15",
+            "elapsed_seconds": 2.4326266920006674,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"xyz\",\"xyz:ALUMINIUM\"]",
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 3.0512898420001875,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.8721108250001635,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 2.5092391999996835,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "unavailable"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"abcd\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"abcd\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"abcd\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"cash\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"cash\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"cash\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"flx\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"flx\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"flx\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"hyna\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"hyna\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"hyna\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"io\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"io\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"io\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"km\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"km\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"km\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"mkts\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"mkts\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"mkts\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"para\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"para\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"para\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"spot\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"spot\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"spot\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"vntl\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"vntl\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"vntl\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"xyz\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"xyz\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"xyz\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      }
+    ],
+    "discovery": [
+      {
+        "exchange": "spot",
+        "kind": "spot",
+        "markets": [
+          "PURR/USDC:0",
+          "HFUN/USDC:1",
+          "LICK/USDC:2",
+          "MANLET/USDC:3",
+          "JEFF/USDC:4",
+          "SIX/USDC:5",
+          "WAGMI/USDC:6",
+          "CAPPY/USDC:7",
+          "POINTS/USDC:8",
+          "TRUMP/USDC:9",
+          "GMEOW/USDC:10",
+          "PEPE/USDC:11",
+          "XULIAN/USDC:12",
+          "RUG/USDC:13",
+          "ILIENS/USDC:14",
+          "FUCKY/USDC:15",
+          "CZ/USDC:16",
+          "BAGS/USDC:17",
+          "ANSEM/USDC:18",
+          "TATE/USDC:19",
+          "PUMP/USDC:20",
+          "KOBE/USDC:21",
+          "HAPPY/USDC:22",
+          "SCHIZO/USDC:23",
+          "SELL/USDC:24",
+          "BIGBEN/USDC:25",
+          "CATNIP/USDC:26",
+          "HBOOST/USDC:27",
+          "SUCKY/USDC:28",
+          "GUP/USDC:29",
+          "FARMED/USDC:30",
+          "GPT/USDC:31",
+          "PURRPS/USDC:32",
+          "BID/USDC:33",
+          "HODL/USDC:34",
+          "VEGAS/USDC:35",
+          "ASI/USDC:36",
+          "VAPOR/USDC:37",
+          "PANDA/USDC:38",
+          "PILL/USDC:39",
+          "ADHD/USDC:40",
+          "FUN/USDC:41",
+          "LADY/USDC:42",
+          "MOG/USDC:43",
+          "HPEPE/USDC:44",
+          "JEET/USDC:45",
+          "DROP/USDC:46",
+          "MBAPPE/USDC:47",
+          "TEST/USDC:48",
+          "RAGE/USDC:49",
+          "FRAC/USDC:50",
+          "ATEHUN/USDC:51",
+          "COZY/USDC:52",
+          "ARI/USDC:53",
+          "WASH/USDC:54",
+          "ANT/USDC:55",
+          "NFT/USDC:56",
+          "RICH/USDC:57",
+          "LORA/USDC:58",
+          "CATBAL/USDC:59",
+          "TJIF/USDC:60",
+          "GUESS/USDC:61",
+          "MAXI/USDC:62",
+          "NMTD/USDC:63",
+          "HPUMP/USDC:64",
+          "PIGEON/USDC:65",
+          "RISE/USDC:66",
+          "CINDY/USDC:67",
+          "CHINA/USDC:68",
+          "STACK/USDC:69",
+          "FRIED/USDC:70",
+          "NOCEX/USDC:72",
+          "RANK/USDC:73",
+          "OMNIX/USDC:74",
+          "RIP/USDC:75",
+          "G/USDC:76",
+          "BOZO/USDC:77",
+          "SPH/USDC:78",
+          "SHOE/USDC:79",
+          "MONAD/USDC:80",
+          "HOPE/USDC:81",
+          "BUSSY/USDC:82",
+          "FATCAT/USDC:83",
+          "SHREK/USDC:84",
+          "PIP/USDC:85",
+          "LQNA/USDC:86",
+          "NASDAQ/USDC:87",
+          "YEETI/USDC:88",
+          "SYLVI/USDC:89",
+          "FEIT/USDC:90",
+          "FRUDO/USDC:91",
+          "VIZN/USDC:92",
+          "STRICT/USDC:93",
+          "AUTIST/USDC:94",
+          "MAGA/USDC:95",
+          "HGOD/USDC:96",
+          "LIQUID/USDC:97",
+          "EARTH/USDC:99",
+          "UP/USDC:100",
+          "NIGGO/USDC:101",
+          "HOP/USDC:102",
+          "LUCKY/USDC:103",
+          "COPE/USDC:104",
+          "HPYH/USDC:105",
+          "YAP/USDC:106",
+          "HYPE/USDC:107",
+          "CHEF/USDC:108",
+          "WOW/USDC:109",
+          "STEEL/USDC:110",
+          "RETARD/USDC:111",
+          "MEOW/USDC:112",
+          "NEIRO/USDC:113",
+          "PEAR/USDC:114",
+          "HOLD/USDC:115",
+          "MUNCH/USDC:116",
+          "BERA/USDC:117",
+          "GENESY/USDC:118",
+          "BUBZ/USDC:119",
+          "PICKL/USDC:120",
+          "SHEEP/USDC:121",
+          "LAUNCH/USDC:122",
+          "FARM/USDC:123",
+          "FLASK/USDC:124",
+          "VAULT/USDC:125",
+          "CAT/USDC:126",
+          "HYENA/USDC:127",
+          "DEPIN/USDC:128",
+          "MON/USDC:129",
+          "BEATS/USDC:130",
+          "ORA/USDC:131",
+          "LIQD/USDC:132",
+          "H/USDC:133",
+          "STAR/USDC:134",
+          "SENT/USDC:135",
+          "SOLV/USDC:136",
+          "FLY/USDC:137",
+          "TIME/USDC:138",
+          "SOVRN/USDC:139",
+          "HWTR/USDC:140",
+          "GOD/USDC:141",
+          "UBTC/USDC:142",
+          "HEAD/USDC:143",
+          "NEKO/USDC:144",
+          "VORTX/USDC:145",
+          "DEFIN/USDC:146",
+          "JPEG/USDC:147",
+          "WHYPI/USDC:148",
+          "USDE/USDC:150",
+          "UETH/USDC:151",
+          "USDXL/USDC:152",
+          "FEUSD/USDC:153",
+          "QUANT/USDC:155",
+          "USOL/USDC:156",
+          "RAT/USDC:157",
+          "TILT/USDC:158",
+          "TREND/USDC:159",
+          "BUDDY/USDC:160",
+          "PRFI/USDC:161",
+          "UFART/USDC:162",
+          "FUND/USDC:163",
+          "DIABLO/USDC:164",
+          "PENIS/USDC:165",
+          "USDT0/USDC:166",
+          "PEG/USDC:170",
+          "USH/USDC:171",
+          "COOK/USDC:172",
+          "RUB/USDC:173",
+          "ANON/USDC:174",
+          "FRCT/USDC:175",
+          "PERP/USDC:176",
+          "PURRO/USDC:177",
+          "USR/USDC:178",
+          "OTTI/USDC:179",
+          "USDHL/USDC:180",
+          "XAUT0/USDC:182",
+          "HORSY/USDC:183",
+          "HPENGU/USDC:184",
+          "ISLAND/USDC:185",
+          "LICKO/USDC:187",
+          "UPUMP/USDC:188",
+          "USPYX/USDC:189",
+          "STLOOP/USDC:190",
+          "TRADE/USDC:191",
+          "ANZ/USDC:192",
+          "UUUSPX/USDC:193",
+          "UBONK/USDC:194",
+          "LATINA/USDC:195",
+          "APU/USDC:196",
+          "WOULD/USDC:198",
+          "EX/USDC:199",
+          "UMOG/USDC:200",
+          "HREKT/USDC:201",
+          "KITTY/USDC:202",
+          "DBLN/USDC:203",
+          "VSN/USDC:204",
+          "THBILL/USDC:205",
+          "UENA/USDC:206",
+          "HYPE/USDT0:207",
+          "LTHREE/USDC:208",
+          "XAUT0/USDT0:209",
+          "UXPL/USDC:210",
+          "BAYC/USDC:211",
+          "LINK0/USDT0:212",
+          "LINK0/USDC:213",
+          "WMNT/USDC:214",
+          "SLAY/USDC:215",
+          "REI/USDC:216",
+          "RZR/USDC:217",
+          "REX/USDC:218",
+          "BRIDGE/USDC:219",
+          "PUP/USDC:223",
+          "UWLD/USDC:224",
+          "FLR/USDC:225",
+          "AVAX0/USDC:226",
+          "AAVE0/USDC:227",
+          "UDZ/USDC:228",
+          "USDH/USDC:230",
+          "UPHL/USDC:231",
+          "HYPE/USDH:232",
+          "UXPL/USDH:233",
+          "UBTC/USDH:234",
+          "UETH/USDH:235",
+          "KEI/USDC:236",
+          "WAR/USDC:237",
+          "XION/USDC:238",
+          "KITTEN/USDC:240",
+          "HWAVE/USDC:241",
+          "SWAP/USDC:242",
+          "UMON/USDC:243",
+          "USDXL/USDT0:244",
+          "NBT/USDC:245",
+          "IZEC/USDC:246",
+          "FI/USDC:247",
+          "BZEC/USDC:248",
+          "RISK/USDC:249",
+          "KHYPE/USDH:250",
+          "MMOVE/USDC:251",
+          "AXL/USDH:252",
+          "CREAM/USDC:253",
+          "KNTQ/USDH:254",
+          "HYPE/USDE:255",
+          "SEDA/USDC:256",
+          "UMEGA/USDC:257",
+          "STABLE/USDC:258",
+          "CASH/USDC:259",
+          "XMR1/USDC:260",
+          "HAR/USDC:261",
+          "CRCL/USDC:263",
+          "TSLA/USDC:264",
+          "SLV/USDC:265",
+          "GOOGL/USDC:266",
+          "FXRP/USDC:267",
+          "AAPL/USDC:268",
+          "BNB1/USDC:269",
+          "SOON/USDC:270",
+          "HOOD/USDC:271",
+          "UZEC/USDC:272",
+          "RUBT/USDT0:273",
+          "NYAN/USDC:274",
+          "FXRP/USDH:275",
+          "GLD/USDC:276",
+          "BNB0/USDC:277",
+          "HMT/USDC:278",
+          "SPY/USDC:279",
+          "AMZN/USDC:280",
+          "WWB/USDC:281",
+          "WOWBIT/USDC:282",
+          "CFX0/USDH:283",
+          "QONE/USDC:284",
+          "AZTEC/USDC:285",
+          "HSEI/USDC:286",
+          "META/USDC:287",
+          "QQQ/USDC:288",
+          "MSFT/USDC:289",
+          "UVIRT/USDC:290",
+          "ZAMA/USDC:292",
+          "HIP/USDC:293",
+          "HPL/USDH:294",
+          "SIGN/USDC:295",
+          "LMTS/USDC:296",
+          "STHYPE/USDH:297",
+          "BRLA/USDC:298",
+          "RAM/USDC:299",
+          "DIME/USDC:300",
+          "RIVER/USDC:301",
+          "USDUC/USDC:302",
+          "TAO1/USDC:303",
+          "LAMA/USDC:304",
+          "BASED/USDC:305",
+          "UAVAX/USDC:306",
+          "HTAO/USDC:307",
+          "QQQM/USDC:308",
+          "TRX1/USDC:309",
+          "KITE/USDC:310",
+          "ORCL/USDC:331",
+          "AVGO/USDC:332",
+          "MU/USDC:333",
+          "KNTQ/USDC:334",
+          "HPL/USDC:335",
+          "KHYPE/USDC:336",
+          "WARS/USDC:367",
+          "CFX0/USDC:370",
+          "SPCXD/USDC:465",
+          "ONEAR/USDC:496",
+          "MGW/USDC:497",
+          "SPCX/USDC:590",
+          "MAX/USDC:591",
+          "HNIL/USDC:698",
+          "UANSEM/USDC:699",
+          "DRV/USDC:700",
+          "WBRL/USDC:701",
+          "NVDAX/USDC:702",
+          "SPYX/USDC:703",
+          "QQQX/USDC:704",
+          "SKHYX/USDC:705",
+          "MUX/USDC:706",
+          "FLOCK/USDC:707",
+          "FXMR/USDC:708",
+          "SNDKX/USDC:709",
+          "SPCXX/USDC:710",
+          "AIW3/USDC:711",
+          "TSLAX/USDC:712",
+          "AAPLX/USDC:713",
+          "CRCLX/USDC:714",
+          "XAUM/USDC:715",
+          "RAIN/USDC:716"
+        ]
+      },
+      {
+        "exchange": "",
+        "kind": "perp",
+        "markets": [
+          "BTC",
+          "ETH",
+          "ATOM",
+          "MATIC",
+          "DYDX",
+          "SOL",
+          "AVAX",
+          "BNB",
+          "APE",
+          "OP",
+          "LTC",
+          "ARB",
+          "DOGE",
+          "INJ",
+          "SUI",
+          "kPEPE",
+          "CRV",
+          "LDO",
+          "LINK",
+          "STX",
+          "RNDR",
+          "CFX",
+          "FTM",
+          "GMX",
+          "SNX",
+          "XRP",
+          "BCH",
+          "APT",
+          "AAVE",
+          "COMP",
+          "MKR",
+          "WLD",
+          "FXS",
+          "HPOS",
+          "RLB",
+          "UNIBOT",
+          "YGG",
+          "TRX",
+          "kSHIB",
+          "UNI",
+          "SEI",
+          "RUNE",
+          "OX",
+          "FRIEND",
+          "SHIA",
+          "CYBER",
+          "ZRO",
+          "BLZ",
+          "DOT",
+          "BANANA",
+          "TRB",
+          "FTT",
+          "LOOM",
+          "OGN",
+          "RDNT",
+          "ARK",
+          "BNT",
+          "CANTO",
+          "REQ",
+          "BIGTIME",
+          "KAS",
+          "ORBS",
+          "BLUR",
+          "TIA",
+          "BSV",
+          "ADA",
+          "TON",
+          "MINA",
+          "POLYX",
+          "GAS",
+          "PENDLE",
+          "STG",
+          "FET",
+          "STRAX",
+          "NEAR",
+          "MEME",
+          "ORDI",
+          "BADGER",
+          "NEO",
+          "ZEN",
+          "FIL",
+          "PYTH",
+          "SUSHI",
+          "ILV",
+          "IMX",
+          "kBONK",
+          "GMT",
+          "SUPER",
+          "USTC",
+          "NFTI",
+          "JUP",
+          "kLUNC",
+          "RSR",
+          "GALA",
+          "JTO",
+          "NTRN",
+          "ACE",
+          "MAV",
+          "WIF",
+          "CAKE",
+          "PEOPLE",
+          "ENS",
+          "ETC",
+          "XAI",
+          "MANTA",
+          "UMA",
+          "ONDO",
+          "ALT",
+          "ZETA",
+          "DYM",
+          "MAVIA",
+          "W",
+          "PANDORA",
+          "STRK",
+          "PIXEL",
+          "AI",
+          "TAO",
+          "AR",
+          "MYRO",
+          "kFLOKI",
+          "BOME",
+          "ETHFI",
+          "ENA",
+          "MNT",
+          "TNSR",
+          "SAGA",
+          "MERL",
+          "HBAR",
+          "POPCAT",
+          "OMNI",
+          "EIGEN",
+          "REZ",
+          "NOT",
+          "TURBO",
+          "BRETT",
+          "IO",
+          "ZK",
+          "BLAST",
+          "LISTA",
+          "MEW",
+          "RENDER",
+          "kDOGS",
+          "POL",
+          "CATI",
+          "CELO",
+          "HMSTR",
+          "SCR",
+          "NEIROETH",
+          "kNEIRO",
+          "GOAT",
+          "MOODENG",
+          "GRASS",
+          "PURR",
+          "PNUT",
+          "XLM",
+          "CHILLGUY",
+          "SAND",
+          "IOTA",
+          "ALGO",
+          "HYPE",
+          "ME",
+          "MOVE",
+          "VIRTUAL",
+          "PENGU",
+          "USUAL",
+          "FARTCOIN",
+          "AI16Z",
+          "AIXBT",
+          "ZEREBRO",
+          "BIO",
+          "GRIFFAIN",
+          "SPX",
+          "S",
+          "MORPHO",
+          "TRUMP",
+          "MELANIA",
+          "ANIME",
+          "VINE",
+          "VVV",
+          "JELLY",
+          "BERA",
+          "TST",
+          "LAYER",
+          "IP",
+          "OM",
+          "KAITO",
+          "NIL",
+          "PAXG",
+          "PROMPT",
+          "BABY",
+          "WCT",
+          "HYPER",
+          "ZORA",
+          "INIT",
+          "DOOD",
+          "LAUNCHCOIN",
+          "NXPC",
+          "SOPH",
+          "RESOLV",
+          "SYRUP",
+          "PUMP",
+          "PROVE",
+          "YZY",
+          "XPL",
+          "WLFI",
+          "LINEA",
+          "SKY",
+          "ASTER",
+          "AVNT",
+          "STBL",
+          "0G",
+          "HEMI",
+          "APEX",
+          "2Z",
+          "ZEC",
+          "MON",
+          "MET",
+          "MEGA",
+          "CC",
+          "ICP",
+          "AERO",
+          "STABLE",
+          "FOGO",
+          "LIT",
+          "XMR",
+          "AXS",
+          "DASH",
+          "SKR",
+          "AZTEC",
+          "CHIP",
+          "GRAM",
+          "CASHCAT",
+          "PONS",
+          "USELESS"
+        ]
+      },
+      {
+        "exchange": "xyz",
+        "kind": "perp",
+        "markets": [
+          "xyz:XYZ100",
+          "xyz:TSLA",
+          "xyz:NVDA",
+          "xyz:GOLD",
+          "xyz:HOOD",
+          "xyz:INTC",
+          "xyz:PLTR",
+          "xyz:COIN",
+          "xyz:META",
+          "xyz:AAPL",
+          "xyz:MSFT",
+          "xyz:ORCL",
+          "xyz:GOOGL",
+          "xyz:AMZN",
+          "xyz:AMD",
+          "xyz:MU",
+          "xyz:SNDK",
+          "xyz:MSTR",
+          "xyz:CRCL",
+          "xyz:NFLX",
+          "xyz:COST",
+          "xyz:LLY",
+          "xyz:SKHX",
+          "xyz:TSM",
+          "xyz:JPY",
+          "xyz:EUR",
+          "xyz:SILVER",
+          "xyz:RIVN",
+          "xyz:BABA",
+          "xyz:CL",
+          "xyz:COPPER",
+          "xyz:NATGAS",
+          "xyz:URANIUM",
+          "xyz:ALUMINIUM",
+          "xyz:SMSN",
+          "xyz:PLATINUM",
+          "xyz:USAR",
+          "xyz:CRWV",
+          "xyz:URNM",
+          "xyz:PALLADIUM",
+          "xyz:DXY",
+          "xyz:GME",
+          "xyz:KR200",
+          "xyz:SOFTBANK",
+          "xyz:JP225",
+          "xyz:HYUNDAI",
+          "xyz:KIOXIA",
+          "xyz:EWY",
+          "xyz:EWJ",
+          "xyz:BRENTOIL",
+          "xyz:VIX",
+          "xyz:HIMS",
+          "xyz:SP500",
+          "xyz:DKNG",
+          "xyz:LITE",
+          "xyz:CORN",
+          "xyz:XLE",
+          "xyz:WHEAT",
+          "xyz:TTF",
+          "xyz:BX",
+          "xyz:PURRDAT",
+          "xyz:MRVL",
+          "xyz:RKLB",
+          "xyz:BIRD",
+          "xyz:VOL",
+          "xyz:DRAM",
+          "xyz:CBRS",
+          "xyz:EWZ",
+          "xyz:KRW",
+          "xyz:ZM",
+          "xyz:EBAY",
+          "xyz:H100",
+          "xyz:NIFTY",
+          "xyz:ARM",
+          "xyz:EWT",
+          "xyz:GBP",
+          "xyz:SPCX",
+          "xyz:IBOV",
+          "xyz:ASML",
+          "xyz:MINIMAX",
+          "xyz:BB",
+          "xyz:QNT",
+          "xyz:DELL",
+          "xyz:IBM",
+          "xyz:AVGO",
+          "xyz:NOW",
+          "xyz:NBIS",
+          "xyz:WDC",
+          "xyz:NOK",
+          "xyz:SMH",
+          "xyz:BE",
+          "xyz:ZHIPU",
+          "xyz:QCOM",
+          "xyz:STRC",
+          "xyz:BOT",
+          "xyz:AMAT",
+          "xyz:IBIDEN",
+          "xyz:GIGADEV",
+          "xyz:SHAZ",
+          "xyz:SKHY",
+          "xyz:KSTR",
+          "xyz:CXMT",
+          "xyz:GEV",
+          "xyz:KORU",
+          "xyz:UNITREE",
+          "xyz:LYTE",
+          "xyz:NCLD",
+          "xyz:SOXL",
+          "xyz:MAGS",
+          "xyz:IREN",
+          "xyz:NET",
+          "xyz:CRWD",
+          "xyz:RDDT",
+          "xyz:AAOI",
+          "xyz:MRNA",
+          "xyz:XBI",
+          "xyz:SHEIN",
+          "xyz:YMTC",
+          "xyz:BMNR",
+          "xyz:SNXX"
+        ]
+      },
+      {
+        "exchange": "flx",
+        "kind": "perp",
+        "markets": [
+          "flx:TSLA",
+          "flx:NVDA",
+          "flx:CRCL",
+          "flx:COIN",
+          "flx:XMR",
+          "flx:GOLD",
+          "flx:SILVER",
+          "flx:OIL",
+          "flx:GAS",
+          "flx:BTC",
+          "flx:COPPER",
+          "flx:PALLADIUM",
+          "flx:PLATINUM",
+          "flx:USDE",
+          "flx:USA500",
+          "flx:USA100"
+        ]
+      },
+      {
+        "exchange": "vntl",
+        "kind": "perp",
+        "markets": [
+          "vntl:SPACEX",
+          "vntl:OPENAI",
+          "vntl:ANTHROPIC",
+          "vntl:MAG7",
+          "vntl:SEMIS",
+          "vntl:ROBOT",
+          "vntl:INFOTECH",
+          "vntl:NUCLEAR",
+          "vntl:DEFENSE",
+          "vntl:ENERGY",
+          "vntl:BIOTECH",
+          "vntl:GOLDJM",
+          "vntl:SILVERJM",
+          "vntl:WHEAT",
+          "vntl:SOY"
+        ]
+      },
+      {
+        "exchange": "hyna",
+        "kind": "perp",
+        "markets": [
+          "hyna:BTC",
+          "hyna:ETH",
+          "hyna:HYPE",
+          "hyna:SOL",
+          "hyna:LIT",
+          "hyna:ZEC",
+          "hyna:XRP",
+          "hyna:LIGHTER",
+          "hyna:BNB",
+          "hyna:DOGE",
+          "hyna:SUI",
+          "hyna:PUMP",
+          "hyna:FARTCOIN",
+          "hyna:ENA",
+          "hyna:XMR",
+          "hyna:LTC",
+          "hyna:LINK",
+          "hyna:XPL",
+          "hyna:IP",
+          "hyna:BCH",
+          "hyna:ADA",
+          "hyna:1000PEPE",
+          "hyna:SILVER",
+          "hyna:GOLD",
+          "hyna:BASED"
+        ]
+      },
+      {
+        "exchange": "km",
+        "kind": "perp",
+        "markets": [
+          "km:US500",
+          "km:BABA",
+          "km:EUR",
+          "km:USBOND",
+          "km:SMALL2000",
+          "km:USTECH",
+          "km:USENERGY",
+          "km:USOIL",
+          "km:TSLA",
+          "km:SILVER",
+          "km:GOLD",
+          "km:AAPL",
+          "km:GOOGL",
+          "km:SEMI",
+          "km:GLDMINE",
+          "km:NVDA",
+          "km:TENCENT",
+          "km:JPN225",
+          "km:MU",
+          "km:PLTR",
+          "km:XIAOMI",
+          "km:BMNR",
+          "km:RTX"
+        ]
+      },
+      {
+        "exchange": "abcd",
+        "kind": "perp",
+        "markets": [
+          "abcd:USA500"
+        ]
+      },
+      {
+        "exchange": "cash",
+        "kind": "perp",
+        "markets": [
+          "cash:USA500",
+          "cash:TSLA",
+          "cash:NVDA",
+          "cash:HOOD",
+          "cash:GOOGL",
+          "cash:INTC",
+          "cash:AMZN",
+          "cash:MSFT",
+          "cash:META",
+          "cash:GOLD",
+          "cash:SILVER",
+          "cash:EWY",
+          "cash:WTI",
+          "cash:BTC",
+          "cash:KWEB",
+          "cash:ETH",
+          "cash:CAR"
+        ]
+      },
+      {
+        "exchange": "para",
+        "kind": "perp",
+        "markets": [
+          "para:TOTAL2",
+          "para:OTHERS",
+          "para:BTCD",
+          "para:H100",
+          "para:AVGO",
+          "para:COHR",
+          "para:GLW",
+          "para:CRDO",
+          "para:LRCX",
+          "para:NET",
+          "para:STX",
+          "para:IREN",
+          "para:VST",
+          "para:TER",
+          "para:AAOI",
+          "para:10Y",
+          "para:CIEN",
+          "para:NAVER",
+          "para:RDDT",
+          "para:UNITREE",
+          "para:CRWD",
+          "para:TENCENT",
+          "para:CAMBRICON",
+          "para:MELI",
+          "para:SMCI",
+          "para:ANSEM",
+          "para:INNOLIGHT",
+          "para:30Y",
+          "para:2Y",
+          "para:IGV",
+          "para:SOFI",
+          "para:ANTH",
+          "para:TTWO",
+          "para:CIFR",
+          "para:TREAD"
+        ]
+      },
+      {
+        "exchange": "mkts",
+        "kind": "perp",
+        "markets": [
+          "mkts:US500",
+          "mkts:BABA",
+          "mkts:EUR",
+          "mkts:USBOND",
+          "mkts:SMALL2000",
+          "mkts:USTECH",
+          "mkts:USENERGY",
+          "mkts:USOIL",
+          "mkts:TSLA",
+          "mkts:SILVER",
+          "mkts:GOLD",
+          "mkts:AAPL",
+          "mkts:GOOGL",
+          "mkts:SEMI",
+          "mkts:GLDMINE",
+          "mkts:NVDA",
+          "mkts:TENCENT",
+          "mkts:JPN225",
+          "mkts:MU",
+          "mkts:PLTR",
+          "mkts:XIAOMI",
+          "mkts:BMNR",
+          "mkts:RTX"
+        ]
+      },
+      {
+        "exchange": "io",
+        "kind": "perp",
+        "markets": [
+          "io:OAI",
+          "io:ANTH",
+          "io:SNDK",
+          "io:IONQ",
+          "io:NBIS",
+          "io:EWY",
+          "io:GPRO",
+          "io:SBE",
+          "io:TCNT"
+        ]
+      }
+    ],
+    "venue": "hyperliquid",
+    "version": 4
+  }
+}

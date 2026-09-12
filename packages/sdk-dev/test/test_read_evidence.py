@@ -255,3 +255,27 @@ def test_public_address_reports_do_not_require_signing_secrets(
     )
   with pytest.raises(pytest.skip.Exception):
     require_report_credentials(Binance(public=True))
+
+
+def test_report_runner_forwards_archive_configuration(tmp_path: Path):
+  """Selecting a full-history provider must reach the SDK without changing bounds."""
+  from sdk_dev.integration.report.conftest import load_sdk
+
+  path = tmp_path / 'accounts.toml'
+  path.write_text(
+    '[accounts.dydx]\nvenue = "dydx"\npublic = true\naddress = "dydx1test"\n'
+    '[report.dydx]\narchive_node = "polkachu"\n'
+  )
+  sdk = load_sdk(Mock(getoption=Mock(return_value=str(path))))
+  assert sdk.config == {'dydx': {'archive_node': 'polkachu'}}
+
+
+def test_report_runner_rejects_unknown_archive_provider(tmp_path: Path):
+  """A typo must not silently select the default non-archive node."""
+  from sdk_dev.integration.report.conftest import load_sdk
+  import pydantic
+
+  path = tmp_path / 'accounts.toml'
+  path.write_text('[accounts]\n[report.dydx]\narchive_node = "typo"\n')
+  with pytest.raises(pydantic.ValidationError):
+    load_sdk(Mock(getoption=Mock(return_value=str(path))))
