@@ -144,6 +144,15 @@ One report qualifies the selected mainnet account, not all account configuration
 chains or providers. See [ADR 0013](adr/0013-all-read-suites-release-gate.md) for scope.
 Read reports use payload version 3; old non-market-only reports are not reusable.
 
+For dYdX Report checks, select an archive provider in the accounts TOML. The runner
+forwards the existing SDK configuration; it does not shorten history to a pruned
+node's retention. Public mainnet market checks remain independent of this selection.
+
+```toml
+[report.dydx]
+archive_node = "polkachu" # or "kingnodes"
+```
+
 Deribit additionally supports the explicitly approved split qualification:
 
 ```sh
