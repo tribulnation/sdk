@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from decimal import Decimal
+from typing_extensions import AsyncIterable, Collection
 import asyncio
 
 import pytest
@@ -16,10 +17,12 @@ from tribulnation.sdk.reporting import (
 class StubReport(Report):
   snapshot_calls = 0
 
-  async def history(self, start=None, end=None):
+  async def history(
+    self, start: datetime | None = None, end: datetime | None = None
+  ) -> AsyncIterable[HistoryRecord]:
     yield HistoryRecord(provenance={'source': 'manual', 'id': 'history'})
 
-  async def snapshot(self, assets=None):
+  async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotRecord:
     self.snapshot_calls += 1
     return SnapshotRecord(
       snapshot=Snapshot(subaccounts=[SubaccountSnapshot(subaccount='spot')]),
@@ -27,7 +30,7 @@ class StubReport(Report):
     )
 
 
-async def collect_history(report: Report, *, end=None):
+async def collect_history(report: Report, *, end: datetime | None = None):
   return [record async for record in report.history(None, end)]
 
 

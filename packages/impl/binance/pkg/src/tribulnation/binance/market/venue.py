@@ -22,8 +22,8 @@ class BinanceMarket(SharedMixin, TradingVenue):
 
   async def exchanges(self) -> list[TradingVenue.ExchangeDescription]:
     return [
-      {'id': 'spot', 'type': 'spot'},
-      {'id': 'usdm', 'type': 'perp'},
+      {'id': 'spot', 'type': 'spot', 'name': 'Spot'},
+      {'id': 'usdm', 'type': 'perp', 'name': 'USD-M Futures'},
     ]
 
   async def perp_exchange(self, exchange_id: str, /):

@@ -1,10 +1,11 @@
-from typing_extensions import TYPE_CHECKING, AsyncContextManager, Iterable
+from collections.abc import Coroutine
+from typing_extensions import TYPE_CHECKING, Any, AsyncContextManager, Iterable
 from dataclasses import dataclass
 from datetime import datetime
 import asyncio
 
 from tribulnation.sdk.core import managed_tasks
-from tribulnation.sdk.reporting import History as _History
+from tribulnation.sdk.reporting import History as _History, HistoryRecord
 from typed_dydx import Dydx
 from .bigquery import BigQueryClient, BigQueryHistory
 from .chain import ChainHistory
@@ -53,7 +54,7 @@ class History(_History):
     )
 
   async def history(self, start: datetime | None = None, end: datetime | None = None):
-    coros = [
+    coros: list[Coroutine[Any, Any, list[HistoryRecord]]] = [
       self.chain.history(start, end),
       self.indexer.history(start, end),
       self.governance.history(start, end),

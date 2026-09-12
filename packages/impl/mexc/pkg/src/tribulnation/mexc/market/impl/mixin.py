@@ -1,6 +1,13 @@
-from typing_extensions import Any, AsyncContextManager, Iterable, TypedDict
+from typing_extensions import (
+  Any,
+  AsyncContextManager,
+  Awaitable,
+  Callable,
+  Iterable,
+  TypeVar,
+  TypedDict,
+)
 from dataclasses import dataclass, field
-from types import TracebackType
 import asyncio
 
 from tribulnation.sdk.core import SDK, Subscription, OverflowPolicy
@@ -8,11 +15,13 @@ from tribulnation.sdk.market import Book
 
 from typed_mexc import MEXC
 from typed_mexc.spot.http.market.exchange_info import SymbolInfo
+from typed_mexc.schemas import ContractSpec
 from typed_mexc.spot.streams.core.proto import PrivateDealsV3Api
 
 from tribulnation.mexc.core.exc import wrap_exceptions
 
 SpotInfo = SymbolInfo
+T = TypeVar('T')
 
 
 class Meta(TypedDict):
@@ -20,18 +29,22 @@ class Meta(TypedDict):
 
 
 @dataclass(kw_only=True)
-class Shared:
+class Shared(SDK):
   client: MEXC
   validate: bool = True
   recv_window: int | None = None
 
   spot_markets: dict[str, SpotInfo] | None = None
+  perp_markets: dict[str, ContractSpec] | None = None
   my_trades_subscription: Subscription[PrivateDealsV3Api] | None = None
   depth_subscriptions: dict[str, Subscription[Book]] = field(
     default_factory=dict[str, Subscription[Book]]
   )
 
   _markets_lock: asyncio.Lock = field(
+    default_factory=asyncio.Lock, init=False, repr=False
+  )
+  _perp_markets_lock: asyncio.Lock = field(
     default_factory=asyncio.Lock, init=False, repr=False
   )
 
@@ -56,20 +69,9 @@ class Shared:
     client = MEXC.new(public=True, validate=validate)
     return cls(client=client, validate=validate)
 
-  @wrap_exceptions
-  async def __aenter__(self):
-    return self
-
-  @wrap_exceptions
-  async def __aexit__(
-    self,
-    exc_type: type[BaseException] | None,
-    exc_value: BaseException | None,
-    traceback: TracebackType | None,
-  ):
-    # We intentionally don't enter/exit the typed client's WS contexts here.
-    # WS connections are opened lazily when the specific stream subscriptions are used.
-    return None
+  def resources(self) -> Iterable[AsyncContextManager[object]]:
+    """Own the typed client's lazy HTTP and WebSocket transports."""
+    yield self.client
 
   @wrap_exceptions
   async def load_markets(self, *, refetch: bool = False) -> dict[str, SpotInfo]:
@@ -84,6 +86,27 @@ class Shared:
       }
       self.spot_markets = markets
       return self.spot_markets
+
+  @wrap_exceptions
+  async def load_perp_markets(
+    self, *, refetch: bool = False
+  ) -> dict[str, ContractSpec]:
+    """Cache linear contract metadata; API trading permission does not gate public data."""
+    if not refetch and self.perp_markets is not None:
+      return self.perp_markets
+    async with self._perp_markets_lock:
+      if not refetch and self.perp_markets is not None:
+        return self.perp_markets
+      response = await self.client.futures.http.market.contract_info(
+        validate=self.validate
+      )
+      rows = response.get('data')
+      if not isinstance(rows, list):
+        raise ValueError('MEXC contract listing did not return a list')
+      self.perp_markets = {
+        row['symbol']: row for row in rows if row['settleCoin'] == row['quoteCoin']
+      }
+      return self.perp_markets
 
   def depth_subscription(self, symbol: str):
     if symbol not in self.depth_subscriptions:
@@ -116,6 +139,12 @@ class Shared:
 @dataclass(frozen=True)
 class SharedMixin(SDK):
   shared: Shared
+
+  @SDK.method
+  @wrap_exceptions
+  async def call_mexc(self, fn: Callable[[], Awaitable[T]]) -> T:
+    """Translate one MEXC request so retry middleware can retry a single page."""
+    return await fn()
 
   @classmethod
   def new(

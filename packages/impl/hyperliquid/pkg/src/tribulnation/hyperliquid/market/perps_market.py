@@ -5,6 +5,8 @@ from decimal import Decimal
 
 from tribulnation.sdk.core import PaginatedResponse, LogicError, OverflowPolicy
 from tribulnation.sdk.market import (
+  Candle,
+  CandleInterval,
   PerpMarket as _PerpMarket,
   Book,
   Order,
@@ -13,6 +15,7 @@ from tribulnation.sdk.market import (
   PerpCollateral,
   PerpPosition,
   Rules,
+  Fees,
   Settings,
   Trade,
   FundingRate,
@@ -21,6 +24,7 @@ from tribulnation.sdk.market import (
 )
 
 from tribulnation.hyperliquid.core import wrap_exceptions
+from .impl.candles import CANDLE_INTERVALS, candles
 
 from .impl import (
   PerpMarketMixin,
@@ -78,6 +82,24 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
     self, start: datetime, end: datetime
   ) -> AsyncIterable[Sequence[Trade]]:
     return trades_history(self, start, end)
+
+  async def fees(self, *, refetch: bool = False) -> Fees:
+    """Fetch complete rates for supported perpetual market configurations."""
+    from .impl.fees import personal_perp_fees
+
+    return await personal_perp_fees(self, refetch=refetch)
+
+  def candles(
+    self,
+    interval: CandleInterval,
+    start: datetime,
+    end: datetime,
+  ) -> PaginatedResponse[Candle]:
+    """Fetch trade candles in the requested half-open range."""
+    self.check_candles(interval, start, end)
+    return PaginatedResponse(candles(self, interval, start, end))
+
+  CANDLE_INTERVALS = CANDLE_INTERVALS
 
   async def open_orders(self) -> Sequence[OrderState]:
     return await open_orders(self)

@@ -50,4 +50,4 @@ class DydxMarket(ExchangeMixin, TradingVenue):
     return await self.exchange(exchange_id)
 
   async def exchanges(self) -> list[TradingVenue.ExchangeDescription]:
-    return [{'id': 'perp', 'type': 'perp'}]
+    return [{'id': 'perp', 'type': 'perp', 'name': 'Perpetuals'}]

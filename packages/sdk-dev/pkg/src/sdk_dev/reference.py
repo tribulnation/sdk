@@ -7,7 +7,7 @@ method's own lines only — the component's preamble is stated once on the page,
 repeated per method.
 """
 
-from sdk_dev.contract import ContractFile
+from sdk_dev.contract import ContractFile, RenderedContract
 from sdk_dev.source import SourceMethod
 
 METHODS_MARKER = '<!-- methods -->'
@@ -16,7 +16,7 @@ METHODS_MARKER = '<!-- methods -->'
 def render_methods_markdown(
   contract: ContractFile,
   *,
-  rendered: dict,
+  rendered: RenderedContract,
   source: dict[str, SourceMethod],
   venue_names: dict[str, str],
 ) -> str:

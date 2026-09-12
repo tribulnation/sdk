@@ -5,11 +5,18 @@ request that failed rather than the whole sweep -- a throttled page 7 of 12 retr
 in place instead of restarting from page 1.
 """
 
-from typing_extensions import AsyncIterator, Sequence
+from typing_extensions import AsyncIterator, Mapping, Sequence
 from datetime import datetime, timezone
 from decimal import Decimal
 
-from tribulnation.sdk.market import FundingPayment, FundingRate, Trade
+from tribulnation.sdk.market import (
+  Candle,
+  CandleInterval,
+  FundingPayment,
+  FundingRate,
+  Trade,
+)
+from typed_bybit.schemas import KlineInterval
 
 from tribulnation.bybit.core import TRADE_WINDOW, windows
 from .mixin import MarketMixin
@@ -17,6 +24,68 @@ from .parse import parse_execution
 
 FUNDING_PAGE = 200
 """Rows per `market.funding_history` page; Bybit's documented maximum."""
+
+CANDLES_PAGE = 1000
+"""Rows per `market.kline` page; Bybit's documented maximum."""
+
+KLINE_INTERVALS: Mapping[CandleInterval, KlineInterval] = {
+  '1m': '1',
+  '5m': '5',
+  '15m': '15',
+  '1h': '60',
+  '4h': '240',
+  '1d': 'D',
+}
+"""Bybit's name for each contract interval: minutes, or `D` for a day."""
+
+CANDLE_INTERVALS = frozenset(KLINE_INTERVALS)
+"""Every contract interval has a Bybit kline interval."""
+
+KlineRow = tuple[datetime, str, str, str, str, str, str]
+"""One `market.kline` row: open time, open, high, low, close, volume, turnover."""
+
+
+def parse_candle(row: KlineRow) -> Candle:
+  """Map one kline row onto a `Candle`.
+
+  `volume` is the base coin and `turnover` the quote coin on both spot and linear,
+  which is the contract's own pairing.
+  """
+  time, open, high, low, close, volume, turnover = row
+  return Candle(
+    time=time,
+    open=Decimal(open),
+    high=Decimal(high),
+    low=Decimal(low),
+    close=Decimal(close),
+    volume=Decimal(volume),
+    quote_volume=Decimal(turnover),
+  )
+
+
+async def candles(
+  self: MarketMixin,
+  interval: CandleInterval,
+  start: datetime,
+  end: datetime,
+) -> AsyncIterator[Sequence[Candle]]:
+  """Yield Bybit's native pages, trimming overlapping buckets to `[start, end)`."""
+  if start == end:
+    return
+  kline = KLINE_INTERVALS[interval]
+  paging = self.client.market.kline_paged(
+    self.category,
+    symbol=self.symbol,
+    interval=kline,
+    start=start,
+    end=end,
+    limit=CANDLES_PAGE,
+    validate=self.validate,
+  ).via(self.call_bybit)
+  async for rows in paging:
+    page = [parse_candle(r) for r in rows if start <= r[0] < end]
+    if page:
+      yield page
 
 
 async def trades_history(

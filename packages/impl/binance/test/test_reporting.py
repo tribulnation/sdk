@@ -10,8 +10,7 @@ def test_every_swept_transfer_type_resolves_to_two_compartments():
   `TRANSFER_TYPES` and `COMPARTMENTS` are two hand-written tables that have to agree:
   a direction present in the first but not derivable from the second still gets swept,
   and every `InternalTransfer` it yields carries `src_account=None, dst_account=None`
-  instead of raising. No live sweep catches it -- the account holds no transfers in
-  most of these 28 directions.
+  instead of raising. Both supported Spot/Funding directions must resolve.
   """
   for type in TRANSFER_TYPES:
     assert split_transfer_type(type) != (None, None), type

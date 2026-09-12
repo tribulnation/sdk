@@ -1,14 +1,12 @@
-"""Binance balances and positions, across the wallet compartments they live in."""
+"""Binance spot-side balances without futures account access."""
 
-from typing_extensions import Awaitable, Collection, TypeVar
+from typing_extensions import Collection
 from dataclasses import dataclass
-from decimal import Decimal
 import asyncio
 
-from tribulnation.sdk.core import SDK, AuthError
+from tribulnation.sdk.core import SDK
 from tribulnation.sdk.reporting import (
   Balances,
-  Position,
   Snapshot,
   SnapshotRecord,
   Snapshots as _Snapshots,
@@ -16,9 +14,7 @@ from tribulnation.sdk.reporting import (
 )
 
 from tribulnation.binance.core import SdkMixin
-from .util import new_source_id, raise_if_all_failed
-
-T = TypeVar('T')
+from .util import new_source_id
 
 PAGE_SIZE = 100
 """Rows per page for the Simple Earn position cursors."""
@@ -31,14 +27,14 @@ def keep(assets: Collection[str] | None, asset: str) -> bool:
 
 @dataclass
 class Snapshots(SdkMixin, _Snapshots):
-  """Binance balances and positions.
+  """Binance Spot, Funding and Simple Earn balances.
 
-  Covers the Spot, Funding, Simple Earn and USD-M futures compartments, each reported as
-  its own subaccount.
+  Each supported compartment is reported separately. Futures compartments are excluded,
+  not represented as empty balances or positions.
 
   **Does not support**:
   - Cross and isolated margin balances (`spot.http.margin.account`).
-  - COIN-M futures, Options and Portfolio Margin balances and positions.
+  - USD-M and COIN-M futures, Options and Portfolio Margin balances and positions.
   - Soft Staking, On-chain Yields, BFUSD, RWUSD and ETH/SOL staking holdings, which sit
     outside the two Simple Earn position endpoints read below.
   """
@@ -95,72 +91,20 @@ class Snapshots(SdkMixin, _Snapshots):
     return out
 
   @SDK.method
-  async def usdm_balances(self, assets: Collection[str] | None = None) -> Balances:
-    """Fetch USD-M futures wallet balances."""
-    account = await self.call_binance(
-      lambda: self.client.usdm_futures.http.account.account_v3()
-    )
-    out = Balances()
-    for row in account['assets']:
-      if keep(assets, row['asset']):
-        out[row['asset']] += row['walletBalance']
-    return out
-
-  @SDK.method
-  async def usdm_positions(self) -> dict[str, Position]:
-    """Fetch open USD-M futures positions, keyed by symbol."""
-    rows = await self.call_binance(
-      lambda: self.client.usdm_futures.http.trading.position_risk_v3()
-    )
-    out: dict[str, Position] = {}
-    for row in rows:
-      # `position_risk_v3` still declares its decimal strings as bare `str`, unlike the
-      # rest of the USD-M account family, so these two stay wrapped.
-      size = Decimal(row['positionAmt'])
-      if size == 0:
-        continue
-      out[row['symbol']] = Position(
-        size=size, avg_price=Decimal(row.get('entryPrice') or 0)
-      )
-    return out
-
-  @SDK.method
   async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotRecord:
-    """Fetch the account's current balances and positions.
-
-    A compartment whose endpoint raises `AuthError` contributes nothing rather than
-    failing the whole snapshot -- Binance gates Futures behind its own API-key flag, so
-    a spot-only key is a normal configuration, not an outage. If every compartment
-    raises one, the credentials are bad and the error propagates.
-    """
-    failures: list[AuthError] = []
-
-    async def guarded(call: Awaitable[T], empty: T) -> T:
-      try:
-        return await call
-      except AuthError as e:
-        failures.append(e)
-        return empty
-
-    spot, funding, earn, usdm, positions = await asyncio.gather(
-      guarded(self.spot_balances(assets), Balances()),
-      guarded(self.funding_balances(assets), Balances()),
-      guarded(self.earn_balances(assets), Balances()),
-      guarded(self.usdm_balances(assets), Balances()),
-      guarded(self.usdm_positions(), {}),
+    """Fetch only Spot, Funding and Simple Earn; supported-source failures propagate."""
+    results = await asyncio.gather(
+      self.spot_balances(assets),
+      self.funding_balances(assets),
+      self.earn_balances(assets),
+      return_exceptions=True,
     )
-    raise_if_all_failed(failures, 5)
-
+    states: list[SubaccountSnapshot] = []
+    for compartment, result in zip(('spot', 'funding', 'earn'), results):
+      if isinstance(result, BaseException):
+        raise result
+      states.append(SubaccountSnapshot(subaccount=compartment, balances=result))
     return SnapshotRecord(
-      snapshot=Snapshot(
-        subaccounts=[
-          SubaccountSnapshot(subaccount='spot', balances=spot),
-          SubaccountSnapshot(subaccount='funding', balances=funding),
-          SubaccountSnapshot(subaccount='earn', balances=earn),
-          SubaccountSnapshot(
-            subaccount='usdm_futures', balances=usdm, positions=positions
-          ),
-        ]
-      ),
+      snapshot=Snapshot(subaccounts=states),
       provenance={'source': 'api', 'service': 'binance', 'id': new_source_id()},
     )

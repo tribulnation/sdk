@@ -1,6 +1,25 @@
 # auth = false means this surface has a real credential-free DEFAULT_ACCOUNTS entry —
 # auth = true means every call always needs a real accounts.Bitget() entry.
 
+[support.market]
+support = "partial"
+auth = false
+methods = [
+  "depth", "depth_stream", "tickers", "rules", "fees", "candles", "perp_stats", "query_order", "open_orders",
+  "trades_history", "trades_stream", "position", "collateral", "available_notional",
+  "index", "next_funding", "funding_rates", "perp_position", "perp_collateral",
+]
+note = "`spot` and `usdt` support read-only account data; `usdc` and `coin-classic` expose public market data only. UTA `coin` markets are deferred; requesting that exchange raises NotImplementedError (SDK issue #32). The former USDT exchange ID `perp` is now `usdt`, without an alias. Read-only: `place_order`/`cancel_*` raise `NotImplementedError` (not a venue we trade on). `funding_payments` is unsupported on either account mode, since Bitget publishes no closed set of futures ledger types to filter a settlement on. On a Classic account `perp_collateral` and the exchange-level spot `collateral` are unsupported too (the futures wallet reports no margin requirement, the spot wallet no pool). `candles` serves every contract interval on all four exchanges with required aware bounds and half-open opening timestamps. Native response order is preserved, without an ordering guarantee across windows. Perp windows cover 198 opens back to the contract's listing; spot windows cover 999 opens but only reach the venue's recent horizon (about two months of hourly candles), since the spot history endpoint has no paged walk in the typed client yet."
+# MarketSDK.DEFAULT_ACCOUNTS includes 'bitget' (Bitget(public=True)) — public market data
+# (markets, depth, depth_stream, tickers, rules, perp_stats, index, next_funding,
+# funding_rates) comes from the venue's public endpoints and is the same whatever the
+# account's mode. Account-scoped reads dispatch on the mode (Classic vs UTA), detected
+# on first use. `usdt`, `usdc`, and `coin-classic` select separate futures product lines;
+# delivery contracts are excluded. USDC and coin account reads remain unsupported. `query_order` is the base scan of
+# `open_orders`: the order-info endpoints exist but were never exercised against an order.
+# `fees()` uses symbol-scoped account rates in Classic or UTA mode. Public contract
+# fees remain unknown for nonzero feeRateUpRatio until its composition is verified.
+
 [support.earn]
 support = "full"
 auth = true
@@ -17,4 +36,4 @@ note = "`tribulnation.bitget.reporting.Reporting` implements snapshots and histo
 
 [ids]
 asset = "symbol"
-note = "The venue's coin name (`BTC`, `USDT`); market ids are concatenated pair symbols (`BTCUSDT`)."
+note = "The venue's coin name (`BTC`, `USDT`); market IDs use Classic API symbols (`BTCUSDT`, `BTCPERP`, `BTCUSD`) under `spot`, `usdt`, `usdc`, or `coin-classic`. UTA `coin` (`*_CM`) is explicitly unsupported pending native quote-sized quantity support (SDK issue #32)."

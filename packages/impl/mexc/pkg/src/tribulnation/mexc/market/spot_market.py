@@ -7,19 +7,24 @@ from tribulnation.sdk.core import PaginatedResponse, OverflowPolicy
 from tribulnation.sdk.market import (
   Market,
   Book,
+  Candle,
+  CandleInterval,
   Collateral,
   Order,
   OrderResponse,
   OrderState,
   Position,
   Rules,
+  Fees,
   Settings,
   Trade,
 )
 
 from tribulnation.mexc.core.exc import wrap_exceptions
 from .impl import (
+  CANDLE_INTERVALS,
   MarketMixin,
+  candles,
   depth,
   depth_stream,
   rules,
@@ -35,6 +40,8 @@ from .impl import (
 
 @dataclass(frozen=True, kw_only=True)
 class SpotMarket(MarketMixin, Market):
+  CANDLE_INTERVALS = CANDLE_INTERVALS
+
   @property
   def venue_id(self) -> str:
     return 'mexc'
@@ -61,6 +68,38 @@ class SpotMarket(MarketMixin, Market):
 
   async def rules(self, *, refetch: bool = False) -> Rules:
     return await rules(self, refetch=refetch)
+
+  async def fees(self, *, refetch: bool = False) -> Fees:
+    """Read ordinary spot rates only when conditional MX deduction is disabled."""
+    status = await self.call_mexc(
+      lambda: self.client.spot.http.account.mx_deduct_status(
+        validate=self.shared.validate
+      )
+    )
+    if status['data']['mxDeductEnable']:
+      raise NotImplementedError(
+        'MEXC spot fees with MX deduction enabled are unverified: tradeFee does '
+        'not separate pre-deduction and discounted rates'
+      )
+    response = await self.call_mexc(
+      lambda: self.client.spot.http.account.trade_fee(
+        self.instrument, validate=self.shared.validate
+      )
+    )
+    rates = response['data']
+    return Fees.symmetric(
+      maker=Decimal(str(rates['makerCommission'])),
+      taker=Decimal(str(rates['takerCommission'])),
+    )
+
+  def candles(
+    self,
+    interval: CandleInterval,
+    start: datetime,
+    end: datetime,
+  ) -> PaginatedResponse[Candle]:
+    self.check_candles(interval, start, end)
+    return PaginatedResponse(candles(self, interval, start, end))
 
   async def open_orders(self) -> Sequence[OrderState]:
     return await open_orders(self)

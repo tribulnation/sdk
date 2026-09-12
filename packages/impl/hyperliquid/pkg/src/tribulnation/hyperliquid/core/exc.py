@@ -13,12 +13,38 @@ from typing_extensions import (
 from functools import wraps
 from types import CoroutineType
 import inspect
+from typed_core.exceptions import RateLimited as ClientRateLimited
 
-from tribulnation.sdk.core import NetworkError, ValidationError, ApiError, Error
+from tribulnation.sdk.core import (
+  NetworkError,
+  ValidationError,
+  ApiError,
+  RateLimited,
+  Error,
+)
 from typed_hyperliquid import core
 
 P = ParamSpec('P')
 R = TypeVar('R')
+
+
+def _api_error(e: 'core.ApiError') -> ApiError:
+  """
+  Translate a client API error to its most specific SDK error.
+
+  `typed_hyperliquid`'s HTTP transport raises a bare `ApiError(status, body)` for every
+  non-200 response, testnet rate limits included, so a `429` status is promoted to
+  `RateLimited` here the same way `tribulnation.dydx` already does for its own client.
+
+  Args:
+    e: The client's API error.
+  """
+  cls = (
+    RateLimited
+    if isinstance(e, ClientRateLimited) or (e.args and e.args[0] == 429)
+    else ApiError
+  )
+  return cls(*e.args)
 
 
 def translate(e: core.Error) -> Error:
@@ -33,7 +59,7 @@ def translate(e: core.Error) -> Error:
   if isinstance(e, core.ValidationError):
     return ValidationError(*e.args)
   if isinstance(e, core.ApiError):
-    return ApiError(*e.args)
+    return _api_error(e)
   return Error(*e.args)
 
 

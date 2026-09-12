@@ -1,6 +1,8 @@
-from typing_extensions import Any, Literal
+"""Shared conversion and paging for legacy Classic report history."""
+
+from typing_extensions import Any, AsyncIterator, Awaitable, Callable, Literal, TypeVar
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 from tribulnation.sdk.reporting import (
@@ -11,7 +13,8 @@ from tribulnation.sdk.reporting import (
 )
 
 
-class AutoDetect: ...
+class AutoDetect:
+  """Use the local timezone only for legacy naive timestamps."""
 
 
 AUTO_DETECT = AutoDetect()
@@ -26,13 +29,45 @@ class TimezoneMixin:
 
   @property
   def timezone(self) -> timezone:
+    """Resolve the legacy timestamp timezone."""
     if isinstance(self.tz, AutoDetect):
       return datetime.now().astimezone().tzinfo  # type: ignore
     else:
       return self.tz
 
   def add_tz(self, time: datetime) -> datetime:
-    return time.replace(tzinfo=self.timezone)
+    """Keep aware Typed timestamps intact; localize only legacy naive values."""
+    return time if time.tzinfo is not None else time.replace(tzinfo=self.timezone)
+
+
+Row = TypeVar('Row')
+
+
+async def id_pages(
+  fetch: Callable[[str | None], Awaitable[list[Row]]],
+  key: Callable[[Row], str],
+) -> AsyncIterator[list[Row]]:
+  """Walk a Classic ID cursor until empty or no new rows, without replaying rows."""
+  cursor: str | None = None
+  seen: set[str] = set()
+  while rows := await fetch(cursor):
+    fresh: list[Row] = []
+    for row in rows:
+      if (identity := key(row)) not in seen:
+        seen.add(identity)
+        fresh.append(row)
+    if not fresh:
+      return
+    yield fresh
+    cursor = key(rows[-1])
+
+
+def windows(start: datetime, end: datetime):
+  """Split legacy inclusive history bounds into at most 30-day wire windows."""
+  while start <= end:
+    upper = min(start + timedelta(days=30) - timedelta(milliseconds=1), end)
+    yield start, upper
+    start = upper + timedelta(milliseconds=1)
 
 
 def api_provenance(endpoint: str, response: Any) -> ApiProvenance:
@@ -74,7 +109,11 @@ def nonzero_fee(amount: Decimal, asset: str) -> Fee | None:
 def require_range(
   start: datetime | None, end: datetime | None
 ) -> tuple[datetime, datetime]:
-  """Require the explicit time range Bitget history endpoints need."""
-  if start is None or end is None:
-    raise ValueError('Bitget history requires both start and end.')
+  """Resolve optional history bounds to a recent best-effort 30-day window."""
+  end = end if end is not None else datetime.now(timezone.utc)
+  start = start if start is not None else end - timedelta(days=30)
+  if start.utcoffset() is None or end.utcoffset() is None:
+    raise ValueError('Bitget history bounds must be timezone-aware.')
+  if start > end:
+    raise ValueError('Bitget history start must not follow end.')
   return start, end

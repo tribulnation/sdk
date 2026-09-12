@@ -7,10 +7,14 @@ from .runner import run_suite
 
 
 def test_earn(
+  venue: Annotated[
+    str | None,
+    typer.Argument(help='Exact venue slug or configured account id'),
+  ] = None,
   accounts: Annotated[
     str,
     typer.Option(help='Path to the accounts configuration file'),
   ] = 'sdk.test.toml',
 ):
   """Test earn implementations against their live APIs."""
-  run_suite('earn', accounts)
+  run_suite('earn', accounts, venue)

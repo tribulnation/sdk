@@ -1,3 +1,5 @@
+"""Best-effort history from Bitget's Classic margin endpoints."""
+
 from typing_extensions import AsyncIterable, Iterable, Literal
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -21,6 +23,7 @@ from .util import (
   nonzero_fee,
   require_range,
   signed_size,
+  windows,
 )
 
 
@@ -36,7 +39,7 @@ class MarginHistory(TimezoneMixin, SdkHistory):
     """Fetch and cache Bitget spot symbol metadata."""
     if self.symbols_cache is None:
       self.symbols_cache = {
-        s['symbol']: s for s in await self.client.spot.public.symbols()
+        s['symbol']: s for s in await self.client.classic.spot.symbols()
       }
     return self.symbols_cache
 
@@ -45,8 +48,15 @@ class MarginHistory(TimezoneMixin, SdkHistory):
     self, margin_type: Literal['isolated', 'crossed'], start: datetime, end: datetime
   ):
     """Fetch margin tax rows as unknown observations."""
-    async for chunk in self.client.common.tax.margin_transaction_records_paged(
-      margin_type, start=start, end=end
+    async for _, record in self.flow_records(margin_type, start, end):
+      yield record
+
+  async def flow_records(
+    self, margin_type: Literal['isolated', 'crossed'], start: datetime, end: datetime
+  ):
+    """Keep the tax row's symbol alongside its observation for fill discovery."""
+    async for chunk in self.client.classic.tax.margin_records_paged(
+      margin_type, start_time=start, end_time=end
     ):
       for tx in chunk:
         subaccount = f'{margin_type}_margin'
@@ -71,10 +81,13 @@ class MarginHistory(TimezoneMixin, SdkHistory):
               subaccount=subaccount,
             )
           )
-        yield api_record_many(
-          observations,
-          endpoint=f'{margin_type}_margin_transaction_records',
-          response=tx,
+        yield (
+          tx['symbol'],
+          api_record_many(
+            observations,
+            endpoint=f'{margin_type}_margin_transaction_records',
+            response=tx,
+          ),
         )
 
   @SDK.method
@@ -88,28 +101,36 @@ class MarginHistory(TimezoneMixin, SdkHistory):
     """Fetch margin fills for one symbol as trade observations."""
     symbols = await self.symbols
     if margin_type == 'isolated':
-      fn = self.client.margin.isolated.trade.fills_paged
+      fn = self.client.classic.margin.isolated.order.fills_paged
     else:
-      fn = self.client.margin.cross.trade.fills_paged
-    async for chunk in fn(symbol, start=start, end=end):
+      fn = self.client.classic.margin.cross.order.fills_paged
+    async for chunk in fn(symbol=symbol, start_time=start, end_time=end):
       for fill in chunk:
         subaccount = f'{margin_type}_margin'
         base = symbols[symbol]['baseCoin']
         quote = symbols[symbol]['quoteCoin']
-        side = 'buy' if 'buy' in fill['side'] else 'sell'
+        direction = fill.get('side')
+        side = 'buy' if direction is not None and 'buy' in direction else 'sell'
+        size = fill.get('size')
+        time = fill.get('cTime')
+        fee_detail = fill.get('feeDetail')
+        fee_amount = fee_detail.get('totalFee') if fee_detail is not None else None
+        fee_asset = fee_detail.get('feeCoin') if fee_detail is not None else None
         yield api_record(
           SpotTrade(
-            id=fill['tradeId'],
-            time=self.add_tz(fill['cTime']),
+            id=fill.get('tradeId'),
+            time=self.add_tz(time) if time is not None else None,
             base=base,
             quote=quote,
             pair=symbol,
-            size=signed_size(fill['size'], side),
-            price=fill['priceAvg'],
-            order_id=fill['orderId'],
-            fee=nonzero_fee(
-              fill['feeDetail']['totalFee'], fill['feeDetail']['feeCoin']
-            ),
+            size=signed_size(size, side)
+            if size is not None and direction is not None
+            else None,
+            price=fill.get('priceAvg'),
+            order_id=fill.get('orderId'),
+            fee=nonzero_fee(fee_amount, fee_asset)
+            if fee_amount is not None and fee_asset is not None
+            else None,
             subaccount=subaccount,
           ),
           endpoint=f'{margin_type}_margin_fills',
@@ -134,20 +155,13 @@ class MarginHistory(TimezoneMixin, SdkHistory):
   ) -> AsyncIterable[HistoryRecord]:
     """Fetch margin history records."""
     start, end = require_range(start, end)
-    for margin_type in ('crossed', 'isolated'):
-      records = [record async for record in self.flows(margin_type, start, end)]
-      for record in records:
-        yield record
-      symbols = {
-        symbol
-        for record in records
-        if (
-          record.provenance['source'] == 'api'
-          and (response := record.provenance.get('response'))
-          and isinstance(response, dict)
-          and isinstance(symbol := response.get('symbol'), str)
-        )
-      }
-      async for chunk in self.trades(margin_type, symbols, start, end):
-        for record in chunk:
+    for lower, upper in windows(start, end):
+      for margin_type in ('crossed', 'isolated'):
+        symbols: set[str] = set()
+        async for symbol, record in self.flow_records(margin_type, lower, upper):
+          if symbol:
+            symbols.add(symbol)
           yield record
+        async for chunk in self.trades(margin_type, symbols, lower, upper):
+          for record in chunk:
+            yield record

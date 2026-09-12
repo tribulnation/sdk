@@ -1,6 +1,9 @@
+"""Best-effort history from Bitget's Classic spot endpoints."""
+
 from typing_extensions import AsyncIterable
 from dataclasses import dataclass, field
 from datetime import datetime
+from decimal import Decimal
 
 from tribulnation.sdk.core import SDK
 from tribulnation.sdk.reporting import (
@@ -23,6 +26,8 @@ from .util import (
   nonzero_fee,
   require_range,
   signed_size,
+  id_pages,
+  windows,
 )
 
 
@@ -38,15 +43,15 @@ class SpotHistory(TimezoneMixin, SdkHistory):
     """Fetch and cache Bitget spot symbol metadata."""
     if self.symbols_cache is None:
       self.symbols_cache = {
-        s['symbol']: s for s in await self.client.spot.public.symbols()
+        s['symbol']: s for s in await self.client.classic.spot.symbols()
       }
     return self.symbols_cache
 
   @SDK.method
   async def flows(self, start: datetime, end: datetime):
     """Fetch spot tax rows as unknown observations."""
-    async for chunk in self.client.common.tax.spot_transaction_records_paged(
-      start=start, end=end
+    async for chunk in self.client.classic.tax.spot_records_paged(
+      start_time=start, end_time=end
     ):
       for tx in chunk:
         observations: list[Observation] = [
@@ -80,7 +85,7 @@ class SpotHistory(TimezoneMixin, SdkHistory):
   async def trades(self, start: datetime, end: datetime):
     """Fetch spot fills as trade observations."""
     symbols = await self.symbols
-    async for chunk in self.client.spot.trade.fills_paged(start=start, end=end):
+    async for chunk in self.fill_pages(start, end):
       for fill in chunk:
         base = symbols[fill['symbol']]['baseCoin']
         quote = symbols[fill['symbol']]['quoteCoin']
@@ -91,11 +96,11 @@ class SpotHistory(TimezoneMixin, SdkHistory):
             base=base,
             quote=quote,
             pair=fill['symbol'],
-            size=signed_size(fill['size'], fill['side']),
-            price=fill['priceAvg'],
+            size=signed_size(Decimal(fill['size']), fill['side']),
+            price=Decimal(fill['priceAvg']),
             order_id=fill['orderId'],
             fee=nonzero_fee(
-              fill['feeDetail']['totalFee'], fill['feeDetail']['feeCoin']
+              Decimal(fill['feeDetail']['totalFee']), fill['feeDetail']['feeCoin']
             ),
             subaccount='spot',
           ),
@@ -106,7 +111,12 @@ class SpotHistory(TimezoneMixin, SdkHistory):
   @SDK.method
   async def deposits(self, start: datetime, end: datetime):
     """Fetch successful on-chain spot deposits."""
-    async for chunk in self.client.spot.wallet.deposit_records_paged(start, end):
+    async for chunk in id_pages(
+      lambda cursor: self.client.classic.spot.deposit.records(
+        start_time=start, end_time=end, id_less_than=cursor, limit=100
+      ),
+      lambda row: row['orderId'],
+    ):
       for deposit in chunk:
         if deposit['dest'] != 'on_chain' or deposit['status'] != 'success':
           continue
@@ -127,7 +137,12 @@ class SpotHistory(TimezoneMixin, SdkHistory):
   @SDK.method
   async def withdrawals(self, start: datetime, end: datetime):
     """Fetch successful on-chain spot withdrawals."""
-    async for chunk in self.client.spot.wallet.withdrawal_records_paged(start, end):
+    async for chunk in id_pages(
+      lambda cursor: self.client.classic.spot.withdrawal.records(
+        start_time=start, end_time=end, id_less_than=cursor, limit=100
+      ),
+      lambda row: row['orderId'],
+    ):
       for withdrawal in chunk:
         if withdrawal['dest'] != 'on_chain' or withdrawal['status'] != 'success':
           continue
@@ -154,11 +169,27 @@ class SpotHistory(TimezoneMixin, SdkHistory):
   ) -> AsyncIterable[HistoryRecord]:
     """Fetch spot history records."""
     start, end = require_range(start, end)
-    async for record in self.flows(start, end):
-      yield record
-    async for record in self.trades(start, end):
-      yield record
-    async for record in self.deposits(start, end):
-      yield record
-    async for record in self.withdrawals(start, end):
-      yield record
+    for lower, upper in windows(start, end):
+      async for record in self.flows(lower, upper):
+        yield record
+      async for record in self.trades(lower, upper):
+        yield record
+      async for record in self.deposits(lower, upper):
+        yield record
+      async for record in self.withdrawals(lower, upper):
+        yield record
+
+  async def fill_pages(self, start: datetime, end: datetime):
+    """Sweep known spot pairs; the current endpoint requires a symbol."""
+    for symbol in await self.symbols:
+      async for page in id_pages(
+        lambda cursor: self.client.classic.spot.order.fills(
+          symbol=symbol,
+          start_time=start,
+          end_time=end,
+          id_less_than=cursor,
+          limit=100,
+        ),
+        lambda row: row['tradeId'],
+      ):
+        yield page

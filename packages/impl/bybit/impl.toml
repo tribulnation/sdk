@@ -3,7 +3,8 @@
 
 [support.market]
 support = "full"
-auth = true
+auth = false
+note = "`candles` serves every contract interval on spot and perp, in Bybit's native newest-first pages, filtered to the required `[start, end)` range."
 # Bybit v5 is one API discriminated by `category`, so both exchanges
 # run off one client. `perp` lists linear perpetuals only — the 40 dated `LinearFutures`
 # contracts the same category carries pay no funding and settle on a delivery date, so

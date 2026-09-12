@@ -88,8 +88,9 @@ class SpotExchange(SpotMixin, _Exchange):
       if wanted is not None and mid not in wanted:
         continue
       result[mid] = Ticker(
-        last=Decimal(px) if (px := ctx.get('midPx')) is not None else None,
-        base_volume_24h=Decimal(ctx['dayNtlVlm']),
+        # Asset contexts publish a midpoint, not the last traded price.
+        last=None,
+        base_volume_24h=ctx.get('dayBaseVlm'),
       )
       coin_to_market[asset['name']] = mid
 

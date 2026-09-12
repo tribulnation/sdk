@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tribulnation-bybit"
-version = "0.1.0"
+version = "0.2.0"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
@@ -12,7 +12,7 @@ description = "Tribulnation SDK implementation for Bybit."
 license = "MIT"
 license-files = ["LICENSE"]
 dependencies = [
-  "tribulnation-sdk>=1.7.0", "typed-bybit>=0.3.0"
+"tribulnation-sdk>=2.0.0", "typed-bybit>=0.3.1"
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}

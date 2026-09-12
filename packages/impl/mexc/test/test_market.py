@@ -7,6 +7,7 @@ from types import TracebackType
 from typing_extensions import AsyncIterable
 import asyncio
 
+from typed_mexc import MEXC
 from typed_mexc.spot.http.market.depth import OrderBook
 from typed_mexc.spot.streams.core.proto import (
   PublicAggreDepthsV3Api,
@@ -20,6 +21,9 @@ from tribulnation.mexc.market.impl.depth import (
   parse_update,
 )
 from tribulnation.mexc.market.impl.mixin import Shared
+from tribulnation.mexc import MexcMarket
+from tribulnation.sdk import MarketSDK
+from tribulnation.sdk.impl.accounts import Mexc
 from tribulnation.sdk.core import Subscription
 from tribulnation.sdk.market import Book
 
@@ -208,6 +212,7 @@ async def test_mexc_depth_stream_recovers_after_version_gap() -> None:
 
 async def test_mexc_depth_stream_unsubscribe_closes_source() -> None:
   """Tearing down the shared subscription unsubscribes the source exactly once."""
+  tasks = asyncio.all_tasks()
   source = FakeDepthSource()
   market_api = FakeMarketApi(
     [
@@ -223,14 +228,50 @@ async def test_mexc_depth_stream_unsubscribe_closes_source() -> None:
     await next_book(stream)
 
   assert source.unsubscribe_count == 1
+  assert not asyncio.all_tasks() - tasks
 
 
-async def test_mexc_shared_context_keeps_streams_lazy() -> None:
-  """Entering the SDK context must not enter the typed client's WS context."""
+async def test_mexc_shared_context_owns_the_lazy_client() -> None:
+  """The typed client owns lazy transports and must be closed by the SDK."""
   client = FakeClient()
   shared = Shared(client=client)  # pyright: ignore[reportArgumentType]
 
   async with shared:
-    assert client.entered == 0
+    assert client.entered == 1
 
-  assert client.exited == 0
+  assert client.exited == 1
+
+
+async def test_mexc_real_client_entry_does_not_open_unused_transports():
+  """Owning a public client must neither dial sockets nor mint private listen keys."""
+  client = MEXC.new(public=True)
+  shared = Shared(client=client)
+  async with shared:
+    assert client.spot_clients.http_client.http._client is None
+    assert client.futures_clients.http_client.http._client is None
+    assert not client.spot_clients.streams_client.user_client.ctx_future.done()
+    assert client.spot_clients.streams_client.market_client._ctx_future is None
+  assert client.spot_clients.http_client.http._client is None
+  assert client.futures_clients.http_client.http._client is None
+
+
+async def test_mexc_standalone_root_lookups_do_not_reuse_closed_transports():
+  """Repeated factory/child-context usage receives fresh real typed client state."""
+  root = MarketSDK(accounts={'test': Mexc(public=True)})
+  first = await root.venue('test')
+  assert isinstance(first, MexcMarket)
+  async with first:
+    first_http = await first.client.spot_clients.http_client.http.client
+    assert not first_http.is_closed
+  assert first_http.is_closed
+
+  second = await root.venue('test')
+  assert isinstance(second, MexcMarket)
+  assert second is not first
+  assert second.client is not first.client
+  async with second:
+    second_http = await second.client.spot_clients.http_client.http.client
+    assert second_http is not first_http
+    assert not second_http.is_closed
+    assert not second.client.spot_clients.streams_client.user_client.ctx_future.done()
+  assert second_http.is_closed

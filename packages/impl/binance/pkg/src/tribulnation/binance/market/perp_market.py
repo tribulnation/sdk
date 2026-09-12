@@ -3,17 +3,20 @@
 from typing_extensions import (
   AsyncContextManager,
   AsyncIterable,
+  AsyncIterator,
   Literal,
   Sequence,
 )
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
   PerpMarket as _PerpMarket,
   Book,
+  Candle,
+  CandleInterval,
   FundingPayment,
   FundingRate,
   NextFunding,
@@ -23,6 +26,7 @@ from tribulnation.sdk.market import (
   PerpCollateral,
   PerpPosition,
   Rules,
+  Fees,
   Settings,
   Trade,
 )
@@ -86,13 +90,14 @@ def one_mark_price(
 class PerpMarket(SharedMixin, _PerpMarket):
   """A Binance USD-M futures market.
 
-  Only the public endpoints (`depth`, `depth_stream`, `index`, `next_funding`,
-  `funding_rates`) are implemented: every private USD-M Futures endpoint returned 401
-  (`Invalid API-key, IP, or permissions`) against the tested account -- Binance blocks
-  USD-M Futures for EEA accounts under MiCA. See `futures_permission_error`.
+  Public depth, candles, index and funding data are implemented. Private USD-M
+  trading and account data are outside this implementation's spot-side account
+  scope; the configured account cannot access them. See `futures_permission_error`.
   """
 
   symbol: str
+
+  CANDLE_INTERVALS = frozenset[CandleInterval]({'1m', '5m', '15m', '1h', '4h', '1d'})
 
   @property
   def venue_id(self) -> str:
@@ -165,18 +170,119 @@ class PerpMarket(SharedMixin, _PerpMarket):
   ):
     """Fetch historical funding rates.
 
-    The client's own walk advances `start_time` to each full page's latest settlement
-    and stops on the first short one, so an unbounded query still costs a single call:
-    the venue's own most-recent slice comes back under the 1000-row cap.
+    An omitted start begins one millisecond after the epoch, before Binance existed.
+    The venue treats zero as an omitted bound and returns a recent slice instead.
+    The typed client's walk then advances through every retained page.
     """
+    earliest = datetime(1970, 1, 1, microsecond=1000, tzinfo=timezone.utc)
+    lower = max(start, earliest) if start is not None else earliest
+    if end is not None and end < lower:
+      return
     paging = self.client.usdm_futures.http.market.funding_rate_paged(
-      self.symbol, start_time=start, end_time=end, limit=1000
+      self.symbol,
+      start_time=lower,
+      end_time=end,
+      limit=1000,
     ).via(self.call_binance)
     async for rows in paging:
       yield [FundingRate(rate=r['fundingRate'], time=r['fundingTime']) for r in rows]
 
+  def candles(
+    self,
+    interval: CandleInterval,
+    start: datetime,
+    end: datetime,
+  ) -> PaginatedResponse[Candle]:
+    """Fetch USD-M trade candles, preserving the venue's native page order."""
+    self.check_candles(interval, start, end)
+    return PaginatedResponse(self.walk_candles(interval, start, end))
+
+  async def walk_candles(
+    self,
+    interval: CandleInterval,
+    start: datetime,
+    end: datetime,
+  ) -> AsyncIterator[Sequence[Candle]]:
+    """Fetch and retry individual pages within the requested half-open range."""
+    if start == end:
+      return
+    paging = self.client.usdm_futures.http.market.klines_paged(
+      self.symbol,
+      interval=interval,
+      start_time=start,
+      end_time=end,
+      limit=1000,
+    ).via(self.call_binance)
+    async for rows in paging:
+      page = [
+        Candle(
+          time=r[0],
+          open=r[1],
+          high=r[2],
+          low=r[3],
+          close=r[4],
+          volume=r[5],
+          quote_volume=r[7],
+          trades=r[8],
+        )
+        for r in rows
+        if start <= r[0] < end
+      ]
+      if page:
+        yield page
+
   async def rules(self, *, refetch: bool = False) -> Rules:
-    raise futures_permission_error('rules', self.id)
+    """Read public USD-M filters; price/quantity precision are not increments."""
+    symbols = await self.shared.load_perp_symbols(refetch=refetch)
+    info = symbols[self.symbol]
+    filters = {item['filterType']: item for item in info['filters']}
+    price = filters['PRICE_FILTER']
+    lot = filters['LOT_SIZE']
+    percent = filters.get('PERCENT_PRICE')
+    notional = filters.get('MIN_NOTIONAL')
+    tick_size = price.get('tickSize')
+    step_size = lot.get('stepSize')
+    if tick_size is None or step_size is None or tick_size <= 0 or step_size <= 0:
+      raise ValueError(
+        'Binance futures filters lack positive price/quantity increments'
+      )
+    # Regular, non-discounted USDT crypto perpetual schedule, checked 2026-09-10:
+    # https://www.binance.com/en-BH/fee/futureFee
+    # Do not extend this rate to USDC, TradFi or other products by guessing.
+    standard = (
+      info['quoteAsset'] == 'USDT'
+      and info['underlyingType'] == 'COIN'
+      and info['contractType'] == 'PERPETUAL'
+    )
+    return Rules(
+      fee_asset=info['marginAsset'],
+      tick_size=tick_size,
+      step_size=step_size,
+      fixed_min_qty=lot.get('minQty') or None,
+      max_qty=lot.get('maxQty') or None,
+      fixed_min_price=price.get('minPrice') or None,
+      fixed_max_price=price.get('maxPrice') or None,
+      min_value=notional.get('notional') if notional is not None else None,
+      rel_min_price=percent.get('multiplierDown') if percent is not None else None,
+      rel_max_price=percent.get('multiplierUp') if percent is not None else None,
+      fees=Fees.symmetric(maker=Decimal('0.0002'), taker=Decimal('0.0005'))
+      if standard
+      else None,
+      api=info['status'] == 'TRADING',
+      details=info,
+    )
+
+  @wrap_exceptions
+  async def fees(self, *, refetch: bool = False) -> Fees:
+    """Read ordinary-order account commissions, excluding RPI and BNB payment."""
+    rates = await self.client.usdm_futures.http.trading.trading_fee(self.symbol)
+    maker = rates.get('makerCommissionRate')
+    taker = rates.get('takerCommissionRate')
+    if (
+      rates.get('symbol', self.symbol) != self.symbol or maker is None or taker is None
+    ):
+      raise ValueError('Binance futures account fee response is missing matching rates')
+    return Fees.symmetric(maker=maker, taker=taker)
 
   async def open_orders(self) -> Sequence[OrderState]:
     raise futures_permission_error('open_orders', self.id)

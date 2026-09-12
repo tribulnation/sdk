@@ -17,10 +17,12 @@ from typed_dydx.indexer.schemas import (
 )
 from typed_dydx.node.orders.types import Flags, TimeInForce
 from typed_dydx.protos.dydxprotocol import feetiers as feetiers_proto
-from tribulnation.sdk.core import SDK, Subscription, OverflowPolicy
+from tribulnation.sdk.core import SDK, Subscription, OverflowPolicy, AuthError
 from tribulnation.dydx.core import wrap_exceptions
 from .depth import depth_stream, Book
 from .rules import parse_rules, Rules
+from .fees import combined_fees, market_charge, market_discount_params, PPM
+from tribulnation.sdk.market import Fees
 
 T = TypeVar('T')
 
@@ -49,13 +51,23 @@ settings_adapter = pydantic.TypeAdapter(Settings)
 class Shared(SDK):
   client: Dydx
   parent_subaccount: int = 0
-  address: str
+  address: str | None
   perpetual_markets: dict[str, PerpetualMarket] | None = None
   fee_tier: feetiers_proto.PerpetualFeeTier | None = None
+  standard_fee_tier: feetiers_proto.PerpetualFeeTier | None = None
+  market_discounts: dict[int, feetiers_proto.PerMarketFeeDiscountParams] | None = None
   parent_subaccount_subscriptions: dict[
     int, Subscription[ParentSubaccountNotification]
-  ] = field(default_factory=dict)
-  depth_subscriptions: dict[str, Subscription[Book]] = field(default_factory=dict)
+  ] = field(default_factory=dict[int, Subscription[ParentSubaccountNotification]])
+  depth_subscriptions: dict[str, Subscription[Book]] = field(
+    default_factory=dict[str, Subscription[Book]]
+  )
+
+  def require_address(self) -> str:
+    """Require an account only when an account-scoped operation uses it."""
+    if self.address is None:
+      raise AuthError('An address or mnemonic is required for account-scoped dYdX data')
+    return self.address
 
   @wrap_exceptions
   async def load_markets(self, *, refetch: bool = False) -> dict[str, PerpetualMarket]:
@@ -68,18 +80,85 @@ class Shared(SDK):
     self, *, refetch: bool = False
   ) -> feetiers_proto.PerpetualFeeTier:
     if refetch or self.fee_tier is None:
-      response = await self.client.chain.feetiers.user_fee_tier(self.address)
+      response = await self.client.chain.feetiers.user_fee_tier(self.require_address())
       if response.tier is None:
         raise ValueError('dYdX fee tier response did not include a tier')
       self.fee_tier = response.tier
     return self.fee_tier
 
   async def rules(self, market: str, *, refetch: bool = False) -> Rules:
-    markets, fee_tier = await asyncio.gather(
-      self.load_markets(refetch=refetch),
-      self.load_fee_tier(refetch=refetch),
+    """Read public metadata and the baseline schedule with active market holidays."""
+    markets = await self.load_markets(refetch=refetch)
+    fees = await self.fees(markets[market], personal=False, refetch=refetch)
+    return parse_rules(markets[market], fees)
+
+  @wrap_exceptions
+  async def load_market_charge(
+    self, clob_pair_id: int, *, refetch: bool = False
+  ) -> int:
+    """Load public holiday parameters and evaluate against the latest chain time."""
+    if self.market_discounts is None or refetch:
+      entries = await market_discount_params(self.client.chain.feetiers)
+      discounts = {entry.clob_pair_id: entry for entry in entries}
+      if len(discounts) != len(entries):
+        raise ValueError('dYdX market fee discounts contain duplicate CLOB pair IDs')
+      self.market_discounts = discounts
+    discount = self.market_discounts.get(clob_pair_id)
+    if discount is None:
+      return PPM
+    latest = await self.client.chain.tendermint.get_latest_block()
+    block = latest.block
+    if block is None or block.header is None or block.header.time is None:
+      raise ValueError('Latest dYdX block response did not include a timestamp')
+    return market_charge(discount, block.header.time)
+
+  @wrap_exceptions
+  async def fees(
+    self,
+    market: PerpetualMarket,
+    *,
+    personal: bool,
+    refetch: bool = False,
+  ) -> Fees:
+    """Combine the public or referral-adjusted personal tier with all fee discounts."""
+    tier, charge = await asyncio.gather(
+      self.load_fee_tier(refetch=refetch)
+      if personal
+      else self.load_standard_fee_tier(refetch=refetch),
+      self.load_market_charge(int(market['clobPairId']), refetch=refetch),
     )
-    return parse_rules(markets[market], fee_tier)
+    staking_discount = 0
+    if personal:
+      staking = await self.client.chain.feetiers.user_staking_tier(
+        self.require_address()
+      )
+      if staking.fee_tier_name != tier.name:
+        raise ValueError(
+          'dYdX account fee tier changed during fee calculation; refetch'
+        )
+      staking_discount = staking.discount_ppm
+    return combined_fees(tier, charge_ppm=charge, staking_discount_ppm=staking_discount)
+
+  @wrap_exceptions
+  async def load_standard_fee_tier(
+    self, *, refetch: bool = False
+  ) -> feetiers_proto.PerpetualFeeTier:
+    """Select the public tier without volume/share qualifications."""
+    if self.standard_fee_tier is None or refetch:
+      response = await self.client.chain.feetiers.perpetual_fee_params()
+      if response.params is None:
+        raise ValueError('dYdX public fee parameters are missing')
+      tiers = [
+        tier
+        for tier in response.params.tiers
+        if tier.absolute_volume_requirement == 0
+        and tier.total_volume_share_requirement_ppm == 0
+        and tier.maker_volume_share_requirement_ppm == 0
+      ]
+      if len(tiers) != 1:
+        raise ValueError('dYdX public fee parameters must identify one base tier')
+      self.standard_fee_tier = tiers[0]
+    return self.standard_fee_tier
 
   def parent_account_subscription(self, parent_subaccount: int):
     if parent_subaccount not in self.parent_subaccount_subscriptions:
@@ -87,7 +166,7 @@ class Shared(SDK):
       @wrap_exceptions
       async def subscribe():
         stream = await self.client.indexer.streams.parent_subaccounts(
-          self.address, subaccount=parent_subaccount
+          self.require_address(), subaccount=parent_subaccount
         )
 
         @wrap_exceptions
@@ -117,8 +196,10 @@ class Shared(SDK):
 class ExchangeMixin(SDK):
   shared: Shared
 
+  @SDK.method
   @wrap_exceptions
   async def call_dydx(self, fn: Callable[[], Awaitable[T]]) -> T:
+    """Retry individual translated requests through the caller's SDK context."""
     return await fn()
 
   @classmethod
@@ -138,9 +219,7 @@ class ExchangeMixin(SDK):
         mnemonic, indexer={'validate': validate}, public=mnemonic is None
       )
     )
-    if address is None:
-      if mnemonic is None:
-        raise ValueError('Either address or mnemonic must be provided')
+    if address is None and mnemonic is not None:
       address = client.node.require_wallet().address
     return cls(
       shared=Shared(client=client, address=address, parent_subaccount=parent_subaccount)
@@ -156,7 +235,7 @@ class ExchangeMixin(SDK):
 
   @property
   def address(self):
-    return self.shared.address
+    return self.shared.require_address()
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield self.shared

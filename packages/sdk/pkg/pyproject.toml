@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tribulnation-sdk"
-version = "1.7.2"
+version = "2.0.0"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
@@ -12,7 +12,7 @@ description = "An abstract, fully-typed, async Python SDK for automated crypto t
 license = "MIT"
 license-files = ["LICENSE"]
 dependencies = [
-  "lazy-loader", "typing-extensions", "typed-core",
+  "lazy-loader", "typing-extensions", "typed-core>=0.8.1",
 ]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}
@@ -27,16 +27,18 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-mexc = ["tribulnation-mexc"]
-dydx = ["tribulnation-dydx"]
-hyperliquid = ["tribulnation-hyperliquid"]
-binance = ["tribulnation-binance"]
-bitget = ["tribulnation-bitget"]
-bit2me = ["tribulnation-bit2me"]
-ethereum = ["tribulnation-ethereum"]
-kraken = ["tribulnation-kraken"]
-bybit = ["tribulnation-bybit"]
-bingx = ["tribulnation-bingx"]
+mexc = ["tribulnation-mexc>=2.0.0"]
+dydx = ["tribulnation-dydx>=0.7.0"]
+hyperliquid = ["tribulnation-hyperliquid>=0.7.0"]
+binance = ["tribulnation-binance>=0.3.0"]
+bitget = ["tribulnation-bitget>=0.7.0"]
+bit2me = ["tribulnation-bit2me>=0.5.0"]
+ethereum = ["tribulnation-ethereum>=0.6.0"]
+bybit = ["tribulnation-bybit>=0.2.0"]
+coinbase = ["tribulnation-coinbase>=0.2.0"]
+kraken = ["tribulnation-kraken>=0.2.0"]
+kucoin = ["tribulnation-kucoin>=0.2.0"]
+deribit = ["tribulnation-deribit>=0.2.0"]
 
 [project.urls]
 Github = "https://github.com/tribulnation/sdk.git"

@@ -8,6 +8,8 @@ from decimal import Decimal
 from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
   Book,
+  Candle,
+  CandleInterval,
   FundingPayment,
   FundingRate,
   NextFunding,
@@ -18,14 +20,17 @@ from tribulnation.sdk.market import (
   PerpMarket as _PerpMarket,
   PerpPosition,
   Rules,
+  Fees,
   Settings,
   Trade,
 )
 
 from tribulnation.bybit.core import num
 from .impl import (
+  CANDLE_INTERVALS,
   Category,
   MarketMixin,
+  candles,
   depth_stream,
   funding_payments,
   funding_rates,
@@ -40,6 +45,8 @@ from .impl import (
 @dataclass(kw_only=True, frozen=True)
 class PerpMarket(MarketMixin, _PerpMarket):
   """One Bybit linear perpetual contract, e.g. `BTCUSDT`."""
+
+  CANDLE_INTERVALS = CANDLE_INTERVALS
 
   @property
   def category(self) -> Category:
@@ -81,21 +88,13 @@ class PerpMarket(MarketMixin, _PerpMarket):
 
     Args:
       refetch: Refetch the instrument catalogue instead of reading the cached one.
-        The fee rate is account-scoped and always fetched fresh.
+        Standard fees are unknown here; use fees() for account rates.
     """
     instruments = await self.perp_instruments(refetch=refetch)
     info = instruments[self.symbol]
     lot = info['lotSizeFilter']
     prices = info['priceFilter']
-    fees = await self.call_bybit(
-      lambda: self.client.account.fee_rate(
-        'linear', symbol=self.symbol, validate=self.validate
-      )
-    )
-    fee = fees['list'][0] if fees['list'] else None
     return Rules(
-      base=info['baseCoin'],
-      quote=info['quoteCoin'],
       fee_asset=info['settleCoin'],
       tick_size=prices['tickSize'],
       step_size=lot['qtyStep'],
@@ -104,11 +103,32 @@ class PerpMarket(MarketMixin, _PerpMarket):
       max_qty=lot['maxOrderQty'],
       fixed_min_price=prices['minPrice'],
       fixed_max_price=prices['maxPrice'],
-      maker_fee=fee['makerFeeRate'] if fee else Decimal(0),
-      taker_fee=fee['takerFeeRate'] if fee else Decimal(0),
+      fees=None,
       api=info['status'] == 'Trading',
       details=info,
     )
+
+  async def fees(self, *, refetch: bool = False) -> Fees:
+    """Read the exact symbol's account rates; never select an unrelated row."""
+    response = await self.call_bybit(
+      lambda: self.client.account.fee_rate(
+        'linear', symbol=self.symbol, validate=self.validate
+      )
+    )
+    rows = [row for row in response['list'] if row['symbol'] == self.symbol]
+    if len(rows) != 1:
+      raise ValueError('Bybit account fee response must contain the requested symbol')
+    return Fees.symmetric(maker=rows[0]['makerFeeRate'], taker=rows[0]['takerFeeRate'])
+
+  def candles(
+    self,
+    interval: CandleInterval,
+    start: datetime,
+    end: datetime,
+  ) -> PaginatedResponse[Candle]:
+    """Fetch historical trade candles in Bybit's native page order."""
+    self.check_candles(interval, start, end)
+    return PaginatedResponse(candles(self, interval, start, end))
 
   async def open_orders(self) -> Sequence[OrderState]:
     """Fetch your currently open orders."""

@@ -1,11 +1,14 @@
 """Tests for declarative async resource lifecycles."""
 
 from dataclasses import dataclass
+from datetime import datetime
+from types import TracebackType
+from typing_extensions import AsyncIterable, Collection, Iterable
 
 import pytest
 
 from tribulnation.sdk import SDK
-from tribulnation.sdk.reporting import Report, Snapshots
+from tribulnation.sdk.reporting import HistoryRecord, Report, SnapshotRecord, Snapshots
 
 
 @dataclass
@@ -20,7 +23,12 @@ class Resource:
       raise RuntimeError(self.name)
     return self
 
-  async def __aexit__(self, exc_type, exc_value, traceback):
+  async def __aexit__(
+    self,
+    exc_type: type[BaseException] | None,
+    exc_value: BaseException | None,
+    traceback: TracebackType | None,
+  ):
     self.events.append(f'exit:{self.name}')
 
 
@@ -28,7 +36,7 @@ class Resource:
 class Owner(SDK):
   resources_to_enter: tuple[Resource, ...]
 
-  def resources(self):
+  def resources(self) -> Iterable[Resource]:
     yield from self.resources_to_enter
 
 
@@ -116,15 +124,17 @@ async def test_report_subclassing_a_concrete_snapshots_still_enters_it():
   class VenueSnapshots(Snapshots):
     resource: Resource
 
-    def resources(self):
+    def resources(self) -> Iterable[Resource]:
       yield self.resource
 
-    async def snapshot(self, assets=None):
+    async def snapshot(self, assets: Collection[str] | None = None) -> SnapshotRecord:
       raise NotImplementedError
 
   @dataclass
   class VenueReport(Report, VenueSnapshots):
-    def history(self, start=None, end=None):
+    def history(
+      self, start: datetime | None = None, end: datetime | None = None
+    ) -> AsyncIterable[HistoryRecord]:
       raise NotImplementedError
 
   async with VenueReport(Resource('client', events)):
@@ -140,14 +150,14 @@ async def test_resources_compose_through_super():
   class Base(SDK):
     first: Resource
 
-    def resources(self):
+    def resources(self) -> Iterable[Resource]:
       yield self.first
 
   @dataclass
   class Derived(Base):
     second: Resource
 
-    def resources(self):
+    def resources(self) -> Iterable[Resource]:
       yield from super().resources()
       yield self.second
 
@@ -246,7 +256,12 @@ async def test_exit_can_suppress_an_exception():
     async def __aenter__(self):
       return self
 
-    async def __aexit__(self, exc_type, exc_value, traceback):
+    async def __aexit__(
+      self,
+      exc_type: type[BaseException] | None,
+      exc_value: BaseException | None,
+      traceback: TracebackType | None,
+    ):
       return True
 
   class Owns(SDK):

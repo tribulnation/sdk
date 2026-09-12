@@ -1,6 +1,7 @@
 from dataclasses import dataclass as _dataclass, field as _field
 from .core import SdkMixin
 from .earn import Earn
+from .market import BitgetMarket
 from .reporting import Reporting
 from .wallet import Wallet
 

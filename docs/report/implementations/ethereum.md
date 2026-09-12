@@ -31,6 +31,6 @@ history provider is Etherscan and its default snapshot provider is Alchemy. Set
 
 ---
 
-← [dYdX Report](dydx.md) · **Next:** [Reference](../../reference/index.md) →
+← [dYdX Report](dydx.md) · **Next:** [MEXC Report](mexc.md) →
 
 <!-- /next -->

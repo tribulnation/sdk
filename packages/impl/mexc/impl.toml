@@ -2,8 +2,10 @@
 # auth = true means every call always needs a real accounts.Mexc() entry.
 
 [support.market]
-support = "full"
+support = "partial"
 auth = false
+methods = ["depth", "depth_stream", "rules", "fees", "candles", "tickers", "index", "next_funding", "funding_rates", "perp_stats", "open_orders", "query_order", "trades_history", "trades_stream", "position", "collateral", "available_notional", "place_order", "cancel_order", "cancel_orders", "cancel_open_orders"]
+note = "Spot keeps its complete implementation. Linear perpetuals use exchange `perp` and exact native symbols such as `BTC_USDT`; public REST discovery, rules, depth, candles, tickers, index, next_funding, funding_rates and perp_stats are implemented. Public spot fees use per-symbol exchange metadata; active API-enabled perpetuals use the separate June 2026 API schedule, corroborated in August, not web/app rates. Personal spot fees require MX deduction disabled because pre-discount rates are not separately exposed; RPI orders are excluded. Personal perpetual fees remain explicitly unsupported until API-channel applicability and conditional adjustments are verified. Perpetual streams and other private/trading methods are unsupported. Quantities and open interest are converted from contracts to base units using contractSize. The bulk perpetual ticker reports funding but not settlement time/interval: those optional perp_stats fields stay None, and next_funding reads the actual per-contract state. Candles require `[start, end)` bounds; spot pages 500 at a time (the real response cap), perpetuals segment at 2000 opens. No synthetic empty candles or response-order guarantee."
 # MarketSDK.DEFAULT_ACCOUNTS includes 'mexc' (Mexc(public=True)) — but that only covers
 # purely public market-data methods; account-scoped/trading methods still need real
 # credentials regardless (see docs/contract/market.yml's per-method `public: false`).
@@ -21,11 +23,15 @@ auth = true
 
 [support.report]
 support = "partial"
-methods = ["snapshot"]
 auth = true
-note = "`history()` raises `NotImplementedError`; the underlying `Reporting` targets classic accounts."
-# MexcReport serves snapshot() directly but raises NotImplementedError from history() —
-# the underlying Reporting class targets a different (classic-account) shape.
+methods = ["snapshot", "history"]
+note = "`history()` defaults to the last 30 days and automatically sweeps all spot symbols returned by exchange info. This can require many requests; delisted symbols absent from the catalogue cannot be discovered. It also covers crypto deposits/withdrawals and futures funding settlements. API history is best-effort: retention and per-query caps can leave gaps for file ingestion. Futures fills and closed positions, spot-futures and sub-account transfers, dust conversions and affiliate rebates are not covered; margin has no surface in the typed client."
+# `snapshot()` reads spot balances plus futures assets and open positions, as two
+# SubaccountSnapshots. `history()` discovers spot symbols and covers crypto deposits/withdrawals (seven-day
+# query cap, so windows are sliced) and futures funding settlements (page-based, no time
+# filter, so every page is read and the window applied client-side). Every one of those
+# endpoints needs an API key with spot trade-read, wallet-read and futures-read scopes.
+# Run `sdk-dev test report mexc` against an appropriately scoped key before release.
 
 [ids]
 asset = "symbol"

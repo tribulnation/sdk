@@ -34,17 +34,7 @@ jobs:
             base="$(git hash-object -t tree /dev/null)"
           fi
 
-          git diff --name-only "$base" HEAD > /tmp/changed-files
-          if grep -Eq '^(packages/sdk/|requirements\.txt$|pyrightconfig\.json$|pytest\.ini$|ruff\.toml$|\.agents/tools/python/ruff\.toml$|\.github/workflows/check\.yml$)' /tmp/changed-files; then
-            {
-              echo sdk
-              find packages/impl -mindepth 1 -maxdepth 1 -type d ! -name '.*' -printf '%f\n'
-            } | sort -u > /tmp/packages
-          else
-            awk -F/ '$1 == "packages" && $2 == "impl" && $3 !~ /^\./ { print $3 }' /tmp/changed-files | sort -u > /tmp/packages
-          fi
-
-          packages=$(jq -R -s -c 'split("\n")[:-1]' /tmp/packages)
+          packages=$(git diff --name-only "$base" HEAD | python .github/select_packages.py)
           echo "packages=$packages" >> "$GITHUB_OUTPUT"
 
   package:
@@ -64,15 +54,22 @@ jobs:
 
       - id: package
         run: |
-          if [ "${{ matrix.package }}" = "sdk" ]; then
-            echo "path=packages/sdk/pkg" >> "$GITHUB_OUTPUT"
+          if [ "${{ matrix.package }}" = "sdk" ] || [ "${{ matrix.package }}" = "sdk-dev" ]; then
+            echo "path=packages/${{ matrix.package }}/pkg" >> "$GITHUB_OUTPUT"
           else
             echo "path=packages/impl/${{ matrix.package }}/pkg" >> "$GITHUB_OUTPUT"
           fi
 
       - run: pip install -e packages/sdk/pkg
-      - if: matrix.package != 'sdk'
+      # SDK routing and sdk-dev checks import optional implementations and EVM types.
+      # Install their real dependencies before checking those imports.
+      - if: matrix.package == 'sdk' || matrix.package == 'sdk-dev'
+        run: pip install -r requirements.txt
+      - if: matrix.package != 'sdk' && matrix.package != 'sdk-dev'
         run: pip install -e ${{ steps.package.outputs.path }}
+      # Shared Market.Settings references both optional venue settings types.
+      - if: matrix.package == 'dydx' || matrix.package == 'hyperliquid'
+        run: pip install -e packages/impl/dydx/pkg -e packages/impl/hyperliquid/pkg
       - run: pip install ruff pyright build
       - run: ruff check --config ruff.toml ${{ steps.package.outputs.path }}/src
       - run: pyright ${{ steps.package.outputs.path }}
@@ -111,3 +108,36 @@ jobs:
 
       - run: pip install -r requirements.txt
       - run: pytest
+
+  release_evidence:
+    if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'release/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/checkout@v5
+        with:
+          repository: tribulnation/catalogue
+          ref: main
+          path: release-catalogue
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      # crcmod 1.7 optionally builds a host-specific C extension. Match the
+      # portable pure-Python build used by local qualification, without waiving hashes.
+      - name: Install reproducible crcmod runtime
+        env:
+          CC: /bin/false
+        run: pip install --no-cache-dir --no-binary=crcmod crcmod==1.7
+      - name: Install candidate with recorded dependency versions
+        run: |
+          constraints=()
+          for report in release-evidence/*/*/dependency-pins.txt; do
+            if [ -f "$report" ]; then
+              constraints+=(-c "$report")
+            fi
+          done
+          pip install "${constraints[@]}" -r requirements.txt
+      - name: Verify local evidence without exchange credentials
+        env:
+          RELEASE_BRANCH: ${{ github.head_ref }}
+        run: sdk-dev results release "${RELEASE_BRANCH#release/}" --catalogue release-catalogue/data

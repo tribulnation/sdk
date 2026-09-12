@@ -4,6 +4,7 @@
 
 ```
 docs/                 # user-facing docs; docs/contract/*.yml feeds the generated method reference
+dev-docs/             # maintainer guides and ADRs; outside the user-docs navigation
 packages/
 ├── sdk/
 │   ├── pkg/          # tribulnation-sdk
@@ -39,6 +40,56 @@ registry.toml         # public venue registry (display name, icon, PyPI, tier)
   live surfaces and lists the IDs the catalogue cannot translate yet
 - Docs: `sdk-dev docs check` (`--fix` rewrites the generated GitHub-only blocks; CI runs
   the check on every push); `just docs-refresh` renders them into a local landing checkout
+
+## Architecture decisions
+
+Developer guides and decision history live in [dev-docs/](dev-docs/README.md),
+separate from the SDK user reference in `docs/`. Keep user-facing contracts and
+examples self-contained there; SDK-dev workflows and release policy belong here
+or in `dev-docs/`.
+
+Keep load-bearing decisions in the [ADR index](dev-docs/adr/README.md): public
+contracts, architecture, guarantees, policy, and meaningful tradeoffs. Read the
+relevant records before changing those areas, and include a new ADR with a PR that
+introduces or changes such a decision. Routine fixes do not need an ADR.
+
+Use the numbered template and index there. Distinguish an accepted design from an
+implemented or release-verified one. Once accepted, preserve the decision and its
+rationale; a changed decision gets a new record that supersedes or amends the old
+one, with links and status updates in both the record and index.
+
+## Live conformance checks
+
+For the fingerprinted local consistency suite and offline release verifier, see
+[Local SDK checks](dev-docs/local-checks.md). Run `sdk-dev test consistency`
+to capture both results and fingerprints; do not generate checksums as an
+independent attestation step. Releases additionally require `sdk-dev test surfaces`
+to record every applicable read-only suite below, even for market implementations.
+
+1. Run `sdk-dev test market|earn|wallet|report [venue-or-account] --accounts sdk.test.toml`.
+   The optional selector matches an exact venue slug or account id, including aliases
+   that do not contain the venue name. Without it, every eligible configured account
+   (and available public default) is selected. Support comes from `impl.toml`.
+2. These suites do not place/cancel orders, transfer funds, or subscribe/redeem Earn
+   positions. Market checks cover reference-market discovery, books and public streams,
+   rules, tickers, funding data, and candles. Rules do not fetch personal fee tiers;
+   Coinbase's authenticated catalogue paths still skip on public-only accounts.
+   Configure a private account to verify those reads. Account-specific Bitget checks remain
+   read-only. Earn enumerates instruments; Wallet enumerates methods; Report reads a
+   snapshot and the last 30 days. Binance and MEXC discover their own spot markets;
+   their per-symbol history sweeps can require many requests.
+3. Missing configured credential environment variables and declared unsupported methods
+   are visible skips, not verification. Rejected credentials, unexpected
+   `NotImplementedError`, malformed responses and transport failures remain failures.
+   An all-skipped run is not evidence of release readiness.
+4. Candle windows roll with time and check timezone awareness, half-open bounds,
+   uniqueness, alignment and value types. They impose no response ordering or synthetic
+   rows for empty venue intervals. Exact page-boundary completeness is covered by
+   deterministic unit fixtures; live cross-page checks apply only where retention
+   allows them. Hyperliquid's retained history fits one response, so its cross-page
+   test explicitly skips.
+5. Each suite uses one session event loop and owned async contexts. Error summaries
+   omit raw exception payloads, which can contain credentials or account records.
 
 ## Writing SDK objects
 
@@ -117,6 +168,12 @@ from the code.
 Bump `version` in the package's `pkg/pyproject.toml` on a branch named `release/sdk` or
 `release/<venue>`, and open a PR touching that package. Merging it tags the commit and
 publishes to PyPI (`.github/workflows/release.yml`).
+
+Publication additionally requires matching, passing local read-suite reports in
+`release-evidence/<venue>/surfaces/` and market consistency reports in
+`release-evidence/<venue>/consistency/`; missing evidence blocks both release PR verification
+and publication. The publication job checks the exact merged commit. Passing
+evidence does not constitute approval to merge or publish.
 
 Release the SDK before the impls: their `tribulnation-sdk` floors require the new version
 to exist on PyPI. Raise those floors in the same release as any change to a base class

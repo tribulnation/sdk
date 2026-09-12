@@ -5,6 +5,8 @@ from decimal import Decimal
 
 from tribulnation.sdk.core import PaginatedResponse, LogicError, OverflowPolicy
 from tribulnation.sdk.market import (
+  Candle,
+  CandleInterval,
   Market,
   Book,
   Collateral,
@@ -13,11 +15,13 @@ from tribulnation.sdk.market import (
   OrderState,
   Position,
   Rules,
+  Fees,
   Settings,
   Trade,
 )
 
 from tribulnation.hyperliquid.core import wrap_exceptions
+from .impl.candles import CANDLE_INTERVALS, candles
 
 from .impl import (
   SpotMarketMixin,
@@ -63,6 +67,24 @@ class SpotMarket(SpotMarketMixin, Market):
 
   async def rules(self, *, refetch: bool = False) -> Rules:
     return await spot_rules(self, refetch=refetch)
+
+  async def fees(self, *, refetch: bool = False) -> Fees:
+    """Decline incomplete spot rates until quote-token adjustments are resolvable."""
+    raise NotImplementedError(
+      'Hyperliquid spot fees require verified quote-token and stable-pair metadata'
+    )
+
+  def candles(
+    self,
+    interval: CandleInterval,
+    start: datetime,
+    end: datetime,
+  ) -> PaginatedResponse[Candle]:
+    """Fetch trade candles in the requested half-open range."""
+    self.check_candles(interval, start, end)
+    return PaginatedResponse(candles(self, interval, start, end))
+
+  CANDLE_INTERVALS = CANDLE_INTERVALS
 
   async def open_orders(self) -> Sequence[OrderState]:
     return await open_orders(self)

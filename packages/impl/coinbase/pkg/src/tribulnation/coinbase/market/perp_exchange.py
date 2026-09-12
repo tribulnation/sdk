@@ -33,12 +33,9 @@ class PerpExchange(impl.ExchangeMixin, _PerpExchange):
   async def tickers(
     self, markets: Collection[str] | None = None, *, settings: Settings = {}
   ) -> Mapping[str, Ticker]:
-    """Fetch a ticker snapshot for many perpetuals at once.
-
-    Same catalogue source, and the same missing book depth, as the spot exchange's.
-    """
+    """Combine INTX trade statistics with batched bid/ask prices and sizes."""
     products = await impl.list_products(self, product_type='FUTURE', perpetual=True)
-    return impl.tickers(impl.filtered(products, markets))
+    return await impl.tickers(self, impl.filtered(products, markets))
 
   async def perp_stats(
     self, markets: Collection[str] | None = None, *, settings: Settings = {}

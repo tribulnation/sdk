@@ -49,19 +49,51 @@ raises, rather than quietly placing a different order.
   `buyable_at`/`sellable_at`, `with_fees`, `limit`, `merge`, `update` (apply an incremental
   diff), and in-place `buy`/`sell`. Quantities are base units, and
   `notional = price × qty`.
-- `Rules`: `base`, `quote` and `fee_asset`, `tick_size`, `step_size`, min and max qty and
-  price (fixed and price-relative), `maker_fee`/`taker_fee`, and an `api` flag for whether
+- `Rules`: `fee_asset`, `tick_size`, `step_size`, min and max qty and
+  price (fixed and price-relative), optional standard `fees`, and an `api` flag for whether
   the instrument is tradable through the API at all. The helpers round, truncate and
   validate against those constraints (`round_price`, `trunc_qty`, `min_qty`, `notional2qty`,
   and so on): see [Your First Order](first-order.md). Fees are fractions of 1.
+  Base/quote identities come from the Catalogue instrument, not `Rules`.
 - `Ticker`: `last`, `bid`, `ask`, `bid_qty`, `ask_qty` and `base_volume_24h`, all optional.
 - `Trade`: `id`, `price`, signed `qty`, `time`, a `maker` flag, and an optional `fee`
   (`amount` plus `asset`).
+
+### Trading fees
+
+`Fees` has four combined rates: `maker_buy`, `maker_sell`, `taker_buy`, and
+`taker_sell`. Rates include applicable side, tax, special and market adjustments,
+but exclude optional fee-payment discounts. Zero is genuinely free and negative
+rates are rebates. `Rules.fees` describes the public standard non-VIP API schedule,
+or is `None` when unknown. `await market.fees()` returns the configured account's
+schedule; missing rates and request failures do not fall back to public fees.
+Unsupported fee calculations raise `NotImplementedError`.
+
+`book.with_fees(fees)` applies taker sell rates to bids and taker buy rates to asks;
+use `maker=True` for maker rates. A single `Decimal` remains a shorthand for a
+symmetric rate. This adjusts quoted notional costs, not actual settlement quantities,
+fee-token conversion or rounding.
 
 > [!NOTE]
 > `Ticker` carries no 24h open, high, low or change on purpose. You can derive them from a
 > sampled series, and storing them would freeze each venue's windowing choices into the
 > type.
+
+## Candles
+
+- `Candle`: `time` (the open time, timezone-aware, never the close), `open`, `high`, `low`
+  and `close`, plus optional `volume` (base units), `quote_volume` (quote turnover) and
+  `trades`. Each optional field is `None` where the venue reports nothing for it: Coinbase,
+  for one, publishes no quote volume.
+- `CandleInterval`: `'1m' | '5m' | '15m' | '1h' | '4h' | '1d'`. Each implementation
+  declares the subset it serves in `Market.CANDLE_INTERVALS`, so you can pick one without a
+  failed request; any other interval raises `ValueError` before anything is sent. Venue
+  extras (`1s`, `3d`, `1w`) are not exposed.
+
+> [!NOTE]
+> There is no `closed` flag: a candle is complete once `time + interval` is in the past.
+> Only trade candles are served; mark- and index-price series are a different thing and
+> would be a separate method, not a flag.
 
 ## Positions and collateral
 

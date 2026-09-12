@@ -1,6 +1,7 @@
 """Tests for structured asynchronous task ownership."""
 
 import asyncio
+from collections.abc import Awaitable
 
 import pytest
 
@@ -134,5 +135,6 @@ async def test_managed_tasks_cleans_up_on_async_generator_close() -> None:
 
 async def test_managed_tasks_accepts_no_awaitables() -> None:
   """Allow callers to own an empty task collection."""
-  async with managed_tasks(()) as tasks:
+  awaitables: list[Awaitable[None]] = []
+  async with managed_tasks(awaitables) as tasks:
     assert tasks == ()

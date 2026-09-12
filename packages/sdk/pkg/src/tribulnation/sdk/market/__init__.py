@@ -1,5 +1,9 @@
 from .types import (
   Book,
+  Candle,
+  CandleInterval,
+  candle_width,
+  candle_windows,
   Collateral,
   PerpCollateral,
   FundingRate,
@@ -14,6 +18,7 @@ from .types import (
   Ticker,
   Trade,
   Rules,
+  Fees,
 )
 from .settings import Settings
 from .market import Market, PerpMarket

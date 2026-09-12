@@ -16,3 +16,6 @@ pytest-asyncio
 -e packages/impl/bit2me/pkg
 -e packages/impl/bybit/pkg
 -e packages/impl/coinbase/pkg
+-e packages/impl/kraken/pkg
+-e packages/impl/kucoin/pkg
+-e packages/impl/deribit/pkg

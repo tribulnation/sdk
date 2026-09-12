@@ -1,0 +1,5495 @@
+{
+  "payload": {
+    "account_id": "coinbase",
+    "checks": [
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"1000BONK-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"1000PEPE-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"1000SHIB-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AAPL-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AAVE-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ADA-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AERO-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ALGO-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ALT-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AMZN-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"APE-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"APT-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ARB-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ASTER-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "coverage_deferred",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ATH-PERP-INTX\"]",
+        "quotes": [],
+        "status": "deferred"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ATOM-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AVAX-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AVNT-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "coverage_deferred",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AXS-PERP-INTX\"]",
+        "quotes": [],
+        "status": "deferred"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BCH-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BERA-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "coverage_deferred",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BLUR-PERP-INTX\"]",
+        "quotes": [],
+        "status": "deferred"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BNB-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BTC-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CFX-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"COMP-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CRV-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"DASH-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"DOGE-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"DOT-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"DYDX-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"EIGEN-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ENA-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ETC-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ETH-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ETHFI-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"EURC-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"FARTCOIN-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"FET-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"FIL-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"GOLD-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"GOOGL-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"HBAR-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"HYPE-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ICP-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"INJ-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"JASMY-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"JTO-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"JUP-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "coverage_deferred",
+        "id": "[\"catalogue_coverage\",\"perp\",\"KAS-PERP-INTX\"]",
+        "quotes": [],
+        "status": "deferred"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LDO-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LINK-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LIT-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LTC-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"META-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MON-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MORPHO-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MSFT-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MSTR-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"NEAR-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"NVDA-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ONDO-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"OP-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PAXG-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PENDLE-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PENGU-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PNUT-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"POL-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PUMP-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PYTH-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "coverage_deferred",
+        "id": "[\"catalogue_coverage\",\"perp\",\"RED-PERP-INTX\"]",
+        "quotes": [],
+        "status": "deferred"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"RENDER-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"RUNE-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"S-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "coverage_deferred",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SAND-PERP-INTX\"]",
+        "quotes": [],
+        "status": "deferred"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SEI-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SILVER-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "coverage_deferred",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SKY-PERP-INTX\"]",
+        "quotes": [],
+        "status": "deferred"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SOL-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"STRK-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SUI-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TAO-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TIA-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TRUMP-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TSLA-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"UNI-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"VIRTUAL-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"VVV-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"W-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"WIF-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"WLD-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"WLFI-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"XLM-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"XPL-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"XRP-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ZEC-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "coverage_deferred",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ZRO-PERP-INTX\"]",
+        "quotes": [],
+        "status": "deferred"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"1INCH-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"1INCH-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"1INCH-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"AAVE-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"AAVE-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"AAVE-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"AAVE-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ADA-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ADA-ETH\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ADA-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ADA-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ADA-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ADA-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"AERO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"AKT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ALEPH-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ALGO-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ALGO-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ALGO-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ALGO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ALT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ANKR-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ANKR-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"APE-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"APE-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"APE-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"APT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ARB-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ARKM-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ASTER-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ATH-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ATOM-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ATOM-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ATOM-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ATOM-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ATOM-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"AVAX-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"AVAX-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"AVAX-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"AVAX-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"AVNT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"AXL-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"AXS-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BAT-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BAT-ETH\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BAT-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BAT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BCH-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BCH-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BCH-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BCH-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BERA-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BIO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BLAST-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BLUR-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BNB-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BONK-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BTC-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BTC-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BTC-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BTC-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"CAKE-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"CGLD-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"CHZ-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"CHZ-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"CHZ-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "coverage_deferred",
+        "id": "[\"catalogue_coverage\",\"spot\",\"CHZ-USDT\"]",
+        "quotes": [],
+        "status": "deferred"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"COMP-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"COMP-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"COW-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"CRO-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"CRO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "coverage_deferred",
+        "id": "[\"catalogue_coverage\",\"spot\",\"CRO-USDT\"]",
+        "quotes": [],
+        "status": "deferred"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"CRV-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"CRV-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"CRV-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"CRV-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"CVX-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"DASH-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"DASH-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"DBR-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"DOGE-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"DOGE-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"DOGE-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"DOGE-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"DOGE-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"DOT-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"DOT-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"DOT-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"DOT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"DOT-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"EIGEN-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ENA-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ENS-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ENS-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ETC-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ETC-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ETC-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ETC-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ETH-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ETH-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ETH-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ETH-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ETH-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ETHFI-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"EURC-USDC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"FARTCOIN-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"FET-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"FET-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"FIL-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"FIL-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"FIL-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"FIL-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"FLOKI-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"FLR-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"G-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"GLM-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"GMT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"GNO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"GRT-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"GRT-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "coverage_deferred",
+        "id": "[\"catalogue_coverage\",\"spot\",\"GRT-GBP\"]",
+        "quotes": [],
+        "status": "deferred"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"GRT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"HBAR-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"HBAR-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"HYPE-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ICP-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ICP-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ICP-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"IMX-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"IMX-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"INJ-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"IO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"JASMY-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"JASMY-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"JTO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"JUPITER-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"KAITO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"LAYER-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"LDO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"LIGHTER-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"LINEA-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"LINK-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"LINK-ETH\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"LINK-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"LINK-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"LINK-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"LINK-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"LTC-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"LTC-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"LTC-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"LTC-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"MANA-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"MANA-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"MANTLE-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "coverage_deferred",
+        "id": "[\"catalogue_coverage\",\"spot\",\"MASK-GBP\"]",
+        "quotes": [],
+        "status": "deferred"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"MASK-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ME-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"META-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"MON-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"MORPHO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"NEAR-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"NEAR-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ONDO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"OP-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"OP-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"OSMO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"PAXG-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"PENDLE-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"PENGU-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"PEPE-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"PNUT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"POL-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"PUMP-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"PYTH-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"QNT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"QNT-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RAY-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RED-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RENDER-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"REQ-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"REZ-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"S-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SAND-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SEI-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SHIB-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SHIB-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SHIB-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SHIB-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SKY-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SNX-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SNX-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SNX-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SOL-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SOL-ETH\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SOL-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SOL-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SOL-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SOL-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"STRK-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"STX-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"STX-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SUI-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SYRUP-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"T-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"TAO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"TIA-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"TON-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"TRAC-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"TRB-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"TRUMP-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"UMA-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"UNI-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"UNI-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"UNI-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"UNI-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"USD1-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"USDC-AUD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"USDC-CAD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"USDC-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"USDC-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"USDS-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"USDT-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"USDT-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"USDT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"USDT-USDC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"VET-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"VIRTUAL-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"VVV-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"W-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"WIF-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"WLD-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"WLFI-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"XCN-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"XLM-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"XLM-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"XLM-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"XLM-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"XPL-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"XRP-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"XRP-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"XRP-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"XTZ-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"XTZ-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"XTZ-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"XTZ-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"YFI-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"YFI-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ZEC-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ZK-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ZRO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"1000BONK-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"1000PEPE-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"1000SHIB-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AAPL-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AAVE-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ADA-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AERO-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ALGO-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ALT-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AMZN-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"APE-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"APT-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ARB-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ASTER-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ATH-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ATOM-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AVAX-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AVNT-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AXS-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BCH-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BERA-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BLUR-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BNB-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BTC-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CFX-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"COMP-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CRV-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"DASH-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"DOGE-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"DOT-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"DYDX-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"EIGEN-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ENA-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ETC-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ETH-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ETHFI-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"EURC-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"FARTCOIN-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"FET-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"FIL-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"GOLD-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"GOOGL-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"HBAR-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"HYPE-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ICP-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"INJ-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"JASMY-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"JTO-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"JUP-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"KAS-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LDO-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LINK-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LIT-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LTC-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"META-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MON-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MORPHO-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MSFT-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MSTR-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"NEAR-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"NVDA-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ONDO-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"OP-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PAXG-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PENDLE-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PENGU-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PNUT-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"POL-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PUMP-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PYTH-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"RED-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"RENDER-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"RUNE-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"S-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SAND-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SEI-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SILVER-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SKY-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SOL-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"STRK-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SUI-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TAO-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TIA-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TRUMP-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TSLA-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"UNI-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"VIRTUAL-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"VVV-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"W-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"WIF-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"WLD-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"WLFI-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"XLM-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"XPL-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"XRP-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ZEC-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ZRO-PERP-INTX\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"1INCH-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"1INCH-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"1INCH-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"AAVE-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"AAVE-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"AAVE-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"AAVE-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ADA-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ADA-ETH\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ADA-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ADA-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ADA-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ADA-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"AERO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"AKT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ALEPH-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ALGO-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ALGO-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ALGO-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ALGO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ALT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ANKR-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ANKR-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"APE-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"APE-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"APE-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"APT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ARB-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ARKM-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ASTER-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ATH-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ATOM-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ATOM-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ATOM-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ATOM-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ATOM-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"AVAX-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"AVAX-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"AVAX-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"AVAX-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"AVNT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"AXL-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"AXS-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BAT-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BAT-ETH\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BAT-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BAT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BCH-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BCH-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BCH-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BCH-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BERA-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BIO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BLAST-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BLUR-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BNB-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BONK-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BTC-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BTC-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BTC-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BTC-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"CAKE-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"CGLD-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"CHZ-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"CHZ-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"CHZ-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"CHZ-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"COMP-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"COMP-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"COW-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"CRO-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"CRO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"CRO-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"CRV-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"CRV-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"CRV-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"CRV-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"CVX-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"DASH-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"DASH-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"DBR-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"DOGE-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"DOGE-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"DOGE-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"DOGE-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"DOGE-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"DOT-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"DOT-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"DOT-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"DOT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"DOT-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"EIGEN-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ENA-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ENS-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ENS-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ETC-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ETC-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ETC-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ETC-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ETH-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ETH-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ETH-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ETH-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ETH-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ETHFI-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"EURC-USDC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"FARTCOIN-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"FET-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"FET-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"FIL-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"FIL-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"FIL-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"FIL-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"FLOKI-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"FLR-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"G-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"GLM-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"GMT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"GNO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"GRT-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"GRT-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"GRT-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"GRT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"HBAR-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"HBAR-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"HYPE-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ICP-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ICP-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ICP-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"IMX-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"IMX-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"INJ-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"IO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"JASMY-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"JASMY-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"JTO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"JUPITER-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"KAITO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"LAYER-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"LDO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"LIGHTER-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"LINEA-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"LINK-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"LINK-ETH\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"LINK-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"LINK-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"LINK-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"LINK-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"LTC-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"LTC-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"LTC-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"LTC-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"MANA-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"MANA-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"MANTLE-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"MASK-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"MASK-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ME-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"META-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"MON-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"MORPHO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"NEAR-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"NEAR-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ONDO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"OP-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"OP-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"OSMO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"PAXG-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"PENDLE-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"PENGU-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"PEPE-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"PNUT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"POL-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"PUMP-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"PYTH-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"QNT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"QNT-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RAY-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RED-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RENDER-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"REQ-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"REZ-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"S-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SAND-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SEI-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SHIB-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SHIB-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SHIB-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SHIB-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SKY-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SNX-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SNX-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SNX-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SOL-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SOL-ETH\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SOL-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SOL-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SOL-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SOL-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"STRK-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"STX-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"STX-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SUI-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SYRUP-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"T-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"TAO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"TIA-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"TON-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"TRAC-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"TRB-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"TRUMP-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"UMA-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"UNI-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"UNI-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"UNI-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"UNI-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"USD1-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"USDC-AUD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"USDC-CAD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"USDC-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"USDC-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"USDS-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"USDT-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"USDT-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"USDT-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"USDT-USDC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"VET-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"VIRTUAL-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"VVV-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"W-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"WIF-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"WLD-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"WLFI-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"XCN-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"XLM-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"XLM-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"XLM-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"XLM-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"XPL-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"XRP-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"XRP-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"XRP-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"XTZ-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"XTZ-EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"XTZ-GBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"XTZ-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"YFI-BTC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"YFI-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ZEC-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ZK-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ZRO-USD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"discovery\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"exchange_identity\",\"intx\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"exchange_identity\",\"spot\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"intx\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"spot\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"intx\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"intx\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"intx\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"setup\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"intx\",\"1000BONK-PERP-INTX\"]",
+        "quotes": [
+          {
+            "after_ask": "0.002705",
+            "after_bid": "0.002699",
+            "ask": "0.002706",
+            "attempt": 1,
+            "before_ask": "0.002705",
+            "before_bid": "0.002699",
+            "bid": "0.002699",
+            "elapsed_seconds": 0.6038112930036732,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"intx\",\"1000MOG-PERP-INTX\"]",
+        "quotes": [
+          {
+            "after_ask": "0.0001",
+            "after_bid": "0.0000954",
+            "ask": "0.0001",
+            "attempt": 1,
+            "before_ask": "0.0001",
+            "before_bid": "0.0000954",
+            "bid": "0.0000954",
+            "elapsed_seconds": 0.4910142509979778,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"intx\",\"1000PEPE-PERP-INTX\"]",
+        "quotes": [
+          {
+            "after_ask": "0.003302",
+            "after_bid": "0.0033",
+            "ask": "0.003303",
+            "attempt": 1,
+            "before_ask": "0.003302",
+            "before_bid": "0.0033",
+            "bid": "0.0033",
+            "elapsed_seconds": 0.5191548349976074,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"intx\",\"BTC-PERP-INTX\"]",
+        "quotes": [
+          {
+            "after_ask": "77329.3",
+            "after_bid": "77329.2",
+            "ask": "77331.5",
+            "attempt": 1,
+            "before_ask": "77329.3",
+            "before_bid": "77329.2",
+            "bid": "77331.4",
+            "elapsed_seconds": 0.6108302850043401,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"spot\",\"00-USD\"]",
+        "quotes": [
+          {
+            "after_ask": "0.01401398",
+            "after_bid": "0.0139",
+            "ask": "0.01401398",
+            "attempt": 1,
+            "before_ask": "0.01401398",
+            "before_bid": "0.0139",
+            "bid": "0.0139",
+            "elapsed_seconds": 0.7589097390009556,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"spot\",\"00-USDC\"]",
+        "quotes": [
+          {
+            "after_ask": "0.01401398",
+            "after_bid": "0.0139",
+            "ask": "0.01401398",
+            "attempt": 1,
+            "before_ask": "0.01401398",
+            "before_bid": "0.0139",
+            "bid": "0.0139",
+            "elapsed_seconds": 0.5477064740043716,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"spot\",\"1INCH-EUR\"]",
+        "quotes": [
+          {
+            "after_ask": "0.07702",
+            "after_bid": "0.07676",
+            "ask": "0.07702",
+            "attempt": 1,
+            "before_ask": "0.07702",
+            "before_bid": "0.07676",
+            "bid": "0.07676",
+            "elapsed_seconds": 1.0188304409966804,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"spot\",\"BTC-USD\"]",
+        "quotes": [
+          {
+            "after_ask": "77315.72",
+            "after_bid": "77315.71",
+            "ask": "77315.72",
+            "attempt": 1,
+            "before_ask": "77315.71",
+            "before_bid": "77312.86",
+            "bid": "77315.71",
+            "elapsed_seconds": 0.7426257400002214,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"intx\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"intx\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"intx\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"spot\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"spot\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"spot\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      }
+    ],
+    "discovery": [
+      {
+        "exchange": "spot",
+        "kind": "spot",
+        "markets": [
+          "BTC-USD",
+          "BTC-USDC",
+          "ETH-USD",
+          "ETH-USDC",
+          "ZEC-USD",
+          "ZEC-USDC",
+          "USDT-USD",
+          "XRP-USD",
+          "XRP-USDC",
+          "SOL-USD",
+          "SOL-USDC",
+          "USDT-USDC",
+          "HYPE-USD",
+          "HYPE-USDC",
+          "USDT-EUR",
+          "VVV-USD",
+          "VVV-USDC",
+          "USDC-EUR",
+          "NEAR-USD",
+          "NEAR-USDC",
+          "USELESS-USD",
+          "USELESS-USDC",
+          "DOGE-USD",
+          "DOGE-USDC",
+          "BTC-EUR",
+          "LINK-USD",
+          "LINK-USDC",
+          "ADA-USD",
+          "ADA-USDC",
+          "PUMP-USD",
+          "PUMP-USDC",
+          "UNI-USD",
+          "UNI-USDC",
+          "SUI-USD",
+          "SUI-USDC",
+          "TAO-USD",
+          "TAO-USDC",
+          "XLM-USD",
+          "XLM-USDC",
+          "EURC-USDC",
+          "USDC-INR",
+          "LTC-USD",
+          "LTC-USDC",
+          "ETH-EUR",
+          "LIGHTER-USD",
+          "LIGHTER-USDC",
+          "VTHO-USD",
+          "VTHO-USDC",
+          "AERO-USD",
+          "AERO-USDC",
+          "ARB-USD",
+          "ARB-USDC",
+          "DASH-USD",
+          "DASH-USDC",
+          "XRP-EUR",
+          "ONDO-USD",
+          "ONDO-USDC",
+          "AVAX-USD",
+          "AVAX-USDC",
+          "FARTCOIN-USD",
+          "FARTCOIN-USDC",
+          "DOT-USD",
+          "DOT-USDC",
+          "TRUMP-USD",
+          "TRUMP-USDC",
+          "BCH-USD",
+          "BCH-USDC",
+          "BTC-USDT",
+          "ENA-USD",
+          "ENA-USDC",
+          "USDT-GBP",
+          "HBAR-USD",
+          "HBAR-USDC",
+          "SOL-EUR",
+          "AAVE-USD",
+          "AAVE-USDC",
+          "ICP-USD",
+          "ICP-USDC",
+          "RAY-USD",
+          "RAY-USDC",
+          "USDC-BRL",
+          "FET-USD",
+          "FET-USDC",
+          "BNB-USD",
+          "BNB-USDC",
+          "BTC-GBP",
+          "ETH-USDT",
+          "PEPE-USD",
+          "PEPE-USDC",
+          "ATOM-USD",
+          "ATOM-USDC",
+          "MON-USD",
+          "MON-USDC",
+          "PENGU-USD",
+          "PENGU-USDC",
+          "INJ-USD",
+          "INJ-USDC",
+          "USDC-GBP",
+          "VET-USD",
+          "VET-USDC",
+          "WLD-USD",
+          "WLD-USDC",
+          "APT-USD",
+          "APT-USDC",
+          "CRV-USD",
+          "CRV-USDC",
+          "BASECAT-USD",
+          "BASECAT-USDC",
+          "ETH-GBP",
+          "FIL-USD",
+          "FIL-USDC",
+          "ETHFI-USD",
+          "ETHFI-USDC",
+          "COTI-USD",
+          "COTI-USDC",
+          "UP-USD",
+          "UP-USDC",
+          "RENDER-USD",
+          "RENDER-USDC",
+          "SOL-USDT",
+          "BONK-USD",
+          "BONK-USDC",
+          "ALGO-USD",
+          "ALGO-USDC",
+          "DRV-USD",
+          "DRV-USDC",
+          "EGLD-USD",
+          "EGLD-USDC",
+          "SYRUP-USD",
+          "SYRUP-USDC",
+          "REZ-USD",
+          "REZ-USDC",
+          "ASTER-USD",
+          "ASTER-USDC",
+          "OXT-USD",
+          "OXT-USDC",
+          "SPX-USD",
+          "SPX-USDC",
+          "MASK-USD",
+          "MASK-USDC",
+          "PAXG-USD",
+          "PAXG-USDC",
+          "SEI-USD",
+          "SEI-USDC",
+          "CHIP-USD",
+          "CHIP-USDC",
+          "PENDLE-USD",
+          "PENDLE-USDC",
+          "ORCA-USD",
+          "ORCA-USDC",
+          "ZORA-USD",
+          "ZORA-USDC",
+          "POL-USD",
+          "POL-USDC",
+          "SKR-USD",
+          "SKR-USDC",
+          "PROS-USD",
+          "PROS-USDC",
+          "MORPHO-USD",
+          "MORPHO-USDC",
+          "ETC-USD",
+          "ETC-USDC",
+          "CP-USD",
+          "CP-USDC",
+          "B3-USD",
+          "B3-USDC",
+          "RAVE-USD",
+          "RAVE-USDC",
+          "TIA-USD",
+          "TIA-USDC",
+          "XAN-USD",
+          "XAN-USDC",
+          "ZEN-USD",
+          "ZEN-USDC",
+          "ALGO-EUR",
+          "POPCAT-USD",
+          "POPCAT-USDC",
+          "APR-USD",
+          "APR-USDC",
+          "HNT-USD",
+          "HNT-USDC",
+          "NCT-USD",
+          "NCT-USDC",
+          "FLOCK-USD",
+          "FLOCK-USDC",
+          "STX-USD",
+          "STX-USDC",
+          "OP-USD",
+          "OP-USDC",
+          "RE-USD",
+          "RE-USDC",
+          "AKT-USD",
+          "AKT-USDC",
+          "WIF-USD",
+          "WIF-USDC",
+          "JUPITER-USD",
+          "JUPITER-USDC",
+          "SOL-GBP",
+          "MEGA-USD",
+          "MEGA-USDC",
+          "JTO-USD",
+          "JTO-USDC",
+          "SHIB-USD",
+          "SHIB-USDC",
+          "BILL-USD",
+          "BILL-USDC",
+          "JASMY-USD",
+          "JASMY-USDC",
+          "GHST-USD",
+          "GHST-USDC",
+          "TON-USD",
+          "TON-USDC",
+          "LINK-EUR",
+          "NEX-USD",
+          "NEX-USDC",
+          "XPL-USD",
+          "XPL-USDC",
+          "ADA-EUR",
+          "KAT-USD",
+          "KAT-USDC",
+          "AVNT-USD",
+          "AVNT-USDC",
+          "TOSHI-USD",
+          "TOSHI-USDC",
+          "WLFI-USD",
+          "WLFI-USDC",
+          "NOM-USD",
+          "NOM-USDC",
+          "CFG-USD",
+          "CFG-USDC",
+          "XCN-USD",
+          "XCN-USDC",
+          "APE-USD",
+          "APE-USDC",
+          "PYTH-USD",
+          "PYTH-USDC",
+          "TROLL-USD",
+          "TROLL-USDC",
+          "ZRO-USD",
+          "ZRO-USDC",
+          "CRO-USD",
+          "CRO-USDC",
+          "MINA-USD",
+          "MINA-USDC",
+          "STRK-USD",
+          "STRK-USDC",
+          "ARX-USD",
+          "ARX-USDC",
+          "XTZ-USD",
+          "XTZ-USDC",
+          "BIRB-USD",
+          "BIRB-USDC",
+          "LTC-EUR",
+          "IP-USD",
+          "IP-USDC",
+          "IO-USD",
+          "IO-USDC",
+          "GRVT-USD",
+          "GRVT-USDC",
+          "DRB-USD",
+          "DRB-USDC",
+          "LDO-USD",
+          "LDO-USDC",
+          "LINK-GBP",
+          "FLR-USD",
+          "FLR-USDC",
+          "SUPER-USD",
+          "SUPER-USDC",
+          "EIGEN-USD",
+          "EIGEN-USDC",
+          "AIOZ-USD",
+          "AIOZ-USDC",
+          "BCH-EUR",
+          "GRT-USD",
+          "GRT-USDC",
+          "VIRTUAL-USD",
+          "VIRTUAL-USDC",
+          "MANTLE-USD",
+          "MANTLE-USDC",
+          "DOT-EUR",
+          "ALLO-USD",
+          "ALLO-USDC",
+          "RSR-USD",
+          "RSR-USDC",
+          "QNT-USD",
+          "QNT-USDC",
+          "SENT-USD",
+          "SENT-USDC",
+          "ENS-USD",
+          "ENS-USDC",
+          "TRIA-USD",
+          "TRIA-USDC",
+          "BICO-USD",
+          "BICO-USDC",
+          "GWEI-USD",
+          "GWEI-USDC",
+          "PLUME-USD",
+          "PLUME-USDC",
+          "ALIGN-USD",
+          "ALIGN-USDC",
+          "CAKE-USD",
+          "CAKE-USDC",
+          "GIGA-USD",
+          "GIGA-USDC",
+          "LA-USD",
+          "LA-USDC",
+          "RLS-USD",
+          "RLS-USDC",
+          "USDS-USD",
+          "USDS-USDC",
+          "USDC-SGD",
+          "NEWT-USD",
+          "NEWT-USDC",
+          "RARE-USD",
+          "RARE-USDC",
+          "ZK-USD",
+          "ZK-USDC",
+          "BTC-INR",
+          "UNI-EUR",
+          "SPK-USD",
+          "SPK-USDC",
+          "CAP-USD",
+          "CAP-USDC",
+          "CVX-USD",
+          "CVX-USDC",
+          "WELL-USD",
+          "WELL-USDC",
+          "KTA-USD",
+          "KTA-USDC",
+          "SYND-USD",
+          "SYND-USDC",
+          "USD1-USD",
+          "USD1-USDC",
+          "CLANKER-USD",
+          "CLANKER-USDC",
+          "DOGE-USDT",
+          "TRAC-USD",
+          "TRAC-USDC",
+          "SUSHI-USD",
+          "SUSHI-USDC",
+          "HOME-USD",
+          "HOME-USDC",
+          "KAITO-USD",
+          "KAITO-USDC",
+          "BNKR-USD",
+          "BNKR-USDC",
+          "XRP-USDT",
+          "ATH-USD",
+          "ATH-USDC",
+          "SXT-USD",
+          "SXT-USDC",
+          "ZAMA-USD",
+          "ZAMA-USDC",
+          "MET-USD",
+          "MET-USDC",
+          "ROSE-USD",
+          "ROSE-USDC",
+          "MOODENG-USD",
+          "MOODENG-USDC",
+          "O-USD",
+          "O-USDC",
+          "CBETH-USD",
+          "CBETH-USDC",
+          "MDT-USD",
+          "MDT-USDC",
+          "SKY-USD",
+          "SKY-USDC",
+          "DOGE-EUR",
+          "IMX-USD",
+          "IMX-USDC",
+          "AMP-USD",
+          "AMP-USDC",
+          "TRB-USD",
+          "TRB-USDC",
+          "HFT-USD",
+          "HFT-USDC",
+          "SAND-USD",
+          "SAND-USDC",
+          "BERA-USD",
+          "BERA-USDC",
+          "FLOKI-USD",
+          "FLOKI-USDC",
+          "PRL-USD",
+          "PRL-USDC",
+          "XLM-EUR",
+          "NMR-USD",
+          "NMR-USDC",
+          "GFI-USD",
+          "GFI-USDC",
+          "BLAST-USD",
+          "BLAST-USDC",
+          "ACH-USD",
+          "ACH-USDC",
+          "BASED1-USD",
+          "BASED1-USDC",
+          "VELO-USD",
+          "VELO-USDC",
+          "TOWNS-USD",
+          "TOWNS-USDC",
+          "SOL-INR",
+          "SKL-USD",
+          "SKL-USDC",
+          "AXS-USD",
+          "AXS-USDC",
+          "RED-USD",
+          "RED-USDC",
+          "S-USD",
+          "S-USDC",
+          "SAFE-USD",
+          "SAFE-USDC",
+          "HIGH-USD",
+          "HIGH-USDC",
+          "EDGE-USD",
+          "EDGE-USDC",
+          "KITE-USD",
+          "KITE-USDC",
+          "YB-USD",
+          "YB-USDC",
+          "ROBO-USD",
+          "ROBO-USDC",
+          "APE-EUR",
+          "USDC-AUD",
+          "ZRX-USD",
+          "ZRX-USDC",
+          "API3-USD",
+          "API3-USDC",
+          "AVAX-EUR",
+          "AI-USD",
+          "AI-USDC",
+          "PROVE-USD",
+          "PROVE-USDC",
+          "KAVA-USD",
+          "KAVA-USDC",
+          "USDC-CAD",
+          "CORECHAIN-USD",
+          "CORECHAIN-USDC",
+          "BOBBOB-USD",
+          "BOBBOB-USDC",
+          "ADA-USDT",
+          "METIS-USD",
+          "METIS-USDC",
+          "ESP-USD",
+          "ESP-USDC",
+          "AERGO-USD",
+          "AERGO-USDC",
+          "ADA-GBP",
+          "DOOD-USD",
+          "DOOD-USDC",
+          "LTC-GBP",
+          "NEAR-USDT",
+          "KSM-USD",
+          "KSM-USDC",
+          "TRUST-USD",
+          "TRUST-USDC",
+          "VOXEL-USD",
+          "VOXEL-USDC",
+          "YFI-USD",
+          "YFI-USDC",
+          "GRASS-USD",
+          "GRASS-USDC",
+          "POWR-USD",
+          "POWR-USDC",
+          "COOKIE-USD",
+          "COOKIE-USDC",
+          "QI-USD",
+          "QI-USDC",
+          "BAT-USD",
+          "BAT-USDC",
+          "APE-USDT",
+          "MLN-USD",
+          "MLN-USDC",
+          "COMP-USD",
+          "COMP-USDC",
+          "AZTEC-USD",
+          "AZTEC-USDC",
+          "UNI-GBP",
+          "CVC-USD",
+          "CVC-USDC",
+          "OPG-USD",
+          "OPG-USDC",
+          "PYR-USD",
+          "PYR-USDC",
+          "ANKR-USD",
+          "ANKR-USDC",
+          "DOT-GBP",
+          "SAPIEN-USD",
+          "SAPIEN-USDC",
+          "DEEP-USD",
+          "DEEP-USDC",
+          "CTR-USD",
+          "CTR-USDC",
+          "DRIFT-USD",
+          "DRIFT-USDC",
+          "FET-USDT",
+          "CTSI-USD",
+          "CTSI-USDC",
+          "SWELL-USD",
+          "SWELL-USDC",
+          "00-USD",
+          "00-USDC",
+          "COW-USD",
+          "COW-USDC",
+          "SQD-USD",
+          "SQD-USDC",
+          "STORJ-USD",
+          "STORJ-USDC",
+          "DIEM-USD",
+          "DIEM-USDC",
+          "FORTH-USD",
+          "FORTH-USDC",
+          "ETH-INR",
+          "DIA-USD",
+          "DIA-USDC",
+          "GEOD-USD",
+          "GEOD-USDC",
+          "ICP-EUR",
+          "LSETH-USD",
+          "LSETH-USDC",
+          "W-USD",
+          "W-USDC",
+          "TREE-USD",
+          "TREE-USDC",
+          "CGLD-USD",
+          "CGLD-USDC",
+          "TGBP-USDC",
+          "CRV-EUR",
+          "ILV-USD",
+          "ILV-USDC",
+          "LINEA-USD",
+          "LINEA-USDC",
+          "EDGEX-USD",
+          "EDGEX-USDC",
+          "FAI-USD",
+          "FAI-USDC",
+          "STG-USD",
+          "STG-USDC",
+          "FUN1-USD",
+          "FUN1-USDC",
+          "KMNO-USD",
+          "KMNO-USDC",
+          "SHPING-USD",
+          "SHPING-USDC",
+          "XYO-USD",
+          "XYO-USDC",
+          "PRO-USD",
+          "PRO-USDC",
+          "PNUT-USD",
+          "PNUT-USDC",
+          "RPL-USD",
+          "RPL-USDC",
+          "XTZ-EUR",
+          "PRIME-USD",
+          "PRIME-USDC",
+          "PROMPT-USD",
+          "PROMPT-USDC",
+          "INX-USD",
+          "INX-USDC",
+          "ALICE-USD",
+          "ALICE-USDC",
+          "XSGD-USDC",
+          "MANA-USD",
+          "MANA-USDC",
+          "DOGE-GBP",
+          "LPT-USD",
+          "LPT-USDC",
+          "NKN-USD",
+          "NKN-USDC",
+          "ICNT-USD",
+          "ICNT-USDC",
+          "LAYER-USD",
+          "LAYER-USDC",
+          "BLUR-USD",
+          "BLUR-USDC",
+          "KEYCAT-USD",
+          "KEYCAT-USDC",
+          "DBR-USD",
+          "DBR-USDC",
+          "BAT-EUR",
+          "OP-USDT",
+          "GLM-USD",
+          "GLM-USDC",
+          "GST-USD",
+          "GST-USDC",
+          "DEGEN-USD",
+          "DEGEN-USDC",
+          "TURBO-USD",
+          "TURBO-USDC",
+          "BARD-USD",
+          "BARD-USDC",
+          "RECALL-USD",
+          "RECALL-USDC",
+          "L3-USD",
+          "L3-USDC",
+          "AXL-USD",
+          "AXL-USDC",
+          "BIO-USD",
+          "BIO-USDC",
+          "GROVE-USD",
+          "GROVE-USDC",
+          "ME-USD",
+          "ME-USDC",
+          "DOT-USDT",
+          "HBAR-USDT",
+          "SNX-USD",
+          "SNX-USDC",
+          "ATOM-GBP",
+          "AVT-USD",
+          "AVT-USDC",
+          "AVAX-USDT",
+          "EUL-USD",
+          "EUL-USDC",
+          "SD-USD",
+          "SD-USDC",
+          "CHZ-USD",
+          "CHZ-USDC",
+          "NOICE-USD",
+          "NOICE-USDC",
+          "UMA-USD",
+          "UMA-USDC",
+          "ATOM-EUR",
+          "ELSA-USD",
+          "ELSA-USDC",
+          "SIGN-USD",
+          "SIGN-USDC",
+          "CELR-USD",
+          "CELR-USDC",
+          "OSMO-USD",
+          "OSMO-USDC",
+          "SPELL-USD",
+          "SPELL-USDC",
+          "FIDA-USD",
+          "FIDA-USDC",
+          "ZKP-USD",
+          "ZKP-USDC",
+          "LCX-USD",
+          "LCX-USDC",
+          "PNG-USD",
+          "PNG-USDC",
+          "FIGHT-USD",
+          "FIGHT-USDC",
+          "BLZ-USD",
+          "BLZ-USDC",
+          "G-USD",
+          "G-USDC",
+          "JITOSOL-USD",
+          "JITOSOL-USDC",
+          "DNT-USD",
+          "DNT-USDC",
+          "GRT-EUR",
+          "2Z-USD",
+          "2Z-USDC",
+          "FLUID-USD",
+          "FLUID-USDC",
+          "POND-USD",
+          "POND-USDC",
+          "TNSR-USD",
+          "TNSR-USDC",
+          "DOGINME-USD",
+          "DOGINME-USDC",
+          "MAMO-USD",
+          "MAMO-USDC",
+          "ERA-USD",
+          "ERA-USDC",
+          "IRYS-USD",
+          "IRYS-USDC",
+          "MOG-USD",
+          "MOG-USDC",
+          "ZKC-USD",
+          "ZKC-USDC",
+          "MEZO-USD",
+          "MEZO-USDC",
+          "RSC-USD",
+          "RSC-USDC",
+          "AAVE-EUR",
+          "AGLD-USD",
+          "AGLD-USDC",
+          "1INCH-USD",
+          "1INCH-USDC",
+          "IOTX-USD",
+          "IOTX-USDC",
+          "AUCTION-USD",
+          "AUCTION-USDC",
+          "CRV-GBP",
+          "LMTS-USD",
+          "LMTS-USDC",
+          "HONEY-USD",
+          "HONEY-USDC",
+          "META-USD",
+          "META-USDC",
+          "XLM-USDT",
+          "KARRAT-USD",
+          "KARRAT-USDC",
+          "AAVE-GBP",
+          "WET-USD",
+          "WET-USDC",
+          "WMTX-USD",
+          "WMTX-USDC",
+          "WAL-USD",
+          "WAL-USDC",
+          "ABT-USD",
+          "ABT-USDC",
+          "PUNDIX-USD",
+          "PUNDIX-USDC",
+          "ARPA-USD",
+          "ARPA-USDC",
+          "FLOW-USD",
+          "FLOW-USDC",
+          "SNX-GBP",
+          "GTC-USD",
+          "GTC-USDC",
+          "MAGIC-USD",
+          "MAGIC-USDC",
+          "FIL-GBP",
+          "ALEO-USD",
+          "ALEO-USDC",
+          "BLEND-USD",
+          "BLEND-USDC",
+          "ALGO-GBP",
+          "MATH-USD",
+          "MATH-USDC",
+          "PERP-USD",
+          "PERP-USDC",
+          "KNC-USD",
+          "KNC-USDC",
+          "OGN-USD",
+          "OGN-USDC",
+          "LRDS-USD",
+          "LRDS-USDC",
+          "A8-USD",
+          "A8-USDC",
+          "PRCL-USD",
+          "PRCL-USDC",
+          "LQTY-USD",
+          "LQTY-USDC",
+          "SUP-USD",
+          "SUP-USDC",
+          "LINK-USDT",
+          "GODS-USD",
+          "GODS-USDC",
+          "SHIB-USDT",
+          "ATOM-USDT",
+          "BAL-USD",
+          "BAL-USDC",
+          "BIGTIME-USD",
+          "BIGTIME-USDC",
+          "ARKM-USD",
+          "ARKM-USDC",
+          "RNBW-USD",
+          "RNBW-USDC",
+          "SHIB-EUR",
+          "VARA-USD",
+          "VARA-USDC",
+          "BEAM-USD",
+          "BEAM-USDC",
+          "BADGER-USD",
+          "BADGER-USDC",
+          "IMU-USD",
+          "IMU-USDC",
+          "ALEPH-USD",
+          "ALEPH-USDC",
+          "MSOL-USD",
+          "MSOL-USDC",
+          "BAND-USD",
+          "BAND-USDC",
+          "T-USD",
+          "T-USDC",
+          "HYPER-USD",
+          "HYPER-USDC",
+          "DIMO-USD",
+          "DIMO-USDC",
+          "ALT-USD",
+          "ALT-USDC",
+          "MNDE-USD",
+          "MNDE-USDC",
+          "MANA-EUR",
+          "KERNEL-USD",
+          "KERNEL-USDC",
+          "PLU-USD",
+          "PLU-USDC",
+          "KAIO-USD",
+          "KAIO-USDC",
+          "GMT-USD",
+          "GMT-USDC",
+          "STX-USDT",
+          "AWE-USD",
+          "AWE-USDC",
+          "HOPR-USD",
+          "HOPR-USDC",
+          "BNT-USD",
+          "BNT-USDC",
+          "SUKU-USD",
+          "SUKU-USDC",
+          "CTX-USD",
+          "CTX-USDC",
+          "SHIB-GBP",
+          "OPN-USD",
+          "OPN-USDC",
+          "POLS-USD",
+          "POLS-USDC",
+          "FORT-USD",
+          "FORT-USDC",
+          "ELA-USD",
+          "ELA-USDC",
+          "SHDW-USD",
+          "SHDW-USDC",
+          "SWFTC-USD",
+          "SWFTC-USDC",
+          "RLC-USD",
+          "RLC-USDC",
+          "ASM-USD",
+          "ASM-USDC",
+          "ALCX-USD",
+          "ALCX-USDC",
+          "WCT-USD",
+          "WCT-USDC",
+          "FARM-USD",
+          "FARM-USDC",
+          "COSMOSDYDX-USD",
+          "COSMOSDYDX-USDC",
+          "DOLO-USD",
+          "DOLO-USDC",
+          "AURORA-USD",
+          "AURORA-USDC",
+          "SNX-EUR",
+          "REQ-USD",
+          "REQ-USDC",
+          "BTRST-USD",
+          "BTRST-USDC",
+          "OCEAN-USD",
+          "OCEAN-USDC",
+          "BCH-GBP",
+          "ZETA-USD",
+          "ZETA-USDC",
+          "C98-USD",
+          "C98-USDC",
+          "ETC-EUR",
+          "XTZ-GBP",
+          "RARI-USD",
+          "RARI-USDC",
+          "IMX-USDT",
+          "BOBA-USD",
+          "BOBA-USDC",
+          "ACS-USD",
+          "ACS-USDC",
+          "RAD-USD",
+          "RAD-USDC",
+          "FOX-USD",
+          "FOX-USDC",
+          "AUDIO-USD",
+          "AUDIO-USDC",
+          "1INCH-GBP",
+          "SPA-USD",
+          "SPA-USDC",
+          "AST-USD",
+          "AST-USDC",
+          "BREV-USD",
+          "BREV-USDC",
+          "CHECK-USD",
+          "CHECK-USDC",
+          "THQ-USD",
+          "THQ-USDC",
+          "JASMY-USDT",
+          "AUDD-USDC",
+          "CRO-EUR",
+          "NEON-USD",
+          "NEON-USDC",
+          "INV-USD",
+          "INV-USDC",
+          "GNO-USD",
+          "GNO-USDC",
+          "KRL-USD",
+          "KRL-USDC",
+          "1INCH-EUR",
+          "ZETACHAIN-USD",
+          "ZETACHAIN-USDC",
+          "INDEX-USD",
+          "INDEX-USDC",
+          "FIL-EUR",
+          "CHZ-EUR",
+          "WRON-USD",
+          "WRON-USDC",
+          "DEXT-USD",
+          "DEXT-USDC",
+          "MPLX-USD",
+          "MPLX-USDC",
+          "CHZ-GBP",
+          "QNT-USDT",
+          "ENS-EUR",
+          "PAX-USD",
+          "PAX-USDC",
+          "WAXL-USD",
+          "WAXL-USDC",
+          "ETC-GBP",
+          "CBETH-ETH",
+          "SOL-ETH",
+          "ANKR-EUR",
+          "ETH-BTC",
+          "LINK-ETH",
+          "SOL-BTC",
+          "LINK-BTC",
+          "BCH-BTC",
+          "ADA-ETH",
+          "DOT-BTC",
+          "UNI-BTC",
+          "AAVE-BTC",
+          "ICP-BTC",
+          "DOGE-BTC",
+          "LTC-BTC",
+          "XLM-BTC",
+          "XTZ-BTC",
+          "DASH-BTC",
+          "ATOM-BTC",
+          "CRV-BTC",
+          "ADA-BTC",
+          "GRT-BTC",
+          "ETC-BTC",
+          "FIL-BTC",
+          "AVAX-BTC",
+          "YFI-BTC",
+          "ALGO-BTC",
+          "COMP-BTC",
+          "BAT-ETH",
+          "BAT-BTC",
+          "DAI-USD",
+          "DAI-USDC",
+          "EOS-USD",
+          "EOS-USDC",
+          "MKR-USD",
+          "MKR-USDC",
+          "RNDR-USD",
+          "RNDR-USDC"
+        ]
+      },
+      {
+        "exchange": "intx",
+        "kind": "perp",
+        "markets": [
+          "BTC-PERP-INTX",
+          "ETH-PERP-INTX",
+          "SOL-PERP-INTX",
+          "XRP-PERP-INTX",
+          "ZEC-PERP-INTX",
+          "DOGE-PERP-INTX",
+          "PUMP-PERP-INTX",
+          "HYPE-PERP-INTX",
+          "ADA-PERP-INTX",
+          "NEAR-PERP-INTX",
+          "META-PERP-INTX",
+          "GOLD-PERP-INTX",
+          "1000PEPE-PERP-INTX",
+          "SUI-PERP-INTX",
+          "FARTCOIN-PERP-INTX",
+          "AAPL-PERP-INTX",
+          "UNI-PERP-INTX",
+          "TAO-PERP-INTX",
+          "CRV-PERP-INTX",
+          "SNDK-PERP-INTX",
+          "ENA-PERP-INTX",
+          "AMZN-PERP-INTX",
+          "LTC-PERP-INTX",
+          "LINK-PERP-INTX",
+          "TRUMP-PERP-INTX",
+          "SILVER-PERP-INTX",
+          "ARB-PERP-INTX",
+          "DOT-PERP-INTX",
+          "SPCX-PERP-INTX",
+          "BCH-PERP-INTX",
+          "QQQ-PERP-INTX",
+          "MSTR-PERP-INTX",
+          "AVAX-PERP-INTX",
+          "SOXL-PERP-INTX",
+          "1000SHIB-PERP-INTX",
+          "JUP-PERP-INTX",
+          "NVDA-PERP-INTX",
+          "WTIOIL-PERP-INTX",
+          "ASTER-PERP-INTX",
+          "MSFT-PERP-INTX",
+          "WIF-PERP-INTX",
+          "BRENTOIL-PERP-INTX",
+          "GOOGL-PERP-INTX",
+          "VVV-PERP-INTX",
+          "AAVE-PERP-INTX",
+          "FIL-PERP-INTX",
+          "WLD-PERP-INTX",
+          "BERA-PERP-INTX",
+          "INTC-PERP-INTX",
+          "BNB-PERP-INTX",
+          "MU-PERP-INTX",
+          "XLM-PERP-INTX",
+          "EURC-PERP-INTX",
+          "OPENAI-PERP-INTX",
+          "HBAR-PERP-INTX",
+          "DRAM-PERP-INTX",
+          "TSLA-PERP-INTX",
+          "AMD-PERP-INTX",
+          "LIT-PERP-INTX",
+          "SPY-PERP-INTX",
+          "PENGU-PERP-INTX",
+          "EWY-PERP-INTX",
+          "CRCL-PERP-INTX",
+          "DASH-PERP-INTX",
+          "PNUT-PERP-INTX",
+          "MERL-PERP-INTX",
+          "EIGEN-PERP-INTX",
+          "HOOD-PERP-INTX",
+          "JTO-PERP-INTX",
+          "CBRS-PERP-INTX",
+          "STRK-PERP-INTX",
+          "COIN50-PERP-INTX",
+          "ETHFI-PERP-INTX",
+          "BOME-PERP-INTX",
+          "SKHY-PERP-INTX",
+          "APT-PERP-INTX",
+          "PENDLE-PERP-INTX",
+          "ATOM-PERP-INTX",
+          "MRVL-PERP-INTX",
+          "VIRTUAL-PERP-INTX",
+          "NBIS-PERP-INTX",
+          "ALGO-PERP-INTX",
+          "INJ-PERP-INTX",
+          "ONDO-PERP-INTX",
+          "PAXG-PERP-INTX",
+          "BILL-PERP-INTX",
+          "OP-PERP-INTX",
+          "POL-PERP-INTX",
+          "XPL-PERP-INTX",
+          "BE-PERP-INTX",
+          "SAGA-PERP-INTX",
+          "ROBO-PERP-INTX",
+          "1000BONK-PERP-INTX",
+          "ARM-PERP-INTX",
+          "TSM-PERP-INTX",
+          "LITE-PERP-INTX",
+          "MON-PERP-INTX",
+          "CFX-PERP-INTX",
+          "JASMY-PERP-INTX",
+          "ANTHROPIC-PERP-INTX",
+          "CHIP-PERP-INTX",
+          "OPG-PERP-INTX",
+          "TOWNS-PERP-INTX",
+          "ICP-PERP-INTX",
+          "EDGEX-PERP-INTX",
+          "TIA-PERP-INTX",
+          "MORPHO-PERP-INTX",
+          "RUNE-PERP-INTX",
+          "FET-PERP-INTX",
+          "APE-PERP-INTX",
+          "PRL-PERP-INTX",
+          "W-PERP-INTX",
+          "S-PERP-INTX",
+          "RENDER-PERP-INTX",
+          "LDO-PERP-INTX",
+          "OPN-PERP-INTX",
+          "AERO-PERP-INTX",
+          "ALT-PERP-INTX",
+          "SEI-PERP-INTX",
+          "MEGA-PERP-INTX",
+          "COMP-PERP-INTX",
+          "AVNT-PERP-INTX",
+          "DYDX-PERP-INTX",
+          "1000MOG-PERP-INTX",
+          "WLFI-PERP-INTX",
+          "ETC-PERP-INTX",
+          "PYTH-PERP-INTX",
+          "RESOLV-PERP-INTX",
+          "INX-PERP-INTX",
+          "BASED1-PERP-INTX",
+          "NIGHT-PERP-INTX"
+        ]
+      }
+    ],
+    "venue": "coinbase",
+    "version": 3
+  }
+}

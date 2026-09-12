@@ -3,14 +3,17 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tribulnation.sdk.market import TradingMarkets, TradingVenue
+from .ownership import VenueOwner
 from .accounts import (
   Account,
   Binance,
   Bit2Me,
+  Bitget,
   Bybit,
   Coinbase,
   Dydx,
   Hyperliquid,
+  Kraken,
   Mexc,
   load_accounts,
 )
@@ -21,11 +24,14 @@ DEFAULT_ACCOUNTS: Mapping[str, Account] = {
   'mexc': Mexc(public=True),
   'binance': Binance(public=True),
   'bit2me': Bit2Me(public=True),
+  'bitget': Bitget(public=True),
+  'bybit': Bybit(public=True),
+  'kraken': Kraken(public=True),
 }
 
 
 @dataclass(frozen=True)
-class MarketSDK(TradingMarkets):
+class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
   accounts: Mapping[str, Account] = field(default_factory=dict[str, Account])
 
   @property
@@ -75,9 +81,12 @@ class MarketSDK(TradingMarkets):
       raise ImportError(
         'mexc market is not installed. Please install it with `pip install tribulnation-mexc`.'
       ) from e
+    api_key, api_secret = account.resolved_api_key, account.resolved_api_secret
+    if account.public and api_key is None and api_secret is None:
+      return MexcMarket.public(validate=account.validate)
     return MexcMarket.new(
-      api_key=account.resolved_api_key,
-      api_secret=account.resolved_api_secret,
+      api_key=api_key,
+      api_secret=api_secret,
       validate=account.validate,
     )
 
@@ -88,9 +97,11 @@ class MarketSDK(TradingMarkets):
       raise ImportError(
         'binance market is not installed. Please install it with `pip install tribulnation-binance`.'
       ) from e
+    api_key, secret_key = account.resolved_api_key, account.resolved_secret_key
     return BinanceMarket.new(
-      api_key=account.resolved_api_key,
-      secret_key=account.resolved_secret_key,
+      api_key=api_key,
+      secret_key=secret_key,
+      public=account.public and api_key is None and secret_key is None,
       validate=account.validate,
     )
 
@@ -101,7 +112,12 @@ class MarketSDK(TradingMarkets):
       raise ImportError(
         'coinbase market is not installed. Please install it with `pip install tribulnation-coinbase`.'
       ) from e
-    return CoinbaseMarket.new(account.resolved_key_name, account.resolved_private_key)
+    key_name, private_key = account.resolved_key_name, account.resolved_private_key
+    return CoinbaseMarket.new(
+      key_name,
+      private_key,
+      public=account.public and key_name is None and private_key is None,
+    )
 
   def bybit(self, account: Bybit) -> TradingVenue:
     try:
@@ -110,10 +126,28 @@ class MarketSDK(TradingMarkets):
       raise ImportError(
         'bybit market is not installed. Please install it with `pip install tribulnation-bybit`.'
       ) from e
+    api_key, api_secret = account.resolved_api_key, account.resolved_api_secret
     return BybitMarket.new(
-      account.resolved_api_key,
-      account.resolved_api_secret,
+      api_key,
+      api_secret,
+      public=account.public and api_key is None and api_secret is None,
       settings={'validate': account.validate},
+    )
+
+  def bitget(self, account: Bitget) -> TradingVenue:
+    try:
+      from tribulnation.bitget import BitgetMarket
+    except ImportError as e:
+      raise ImportError(
+        'bitget market is not installed. Please install it with `pip install tribulnation-bitget`.'
+      ) from e
+    return BitgetMarket.new(
+      account.resolved_access_key,
+      account.resolved_secret_key,
+      account.resolved_passphrase,
+      uta=account.uta,
+      public=account.public,
+      validate=account.validate,
     )
 
   def bit2me(self, account: Bit2Me) -> TradingVenue:
@@ -126,6 +160,20 @@ class MarketSDK(TradingMarkets):
     return Bit2MeMarket.new(
       account.resolved_api_key,
       account.resolved_api_secret,
+      public=account.public,
+      validate=account.validate,
+    )
+
+  def kraken(self, account: Kraken) -> TradingVenue:
+    try:
+      from tribulnation.kraken import KrakenMarket
+    except ImportError as e:
+      raise ImportError(
+        'kraken market is not installed. Please install it with `pip install tribulnation-kraken`.'
+      ) from e
+    return KrakenMarket.new(
+      account.resolved_api_key,
+      account.resolved_private_key,
       public=account.public,
       validate=account.validate,
     )
@@ -148,15 +196,28 @@ class MarketSDK(TradingMarkets):
         return self.bybit(account)
       case 'bit2me':
         return self.bit2me(account)
+      case 'bitget':
+        return self.bitget(account)
+      case 'kraken':
+        return self.kraken(account)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 
   async def venue(self, id: str, /) -> TradingVenue:
-    return self._venue(id)
+    """Borrow a cached venue inside an entered root, otherwise construct a fresh one."""
+    return await self.venue_registry.get(id, lambda: self._venue(id))
 
   async def venues(self) -> Sequence[str]:
     return list(self.all_accounts)
 
   @property
   def all(self) -> dict[str, TradingVenue]:
-    return {id: self._venue(id) for id in self.all_accounts}
+    """Construct caller-managed venues outside a root context, or return live ones.
+
+    Inside an entered root, first acquire any new venue with `await venue(id)`;
+    synchronous construction cannot acquire its async resources.
+    """
+    return {
+      id: self.venue_registry.unmanaged(id, lambda: self._venue(id))
+      for id in self.all_accounts
+    }

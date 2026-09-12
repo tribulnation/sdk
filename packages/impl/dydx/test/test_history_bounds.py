@@ -2,21 +2,51 @@
 
 import asyncio
 from datetime import datetime, timedelta, timezone
-from typing_extensions import cast
+from pathlib import Path
+from types import TracebackType
+from typing_extensions import Self, TypedDict, cast
 
 import pytest
 from sqlalchemy.orm import Session
+from tribulnation.dydx.report.history.bigquery import BigQueryHistory
 from tribulnation.dydx.report.history.cache import (
   CacheWatermark,
   ChainTransaction,
   HistoryCache,
 )
 from tribulnation.dydx.report.history.chain import ChainHistory
+from tribulnation.dydx.report.history.governance import GovernanceHistory
+from tribulnation.dydx.report.history.indexer import IndexerHistory
 from tribulnation.dydx.report.history.main import History
 from tribulnation.dydx.report.history.window import in_window
-from typing_extensions import Any
+from tribulnation.sdk.reporting import HistoryRecord
+from typed_dydx.chain.comet import Comet
+from typed_dydx.chain.comet.schemas import TxResponse
 
 BASE_TIME = datetime(2025, 1, 1, tzinfo=timezone.utc)
+
+
+class FakeBlockHeader(TypedDict):
+  """Header fields `ChainHistory` reads off a Comet block response."""
+
+  height: str
+  time: datetime
+
+
+class FakeBlock(TypedDict):
+  """Block fields `ChainHistory` reads off a Comet block response."""
+
+  header: FakeBlockHeader
+
+
+class FakeBlockResponse(TypedDict):
+  """Minimal Comet `block` response `FakeComet.block` returns.
+
+  `height` is a `str` here (unlike `BlockHeader.height`'s real `int`) to exercise the
+  `int(header['height'])` coercion `ChainHistory.latest_block` performs on it.
+  """
+
+  block: FakeBlock
 
 
 class EmptyPaging:
@@ -27,7 +57,7 @@ class EmptyPaging:
   def __init__(self, *, fail: bool = False):
     self.fail = fail
 
-  async def next(self, state):
+  async def next(self, state: int) -> tuple[list[TxResponse], int | None]:
     if self.fail:
       raise RuntimeError('search failed')
     return [], None
@@ -39,16 +69,21 @@ class FakeComet:
   def __init__(self, latest_height: int = 16, *, fail_pattern: str | None = None):
     self.latest_height = latest_height
     self.fail_pattern = fail_pattern
-    self.block_calls = []
-    self.queries = []
+    self.block_calls: list[int] = []
+    self.queries: list[tuple[str, int | None]] = []
 
-  async def __aenter__(self):
+  async def __aenter__(self) -> Self:
     return self
 
-  async def __aexit__(self, exc_type, exc_value, traceback):
+  async def __aexit__(
+    self,
+    exc_type: type[BaseException] | None,
+    exc_value: BaseException | None,
+    traceback: TracebackType | None,
+  ):
     pass
 
-  async def block(self, height=None):
+  async def block(self, height: int | None = None) -> FakeBlockResponse:
     height = self.latest_height if height is None else height
     self.block_calls.append(height)
     return {
@@ -60,7 +95,7 @@ class FakeComet:
       }
     }
 
-  def tx_search_paged(self, query, *, per_page=None):
+  def tx_search_paged(self, query: str, *, per_page: int | None = None):
     self.queries.append((query, per_page))
     return EmptyPaging(
       fail=(self.fail_pattern is not None and self.fail_pattern in query)
@@ -75,7 +110,7 @@ def chain_history(comet: FakeComet) -> ChainHistory:
   """
   return ChainHistory(
     address='dydx1test',
-    comet=cast(Any, comet),
+    comet=cast(Comet, comet),
   )
 
 
@@ -86,7 +121,7 @@ def cached_chain_history(
   """Create chain history around a Comet stub and persistent cache."""
   return ChainHistory(
     address='dydx1test',
-    comet=cast(Any, comet),
+    comet=cast(Comet, comet),
     cache=cache,
   )
 
@@ -112,6 +147,39 @@ def test_chain_resolves_inclusive_time_window_and_reuses_cache():
   assert window == (6, 10)
   assert repeated == window
   assert comet.block_calls[len(first_calls) :] == [16]
+
+
+async def test_block_times_share_the_chain_request_limit():
+  """Parallel timestamp parsing cannot bypass the existing four-request bound."""
+
+  class SlowComet(FakeComet):
+    """Track concurrent public reads while yielding to all competing tasks."""
+
+    active = 0
+    peak = 0
+
+    async def block(self, height: int | None = None) -> FakeBlockResponse:
+      """Keep every requested height and expose concurrent network work."""
+      self.active += 1
+      self.peak = max(self.peak, self.active)
+      try:
+        await asyncio.sleep(0.001)
+        return await super().block(height)
+      finally:
+        self.active -= 1
+
+  comet = SlowComet()
+  history = chain_history(comet)
+  timestamps, _ = await asyncio.gather(
+    asyncio.gather(*(history.block_time(height) for height in range(1, 21))),
+    asyncio.gather(*(history.call(lambda: comet.block()) for _ in range(4))),
+  )
+  assert timestamps == [BASE_TIME + timedelta(minutes=h) for h in range(1, 21)]
+  assert len(comet.block_calls) == 24
+  assert comet.peak == 4
+  assert comet.active == 0
+  assert await history.block_time(1) == BASE_TIME + timedelta(minutes=1)
+  assert len(comet.block_calls) == 24
 
 
 def test_chain_resolves_open_time_bounds_to_genesis_and_latest():
@@ -168,7 +236,7 @@ def test_chain_skips_search_for_window_after_latest_block():
   assert comet.queries == []
 
 
-def test_chain_cache_backfills_around_bounded_coverage(tmp_path):
+def test_chain_cache_backfills_around_bounded_coverage(tmp_path: Path):
   """An unbounded fetch fills both sides of an initially bounded cache."""
   comet = FakeComet()
   cache = HistoryCache.connect(f'sqlite:///{tmp_path / "cache.db"}')
@@ -203,7 +271,7 @@ def test_chain_cache_backfills_around_bounded_coverage(tmp_path):
   )
 
 
-def test_chain_cache_extends_genesis_coverage(tmp_path):
+def test_chain_cache_extends_genesis_coverage(tmp_path: Path):
   """A later unbounded fetch requests only heights beyond verified coverage."""
   comet = FakeComet(latest_height=10)
   cache = HistoryCache.connect(f'sqlite:///{tmp_path / "cache.db"}')
@@ -224,7 +292,7 @@ def test_chain_cache_extends_genesis_coverage(tmp_path):
   )
 
 
-def test_chain_cache_records_empty_coverage(tmp_path):
+def test_chain_cache_records_empty_coverage(tmp_path: Path):
   """A successful empty fetch is not repeated."""
   comet = FakeComet()
   cache = HistoryCache.connect(f'sqlite:///{tmp_path / "cache.db"}')
@@ -238,7 +306,7 @@ def test_chain_cache_records_empty_coverage(tmp_path):
   assert comet.queries == []
 
 
-def test_chain_cache_does_not_cover_failed_fetch(tmp_path):
+def test_chain_cache_does_not_cover_failed_fetch(tmp_path: Path):
   """A failed provider group does not claim coverage."""
   comet = FakeComet(fail_pattern='coin_spent.spender')
   cache = HistoryCache.connect(f'sqlite:///{tmp_path / "cache.db"}')
@@ -250,7 +318,7 @@ def test_chain_cache_does_not_cover_failed_fetch(tmp_path):
   assert cache.chain_coverage(history.address) == []
 
 
-def test_chain_cache_ignores_legacy_watermark(tmp_path):
+def test_chain_cache_ignores_legacy_watermark(tmp_path: Path):
   """An old high watermark does not imply verified genesis coverage."""
   comet = FakeComet()
   cache = HistoryCache.connect(f'sqlite:///{tmp_path / "cache.db"}')
@@ -278,7 +346,7 @@ def test_chain_cache_ignores_legacy_watermark(tmp_path):
   assert cache.chain_coverage(history.address) == [(1, 16)]
   # `data` is a ValidatedJSON(TxResponse) column, and typed-dydx types Comet's `height`
   # as an int, so a cached row reads back normalized however it was written.
-  assert transactions['legacy']['height'] == 6
+  assert transactions['legacy'].get('height') == 6
   assert len(comet.queries) == 4
   assert all(
     'tx.height >= 1' in query and 'tx.height <= 16' in query
@@ -286,7 +354,7 @@ def test_chain_cache_ignores_legacy_watermark(tmp_path):
   )
 
 
-def test_chain_no_cache_reads_refetches_and_populates(tmp_path):
+def test_chain_no_cache_reads_refetches_and_populates(tmp_path: Path):
   """No-cache mode bypasses coverage reads but still writes coverage."""
   path = tmp_path / 'cache.db'
   initial_comet = FakeComet()
@@ -318,9 +386,11 @@ class HistoryProvider:
   """History stub recording requested bounds."""
 
   def __init__(self):
-    self.calls = []
+    self.calls: list[tuple[datetime | None, datetime | None]] = []
 
-  async def history(self, start, end):
+  async def history(
+    self, start: datetime | None, end: datetime | None
+  ) -> list[HistoryRecord]:
     self.calls.append((start, end))
     return []
 
@@ -329,10 +399,10 @@ def test_aggregate_history_forwards_bounds_to_every_provider():
   providers = [HistoryProvider() for _ in range(4)]
   report = History(
     address='dydx1test',
-    chain=cast(Any, providers[0]),
-    indexer=cast(Any, providers[1]),
-    governance=cast(Any, providers[2]),
-    bigquery=cast(Any, providers[3]),
+    chain=cast(ChainHistory, providers[0]),
+    indexer=cast(IndexerHistory, providers[1]),
+    governance=cast(GovernanceHistory, providers[2]),
+    bigquery=cast(BigQueryHistory, providers[3]),
   )
   start = BASE_TIME
   end = BASE_TIME + timedelta(days=1)

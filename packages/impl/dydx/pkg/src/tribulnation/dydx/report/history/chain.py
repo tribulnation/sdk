@@ -86,7 +86,7 @@ class ChainHistory(SDK):
     default_factory=lambda: asyncio.Semaphore(4)
   )
   cache: 'HistoryCache | None' = None
-  _block_times: dict[int, datetime] = field(default_factory=dict)
+  _block_times: dict[int, datetime] = field(default_factory=dict[int, datetime])
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield self.comet
@@ -104,17 +104,19 @@ class ChainHistory(SDK):
   @SDK.method
   @wrap_exceptions
   async def block_time(self, height: int) -> datetime:
-    if (time := self._block_times.get(height)) is not None:
-      return time
-    if self.cache is not None and (time := self.cache.get(height)) is not None:
+    """Resolve timestamps under the same request bound as transaction searches."""
+    async with self.chain_semaphore:
+      if (time := self._block_times.get(height)) is not None:
+        return time
+      if self.cache is not None and (time := self.cache.get(height)) is not None:
+        self._block_times[height] = time
+        return time
+      block = await self.comet.block(height)
+      time = block['block']['header']['time']
       self._block_times[height] = time
+      if self.cache is not None:
+        self.cache.set(height, time)
       return time
-    block = await self.comet.block(height)
-    time = block['block']['header']['time']
-    self._block_times[height] = time
-    if self.cache is not None:
-      self.cache.set(height, time)
-    return time
 
   async def tx_search(self, query: str, *, per_page: int | None = None):
     paging = self.comet.tx_search_paged(query, per_page=per_page)

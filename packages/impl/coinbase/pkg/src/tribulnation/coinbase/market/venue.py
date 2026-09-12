@@ -24,8 +24,8 @@ class CoinbaseMarket(impl.ExchangeMixin, TradingVenue):
 
   async def exchanges(self) -> list[TradingVenue.ExchangeDescription]:
     return [
-      {'id': impl.SPOT_EXCHANGE_ID, 'type': 'spot'},
-      {'id': impl.INTX_EXCHANGE_ID, 'type': 'perp'},
+      {'id': impl.SPOT_EXCHANGE_ID, 'type': 'spot', 'name': 'Advanced Trade'},
+      {'id': impl.INTX_EXCHANGE_ID, 'type': 'perp', 'name': 'International Exchange'},
     ]
 
   async def exchange(self, exchange_id: str, /):

@@ -27,10 +27,6 @@ class SpotExchange(impl.ExchangeMixin, _Exchange):
   async def tickers(
     self, markets: Collection[str] | None = None, *, settings: Settings = {}
   ) -> Mapping[str, Ticker]:
-    """Fetch a ticker snapshot for many spot markets at once.
-
-    Read from the product catalogue, which carries last price and 24h volume but no
-    book depth, so `bid_qty`/`ask_qty` are always unset -- use `depth` for those.
-    """
+    """Combine catalogue trade statistics with batched bid/ask prices and sizes."""
     products = await impl.list_products(self, product_type='SPOT')
-    return impl.tickers(impl.filtered(products, markets))
+    return await impl.tickers(self, impl.filtered(products, markets))

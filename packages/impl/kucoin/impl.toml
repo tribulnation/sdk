@@ -1,0 +1,26 @@
+[support.report]
+support = "partial"
+auth = true
+methods = ["history", "snapshot"]
+note = "Classic spot-side only. History includes automatically discovered spot fills and successful external/internal deposits/withdrawals. Defaults: seven days for spot fills, 30 days for capital history. Snapshots include main/trade balances and paginated Earn holdings. No futures endpoints or permissions are required; futures and legacy margin/isolated compartments are excluded, not reported as zero. Supported-source errors propagate. Retention, delisted markets and unsupported Earn/internal ledgers leave gaps for file ingestion; other user subaccounts are not included."
+
+[support.wallet]
+support = "full"
+auth = true
+note = "Both methods use public currency metadata and support public=True. Enabled chains only; withdrawal fees are published per-chain minimums, not a transaction quote. No credential-free default account is installed."
+
+[support.earn]
+support = "partial"
+auth = true
+methods = ["instruments"]
+note = "Savings, promotions, staking, KCS staking and ETH staking. Structured dual investment is excluded because conditional principal conversion cannot be represented by the plain APR contract."
+
+[support.market]
+support = "none"
+auth = true
+note = "Market implementation is not yet packaged; the prototype is not a supported SDK surface."
+
+[ids]
+asset = "symbol"
+market = "Spot symbols such as BTC-USDT."
+note = "Native currency ids and chainId network ids. Snapshot compartments are Classic main/trade and Earn."

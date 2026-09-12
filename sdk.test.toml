@@ -18,6 +18,11 @@ venue = "bit2me"
 api_key = "$BIT2ME_API_KEY"
 api_secret = "$BIT2ME_SECRET_KEY"
 
+[accounts.kraken]
+venue = "kraken"
+api_key = "$KRAKEN_API_KEY"
+private_key = "$KRAKEN_PRIVATE_KEY"
+
 [accounts.bybit]
 venue = "bybit"
 api_key = "$BYBIT_API_KEY"

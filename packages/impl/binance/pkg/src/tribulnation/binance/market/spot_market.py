@@ -16,12 +16,15 @@ from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
   Market,
   Book,
+  Candle,
+  CandleInterval,
   Collateral,
   Order,
   OrderResponse,
   OrderState,
   Position,
   Rules,
+  Fees,
   Settings,
   Trade,
 )
@@ -35,6 +38,12 @@ from .impl import SharedMixin, wrap_exceptions, not_implemented
 
 TRADES_WINDOW = timedelta(hours=24)
 """`myTrades` refuses a window wider than 24h."""
+
+CANDLES_PAGE = 1000
+"""Rows per `klines` page; Binance's documented maximum."""
+
+CANDLE_INTERVALS = frozenset[CandleInterval]({'1m', '5m', '15m', '1h', '4h', '1d'})
+"""Every contract interval is a Binance `klines` interval under the same name."""
 
 
 def stream_levels(levels: int | None) -> Literal[5, 10, 20]:
@@ -65,6 +74,8 @@ async def trades_only(
 @dataclass(frozen=True, kw_only=True)
 class SpotMarket(SharedMixin, Market):
   """A Binance spot market."""
+
+  CANDLE_INTERVALS = CANDLE_INTERVALS
 
   symbol: str
 
@@ -123,22 +134,77 @@ class SpotMarket(SharedMixin, Market):
     notional = next(
       (f for f in filters if f['filterType'] == 'NOTIONAL'), None
     ) or next((f for f in filters if f['filterType'] == 'MIN_NOTIONAL'), None)
-    account = await self.client.spot.http.account.info()
-    commission = account['commissionRates']
     return Rules(
-      base=sym['baseAsset'],
-      quote=sym['quoteAsset'],
       fee_asset=sym['quoteAsset'],
       tick_size=price_filter['tickSize'] if price_filter else Decimal(0),
       step_size=lot_size['stepSize'] if lot_size else Decimal(0),
       fixed_min_qty=lot_size['minQty'] if lot_size else None,
       min_value=notional['minNotional'] if notional else None,
       max_qty=lot_size['maxQty'] if lot_size else None,
-      maker_fee=commission['maker'],
-      taker_fee=commission['taker'],
+      # Public tier defaults do not identify per-symbol promotions or taxes.
+      fees=None,
       api=sym['isSpotTradingAllowed'],
       details=sym,
     )
+
+  @wrap_exceptions
+  async def fees(self, *, refetch: bool = False) -> Fees:
+    """Combine standard, tax and special rates, excluding optional BNB payment."""
+    commission = await self.client.spot.http.account.commission(self.symbol)
+    if commission['symbol'] != self.symbol:
+      raise ValueError('Binance spot account fee response returned the wrong symbol')
+    groups = (
+      commission['standardCommission'],
+      commission['taxCommission'],
+      commission['specialCommission'],
+    )
+    return Fees(
+      maker_buy=sum((g['maker'] + g['buyer'] for g in groups), Decimal(0)),
+      maker_sell=sum((g['maker'] + g['seller'] for g in groups), Decimal(0)),
+      taker_buy=sum((g['taker'] + g['buyer'] for g in groups), Decimal(0)),
+      taker_sell=sum((g['taker'] + g['seller'] for g in groups), Decimal(0)),
+    )
+
+  def candles(
+    self,
+    interval: CandleInterval,
+    start: datetime,
+    end: datetime,
+  ) -> PaginatedResponse[Candle]:
+    """Fetch Binance's native pages, filtering to the requested `[start, end)`."""
+    self.check_candles(interval, start, end)
+    return PaginatedResponse(self.walk_candles(interval, start, end))
+
+  async def walk_candles(
+    self, interval: CandleInterval, start: datetime, end: datetime
+  ) -> AsyncIterator[Sequence[Candle]]:
+    """The pages behind `candles`."""
+    if start == end:
+      return
+    paging = self.client.spot.http.market.klines_paged(
+      symbol=self.symbol,
+      interval=interval,
+      start_time=start,
+      end_time=end,
+      limit=CANDLES_PAGE,
+    ).via(self.call_binance)
+    async for rows in paging:
+      page = [
+        Candle(
+          time=r[0],
+          open=r[1],
+          high=r[2],
+          low=r[3],
+          close=r[4],
+          volume=r[5],
+          quote_volume=r[7],
+          trades=r[8],
+        )
+        for r in rows
+        if start <= r[0] < end
+      ]
+      if page:
+        yield page
 
   @wrap_exceptions
   async def open_orders(self) -> Sequence[OrderState]:

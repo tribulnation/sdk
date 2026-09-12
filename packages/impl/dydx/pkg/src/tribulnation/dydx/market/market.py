@@ -14,6 +14,8 @@ import asyncio
 from tribulnation.sdk.core import PaginatedResponse, ApiError, OverflowPolicy
 from tribulnation.sdk.market import (
   Book,
+  Candle,
+  CandleInterval,
   FundingPayment,
   FundingRate,
   NextFunding,
@@ -24,13 +26,16 @@ from tribulnation.sdk.market import (
   PerpMarket,
   PerpPosition,
   Rules,
+  Fees,
   Settings,
   Trade,
 )
 
 from tribulnation.dydx.core import wrap_exceptions
 from .impl import (
+  CANDLE_INTERVALS,
   MarketMixin,
+  candles,
   max_leverage,
   parse_book,
   trades_history,
@@ -48,6 +53,8 @@ from .impl import (
 
 @dataclass(frozen=True)
 class Market(MarketMixin, PerpMarket):
+  CANDLE_INTERVALS = CANDLE_INTERVALS
+
   @property
   def market_id(self) -> str:
     return self.market
@@ -80,6 +87,19 @@ class Market(MarketMixin, PerpMarket):
 
   async def rules(self, *, refetch: bool = False) -> Rules:
     return await self.shared.rules(self.market, refetch=refetch)
+
+  async def fees(self, *, refetch: bool = False) -> Fees:
+    """Read account fees including referral-tier, staking and market discounts."""
+    return await self.shared.fees(self.perpetual_market, personal=True, refetch=refetch)
+
+  def candles(
+    self,
+    interval: CandleInterval,
+    start: datetime,
+    end: datetime,
+  ) -> PaginatedResponse[Candle]:
+    self.check_candles(interval, start, end)
+    return PaginatedResponse(candles(self, interval, start, end))
 
   def trades_history(self, start: datetime, end: datetime) -> PaginatedResponse[Trade]:
     return PaginatedResponse(trades_history(self, start, end))

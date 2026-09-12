@@ -20,6 +20,7 @@ methods = [
   "depth",
   "depth_stream",
   "rules",
+  "fees",
   "tickers",
   "perp_stats",
   "query_order",
@@ -36,10 +37,12 @@ methods = [
   "cancel_open_orders",
   "index",
   "next_funding",
+  "funding_rates",
   "perp_position",
   "perp_collateral",
+  "candles",
 ]
-note = "Spot is complete. INTX perpetuals serve market data, orders and funding state, but `funding_rates()`/`funding_payments()` raise `NotImplementedError` (Coinbase publishes no funding history at all), and `perp_position()`/`perp_collateral()` need a key scoped to an INTX portfolio — a retail key gets `PERMISSION_DENIED`."
+note = "Spot serves market data and trading. Account fees() is unsupported on spot until product-specific stablepair pricing is resolved; INTX fees reject cost-plus commissions and exclusive or unspecified GST instead of returning incomplete rates. Public rules().fees remains None. INTX perpetuals serve market data, orders, funding state and public funding-rate history. History resolves the Advanced Trade -INTX product ID to an International Exchange instrument and pages its credential-free endpoint with inclusive optional bounds. Offset pages are not an atomic snapshot; duplicate settlements are removed. funding_payments remains unsupported; perp_position/perp_collateral need an INTX-scoped key. Candles use required [start, end) bounds, page 299 opens per window and carry no quote_volume."
 # Two exchanges: `spot` (Advanced Trade SPOT products) and `intx` (perpetual swaps).
 # `trades_stream` is best-effort on both: the `user` channel carries order-level
 # cumulative quantities rather than itemized fills, so it loses per-fill maker/taker and

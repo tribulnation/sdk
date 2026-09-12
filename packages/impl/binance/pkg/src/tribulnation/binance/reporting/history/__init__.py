@@ -1,28 +1,26 @@
-"""Binance transaction history, merged from every account-scoped source."""
+"""Binance transaction history, limited to the declared spot-side sources."""
 
 from typing_extensions import AsyncIterable, AsyncIterator
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
-from tribulnation.sdk.core import SDK, AuthError
+from tribulnation.sdk.core import SDK
 from tribulnation.sdk.reporting import History as _History, HistoryRecord
 
-from ..util import new_source_id, raise_if_all_failed
+from ..util import months_before, new_source_id
 from .spot import SpotHistory
-from .usdm import UsdmHistory
 
 
 @dataclass
-class History(SpotHistory, UsdmHistory, _History):
+class History(SpotHistory, _History):
   """Binance transaction history.
 
-  Six sources, none of which Binance unifies for you: spot fills, on-chain deposits,
-  on-chain withdrawals, wallet-to-wallet transfers, USD-M futures fills, and the USD-M
-  income ledger.
+  Spot fills, on-chain deposits/withdrawals and transfers between Spot and Funding.
+  Futures endpoints are never called; their absence is explicit scope, not zero exposure.
 
   **Does not support**:
   - Margin borrow/repay and margin fills (`spot.http.margin`).
-  - COIN-M futures, Options and Portfolio Margin, each of which has its own parallel
+  - USD-M and COIN-M futures, Options and Portfolio Margin, each of which has its own parallel
     fills/income surface.
   - Simple Earn subscription, redemption and reward events
     (`simple_earn.*.history`) -- the Earn surface reports the current product
@@ -34,36 +32,30 @@ class History(SpotHistory, UsdmHistory, _History):
   async def history(
     self, start: datetime | None = None, end: datetime | None = None
   ) -> AsyncIterator[HistoryRecord]:
-    """Stream this account's history over an explicit window.
+    """Stream best-effort history without requiring dates or a list of traded markets.
 
-    Both bounds are required: no Binance history endpoint serves all time, and each one
-    stops at a different retention horizon (90 days for deposits/withdrawals, three
-    months for USD-M income, six months for transfers and fills), so an open-ended
-    window would silently return a truncated result rather than everything.
+    An omitted end means now. With no start, capital uses the preceding 90 days,
+    Spot/Funding transfers six calendar months.
+    Spot fills walk the retained ID history for every discoverable symbol. Explicit
+    bounds are preserved; venue retention and delisted symbols can still leave gaps.
 
-    A source that raises `AuthError` is reported as a permission gap and skipped -- the
-    API key's Futures, Margin and Options permissions are separate flags -- unless every
-    source raises one, which means the credentials themselves are bad.
+    Errors from supported sources propagate; rejected reads are not empty history.
     """
-    if start is None or end is None:
-      raise ValueError('Binance history requires both start and end.')
+    end = end if end is not None else datetime.now(timezone.utc)
+    if end.utcoffset() is None or (start is not None and start.utcoffset() is None):
+      raise ValueError('Binance history bounds must be timezone-aware.')
+    if start is not None and start > end:
+      raise ValueError('Binance history start must not follow end.')
+    capital_start = start if start is not None else end - timedelta(days=90)
+    transfer_start = start if start is not None else months_before(end, 6)
     id = new_source_id()
     sources: list[AsyncIterable[HistoryRecord]] = [
-      self.crypto_deposits(start, end, id=id),
-      self.crypto_withdrawals(start, end, id=id),
-      self.internal_transfers(start, end, id=id),
-      self.income(start, end, id=id),
+      self.crypto_deposits(capital_start, end, id=id),
+      self.crypto_withdrawals(capital_start, end, id=id),
+      self.internal_transfers(transfer_start, end, id=id),
+      self.spot_trades(start, end, id=id),
     ]
-    if self.spot_markets:
-      sources.append(self.spot_trades(start, end, id=id))
-    if self.usdm_markets:
-      sources.append(self.future_trades(start, end, id=id))
 
-    failures: list[AuthError] = []
     for source in sources:
-      try:
-        async for entry in source:
-          yield entry
-      except AuthError as e:
-        failures.append(e)
-    raise_if_all_failed(failures, len(sources))
+      async for entry in source:
+        yield entry

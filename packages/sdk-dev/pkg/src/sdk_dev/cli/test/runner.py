@@ -13,7 +13,10 @@ def run(args: list[str]):
     raise typer.Exit(code=int(exit_code))
 
 
-def run_suite(name: str, accounts: str):
+def run_suite(name: str, accounts: str, venue: str | None = None):
   """Run a named sdk-dev integration suite and propagate its exit status."""
   suite = Path(__file__).parents[2] / 'integration' / name / 'suite.py'
-  run([str(suite), '--accounts-config', accounts])
+  args = [str(suite), '--accounts-config', accounts]
+  if venue is not None:
+    args += ['--sdk-venue', venue]
+  run(args)

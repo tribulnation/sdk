@@ -18,10 +18,7 @@ from tribulnation.binance.core import SdkMixin
 from tribulnation.binance.util import windows
 from ..util import nonzero_fee, record, split_transfer_type
 
-TRADES_WINDOW = timedelta(hours=24)
-"""`myTrades` refuses a window wider than 24h."""
-
-CAPITAL_WINDOW = timedelta(days=90)
+CAPITAL_WINDOW = timedelta(days=90) - timedelta(milliseconds=1)
 """Deposit and withdrawal history refuse a window wider than 90 days."""
 
 PAGE_SIZE = 100
@@ -36,74 +33,43 @@ DEPOSIT_SUCCESS = 1
 WITHDRAWAL_COMPLETED = 6
 """`WithdrawRecord.status` for a completed withdrawal."""
 
-TRANSFER_TYPES: Sequence[UniversalTransferType] = [
-  'MAIN_UMFUTURE',
-  'MAIN_CMFUTURE',
-  'MAIN_MARGIN',
-  'MAIN_FUNDING',
-  'MAIN_OPTION',
-  'MAIN_PORTFOLIO_MARGIN',
-  'UMFUTURE_MAIN',
-  'UMFUTURE_MARGIN',
-  'UMFUTURE_FUNDING',
-  'UMFUTURE_OPTION',
-  'CMFUTURE_MAIN',
-  'CMFUTURE_MARGIN',
-  'CMFUTURE_FUNDING',
-  'MARGIN_MAIN',
-  'MARGIN_UMFUTURE',
-  'MARGIN_CMFUTURE',
-  'MARGIN_FUNDING',
-  'MARGIN_OPTION',
-  'FUNDING_MAIN',
-  'FUNDING_UMFUTURE',
-  'FUNDING_CMFUTURE',
-  'FUNDING_MARGIN',
-  'FUNDING_OPTION',
-  'OPTION_MAIN',
-  'OPTION_UMFUTURE',
-  'OPTION_MARGIN',
-  'OPTION_FUNDING',
-  'PORTFOLIO_MARGIN_MAIN',
-]
-"""Every transfer direction queryable without a symbol.
-
-The endpoint takes exactly one direction per call and has no "all directions" mode, so
-a full sweep is one call (plus paging) per entry. The three `ISOLATEDMARGIN_*` /
-`*_ISOLATEDMARGIN` directions are left out: they additionally require the isolated
-market's `fromSymbol`/`toSymbol`, which the sweep has no way to enumerate.
-"""
+TRANSFER_TYPES: Sequence[UniversalTransferType] = ['MAIN_FUNDING', 'FUNDING_MAIN']
+"""Only movements between the supported Spot and Funding compartments are queried."""
 
 
 @dataclass
 class SpotHistory(SdkMixin):
   """Binance spot-wallet history sources."""
 
-  spot_markets: Sequence[str] = ()
-  """Spot symbols to sweep for fills.
-
-  Binance has no account-wide fills endpoint -- `myTrades` is per symbol -- and the spot
-  exchange lists thousands of them, so the caller names the markets to look at. Empty
-  means no fills are reported. Each symbol costs one call per 24h of the window, so keep
-  the list to the markets actually traded.
-  """
-
   @SDK.method
   async def spot_trades(
-    self, start: datetime, end: datetime, *, id: str
+    self, start: datetime | None, end: datetime, *, id: str
   ) -> AsyncIterator[HistoryRecord]:
-    """Fetch spot fills for every configured market."""
-    for symbol in self.spot_markets:
-      for window_start, window_end in windows(start, end, TRADES_WINDOW):
+    """Discover all listed symbols and walk their retained fill IDs.
+
+    The ID cursor avoids one empty request per symbol per day. Date filtering is
+    local because Binance forbids combining `fromId` with time bounds. Symbols
+    removed from exchange information remain a best-effort coverage limitation.
+    """
+    info = await self.call_binance(self.client.spot.http.market.exchange_info)
+    for market in info['symbols']:
+      symbol = market['symbol']
+      cursor = 0
+      while True:
         fills = await self.call_binance(
           lambda: self.client.spot.http.account.my_trades(
             symbol=symbol,
-            start_time=window_start,
-            end_time=window_end,
+            from_id=cursor,
             limit=1000,
           )
         )
         for fill in fills:
+          if (
+            fill['id'] < cursor
+            or fill['time'] > end
+            or (start is not None and fill['time'] < start)
+          ):
+            continue
           yield record(
             SpotTrade(
               id=str(fill['id']),
@@ -117,6 +83,12 @@ class SpotHistory(SdkMixin):
             ),
             id=id,
           )
+        if not fills or len(fills) < 1000 or max(fill['time'] for fill in fills) > end:
+          break
+        following = max(fill['id'] for fill in fills) + 1
+        if following <= cursor:
+          break
+        cursor = following
 
   @SDK.method
   async def crypto_deposits(

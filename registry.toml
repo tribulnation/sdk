@@ -84,6 +84,15 @@ pypi = "https://pypi.org/project/tribulnation-coinbase/"
 icon = "https://catalogue.tribulnation.com/icons/platform/coinbase.svg"
 
 [[venues]]
+slug = "kraken"
+name = "Kraken"
+tier = "production"
+repo = "https://github.com/tribulnationx/sdk"
+path = "packages/impl/kraken"
+pypi = "https://pypi.org/project/tribulnation-kraken/"
+icon = "https://catalogue.tribulnation.com/icons/platform/kraken.svg"
+
+[[venues]]
 slug = "bybit"
 name = "Bybit"
 tier = "production"
@@ -91,3 +100,17 @@ repo = "https://github.com/tribulnationx/sdk"
 path = "packages/impl/bybit"
 pypi = "https://pypi.org/project/tribulnation-bybit/"
 icon = "https://catalogue.tribulnation.com/icons/platform/bybit.svg"
+
+[[venues]]
+slug = "kucoin"
+name = "Kucoin"
+tier = "development"
+repo = "https://github.com/tribulnation/sdk"
+path = "packages/impl/kucoin"
+
+[[venues]]
+slug = "deribit"
+name = "Deribit"
+tier = "development"
+repo = "https://github.com/tribulnation/sdk"
+path = "packages/impl/deribit"

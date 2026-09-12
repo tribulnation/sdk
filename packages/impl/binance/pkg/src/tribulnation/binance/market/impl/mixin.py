@@ -15,6 +15,7 @@ from tribulnation.sdk.core import SDK, exception_wrapper
 
 from typed_binance import Binance
 from typed_binance.spot.http.market.exchange_info import SpotSymbol
+from typed_binance.usdm_futures.http.market.exchange_info import ExchangeSymbol
 
 wrap_exceptions = exception_wrapper()
 
@@ -35,12 +36,32 @@ class Shared:
     default_factory=asyncio.Lock, init=False, repr=False
   )
 
+  perp_symbols: dict[str, ExchangeSymbol] | None = None
+  perp_symbols_lock: asyncio.Lock = field(
+    default_factory=asyncio.Lock, init=False, repr=False
+  )
+
+  @wrap_exceptions
+  async def load_perp_symbols(
+    self, *, refetch: bool = False
+  ) -> dict[str, ExchangeSymbol]:
+    """Share a public USD-M metadata snapshot across all market rule reads."""
+    if not refetch and self.perp_symbols is not None:
+      return self.perp_symbols
+    async with self.perp_symbols_lock:
+      if not refetch and self.perp_symbols is not None:
+        return self.perp_symbols
+      info = await self.client.usdm_futures.http.market.exchange_info()
+      self.perp_symbols = {row['symbol']: row for row in info['symbols']}
+      return self.perp_symbols
+
   @classmethod
   def new(
     cls,
     api_key: str | None = None,
     secret_key: str | None = None,
     *,
+    public: bool = False,
     validate: bool = True,
   ):
     """Create a `Shared` backed by a new Binance client.
@@ -48,9 +69,12 @@ class Shared:
     Args:
       api_key: Binance API key. Defaults to `BINANCE_API_KEY`.
       secret_key: Binance API secret. Defaults to `BINANCE_SECRET_KEY`.
+      public: Construct a credential-free client.
       validate: Validate responses against the typed client's schemas.
     """
-    client = Binance.new(api_key=api_key, secret_key=secret_key, validate=validate)
+    client = Binance.new(
+      api_key=api_key, secret_key=secret_key, public=public, validate=validate
+    )
     return cls(client=client, validate=validate)
 
   @wrap_exceptions
@@ -82,6 +106,7 @@ class SharedMixin(SDK):
     api_key: str | None = None,
     secret_key: str | None = None,
     *,
+    public: bool = False,
     validate: bool = True,
   ):
     """Create a market object backed by a new Binance client.
@@ -89,10 +114,13 @@ class SharedMixin(SDK):
     Args:
       api_key: Binance API key. Defaults to `BINANCE_API_KEY`.
       secret_key: Binance API secret. Defaults to `BINANCE_SECRET_KEY`.
+      public: Construct a credential-free client.
       validate: Validate responses against the typed client's schemas.
     """
     return cls(
-      shared=Shared.new(api_key=api_key, secret_key=secret_key, validate=validate)
+      shared=Shared.new(
+        api_key=api_key, secret_key=secret_key, public=public, validate=validate
+      )
     )
 
   @property

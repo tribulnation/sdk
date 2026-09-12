@@ -101,7 +101,7 @@ def stale_pages(docs_dir: Path, *, streams: str | None = None) -> list[Path]:
 
 def write_pages(docs_dir: Path, *, streams: str | None = None) -> list[Path]:
   """Rewrite every stale page under `docs_dir`. Returns the pages changed."""
-  changed = []
+  changed: list[Path] = []
   for path, text in render_pages(docs_dir, streams=streams).items():
     if (docs_dir / path).read_text() != text:
       (docs_dir / path).write_text(text)
@@ -187,7 +187,7 @@ def site_url(path: Path, *, scheme: bool = True) -> str:
 
 def render_footer(page: Page, *, prev: Page | None, next: Page | None) -> str:
   """The footer block for one page, or `''` when it is the only page."""
-  links = []
+  links: list[str] = []
   if prev is not None:
     links.append(f'← [{link_title(page, prev)}]({relative_href(page.path, prev.path)})')
   if next is not None:

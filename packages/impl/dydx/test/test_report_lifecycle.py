@@ -1,11 +1,15 @@
 """Tests for dYdX reporting client lifecycle."""
 
+from types import TracebackType
+from typing_extensions import cast
 import asyncio
 
-from typing_extensions import Any, cast
-
+from typed_dydx import Dydx
+from tribulnation.dydx.report.history import History
 from tribulnation.dydx.report.main import Report
 from tribulnation.dydx.report.snapshots import Snapshots
+
+ExitCall = tuple[type[BaseException] | None, BaseException | None, TracebackType | None]
 
 
 class FakeContext:
@@ -13,20 +17,25 @@ class FakeContext:
 
   def __init__(self):
     self.entered = 0
-    self.exits = []
+    self.exits: list[ExitCall] = []
 
   async def __aenter__(self):
     self.entered += 1
     return self
 
-  async def __aexit__(self, exc_type, exc_value, traceback):
+  async def __aexit__(
+    self,
+    exc_type: type[BaseException] | None,
+    exc_value: BaseException | None,
+    traceback: TracebackType | None,
+  ):
     self.exits.append((exc_type, exc_value, traceback))
 
 
 def test_snapshots_owns_client_lifecycle():
   """Snapshots enters and exits its dYdX client."""
   client = FakeContext()
-  snapshots = Snapshots(address='dydx1test', client=cast(Any, client))
+  snapshots = Snapshots(address='dydx1test', client=cast(Dydx, client))
 
   async def use_snapshots():
     async with snapshots:
@@ -43,8 +52,8 @@ def test_report_manages_implementations_on_exception():
   history = FakeContext()
   snapshots = FakeContext()
   report = Report(
-    history_impl=cast(Any, history),
-    snapshots_impl=cast(Any, snapshots),
+    history_impl=cast(History, history),
+    snapshots_impl=cast(Snapshots, snapshots),
   )
 
   async def use_report():

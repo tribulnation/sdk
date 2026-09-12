@@ -1,9 +1,9 @@
 """Helpers shared by the Binance reporting sources."""
 
-from typing_extensions import Sequence
+from calendar import monthrange
+from datetime import datetime
 from decimal import Decimal
 
-from tribulnation.sdk.core import AuthError
 from tribulnation.sdk.reporting import (
   Fee,
   HistoryRecord,
@@ -13,15 +13,19 @@ from tribulnation.sdk.reporting import (
 
 SERVICE = 'binance'
 
+
+def months_before(time: datetime, months: int) -> datetime:
+  """Subtract calendar months, clamping month-end dates to a valid day."""
+  year, month = divmod(time.year * 12 + time.month - 1 - months, 12)
+  month += 1
+  return time.replace(
+    year=year, month=month, day=min(time.day, monthrange(year, month)[1])
+  )
+
+
 COMPARTMENTS = {
   'MAIN': 'spot',
   'FUNDING': 'funding',
-  'UMFUTURE': 'usdm_futures',
-  'CMFUTURE': 'coinm_futures',
-  'MARGIN': 'cross_margin',
-  'ISOLATEDMARGIN': 'isolated_margin',
-  'OPTION': 'options',
-  'PORTFOLIO_MARGIN': 'portfolio_margin',
 }
 """Wallet compartment names, keyed by the token Binance uses in `UniversalTransferType`."""
 
@@ -53,14 +57,3 @@ def split_transfer_type(type: str) -> tuple[str | None, str | None]:
     if type.startswith(prefix) and (dst := COMPARTMENTS.get(type[len(prefix) :])):
       return src, dst
   return None, None
-
-
-def raise_if_all_failed(failures: Sequence[AuthError], sources: int):
-  """Re-raise when every source hit the same credential wall.
-
-  An `AuthError` from one source is a real per-surface permission gap (Binance gates
-  futures, margin and options behind separate API-key flags), so the rest of the sweep
-  still stands. An `AuthError` from all of them is a broken key, not a capability gap.
-  """
-  if failures and len(failures) == sources:
-    raise failures[0]

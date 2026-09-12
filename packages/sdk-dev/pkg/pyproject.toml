@@ -16,6 +16,7 @@ dependencies = [
   "tribulnation-sdk",
   "tribulnation-catalogue",
   "pydantic",
+  "packaging",
   "pyyaml",
   "jinja2",
   "griffe",

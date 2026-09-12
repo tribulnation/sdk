@@ -23,6 +23,21 @@ The markets implementation is structured following the market IDs: `account` →
 
 ## Examples
 
+### Exchange discovery metadata
+
+`await venue.exchanges()` returns `ExchangeDescription` records with required
+`id`, `type` (`spot` or `perp`) and nonempty `name`, plus an optional official
+HTTPS `url`. Names describe product families within a venue, not necessarily
+distinct legal entities. They may change and are never identifiers.
+
+For Coinbase, `spot` is named `Advanced Trade` and `intx` is named
+`International Exchange`. Resolve the object with `await venue.exchange(id)`;
+never substitute its display name. Hyperliquid's empty default ID stays empty,
+and dynamically discovered DEXs carry their API-provided full names. Consumers
+persisting metadata should key it by `(venue_id, exchange_id)`. URLs may be
+omitted rather than guessed. No discovery ordering or trading-access guarantee
+is implied by a name.
+
 **Top-level**: For example, if you're working across multiple venues, you'd likely work at the top level:
 
 ```python

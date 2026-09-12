@@ -3,6 +3,7 @@ from typing_extensions import (
   AsyncContextManager,
   AsyncIterable,
   AsyncIterator,
+  ClassVar,
   Sequence,
 )
 from abc import abstractmethod
@@ -13,6 +14,8 @@ import asyncio
 from tribulnation.sdk.core import SDK, PaginatedResponse, OverflowPolicy
 from .types import (
   Book,
+  Candle,
+  CandleInterval,
   Collateral,
   PerpCollateral,
   FundingRate,
@@ -25,12 +28,17 @@ from .types import (
   PerpPosition,
   Trade,
   Rules,
+  Fees,
 )
 from .settings import Settings
 
 
 class Market(SDK):
   """An abstract market interface."""
+
+  CANDLE_INTERVALS: ClassVar[frozenset[CandleInterval]] = frozenset()
+  """Candle widths this market serves. Check it before calling `candles`; an interval
+  outside it raises `ValueError` without a request being made."""
 
   @property
   def market_id(self) -> str: ...
@@ -73,10 +81,21 @@ class Market(SDK):
   @SDK.method
   @abstractmethod
   async def rules(self, *, refetch: bool = False) -> Rules:
-    """Fetch the market rules.
+    """Fetch market specifications and standard rates, without account-fee reads.
 
     - `refetch`: if `True`, fetch the rules even if they are already cached.
     """
+
+  @SDK.method
+  async def fees(self, *, refetch: bool = False) -> Fees:
+    """Fetch combined account rates for maker/taker buys and sells.
+
+    Includes applicable side and market adjustments, but excludes optional
+    fee-payment discounts. Never falls back to standard or partial base rates.
+    Unsupported implementations raise `NotImplementedError`. Authentication
+    failures and missing account rates propagate instead of returning zero.
+    """
+    raise NotImplementedError(f'Account trading fees are not implemented: {self.id}')
 
   @SDK.method
   async def query_order(self, id: str) -> OrderState | None:
@@ -85,6 +104,43 @@ class Market(SDK):
     for order in open_orders:
       if order.id == id:
         return order
+
+  def check_interval(self, interval: CandleInterval):
+    """Raise `ValueError` unless `interval` is one of `CANDLE_INTERVALS`."""
+    if interval not in self.CANDLE_INTERVALS:
+      served = ', '.join(sorted(self.CANDLE_INTERVALS)) or 'none'
+      raise ValueError(
+        f'{interval!r} candles are not served by this market [{self.id}]; '
+        f'CANDLE_INTERVALS: {served}.'
+      )
+
+  def check_candles(self, interval: CandleInterval, start: datetime, end: datetime):
+    """Validate an interval and its explicit, timezone-aware candle bounds."""
+    self.check_interval(interval)
+    if start.utcoffset() is None or end.utcoffset() is None:
+      raise ValueError('Candle bounds must be timezone-aware')
+    if end < start:
+      raise ValueError('Candle end must not precede start')
+
+  @SDK.method
+  @abstractmethod
+  def candles(
+    self,
+    interval: CandleInterval,
+    start: datetime,
+    end: datetime,
+  ) -> PaginatedResponse[Candle]:
+    """Fetch the market's historical trade candles.
+
+    Each opening timestamp appears at most once. Ordering within and across pages
+    follows the venue; page sizes are not fixed. Empty intervals are not filled in.
+
+    Args:
+      interval: Candle width. Must be one of `CANDLE_INTERVALS`, else `ValueError`.
+      start: Inclusive lower bound on opening time, as a timezone-aware datetime.
+      end: Exclusive upper bound on opening time, as a timezone-aware datetime.
+        A returned candle can still be forming. Equal bounds produce no candles.
+    """
 
   @SDK.method
   @abstractmethod

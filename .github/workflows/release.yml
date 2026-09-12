@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: main
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
           fetch-depth: 0
 
       - id: package
@@ -78,18 +78,39 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: main
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
           fetch-depth: 0
           fetch-tags: true
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
-      - run: pip install -e packages/sdk/pkg
-      - if: needs.check.outputs.slug != 'sdk'
-        run: pip install -e ${{ needs.check.outputs.package_path }}
+      - uses: actions/checkout@v5
+        with:
+          repository: tribulnation/catalogue
+          ref: main
+          path: release-catalogue
+
+      # SDK routers type-check against the local implementation packages. Installing
+      # the complete candidate also avoids requiring implementations to be published
+      # before the SDK version they depend on.
+      - name: Install reproducible crcmod runtime
+        env:
+          CC: /bin/false
+        run: pip install --no-cache-dir --no-binary=crcmod crcmod==1.7
+      - name: Install candidate with recorded dependency versions
+        run: |
+          constraints=()
+          for report in release-evidence/*/*/dependency-pins.txt; do
+            if [ -f "$report" ]; then
+              constraints+=(-c "$report")
+            fi
+          done
+          pip install "${constraints[@]}" -r requirements.txt
       - run: pip install ruff pyright build
+      - name: Require current passing local evidence before publication
+        run: sdk-dev results release '${{ needs.check.outputs.slug }}' --catalogue release-catalogue/data
       - run: ruff check --config ruff.toml ${{ needs.check.outputs.package_path }}/src
       - run: pyright ${{ needs.check.outputs.package_path }}
       - run: cp ${{ needs.check.outputs.package_path }}/../README.md ${{ needs.check.outputs.package_path }}/../LICENSE ${{ needs.check.outputs.package_path }}/

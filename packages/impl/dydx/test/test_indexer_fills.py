@@ -3,10 +3,12 @@
 import asyncio
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
-from typing_extensions import Any, cast
+from pathlib import Path
+from typing_extensions import TypedDict, cast
 
 import pytest
-from typed_dydx.indexer.data.get_fills import Fill
+from typed_dydx import Indexer
+from typed_dydx.indexer.schemas import Fill, OrderSide
 from sqlalchemy.orm import Session
 from tribulnation.dydx.report.history.cache import (
   CacheWatermark,
@@ -24,36 +26,45 @@ from tribulnation.sdk.reporting import Position, Snapshot, SubaccountSnapshot
 BASE_TIME = datetime(2026, 1, 1, tzinfo=timezone.utc)
 
 
+class FakeHeightResponse(TypedDict):
+  """Minimal indexer `/v4/height` response `FakeIndexerData.get_height` returns.
+
+  `height` is a `str` here (unlike `HeightResponse.height`'s real `int`) since nothing
+  under test reads it back -- only `time` is.
+  """
+
+  height: str
+  time: datetime
+
+
 def fill(
   id: str,
   *,
   minute: int,
-  side: str,
+  side: OrderSide,
   size: str,
   price: str,
   market: str = 'BTC-USD',
   height: int | None = None,
 ) -> Fill:
   """Create a typed fill fixture."""
-  return cast(
-    Fill,
-    {
-      'id': id,
-      'side': side,
-      'liquidity': 'TAKER',
-      'type': 'LIMIT',
-      'market': market,
-      'marketType': 'PERPETUAL',
-      'price': Decimal(price),
-      'size': Decimal(size),
-      'fee': Decimal('0.01'),
-      'affiliateRevShare': Decimal(0),
-      'createdAt': BASE_TIME + timedelta(minutes=minute),
-      'createdAtHeight': str(height if height is not None else minute + 1),
-      'orderId': f'order-{id}',
-      'subaccountNumber': 0,
-    },
-  )
+  data: Fill = {
+    'id': id,
+    'side': side,
+    'liquidity': 'TAKER',
+    'type': 'LIMIT',
+    'market': market,
+    'marketType': 'PERPETUAL',
+    'price': Decimal(price),
+    'size': Decimal(size),
+    'fee': Decimal('0.01'),
+    'affiliateRevShare': Decimal(0),
+    'createdAt': BASE_TIME + timedelta(minutes=minute),
+    'createdAtHeight': height if height is not None else minute + 1,
+    'orderId': f'order-{id}',
+    'subaccountNumber': 0,
+  }
+  return data
 
 
 class FakePaging:
@@ -83,7 +94,7 @@ class FakeIndexerData:
     self.fetches = 0
     self.fail = False
 
-  async def get_height(self):
+  async def get_height(self) -> FakeHeightResponse:
     """Return the configured indexed time."""
     return {'height': '100', 'time': self.indexed_through}
 
@@ -118,7 +129,7 @@ def history(data: FakeIndexerData, cache: HistoryCache | None = None) -> Indexer
   """Create indexer history around a stub."""
   return IndexerHistory(
     address='dydx1test',
-    indexer=cast(Any, FakeIndexer(data)),
+    indexer=cast(Indexer, FakeIndexer(data)),
     cache=cache,
   )
 
@@ -219,7 +230,7 @@ def test_parse_fills_rejects_non_chronological_input():
     )
 
 
-def test_fetch_reverses_endpoint_pages_and_persists_sequence(tmp_path):
+def test_fetch_reverses_endpoint_pages_and_persists_sequence(tmp_path: Path):
   """A full newest-first response is cached and replayed chronologically."""
   newest_first = [
     fill('third', minute=2, side='SELL', size='1', price='110'),
@@ -262,7 +273,7 @@ def test_fetch_preserves_ascending_endpoint_pages():
   assert [row['id'] for row in fetched] == ['first', 'second', 'third']
 
 
-def test_fetch_extends_coverage_with_full_atomic_refresh(tmp_path):
+def test_fetch_extends_coverage_with_full_atomic_refresh(tmp_path: Path):
   """Extending a genesis prefix replaces the complete sequenced stream."""
   first = fill('first', minute=0, side='BUY', size='1', price='100')
   data = FakeIndexerData(
@@ -286,7 +297,7 @@ def test_fetch_extends_coverage_with_full_atomic_refresh(tmp_path):
   ) == BASE_TIME + timedelta(minutes=2)
 
 
-def test_fetch_failure_keeps_previous_fills_and_coverage(tmp_path):
+def test_fetch_failure_keeps_previous_fills_and_coverage(tmp_path: Path):
   """A failed refresh does not claim coverage or replace good rows."""
   first = fill('first', minute=0, side='BUY', size='1', price='100')
   data = FakeIndexerData(
@@ -315,7 +326,7 @@ def test_fetch_failure_keeps_previous_fills_and_coverage(tmp_path):
   ) == BASE_TIME + timedelta(minutes=1)
 
 
-def test_fetch_ignores_legacy_indexer_watermark_and_rows(tmp_path):
+def test_fetch_ignores_legacy_indexer_watermark_and_rows(tmp_path: Path):
   """Legacy unsequenced cache state does not imply genesis coverage."""
   legacy = fill('legacy', minute=0, side='BUY', size='1', price='100')
   current = fill('current', minute=1, side='SELL', size='1', price='110')
@@ -349,7 +360,7 @@ def test_fetch_ignores_legacy_indexer_watermark_and_rows(tmp_path):
   assert data.fetches == 1
 
 
-def test_start_is_applied_after_replay_from_genesis(tmp_path):
+def test_start_is_applied_after_replay_from_genesis(tmp_path: Path):
   """A bounded output obtains its position basis from earlier fills."""
   newest_first = [
     fill('close', minute=2, side='SELL', size='1', price='110'),

@@ -43,9 +43,59 @@ async with MarketSDK.load('sdk.toml') as sdk:
 # every connection this sdk opened is closed here
 ```
 
-Entering connects nothing — it only takes ownership — so there is no cost to entering
-early. Do it in anything long-running, and anywhere you build SDK objects repeatedly: one
-dropped without exiting takes its open connections with it.
+An entered `MarketSDK` constructs venues lazily, once per account ID within that context.
+Repeated `venue()`, `exchange()` and `market()` routes share their venue's clients,
+metadata caches and subscriptions. Unused accounts are neither constructed nor entered.
+A newly requested venue is entered before its lookup returns; most transports connect
+only on use, but venue-specific initialization (such as loading a signing wallet) may
+perform I/O.
+
+Root exit closes acquired venues in reverse acquisition order and clears the cache,
+including when the body or cleanup raises. Re-entering the root creates fresh venues.
+Keep borrowed references within their owner's context, and finish tasks and stream
+contexts before leaving it.
+
+For a long-lived service or strategy gateway, enter the root once around the service
+lifetime. Consumers can continue borrowing markets without managing each one:
+
+```python
+async with MarketSDK(accounts=accounts) as sdk:
+  maker = await sdk.market(maker_id)
+  hedger = await sdk.market(hedger_id)
+  await run_strategy(maker, hedger)
+```
+
+## Standalone factories
+
+Outside a root context, each routed market venue is fresh and caller-managed:
+
+```python
+sdk = MarketSDK(accounts=accounts)
+venue = await sdk.venue('my_account')
+async with venue:
+  market = await venue.market('spot:BTCUSDT')
+  book = await market.depth()
+```
+
+Entering the root does not adopt venues previously constructed outside it. They remain
+independently owned; managed lookups create separate venues even for the same account.
+
+The synchronous `MarketSDK.all` property remains a factory collection outside a root
+context. Within an entered root it can return already acquired venues, but raises if
+any venue still needs acquisition: use `await sdk.venue(id)` for those lookups. Accessing
+`sdk.all` outside a context constructs fresh caller-managed venues for every account.
+
+`EarnSDK`, `WalletSDK` and `ReportSDK` retain their synchronous `venue()` factory APIs:
+enter the returned child, not the root. Direct venue-specific factories also remain
+independently owned; they do not participate in a `MarketSDK` root's routing cache.
+
+```python
+from tribulnation.sdk import WalletSDK
+
+wallet = WalletSDK(accounts=accounts).venue('my_account')
+async with wallet:
+  methods = await wallet.deposit_methods()
+```
 
 ## Entering a parent enters its children
 
