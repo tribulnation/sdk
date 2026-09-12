@@ -56,15 +56,26 @@ class SpotExchange(ExchangeMixin, Exchange):
     *,
     settings: Settings = {},
   ) -> Mapping[str, Ticker]:
-    """Fetch last price, best bid and best ask for every market in one call.
+    """Fetch bulk tickers, or use symbol-specific reads for an explicit selection.
 
     Args:
       markets: Symbols to keep. `None` keeps every symbol.
-      settings: Accepted for interface compatibility and ignored: `v2/trading/tickers`
-        answers for the whole catalogue in one request either way.
+      settings: Accepted for interface compatibility and ignored.
+
+    Bit2Me's bulk cache can lag its symbol-specific quotes. An explicit selection
+    uses one request per distinct symbol instead of filtering that stale bulk cache.
     """
-    entries = await self.call_bit2me(self.client.v2.trading.tickers)
     wanted = None if markets is None else set(markets)
+    if wanted is None:
+      entries = await self.call_bit2me(self.client.v2.trading.tickers)
+    else:
+      entries: list[TickerInfo] = []
+      for symbol in sorted(wanted):
+        entries.extend(
+          await self.call_bit2me(
+            lambda symbol=symbol: self.client.v2.trading.tickers(symbol=symbol)
+          )
+        )
     return {
       symbol: parse_ticker(entry)
       for entry in entries
