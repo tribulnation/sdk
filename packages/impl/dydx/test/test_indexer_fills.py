@@ -4,10 +4,12 @@ import asyncio
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import AsyncMock
 from typing_extensions import TypedDict, cast
 
 import pytest
-from typed_dydx import Indexer
+from typed_dydx import Dydx, Indexer
 from typed_dydx.indexer.schemas import Fill, OrderSide
 from sqlalchemy.orm import Session
 from tribulnation.dydx.report.history.cache import (
@@ -17,11 +19,13 @@ from tribulnation.dydx.report.history.cache import (
 )
 from tribulnation.dydx.report.history.indexer import (
   IndexerHistory,
-  ReplayPosition,
+  replay_fills,
   parse_fills,
 )
-from tribulnation.dydx.report.main import normalize_perpetual_collateral
-from tribulnation.sdk.reporting import Position, Snapshot, SubaccountSnapshot
+from tribulnation.dydx.report.main import Report
+from tribulnation.dydx.report.history import History
+from tribulnation.dydx.report.snapshots import Snapshots
+from tribulnation.sdk.reporting import Balances, Snapshot
 
 BASE_TIME = datetime(2026, 1, 1, tzinfo=timezone.utc)
 
@@ -188,35 +192,126 @@ def test_parse_fills_weights_increases_by_remaining_position():
   ]
 
 
-def test_snapshot_collateral_uses_replayed_position_basis():
-  """Collateral and realized PnL use the same average-cost convention."""
-  snapshot = Snapshot(
-    time=BASE_TIME,
-    subaccounts=[
-      SubaccountSnapshot(
-        subaccount='0',
-        balances={'USDC': Decimal(100)},
-        positions={
-          'BTC-USD': Position(size=Decimal(2), avg_price=Decimal(90)),
-        },
-      ),
-    ],
-  )
-
-  normalized = normalize_perpetual_collateral(
-    snapshot,
-    {
-      '0': {
-        'BTC-USD': ReplayPosition(
-          signed_size=Decimal(2),
-          entry_price=Decimal(95),
+def snapshot_equity(snapshot: Snapshot, *, mark: Decimal) -> Decimal:
+  """Value each subaccount independently, including offsetting positions."""
+  return sum(
+    (
+      state.balances.get('USDC', Decimal(0))
+      + sum(
+        (
+          position.size * (mark - position.avg_price)
+          for position in state.positions.values()
         ),
-      },
-    },
+        start=Decimal(0),
+      )
+      for state in snapshot.subaccounts
+    ),
+    start=Decimal(0),
   )
 
-  assert normalized.subaccounts[0].balances['USDC'] == Decimal(110)
-  assert normalized.subaccounts[0].positions == snapshot.subaccounts[0].positions
+
+@pytest.mark.parametrize('side', ['BUY', 'SELL'])
+@pytest.mark.parametrize(
+  'replay_state', ['matching', 'partial-close', 'missing-close', 'late-fill']
+)
+def test_snapshot_preserves_native_equity(
+  monkeypatch: pytest.MonkeyPatch,
+  side: OrderSide,
+  replay_state: str,
+):
+  """Public snapshots retain native equity regardless of fill basis or timing."""
+  direction = Decimal(1) if side == 'BUY' else Decimal(-1)
+  opposing: OrderSide = 'SELL' if side == 'BUY' else 'BUY'
+  fills = [fill('open', minute=0, side=side, size='3', price='95')]
+  if replay_state != 'missing-close':
+    fills.append(fill('close', minute=1, side=opposing, size='1', price='100'))
+  if replay_state == 'late-fill':
+    fills.append(fill('late', minute=3, side=side, size='1', price='105'))
+  if replay_state == 'matching':
+    fills = [fill('open', minute=0, side=side, size='2', price='95')]
+  trades, replayed = replay_fills(fills)
+  if replay_state == 'partial-close':
+    assert trades[-1].realized_pnl == direction * Decimal(5)
+  if replay_state in ('matching', 'partial-close'):
+    assert replayed['BTC-USD'].signed_size == direction * Decimal(2)
+    assert replayed['BTC-USD'].entry_price == Decimal(95)
+  else:
+    assert replayed['BTC-USD'].signed_size != direction * Decimal(2)
+
+  # A single captured indexer response supplies collateral and position basis.
+  # The second subaccount holds the opposite position in the same instrument.
+  native_equities = [
+    Decimal(100) + direction * Decimal(20),
+    Decimal(50) - direction * Decimal(20),
+  ]
+  get_subaccounts = AsyncMock(
+    return_value={
+      'subaccounts': [
+        {
+          'subaccountNumber': number,
+          'equity': equity,
+          'openPerpetualPositions': {
+            'BTC-USD': {
+              'market': 'BTC-USD',
+              'size': size,
+              'entryPrice': Decimal(90),
+              'unrealizedPnl': size * Decimal(10),
+            },
+          },
+        }
+        for number, size, equity in zip(
+          (0, 1),
+          (direction * Decimal(2), -direction * Decimal(2)),
+          native_equities,
+        )
+      ],
+    }
+  )
+  indexer = cast(
+    Indexer, SimpleNamespace(data=SimpleNamespace(get_subaccounts=get_subaccounts))
+  )
+  for method in (
+    'bank_module_balances',
+    'active_delegations',
+    'unbonding_delegations',
+    'unclaimed_delegation_rewards',
+  ):
+    monkeypatch.setattr(Snapshots, method, AsyncMock(return_value=Balances()))
+  snapshots = Snapshots(
+    address='dydx1test',
+    client=cast(Dydx, SimpleNamespace(indexer=indexer)),
+  )
+  native = asyncio.run(snapshots.snapshot())
+  # Capture once so both APIs are compared at exactly the same time and holdings.
+  native.snapshot.time = BASE_TIME + timedelta(minutes=2)
+  snapshot_call = AsyncMock(return_value=native)
+  monkeypatch.setattr(Snapshots, 'snapshot', snapshot_call)
+  fetch_fills = AsyncMock(return_value=fills)
+  history_impl = cast(
+    History,
+    SimpleNamespace(
+      indexer=SimpleNamespace(
+        cache=None,
+        fetch_fills=fetch_fills,
+      )
+    ),
+  )
+  report = Report(history_impl=history_impl, snapshots_impl=snapshots)
+  assets = ['USDC']
+
+  result = asyncio.run(report.snapshot(assets))
+
+  for state, equity in zip(result.snapshot.subaccounts[1:], native_equities):
+    assert snapshot_equity(Snapshot(subaccounts=[state]), mark=Decimal(100)) == equity
+  assert result.snapshot.subaccounts[1].balances['USDC'] == Decimal(100)
+  assert result.snapshot.subaccounts[2].balances['USDC'] == Decimal(50)
+  for mark in (Decimal(80), Decimal(100), Decimal(120)):
+    assert snapshot_equity(result.snapshot, mark=mark) == snapshot_equity(
+      native.snapshot, mark=mark
+    )
+  assert result is native
+  snapshot_call.assert_awaited_once_with(assets)
+  fetch_fills.assert_not_awaited()
 
 
 def test_parse_fills_rejects_non_chronological_input():
