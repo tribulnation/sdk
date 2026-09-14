@@ -34,7 +34,7 @@ async def funding_rates(
     coin=self.asset_name,
     start_time=start_time,
     end_time=end,
-  ):
+  ).via(self.call_hyperliquid):
     yield [
       FundingRate(
         rate=Decimal(entry['fundingRate']),
@@ -55,7 +55,7 @@ async def funding_payments(
     user=self.address,
     start_time=start,
     end_time=end,
-  ):
+  ).via(self.call_hyperliquid):
     payments: list[FundingPayment] = []
     for p in chunk:
       if p['delta']['coin'] != self.asset_name:

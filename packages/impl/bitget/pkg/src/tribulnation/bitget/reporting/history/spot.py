@@ -21,6 +21,7 @@ from typed_bitget.classic.spot.symbols import SpotSymbol
 
 from .util import (
   TimezoneMixin,
+  call_bitget,
   api_record,
   api_record_many,
   nonzero_fee,
@@ -52,7 +53,7 @@ class SpotHistory(TimezoneMixin, SdkHistory):
     """Fetch spot tax rows as unknown observations."""
     async for chunk in self.client.classic.tax.spot_records_paged(
       start_time=start, end_time=end
-    ):
+    ).via(call_bitget):
       for tx in chunk:
         observations: list[Observation] = [
           UnknownObservation(

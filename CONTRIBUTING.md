@@ -154,6 +154,13 @@ Two notes: `__aexit__` propagates a resource's suppression signal, so one return
 swallows the exception; and `AsyncResources` was removed in 1.7.0 — it was a second root
 competing with `SDK`, which is what allowed the MRO race above.
 
+## Pagination
+
+Route each page request through an async `@SDK.method` with exception translation
+inside the decorator. Use typed pagers with `.via(self.call_venue)` or wrap each
+manual cursor/window request individually. See [Pagination retries](dev-docs/pagination-retries.md)
+for implementation guidance, regression expectations and the venue audit.
+
 ## Adding a venue
 
 Copy the shape of an existing `packages/impl/<venue>/`: a `pkg/` package named

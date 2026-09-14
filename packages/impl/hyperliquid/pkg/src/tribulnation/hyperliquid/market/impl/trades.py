@@ -65,7 +65,7 @@ def trades_history(
       user=self.address,
       start_time=start,
       end_time=end,
-    ):
+    ).via(self.call_hyperliquid):
       trades: list[Trade] = []
       for f in chunk:
         if f.get('coin') != self.asset_name:

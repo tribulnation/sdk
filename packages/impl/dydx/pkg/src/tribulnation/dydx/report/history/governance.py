@@ -6,6 +6,9 @@ from decimal import Decimal
 import json
 from urllib.parse import urlencode
 from urllib.request import urlopen
+from urllib.error import HTTPError, URLError
+
+from tribulnation.sdk import SDK, ApiError, NetworkError, RateLimited
 
 from pydantic import JsonValue, TypeAdapter
 
@@ -91,6 +94,7 @@ class GovernanceHistory:
 
     return proposals
 
+  @SDK.method
   async def governance_json(self, path: str, *, params: dict[str, str]) -> JsonObject:
     """Fetch one governance REST JSON payload."""
     query = urlencode(params)
@@ -104,7 +108,13 @@ class GovernanceHistory:
         raise ValueError(f'Expected governance JSON object from {url}.')
       return payload
 
-    return await asyncio.to_thread(fetch)
+    try:
+      return await asyncio.to_thread(fetch)
+    except HTTPError as error:
+      cls = RateLimited if error.code == 429 else ApiError
+      raise cls(error.code, error.reason) from error
+    except (URLError, TimeoutError, ConnectionError) as error:
+      raise NetworkError(*error.args) from error
 
   def parse_governance_proposal(self, proposal: JsonObject) -> HistoryRecord | None:
     """Convert one governance proposal into a Community Treasury yield record."""
