@@ -25,7 +25,7 @@ def passing(venue: str) -> dict[str, object]:
 
 
 @pytest.mark.parametrize(
-  'venue,count', [('ethereum', 6), ('kucoin', 12), ('deribit', 12)]
+  'venue,count', [('ethereum', 3), ('kucoin', 9), ('deribit', 9)]
 )
 def test_nonmarket_packages_have_real_required_read_suites(venue: str, count: int):
   """Every supported surface contributes checks, with no placeholder market report."""
@@ -93,7 +93,8 @@ def test_deribit_groups_partition_every_required_check():
   """A split retains exactly the required public and private tests, without skips."""
   public = evidence.group_inventory(repo_root(), 'deribit', 'public_mainnet')
   private = evidence.group_inventory(repo_root(), 'deribit', 'report_testnet')
-  assert len(public) == len(private) == 6
+  assert len(public) == 6
+  assert len(private) == 3
   assert not set(public) & set(private)
   assert set(public) | set(private) == set(evidence.inventory(repo_root(), 'deribit'))
   assert all(not id.startswith('report.') for id in public)

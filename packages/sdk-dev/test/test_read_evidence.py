@@ -1,9 +1,10 @@
 """All supported read suites must pass; omitted cases and forged skips fail closed."""
 
+import asyncio
 from contextlib import redirect_stderr, redirect_stdout
 import io
 from pathlib import Path
-from unittest.mock import Mock
+from unittest.mock import AsyncMock, MagicMock, Mock
 
 import pytest
 from typing_extensions import Literal
@@ -83,10 +84,6 @@ def test_exclusions_are_specific_and_never_passes():
     evidence.verify_payload(hl.model_dump(mode='json'), root=repo_root())
   mexc = evidence.inventory(repo_root(), 'mexc')
   assert sum(case.exclusion == 'unsupported_perp_stream' for case in mexc.values()) == 1
-  assert any(
-    case.test == 'test_mexc_history_sources' and not case.exclusion
-    for case in mexc.values()
-  )
 
 
 def test_deribit_split_and_legacy_reports():
@@ -258,7 +255,7 @@ def test_public_address_reports_do_not_require_signing_secrets(
 
 
 def test_report_runner_forwards_archive_configuration(tmp_path: Path):
-  """Selecting a full-history provider must reach the SDK without changing bounds."""
+  """Report provider configuration still reaches snapshot construction."""
   from sdk_dev.integration.report.conftest import load_sdk
 
   path = tmp_path / 'accounts.toml'
@@ -279,3 +276,46 @@ def test_report_runner_rejects_unknown_archive_provider(tmp_path: Path):
   path.write_text('[accounts]\n[report.dydx]\narchive_node = "typo"\n')
   with pytest.raises(pydantic.ValidationError):
     load_sdk(Mock(getoption=Mock(return_value=str(path))))
+
+
+@pytest.mark.parametrize('venue', results.required_venues(repo_root(), 'sdk'))
+def test_report_inventory_requires_only_snapshots(venue: str):
+  """Report history is outside SDK live qualification under ADR 0016."""
+  cases = evidence.inventory(repo_root(), venue)
+  report_tests = {case.test for case in cases.values() if case.surface == 'report'}
+  assert report_tests <= {
+    'test_snapshot_can_be_fetched',
+    'test_snapshot_time_is_tz_aware',
+    'test_snapshot_balances_are_finite_decimals',
+  }
+
+
+def test_report_snapshot_fixture_never_reads_history():
+  """A snapshot check must not launch an archive-backed history sweep."""
+  from sdk_dev.integration.report.conftest import read_report
+  from tribulnation.sdk.reporting import Snapshot, SnapshotRecord
+
+  snapshot = SnapshotRecord(
+    snapshot=Snapshot(subaccounts=[]),
+    provenance={'source': 'api', 'service': 'fixture', 'id': 'fixture'},
+  )
+  report = MagicMock()
+  report.snapshot = AsyncMock(return_value=snapshot)
+  report.history.side_effect = AssertionError('History must not be requested')
+  sdk = Mock(venue=Mock(return_value=report))
+
+  result = asyncio.run(read_report(sdk, 'fixture'))
+
+  assert result.snapshot is snapshot
+  assert result.snapshot_failure is None
+  report.snapshot.assert_awaited_once_with()
+  report.history.assert_not_called()
+  report.__aexit__.assert_awaited_once()
+
+
+def test_previous_history_qualification_version_is_rejected():
+  """The changed qualification boundary requires newly recorded evidence."""
+  legacy = passing('dydx').model_dump(mode='json')
+  legacy['version'] = 3
+  with pytest.raises(ValueError):
+    evidence.verify_payload(legacy, root=repo_root())

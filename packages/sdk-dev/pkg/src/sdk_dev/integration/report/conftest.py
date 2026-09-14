@@ -9,7 +9,6 @@ a consumer iterating `report.all` would: some clients bind a lock or a semaphore
 the loop they first run on, and one `asyncio.run` per account trips over that.
 """
 
-from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import tomllib
 
@@ -23,11 +22,10 @@ from ..runtime import loop_of
 from .support import ReportResult
 
 SDK: pytest.StashKey[ReportSDK] = pytest.StashKey()
-HISTORY_WINDOW = timedelta(days=30)
 
 
 def load_sdk(config: pytest.Config) -> ReportSDK:
-  """Build the report router; implementations discover their own history markets."""
+  """Build the report router with its configured snapshot providers."""
   sdk = ReportSDK(accounts=load_accounts(config))
   account_path = config.getoption('accounts_config')
   if not isinstance(account_path, str):
@@ -59,48 +57,23 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
   metafunc.parametrize('report_account', ids, ids=ids, scope='module')
 
 
-async def read_report(
-  sdk: ReportSDK, id: str, *, venue: str, start: datetime, end: datetime
-) -> ReportResult:
-  """Build one account's report and read a snapshot and a history window, keeping
-  the two failures apart."""
-  snapshot = snapshot_failure = records = history_failure = None
+async def read_report(sdk: ReportSDK, id: str) -> ReportResult:
+  """Read one snapshot and retain sanitized request or lifecycle failures."""
+  snapshot = None
+  snapshot_failure = None
   with Context().retried(NetworkError, RateLimited, max_retries=5).use():
     try:
       report: Report = sdk.venue(id)
       async with report:
-        try:
-          snapshot = await report.snapshot()
-        except Exception as exception:
-          snapshot_failure = describe_exception(exception)
-        try:
-          records = [record async for record in report.history(start, end)]
-        except Exception as exception:
-          history_failure = describe_exception(exception)
+        snapshot = await report.snapshot()
     except Exception as exception:
-      # Building, entering or leaving the report failed; neither read can be trusted.
-      failure = describe_exception(exception)
-      snapshot_failure = snapshot_failure or failure
-      history_failure = history_failure or failure
-  return ReportResult(
-    venue=venue,
-    start=start,
-    end=end,
-    snapshot=snapshot,
-    snapshot_failure=snapshot_failure,
-    records=records,
-    history_failure=history_failure,
-  )
+      snapshot_failure = describe_exception(exception)
+  return ReportResult(snapshot=snapshot, snapshot_failure=snapshot_failure)
 
 
 @pytest.fixture(scope='module')
 def report_result(report_account: str, pytestconfig: pytest.Config) -> ReportResult:
-  """Read and cache one account's snapshot and last-30-days history for the module."""
+  """Read and cache one account's snapshot for the module."""
   sdk = pytestconfig.stash[SDK]
   require_report_credentials(sdk.accounts[report_account])
-  venue = sdk.accounts[report_account].venue
-  end = datetime.now(timezone.utc)
-  start = end - HISTORY_WINDOW
-  return loop_of(pytestconfig).run_until_complete(
-    read_report(sdk, report_account, venue=venue, start=start, end=end)
-  )
+  return loop_of(pytestconfig).run_until_complete(read_report(sdk, report_account))

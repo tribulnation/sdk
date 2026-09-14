@@ -160,7 +160,7 @@ def test_surfaces(
     ),
   ] = None,
 ):
-  """Record all supported read-only suites without saving private records."""
+  """Record required read-only suites without saving private records."""
   from sdk_dev.evidence import capture, write_report
   from sdk_dev.read_evidence import collect, collect_deribit, verify_payload
 
@@ -177,7 +177,7 @@ def test_surfaces(
     root = repo_root()
     started = datetime.now(timezone.utc)
     before = capture(root, venue, catalogue)
-    typer.echo(f'Checking {venue}: all supported read-only suites…')
+    typer.echo(f'Checking {venue}: required read-only suites…')
     payload = (
       collect(venue, selected, accounts)
       if testnet_account is None
