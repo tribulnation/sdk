@@ -40,11 +40,6 @@ TESTS: dict[str, dict[str, tuple[str, ...]]] = {
       'test_snapshot_time_is_tz_aware',
       'test_snapshot_balances_are_finite_decimals',
     ),
-    'history': (
-      'test_history_can_be_fetched',
-      'test_history_times_are_tz_aware_and_within_bounds',
-      'test_history_provenance_is_valid',
-    ),
   },
 }
 
