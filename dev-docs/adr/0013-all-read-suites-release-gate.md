@@ -2,7 +2,7 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: accepted
+1. Status: accepted; Report history scope amended by [ADR 0016](0016-report-snapshot-release-scope.md)
 2. Date: 2026-09-11
 3. Amends: ADRs 0003 and 0006. Preserves the Deribit network split in ADR 0012.
 
