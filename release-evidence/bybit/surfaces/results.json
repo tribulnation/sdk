@@ -78,38 +78,6 @@
       {
         "exclusion": null,
         "failed": 0,
-        "id": "report.test_history_can_be_fetched[null, null]",
-        "network": "mainnet",
-        "passed": 1,
-        "skipped": 0
-      },
-      {
-        "exclusion": null,
-        "failed": 0,
-        "id": "report.test_history_times_are_tz_aware_and_within_bounds[null, null]",
-        "network": "mainnet",
-        "passed": 1,
-        "skipped": 0
-      },
-      {
-        "exclusion": null,
-        "failed": 0,
-        "id": "report.test_history_provenance_is_valid[null, null]",
-        "network": "mainnet",
-        "passed": 1,
-        "skipped": 0
-      },
-      {
-        "exclusion": "not_applicable",
-        "failed": 0,
-        "id": "report.test_mexc_history_sources[null, null]",
-        "network": "mainnet",
-        "passed": 0,
-        "skipped": 0
-      },
-      {
-        "exclusion": null,
-        "failed": 0,
         "id": "market.test_candle_values_are_decimals_and_ordered[\"spot:BTCUSDT\", null]",
         "network": "mainnet",
         "passed": 1,
@@ -336,6 +304,6 @@
     "private_account_venue": null,
     "scope": "surfaces",
     "venue": "bybit",
-    "version": 3
+    "version": 4
   }
 }

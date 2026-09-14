@@ -108,6 +108,10 @@ jobs:
             fi
           done
           pip install "${constraints[@]}" -r requirements.txt
+          # These wheels share docs/* paths. Install hexbytes last so the complete
+          # file inventory matches local evidence, including the overlapping docs.
+          hexbytes_version=$(python -c 'from importlib.metadata import version; print(version("hexbytes"))')
+          pip install --no-deps --force-reinstall "hexbytes==$hexbytes_version"
       - run: pip install ruff pyright build
       - name: Require current passing local evidence before publication
         run: sdk-dev results release '${{ needs.check.outputs.slug }}' --catalogue release-catalogue/data

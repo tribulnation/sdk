@@ -20,6 +20,7 @@ from typed_bitget import Bitget
 
 from .util import (
   TimezoneMixin,
+  call_bitget,
   api_record,
   api_record_many,
   nonzero_fee,
@@ -40,7 +41,7 @@ class FuturesHistory(TimezoneMixin, SdkHistory):
     """Fetch futures tax rows as unknown observations."""
     async for chunk in self.client.classic.tax.futures_records_paged(
       start_time=start, end_time=end
-    ):
+    ).via(call_bitget):
       for tx in chunk:
         observations: list[Observation] = [
           UnknownObservation(
@@ -74,7 +75,7 @@ class FuturesHistory(TimezoneMixin, SdkHistory):
     """Fetch futures fills as trade observations."""
     async for chunk in self.client.classic.mix.order.fill_history_paged(
       product_type='USDT-FUTURES', start_time=start, end_time=end
-    ):
+    ).via(call_bitget):
       for fill in chunk:
         if len(fill['feeDetail']) > 1:
           warnings.warn(

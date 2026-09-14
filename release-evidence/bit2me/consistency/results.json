@@ -4,6 +4,126 @@
     "checks": [
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"B2M/EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"B2M/USDC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BTC/EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BTC/EURR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BTC/USDC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ETH/EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ETH/USDC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"EUR/EURR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"EURC/EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"USDC/EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"B2M/EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"B2M/USDC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BTC/EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BTC/EURR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BTC/USDC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ETH/EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ETH/USDC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"EUR/EURR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"EURC/EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"USDC/EUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"discovery\"]",
         "quotes": [],
         "status": "pass"
@@ -31,14 +151,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"1INCH/EUR\"]",
         "quotes": [
           {
-            "after_ask": "0.0795",
-            "after_bid": "0.0787",
-            "ask": "0.0795",
+            "after_ask": "0.0798",
+            "after_bid": "0.0797",
+            "ask": "0.0801",
             "attempt": 1,
-            "before_ask": "0.0795",
-            "before_bid": "0.0787",
-            "bid": "0.0787",
-            "elapsed_seconds": 0.12390279800001736,
+            "before_ask": "0.0798",
+            "before_bid": "0.0797",
+            "bid": "0.08",
+            "elapsed_seconds": 0.3227373260015156,
             "ticker_ids_match": true
           }
         ],
@@ -56,7 +176,7 @@
             "before_ask": "0.0001413",
             "before_bid": "0.0001375",
             "bid": "0.0",
-            "elapsed_seconds": 0.08813314899998659,
+            "elapsed_seconds": 0.34175624599447474,
             "ticker_ids_match": true
           },
           {
@@ -67,7 +187,7 @@
             "before_ask": "0.0001413",
             "before_bid": "0.0001375",
             "bid": "0.0",
-            "elapsed_seconds": 0.10766117700040923,
+            "elapsed_seconds": 0.2831240270170383,
             "ticker_ids_match": true
           },
           {
@@ -78,7 +198,7 @@
             "before_ask": "0.0001413",
             "before_bid": "0.0001375",
             "bid": "0.0",
-            "elapsed_seconds": 0.09120129799975984,
+            "elapsed_seconds": 0.35912772099254653,
             "ticker_ids_match": true
           }
         ],
@@ -89,14 +209,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"AAVE/EUR\"]",
         "quotes": [
           {
-            "after_ask": "108.94",
-            "after_bid": "108.89",
-            "ask": "108.94",
+            "after_ask": "109.11",
+            "after_bid": "109.02",
+            "ask": "109.14",
             "attempt": 1,
-            "before_ask": "108.94",
-            "before_bid": "108.89",
-            "bid": "108.84",
-            "elapsed_seconds": 0.1084877580005923,
+            "before_ask": "109.11",
+            "before_bid": "109.02",
+            "bid": "109.07",
+            "elapsed_seconds": 0.1778569529997185,
             "ticker_ids_match": true
           }
         ],
@@ -107,14 +227,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"BTC/EUR\"]",
         "quotes": [
           {
-            "after_ask": "66724.0",
-            "after_bid": "66723.9",
-            "ask": "66730.2",
+            "after_ask": "67932.1",
+            "after_bid": "67932.0",
+            "ask": "67945.4",
             "attempt": 1,
-            "before_ask": "66724.0",
-            "before_bid": "66723.9",
-            "bid": "66730.1",
-            "elapsed_seconds": 0.08478418799950305,
+            "before_ask": "67932.1",
+            "before_bid": "67932.0",
+            "bid": "67931.0",
+            "elapsed_seconds": 0.2060651570209302,
             "ticker_ids_match": true
           }
         ],

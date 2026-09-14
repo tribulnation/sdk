@@ -18,6 +18,7 @@ from typed_bitget.classic.spot.symbols import SpotSymbol
 
 from .util import (
   TimezoneMixin,
+  call_bitget,
   api_record,
   api_record_many,
   nonzero_fee,
@@ -57,7 +58,7 @@ class MarginHistory(TimezoneMixin, SdkHistory):
     """Keep the tax row's symbol alongside its observation for fill discovery."""
     async for chunk in self.client.classic.tax.margin_records_paged(
       margin_type, start_time=start, end_time=end
-    ):
+    ).via(call_bitget):
       for tx in chunk:
         subaccount = f'{margin_type}_margin'
         observations: list[Observation] = [
@@ -104,7 +105,9 @@ class MarginHistory(TimezoneMixin, SdkHistory):
       fn = self.client.classic.margin.isolated.order.fills_paged
     else:
       fn = self.client.classic.margin.cross.order.fills_paged
-    async for chunk in fn(symbol=symbol, start_time=start, end_time=end):
+    async for chunk in fn(symbol=symbol, start_time=start, end_time=end).via(
+      call_bitget
+    ):
       for fill in chunk:
         subaccount = f'{margin_type}_margin'
         base = symbols[symbol]['baseCoin']

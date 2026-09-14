@@ -1,7 +1,7 @@
 from typing_extensions import TYPE_CHECKING, Any, TypedDict
 from dataclasses import dataclass, field
 from datetime import datetime
-from asyncer import asyncify
+import asyncio
 from google.cloud import bigquery
 from google.cloud.bigquery import Client as BigQueryClient
 import requests
@@ -68,7 +68,7 @@ def estimate_query_cost(
   }
 
 
-def run_query_with_cost(
+async def run_query_with_cost_async(
   client: bigquery.Client,
   query: str,
   price_per_tib: float = 6.25,
@@ -87,8 +87,8 @@ def run_query_with_cost(
     maximum_bytes_billed=maximum_bytes_billed,
   )
 
-  query_job = client.query(query, job_config=config)
-  results = gcloud.rows(query_job)
+  query_job = await asyncio.to_thread(client.query, query, job_config=config)
+  results = await gcloud.rows(query_job)
 
   bytes_processed = query_job.total_bytes_processed or 0
   bytes_billed = query_job.total_bytes_billed or 0
@@ -105,9 +105,6 @@ def run_query_with_cost(
   }
 
   return results, cost_info
-
-
-run_query_with_cost_async = asyncify(run_query_with_cost)
 
 
 def reward_row(row: dict[str, Any]) -> RewardRow:

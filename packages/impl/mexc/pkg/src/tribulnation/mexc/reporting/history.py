@@ -219,8 +219,10 @@ async def deposits(
 ) -> AsyncIterator[HistoryRecord]:
   """Yield one record per credited on-chain deposit in the window."""
   for lower, upper in windows(start, end, CAPITAL_WINDOW):
-    rows = await self.client.spot.http.wallet.deposit_history(
-      status=DEPOSIT_SUCCESS, start_time=lower, end_time=upper, limit=CAPITAL_LIMIT
+    rows = await self.call_mexc(
+      lambda: self.client.spot.http.wallet.deposit_history(
+        status=DEPOSIT_SUCCESS, start_time=lower, end_time=upper, limit=CAPITAL_LIMIT
+      )
     )
     for d in rows:
       deposit = parse_deposit(d)
@@ -234,11 +236,13 @@ async def withdrawals(
 ) -> AsyncIterator[HistoryRecord]:
   """Yield one record per completed withdrawal in the window."""
   for lower, upper in windows(start, end, CAPITAL_WINDOW):
-    rows = await self.client.spot.http.wallet.withdraw_history(
-      status=WITHDRAWAL_SUCCESS,
-      start_time=lower,
-      end_time=upper,
-      limit=CAPITAL_LIMIT,
+    rows = await self.call_mexc(
+      lambda: self.client.spot.http.wallet.withdraw_history(
+        status=WITHDRAWAL_SUCCESS,
+        start_time=lower,
+        end_time=upper,
+        limit=CAPITAL_LIMIT,
+      )
     )
     for w in rows:
       withdrawal = parse_withdrawal(w)
@@ -259,7 +263,7 @@ async def funding(
   paging = self.client.futures.http.account.funding_records_paged(
     page_size=FUNDING_PAGE_SIZE
   )
-  async for page in paging:
+  async for page in paging.via(self.call_mexc):
     for r in page:
       if not start <= r['settleTime'] <= end:
         continue

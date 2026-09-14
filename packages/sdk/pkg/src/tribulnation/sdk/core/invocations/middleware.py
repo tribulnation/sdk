@@ -131,8 +131,8 @@ def retry(
         except handled as e:
           if max_retries is not None and retries >= max_retries:
             raise
-          retries += 1
           delay = base_delay * 2**retries
+          retries += 1
           if max_delay is not None and delay > max_delay:
             delay = max_delay
           if jitter is not None:

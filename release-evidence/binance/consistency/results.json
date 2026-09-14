@@ -1174,6 +1174,24 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"2ZTRY\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"2ZUSDC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"2ZUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"AAVEBTC\"]",
         "quotes": [],
         "status": "pass"
@@ -1205,6 +1223,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"ACETRY\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ACEUSDC\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -2842,6 +2866,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"KSMTRY\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"KSMUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"LAYERTRY\"]",
         "quotes": [],
         "status": "pass"
@@ -3094,6 +3130,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"MOVEUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"NEARBTC\"]",
         "quotes": [],
         "status": "pass"
@@ -3233,6 +3275,24 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"OPUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ORCATRY\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ORCAUSDC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ORCAUSDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -3964,6 +4024,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SUSHITRY\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SUSHIUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"SYNUSDC\"]",
         "quotes": [],
         "status": "pass"
@@ -4546,6 +4618,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"WOOUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"WTRY\"]",
         "quotes": [],
         "status": "pass"
@@ -4787,6 +4865,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"ZECUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ZENUSDC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ZENUSDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -6004,6 +6094,24 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"2ZTRY\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"2ZUSDC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"2ZUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"AAVEBTC\"]",
         "quotes": [],
         "status": "pass"
@@ -6035,6 +6143,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"ACETRY\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ACEUSDC\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -7672,6 +7786,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"KSMTRY\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"KSMUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"LAYERTRY\"]",
         "quotes": [],
         "status": "pass"
@@ -7924,6 +8050,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"MOVEUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"NEARBTC\"]",
         "quotes": [],
         "status": "pass"
@@ -8063,6 +8195,24 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"OPUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ORCATRY\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ORCAUSDC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ORCAUSDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -8794,6 +8944,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SUSHITRY\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SUSHIUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"SYNUSDC\"]",
         "quotes": [],
         "status": "pass"
@@ -9376,6 +9538,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"WOOUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"WTRY\"]",
         "quotes": [],
         "status": "pass"
@@ -9622,6 +9790,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ZENUSDC\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ZENUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"ZKTRY\"]",
         "quotes": [],
         "status": "pass"
@@ -9728,7 +9908,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 2.412502033000237,
+            "elapsed_seconds": 1.2540364250016864,
             "ticker_ids_match": true
           },
           {
@@ -9739,7 +9919,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.8352306380002119,
+            "elapsed_seconds": 0.8687354380090255,
             "ticker_ids_match": true
           },
           {
@@ -9750,7 +9930,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.8365802899998016,
+            "elapsed_seconds": 1.0976791560242418,
             "ticker_ids_match": true
           }
         ],
@@ -9768,7 +9948,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.83453010500034,
+            "elapsed_seconds": 0.8718725889921188,
             "ticker_ids_match": true
           },
           {
@@ -9779,7 +9959,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.838044181999976,
+            "elapsed_seconds": 1.0836296910129022,
             "ticker_ids_match": true
           },
           {
@@ -9790,7 +9970,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0612593640007617,
+            "elapsed_seconds": 1.3171007040073164,
             "ticker_ids_match": true
           }
         ],
@@ -9801,14 +9981,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"0GTRY\"]",
         "quotes": [
           {
-            "after_ask": "9.20000000",
-            "after_bid": "9.19100000",
-            "ask": "9.20000000",
+            "after_ask": "9.60600000",
+            "after_bid": "9.59000000",
+            "ask": "9.60600000",
             "attempt": 1,
-            "before_ask": "9.20000000",
-            "before_bid": "9.19100000",
-            "bid": "9.19100000",
-            "elapsed_seconds": 0.836091626999405,
+            "before_ask": "9.60600000",
+            "before_bid": "9.59000000",
+            "bid": "9.59000000",
+            "elapsed_seconds": 1.3702708009805065,
             "ticker_ids_match": true
           }
         ],
@@ -9819,14 +9999,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"BTCUSDT\"]",
         "quotes": [
           {
-            "after_ask": "77363.46000000",
-            "after_bid": "77363.45000000",
-            "ask": "77363.46000000",
+            "after_ask": "78428.01000000",
+            "after_bid": "78428.00000000",
+            "ask": "78428.01000000",
             "attempt": 1,
-            "before_ask": "77363.46000000",
-            "before_bid": "77363.45000000",
-            "bid": "77363.45000000",
-            "elapsed_seconds": 0.8355442800002493,
+            "before_ask": "78428.01000000",
+            "before_bid": "78428.00000000",
+            "bid": "78428.00000000",
+            "elapsed_seconds": 0.9111898929986637,
             "ticker_ids_match": true
           }
         ],
@@ -9837,14 +10017,14 @@
         "id": "[\"ticker_depth\",\"usdm\",\"0GUSDT\"]",
         "quotes": [
           {
-            "after_ask": "0.1893000",
-            "after_bid": "0.1892000",
-            "ask": "0.1893000",
+            "after_ask": "0.1972000",
+            "after_bid": "0.1971000",
+            "ask": "0.1972000",
             "attempt": 1,
-            "before_ask": "0.1893000",
-            "before_bid": "0.1892000",
-            "bid": "0.1892000",
-            "elapsed_seconds": 1.1920625779994225,
+            "before_ask": "0.1972000",
+            "before_bid": "0.1971000",
+            "bid": "0.1971000",
+            "elapsed_seconds": 0.9506981520098634,
             "ticker_ids_match": true
           }
         ],
@@ -9855,14 +10035,14 @@
         "id": "[\"ticker_depth\",\"usdm\",\"1000000BOBUSDT\"]",
         "quotes": [
           {
-            "after_ask": "0.0190700",
-            "after_bid": "0.0190600",
-            "ask": "0.0190700",
+            "after_ask": "0.0192600",
+            "after_bid": "0.0192500",
+            "ask": "0.0192600",
             "attempt": 1,
-            "before_ask": "0.0190700",
-            "before_bid": "0.0190600",
-            "bid": "0.0190600",
-            "elapsed_seconds": 0.9639772110003832,
+            "before_ask": "0.0192600",
+            "before_bid": "0.0192500",
+            "bid": "0.0192500",
+            "elapsed_seconds": 1.0846420539892279,
             "ticker_ids_match": true
           }
         ],
@@ -9873,14 +10053,14 @@
         "id": "[\"ticker_depth\",\"usdm\",\"1000000MOGUSDT\"]",
         "quotes": [
           {
-            "after_ask": "0.1095000",
-            "after_bid": "0.1094000",
-            "ask": "0.1095000",
+            "after_ask": "0.1013000",
+            "after_bid": "0.1012000",
+            "ask": "0.1013000",
             "attempt": 1,
-            "before_ask": "0.1095000",
-            "before_bid": "0.1094000",
-            "bid": "0.1094000",
-            "elapsed_seconds": 0.9586754399997517,
+            "before_ask": "0.1013000",
+            "before_bid": "0.1012000",
+            "bid": "0.1012000",
+            "elapsed_seconds": 1.0678020320192445,
             "ticker_ids_match": true
           }
         ],
@@ -9891,14 +10071,14 @@
         "id": "[\"ticker_depth\",\"usdm\",\"BTCUSDT\"]",
         "quotes": [
           {
-            "after_ask": "77322.20",
-            "after_bid": "77322.10",
-            "ask": "77322.20",
+            "after_ask": "78361.20",
+            "after_bid": "78361.10",
+            "ask": "78361.20",
             "attempt": 1,
-            "before_ask": "77322.20",
-            "before_bid": "77322.10",
-            "bid": "77322.10",
-            "elapsed_seconds": 1.181935595000141,
+            "before_ask": "78361.20",
+            "before_bid": "78361.10",
+            "bid": "78361.10",
+            "elapsed_seconds": 0.9478429749724455,
             "ticker_ids_match": true
           }
         ],
@@ -13643,7 +13823,8 @@
           "CRMBUSDT",
           "HIMSBUSDT",
           "\u725b\u6765USDT",
-          "\u725b\u6765USDC"
+          "\u725b\u6765USDC",
+          "BNCBUSDT"
         ]
       },
       {

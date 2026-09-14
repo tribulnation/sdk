@@ -1,6 +1,8 @@
 """Release dependencies retain the SDK contract and transport cleanup fixes."""
 
 from pathlib import Path
+from packaging.requirements import Requirement
+from packaging.version import Version
 import tomllib
 from typing_extensions import cast
 
@@ -36,7 +38,12 @@ def test_implementations_require_the_current_sdk_contract():
   for manifest in sorted((ROOT / 'packages/impl').glob('*/pkg/pyproject.toml')):
     if manifest.parents[1].name.startswith('.'):
       continue
-    assert 'tribulnation-sdk>=2.0.0' in dependencies(manifest), manifest
+    requirements = [Requirement(value) for value in dependencies(manifest)]
+    sdk = next(value for value in requirements if value.name == 'tribulnation-sdk')
+    floors = [
+      Version(value.version) for value in sdk.specifier if value.operator == '>='
+    ]
+    assert floors and max(floors) >= Version('2.0.0'), manifest
 
 
 def test_sdk_extras_exclude_pre_migration_implementations():
