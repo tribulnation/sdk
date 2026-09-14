@@ -1,4 +1,4 @@
-"""Record every applicable read-only live suite without exporting account data."""
+"""Record required read-only live suites without exporting account data."""
 
 import ast
 from contextlib import redirect_stderr, redirect_stdout
@@ -49,9 +49,9 @@ class Outcome(StrictModel):
 
 
 class Payload(StrictModel):
-  """All supported read suites for one selected account, not all account modes."""
+  """Required read suites for one selected account, not all account modes."""
 
-  version: Literal[3] = 3
+  version: Literal[4] = 4
   scope: Literal['surfaces'] = 'surfaces'
   venue: str
   account_venue: str
@@ -84,8 +84,7 @@ def inventory(root: Path, venue: str) -> dict[str, Case]:
       continue
     path = base / surface / 'suite.py'
     mapped = {test for tests in methods.values() for test in tests}
-    extra: set[str] = {'test_mexc_history_sources'} if surface == 'report' else set()
-    if test_names(path) != mapped | extra:
+    if test_names(path) != mapped:
       raise ValueError(f'Unmapped live tests in {surface}')
     enabled = set(methods) if support.support == 'full' else set(support.methods or ())
     for method, tests in methods.items():
@@ -98,17 +97,6 @@ def inventory(root: Path, venue: str) -> dict[str, Case]:
             exclusion=None if method in enabled else 'unsupported',
           )
         )
-    if surface == 'report':
-      cases.append(
-        Case(
-          surface=surface,
-          path=path,
-          test='test_mexc_history_sources',
-          exclusion=None
-          if venue == 'mexc' and 'history' in enabled
-          else 'not_applicable',
-        )
-      )
   support = impl.support.get('market')
   if support is not None and support.support != 'none':
     references = CASES.get(venue, ())

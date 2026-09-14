@@ -64,7 +64,7 @@ For the fingerprinted local consistency suite and offline release verifier, see
 [Local SDK checks](dev-docs/local-checks.md). Run `sdk-dev test consistency`
 to capture both results and fingerprints; do not generate checksums as an
 independent attestation step. Releases additionally require `sdk-dev test surfaces`
-to record every applicable read-only suite below, even for market implementations.
+to record every required read-only suite below, even for market implementations.
 
 1. Run `sdk-dev test market|earn|wallet|report [venue-or-account] --accounts sdk.test.toml`.
    The optional selector matches an exact venue slug or account id, including aliases
@@ -76,8 +76,9 @@ to record every applicable read-only suite below, even for market implementation
    Coinbase's authenticated catalogue paths still skip on public-only accounts.
    Configure a private account to verify those reads. Account-specific Bitget checks remain
    read-only. Earn enumerates instruments; Wallet enumerates methods; Report reads a
-   snapshot and the last 30 days. Binance and MEXC discover their own spot markets;
-   their per-symbol history sweeps can require many requests.
+   snapshot. Report history is outside SDK live qualification: application-level
+   ingestion and auditing own its correctness checks ([ADR 0016](dev-docs/adr/0016-report-snapshot-release-scope.md)).
+   Focused SDK retry, pagination and parsing regression tests remain required.
 3. Missing configured credential environment variables and declared unsupported methods
    are visible skips, not verification. Rejected credentials, unexpected
    `NotImplementedError`, malformed responses and transport failures remain failures.
@@ -179,7 +180,8 @@ publishes to PyPI (`.github/workflows/release.yml`).
 Publication additionally requires matching, passing local read-suite reports in
 `release-evidence/<venue>/surfaces/` and market consistency reports in
 `release-evidence/<venue>/consistency/`; missing evidence blocks both release PR verification
-and publication. The publication job checks the exact merged commit. Passing
+and publication. Report evidence covers snapshots, not history correctness or completeness
+(ADR 0016). The publication job checks the exact merged commit. Passing
 evidence does not constitute approval to merge or publish.
 
 Release the SDK before the impls: their `tribulnation-sdk` floors require the new version
