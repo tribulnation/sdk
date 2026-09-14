@@ -313,7 +313,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "cc03a57f39aeb52086e636950b9f5013bd2e9fc5d302034fc72fd6f7ce080876",
+        "files_sha256": "3e7451d42b3f1b88b719adc4561a2f636c981c455ff7507dd7f397b562022e05",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -400,7 +400,7 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "c8f24a4e35dcab3491946d9fb1c9e18cf61122069f5bd0909a9563fc69a958d8",
+    "source_sha256": "d074566299877190366fd466d959da740ad336e6d94c1a1087e76f09d89a7a7a",
     "venue": "hyperliquid"
   },
   "before": {
@@ -717,7 +717,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "cc03a57f39aeb52086e636950b9f5013bd2e9fc5d302034fc72fd6f7ce080876",
+        "files_sha256": "3e7451d42b3f1b88b719adc4561a2f636c981c455ff7507dd7f397b562022e05",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -804,12 +804,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "c8f24a4e35dcab3491946d9fb1c9e18cf61122069f5bd0909a9563fc69a958d8",
+    "source_sha256": "d074566299877190366fd466d959da740ad336e6d94c1a1087e76f09d89a7a7a",
     "venue": "hyperliquid"
   },
-  "finished": "2026-09-14T14:08:54.895227Z",
-  "results_sha256": "8eefac854aae2393efea38283995626919220e8c47bb4b58d93245424bb5feef",
+  "finished": "2026-09-14T14:45:02.475024Z",
+  "results_sha256": "f59124f0da6f6264cf23dc2c4a395ee1d1af8240cb1f172622f9ea2c645a8f38",
   "schema_version": 1,
-  "started": "2026-09-14T14:06:32.292760Z",
-  "summary_sha256": "597830ccffdfb502d17be8444181bf17d51dd3455460c0e7994a2abf51665e41"
+  "started": "2026-09-14T14:42:43.159199Z",
+  "summary_sha256": "c9a0b50a053c6e4d5a2942389ce5fc42102f04f6d2cf4a2f481bb27520eb4876"
 }
