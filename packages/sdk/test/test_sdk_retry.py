@@ -67,12 +67,12 @@ async def invoke_retry(
   return sleeps, logged
 
 
-async def test_retry_preserves_existing_delays_without_jitter(
+async def test_retry_starts_at_base_delay_without_jitter(
   monkeypatch: pytest.MonkeyPatch,
 ):
-  """Omitting jitter preserves the exact exponential delay sequence."""
+  """Without jitter, delays start at the base and double on each retry."""
   sleeps, logged = await invoke_retry(monkeypatch)
-  assert sleeps == [2, 4]
+  assert sleeps == [1, 2]
   assert logged == sleeps
 
 
@@ -93,8 +93,8 @@ async def test_retry_applies_jitter_after_max_delay(
     max_delay=5,
     jitter=half_jitter,
   )
-  assert caps == [5, 5]
-  assert sleeps == [2.5, 2.5]
+  assert caps == [4, 5]
+  assert sleeps == [2, 2.5]
   assert logged == sleeps
 
 
@@ -223,7 +223,7 @@ async def test_default_retry_logger_excludes_call_arguments(
   output = capsys.readouterr().out
   assert output == (
     "Retry 1 for report.history.get_tx after RetriableError('upstream said no'); "
-    'sleeping 2.00s\n'
+    'sleeping 1.00s\n'
   )
   assert 'repr-secret' not in output
   assert 'argument-secret' not in output
