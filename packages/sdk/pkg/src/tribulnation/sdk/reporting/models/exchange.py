@@ -75,11 +75,25 @@ class FutureTrade(BaseObservation):
   price: Decimal
   """Execution price in quote units."""
   realized_pnl: Decimal | None = None
-  """Fill-level realized PnL in settlement asset units, excluding fees. If provided by the source."""
+  """Fill-level closing PnL in settlement units, excluding fees; reported or reconstructed using the venue's entry-price convention."""
+  collateral_change: Decimal | None = None
+  """Total fill effect on collateral (equity minus unrealized PnL), excluding fees.
+
+  Includes realized_pnl; never add the two. May also include redistribution
+  between collateral and unrealized PnL when the venue changes position basis.
+  None retains the traditional realized_pnl-only collateral effect.
+  """
   order_id: str | None = None
   """Raw order identifier, if provided by the source."""
   fee: Fee | None = None
   """Fee paid, if any."""
+
+  @property
+  def balance_change(self) -> Decimal | None:
+    """Return the fill's collateral effect, excluding its separately recorded fee."""
+    return (
+      self.realized_pnl if self.collateral_change is None else self.collateral_change
+    )
 
 
 class FutureOrder(BaseObservation):
