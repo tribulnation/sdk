@@ -32,9 +32,7 @@ async def trades_history(
       market=self.market,
       market_type='PERPETUAL',
     )
-    state = paging.init
-    while state is not None:
-      fills, state = await paging.next(state)
+    async for fills in paging.via(self.call_dydx):
       trades: list[Trade] = []
       for fill in fills:
         if fill['market'] != self.market or not within(fill['createdAt']):

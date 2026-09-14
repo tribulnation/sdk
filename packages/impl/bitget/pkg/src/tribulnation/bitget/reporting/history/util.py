@@ -5,6 +5,9 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
+from tribulnation.sdk import SDK
+from tribulnation.bitget.core import wrap_exceptions
+
 from tribulnation.sdk.reporting import (
   ApiProvenance,
   Fee,
@@ -41,6 +44,14 @@ class TimezoneMixin:
 
 
 Row = TypeVar('Row')
+T = TypeVar('T')
+
+
+@SDK.method
+@wrap_exceptions
+async def call_bitget(fetch: Callable[[], Awaitable[T]]) -> T:
+  """Retry and translate one Classic report request before advancing its cursor."""
+  return await fetch()
 
 
 async def id_pages(
@@ -50,7 +61,7 @@ async def id_pages(
   """Walk a Classic ID cursor until empty or no new rows, without replaying rows."""
   cursor: str | None = None
   seen: set[str] = set()
-  while rows := await fetch(cursor):
+  while rows := await call_bitget(lambda: fetch(cursor)):
     fresh: list[Row] = []
     for row in rows:
       if (identity := key(row)) not in seen:

@@ -1,4 +1,12 @@
-from typing_extensions import Any, AsyncContextManager, Iterable, TypedDict
+from typing_extensions import (
+  Any,
+  AsyncContextManager,
+  Awaitable,
+  Callable,
+  Iterable,
+  TypedDict,
+  TypeVar,
+)
 from dataclasses import dataclass, field
 
 from tribulnation.sdk import SDK
@@ -6,7 +14,10 @@ from tribulnation.sdk import SDK
 from typed_mexc import MEXC
 from typed_mexc.schemas import ContractSpec
 from typed_mexc.spot.http.market.exchange_info import SymbolInfo
+from .exc import wrap_exceptions
 from .util import StreamManager, closing_streams
+
+T = TypeVar('T')
 
 SpotInfo = SymbolInfo
 PerpInfo = ContractSpec
@@ -29,6 +40,12 @@ class Mixin(SDK):
   settings: Settings = field(default_factory=Settings)
   streams: dict[str, StreamManager[Any]]
   cache: Cache = field(default_factory=Cache)
+
+  @SDK.method
+  @wrap_exceptions
+  async def call_mexc(self, fetch: Callable[[], Awaitable[T]]) -> T:
+    """Retry one report page after translating its transport exception."""
+    return await fetch()
 
   @property
   def validate(self) -> bool:

@@ -1,4 +1,13 @@
-from typing_extensions import AsyncContextManager, Collection, Iterable
+"""Account snapshots with independently retried chain pages."""
+
+from typing_extensions import (
+  AsyncContextManager,
+  Awaitable,
+  Callable,
+  Collection,
+  Iterable,
+  TypeVar,
+)
 from dataclasses import dataclass, field
 from decimal import Decimal
 import asyncio
@@ -24,6 +33,9 @@ from tribulnation.dydx.core import (
 from typed_dydx import Dydx, Indexer
 
 
+T = TypeVar('T')
+
+
 @dataclass(frozen=True)
 class Snapshots(_Snapshots):
   address: str
@@ -44,11 +56,17 @@ class Snapshots(_Snapshots):
 
   @SDK.method
   @wrap_exceptions
+  async def call(self, fetch: Callable[[], Awaitable[T]]) -> T:
+    """Retry one chain page after translating its transport exception."""
+    return await fetch()
+
+  @SDK.method
+  @wrap_exceptions
   async def bank_module_balances(self) -> Balances:
     bank_balances = await self.client.chain.bank.all_balances_paged(
       self.address,
       resolve_denom=False,
-    )
+    ).via(self.call)
     balances = Balances()
     for coin in bank_balances:
       asset, amount = parse_coin(coin)
@@ -60,7 +78,7 @@ class Snapshots(_Snapshots):
   async def active_delegations(self) -> Balances:
     delegations = await self.client.chain.staking.delegator_delegations_paged(
       self.address
-    )
+    ).via(self.call)
     balances = Balances()
     for d in delegations:
       if d.balance is not None:
@@ -74,7 +92,7 @@ class Snapshots(_Snapshots):
     unbonding_delegations = (
       await self.client.chain.staking.delegator_unbonding_delegations_paged(
         self.address
-      )
+      ).via(self.call)
     )
     balances = Balances()
     for u in unbonding_delegations:
