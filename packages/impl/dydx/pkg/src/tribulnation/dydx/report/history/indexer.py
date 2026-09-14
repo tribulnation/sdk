@@ -35,10 +35,17 @@ def fill_signed_size(fill: Fill) -> Decimal:
 
 @dataclass(frozen=True)
 class ReplayPosition:
-  """Running position state reconstructed with average-cost accounting."""
+  """Position quantity and cumulative opening weight in the indexer convention."""
 
   signed_size: Decimal = Decimal(0)
   entry_price: Decimal | None = None
+  opened_size: Decimal = Decimal(0)
+  """Cumulative opening fills for the current position lifecycle."""
+
+  @property
+  def entry_value(self) -> Decimal:
+    """Return the signed entry value used to derive collateral from native USDC."""
+    return self.signed_size * (self.entry_price or Decimal(0))
 
 
 def position_realized_pnl(
@@ -66,37 +73,38 @@ def update_position(
   signed_fill: Decimal,
   price: Decimal,
 ) -> ReplayPosition:
-  """Apply a fill using average-cost position accounting."""
+  """Apply the indexer's cumulative-opening entry-price convention.
+
+  Partial closes preserve the opening weight. On a flip, the indexer starts a
+  new lifecycle and applies the full crossing fill to sumOpen, not its residual.
+  Actual exposure is always reconstructed from signed fills.
+
+  References:
+    - https://github.com/dydxprotocol/v4-chain/blob/main/indexer/services/ender/src/scripts/helpers/dydx_update_perpetual_position_aggregate_fields.sql
+  """
   signed_before = position.signed_size
   signed_after = signed_before + signed_fill
   if signed_after == 0:
     return ReplayPosition()
-  if (
-    signed_before == 0
-    or signed_before * signed_fill < 0
-    and abs(signed_fill) > abs(signed_before)
-  ):
-    return ReplayPosition(
-      signed_size=signed_after,
-      entry_price=price,
-    )
+  if signed_before == 0 or signed_before * signed_after < 0:
+    return ReplayPosition(signed_after, price, abs(signed_fill))
   if signed_before * signed_fill < 0:
-    return ReplayPosition(
-      signed_size=signed_after,
-      entry_price=position.entry_price,
-    )
-  if position.entry_price is None:
-    entry_price = price
-  else:
-    notional = abs(signed_before) * position.entry_price + abs(signed_fill) * price
-    entry_price = notional / abs(signed_after)
-  return ReplayPosition(
-    signed_size=signed_after,
-    entry_price=entry_price,
-  )
+    return ReplayPosition(signed_after, position.entry_price, position.opened_size)
+  opened_size = position.opened_size + abs(signed_fill)
+  if position.entry_price is None or position.opened_size == 0:
+    raise ValueError('dYdX replay has an open position without opening basis')
+  entry_price = (
+    position.opened_size * position.entry_price + abs(signed_fill) * price
+  ) / opened_size
+  return ReplayPosition(signed_after, entry_price, opened_size)
 
 
-def parse_fill(fill: Fill, *, realized_pnl: Decimal | None = None):
+def parse_fill(
+  fill: Fill,
+  *,
+  realized_pnl: Decimal | None = None,
+  collateral_change: Decimal | None = None,
+):
   """Convert an indexer fill into an SDK future trade record."""
   side = Decimal(1) if fill['side'] == 'BUY' else Decimal(-1)
   base, _ = fill['market'].split('-')
@@ -110,6 +118,7 @@ def parse_fill(fill: Fill, *, realized_pnl: Decimal | None = None):
     size=Decimal(fill['size']) * side,
     price=Decimal(fill['price']),
     realized_pnl=realized_pnl,
+    collateral_change=collateral_change,
     subaccount=str(fill['subaccountNumber']),
     order_id=fill.get('orderId'),
     fee=Fee(asset=USDC, amount=Decimal(fill['fee'])),
@@ -119,7 +128,7 @@ def parse_fill(fill: Fill, *, realized_pnl: Decimal | None = None):
 def replay_fills(
   fills: list[Fill],
 ) -> tuple[list[FutureTrade], dict[str, ReplayPosition]]:
-  """Replay chronological fills into trades and terminal average-cost positions."""
+  """Reconstruct closing PnL and collateral effects without snapshot inputs."""
   positions: dict[str, ReplayPosition] = {}
   trades: list[FutureTrade] = []
   previous_time: datetime | None = None
@@ -136,12 +145,20 @@ def replay_fills(
       signed_fill=signed_fill,
       price=price,
     )
-    positions[fill['market']] = update_position(
+    updated = update_position(
       position=position,
       signed_fill=signed_fill,
       price=price,
     )
-    trades.append(parse_fill(fill, realized_pnl=realized_pnl))
+    positions[fill['market']] = updated
+    collateral_change = updated.entry_value - position.entry_value - signed_fill * price
+    trades.append(
+      parse_fill(
+        fill,
+        realized_pnl=realized_pnl,
+        collateral_change=collateral_change,
+      )
+    )
   return trades, positions
 
 

@@ -173,23 +173,63 @@ def test_parse_fills_handles_short_reductions_and_flips():
   ]
 
 
-def test_parse_fills_weights_increases_by_remaining_position():
-  """Entry price uses the remaining position after partial reductions."""
-  trades = parse_fills(
+def test_parse_fills_weights_increases_by_cumulative_openings():
+  """Collateral reconciles while opening weight survives partial reductions."""
+  trades, positions = replay_fills(
     [
       fill('open', minute=0, side='BUY', size='2', price='100'),
       fill('reduce', minute=1, side='SELL', size='1', price='110'),
       fill('increase', minute=2, side='BUY', size='1', price='80'),
-      fill('close', minute=3, side='SELL', size='2', price='100'),
     ]
   )
+  assert positions['BTC-USD'].entry_price == pytest.approx(Decimal(280) / 3)
+  assert trades[-1].realized_pnl == 0
+  assert trades[-1].collateral_change == pytest.approx(Decimal(20) / 3)
+  assert sum(t.balance_change for t in trades) == pytest.approx(Decimal(50) / 3)
+  # At a mark of 100, independently accumulated cash flows give equity 30.
+  unrealized = Decimal(2) * (100 - positions['BTC-USD'].entry_price)
+  assert sum(t.balance_change for t in trades) + unrealized == pytest.approx(
+    Decimal(30)
+  )
 
-  assert [trade.realized_pnl for trade in trades] == [
-    Decimal(0),
-    Decimal(10),
-    Decimal(0),
-    Decimal(20),
-  ]
+
+@pytest.mark.parametrize('direction', [1, -1])
+def test_crossing_fill_uses_full_opening_weight(direction: int):
+  """Flips weight the entire crossing fill but retain only residual exposure."""
+  side: OrderSide = 'BUY' if direction == 1 else 'SELL'
+  opposite: OrderSide = 'SELL' if direction == 1 else 'BUY'
+  trades, positions = replay_fills(
+    [
+      fill('open', minute=0, side=opposite, size='2', price='100'),
+      fill('flip', minute=1, side=side, size='3', price='90'),
+      fill('increase', minute=2, side=side, size='1', price='110'),
+    ]
+  )
+  assert positions['BTC-USD'].signed_size == direction * 2
+  assert positions['BTC-USD'].opened_size == 4
+  assert positions['BTC-USD'].entry_price == 95
+  assert trades[1].realized_pnl == direction * 20
+  assert trades[2].realized_pnl == 0
+  assert trades[2].collateral_change == direction * -10
+
+
+@pytest.mark.parametrize('direction', [1, -1])
+def test_closed_lifecycle_collateral_equals_net_execution_value(direction: int):
+  """Closing resets basis and leaves exactly the net trade-value contribution."""
+  side: OrderSide = 'BUY' if direction == 1 else 'SELL'
+  opposite: OrderSide = 'SELL' if direction == 1 else 'BUY'
+  trades, positions = replay_fills(
+    [
+      fill('open', minute=0, side=side, size='2', price='100'),
+      fill('partial', minute=1, side=opposite, size='1', price='110'),
+      fill('add', minute=2, side=side, size='1', price='80'),
+      fill('close', minute=3, side=opposite, size='2', price='100'),
+    ]
+  )
+  assert positions['BTC-USD'].signed_size == 0
+  assert positions['BTC-USD'].opened_size == 0
+  assert sum(t.balance_change for t in trades) == pytest.approx(Decimal(direction * 30))
+  assert all(t.fee.amount == Decimal('0.01') for t in trades)
 
 
 def snapshot_equity(snapshot: Snapshot, *, mark: Decimal) -> Decimal:
