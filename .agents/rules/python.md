@@ -7,16 +7,14 @@
 
 ## Style Guide
 
+Formatting and the mechanical rules (indentation, quotes, `typing_extensions`, no `from __future__ import annotations`, built-in generics, `X | None`) are enforced by the shared ruff config; see Tooling. This document only covers what a linter cannot check.
+
 ### General Notes
 
 - Don't add `__all__ = [...]` to `__init__.py` files, it's innecessary. They're only used in `__init__.pyi` files for use with the `lazy-loader` package.
 - Don't create `__init__.pyi` files unless to use with `lazy-loader`. That can be used when it'd make sense to import only one of the submodules as standalone, and the rest are heavy to import.
 - Don't `from ... import symbol as symbol` in `__init__.py`. Don't use `as` unless explicitly requested by the user.
-- Don't use `from __future__ import annotations`. NEVER. It's bad practice. Order types well, and use string typings if there's no other option.
-- Use 2-space indentation.
-- Use single-quotes for normal strings, double-quotes for docstrings.
 - Add a small docstring to every function, class, and module. Make it concise and descriptive. If you're not sure what to write, consider whether the function is necesary or can be removed.
-- Do not use double-line spaces. In general, prefer single-line spaces. You can only use them seldomly to incidcate a division within a large (>200 LOC) file.
 - Don't assert/cast types with a discriminator field. Example:
 
   ```python
@@ -67,6 +65,8 @@ def http(
 ### Typing
 
 - Use precise type annotations as much as possible. Especially, if a `TypedDict` exists, use it instead of `dict`. Also if a `Literal` is appropriate, use it instead of a string.
+- Use `Literal` instead of enums.
+- Use `TypedDict` for wire shapes: anything a client sends or receives as JSON. Use frozen `dataclasses` for domain models that code passes around and reasons about; `pydantic.TypeAdapter` over the dataclass is the JSON boundary, so there is one schema.
 - Document non-trivial fields using docstrings below each field. Don’t leave any extra empty lines. E.g:
 
   ```python
@@ -77,9 +77,6 @@ def http(
 	"""Amount to buy (or negative if sell)"""
   ```	
 
-- Use built-ins `list`, `tuple`, `dict` instead of `typing.List`, `typing.Tuple`, `typing.Dict`
-- Always import from `typing_extensions` instead of `typing`
-- Use `<type> | None` instead of `Optional[<type>]`
 - For `typing_extensions.TypedDict`s, use either of these depending on the fields.
     1. If most are not required, use `total=False` + `Required`:
         
@@ -152,7 +149,6 @@ def http(
 
 ### Functions
 
-- Prefer using `typing_extensions.Literal`, `typing_extensions.TypedDict` instead of enums or dataclasses.
 - When having multiple parameters with the same type, force them to be kwargs. So, avoid this:
     
     ```python
@@ -168,37 +164,8 @@ def http(
     ```
 
 - When the return type is `None`, don't annotate it (it's already implicit).
-- Prefer single-line headers when not too long.
-- When doing multi-line headers, use this style:
-
-  ```python
-  async def example1(
-    name: str, age: int, friends: list[str],
-  ) -> list[int]:
-    ...
-
-  def example2(
-    arg: str, *, kwarg1: int, kwarg2: bool,
-  ) -> str | None:
-    ...
-  
-  def example3(
-    arg1: str, arg2: int, *,
-    kwarg1: int, kwarg2: bool,
-  ) -> str | None:
-    ...
-  ```
-
+- Prefer single-line headers when not too long; the formatter decides the layout of multi-line ones.
 - Avoid names starting with underscore unless they are really private, concrete and not reusable.
-
-### Timestamps
-
-- Prefer `datetime` for public Python values and typed response fields.
-- Use the client-local timestamp helper, usually `ts.parse`, when converting
-  venue timestamp fields into `datetime` values.
-- Keep conversion rules centralized in the client core instead of scattering
-  `datetime.fromtimestamp(...)` calls through endpoint methods.
-
 
 ### Tooling
 
