@@ -25,7 +25,7 @@ the account is a Unified Trading Account (`True`), a Classic account (`False`), 
 be auto-detected on the first account-scoped call (`None`, the default). `validate`
 toggles pydantic validation of API responses. The built-in `bitget` account is
 `accounts.Bitget(public=True)`: every public method works on it, implemented account-scoped methods raise `AuthError`.
-USDC and coin futures expose public data only; their account methods raise
+USDC futures expose public data only; their account methods raise
 `NotImplementedError`, including when credentials are configured.
 
 ## Exchanges & ID conventions
@@ -35,7 +35,11 @@ USDC and coin futures expose public data only; their account methods raise
 | `spot` | spot | Every spot pair. |
 | `usdt` | perp | USDT-margined perpetuals (`USDT-FUTURES`). |
 | `usdc` | perp | USDC-margined perpetuals (`USDC-FUTURES`). |
-| `coin-classic` | perp | Classic coin-margined perpetuals (`COIN-FUTURES`). |
+
+Classic `coin-classic` futures retired on September 17, 2026 at 07:00 UTC.
+The exchange is absent from discovery and explicit requests raise `NotImplementedError`.
+Historical IDs such as `bitget:coin-classic:BTCUSD` remain delisted Catalogue records;
+they are never mapped to UTA IDs. See the [Bitget retirement announcement](https://www.bitget.com/support/articles/12560603893788).
 
 UTA `coin` (`BTCUSD_CM`, etc.) is not supported or listed in discovery. Requesting
 it raises `NotImplementedError`: native USD-sized quantities do not fit the current
@@ -43,9 +47,9 @@ SDK base-unit rules. See [issue #32](https://github.com/tribulnation/sdk/issues/
 Catalogue entries remain active; this is an SDK capability deferral.
 
 Market IDs are Bitget's Classic API symbols: `BTCUSDT` on `spot` and `usdt`,
-`BTCPERP` on `usdc`, and `BTCUSD` on `coin-classic` (not the web/UTA symbol `BTCUSD_CM`).
-Full SDK IDs include `bitget:usdt:BTCUSDT`, `bitget:usdc:BTCPERP`, and
-`bitget:coin-classic:BTCUSD`; a configured account key can replace `bitget`.
+`BTCPERP` on `usdc`.
+Full SDK IDs include `bitget:usdt:BTCUSDT` and `bitget:usdc:BTCPERP`; a configured
+account key can replace `bitget`.
 The former USDT exchange ID `perp` is replaced by `usdt`, without an alias.
 `Exchange.markets()` returns the symbols of the public catalogue: every spot pair, and
 every perpetual of the product line (delivery contracts, which pay no funding, are
@@ -57,22 +61,22 @@ dropped).
   `rules`, `perp_stats`, `index`, `next_funding` and `funding_rates` read the venue's public
   endpoints, so they answer the same on a Classic account, a UTA account and the built-in
   public one. Account-scoped reads on `spot` and `usdt` dispatch on the account's mode;
-  `usdc` and `coin-classic` account reads are not implemented.
+  `usdc` account reads are not implemented.
 - **Trading is not implemented.** `place_order`, `cancel_order`, `cancel_orders` and
   `cancel_open_orders` raise `NotImplementedError`: Bitget is not a venue we trade on.
 - **`rules`** come from the public symbol and contract catalogues, cached after the first
   call. Bitget publishes decimal-place counts rather than tick sizes, so `tick_size` and
   `step_size` are derived from them (`priceEndStep * 10 ** -pricePlace` on perps). The fee
   rates are the venue's default tier, not the account's; nonzero `feeRateUpRatio`
-  leaves public contract fees unknown until its composition is verified. Coin futures
-  use the base coin as `fee_asset`; other products use the quote coin. Futures
+  leaves public contract fees unknown until its composition is verified. Active futures
+  products use the quote coin as `fee_asset`. Futures
   `min_value` is reported only for `usdt`: Bitget's `minTradeUSDT` cannot be reported
-  as USD or USDC without conversion, so it is `None` for `usdc` and `coin-classic`.
+  as USDC without conversion, so it is `None` for `usdc`.
 - **`depth`** on `spot` takes any `levels` (150 a side by default); on futures the venue
   serves a fixed depth of 1, 5, 15, 50 or 100 levels, so a request is served by the next
   size up and trimmed. **`depth_stream`** folds the `books` channel (a full snapshot, then
   deltas) into whole books; `levels` trims each delivered book.
-- **`candles`** serves every `CandleInterval` (`CANDLE_INTERVALS` is the full set) on all four
+- **`candles`** serves every `CandleInterval` (`CANDLE_INTERVALS` is the full set) on all three
   exchanges, with required timezone-aware `start` and `end` bounds. Opening timestamps
   are filtered to `[start, end)`; responses retain their native order with no ordering
   guarantee across windows. Each futures product reads the futures history endpoint in windows of
