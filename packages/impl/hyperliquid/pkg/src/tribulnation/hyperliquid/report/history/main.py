@@ -1,5 +1,8 @@
 """Hyperliquid reporting history."""
 
+from tribulnation.sdk.core import ManagedResource
+from functools import cached_property
+
 from typing_extensions import (
   TYPE_CHECKING,
   AsyncContextManager,
@@ -85,8 +88,17 @@ class History(_History):
     watermark = self.cache.watermark(source, self.address)
     return timestamp_millis.parse(GENESIS_MS if watermark is None else watermark)
 
+  @cached_property
+  def info_resource(self) -> ManagedResource[object]:
+    """Own info with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.info,
+      wrap_enter=wrap_exceptions,
+      wrap_exit=wrap_exceptions,
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[object]]:
-    yield self.info
+    yield self.info_resource
 
   @SDK.method
   @wrap_exceptions

@@ -1,6 +1,8 @@
 """Shared plumbing for every Bit2Me SDK surface: the per-request seam and the
 single-client base the non-market surfaces are built on."""
 
+from functools import cached_property
+
 from typing_extensions import (
   Any,
   AsyncContextManager,
@@ -11,7 +13,7 @@ from typing_extensions import (
 )
 from dataclasses import dataclass
 
-from tribulnation.sdk.core import SDK
+from tribulnation.sdk.core import ManagedResource, SDK
 
 from typed_bit2me import Bit2Me
 
@@ -68,6 +70,15 @@ class Mixin(Calls):
       **fields,
     )
 
+  @cached_property
+  def client_resource(self) -> ManagedResource[object]:
+    """Own client with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.client,
+      wrap_enter=wrap_exceptions,
+      wrap_exit=wrap_exceptions,
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield from super().resources()
-    yield self.client
+    yield self.client_resource

@@ -60,6 +60,14 @@ All external methods in the SDK (`Market.place_order`, `Earn.instruments`, etc.)
 
 Therefore, it's not only the method you call: any delegated calls made inside it will also have the same context applied. If there's a long method hitting rate-limits, do not worry!: the inner calls will be retried, not just the whole thing.
 
+### Resource acquisition and cleanup
+
+`Context.retried()` does not retry SDK context-manager entry or exit. Venues own
+those policies and translate client acquisition and cleanup failures into SDK errors.
+Current venue resource policies translate errors without automatically retrying them.
+Decorated SDK methods called during acquisition or cleanup still receive the active
+context's retries and logging. Entry and exit do not produce their own logging spans.
+
 ## Writing your own middleware (unstable)
 
 A middleware is a callable with this signature:

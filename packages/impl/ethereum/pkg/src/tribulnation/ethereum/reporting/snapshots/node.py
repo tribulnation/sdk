@@ -1,3 +1,4 @@
+from functools import cached_property
 from typing_extensions import AsyncContextManager, Collection, Iterable
 from dataclasses import dataclass
 from decimal import Decimal
@@ -8,7 +9,7 @@ from web3.exceptions import BadFunctionCallOutput, ContractLogicError
 from typed_ethereum import NodeRpc
 
 from tribulnation.sdk import SDK, ApiError
-from tribulnation.sdk.core import managed_tasks
+from tribulnation.sdk.core import ManagedResource, managed_tasks
 from tribulnation.sdk.reporting import (
   Balances,
   Snapshot,
@@ -30,9 +31,18 @@ class NodeSnapshots(Snapshots):
   ignore_zero_value: bool = True
   batch_size: int = 32
 
+  @cached_property
+  def node_resource(self) -> ManagedResource[object]:
+    """Own node with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.node,
+      wrap_enter=rpc.wrap_exceptions,
+      wrap_exit=rpc.wrap_exceptions,
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield from super().resources()
-    yield self.node
+    yield self.node_resource
 
   @SDK.method
   @rpc.wrap_exceptions

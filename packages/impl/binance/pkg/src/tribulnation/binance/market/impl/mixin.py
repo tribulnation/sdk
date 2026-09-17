@@ -1,5 +1,7 @@
 """Client, caches and error helpers shared by every Binance market object."""
 
+from functools import cached_property
+
 from typing_extensions import (
   Any,
   AsyncContextManager,
@@ -11,7 +13,7 @@ from typing_extensions import (
 from dataclasses import dataclass, field
 import asyncio
 
-from tribulnation.sdk.core import SDK, exception_wrapper
+from tribulnation.sdk.core import ManagedResource, SDK, exception_wrapper
 
 from typed_binance import Binance
 from typed_binance.spot.http.market.exchange_info import SpotSymbol
@@ -138,9 +140,18 @@ class SharedMixin(SDK):
     """
     return await fn()
 
+  @cached_property
+  def client_resource(self) -> ManagedResource[object]:
+    """Own client with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.client,
+      wrap_enter=wrap_exceptions,
+      wrap_exit=wrap_exceptions,
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[Any]]:
     yield from super().resources()
-    yield self.client
+    yield self.client_resource
 
 
 def not_implemented(name: str, id: str) -> NotImplementedError:

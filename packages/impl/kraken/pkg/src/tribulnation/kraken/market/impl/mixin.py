@@ -10,6 +10,8 @@ WebSocket v2 `symbol` (`BTC/USD`). The altname is the market id; the other two a
 looked up from the catalogue loaded here.
 """
 
+from functools import cached_property
+
 from typing_extensions import (
   Any,
   AsyncContextManager,
@@ -25,7 +27,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 import asyncio
 
-from tribulnation.sdk.core import OverflowPolicy, Subscription
+from tribulnation.sdk.core import ManagedResource, OverflowPolicy, Subscription
 from tribulnation.sdk.market import Book
 from tribulnation.kraken.core import Calls, wrap_exceptions
 
@@ -145,8 +147,17 @@ class Shared(Calls):
       )
     )
 
+  @cached_property
+  def client_resource(self) -> ManagedResource[object]:
+    """Own client with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.client,
+      wrap_enter=wrap_exceptions,
+      wrap_exit=wrap_exceptions,
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[object]]:
-    yield self.client
+    yield self.client_resource
 
   async def load_pairs(self, *, refetch: bool = False) -> dict[str, PairInfo]:
     """Fetch and memoise the whole pair catalogue, keyed by altname.

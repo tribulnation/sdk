@@ -1,5 +1,8 @@
 """Account snapshots with independently retried chain pages."""
 
+from tribulnation.sdk.core import ManagedResource
+from functools import cached_property
+
 from typing_extensions import (
   AsyncContextManager,
   Awaitable,
@@ -51,8 +54,17 @@ class Snapshots(_Snapshots):
   def indexer(self) -> Indexer:
     return self.client.indexer
 
+  @cached_property
+  def client_resource(self) -> ManagedResource[object]:
+    """Own client with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.client,
+      wrap_enter=wrap_exceptions,
+      wrap_exit=wrap_exceptions,
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[object]]:
-    yield self.client
+    yield self.client_resource
 
   @SDK.method
   @wrap_exceptions

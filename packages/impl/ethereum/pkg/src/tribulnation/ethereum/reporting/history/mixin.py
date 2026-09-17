@@ -2,6 +2,8 @@
 and the parsing of fee, execution and native value movements out of them.
 """
 
+from functools import cached_property
+
 from typing_extensions import Any, AsyncContextManager, Iterable
 from dataclasses import dataclass, field
 from decimal import Decimal
@@ -12,7 +14,7 @@ from web3 import Web3
 from web3.types import TxReceipt, TxData
 from typed_ethereum import NodeRpc
 
-from tribulnation.sdk.core import SDK, managed_tasks
+from tribulnation.sdk.core import ManagedResource, SDK, managed_tasks
 from tribulnation.sdk.reporting import EvmTx, Fee
 from tribulnation.ethereum.core import rpc, wei2eth, same_address
 
@@ -49,8 +51,17 @@ class HistoryMixin(SDK):
   rpc_url: str
   eoa_cache: dict[str, bool] = field(default_factory=dict[str, bool])
 
+  @cached_property
+  def node_resource(self) -> ManagedResource[object]:
+    """Own node with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.node,
+      wrap_enter=rpc.wrap_exceptions,
+      wrap_exit=rpc.wrap_exceptions,
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[object]]:
-    yield self.node
+    yield self.node_resource
 
   @property
   def w3(self):

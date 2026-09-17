@@ -155,6 +155,39 @@ Two notes: `__aexit__` propagates a resource's suppression signal, so one return
 swallows the exception; and `AsyncResources` was removed in 1.7.0 — it was a second root
 competing with `SDK`, which is what allowed the MRO race above.
 
+### Venue resource policies
+
+Yield a cached `ManagedResource` from `tribulnation.sdk.core` for each owned client:
+
+```python
+@cached_property
+def client_resource(self) -> ManagedResource[object]:
+  """Own the client with venue exception translation."""
+  return ManagedResource(
+    resource=self.client,
+    wrap_enter=wrap_exceptions,
+    wrap_exit=wrap_exceptions,
+  )
+
+def resources(self):
+  yield self.client_resource
+```
+
+Reuse the same adapter wherever that client is declared within one owner; creating
+fresh adapters defeats identity de-duplication. One-shot closers created on each
+`resources()` iteration can use fresh adapters. Keep nested SDK owners unchanged.
+Entry and cleanup policies are independent. Current venues translate errors without
+adding retries; a venue may add retries only after establishing the operation is safe.
+The failing client's `__aenter__` must clean up its own partial acquisition.
+
+SDK `__aenter__` and `__aexit__` are not `@SDK.method` calls: the context neither
+retries the whole lifecycle nor creates outer lifecycle logging spans. Decorated
+calls made inside acquisition or cleanup still use the active context normally.
+Do not add venue lifecycle overrides or decorate `resources()`.
+
+See [ADR 0017](dev-docs/adr/0017-venue-resource-policies.md) for the policy and
+`packages/sdk-dev/test/test_lifecycle_structure.py` for the cross-venue guard.
+
 ## Pagination
 
 Route each page request through an async `@SDK.method` with exception translation

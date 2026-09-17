@@ -20,7 +20,7 @@ from .invocations import (
   retry,
 )
 from .concurrency import managed_tasks
-from .lifecycle import AsyncResourceState, resource_state
+from .lifecycle import AsyncResourceState, ManagedResource, resource_state
 from .stream import Subscription, StreamInbox, OverflowPolicy
 from .paging import PaginatedResponse
 
@@ -44,6 +44,7 @@ __all__ = [
   'retry',
   'managed_tasks',
   'AsyncResourceState',
+  'ManagedResource',
   'resource_state',
   'Subscription',
   'StreamInbox',

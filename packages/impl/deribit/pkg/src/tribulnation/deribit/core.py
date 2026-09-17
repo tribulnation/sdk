@@ -1,5 +1,7 @@
 """Shared Deribit ownership and per-request SDK middleware."""
 
+from functools import cached_property
+
 from dataclasses import dataclass
 from typing_extensions import (
   AsyncContextManager,
@@ -10,7 +12,7 @@ from typing_extensions import (
 )
 from typed_deribit import Deribit
 from tribulnation.sdk import SDK
-from tribulnation.sdk.core import exception_wrapper
+from tribulnation.sdk.core import ManagedResource, exception_wrapper
 
 T = TypeVar('T')
 
@@ -42,9 +44,18 @@ class Mixin(SDK):
       )
     )
 
+  @cached_property
+  def client_resource(self) -> ManagedResource[object]:
+    """Own client with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.client,
+      wrap_enter=exception_wrapper(),
+      wrap_exit=exception_wrapper(),
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     """The surface owns its client, including its lazy socket transport."""
-    yield self.client
+    yield self.client_resource
 
   @SDK.method
   @exception_wrapper()

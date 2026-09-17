@@ -3,16 +3,63 @@
 `AsyncResourceState` is the engine; `SDK` (see `core/invocations/sdk.py`) exposes it through
 `resources()`/`__aenter__`/`__aexit__`.
 
-Nothing here may be a dataclass. `dataclasses` refuses to mix frozen and non-frozen classes
-in one hierarchy, so a dataclass field here would make frozen-ness contagious across every
-SDK subclass -- which is exactly what used to force venue mixins into a single frozen-ness.
-State therefore lives in `__dict__`, written directly so frozen instances can own it.
+SDK base classes must not carry dataclass lifecycle fields: Python refuses to mix
+frozen and non-frozen dataclasses in one hierarchy. Mutable ownership state lives in
+a separate object stored in `__dict__`, so both kinds of SDK subclass can own it.
 """
 
-from typing_extensions import Any, AsyncContextManager, Iterable
+from typing_extensions import (
+  Any,
+  AsyncContextManager,
+  Callable,
+  Generic,
+  Iterable,
+  Protocol,
+  ParamSpec,
+  TypeVar,
+)
 from dataclasses import dataclass
 from contextlib import AsyncExitStack
 from types import TracebackType
+
+
+T = TypeVar('T', covariant=True)
+P = ParamSpec('P')
+R = TypeVar('R')
+
+
+class ResourceWrapper(Protocol):
+  """A decorator preserving the resource method's signature."""
+
+  def __call__(self, fn: Callable[P, R], /) -> Callable[P, R]:
+    """Apply a venue policy to one lifecycle method."""
+    ...
+
+
+@dataclass(frozen=True, kw_only=True)
+class ManagedResource(Generic[T]):
+  """Delegate entry and cleanup through independent venue policies.
+
+  Reuse the same adapter when declaring a resource more than once. Policies may
+  translate exceptions or retry operations known to be safe; no retries are implicit.
+  """
+
+  resource: AsyncContextManager[T]
+  wrap_enter: ResourceWrapper
+  wrap_exit: ResourceWrapper
+
+  async def __aenter__(self) -> T:
+    """Enter the resource using its acquisition policy."""
+    return await self.wrap_enter(self.resource.__aenter__)()
+
+  async def __aexit__(
+    self,
+    exc_type: type[BaseException] | None,
+    exc_value: BaseException | None,
+    traceback: TracebackType | None,
+  ) -> bool | None:
+    """Apply cleanup policy and preserve the resource's suppression signal."""
+    return await self.wrap_exit(self.resource.__aexit__)(exc_type, exc_value, traceback)
 
 
 @dataclass

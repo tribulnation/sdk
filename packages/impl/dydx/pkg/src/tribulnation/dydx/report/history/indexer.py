@@ -1,3 +1,4 @@
+from functools import cached_property
 import asyncio
 from collections.abc import Awaitable, Callable, Iterable
 from contextlib import AbstractAsyncContextManager
@@ -7,6 +8,7 @@ from decimal import Decimal
 from itertools import pairwise
 
 from tribulnation.dydx.core import USDC, wrap_exceptions
+from tribulnation.sdk.core import ManagedResource
 from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import (
   Fee,
@@ -157,8 +159,17 @@ class IndexerHistory(SDK):
   indexer: Indexer
   cache: 'HistoryCache | None' = None
 
+  @cached_property
+  def indexer_resource(self) -> ManagedResource[object]:
+    """Own indexer with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.indexer,
+      wrap_enter=wrap_exceptions,
+      wrap_exit=wrap_exceptions,
+    )
+
   def resources(self) -> Iterable[AbstractAsyncContextManager[object]]:
-    yield self.indexer
+    yield self.indexer_resource
 
   @classmethod
   def of(

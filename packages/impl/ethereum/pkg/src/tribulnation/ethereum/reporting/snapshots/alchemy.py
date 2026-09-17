@@ -2,6 +2,9 @@
 ERC-20 balance, with the metadata needed to scale each one.
 """
 
+from tribulnation.sdk.core import ManagedResource
+from functools import cached_property
+
 from decimal import Decimal
 from typing_extensions import (
   AsyncContextManager,
@@ -62,9 +65,18 @@ class AlchemySnapshots(Snapshots):
   network: str
   ignore_zero_value: bool = True
 
+  @cached_property
+  def alchemy_resource(self) -> ManagedResource[object]:
+    """Own alchemy with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.alchemy,
+      wrap_enter=alchemy_core.wrap_exceptions,
+      wrap_exit=alchemy_core.wrap_exceptions,
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield from super().resources()
-    yield self.alchemy
+    yield self.alchemy_resource
 
   @SDK.method
   @alchemy_core.wrap_exceptions

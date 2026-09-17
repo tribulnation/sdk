@@ -1,3 +1,4 @@
+from functools import cached_property
 from typing_extensions import (
   Any,
   AsyncContextManager,
@@ -9,6 +10,7 @@ from typing_extensions import (
 )
 from dataclasses import dataclass, field
 
+from tribulnation.sdk.core import ManagedResource
 from tribulnation.sdk import SDK
 
 from typed_mexc import MEXC
@@ -68,12 +70,25 @@ class Mixin(SDK):
     )
     return cls(client=client, settings=settings, streams={})
 
+  @cached_property
+  def client_resource(self) -> ManagedResource[object]:
+    """Own client with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.client,
+      wrap_enter=wrap_exceptions,
+      wrap_exit=wrap_exceptions,
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[Any]]:
     yield from super().resources()
-    yield self.client
+    yield self.client_resource
     # Streams are opened lazily during the block, so they cannot be named up front.
     # Reverse-order exit closes them before the client, as the old `__aexit__` did.
-    yield closing_streams(self.streams)
+    yield ManagedResource(
+      resource=closing_streams(self.streams),
+      wrap_enter=wrap_exceptions,
+      wrap_exit=wrap_exceptions,
+    )
 
   async def cached_spot_market(
     self, instrument: str, *, refetch: bool = False
