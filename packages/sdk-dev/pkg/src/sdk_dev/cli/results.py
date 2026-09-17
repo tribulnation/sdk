@@ -11,7 +11,9 @@ import typer
 from typing_extensions import Annotated, Literal
 
 from tribulnation.catalogue import Catalogue
-from tribulnation.sdk import MarketSDK
+from tribulnation.sdk import MarketSDK, RateLimited
+from tribulnation.sdk.core import Context
+from tribulnation.sdk.core.invocations import retry
 from tribulnation.sdk.impl.accounts import Account
 from sdk_dev.repo import repo_root
 from sdk_dev.support import load_impl_files
@@ -56,6 +58,13 @@ def select_account(sdk: MarketSDK, venue: str, account: str | None) -> str:
   )
 
 
+def consistency_context() -> Context:
+  """Retry throttled reads within the existing request and quote time bounds."""
+  return Context().add(
+    retry(RateLimited, max_retries=5, base_delay=1, max_delay=8, jitter=None, log=None)
+  )
+
+
 def test_consistency(
   venue: Annotated[str, typer.Argument(help='Exact mainnet venue slug.')],
   catalogue: Annotated[Path, typer.Option(help='Explicit Catalogue data directory.')],
@@ -89,8 +98,9 @@ def test_consistency(
 
     async def run() -> dict[str, object]:
       """Close all lazily created venue clients when collection finishes or fails."""
-      async with sdk:
-        return await collect(sdk, selected, venue, data)
+      with consistency_context().use():
+        async with sdk:
+          return await collect(sdk, selected, venue, data)
 
     payload = asyncio.run(run())
     after = capture(root, venue, catalogue)
