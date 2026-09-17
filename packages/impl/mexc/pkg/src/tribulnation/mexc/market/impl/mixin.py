@@ -1,3 +1,4 @@
+from functools import cached_property
 from typing_extensions import (
   Any,
   AsyncContextManager,
@@ -10,7 +11,7 @@ from typing_extensions import (
 from dataclasses import dataclass, field
 import asyncio
 
-from tribulnation.sdk.core import SDK, Subscription, OverflowPolicy
+from tribulnation.sdk.core import ManagedResource, SDK, Subscription, OverflowPolicy
 from tribulnation.sdk.market import Book
 
 from typed_mexc import MEXC
@@ -69,9 +70,18 @@ class Shared(SDK):
     client = MEXC.new(public=True, validate=validate)
     return cls(client=client, validate=validate)
 
+  @cached_property
+  def client_resource(self) -> ManagedResource[object]:
+    """Own client with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.client,
+      wrap_enter=wrap_exceptions,
+      wrap_exit=wrap_exceptions,
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     """Own the typed client's lazy HTTP and WebSocket transports."""
-    yield self.client
+    yield self.client_resource
 
   @wrap_exceptions
   async def load_markets(self, *, refetch: bool = False) -> dict[str, SpotInfo]:

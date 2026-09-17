@@ -147,18 +147,18 @@ class SDK(ABC):
     """
     return ()
 
-  @_decorate_method
   async def __aenter__(self):
+    """Acquire resources under their own policies, without lifecycle middleware."""
     await resource_state(self).enter(self.resources())
     return self
 
-  @_decorate_method
   async def __aexit__(
     self,
     exc_type: type[BaseException] | None,
     exc_value: BaseException | None,
     traceback: TracebackType | None,
   ) -> bool | None:
+    """Release resources once; decorated calls retain the active context."""
     return await resource_state(self).exit(exc_type, exc_value, traceback)
 
   def __init_subclass__(cls, **kwargs: Any) -> None:

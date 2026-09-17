@@ -1,5 +1,7 @@
 """The client every Coinbase SDK surface is built on, and the state they share."""
 
+from functools import cached_property
+
 from typing_extensions import (
   Any,
   AsyncContextManager,
@@ -13,7 +15,7 @@ from typing_extensions import (
 from dataclasses import dataclass, field
 import asyncio
 
-from tribulnation.sdk.core import SDK, OverflowPolicy, Subscription
+from tribulnation.sdk.core import ManagedResource, SDK, OverflowPolicy, Subscription
 from tribulnation.sdk.market import Book, Trade
 
 from typed_coinbase import Coinbase
@@ -71,8 +73,17 @@ class Shared(SDK):
   )
   fee_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
 
+  @cached_property
+  def client_resource(self) -> ManagedResource[object]:
+    """Own client with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.client,
+      wrap_enter=wrap_exceptions,
+      wrap_exit=wrap_exceptions,
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[object]]:
-    yield self.client
+    yield self.client_resource
 
   @wrap_exceptions
   async def load_product(self, product_id: str, /, *, refetch: bool = False) -> Product:

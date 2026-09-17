@@ -1,3 +1,4 @@
+from functools import cached_property
 from typing_extensions import (
   Any,
   AsyncContextManager,
@@ -11,7 +12,7 @@ from dataclasses import dataclass, field
 import asyncio
 import os
 
-from tribulnation.sdk.core import SDK, Subscription, OverflowPolicy
+from tribulnation.sdk.core import ManagedResource, SDK, Subscription, OverflowPolicy
 
 from typed_hyperliquid import Hyperliquid, Wallet
 from typed_hyperliquid.info.spot_meta import (
@@ -122,8 +123,17 @@ class Shared(SDK):
   )
   _fees_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
 
+  @cached_property
+  def client_resource(self) -> ManagedResource[object]:
+    """Own client with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.client,
+      wrap_enter=wrap_exceptions,
+      wrap_exit=wrap_exceptions,
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[object]]:
-    yield self.client
+    yield self.client_resource
 
   @wrap_exceptions
   async def load_spot_meta(self, *, refetch: bool = False) -> SpotMetaResponse:

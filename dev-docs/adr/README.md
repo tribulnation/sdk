@@ -39,3 +39,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0014](0014-bit2me-native-ticker-limitation.md) | Preserve Bit2Me native tickers with a visible upstream quote limitation | Accepted; amends 0003 and 0011 |
 | [0015](0015-single-venue-doc-examples.md) | Linear per-venue documentation examples without hidden support | Accepted |
 | [0016](0016-report-snapshot-release-scope.md) | Qualify Report snapshots; application auditing owns history correctness | Accepted; amends 0013 |
+| [0017](0017-venue-resource-policies.md) | Venue-owned resource policies without whole-lifecycle middleware | Accepted |

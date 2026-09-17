@@ -1,3 +1,4 @@
+from functools import cached_property
 import asyncio
 from collections import defaultdict
 from collections.abc import Awaitable, Callable, Iterable
@@ -5,6 +6,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 
 from tribulnation.dydx.core import wrap_exceptions
+from tribulnation.sdk.core import ManagedResource
 from tribulnation.sdk import SDK
 from tribulnation.sdk.reporting import CosmosTx, HistoryRecord, source_id
 from typing_extensions import (
@@ -88,8 +90,17 @@ class ChainHistory(SDK):
   cache: 'HistoryCache | None' = None
   _block_times: dict[int, datetime] = field(default_factory=dict[int, datetime])
 
+  @cached_property
+  def comet_resource(self) -> ManagedResource[object]:
+    """Own comet with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.comet,
+      wrap_enter=wrap_exceptions,
+      wrap_exit=wrap_exceptions,
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[object]]:
-    yield self.comet
+    yield self.comet_resource
 
   @classmethod
   def of(cls, address: str, dydx: Dydx, cache: 'HistoryCache | None' = None):

@@ -1,3 +1,4 @@
+from functools import cached_property
 from typing_extensions import (
   AsyncContextManager,
   Iterable,
@@ -17,7 +18,13 @@ from typed_dydx.indexer.schemas import (
 )
 from typed_dydx.node.orders.types import Flags, TimeInForce
 from typed_dydx.protos.dydxprotocol import feetiers as feetiers_proto
-from tribulnation.sdk.core import SDK, Subscription, OverflowPolicy, AuthError
+from tribulnation.sdk.core import (
+  ManagedResource,
+  SDK,
+  Subscription,
+  OverflowPolicy,
+  AuthError,
+)
 from tribulnation.dydx.core import wrap_exceptions
 from .depth import depth_stream, Book
 from .rules import parse_rules, Rules
@@ -188,8 +195,17 @@ class Shared(SDK):
       )
     return self.depth_subscriptions[market]
 
+  @cached_property
+  def client_resource(self) -> ManagedResource[object]:
+    """Own client with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.client,
+      wrap_enter=wrap_exceptions,
+      wrap_exit=wrap_exceptions,
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[object]]:
-    yield self.client
+    yield self.client_resource
 
 
 @dataclass(kw_only=True, frozen=True)

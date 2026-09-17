@@ -2,6 +2,9 @@
 balance, each with its decimals and a pre-scaled amount.
 """
 
+from tribulnation.sdk.core import ManagedResource
+from functools import cached_property
+
 from typing_extensions import (
   AsyncContextManager,
   Awaitable,
@@ -67,9 +70,18 @@ class MoralisSnapshots(Snapshots):
   moralis: Moralis = field(default_factory=Moralis.new)
   ignore_zero_value: bool = True
 
+  @cached_property
+  def moralis_resource(self) -> ManagedResource[object]:
+    """Own moralis with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.moralis,
+      wrap_enter=moralis_core.wrap_exceptions,
+      wrap_exit=moralis_core.wrap_exceptions,
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield from super().resources()
-    yield self.moralis
+    yield self.moralis_resource
 
   @SDK.method
   @moralis_core.wrap_exceptions

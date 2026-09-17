@@ -1,5 +1,7 @@
 """Kucoin client ownership, request middleware and inclusive history windows."""
 
+from functools import cached_property
+
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing_extensions import (
@@ -12,7 +14,7 @@ from typing_extensions import (
 )
 from typed_kucoin import KuCoin
 from tribulnation.sdk import SDK
-from tribulnation.sdk.core import exception_wrapper
+from tribulnation.sdk.core import ManagedResource, exception_wrapper
 
 T = TypeVar('T')
 MILLISECOND = timedelta(milliseconds=1)
@@ -55,9 +57,18 @@ class Mixin(SDK):
       )
     )
 
+  @cached_property
+  def client_resource(self) -> ManagedResource[object]:
+    """Own client with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.client,
+      wrap_enter=exception_wrapper(),
+      wrap_exit=exception_wrapper(),
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     """The surface owns all transports through the client root."""
-    yield self.client
+    yield self.client_resource
 
   @SDK.method
   @exception_wrapper()

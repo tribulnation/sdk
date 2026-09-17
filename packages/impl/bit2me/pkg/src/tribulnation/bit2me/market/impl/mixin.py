@@ -5,6 +5,8 @@ funding surface at all -- so `spot` is the venue's only exchange and there is no
 `PerpMarket` here.
 """
 
+from functools import cached_property
+
 from typing_extensions import (
   Any,
   AsyncContextManager,
@@ -21,7 +23,7 @@ from contextlib import AsyncExitStack, asynccontextmanager
 from datetime import datetime, timedelta, timezone
 import asyncio
 
-from tribulnation.sdk.core import OverflowPolicy, Subscription
+from tribulnation.sdk.core import ManagedResource, OverflowPolicy, Subscription
 from tribulnation.sdk.market import Book
 from tribulnation.bit2me.core import Calls, wrap_exceptions
 
@@ -128,9 +130,22 @@ class Shared(Calls):
       )
     )
 
+  @cached_property
+  def client_resource(self) -> ManagedResource[object]:
+    """Own client with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.client,
+      wrap_enter=wrap_exceptions,
+      wrap_exit=wrap_exceptions,
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[object]]:
-    yield self.client
-    yield closing_ws(self)
+    yield self.client_resource
+    yield ManagedResource(
+      resource=closing_ws(self),
+      wrap_enter=wrap_exceptions,
+      wrap_exit=wrap_exceptions,
+    )
 
   async def load_markets(self, *, refetch: bool = False) -> dict[str, MarketInfo]:
     """Fetch and memoise the whole market catalogue.

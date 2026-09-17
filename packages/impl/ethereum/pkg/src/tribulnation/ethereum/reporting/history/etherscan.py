@@ -2,6 +2,8 @@
 the node gives each transaction's receipt, input and bytecode check.
 """
 
+from functools import cached_property
+
 from collections.abc import Iterable
 from typing_extensions import (
   AsyncContextManager,
@@ -22,7 +24,7 @@ from typed_etherscan.account.erc20_transfers import Erc20Transfer as TokenTransa
 from typed_etherscan.account.erc721_transfers import Erc721Transfer as NftTransaction
 from typed_etherscan.account.internal_transactions import InternalTransaction
 
-from tribulnation.sdk.core import SDK, ApiError, managed_tasks
+from tribulnation.sdk.core import ManagedResource, SDK, ApiError, managed_tasks
 from tribulnation.sdk.reporting import History, HistoryRecord, EvmTx, source_id
 from tribulnation.ethereum.core import (
   Network,
@@ -86,9 +88,18 @@ class EtherscanHistory(HistoryMixin, History):
       etherscan=etherscan,
     )
 
+  @cached_property
+  def etherscan_resource(self) -> ManagedResource[object]:
+    """Own etherscan with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.etherscan,
+      wrap_enter=etherscan_core.wrap_exceptions,
+      wrap_exit=etherscan_core.wrap_exceptions,
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield from super().resources()
-    yield self.etherscan
+    yield self.etherscan_resource
 
   @property
   def chainid(self) -> str:

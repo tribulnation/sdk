@@ -1,5 +1,7 @@
 """The base every Bybit surface is built on: one shared client, one retriable call shim."""
 
+from functools import cached_property
+
 from typing_extensions import (
   Any,
   AsyncContextManager,
@@ -10,7 +12,7 @@ from typing_extensions import (
 )
 from dataclasses import dataclass, field
 
-from tribulnation.sdk.core import SDK
+from tribulnation.sdk.core import ManagedResource, SDK
 from typed_bybit import Bybit
 from typed_bybit.account.wallet_balance import AccountBalance, Coin
 from typed_bybit.core.http import Region
@@ -70,11 +72,20 @@ class Mixin(SDK):
     )
     return cls(client=client, settings=settings)
 
+  @cached_property
+  def client_resource(self) -> ManagedResource[object]:
+    """Own client with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.client,
+      wrap_enter=wrap_exceptions,
+      wrap_exit=wrap_exceptions,
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[Any]]:
     # The client's REST transport and its nine sockets all connect lazily, so taking
     # ownership here costs nothing until a surface actually calls something.
     yield from super().resources()
-    yield self.client
+    yield self.client_resource
 
   @SDK.method
   @wrap_exceptions

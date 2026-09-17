@@ -4,6 +4,9 @@ check. NFT legs are not read: `WalletHistoryTransaction` declares no `nft_transf
 field.
 """
 
+from tribulnation.sdk.core import ManagedResource
+from functools import cached_property
+
 from typing_extensions import (
   AsyncContextManager,
   Awaitable,
@@ -89,9 +92,18 @@ class MoralisHistory(HistoryMixin, History):
       moralis=Moralis.new(api_key),
     )
 
+  @cached_property
+  def moralis_resource(self) -> ManagedResource[object]:
+    """Own moralis with the venue's entry and cleanup policies."""
+    return ManagedResource(
+      resource=self.moralis,
+      wrap_enter=moralis_core.wrap_exceptions,
+      wrap_exit=moralis_core.wrap_exceptions,
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield from super().resources()
-    yield self.moralis
+    yield self.moralis_resource
 
   @SDK.method
   @moralis_core.wrap_exceptions
