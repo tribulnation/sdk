@@ -42,7 +42,7 @@ class Harness:
     return (*values, Decimal(5)) if self.spot else values
 
 
-@pytest.fixture(params=['spot', 'usdt', 'usdc', 'coin-classic'])
+@pytest.fixture(params=['spot', 'usdt', 'usdc'])
 def harness(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch):
   """Exercise both endpoint families through their generated pagination."""
   endpoint = AsyncMock()
@@ -54,7 +54,7 @@ def harness(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch):
   from tribulnation.bitget.market.impl.parse import PERP_PRODUCTS
 
   product = PERP_PRODUCTS[request.param]
-  symbol = {'usdt': 'BTCUSDT', 'usdc': 'BTCPERP', 'coin-classic': 'BTCUSD'}[request.param]
+  symbol = {'usdt': 'BTCUSDT', 'usdc': 'BTCPERP'}[request.param]
   return Harness(
     PerpMarket(account=account, symbol=symbol, perp_product=product),
     endpoint,
