@@ -95,3 +95,34 @@ def test_release_pr_has_offline_evidence_job():
   assert "startsWith(github.head_ref, 'release/')" in job['if']
   assert any('sdk-dev results release' in step.get('run', '') for step in job['steps'])
   assert 'secrets.' not in str(job)
+
+
+@pytest.mark.parametrize('limited', [True, False])
+async def test_consistency_retries_only_throttled_reads(
+  monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], limited: bool
+):
+  """Retry throttling finitely without logging payloads or retrying other errors."""
+  from unittest.mock import AsyncMock
+
+  from tribulnation.sdk import SDK, ApiError, RateLimited
+  from tribulnation.sdk.core.invocations import middleware
+
+  sleep = AsyncMock()
+  monkeypatch.setattr(middleware.asyncio, 'sleep', sleep)
+  error = RateLimited if limited else ApiError
+  attempts = 0
+
+  @SDK.method
+  async def read():
+    """Fail with an upstream payload that must remain private."""
+    nonlocal attempts
+    attempts += 1
+    raise error('private upstream payload')
+
+  with results.consistency_context().use(), pytest.raises(error):
+    await read()
+  assert attempts == (6 if limited else 1)
+  assert [call.args[0] for call in sleep.call_args_list] == (
+    [1, 2, 4, 8, 8] if limited else []
+  )
+  assert not capsys.readouterr().out

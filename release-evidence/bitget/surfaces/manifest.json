@@ -1,6 +1,6 @@
 {
   "after": {
-    "catalogue_sha256": "8a57362a43367b2a79630c9563a47343e74276979e51366383d79dca43f9e423",
+    "catalogue_sha256": "86f3a15b36ebe98f95a0a46391ac8b0973435e25bd24f5f09d65ce6fbd7d7088",
     "dependencies": {
       "annotated-doc": {
         "files_sha256": "c566fc7785ed355930120476a82a381672cb77f95d528fcc449c758c617fbdc4",
@@ -218,7 +218,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "3e7451d42b3f1b88b719adc4561a2f636c981c455ff7507dd7f397b562022e05",
+        "files_sha256": "4bc13b343f50bade1c30012d5c7cdd5ea8519df130870007e14a3b5b0d00580c",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -243,7 +243,7 @@
         "version": "5.16.1"
       },
       "tribulnation-bitget": {
-        "files_sha256": "eb20f5caedff4dbf3ec8773610f30f2b39f08c01a7e7c57d0e7fb094535721ea",
+        "files_sha256": "cf41a2ef4c3c0b3a052648378513a84cb70ed8af45e7ddf7c94e6cdb2b9e0ba7",
         "metadata_sha256": "ef472c86f3ae435a2b9f547d8888a60f0275b587681c48ec5763aa5aa400b3ba",
         "version": "0.7.1"
       },
@@ -253,9 +253,9 @@
         "version": "0.3.0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "c5704a66aaf0ef765866e2586eda977ca4ddd9766e0cbe9d4c738d4fa4422dbb",
-        "metadata_sha256": "eabdd1598ab54415089a957918dbde7ac6ab6daa52ac0e12f05b1aa154d52261",
-        "version": "2.0.1"
+        "files_sha256": "2249b393b9378eae1eb1e9cbd0f1672dc8d2df5e63624a042b4b01c827a51fff",
+        "metadata_sha256": "0c9e126ee097c2e2356fbfab47c266db55405d415d1bce6cbcd40ea3912f432b",
+        "version": "2.0.2"
       },
       "typed-bitget": {
         "files_sha256": "ae99dc656866de5d84b9f010722d262466036122971bf7ba0185a96e0cf83225",
@@ -290,11 +290,11 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "0d3f020483efaa9d083cb44d50ac293d9d0712a4b04cb7bea63956c0da2e942c",
+    "source_sha256": "54dd95c65b55b8476a4a18fff5c87eb9f9924ed945ce5f8fcfd6e95aa6ade8f9",
     "venue": "bitget"
   },
   "before": {
-    "catalogue_sha256": "8a57362a43367b2a79630c9563a47343e74276979e51366383d79dca43f9e423",
+    "catalogue_sha256": "86f3a15b36ebe98f95a0a46391ac8b0973435e25bd24f5f09d65ce6fbd7d7088",
     "dependencies": {
       "annotated-doc": {
         "files_sha256": "c566fc7785ed355930120476a82a381672cb77f95d528fcc449c758c617fbdc4",
@@ -512,7 +512,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "3e7451d42b3f1b88b719adc4561a2f636c981c455ff7507dd7f397b562022e05",
+        "files_sha256": "4bc13b343f50bade1c30012d5c7cdd5ea8519df130870007e14a3b5b0d00580c",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -537,7 +537,7 @@
         "version": "5.16.1"
       },
       "tribulnation-bitget": {
-        "files_sha256": "eb20f5caedff4dbf3ec8773610f30f2b39f08c01a7e7c57d0e7fb094535721ea",
+        "files_sha256": "cf41a2ef4c3c0b3a052648378513a84cb70ed8af45e7ddf7c94e6cdb2b9e0ba7",
         "metadata_sha256": "ef472c86f3ae435a2b9f547d8888a60f0275b587681c48ec5763aa5aa400b3ba",
         "version": "0.7.1"
       },
@@ -547,9 +547,9 @@
         "version": "0.3.0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "c5704a66aaf0ef765866e2586eda977ca4ddd9766e0cbe9d4c738d4fa4422dbb",
-        "metadata_sha256": "eabdd1598ab54415089a957918dbde7ac6ab6daa52ac0e12f05b1aa154d52261",
-        "version": "2.0.1"
+        "files_sha256": "2249b393b9378eae1eb1e9cbd0f1672dc8d2df5e63624a042b4b01c827a51fff",
+        "metadata_sha256": "0c9e126ee097c2e2356fbfab47c266db55405d415d1bce6cbcd40ea3912f432b",
+        "version": "2.0.2"
       },
       "typed-bitget": {
         "files_sha256": "ae99dc656866de5d84b9f010722d262466036122971bf7ba0185a96e0cf83225",
@@ -584,12 +584,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "0d3f020483efaa9d083cb44d50ac293d9d0712a4b04cb7bea63956c0da2e942c",
+    "source_sha256": "54dd95c65b55b8476a4a18fff5c87eb9f9924ed945ce5f8fcfd6e95aa6ade8f9",
     "venue": "bitget"
   },
-  "finished": "2026-09-14T14:42:03.261795Z",
-  "results_sha256": "eb2e07429dff9cb1483400c9267ab17960219fe357f1a6dc4721e066ef99bb91",
+  "finished": "2026-09-17T13:56:41.167962Z",
+  "results_sha256": "f4cf25048d220e8b145808ea3fe390daa2efd39fb121f76a048b0f16cb75a87d",
   "schema_version": 1,
-  "started": "2026-09-14T14:41:16.410259Z",
-  "summary_sha256": "046f8bb0124b55a658a4fdc3199e79c57be5857e1f19951c93968ef3d74fe309"
+  "started": "2026-09-17T13:56:03.938025Z",
+  "summary_sha256": "1dbbec89b5b6f03f87ca67937ca99375d7849cf40e0281bdd50ce5ddad136181"
 }

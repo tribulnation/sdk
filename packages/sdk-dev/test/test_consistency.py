@@ -708,3 +708,21 @@ async def test_perp_stats_checks_exact_requested_ids(
   perp.perp_stats.return_value = {'UNRELATED': PerpStats(index=Decimal(100))}
   with pytest.raises(ValueError):
     verify_payload(await payload(sdk, catalogue), catalogue=catalogue, root=root)
+
+
+async def test_retired_exchange_requires_explicit_catalogue_delisting(
+  root: Path, sdk: MarketSDK, catalogue: Catalogue
+):
+  """Missing retired exchanges only leave qualification after reviewed delisting."""
+  catalogue.perpetual_instruments['fixture'] = {
+    'BTCUSD': {
+      'exchange': 'coin-classic',
+      'base': 'bitcoin',
+      'quote': 'dollar',
+      'settlement': 'bitcoin',
+    },
+  }
+  with pytest.raises(ValueError):
+    verify_payload(await payload(sdk, catalogue), catalogue=catalogue, root=root)
+  catalogue.perpetual_instruments['fixture']['BTCUSD']['delisted'] = True
+  verify_payload(await payload(sdk, catalogue), catalogue=catalogue, root=root)

@@ -2,7 +2,7 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: accepted
+1. Status: accepted; Classic coin support retired by [ADR 0018](0018-retire-bitget-classic-coin.md)
 2. Date: 2026-09-10
 3. Amends: [ADR 0008](0008-bitget-classic-and-uta-coin.md)
 

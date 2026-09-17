@@ -2,7 +2,7 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: accepted; UTA support deferred by [ADR 0010](0010-defer-bitget-uta-coin.md)
+1. Status: accepted; UTA support deferred by [ADR 0010](0010-defer-bitget-uta-coin.md); Classic coin support retired by [ADR 0018](0018-retire-bitget-classic-coin.md)
 2. Date: 2026-09-10
 3. Amends: [ADR 0005](0005-bitget-product-identities.md)
 
