@@ -244,8 +244,8 @@
       },
       "tribulnation-bitget": {
         "files_sha256": "cf41a2ef4c3c0b3a052648378513a84cb70ed8af45e7ddf7c94e6cdb2b9e0ba7",
-        "metadata_sha256": "ef472c86f3ae435a2b9f547d8888a60f0275b587681c48ec5763aa5aa400b3ba",
-        "version": "0.7.1"
+        "metadata_sha256": "db064fefb7d08015c5c87d6359abe61cb9a73157ffba6a5b548b0e3230539f7c",
+        "version": "0.7.2"
       },
       "tribulnation-catalogue": {
         "files_sha256": "342fcc56465f23b9874e44f1d4c3f61061c9eaef49f2eff65ee7ee931f50f5fb",
@@ -290,7 +290,7 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "54dd95c65b55b8476a4a18fff5c87eb9f9924ed945ce5f8fcfd6e95aa6ade8f9",
+    "source_sha256": "d16dab0d9baddb9a10aa46449f0b77d421aea47c48d281770d6cb7f3360b887d",
     "venue": "bitget"
   },
   "before": {
@@ -538,8 +538,8 @@
       },
       "tribulnation-bitget": {
         "files_sha256": "cf41a2ef4c3c0b3a052648378513a84cb70ed8af45e7ddf7c94e6cdb2b9e0ba7",
-        "metadata_sha256": "ef472c86f3ae435a2b9f547d8888a60f0275b587681c48ec5763aa5aa400b3ba",
-        "version": "0.7.1"
+        "metadata_sha256": "db064fefb7d08015c5c87d6359abe61cb9a73157ffba6a5b548b0e3230539f7c",
+        "version": "0.7.2"
       },
       "tribulnation-catalogue": {
         "files_sha256": "342fcc56465f23b9874e44f1d4c3f61061c9eaef49f2eff65ee7ee931f50f5fb",
@@ -584,12 +584,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "54dd95c65b55b8476a4a18fff5c87eb9f9924ed945ce5f8fcfd6e95aa6ade8f9",
+    "source_sha256": "d16dab0d9baddb9a10aa46449f0b77d421aea47c48d281770d6cb7f3360b887d",
     "venue": "bitget"
   },
-  "finished": "2026-09-17T13:56:41.167962Z",
+  "finished": "2026-09-17T14:01:46.152528Z",
   "results_sha256": "f4cf25048d220e8b145808ea3fe390daa2efd39fb121f76a048b0f16cb75a87d",
   "schema_version": 1,
-  "started": "2026-09-17T13:56:03.938025Z",
-  "summary_sha256": "1dbbec89b5b6f03f87ca67937ca99375d7849cf40e0281bdd50ce5ddad136181"
+  "started": "2026-09-17T14:01:10.065346Z",
+  "summary_sha256": "72c00d3b8ecf40752e84b5956b787689eb44946306788e785dfd86385219bb42"
 }
