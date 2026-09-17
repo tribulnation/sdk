@@ -244,8 +244,8 @@
       },
       "tribulnation-bit2me": {
         "files_sha256": "141f03f4b614d29711176c8378272b4554bf082addba27f37038fb943411302d",
-        "metadata_sha256": "2710728198393229be09d91d3d6a1a4b43bd24036cec44ec82364e1e77dde5d3",
-        "version": "0.5.0"
+        "metadata_sha256": "62e84aa1cd6cd7eb9ce08dd1d0f4e00105f7c8f37b85744b57e35233aadc9910",
+        "version": "0.5.1"
       },
       "tribulnation-catalogue": {
         "files_sha256": "342fcc56465f23b9874e44f1d4c3f61061c9eaef49f2eff65ee7ee931f50f5fb",
@@ -290,7 +290,7 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "272f740e1d55e1df78dd2ac3c07cba62086cdfa1b41f9a04f81242d7d68b006c",
+    "source_sha256": "b0d1325940c779aba723efcfbc5df5feb8237abfd3d65006747b92d65df04ffc",
     "venue": "bit2me"
   },
   "before": {
@@ -538,8 +538,8 @@
       },
       "tribulnation-bit2me": {
         "files_sha256": "141f03f4b614d29711176c8378272b4554bf082addba27f37038fb943411302d",
-        "metadata_sha256": "2710728198393229be09d91d3d6a1a4b43bd24036cec44ec82364e1e77dde5d3",
-        "version": "0.5.0"
+        "metadata_sha256": "62e84aa1cd6cd7eb9ce08dd1d0f4e00105f7c8f37b85744b57e35233aadc9910",
+        "version": "0.5.1"
       },
       "tribulnation-catalogue": {
         "files_sha256": "342fcc56465f23b9874e44f1d4c3f61061c9eaef49f2eff65ee7ee931f50f5fb",
@@ -584,12 +584,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "272f740e1d55e1df78dd2ac3c07cba62086cdfa1b41f9a04f81242d7d68b006c",
+    "source_sha256": "b0d1325940c779aba723efcfbc5df5feb8237abfd3d65006747b92d65df04ffc",
     "venue": "bit2me"
   },
-  "finished": "2026-09-17T13:56:15.799913Z",
+  "finished": "2026-09-17T14:01:20.898837Z",
   "results_sha256": "9d2e02e58135b3508d6b7bc39f29e0e6f9d8522d4c8e43afe6603776be039fda",
   "schema_version": 1,
-  "started": "2026-09-17T13:56:03.756606Z",
-  "summary_sha256": "c33a6947fded8ef3bf2fc6e2b996522be31243f41ed1d43336f3ceabe3bb2347"
+  "started": "2026-09-17T14:01:10.022715Z",
+  "summary_sha256": "e356182f649701205915fddc8cf0e526e60b752b7666f7263f9453022ba434e8"
 }
