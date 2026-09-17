@@ -1,6 +1,6 @@
 {
   "after": {
-    "catalogue_sha256": "6279cbe14e4c3326fe0aa2ebe1d294ffdfa4be7aa10d3461b1e0a9b612a7fb38",
+    "catalogue_sha256": "86f3a15b36ebe98f95a0a46391ac8b0973435e25bd24f5f09d65ce6fbd7d7088",
     "dependencies": {
       "annotated-doc": {
         "files_sha256": "c566fc7785ed355930120476a82a381672cb77f95d528fcc449c758c617fbdc4",
@@ -218,7 +218,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "3e7451d42b3f1b88b719adc4561a2f636c981c455ff7507dd7f397b562022e05",
+        "files_sha256": "4bc13b343f50bade1c30012d5c7cdd5ea8519df130870007e14a3b5b0d00580c",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -290,11 +290,11 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "273197303098c20b00608870c3514851f476c469de314a378e7c307fa25da218",
+    "source_sha256": "bd91c843fc487fdc8fe388e54e33450df334bc0e1c2cbbe5a62d2f1365539a47",
     "venue": "bybit"
   },
   "before": {
-    "catalogue_sha256": "6279cbe14e4c3326fe0aa2ebe1d294ffdfa4be7aa10d3461b1e0a9b612a7fb38",
+    "catalogue_sha256": "86f3a15b36ebe98f95a0a46391ac8b0973435e25bd24f5f09d65ce6fbd7d7088",
     "dependencies": {
       "annotated-doc": {
         "files_sha256": "c566fc7785ed355930120476a82a381672cb77f95d528fcc449c758c617fbdc4",
@@ -512,7 +512,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "3e7451d42b3f1b88b719adc4561a2f636c981c455ff7507dd7f397b562022e05",
+        "files_sha256": "4bc13b343f50bade1c30012d5c7cdd5ea8519df130870007e14a3b5b0d00580c",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -584,12 +584,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "273197303098c20b00608870c3514851f476c469de314a378e7c307fa25da218",
+    "source_sha256": "bd91c843fc487fdc8fe388e54e33450df334bc0e1c2cbbe5a62d2f1365539a47",
     "venue": "bybit"
   },
-  "finished": "2026-09-17T13:32:55.937441Z",
-  "results_sha256": "7302e71d0e8c52805aef3a9e478df3c3719f0d14326d49e6b95431e5cef00404",
+  "finished": "2026-09-17T13:56:50.717012Z",
+  "results_sha256": "66c82e123b3380f0040e163a24b476672f988856dc265c0fd3a3d9642cf75fa6",
   "schema_version": 1,
-  "started": "2026-09-17T13:32:44.185873Z",
-  "summary_sha256": "4768bf31fa19c1814774daa7db6b2b9283679863c5d1c9ff8c5059e8e21a5766"
+  "started": "2026-09-17T13:56:35.998848Z",
+  "summary_sha256": "02f9b27c3be9a48c0258b1fd9d6fa240e3443d6763c85b40944f86231ec35d52"
 }
