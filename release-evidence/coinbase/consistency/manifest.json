@@ -264,8 +264,8 @@
       },
       "tribulnation-coinbase": {
         "files_sha256": "e490dc9494db159cf6f18dd5ab4eda534826a25d7b7430e0d6cb4ca241fffa64",
-        "metadata_sha256": "7045b1edfa66b73f67564e043e0214bced3f6aae0e16d9dc761a139bc35e67e2",
-        "version": "0.2.0"
+        "metadata_sha256": "d0cb4a0707173b20e7e4963de85bca35131c15697f93649adb2469d1f06d3764",
+        "version": "0.2.1"
       },
       "tribulnation-sdk": {
         "files_sha256": "2249b393b9378eae1eb1e9cbd0f1672dc8d2df5e63624a042b4b01c827a51fff",
@@ -305,7 +305,7 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "2b1f68fc5e399ce45e8986645431d8b1aa9ac8c7c8c05fb28def4941af41e31e",
+    "source_sha256": "fbac66ff9b61e12b34a84d3428502c1169c527f1e98440f6305e75c231ed13d1",
     "venue": "coinbase"
   },
   "before": {
@@ -573,8 +573,8 @@
       },
       "tribulnation-coinbase": {
         "files_sha256": "e490dc9494db159cf6f18dd5ab4eda534826a25d7b7430e0d6cb4ca241fffa64",
-        "metadata_sha256": "7045b1edfa66b73f67564e043e0214bced3f6aae0e16d9dc761a139bc35e67e2",
-        "version": "0.2.0"
+        "metadata_sha256": "d0cb4a0707173b20e7e4963de85bca35131c15697f93649adb2469d1f06d3764",
+        "version": "0.2.1"
       },
       "tribulnation-sdk": {
         "files_sha256": "2249b393b9378eae1eb1e9cbd0f1672dc8d2df5e63624a042b4b01c827a51fff",
@@ -614,12 +614,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "2b1f68fc5e399ce45e8986645431d8b1aa9ac8c7c8c05fb28def4941af41e31e",
+    "source_sha256": "fbac66ff9b61e12b34a84d3428502c1169c527f1e98440f6305e75c231ed13d1",
     "venue": "coinbase"
   },
-  "finished": "2026-09-17T13:57:14.228346Z",
-  "results_sha256": "2801e4df063000636edebca5cc7557f0ab53650607a7f240cbdb3844f6160ed8",
+  "finished": "2026-09-17T14:02:15.656990Z",
+  "results_sha256": "b1515c18efe09f0d334d89baf6476bc92c3bf574e054f44db9d2af84e3630bee",
   "schema_version": 1,
-  "started": "2026-09-17T13:57:03.117568Z",
-  "summary_sha256": "d74cbc9f4bde381c5f6ccb3b07266721a3c8046536c841900c667e955f3674d2"
+  "started": "2026-09-17T14:02:03.524034Z",
+  "summary_sha256": "d1dea8b321fbbec142d662df8d655c4bb522c8155de897a128a4cb2d77372bf4"
 }
