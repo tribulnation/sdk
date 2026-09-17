@@ -1,7 +1,10 @@
-# tribulnation-bitget 0.7.1
+# tribulnation-bitget 0.7.2
 
-Retry individual Bitget reporting pages through the SDK context.
+Translate native client acquisition and cleanup failures through managed resource
+adapters. Entry and exit policies remain independent; this release adds no automatic
+resource retries. Decorated calls inside the lifecycle retain context middleware.
 
-Requires tribulnation-sdk >=2.0.1. The implementation and version bump are included in [SDK #41](https://github.com/tribulnation/sdk/pull/41); this release handoff publishes the implementation after SDK 2.0.1 is available.
+Requires tribulnation-sdk >=2.0.2. Publish after the SDK patch release.
 
-The release workflow verifies current read-suite and market-consistency reports under `release-evidence/bitget/` before publishing. The live checks use read-only operations.
+The release workflow requires fresh passing read-only qualification for this exact
+version and dependency floor before publication.
