@@ -1,6 +1,6 @@
 {
   "after": {
-    "catalogue_sha256": "6279cbe14e4c3326fe0aa2ebe1d294ffdfa4be7aa10d3461b1e0a9b612a7fb38",
+    "catalogue_sha256": "86f3a15b36ebe98f95a0a46391ac8b0973435e25bd24f5f09d65ce6fbd7d7088",
     "dependencies": {
       "annotated-doc": {
         "files_sha256": "c566fc7785ed355930120476a82a381672cb77f95d528fcc449c758c617fbdc4",
@@ -313,7 +313,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "3e7451d42b3f1b88b719adc4561a2f636c981c455ff7507dd7f397b562022e05",
+        "files_sha256": "4bc13b343f50bade1c30012d5c7cdd5ea8519df130870007e14a3b5b0d00580c",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -400,11 +400,11 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "ebb2fbfa5024d1c4847a0188710a41413e8609e8548996ea2a12573e12cece50",
+    "source_sha256": "c0f69b979602374c7f214c972a3de20b350e2ec00675e12b164a705add2c4166",
     "venue": "hyperliquid"
   },
   "before": {
-    "catalogue_sha256": "6279cbe14e4c3326fe0aa2ebe1d294ffdfa4be7aa10d3461b1e0a9b612a7fb38",
+    "catalogue_sha256": "86f3a15b36ebe98f95a0a46391ac8b0973435e25bd24f5f09d65ce6fbd7d7088",
     "dependencies": {
       "annotated-doc": {
         "files_sha256": "c566fc7785ed355930120476a82a381672cb77f95d528fcc449c758c617fbdc4",
@@ -717,7 +717,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "3e7451d42b3f1b88b719adc4561a2f636c981c455ff7507dd7f397b562022e05",
+        "files_sha256": "4bc13b343f50bade1c30012d5c7cdd5ea8519df130870007e14a3b5b0d00580c",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -804,12 +804,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "ebb2fbfa5024d1c4847a0188710a41413e8609e8548996ea2a12573e12cece50",
+    "source_sha256": "c0f69b979602374c7f214c972a3de20b350e2ec00675e12b164a705add2c4166",
     "venue": "hyperliquid"
   },
-  "finished": "2026-09-17T13:35:50.977658Z",
-  "results_sha256": "6948e507828a59d03d7b0066b2a422f3b8b1b93e6e4368cbdb727be638392c40",
+  "finished": "2026-09-17T13:59:55.815676Z",
+  "results_sha256": "803edf6724504dc83f5b411aec94da4ab1a394cf06611fab1d5b36fa0e570d59",
   "schema_version": 1,
-  "started": "2026-09-17T13:33:32.357223Z",
-  "summary_sha256": "911874fb093f0aa453db1e73e30afe5f605360938adc737430991dfc9fc711e3"
+  "started": "2026-09-17T13:57:34.956711Z",
+  "summary_sha256": "ea8ca3911273366bdd05d9dac9cb8cc4b424c7feac1783d7227efe341d5b900a"
 }

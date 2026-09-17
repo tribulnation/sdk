@@ -30,9 +30,9 @@ not a changelog or a substitute for API documentation and tests.
 | [0005](0005-bitget-product-identities.md) | Explicit Bitget futures product identities | Accepted; amended by 0008 |
 | [0006](0006-release-evidence-scope.md) | Separate exact coverage and add non-market release evidence | Accepted; amended by 0009 |
 | [0007](0007-dydx-quote-asset.md) | dYdX quote and fee assets are USDC | Accepted; quote field removed by 0009 |
-| [0008](0008-bitget-classic-and-uta-coin.md) | Coexisting Classic and UTA Bitget coin perpetuals | Accepted; UTA support deferred by 0010 |
+| [0008](0008-bitget-classic-and-uta-coin.md) | Coexisting Classic and UTA Bitget coin perpetuals | Accepted; UTA support deferred by 0010; Classic retired by 0018 |
 | [0009](0009-catalogue-owned-asset-identity.md) | Catalogue-owned instrument asset identity | Accepted |
-| [0010](0010-defer-bitget-uta-coin.md) | Defer Bitget UTA coin support | Accepted |
+| [0010](0010-defer-bitget-uta-coin.md) | Defer Bitget UTA coin support | Accepted; amended by 0018 |
 | [0011](0011-liquidity-independent-consistency.md) | Compare available quote sides without guaranteeing liquidity | Accepted |
 | [0012](0012-deribit-public-mainnet-private-testnet.md) | Deribit mainnet public metadata and testnet private Report evidence | Accepted |
 | [0013](0013-all-read-suites-release-gate.md) | Require all supported read-only suites alongside market consistency | Accepted; amends 0003 and 0006; amended by 0016 |
@@ -40,3 +40,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0015](0015-single-venue-doc-examples.md) | Linear per-venue documentation examples without hidden support | Accepted |
 | [0016](0016-report-snapshot-release-scope.md) | Qualify Report snapshots; application auditing owns history correctness | Accepted; amends 0013 |
 | [0017](0017-venue-resource-policies.md) | Venue-owned resource policies without whole-lifecycle middleware | Accepted |
+| [0018](0018-retire-bitget-classic-coin.md) | Retire confirmed Bitget Classic coin markets while preserving historical IDs | Accepted; amends 0008 and 0010 |

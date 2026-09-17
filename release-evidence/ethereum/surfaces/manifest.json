@@ -1,6 +1,6 @@
 {
   "after": {
-    "catalogue_sha256": "6279cbe14e4c3326fe0aa2ebe1d294ffdfa4be7aa10d3461b1e0a9b612a7fb38",
+    "catalogue_sha256": "86f3a15b36ebe98f95a0a46391ac8b0973435e25bd24f5f09d65ce6fbd7d7088",
     "dependencies": {
       "aiohappyeyeballs": {
         "files_sha256": "d9e8c5a3f6321563084f4fa3a7c9e73da78a2dd5e02c3c21cd90cffde5d1d6bb",
@@ -348,7 +348,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "3e7451d42b3f1b88b719adc4561a2f636c981c455ff7507dd7f397b562022e05",
+        "files_sha256": "4bc13b343f50bade1c30012d5c7cdd5ea8519df130870007e14a3b5b0d00580c",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -455,11 +455,11 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "81a0219ccc484a60be7031cfee7fc7478fab6461ccce2aaab943035fe6b684bf",
+    "source_sha256": "af27d02d32981132513f65852c47725605684983785251f2a6ab207c69752872",
     "venue": "ethereum"
   },
   "before": {
-    "catalogue_sha256": "6279cbe14e4c3326fe0aa2ebe1d294ffdfa4be7aa10d3461b1e0a9b612a7fb38",
+    "catalogue_sha256": "86f3a15b36ebe98f95a0a46391ac8b0973435e25bd24f5f09d65ce6fbd7d7088",
     "dependencies": {
       "aiohappyeyeballs": {
         "files_sha256": "d9e8c5a3f6321563084f4fa3a7c9e73da78a2dd5e02c3c21cd90cffde5d1d6bb",
@@ -807,7 +807,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "3e7451d42b3f1b88b719adc4561a2f636c981c455ff7507dd7f397b562022e05",
+        "files_sha256": "4bc13b343f50bade1c30012d5c7cdd5ea8519df130870007e14a3b5b0d00580c",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -914,12 +914,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "81a0219ccc484a60be7031cfee7fc7478fab6461ccce2aaab943035fe6b684bf",
+    "source_sha256": "af27d02d32981132513f65852c47725605684983785251f2a6ab207c69752872",
     "venue": "ethereum"
   },
-  "finished": "2026-09-17T13:33:15.635387Z",
+  "finished": "2026-09-17T13:57:18.462361Z",
   "results_sha256": "dae17bd88826beea9270824c4c487c754600ed50c5945bf9cd9b5ca52176bb03",
   "schema_version": 1,
-  "started": "2026-09-17T13:33:11.434042Z",
-  "summary_sha256": "d82e1ce4155e8e214cb1c91f7983a3b2a25b0562c673913fec5561774cd3329f"
+  "started": "2026-09-17T13:57:14.866167Z",
+  "summary_sha256": "20d34f958bfc54572a0a3d85d0a5c5e5f17c72fbe9b1276581b2a99aa8ea52e1"
 }
