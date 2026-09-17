@@ -359,8 +359,8 @@
       },
       "tribulnation-hyperliquid": {
         "files_sha256": "aae8b705ac5cf930bcdd5a51855f61e98103f28a2d43abc359d6276333dc434f",
-        "metadata_sha256": "4ce963e7f1a89e227acd59d122ad2bbc1d8570e16c8c34dc514be24ec2e07511",
-        "version": "0.7.1"
+        "metadata_sha256": "084e2c421c886ba483681743837c093f316e41f3cdc9e25e9be0d107bbcaca26",
+        "version": "0.7.2"
       },
       "tribulnation-sdk": {
         "files_sha256": "2249b393b9378eae1eb1e9cbd0f1672dc8d2df5e63624a042b4b01c827a51fff",
@@ -400,7 +400,7 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "c0f69b979602374c7f214c972a3de20b350e2ec00675e12b164a705add2c4166",
+    "source_sha256": "d325c4ba8ad0ea5b293db1aaabebda7fc9b28b51c7b9553f775a2a27e4b2ff0f",
     "venue": "hyperliquid"
   },
   "before": {
@@ -763,8 +763,8 @@
       },
       "tribulnation-hyperliquid": {
         "files_sha256": "aae8b705ac5cf930bcdd5a51855f61e98103f28a2d43abc359d6276333dc434f",
-        "metadata_sha256": "4ce963e7f1a89e227acd59d122ad2bbc1d8570e16c8c34dc514be24ec2e07511",
-        "version": "0.7.1"
+        "metadata_sha256": "084e2c421c886ba483681743837c093f316e41f3cdc9e25e9be0d107bbcaca26",
+        "version": "0.7.2"
       },
       "tribulnation-sdk": {
         "files_sha256": "2249b393b9378eae1eb1e9cbd0f1672dc8d2df5e63624a042b4b01c827a51fff",
@@ -804,12 +804,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "c0f69b979602374c7f214c972a3de20b350e2ec00675e12b164a705add2c4166",
+    "source_sha256": "d325c4ba8ad0ea5b293db1aaabebda7fc9b28b51c7b9553f775a2a27e4b2ff0f",
     "venue": "hyperliquid"
   },
-  "finished": "2026-09-17T13:57:34.349551Z",
+  "finished": "2026-09-17T14:02:34.648440Z",
   "results_sha256": "6430cb107a5e7d786fa74401c8cb89de34d375a853bd6bc2f3ce8eb4d1774b6b",
   "schema_version": 1,
-  "started": "2026-09-17T13:57:19.097849Z",
-  "summary_sha256": "4cec239d8e79320e2a3ac4802e4337ffe16a2d6939ed68192d06567cc9b592f6"
+  "started": "2026-09-17T14:02:20.504591Z",
+  "summary_sha256": "7dbde002976e1785a65a5ea3ec4a1081e57250e87b64378330014be0de6ee585"
 }
