@@ -8,3 +8,7 @@ Requires tribulnation-sdk >=2.0.2. Publish after the SDK patch release.
 
 The release workflow requires fresh passing read-only qualification for this exact
 version and dependency floor before publication.
+
+Retire Classic coin-margined futures from market discovery and reject explicit
+`coin-classic` routing. Historical IDs and reporting remain available; UTA coin
+support remains deferred.
