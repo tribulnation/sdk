@@ -2523,10 +2523,10 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"MONAUSD\"]",
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -8179,14 +8179,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"0GEUR\"]",
         "quotes": [
           {
-            "after_ask": "0.1720000",
-            "after_bid": "0.1710000",
-            "ask": "0.1720000",
+            "after_ask": "0.1760000",
+            "after_bid": "0.1750000",
+            "ask": "0.1760000",
             "attempt": 1,
-            "before_ask": "0.1720000",
-            "before_bid": "0.1710000",
-            "bid": "0.1710000",
-            "elapsed_seconds": 2.5533905960037373,
+            "before_ask": "0.1760000",
+            "before_bid": "0.1750000",
+            "bid": "0.1750000",
+            "elapsed_seconds": 0.13452519199927337,
             "ticker_ids_match": true
           }
         ],
@@ -8197,14 +8197,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"0GUSD\"]",
         "quotes": [
           {
-            "after_ask": "0.1980000",
-            "after_bid": "0.1970000",
-            "ask": "0.1980000",
+            "after_ask": "0.2020000",
+            "after_bid": "0.2010000",
+            "ask": "0.2020000",
             "attempt": 1,
-            "before_ask": "0.1980000",
-            "before_bid": "0.1970000",
-            "bid": "0.1970000",
-            "elapsed_seconds": 0.4674241349857766,
+            "before_ask": "0.2020000",
+            "before_bid": "0.2010000",
+            "bid": "0.2010000",
+            "elapsed_seconds": 0.1158564520010259,
             "ticker_ids_match": true
           }
         ],
@@ -8215,14 +8215,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"1INCHEUR\"]",
         "quotes": [
           {
-            "after_ask": "0.07970",
-            "after_bid": "0.07960",
-            "ask": "0.07970",
+            "after_ask": "0.07820",
+            "after_bid": "0.07810",
+            "ask": "0.07820",
             "attempt": 1,
-            "before_ask": "0.07970",
-            "before_bid": "0.07960",
-            "bid": "0.07960",
-            "elapsed_seconds": 0.4875675619987305,
+            "before_ask": "0.07820",
+            "before_bid": "0.07810",
+            "bid": "0.07810",
+            "elapsed_seconds": 0.11423007701523602,
             "ticker_ids_match": true
           }
         ],
@@ -8233,14 +8233,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"XBTUSD\"]",
         "quotes": [
           {
-            "after_ask": "78404.00000",
-            "after_bid": "78403.90000",
-            "ask": "78395.40000",
+            "after_ask": "76281.30000",
+            "after_bid": "76281.20000",
+            "ask": "76281.00000",
             "attempt": 1,
-            "before_ask": "78404.00000",
-            "before_bid": "78403.90000",
-            "bid": "78395.30000",
-            "elapsed_seconds": 0.09441771599813364,
+            "before_ask": "76281.30000",
+            "before_bid": "76281.20000",
+            "bid": "76280.90000",
+            "elapsed_seconds": 0.10472467500949278,
             "ticker_ids_match": true
           }
         ],
@@ -8790,6 +8790,7 @@
           "GMXEUR",
           "GMXUSD",
           "GNOEUR",
+          "GNOTUSD",
           "GNOUSD",
           "GOATEUR",
           "GOATUSD",
@@ -9016,7 +9017,6 @@
           "MOCAUSD",
           "MOGEUR",
           "MOGUSD",
-          "MONAUSD",
           "MONEUR",
           "MONUSD",
           "MOODENGEUR",
@@ -9422,6 +9422,7 @@
           "TOSHIUSD",
           "TRACEUR",
           "TRACUSD",
+          "TREADUSD",
           "TREEEUR",
           "TREEUSD",
           "TREMPUSD",

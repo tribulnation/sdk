@@ -147,22 +147,44 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "native_ticker_quotes",
         "id": "[\"ticker_depth\",\"spot\",\"1INCH/EUR\"]",
         "quotes": [
           {
-            "after_ask": "0.0798",
-            "after_bid": "0.0797",
-            "ask": "0.0801",
+            "after_ask": "0.0784",
+            "after_bid": "0.0782",
+            "ask": "0.0787",
             "attempt": 1,
-            "before_ask": "0.0798",
-            "before_bid": "0.0797",
-            "bid": "0.08",
-            "elapsed_seconds": 0.3227373260015156,
+            "before_ask": "0.0784",
+            "before_bid": "0.0782",
+            "bid": "0.0786",
+            "elapsed_seconds": 0.15552907998790033,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": "0.0784",
+            "after_bid": "0.0782",
+            "ask": "0.0787",
+            "attempt": 2,
+            "before_ask": "0.0784",
+            "before_bid": "0.0782",
+            "bid": "0.0786",
+            "elapsed_seconds": 0.15832100599072874,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": "0.0784",
+            "after_bid": "0.0782",
+            "ask": "0.0787",
+            "attempt": 3,
+            "before_ask": "0.0784",
+            "before_bid": "0.0782",
+            "bid": "0.0786",
+            "elapsed_seconds": 0.1693526960152667,
             "ticker_ids_match": true
           }
         ],
-        "status": "pass"
+        "status": "limitation"
       },
       {
         "code": "native_ticker_quotes",
@@ -176,7 +198,7 @@
             "before_ask": "0.0001413",
             "before_bid": "0.0001375",
             "bid": "0.0",
-            "elapsed_seconds": 0.34175624599447474,
+            "elapsed_seconds": 0.19135075499070808,
             "ticker_ids_match": true
           },
           {
@@ -187,7 +209,7 @@
             "before_ask": "0.0001413",
             "before_bid": "0.0001375",
             "bid": "0.0",
-            "elapsed_seconds": 0.2831240270170383,
+            "elapsed_seconds": 0.18321057397406548,
             "ticker_ids_match": true
           },
           {
@@ -198,7 +220,7 @@
             "before_ask": "0.0001413",
             "before_bid": "0.0001375",
             "bid": "0.0",
-            "elapsed_seconds": 0.35912772099254653,
+            "elapsed_seconds": 0.16835846699541435,
             "ticker_ids_match": true
           }
         ],
@@ -209,14 +231,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"AAVE/EUR\"]",
         "quotes": [
           {
-            "after_ask": "109.11",
-            "after_bid": "109.02",
-            "ask": "109.14",
+            "after_ask": "108.01",
+            "after_bid": "107.87",
+            "ask": "108.03",
             "attempt": 1,
-            "before_ask": "109.11",
-            "before_bid": "109.02",
-            "bid": "109.07",
-            "elapsed_seconds": 0.1778569529997185,
+            "before_ask": "108.01",
+            "before_bid": "107.87",
+            "bid": "108.02",
+            "elapsed_seconds": 0.14985213198815472,
             "ticker_ids_match": true
           }
         ],
@@ -227,14 +249,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"BTC/EUR\"]",
         "quotes": [
           {
-            "after_ask": "67932.1",
-            "after_bid": "67932.0",
-            "ask": "67945.4",
+            "after_ask": "66474.4",
+            "after_bid": "66474.3",
+            "ask": "66442.2",
             "attempt": 1,
-            "before_ask": "67932.1",
-            "before_bid": "67932.0",
-            "bid": "67931.0",
-            "elapsed_seconds": 0.2060651570209302,
+            "before_ask": "66474.4",
+            "before_bid": "66474.3",
+            "bid": "66442.1",
+            "elapsed_seconds": 0.153945702011697,
             "ticker_ids_match": true
           }
         ],
@@ -538,6 +560,7 @@
           "WIN/EUR",
           "WIN/USDC",
           "WLD/EUR",
+          "XAUT/USD",
           "XCN/EUR",
           "XLM/EUR",
           "XMN/EUR",
