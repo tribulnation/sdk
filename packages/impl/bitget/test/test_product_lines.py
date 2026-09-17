@@ -24,7 +24,6 @@ def contract(product: PerpProduct, *, delivery: bool = False) -> MixContract:
       'quoteCoin': {
         'USDT-FUTURES': 'USDT',
         'USDC-FUTURES': 'USDC',
-        'COIN-FUTURES': 'USD',
       }[product],
       'priceEndStep': 1,
       'pricePlace': 1,
@@ -74,16 +73,13 @@ async def test_product_caches_are_independent(venue: BitgetMarket):
     'spot',
     'usdt',
     'usdc',
-    'coin-classic',
   ]
   exchanges = [await venue.perp_exchange(id) for id in PERP_PRODUCTS]
   assert (
     await asyncio.gather(*(exchange.markets() for exchange in exchanges))
-    == [['SAME']] * 3
+    == [['SAME']] * 2
   )
-  for exchange, quote, fee_asset in zip(
-    exchanges, ('USDT', 'USDC', 'USD'), ('USDT', 'USDC', 'BTC')
-  ):
+  for exchange, quote, fee_asset in zip(exchanges, ('USDT', 'USDC'), ('USDT', 'USDC')):
     market = await exchange.market('SAME')
     assert market.exchange_id == exchange.exchange_id
     assert market.product == exchange.product
@@ -93,9 +89,9 @@ async def test_product_caches_are_independent(venue: BitgetMarket):
     with pytest.raises(ValueError, match='Unknown'):
       await exchange.market('DELIVERY')
   requests = cast(AsyncMock, venue.client.classic.mix.market.contracts)
-  assert requests.await_count == 3
+  assert requests.await_count == 2
   await (await exchanges[1].market('SAME')).rules(refetch=True)
-  assert requests.await_count == 4
+  assert requests.await_count == 3
   assert requests.await_args is not None and requests.await_args.args == (
     'USDC-FUTURES',
   )
@@ -109,7 +105,7 @@ async def test_uta_coin_is_explicitly_unsupported(venue: BitgetMarket):
       await resolve('coin')
 
 
-@pytest.mark.parametrize('exchange_id', ['usdt', 'usdc', 'coin-classic'])
+@pytest.mark.parametrize('exchange_id', ['usdt', 'usdc'])
 async def test_public_requests_address_the_product(
   venue: BitgetMarket, exchange_id: str, monkeypatch: pytest.MonkeyPatch
 ):
@@ -147,7 +143,7 @@ async def test_public_requests_address_the_product(
   assert await exchange.perp_stats([]) == {}
 
 
-@pytest.mark.parametrize('exchange_id', ['usdc', 'coin-classic'])
+@pytest.mark.parametrize('exchange_id', ['usdc'])
 async def test_new_products_cannot_enter_account_adapters(
   venue: BitgetMarket, exchange_id: str, monkeypatch: pytest.MonkeyPatch
 ):
@@ -173,3 +169,14 @@ async def test_new_products_cannot_enter_account_adapters(
     async with market.trades_stream():
       pass
   mode.assert_not_called()
+
+
+async def test_retired_classic_coin_is_rejected_without_requests(venue: BitgetMarket):
+  """Retired identities must not silently alias to UTA or contact retired endpoints."""
+  assert 'coin-classic' not in {row['id'] for row in await venue.exchanges()}
+  for resolve in (venue.exchange, venue.perp_exchange):
+    with pytest.raises(NotImplementedError, match='retired on 2026-09-17'):
+      await resolve('coin-classic')
+  with pytest.raises(NotImplementedError, match='retired on 2026-09-17'):
+    await venue.market('coin-classic:BTCUSD')
+  cast(AsyncMock, venue.client.classic.mix.market.contracts).assert_not_awaited()

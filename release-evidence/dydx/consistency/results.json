@@ -1,6 +1,6 @@
 {
   "payload": {
-    "account_id": "dydx",
+    "account_id": "dydx_mainnet",
     "checks": [
       {
         "code": "ok",
@@ -1237,14 +1237,14 @@
         "id": "[\"ticker_depth\",\"perp\",\"1INCH-USD\"]",
         "quotes": [
           {
-            "after_ask": "0.09217",
-            "after_bid": "0.0916",
-            "ask": "0.09217",
+            "after_ask": "0.0908",
+            "after_bid": "0.0901",
+            "ask": "0.0908",
             "attempt": 1,
-            "before_ask": "0.09217",
-            "before_bid": "0.0916",
-            "bid": "0.0916",
-            "elapsed_seconds": 0.32328750399756245,
+            "before_ask": "0.0908",
+            "before_bid": "0.0901",
+            "bid": "0.0901",
+            "elapsed_seconds": 0.10061232899897732,
             "ticker_ids_match": true
           }
         ],
@@ -1262,7 +1262,7 @@
             "before_ask": "0.05824",
             "before_bid": "0.05164",
             "bid": "0.05164",
-            "elapsed_seconds": 0.5387844180222601,
+            "elapsed_seconds": 0.08922214200720191,
             "ticker_ids_match": true
           }
         ],
@@ -1273,14 +1273,14 @@
         "id": "[\"ticker_depth\",\"perp\",\"AAVE-USD\"]",
         "quotes": [
           {
-            "after_ask": "127.29",
-            "after_bid": "124.92",
-            "ask": "127.29",
+            "after_ask": "124.91",
+            "after_bid": "122.95",
+            "ask": "124.91",
             "attempt": 1,
-            "before_ask": "127.29",
-            "before_bid": "124.92",
-            "bid": "124.92",
-            "elapsed_seconds": 0.31158573701395653,
+            "before_ask": "124.91",
+            "before_bid": "122.95",
+            "bid": "122.95",
+            "elapsed_seconds": 0.3488478130020667,
             "ticker_ids_match": true
           }
         ],
@@ -1291,14 +1291,14 @@
         "id": "[\"ticker_depth\",\"perp\",\"BTC-USD\"]",
         "quotes": [
           {
-            "after_ask": "78450",
-            "after_bid": "78391",
-            "ask": "78450",
+            "after_ask": "76601",
+            "after_bid": "76542",
+            "ask": "76601",
             "attempt": 1,
-            "before_ask": "78450",
-            "before_bid": "78391",
-            "bid": "78391",
-            "elapsed_seconds": 0.315299137000693,
+            "before_ask": "76601",
+            "before_bid": "76542",
+            "bid": "76542",
+            "elapsed_seconds": 0.35038519601221196,
             "ticker_ids_match": true
           }
         ],
