@@ -38,6 +38,10 @@ sdk-dev results verify /path/to/new-run \
 3. Missing credentials, request errors, unavailable required observations, missing
    checks, stale fingerprints, and failed comparisons block verification. A declared
    unsupported method is a visible exclusion, not a successful observation.
+   Consistency reads retry only `RateLimited`, up to five times with delays of
+   1, 2, 4, 8 and 8 seconds. The existing request timeout and quote-bracket
+   duration still apply; exhausted retries fail normally. Retry logging omits
+   upstream payloads.
 4. The initial suite checks exact exchange/market identities, bulk and selected
    ticker/perpetual-stat keys, empty selections, and sampled ticker/depth quotes.
    It checks every non-delisted Catalogue spot/perpetual entry's exchange, kind and
