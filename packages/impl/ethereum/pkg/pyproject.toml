@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tribulnation-ethereum"
-version = "0.6.0"
+version = "0.6.1"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
@@ -12,7 +12,7 @@ description = "Tribulnation SDK implementation for Ethereum."
 license = "MIT"
 license-files = ["LICENSE"]
 dependencies = [
-  "tribulnation-sdk>=2.0.0",
+  "tribulnation-sdk>=2.0.2",
   "web3",
   "httpx",
   "pydantic",
