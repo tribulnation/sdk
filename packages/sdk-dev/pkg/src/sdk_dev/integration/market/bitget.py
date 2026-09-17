@@ -233,12 +233,11 @@ def is_classic(bitget: Results) -> bool:
 
 
 def test_exchanges(bitget: Results):
-  """Spot and all three futures product lines are listed."""
+  """Spot and both active futures product lines are listed."""
   assert {e['id'] for e in bitget.check('exchanges')} == {
     'spot',
     'usdt',
     'usdc',
-    'coin-classic',
   }
 
 
