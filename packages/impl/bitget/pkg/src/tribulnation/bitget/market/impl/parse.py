@@ -29,10 +29,10 @@ from typed_bitget.uta_streams.fill import FillUpdate
 
 from .util import dec
 
-PerpProduct = Literal['USDT-FUTURES', 'USDC-FUTURES', 'COIN-FUTURES']
+PerpProduct = Literal['USDT-FUTURES', 'USDC-FUTURES']
 """Native futures product lines, excluding dated contracts during discovery."""
 
-Product = Literal['SPOT', 'USDT-FUTURES', 'USDC-FUTURES', 'COIN-FUTURES']
+Product = Literal['SPOT', 'USDT-FUTURES', 'USDC-FUTURES']
 """Bitget product lines used to address public endpoints.
 
 The same strings name a Classic v2 `productType`/`instType` and a UTA v3
@@ -45,7 +45,6 @@ PERP: Literal['USDT-FUTURES'] = 'USDT-FUTURES'
 PERP_PRODUCTS: dict[str, PerpProduct] = {
   'usdt': PERP,
   'usdc': 'USDC-FUTURES',
-  'coin-classic': 'COIN-FUTURES',
 }
 """Stable SDK exchange IDs mapped to native product types."""
 
@@ -177,14 +176,12 @@ def parse_perp_rules(contract: MixContract, *, product: PerpProduct = PERP) -> R
   venue's own `sizeMultiplier`.
   """
   return Rules(
-    fee_asset=contract['baseCoin']
-    if product == 'COIN-FUTURES'
-    else contract['quoteCoin'],
+    fee_asset=contract['quoteCoin'],
     tick_size=contract['priceEndStep'] * Decimal(10) ** -contract['pricePlace'],
     step_size=contract['sizeMultiplier'],
     fixed_min_qty=contract['minTradeNum'],
     # This endpoint denominates its minimum in USDT, not the contract's quote.
-    # Do not assume USDT, USDC and USD are interchangeable units.
+    # Do not assume USDT and USDC are interchangeable units.
     min_value=contract['minTradeUSDT'] if product == PERP else None,
     max_qty=Decimal(contract['maxOrderQty']),
     rel_min_price=1 - contract['sellLimitPriceRatio'],
