@@ -85,6 +85,11 @@ class Shared(SDK):
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield self.client_resource
 
+  @property
+  def public(self) -> bool:
+    """Whether Advanced Trade was built without account credentials."""
+    return self.client.app_client.credentials is None
+
   @wrap_exceptions
   async def load_product(self, product_id: str, /, *, refetch: bool = False) -> Product:
     """Fetch a product's catalogue entry, caching it for later reads.
@@ -98,7 +103,8 @@ class Shared(SDK):
     async with self.product_lock:
       if not refetch and product_id in self.products:
         return self.products[product_id]
-      product = await self.client.app.advanced_trade.http.products.get(product_id)
+      products = self.client.app.advanced_trade.http.products
+      product = await (products.public if self.public else products).get(product_id)
       self.products[product_id] = product
       return product
 

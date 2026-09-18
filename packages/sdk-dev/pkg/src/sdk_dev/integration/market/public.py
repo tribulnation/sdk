@@ -50,14 +50,8 @@ READS = (
   'perp_stats',
 )
 TIMEOUT = 30
-AUTHENTICATED_READS: dict[str, frozenset[str]] = {
-  'coinbase': frozenset(
-    {'markets', 'rules', 'tickers', 'index', 'next_funding', 'perp_stats'}
-  ),
-}
-"""Coinbase catalogue/funding paths still use authenticated Advanced Trade products.
-Do not infer this from a caught AuthError: an unexpected rejection stays a failure.
-"""
+AUTHENTICATED_READS: dict[str, frozenset[str]] = {}
+"""Explicit exceptions for market-data paths that require account credentials."""
 
 
 def needs_account(venue: str, method: str, *, public: bool) -> bool:
