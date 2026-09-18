@@ -54,6 +54,7 @@ would raise instead.
 | Coinbase | ✅ | ✅ |
 | Kraken | ✅ | ✅ |
 | Bybit | ✅ | ✅ |
+| KuCoin | ✅ | — |
 <!-- /streams -->
 
 Per-venue caveats are on the

@@ -14,6 +14,7 @@ from .accounts import (
   Dydx,
   Hyperliquid,
   Kraken,
+  Kucoin,
   Mexc,
   load_accounts,
 )
@@ -27,6 +28,7 @@ DEFAULT_ACCOUNTS: Mapping[str, Account] = {
   'bitget': Bitget(public=True),
   'bybit': Bybit(public=True),
   'kraken': Kraken(public=True),
+  'kucoin': Kucoin(public=True),
 }
 
 
@@ -178,6 +180,14 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       validate=account.validate,
     )
 
+  def kucoin(self, account: Kucoin) -> TradingVenue:
+    """Build KuCoin's credential-free public Market surface."""
+    try:
+      from tribulnation.kucoin import KucoinMarket
+    except ImportError as e:
+      raise ImportError('Install tribulnation-kucoin to use this venue.') from e
+    return KucoinMarket.new(validate=account.validate)
+
   def _venue(self, id: str, /) -> TradingVenue:
     if (account := self.all_accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
@@ -200,6 +210,8 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
         return self.bitget(account)
       case 'kraken':
         return self.kraken(account)
+      case 'kucoin':
+        return self.kucoin(account)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 
