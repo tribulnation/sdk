@@ -2,8 +2,8 @@
 
 Three public catalogues back this surface: `finance.fixed_saving` for fixed-term
 savings, and `finance.easy_onchain` for open-ended savings and liquid staking, the
-latter two discriminated by `category` off one endpoint. All three carry APR,
-min/max stake and a product id, which is what `Instrument` needs.
+latter two discriminated by `category` off one endpoint. Native product IDs are
+reused across families and terms, so the optional `Instrument.id` stays unset.
 """
 
 from typing_extensions import Collection, Literal, Sequence
@@ -80,7 +80,6 @@ def parse_fixed_saving(product: FixedSavingProduct) -> Instrument:
     min_qty=product['minStakeAmount'],
     max_qty=max_qty if max_qty != NO_CAP else None,
     duration=parse_duration(product['duration']),
-    id=product['productId'],
   )
 
 
@@ -104,7 +103,6 @@ def parse_easy_onchain(
     min_qty=product['minStakeAmount'],
     max_qty=product['maxStakeAmount'],
     duration=timedelta(days=term) if term else None,
-    id=product['productId'],
   )
 
 
