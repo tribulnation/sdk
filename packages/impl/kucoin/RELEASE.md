@@ -8,7 +8,7 @@ Inverse and dated contracts, account fees and private Market methods remain
 unsupported. See dev-docs/kucoin-public-market.md for bounds, units and sparse history.
 
 Exact-version surfaces and consistency evidence was captured on 2026-09-18
-against Catalogue PR #137. The KuCoin release gate passes against that candidate.
-Merge that Catalogue data and publish SDK 2.1.0 before merging this release PR.
+against merged Catalogue main (including PR #137). The KuCoin release gate passes
+against that data. Publish SDK 2.1.0 before merging this release PR.
 Reverify evidence against the final merged inputs; evidence expires after seven days.
 Terminal rollout requires its own lock, replay and deployment review.
