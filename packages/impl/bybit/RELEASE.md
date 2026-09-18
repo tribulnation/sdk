@@ -10,3 +10,7 @@ Consumers that persisted the previous IDs should reconcile their existing keys
 when upgrading to avoid retaining stale rows.
 
 Requires tribulnation-sdk >=2.0.2. See SDK issue #67.
+
+Release qualification was refreshed after the Coinbase 0.2.2 merge changed the
+shared SDK development test inputs. Both Bybit read-only suites and market
+consistency must match the final merged candidate before publication.
