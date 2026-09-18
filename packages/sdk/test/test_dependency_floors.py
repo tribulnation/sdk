@@ -18,7 +18,7 @@ SDK_2_IMPLEMENTATIONS = {
   'ethereum': '0.6.0',
   'hyperliquid': '0.7.0',
   'kraken': '0.2.0',
-  'kucoin': '0.2.0',
+  'kucoin': '0.3.0',
   'mexc': '2.0.0',
 }
 
