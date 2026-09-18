@@ -290,7 +290,7 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "aa64b71ec62068f07efcdfa2cd8f12fbcf39f70eabd4cd06adab42dc66d1b414",
+    "source_sha256": "91f44d01d14b728641bd408f2b475e4807df6413915092c38fc1074513647836",
     "venue": "kucoin"
   },
   "before": {
@@ -584,12 +584,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "aa64b71ec62068f07efcdfa2cd8f12fbcf39f70eabd4cd06adab42dc66d1b414",
+    "source_sha256": "91f44d01d14b728641bd408f2b475e4807df6413915092c38fc1074513647836",
     "venue": "kucoin"
   },
-  "finished": "2026-09-18T18:08:11.421723Z",
-  "results_sha256": "fa8068f746525662b3e783079699c2b8e9fd1fdf0ad0b566b18ed5074e7a865c",
+  "finished": "2026-09-18T18:14:30.969202Z",
+  "results_sha256": "e84cfb0e36ae89ae69e93953cc083915180089a96371195a4d0e2aa347714291",
   "schema_version": 1,
-  "started": "2026-09-18T18:07:58.949456Z",
-  "summary_sha256": "d9ef018d3bf63d4289f3a9defc980dadd00b5066ed0adb9b911829bd8ab1959b"
+  "started": "2026-09-18T18:14:17.710668Z",
+  "summary_sha256": "5953530e33b542b440c49bd00ef6f032a79c645e7fb51c950feea1eebc296a9a"
 }

@@ -91,12 +91,12 @@ passed all 19 selected cells. Type checks, lint and generated documentation chec
 also passed. The rebased full offline suite passed 867 tests. Strict Catalogue consistency
 passes against Catalogue PR #137; publication still requires current release evidence.
 
-The source checkout still carries `tribulnation-kucoin 0.2.1` and core SDK `2.0.2`
-metadata; those released version numbers must not be advertised as containing this
-expansion. Proposed handoff versions are KuCoin `0.3.0` and SDK `2.1.0`, subject to the
-normal release work. The core release must include the MarketSDK registration; KuCoin
-should then declare that released SDK floor. Qualification here uses typed-kucoin
-`0.3.0`; no typed-client release is required by the tested mappings.
+This release candidate carries `tribulnation-kucoin 0.3.0` and core SDK `2.1.0`
+metadata. Neither is claimed published by this document. The core release includes
+MarketSDK registration; KuCoin declares SDK >=2.1.0, and the SDK extra requires
+KuCoin >=0.3.0. Publish core first, then the implementation, before handing the pair
+to Terminal. Qualification uses typed-kucoin `0.3.0`; no typed-client release is
+required by the tested mappings.
 
 Before publication, record matching passing `surfaces` and `consistency` evidence for
 the final release versions and dependencies. Existing release evidence predates this
