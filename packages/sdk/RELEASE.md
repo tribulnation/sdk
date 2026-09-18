@@ -1,11 +1,13 @@
-# tribulnation-sdk 2.0.2
+# tribulnation-sdk 2.1.0 release candidate
 
-Add `ManagedResource` so venue implementations can apply independent exception
-translation and retry policies to resource entry and cleanup.
+Register KuCoin's credential-free public Market in MarketSDK. The KuCoin extra
+now requires tribulnation-kucoin >=0.3.0, which adds Classic spot and linear
+perpetual data with native exchange IDs `spot` and `perp`.
 
-SDK context-manager entry and exit no longer apply method middleware to the whole
-lifecycle. Decorated calls made during acquisition and cleanup still receive the
-active context's retries and logging. Ownership, rollback, reverse cleanup, and
-suppression behavior are preserved.
+Publish core first, then KuCoin 0.3.0. The extra becomes installable once the
+implementation is published; consumers should adopt the pair together.
+Private Wallet/Earn/Report behavior is unchanged by this core registration.
 
-Publish this SDK patch before the implementation patches that require it.
+Publication requires fresh all-venue read-suite and applicable Market consistency
+evidence against the merged Catalogue. Terminal rollout is handled separately
+by the owner; this release does not enable Terminal collection or deployment.
