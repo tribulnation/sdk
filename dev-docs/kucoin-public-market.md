@@ -21,9 +21,9 @@ spot-side Wallet/Earn/Report package and Terminal's collection/serving rollout.
 | Private Market methods | Unsupported | Explicit `NotImplementedError`; private reporting stays on Report |
 
 Exchange IDs are `spot` and `perp`. Spot matches existing Catalogue metadata.
-All 183 existing KuCoin perpetual Catalogue entries omit `exchange`; neither an empty
-SDK exchange ID nor `perp` can satisfy exact consistency against a missing value.
-Catalogue must explicitly record `exchange: perp` for the supported perpetual family.
+Catalogue PR [#137](https://github.com/tribulnation/catalogue/pull/137) adds the missing
+`exchange: perp` to all 183 existing KuCoin perpetual entries. Strict consistency
+passes against that candidate; release qualification must use the merged Catalogue.
 Full reference IDs are `kucoin:spot:BTC-USDT` and `kucoin:perp:XBTUSDTM`.
 Unknown exchange IDs and inverse/dated/otherwise unsupported contract IDs are rejected.
 Native asset and symbol spellings are preserved; canonical translation belongs to Catalogue.
@@ -88,8 +88,8 @@ perpetual reference cases, including cross-page candles. All 33 required read ch
 passed (24 public Market checks and nine Wallet/Earn/Report snapshot checks), with
 four perpetual-only methods excluded on the spot reference. Public PoC execution
 passed all 19 selected cells. Type checks, lint and generated documentation checks
-also passed. The full offline suite passed 865 tests. Strict Catalogue consistency
-remains blocked as described below.
+also passed. The rebased full offline suite passed 867 tests. Strict Catalogue consistency
+passes against Catalogue PR #137; publication still requires current release evidence.
 
 The source checkout still carries `tribulnation-kucoin 0.2.1` and core SDK `2.0.2`
 metadata; those released version numbers must not be advertised as containing this
@@ -109,22 +109,20 @@ its separately approved rollout. Catalogue coverage gaps remain explicit: new ve
 symbols do not automatically acquire canonical asset mappings, and omitted inactive
 or excluded contracts are not evidence of zero activity.
 
-## Remaining Catalogue work
+## Catalogue handoff
 
-The strict consistency run passes SDK exchange/market identity, ticker/stat selection
-and all eight sampled ticker/depth comparisons. It fails identity and coverage for
-183 existing perpetual Catalogue entries because their `exchange` metadata is missing.
-This is not waived or relabeled as a pass. Nine existing spot entries are absent from
-active SDK discovery and remain `coverage_deferred` under the existing policy.
+Catalogue [PR #137](https://github.com/tribulnation/catalogue/pull/137) fixes all 183
+missing perpetual exchange identities. Strict KuCoin consistency passes its coverage
+policy against that candidate, including exchange/market identities, ticker/stat
+selection and sampled ticker/depth comparisons. Nineteen existing entries remain
+outside supported discovery: five active inverse/dated contracts and fourteen absent
+from current public listings. Absence alone is not treated as delisting.
 
-The PoC additionally found 689 active spot IDs and 505 supported perpetual IDs with no
-Catalogue entry at the time of the run. Those additions need canonical asset mapping
-in the Catalogue repository. Missing translations do not change native SDK IDs.
-Inverse contracts in the existing Catalogue must remain explicitly outside this
-implementation's supported universe; adding exchange metadata does not qualify them.
+The PoC additionally found 689 active spot IDs and 505 supported perpetual IDs without
+Catalogue entries. BTC/ETH reference markets are already mapped. New symbol mappings
+remain a separate coverage task; consistency does not establish exhaustive coverage.
 
-Explicit matching exchange metadata and fresh successful qualification are required
-before a release can claim consistency. New symbol translations are a separate
-Catalogue coverage task; the consistency gate does not prove complete canonical
-coverage of the entire discovered universe. The failure is recorded in the local consistency report;
-no exception to the release gate or publication is part of this work.
+Merge Catalogue first, then capture final-version release evidence against the merged
+data. Core SDK publication requires every supported venue's read reports and applicable
+Market consistency reports; the existing reports do not match this changed candidate.
+Do not waive that gate or infer publication readiness from KuCoin-only qualification.
