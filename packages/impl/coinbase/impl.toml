@@ -1,9 +1,9 @@
 # auth = false means this surface has a real credential-free DEFAULT_ACCOUNTS entry —
-# auth = true means every call always needs a real accounts.Coinbase() entry.
+# auth = true means the router requires an explicit accounts.Coinbase() entry.
 #
-# Every surface here is auth = true: `accounts.Coinbase` carries a CDP key, and none of the
-# routers has a credential-free default for it (`EarnSDK`, `ReportSDK` and `MarketSDK` all
-# build from the account).
+# Every surface here requires an explicit account entry; none of the routers has a
+# Coinbase default. Market data also accepts accounts.Coinbase(public=True); account
+# reads and trading require a CDP key.
 #
 # One client fronts two Coinbase products, and which one a method reads is a real
 # distinction, not an implementation detail: `app` is the retail Coinbase App tier
@@ -42,7 +42,7 @@ methods = [
   "perp_collateral",
   "candles",
 ]
-note = "Spot serves market data and trading. Account fees() is unsupported on spot until product-specific stablepair pricing is resolved; INTX fees reject cost-plus commissions and exclusive or unspecified GST instead of returning incomplete rates. Public rules().fees remains None. INTX perpetuals serve market data, orders, funding state and public funding-rate history. History resolves the Advanced Trade -INTX product ID to an International Exchange instrument and pages its credential-free endpoint with inclusive optional bounds. Offset pages are not an atomic snapshot; duplicate settlements are removed. funding_payments remains unsupported; perp_position/perp_collateral need an INTX-scoped key. Candles use required [start, end) bounds, page 299 opens per window and carry no quote_volume."
+note = "Coinbase is not a default account. Authenticated access is recommended, especially for bulk tickers; public=True is an explicit credential-free fallback, never an automatic fallback on authentication errors. Explicit public=True accounts support spot and INTX discovery, rules, tickers, index and funding state without credentials. Public catalogue reads reject incomplete or duplicate responses. Public tickers fetch one book per selected product; authenticated tickers retain batched quotes. Spot serves market data and trading. Account fees() is unsupported on spot until product-specific stablepair pricing is resolved; INTX fees reject cost-plus commissions and exclusive or unspecified GST instead of returning incomplete rates. Public rules().fees remains None. INTX perpetuals serve market data, orders, funding state and public funding-rate history. History resolves the Advanced Trade -INTX product ID to an International Exchange instrument and pages its credential-free endpoint with inclusive optional bounds. Offset pages are not an atomic snapshot; duplicate settlements are removed. funding_payments remains unsupported; perp_position/perp_collateral need an INTX-scoped key. Candles use required [start, end) bounds, page 299 opens per window and carry no quote_volume."
 # Two exchanges: `spot` (Advanced Trade SPOT products) and `intx` (perpetual swaps).
 # `trades_stream` is best-effort on both: the `user` channel carries order-level
 # cumulative quantities rather than itemized fills, so it loses per-fill maker/taker and

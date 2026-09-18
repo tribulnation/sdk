@@ -279,6 +279,8 @@ methods:
 
   tickers:
     group: Bulk market data
+    venues:
+      coinbase: "Authenticated access is recommended: quotes are batched in groups of up to 100 products. Explicit public=True accounts without resolved credentials use one public book request per selected product. Available credentials are still preferred. Coinbase is not a default account; select markets to limit public request volume. Authentication errors never trigger an automatic fallback."
     example:
       accountVenues: [mexc]
       # Exchange-level id (no market segment) — this method is defined on Exchange, not a
@@ -331,7 +333,7 @@ methods:
       binance: USD-M perpetuals; bulk price/funding plus per-market open-interest reads. Component observations are not atomic.
       bitget: USDT, USDC and Classic coin-margined perpetuals. UTA coin is unsupported.
       bybit: Linear perpetuals only.
-      coinbase: INTX perpetuals, not domestic dated futures; authenticated product catalogue reads.
+      coinbase: INTX perpetuals, not domestic dated futures; explicit public=True accounts use the public product catalogue.
       mexc: Public perpetual metadata; account-specific futures permissions are not needed for this method.
     example:
       accountVenues: [dydx]

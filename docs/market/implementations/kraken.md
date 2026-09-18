@@ -87,6 +87,6 @@ async with sdk.depth_stream('kraken:spot:XBTUSD', levels=10) as books:
 
 ---
 
-← [Bitget Market](bitget.md) · **Next:** [Earn](../../earn/index.md) →
+← [Bitget Market](bitget.md) · **Next:** [Coinbase Market](coinbase.md) →
 
 <!-- /next -->

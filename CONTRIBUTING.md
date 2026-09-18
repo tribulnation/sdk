@@ -73,8 +73,8 @@ to record every required read-only suite below, even for market implementations.
 2. These suites do not place/cancel orders, transfer funds, or subscribe/redeem Earn
    positions. Market checks cover reference-market discovery, books and public streams,
    rules, tickers, funding data, and candles. Rules do not fetch personal fee tiers;
-   Coinbase's authenticated catalogue paths still skip on public-only accounts.
-   Configure a private account to verify those reads. Account-specific Bitget checks remain
+   Coinbase catalogue reads also run on explicitly configured public-only accounts.
+   Account-specific Bitget checks remain
    read-only. Earn enumerates instruments; Wallet enumerates methods; Report reads a
    snapshot. Report history is outside SDK live qualification: application-level
    ingestion and auditing own its correctness checks ([ADR 0016](dev-docs/adr/0016-report-snapshot-release-scope.md)).

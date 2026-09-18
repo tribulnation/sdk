@@ -54,7 +54,7 @@ async def test_both_exchanges_enrich_only_selected_products(
   )
   request = AsyncMock(return_value={'pricebooks': [book(identifier)]})
   monkeypatch.setattr(BestBidAsk, 'best_bid_ask', request)
-  async with CoinbaseMarket.new(public=True) as sdk:
+  async with CoinbaseMarket.new(key_name='test', private_key='test') as sdk:
     exchange = await sdk.exchange(exchange_id)
     result = await exchange.tickers([identifier])
   assert list(result) == [identifier]
@@ -75,7 +75,7 @@ async def test_bounded_batches_and_response_order(monkeypatch: pytest.MonkeyPatc
     ]
   )
   monkeypatch.setattr(BestBidAsk, 'best_bid_ask', request)
-  async with CoinbaseMarket.new(public=True) as sdk:
+  async with CoinbaseMarket.new(key_name='test', private_key='test') as sdk:
     result = await tickers(sdk, [product(identifier) for identifier in ids])
   assert list(result) == ids
   assert all(ticker.bid == Decimal('99') for ticker in result.values())
@@ -90,7 +90,7 @@ async def test_missing_books_and_empty_sides_remain_unknown(
   partial['asks'] = []
   request = AsyncMock(return_value={'pricebooks': [partial]})
   monkeypatch.setattr(BestBidAsk, 'best_bid_ask', request)
-  async with CoinbaseMarket.new(public=True) as sdk:
+  async with CoinbaseMarket.new(key_name='test', private_key='test') as sdk:
     result = await tickers(sdk, [product('ONE'), product('MISSING')])
   assert result['ONE'].bid == Decimal('99')
   assert result['ONE'].ask is None and result['ONE'].ask_qty is None
@@ -102,7 +102,7 @@ async def test_empty_selection_does_not_fetch_quotes(monkeypatch: pytest.MonkeyP
   """An explicitly empty product set never becomes an unfiltered quote sweep."""
   request = AsyncMock()
   monkeypatch.setattr(BestBidAsk, 'best_bid_ask', request)
-  async with CoinbaseMarket.new(public=True) as sdk:
+  async with CoinbaseMarket.new(key_name='test', private_key='test') as sdk:
     assert await tickers(sdk, []) == {}
   request.assert_not_awaited()
 
@@ -115,7 +115,7 @@ async def test_wrong_or_duplicate_id_is_rejected(
   monkeypatch.setattr(
     BestBidAsk, 'best_bid_ask', AsyncMock(return_value={'pricebooks': books})
   )
-  async with CoinbaseMarket.new(public=True) as sdk:
+  async with CoinbaseMarket.new(key_name='test', private_key='test') as sdk:
     with pytest.raises(ApiError):
       await tickers(sdk, [product('ONE')])
 
@@ -133,7 +133,7 @@ async def test_quote_request_retries_without_replaying_prior_batch(
     ]
   )
   monkeypatch.setattr(BestBidAsk, 'best_bid_ask', request)
-  async with CoinbaseMarket.new(public=True) as sdk:
+  async with CoinbaseMarket.new(key_name='test', private_key='test') as sdk:
     with Context().retried(RateLimited, max_retries=1, base_delay=0).use():
       assert len(
         await tickers(sdk, [product(identifier) for identifier in ids])
@@ -150,6 +150,6 @@ async def test_quote_failure_is_not_hidden(monkeypatch: pytest.MonkeyPatch):
   monkeypatch.setattr(
     BestBidAsk, 'best_bid_ask', AsyncMock(side_effect=core.ApiError(503, 'unavailable'))
   )
-  async with CoinbaseMarket.new(public=True) as sdk:
+  async with CoinbaseMarket.new(key_name='test', private_key='test') as sdk:
     with pytest.raises(ApiError):
       await tickers(sdk, [product('ONE')])

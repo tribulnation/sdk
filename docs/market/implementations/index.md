@@ -20,6 +20,7 @@ Per-method differences are on the [Methods](../methods.md) page, under each meth
 - [Hyperliquid](hyperliquid.md) — spot and perpetuals, several exchanges under one venue
 - [MEXC](mexc.md) — spot only
 - [Bitget](bitget.md) — spot and USDT-, USDC- and coin-margined perpetual data; account reads on spot and USDT only
+- [Coinbase](coinbase.md) — spot and INTX perpetuals; authenticated access recommended, explicit public fallback
 - [Kraken](kraken.md) — spot only, read only; altname market ids
 
 <!-- next -->

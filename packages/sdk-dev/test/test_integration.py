@@ -220,7 +220,7 @@ def test_account_dependent_market_reads_are_explicit():
   assert not public.needs_account('bybit', 'rules', public=False)
   assert not public.needs_account('bybit', 'depth', public=True)
   assert not public.needs_account('kraken', 'rules', public=True)
-  assert public.needs_account('coinbase', 'perp_stats', public=True)
+  assert not public.needs_account('coinbase', 'perp_stats', public=True)
 
 
 def test_perp_stats_conformance_accepts_unknown_optional_fields():

@@ -40,6 +40,6 @@ for account, sdk in earn.all.items():
 
 ---
 
-← [Kraken Market](../market/implementations/kraken.md) · **Next:** [Methods](methods.md) →
+← [Coinbase Market](../market/implementations/coinbase.md) · **Next:** [Methods](methods.md) →
 
 <!-- /next -->
