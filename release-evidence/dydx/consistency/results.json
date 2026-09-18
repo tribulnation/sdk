@@ -1237,14 +1237,14 @@
         "id": "[\"ticker_depth\",\"perp\",\"1INCH-USD\"]",
         "quotes": [
           {
-            "after_ask": "0.09063",
-            "after_bid": "0.09",
-            "ask": "0.09063",
+            "after_ask": "0.09676",
+            "after_bid": "0.09619",
+            "ask": "0.09676",
             "attempt": 1,
-            "before_ask": "0.09063",
-            "before_bid": "0.09",
-            "bid": "0.09",
-            "elapsed_seconds": 0.3092527449771296,
+            "before_ask": "0.09676",
+            "before_bid": "0.09619",
+            "bid": "0.09619",
+            "elapsed_seconds": 0.052420900989091024,
             "ticker_ids_match": true
           }
         ],
@@ -1262,7 +1262,7 @@
             "before_ask": "0.05824",
             "before_bid": "0.05164",
             "bid": "0.05164",
-            "elapsed_seconds": 0.30200135000632145,
+            "elapsed_seconds": 0.29202212899690494,
             "ticker_ids_match": true
           }
         ],
@@ -1273,14 +1273,25 @@
         "id": "[\"ticker_depth\",\"perp\",\"AAVE-USD\"]",
         "quotes": [
           {
-            "after_ask": "124.92",
-            "after_bid": "123.06",
-            "ask": "124.92",
+            "after_ask": "140.29",
+            "after_bid": "136.43",
+            "ask": "140.56",
             "attempt": 1,
-            "before_ask": "124.92",
-            "before_bid": "123.06",
-            "bid": "123.06",
-            "elapsed_seconds": 0.05521308499737643,
+            "before_ask": "140.56",
+            "before_bid": "136.41",
+            "bid": "136.41",
+            "elapsed_seconds": 15.335769244993571,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": "140.29",
+            "after_bid": "136.43",
+            "ask": "140.29",
+            "attempt": 2,
+            "before_ask": "140.29",
+            "before_bid": "136.43",
+            "bid": "136.43",
+            "elapsed_seconds": 0.30634789599571377,
             "ticker_ids_match": true
           }
         ],
@@ -1291,14 +1302,14 @@
         "id": "[\"ticker_depth\",\"perp\",\"BTC-USD\"]",
         "quotes": [
           {
-            "after_ask": "76456",
-            "after_bid": "76413",
-            "ask": "76456",
+            "after_ask": "80851",
+            "after_bid": "80837",
+            "ask": "80851",
             "attempt": 1,
-            "before_ask": "76456",
-            "before_bid": "76413",
-            "bid": "76413",
-            "elapsed_seconds": 0.32036505098221824,
+            "before_ask": "80851",
+            "before_bid": "80837",
+            "bid": "80837",
+            "elapsed_seconds": 0.777553652995266,
             "ticker_ids_match": true
           }
         ],
