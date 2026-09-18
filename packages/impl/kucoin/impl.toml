@@ -16,11 +16,12 @@ methods = ["instruments"]
 note = "Savings, promotions, staking, KCS staking and ETH staking. Structured dual investment is excluded because conditional principal conversion cannot be represented by the plain APR contract."
 
 [support.market]
-support = "none"
-auth = true
-note = "Market implementation is not yet packaged; the prototype is not a supported SDK surface."
+support = "partial"
+auth = false
+methods = ["depth", "depth_stream", "rules", "tickers", "candles", "index", "next_funding", "perp_stats", "funding_rates"]
+note = "Credential-free Classic spot and linear perpetual public data. Exchange IDs are spot and perp respectively. Inverse and dated contracts are excluded. REST depth supports 1-100 levels (default 20); streams support 1-5 (default 5). All six SDK candle intervals use aware half-open bounds, native sparse rows and time windows of 1500 spot/200 futures candles. Historical availability varies by product and interval; no archive completeness guarantee. Futures quantities are converted from lots to base units. Rules do not read account fees; standard fees are unknown. Perp stats expose index, mark and open interest; next_funding provides the current cycle rate, settlement time and interval. Funding history uses inclusive bounds and an open start walks earliest available data. Private Market methods and trading are unsupported."
 
 [ids]
 asset = "symbol"
-market = "Spot symbols such as BTC-USDT."
+market = "Native spot symbols such as BTC-USDT under exchange spot; linear perpetual symbols such as XBTUSDTM under exchange perp."
 note = "Native currency ids and chainId network ids. Snapshot compartments are Classic main/trade and Earn."

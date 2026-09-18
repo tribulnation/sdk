@@ -60,6 +60,7 @@ methods:
     example:
       accountVenues: [mexc]
       constants:
+        kucoin: {market_id: 'kucoin:spot:BTC-USDT', bid: '60123.00', ask: '60124.10'}
         mexc: {market_id: 'mexc:spot:BTCUSDT', bid: '60123.00', ask: '60124.10'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', bid: '60095.20', ask: '60096.50'}
         binance: {market_id: 'binance:spot:BTCUSDT', bid: '60123.00', ask: '60124.10'}
@@ -98,6 +99,7 @@ methods:
     example:
       accountVenues: [mexc]
       constants:
+        kucoin: {market_id: 'kucoin:spot:BTC-USDT', ticks: [{bid: '60123.40', ask: '60124.00'}, {bid: '60123.50', ask: '60124.00'}]}
         mexc:
           market_id: 'mexc:spot:BTCUSDT'
           ticks:
@@ -153,6 +155,7 @@ methods:
     example:
       accountVenues: [mexc]
       constants:
+        kucoin: {market_id: 'kucoin:spot:BTC-USDT', instrument_id: 'BTC-USDT', fee_asset: 'USDT', tick_size: '0.10', step_size: '0.000001', kind: 'spot'}
         mexc:
           market_id: 'mexc:spot:BTCUSDT'
           instrument_id: BTCUSDT
@@ -232,6 +235,7 @@ methods:
   candles:
     group: Public market data
     venues:
+      kucoin: "Classic spot and linear perpetuals; 1500/200-row time windows, all six SDK intervals, aware half-open bounds. Sparse rows remain absent; historical availability varies by product and interval."
       binance: Spot and USD-M, every contract interval, 1000 per page with `[start, end)` filtering.
       bit2me: Bounded windows continue through empty slots; no synthetic candles. Native order, JSON-number prices converted to decimals.
       hyperliquid: Spot and perpetuals in native order. Only the latest 5000 candles per interval are retained by the venue; quote volume is not reported.
@@ -244,6 +248,7 @@ methods:
     example:
       accountVenues: [mexc]
       constants:
+        kucoin: {market_id: 'kucoin:spot:BTC-USDT', open1: '60123.40', close1: '60150.00', open2: '60150.00', close2: '60098.20'}
         mexc: {market_id: 'mexc:spot:BTCUSDT', open1: '60123.40', close1: '60150.00', open2: '60150.00', close2: '60098.20'}
         binance: {market_id: 'binance:spot:BTCUSDT', open1: '60124.10', close1: '60151.30', open2: '60151.30', close2: '60099.00'}
         bybit: {market_id: 'bybit:spot:BTCUSDT', open1: '60122.80', close1: '60149.50', open2: '60149.50', close2: '60097.60'}
@@ -280,12 +285,14 @@ methods:
   tickers:
     group: Bulk market data
     venues:
+      kucoin: "Credential-free spot and linear perpetual tickers; quantities use base units."
       coinbase: "Authenticated access is recommended: quotes are batched in groups of up to 100 products. Explicit public=True accounts without resolved credentials use one public book request per selected product. Available credentials are still preferred. Coinbase is not a default account; select markets to limit public request volume. Authentication errors never trigger an automatic fallback."
     example:
       accountVenues: [mexc]
       # Exchange-level id (no market segment) — this method is defined on Exchange, not a
       # single Market, per docs/market/index.md's grammar table.
       constants:
+        kucoin: {exchange_id: 'kucoin:spot', markets: [{key: 'BTC-USDT', last: '60123.40', bid: '60123.00', ask: '60124.10'}]}
         mexc:
           exchange_id: 'mexc:spot'
           markets:
@@ -328,6 +335,7 @@ methods:
   perp_stats:
     group: Bulk market data
     venues:
+      kucoin: "Linear perpetual index, mark and base-unit open interest; funding fields are unset. Use next_funding for the dedicated public funding snapshot."
       dydx: Fetched for the whole universe in one request.
       hyperliquid: Fetched for the whole universe in one request.
       binance: USD-M perpetuals; bulk price/funding plus per-market open-interest reads. Component observations are not atomic.
@@ -341,6 +349,7 @@ methods:
       # default perp DEX has an empty exchange_id (docs/market/index.md:54), so its
       # exchange-level id is a bare trailing colon: 'hyperliquid:'.
       constants:
+        kucoin: {exchange_id: 'kucoin:perp', key: 'XBTUSDTM', index: '60120.00', mark: '60125.50', funding: null, open_interest: '812.4'}
         dydx:
           exchange_id: 'dydx:perp'
           key: BTC-USD
@@ -364,7 +373,7 @@ methods:
         stats = await sdk.perp_stats('{{ constants[accounts[0]].exchange_id }}')
       resultTemplate: |
         {'{{ constants[accounts[0]].key }}': PerpStats(index=Decimal('{{ constants[accounts[0]].index }}'), mark=Decimal('{{ constants[accounts[0]].mark }}'),
-                               funding=Decimal('{{ constants[accounts[0]].funding }}'), open_interest=Decimal('{{ constants[accounts[0]].open_interest }}'))}
+                               funding={% if constants[accounts[0]].funding is none %}None{% else %}Decimal('{{ constants[accounts[0]].funding }}'){% endif %}, open_interest=Decimal('{{ constants[accounts[0]].open_interest }}'))}
     catalogue:
       callTemplate: |
         # pip install tribulnation-catalogue
@@ -833,6 +842,7 @@ methods:
     example:
       accountVenues: [dydx]
       constants:
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM', index: '60120.00'}
         dydx: {market_id: 'dydx:perp:BTC-USD', index: '60120.00'}
         hyperliquid: {market_id: 'hyperliquid::BTC', index: '60110.50'}
         bybit: {market_id: 'bybit:perp:BTCUSDT', index: '60120.00'}
@@ -866,6 +876,7 @@ methods:
     example:
       accountVenues: [dydx]
       constants:
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM', rate: '0.0001', annualized: '0.1095'}
         dydx: {market_id: 'dydx:perp:BTC-USD', rate: '0.0001', annualized: '0.876'}
         hyperliquid: {market_id: 'hyperliquid::BTC', rate: '0.00012', annualized: '1.0512'}
         coinbase: {market_id: 'coinbase:intx:BTC-PERP-INTX', rate: '0.0001', annualized: '0.876'}
@@ -900,6 +911,7 @@ methods:
     example:
       accountVenues: [dydx]
       constants:
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM', rate1: '0.0001', rate2: '0.00012'}
         dydx: {market_id: 'dydx:perp:BTC-USD', rate1: '0.0001', rate2: '0.00012'}
         hyperliquid: {market_id: 'hyperliquid::BTC', rate1: '0.00012', rate2: '0.00011'}
         bybit: {market_id: 'bybit:perp:BTCUSDT', rate1: '0.0001', rate2: '0.00012'}

@@ -62,6 +62,10 @@ CASES: Mapping[str, Sequence[CandleCase]] = {
     CandleCase(market_id='spot:BTCUSDT', page=500),
     CandleCase(market_id='perp:BTC_USDT', page=2000),
   ],
+  'kucoin': [
+    CandleCase(market_id='spot:BTC-USDT', page=1500),
+    CandleCase(market_id='perp:XBTUSDTM', page=200),
+  ],
   # Kraken retains 720 rows and cannot page into older history.
   'kraken': [CandleCase(market_id='spot:XBTUSD', page=None)],
 }

@@ -10,6 +10,9 @@ for repository setup, development commands and implementation guidance.
 3. [Release workflow](../CONTRIBUTING.md#releasing) and
    [recorded evidence](../release-evidence/README.md).
 
+4. [KuCoin public Market qualification](kucoin-public-market.md): endpoint mappings,
+   observed history limits and the capability/version handoff for SDK #33.
+
 ## Documentation boundaries
 
 1. [User documentation](../docs/index.md) explains installation, configuration,

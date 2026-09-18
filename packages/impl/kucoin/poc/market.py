@@ -1,3 +1,9 @@
+# %% [markdown]
+# # Legacy KuCoin market prototype
+#
+# Historical private/trading exploration, not package support or current qualification.
+# Use `market/public.py` for the credential-free public Market mappings and coverage.
+
 # %%
 import asyncio
 from decimal import Decimal
@@ -84,12 +90,9 @@ books
 
 
 # %%
+# not executed: legacy mapping superseded by market/public.py
 async def rules(symbol: str, *, refetch: bool = False) -> Rules:
-  sym, fees = await asyncio.gather(
-    client.spot.symbol(symbol),
-    client.account.trade_fee.actual_fee(symbols=symbol),
-  )
-  fee = fees[0]
+  sym = await client.spot.symbol(symbol)
   return Rules(
     fee_asset=sym['feeCurrency'],
     tick_size=Decimal(sym['priceIncrement']),
@@ -97,8 +100,7 @@ async def rules(symbol: str, *, refetch: bool = False) -> Rules:
     fixed_min_qty=Decimal(sym['baseMinSize']),
     min_value=Decimal(sym['quoteMinSize']) if sym.get('quoteMinSize') else None,
     max_qty=Decimal(sym['baseMaxSize']) if sym.get('baseMaxSize') else None,
-    maker_fee=Decimal(fee['makerFeeRate']),
-    taker_fee=Decimal(fee['takerFeeRate']),
+    fees=None,  # Combined public fees are not qualified by this legacy prototype.
     api=sym['enableTrading'],
     details=sym,
   )
@@ -321,6 +323,7 @@ books
 
 
 # %%
+# not executed: legacy mapping superseded by market/public.py
 async def rules(symbol: str, *, refetch: bool = False) -> Rules:
   sym = await client.futures.symbol(symbol)
   return Rules(
@@ -329,8 +332,7 @@ async def rules(symbol: str, *, refetch: bool = False) -> Rules:
     step_size=Decimal(sym['lotSize']),
     fixed_min_qty=Decimal(sym['lotSize']),
     max_qty=Decimal(sym['maxOrderQty']),
-    maker_fee=Decimal(str(sym['makerFeeRate'])),
-    taker_fee=Decimal(str(sym['takerFeeRate'])),
+    fees=None,  # Combined public fees are not qualified by this legacy prototype.
     api=sym['status'] == 'Open',
     details=sym,
   )
