@@ -1,5 +1,5 @@
-# Local SDK evidence: kraken
+# Local SDK evidence: kucoin
 
-Run completed: 2026-09-18T18:23:46.745931+00:00
+Run completed: 2026-09-18T18:24:14.795866+00:00
 
 This records a trusted local run, not cryptographic proof. Release policy must separately validate required check coverage and statuses.
