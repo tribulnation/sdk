@@ -62,6 +62,10 @@ CASES: Mapping[str, Sequence[CandleCase]] = {
     CandleCase(market_id='spot:BTCUSDT', page=500),
     CandleCase(market_id='perp:BTC_USDT', page=2000),
   ],
+  'deribit': [
+    CandleCase(market_id='spot:BTC_USDT', page=1000),
+    CandleCase(market_id='perp:BTC_USDC-PERPETUAL', page=1000),
+  ],
   'kucoin': [
     CandleCase(market_id='spot:BTC-USDT', page=1500),
     CandleCase(market_id='perp:XBTUSDTM', page=200),

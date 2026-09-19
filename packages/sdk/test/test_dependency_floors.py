@@ -13,7 +13,7 @@ SDK_2_IMPLEMENTATIONS = {
   'bitget': '0.7.0',
   'bybit': '0.2.0',
   'coinbase': '0.2.0',
-  'deribit': '0.2.0',
+  'deribit': '0.3.0',
   'dydx': '0.7.0',
   'ethereum': '0.6.0',
   'hyperliquid': '0.7.0',

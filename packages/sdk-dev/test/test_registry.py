@@ -22,7 +22,7 @@ def test_registry_links_match_released_implementation_packages():
     assert entry['pypi'] == f'https://pypi.org/project/{package}/'
 
 
-def test_kucoin_public_expansion_and_deribit_deferred_market_support():
+def test_kucoin_and_deribit_public_expansion_preserves_private_surface_scope():
   """Published venue visibility remains separate from per-surface support."""
   registry = load_registry(str(ROOT / 'registry.toml'))
   for venue in ('kucoin', 'deribit'):
@@ -30,12 +30,13 @@ def test_kucoin_public_expansion_and_deribit_deferred_market_support():
     assert registry[venue]['icon']
     with (ROOT / f'packages/impl/{venue}/impl.toml').open('rb') as source:
       support = tomllib.load(source)['support']
-    if venue == 'kucoin':
-      assert support['market']['support'] == 'partial'
-      assert support['market']['auth'] is False
-      assert 'candles' in support['market']['methods']
-      assert 'place_order' not in support['market']['methods']
-    else:
-      assert support['market']['support'] == 'none'
+    assert support['market']['support'] == 'partial'
+    assert support['market']['auth'] is False
+    assert 'candles' in support['market']['methods']
+    assert 'place_order' not in support['market']['methods']
+    if venue == 'deribit':
+      assert 'rules' not in support['market']['methods']
+      assert 'next_funding' not in support['market']['methods']
+      assert 'funding_rates' not in support['market']['methods']
     assert support['report']['support'] == 'partial'
     assert support['earn']['support'] == 'partial'

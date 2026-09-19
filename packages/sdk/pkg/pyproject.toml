@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tribulnation-sdk"
-version = "2.1.0"
+version = "2.2.0"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
@@ -38,7 +38,7 @@ bybit = ["tribulnation-bybit>=0.2.0"]
 coinbase = ["tribulnation-coinbase>=0.2.0"]
 kraken = ["tribulnation-kraken>=0.2.0"]
 kucoin = ["tribulnation-kucoin>=0.3.0"]
-deribit = ["tribulnation-deribit>=0.2.0"]
+deribit = ["tribulnation-deribit>=0.3.0"]
 
 [project.urls]
 Github = "https://github.com/tribulnation/sdk.git"

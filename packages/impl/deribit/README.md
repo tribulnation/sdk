@@ -1,7 +1,8 @@
 # Deribit SDK
 
-Read-only ledger reporting, wallet network methods and reward-bearing balances.
-The Market prototype is not yet a supported package surface.
+Public mainnet spot and linear perpetual Market data, read-only ledger reporting,
+wallet network methods and reward-bearing balances. The public Market expansion is
+prepared for Deribit 0.3.0 with SDK 2.2.0, pending publication; see the [capability handoff](../../../dev-docs/deribit-public-market.md).
 
 ```python
 from tribulnation.sdk import ReportSDK, accounts
@@ -28,3 +29,11 @@ async with reports.venue('deribit') as report:
 6. Use `accounts.Deribit(venue='deribit_testnet')` for testnet. It selects separate
    hosts and `TEST_DERIBIT_CLIENT_ID` / `TEST_DERIBIT_CLIENT_SECRET` defaults; mainnet
    never falls back to those test credentials.
+
+Public `MarketSDK()` discovery uses `spot` and `perp`, preserving native instrument
+names. Books, tickers, streams, native index/mark and linear open interest require
+no credentials. Trade candles support `1m`, `5m`, `15m`, `1h` through validated
+WebSocket calls and aware half-open windows. Routed spot has no candles; `4h` and
+native 08:00 UTC daily candles are unsupported. Rules, scheduled funding, private
+Market methods and trading remain explicit gaps. Inverse/dated/option/combo products
+are excluded. See [Deribit Market](../../../docs/market/implementations/deribit.md).

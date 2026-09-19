@@ -910,6 +910,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"2ZEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"2ZUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"AAVEETH\"]",
         "quotes": [],
         "status": "pass"
@@ -1019,6 +1031,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"AKTUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ALCXEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ALCXUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -1319,6 +1343,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"AXSUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BALEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BALUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -1744,6 +1780,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"DRVEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"DRVUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"DYDXEUR\"]",
         "quotes": [],
         "status": "pass"
@@ -2068,6 +2116,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"FXSEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"FXSUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"GALAEUR\"]",
         "quotes": [],
         "status": "pass"
@@ -2081,6 +2141,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"GBPUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"GHSTEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"GHSTUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -2297,6 +2369,24 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"KASUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"KSMEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"KSMGBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"KSMUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -2633,6 +2723,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"OPUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ORCAEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ORCAUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -3088,6 +3190,36 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SONICUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SPXEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SPXUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"STGEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"STGUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"STRKEUR\"]",
         "quotes": [],
         "status": "pass"
@@ -3160,6 +3292,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SUSHIEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SUSHIUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"SYNEUR\"]",
         "quotes": [],
         "status": "pass"
@@ -3191,6 +3335,24 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"TAOUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"TBTCEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"TBTCUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"TBTCXBT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -3538,6 +3700,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"USELESSEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"USELESSUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"USUALEUR\"]",
         "quotes": [],
         "status": "pass"
@@ -3605,6 +3779,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"VVVUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"WAXLEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"WAXLUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -3695,6 +3881,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"WLFIUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"WOOEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"WOOUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -4067,6 +4265,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"ZKUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ZORAEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ZORAUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -4990,6 +5200,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"2ZEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"2ZUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"AAVEETH\"]",
         "quotes": [],
         "status": "pass"
@@ -5099,6 +5321,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"AKTUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ALCXEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ALCXUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -5399,6 +5633,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"AXSUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BALEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BALUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -5824,6 +6070,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"DRVEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"DRVUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"DYDXEUR\"]",
         "quotes": [],
         "status": "pass"
@@ -6148,6 +6406,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"FXSEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"FXSUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"GALAEUR\"]",
         "quotes": [],
         "status": "pass"
@@ -6161,6 +6431,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"GBPUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"GHSTEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"GHSTUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -6377,6 +6659,24 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"KASUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"KSMEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"KSMGBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"KSMUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -6713,6 +7013,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"OPUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ORCAEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ORCAUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -7168,6 +7480,36 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SONICUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SPXEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SPXUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"STGEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"STGUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"STRKEUR\"]",
         "quotes": [],
         "status": "pass"
@@ -7240,6 +7582,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SUSHIEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SUSHIUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"SYNEUR\"]",
         "quotes": [],
         "status": "pass"
@@ -7271,6 +7625,24 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"TAOUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"TBTCEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"TBTCUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"TBTCXBT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -7618,6 +7990,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"USELESSEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"USELESSUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"USUALEUR\"]",
         "quotes": [],
         "status": "pass"
@@ -7685,6 +8069,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"VVVUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"WAXLEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"WAXLUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -7775,6 +8171,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"WLFIUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"WOOEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"WOOUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -8152,6 +8560,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ZORAEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ZORAUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"ZROEUR\"]",
         "quotes": [],
         "status": "pass"
@@ -8221,14 +8641,14 @@
         "id": "[\"ticker_depth\",\"perp\",\"PF_1INCHUSD\"]",
         "quotes": [
           {
-            "after_ask": "0.10046",
-            "after_bid": "0.09952",
-            "ask": "0.10046",
+            "after_ask": "0.10032",
+            "after_bid": "0.09936",
+            "ask": "0.10032",
             "attempt": 1,
-            "before_ask": "0.10046",
-            "before_bid": "0.09952",
-            "bid": "0.09952",
-            "elapsed_seconds": 0.16689395002322271,
+            "before_ask": "0.10032",
+            "before_bid": "0.09936",
+            "bid": "0.09936",
+            "elapsed_seconds": 0.2220013759797439,
             "ticker_ids_match": true
           }
         ],
@@ -8239,14 +8659,14 @@
         "id": "[\"ticker_depth\",\"perp\",\"PF_2ZUSD\"]",
         "quotes": [
           {
-            "after_ask": "0.05101",
-            "after_bid": "0.05084",
-            "ask": "0.05101",
+            "after_ask": "0.05094",
+            "after_bid": "0.05058",
+            "ask": "0.05094",
             "attempt": 1,
-            "before_ask": "0.05101",
-            "before_bid": "0.05084",
-            "bid": "0.05084",
-            "elapsed_seconds": 0.16632257198216394,
+            "before_ask": "0.05094",
+            "before_bid": "0.05058",
+            "bid": "0.05058",
+            "elapsed_seconds": 0.14173260802635923,
             "ticker_ids_match": true
           }
         ],
@@ -8257,14 +8677,14 @@
         "id": "[\"ticker_depth\",\"perp\",\"PF_AAPLXUSD\"]",
         "quotes": [
           {
-            "after_ask": "335.3",
-            "after_bid": "335.07",
-            "ask": "335.3",
+            "after_ask": "335.16",
+            "after_bid": "334.92",
+            "ask": "335.16",
             "attempt": 1,
-            "before_ask": "335.3",
-            "before_bid": "335.07",
-            "bid": "335.07",
-            "elapsed_seconds": 0.22444486001040787,
+            "before_ask": "335.16",
+            "before_bid": "334.92",
+            "bid": "334.92",
+            "elapsed_seconds": 0.16267356497701257,
             "ticker_ids_match": true
           }
         ],
@@ -8275,14 +8695,14 @@
         "id": "[\"ticker_depth\",\"perp\",\"PF_XBTUSD\"]",
         "quotes": [
           {
-            "after_ask": "81866.0",
-            "after_bid": "81865.0",
-            "ask": "81866.0",
+            "after_ask": "81421.0",
+            "after_bid": "81417.0",
+            "ask": "81421.0",
             "attempt": 1,
-            "before_ask": "81866.0",
-            "before_bid": "81865.0",
-            "bid": "81865.0",
-            "elapsed_seconds": 0.34810370102059096,
+            "before_ask": "81418.0",
+            "before_bid": "81417.0",
+            "bid": "81417.0",
+            "elapsed_seconds": 0.2194861900061369,
             "ticker_ids_match": true
           }
         ],
@@ -8293,14 +8713,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"0GEUR\"]",
         "quotes": [
           {
-            "after_ask": "0.2000000",
-            "after_bid": "0.1990000",
-            "ask": "0.2000000",
+            "after_ask": "0.1970000",
+            "after_bid": "0.1960000",
+            "ask": "0.1970000",
             "attempt": 1,
-            "before_ask": "0.2000000",
-            "before_bid": "0.1990000",
-            "bid": "0.1990000",
-            "elapsed_seconds": 0.11576392099959776,
+            "before_ask": "0.1970000",
+            "before_bid": "0.1960000",
+            "bid": "0.1960000",
+            "elapsed_seconds": 0.15978517499752343,
             "ticker_ids_match": true
           }
         ],
@@ -8311,14 +8731,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"0GUSD\"]",
         "quotes": [
           {
-            "after_ask": "0.2300000",
-            "after_bid": "0.2290000",
-            "ask": "0.2300000",
+            "after_ask": "0.2270000",
+            "after_bid": "0.2260000",
+            "ask": "0.2270000",
             "attempt": 1,
-            "before_ask": "0.2300000",
-            "before_bid": "0.2290000",
-            "bid": "0.2290000",
-            "elapsed_seconds": 0.12727140303468332,
+            "before_ask": "0.2270000",
+            "before_bid": "0.2260000",
+            "bid": "0.2260000",
+            "elapsed_seconds": 0.11284334299853072,
             "ticker_ids_match": true
           }
         ],
@@ -8329,14 +8749,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"1INCHEUR\"]",
         "quotes": [
           {
-            "after_ask": "0.08690",
+            "after_ask": "0.08680",
             "after_bid": "0.08670",
-            "ask": "0.08690",
+            "ask": "0.08680",
             "attempt": 1,
-            "before_ask": "0.08690",
+            "before_ask": "0.08680",
             "before_bid": "0.08670",
             "bid": "0.08670",
-            "elapsed_seconds": 0.15020150900818408,
+            "elapsed_seconds": 0.10778319102246314,
             "ticker_ids_match": true
           }
         ],
@@ -8347,14 +8767,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"XBTUSD\"]",
         "quotes": [
           {
-            "after_ask": "81869.80000",
-            "after_bid": "81869.70000",
-            "ask": "81869.80000",
+            "after_ask": "81425.10000",
+            "after_bid": "81425.00000",
+            "ask": "81429.40000",
             "attempt": 1,
-            "before_ask": "81869.80000",
-            "before_bid": "81869.70000",
-            "bid": "81869.70000",
-            "elapsed_seconds": 0.0979046430438757,
+            "before_ask": "81425.10000",
+            "before_bid": "81425.00000",
+            "bid": "81429.30000",
+            "elapsed_seconds": 0.15802666102536023,
             "ticker_ids_match": true
           }
         ],

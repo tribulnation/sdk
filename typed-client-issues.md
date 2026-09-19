@@ -472,10 +472,35 @@ because it is a public surface change on a shipped client.
   `get_index_price_names`, and confirmed live that `get_index_price` serves several the
   literal does not list, against 54 distinct `price_index` values on 5,550 instruments
 - Condition: any index outside the literal
-- Blocks: nothing shipped -- deribit has no package yet, only PoCs
+- Blocks: the old direct index-name PoC mapping; packaged public Market reads the native ticker index field and does not call this endpoint
 - Suggestion (unverified): widen the literal to the venue's own list, or drop it to `str`.
   The `currency` literals on `get_account_summary` and `get_positions` do look genuinely
   closed and should stay
+
+### `BookSummary.estimated_delivery_price` is null in unfiltered currency summaries
+
+`market_data.get_book_summary_by_currency(currency='BTC')` failed validated mainnet
+reads on 2026-09-19: 76 records carried null `estimated_delivery_price`. The same
+client validates the supported product-scoped BTC spot and USDC future summaries.
+The exact instrument-level condition is not yet established; do not assume the
+field is absent or invalid on every derivative.
+
+`schemas.py:244` (typed-deribit 0.3.0):
+
+```python
+  estimated_delivery_price: NotRequired[float]
+```
+
+- Kind: absent-under-condition
+- Observed: validation reports `float_type`, input `None`, at row indexes 27, 83,
+  114 and others in the initial broad response.
+- Condition: unfiltered BTC summary response; instrument-level condition unverified.
+- Samples: broad BTC response fails; `currency='BTC', kind='spot'` returns four
+  validated rows and `currency='USDC', kind='future'` returns 173 validated rows.
+- Blocks: broad/unfiltered summary expansion; reproduce in
+  `packages/impl/deribit/poc/market/public.py` cell 30. The packaged spot/futures
+  implementation requests its explicit product kinds and does not expose options.
+
 
 ## typed-bit2me
 

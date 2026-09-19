@@ -1,10 +1,25 @@
-# tribulnation-deribit 0.2.1
+# tribulnation-deribit 0.3.0 release candidate
 
-Translate native client acquisition and cleanup failures through managed resource
-adapters. Entry and exit policies remain independent; this release adds no automatic
-resource retries. Decorated calls inside the lifecycle retain context middleware.
+Add credential-free public mainnet Market data for active spot and linear perpetual
+instruments. Exchange IDs are `spot` and `perp`; symbols retain Deribit's native
+spelling, including `BTC_USDT` and `BTC_USDC-PERPETUAL`.
 
-Requires tribulnation-sdk >=2.0.2. Publish after the SDK patch release.
+- Discovery and selected/bulk tickers preserve native identifiers and unknown values.
+- REST depth supports 1–100 levels; shared public streams support 1–20 levels.
+- Native spot and linear perpetual candles support 1m, 5m, 15m and 1h, with bounded
+  pagination and aware, half-open time bounds. Routed spot candles are unsupported.
+- Perpetual statistics expose the native index, mark and optional base open interest.
 
-The release workflow requires fresh passing read-only qualification for this exact
-version and dependency floor before publication.
+Inverse contracts, dated futures, options, combinations, daily/4h candles, rules,
+account fees, scheduled funding and private Market operations remain unsupported.
+Native WebSocket candle requests validate; the observed HTTP candle endpoint does
+not. Broad option summaries have a recorded typed-client defect; supported product
+scopes validate without bypasses. See the public Market qualification handoff.
+
+Requires tribulnation-sdk >=2.2.0 and typed-deribit >=0.3.0. Publish after SDK 2.2.0.
+
+Release qualification must record Market and Wallet/Earn metadata on mainnet,
+private Report snapshots on testnet under ADR 0012, and Market consistency.
+Private mainnet account behavior remains unverified. Report history correctness and
+completeness are outside snapshot qualification. Catalogue market mappings and
+Terminal deployment remain separate work.
