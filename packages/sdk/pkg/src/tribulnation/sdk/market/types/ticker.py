@@ -22,3 +22,9 @@ class Ticker:
   """Quantity available at the best ask, in base units."""
   base_volume_24h: Decimal | None = None
   """Traded volume over the last 24h, in base units."""
+  quote_volume_24h: Decimal | None = None
+  """Native traded volume over the last 24h, in the market's quote currency.
+
+  `None` when unavailable; zero means no traded volume. Not normalized to USD
+  or estimated from base volume and the latest price.
+  """

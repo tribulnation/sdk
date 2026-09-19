@@ -148,6 +148,11 @@ class TradingMarkets(SDK):
     one request override it, which yields a consistent cross-section at one instant
     instead of a snapshot spread over minutes of wall clock.
 
+    Native 24h volumes are returned in `base_volume_24h` and `quote_volume_24h`,
+    in base and quote currency respectively. Each is `None` when unavailable;
+    zero is a reported zero. Quote volume is not normalized to USD or estimated
+    from the latest price. The venue defines the trailing 24h window.
+
     Args:
       exchange: `<account_id>:<exchange_id>`.
       markets: Market IDs to fetch. `None` fetches every market of the exchange.

@@ -10,6 +10,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PF_2ZUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_AAVEUSD\"]",
         "quotes": [],
         "status": "pass"
@@ -328,6 +334,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PF_FLOWUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_GALAUSD\"]",
         "quotes": [],
         "status": "pass"
@@ -448,6 +460,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PF_KAVAUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PF_KSMUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_LAYERUSD\"]",
         "quotes": [],
         "status": "pass"
@@ -473,6 +497,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_MANAUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PF_MINAUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -521,6 +551,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_OPUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PF_ORCAUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -646,6 +682,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PF_SPXUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PF_STGUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_STRKUSD\"]",
         "quotes": [],
         "status": "pass"
@@ -671,6 +719,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_SUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PF_SUSHIUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -2104,6 +2158,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"FLOWEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"FLOWUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"FLREUR\"]",
         "quotes": [],
         "status": "pass"
@@ -2374,6 +2440,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"KAVAEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"KAVAUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"KSMEUR\"]",
         "quotes": [],
         "status": "pass"
@@ -2603,6 +2681,30 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"MEUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"MINAEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"MINAGBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"MINAUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"MINAXBT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -3035,6 +3137,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"SANDXBT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SCRTEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SCRTUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -4300,6 +4414,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PF_2ZUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_AAVEUSD\"]",
         "quotes": [],
         "status": "pass"
@@ -4618,6 +4738,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PF_FLOWUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_GALAUSD\"]",
         "quotes": [],
         "status": "pass"
@@ -4738,6 +4864,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PF_KAVAUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PF_KSMUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_LAYERUSD\"]",
         "quotes": [],
         "status": "pass"
@@ -4763,6 +4901,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_MANAUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PF_MINAUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -4811,6 +4955,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_OPUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PF_ORCAUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -4936,6 +5086,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PF_SPXUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PF_STGUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_STRKUSD\"]",
         "quotes": [],
         "status": "pass"
@@ -4961,6 +5123,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_SUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PF_SUSHIUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -6394,6 +6562,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"FLOWEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"FLOWUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"FLREUR\"]",
         "quotes": [],
         "status": "pass"
@@ -6664,6 +6844,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"KAVAEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"KAVAUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"KSMEUR\"]",
         "quotes": [],
         "status": "pass"
@@ -6893,6 +7085,30 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"MEUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"MINAEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"MINAGBP\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"MINAUSD\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"MINAXBT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -7325,6 +7541,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"SANDXBT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SCRTEUR\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SCRTUSD\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -8641,14 +8869,14 @@
         "id": "[\"ticker_depth\",\"perp\",\"PF_1INCHUSD\"]",
         "quotes": [
           {
-            "after_ask": "0.1005",
-            "after_bid": "0.09958",
-            "ask": "0.1005",
+            "after_ask": "0.1028",
+            "after_bid": "0.09914",
+            "ask": "0.1028",
             "attempt": 1,
-            "before_ask": "0.1005",
-            "before_bid": "0.09958",
-            "bid": "0.09958",
-            "elapsed_seconds": 0.13994568801717833,
+            "before_ask": "0.1028",
+            "before_bid": "0.09914",
+            "bid": "0.09914",
+            "elapsed_seconds": 0.1582144579733722,
             "ticker_ids_match": true
           }
         ],
@@ -8659,14 +8887,14 @@
         "id": "[\"ticker_depth\",\"perp\",\"PF_2ZUSD\"]",
         "quotes": [
           {
-            "after_ask": "0.05095",
-            "after_bid": "0.05059",
-            "ask": "0.05095",
+            "after_ask": "0.05094",
+            "after_bid": "0.05035",
+            "ask": "0.05094",
             "attempt": 1,
-            "before_ask": "0.05095",
-            "before_bid": "0.05059",
-            "bid": "0.05059",
-            "elapsed_seconds": 0.1507603790378198,
+            "before_ask": "0.05094",
+            "before_bid": "0.05035",
+            "bid": "0.05035",
+            "elapsed_seconds": 0.1941933169728145,
             "ticker_ids_match": true
           }
         ],
@@ -8677,14 +8905,14 @@
         "id": "[\"ticker_depth\",\"perp\",\"PF_AAPLXUSD\"]",
         "quotes": [
           {
-            "after_ask": "335.16",
-            "after_bid": "334.85",
-            "ask": "335.16",
+            "after_ask": "335.14",
+            "after_bid": "334.86",
+            "ask": "335.14",
             "attempt": 1,
-            "before_ask": "335.16",
-            "before_bid": "334.85",
-            "bid": "334.85",
-            "elapsed_seconds": 0.14665595797123387,
+            "before_ask": "335.14",
+            "before_bid": "334.86",
+            "bid": "334.86",
+            "elapsed_seconds": 0.1613164110458456,
             "ticker_ids_match": true
           }
         ],
@@ -8695,14 +8923,14 @@
         "id": "[\"ticker_depth\",\"perp\",\"PF_XBTUSD\"]",
         "quotes": [
           {
-            "after_ask": "81481.0",
-            "after_bid": "81480.0",
-            "ask": "81481.0",
+            "after_ask": "81114.0",
+            "after_bid": "81113.0",
+            "ask": "81114.0",
             "attempt": 1,
-            "before_ask": "81481.0",
-            "before_bid": "81480.0",
-            "bid": "81480.0",
-            "elapsed_seconds": 0.1686745979823172,
+            "before_ask": "81114.0",
+            "before_bid": "81113.0",
+            "bid": "81113.0",
+            "elapsed_seconds": 0.17593383096391335,
             "ticker_ids_match": true
           }
         ],
@@ -8713,14 +8941,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"0GEUR\"]",
         "quotes": [
           {
-            "after_ask": "0.1970000",
-            "after_bid": "0.1960000",
-            "ask": "0.1970000",
+            "after_ask": "0.1990000",
+            "after_bid": "0.1980000",
+            "ask": "0.1990000",
             "attempt": 1,
-            "before_ask": "0.1970000",
-            "before_bid": "0.1960000",
-            "bid": "0.1960000",
-            "elapsed_seconds": 0.10330296104075387,
+            "before_ask": "0.1990000",
+            "before_bid": "0.1980000",
+            "bid": "0.1980000",
+            "elapsed_seconds": 0.10267014801502228,
             "ticker_ids_match": true
           }
         ],
@@ -8731,14 +8959,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"0GUSD\"]",
         "quotes": [
           {
-            "after_ask": "0.2260000",
-            "after_bid": "0.2250000",
-            "ask": "0.2260000",
+            "after_ask": "0.2290000",
+            "after_bid": "0.2270000",
+            "ask": "0.2290000",
             "attempt": 1,
-            "before_ask": "0.2260000",
-            "before_bid": "0.2250000",
-            "bid": "0.2250000",
-            "elapsed_seconds": 0.10914509295253083,
+            "before_ask": "0.2290000",
+            "before_bid": "0.2270000",
+            "bid": "0.2270000",
+            "elapsed_seconds": 0.14320480002788827,
             "ticker_ids_match": true
           }
         ],
@@ -8749,14 +8977,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"1INCHEUR\"]",
         "quotes": [
           {
-            "after_ask": "0.08700",
-            "after_bid": "0.08690",
-            "ask": "0.08700",
+            "after_ask": "0.08660",
+            "after_bid": "0.08640",
+            "ask": "0.08660",
             "attempt": 1,
-            "before_ask": "0.08700",
-            "before_bid": "0.08690",
-            "bid": "0.08690",
-            "elapsed_seconds": 0.10302461101673543,
+            "before_ask": "0.08660",
+            "before_bid": "0.08640",
+            "bid": "0.08640",
+            "elapsed_seconds": 0.097318178974092,
             "ticker_ids_match": true
           }
         ],
@@ -8767,14 +8995,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"XBTUSD\"]",
         "quotes": [
           {
-            "after_ask": "81484.30000",
-            "after_bid": "81484.20000",
-            "ask": "81484.30000",
+            "after_ask": "81106.10000",
+            "after_bid": "81106.00000",
+            "ask": "81106.10000",
             "attempt": 1,
-            "before_ask": "81484.30000",
-            "before_bid": "81484.20000",
-            "bid": "81484.20000",
-            "elapsed_seconds": 0.10298350697848946,
+            "before_ask": "81106.10000",
+            "before_bid": "81106.00000",
+            "bid": "81106.00000",
+            "elapsed_seconds": 0.08750356500968337,
             "ticker_ids_match": true
           }
         ],
