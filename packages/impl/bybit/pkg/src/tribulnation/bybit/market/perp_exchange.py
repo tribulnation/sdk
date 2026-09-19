@@ -85,6 +85,7 @@ class PerpExchange(VenueMixin, _PerpExchange):
         bid_qty=t['bid1Size'],
         ask_qty=t['ask1Size'],
         base_volume_24h=t['volume24h'],
+        quote_volume_24h=t['turnover24h'],
       )
       for t in rows
       if t['symbol'] in wanted
