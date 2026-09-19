@@ -47,6 +47,7 @@ def ticker(symbol: str = 'BTC_USDT') -> ContractTicker:
       'bid1': 100.0,
       'ask1': 100.2,
       'volume24': 10000.0,
+      'amount24': 100.15,
       'holdVol': 20000.0,
       'indexPrice': 100.3,
       'fairPrice': 100.1,
@@ -118,6 +119,7 @@ async def test_bulk_tickers_and_stats_convert_contract_units(
   assert set(tickers) == {'BTC_USDT'}
   assert tickers['BTC_USDT'].last == Decimal('100.1')
   assert tickers['BTC_USDT'].base_volume_24h == Decimal('1')
+  assert tickers['BTC_USDT'].quote_volume_24h == Decimal('100.15')
   assert tickers['BTC_USDT'].bid_qty is None
   stats = (await exchange.perp_stats(['BTC_USDT']))['BTC_USDT']
   assert stats.open_interest == Decimal('2')
@@ -258,6 +260,7 @@ async def test_zero_or_absent_book_sides_remain_unknown(
   row['bid1'] = 0
   del row['ask1']
   row['volume24'] = 0
+  row['amount24'] = 0
   monkeypatch.setattr(
     venue.client.futures.http.market,
     'ticker',
@@ -266,6 +269,7 @@ async def test_zero_or_absent_book_sides_remain_unknown(
   item = (await (await venue.perp_exchange('perp')).tickers())['BTC_USDT']
   assert item.bid is None and item.ask is None
   assert item.base_volume_24h == 0
+  assert item.quote_volume_24h == Decimal(0)
 
 
 async def test_public_funding_state_and_depth(
