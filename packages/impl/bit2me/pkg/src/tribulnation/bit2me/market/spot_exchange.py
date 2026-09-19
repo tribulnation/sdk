@@ -22,11 +22,13 @@ def parse_ticker(entry: TickerInfo) -> Ticker:
   bid = entry.get('bid')
   ask = entry.get('ask')
   volume = entry.get('baseVolume')
+  quote_volume = entry.get('quoteVolume')
   return Ticker(
     last=Decimal(str(last)) if last is not None else None,
     bid=Decimal(str(bid)) if bid is not None else None,
     ask=Decimal(str(ask)) if ask is not None else None,
     base_volume_24h=Decimal(str(volume)) if volume is not None else None,
+    quote_volume_24h=Decimal(str(quote_volume)) if quote_volume is not None else None,
   )
 
 

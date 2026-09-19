@@ -1,5 +1,7 @@
 """Regression tests for defects found mapping the Bit2Me market surface."""
 
+import pytest
+
 from decimal import Decimal
 from unittest.mock import AsyncMock, Mock
 
@@ -36,16 +38,27 @@ def test_standard_fees_distinguish_documented_pair_classes():
   assert standard_fees('UNCLASSIFIED', 'EUR') is None
 
 
-async def test_selected_tickers_use_symbol_specific_quotes():
+@pytest.mark.parametrize('quote_volume', [None, 0.0, 123.45])
+async def test_selected_tickers_use_symbol_specific_quotes(quote_volume: float | None):
   """Explicit selections do not read the independently stale upstream bulk cache."""
   client = Mock()
   client.v2.trading.tickers = AsyncMock(
-    return_value=[{'symbol': '1INCH/EUR', 'bid': 0.0787, 'ask': 0.0823}]
+    return_value=[
+      {
+        'symbol': '1INCH/EUR',
+        'bid': 0.0787,
+        'ask': 0.0823,
+        **({} if quote_volume is None else {'quoteVolume': quote_volume}),
+      }
+    ]
   )
   exchange = SpotExchange(shared=Shared(client=client))
   tickers = await exchange.tickers(['1INCH/EUR', '1INCH/EUR'])
   client.v2.trading.tickers.assert_awaited_once_with(symbol='1INCH/EUR')
   assert tickers['1INCH/EUR'].ask == Decimal('0.0823')
+  assert tickers['1INCH/EUR'].quote_volume_24h == (
+    None if quote_volume is None else Decimal(str(quote_volume))
+  )
 
 
 async def test_bulk_tickers_still_use_one_unfiltered_request():
