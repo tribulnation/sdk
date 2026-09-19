@@ -1,0 +1,402 @@
+{
+  "payload": {
+    "account_id": "deribit_public",
+    "checks": [
+      {
+        "code": "ok",
+        "id": "[\"discovery\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"exchange_identity\",\"perp\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"exchange_identity\",\"spot\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"perp\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"spot\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"perp\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"perp\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"perp\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"setup\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"perp\",\"1000BONK_USDC-PERPETUAL\"]",
+        "quotes": [
+          {
+            "after_ask": "0.003096",
+            "after_bid": "0.00309",
+            "ask": "0.003096",
+            "attempt": 1,
+            "before_ask": "0.003096",
+            "before_bid": "0.00309",
+            "bid": "0.00309",
+            "elapsed_seconds": 0.136498000996653,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"perp\",\"1000MOG_USDC-PERPETUAL\"]",
+        "quotes": [
+          {
+            "after_ask": "0.0001091",
+            "after_bid": "0.0001088",
+            "ask": "0.0001091",
+            "attempt": 1,
+            "before_ask": "0.0001091",
+            "before_bid": "0.0001088",
+            "bid": "0.0001088",
+            "elapsed_seconds": 0.1398125150008127,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"perp\",\"1000PEPE_USDC-PERPETUAL\"]",
+        "quotes": [
+          {
+            "after_ask": "0.004263",
+            "after_bid": "0.004257",
+            "ask": "0.004263",
+            "attempt": 1,
+            "before_ask": "0.004263",
+            "before_bid": "0.004257",
+            "bid": "0.004257",
+            "elapsed_seconds": 0.14146487199468538,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"perp\",\"BTC_USDC-PERPETUAL\"]",
+        "quotes": [
+          {
+            "after_ask": "81455.8",
+            "after_bid": "81455.7",
+            "ask": "81460.5",
+            "attempt": 1,
+            "before_ask": "81455.8",
+            "before_bid": "81455.7",
+            "bid": "81460.4",
+            "elapsed_seconds": 0.13975293998373672,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"spot\",\"BNB_USDC\"]",
+        "quotes": [
+          {
+            "after_ask": "762.77",
+            "after_bid": "762.48",
+            "ask": "762.89",
+            "attempt": 1,
+            "before_ask": "762.77",
+            "before_bid": "762.48",
+            "bid": "762.64",
+            "elapsed_seconds": 0.13953472604043782,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"spot\",\"BTC_USDC\"]",
+        "quotes": [
+          {
+            "after_ask": "81405.69",
+            "after_bid": "81402.67",
+            "ask": "81413.79",
+            "attempt": 1,
+            "before_ask": "81406.67",
+            "before_bid": "81401.67",
+            "bid": "81413.78",
+            "elapsed_seconds": 0.1381659559556283,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"spot\",\"BTC_USDE\"]",
+        "quotes": [
+          {
+            "after_ask": "81583.0",
+            "after_bid": "81289.0",
+            "ask": "81583.0",
+            "attempt": 1,
+            "before_ask": "81583.0",
+            "before_bid": "81289.0",
+            "bid": "81289.0",
+            "elapsed_seconds": 0.16909352299990132,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"spot\",\"BTC_USDT\"]",
+        "quotes": [
+          {
+            "after_ask": "81564.0",
+            "after_bid": "81287.0",
+            "ask": "81564.0",
+            "attempt": 1,
+            "before_ask": "81564.0",
+            "before_bid": "81287.0",
+            "bid": "81287.0",
+            "elapsed_seconds": 0.1348831219947897,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"perp\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"perp\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"perp\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"spot\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"spot\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"spot\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      }
+    ],
+    "discovery": [
+      {
+        "exchange": "spot",
+        "kind": "spot",
+        "markets": [
+          "BNB_USDC",
+          "BTC_USDC",
+          "BTC_USDE",
+          "BTC_USDT",
+          "BUIDL_USDC",
+          "ETH_BTC",
+          "ETH_USDC",
+          "ETH_USDE",
+          "ETH_USDT",
+          "PAXG_USDC",
+          "SOL_ETH",
+          "SOL_USDC",
+          "STETH_ETH",
+          "STETH_USDC",
+          "USDC_USDT",
+          "USDE_USDC",
+          "USDE_USDT",
+          "USYC_USDC",
+          "XRP_USDC"
+        ]
+      },
+      {
+        "exchange": "perp",
+        "kind": "perp",
+        "markets": [
+          "1000BONK_USDC-PERPETUAL",
+          "1000MOG_USDC-PERPETUAL",
+          "1000PEPE_USDC-PERPETUAL",
+          "1000SHIB_USDC-PERPETUAL",
+          "AAPL_USDC-PERPETUAL",
+          "AAVE_USDC-PERPETUAL",
+          "ADA_USDC-PERPETUAL",
+          "AERO_USDC-PERPETUAL",
+          "ALGO_USDC-PERPETUAL",
+          "ALT_USDC-PERPETUAL",
+          "AMD_USDC-PERPETUAL",
+          "AMZN_USDC-PERPETUAL",
+          "APE_USDC-PERPETUAL",
+          "APT_USDC-PERPETUAL",
+          "ARB_USDC-PERPETUAL",
+          "ARM_USDC-PERPETUAL",
+          "ASTER_USDC-PERPETUAL",
+          "ATOM_USDC-PERPETUAL",
+          "AVAX_USDC-PERPETUAL",
+          "AVNT_USDC-PERPETUAL",
+          "BASED1_USDC-PERPETUAL",
+          "BCH_USDC-PERPETUAL",
+          "BE_USDC-PERPETUAL",
+          "BERA_USDC-PERPETUAL",
+          "BILL_USDC-PERPETUAL",
+          "BNB_USDC-PERPETUAL",
+          "BOME_USDC-PERPETUAL",
+          "BRENTOIL_USDC-PERPETUAL",
+          "BTC_USDC-PERPETUAL",
+          "CBRS_USDC-PERPETUAL",
+          "CFX_USDC-PERPETUAL",
+          "CHIP_USDC-PERPETUAL",
+          "COMP_USDC-PERPETUAL",
+          "CRCL_USDC-PERPETUAL",
+          "CRV_USDC-PERPETUAL",
+          "DASH_USDC-PERPETUAL",
+          "DOGE_USDC-PERPETUAL",
+          "DOT_USDC-PERPETUAL",
+          "DRAM_USDC-PERPETUAL",
+          "DYDX_USDC-PERPETUAL",
+          "EDGEX_USDC-PERPETUAL",
+          "EIGEN_USDC-PERPETUAL",
+          "ENA_USDC-PERPETUAL",
+          "ETC_USDC-PERPETUAL",
+          "ETH_USDC-PERPETUAL",
+          "ETHFI_USDC-PERPETUAL",
+          "EWY_USDC-PERPETUAL",
+          "FARTCOIN_USDC-PERPETUAL",
+          "FET_USDC-PERPETUAL",
+          "FIL_USDC-PERPETUAL",
+          "GOLD_USDC-PERPETUAL",
+          "GOOGL_USDC-PERPETUAL",
+          "HBAR_USDC-PERPETUAL",
+          "HOOD_USDC-PERPETUAL",
+          "HYPE_USDC-PERPETUAL",
+          "ICP_USDC-PERPETUAL",
+          "INJ_USDC-PERPETUAL",
+          "INTC_USDC-PERPETUAL",
+          "INX_USDC-PERPETUAL",
+          "JASMY_USDC-PERPETUAL",
+          "JTO_USDC-PERPETUAL",
+          "JUP_USDC-PERPETUAL",
+          "LDO_USDC-PERPETUAL",
+          "LINK_USDC-PERPETUAL",
+          "LIT_USDC-PERPETUAL",
+          "LITE_USDC-PERPETUAL",
+          "LTC_USDC-PERPETUAL",
+          "MEGA_USDC-PERPETUAL",
+          "MERL_USDC-PERPETUAL",
+          "META_USDC-PERPETUAL",
+          "MON_USDC-PERPETUAL",
+          "MORPHO_USDC-PERPETUAL",
+          "MRVL_USDC-PERPETUAL",
+          "MSFT_USDC-PERPETUAL",
+          "MSTR_USDC-PERPETUAL",
+          "MU_USDC-PERPETUAL",
+          "NBIS_USDC-PERPETUAL",
+          "NEAR_USDC-PERPETUAL",
+          "NIGHT_USDC-PERPETUAL",
+          "NVDA_USDC-PERPETUAL",
+          "ONDO_USDC-PERPETUAL",
+          "OP_USDC-PERPETUAL",
+          "OPN_USDC-PERPETUAL",
+          "PAXG_USDC-PERPETUAL",
+          "PENDLE_USDC-PERPETUAL",
+          "PENGU_USDC-PERPETUAL",
+          "PNUT_USDC-PERPETUAL",
+          "PRL_USDC-PERPETUAL",
+          "PUMP_USDC-PERPETUAL",
+          "PYTH_USDC-PERPETUAL",
+          "QQQ_USDC-PERPETUAL",
+          "RENDER_USDC-PERPETUAL",
+          "RESOLV_USDC-PERPETUAL",
+          "ROBO_USDC-PERPETUAL",
+          "RUNE_USDC-PERPETUAL",
+          "S_USDC-PERPETUAL",
+          "SAGA_USDC-PERPETUAL",
+          "SEI_USDC-PERPETUAL",
+          "SILVER_USDC-PERPETUAL",
+          "SKHY_USDC-PERPETUAL",
+          "SNDK_USDC-PERPETUAL",
+          "SOL_USDC-PERPETUAL",
+          "SOXL_USDC-PERPETUAL",
+          "SPCX_USDC-PERPETUAL",
+          "SPY_USDC-PERPETUAL",
+          "STRK_USDC-PERPETUAL",
+          "SUI_USDC-PERPETUAL",
+          "TAO_USDC-PERPETUAL",
+          "TIA_USDC-PERPETUAL",
+          "TOWNS_USDC-PERPETUAL",
+          "TRUMP_USDC-PERPETUAL",
+          "TRX_USDC-PERPETUAL",
+          "TSLA_USDC-PERPETUAL",
+          "TSM_USDC-PERPETUAL",
+          "UNI_USDC-PERPETUAL",
+          "VIRTUAL_USDC-PERPETUAL",
+          "VVV_USDC-PERPETUAL",
+          "W_USDC-PERPETUAL",
+          "WIF_USDC-PERPETUAL",
+          "WLD_USDC-PERPETUAL",
+          "WLFI_USDC-PERPETUAL",
+          "WTIOIL_USDC-PERPETUAL",
+          "XLM_USDC-PERPETUAL",
+          "XPL_USDC-PERPETUAL",
+          "XRP_USDC-PERPETUAL",
+          "ZEC_USDC-PERPETUAL"
+        ]
+      }
+    ],
+    "venue": "deribit",
+    "version": 4
+  }
+}

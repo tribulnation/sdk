@@ -1,5 +1,5 @@
 # Local SDK evidence: hyperliquid
 
-Run completed: 2026-09-18T18:25:47.767853+00:00
+Run completed: 2026-09-19T18:13:20.882117+00:00
 
 This records a trusted local run, not cryptographic proof. Release policy must separately validate required check coverage and statuses.

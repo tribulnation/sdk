@@ -114,7 +114,10 @@ tribulnation-deribit **0.2.1** and core SDK **2.1.0**, with the new source chang
 The release candidates are now **tribulnation-sdk 2.2.0** and
 **tribulnation-deribit 0.3.0**. Deribit's SDK floor is 2.2.0 and the core Deribit
 extra requires 0.3.0. Final candidate qualification is recorded separately in
-`release-evidence/`. Publication remains pending; publish core first, then Deribit.
+`release-evidence/`. The SDK release PR carries the integration with Deribit
+metadata still at 0.2.1; the follow-up Deribit release raises its version and floor.
+Both branches need their own matching Deribit reports. Publication remains pending;
+publish core first, then Deribit.
 
 [PR #25](https://github.com/tribulnation/sdk/pull/25) already merged the earlier
 Wallet/Earn/Report release; this work does not recreate it. Public Market qualification
