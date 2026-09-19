@@ -18,8 +18,10 @@ scopes validate without bypasses. See the public Market qualification handoff.
 
 Requires tribulnation-sdk >=2.2.0 and typed-deribit >=0.3.0. Publish after SDK 2.2.0.
 
-Release qualification must record Market and Wallet/Earn metadata on mainnet,
+Release qualification records Market and Wallet/Earn metadata on mainnet,
 private Report snapshots on testnet under ADR 0012, and Market consistency.
+The 2026-09-19 candidate passes 29 read-suite cases and 23 consistency checks
+against Catalogue main `720d17275eeb025bad0e2da1f43f674531471dab`.
 Private mainnet account behavior remains unverified. Report history correctness and
 completeness are outside snapshot qualification. Catalogue market mappings and
 Terminal deployment remain separate work.
