@@ -86,6 +86,7 @@ class PerpExchange(SharedMixin, _PerpExchange):
       result[symbol] = Ticker(
         last=trade['lastPrice'],
         base_volume_24h=trade['volume'],
+        quote_volume_24h=trade['quoteVolume'],
         bid=book['bidPrice'] if book is not None and has_bid else None,
         bid_qty=book['bidQty'] if book is not None and has_bid else None,
         ask=book['askPrice'] if book is not None and has_ask else None,

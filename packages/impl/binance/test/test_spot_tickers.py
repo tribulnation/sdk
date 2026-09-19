@@ -28,6 +28,7 @@ def ticker(symbol: str, **overrides: Decimal) -> dict[str, str | Decimal]:
     'askPrice': Decimal('3'),
     'askQty': Decimal('4'),
     'volume': Decimal('5'),
+    'quoteVolume': Decimal('6.123456789012345678'),
     **overrides,
   }
 
@@ -44,6 +45,7 @@ async def test_bulk_spot_tickers_preserve_decimal_fields(
   assert result['BTCUSDT'].last == Decimal('1.000000000000000001')
   assert result['BTCUSDT'].bid_qty == Decimal('2')
   assert result['BTCUSDT'].base_volume_24h == Decimal('5')
+  assert result['BTCUSDT'].quote_volume_24h == Decimal('6.123456789012345678')
   request.assert_awaited_once_with(type='FULL')
 
 
@@ -77,7 +79,13 @@ async def test_subset_and_unavailable_book(monkeypatch: pytest.MonkeyPatch):
   """An empty book has absent quotes, while zero traded volume remains real zero."""
   request = AsyncMock(
     return_value=[
-      ticker('BTCUSDT', bidQty=Decimal(0), askQty=Decimal(0), volume=Decimal(0)),
+      ticker(
+        'BTCUSDT',
+        bidQty=Decimal(0),
+        askQty=Decimal(0),
+        volume=Decimal(0),
+        quoteVolume=Decimal(0),
+      ),
       ticker('ETHUSDT'),
     ]
   )
@@ -88,6 +96,7 @@ async def test_subset_and_unavailable_book(monkeypatch: pytest.MonkeyPatch):
   assert result['BTCUSDT'].bid is None
   assert result['BTCUSDT'].ask_qty is None
   assert result['BTCUSDT'].base_volume_24h == 0
+  assert result['BTCUSDT'].quote_volume_24h == Decimal(0)
 
 
 async def test_missing_requested_symbol_is_not_silent(monkeypatch: pytest.MonkeyPatch):

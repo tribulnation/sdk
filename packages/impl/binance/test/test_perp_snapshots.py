@@ -47,6 +47,7 @@ def public_api(monkeypatch: pytest.MonkeyPatch) -> dict[str, AsyncMock]:
           'symbol': symbol,
           'lastPrice': Decimal('1.000000000000000001'),
           'volume': Decimal('0'),
+          'quoteVolume': Decimal('0'),
         }
         for symbol in ('BTCUSDT', 'ETHUSDT', 'DATED', 'PAUSED')
       ]
@@ -100,6 +101,7 @@ async def test_tickers_keep_only_active_perpetuals(public_api: dict[str, AsyncMo
   assert set(result) == {'BTCUSDT', 'ETHUSDT'}
   assert result['BTCUSDT'].last == Decimal('1.000000000000000001')
   assert result['BTCUSDT'].base_volume_24h == 0
+  assert result['BTCUSDT'].quote_volume_24h == Decimal(0)
   assert result['BTCUSDT'].bid_qty == 2
   assert result['BTCUSDT'].ask is None
   assert result['ETHUSDT'].bid is None
