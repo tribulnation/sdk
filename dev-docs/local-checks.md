@@ -53,9 +53,10 @@ sdk-dev results verify /path/to/new-run \
 5. SDK-only instruments absent from the Catalogue do not fail these checks. Adding
    Catalogue coverage, checking instrument URLs, and Terminal cross-venue outliers
    remain separate work. The runner neither fixes data nor opens issues.
-6. Kraken Futures and Bitget UTA `coin` are explicitly excluded capabilities, not
-   passing checks or missing-market coverage. Bitget Classic `coin-classic` remains
-   in scope. See [issue #32](https://github.com/tribulnation/sdk/issues/32).
+6. Bitget UTA `coin` remains an explicitly excluded capability, not a passing check.
+   Kraken linear perpetuals are now in scope under `perp`; see
+   [ADR 0020](adr/0020-kraken-public-perpetuals.md). Missing Catalogue markets remain
+   deferred coverage rather than automatic product exclusions.
 7. Market payload version 4 includes the explicit Bit2Me native-ticker limitation and rejects older policies. Fresh reports
    are required after this policy change; old reports cannot be relabeled as passing.
 

@@ -3,898 +3,898 @@
     "account_id": "kraken",
     "checks": [
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_1INCHUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_AAVEUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ACEUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ADAUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_AKTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ALGOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ALTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ANKRUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_APEUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_APTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ARBUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ARKMUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ARUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ASTERUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ASTRUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ATHUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ATOMUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_AVAXUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_AXSUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_BATUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_BCHUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_BERAUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_BIOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_BLURUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_BNBUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_BONKUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_CAKEUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_CATIUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_CELOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_CFXUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_CHFUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "deferred"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_CHZUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_COMPUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_COWUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_CROUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_CRVUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_CVXUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_DASHUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_DEXEUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_DOGEUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_DOTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_DYDXUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_DYMUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_EIGENUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ENAUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ENSUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ETCUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ETHFIUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ETHUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_EURUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "deferred"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_FARTCOINUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_FETUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_FILUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_FLOKIUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_GALAUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_GBPUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "deferred"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_GMTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_GMXUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_GRASSUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_GRTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_HBARUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_HYPEUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ICPUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_IMXUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_INJUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_IOSTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "deferred"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_IOTAUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_IOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_JASMYUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_JTOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_JUPUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_KAIAUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_KAITOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_KASUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_LAYERUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_LDOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_LINKUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_LTCUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_MANAUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_MNTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_MONUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_MORPHOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_NEARUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_NEOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_NOTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ONDOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_OPUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ORDIUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_PAXGUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_PENDLEUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_PENGUUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_PEPEUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_PIXELUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_PNUTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_POLUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_PUMPUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_PYTHUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_QNTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_RAYUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_RENDERUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_REZUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_RUNEUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_SANDUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_SEIUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_SHIBUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_SNXUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_SOLUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_STRKUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_STXUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_SUIUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_SUNUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "deferred"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_SUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_SYNUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_SYRUPUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_TAOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_THETAUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_TIAUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_TRBUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_TRUMPUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_TRXUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_TUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_UMAUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_UNIUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_USDCUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_USDTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_USUALUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_VETUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_VIRTUALUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_WIFUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_WLDUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_WLFIUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_WUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_XAGUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_XAUTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_XBTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_XCNUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_XLMUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_XMRUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_XPLUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_XRPUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_XTZUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_YFIUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ZECUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ZKUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ZROUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PI_ETHUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "deferred"
       },
       {
-        "code": "unsupported",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PI_LTCUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "deferred"
       },
       {
-        "code": "unsupported",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PI_XBTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "deferred"
       },
       {
-        "code": "unsupported",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PI_XRPUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -4083,898 +4083,898 @@
         "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_1INCHUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_AAVEUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ACEUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ADAUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_AKTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ALGOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ALTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ANKRUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_APEUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_APTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ARBUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ARKMUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ARUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ASTERUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ASTRUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ATHUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ATOMUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_AVAXUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_AXSUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_BATUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_BCHUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_BERAUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_BIOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_BLURUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_BNBUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_BONKUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_CAKEUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_CATIUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_CELOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_CFXUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_CHFUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_CHZUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_COMPUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_COWUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_CROUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_CRVUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_CVXUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_DASHUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_DEXEUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_DOGEUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_DOTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_DYDXUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_DYMUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_EIGENUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ENAUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ENSUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ETCUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ETHFIUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ETHUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_EURUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_FARTCOINUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_FETUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_FILUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_FLOKIUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_GALAUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_GBPUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_GMTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_GMXUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_GRASSUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_GRTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_HBARUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_HYPEUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ICPUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_IMXUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_INJUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_IOSTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_IOTAUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_IOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_JASMYUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_JTOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_JUPUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_KAIAUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_KAITOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_KASUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_LAYERUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_LDOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_LINKUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_LTCUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_MANAUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_MNTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_MONUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_MORPHOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_NEARUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_NEOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_NOTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ONDOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_OPUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ORDIUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_PAXGUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_PENDLEUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_PENGUUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_PEPEUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_PIXELUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_PNUTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_POLUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_PUMPUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_PYTHUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_QNTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_RAYUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_RENDERUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_REZUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_RUNEUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_SANDUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_SEIUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_SHIBUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_SNXUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_SOLUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_STRKUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_STXUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_SUIUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_SUNUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_SUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_SYNUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_SYRUPUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_TAOUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_THETAUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_TIAUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_TRBUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_TRUMPUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_TRXUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_TUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_UMAUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_UNIUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_USDCUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_USDTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_USUALUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_VETUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_VIRTUALUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_WIFUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_WLDUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_WLFIUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_WUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_XAGUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_XAUTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_XBTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_XCNUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_XLMUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_XMRUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_XPLUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_XRPUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_XTZUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_YFIUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ZECUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ZKUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PF_ZROUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PI_ETHUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PI_LTCUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PI_XBTUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
-        "code": "unsupported",
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PI_XRPUSD\"]",
         "quotes": [],
-        "status": "excluded"
+        "status": "pass"
       },
       {
         "code": "ok",
@@ -8170,7 +8170,19 @@
       },
       {
         "code": "ok",
+        "id": "[\"exchange_identity\",\"perp\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"exchange_identity\",\"spot\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"perp\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -8182,8 +8194,98 @@
       },
       {
         "code": "ok",
+        "id": "[\"perp_stats\",\"perp\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"perp\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"perp\",\"selected\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"setup\"]",
         "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"perp\",\"PF_1INCHUSD\"]",
+        "quotes": [
+          {
+            "after_ask": "0.10046",
+            "after_bid": "0.09952",
+            "ask": "0.10046",
+            "attempt": 1,
+            "before_ask": "0.10046",
+            "before_bid": "0.09952",
+            "bid": "0.09952",
+            "elapsed_seconds": 0.16689395002322271,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"perp\",\"PF_2ZUSD\"]",
+        "quotes": [
+          {
+            "after_ask": "0.05101",
+            "after_bid": "0.05084",
+            "ask": "0.05101",
+            "attempt": 1,
+            "before_ask": "0.05101",
+            "before_bid": "0.05084",
+            "bid": "0.05084",
+            "elapsed_seconds": 0.16632257198216394,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"perp\",\"PF_AAPLXUSD\"]",
+        "quotes": [
+          {
+            "after_ask": "335.3",
+            "after_bid": "335.07",
+            "ask": "335.3",
+            "attempt": 1,
+            "before_ask": "335.3",
+            "before_bid": "335.07",
+            "bid": "335.07",
+            "elapsed_seconds": 0.22444486001040787,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"perp\",\"PF_XBTUSD\"]",
+        "quotes": [
+          {
+            "after_ask": "81866.0",
+            "after_bid": "81865.0",
+            "ask": "81866.0",
+            "attempt": 1,
+            "before_ask": "81866.0",
+            "before_bid": "81865.0",
+            "bid": "81865.0",
+            "elapsed_seconds": 0.34810370102059096,
+            "ticker_ids_match": true
+          }
+        ],
         "status": "pass"
       },
       {
@@ -8191,14 +8293,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"0GEUR\"]",
         "quotes": [
           {
-            "after_ask": "0.1900000",
-            "after_bid": "0.1890000",
-            "ask": "0.1900000",
+            "after_ask": "0.2000000",
+            "after_bid": "0.1990000",
+            "ask": "0.2000000",
             "attempt": 1,
-            "before_ask": "0.1900000",
-            "before_bid": "0.1890000",
-            "bid": "0.1890000",
-            "elapsed_seconds": 0.14622371099540032,
+            "before_ask": "0.2000000",
+            "before_bid": "0.1990000",
+            "bid": "0.1990000",
+            "elapsed_seconds": 0.11576392099959776,
             "ticker_ids_match": true
           }
         ],
@@ -8209,14 +8311,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"0GUSD\"]",
         "quotes": [
           {
-            "after_ask": "0.2180000",
-            "after_bid": "0.2170000",
-            "ask": "0.2180000",
+            "after_ask": "0.2300000",
+            "after_bid": "0.2290000",
+            "ask": "0.2300000",
             "attempt": 1,
-            "before_ask": "0.2180000",
-            "before_bid": "0.2170000",
-            "bid": "0.2170000",
-            "elapsed_seconds": 0.10057104102452286,
+            "before_ask": "0.2300000",
+            "before_bid": "0.2290000",
+            "bid": "0.2290000",
+            "elapsed_seconds": 0.12727140303468332,
             "ticker_ids_match": true
           }
         ],
@@ -8227,14 +8329,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"1INCHEUR\"]",
         "quotes": [
           {
-            "after_ask": "0.08410",
-            "after_bid": "0.08390",
-            "ask": "0.08410",
+            "after_ask": "0.08690",
+            "after_bid": "0.08670",
+            "ask": "0.08690",
             "attempt": 1,
-            "before_ask": "0.08410",
-            "before_bid": "0.08390",
-            "bid": "0.08390",
-            "elapsed_seconds": 0.10585608001565561,
+            "before_ask": "0.08690",
+            "before_bid": "0.08670",
+            "bid": "0.08670",
+            "elapsed_seconds": 0.15020150900818408,
             "ticker_ids_match": true
           }
         ],
@@ -8245,17 +8347,35 @@
         "id": "[\"ticker_depth\",\"spot\",\"XBTUSD\"]",
         "quotes": [
           {
-            "after_ask": "80878.50000",
-            "after_bid": "80878.40000",
-            "ask": "80878.50000",
+            "after_ask": "81869.80000",
+            "after_bid": "81869.70000",
+            "ask": "81869.80000",
             "attempt": 1,
-            "before_ask": "80878.50000",
-            "before_bid": "80878.40000",
-            "bid": "80878.40000",
-            "elapsed_seconds": 0.09043262497289106,
+            "before_ask": "81869.80000",
+            "before_bid": "81869.70000",
+            "bid": "81869.70000",
+            "elapsed_seconds": 0.0979046430438757,
             "ticker_ids_match": true
           }
         ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"perp\",\"bulk\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"perp\",\"empty\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"perp\",\"selected\"]",
+        "quotes": [],
         "status": "pass"
       },
       {
@@ -9732,6 +9852,283 @@
           "ZRXXBT",
           "USDCAD",
           "USDJPY"
+        ]
+      },
+      {
+        "exchange": "perp",
+        "kind": "perp",
+        "markets": [
+          "PF_XBTUSD",
+          "PF_ETHUSD",
+          "PF_ADAUSD",
+          "PF_XRPUSD",
+          "PF_SOLUSD",
+          "PF_UNIUSD",
+          "PF_ATOMUSD",
+          "PF_BCHUSD",
+          "PF_DOTUSD",
+          "PF_FILUSD",
+          "PF_LINKUSD",
+          "PF_LTCUSD",
+          "PF_AVAXUSD",
+          "PF_XMRUSD",
+          "PF_GMTUSD",
+          "PF_LUNA2USD",
+          "PF_OPUSD",
+          "PF_NEARUSD",
+          "PF_APEUSD",
+          "PF_DOGEUSD",
+          "PF_TRXUSD",
+          "PF_MANAUSD",
+          "PF_CRVUSD",
+          "PF_AAVEUSD",
+          "PF_SNXUSD",
+          "PF_XTZUSD",
+          "PF_XLMUSD",
+          "PF_ALGOUSD",
+          "PF_SANDUSD",
+          "PF_ENJUSD",
+          "PF_COMPUSD",
+          "PF_YFIUSD",
+          "PF_CHZUSD",
+          "PF_LPTUSD",
+          "PF_BATUSD",
+          "PF_AXSUSD",
+          "PF_GALAUSD",
+          "PF_ETCUSD",
+          "PF_KAVAUSD",
+          "PF_KSMUSD",
+          "PF_GRTUSD",
+          "PF_FLOWUSD",
+          "PF_ZECUSD",
+          "PF_QTUMUSD",
+          "PF_DASHUSD",
+          "PF_1INCHUSD",
+          "PF_OGNUSD",
+          "PF_SUSHIUSD",
+          "PF_RUNEUSD",
+          "PF_EGLDUSD",
+          "PF_DYDXUSD",
+          "PF_ANKRUSD",
+          "PF_ICPUSD",
+          "PF_BANDUSD",
+          "PF_ALICEUSD",
+          "PF_ENSUSD",
+          "PF_MINAUSD",
+          "PF_THETAUSD",
+          "PF_QNTUSD",
+          "PF_IMXUSD",
+          "PF_APTUSD",
+          "PF_BLURUSD",
+          "PF_GMXUSD",
+          "PF_LDOUSD",
+          "PF_USDCUSD",
+          "PF_USDTUSD",
+          "PF_ARBUSD",
+          "PF_FETUSD",
+          "PF_STXUSD",
+          "PF_CVXUSD",
+          "PF_JASMYUSD",
+          "PF_INJUSD",
+          "PF_ZRXUSD",
+          "PF_RLCUSD",
+          "PF_SUIUSD",
+          "PF_PEPEUSD",
+          "PF_SHIBUSD",
+          "PF_STGUSD",
+          "PF_HFTUSD",
+          "PF_WLDUSD",
+          "PF_CFXUSD",
+          "PF_PAXGUSD",
+          "PF_AGLDUSD",
+          "PF_SEIUSD",
+          "PF_BNBUSD",
+          "PF_PYTHUSD",
+          "PF_TIAUSD",
+          "PF_JTOUSD",
+          "PF_BONKUSD",
+          "PF_KASUSD",
+          "PF_WIFUSD",
+          "PF_ORDIUSD",
+          "PF_UMAUSD",
+          "PF_LSKUSD",
+          "PF_API3USD",
+          "PF_JUPUSD",
+          "PF_DYMUSD",
+          "PF_STRKUSD",
+          "PF_SPELLUSD",
+          "PF_WUSD",
+          "PF_YGGUSD",
+          "PF_ONDOUSD",
+          "PF_SAGAUSD",
+          "PF_BOMEUSD",
+          "PF_ENAUSD",
+          "PF_NEOUSD",
+          "PF_SUPERUSD",
+          "PF_BICOUSD",
+          "PF_ASTRUSD",
+          "PF_TUSD",
+          "PF_ARUSD",
+          "PF_ETHFIUSD",
+          "PF_ZETAUSD",
+          "PF_POWRUSD",
+          "PF_MOVRUSD",
+          "PF_FLOKIUSD",
+          "PF_ARKMUSD",
+          "PF_AEVOUSD",
+          "PF_C98USD",
+          "PF_PENDLEUSD",
+          "PF_CTSIUSD",
+          "PF_ALTUSD",
+          "PF_TURBOUSD",
+          "PF_TLMUSD",
+          "PF_TNSRUSD",
+          "PF_PIXELUSD",
+          "PF_PEOPLEUSD",
+          "PF_BRETTUSD",
+          "PF_POPCATUSD",
+          "PF_MEWUSD",
+          "PF_BBUSD",
+          "PF_STEEMUSD",
+          "PF_TRBUSD",
+          "PF_ZROUSD",
+          "PF_PORTALUSD",
+          "PF_HBARUSD",
+          "PF_BIGTIMEUSD",
+          "PF_TAOUSD",
+          "PF_NMRUSD",
+          "PF_NOTUSD",
+          "PF_MNTUSD",
+          "PF_REZUSD",
+          "PF_RENDERUSD",
+          "PF_ZKUSD",
+          "PF_MOGUSD",
+          "PF_AUCTIONUSD",
+          "PF_RAREUSD",
+          "PF_SYNUSD",
+          "PF_CELRUSD",
+          "PF_POLUSD",
+          "PF_RSRUSD",
+          "PF_BANANAUSD",
+          "PF_EIGENUSD",
+          "PF_NEIROUSD",
+          "PF_DOGSUSD",
+          "PF_ACEUSD",
+          "PF_CELOUSD",
+          "PF_CATIUSD",
+          "PF_LQTYUSD",
+          "PF_RAYUSD",
+          "PF_CYBERUSD",
+          "PF_HMSTRUSD",
+          "PF_ROSEUSD",
+          "PF_GOATUSD",
+          "PF_CKBUSD",
+          "PF_CETUSUSD",
+          "PF_MOODENGUSD",
+          "PF_VETUSD",
+          "PF_BELUSD",
+          "PF_SSVUSD",
+          "PF_METISUSD",
+          "PF_ATHUSD",
+          "PF_DEGENUSD",
+          "PF_ONTUSD",
+          "PF_KAIAUSD",
+          "PF_DEEPUSD",
+          "PF_GRASSUSD",
+          "PF_CAKEUSD",
+          "PF_AKTUSD",
+          "PF_PNUTUSD",
+          "PF_MORPHOUSD",
+          "PF_COWUSD",
+          "PF_ZILUSD",
+          "PF_FLUXUSD",
+          "PF_ZENUSD",
+          "PF_CSPRUSD",
+          "PF_IOTAUSD",
+          "PF_IOTXUSD",
+          "PF_ORCAUSD",
+          "PF_SPXUSD",
+          "PF_CROUSD",
+          "PF_PENGUUSD",
+          "PF_USUALUSD",
+          "PF_CHILLGUYUSD",
+          "PF_TRUMPUSD",
+          "PF_SUSD",
+          "PF_MELANIAUSD",
+          "PF_FARTCOINUSD",
+          "PF_VIRTUALUSD",
+          "PF_AIXBTUSD",
+          "PF_ZEREBROUSD",
+          "PF_GRIFFAINUSD",
+          "PF_ANIMEUSD",
+          "PF_HYPEUSD",
+          "PF_XCNUSD",
+          "PF_IOUSD",
+          "PF_ALCHUSD",
+          "PF_ARCUSD",
+          "PF_CGPTUSD",
+          "PF_SKLUSD",
+          "PF_BIOUSD",
+          "PF_COOKIEUSD",
+          "PF_DEXEUSD",
+          "PF_VELOUSD",
+          "PF_SWARMSUSD",
+          "PF_BERAUSD",
+          "PF_IDUSD",
+          "PF_LAYERUSD",
+          "PF_KAITOUSD",
+          "PF_GPSUSD",
+          "PF_INITUSD",
+          "PF_SYRUPUSD",
+          "PF_MUBARAKUSD",
+          "PF_SPKUSD",
+          "PF_PUMPUSD",
+          "PF_WLFIUSD",
+          "PF_XAUTUSD",
+          "PF_SOONUSD",
+          "PF_ASTERUSD",
+          "PF_XPLUSD",
+          "PF_PROMPTUSD",
+          "PF_MIRAUSD",
+          "PF_2ZUSD",
+          "PF_OPENUSD",
+          "PF_RIVERUSD",
+          "PF_ZBTUSD",
+          "PF_NIGHTUSD",
+          "PF_LCAPUSD",
+          "PF_GLDXUSD",
+          "PF_QQQXUSD",
+          "PF_SPYXUSD",
+          "PF_MONUSD",
+          "PF_ZIGUSD",
+          "PF_TSLAXUSD",
+          "PF_NVDAXUSD",
+          "PF_MSTRXUSD",
+          "PF_HOODXUSD",
+          "PF_GOOGLXUSD",
+          "PF_CRCLXUSD",
+          "PF_AAPLXUSD",
+          "PF_CFGUSD",
+          "PF_OPNUSD",
+          "PF_WTIOILUSD",
+          "PF_SPCXXUSD",
+          "PF_ANTHROPICXUSD",
+          "PF_OPENAIXUSD",
+          "PF_XAGUSD",
+          "PF_AMZNXUSD",
+          "PF_COINXUSD",
+          "PF_METAXUSD",
+          "PF_XAUUSD",
+          "PF_NATGASUSD",
+          "PF_XCUUSD",
+          "PF_BRENTOILUSD",
+          "PF_US100USD",
+          "PF_NBISUSD",
+          "PF_SKHYUSD",
+          "PF_SAMSUNGUSD",
+          "PF_SNDKUSD",
+          "PF_SOXLUSD",
+          "PF_SOXSUSD"
         ]
       }
     ],

@@ -41,7 +41,7 @@ class Calls(SDK):
 class Mixin(Calls):
   """Base for the Kraken surfaces backed by one plain `typed_kraken` client.
 
-  The client owns one HTTP transport and two WebSocket v2 sockets, all of which
+  The client owns three HTTP transports and two WebSocket v2 sockets, all of which
   connect lazily on first use, so yielding it from `resources()` costs nothing for a
   surface that only ever reads REST.
   """
@@ -58,7 +58,7 @@ class Mixin(Calls):
     validate: bool = True,
     **fields: Any,
   ):
-    """Build a surface around a fresh Kraken Spot client.
+    """Build a surface around a fresh Kraken client.
 
     Args:
       api_key: Kraken API key; read from `KRAKEN_API_KEY` when omitted.

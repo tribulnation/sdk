@@ -27,12 +27,10 @@ T = TypeVar('T')
 Kind = Literal['spot', 'perp']
 Status = Literal['pass', 'fail', 'unavailable', 'excluded', 'deferred', 'limitation']
 
-# Kraken Futures and Bitget UTA coin are explicitly deferred products.
+# Bitget UTA coin is an explicitly deferred product.
 # Keep its Catalogue rows visible as exclusions; never infer scope from discovery
 # failures or automatically exclude other unrecognized exchange IDs.
-CATALOGUE_EXCLUSIONS = frozenset(
-  {('kraken', 'perp', 'perp'), ('bitget', 'perp', 'coin')}
-)
+CATALOGUE_EXCLUSIONS = frozenset({('bitget', 'perp', 'coin')})
 
 
 class StrictModel(BaseModel):

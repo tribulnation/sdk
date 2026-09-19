@@ -30,6 +30,9 @@ methods = [
   "rules",
   "fees",
   "tickers",
+  "index",
+  "perp_stats",
+  "funding_rates",
   "candles",
   "query_order",
   "open_orders",
@@ -39,13 +42,11 @@ methods = [
   "collateral",
   "available_notional",
 ]
-note = "Spot only; we do not trade on Kraken, so `place_order`/`cancel_order` raise `NotImplementedError`. `candles` serves all six contract intervals with required aware, half-open bounds and native response order. Kraken retains only the latest 720 candles per interval: older requested data is unavailable, and `since` cannot page past that limit. `rules().fees` is the lowest-volume tier of the pair's public schedule, or None for absent rates; `fees()` reads the account's TradeVolume schedule. `depth_stream` subscribes at the smallest of Kraken's fixed depths (10/25/100/500/1000) holding `levels` and trims to it."
-# MarketSDK.DEFAULT_ACCOUNTS includes 'kraken' (Kraken(public=True)): markets, depth,
-# depth_stream, tickers and rules are public; account-scoped methods need real
-# credentials. Kraken Futures is a separate product with its own keys and is not
-# wrapped by typed_kraken, so there is no perp exchange.
+note = "Spot retains its existing public/private reads; perp adds public non-tradfi USD linear perpetuals with unit contract size, including tokenized assets classified that way by Kraken. Perp supports discovery, depth, tickers, rules, index, perp_stats, funding_rates and all six candle intervals. Futures streams, next_funding, account fees and all private/trading methods remain unsupported. Spot candles retain the recent API window (documented 720; 721 observed including forming). Perp candles use trade Charts in bounded 2000-open windows, preserve missing intervals, and filter aware half-open bounds. Funding history uses native relativeFundingRate, with settlement time = native period start + 1 hour and inclusive/open bounds. Perp standard fees and maximum order size remain unknown; USD fee currency resolves through Assets to ZUSD."
+# Spot depth_stream is supported; perpetual streams are explicitly unsupported.
+# Public reads use the credential-free Kraken DEFAULT_ACCOUNTS entry.
 
 [ids]
 asset = "symbol"
-market = "The REST pair altname (`XBTUSD`, `ETHUSDC`)."
+market = "Spot REST pair altname (`XBTUSD`, `ETHUSDC`); perpetual instrument symbol (`PF_XBTUSD`, `PF_ETHUSD`) under exchange perp."
 note = "Kraken's internal asset id (`XXBT`, `XETH`, `ZUSD`, `USDC`, `SOL`): what `Balance`, `Ledgers`, `TradesHistory`, `WithdrawMethods` and the default `AssetPairs`/`Assets` listings name assets by. `Earn/Strategies` answers in display names (`BTC`) and is re-keyed to the internal id through the venue's own `Assets` join on `altname`. Networks are Kraken's display network names (`Bitcoin`, `Arbitrum One`)."

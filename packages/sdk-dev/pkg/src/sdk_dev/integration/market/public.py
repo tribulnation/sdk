@@ -143,9 +143,13 @@ async def collect_public(sdk: MarketSDK, id: str) -> PublicResults:
           and name not in support.methods
         ):
           result.skips[name] = f'{name} is not declared in impl.toml'
-        elif venue_slug == 'mexc' and exchange_id == 'perp' and name == 'depth_stream':
+        elif (
+          venue_slug in {'mexc', 'kraken'}
+          and exchange_id == 'perp'
+          and name == 'depth_stream'
+        ):
           result.skips[name] = (
-            'MEXC perpetual streams are explicitly unsupported (impl.toml note)'
+            f'{venue_slug} perpetual streams are explicitly unsupported (impl.toml note)'
           )
         elif needs_account(
           venue_slug, name, public=sdk.all_accounts[account_id].public

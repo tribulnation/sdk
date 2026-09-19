@@ -1,30 +1,53 @@
-"""Kraken as a trading venue: one spot exchange, and nothing else."""
+"""Kraken Spot and public linear perpetual market data."""
 
-from typing_extensions import Sequence
+from typing_extensions import Literal, Sequence, overload
 from dataclasses import dataclass
 
 from tribulnation.sdk.market import TradingVenue
 
 from .impl import SharedMixin
 from .spot_exchange import SpotExchange
+from .perp_exchange import PerpExchange
 
 
 @dataclass(frozen=True, kw_only=True)
 class KrakenMarket(SharedMixin, TradingVenue):
   """Kraken implementation of `TradingVenue`.
 
-  Spot is the only exchange: Kraken Futures is a separate product on its own host,
-  with its own API keys, and `typed_kraken` wraps Kraken Spot alone.
+  Spot retains its existing private capabilities; perpetuals expose public data
+  through the independent Futures REST and Charts transports.
   """
 
   @property
   def venue_id(self) -> str:
     return 'kraken'
 
-  async def exchange(self, exchange_id: str, /) -> SpotExchange:
-    if exchange_id != 'spot':
-      raise ValueError(f'Invalid exchange ID: {exchange_id}. Only "spot" is supported.')
-    return SpotExchange(shared=self.shared)
+  @overload
+  async def exchange(self, exchange_id: Literal['spot'], /) -> SpotExchange:
+    """Resolve Spot with its concrete type."""
+    ...
+
+  @overload
+  async def exchange(self, exchange_id: Literal['perp'], /) -> PerpExchange:
+    """Resolve perpetuals with their concrete type."""
+    ...
+
+  @overload
+  async def exchange(self, exchange_id: str, /) -> SpotExchange | PerpExchange:
+    """Resolve a runtime exchange ID."""
+    ...
+
+  async def exchange(self, exchange_id: str, /) -> SpotExchange | PerpExchange:
+    """Resolve the explicit Spot or qualified linear perpetual exchange."""
+    if exchange_id == 'spot':
+      return SpotExchange(shared=self.shared)
+    if exchange_id == 'perp':
+      return PerpExchange(shared=self.shared)
+    raise ValueError(f'Invalid Kraken exchange ID: {exchange_id}')
 
   async def exchanges(self) -> Sequence[TradingVenue.ExchangeDescription]:
-    return [{'id': 'spot', 'type': 'spot', 'name': 'Spot'}]
+    """List the public Spot and perpetual product identities."""
+    return [
+      {'id': 'spot', 'type': 'spot', 'name': 'Spot'},
+      {'id': 'perp', 'type': 'perp', 'name': 'Linear perpetuals'},
+    ]

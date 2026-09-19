@@ -13,6 +13,9 @@ for repository setup, development commands and implementation guidance.
 4. [KuCoin public Market qualification](kucoin-public-market.md): endpoint mappings,
    observed history limits and the capability/version handoff for SDK #33.
 
+5. [Kraken public Market qualification and remaining scope](kraken-public-market.md):
+   Spot and public perpetual coverage, candle/funding semantics and remaining backfill tasks.
+
 ## Documentation boundaries
 
 1. [User documentation](../docs/index.md) explains installation, configuration,

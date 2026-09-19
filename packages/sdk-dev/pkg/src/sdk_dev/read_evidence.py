@@ -142,7 +142,7 @@ def inventory(root: Path, venue: str) -> dict[str, Case]:
         elif method not in {'exchanges', 'markets'} and method not in enabled:
           exclusion = 'unsupported'
         elif (
-          venue == 'mexc'
+          venue in {'mexc', 'kraken'}
           and reference.market_id.startswith('perp:')
           and method == 'depth_stream'
         ):
