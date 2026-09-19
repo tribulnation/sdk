@@ -99,6 +99,7 @@ async def tickers(
       last=None,
       # The indexer sums quoteAmount into volume24H; it is not base volume.
       base_volume_24h=None,
+      quote_volume_24h=Decimal(perpetual_markets[ticker_name]['volume24H']),
     )
 
   venue_settings = settings.get('dydx', {})

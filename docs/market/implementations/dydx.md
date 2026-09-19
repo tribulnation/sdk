@@ -12,6 +12,8 @@
 
 # dYdX Market
 
+`tickers()` returns native `quote_volume_24h`; `base_volume_24h` remains `None` because the indexer reports quote turnover.
+
 > Perpetuals only. `tribulnation-dydx`, venue name `dydx`.
 
 See the [generic market interface](../index.md) for the shared method surface. This page
