@@ -151,21 +151,21 @@
         "id": "[\"ticker_depth\",\"spot\",\"1INCH/EUR\"]",
         "quotes": [
           {
-            "after_ask": "0.0866",
-            "after_bid": "0.0865",
-            "ask": "0.0868",
+            "after_ask": "0.087",
+            "after_bid": "0.0868",
+            "ask": "0.0867",
             "attempt": 1,
-            "before_ask": "0.0867",
-            "before_bid": "0.0865",
-            "bid": "0.0867",
-            "elapsed_seconds": 0.1873876639874652,
+            "before_ask": "0.087",
+            "before_bid": "0.0868",
+            "bid": "0.0866",
+            "elapsed_seconds": 0.17829035100294277,
             "ticker_ids_match": true
           }
         ],
         "status": "pass"
       },
       {
-        "code": "mismatch",
+        "code": "native_ticker_quotes",
         "id": "[\"ticker_depth\",\"spot\",\"A1X/USDC\"]",
         "quotes": [
           {
@@ -176,7 +176,7 @@
             "before_ask": "0.0005999",
             "before_bid": null,
             "bid": "0.0",
-            "elapsed_seconds": 0.16907969501335174,
+            "elapsed_seconds": 0.15002136497059837,
             "ticker_ids_match": true
           },
           {
@@ -187,7 +187,7 @@
             "before_ask": "0.0005999",
             "before_bid": null,
             "bid": "0.0",
-            "elapsed_seconds": 0.15096101397648454,
+            "elapsed_seconds": 0.1332139139994979,
             "ticker_ids_match": true
           },
           {
@@ -198,25 +198,25 @@
             "before_ask": "0.0005999",
             "before_bid": null,
             "bid": "0.0",
-            "elapsed_seconds": 0.15664497297257185,
+            "elapsed_seconds": 0.16610027698334306,
             "ticker_ids_match": true
           }
         ],
-        "status": "fail"
+        "status": "limitation"
       },
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"spot\",\"AAVE/EUR\"]",
         "quotes": [
           {
-            "after_ask": "123.82",
-            "after_bid": "123.71",
-            "ask": "123.88",
+            "after_ask": "123.91",
+            "after_bid": "123.82",
+            "ask": "123.72",
             "attempt": 1,
-            "before_ask": "123.81",
-            "before_bid": "123.71",
-            "bid": "123.76",
-            "elapsed_seconds": 0.1565324289840646,
+            "before_ask": "123.91",
+            "before_bid": "123.82",
+            "bid": "123.58",
+            "elapsed_seconds": 0.15110589301912114,
             "ticker_ids_match": true
           }
         ],
@@ -227,14 +227,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"BTC/EUR\"]",
         "quotes": [
           {
-            "after_ask": "70832.1",
-            "after_bid": "70830.2",
-            "ask": "70828.7",
+            "after_ask": "70868.9",
+            "after_bid": "70868.8",
+            "ask": "70873.4",
             "attempt": 1,
-            "before_ask": "70832.1",
-            "before_bid": "70830.2",
-            "bid": "70828.6",
-            "elapsed_seconds": 0.15924983500735834,
+            "before_ask": "70868.9",
+            "before_bid": "70868.8",
+            "bid": "70873.3",
+            "elapsed_seconds": 0.14309006195981055,
             "ticker_ids_match": true
           }
         ],
@@ -555,6 +555,6 @@
       }
     ],
     "venue": "bit2me",
-    "version": 4
+    "version": 5
   }
 }
