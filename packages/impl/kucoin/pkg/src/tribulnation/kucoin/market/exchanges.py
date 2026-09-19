@@ -51,6 +51,7 @@ class SpotExchange(Public, Exchange):
         bid_qty=r['bestBidSize'] if r['buy'] > 0 else None,
         ask_qty=r['bestAskSize'] if r['sell'] > 0 else None,
         base_volume_24h=r['vol'],
+        quote_volume_24h=r['volValue'],
       )
       for r in rows['ticker']
       if r['symbol'] in selected
@@ -109,6 +110,7 @@ class LinearPerpExchange(Public, PerpExchange):
         if r['bestAskPrice'] > 0
         else None,
         base_volume_24h=Decimal(str(c['volumeOf24h'])),
+        quote_volume_24h=Decimal(str(c['turnoverOf24h'])),
       )
     return result
 
