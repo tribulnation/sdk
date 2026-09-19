@@ -107,6 +107,7 @@ def parse_spot_ticker(ticker: SpotTicker) -> Ticker:
     bid_qty=ticker['bidSz'],
     ask_qty=ticker['askSz'],
     base_volume_24h=ticker['baseVolume'],
+    quote_volume_24h=ticker['quoteVolume'],
   )
 
 
@@ -119,6 +120,7 @@ def parse_perp_ticker(ticker: MixTicker) -> Ticker:
     bid_qty=ticker['bidSz'],
     ask_qty=ticker['askSz'],
     base_volume_24h=ticker['baseVolume'],
+    quote_volume_24h=ticker['quoteVolume'],
   )
 
 

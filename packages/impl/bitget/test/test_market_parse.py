@@ -128,9 +128,11 @@ def test_a_one_sided_spot_ticker_reports_no_size():
         'bidSz': None,
         'askSz': Decimal('5'),
         'baseVolume': Decimal('100'),
+        'quoteVolume': Decimal('95.123456789012345678'),
       },
     )
   )
+  assert ticker.quote_volume_24h == Decimal('95.123456789012345678')
   assert ticker.bid_qty is None and ticker.ask_qty == Decimal(5)
   assert ticker.last == Decimal(1) and ticker.base_volume_24h == Decimal(100)
 
@@ -147,6 +149,7 @@ def mix_ticker() -> MixTicker:
       'bidSz': Decimal('1'),
       'askSz': Decimal('2'),
       'baseVolume': Decimal('50000'),
+      'quoteVolume': Decimal('3900000000.125'),
       'indexPrice': Decimal('78447.1135'),
       'fundingRate': Decimal('0.0001'),
       'holdingAmount': Decimal('35009.8822999998803'),
