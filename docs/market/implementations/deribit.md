@@ -13,8 +13,7 @@
 # Deribit Market
 
 Public mainnet spot and linear perpetual data through `tribulnation-deribit`.
-This capability is prepared for `tribulnation-sdk` 2.2.0 and
-`tribulnation-deribit` 0.3.0; both releases are pending publication.
+Requires `tribulnation-sdk` >=2.2.0 and `tribulnation-deribit` >=0.3.0.
 
 ```python
 from tribulnation.sdk import MarketSDK

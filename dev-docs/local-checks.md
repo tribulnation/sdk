@@ -57,7 +57,7 @@ sdk-dev results verify /path/to/new-run \
    Kraken linear perpetuals are now in scope under `perp`; see
    [ADR 0020](adr/0020-kraken-public-perpetuals.md). Missing Catalogue markets remain
    deferred coverage rather than automatic product exclusions.
-7. Market payload version 4 includes the explicit Bit2Me native-ticker limitation and rejects older policies. Fresh reports
+7. Market payload version 5 includes the Bit2Me limitation for stable one-sided books and rejects older policies. Fresh reports
    are required after this policy change; old reports cannot be relabeled as passing.
 
 ## Quote comparison and scope
@@ -83,11 +83,13 @@ See [ADR 0011](adr/0011-liquidity-independent-consistency.md).
 Bit2Me `spot` has one reviewed upstream limitation: its native ticker bid/ask can
 be stale or zero even with a live book, including symbol-specific reads. Keep native
 values and request `depth()` explicitly when current book quotes are needed.
-Three timely, exact-ID discrepancies against valid two-sided books are recorded as
+Three timely, exact-ID discrepancies against valid books with the same nonempty
+side inventory across all six depth snapshots are recorded as
 `limitation/native_ticker_quotes`, not passes, but do not block release. Public
 brackets and a warning in the evidence summary remain visible. Request errors,
 wrong IDs, invalid books, malformed/negative prices and other checks still block.
-See [ADR 0014](adr/0014-bit2me-native-ticker-limitation.md); this is not a general
+See [ADR 0014](adr/0014-bit2me-native-ticker-limitation.md) and
+[ADR 0022](adr/0022-bit2me-one-sided-ticker-limitation.md); this is not a general
 venue exemption or permission to relabel old reports.
 
 This suite does not call personal `fees()`, place orders, transfer funds, or claim

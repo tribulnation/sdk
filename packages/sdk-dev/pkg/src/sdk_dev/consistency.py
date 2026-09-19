@@ -18,7 +18,7 @@ from .integration.market.support import CASES
 from .repo import repo_root
 from .support import load_impl_files
 
-VERSION = 4
+VERSION = 5
 REQUEST_TIMEOUT = 120
 BRACKET_SECONDS = 15
 TOLERANCE = Decimal('0.005')
@@ -84,7 +84,7 @@ class Check(StrictModel):
 class Payload(StrictModel):
   """One mainnet venue's discovery and deterministic check inventory."""
 
-  version: Literal[4] = VERSION
+  version: Literal[5] = VERSION
   venue: str
   account_id: str
   discovery: list[Discovery]
@@ -321,8 +321,9 @@ async def request(awaitable: Awaitable[T]) -> T:
 def native_ticker_limitation(venue: str, check: Check) -> bool:
   """Recognize only Bit2Me native quote discrepancies against valid live books.
 
-  ADR 0014 permits stale, zero or missing native ticker sides, not wrong IDs,
-  failed requests, incomplete/slow brackets or malformed/negative prices.
+  ADRs 0014/0022 permit stale, zero or missing native ticker sides against
+  stable nonempty book sides, not wrong IDs, failed requests, slow brackets
+  or malformed/negative prices.
   """
   parts: list[object] = json.loads(check.id)
   if (
@@ -332,6 +333,12 @@ def native_ticker_limitation(venue: str, check: Check) -> bool:
     or parts[:2] != ['ticker_depth', 'spot']
     or len(check.quotes) != RETRIES
   ):
+    return False
+  sides = (
+    check.quotes[0].before_bid is not None,
+    check.quotes[0].before_ask is not None,
+  )
+  if not any(sides):
     return False
   for attempt, row in enumerate(check.quotes, start=1):
     if (
@@ -346,10 +353,14 @@ def native_ticker_limitation(venue: str, check: Check) -> bool:
         (row.before_bid, row.before_ask),
         (row.after_bid, row.after_ask),
       ):
-        if bid is None or ask is None:
+        if (bid is not None, ask is not None) != sides:
           return False
-        lower, upper = Decimal(bid), Decimal(ask)
-        if not lower.is_finite() or not upper.is_finite() or not 0 < lower <= upper:
+        for value in (bid, ask):
+          if value is not None:
+            price = Decimal(value)
+            if not price.is_finite() or price <= 0:
+              return False
+        if bid is not None and ask is not None and Decimal(bid) > Decimal(ask):
           return False
       for value in (row.bid, row.ask):
         if value is not None:

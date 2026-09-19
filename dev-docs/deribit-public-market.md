@@ -1,8 +1,8 @@
 # Deribit public Market qualification
 
 Scope: [SDK #33](https://github.com/tribulnation/sdk/issues/33), Deribit only.
-Implemented and probed on mainnet on 2026-09-19. This is an unreleased public-data
-expansion, separate from Wallet/Earn/Report and Terminal collection/serving rollout.
+Implemented and probed on mainnet on 2026-09-19. Public Market support requires
+Deribit 0.3.0 and SDK 2.2.0, separate from Terminal collection/serving rollout.
 [ADR 0021](adr/0021-deribit-public-market.md) records the supported subset.
 
 ## Capability handoff
@@ -111,13 +111,15 @@ no SDK symbols were renamed to hide the gaps.
 
 Initial implementation qualification used typed-deribit **0.3.0**, editable
 tribulnation-deribit **0.2.1** and core SDK **2.1.0**, with the new source changes.
-The release candidates are now **tribulnation-sdk 2.2.0** and
+The release pair is **tribulnation-sdk 2.2.0** and
 **tribulnation-deribit 0.3.0**. Deribit's SDK floor is 2.2.0 and the core Deribit
 extra requires 0.3.0. Final candidate qualification is recorded separately in
 `release-evidence/`. The SDK release PR carries the integration with Deribit
 metadata still at 0.2.1; the follow-up Deribit release raises its version and floor.
-Both branches need their own matching Deribit reports. Publication remains pending;
-publish core first, then Deribit.
+Both branches recorded matching Deribit reports. Deribit 0.3.0 was published
+after its release gate passed; the initial SDK publication was blocked by Bit2Me.
+The SDK release completes the dependency pair with fresh all-venue evidence under
+[ADR 0022](adr/0022-bit2me-one-sided-ticker-limitation.md).
 
 [PR #25](https://github.com/tribulnation/sdk/pull/25) already merged the earlier
 Wallet/Earn/Report release; this work does not recreate it. Public Market qualification
