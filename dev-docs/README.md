@@ -16,6 +16,9 @@ for repository setup, development commands and implementation guidance.
 5. [Kraken public Market qualification and remaining scope](kraken-public-market.md):
    Spot and public perpetual coverage, candle/funding semantics and remaining backfill tasks.
 
+6. [Deribit public Market qualification](deribit-public-market.md): public methods, live observations,
+   candle/funding limitations and the version/Catalogue handoff.
+
 ## Documentation boundaries
 
 1. [User documentation](../docs/index.md) explains installation, configuration,

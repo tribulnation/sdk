@@ -43,3 +43,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0018](0018-retire-bitget-classic-coin.md) | Retire confirmed Bitget Classic coin markets while preserving historical IDs | Accepted; amends 0008 and 0010 |
 | [0019](0019-kucoin-public-market.md) | KuCoin public spot and linear perpetual data with native identities and base units | Accepted |
 | [0020](0020-kraken-public-perpetuals.md) | Kraken public linear perpetual data with native identities and hourly funding settlement conversion | Accepted |
+| [0021](0021-deribit-public-market.md) | Deribit public spot and linear perpetuals with explicit candle and funding limits | Accepted |

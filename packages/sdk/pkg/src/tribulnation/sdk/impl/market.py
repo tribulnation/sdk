@@ -11,6 +11,7 @@ from .accounts import (
   Bitget,
   Bybit,
   Coinbase,
+  Deribit,
   Dydx,
   Hyperliquid,
   Kraken,
@@ -29,6 +30,7 @@ DEFAULT_ACCOUNTS: Mapping[str, Account] = {
   'bybit': Bybit(public=True),
   'kraken': Kraken(public=True),
   'kucoin': Kucoin(public=True),
+  'deribit': Deribit(public=True),
 }
 
 
@@ -188,6 +190,16 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       raise ImportError('Install tribulnation-kucoin to use this venue.') from e
     return KucoinMarket.new(validate=account.validate)
 
+  def deribit(self, account: Deribit) -> TradingVenue:
+    """Build Deribit's credential-free mainnet public Market surface."""
+    if account.venue != 'deribit':
+      raise ValueError('Deribit Market is qualified on mainnet only')
+    try:
+      from tribulnation.deribit import DeribitMarket
+    except ImportError as e:
+      raise ImportError('Install tribulnation-deribit to use this venue.') from e
+    return DeribitMarket.new(validate=account.validate)
+
   def _venue(self, id: str, /) -> TradingVenue:
     if (account := self.all_accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
@@ -212,6 +224,8 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
         return self.kraken(account)
       case 'kucoin':
         return self.kucoin(account)
+      case 'deribit' | 'deribit_testnet':
+        return self.deribit(account)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 

@@ -40,6 +40,6 @@ for account, sdk in earn.all.items():
 
 ---
 
-← [Coinbase Market](../market/implementations/coinbase.md) · **Next:** [Methods](methods.md) →
+← [Deribit Market](../market/implementations/deribit.md) · **Next:** [Methods](methods.md) →
 
 <!-- /next -->

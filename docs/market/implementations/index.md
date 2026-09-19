@@ -23,6 +23,8 @@ Per-method differences are on the [Methods](../methods.md) page, under each meth
 - [Coinbase](coinbase.md) — spot and INTX perpetuals; authenticated access recommended, explicit public fallback
 - [Kraken](kraken.md) — spot only, read only; altname market ids
 
+- [Deribit](deribit.md) — public spot and linear perpetuals; four intraday candle intervals
+
 <!-- next -->
 
 ---

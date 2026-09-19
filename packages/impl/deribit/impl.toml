@@ -16,9 +16,10 @@ methods = ["instruments"]
 note = "Public seven-day SMA APRs on automatically discovered reward-bearing balances, not subscribable products or an account-eligibility guarantee. Supports public=True; no credential-free default account is installed."
 
 [support.market]
-support = "none"
-auth = true
-note = "Market implementation is not yet packaged; the prototype is not a supported SDK surface."
+support = "partial"
+auth = false
+methods = ["depth", "depth_stream", "tickers", "candles", "index", "perp_stats"]
+note = "Credential-free mainnet spot and linear perpetuals under spot/perp; inverse, dated and combo contracts are excluded. Native base quantities; REST books 1-100 levels, streams 1-20, default 20. Native trade candles use public WebSocket requests, aware half-open bounds and 1000-open windows for 1m/5m/15m/1h; no 4h, native 08:00-UTC daily, or Coinbase-routed spot candles. No archive completeness guarantee. Index/mark and optional base open interest are public. Rules, fees, scheduled funding, account methods and trading remain unsupported; hourly funding observations are not discrete payment rates."
 
 [ids]
 asset = "symbol"

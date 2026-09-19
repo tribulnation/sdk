@@ -55,6 +55,7 @@ would raise instead.
 | Kraken | ✅ | ✅ |
 | Bybit | ✅ | ✅ |
 | KuCoin | ✅ | — |
+| Deribit | ✅ | — |
 <!-- /streams -->
 
 Per-venue caveats are on the
