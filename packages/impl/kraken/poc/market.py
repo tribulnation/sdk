@@ -1,4 +1,5 @@
 # %%
+# not executed: Legacy account mapping is outside the current public Futures qualification.
 import asyncio
 from decimal import Decimal
 from datetime import datetime, timedelta, timezone
@@ -11,6 +12,7 @@ from dotenv import load_dotenv
 
 from tribulnation.sdk.market import (
   Book,
+  Fees,
   Collateral,
   Order,
   OrderResponse,
@@ -46,9 +48,13 @@ WS_SYMBOLS = {
 # %% [markdown]
 # ## `Market` (spot)
 #
-# Kraken's `typed_kraken` client is Spot-only -- see the `PerpMarket` section at the end for why the perpetual half of the interface doesn't apply here at all.
+# This legacy account PoC is not current public qualification. See `market/public.py`
+# for credential-free Spot probes and `dev-docs/kraken-public-market.md` for SDK #33.
+# Public Futures mappings below use typed-kraken 0.4.0 through the SDK.
+
 
 # %%
+# not executed: Legacy account mapping is outside the current public Futures qualification.
 async def depth(symbol: str, *, levels: int | None = None) -> Book:
   raw = await client.spot.market_data.depth(pair=symbol, count=levels)
   book = next(iter(raw.values()))
@@ -62,6 +68,7 @@ async def depth(symbol: str, *, levels: int | None = None) -> Book:
 
 
 # %%
+# not executed: Legacy account mapping is outside the current public Futures qualification.
 def depth_stream(symbol: str, *, levels: Literal[10, 25, 100, 500, 1000] = 10):
   def to_book(msg: BookMessage) -> Book:
     data = msg['data'][0]
@@ -93,7 +100,10 @@ books
 
 
 # %%
+# not executed: Legacy account mapping is outside the current public Futures qualification.
+# not executed: legacy Spot mapping updated for typing; public qualification is in market/public.py
 async def rules(symbol: str, *, refetch: bool = False) -> Rules:
+  """Map the public pair schedule to current combined SDK fees."""
   raw = await client.spot.market_data.asset_pairs(pair=symbol)
   pair = next(iter(raw.values()))
   fees_taker = pair.get('fees') or []
@@ -109,8 +119,12 @@ async def rules(symbol: str, *, refetch: bool = False) -> Rules:
     step_size=Decimal(1) / 10 ** pair.get('lot_decimals', 0),
     fixed_min_qty=ordermin,
     min_value=costmin,
-    maker_fee=Decimal(str(fees_maker[0][1])) / 100 if fees_maker else Decimal(0),
-    taker_fee=Decimal(str(fees_taker[0][1])) / 100 if fees_taker else Decimal(0),
+    fees=Fees.symmetric(
+      maker=Decimal(str(min(fees_maker, key=lambda tier: tier[0])[1])) / 100,
+      taker=Decimal(str(min(fees_taker, key=lambda tier: tier[0])[1])) / 100,
+    )
+    if fees_maker and fees_taker
+    else None,
     api=pair.get('status') == 'online',
     details=pair,
   )
@@ -120,6 +134,7 @@ async def rules(symbol: str, *, refetch: bool = False) -> Rules:
 
 
 # %%
+# not executed: Legacy account mapping is outside the current public Futures qualification.
 async def open_orders(symbol: str) -> list[OrderState]:
   raw = await client.spot.account.open_orders()
   out: list[OrderState] = []
@@ -147,9 +162,14 @@ async def open_orders(symbol: str) -> list[OrderState]:
 
 
 # %%
+# not executed: Legacy account mapping is outside the current public Futures qualification.
+# not executed: legacy Spot mapping updated for typing; public qualification is in market/public.py
 async def trades_history(symbol: str, start: datetime, end: datetime) -> list[Trade]:
+  """Map account fills using the published quote asset."""
   pairs = await client.spot.market_data.asset_pairs(pair=symbol)
-  quote = next(iter(pairs.values()))['quote']
+  quote = next(iter(pairs.values())).get('quote')
+  if quote is None:
+    raise ValueError('Kraken pair omitted its quote asset')
   raw = await client.spot.account.trades_history(
     pair=symbol,
     start=int(start.timestamp()),
@@ -182,6 +202,7 @@ start = end - timedelta(days=365)
 
 
 # %%
+# not executed: Legacy account mapping is outside the current public Futures qualification.
 async def trades_stream(symbol: str):
   ws_symbol = WS_SYMBOLS[symbol]
   async with client.streams.private.executions(snap_trades=False) as stream:
@@ -222,9 +243,14 @@ result
 
 
 # %%
+# not executed: Legacy account mapping is outside the current public Futures qualification.
+# not executed: legacy Spot mapping updated for typing; public qualification is in market/public.py
 async def position(symbol: str) -> Position:
+  """Read the base asset balance for a spot pair."""
   pairs = await client.spot.market_data.asset_pairs(pair=symbol)
-  base = next(iter(pairs.values()))['base']
+  base = next(iter(pairs.values())).get('base')
+  if base is None:
+    raise ValueError('Kraken pair omitted its base asset')
   balances = await client.spot.account.balance()
   size = Decimal(balances.get(base, '0'))
   return Position(size=size)
@@ -234,9 +260,14 @@ async def position(symbol: str) -> Position:
 
 
 # %%
+# not executed: Legacy account mapping is outside the current public Futures qualification.
+# not executed: legacy Spot mapping updated for typing; public qualification is in market/public.py
 async def collateral(symbol: str) -> Collateral:
+  """Read the quote balance and native trade holds."""
   pairs = await client.spot.market_data.asset_pairs(pair=symbol)
-  quote = next(iter(pairs.values()))['quote']
+  quote = next(iter(pairs.values())).get('quote')
+  if quote is None:
+    raise ValueError('Kraken pair omitted its quote asset')
   balances = await client.spot.account.balance_ex()
   info = balances.get(quote) or {}
   balance = Decimal(info.get('balance', '0'))
@@ -248,6 +279,7 @@ async def collateral(symbol: str) -> Collateral:
 
 
 # %%
+# not executed: Legacy account mapping is outside the current public Futures qualification.
 async def available_notional(symbol: str) -> Decimal:
   c = await collateral(symbol)
   return c.free_collateral
@@ -257,6 +289,7 @@ async def available_notional(symbol: str) -> Decimal:
 
 
 # %%
+# not executed: Legacy account mapping is outside the current public Futures qualification.
 async def place_order(
   symbol: str, order: Order, *, settings: Settings = {}
 ) -> OrderResponse:
@@ -294,6 +327,7 @@ await place_order(
 
 
 # %%
+# not executed: Legacy account mapping is outside the current public Futures qualification.
 async def cancel_order(symbol: str, id: str, *, settings: Settings = {}):
   return await client.spot.trading.cancel_order(txid=id)
 
@@ -302,220 +336,76 @@ async def cancel_order(symbol: str, id: str, *, settings: Settings = {}):
 await cancel_order('XBTUSD', '123456')
 
 # %% [markdown]
-# ## `PerpMarket` (Kraken Futures) -- bypassing `typed_kraken`
+# ## Kraken Futures
 #
-# `typed_kraken` is Kraken **Spot** only (`Kraken.new()` exposes just `spot`, `streams`, and
-# `trading_ws` -- no perpetuals/futures namespace). Kraken's perpetual futures product is a
-# separate, fully public, officially documented API on its own host, `futures.kraken.com`,
-# described at **https://docs.kraken.com/api/docs/futures-api/**. It is not an internal or
-# undocumented surface -- it's Kraken's normal Futures product docs, just not wrapped by
-# `typed_kraken`.
-#
-# The cells below talk to that API's **public, unauthenticated** REST endpoints directly with
-# `httpx`, entirely bypassing `typed_kraken`. Endpoints used (all cited inline below too):
-#
-# - Orderbook -- https://docs.kraken.com/api/docs/futures-api/trading/get-orderbook/
-# - Instruments -- https://docs.kraken.com/api/docs/futures-api/trading/get-instruments
-# - Fee schedules -- https://docs.kraken.com/api/docs/futures-api/trading/get-fee-schedules
-# - Ticker by symbol -- https://docs.kraken.com/api/docs/futures-api/trading/get-ticker/
-# - Historical funding rates -- https://docs.kraken.com/api/docs/futures-api/trading/historical-funding-rates
-#
-# **Credential caveat:** Kraken Futures authenticates with its own, separate API key/secret pair,
-# distinct from Kraken Spot. The `KRAKEN_API_KEY`/`KRAKEN_PRIVATE_KEY` in `.env` are Spot
-# credentials and would not authenticate against Kraken Futures' private endpoints -- this
-# environment has no Kraken Futures API credentials. So only public endpoints are called here;
-# see the markdown cell after the code below for exactly which `PerpMarket`/`Market` methods that
-# leaves out.
+# Public mappings now use released typed-kraken 0.4.0. See `market/futures.py` for the full qualification. Depth, rules, index and funding history are verified; next funding remains explicitly unsupported.
 
 # %%
-import httpx
-from typing_extensions import Any
-
+from tribulnation.kraken import KrakenMarket
 from tribulnation.sdk.market import FundingRate, NextFunding
+from datetime import datetime
+from decimal import Decimal
 
-FUTURES_BASE_URL = 'https://futures.kraken.com/derivatives/api/v3'
-# Kraken Futures is a fully separate, publicly documented product from Kraken Spot -- see
-# https://docs.kraken.com/api/docs/futures-api/ -- and isn't covered by `typed_kraken` at all
-# (that package only wraps api.kraken.com Spot). Everything below talks to Kraken Futures'
-# public REST endpoints directly with `httpx`, bypassing `typed_kraken` entirely. Only
-# unauthenticated endpoints are used: the `KRAKEN_API_KEY`/`KRAKEN_PRIVATE_KEY` in `.env` are
-# Spot API keys and would not authenticate against Kraken Futures' separate key/secret scheme.
-futures = httpx.AsyncClient(base_url=FUTURES_BASE_URL)
-
-# "PF_" = flexible (multi-collateral) linear perpetuals, quoted and margined in USD -- the
-# closest Kraken Futures analogue to Binance's USDT-M perps used elsewhere in this repo.
-PERP_MARKETS = ['PF_XBTUSD', 'PF_ETHUSD', 'PF_SOLUSD']
+futures_venue = await KrakenMarket.new(public=True).__aenter__()
+futures_exchange = await futures_venue.exchange('perp')
 
 
 # %%
-async def depth(symbol: str, *, levels: int | None = None) -> Book:
-  # https://docs.kraken.com/api/docs/futures-api/trading/get-orderbook/
-  # The endpoint has no server-side depth/count param -- it always returns the full book,
-  # bids and asks both sorted ascending by price -- so `levels` is applied client-side.
-  raw = (await futures.get('/orderbook', params={'symbol': symbol})).json()['orderBook']
-  bids = raw['bids'][-levels:] if levels else raw['bids']
-  asks = raw['asks'][:levels] if levels else raw['asks']
-  return Book(
-    bids=[Book.Entry(Decimal(str(p)), Decimal(str(q))) for p, q in bids],
-    asks=[Book.Entry(Decimal(str(p)), Decimal(str(q))) for p, q in asks],
-  )
+async def depth(symbol: str, *, levels: int | None = None):
+  """Requalify the formerly blocked method through typed-kraken 0.4.0 and the SDK."""
+  return await (await futures_exchange.market(symbol)).depth(levels=levels)
 
 
-{symbol: await depth(symbol, levels=5) for symbol in PERP_MARKETS}
+{symbol: await depth(symbol) for symbol in ['PF_XBTUSD', 'PF_ETHUSD']}
 
 
 # %%
-async def rules(symbol: str, *, refetch: bool = False) -> Rules:
-  # https://docs.kraken.com/api/docs/futures-api/trading/get-instruments
-  # Fees aren't on the instrument itself -- each instrument points at a `feeScheduleUid`,
-  # resolved against the public https://docs.kraken.com/api/docs/futures-api/trading/get-fee-schedules
-  # fee schedules list. This is the base (lowest-volume) tier -- actual tier depends on
-  # trailing volume, which needs an authenticated account.
-  instruments = (await futures.get('/instruments')).json()['instruments']
-  instr = next(i for i in instruments if i['symbol'] == symbol)
-  fee_schedules = {
-    fs['uid']: fs for fs in (await futures.get('/feeschedules')).json()['feeSchedules']
-  }
-  schedule: dict[str, Any] = fee_schedules.get(instr.get('feeScheduleUid')) or {}
-  tiers: list[dict[str, Any]] = schedule.get('tiers') or []
-  base_tier = tiers[0] if tiers else None
-  return Rules(
-    fee_asset=instr['quote'],
-    tick_size=Decimal(str(instr['tickSize'])),
-    step_size=Decimal(1) / 10 ** instr.get('contractValueTradePrecision', 0),
-    max_qty=Decimal(str(instr['maxPositionSize']))
-    if instr.get('maxPositionSize')
-    else None,
-    maker_fee=Decimal(str(base_tier['makerFee'])) / 100 if base_tier else Decimal(0),
-    taker_fee=Decimal(str(base_tier['takerFee'])) / 100 if base_tier else Decimal(0),
-    api=instr.get('tradeable', False),
-    details=instr,
-  )
+async def rules(symbol: str, *, refetch: bool = False):
+  """Requalify the formerly blocked method through typed-kraken 0.4.0 and the SDK."""
+  return await (await futures_exchange.market(symbol)).rules(refetch=refetch)
 
 
-{symbol: await rules(symbol) for symbol in PERP_MARKETS}
+{symbol: await rules(symbol) for symbol in ['PF_XBTUSD', 'PF_ETHUSD']}
 
 
 # %%
-async def index(symbol: str, *, settings: Settings = {}) -> Decimal:
-  # https://docs.kraken.com/api/docs/futures-api/trading/get-ticker/
-  raw = (await futures.get(f'/tickers/{symbol}')).json()['ticker']
-  return Decimal(str(raw['indexPrice']))
+async def index(symbol: str):
+  """Requalify the formerly blocked method through typed-kraken 0.4.0 and the SDK."""
+  return await (await futures_exchange.market(symbol)).index()
 
 
-{symbol: await index(symbol) for symbol in PERP_MARKETS}
+{symbol: await index(symbol) for symbol in ['PF_XBTUSD', 'PF_ETHUSD']}
 
 
 # %%
 async def next_funding(symbol: str) -> NextFunding:
-  # Kraken Futures perpetuals fund continuously, re-setting the rate every hour on the hour --
-  # not Binance-style fixed 8h windows. See
-  # https://docs.kraken.com/api/docs/futures-api/trading/get-ticker/ and
-  # https://blog.kraken.com/product/quick-primer-on-funding-rates
-  # `ticker.fundingRate` is reported in absolute quote-currency units per contract; dividing by
-  # `markPrice` recovers the relative rate -- verified live against `relativeFundingRate` from
-  # the historical-funding-rates endpoint below, which agrees to the reported precision.
-  raw = (await futures.get(f'/tickers/{symbol}')).json()['ticker']
-  rate = Decimal(str(raw['fundingRate'])) / Decimal(str(raw['markPrice']))
-  next_time = datetime.now(timezone.utc).replace(
-    minute=0, second=0, microsecond=0
-  ) + timedelta(hours=1)
-  return NextFunding(rate=rate, time=next_time, interval=timedelta(hours=1))
+  """No qualified native relative rate and settlement timestamp are published here."""
+  return await (await futures_exchange.market(symbol)).next_funding()
 
 
-{symbol: await next_funding(symbol) for symbol in PERP_MARKETS}
+try:
+  await next_funding('PF_XBTUSD')
+except NotImplementedError:
+  print('Unsupported: native next-funding rate/time mapping remains unqualified')
+else:
+  raise AssertionError('next_funding must remain unsupported')
 
 
 # %%
 async def funding_rates(
-  symbol: str,
-  start: datetime | None = None,
-  end: datetime | None = None,
+  symbol: str, start: datetime | None = None, end: datetime | None = None
 ) -> list[FundingRate]:
-  # https://docs.kraken.com/api/docs/futures-api/trading/historical-funding-rates
-  # The endpoint takes no start/end params and returns the full history (back to contract
-  # launch, thousands of rows) in a single response -- filtered client-side here.
-  raw = (
-    await futures.get('/historical-funding-rates', params={'symbol': symbol})
-  ).json()['rates']
-  out = [
-    FundingRate(
-      rate=Decimal(str(r['relativeFundingRate'])),
-      time=datetime.fromisoformat(r['timestamp'].replace('Z', '+00:00')),
-    )
-    for r in raw
-  ]
-  if start:
-    out = [r for r in out if r.time >= start]
-  if end:
-    out = [r for r in out if r.time <= end]
-  return out
+  """Requalify historical relative rates at documented hour-end settlement times."""
+  return list(await (await futures_exchange.market(symbol)).funding_rates(start, end))
 
 
-end = datetime.now(timezone.utc)
-start = end - timedelta(days=7)
-{symbol: await funding_rates(symbol, start, end) for symbol in PERP_MARKETS}
+{symbol: len(await funding_rates(symbol)) for symbol in ['PF_XBTUSD', 'PF_ETHUSD']}
+
 
 # %% [markdown]
-# ### Not covered here: private/authenticated Kraken Futures endpoints
+# ## Kraken Futures
 #
-# Everything below needs an authenticated call against Kraken Futures' private REST API, which
-# uses its own separate API key/secret -- not present in this environment (only Spot credentials
-# are configured). Per the task's mutation/credential-safety rules, none of these were attempted:
-#
-# - `open_orders`, `trades_history`, `trades_stream` -- need Futures account credentials.
-# - `position`/`perp_position`, `collateral`/`perp_collateral`, `available_notional` -- need the
-#   authenticated Futures accounts/positions endpoints.
-# - `funding_payments` -- needs the authenticated Futures fills/history endpoint.
-# - `place_order`, `cancel_order` -- mutating, and would need Futures credentials regardless of
-#   the no-mutation rule.
-#
-# A hypothetical `typed_kraken_futures` client (or a Kraken Futures key/secret pair) would be the
-# place to fill these in.
+# Public mappings now use released typed-kraken 0.4.0. See `market/futures.py` for the full qualification. Depth, rules, index and funding history are verified; next funding remains explicitly unsupported.
 
-# %% [markdown]
-# ## Coverage
-#
-# **Mostly supported for spot.** All of `Market`'s read-only methods have a working mapping and were exercised live against real market/account data:
-#
-# - `depth`/`depth_stream`: solid, modulo the pair-naming mismatch called out above (REST altname vs. WS v2 symbol) and Kraken's fixed set of allowed WS book depths.
-# - `rules`: Kraken's `AssetPairs` doesn't distinguish `fixed_min_price`/`rel_min_price` -- there's no min/max price field at all, only min *order size* (`ordermin`) and min *order cost* (`costmin`); those SDK price-bound fields are simply unset.
-# - `open_orders`/`trades_history`: Kraken's `open_orders` is account-wide, so this notebook filters client-side on `descr['pair']`; `trades_history` does take a `pair=` filter. `trades_history` also infers the fee asset (quote currency) rather than reading it off the trade row, since Kraken doesn't report it explicitly there. `XBTUSDC` is in `MARKETS['spot']` because it is the only pair this account has ever traded -- without it every account-scoped cell here returns empty and verifies nothing. `open_orders` still returns nothing on all four pairs: the account holds no resting orders and placing one is a mutation.
-# - `trades_history`: `HistoricalTrade.time` renders `TimestampSeconds` since the codegen fix, so `Trade.time` lands as an aware UTC `datetime` -- with its microseconds intact, because `EpochConverter.parse` no longer truncates a fractional epoch. Nothing is converted locally.
-# - `trades_stream`: mapped onto `streams.private.executions` filtered to `exec_type == 'trade'`, which is a unified fills+order-status channel -- this notebook only reads the fill half of it.
-# - `position`/`collateral`/`available_notional`: spot has no native "position" or margin-collateral concept for an unlevered account, so these are approximated from plain asset balances (base-asset balance as `position.size`, quote-asset balance net of `hold_trade` as `collateral`), matching how the Binance spot PoC does it.
-# - `place_order`/`cancel_order`: written against `spot.trading.add_order`/`cancel_order` but never executed, per the task's mutation-safety rule. Kraken also exposes an entirely separate WS trading surface, `trading_ws` (kept off `streams` so that channel stays subscription-only) -- not used here, but a real venue implementation would likely prefer it for order placement latency.
-#
-# ## Coverage -- `PerpMarket` (Kraken Futures)
-#
-# **Public perp market data is fully reachable, live-verified above.** All of it bypasses
-# `typed_kraken` (Spot-only) and hits Kraken Futures' separate, publicly documented REST API
-# directly:
-#
-# - `depth`: solid. The endpoint has no server-side depth/count param -- it always returns the
-#   full book (thousands of levels), ascending-sorted on both sides -- so `levels` is sliced
-#   client-side.
-# - `rules`: `tick_size`/`step_size`/`max_qty`/`api` map cleanly from `/instruments`. There's no
-#   `fixed_min_qty`/`min_value` field in the current public schema (unlike the blog-era docs that
-#   mention a `minOrderSize`, it isn't actually present on live instrument rows). Fees require a
-#   second call to `/feeschedules`, resolved via the instrument's `feeScheduleUid` -- this only
-#   gets the base (lowest-volume) tier, since the actual tier depends on trailing volume that's
-#   only visible to an authenticated account.
-# - `index`: direct `indexPrice` field off the per-symbol ticker.
-# - `next_funding`: Kraken Futures perpetuals fund **continuously**, re-setting the rate every
-#   hour on the hour, unlike Binance's fixed 8h windows -- so `interval` is always 1 hour and
-#   `time` is simply the next hour boundary. The ticker's `fundingRate` field is in *absolute*
-#   quote-currency units per contract, not the SDK's relative-rate convention; dividing by
-#   `markPrice` recovers the relative rate, verified live against `relativeFundingRate` from
-#   `historical-funding-rates` (they agree to reported precision).
-# - `funding_rates`: `historical-funding-rates` takes no `start`/`end` params -- it returns the
-#   entire history back to contract launch (thousands of rows) in one response, filtered
-#   client-side here.
-#
-# **Private/authenticated Kraken Futures methods are not covered** (`open_orders`,
-# `trades_history`, `trades_stream`, `position`/`perp_position`, `collateral`/`perp_collateral`,
-# `available_notional`, `funding_payments`, `place_order`, `cancel_order`): Kraken Futures uses a
-# separate API key/secret from Kraken Spot, and this environment only has Spot credentials
-# (`KRAKEN_API_KEY`/`KRAKEN_PRIVATE_KEY`). Authenticated Futures coverage would need a separate
-# Kraken Futures API key/secret pair that isn't available here -- not a modeling gap, just a
-# credentials gap.
+# %%
+await futures_venue.__aexit__(None, None, None)

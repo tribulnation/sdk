@@ -66,8 +66,11 @@ CASES: Mapping[str, Sequence[CandleCase]] = {
     CandleCase(market_id='spot:BTC-USDT', page=1500),
     CandleCase(market_id='perp:XBTUSDTM', page=200),
   ],
-  # Kraken retains 720 rows and cannot page into older history.
-  'kraken': [CandleCase(market_id='spot:XBTUSD', page=None)],
+  # Spot has a retained window; Futures Charts support bounded history requests.
+  'kraken': [
+    CandleCase(market_id='spot:XBTUSD', page=None),
+    CandleCase(market_id='perp:PF_XBTUSD', page=2000),
+  ],
 }
 """The BTC market(s) to fetch per venue slug, for every venue implementing `candles`."""
 

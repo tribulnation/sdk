@@ -84,6 +84,8 @@ def test_exclusions_are_specific_and_never_passes():
     evidence.verify_payload(hl.model_dump(mode='json'), root=repo_root())
   mexc = evidence.inventory(repo_root(), 'mexc')
   assert sum(case.exclusion == 'unsupported_perp_stream' for case in mexc.values()) == 1
+  kraken = evidence.inventory(repo_root(), 'kraken')
+  assert sum(case.exclusion == 'unsupported_perp_stream' for case in kraken.values()) == 1
 
 
 def test_deribit_split_and_legacy_reports():

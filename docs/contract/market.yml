@@ -244,7 +244,7 @@ methods:
       dydx: Native newest-first pages, filtered to required `[start, end)` bounds without buffering the full history.
       mexc: "Required `[start, end)` bounds. Pages of 500, the cap MEXC really serves."
       bitget: Spot and supported perpetual exchanges; required aware half-open bounds. Native page order, no synthetic rows.
-      kraken: Spot only. Venue retention is the latest 720 candles per interval; older windows cannot be reconstructed by paging.
+      kraken: "Spot retains its recent OHLC window (720 documented; 721 observed). Perpetuals use bounded 2000-open trade Charts windows. Both support all six intervals and aware half-open bounds; neither guarantees complete archive coverage."
     example:
       accountVenues: [mexc]
       constants:
@@ -335,6 +335,7 @@ methods:
   perp_stats:
     group: Bulk market data
     venues:
+      kraken: "Public linear perpetual index, mark and base-unit open interest; optional funding fields remain unset."
       kucoin: "Linear perpetual index, mark and base-unit open interest; funding fields are unset. Use next_funding for the dedicated public funding snapshot."
       dydx: Fetched for the whole universe in one request.
       hyperliquid: Fetched for the whole universe in one request.
@@ -349,6 +350,7 @@ methods:
       # default perp DEX has an empty exchange_id (docs/market/index.md:54), so its
       # exchange-level id is a bare trailing colon: 'hyperliquid:'.
       constants:
+        kraken: {exchange_id: 'kraken:perp', key: 'PF_XBTUSD', index: '60120.00', mark: '60125.50', funding: null, open_interest: '812.4'}
         kucoin: {exchange_id: 'kucoin:perp', key: 'XBTUSDTM', index: '60120.00', mark: '60125.50', funding: null, open_interest: '812.4'}
         dydx:
           exchange_id: 'dydx:perp'
@@ -842,6 +844,7 @@ methods:
     example:
       accountVenues: [dydx]
       constants:
+        kraken: {market_id: 'kraken:perp:PF_XBTUSD', index: '60120.00'}
         kucoin: {market_id: 'kucoin:perp:XBTUSDTM', index: '60120.00'}
         dydx: {market_id: 'dydx:perp:BTC-USD', index: '60120.00'}
         hyperliquid: {market_id: 'hyperliquid::BTC', index: '60110.50'}
@@ -908,9 +911,12 @@ methods:
 
   funding_rates:
     group: Perpetual-only
+    venues:
+      kraken: "Native historical relative rates; SDK settlement time is period start plus one hour. Inclusive bounds apply to settlement time; an omitted start includes all retained rows."
     example:
       accountVenues: [dydx]
       constants:
+        kraken: {market_id: 'kraken:perp:PF_XBTUSD', rate1: '0.0001', rate2: '0.00012'}
         kucoin: {market_id: 'kucoin:perp:XBTUSDTM', rate1: '0.0001', rate2: '0.00012'}
         dydx: {market_id: 'dydx:perp:BTC-USD', rate1: '0.0001', rate2: '0.00012'}
         hyperliquid: {market_id: 'hyperliquid::BTC', rate1: '0.00012', rate2: '0.00011'}

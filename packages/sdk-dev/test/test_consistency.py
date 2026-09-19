@@ -262,7 +262,7 @@ async def test_product_exclusions_are_explicit_not_inferred_from_missing_discove
   root: Path, sdk: MarketSDK, catalogue: Catalogue, monkeypatch: pytest.MonkeyPatch
 ):
   """Only the declared deferred product is excluded; other unknown exchanges fail."""
-  assert consistency.catalogue_excluded('kraken', 'perp', 'perp')
+  assert not consistency.catalogue_excluded('kraken', 'perp', 'perp')
   assert not consistency.catalogue_excluded('kraken', 'spot', 'perp')
   assert consistency.catalogue_excluded('bitget', 'perp', 'coin')
   assert not consistency.catalogue_excluded('bitget', 'perp', 'coin-classic')

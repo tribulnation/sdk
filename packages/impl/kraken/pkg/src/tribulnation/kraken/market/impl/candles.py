@@ -23,7 +23,7 @@ async def candles(
   start: datetime,
   end: datetime,
 ) -> AsyncIterator[Sequence[Candle]]:
-  """Return matching opens from the latest 720 rows, in the venue's order.
+  """Return matching opens from the retained rows, in the venue's order.
 
   `since` is a polling cursor, not a means of retrieving older data. The final,
   still-forming candle is returned only when its open lies inside the caller's range.

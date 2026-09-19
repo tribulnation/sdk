@@ -1,13 +1,7 @@
-"""Shared state and mixins behind Kraken's Spot market surface.
+"""Shared state for Kraken Spot and public linear perpetual markets.
 
-`typed_kraken` wraps Kraken Spot only -- Kraken Futures is a separate product on its
-own host with its own credentials, and the client has no namespace for it -- so `spot`
-is the venue's only exchange here and there is no `PerpMarket`.
-
-One pair has three spellings across the client: the `AssetPairs` key (`XXBTZUSD`), the
-`altname` every REST `pair=` argument and account row uses (`XBTUSD`), and the
-WebSocket v2 `symbol` (`BTC/USD`). The altname is the market id; the other two are
-looked up from the catalogue loaded here.
+Spot market IDs use REST altnames; Futures market IDs retain instrument symbols.
+The shared client owns transports while each request crosses the retry seam.
 """
 
 from functools import cached_property
@@ -32,6 +26,8 @@ from tribulnation.sdk.market import Book
 from tribulnation.kraken.core import Calls, wrap_exceptions
 
 from typed_kraken import Kraken
+from typed_kraken.futures.instruments import FuturesInstrument
+from .perp_data import select_perps
 from typed_kraken.spot.account.balance_ex import ExtendedBalance
 from typed_kraken.spot.market_data.asset_pairs import AssetPair
 from typed_kraken.streams.private.executions import ExecutionTradeEvent
@@ -120,6 +116,9 @@ class Shared(Calls):
   client: Kraken
   balance_ttl: timedelta = BALANCE_TTL
   pairs: dict[str, PairInfo] | None = None
+  perp_instruments: dict[str, FuturesInstrument] | None = None
+  fee_asset: str | None = None
+  perp_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
   balances: dict[str, ExtendedBalance] | None = None
   balances_at: datetime | None = None
   depth_subscriptions: dict[tuple[str, BookDepth], Subscription[Book]] = field(
@@ -178,6 +177,30 @@ class Shared(Calls):
       )
       self.pairs = join_pairs(internal, display)
       return self.pairs
+
+  async def load_perps(self, *, refetch: bool = False) -> dict[str, FuturesInstrument]:
+    """Cache the qualified instrument/ticker join, with explicit refresh support."""
+    if not refetch and self.perp_instruments is not None:
+      return self.perp_instruments
+    async with self.perp_lock:
+      if not refetch and self.perp_instruments is not None:
+        return self.perp_instruments
+      instruments = await self.call_kraken(self.client.futures.instruments)
+      tickers = await self.call_kraken(self.client.futures.tickers)
+      self.perp_instruments = select_perps(
+        instruments['instruments'], tickers['tickers']
+      )
+      return self.perp_instruments
+
+  async def load_fee_asset(self) -> str:
+    """Resolve documented USD Futures fees to Kraken's native internal asset ID."""
+    if self.fee_asset is None:
+      assets = await self.call_kraken(self.client.spot.market_data.assets)
+      matches = [key for key, row in assets.items() if row.get('altname') == 'USD']
+      if len(matches) != 1:
+        raise ValueError('Kraken Assets must identify exactly one USD fee asset')
+      self.fee_asset = matches[0]
+    return self.fee_asset
 
   async def load_balances(self, *, refetch: bool = False) -> dict[str, ExtendedBalance]:
     """Fetch every asset's extended balance, keyed by internal asset id.
