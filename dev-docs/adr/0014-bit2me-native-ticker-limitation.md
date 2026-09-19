@@ -2,7 +2,7 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: accepted
+1. Status: accepted; amended by [ADR 0022](0022-bit2me-one-sided-ticker-limitation.md)
 2. Date: 2026-09-12
 3. Amends: [ADR 0003](0003-local-consistency-release-evidence.md) and
    [ADR 0011](0011-liquidity-independent-consistency.md).

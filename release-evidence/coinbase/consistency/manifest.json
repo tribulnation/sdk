@@ -233,7 +233,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "b1c589a4b374cf777ce97e19306ab58767ee02d44cab13f2d2703c9f8192f0f6",
+        "files_sha256": "ef835263d2b046976e4cb1e071822a47c7677283d62f5847030a580408c7520b",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -305,7 +305,7 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "d5d45665dde72010528ed07c80e076f4918d370709a5bf164550c1c80b6860f5",
+    "source_sha256": "3f78bfaab5bd89e35a42d48126463170a030234d63ebd1fade699faf8c4d2cca",
     "venue": "coinbase"
   },
   "before": {
@@ -542,7 +542,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "b1c589a4b374cf777ce97e19306ab58767ee02d44cab13f2d2703c9f8192f0f6",
+        "files_sha256": "ef835263d2b046976e4cb1e071822a47c7677283d62f5847030a580408c7520b",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -614,12 +614,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "d5d45665dde72010528ed07c80e076f4918d370709a5bf164550c1c80b6860f5",
+    "source_sha256": "3f78bfaab5bd89e35a42d48126463170a030234d63ebd1fade699faf8c4d2cca",
     "venue": "coinbase"
   },
-  "finished": "2026-09-19T18:10:31.858963Z",
-  "results_sha256": "a9e511f1faa1f2d4124a9b8f5e1e055921c79c2be1f7dfab5dac522c3876bdea",
+  "finished": "2026-09-19T18:36:50.166543Z",
+  "results_sha256": "a403e8586f881132ea3fe6e8cbcd01e90e3c16019c4f1a3e43469b2013335440",
   "schema_version": 1,
-  "started": "2026-09-19T18:10:21.352947Z",
-  "summary_sha256": "fce0606c1c82479e80e40b26a8aae41146e1000a0fdcef4740d69448b05f6a12"
+  "started": "2026-09-19T18:36:38.802765Z",
+  "summary_sha256": "038a0eb97cc2cb786c01f0fefb99e48e041388f7af7d4733ae5a1271061f3502"
 }

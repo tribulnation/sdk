@@ -364,12 +364,22 @@ async def bit2me_sdk(
   return sdk
 
 
+@pytest.mark.parametrize('sides', ['both', 'bid', 'ask'])
 @pytest.mark.parametrize('price', [Decimal(99), Decimal(0), None])
 async def test_bit2me_native_discrepancy_is_visible_not_passing(
-  price: Decimal | None, root: Path, bit2me_sdk: MarketSDK, catalogue: Catalogue
+  sides: str,
+  price: Decimal | None,
+  root: Path,
+  bit2me_sdk: MarketSDK,
+  catalogue: Catalogue,
 ):
   """Native stale, zero and absent quotes retain three failed comparison brackets."""
   exchange = await (await bit2me_sdk.venue('local')).exchange('spot')
+  market = await exchange.market('BTC/USD')
+  cast(AsyncMock, market.depth).return_value = Book(
+    bids=[Book.Entry(Decimal(50), Decimal(1))] if sides != 'ask' else [],
+    asks=[Book.Entry(Decimal(51), Decimal(1))] if sides != 'bid' else [],
+  )
 
   async def tickers(markets: list[str] | None = None) -> dict[str, Ticker]:
     """Preserve upstream quote values and exact selection semantics."""
@@ -437,6 +447,60 @@ async def test_bit2me_limitation_cannot_hide_other_failures(
   quote.quotes.pop()
   with pytest.raises(ValueError):
     verify_payload(report.model_dump(mode='json'), catalogue=catalogue, root=root)
+
+
+@pytest.mark.parametrize('side', ['bid', 'ask'])
+async def test_bit2me_one_sided_limitation_rejects_invalid_books(
+  side: str, root: Path, bit2me_sdk: MarketSDK, catalogue: Catalogue
+):
+  """Every bracket must retain the same valid, nonempty book-side inventory."""
+  report = Payload.model_validate(
+    await collect(bit2me_sdk, 'local', 'bit2me', catalogue)
+  )
+  quote = next(check for check in report.checks if check.quotes)
+  absent = 'ask' if side == 'bid' else 'bid'
+  for row in quote.quotes:
+    setattr(row, f'before_{absent}', None)
+    setattr(row, f'after_{absent}', None)
+  verify_payload(report.model_dump(mode='json'), catalogue=catalogue, root=root)
+  for prefix in ('before', 'after'):
+    for value in (None, '0', '-1', 'NaN', 'Infinity', 'bad'):
+      invalid = report.model_copy(deep=True)
+      check = next(item for item in invalid.checks if item.quotes)
+      setattr(check.quotes[1], f'{prefix}_{side}', value)
+      with pytest.raises(ValueError):
+        verify_payload(invalid.model_dump(mode='json'), catalogue=catalogue, root=root)
+  for replacement in ('both', 'opposite', 'empty'):
+    invalid = report.model_copy(deep=True)
+    check = next(item for item in invalid.checks if item.quotes)
+    for row in check.quotes[1:]:
+      for prefix in ('before', 'after'):
+        setattr(
+          row,
+          f'{prefix}_{side}',
+          ('50' if side == 'bid' else '51') if replacement == 'both' else None,
+        )
+        setattr(
+          row,
+          f'{prefix}_{absent}',
+          None if replacement == 'empty' else ('51' if side == 'bid' else '50'),
+        )
+    with pytest.raises(ValueError):
+      verify_payload(invalid.model_dump(mode='json'), catalogue=catalogue, root=root)
+  for row in quote.quotes:
+    row.before_bid = row.before_ask = row.after_bid = row.after_ask = None
+  with pytest.raises(ValueError):
+    verify_payload(report.model_dump(mode='json'), catalogue=catalogue, root=root)
+
+
+async def test_previous_bit2me_policy_requires_fresh_evidence(
+  root: Path, bit2me_sdk: MarketSDK, catalogue: Catalogue
+):
+  """Version four cannot attest the newly accepted one-sided observation shape."""
+  report = await collect(bit2me_sdk, 'local', 'bit2me', catalogue)
+  report['version'] = 4
+  with pytest.raises(ValueError):
+    verify_payload(report, catalogue=catalogue, root=root)
 
 
 async def test_other_venues_cannot_claim_bit2me_limitation(

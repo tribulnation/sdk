@@ -2,7 +2,7 @@
 
 Public mainnet spot and linear perpetual Market data, read-only ledger reporting,
 wallet network methods and reward-bearing balances. The public Market expansion is
-prepared for Deribit 0.3.0 with SDK 2.2.0, pending publication; see the [capability handoff](../../../dev-docs/deribit-public-market.md).
+available in Deribit 0.3.0 with SDK >=2.2.0; see the [capability handoff](../../../dev-docs/deribit-public-market.md).
 
 ```python
 from tribulnation.sdk import ReportSDK, accounts
