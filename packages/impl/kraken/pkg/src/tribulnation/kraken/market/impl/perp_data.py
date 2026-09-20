@@ -48,6 +48,7 @@ def parse_ticker(row: FuturesMarketTicker) -> Ticker:
     bid_qty=Decimal(str(row['bidSize'])) if 'bidSize' in row else None,
     ask_qty=Decimal(str(row['askSize'])) if 'askSize' in row else None,
     base_volume_24h=Decimal(str(row['vol24h'])),
+    quote_volume_24h=Decimal(str(row['volumeQuote'])),
   )
 
 

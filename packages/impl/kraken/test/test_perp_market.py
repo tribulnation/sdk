@@ -154,6 +154,7 @@ def test_native_ticker_units_and_no_absolute_funding_substitute():
   mapped = parse_ticker(row)
   assert mapped.bid_qty == Decimal('0.0123')
   assert mapped.base_volume_24h == Decimal('20.3')
+  assert mapped.quote_volume_24h == Decimal('2030')
   stats = parse_stats(row)
   assert stats.index == 99 and stats.mark == 100
   assert stats.open_interest == Decimal('30.5')

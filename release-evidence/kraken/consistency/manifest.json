@@ -248,9 +248,9 @@
         "version": "0.3.0"
       },
       "tribulnation-kraken": {
-        "files_sha256": "ed7cb2165a220f48d59df405e7886f6d1dfff11bff822e78a4c32798c3a6c84b",
-        "metadata_sha256": "e41cd810d5bc0bc44364a4c9d3f9f31772674e1c7e6fc1a3c562931d54d48626",
-        "version": "0.3.0"
+        "files_sha256": "f8333f9fc4581cdc64b24342da3e538b5865584ba432eac6d8f217fcba16c42f",
+        "metadata_sha256": "3e9cc446f3e30af4bb3d9ff93f02d319ce99f679a8646145ed755f3e4823a085",
+        "version": "0.4.0"
       },
       "tribulnation-sdk": {
         "files_sha256": "60c255fc4254a7f83094cf5cbdb1c64dfb287768641cac4e29a2711488700e10",
@@ -290,7 +290,7 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "00a0d8dee43adcdcbcc5fa6d9c7e1118616a340d6126a7a9f1eb6b3ada9716ab",
+    "source_sha256": "d7b3c0c49a9a8ae0fbdfbc06ee74b53c2418681acde4cecd3154d02386d943a4",
     "venue": "kraken"
   },
   "before": {
@@ -542,9 +542,9 @@
         "version": "0.3.0"
       },
       "tribulnation-kraken": {
-        "files_sha256": "ed7cb2165a220f48d59df405e7886f6d1dfff11bff822e78a4c32798c3a6c84b",
-        "metadata_sha256": "e41cd810d5bc0bc44364a4c9d3f9f31772674e1c7e6fc1a3c562931d54d48626",
-        "version": "0.3.0"
+        "files_sha256": "f8333f9fc4581cdc64b24342da3e538b5865584ba432eac6d8f217fcba16c42f",
+        "metadata_sha256": "3e9cc446f3e30af4bb3d9ff93f02d319ce99f679a8646145ed755f3e4823a085",
+        "version": "0.4.0"
       },
       "tribulnation-sdk": {
         "files_sha256": "60c255fc4254a7f83094cf5cbdb1c64dfb287768641cac4e29a2711488700e10",
@@ -584,12 +584,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "00a0d8dee43adcdcbcc5fa6d9c7e1118616a340d6126a7a9f1eb6b3ada9716ab",
+    "source_sha256": "d7b3c0c49a9a8ae0fbdfbc06ee74b53c2418681acde4cecd3154d02386d943a4",
     "venue": "kraken"
   },
-  "finished": "2026-09-19T21:08:25.567193Z",
-  "results_sha256": "115d64d53ca1b00b22281ee2579c253ae6a95fd36c5a9e6d491f682ffaeaf913",
+  "finished": "2026-09-19T21:15:05.748627Z",
+  "results_sha256": "310492d7c8993e8665d4d4cd3d688a996a4e3c103e8dd321e76a6951b72ed5a8",
   "schema_version": 1,
-  "started": "2026-09-19T21:08:22.641531Z",
-  "summary_sha256": "636c8de4f1e9229174e82ec10e607b02526400d60f5930ccf136203860355fc9"
+  "started": "2026-09-19T21:15:01.538045Z",
+  "summary_sha256": "1e10ef47461689a27505ed47e89d691d4cf6ad5ac057d60d2d9448bfd8da43cf"
 }
