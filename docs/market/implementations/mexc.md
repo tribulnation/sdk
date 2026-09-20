@@ -12,7 +12,9 @@
 
 # MEXC Market
 
-> Spot only. `tribulnation-mexc`, venue name `mexc`.
+Spot uses the full 24h ticker endpoint to return quotes, last price and native base and quote volumes in one request. Linear perpetual tickers also return native `quote_volume_24h`.
+
+> Spot and public linear perpetuals. `tribulnation-mexc`, venue name `mexc`.
 
 See the [generic market interface](../index.md) for the shared method surface. This page
 covers only what is MEXC-specific.
@@ -24,8 +26,8 @@ built-in `mexc` account is `accounts.Mexc(public=True)`, read-only.
 
 ## Exchange & ID conventions
 
-- The only exchange is `spot` (`exchange_id == 'spot'`); any other exchange ID raises.
-- Market IDs are MEXC symbols, e.g. `BTCUSDT`, `ETHUSDT`.
+- Exchanges are `spot` and public linear perpetuals (`perp`).
+- Market IDs are native MEXC symbols: `BTCUSDT` for spot and `BTC_USDT` for perpetuals.
 - Full SDK ID: `mexc:spot:BTCUSDT` (or `<your-account-key>:spot:BTCUSDT`).
 - `Exchange.markets()` returns the symbol keys from the venue's exchange-info.
 

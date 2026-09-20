@@ -101,6 +101,7 @@ class PerpExchange(ExchangeMixin, BasePerpExchange):
         ask=price(row.get('ask1')),
         base_volume_24h=Decimal(str(row['volume24']))
         * Decimal(str(contracts[row['symbol']]['contractSize'])),
+        quote_volume_24h=Decimal(str(row['amount24'])),
       )
       for row in await self.contract_tickers(contracts)
     }

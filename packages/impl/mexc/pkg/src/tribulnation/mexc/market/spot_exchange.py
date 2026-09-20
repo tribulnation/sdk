@@ -1,6 +1,5 @@
 from typing_extensions import Collection, Mapping, Sequence
 from dataclasses import dataclass
-from decimal import Decimal
 
 from tribulnation.sdk.market import Exchange, Settings, Ticker
 from tribulnation.mexc.core.exc import wrap_exceptions
@@ -34,14 +33,16 @@ class SpotExchange(ExchangeMixin, Exchange):
     *,
     settings: Settings = {},
   ) -> Mapping[str, Ticker]:
-    """Fetch best bid/ask for every spot symbol in one call.
+    """Fetch quotes and native 24-hour volumes for every spot symbol in one call.
 
     Args:
       markets: Symbols to keep. `None` keeps every symbol.
       settings: Accepted for interface compatibility and ignored because MEXC
-        returns all best bids and asks in one request.
+        returns all ticker statistics in one request.
     """
-    items = await self.client.spot.http.market.book_ticker(
+    if markets is not None and not markets:
+      return {}
+    items = await self.client.spot.http.market.ticker_24hr(
       validate=self.shared.validate
     )
     if not isinstance(items, list):
@@ -49,15 +50,16 @@ class SpotExchange(ExchangeMixin, Exchange):
     wanted = None if markets is None else set(markets)
     result: dict[str, Ticker] = {}
     for item in items:
-      symbol = item.get('symbol')
-      if symbol is None:
-        continue
+      symbol = item['symbol']
       if wanted is not None and symbol not in wanted:
         continue
       result[symbol] = Ticker(
-        bid=Decimal(p) if (p := item.get('bidPrice')) else None,
-        ask=Decimal(p) if (p := item.get('askPrice')) else None,
-        bid_qty=Decimal(q) if (q := item.get('bidQty')) else None,
-        ask_qty=Decimal(q) if (q := item.get('askQty')) else None,
+        last=item['lastPrice'] if item['lastPrice'] > 0 else None,
+        bid=item['bidPrice'] if item['bidPrice'] > 0 else None,
+        ask=item['askPrice'] if item['askPrice'] > 0 else None,
+        bid_qty=item['bidQty'] if item['bidQty'] > 0 else None,
+        ask_qty=item['askQty'] if item['askQty'] > 0 else None,
+        base_volume_24h=item['volume'],
+        quote_volume_24h=item['quoteVolume'],
       )
     return result
