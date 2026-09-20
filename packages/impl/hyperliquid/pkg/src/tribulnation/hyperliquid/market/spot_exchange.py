@@ -91,6 +91,7 @@ class SpotExchange(SpotMixin, _Exchange):
         # Asset contexts publish a midpoint, not the last traded price.
         last=None,
         base_volume_24h=ctx.get('dayBaseVlm'),
+        quote_volume_24h=ctx['dayNtlVlm'],
       )
       coin_to_market[asset['name']] = mid
 

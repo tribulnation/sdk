@@ -117,6 +117,7 @@ async def perp_tickers(
       # Asset contexts publish a midpoint, not the last traded price.
       last=None,
       base_volume_24h=ctx.get('dayBaseVlm'),
+      quote_volume_24h=ctx['dayNtlVlm'],
     )
 
   if wanted is not None and (missing := wanted - set(result)):

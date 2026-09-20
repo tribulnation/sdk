@@ -43,7 +43,7 @@ def tracking_fetch() -> tuple[Callable[..., Awaitable[Book]], Callable[[], int]]
 def perp_context() -> PerpAssetContext:
   """One perp asset context, priced at 100 with 10 of daily volume."""
   return {
-    'dayNtlVlm': Decimal('1000'),
+    'dayNtlVlm': Decimal('987.123456789012345678'),
     'dayBaseVlm': Decimal('10'),
     'funding': Decimal(0),
     'impactPxs': None,
@@ -62,7 +62,7 @@ def spot_context() -> SpotAssetCtx:
     'markPx': Decimal('100'),
     'midPx': Decimal('100'),
     'prevDayPx': Decimal('100'),
-    'dayNtlVlm': Decimal('1000'),
+    'dayNtlVlm': Decimal('987.123456789012345678'),
     'dayBaseVlm': Decimal('10'),
   }
 
@@ -107,6 +107,9 @@ async def test_perp_tickers_depth_concurrency(
   assert len(result) == count
   assert peak() == expected
   assert all(ticker.last is None for ticker in result.values())
+  assert all(
+    t.quote_volume_24h == Decimal('987.123456789012345678') for t in result.values()
+  )
   assert [ticker.base_volume_24h for ticker in result.values()] == [None] + [
     Decimal('10')
   ] * (count - 1)
@@ -177,6 +180,9 @@ async def test_spot_tickers_depth_concurrency(
   assert len(result) == count
   assert peak() == expected
   assert all(ticker.last is None for ticker in result.values())
+  assert all(
+    t.quote_volume_24h == Decimal('987.123456789012345678') for t in result.values()
+  )
   assert [ticker.base_volume_24h for ticker in result.values()] == [None] + [
     Decimal('10')
   ] * (count - 1)
