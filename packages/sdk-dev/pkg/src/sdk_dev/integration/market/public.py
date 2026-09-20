@@ -22,6 +22,7 @@ from tribulnation.sdk.market import (
   PerpStats,
   Rules,
   Ticker,
+  TradingVenue,
 )
 from ..accounts import (
   package_of,
@@ -104,6 +105,22 @@ async def funding_rates(market: PerpMarket) -> Sequence[FundingRate]:
   return await market.funding_rates(END - timedelta(days=3), END)
 
 
+async def exchanges(venue: TradingVenue) -> Sequence[TradingVenue.ExchangeDescription]:
+  """Check that every advertised perpetual resolves through both accessors."""
+  descriptions = await venue.exchanges()
+  for description in descriptions:
+    if description['type'] != 'perp':
+      continue
+    exchange_id = description['id']
+    generic = await venue.exchange(exchange_id)
+    perpetual = await venue.perp_exchange(exchange_id)
+    assert isinstance(generic, PerpExchange)
+    assert isinstance(perpetual, PerpExchange)
+    assert generic.venue_id == perpetual.venue_id == venue.venue_id
+    assert generic.exchange_id == perpetual.exchange_id == exchange_id
+  return descriptions
+
+
 async def collect_public(sdk: MarketSDK, id: str) -> PublicResults:
   """Acquire one managed venue and call only a fixed allowlist of market-data reads."""
   result = PublicResults()
@@ -116,7 +133,7 @@ async def collect_public(sdk: MarketSDK, id: str) -> PublicResults:
       exchange = await venue.exchange(exchange_id)
       market = await exchange.market(symbol)
       calls: dict[str, Callable[[], Awaitable[object]]] = {
-        'exchanges': venue.exchanges,
+        'exchanges': lambda: exchanges(venue),
         'markets': exchange.markets,
         'depth': market.depth,
         'depth_stream': lambda: first_book(market),
