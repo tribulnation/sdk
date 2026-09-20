@@ -69,6 +69,7 @@ class SpotExchange(SharedMixin, Exchange):
         bid_qty=bid_qty if bid_qty > 0 else None,
         ask_qty=ask_qty if ask_qty > 0 else None,
         base_volume_24h=Decimal(row['volume']),
+        quote_volume_24h=Decimal(row['quoteVolume']),
       )
     if selected is not None and selected - result.keys():
       raise ValueError(
