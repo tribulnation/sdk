@@ -71,6 +71,7 @@ class SpotExchange(VenueMixin, Exchange):
         bid_qty=num(t['bid1Size']),
         ask_qty=num(t['ask1Size']),
         base_volume_24h=t['volume24h'],
+        quote_volume_24h=t['turnover24h'],
       )
       for t in tickers['list']
       if wanted is None or t['symbol'] in wanted
