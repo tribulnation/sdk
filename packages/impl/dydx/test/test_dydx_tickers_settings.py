@@ -61,7 +61,7 @@ async def test_invalid_ticker_concurrency_rejected(concurrency: int):
   """Zero concurrency must fail instead of deadlocking the entire ticker call."""
   from tribulnation.dydx.market.impl import stats
 
-  load = AsyncMock(return_value={'BTC-USD': {}})
+  load = AsyncMock(return_value={'BTC-USD': {'volume24H': Decimal(0)}})
   target = cast(
     ExchangeMixin, SimpleNamespace(shared=SimpleNamespace(load_markets=load))
   )
@@ -87,7 +87,7 @@ async def test_tickers_depth_concurrency(
 
   count = 25
   markets: dict[str, MarketFields] = {
-    f'MARKET-{i}': {'oraclePrice': '100', 'volume24H': '10'} for i in range(count)
+    f'MARKET-{i}': {'oraclePrice': '100', 'volume24H': str(i)} for i in range(count)
   }
 
   class Shared:
@@ -105,6 +105,9 @@ async def test_tickers_depth_concurrency(
   assert peak() == expected
   assert all(ticker.last is None for ticker in result.values())
   assert all(ticker.base_volume_24h is None for ticker in result.values())
+  assert [t.quote_volume_24h for t in result.values()] == [
+    Decimal(i) for i in range(count)
+  ]
   if expected:
     assert all(ticker.bid == Decimal('99') for ticker in result.values())
   else:
