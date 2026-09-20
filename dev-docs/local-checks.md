@@ -146,7 +146,10 @@ does not write qualification evidence; `surfaces` is the recording wrapper.
 It stores public test/market/method identities, per-case outcomes and explicit
 exclusion codes, not account IDs, balances, records or error text. Missing
 credentials, unexpected skips, setup/teardown failures and incomplete inventories
-block qualification. Every supported market reference case must pass candles,
+block qualification. Market discovery also resolves every advertised perpetual exchange through both the
+generic and typed accessors, checking perpetual types and matching venue/exchange IDs.
+An unexpected typed-accessor rejection fails discovery.
+Every supported market reference case must pass candles,
 rules, public depth/streams, ticker and applicable perpetual reads. The declared
 unsupported MEXC perpetual stream, spot-only methods and single-page retention
 cases are excluded, not passed. Bitget additionally requires its existing private

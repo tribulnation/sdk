@@ -10,10 +10,14 @@ from typed_core.validation import validator
 from typed_kraken import Kraken
 from typed_kraken.charts.candles import Candles, ChartCandlesResult
 from typed_kraken.futures.tickers import Tickers
-from typed_kraken.futures.instruments import FuturesInstrument
+from typed_kraken.futures.ticker import Ticker
+from typed_kraken.futures.instruments import FuturesInstrument, Instruments
+from typed_kraken.futures.historical_funding_rates import HistoricalFundingRates
 from typed_kraken.schemas import FuturesMarketTicker
 
-from tribulnation.sdk import Context, NetworkError
+from tribulnation.sdk import Context, MarketSDK, NetworkError
+from tribulnation.kraken import KrakenMarket
+from tribulnation.kraken.market import SpotExchange
 from tribulnation.kraken.market.impl.mixin import Shared
 from tribulnation.kraken.market.impl.perp_candles import PAGE_SIZE
 from tribulnation.kraken.market.impl.perp_data import (
@@ -25,7 +29,6 @@ from tribulnation.kraken.market.impl.perp_data import (
 )
 from tribulnation.kraken.market.perp_exchange import PerpExchange
 from tribulnation.kraken.market.perp_market import PerpMarket
-from tribulnation.kraken.market.venue import KrakenMarket
 
 START = datetime(2026, 9, 1, tzinfo=timezone.utc)
 MINUTE = timedelta(minutes=1)
@@ -113,7 +116,7 @@ def market(shared: Shared) -> PerpMarket:
 def test_discovery_uses_product_fields_not_symbol_prefix():
   """Inverse, dated, expired, suspended and non-unit products never leak into perp."""
   good = instrument('NATIVE_WITHOUT_PREFIX')
-  rows = [
+  rows: list[FuturesInstrument] = [
     good,
     {**instrument('inverse'), 'type': 'futures_inverse'},
     {**instrument('dated'), 'lastTradingTime': START},
@@ -250,6 +253,7 @@ async def test_fractional_bounds_and_forming_candle(
     '1m', START + timedelta(microseconds=1), START + MINUTE + timedelta(microseconds=1)
   )
   assert [r.time for r in rows] == [START + MINUTE]
+  assert request.await_args is not None
   assert request.await_args.kwargs['to'] == START + MINUTE
 
 
@@ -294,8 +298,6 @@ async def test_funding_settlement_conversion_and_inclusive_bounds(
   market: PerpMarket, monkeypatch: pytest.MonkeyPatch
 ):
   """Filter the documented hour-end settlement, not the earlier native period start."""
-  from typed_kraken.futures.historical_funding_rates import HistoricalFundingRates
-
   request = AsyncMock(
     return_value={
       'result': 'success',
@@ -319,9 +321,111 @@ async def test_funding_settlement_conversion_and_inclusive_bounds(
   assert rows[0].rate == Decimal('0.002')
   all_rows = await market.funding_rates()
   assert [r.time for r in all_rows] == [START + timedelta(hours=i) for i in [1, 2, 3]]
+  assert request.await_args is not None
   assert request.await_args.args == ('PF_XBTUSD',)
   assert request.await_args.kwargs == {}
   with pytest.raises(ValueError, match='timezone-aware'):
     market.funding_rates(START.replace(tzinfo=None))
   with pytest.raises(ValueError, match='precede'):
     market.funding_rates(START + MINUTE, START)
+
+
+@pytest.fixture
+def public_futures(monkeypatch: pytest.MonkeyPatch) -> AsyncMock:
+  """Serve native metadata and snapshots through the real public factory."""
+  instruments = AsyncMock(
+    return_value={'result': 'success', 'instruments': [instrument()]}
+  )
+  monkeypatch.setattr(Instruments, 'instruments', instruments)
+  monkeypatch.setattr(
+    Tickers,
+    'tickers',
+    AsyncMock(return_value={'result': 'success', 'tickers': [ticker()]}),
+  )
+  monkeypatch.setattr(
+    Ticker,
+    'ticker',
+    AsyncMock(return_value={'result': 'success', 'ticker': ticker()}),
+  )
+  monkeypatch.setattr(
+    HistoricalFundingRates,
+    'historical_funding_rates',
+    AsyncMock(
+      return_value={
+        'result': 'success',
+        'rates': [
+          {'timestamp': START, 'relativeFundingRate': 0.001, 'fundingRate': 20}
+        ],
+      }
+    ),
+  )
+  return instruments
+
+
+async def test_public_factory_perpetual_accessors_and_helpers(
+  public_futures: AsyncMock,
+):
+  """Discovery and typed helpers reach the same public native perpetual data."""
+  async with KrakenMarket.new(public=True) as venue:
+    assert [(row['id'], row['type']) for row in await venue.exchanges()] == [
+      ('spot', 'spot'),
+      ('perp', 'perp'),
+    ]
+    spot = await venue.exchange('spot')
+    assert isinstance(spot, SpotExchange)
+    generic = await venue.exchange('perp')
+    perpetual = await venue.perp_exchange('perp')
+    assert isinstance(generic, PerpExchange)
+    assert isinstance(perpetual, PerpExchange)
+    assert generic.id == perpetual.id == 'kraken:perp'
+    assert generic.shared is perpetual.shared is spot.shared is venue.shared
+    public_futures.assert_not_awaited()
+    assert await generic.perp_stats() == await perpetual.perp_stats()
+    market = await venue.perp_market('perp:PF_XBTUSD')
+    assert isinstance(market, PerpMarket)
+    assert market.id == 'kraken:perp:PF_XBTUSD'
+    assert market.shared is venue.shared
+    assert await venue.index('perp:PF_XBTUSD') == Decimal(99)
+    settlement = START + timedelta(hours=1)
+    rates = await venue.funding_rates('perp:PF_XBTUSD', settlement, settlement)
+    assert [(row.time, row.rate) for row in rates] == [(settlement, Decimal('0.001'))]
+    public_futures.assert_awaited_once()
+    for exchange_id in ('spot', '', 'PERP', 'unknown'):
+      with pytest.raises(ValueError, match='Invalid Kraken perpetual exchange ID'):
+        await venue.perp_exchange(exchange_id)
+    with pytest.raises(ValueError, match='Invalid Kraken exchange ID'):
+      await venue.exchange('unknown')
+
+
+async def test_root_public_perpetual_helpers(public_futures: AsyncMock):
+  """The aggregate SDK uses the same public factory and typed perpetual route."""
+  async with MarketSDK() as sdk:
+    exchange = await sdk.perp_exchange('kraken:perp')
+    assert isinstance(exchange, PerpExchange)
+    market = await sdk.perp_market('kraken:perp:PF_XBTUSD')
+    assert isinstance(market, PerpMarket)
+    assert market.shared is exchange.shared
+    stats = await sdk.perp_stats('kraken:perp', markets=['PF_XBTUSD'])
+    assert set(stats) == {'PF_XBTUSD'}
+    assert stats['PF_XBTUSD'].index == Decimal(99)
+    assert await sdk.index('kraken:perp:PF_XBTUSD') == Decimal(99)
+    assert len(await sdk.funding_rates('kraken:perp:PF_XBTUSD')) == 1
+    public_futures.assert_awaited_once()
+
+
+async def test_venue_perpetual_helpers_preserve_unsupported_methods(
+  public_futures: AsyncMock,
+):
+  """Typed routing reaches the existing method-level public Futures limitations."""
+  async with KrakenMarket.new(public=True) as venue:
+    market_id = 'perp:PF_XBTUSD'
+    with pytest.raises(NotImplementedError, match='no qualified native rate/time'):
+      await venue.next_funding(market_id)
+    with pytest.raises(NotImplementedError, match='public market data only'):
+      await venue.funding_payments(market_id, START, START + MINUTE)
+    with pytest.raises(NotImplementedError, match='public market data only'):
+      await venue.perp_position(market_id)
+    for id in ('perp', market_id):
+      with pytest.raises(NotImplementedError):
+        await venue.perp_collateral(id)
+    public_futures.assert_awaited_once()

@@ -4,7 +4,7 @@ from collections.abc import Sequence
 from datetime import timedelta
 from decimal import Decimal
 from pathlib import Path
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, Mock, call
 import ast
 import asyncio
 
@@ -14,7 +14,13 @@ from typing_extensions import cast
 
 from tribulnation.sdk import ApiError, Earn, Wallet
 from tribulnation.sdk.impl.accounts import Account, Bybit, Kraken, Mexc
-from tribulnation.sdk.market import Candle, PerpStats
+from tribulnation.sdk.market import (
+  Candle,
+  Exchange,
+  PerpExchange,
+  PerpStats,
+  TradingVenue,
+)
 from sdk_dev.cli import test as cli
 from sdk_dev.cli.test import runner
 from sdk_dev.integration import accounts, conftest
@@ -277,3 +283,50 @@ def test_live_suites_have_no_mutating_order_calls():
     tree = ast.parse(path.read_text())
     for node in ast.walk(tree):
       assert not (isinstance(node, ast.Attribute) and node.attr in forbidden), path.name
+
+
+@pytest.mark.parametrize(
+  'failure', [None, 'missing', 'generic_type', 'typed_type', 'venue', 'exchange']
+)
+async def test_discovered_perpetual_accessors_must_agree(failure: str | None):
+  """Discovery fails on a broken typed route, even for a non-reference exchange."""
+  venue = AsyncMock(spec=TradingVenue)
+  venue.venue_id = 'test'
+  descriptions: list[TradingVenue.ExchangeDescription] = [
+    {'id': 'spot', 'type': 'spot', 'name': 'Spot'},
+    {'id': 'linear', 'type': 'perp', 'name': 'Linear'},
+    {'id': 'inverse', 'type': 'perp', 'name': 'Inverse'},
+  ]
+  venue.exchanges.return_value = descriptions
+  generic = [
+    Mock(spec=PerpExchange, venue_id='test', exchange_id=id)
+    for id in ('linear', 'inverse')
+  ]
+  perpetual = [
+    Mock(spec=PerpExchange, venue_id='test', exchange_id=id)
+    for id in ('linear', 'inverse')
+  ]
+  if failure == 'generic_type':
+    generic[1] = Mock(spec=Exchange, venue_id='test', exchange_id='inverse')
+  elif failure == 'typed_type':
+    perpetual[1] = Mock(spec=Exchange, venue_id='test', exchange_id='inverse')
+  elif failure == 'venue':
+    perpetual[1].venue_id = 'wrong'
+  elif failure == 'exchange':
+    perpetual[1].exchange_id = 'linear'
+  venue.exchange.side_effect = generic
+  venue.perp_exchange.side_effect = (
+    [perpetual[0], NotImplementedError()] if failure == 'missing' else perpetual
+  )
+  result = public.PublicResults()
+  await result.attempt('exchanges', lambda: public.exchanges(cast(TradingVenue, venue)))
+  if failure is None:
+    assert result.values['exchanges'] == descriptions
+    assert result.failures == {}
+  else:
+    assert result.failures == {
+      'exchanges': 'NotImplementedError' if failure == 'missing' else 'AssertionError'
+    }
+    assert result.skips == {}
+  assert venue.exchange.await_args_list == [call('linear'), call('inverse')]
+  assert venue.perp_exchange.await_args_list == [call('linear'), call('inverse')]

@@ -42,8 +42,14 @@ class KrakenMarket(SharedMixin, TradingVenue):
     if exchange_id == 'spot':
       return SpotExchange(shared=self.shared)
     if exchange_id == 'perp':
-      return PerpExchange(shared=self.shared)
+      return await self.perp_exchange(exchange_id)
     raise ValueError(f'Invalid Kraken exchange ID: {exchange_id}')
+
+  async def perp_exchange(self, exchange_id: str, /) -> PerpExchange:
+    """Resolve the public linear perpetual exchange by its explicit ID."""
+    if exchange_id != 'perp':
+      raise ValueError(f'Invalid Kraken perpetual exchange ID: {exchange_id}')
+    return PerpExchange(shared=self.shared)
 
   async def exchanges(self) -> Sequence[TradingVenue.ExchangeDescription]:
     """List the public Spot and perpetual product identities."""
