@@ -150,12 +150,24 @@ async def test_book_units_sorting_limits_and_unsupported_sizes():
   assert request.await_count == 2
 
 
-async def test_tickers_query_only_requested_product_scopes_and_keep_nulls():
+@pytest.mark.parametrize('quote_volume', [None, 0.0, 197.25])
+@pytest.mark.parametrize(
+  ('exchange_id', 'symbol', 'currency', 'kind'),
+  [
+    ('spot', 'BTC_USDT', 'BTC', 'spot'),
+    ('perp', 'BTC_USDC-PERPETUAL', 'USDC', 'future'),
+  ],
+)
+async def test_tickers_query_only_requested_product_scopes_and_keep_nulls(
+  quote_volume: float | None, exchange_id: str, symbol: str, currency: str, kind: str
+):
   """An unrelated option response must never enter spot/futures summary validation."""
   request = AsyncMock(
     return_value=[
       dict(
-        instrument_name='BTC_USDC-PERPETUAL',
+        instrument_name=symbol,
+        volume_usd=999.0,
+        **({} if quote_volume is None else {'volume_notional': quote_volume}),
         last=None,
         bid_price=99.0,
         ask_price=None,
@@ -168,15 +180,18 @@ async def test_tickers_query_only_requested_product_scopes_and_keep_nulls():
   )
   exchange = await DeribitMarket(
     shared=shared_client(SimpleNamespace(get_book_summary_by_currency=request))
-  ).perp_exchange('perp')
+  ).exchange(exchange_id)
   assert await exchange.tickers([]) == await exchange.tickers(['UNKNOWN']) == {}
   request.assert_not_called()
-  rows = await exchange.tickers(['BTC_USDC-PERPETUAL'])
-  assert set(rows) == {'BTC_USDC-PERPETUAL'}
-  ticker = rows['BTC_USDC-PERPETUAL']
+  rows = await exchange.tickers([symbol])
+  assert set(rows) == {symbol}
+  ticker = rows[symbol]
   assert ticker.bid == 99 and ticker.last is None and ticker.ask is None
   assert ticker.base_volume_24h == 2 and ticker.bid_qty is None
-  request.assert_awaited_once_with(currency='USDC', kind='future')
+  assert ticker.quote_volume_24h == (
+    None if quote_volume is None else Decimal(str(quote_volume))
+  )
+  request.assert_awaited_once_with(currency=currency, kind=kind)
 
 
 async def test_stats_use_native_index_and_base_interest_without_funding_forecast():

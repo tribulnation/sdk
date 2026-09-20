@@ -12,6 +12,8 @@
 
 # Deribit Market
 
+Spot and linear perpetual tickers return `quote_volume_24h` when native `volume_notional` is present. Missing quote turnover remains `None`; USD-normalized volume is not substituted.
+
 Public mainnet spot and linear perpetual data through `tribulnation-deribit`.
 Requires `tribulnation-sdk` >=2.2.0 and `tribulnation-deribit` >=0.3.0.
 

@@ -67,6 +67,9 @@ class SpotExchange(Public, Exchange):
             bid=None if row['bid_price'] is None else Decimal(str(row['bid_price'])),
             ask=None if row['ask_price'] is None else Decimal(str(row['ask_price'])),
             base_volume_24h=Decimal(str(row['volume'])),
+            quote_volume_24h=Decimal(str(row['volume_notional']))
+            if 'volume_notional' in row
+            else None,
           )
     return result
 
