@@ -45,3 +45,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0020](0020-kraken-public-perpetuals.md) | Kraken public linear perpetual data with native identities and hourly funding settlement conversion | Accepted |
 | [0021](0021-deribit-public-market.md) | Deribit public spot and linear perpetuals with explicit candle and funding limits | Accepted |
 | [0022](0022-bit2me-one-sided-ticker-limitation.md) | Extend the Bit2Me native ticker limitation to stable one-sided books | Accepted; amends 0014 |
+| [0023](0023-ticker-quote-volume.md) | Native 24-hour quote volume in tickers | Accepted |

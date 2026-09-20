@@ -1,6 +1,6 @@
 {
   "after": {
-    "catalogue_sha256": "f73f601a3800867e4b548e60b57623780ef0c0a77533c3669a170a74fc4716db",
+    "catalogue_sha256": "885fe1481b6e55a3145c572e160d11255ab8d96b331c4f43a68fcacceedabd16",
     "dependencies": {
       "aiohappyeyeballs": {
         "files_sha256": "d9e8c5a3f6321563084f4fa3a7c9e73da78a2dd5e02c3c21cd90cffde5d1d6bb",
@@ -388,9 +388,9 @@
         "version": "0.6.1"
       },
       "tribulnation-sdk": {
-        "files_sha256": "8430cfb714ded53a1066ba245906e352dda19430aafcbff9460425a4add74461",
-        "metadata_sha256": "54e07f4d876642a959b59475f138cff59105ffaaa205de7a80477dbd2afa1761",
-        "version": "2.2.0"
+        "files_sha256": "60c255fc4254a7f83094cf5cbdb1c64dfb287768641cac4e29a2711488700e10",
+        "metadata_sha256": "c8a6522967e4424d1fbfb0ef657b5c97b42c3af260b237631a5b59dcb7081aa4",
+        "version": "2.3.0"
       },
       "typed-alchemy": {
         "files_sha256": "6e96a4a07fdfb0d9b50025f04a65923fe68829786b380a4183d98e036bc43a51",
@@ -455,11 +455,11 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "f659d11af0917035bb042c5a6f8a03beb64d9d48f103884fa37a3eca0d931c10",
+    "source_sha256": "66ce6276800e1b13601b94503ab05c71f14fb9b486e543dfd579671764d6d5cf",
     "venue": "ethereum"
   },
   "before": {
-    "catalogue_sha256": "f73f601a3800867e4b548e60b57623780ef0c0a77533c3669a170a74fc4716db",
+    "catalogue_sha256": "885fe1481b6e55a3145c572e160d11255ab8d96b331c4f43a68fcacceedabd16",
     "dependencies": {
       "aiohappyeyeballs": {
         "files_sha256": "d9e8c5a3f6321563084f4fa3a7c9e73da78a2dd5e02c3c21cd90cffde5d1d6bb",
@@ -847,9 +847,9 @@
         "version": "0.6.1"
       },
       "tribulnation-sdk": {
-        "files_sha256": "8430cfb714ded53a1066ba245906e352dda19430aafcbff9460425a4add74461",
-        "metadata_sha256": "54e07f4d876642a959b59475f138cff59105ffaaa205de7a80477dbd2afa1761",
-        "version": "2.2.0"
+        "files_sha256": "60c255fc4254a7f83094cf5cbdb1c64dfb287768641cac4e29a2711488700e10",
+        "metadata_sha256": "c8a6522967e4424d1fbfb0ef657b5c97b42c3af260b237631a5b59dcb7081aa4",
+        "version": "2.3.0"
       },
       "typed-alchemy": {
         "files_sha256": "6e96a4a07fdfb0d9b50025f04a65923fe68829786b380a4183d98e036bc43a51",
@@ -914,12 +914,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "f659d11af0917035bb042c5a6f8a03beb64d9d48f103884fa37a3eca0d931c10",
+    "source_sha256": "66ce6276800e1b13601b94503ab05c71f14fb9b486e543dfd579671764d6d5cf",
     "venue": "ethereum"
   },
-  "finished": "2026-09-19T18:37:02.692272Z",
+  "finished": "2026-09-19T21:08:12.754629Z",
   "results_sha256": "dae17bd88826beea9270824c4c487c754600ed50c5945bf9cd9b5ca52176bb03",
   "schema_version": 1,
-  "started": "2026-09-19T18:36:58.979498Z",
-  "summary_sha256": "f38fa4465e90f770c8199f3b88a2d150291611f0487d2ba4ca938df4b22eecee"
+  "started": "2026-09-19T21:08:09.059767Z",
+  "summary_sha256": "2ca97aeb8676f16f9f7c141c1c6abdedfaacc776400836d32f922da9fcc9dffb"
 }

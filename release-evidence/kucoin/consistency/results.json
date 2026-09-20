@@ -10,6 +10,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"2ZUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"AAPLUSDTM\"]",
         "quotes": [],
         "status": "pass"
@@ -448,6 +454,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"HEIUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"HYPEUSDTM\"]",
         "quotes": [],
         "status": "pass"
@@ -526,6 +538,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"KSMUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"LDOUSDTM\"]",
         "quotes": [],
         "status": "pass"
@@ -598,6 +616,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MOVEUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"MSFTUSDTM\"]",
         "quotes": [],
         "status": "pass"
@@ -647,6 +671,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"OPUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ORCAUSDTM\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -730,6 +760,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"REDSTONEUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"RENDERUSDTM\"]",
         "quotes": [],
         "status": "pass"
@@ -808,6 +844,24 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SONICUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SPXUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"STGUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"STRKUSDTM\"]",
         "quotes": [],
         "status": "pass"
@@ -850,7 +904,19 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SUSHIUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SYRUPUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TAIKOUSDTM\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -940,6 +1006,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"USELESSUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"USUALUSDTM\"]",
         "quotes": [],
         "status": "pass"
@@ -988,6 +1060,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"WOOUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"WUSDTM\"]",
         "quotes": [],
         "status": "pass"
@@ -1025,6 +1103,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"XBTUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"XDCUSDTM\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -1090,7 +1174,19 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ZENUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ZKUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ZORAUSDTM\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -1108,6 +1204,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"2Z-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"AAVE-BTC\"]",
         "quotes": [],
         "status": "pass"
@@ -1115,6 +1217,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"AAVE-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ACE-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ACT-USDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -1181,6 +1295,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"ALGO-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ALT-USDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -1325,6 +1445,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"AXS-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BAL-USDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -1696,6 +1822,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ETH-USDG\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"ETH-USDT\"]",
         "quotes": [],
         "status": "pass"
@@ -1786,6 +1918,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"GALAX-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"GLM-USDT\"]",
         "quotes": [],
         "status": "pass"
@@ -1835,6 +1973,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"HBAR-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"HEI-USDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -2014,6 +2158,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"KSM-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"LAYER-USDT\"]",
         "quotes": [],
         "status": "pass"
@@ -2134,6 +2284,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"MOVE-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"NEAR-BTC\"]",
         "quotes": [],
         "status": "pass"
@@ -2195,6 +2351,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"OP-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ORCA-USDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -2297,6 +2459,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"RAY-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"REDSTONE-USDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -2446,6 +2614,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SPX-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"STG-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"STRK-USDT\"]",
         "quotes": [],
         "status": "pass"
@@ -2482,6 +2662,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SUSHI-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"SYN-USDT\"]",
         "quotes": [],
         "status": "pass"
@@ -2495,6 +2681,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"T-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"TAIKO-USDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -2608,6 +2800,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"TSLAX-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"TUSD-USDT\"]",
         "quotes": [],
         "status": "pass"
@@ -2704,6 +2902,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"USELESS-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"USUAL-USDT\"]",
         "quotes": [],
         "status": "pass"
@@ -2747,6 +2951,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"W-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"WAXL-USDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -2807,6 +3017,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"WLFI-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"WOO-USDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -2968,7 +3184,19 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ZEN-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"ZK-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ZORA-USDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -2981,6 +3209,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"1INCHUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"2ZUSDTM\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -3424,6 +3658,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"HEIUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"HYPEUSDTM\"]",
         "quotes": [],
         "status": "pass"
@@ -3502,6 +3742,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"KSMUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"LDOUSDTM\"]",
         "quotes": [],
         "status": "pass"
@@ -3574,6 +3820,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MOVEUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"MSFTUSDTM\"]",
         "quotes": [],
         "status": "pass"
@@ -3623,6 +3875,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"OPUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ORCAUSDTM\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -3706,6 +3964,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"REDSTONEUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"RENDERUSDTM\"]",
         "quotes": [],
         "status": "pass"
@@ -3784,6 +4048,24 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SONICUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SPXUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"STGUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"STRKUSDTM\"]",
         "quotes": [],
         "status": "pass"
@@ -3826,7 +4108,19 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SUSHIUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SYRUPUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TAIKOUSDTM\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -3916,6 +4210,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"USELESSUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"USUALUSDTM\"]",
         "quotes": [],
         "status": "pass"
@@ -3964,6 +4264,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"WOOUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"WUSDTM\"]",
         "quotes": [],
         "status": "pass"
@@ -4001,6 +4307,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"XBTUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"XDCUSDTM\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -4066,7 +4378,19 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ZENUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ZKUSDTM\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ZORAUSDTM\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -4084,6 +4408,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"2Z-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"AAVE-BTC\"]",
         "quotes": [],
         "status": "pass"
@@ -4091,6 +4421,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"AAVE-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ACE-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ACT-USDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -4157,6 +4499,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"ALGO-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ALT-USDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -4301,6 +4649,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"AXS-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BAL-USDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -4672,6 +5026,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ETH-USDG\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"ETH-USDT\"]",
         "quotes": [],
         "status": "pass"
@@ -4762,6 +5122,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"GALAX-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"GLM-USDT\"]",
         "quotes": [],
         "status": "pass"
@@ -4811,6 +5177,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"HBAR-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"HEI-USDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -4990,6 +5362,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"KSM-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"LAYER-USDT\"]",
         "quotes": [],
         "status": "pass"
@@ -5110,6 +5488,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"MOVE-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"NEAR-BTC\"]",
         "quotes": [],
         "status": "pass"
@@ -5171,6 +5555,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"OP-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ORCA-USDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -5273,6 +5663,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"RAY-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"REDSTONE-USDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -5422,6 +5818,18 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SPX-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"STG-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"STRK-USDT\"]",
         "quotes": [],
         "status": "pass"
@@ -5458,6 +5866,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SUSHI-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"SYN-USDT\"]",
         "quotes": [],
         "status": "pass"
@@ -5471,6 +5885,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"T-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"TAIKO-USDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -5584,6 +6004,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"TSLAX-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"TUSD-USDT\"]",
         "quotes": [],
         "status": "pass"
@@ -5680,6 +6106,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"USELESS-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"USUAL-USDT\"]",
         "quotes": [],
         "status": "pass"
@@ -5723,6 +6155,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"W-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"WAXL-USDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -5783,6 +6221,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"WLFI-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"WOO-USDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -5944,7 +6388,19 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ZEN-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"ZK-USDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ZORA-USDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -6013,14 +6469,14 @@
         "id": "[\"ticker_depth\",\"perp\",\"0GUSDTM\"]",
         "quotes": [
           {
-            "after_ask": "0.2258",
-            "after_bid": "0.22554",
-            "ask": "0.22579",
+            "after_ask": "0.22842",
+            "after_bid": "0.22817",
+            "ask": "0.22842",
             "attempt": 1,
-            "before_ask": "0.22579",
-            "before_bid": "0.22554",
-            "bid": "0.22554",
-            "elapsed_seconds": 1.1285414309822954,
+            "before_ask": "0.22842",
+            "before_bid": "0.22817",
+            "bid": "0.22817",
+            "elapsed_seconds": 1.1993639689753763,
             "ticker_ids_match": true
           }
         ],
@@ -6031,14 +6487,14 @@
         "id": "[\"ticker_depth\",\"perp\",\"1000000MOGUSDTM\"]",
         "quotes": [
           {
-            "after_ask": "0.1087",
-            "after_bid": "0.1084",
-            "ask": "0.1087",
+            "after_ask": "0.1082",
+            "after_bid": "0.1078",
+            "ask": "0.1082",
             "attempt": 1,
-            "before_ask": "0.1087",
-            "before_bid": "0.1084",
-            "bid": "0.1084",
-            "elapsed_seconds": 1.2917613810277544,
+            "before_ask": "0.1082",
+            "before_bid": "0.1078",
+            "bid": "0.1078",
+            "elapsed_seconds": 1.359476380981505,
             "ticker_ids_match": true
           }
         ],
@@ -6049,14 +6505,14 @@
         "id": "[\"ticker_depth\",\"perp\",\"10000CATUSDTM\"]",
         "quotes": [
           {
-            "after_ask": "0.0214",
-            "after_bid": "0.02133",
-            "ask": "0.0214",
+            "after_ask": "0.02123",
+            "after_bid": "0.02116",
+            "ask": "0.02123",
             "attempt": 1,
-            "before_ask": "0.0214",
-            "before_bid": "0.02133",
-            "bid": "0.02133",
-            "elapsed_seconds": 1.1147274340037256,
+            "before_ask": "0.02123",
+            "before_bid": "0.02116",
+            "bid": "0.02116",
+            "elapsed_seconds": 1.1955637719947845,
             "ticker_ids_match": true
           }
         ],
@@ -6067,14 +6523,14 @@
         "id": "[\"ticker_depth\",\"perp\",\"XBTUSDTM\"]",
         "quotes": [
           {
-            "after_ask": "81461.2",
-            "after_bid": "81461.1",
-            "ask": "81461.2",
+            "after_ask": "81082.9",
+            "after_bid": "81082.8",
+            "ask": "81082.9",
             "attempt": 1,
-            "before_ask": "81461.2",
-            "before_bid": "81461.1",
-            "bid": "81461.1",
-            "elapsed_seconds": 1.073353504005354,
+            "before_ask": "81082.9",
+            "before_bid": "81082.8",
+            "bid": "81082.8",
+            "elapsed_seconds": 1.3502694059861824,
             "ticker_ids_match": true
           }
         ],
@@ -6085,14 +6541,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"0G-USDT\"]",
         "quotes": [
           {
-            "after_ask": "0.2256",
-            "after_bid": "0.2253",
-            "ask": "0.2256",
+            "after_ask": "0.2285",
+            "after_bid": "0.228",
+            "ask": "0.2285",
             "attempt": 1,
-            "before_ask": "0.2256",
-            "before_bid": "0.2253",
-            "bid": "0.2253",
-            "elapsed_seconds": 0.7485920820035972,
+            "before_ask": "0.2285",
+            "before_bid": "0.228",
+            "bid": "0.228",
+            "elapsed_seconds": 0.8082312569604255,
             "ticker_ids_match": true
           }
         ],
@@ -6103,14 +6559,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"1INCH-USDT\"]",
         "quotes": [
           {
-            "after_ask": "0.09996",
-            "after_bid": "0.09986",
-            "ask": "0.09996",
+            "after_ask": "0.09944",
+            "after_bid": "0.09934",
+            "ask": "0.09944",
             "attempt": 1,
-            "before_ask": "0.09996",
-            "before_bid": "0.09987",
-            "bid": "0.09987",
-            "elapsed_seconds": 0.7495355739956722,
+            "before_ask": "0.09944",
+            "before_bid": "0.09934",
+            "bid": "0.09934",
+            "elapsed_seconds": 0.8245930710108951,
             "ticker_ids_match": true
           }
         ],
@@ -6121,14 +6577,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"2U2-USDT\"]",
         "quotes": [
           {
-            "after_ask": "0.00355",
-            "after_bid": "0.0035",
-            "ask": "0.00355",
+            "after_ask": "0.00348",
+            "after_bid": "0.00342",
+            "ask": "0.00348",
             "attempt": 1,
-            "before_ask": "0.00355",
-            "before_bid": "0.0035",
-            "bid": "0.0035",
-            "elapsed_seconds": 0.7867394260247238,
+            "before_ask": "0.00348",
+            "before_bid": "0.00342",
+            "bid": "0.00342",
+            "elapsed_seconds": 0.8329102089628577,
             "ticker_ids_match": true
           }
         ],
@@ -6139,14 +6595,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"BTC-USDT\"]",
         "quotes": [
           {
-            "after_ask": "81494.6",
-            "after_bid": "81494.5",
-            "ask": "81494.6",
+            "after_ask": "81137.8",
+            "after_bid": "81137.7",
+            "ask": "81137.8",
             "attempt": 1,
-            "before_ask": "81494.6",
-            "before_bid": "81494.5",
-            "bid": "81494.5",
-            "elapsed_seconds": 0.7574993209564127,
+            "before_ask": "81137.8",
+            "before_bid": "81137.7",
+            "bid": "81137.7",
+            "elapsed_seconds": 0.794711283990182,
             "ticker_ids_match": true
           }
         ],

@@ -110,6 +110,11 @@ class Exchange(SDK):
   ) -> Mapping[str, Ticker]:
     """Fetch a ticker snapshot for many markets at once.
 
+    Native 24h volumes are returned in `base_volume_24h` and `quote_volume_24h`,
+    in base and quote currency respectively. Each is `None` when unavailable;
+    zero is a reported zero. Quote volume is not normalized to USD or estimated
+    from the latest price. The venue defines the trailing 24h window.
+
     Args:
       markets: Market IDs to fetch. `None` fetches every market of the exchange.
       settings: Venue-specific ticker settings.
