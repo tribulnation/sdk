@@ -44,6 +44,7 @@ def contract(symbol: str = 'XBTUSDTM', **overrides: object) -> FuturesContract:
       markPrice=100.4,
       openInterest=1200,
       volumeOf24h=12.5,
+      turnoverOf24h=1240.75,
     )
     | overrides,
   )
@@ -153,6 +154,7 @@ async def test_ticker_and_stats_selection_preserve_native_units():
     D('.003'),
     D('12.5'),
   )
+  assert ticker.quote_volume_24h == D('1240.75')
   assert await exchange.tickers(['UNKNOWN']) == {}
   stats = (await exchange.perp_stats(['XBTUSDTM']))['XBTUSDTM']
   assert stats.open_interest == D('1.2')
