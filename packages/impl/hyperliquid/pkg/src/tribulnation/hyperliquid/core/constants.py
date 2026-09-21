@@ -1,3 +1,5 @@
+"""Hyperliquid trading limits and price rounding."""
+
 from decimal import Decimal, ROUND_HALF_UP
 
 PRICE_MAX_DECIMALS = 5
@@ -18,13 +20,16 @@ MAX_RELATIVE_PRICE = Decimal('1.8')
 
 def round_price(price: Decimal, max_sig_figs: int = MAX_SIGNIFICANT_FIGURES) -> Decimal:
   """
-  Round `price` to at most `max_sig_figs` significant figures.
-  - If `price` is zero or integral, return it unchanged.
+  Round `price` to at most `max_sig_figs` significant figures without trailing zeros.
 
-  See https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/tick-and-lot-size for details
+  Integer prices are exempt from the significant-figure limit. Remove fractional
+  trailing zeros before signing, while keeping integers in ordinary decimal form.
+
+  References:
+    - https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/tick-and-lot-size
   """
   if price.is_zero():
-    return price
+    return Decimal(0)
 
   if price >= 10000:
     return price.to_integral_value()
@@ -38,4 +43,7 @@ def round_price(price: Decimal, max_sig_figs: int = MAX_SIGNIFICANT_FIGURES) -> 
   # quant = 10^(-decimal_places); works for positive or negative decimal_places
   quant = Decimal(1).scaleb(-decimal_places)
 
-  return x.quantize(quant, rounding=ROUND_HALF_UP)
+  rounded = x.quantize(quant, rounding=ROUND_HALF_UP)
+  if rounded == rounded.to_integral_value():
+    return rounded.to_integral_value()
+  return rounded.normalize()
