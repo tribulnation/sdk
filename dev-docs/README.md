@@ -19,6 +19,9 @@ for repository setup, development commands and implementation guidance.
 6. [Deribit public Market qualification](deribit-public-market.md): public methods, live observations,
    candle/funding limitations and the version/Catalogue handoff.
 
+7. [Exchange-wide personal history](exchange-history-venues.md): native endpoint
+   coverage, implemented exchange scopes and remaining venue gaps.
+
 ## Documentation boundaries
 
 1. [User documentation](../docs/index.md) explains installation, configuration,

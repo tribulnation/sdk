@@ -33,3 +33,11 @@ class FundingPayment:
   amount: Decimal
   """Funding paid (if positive) or received (in quote units)"""
   time: datetime
+
+
+@dataclass(kw_only=True)
+class ExchangeFundingPayment(FundingPayment):
+  """A funding payment with its exchange-local market identity."""
+
+  market_id: str
+  """Native SDK market ID within the exchange, without venue/exchange prefixes."""

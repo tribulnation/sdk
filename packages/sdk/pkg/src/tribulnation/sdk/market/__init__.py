@@ -9,6 +9,7 @@ from .types import (
   FundingRate,
   NextFunding,
   FundingPayment,
+  ExchangeFundingPayment,
   Order,
   OrderResponse,
   OrderState,
@@ -17,6 +18,7 @@ from .types import (
   PerpStats,
   Ticker,
   Trade,
+  ExchangeTrade,
   Rules,
   Fees,
 )

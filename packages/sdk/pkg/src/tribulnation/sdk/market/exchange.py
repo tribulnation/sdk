@@ -5,6 +5,7 @@ from typing_extensions import (
   Collection,
   Mapping,
   Sequence,
+  overload,
 )
 from abc import abstractmethod
 from contextlib import asynccontextmanager
@@ -25,6 +26,9 @@ from .types import (
   PerpStats,
   Ticker,
   Trade,
+  ExchangeTrade,
+  ExchangeFundingPayment,
+  FundingPayment,
   Rules,
   Fees,
 )
@@ -168,10 +172,38 @@ class Exchange(SDK):
     market = await self.market(market_id)
     return await market.open_orders()
 
+  @overload
+  def trades_history(
+    self, market_id: None, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[ExchangeTrade]: ...
+
+  @overload
+  def trades_history(
+    self, market_id: str, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[Trade]: ...
+
   @SDK.method
   @PaginatedResponse.lift
-  async def trades_history(self, market_id: str, /, start: datetime, end: datetime):
-    """Fetch your trades history."""
+  async def trades_history(
+    self, market_id: str | None, /, start: datetime, end: datetime
+  ) -> AsyncIterable[Sequence[Trade]]:
+    """Fetch personal fills for one market or the whole exchange.
+
+    Args:
+      market_id: Native market ID, or `None` for all markets in this exchange.
+        Exchange-wide rows are `ExchangeTrade` records with a native `market_id`.
+      start: Inclusive start of the history window.
+      end: Inclusive end of the history window.
+
+    Exchange-wide support is venue-specific and raises `NotImplementedError`
+    when unavailable. It never falls back to scanning currently listed markets:
+    that would omit delisted-market history. Pages retain venue ordering and
+    retention limits; no global sorting or unlimited-history guarantee is made.
+    """
+    if market_id is None:
+      raise NotImplementedError(
+        f'Exchange-wide trades history is not supported [{self.id}].'
+      )
     market = await self.market(market_id)
     async for page in market.trades_history(start, end):
       yield page
@@ -314,10 +346,37 @@ class PerpExchange(Exchange):
     async for page in market.funding_rates(start, end):
       yield page
 
+  @overload
+  def funding_payments(
+    self, market_id: None, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[ExchangeFundingPayment]: ...
+
+  @overload
+  def funding_payments(
+    self, market_id: str, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[FundingPayment]: ...
+
   @SDK.method
   @PaginatedResponse.lift
-  async def funding_payments(self, market_id: str, /, start: datetime, end: datetime):
-    """Fetch your funding payments history."""
+  async def funding_payments(
+    self, market_id: str | None, /, start: datetime, end: datetime
+  ) -> AsyncIterable[Sequence[FundingPayment]]:
+    """Fetch personal funding payments for one market or the whole exchange.
+
+    Args:
+      market_id: Native market ID, or `None` for all markets in this exchange.
+        Exchange-wide rows are `ExchangeFundingPayment` records with `market_id`.
+      start: Inclusive start of the history window.
+      end: Inclusive end of the history window.
+
+    Exchange-wide support is venue-specific; unsupported calls raise
+    `NotImplementedError`. Pagination and retention follow the native endpoint,
+    as for `Exchange.trades_history`.
+    """
+    if market_id is None:
+      raise NotImplementedError(
+        f'Exchange-wide funding payments are not supported [{self.id}].'
+      )
     market = await self.market(market_id)
     async for page in market.funding_payments(start, end):
       yield page

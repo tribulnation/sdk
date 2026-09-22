@@ -48,7 +48,7 @@ market ID. The exchange qualifier selects it:
 So `dydx:perp:BTC-USD` addresses the parent/cross pool and `dydx:perp.256:XAUT-USD` addresses
 child subaccount `256` (isolated). Child subaccounts of parent `p` are `p, 128+p, 256+p, …`;
 any `N` failing `N % 128 == p` raises. Markets **inherit** the subaccount from their exchange,
-so every account-scoped method (`place_order`, `open_orders`, `query_order`, `perp_position`,
+so trading and position methods (`place_order`, `open_orders`, `query_order`, `perp_position`,
 `available_notional`, `perp_collateral`) keys off the same bucket by construction.
 
 > **Migration:** the old `<BASE>-USD:<N>` market-ID suffix (`parse_market_id`) has been
@@ -59,10 +59,13 @@ so every account-scoped method (`place_order`, `open_orders`, `query_order`, `pe
 > lives inside the exchange segment, so it does not disturb the top-level
 > `<account>:<exchange>:<market>` colon split.
 
-**Reads: aggregate vs scoped.** The bare `perp` (parent) exchange reads *parent-aggregate*
-history across the parent's child subaccounts (coherent for additive reads like trades and
-funding). A qualified `perp.<N>` exchange scopes those reads to exactly that child subaccount.
-Collateral never aggregates — it is always scoped to the addressed subaccount's own bucket.
+### Historical trades and funding
+
+`trades_history` and `funding_payments` include **all subaccounts of the configured
+address**, including isolated child accounts. This applies to both selected-market
+and exchange-wide history, regardless of which `perp` or `perp.<N>` object is used.
+Exchange-wide records carry `market_id`, the native instrument ticker (for example,
+`BTC-USD`). Positions and collateral continue to use the selected margin bucket.
 
 ## Settings
 

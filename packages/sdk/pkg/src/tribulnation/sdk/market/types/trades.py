@@ -20,3 +20,11 @@ class Trade:
   maker: bool
   fee: Fee | None = None
   details: Any = None
+
+
+@dataclass(kw_only=True)
+class ExchangeTrade(Trade):
+  """A personal fill with its exchange-local market identity."""
+
+  market_id: str
+  """Native SDK market ID within the exchange, without venue/exchange prefixes."""

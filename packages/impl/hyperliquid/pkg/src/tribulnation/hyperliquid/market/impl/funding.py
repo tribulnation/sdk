@@ -63,6 +63,6 @@ async def funding_payments(
       t = p['time'].astimezone()
       if t < start or t > end:
         continue
-      payments.append(FundingPayment(amount=Decimal(p['delta']['usdc']), time=t))
+      payments.append(FundingPayment(amount=-Decimal(p['delta']['usdc']), time=t))
     if payments:
       yield payments

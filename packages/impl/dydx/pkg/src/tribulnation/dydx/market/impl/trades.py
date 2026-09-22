@@ -22,7 +22,9 @@ async def trades_history(
     return start <= time <= end
 
   address = self.address
-  subaccounts = (await self.indexer.data.get_subaccounts(address))['subaccounts']
+  subaccounts = (
+    await self.call_dydx(lambda: self.indexer.data.get_subaccounts(address))
+  )['subaccounts']
 
   for sub in subaccounts:
     paging = self.indexer.data.get_fills_paged(

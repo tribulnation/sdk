@@ -51,7 +51,9 @@ async def funding_payments(
   start = start.astimezone()
   end = end.astimezone()
   address = self.address
-  subaccounts = (await self.indexer.data.get_subaccounts(address))['subaccounts']
+  subaccounts = (
+    await self.call_dydx(lambda: self.indexer.data.get_subaccounts(address))
+  )['subaccounts']
 
   for sub in subaccounts:
     paging = self.indexer.data.get_funding_payments_paged(
@@ -65,7 +67,7 @@ async def funding_payments(
       next_state = state
       batch, state = await self.call_dydx(lambda: paging.next(next_state))
       payments = [
-        FundingPayment(amount=Decimal(item['payment']), time=item['createdAt'])
+        FundingPayment(amount=-Decimal(item['payment']), time=item['createdAt'])
         for item in batch
         if start <= item['createdAt'] <= end
       ]

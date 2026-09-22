@@ -70,6 +70,40 @@ rules, book = await asyncio.gather(
 )
 ```
 
+## Exchange-wide account history
+
+Pass `None` as the market selector to read across a supported exchange:
+
+```python
+exchange = await sdk.perp_exchange('dydx:perp')
+async for page in exchange.trades_history(None, start, end):
+  for trade in page:
+    print(trade.market_id, trade.time, trade.qty)
+
+async for page in exchange.funding_payments(None, start, end):
+  for payment in page:
+    print(payment.market_id, payment.time, payment.amount)
+```
+
+Both datetime bounds are required and inclusive. Exchange-wide rows are
+`ExchangeTrade` or `ExchangeFundingPayment`, with the existing record fields plus
+`market_id`, the native ID within that exchange. Funding paid is positive and
+funding received is negative. Hyperliquid and dYdX now apply that sign convention
+to both exchange-wide and selected-market results. Passing a string market ID
+keeps the existing single-market API and base record types.
+
+Hyperliquid supports trades on spot and perpetual exchanges, and funding payments
+on perpetual exchanges. Each builder DEX is scoped separately. dYdX supports both
+methods across all subaccounts of the configured address, for both `perp` and
+`perp.<N>` exchange objects; selecting one market still includes every subaccount.
+All other venues currently raise `NotImplementedError` for exchange-wide reads; single-market
+support is unchanged.
+
+These reads use native account feeds, with their retention and pagination limits.
+Pages have no global ordering guarantee. Hyperliquid's fills feed retains only its
+recent history and does not include TWAP slice fills. A current market catalogue
+is never scanned as a substitute for historical account data.
+
 ## Perpetuals
 
 Perpetual markets are scope similarly, just use different methods:
