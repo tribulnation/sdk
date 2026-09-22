@@ -359,8 +359,8 @@
       },
       "tribulnation-hyperliquid": {
         "files_sha256": "e43f2d0e7208d1de63717380705c84ee402435bd666bdd6cf1932e2e0407c64a",
-        "metadata_sha256": "bad3f8e7011608fcf2be00d1ed5199ba9684f183a4150d3ce782fdc3d287b471",
-        "version": "0.8.1"
+        "metadata_sha256": "3f5a6ce22206c674512be1a045d30c09ab27ff61759500e8b2eb4310ff62b291",
+        "version": "0.9.0"
       },
       "tribulnation-sdk": {
         "files_sha256": "de80df460134018eefac1f01aae414d13e2cc35dc90cfa8216c4cc82326c5ec8",
@@ -400,7 +400,7 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "c43bf8bf1b479272a1b87a736408d10e42a44a12d85f70186beee54508874f84",
+    "source_sha256": "b689d50641988abc00bb9f375acd46514891bd6df09ce5320c20ea2c83509dee",
     "venue": "hyperliquid"
   },
   "before": {
@@ -763,8 +763,8 @@
       },
       "tribulnation-hyperliquid": {
         "files_sha256": "e43f2d0e7208d1de63717380705c84ee402435bd666bdd6cf1932e2e0407c64a",
-        "metadata_sha256": "bad3f8e7011608fcf2be00d1ed5199ba9684f183a4150d3ce782fdc3d287b471",
-        "version": "0.8.1"
+        "metadata_sha256": "3f5a6ce22206c674512be1a045d30c09ab27ff61759500e8b2eb4310ff62b291",
+        "version": "0.9.0"
       },
       "tribulnation-sdk": {
         "files_sha256": "de80df460134018eefac1f01aae414d13e2cc35dc90cfa8216c4cc82326c5ec8",
@@ -804,12 +804,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "c43bf8bf1b479272a1b87a736408d10e42a44a12d85f70186beee54508874f84",
+    "source_sha256": "b689d50641988abc00bb9f375acd46514891bd6df09ce5320c20ea2c83509dee",
     "venue": "hyperliquid"
   },
-  "finished": "2026-09-22T16:08:23.913081Z",
+  "finished": "2026-09-22T16:12:37.517315Z",
   "results_sha256": "6430cb107a5e7d786fa74401c8cb89de34d375a853bd6bc2f3ce8eb4d1774b6b",
   "schema_version": 1,
-  "started": "2026-09-22T16:08:01.335289Z",
-  "summary_sha256": "aac87a674460ebfd7e92f13b949b097d2d784e3e0c1fed3d464c1cb35e9e93d7"
+  "started": "2026-09-22T16:12:15.653751Z",
+  "summary_sha256": "030950944fa0fa789db1e26ad8671f43a5b83fcc47f11b0600303471aad979de"
 }
