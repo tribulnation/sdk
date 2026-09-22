@@ -1,11 +1,21 @@
-from typing_extensions import Collection, Mapping
+from typing_extensions import AsyncIterable, Collection, Mapping, Sequence, overload
 from dataclasses import dataclass
+from datetime import datetime
 from decimal import Decimal
 import asyncio
 
 from tribulnation.sdk import PerpExchange
-from tribulnation.sdk.core import ApiError
-from tribulnation.sdk.market import PerpCollateral, PerpStats, Settings, Ticker
+from tribulnation.sdk.core import ApiError, PaginatedResponse
+from tribulnation.sdk.market import (
+  ExchangeFundingPayment,
+  ExchangeTrade,
+  FundingPayment,
+  PerpCollateral,
+  PerpStats,
+  Settings,
+  Ticker,
+  Trade,
+)
 
 from tribulnation.dydx.core import wrap_exceptions
 from .impl import ExchangeMixin, effective_mmf, perp_stats, tickers
@@ -79,6 +89,98 @@ class Exchange(ExchangeMixin, PerpExchange):
       perpetual_market=markets[market_id],
       subaccount=self.subaccount,
     )
+
+  @overload
+  def trades_history(
+    self, market_id: None, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[ExchangeTrade]:
+    """Fetch all-market history."""
+    ...
+
+  @overload
+  def trades_history(
+    self, market_id: str, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[Trade]:
+    """Fetch selected-market history."""
+    ...
+
+  @PaginatedResponse.lift
+  @wrap_exceptions
+  async def trades_history(
+    self, market_id: str | None, /, start: datetime, end: datetime
+  ) -> AsyncIterable[Sequence[Trade]]:
+    """Fetch all-market fills for this subaccount, or delegate a selected market."""
+    if market_id is not None:
+      async for page in super().trades_history(market_id, start, end):
+        yield page
+      return
+    start, end = start.astimezone(), end.astimezone()
+    paging = self.indexer.data.get_fills_paged(
+      address=self.address,
+      subaccount=self.subaccount,
+      created_before_or_at=end,
+      market_type='PERPETUAL',
+    )
+    async for fills in paging.via(self.call_dydx):
+      trades = [
+        ExchangeTrade(
+          market_id=fill['market'],
+          id=fill['id'],
+          price=Decimal(fill['price']),
+          qty=Decimal(fill['size']) * (1 if fill['side'] == 'BUY' else -1),
+          time=fill['createdAt'],
+          maker=fill['liquidity'] == 'MAKER',
+          fee=Trade.Fee(asset='USDC', amount=Decimal(fill['fee'])),
+          details=fill,
+        )
+        for fill in fills
+        if start <= fill['createdAt'] <= end
+      ]
+      if trades:
+        yield trades
+
+  @overload
+  def funding_payments(
+    self, market_id: None, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[ExchangeFundingPayment]:
+    """Fetch all-market history."""
+    ...
+
+  @overload
+  def funding_payments(
+    self, market_id: str, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[FundingPayment]:
+    """Fetch selected-market history."""
+    ...
+
+  @PaginatedResponse.lift
+  @wrap_exceptions
+  async def funding_payments(
+    self, market_id: str | None, /, start: datetime, end: datetime
+  ) -> AsyncIterable[Sequence[FundingPayment]]:
+    """Fetch all-market funding for this subaccount, or delegate a selected market."""
+    if market_id is not None:
+      async for page in super().funding_payments(market_id, start, end):
+        yield page
+      return
+    start, end = start.astimezone(), end.astimezone()
+    paging = self.indexer.data.get_funding_payments_paged(
+      address=self.address,
+      subaccount=self.subaccount,
+      after_or_at=start,
+    )
+    async for batch in paging.via(self.call_dydx):
+      payments = [
+        ExchangeFundingPayment(
+          market_id=item['ticker'],
+          amount=-Decimal(item['payment']),
+          time=item['createdAt'],
+        )
+        for item in batch
+        if start <= item['createdAt'] <= end
+      ]
+      if payments:
+        yield payments
 
   @wrap_exceptions
   async def perp_collateral(self, market_id: str | None = None, /) -> PerpCollateral:

@@ -1,5 +1,8 @@
-from typing_extensions import Collection, Mapping, Sequence
+from typing_extensions import Collection, Mapping, Sequence, overload
 from dataclasses import dataclass
+from datetime import datetime
+
+from tribulnation.sdk.core import PaginatedResponse
 
 from tribulnation.sdk.market import (
   PerpExchange as _PerpExchange,
@@ -7,10 +10,15 @@ from tribulnation.sdk.market import (
   PerpStats,
   Settings,
   Ticker,
+  Trade,
+  ExchangeTrade,
+  ExchangeFundingPayment,
+  FundingPayment,
 )
 
 from .impl import PerpMixin, perp_exchange_collateral, perp_stats, perp_tickers
 from .perps_market import PerpMarket
+from .impl.exchange_history import exchange_trades_history, exchange_funding_payments
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -22,6 +30,42 @@ class PerpExchange(PerpMixin, _PerpExchange):
   @property
   def exchange_id(self) -> str:
     return self.dex_name or ''
+
+  @overload
+  def trades_history(
+    self, market_id: None, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[ExchangeTrade]: ...
+
+  @overload
+  def trades_history(
+    self, market_id: str, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[Trade]: ...
+
+  def trades_history(
+    self, market_id: str | None, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[Trade] | PaginatedResponse[ExchangeTrade]:
+    """Fetch one market, or this DEX's fills with market IDs when given None."""
+    if market_id is not None:
+      return super().trades_history(market_id, start, end)
+    return PaginatedResponse(exchange_trades_history(self, start=start, end=end))
+
+  @overload
+  def funding_payments(
+    self, market_id: None, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[ExchangeFundingPayment]: ...
+
+  @overload
+  def funding_payments(
+    self, market_id: str, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[FundingPayment]: ...
+
+  def funding_payments(
+    self, market_id: str | None, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[FundingPayment] | PaginatedResponse[ExchangeFundingPayment]:
+    """Fetch one market, or this DEX's funding with market IDs when given None."""
+    if market_id is not None:
+      return super().funding_payments(market_id, start, end)
+    return PaginatedResponse(exchange_funding_payments(self, start=start, end=end))
 
   async def perp_collateral(self, market_id: str | None = None, /) -> PerpCollateral:
     if market_id is not None:

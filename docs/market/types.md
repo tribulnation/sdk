@@ -18,6 +18,14 @@ timestamps are `datetime`, and quantities are signed base units: positive is a b
 long, negative a sell or a short. This page is the catalogue; [Methods](methods.md) says
 which call returns what.
 
+## Exchange history records
+
+`ExchangeTrade` extends `Trade`, and `ExchangeFundingPayment` extends
+`FundingPayment`. Each adds a required `market_id`: the native market ID within
+the exchange, without account or exchange prefixes. Exchange-wide history calls
+return these records; selected-market calls retain the existing base types.
+See [exchange-wide account history](hierarchy.md#exchange-wide-account-history).
+
 ## Orders
 
 An `Order` is what you pass to `place_order`:

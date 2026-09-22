@@ -17,6 +17,7 @@ from tribulnation.hyperliquid.market.impl.mixin import (
   SharedMixin,
 )
 from tribulnation.sdk import Context, NetworkError
+from tribulnation.sdk.market import FundingPayment
 
 START = datetime(2026, 1, 1, tzinfo=timezone.utc)
 
@@ -82,3 +83,9 @@ async def test_market_page_retry(
   assert calls == [0, 1, 1, 2]
   if method == 'trades_history':
     assert [trade.id for page in pages for trade in page] == ['0', '1', '2']
+
+  if method == 'funding_payments':
+    for page in pages:
+      for payment in page:
+        assert isinstance(payment, FundingPayment)
+        assert payment.amount == -1

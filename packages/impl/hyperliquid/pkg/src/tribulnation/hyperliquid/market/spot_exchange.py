@@ -1,17 +1,27 @@
 import asyncio
 import logging
 
-from typing_extensions import Collection, Mapping, Sequence
+from typing_extensions import Collection, Mapping, Sequence, overload
 from dataclasses import dataclass
+from datetime import datetime
 from decimal import Decimal
 
 from tribulnation.sdk import SDK
-from tribulnation.sdk.market import Book, Exchange as _Exchange, Settings, Ticker
+from tribulnation.sdk.core import PaginatedResponse
+from tribulnation.sdk.market import (
+  Book,
+  Exchange as _Exchange,
+  Settings,
+  Ticker,
+  Trade,
+  ExchangeTrade,
+)
 from tribulnation.sdk.market.exchange import ticker_from_book
 
 from tribulnation.hyperliquid.core import wrap_exceptions
 from .impl import SpotMixin
 from .spot_market import SpotMarket
+from .impl.exchange_history import exchange_trades_history
 
 
 def _market_id(base: str, quote: str, asset_idx: int) -> str:
@@ -49,6 +59,24 @@ class SpotExchange(SpotMixin, _Exchange):
   @property
   def exchange_id(self) -> str:
     return 'spot'
+
+  @overload
+  def trades_history(
+    self, market_id: None, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[ExchangeTrade]: ...
+
+  @overload
+  def trades_history(
+    self, market_id: str, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[Trade]: ...
+
+  def trades_history(
+    self, market_id: str | None, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[Trade] | PaginatedResponse[ExchangeTrade]:
+    """Fetch one market, or all spot fills with canonical market IDs for None."""
+    if market_id is not None:
+      return super().trades_history(market_id, start, end)
+    return PaginatedResponse(exchange_trades_history(self, start=start, end=end))
 
   async def markets(self) -> Sequence[str]:
     meta = await self.shared.load_spot_meta()

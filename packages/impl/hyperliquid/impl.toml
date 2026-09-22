@@ -31,7 +31,7 @@ methods = [
   "perp_position",
   "perp_collateral",
 ]
-note = "`candles` serves spot and perpetuals in native order within `[start, end)`. Hyperliquid retains only the latest 5000 candles per interval; pagination does not recover expired history. Quote volume is not reported. `fees` supports native USDC perpetuals, including account staking/tier and referral adjustments. Spot and HIP-3 fees are explicitly unsupported pending verified quote-token and per-asset deployer metadata; their public rules return fees=None."
+note = "`candles` serves spot and perpetuals in native order within `[start, end)`. Hyperliquid retains only the latest 5000 candles per interval; pagination does not recover expired history. Quote volume is not reported. `fees` supports native USDC perpetuals, including account staking/tier and referral adjustments. Spot and HIP-3 fees are explicitly unsupported pending verified quote-token and per-asset deployer metadata; their public rules return fees=None. Exchange trades_history(None, start, end) and perpetual funding_payments(None, start, end) use native account pages scoped to the exchange, with market_id on each row. Fill history retains at most 10000 fills and excludes TWAP slices; unresolved historical spot metadata raises. Funding is positive paid and negative received, correcting the previous single-market sign."
 # MarketSDK.DEFAULT_ACCOUNTS includes 'hyperliquid' (Hyperliquid(public=True)) — but that
 # only covers purely public market-data methods; account-scoped/trading methods still need
 # real credentials regardless (see docs/contract/market.yml's per-method `public: false`).

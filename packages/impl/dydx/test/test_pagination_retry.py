@@ -157,6 +157,7 @@ async def test_market_fills_retry(monkeypatch: pytest.MonkeyPatch):
       MarketMixin,
       SimpleNamespace(
         address='dydx1fixture',
+        subaccount=0,
         market='BTC-USD',
         indexer=owner.indexer,
         call_dydx=owner.call_dydx,
