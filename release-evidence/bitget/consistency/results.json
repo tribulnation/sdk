@@ -2080,7 +2080,163 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RAAPLUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RAEPUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RALABUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RAMATUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RAMDUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RAMGNUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RAMZNUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RAPPUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RARMUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RAVGOUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"RAYUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RBACUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RBEUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RBSXUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RCOHRUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RCOINUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RCOSTUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RCRDOUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RCRMUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RCRWDUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RCRWVUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RCSCOUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RCVXUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RDHRUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RDIAUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RDRAMUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"REEMUSDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -2098,7 +2254,133 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"REWYUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"REZUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RGEVUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RGLDUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RGOOGLUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RGSUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RHDUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RHOODUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RHYGUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RIBITUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RIBMUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RINTCUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RIRENUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RIVVUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RIWMUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RJNJUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RJPMUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RKLACUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RKOUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RLITEUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RLLYUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RLRCXUSDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -2111,6 +2393,300 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"RLUSDUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RMAUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RMELIUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RMETAUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RMPCUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RMRKUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RMRNAUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RMRVLUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RMSFTUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RMSTRUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RMUUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RNBISUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RNFLXUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RNVDAUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RNXPIUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RORCLUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RPANWUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RPEPUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RPLTRUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RQCOMUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RQQQUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RSGOVUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RSHOPUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RSKHYUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RSMHUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RSNDKUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RSOXLUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RSOXSUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RSOXXUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RSPCXUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RSPYUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RSQQQUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RSTXUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RTERUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RTJXUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RTLTUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RTMOUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RTQQQUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RTSLAUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RTSMUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RTXNUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RUNHUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RVLOUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RVOOUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RVUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RWBDUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RWDCUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RWMTUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RXLKUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RXOMUSDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -4588,7 +5164,163 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RAAPLUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RAEPUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RALABUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RAMATUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RAMDUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RAMGNUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RAMZNUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RAPPUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RARMUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RAVGOUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"RAYUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RBACUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RBEUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RBSXUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RCOHRUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RCOINUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RCOSTUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RCRDOUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RCRMUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RCRWDUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RCRWVUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RCSCOUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RCVXUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RDHRUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RDIAUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RDRAMUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"REEMUSDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -4606,7 +5338,133 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"REWYUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"REZUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RGEVUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RGLDUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RGOOGLUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RGSUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RHDUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RHOODUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RHYGUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RIBITUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RIBMUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RINTCUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RIRENUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RIVVUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RIWMUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RJNJUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RJPMUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RKLACUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RKOUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RLITEUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RLLYUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RLRCXUSDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -4619,6 +5477,300 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"RLUSDUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RMAUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RMELIUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RMETAUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RMPCUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RMRKUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RMRNAUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RMRVLUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RMSFTUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RMSTRUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RMUUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RNBISUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RNFLXUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RNVDAUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RNXPIUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RORCLUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RPANWUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RPEPUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RPLTRUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RQCOMUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RQQQUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RSGOVUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RSHOPUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RSKHYUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RSMHUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RSNDKUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RSOXLUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RSOXSUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RSOXXUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RSPCXUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RSPYUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RSQQQUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RSTXUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RTERUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RTJXUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RTLTUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RTMOUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RTQQQUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RTSLAUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RTSMUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RTXNUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RUNHUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RVLOUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RVOOUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RVUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RWBDUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RWDCUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RWMTUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RXLKUSDT\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RXOMUSDT\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -5107,14 +6259,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"0GUSDT\"]",
         "quotes": [
           {
-            "after_ask": "0.227",
-            "after_bid": "0.2267",
-            "ask": "0.227",
+            "after_ask": "0.2352",
+            "after_bid": "0.2349",
+            "ask": "0.2352",
             "attempt": 1,
-            "before_ask": "0.227",
-            "before_bid": "0.2267",
-            "bid": "0.2267",
-            "elapsed_seconds": 0.8981805369840004,
+            "before_ask": "0.2352",
+            "before_bid": "0.2349",
+            "bid": "0.2349",
+            "elapsed_seconds": 1.185419169953093,
             "ticker_ids_match": true
           }
         ],
@@ -5125,14 +6277,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"10SETUSDT\"]",
         "quotes": [
           {
-            "after_ask": "0.00946",
-            "after_bid": "0.00945",
-            "ask": "0.00946",
+            "after_ask": "0.00911",
+            "after_bid": "0.0091",
+            "ask": "0.00911",
             "attempt": 1,
-            "before_ask": "0.00946",
-            "before_bid": "0.00945",
-            "bid": "0.00945",
-            "elapsed_seconds": 0.9037946799653582,
+            "before_ask": "0.00911",
+            "before_bid": "0.0091",
+            "bid": "0.0091",
+            "elapsed_seconds": 0.9862303769914433,
             "ticker_ids_match": true
           }
         ],
@@ -5143,14 +6295,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"1INCHUSDT\"]",
         "quotes": [
           {
-            "after_ask": "0.09927",
-            "after_bid": "0.09914",
-            "ask": "0.09927",
+            "after_ask": "0.10193",
+            "after_bid": "0.10181",
+            "ask": "0.10193",
             "attempt": 1,
-            "before_ask": "0.09927",
-            "before_bid": "0.09914",
-            "bid": "0.09914",
-            "elapsed_seconds": 0.9142483790055849,
+            "before_ask": "0.10193",
+            "before_bid": "0.10181",
+            "bid": "0.10181",
+            "elapsed_seconds": 1.1132541740080342,
             "ticker_ids_match": true
           }
         ],
@@ -5161,14 +6313,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"BTCUSDT\"]",
         "quotes": [
           {
-            "after_ask": "81005.23",
-            "after_bid": "81005.22",
-            "ask": "81000.01",
+            "after_ask": "86245.75",
+            "after_bid": "86245.74",
+            "ask": "86250.56",
             "attempt": 1,
-            "before_ask": "81000.01",
-            "before_bid": "81000",
-            "bid": "81000",
-            "elapsed_seconds": 1.0619685730198398,
+            "before_ask": "86245.75",
+            "before_bid": "86245.74",
+            "bid": "86250.55",
+            "elapsed_seconds": 1.1330954190343618,
             "ticker_ids_match": true
           }
         ],
@@ -5179,14 +6331,14 @@
         "id": "[\"ticker_depth\",\"usdc\",\"1000BONKPERP\"]",
         "quotes": [
           {
-            "after_ask": "0.00303",
-            "after_bid": "0.003007",
-            "ask": "0.003016",
+            "after_ask": "0.003534",
+            "after_bid": "0.003513",
+            "ask": "0.003525",
             "attempt": 1,
-            "before_ask": "0.00303",
-            "before_bid": "0.003007",
-            "bid": "0.003013",
-            "elapsed_seconds": 0.7653415300301276,
+            "before_ask": "0.003534",
+            "before_bid": "0.003513",
+            "bid": "0.003521",
+            "elapsed_seconds": 0.7809819539543241,
             "ticker_ids_match": true
           }
         ],
@@ -5197,14 +6349,14 @@
         "id": "[\"ticker_depth\",\"usdc\",\"AAVEPERP\"]",
         "quotes": [
           {
-            "after_ask": "140.8",
-            "after_bid": "140.63",
-            "ask": "140.8",
+            "after_ask": "142.25",
+            "after_bid": "142.09",
+            "ask": "142.25",
             "attempt": 1,
-            "before_ask": "140.8",
-            "before_bid": "140.66",
-            "bid": "140.66",
-            "elapsed_seconds": 0.7730564660159871,
+            "before_ask": "142.25",
+            "before_bid": "142.09",
+            "bid": "142.13",
+            "elapsed_seconds": 0.7668521630112082,
             "ticker_ids_match": true
           }
         ],
@@ -5215,14 +6367,14 @@
         "id": "[\"ticker_depth\",\"usdc\",\"ADAPERP\"]",
         "quotes": [
           {
-            "after_ask": "0.2268",
-            "after_bid": "0.2266",
-            "ask": "0.2268",
+            "after_ask": "0.249",
+            "after_bid": "0.2487",
+            "ask": "0.249",
             "attempt": 1,
-            "before_ask": "0.2268",
-            "before_bid": "0.2266",
-            "bid": "0.2266",
-            "elapsed_seconds": 0.753891633998137,
+            "before_ask": "0.249",
+            "before_bid": "0.2487",
+            "bid": "0.2487",
+            "elapsed_seconds": 0.7848266960354522,
             "ticker_ids_match": true
           }
         ],
@@ -5233,14 +6385,14 @@
         "id": "[\"ticker_depth\",\"usdc\",\"BTCPERP\"]",
         "quotes": [
           {
-            "after_ask": "80948.0",
-            "after_bid": "80947.9",
-            "ask": "80948",
+            "after_ask": "86195.2",
+            "after_bid": "86195.1",
+            "ask": "86195.2",
             "attempt": 1,
-            "before_ask": "80948.0",
-            "before_bid": "80947.9",
-            "bid": "80947.9",
-            "elapsed_seconds": 0.7659143329947256,
+            "before_ask": "86195.2",
+            "before_bid": "86195.1",
+            "bid": "86195.1",
+            "elapsed_seconds": 0.8054053459782153,
             "ticker_ids_match": true
           }
         ],
@@ -5251,14 +6403,14 @@
         "id": "[\"ticker_depth\",\"usdt\",\"0GUSDT\"]",
         "quotes": [
           {
-            "after_ask": "0.2271",
-            "after_bid": "0.2268",
-            "ask": "0.2271",
+            "after_ask": "0.2356",
+            "after_bid": "0.2354",
+            "ask": "0.2356",
             "attempt": 1,
-            "before_ask": "0.2271",
-            "before_bid": "0.2268",
-            "bid": "0.2268",
-            "elapsed_seconds": 0.8962592520401813,
+            "before_ask": "0.2356",
+            "before_bid": "0.2354",
+            "bid": "0.2354",
+            "elapsed_seconds": 0.8485892999451607,
             "ticker_ids_match": true
           }
         ],
@@ -5269,14 +6421,14 @@
         "id": "[\"ticker_depth\",\"usdt\",\"1000000MOGUSDT\"]",
         "quotes": [
           {
-            "after_ask": "0.1078",
-            "after_bid": "0.1075",
-            "ask": "0.1078",
+            "after_ask": "0.1225",
+            "after_bid": "0.1223",
+            "ask": "0.1225",
             "attempt": 1,
-            "before_ask": "0.1078",
-            "before_bid": "0.1075",
-            "bid": "0.1075",
-            "elapsed_seconds": 0.8281051889644004,
+            "before_ask": "0.1225",
+            "before_bid": "0.1223",
+            "bid": "0.1223",
+            "elapsed_seconds": 0.8308792050229385,
             "ticker_ids_match": true
           }
         ],
@@ -5287,14 +6439,14 @@
         "id": "[\"ticker_depth\",\"usdt\",\"10000NEXUSDT\"]",
         "quotes": [
           {
-            "after_ask": "0.01078",
-            "after_bid": "0.01074",
-            "ask": "0.01078",
+            "after_ask": "0.01079",
+            "after_bid": "0.01077",
+            "ask": "0.01079",
             "attempt": 1,
-            "before_ask": "0.01078",
-            "before_bid": "0.01074",
-            "bid": "0.01074",
-            "elapsed_seconds": 0.822912206989713,
+            "before_ask": "0.01079",
+            "before_bid": "0.01077",
+            "bid": "0.01077",
+            "elapsed_seconds": 0.8397611320251599,
             "ticker_ids_match": true
           }
         ],
@@ -5305,14 +6457,14 @@
         "id": "[\"ticker_depth\",\"usdt\",\"BTCUSDT\"]",
         "quotes": [
           {
-            "after_ask": "80972.8",
-            "after_bid": "80972.7",
-            "ask": "80972.8",
+            "after_ask": "86207.6",
+            "after_bid": "86207.5",
+            "ask": "86215.5",
             "attempt": 1,
-            "before_ask": "80972.8",
-            "before_bid": "80972.7",
-            "bid": "80972.7",
-            "elapsed_seconds": 0.8434339290251955,
+            "before_ask": "86215.5",
+            "before_bid": "86215.4",
+            "bid": "86215.4",
+            "elapsed_seconds": 0.8541109579382464,
             "ticker_ids_match": true
           }
         ],
@@ -5429,6 +6581,9 @@
           "RALMUSDT",
           "RAMTUSDT",
           "RBRCUSDT",
+          "RIYEUSDT",
+          "RILFUSDT",
+          "RSPSMUSDT",
           "RMRKUSDT",
           "RMNSTUSDT",
           "RCSXUSDT",
@@ -5440,7 +6595,18 @@
           "RJCIUSDT",
           "RGRNDUSDT",
           "MHAUSDT",
+          "RFDVVUSDT",
+          "RGDXUUSDT",
+          "RBITXUSDT",
+          "RJPIEUSDT",
+          "RCWBUSDT",
+          "RIWPUSDT",
           "RPLDUSDT",
+          "RAAPUUSDT",
+          "RIWSUSDT",
+          "RSCHAUSDT",
+          "RDFACUSDT",
+          "RTMFUSDT",
           "RNIKLUSDT",
           "RGLWUSDT",
           "RCMCSAUSDT",
@@ -5452,6 +6618,18 @@
           "RMRNAUSDT",
           "RWELLUSDT",
           "RHONUSDT",
+          "RVDEUSDT",
+          "RPLTUUSDT",
+          "RSILUSDT",
+          "RVYMIUSDT",
+          "RQYLDUSDT",
+          "RFENIUSDT",
+          "RNVDXUSDT",
+          "RAMZUUSDT",
+          "RAVDEUSDT",
+          "RBAIUSDT",
+          "RTSMXUSDT",
+          "RPYLDUSDT",
           "RAEMUSDT",
           "RSHELUSDT",
           "RSAPUSDT",
@@ -5464,6 +6642,18 @@
           "SNEKUSDT",
           "RRIOUSDT",
           "RSLBUSDT",
+          "RGGOVUSDT",
+          "RVTIPUSDT",
+          "RPHYSUSDT",
+          "RGBTCUSDT",
+          "RAAOXUSDT",
+          "RBULZUSDT",
+          "RVGLTUSDT",
+          "RUDOWUSDT",
+          "RUSIGUSDT",
+          "RFLOTUSDT",
+          "RVBUSDT",
+          "RIUSVUSDT",
           "RSOUSDT",
           "RASXUSDT",
           "REBAYUSDT",
@@ -5476,6 +6666,11 @@
           "RMMMUSDT",
           "RNVSUSDT",
           "RPMUSDT",
+          "RSGOLUSDT",
+          "RVOTUSDT",
+          "RDGROUSDT",
+          "RORCXUSDT",
+          "RIQLTUSDT",
           "RMOUSDT",
           "RWMUSDT",
           "RVRTXUSDT",
@@ -5491,6 +6686,10 @@
           "RTLNUSDT",
           "IOSTUSDT",
           "RHIMSUSDT",
+          "RIGIBUSDT",
+          "RAAXJUSDT",
+          "RKIEUSDT",
+          "RBTCZUSDT",
           "RLNGUSDT",
           "RROKUSDT",
           "ONDOUSDT",
@@ -5516,13 +6715,39 @@
           "RMCHPUSDT",
           "RDVNUSDT",
           "RAMEUSDT",
+          "RCLBTUSDT",
+          "RAKRUSDT",
+          "RGPKUSDT",
           "USDCEUR",
           "ZETAUSDT",
           "RXELUSDT",
           "RARGXUSDT",
+          "RRGCUSDT",
+          "RPPLIUSDT",
+          "RWORUSDT",
+          "RHAYWUSDT",
+          "RSPNTUSDT",
+          "RCSANYUSDT",
+          "RMNSOUSDT",
+          "RPAGSUSDT",
+          "RIMNMUSDT",
+          "REFXTUSDT",
+          "RBHEUSDT",
           "STRKUSDT",
+          "RGPCRUSDT",
+          "RVECOUSDT",
+          "RFBKUSDT",
+          "RTRMKUSDT",
+          "RNAMSUSDT",
           "HTXUSDT",
           "PIXELUSDT",
+          "RFULUSDT",
+          "RATRCUSDT",
+          "RCHRNUSDT",
+          "RNTCTUSDT",
+          "RGRDNUSDT",
+          "RCALYUSDT",
+          "RSHAKUSDT",
           "TRXETH",
           "ZENUSDT",
           "PEOPLEUSDT",
@@ -5629,27 +6854,81 @@
           "RARMUSDT",
           "RMRVLUSDT",
           "RMPUSDT",
+          "RSPEMUSDT",
+          "RFBNDUSDT",
+          "RCGGRUSDT",
+          "RBKLNUSDT",
+          "RAVDVUSDT",
+          "RMCHIUSDT",
+          "RDFICUSDT",
+          "RVOOGUSDT",
+          "RIXUSUSDT",
+          "RPSLVUSDT",
+          "RSPHYUSDT",
+          "RTSLQUSDT",
+          "RDYNFUSDT",
+          "RSPYVUSDT",
+          "RIDEVUSDT",
+          "RVONGUSDT",
+          "RIUSBUSDT",
+          "RSPSBUSDT",
+          "RAIQUSDT",
+          "RIVEUSDT",
+          "RIUSGUSDT",
+          "RJETSUSDT",
+          "RMUDUSDT",
+          "RAVLVUSDT",
+          "RBSVUSDT",
+          "RFNGUUSDT",
+          "RIGSBUSDT",
+          "RSPMDUSDT",
+          "RSPHQUSDT",
+          "RAMZDUSDT",
+          "RMGKUSDT",
           "RADSKUSDT",
+          "RIWOUSDT",
           "RFANGUSDT",
+          "RAIRRUSDT",
           "RALLUSDT",
           "RCAHUSDT",
           "RFLEXUSDT",
+          "RIWBUSDT",
+          "RVFHUSDT",
+          "RMSFUUSDT",
           "RLHXUSDT",
+          "RBIVUSDT",
           "RCCJUSDT",
+          "RGOVTUSDT",
           "ROUSDT",
+          "RSPYIUSDT",
           "RCARRUSDT",
+          "RMBBUSDT",
+          "RTSDDUSDT",
           "RSPGUSDT",
+          "RFNDXUSDT",
           "RHEIUSDT",
+          "RVBILUSDT",
           "RMSIUSDT",
           "RNUUSDT",
           "REXCUSDT",
           "RTDGUSDT",
           "RTGTUSDT",
+          "ROEFUSDT",
+          "RVLUEUSDT",
+          "RAVEMUSDT",
+          "RDFGPUSDT",
+          "RAAPDUSDT",
           "RCRHUSDT",
+          "RVGITUSDT",
           "RSTTUSDT",
+          "RTECLUSDT",
           "RKEYSUSDT",
+          "RAVUVUSDT",
+          "RUSHYUSDT",
+          "RSPDWUSDT",
           "RAFLUSDT",
           "RAEPUSDT",
+          "RSPIBUSDT",
           "RSREUSDT",
           "RCLUSDT",
           "RMDLNUSDT",
@@ -5657,8 +6936,19 @@
           "RNUEUSDT",
           "RCLSUSDT",
           "RDUSDT",
+          "RDRIPUSDT",
+          "RSCZUSDT",
+          "RDFASUSDT",
+          "RASHRUSDT",
+          "RITBUSDT",
+          "RSDSUSDT",
           "RAONUSDT",
+          "RARKGUSDT",
           "RCTASUSDT",
+          "RIEIUSDT",
+          "RRWMUSDT",
+          "RIVWUSDT",
+          "RKBWBUSDT",
           "RAPDUSDT",
           "RFERGUSDT",
           "RGWWUSDT",
@@ -5671,8 +6961,20 @@
           "MLUSDT",
           "RIDXXUSDT",
           "RKMIUSDT",
+          "RMULLUSDT",
+          "RVTWOUSDT",
+          "RVXXUSDT",
+          "RMETUUSDT",
+          "RBNDXUSDT",
+          "RVGSHUSDT",
           "MAPOUSDT",
+          "RVGKUSDT",
           "RECLUSDT",
+          "RSCHHUSDT",
+          "RSCHFUSDT",
+          "RUSMVUSDT",
+          "RSOXQUSDT",
+          "REMXCUSDT",
           "RORLYUSDT",
           "RPSXUSDT",
           "RTRVUSDT",
@@ -5686,6 +6988,18 @@
           "RHUMUSDT",
           "RPCARUSDT",
           "RITWUSDT",
+          "RXLREUSDT",
+          "RXMEUSDT",
+          "RAMDLUSDT",
+          "RSHVUSDT",
+          "RTSLGUSDT",
+          "RVOUSDT",
+          "RXHBUSDT",
+          "RQIDUSDT",
+          "RMAGSUSDT",
+          "RMINTUSDT",
+          "RCGDVUSDT",
+          "RJPSTUSDT",
           "KLVUSDT",
           "RMPWRUSDT",
           "RARESUSDT",
@@ -5699,6 +7013,12 @@
           "RGFSUSDT",
           "RSHWUSDT",
           "RVALEUSDT",
+          "RSPYGUSDT",
+          "RIYWUSDT",
+          "RSHUSDT",
+          "RSCHGUSDT",
+          "RVIGUSDT",
+          "RGLDMUSDT",
           "REMRUSDT",
           "ETHFIUSDT",
           "RMPCUSDT",
@@ -5713,6 +7033,11 @@
           "RCIUSDT",
           "RFIXUSDT",
           "RKDPUSDT",
+          "RSCHBUSDT",
+          "RIWRUSDT",
+          "RQUALUSDT",
+          "RSPLVUSDT",
+          "RMUBUSDT",
           "RSMTCUSDT",
           "RRXTUSDT",
           "BLUAIUSDT",
@@ -5800,37 +7125,101 @@
           "BGBUSDT",
           "YGGUSDT",
           "LDOUSDT",
+          "RXRTUSDT",
+          "RLCTUUSDT",
+          "RVTEBUSDT",
+          "RBOXXUSDT",
+          "RSPXSUSDT",
+          "RJNKUSDT",
+          "RSCHXUSDT",
+          "RVYMUSDT",
+          "RVCLTUSDT",
+          "RSSOUSDT",
+          "RKLMNUSDT",
+          "RMTUMUSDT",
+          "RSPDNUSDT",
+          "RVCSHUSDT",
+          "RSPXLUSDT",
+          "RIWDUSDT",
+          "RACWIUSDT",
+          "RIJRUSDT",
+          "RVTUSDT",
+          "RMDYUSDT",
+          "RGDXJUSDT",
+          "RIYRUSDT",
+          "RIQMMUSDT",
+          "RVCITUSDT",
+          "RTSLLUSDT",
+          "RVEUUSDT",
+          "RFBTCUSDT",
+          "RPLTDUSDT",
+          "RXLBUSDT",
+          "RVWOUSDT",
           "RAIGUSDT",
+          "RVUGUSDT",
           "RWCNUSDT",
+          "REFVUSDT",
           "RALNYUSDT",
+          "RSPYMUSDT",
           "RPEGUSDT",
+          "RKREUSDT",
           "RRAMUSDT",
+          "RBILUSDT",
           "RONUSDT",
+          "RVEAUSDT",
           "RAMKRUSDT",
+          "RXLCUSDT",
           "RUVXYUSDT",
+          "REMBUSDT",
           "RCSIQUSDT",
+          "RXLPUSDT",
           "RCCIUSDT",
+          "RXLYUSDT",
           "RAVAVUSDT",
+          "RLQDUSDT",
           "RKLACUSDT",
+          "ROLLIUSDT",
           "RFWDIUSDT",
+          "RGFFUSDT",
           "RSATAUSDT",
+          "RFINAUSDT",
+          "RXOPUSDT",
+          "RXLIUSDT",
           "RLGHLUSDT",
+          "RRSPUSDT",
           "RSNEXUSDT",
+          "RGDXUSDT",
           "RSKHYUSDT",
+          "RXLFUSDT",
           "EVAAUSDT",
+          "RXLEUSDT",
+          "RFBPUSDT",
           "RCBREUSDT",
+          "RKFYUSDT",
           "RSTLDUSDT",
+          "RSTNGUSDT",
           "RJBLUSDT",
           "RLYVUSDT",
           "RAUSDT",
           "REMEUSDT",
           "RSYYUSDT",
+          "RVNTUSDT",
+          "RCRKUSDT",
+          "RHTFLUSDT",
+          "RTDSUSDT",
+          "RARXUSDT",
           "RADMUSDT",
+          "ROPLNUSDT",
           "RKRUSDT",
+          "RITGRUSDT",
           "RCCLUSDT",
+          "RPARRUSDT",
+          "RBFHUSDT",
+          "RWSFSUSDT",
           "RQLDUSDT",
           "MEWUSDT",
           "RXLVUSDT",
+          "RITRIUSDT",
           "WUSDT",
           "RUALUSDT",
           "IAGUSDT",
@@ -5841,8 +7230,19 @@
           "ENAUSDT",
           "RKSTRUSDT",
           "RECHOUSDT",
+          "RSUNCUSDT",
+          "RPJTUSDT",
+          "RGEOUSDT",
+          "RBNLUSDT",
+          "RCATYUSDT",
+          "RBWINUSDT",
           "RSSPCUSDT",
+          "RRLAYUSDT",
           "RIBBUSDT",
+          "RMIAXUSDT",
+          "RBWLPUSDT",
+          "RMATUSDT",
+          "RPHIUSDT",
           "RVMCUSDT",
           "RHIGUSDT",
           "SAGAUSDT",
@@ -5856,7 +7256,19 @@
           "REQTUSDT",
           "MOEWUSDT",
           "RZTSUSDT",
+          "RCNKUSDT",
+          "RCCCUSDT",
+          "RARISUSDT",
+          "RAYAUSDT",
+          "RCDPUSDT",
+          "RCAAPUSDT",
+          "RUSACUSDT",
           "RRKTUSDT",
+          "RLAZUSDT",
+          "RICUIUSDT",
+          "RWKUSDT",
+          "RIOVAUSDT",
+          "RADPTUSDT",
           "RELUSDT",
           "RNTRAUSDT",
           "RZMUSDT",
@@ -5869,6 +7281,13 @@
           "RHSYUSDT",
           "RWATUSDT",
           "RPAYXUSDT",
+          "RELVNUSDT",
+          "RSKEUSDT",
+          "RMIRUSDT",
+          "RGNWUSDT",
+          "RCVBFUSDT",
+          "RLOPEUSDT",
+          "RINDBUSDT",
           "SAFEUSDT",
           "RGTLBUSDT",
           "RTOSTUSDT",
@@ -5883,6 +7302,12 @@
           "CKBUSDT",
           "RKGCUSDT",
           "RIQVUSDT",
+          "RRHIUSDT",
+          "RGPGIUSDT",
+          "RCNSUSDT",
+          "RWSBCUSDT",
+          "RSIGUSDT",
+          "ROLEDUSDT",
           "RNRGUSDT",
           "ROTISUSDT",
           "RFDXFUSDT",
@@ -6039,37 +7464,99 @@
           "RSMMTUSDT",
           "RAFGUSDT",
           "CTSIUSDT",
+          "RAVNTUSDT",
+          "RQTWOUSDT",
+          "RTHOUSDT",
+          "RPLSEUSDT",
+          "RJOYYUSDT",
+          "RSLGUSDT",
+          "RDORMUSDT",
+          "RIONDUSDT",
+          "RPLNTUSDT",
+          "RTLXUSDT",
+          "RABGUSDT",
+          "RMWAUSDT",
+          "RSKYWUSDT",
+          "RRNSTUSDT",
+          "RBANFUSDT",
+          "RTARSUSDT",
+          "RATMUUSDT",
+          "RJOEUSDT",
+          "RMSGEUSDT",
+          "RBBWIUSDT",
+          "RPFSIUSDT",
+          "RFAUSDT",
+          "RBMIUSDT",
+          "RIDYAUSDT",
+          "RWTUSDT",
+          "RBELFBUSDT",
+          "REROUSDT",
+          "ROTTRUSDT",
+          "RIRTCUSDT",
+          "RAPLEUSDT",
           "RLAZRUSDT",
+          "RNICUSDT",
           "RCBOEUSDT",
+          "RZIMUSDT",
           "RCPRTUSDT",
+          "RVACUSDT",
           "RTPRUSDT",
+          "RRUMUSDT",
+          "RTRMDUSDT",
           "REXEUSDT",
           "RMTDUSDT",
+          "RIPARUSDT",
           "RHPQUSDT",
+          "RLXPUSDT",
           "RWWDUSDT",
+          "ROGNUSDT",
           "DOSUSDT",
+          "RIRTUSDT",
           "RLYTEUSDT",
+          "RLBTYAUSDT",
           "RROLUSDT",
+          "RFRMIUSDT",
           "RLENUSDT",
+          "RFIBKUSDT",
           "RRLUSDT",
+          "RPLMRUSDT",
           "RCHRWUSDT",
+          "RBTEUSDT",
           "RCMSUSDT",
+          "RFSMUSDT",
           "RKEYUSDT",
+          "RDHTUSDT",
           "RDGUSDT",
+          "RCSTMUSDT",
           "RVRSKUSDT",
+          "RMHOUSDT",
           "RUTHRUSDT",
+          "RPOSTUSDT",
           "RLPLAUSDT",
+          "RAMLXUSDT",
           "RCRSUSDT",
+          "RBATRAUSDT",
           "RDOWUSDT",
+          "RCALMUSDT",
           "RRFUSDT",
+          "RLBTYKUSDT",
           "RBGUSDT",
           "RSTZUSDT",
           "RFTAIUSDT",
+          "ROPCHUSDT",
+          "RNHCUSDT",
+          "RACLSUSDT",
           "RHUBBUSDT",
+          "RCRVLUSDT",
           "RBAPUSDT",
+          "RTNKUSDT",
           "RCTSHUSDT",
+          "RSBLKUSDT",
           "RQSRUSDT",
+          "RLIFUSDT",
+          "RSIIUSDT",
           "RAMPGUSDT",
+          "RUUUUUSDT",
           "RFLYUSDT",
           "RLQDAUSDT",
           "RJEPIUSDT",
@@ -6077,11 +7564,22 @@
           "RHDVUSDT",
           "KIIUSDT",
           "RVRSNUSDT",
+          "RMANUUSDT",
+          "RCXWUSDT",
+          "RNHIUSDT",
+          "RNATLUSDT",
+          "RBTUUSDT",
           "RINFQUSDT",
+          "RHGUSDT",
           "RLPTHUSDT",
+          "RDTWUSDT",
           "RAMPXUSDT",
+          "RKENUSDT",
+          "RDYNUSDT",
+          "RPRKUSDT",
           "RLYBUSDT",
           "RFISUSDT",
+          "RMCHBUSDT",
           "RINSMUSDT",
           "RENTGUSDT",
           "RINCYUSDT",
@@ -6089,8 +7587,19 @@
           "RLUVUSDT",
           "RPOETUSDT",
           "RLWLGUSDT",
+          "RLBRTUSDT",
+          "RTOWNUSDT",
+          "RHIWUSDT",
+          "RFFBCUSDT",
+          "RMGNIUSDT",
+          "RASOUSDT",
           "RDLTRUSDT",
+          "RLRNUSDT",
           "RAKAMUSDT",
+          "RGRALUSDT",
+          "RSAUSDT",
+          "RDANUSDT",
+          "RPIIUSDT",
           "TAIKOUSDT",
           "RSEZLUSDT",
           "REROCUSDT",
@@ -6102,7 +7611,15 @@
           "REXPDUSDT",
           "RSWUSDT",
           "RMKSIUSDT",
+          "RHNIUSDT",
+          "RNESRUSDT",
+          "RUSLMUSDT",
+          "RCURBUSDT",
+          "RDNLIUSDT",
+          "RLIONUSDT",
+          "RNTRSOUSDT",
           "TMXUSDT",
+          "RSFNCUSDT",
           "IOUSDT",
           "REFXUSDT",
           "RULTAUSDT",
@@ -6115,6 +7632,13 @@
           "RTTMIUSDT",
           "RLNTUSDT",
           "RHUSDT",
+          "REROKUSDT",
+          "RVGNTUSDT",
+          "RGBDCUSDT",
+          "RGPIUSDT",
+          "RLPLUSDT",
+          "RSXIUSDT",
+          "RNMIHUSDT",
           "RVICIUSDT",
           "RGLPIUSDT",
           "RGISUSDT",
@@ -7494,27 +9018,127 @@
           "RCMIUSDT",
           "RCNQUSDT",
           "RBNYUSDT",
+          "RNGUSDT",
+          "RCBUUSDT",
+          "RSBCFUSDT",
+          "RSMGUSDT",
           "RMARAUSDT",
+          "RASHUSDT",
+          "RAAMIUSDT",
+          "RAGOUSDT",
+          "RWIXUSDT",
+          "REXPOUSDT",
+          "RFSKUSDT",
+          "RQSUSDT",
+          "RPVHUSDT",
+          "RHTGCUSDT",
+          "ROSISUSDT",
+          "RBTDRUSDT",
+          "RBFAMUSDT",
+          "RKYIVUSDT",
+          "RKNUSDT",
+          "RKAIUSDT",
+          "RSHOOUSDT",
+          "RBATRKUSDT",
+          "RWINGUSDT",
+          "RBKUUSDT",
+          "RAAUCUSDT",
+          "RATROUSDT",
+          "RATKRUSDT",
+          "RCLBKUSDT",
+          "RLFTOUSDT",
+          "RDXUSDT",
+          "RFRSHUSDT",
+          "RQUREUSDT",
+          "RAVAUSDT",
+          "RPKUSDT",
+          "RFHBUSDT",
+          "RRCUSUSDT",
+          "RCPKUSDT",
+          "RVTMXUSDT",
+          "RCARGUSDT",
+          "RXXIUSDT",
+          "RGPORUSDT",
+          "RFRPTUSDT",
+          "RWRBYUSDT",
+          "RBBARUSDT",
+          "RLEUUSDT",
+          "RPFSUSDT",
           "AGLDUSDT",
           "DYDXUSDT",
+          "RAVAHUSDT",
           "AXSUSDT",
+          "RAPAMUSDT",
+          "RHGVUSDT",
+          "REXKUSDT",
+          "RARCBUSDT",
+          "RKBHUSDT",
+          "RBELFAUSDT",
+          "RARQTUSDT",
+          "RSDRLUSDT",
+          "RCXTUSDT",
+          "RBOHUSDT",
+          "RFGUSDT",
           "GALAUSDT",
           "SANDUSDT",
           "ALICEUSDT",
           "TLMUSDT",
+          "RTNETUSDT",
+          "RCWKUSDT",
+          "RMMSUSDT",
+          "RTGBUSDT",
+          "RSPSCUSDT",
+          "RECOUSDT",
+          "RCBZUSDT",
+          "RPPTAUSDT",
+          "RTALOUSDT",
+          "RAGYSUSDT",
+          "RCWTUSDT",
+          "RDBRGUSDT",
+          "RKCUSDT",
+          "RYETIUSDT",
+          "RFIZZUSDT",
+          "RPOWIUSDT",
+          "RTRUSDT",
+          "RCOLMUSDT",
+          "RHOSUSDT",
+          "RDXPEUSDT",
+          "RADEAUSDT",
+          "RGRBKUSDT",
+          "RBANCUSDT",
           "DOTUSDT",
           "ATOMUSDT",
           "IMXUSDT",
+          "RCLDXUSDT",
+          "RABMUSDT",
+          "RAMBPUSDT",
+          "RMGEEUSDT",
+          "RPONYUSDT",
+          "RBHFUSDT",
           "RIVERUSDT",
+          "RCSQRUSDT",
           "MOVRUSDT",
+          "RSLDEUSDT",
           "ENSUSDT",
+          "RHOGUSDT",
+          "RBKDUSDT",
           "HOLOUSDT",
           "BLESSUSDT",
           "0GUSDT",
           "BARDUSDT",
           "AIAUSDT",
           "ZKCUSDT",
+          "RINTAUSDT",
+          "RMBXUSDT",
+          "RMZTIUSDT",
+          "RNOGUSDT",
+          "RDNOWUSDT",
+          "RIHSUSDT",
           "AVAXUSDT",
+          "RKDUSDT",
+          "RWTTRUSDT",
+          "RIMAXUSDT",
+          "RTMDXUSDT",
           "XPLUSDT",
           "CROUSDT",
           "NOMUSDT",
@@ -7964,7 +9588,6 @@
           "ICNTUSDT",
           "MUSDT",
           "CROSSUSDT",
-          "AINUSDT",
           "USELESSUSDT",
           "PUMPUSDT",
           "CUSDT",
@@ -8187,7 +9810,6 @@
           "DELLUSDT",
           "QNTSTOCKUSDT",
           "EVEXUSDT",
-          "RCATUSDT",
           "KTOSUSDT",
           "DFENUSDT",
           "AVAVUSDT",
@@ -8418,7 +10040,14 @@
           "CYPHUSDT",
           "HUTUSDT",
           "AGPUUSDT",
-          "STONKUSDT"
+          "STONKUSDT",
+          "TLTUSDT",
+          "JEPQUSDT",
+          "CORZUSDT",
+          "BLSHUSDT",
+          "SECZUSDT",
+          "USDBRLUSDT",
+          "OURAUSDT"
         ]
       },
       {

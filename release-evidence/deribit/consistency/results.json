@@ -10,6 +10,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"1000MOG_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"1000PEPE_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
@@ -58,6 +64,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AMD_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"AMZN_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
@@ -77,6 +89,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ARB_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ARM_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -106,6 +124,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BASED1_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BCH_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
@@ -118,7 +142,25 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BE_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BILL_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BNB_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BOME_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -136,13 +178,37 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CBRS_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"CFX_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CHIP_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"COIN50_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"COMP_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CRCL_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -172,7 +238,19 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"DRAM_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"DYDX_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"EDGEX_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -203,6 +281,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ETH_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"EURC_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"EWY_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -244,6 +334,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"HOOD_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"HYPE_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
@@ -257,6 +353,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"INJ_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"INTC_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"INX_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -292,6 +400,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LITE_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"LIT_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
@@ -299,6 +413,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"LTC_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MEGA_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MERL_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -322,6 +448,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MRVL_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"MSFT_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
@@ -334,7 +466,25 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MU_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"NBIS_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"NEAR_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"NIGHT_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -347,6 +497,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ONDO_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"OPN_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -382,6 +538,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PRL_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PUMP_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
@@ -394,13 +556,37 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"QQQ_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"RENDER_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"RESOLV_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ROBO_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"RUNE_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SAGA_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -418,7 +604,37 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SKHY_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SNDK_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SOL_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SOXL_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SPCX_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SPY_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -454,6 +670,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TOWNS_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"TRUMP_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
@@ -467,6 +689,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"TSLA_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TSM_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -664,6 +892,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"1000MOG_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"1000PEPE_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
@@ -712,6 +946,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AMD_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"AMZN_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
@@ -731,6 +971,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ARB_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ARM_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -760,6 +1006,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BASED1_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BCH_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
@@ -772,7 +1024,25 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BE_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BILL_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BNB_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BOME_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -790,13 +1060,37 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CBRS_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"CFX_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CHIP_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"COIN50_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"COMP_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CRCL_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -826,7 +1120,19 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"DRAM_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"DYDX_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"EDGEX_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -857,6 +1163,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ETH_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"EURC_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"EWY_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -898,6 +1216,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"HOOD_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"HYPE_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
@@ -911,6 +1235,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"INJ_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"INTC_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"INX_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -946,6 +1282,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LITE_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"LIT_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
@@ -953,6 +1295,18 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"LTC_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MEGA_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MERL_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -976,6 +1330,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MRVL_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"MSFT_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
@@ -988,7 +1348,25 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MU_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"NBIS_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"NEAR_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"NIGHT_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -1001,6 +1379,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ONDO_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"OPN_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -1036,6 +1420,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PRL_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PUMP_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
@@ -1048,13 +1438,37 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"QQQ_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"RENDER_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"RESOLV_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ROBO_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"RUNE_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SAGA_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -1072,7 +1486,37 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SKHY_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SNDK_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SOL_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SOXL_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SPCX_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SPY_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -1108,6 +1552,12 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TOWNS_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"TRUMP_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
@@ -1121,6 +1571,12 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"TSLA_USDC-PERPETUAL\"]",
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TSM_USDC-PERPETUAL\"]",
         "quotes": [],
         "status": "pass"
       },
@@ -1369,14 +1825,14 @@
         "id": "[\"ticker_depth\",\"perp\",\"1000BONK_USDC-PERPETUAL\"]",
         "quotes": [
           {
-            "after_ask": "0.003024",
-            "after_bid": "0.003021",
-            "ask": "0.003024",
+            "after_ask": "0.003522",
+            "after_bid": "0.003519",
+            "ask": "0.003522",
             "attempt": 1,
-            "before_ask": "0.003024",
-            "before_bid": "0.003021",
-            "bid": "0.003021",
-            "elapsed_seconds": 0.13270673103397712,
+            "before_ask": "0.003522",
+            "before_bid": "0.003519",
+            "bid": "0.003518",
+            "elapsed_seconds": 0.15133914002217352,
             "ticker_ids_match": true
           }
         ],
@@ -1387,14 +1843,14 @@
         "id": "[\"ticker_depth\",\"perp\",\"1000MOG_USDC-PERPETUAL\"]",
         "quotes": [
           {
-            "after_ask": "0.0001077",
-            "after_bid": "0.0001075",
-            "ask": "0.0001077",
+            "after_ask": "0.0001224",
+            "after_bid": "0.0001221",
+            "ask": "0.0001224",
             "attempt": 1,
-            "before_ask": "0.0001077",
-            "before_bid": "0.0001075",
-            "bid": "0.0001075",
-            "elapsed_seconds": 0.12626691500190645,
+            "before_ask": "0.0001224",
+            "before_bid": "0.0001221",
+            "bid": "0.0001221",
+            "elapsed_seconds": 0.1550437769619748,
             "ticker_ids_match": true
           }
         ],
@@ -1405,14 +1861,14 @@
         "id": "[\"ticker_depth\",\"perp\",\"1000PEPE_USDC-PERPETUAL\"]",
         "quotes": [
           {
-            "after_ask": "0.004175",
-            "after_bid": "0.004172",
-            "ask": "0.00418",
+            "after_ask": "0.004824",
+            "after_bid": "0.004819",
+            "ask": "0.004824",
             "attempt": 1,
-            "before_ask": "0.004175",
-            "before_bid": "0.004166",
-            "bid": "0.004171",
-            "elapsed_seconds": 0.14200086100026965,
+            "before_ask": "0.004824",
+            "before_bid": "0.004819",
+            "bid": "0.004819",
+            "elapsed_seconds": 0.15097677195444703,
             "ticker_ids_match": true
           }
         ],
@@ -1423,14 +1879,14 @@
         "id": "[\"ticker_depth\",\"perp\",\"BTC_USDC-PERPETUAL\"]",
         "quotes": [
           {
-            "after_ask": "81010.7",
-            "after_bid": "81010.6",
-            "ask": "81010.7",
+            "after_ask": "86167.5",
+            "after_bid": "86167.4",
+            "ask": "86167.5",
             "attempt": 1,
-            "before_ask": "81010.7",
-            "before_bid": "81010.6",
-            "bid": "81010.6",
-            "elapsed_seconds": 0.13428602402564138,
+            "before_ask": "86167.5",
+            "before_bid": "86167.4",
+            "bid": "86167.4",
+            "elapsed_seconds": 0.157122652977705,
             "ticker_ids_match": true
           }
         ],
@@ -1438,17 +1894,17 @@
       },
       {
         "code": "ok",
-        "id": "[\"ticker_depth\",\"spot\",\"BNB_USDC\"]",
+        "id": "[\"ticker_depth\",\"spot\",\"AAVE_USDC\"]",
         "quotes": [
           {
-            "after_ask": "759.72",
-            "after_bid": "759.6",
-            "ask": "759.72",
+            "after_ask": "142.24",
+            "after_bid": "142.17",
+            "ask": "142.25",
             "attempt": 1,
-            "before_ask": "759.72",
-            "before_bid": "759.6",
-            "bid": "759.6",
-            "elapsed_seconds": 0.12428753601852804,
+            "before_ask": "142.24",
+            "before_bid": "142.17",
+            "bid": "142.16",
+            "elapsed_seconds": 0.15803941106423736,
             "ticker_ids_match": true
           }
         ],
@@ -1456,17 +1912,17 @@
       },
       {
         "code": "ok",
-        "id": "[\"ticker_depth\",\"spot\",\"BTC_USDC\"]",
+        "id": "[\"ticker_depth\",\"spot\",\"ADA_USDC\"]",
         "quotes": [
           {
-            "after_ask": "80973.82",
-            "after_bid": "80973.81",
-            "ask": "80973.82",
+            "after_ask": "0.24835",
+            "after_bid": "0.24829",
+            "ask": "0.24835",
             "attempt": 1,
-            "before_ask": "80973.82",
-            "before_bid": "80973.81",
-            "bid": "80973.81",
-            "elapsed_seconds": 0.1220014650025405,
+            "before_ask": "0.24835",
+            "before_bid": "0.24829",
+            "bid": "0.24829",
+            "elapsed_seconds": 0.14677053096238524,
             "ticker_ids_match": true
           }
         ],
@@ -1474,17 +1930,17 @@
       },
       {
         "code": "ok",
-        "id": "[\"ticker_depth\",\"spot\",\"BTC_USDE\"]",
+        "id": "[\"ticker_depth\",\"spot\",\"AERO_USDC\"]",
         "quotes": [
           {
-            "after_ask": "81163.0",
-            "after_bid": "80870.0",
-            "ask": "81163.0",
+            "after_ask": "0.67804",
+            "after_bid": "0.67735",
+            "ask": "0.67804",
             "attempt": 1,
-            "before_ask": "81163.0",
-            "before_bid": "80870.0",
-            "bid": "80870.0",
-            "elapsed_seconds": 0.11567654501413926,
+            "before_ask": "0.67804",
+            "before_bid": "0.67735",
+            "bid": "0.67735",
+            "elapsed_seconds": 0.13995588303077966,
             "ticker_ids_match": true
           }
         ],
@@ -1495,14 +1951,14 @@
         "id": "[\"ticker_depth\",\"spot\",\"BTC_USDT\"]",
         "quotes": [
           {
-            "after_ask": "81163.0",
-            "after_bid": "81000.0",
-            "ask": "81163.0",
+            "after_ask": "86341.0",
+            "after_bid": "86010.0",
+            "ask": "86341.0",
             "attempt": 1,
-            "before_ask": "81163.0",
-            "before_bid": "81000.0",
-            "bid": "81000.0",
-            "elapsed_seconds": 0.11989797401474789,
+            "before_ask": "86341.0",
+            "before_bid": "86010.0",
+            "bid": "86010.0",
+            "elapsed_seconds": 0.13906402292195708,
             "ticker_ids_match": true
           }
         ],
@@ -1550,16 +2006,44 @@
         "exchange": "spot",
         "kind": "spot",
         "markets": [
+          "AAVE_USDC",
+          "ADA_USDC",
+          "AERO_USDC",
+          "ALGO_USDC",
+          "APT_USDC",
+          "ARB_USDC",
+          "ATOM_USDC",
+          "AVAX_USDC",
+          "BCH_USDC",
           "BNB_USDC",
           "BTC_USDC",
           "BTC_USDE",
           "BTC_USDT",
           "BUIDL_USDC",
+          "CBETH_USDC",
+          "CRV_USDC",
+          "DOGE_USDC",
+          "DOT_USDC",
           "ETH_BTC",
           "ETH_USDC",
           "ETH_USDE",
           "ETH_USDT",
+          "EURC_USDC",
+          "FARTCOIN_USDC",
+          "FIL_USDC",
+          "HBAR_USDC",
+          "ICP_USDC",
+          "INJ_USDC",
+          "JASMY_USDC",
+          "LINK_USDC",
+          "LTC_USDC",
+          "NEAR_USDC",
+          "ONDO_USDC",
+          "OP_USDC",
           "PAXG_USDC",
+          "PENGU_USDC",
+          "PUMP_USDC",
+          "SHIB_USDC",
           "SOL_ETH",
           "SOL_USDC",
           "STETH_ETH",
@@ -1607,6 +2091,7 @@
           "CBRS_USDC-PERPETUAL",
           "CFX_USDC-PERPETUAL",
           "CHIP_USDC-PERPETUAL",
+          "COIN50_USDC-PERPETUAL",
           "COMP_USDC-PERPETUAL",
           "CRCL_USDC-PERPETUAL",
           "CRV_USDC-PERPETUAL",
@@ -1621,6 +2106,7 @@
           "ETC_USDC-PERPETUAL",
           "ETH_USDC-PERPETUAL",
           "ETHFI_USDC-PERPETUAL",
+          "EURC_USDC-PERPETUAL",
           "EWY_USDC-PERPETUAL",
           "FARTCOIN_USDC-PERPETUAL",
           "FET_USDC-PERPETUAL",
@@ -1657,6 +2143,7 @@
           "NVDA_USDC-PERPETUAL",
           "ONDO_USDC-PERPETUAL",
           "OP_USDC-PERPETUAL",
+          "OPENAI_USDC-PERPETUAL",
           "OPN_USDC-PERPETUAL",
           "PAXG_USDC-PERPETUAL",
           "PENDLE_USDC-PERPETUAL",
