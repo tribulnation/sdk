@@ -1,9 +1,9 @@
-"""Exchange history uses native all-market queries within one dYdX subaccount."""
+"""Exchange history uses native all-market queries across all dYdX address subaccounts."""
 
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from typing_extensions import Any
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import AsyncMock, Mock, call
 
 import pytest
 from typed_core import PaginatedResponse
@@ -52,7 +52,9 @@ async def test_exchange_history_scope_bounds_retry(
   endpoint = 'get_fills_paged' if kind == 'trades' else 'get_funding_payments_paged'
   paging = Mock(return_value=PaginatedResponse(0, fetch))
   markets = AsyncMock(side_effect=AssertionError('Must not enumerate markets'))
-  subaccounts = AsyncMock(side_effect=AssertionError('Must not enumerate accounts'))
+  subaccounts = AsyncMock(
+    return_value={'subaccounts': [{'subaccountNumber': 0}, {'subaccountNumber': 128}]}
+  )
   monkeypatch.setattr(type(exchange.indexer.data), endpoint, paging)
   monkeypatch.setattr(type(exchange.indexer.data), 'get_markets', markets)
   monkeypatch.setattr(type(exchange.indexer.data), 'get_subaccounts', subaccounts)
@@ -64,14 +66,14 @@ async def test_exchange_history_scope_bounds_retry(
     )
     pages = [page async for page in response]
   rows = [row for page in pages for row in page]
-  assert [len(page) for page in pages] == [1, 1]
-  assert [row.time for row in rows] == [start, end]
+  assert [len(page) for page in pages] == [1, 1, 1, 1]
+  assert [row.time for row in rows] == [start, end, start, end]
   assert all(isinstance(row, (ExchangeTrade, ExchangeFundingPayment)) for row in rows)
   market_ids: list[str] = []
   for row in rows:
     assert isinstance(row, (ExchangeTrade, ExchangeFundingPayment))
     market_ids.append(row.market_id)
-  assert market_ids == ['BTC-USD', 'DELISTED-USD']
+  assert market_ids == ['BTC-USD', 'DELISTED-USD'] * 2
   if kind == 'trades':
     assert all(
       isinstance(row, ExchangeTrade) and row.qty == Decimal('-2') for row in rows
@@ -86,10 +88,13 @@ async def test_exchange_history_scope_bounds_retry(
     expected.update(created_before_or_at=end, market_type='PERPETUAL')
   else:
     expected.update(after_or_at=start)
-  paging.assert_called_once_with(**expected)
-  assert calls == [0, 1, 1, 2]
+  paging.assert_has_calls(
+    [call(**(expected | {'subaccount': number})) for number in (0, 128)]
+  )
+  assert paging.call_count == 2
+  assert calls == [0, 1, 1, 2, 0, 1, 2]
   markets.assert_not_called()
-  subaccounts.assert_not_called()
+  subaccounts.assert_awaited_once_with('dydx1fixture')
 
 
 @pytest.mark.parametrize('method', ['trades_history', 'funding_payments'])
@@ -147,7 +152,7 @@ async def test_market_funding_payment_sign(monkeypatch: pytest.MonkeyPatch):
 async def test_selected_market_history_subaccount(
   monkeypatch: pytest.MonkeyPatch, subaccount: int, method: str
 ):
-  """A selected market reads only its exchange bucket, excluding sibling accounts."""
+  """A selected market retains history from every address subaccount."""
   from tribulnation.dydx.market.impl.mixin import Shared
 
   start = datetime(2026, 1, 1, tzinfo=timezone.utc)
@@ -185,7 +190,7 @@ async def test_selected_market_history_subaccount(
   paging = Mock(return_value=PaginatedResponse(0, fetch))
   monkeypatch.setattr(type(exchange.indexer.data), endpoint, paging)
   rows = await getattr(exchange, method)('BTC-USD', start, start)
-  assert len(rows) == 1
+  assert len(rows) == 2
   expected: dict[str, object] = {'address': 'dydx1fixture', 'subaccount': subaccount}
   if method == 'trades_history':
     expected.update(
@@ -194,5 +199,8 @@ async def test_selected_market_history_subaccount(
   else:
     expected.update(ticker='BTC-USD', after_or_at=start)
     assert rows[0].amount == Decimal('-2')
-  paging.assert_called_once_with(**expected)
-  accounts.assert_not_called()
+  paging.assert_has_calls(
+    [call(**(expected | {'subaccount': number})) for number in (0, 128)]
+  )
+  assert paging.call_count == 2
+  accounts.assert_awaited_once_with('dydx1fixture')

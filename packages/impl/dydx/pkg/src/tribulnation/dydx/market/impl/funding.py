@@ -50,20 +50,26 @@ async def funding_payments(
 ) -> AsyncIterable[Sequence[FundingPayment]]:
   start = start.astimezone()
   end = end.astimezone()
-  paging = self.indexer.data.get_funding_payments_paged(
-    address=self.address,
-    subaccount=self.subaccount,
-    ticker=self.market,
-    after_or_at=start,
-  )
-  state = paging.init
-  while state is not None:
-    next_state = state
-    batch, state = await self.call_dydx(lambda: paging.next(next_state))
-    payments = [
-      FundingPayment(amount=-Decimal(item['payment']), time=item['createdAt'])
-      for item in batch
-      if start <= item['createdAt'] <= end
-    ]
-    if payments:
-      yield payments
+  address = self.address
+  subaccounts = (
+    await self.call_dydx(lambda: self.indexer.data.get_subaccounts(address))
+  )['subaccounts']
+
+  for sub in subaccounts:
+    paging = self.indexer.data.get_funding_payments_paged(
+      address=address,
+      subaccount=int(sub['subaccountNumber']),
+      ticker=self.market,
+      after_or_at=start,
+    )
+    state = paging.init
+    while state is not None:
+      next_state = state
+      batch, state = await self.call_dydx(lambda: paging.next(next_state))
+      payments = [
+        FundingPayment(amount=-Decimal(item['payment']), time=item['createdAt'])
+        for item in batch
+        if start <= item['createdAt'] <= end
+      ]
+      if payments:
+        yield payments

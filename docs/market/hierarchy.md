@@ -94,8 +94,9 @@ keeps the existing single-market API and base record types.
 
 Hyperliquid supports trades on spot and perpetual exchanges, and funding payments
 on perpetual exchanges. Each builder DEX is scoped separately. dYdX supports both
-methods for the selected subaccount (`perp` or `perp.<N>`). All other venues
-currently raise `NotImplementedError` for exchange-wide reads; single-market
+methods across all subaccounts of the configured address, for both `perp` and
+`perp.<N>` exchange objects; selecting one market still includes every subaccount.
+All other venues currently raise `NotImplementedError` for exchange-wide reads; single-market
 support is unchanged.
 
 These reads use native account feeds, with their retention and pagination limits.

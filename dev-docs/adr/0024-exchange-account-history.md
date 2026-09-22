@@ -23,8 +23,10 @@ of the existing records with a required native, exchange-local `market_id`.
 The identity can contain colons and is not a fully qualified SDK route.
 Market-specific records and streams remain unchanged.
 
-Use native account history endpoints scoped to the selected exchange/account
-bucket. Do not implement a generic fallback over currently listed markets.
+Use native account history endpoints with venue-specific account scope.
+Hyperliquid filters by spot/default perpetual/builder DEX. dYdX history includes
+all subaccounts of the configured address, preserving the existing selected-market
+history scope; an exchange subaccount selector does not restrict historical reads. Do not implement a generic fallback over currently listed markets.
 Unsupported exchange-wide reads raise `NotImplementedError`, even where a
 venue supports market-specific reads. Native retention and source coverage
 limitations remain visible; no global ordering or unlimited history is promised.
@@ -49,6 +51,6 @@ SDK providing these record types when released, following the existing release
 policy. No release or live verification is asserted here.
 
 The implementation also corrects existing Hyperliquid and dYdX funding signs to
-honor the positive-paid contract. dYdX selected-market history is scoped to its
-own exchange subaccount, matching the new exchange-wide reads. These are
-observable corrections to existing history results.
+honor the positive-paid contract. That sign normalization is an observable
+correction to existing history results. dYdX selected-market history continues to
+include all address subaccounts, as do the new exchange-wide reads.

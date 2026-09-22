@@ -21,32 +21,38 @@ async def trades_history(
   def within(time: datetime) -> bool:
     return start <= time <= end
 
-  paging = self.indexer.data.get_fills_paged(
-    address=self.address,
-    subaccount=self.subaccount,
-    created_before_or_at=end,
-    market=self.market,
-    market_type='PERPETUAL',
-  )
-  async for fills in paging.via(self.call_dydx):
-    trades: list[Trade] = []
-    for fill in fills:
-      if fill['market'] != self.market or not within(fill['createdAt']):
-        continue
-      sign = 1 if fill['side'] == 'BUY' else -1
-      trades.append(
-        Trade(
-          id=fill['id'],
-          price=Decimal(fill['price']),
-          qty=Decimal(fill['size']) * sign,
-          time=fill['createdAt'],
-          maker=fill['liquidity'] == 'MAKER',
-          fee=Trade.Fee(asset='USDC', amount=Decimal(fill['fee'])),
-          details=fill,
+  address = self.address
+  subaccounts = (
+    await self.call_dydx(lambda: self.indexer.data.get_subaccounts(address))
+  )['subaccounts']
+
+  for sub in subaccounts:
+    paging = self.indexer.data.get_fills_paged(
+      address=address,
+      subaccount=int(sub['subaccountNumber']),
+      created_before_or_at=end,
+      market=self.market,
+      market_type='PERPETUAL',
+    )
+    async for fills in paging.via(self.call_dydx):
+      trades: list[Trade] = []
+      for fill in fills:
+        if fill['market'] != self.market or not within(fill['createdAt']):
+          continue
+        sign = 1 if fill['side'] == 'BUY' else -1
+        trades.append(
+          Trade(
+            id=fill['id'],
+            price=Decimal(fill['price']),
+            qty=Decimal(fill['size']) * sign,
+            time=fill['createdAt'],
+            maker=fill['liquidity'] == 'MAKER',
+            fee=Trade.Fee(asset='USDC', amount=Decimal(fill['fee'])),
+            details=fill,
+          )
         )
-      )
-    if trades:
-      yield trades
+      if trades:
+        yield trades
 
 
 @asynccontextmanager

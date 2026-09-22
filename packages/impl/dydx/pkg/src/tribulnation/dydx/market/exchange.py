@@ -26,7 +26,7 @@ from .market import Market
 # subaccount == one margin/liquidation bucket), resolved from the exchange id via
 # `venue.exchange('perp')` (parent subaccount) or `venue.exchange('perp.<N>')`
 # (child subaccount `<N>`). Markets inherit the subaccount from their exchange, so
-# every account-scoped method keys off the same bucket. The old suffix `parse_market_id`
+# positions and collateral use that bucket; history spans all address subaccounts. The old suffix `parse_market_id`
 # has been retired (grep-confirmed: no callers used the suffix form).
 
 
@@ -109,35 +109,40 @@ class Exchange(ExchangeMixin, PerpExchange):
   async def trades_history(
     self, market_id: str | None, /, start: datetime, end: datetime
   ) -> AsyncIterable[Sequence[Trade]]:
-    """Fetch all-market fills for this subaccount, or delegate a selected market."""
+    """Fetch fills across all address subaccounts, optionally selecting one market."""
     if market_id is not None:
       async for page in super().trades_history(market_id, start, end):
         yield page
       return
     start, end = start.astimezone(), end.astimezone()
-    paging = self.indexer.data.get_fills_paged(
-      address=self.address,
-      subaccount=self.subaccount,
-      created_before_or_at=end,
-      market_type='PERPETUAL',
-    )
-    async for fills in paging.via(self.call_dydx):
-      trades = [
-        ExchangeTrade(
-          market_id=fill['market'],
-          id=fill['id'],
-          price=Decimal(fill['price']),
-          qty=Decimal(fill['size']) * (1 if fill['side'] == 'BUY' else -1),
-          time=fill['createdAt'],
-          maker=fill['liquidity'] == 'MAKER',
-          fee=Trade.Fee(asset='USDC', amount=Decimal(fill['fee'])),
-          details=fill,
-        )
-        for fill in fills
-        if start <= fill['createdAt'] <= end
-      ]
-      if trades:
-        yield trades
+    address = self.address
+    subaccounts = (
+      await self.call_dydx(lambda: self.indexer.data.get_subaccounts(address))
+    )['subaccounts']
+    for sub in subaccounts:
+      paging = self.indexer.data.get_fills_paged(
+        address=address,
+        subaccount=int(sub['subaccountNumber']),
+        created_before_or_at=end,
+        market_type='PERPETUAL',
+      )
+      async for fills in paging.via(self.call_dydx):
+        trades = [
+          ExchangeTrade(
+            market_id=fill['market'],
+            id=fill['id'],
+            price=Decimal(fill['price']),
+            qty=Decimal(fill['size']) * (1 if fill['side'] == 'BUY' else -1),
+            time=fill['createdAt'],
+            maker=fill['liquidity'] == 'MAKER',
+            fee=Trade.Fee(asset='USDC', amount=Decimal(fill['fee'])),
+            details=fill,
+          )
+          for fill in fills
+          if start <= fill['createdAt'] <= end
+        ]
+        if trades:
+          yield trades
 
   @overload
   def funding_payments(
@@ -158,29 +163,34 @@ class Exchange(ExchangeMixin, PerpExchange):
   async def funding_payments(
     self, market_id: str | None, /, start: datetime, end: datetime
   ) -> AsyncIterable[Sequence[FundingPayment]]:
-    """Fetch all-market funding for this subaccount, or delegate a selected market."""
+    """Fetch funding across all address subaccounts, optionally selecting one market."""
     if market_id is not None:
       async for page in super().funding_payments(market_id, start, end):
         yield page
       return
     start, end = start.astimezone(), end.astimezone()
-    paging = self.indexer.data.get_funding_payments_paged(
-      address=self.address,
-      subaccount=self.subaccount,
-      after_or_at=start,
-    )
-    async for batch in paging.via(self.call_dydx):
-      payments = [
-        ExchangeFundingPayment(
-          market_id=item['ticker'],
-          amount=-Decimal(item['payment']),
-          time=item['createdAt'],
-        )
-        for item in batch
-        if start <= item['createdAt'] <= end
-      ]
-      if payments:
-        yield payments
+    address = self.address
+    subaccounts = (
+      await self.call_dydx(lambda: self.indexer.data.get_subaccounts(address))
+    )['subaccounts']
+    for sub in subaccounts:
+      paging = self.indexer.data.get_funding_payments_paged(
+        address=address,
+        subaccount=int(sub['subaccountNumber']),
+        after_or_at=start,
+      )
+      async for batch in paging.via(self.call_dydx):
+        payments = [
+          ExchangeFundingPayment(
+            market_id=item['ticker'],
+            amount=-Decimal(item['payment']),
+            time=item['createdAt'],
+          )
+          for item in batch
+          if start <= item['createdAt'] <= end
+        ]
+        if payments:
+          yield payments
 
   @wrap_exceptions
   async def perp_collateral(self, market_id: str | None = None, /) -> PerpCollateral:
