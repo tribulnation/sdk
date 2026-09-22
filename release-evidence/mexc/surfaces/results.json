@@ -261,10 +261,10 @@
       },
       {
         "exclusion": null,
-        "failed": 0,
+        "failed": 1,
         "id": "market.test_public_read[\"perp:BTC_USDT\", \"tickers\"]",
         "network": "mainnet",
-        "passed": 1,
+        "passed": 0,
         "skipped": 0
       },
       {
@@ -293,14 +293,14 @@
       },
       {
         "exclusion": null,
-        "failed": 0,
+        "failed": 1,
         "id": "market.test_public_read[\"perp:BTC_USDT\", \"perp_stats\"]",
         "network": "mainnet",
-        "passed": 1,
+        "passed": 0,
         "skipped": 0
       }
     ],
-    "completed": true,
+    "completed": false,
     "private_account_venue": null,
     "scope": "surfaces",
     "venue": "mexc",
