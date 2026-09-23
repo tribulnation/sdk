@@ -149,10 +149,10 @@
       },
       {
         "exclusion": null,
-        "failed": 0,
+        "failed": 1,
         "id": "market.test_public_read[\"spot:BTC-USDT\", \"tickers\"]",
         "network": "mainnet",
-        "passed": 1,
+        "passed": 0,
         "skipped": 0
       },
       {
@@ -300,7 +300,7 @@
         "skipped": 0
       }
     ],
-    "completed": true,
+    "completed": false,
     "private_account_venue": null,
     "scope": "surfaces",
     "venue": "kucoin",

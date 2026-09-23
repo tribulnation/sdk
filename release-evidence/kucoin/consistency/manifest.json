@@ -218,7 +218,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "c8c43110ef8294c52971a15d15b37d38728474151eaf2348b50e1e2e5447be2d",
+        "files_sha256": "7a143b7f6a2a37c693dc9e2d3687732ade7d5f3a887adfd21d115d290bf58ecd",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -253,19 +253,19 @@
         "version": "0.4.0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "de80df460134018eefac1f01aae414d13e2cc35dc90cfa8216c4cc82326c5ec8",
+        "files_sha256": "0e33d4a89db64fe6cd0763c9c6621881efdbda9647a72982eed5f46bdf4dc9a7",
         "metadata_sha256": "b0dd8b0cd2aba118b476b8abb792b5d695f709e88b80c1309f4c54cf62df4256",
         "version": "2.4.0"
       },
       "typed-core": {
-        "files_sha256": "8d9fc757ae525ecbb38118baae1a4f55fbd7b08af123d7ea498ee492205719df",
-        "metadata_sha256": "42c22009a3b6fc5457f8d2f24c8db6e237f8649f78b7b948dfdd80675fdd64ff",
-        "version": "0.8.1"
+        "files_sha256": "5fecdccc89907d537a4d20c11c3a494357b1c8c3f66c54de5729c92d9bee47ab",
+        "metadata_sha256": "0bec0107c1d72805e81e20c613ee9a361e022bae90de05e2665d4cee9571c28e",
+        "version": "0.9.0"
       },
       "typed-kucoin": {
-        "files_sha256": "18bedfab4c4c8850df9a6d93737d38f44abf7768a868df52bb500ed3a681fb04",
-        "metadata_sha256": "fc5d803dcd46033400ed993e1db22a149176673fb40b78bd82de4c18be3aaca8",
-        "version": "0.3.0"
+        "files_sha256": "e895d6d339d8690773b556997ae33deac4d8058b0ff1eec9ffa258833c199ded",
+        "metadata_sha256": "520b073e56831bb87d83a90a2a0f6e2b0f6d87cedb37f3bf896dcb96fbddbc77",
+        "version": "0.4.0"
       },
       "typer": {
         "files_sha256": "c93be57c9f3d9bad1aea56da475928888a1f011043eeabc67ca1d0246c5ff156",
@@ -290,7 +290,7 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "08ca7d2abf1c3421021552c09fc9ed42d8368f63cc425385fe90074eeffd11ca",
+    "source_sha256": "8c8c73012b1b030ca8abe7162937b5f05512c8b6f85bb7f43e2f24b796a01e57",
     "venue": "kucoin"
   },
   "before": {
@@ -512,7 +512,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "c8c43110ef8294c52971a15d15b37d38728474151eaf2348b50e1e2e5447be2d",
+        "files_sha256": "7a143b7f6a2a37c693dc9e2d3687732ade7d5f3a887adfd21d115d290bf58ecd",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -547,19 +547,19 @@
         "version": "0.4.0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "de80df460134018eefac1f01aae414d13e2cc35dc90cfa8216c4cc82326c5ec8",
+        "files_sha256": "0e33d4a89db64fe6cd0763c9c6621881efdbda9647a72982eed5f46bdf4dc9a7",
         "metadata_sha256": "b0dd8b0cd2aba118b476b8abb792b5d695f709e88b80c1309f4c54cf62df4256",
         "version": "2.4.0"
       },
       "typed-core": {
-        "files_sha256": "8d9fc757ae525ecbb38118baae1a4f55fbd7b08af123d7ea498ee492205719df",
-        "metadata_sha256": "42c22009a3b6fc5457f8d2f24c8db6e237f8649f78b7b948dfdd80675fdd64ff",
-        "version": "0.8.1"
+        "files_sha256": "5fecdccc89907d537a4d20c11c3a494357b1c8c3f66c54de5729c92d9bee47ab",
+        "metadata_sha256": "0bec0107c1d72805e81e20c613ee9a361e022bae90de05e2665d4cee9571c28e",
+        "version": "0.9.0"
       },
       "typed-kucoin": {
-        "files_sha256": "18bedfab4c4c8850df9a6d93737d38f44abf7768a868df52bb500ed3a681fb04",
-        "metadata_sha256": "fc5d803dcd46033400ed993e1db22a149176673fb40b78bd82de4c18be3aaca8",
-        "version": "0.3.0"
+        "files_sha256": "e895d6d339d8690773b556997ae33deac4d8058b0ff1eec9ffa258833c199ded",
+        "metadata_sha256": "520b073e56831bb87d83a90a2a0f6e2b0f6d87cedb37f3bf896dcb96fbddbc77",
+        "version": "0.4.0"
       },
       "typer": {
         "files_sha256": "c93be57c9f3d9bad1aea56da475928888a1f011043eeabc67ca1d0246c5ff156",
@@ -584,12 +584,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "08ca7d2abf1c3421021552c09fc9ed42d8368f63cc425385fe90074eeffd11ca",
+    "source_sha256": "8c8c73012b1b030ca8abe7162937b5f05512c8b6f85bb7f43e2f24b796a01e57",
     "venue": "kucoin"
   },
-  "finished": "2026-09-22T16:11:56.607478Z",
-  "results_sha256": "c2a612ee6bb18cc2df3dc80db1936b144be8293dd1606d64f9239e03b5e40875",
+  "finished": "2026-09-23T09:27:13.776584Z",
+  "results_sha256": "6749cdc02cfa3513aa0079ba99ca49979745e4a003ba844d8a3140648f9f481a",
   "schema_version": 1,
-  "started": "2026-09-22T16:11:44.517966Z",
-  "summary_sha256": "612ca10ea167c82a6c1142459d35fe93eefd7be76ad5f2a2a2dead2b2ae49bc2"
+  "started": "2026-09-23T09:27:01.686227Z",
+  "summary_sha256": "8d17cd6551b719e16985836c50d29bccb606299ba6e7106dd04aba545b0e99a6"
 }
