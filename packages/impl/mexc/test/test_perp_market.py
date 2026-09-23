@@ -10,6 +10,7 @@ import pytest
 from typed_mexc.schemas import ContractSpec, ContractTicker, FuturesCandle
 from tribulnation.mexc import MexcMarket
 from tribulnation.mexc.market.perp_market import PerpMarket
+from tribulnation.sdk import ApiError
 from tribulnation.sdk.market import Fees
 
 START = datetime(2026, 9, 1, tzinfo=timezone.utc)
@@ -473,3 +474,47 @@ async def test_perpetual_personal_fees_do_not_guess_api_channel(
     with pytest.raises(NotImplementedError, match='API fees are unverified'):
       await market.fees()
   private.assert_not_awaited()
+
+
+@pytest.mark.parametrize('missing', [True, False])
+@pytest.mark.parametrize('markets', [None, ['BTC_USDT']])
+async def test_perp_stats_requires_index_price(
+  venue: MexcMarket,
+  monkeypatch: pytest.MonkeyPatch,
+  missing: bool,
+  markets: list[str] | None,
+):
+  """Missing or null index prices raise the SDK API error for bulk and selected reads."""
+  row = dict(ticker())
+  if missing:
+    del row['indexPrice']
+  else:
+    row['indexPrice'] = None
+  monkeypatch.setattr(
+    venue.client.futures.http.market,
+    'ticker',
+    AsyncMock(return_value={'success': True, 'data': [row]}),
+  )
+  exchange = await venue.perp_exchange('perp')
+  with pytest.raises(ApiError, match='missing index price: BTC_USDT'):
+    await exchange.perp_stats(markets)
+
+
+async def test_perp_stats_preserves_missing_optional_fields(
+  venue: MexcMarket, monkeypatch: pytest.MonkeyPatch
+):
+  """A valid index still yields stats when mark price and funding are omitted."""
+  row = dict(ticker())
+  del row['fairPrice']
+  del row['fundingRate']
+  monkeypatch.setattr(
+    venue.client.futures.http.market,
+    'ticker',
+    AsyncMock(return_value={'success': True, 'data': [row]}),
+  )
+  exchange = await venue.perp_exchange('perp')
+  stats = (await exchange.perp_stats())['BTC_USDT']
+  assert stats.index == Decimal('100.3')
+  assert stats.mark is None
+  assert stats.funding is None
+  assert stats.open_interest == Decimal('2')
