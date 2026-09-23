@@ -473,9 +473,9 @@
         "version": "2.4.0"
       },
       "typed-core": {
-        "files_sha256": "8d9fc757ae525ecbb38118baae1a4f55fbd7b08af123d7ea498ee492205719df",
-        "metadata_sha256": "42c22009a3b6fc5457f8d2f24c8db6e237f8649f78b7b948dfdd80675fdd64ff",
-        "version": "0.8.1"
+        "files_sha256": "5fecdccc89907d537a4d20c11c3a494357b1c8c3f66c54de5729c92d9bee47ab",
+        "metadata_sha256": "0bec0107c1d72805e81e20c613ee9a361e022bae90de05e2665d4cee9571c28e",
+        "version": "0.9.0"
       },
       "typed-dydx": {
         "files_sha256": "fd839220e4b26cbb8e8323446884b3fe49b350d73a0a737f3281ff218207ac1c",
@@ -992,9 +992,9 @@
         "version": "2.4.0"
       },
       "typed-core": {
-        "files_sha256": "8d9fc757ae525ecbb38118baae1a4f55fbd7b08af123d7ea498ee492205719df",
-        "metadata_sha256": "42c22009a3b6fc5457f8d2f24c8db6e237f8649f78b7b948dfdd80675fdd64ff",
-        "version": "0.8.1"
+        "files_sha256": "5fecdccc89907d537a4d20c11c3a494357b1c8c3f66c54de5729c92d9bee47ab",
+        "metadata_sha256": "0bec0107c1d72805e81e20c613ee9a361e022bae90de05e2665d4cee9571c28e",
+        "version": "0.9.0"
       },
       "typed-dydx": {
         "files_sha256": "fd839220e4b26cbb8e8323446884b3fe49b350d73a0a737f3281ff218207ac1c",
@@ -1037,9 +1037,9 @@
     "source_sha256": "f4f0231bc407e1a3eb16b0d080b272f5517156fc7bf173db94d2c475fa1c3ed1",
     "venue": "dydx"
   },
-  "finished": "2026-09-22T16:16:03.173435Z",
-  "results_sha256": "8c47ad74d8adff830447e370f55bc863ac35bf17766ef220df79e3c34e520713",
+  "finished": "2026-09-23T08:53:28.479964Z",
+  "results_sha256": "a571eef23981902f16e57685e8b210868e013f3296979235ad1c9a8dd2659102",
   "schema_version": 1,
-  "started": "2026-09-22T16:15:03.365941Z",
-  "summary_sha256": "3ce2617c558d0310d5dad41d4031b418920e19b5ab328051406f1a50bc13bd61"
+  "started": "2026-09-23T08:52:26.133545Z",
+  "summary_sha256": "7efe3684e0bdac6342f9c31da935fbb5b78d4bd4923ece2e64a389fe42cf9110"
 }

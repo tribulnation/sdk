@@ -263,9 +263,9 @@
         "version": "0.4.0"
       },
       "typed-core": {
-        "files_sha256": "8d9fc757ae525ecbb38118baae1a4f55fbd7b08af123d7ea498ee492205719df",
-        "metadata_sha256": "42c22009a3b6fc5457f8d2f24c8db6e237f8649f78b7b948dfdd80675fdd64ff",
-        "version": "0.8.1"
+        "files_sha256": "5fecdccc89907d537a4d20c11c3a494357b1c8c3f66c54de5729c92d9bee47ab",
+        "metadata_sha256": "0bec0107c1d72805e81e20c613ee9a361e022bae90de05e2665d4cee9571c28e",
+        "version": "0.9.0"
       },
       "typer": {
         "files_sha256": "c93be57c9f3d9bad1aea56da475928888a1f011043eeabc67ca1d0246c5ff156",
@@ -557,9 +557,9 @@
         "version": "0.4.0"
       },
       "typed-core": {
-        "files_sha256": "8d9fc757ae525ecbb38118baae1a4f55fbd7b08af123d7ea498ee492205719df",
-        "metadata_sha256": "42c22009a3b6fc5457f8d2f24c8db6e237f8649f78b7b948dfdd80675fdd64ff",
-        "version": "0.8.1"
+        "files_sha256": "5fecdccc89907d537a4d20c11c3a494357b1c8c3f66c54de5729c92d9bee47ab",
+        "metadata_sha256": "0bec0107c1d72805e81e20c613ee9a361e022bae90de05e2665d4cee9571c28e",
+        "version": "0.9.0"
       },
       "typer": {
         "files_sha256": "c93be57c9f3d9bad1aea56da475928888a1f011043eeabc67ca1d0246c5ff156",
@@ -587,9 +587,9 @@
     "source_sha256": "abbf5732a4e180ec399f54609aa851452fbc6f890f308f04091b6eb5ed0293ea",
     "venue": "bit2me"
   },
-  "finished": "2026-09-22T16:09:42.959320Z",
-  "results_sha256": "d6197c540417fe9cfcdcff9610a6f940dad84b122292eac3f27f503c6905723d",
+  "finished": "2026-09-23T08:53:43.106053Z",
+  "results_sha256": "bdfcb52fea75af14243838817d1f5c4753b22d1e578f70e58ab064a85e182621",
   "schema_version": 1,
-  "started": "2026-09-22T16:09:39.339616Z",
-  "summary_sha256": "7a4519881ebf3c841d4afca74dd5ee93ee4687f1ce0381bc574d1b8183946400"
+  "started": "2026-09-23T08:53:40.885691Z",
+  "summary_sha256": "368cc740466e764ee00ca8b74aa93aac0ff0a6a613010d7648e4f25977f83b84"
 }

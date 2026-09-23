@@ -278,9 +278,9 @@
         "version": "0.4.0"
       },
       "typed-core": {
-        "files_sha256": "8d9fc757ae525ecbb38118baae1a4f55fbd7b08af123d7ea498ee492205719df",
-        "metadata_sha256": "42c22009a3b6fc5457f8d2f24c8db6e237f8649f78b7b948dfdd80675fdd64ff",
-        "version": "0.8.1"
+        "files_sha256": "5fecdccc89907d537a4d20c11c3a494357b1c8c3f66c54de5729c92d9bee47ab",
+        "metadata_sha256": "0bec0107c1d72805e81e20c613ee9a361e022bae90de05e2665d4cee9571c28e",
+        "version": "0.9.0"
       },
       "typer": {
         "files_sha256": "c93be57c9f3d9bad1aea56da475928888a1f011043eeabc67ca1d0246c5ff156",
@@ -587,9 +587,9 @@
         "version": "0.4.0"
       },
       "typed-core": {
-        "files_sha256": "8d9fc757ae525ecbb38118baae1a4f55fbd7b08af123d7ea498ee492205719df",
-        "metadata_sha256": "42c22009a3b6fc5457f8d2f24c8db6e237f8649f78b7b948dfdd80675fdd64ff",
-        "version": "0.8.1"
+        "files_sha256": "5fecdccc89907d537a4d20c11c3a494357b1c8c3f66c54de5729c92d9bee47ab",
+        "metadata_sha256": "0bec0107c1d72805e81e20c613ee9a361e022bae90de05e2665d4cee9571c28e",
+        "version": "0.9.0"
       },
       "typer": {
         "files_sha256": "c93be57c9f3d9bad1aea56da475928888a1f011043eeabc67ca1d0246c5ff156",
@@ -617,9 +617,9 @@
     "source_sha256": "e55784ec5a7479e93a16992ae9b95a58b5b6f5d948ccad13e965d38459f73726",
     "venue": "coinbase"
   },
-  "finished": "2026-09-22T16:10:59.023661Z",
+  "finished": "2026-09-23T08:54:25.802883Z",
   "results_sha256": "c32c824052572efec04688631f6c048452f0acdb1791c363e4bd6eec2c77ae3b",
   "schema_version": 1,
-  "started": "2026-09-22T16:10:46.678239Z",
-  "summary_sha256": "c520c51928955ea856f2bb2ec01897cac48f8f09cc0afd6d3078d70e10d1ba3f"
+  "started": "2026-09-23T08:54:14.098457Z",
+  "summary_sha256": "03078b127dd2d2c1bda241f415689962837d395caf93e3a459b4973229925ed8"
 }

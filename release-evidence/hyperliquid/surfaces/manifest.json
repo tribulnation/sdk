@@ -368,9 +368,9 @@
         "version": "2.4.0"
       },
       "typed-core": {
-        "files_sha256": "8d9fc757ae525ecbb38118baae1a4f55fbd7b08af123d7ea498ee492205719df",
-        "metadata_sha256": "42c22009a3b6fc5457f8d2f24c8db6e237f8649f78b7b948dfdd80675fdd64ff",
-        "version": "0.8.1"
+        "files_sha256": "5fecdccc89907d537a4d20c11c3a494357b1c8c3f66c54de5729c92d9bee47ab",
+        "metadata_sha256": "0bec0107c1d72805e81e20c613ee9a361e022bae90de05e2665d4cee9571c28e",
+        "version": "0.9.0"
       },
       "typed-hyperliquid": {
         "files_sha256": "6649c87fe03a862dc4b3b12fde594a93f887c724353043c686f4178ca000bd1c",
@@ -772,9 +772,9 @@
         "version": "2.4.0"
       },
       "typed-core": {
-        "files_sha256": "8d9fc757ae525ecbb38118baae1a4f55fbd7b08af123d7ea498ee492205719df",
-        "metadata_sha256": "42c22009a3b6fc5457f8d2f24c8db6e237f8649f78b7b948dfdd80675fdd64ff",
-        "version": "0.8.1"
+        "files_sha256": "5fecdccc89907d537a4d20c11c3a494357b1c8c3f66c54de5729c92d9bee47ab",
+        "metadata_sha256": "0bec0107c1d72805e81e20c613ee9a361e022bae90de05e2665d4cee9571c28e",
+        "version": "0.9.0"
       },
       "typed-hyperliquid": {
         "files_sha256": "6649c87fe03a862dc4b3b12fde594a93f887c724353043c686f4178ca000bd1c",
@@ -807,9 +807,9 @@
     "source_sha256": "c43bf8bf1b479272a1b87a736408d10e42a44a12d85f70186beee54508874f84",
     "venue": "hyperliquid"
   },
-  "finished": "2026-09-22T16:08:23.913081Z",
+  "finished": "2026-09-23T08:52:29.514725Z",
   "results_sha256": "6430cb107a5e7d786fa74401c8cb89de34d375a853bd6bc2f3ce8eb4d1774b6b",
   "schema_version": 1,
-  "started": "2026-09-22T16:08:01.335289Z",
-  "summary_sha256": "aac87a674460ebfd7e92f13b949b097d2d784e3e0c1fed3d464c1cb35e9e93d7"
+  "started": "2026-09-23T08:52:06.498444Z",
+  "summary_sha256": "c39d0705b4868c683c22ec9ca50febd460674f126c176aec7e03b6ca509b239f"
 }

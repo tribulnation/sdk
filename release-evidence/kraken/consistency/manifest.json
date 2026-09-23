@@ -258,9 +258,9 @@
         "version": "2.4.0"
       },
       "typed-core": {
-        "files_sha256": "8d9fc757ae525ecbb38118baae1a4f55fbd7b08af123d7ea498ee492205719df",
-        "metadata_sha256": "42c22009a3b6fc5457f8d2f24c8db6e237f8649f78b7b948dfdd80675fdd64ff",
-        "version": "0.8.1"
+        "files_sha256": "5fecdccc89907d537a4d20c11c3a494357b1c8c3f66c54de5729c92d9bee47ab",
+        "metadata_sha256": "0bec0107c1d72805e81e20c613ee9a361e022bae90de05e2665d4cee9571c28e",
+        "version": "0.9.0"
       },
       "typed-kraken": {
         "files_sha256": "5743531b776f741b6381c8192fafec93bd4a654161fff8c14723aa30f169d061",
@@ -552,9 +552,9 @@
         "version": "2.4.0"
       },
       "typed-core": {
-        "files_sha256": "8d9fc757ae525ecbb38118baae1a4f55fbd7b08af123d7ea498ee492205719df",
-        "metadata_sha256": "42c22009a3b6fc5457f8d2f24c8db6e237f8649f78b7b948dfdd80675fdd64ff",
-        "version": "0.8.1"
+        "files_sha256": "5fecdccc89907d537a4d20c11c3a494357b1c8c3f66c54de5729c92d9bee47ab",
+        "metadata_sha256": "0bec0107c1d72805e81e20c613ee9a361e022bae90de05e2665d4cee9571c28e",
+        "version": "0.9.0"
       },
       "typed-kraken": {
         "files_sha256": "5743531b776f741b6381c8192fafec93bd4a654161fff8c14723aa30f169d061",
@@ -587,9 +587,9 @@
     "source_sha256": "892d4148865c178536bd1e224647cb604eff2469c2504298f1f3181e61e473ed",
     "venue": "kraken"
   },
-  "finished": "2026-09-22T16:11:27.127359Z",
-  "results_sha256": "2613b1b23f34962c7057509b60f045e8d52ec73c4ee0d6ebf8095396b9d8a85e",
+  "finished": "2026-09-23T08:54:52.251534Z",
+  "results_sha256": "f4b3953c4ee9df436caa704fe11a2ccd7039af85344b833f703feca8d72bfd21",
   "schema_version": 1,
-  "started": "2026-09-22T16:11:23.969272Z",
-  "summary_sha256": "5a6f1bd60a7745efe3f4498f6a541f2e0bba93465fcf28aec261f44b87c83f87"
+  "started": "2026-09-23T08:54:49.290983Z",
+  "summary_sha256": "ee7c7c9de76291a78eecf01683d5f8daf8348e804dd8d40dcee3fe5badef698f"
 }
