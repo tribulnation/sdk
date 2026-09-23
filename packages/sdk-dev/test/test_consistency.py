@@ -8,6 +8,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 from typing_extensions import cast
 from tribulnation.catalogue import Catalogue
+from tribulnation.sdk import ApiError, MissingData
 from tribulnation.sdk.impl.market import MarketSDK
 from tribulnation.sdk.market import Book, PerpExchange, PerpStats, Ticker
 
@@ -790,3 +791,140 @@ async def test_retired_exchange_requires_explicit_catalogue_delisting(
     verify_payload(await payload(sdk, catalogue), catalogue=catalogue, root=root)
   catalogue.perpetual_instruments['fixture']['BTCUSD']['delisted'] = True
   verify_payload(await payload(sdk, catalogue), catalogue=catalogue, root=root)
+
+
+@pytest.fixture
+async def mexc_missing_sdk(
+  root: Path, sdk: MarketSDK, catalogue: Catalogue, monkeypatch: pytest.MonkeyPatch
+) -> MarketSDK:
+  """A missing index on one discovered instrument leaves other markets readable."""
+  directory = root / 'packages/impl/mexc'
+  directory.mkdir()
+  (directory / 'impl.toml').write_text('[support.market]\nsupport="full"\nauth=false\n')
+  monkeypatch.setattr(sdk.all_accounts['local'], 'venue', 'mexc')
+  owner = await sdk.venue('local')
+  monkeypatch.setattr(owner, 'venue_id', 'mexc')
+  symbols = ['AAA_USDT', 'BBB_USDT', 'CCC_USDT', 'BTC_USDT', 'KOKUSAISTOCK_USDT']
+  perp = Mock(spec=PerpExchange)
+  perp.venue_id, perp.exchange_id = 'mexc', 'perp'
+  perp.markets = AsyncMock(return_value=symbols)
+
+  async def market(symbol: str):
+    """Supply exact public identities and matching books for sampled markets."""
+    return SimpleNamespace(
+      venue_id='mexc',
+      exchange_id='perp',
+      market_id=symbol,
+      depth=AsyncMock(
+        return_value=Book(
+          bids=[Book.Entry(Decimal(99), Decimal(1))],
+          asks=[Book.Entry(Decimal(101), Decimal(1))],
+        )
+      ),
+    )
+
+  async def tickers(markets: list[str] | None = None) -> dict[str, Ticker]:
+    """Missing index data does not prevent ticker reads."""
+    return {
+      key: Ticker(bid=Decimal(99), ask=Decimal(101))
+      for key in (symbols if markets is None else markets)
+    }
+
+  async def stats(markets: list[str] | None = None) -> dict[str, PerpStats]:
+    """Raise the structured error only when the unavailable market is requested."""
+    selected = symbols if markets is None else markets
+    if 'KOKUSAISTOCK_USDT' in selected:
+      raise MissingData(
+        'Index unavailable', market_id='KOKUSAISTOCK_USDT', field='index'
+      )
+    return {key: PerpStats(index=Decimal(100)) for key in selected}
+
+  perp.market = AsyncMock(side_effect=market)
+  perp.tickers = AsyncMock(side_effect=tickers)
+  perp.perp_stats = AsyncMock(side_effect=stats)
+  cast(AsyncMock, owner.exchange).return_value = perp
+  cast(AsyncMock, owner.exchanges).return_value = [
+    {'id': 'perp', 'type': 'perp', 'name': 'Perpetuals'}
+  ]
+  catalogue.spot_instruments = {}
+  return sdk
+
+
+async def test_mexc_missing_index_exclusion_checks_remaining_markets(
+  root: Path, mexc_missing_sdk: MarketSDK, catalogue: Catalogue
+):
+  """The known failure qualifies only with an exact read of every remaining market."""
+  result = await collect(mexc_missing_sdk, 'local', 'mexc', catalogue)
+  verify_payload(result, catalogue=catalogue, root=root)
+  report = Payload.model_validate(result)
+  bulk = next(
+    check
+    for check in report.checks
+    if check.id == check_id('perp_stats', 'perp', 'bulk')
+  )
+  assert (bulk.status, bulk.code) == ('excluded', 'missing_index')
+  assert bulk.missing_data is not None
+  assert set(bulk.missing_data.returned_market_ids) == {
+    'AAA_USDT',
+    'BBB_USDT',
+    'CCC_USDT',
+    'BTC_USDT',
+  }
+  for mutation in (
+    'field',
+    'market',
+    'coverage',
+    'status',
+    'selection',
+    'venue',
+    'version',
+  ):
+    altered = report.model_copy(deep=True)
+    check = next(check for check in altered.checks if check.id == bulk.id)
+    assert check.missing_data is not None
+    if mutation == 'field':
+      check.missing_data.field = 'funding'
+    elif mutation == 'market':
+      check.missing_data.market_id = 'BTC_USDT'
+    elif mutation == 'coverage':
+      check.missing_data.returned_market_ids.pop()
+    elif mutation == 'status':
+      check.status = 'pass'
+    elif mutation == 'selection':
+      check.id = check_id('perp_stats', 'perp', 'selected')
+    elif mutation == 'venue':
+      altered.venue = 'fixture'
+    payload = altered.model_dump(mode='json')
+    if mutation == 'version':
+      payload['version'] = 5
+    with pytest.raises(ValueError):
+      verify_payload(payload, catalogue=catalogue, root=root)
+
+
+@pytest.mark.parametrize('failure', ['api', 'field', 'market', 'remaining'])
+async def test_missing_data_cannot_waive_unrelated_failures(
+  failure: str, root: Path, mexc_missing_sdk: MarketSDK, catalogue: Catalogue
+):
+  """General API failures, other omissions and failed follow-up reads remain blocking."""
+  owner = await mexc_missing_sdk.venue('local')
+  exchange = await owner.exchange('perp')
+  assert isinstance(exchange, PerpExchange)
+  stats = cast(AsyncMock, exchange.perp_stats)
+  if failure == 'api':
+    stats.side_effect = ApiError('Unavailable')
+  elif failure == 'field':
+    stats.side_effect = MissingData(
+      'Unavailable', market_id='KOKUSAISTOCK_USDT', field='funding'
+    )
+  elif failure == 'market':
+    stats.side_effect = MissingData('Unavailable', market_id='BTC_USDT', field='index')
+  else:
+    stats.side_effect = [
+      MissingData('Unavailable', market_id='KOKUSAISTOCK_USDT', field='index'),
+      ApiError('Follow-up failed'),
+      {'BTC_USDT': PerpStats(index=Decimal(100))},
+      {},
+    ]
+  result = await collect(mexc_missing_sdk, 'local', 'mexc', catalogue)
+  with pytest.raises(ValueError):
+    verify_payload(result, catalogue=catalogue, root=root)

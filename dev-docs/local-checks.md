@@ -57,8 +57,12 @@ sdk-dev results verify /path/to/new-run \
    Kraken linear perpetuals are now in scope under `perp`; see
    [ADR 0020](adr/0020-kraken-public-perpetuals.md). Missing Catalogue markets remain
    deferred coverage rather than automatic product exclusions.
-7. Market payload version 5 includes the Bit2Me limitation for stable one-sided books and rejects older policies. Fresh reports
-   are required after this policy change; old reports cannot be relabeled as passing.
+7. Market payload version 6 includes the narrow MEXC missing-index exclusion in
+   [ADR 0025](adr/0025-missing-market-data.md). Only the documented bulk stats failure
+   for KOKUSAISTOCK_USDT qualifies, after a successful exact read for every other
+   discovered market. MissingData is not a general waiver. The exclusion remains
+   visible in results and summaries. Fresh reports are required; old reports cannot
+   be relabeled as passing.
 
 ## Quote comparison and scope
 

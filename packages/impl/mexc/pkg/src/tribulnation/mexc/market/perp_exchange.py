@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from typed_mexc.schemas import ContractSpec, ContractTicker
-from tribulnation.sdk import ApiError
+from tribulnation.sdk import MissingData
 from tribulnation.sdk.market import (
   PerpExchange as BasePerpExchange,
   PerpStats,
@@ -119,7 +119,7 @@ class PerpExchange(ExchangeMixin, BasePerpExchange):
     remain absent rather than synthesizing a schedule or issuing one request per market.
 
     Raises:
-      ApiError: A selected ticker omits its required index price.
+      MissingData: A selected ticker omits its required index price.
     """
     if markets is not None and not markets:
       return {}
@@ -128,7 +128,11 @@ class PerpExchange(ExchangeMixin, BasePerpExchange):
     for row in await self.contract_tickers(contracts):
       index = row.get('indexPrice')
       if index is None:
-        raise ApiError(f'MEXC perpetual ticker missing index price: {row["symbol"]}')
+        raise MissingData(
+          f'MEXC perpetual ticker missing index price: {row["symbol"]}',
+          market_id=row['symbol'],
+          field='index',
+        )
       funding = row.get('fundingRate')
       stats[row['symbol']] = PerpStats(
         index=Decimal(str(index)),
