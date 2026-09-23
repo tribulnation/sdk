@@ -1,6 +1,6 @@
 {
   "after": {
-    "catalogue_sha256": "5676bad3a4b4262261dd3581c3a8c5c599ea940acb256eba0fc246d08303bf40",
+    "catalogue_sha256": "066c09f09433d6b5d5129b4eb270eb8e471b5b2b5c83ef90e9e94bcffdea0ab0",
     "dependencies": {
       "annotated-doc": {
         "files_sha256": "c566fc7785ed355930120476a82a381672cb77f95d528fcc449c758c617fbdc4",
@@ -519,7 +519,7 @@
     "venue": "dydx"
   },
   "before": {
-    "catalogue_sha256": "5676bad3a4b4262261dd3581c3a8c5c599ea940acb256eba0fc246d08303bf40",
+    "catalogue_sha256": "066c09f09433d6b5d5129b4eb270eb8e471b5b2b5c83ef90e9e94bcffdea0ab0",
     "dependencies": {
       "annotated-doc": {
         "files_sha256": "c566fc7785ed355930120476a82a381672cb77f95d528fcc449c758c617fbdc4",
@@ -1037,9 +1037,9 @@
     "source_sha256": "92377e250d5f968d1c293288292cff7c0345e02df2606ce51b9d2d6fe1eb58b1",
     "venue": "dydx"
   },
-  "finished": "2026-09-23T09:27:18.553415Z",
-  "results_sha256": "73854919605ae2f344b43338cc38041b0d099a7743e7f83442ec30fcee74a680",
+  "finished": "2026-09-23T09:36:31.938644Z",
+  "results_sha256": "0ab486ca81463c40702c9364b4b8d565bac002581577351f4e947d2021c53288",
   "schema_version": 1,
-  "started": "2026-09-23T09:26:17.044380Z",
-  "summary_sha256": "c3c2ff3f5993d046948323f686f2d1e2570959a6a23daaf57f3b1a6543c7dff0"
+  "started": "2026-09-23T09:35:30.578417Z",
+  "summary_sha256": "b6d3b92666fe0d8a00ad128b6a722c2c4dbf21c5efc4807623a69ce8dcd77020"
 }

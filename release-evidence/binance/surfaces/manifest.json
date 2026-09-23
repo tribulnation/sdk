@@ -1,6 +1,6 @@
 {
   "after": {
-    "catalogue_sha256": "5676bad3a4b4262261dd3581c3a8c5c599ea940acb256eba0fc246d08303bf40",
+    "catalogue_sha256": "066c09f09433d6b5d5129b4eb270eb8e471b5b2b5c83ef90e9e94bcffdea0ab0",
     "dependencies": {
       "annotated-doc": {
         "files_sha256": "c566fc7785ed355930120476a82a381672cb77f95d528fcc449c758c617fbdc4",
@@ -294,7 +294,7 @@
     "venue": "binance"
   },
   "before": {
-    "catalogue_sha256": "5676bad3a4b4262261dd3581c3a8c5c599ea940acb256eba0fc246d08303bf40",
+    "catalogue_sha256": "066c09f09433d6b5d5129b4eb270eb8e471b5b2b5c83ef90e9e94bcffdea0ab0",
     "dependencies": {
       "annotated-doc": {
         "files_sha256": "c566fc7785ed355930120476a82a381672cb77f95d528fcc449c758c617fbdc4",
@@ -587,9 +587,9 @@
     "source_sha256": "9f0e90f2481c0b87a56293cf65501ec94623c26b56e0741732682065ee2eae5d",
     "venue": "binance"
   },
-  "finished": "2026-09-23T09:24:45.203260Z",
+  "finished": "2026-09-23T09:33:44.905227Z",
   "results_sha256": "07bd59e1b26f7cb9cf6ff851183b1a05fd97634beb1c7b562c32e0169a6b9ac8",
   "schema_version": 1,
-  "started": "2026-09-23T09:24:11.157092Z",
-  "summary_sha256": "a8b2e0776ebe3304ce023682fc97986572e99b9d67ca4336056c671df5c0ca99"
+  "started": "2026-09-23T09:33:02.206334Z",
+  "summary_sha256": "fba914e40ec57a667ebdcc4fdb840ff3bafa83b563074c9b11173d905426e3c4"
 }
