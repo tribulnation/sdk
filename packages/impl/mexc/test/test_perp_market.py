@@ -10,7 +10,7 @@ import pytest
 from typed_mexc.schemas import ContractSpec, ContractTicker, FuturesCandle
 from tribulnation.mexc import MexcMarket
 from tribulnation.mexc.market.perp_market import PerpMarket
-from tribulnation.sdk import ApiError
+from tribulnation.sdk import ApiError, MissingData
 from tribulnation.sdk.market import Fees
 
 START = datetime(2026, 9, 1, tzinfo=timezone.utc)
@@ -496,8 +496,11 @@ async def test_perp_stats_requires_index_price(
     AsyncMock(return_value={'success': True, 'data': [row]}),
   )
   exchange = await venue.perp_exchange('perp')
-  with pytest.raises(ApiError, match='missing index price: BTC_USDT'):
+  with pytest.raises(MissingData, match='missing index price: BTC_USDT') as raised:
     await exchange.perp_stats(markets)
+  assert isinstance(raised.value, ApiError)
+  assert raised.value.market_id == 'BTC_USDT'
+  assert raised.value.field == 'index'
 
 
 async def test_perp_stats_preserves_missing_optional_fields(

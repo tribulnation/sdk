@@ -35,6 +35,16 @@ class ApiError(Error):
     return super().__str__()
 
 
+class MissingData(ApiError):
+  """A successful venue response omitted a required field for a native market ID."""
+
+  def __init__(self, message: str, *, market_id: str, field: str):
+    """Identify the unavailable field without retaining the venue response."""
+    super().__init__(message)
+    self.market_id = market_id
+    self.field = field
+
+
 class BadRequest(ApiError):
   """Bad request: invalid request, invalid input, etc."""
 

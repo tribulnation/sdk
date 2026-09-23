@@ -406,6 +406,16 @@ def write_report(
         'See results.json for retained brackets. ADR 0014 permits only Bit2Me '
         'native ticker/depth discrepancies; all other required checks still apply.\n'
       )
+    missing_indexes = sum(
+      isinstance(check, dict) and check.get('code') == 'missing_index'
+      for check in checks
+    )
+    if missing_indexes:
+      summary += (
+        '\nMissing index exclusion: MEXC KOKUSAISTOCK_USDT bulk stats remain '
+        'unavailable. Every other discovered market must be observed in a separate '
+        'stats read. See results.json and ADR 0025; this is not a passing bulk read.\n'
+      )
   summary = summary.encode()
   manifest = Manifest(
     before=before,
