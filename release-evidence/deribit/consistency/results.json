@@ -5,1834 +5,2138 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"1000BONK_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"1000MOG_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"1000PEPE_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"1000SHIB_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"AAPL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"AAVE_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ADA_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"AERO_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ALGO_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ALT_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"AMD_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"AMZN_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"APE_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"APT_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ARB_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ARM_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ASTER_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ATOM_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"AVAX_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"AVNT_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BASED1_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BCH_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BERA_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BE_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BILL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BNB_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BOME_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BRENTOIL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BTC_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"CBRS_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"CFX_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"CHIP_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"COIN50_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"COMP_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"CRCL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"CRV_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"DASH_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"DOGE_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"DOT_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"DRAM_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"DYDX_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"EDGEX_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"EIGEN_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ENA_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ETC_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ETHFI_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ETH_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"EURC_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"EWY_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"FARTCOIN_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"FET_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"FIL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"GOLD_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"GOOGL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"HBAR_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"HOOD_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"HYPE_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ICP_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"INJ_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"INTC_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"INX_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"JASMY_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"JTO_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"JUP_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"LDO_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"LINK_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"LITE_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"LIT_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"LTC_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"MEGA_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"MERL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"META_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"MON_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"MORPHO_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"MRVL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"MSFT_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"MSTR_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"MU_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"NBIS_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"NEAR_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"NIGHT_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"NVDA_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ONDO_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"OPN_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"OP_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PAXG_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PENDLE_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PENGU_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PNUT_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PRL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PUMP_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PYTH_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"QQQ_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"RENDER_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"RESOLV_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ROBO_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"RUNE_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SAGA_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SEI_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SILVER_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SKHY_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SNDK_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SOL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SOXL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SPCX_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SPY_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"STRK_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SUI_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"S_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"TAO_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"TIA_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"TOWNS_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"TRUMP_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"TRX_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"TSLA_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"TSM_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"UNI_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"VIRTUAL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"VVV_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"WIF_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"WLD_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"WLFI_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"WTIOIL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"W_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"XLM_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"XPL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"XRP_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ZEC_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"BNB_USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"BTC_USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"BTC_USDE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"BTC_USDT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"BUIDL_USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"ETH_BTC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"ETH_USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"ETH_USDE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"ETH_USDT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"PAXG_USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"SOL_ETH\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"SOL_USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"STETH_ETH\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"STETH_USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"USDC_USDT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"USDE_USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"USDE_USDT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"USYC_USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"XRP_USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"1000BONK_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"1000MOG_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"1000PEPE_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"1000SHIB_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"AAPL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"AAVE_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ADA_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"AERO_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ALGO_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ALT_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"AMD_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"AMZN_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"APE_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"APT_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ARB_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ARM_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ASTER_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ATOM_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"AVAX_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"AVNT_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BASED1_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BCH_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BERA_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BE_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BILL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BNB_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BOME_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BRENTOIL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BTC_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"CBRS_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"CFX_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"CHIP_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"COIN50_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"COMP_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"CRCL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"CRV_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"DASH_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"DOGE_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"DOT_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"DRAM_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"DYDX_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"EDGEX_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"EIGEN_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ENA_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ETC_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ETHFI_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ETH_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"EURC_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"EWY_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"FARTCOIN_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"FET_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"FIL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"GOLD_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"GOOGL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"HBAR_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"HOOD_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"HYPE_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ICP_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"INJ_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"INTC_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"INX_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"JASMY_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"JTO_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"JUP_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"LDO_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"LINK_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"LITE_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"LIT_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"LTC_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"MEGA_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"MERL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"META_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"MON_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"MORPHO_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"MRVL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"MSFT_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"MSTR_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"MU_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"NBIS_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"NEAR_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"NIGHT_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"NVDA_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ONDO_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"OPN_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"OP_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PAXG_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PENDLE_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PENGU_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PNUT_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PRL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PUMP_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PYTH_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"QQQ_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"RENDER_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"RESOLV_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ROBO_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"RUNE_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SAGA_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SEI_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SILVER_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SKHY_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SNDK_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SOL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SOXL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SPCX_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SPY_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"STRK_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SUI_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"S_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"TAO_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"TIA_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"TOWNS_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"TRUMP_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"TRX_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"TSLA_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"TSM_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"UNI_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"VIRTUAL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"VVV_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"WIF_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"WLD_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"WLFI_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"WTIOIL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"W_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"XLM_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"XPL_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"XRP_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ZEC_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"BNB_USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"BTC_USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"BTC_USDE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"BTC_USDT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"BUIDL_USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"ETH_BTC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"ETH_USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"ETH_USDE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"ETH_USDT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"PAXG_USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"SOL_ETH\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"SOL_USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"STETH_ETH\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"STETH_USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"USDC_USDT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"USDE_USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"USDE_USDT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"USYC_USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"XRP_USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"discovery\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"exchange_identity\",\"perp\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"exchange_identity\",\"spot\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"market_identity\",\"perp\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"market_identity\",\"spot\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"perp\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"perp\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"perp\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"setup\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"perp\",\"1000BONK_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.003522",
-            "after_bid": "0.003519",
-            "ask": "0.003522",
+            "after_ask": "0.004049",
+            "after_bid": "0.004046",
+            "ask": "0.004049",
             "attempt": 1,
-            "before_ask": "0.003522",
-            "before_bid": "0.003519",
-            "bid": "0.003518",
-            "elapsed_seconds": 0.15133914002217352,
+            "before_ask": "0.004049",
+            "before_bid": "0.004046",
+            "bid": "0.004046",
+            "elapsed_seconds": 0.12297698704060167,
             "ticker_ids_match": true
           }
         ],
@@ -1841,16 +2145,17 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"perp\",\"1000MOG_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.0001224",
-            "after_bid": "0.0001221",
-            "ask": "0.0001224",
+            "after_ask": "0.0001301",
+            "after_bid": "0.0001298",
+            "ask": "0.0001301",
             "attempt": 1,
-            "before_ask": "0.0001224",
-            "before_bid": "0.0001221",
-            "bid": "0.0001221",
-            "elapsed_seconds": 0.1550437769619748,
+            "before_ask": "0.0001301",
+            "before_bid": "0.0001298",
+            "bid": "0.0001298",
+            "elapsed_seconds": 0.13341026206035167,
             "ticker_ids_match": true
           }
         ],
@@ -1859,16 +2164,17 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"perp\",\"1000PEPE_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.004824",
-            "after_bid": "0.004819",
-            "ask": "0.004824",
+            "after_ask": "0.004883",
+            "after_bid": "0.004877",
+            "ask": "0.004883",
             "attempt": 1,
-            "before_ask": "0.004824",
-            "before_bid": "0.004819",
-            "bid": "0.004819",
-            "elapsed_seconds": 0.15097677195444703,
+            "before_ask": "0.004883",
+            "before_bid": "0.004877",
+            "bid": "0.004877",
+            "elapsed_seconds": 0.18672937096562237,
             "ticker_ids_match": true
           }
         ],
@@ -1877,16 +2183,17 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"perp\",\"BTC_USDC-PERPETUAL\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "86167.5",
-            "after_bid": "86167.4",
-            "ask": "86167.5",
+            "after_ask": "85847.6",
+            "after_bid": "85847.5",
+            "ask": "85848.9",
             "attempt": 1,
-            "before_ask": "86167.5",
-            "before_bid": "86167.4",
-            "bid": "86167.4",
-            "elapsed_seconds": 0.157122652977705,
+            "before_ask": "85847.6",
+            "before_bid": "85847.5",
+            "bid": "85848.8",
+            "elapsed_seconds": 0.13192721002269536,
             "ticker_ids_match": true
           }
         ],
@@ -1895,16 +2202,17 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"spot\",\"AAVE_USDC\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "142.24",
-            "after_bid": "142.17",
-            "ask": "142.25",
+            "after_ask": "149.61",
+            "after_bid": "149.57",
+            "ask": "149.61",
             "attempt": 1,
-            "before_ask": "142.24",
-            "before_bid": "142.17",
-            "bid": "142.16",
-            "elapsed_seconds": 0.15803941106423736,
+            "before_ask": "149.61",
+            "before_bid": "149.57",
+            "bid": "149.57",
+            "elapsed_seconds": 0.1374995969235897,
             "ticker_ids_match": true
           }
         ],
@@ -1913,16 +2221,17 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"spot\",\"ADA_USDC\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.24835",
-            "after_bid": "0.24829",
-            "ask": "0.24835",
+            "after_ask": "0.25413",
+            "after_bid": "0.25412",
+            "ask": "0.25413",
             "attempt": 1,
-            "before_ask": "0.24835",
-            "before_bid": "0.24829",
-            "bid": "0.24829",
-            "elapsed_seconds": 0.14677053096238524,
+            "before_ask": "0.25413",
+            "before_bid": "0.25412",
+            "bid": "0.25411",
+            "elapsed_seconds": 0.13714325497858226,
             "ticker_ids_match": true
           }
         ],
@@ -1931,16 +2240,17 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"spot\",\"AERO_USDC\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.67804",
-            "after_bid": "0.67735",
-            "ask": "0.67804",
+            "after_ask": "0.7231",
+            "after_bid": "0.72221",
+            "ask": "0.72317",
             "attempt": 1,
-            "before_ask": "0.67804",
-            "before_bid": "0.67735",
-            "bid": "0.67735",
-            "elapsed_seconds": 0.13995588303077966,
+            "before_ask": "0.7231",
+            "before_bid": "0.72221",
+            "bid": "0.72221",
+            "elapsed_seconds": 0.14992499793879688,
             "ticker_ids_match": true
           }
         ],
@@ -1949,16 +2259,17 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"spot\",\"BTC_USDT\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "86341.0",
-            "after_bid": "86010.0",
-            "ask": "86341.0",
+            "after_ask": "85973.0",
+            "after_bid": "85574.0",
+            "ask": "85973.0",
             "attempt": 1,
-            "before_ask": "86341.0",
-            "before_bid": "86010.0",
-            "bid": "86010.0",
-            "elapsed_seconds": 0.13906402292195708,
+            "before_ask": "85973.0",
+            "before_bid": "85574.0",
+            "bid": "85574.0",
+            "elapsed_seconds": 0.1972820300143212,
             "ticker_ids_match": true
           }
         ],
@@ -1967,36 +2278,42 @@
       {
         "code": "ok",
         "id": "[\"tickers\",\"perp\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"perp\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"perp\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"spot\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"spot\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"spot\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       }
@@ -2016,6 +2333,7 @@
           "AVAX_USDC",
           "BCH_USDC",
           "BNB_USDC",
+          "BONK_USDC",
           "BTC_USDC",
           "BTC_USDE",
           "BTC_USDT",
@@ -2048,11 +2366,18 @@
           "SOL_USDC",
           "STETH_ETH",
           "STETH_USDC",
+          "SUI_USDC",
+          "TAO_USDC",
+          "UNI_USDC",
           "USDC_USDT",
           "USDE_USDC",
           "USDE_USDT",
+          "USDT_USDC",
           "USYC_USDC",
-          "XRP_USDC"
+          "VET_USDC",
+          "XLM_USDC",
+          "XRP_USDC",
+          "ZORA_USDC"
         ]
       },
       {
@@ -2192,6 +2517,6 @@
       }
     ],
     "venue": "deribit",
-    "version": 5
+    "version": 6
   }
 }

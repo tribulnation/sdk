@@ -1,6 +1,6 @@
 {
   "after": {
-    "catalogue_sha256": "5676bad3a4b4262261dd3581c3a8c5c599ea940acb256eba0fc246d08303bf40",
+    "catalogue_sha256": "066c09f09433d6b5d5129b4eb270eb8e471b5b2b5c83ef90e9e94bcffdea0ab0",
     "dependencies": {
       "annotated-doc": {
         "files_sha256": "c566fc7785ed355930120476a82a381672cb77f95d528fcc449c758c617fbdc4",
@@ -313,7 +313,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "c8c43110ef8294c52971a15d15b37d38728474151eaf2348b50e1e2e5447be2d",
+        "files_sha256": "7a143b7f6a2a37c693dc9e2d3687732ade7d5f3a887adfd21d115d290bf58ecd",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -363,14 +363,14 @@
         "version": "0.9.0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "de80df460134018eefac1f01aae414d13e2cc35dc90cfa8216c4cc82326c5ec8",
+        "files_sha256": "0e33d4a89db64fe6cd0763c9c6621881efdbda9647a72982eed5f46bdf4dc9a7",
         "metadata_sha256": "b0dd8b0cd2aba118b476b8abb792b5d695f709e88b80c1309f4c54cf62df4256",
         "version": "2.4.0"
       },
       "typed-core": {
-        "files_sha256": "8d9fc757ae525ecbb38118baae1a4f55fbd7b08af123d7ea498ee492205719df",
-        "metadata_sha256": "42c22009a3b6fc5457f8d2f24c8db6e237f8649f78b7b948dfdd80675fdd64ff",
-        "version": "0.8.1"
+        "files_sha256": "5fecdccc89907d537a4d20c11c3a494357b1c8c3f66c54de5729c92d9bee47ab",
+        "metadata_sha256": "0bec0107c1d72805e81e20c613ee9a361e022bae90de05e2665d4cee9571c28e",
+        "version": "0.9.0"
       },
       "typed-hyperliquid": {
         "files_sha256": "6649c87fe03a862dc4b3b12fde594a93f887c724353043c686f4178ca000bd1c",
@@ -400,11 +400,11 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "b689d50641988abc00bb9f375acd46514891bd6df09ce5320c20ea2c83509dee",
+    "source_sha256": "4f1ae128ce544464d117117beee69b04745eef23e0d8e925461b2482a87401ce",
     "venue": "hyperliquid"
   },
   "before": {
-    "catalogue_sha256": "5676bad3a4b4262261dd3581c3a8c5c599ea940acb256eba0fc246d08303bf40",
+    "catalogue_sha256": "066c09f09433d6b5d5129b4eb270eb8e471b5b2b5c83ef90e9e94bcffdea0ab0",
     "dependencies": {
       "annotated-doc": {
         "files_sha256": "c566fc7785ed355930120476a82a381672cb77f95d528fcc449c758c617fbdc4",
@@ -717,7 +717,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "c8c43110ef8294c52971a15d15b37d38728474151eaf2348b50e1e2e5447be2d",
+        "files_sha256": "7a143b7f6a2a37c693dc9e2d3687732ade7d5f3a887adfd21d115d290bf58ecd",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -767,14 +767,14 @@
         "version": "0.9.0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "de80df460134018eefac1f01aae414d13e2cc35dc90cfa8216c4cc82326c5ec8",
+        "files_sha256": "0e33d4a89db64fe6cd0763c9c6621881efdbda9647a72982eed5f46bdf4dc9a7",
         "metadata_sha256": "b0dd8b0cd2aba118b476b8abb792b5d695f709e88b80c1309f4c54cf62df4256",
         "version": "2.4.0"
       },
       "typed-core": {
-        "files_sha256": "8d9fc757ae525ecbb38118baae1a4f55fbd7b08af123d7ea498ee492205719df",
-        "metadata_sha256": "42c22009a3b6fc5457f8d2f24c8db6e237f8649f78b7b948dfdd80675fdd64ff",
-        "version": "0.8.1"
+        "files_sha256": "5fecdccc89907d537a4d20c11c3a494357b1c8c3f66c54de5729c92d9bee47ab",
+        "metadata_sha256": "0bec0107c1d72805e81e20c613ee9a361e022bae90de05e2665d4cee9571c28e",
+        "version": "0.9.0"
       },
       "typed-hyperliquid": {
         "files_sha256": "6649c87fe03a862dc4b3b12fde594a93f887c724353043c686f4178ca000bd1c",
@@ -804,12 +804,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "b689d50641988abc00bb9f375acd46514891bd6df09ce5320c20ea2c83509dee",
+    "source_sha256": "4f1ae128ce544464d117117beee69b04745eef23e0d8e925461b2482a87401ce",
     "venue": "hyperliquid"
   },
-  "finished": "2026-09-22T16:12:37.517315Z",
+  "finished": "2026-09-23T09:38:46.811523Z",
   "results_sha256": "6430cb107a5e7d786fa74401c8cb89de34d375a853bd6bc2f3ce8eb4d1774b6b",
   "schema_version": 1,
-  "started": "2026-09-22T16:12:15.653751Z",
-  "summary_sha256": "030950944fa0fa789db1e26ad8671f43a5b83fcc47f11b0600303471aad979de"
+  "started": "2026-09-23T09:38:23.617274Z",
+  "summary_sha256": "74241ae89194da22f36102f81a36a1e695a6f86ea05679b043836e6c756a6b4c"
 }
