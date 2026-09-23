@@ -32,7 +32,9 @@ except Error as e:
 - `Error` — base class for everything below.
   - `NetworkError` — the venue could not be reached.
   - `ValidationError` — the response did not match the expected shape.
-  - `ApiError` — the venue returned an error.
+  - `ApiError` — the venue returned an error or could not supply required data.
+    - `MissingData` — a successful response omitted required market data;
+      `market_id` identifies the native instrument and `field` the SDK field.
     - `BadRequest` — invalid request or input.
     - `AuthError` — invalid or missing credentials.
     - `RateLimited` — the venue's rate limit was hit.

@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from typed_mexc.schemas import ContractSpec, ContractTicker
+from tribulnation.sdk import MissingData
 from tribulnation.sdk.market import (
   PerpExchange as BasePerpExchange,
   PerpStats,
@@ -116,17 +117,28 @@ class PerpExchange(ExchangeMixin, BasePerpExchange):
 
     MEXC's bulk ticker does not report the settlement time or interval. Those fields
     remain absent rather than synthesizing a schedule or issuing one request per market.
+
+    Raises:
+      MissingData: A selected ticker omits its required index price.
     """
     if markets is not None and not markets:
       return {}
     contracts = await self.selected_contracts(markets)
-    return {
-      row['symbol']: PerpStats(
-        index=Decimal(str(row['indexPrice'])),
-        mark=price(row['fairPrice']),
-        funding=Decimal(str(row['fundingRate'])),
+    stats: dict[str, PerpStats] = {}
+    for row in await self.contract_tickers(contracts):
+      index = row.get('indexPrice')
+      if index is None:
+        raise MissingData(
+          f'MEXC perpetual ticker missing index price: {row["symbol"]}',
+          market_id=row['symbol'],
+          field='index',
+        )
+      funding = row.get('fundingRate')
+      stats[row['symbol']] = PerpStats(
+        index=Decimal(str(index)),
+        mark=price(row.get('fairPrice')),
+        funding=Decimal(str(funding)) if funding is not None else None,
         open_interest=Decimal(str(row['holdVol']))
         * Decimal(str(contracts[row['symbol']]['contractSize'])),
       )
-      for row in await self.contract_tickers(contracts)
-    }
+    return stats

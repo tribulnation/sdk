@@ -67,8 +67,8 @@ sqltypes==0.1.11
 toolz==1.1.0
 tornado==6.5.8
 traitlets==5.16.1
-tribulnation-catalogue==0.3.0
-typed-core==0.8.1
+tribulnation-catalogue==0.3.3
+typed-core==0.9.0
 typed-hyperliquid==2.1.1
 typer==0.27.2
 typing-extensions==4.16.0

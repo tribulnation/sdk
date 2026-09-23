@@ -11,6 +11,7 @@ from time import monotonic
 from pydantic import BaseModel, ConfigDict, Field
 from typing_extensions import Literal, TypeVar
 from tribulnation.catalogue import Catalogue
+from tribulnation.sdk import MissingData
 from tribulnation.sdk.impl.market import MarketSDK
 from tribulnation.sdk.market import Exchange, Market, PerpExchange
 
@@ -18,7 +19,7 @@ from .integration.market.support import CASES
 from .repo import repo_root
 from .support import load_impl_files
 
-VERSION = 5
+VERSION = 6
 REQUEST_TIMEOUT = 120
 BRACKET_SECONDS = 15
 TOLERANCE = Decimal('0.005')
@@ -61,6 +62,14 @@ class QuoteObservation(StrictModel):
   after_ask: str | None = None
 
 
+class MissingDataObservation(StrictModel):
+  """An approved unavailable field and the exact IDs returned by the remaining read."""
+
+  market_id: str
+  field: str
+  returned_market_ids: list[str]
+
+
 class Check(StrictModel):
   """A sanitized outcome: no exception text or account API payloads."""
 
@@ -77,14 +86,16 @@ class Check(StrictModel):
     'coverage_deferred',
     'delisted',
     'native_ticker_quotes',
+    'missing_index',
   ]
   quotes: list[QuoteObservation] = Field(default_factory=list[QuoteObservation])
+  missing_data: MissingDataObservation | None = None
 
 
 class Payload(StrictModel):
   """One mainnet venue's discovery and deterministic check inventory."""
 
-  version: Literal[5] = VERSION
+  version: Literal[6] = VERSION
   venue: str
   account_id: str
   discovery: list[Discovery]
@@ -261,6 +272,10 @@ def verify_payload(
   }
   for id, method in expected.items():
     check = actual[id]
+    if check.missing_data is not None or check.code == 'missing_index':
+      if not enabled(method, supported) or not missing_index_exclusion(report, check):
+        raise ValueError('Invalid missing-index exclusion')
+      continue
     if method == 'delisted':
       if check.status != 'excluded' or check.code != 'delisted' or check.quotes:
         raise ValueError('Delisted quote checks must remain explicit exclusions')
@@ -311,6 +326,32 @@ def verify_payload(
       or not valid_market_id(report.venue, item.exchange, market)
     ):
       raise ValueError('Catalogue identity contradicts discovery')
+
+
+def missing_index_exclusion(report: Payload, check: Check) -> bool:
+  """Accept only the documented MEXC bulk case with every other market observed."""
+  observation = check.missing_data
+  item = next((item for item in report.discovery if item.exchange == 'perp'), None)
+  if (
+    report.venue != 'mexc'
+    or check.id != check_id('perp_stats', 'perp', 'bulk')
+    or check.status != 'excluded'
+    or check.code != 'missing_index'
+    or check.quotes
+    or observation is None
+    or observation.market_id != 'KOKUSAISTOCK_USDT'
+    or observation.field != 'index'
+    or item is None
+    or item.kind != 'perp'
+    or observation.market_id not in item.markets
+  ):
+    return False
+  returned = observation.returned_market_ids
+  return (
+    bool(returned)
+    and len(returned) == len(set(returned))
+    and set(returned) == set(item.markets) - {observation.market_id}
+  )
 
 
 async def request(awaitable: Awaitable[T]) -> T:
@@ -497,7 +538,7 @@ async def collect(
 
   async def run(
     id: str,
-    fn: Callable[[], Awaitable[bool | None]],
+    fn: Callable[[], Awaitable[bool | None | Check]],
     method: str | None = None,
     quotes: list[QuoteObservation] | None = None,
   ):
@@ -506,7 +547,11 @@ async def collect(
       report.checks.append(Check(id=id, status='excluded', code='unsupported'))
       return
     try:
-      add(id, await fn(), quotes=quotes)
+      result = await fn()
+      if isinstance(result, Check):
+        report.checks.append(result)
+      else:
+        add(id, result, quotes=quotes)
     except Exception:
       add(id, False, 'request_failed', quotes=quotes)
 
@@ -570,7 +615,7 @@ async def collect(
           selection: str = selection,
           item: Discovery = item,
           selected: list[str] = selected,
-        ) -> bool:
+        ) -> bool | Check:
           """Read exact selection semantics, including the explicitly empty request."""
           requested = (
             None if selection == 'bulk' else selected if selection == 'selected' else []
@@ -578,7 +623,33 @@ async def collect(
           if method == 'perp_stats':
             if not isinstance(exchange, PerpExchange):
               return False
-            result = await request(exchange.perp_stats(markets=requested))
+            try:
+              result = await request(exchange.perp_stats(markets=requested))
+            except MissingData as error:
+              if (
+                venue != 'mexc'
+                or item.exchange != 'perp'
+                or selection != 'bulk'
+                or error.market_id != 'KOKUSAISTOCK_USDT'
+                or error.field != 'index'
+                or error.market_id not in item.markets
+              ):
+                raise
+              remaining = [id for id in item.markets if id != error.market_id]
+              result = await request(exchange.perp_stats(markets=remaining))
+              check = Check(
+                id=check_id(method, item.exchange, selection),
+                status='excluded',
+                code='missing_index',
+                missing_data=MissingDataObservation(
+                  market_id=error.market_id,
+                  field=error.field,
+                  returned_market_ids=sorted(result),
+                ),
+              )
+              if not missing_index_exclusion(report, check):
+                return False
+              return check
           else:
             result = await request(exchange.tickers(markets=requested))
           return (

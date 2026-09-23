@@ -1,1946 +1,2282 @@
 {
   "payload": {
-    "account_id": "hyperliquid_read",
+    "account_id": "hyperliquid_mainnet",
     "checks": [
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"AAVE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ACE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ADA\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"AERO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ALGO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"APE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"APT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"AR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ARB\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ASTER\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ATOM\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"AVAX\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"AVNT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"AXS\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BCH\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BIO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BLAST\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BLUR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BNB\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BSV\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BTC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"CAKE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"CC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"CELO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"COMP\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"CRV\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"DOGE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"DOT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"DYDX\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"DYM\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"EIGEN\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ENA\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ENS\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ETC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ETH\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ETHFI\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"FARTCOIN\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"FET\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"FIL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"GALA\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"GMT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"GMX\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"GRASS\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"HBAR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"HYPE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ICP\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"IMX\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"INJ\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"IO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"IOTA\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"JTO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"JUP\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"KAS\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"LAYER\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"LDO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"LINEA\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"LINK\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"LIT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"LTC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"MNT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"MON\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"MORPHO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"NEAR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"NEO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"NIL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"NOT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ONDO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"OP\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ORDI\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PAXG\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PENDLE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PENGU\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PNUT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"POL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PUMP\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PURR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PYTH\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"RENDER\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"REZ\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"RUNE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"S\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SAND\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SEI\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SKY\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SNX\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SOL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"STRK\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"STX\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SUI\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SYRUP\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"TAO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"TIA\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"TON\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"TRUMP\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"TRX\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"UNI\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"USUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"VIRTUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"VVV\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"W\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"WIF\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"WLD\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"WLFI\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"XLM\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"XMR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"XPL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"XRP\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ZEC\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ZETA\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ZK\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ZRO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"kBONK\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"kFLOKI\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"kPEPE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"kSHIB\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"xyz:CL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"xyz:SILVER\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"HYPE/USDC:107\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"HYPE/USDE:255\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"HYPE/USDT0:207\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"MON/USDC:129\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"PEPE/USDC:11\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"PURR/USDC:0\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"UBTC/USDC:142\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"UENA/USDC:206\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"UETH/USDC:151\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"UFART/USDC:162\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"USDE/USDC:150\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"USDT0/USDC:166\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"UXPL/USDC:210\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"XAUT0/USDC:182\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"XAUT0/USDT0:209\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"AAVE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ACE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ADA\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"AERO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ALGO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"APE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"APT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"AR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ARB\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ASTER\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ATOM\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"AVAX\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"AVNT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"AXS\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BCH\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BIO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BLAST\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BLUR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BNB\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BSV\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BTC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"CAKE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"CC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"CELO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"COMP\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"CRV\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"DOGE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"DOT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"DYDX\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"DYM\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"EIGEN\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ENA\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ENS\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ETC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ETH\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ETHFI\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"FARTCOIN\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"FET\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"FIL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"GALA\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"GMT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"GMX\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"GRASS\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"HBAR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"HYPE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ICP\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"IMX\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"INJ\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"IO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"IOTA\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"JTO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"JUP\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"KAS\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"LAYER\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"LDO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"LINEA\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"LINK\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"LIT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"LTC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"MNT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"MON\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"MORPHO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"NEAR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"NEO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"NIL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"NOT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ONDO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"OP\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ORDI\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PAXG\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PENDLE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PENGU\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PNUT\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"POL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PUMP\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PURR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PYTH\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"RENDER\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"REZ\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"RUNE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"S\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SAND\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SEI\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SKY\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SNX\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SOL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"STRK\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"STX\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SUI\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SYRUP\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"TAO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"TIA\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"TON\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"TRUMP\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"TRX\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"UNI\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"USUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"VIRTUAL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"VVV\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"W\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"WIF\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"WLD\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"WLFI\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"XLM\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"XMR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"XPL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"XRP\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ZEC\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ZETA\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ZK\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ZRO\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"kBONK\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"kFLOKI\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"kPEPE\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"kSHIB\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"xyz:CL\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"xyz:SILVER\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"HYPE/USDC:107\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"HYPE/USDE:255\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"HYPE/USDT0:207\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"MON/USDC:129\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"PEPE/USDC:11\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"PURR/USDC:0\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"UBTC/USDC:142\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"UENA/USDC:206\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"UETH/USDC:151\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"UFART/USDC:162\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"USDE/USDC:150\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"USDT0/USDC:166\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"UXPL/USDC:210\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"XAUT0/USDC:182\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"XAUT0/USDT0:209\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"discovery\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"exchange_identity\",\"\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"exchange_identity\",\"abcd\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"exchange_identity\",\"cash\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"exchange_identity\",\"flx\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"exchange_identity\",\"hyna\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"exchange_identity\",\"io\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"exchange_identity\",\"km\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"exchange_identity\",\"mkts\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"exchange_identity\",\"para\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"exchange_identity\",\"spot\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"exchange_identity\",\"vntl\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"exchange_identity\",\"xyz\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"market_identity\",\"\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"market_identity\",\"abcd\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"market_identity\",\"cash\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"market_identity\",\"flx\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"market_identity\",\"hyna\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"market_identity\",\"io\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"market_identity\",\"km\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"market_identity\",\"mkts\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"market_identity\",\"para\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"market_identity\",\"spot\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"market_identity\",\"vntl\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"market_identity\",\"xyz\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"abcd\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"abcd\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"abcd\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"cash\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"cash\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"cash\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"flx\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"flx\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"flx\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"hyna\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"hyna\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"hyna\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"io\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"io\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"io\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"km\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"km\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"km\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"mkts\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"mkts\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"mkts\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"para\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"para\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"para\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"vntl\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"vntl\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"vntl\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"xyz\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"xyz\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"perp_stats\",\"xyz\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"setup\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"\",\"0G\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.23273",
-            "after_bid": "0.23251",
-            "ask": "0.23273",
+            "after_ask": "0.26672",
+            "after_bid": "0.26631",
+            "ask": "0.26672",
             "attempt": 1,
-            "before_ask": "0.23276",
-            "before_bid": "0.23265",
-            "bid": "0.23251",
-            "elapsed_seconds": 1.2502352929441258,
+            "before_ask": "0.266",
+            "before_bid": "0.26592",
+            "bid": "0.26631",
+            "elapsed_seconds": 1.5960343519691378,
             "ticker_ids_match": true
           }
         ],
@@ -1949,16 +2285,17 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"\",\"2Z\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.051936",
-            "after_bid": "0.051929",
-            "ask": "0.051936",
+            "after_ask": "0.054327",
+            "after_bid": "0.054316",
+            "ask": "0.054327",
             "attempt": 1,
-            "before_ask": "0.051937",
-            "before_bid": "0.051925",
-            "bid": "0.051929",
-            "elapsed_seconds": 1.0512058659805916,
+            "before_ask": "0.054327",
+            "before_bid": "0.054316",
+            "bid": "0.054316",
+            "elapsed_seconds": 1.4142298969672993,
             "ticker_ids_match": true
           }
         ],
@@ -1967,16 +2304,17 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"\",\"AAVE\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "146.23",
-            "after_bid": "146.22",
-            "ask": "146.23",
+            "after_ask": "148.1",
+            "after_bid": "148.06",
+            "ask": "148.08",
             "attempt": 1,
-            "before_ask": "146.24",
-            "before_bid": "146.22",
-            "bid": "146.22",
-            "elapsed_seconds": 1.4149619030067697,
+            "before_ask": "148.09",
+            "before_bid": "148.07",
+            "bid": "148.04",
+            "elapsed_seconds": 1.626506005995907,
             "ticker_ids_match": true
           }
         ],
@@ -1985,16 +2323,17 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"\",\"BTC\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "85546.0",
-            "after_bid": "85545.0",
-            "ask": "85546.0",
+            "after_ask": "85828.0",
+            "after_bid": "85827.0",
+            "ask": "85828.0",
             "attempt": 1,
-            "before_ask": "85556.0",
-            "before_bid": "85555.0",
-            "bid": "85545.0",
-            "elapsed_seconds": 0.984319016977679,
+            "before_ask": "85828.0",
+            "before_bid": "85827.0",
+            "bid": "85827.0",
+            "elapsed_seconds": 1.3673599880421534,
             "ticker_ids_match": true
           }
         ],
@@ -2003,6 +2342,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"abcd\",\"abcd:USA500\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2012,7 +2352,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.046979563019704,
+            "elapsed_seconds": 0.9410332889528945,
             "ticker_ids_match": true
           },
           {
@@ -2023,7 +2363,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.1328302170149982,
+            "elapsed_seconds": 1.1581674109911546,
             "ticker_ids_match": true
           },
           {
@@ -2034,7 +2374,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9803518640110269,
+            "elapsed_seconds": 0.9070158660179004,
             "ticker_ids_match": true
           }
         ],
@@ -2043,6 +2383,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"cash\",\"cash:AMZN\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2052,7 +2393,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0287444540299475,
+            "elapsed_seconds": 1.0185259929858148,
             "ticker_ids_match": true
           },
           {
@@ -2063,7 +2404,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.2785834929673001,
+            "elapsed_seconds": 1.118682530010119,
             "ticker_ids_match": true
           },
           {
@@ -2074,7 +2415,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9855527210165747,
+            "elapsed_seconds": 0.9151232551084831,
             "ticker_ids_match": true
           }
         ],
@@ -2083,6 +2424,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"cash\",\"cash:BTC\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2092,7 +2434,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9899118680041283,
+            "elapsed_seconds": 1.0299436100758612,
             "ticker_ids_match": true
           },
           {
@@ -2103,7 +2445,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0891343739931472,
+            "elapsed_seconds": 1.1502077369950712,
             "ticker_ids_match": true
           },
           {
@@ -2114,7 +2456,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9752220190130174,
+            "elapsed_seconds": 0.9319955590181053,
             "ticker_ids_match": true
           }
         ],
@@ -2123,6 +2465,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"cash\",\"cash:CAR\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2132,7 +2475,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0867823740118183,
+            "elapsed_seconds": 1.1335225970251486,
             "ticker_ids_match": true
           },
           {
@@ -2143,7 +2486,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9832249149912968,
+            "elapsed_seconds": 0.9152749179629609,
             "ticker_ids_match": true
           },
           {
@@ -2154,7 +2497,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9876907599973492,
+            "elapsed_seconds": 0.901116352993995,
             "ticker_ids_match": true
           }
         ],
@@ -2163,6 +2506,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"flx\",\"flx:BTC\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2172,7 +2516,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0003728360170498,
+            "elapsed_seconds": 0.9033795680152252,
             "ticker_ids_match": true
           },
           {
@@ -2183,7 +2527,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.1415145469945855,
+            "elapsed_seconds": 1.135365343070589,
             "ticker_ids_match": true
           },
           {
@@ -2194,7 +2538,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0035364429932088,
+            "elapsed_seconds": 0.9417399560334161,
             "ticker_ids_match": true
           }
         ],
@@ -2203,6 +2547,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"flx\",\"flx:COIN\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2212,7 +2557,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9867182040470652,
+            "elapsed_seconds": 0.9496718000154942,
             "ticker_ids_match": true
           },
           {
@@ -2223,7 +2568,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.2167997779906727,
+            "elapsed_seconds": 0.9117237519240007,
             "ticker_ids_match": true
           },
           {
@@ -2234,7 +2579,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0396405850187875,
+            "elapsed_seconds": 0.9936016059946269,
             "ticker_ids_match": true
           }
         ],
@@ -2243,6 +2588,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"flx\",\"flx:COPPER\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2252,7 +2598,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0187360290437937,
+            "elapsed_seconds": 0.9336993639590219,
             "ticker_ids_match": true
           },
           {
@@ -2263,7 +2609,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0123486840166152,
+            "elapsed_seconds": 0.9218353909673169,
             "ticker_ids_match": true
           },
           {
@@ -2274,7 +2620,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.257602608005982,
+            "elapsed_seconds": 0.9345698909601197,
             "ticker_ids_match": true
           }
         ],
@@ -2283,6 +2629,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"hyna\",\"hyna:1000PEPE\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2292,7 +2639,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.1335245989612304,
+            "elapsed_seconds": 0.9072837440762669,
             "ticker_ids_match": true
           },
           {
@@ -2303,7 +2650,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0246084179962054,
+            "elapsed_seconds": 0.9367693120148033,
             "ticker_ids_match": true
           },
           {
@@ -2314,7 +2661,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0665357889956795,
+            "elapsed_seconds": 0.9218485970050097,
             "ticker_ids_match": true
           }
         ],
@@ -2323,6 +2670,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"hyna\",\"hyna:ADA\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2332,7 +2680,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9847987259854563,
+            "elapsed_seconds": 1.0315894349478185,
             "ticker_ids_match": true
           },
           {
@@ -2343,7 +2691,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9859945860225707,
+            "elapsed_seconds": 1.2266866700956598,
             "ticker_ids_match": true
           },
           {
@@ -2354,7 +2702,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0304197679506615,
+            "elapsed_seconds": 0.9247822019970044,
             "ticker_ids_match": true
           }
         ],
@@ -2363,6 +2711,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"hyna\",\"hyna:BASED\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2372,7 +2721,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.19420241197804,
+            "elapsed_seconds": 0.9274042419856414,
             "ticker_ids_match": true
           },
           {
@@ -2383,7 +2732,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9604295360040851,
+            "elapsed_seconds": 0.9383886540308595,
             "ticker_ids_match": true
           },
           {
@@ -2394,7 +2743,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9773489859653637,
+            "elapsed_seconds": 0.9905535320285708,
             "ticker_ids_match": true
           }
         ],
@@ -2403,16 +2752,17 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"io\",\"io:ANTH\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "2167.2",
-            "after_bid": "2166.9",
-            "ask": "2167.2",
+            "after_ask": "2171.5",
+            "after_bid": "2171.4",
+            "ask": "2171.5",
             "attempt": 1,
-            "before_ask": "2167.2",
-            "before_bid": "2166.9",
-            "bid": "2166.9",
-            "elapsed_seconds": 0.9790757459704764,
+            "before_ask": "2171.5",
+            "before_bid": "2171.4",
+            "bid": "2171.4",
+            "elapsed_seconds": 1.1856872820062563,
             "ticker_ids_match": true
           }
         ],
@@ -2421,16 +2771,17 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"io\",\"io:DRAM\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "61.217",
-            "after_bid": "61.174",
-            "ask": "61.217",
+            "after_ask": "63.076",
+            "after_bid": "63.016",
+            "ask": "63.076",
             "attempt": 1,
-            "before_ask": "61.217",
-            "before_bid": "61.174",
-            "bid": "61.174",
-            "elapsed_seconds": 0.9756096820347011,
+            "before_ask": "63.076",
+            "before_bid": "63.015",
+            "bid": "63.016",
+            "elapsed_seconds": 1.3971513009164482,
             "ticker_ids_match": true
           }
         ],
@@ -2439,16 +2790,17 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"io\",\"io:EWY\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "186.96",
-            "after_bid": "186.7",
-            "ask": "186.96",
+            "after_ask": "188.66",
+            "after_bid": "188.39",
+            "ask": "188.66",
             "attempt": 1,
-            "before_ask": "186.96",
-            "before_bid": "186.69",
-            "bid": "186.7",
-            "elapsed_seconds": 0.9753626270103268,
+            "before_ask": "188.66",
+            "before_bid": "188.39",
+            "bid": "188.39",
+            "elapsed_seconds": 0.9914668559795246,
             "ticker_ids_match": true
           }
         ],
@@ -2457,6 +2809,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"km\",\"km:AAPL\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2466,7 +2819,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0856494899489917,
+            "elapsed_seconds": 0.9094210190232843,
             "ticker_ids_match": true
           },
           {
@@ -2477,7 +2830,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0261469929828309,
+            "elapsed_seconds": 0.908053572056815,
             "ticker_ids_match": true
           },
           {
@@ -2488,7 +2841,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.041797393001616,
+            "elapsed_seconds": 1.1421942780725658,
             "ticker_ids_match": true
           }
         ],
@@ -2497,6 +2850,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"km\",\"km:BABA\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2506,7 +2860,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.1916797789745033,
+            "elapsed_seconds": 0.9489308738848194,
             "ticker_ids_match": true
           },
           {
@@ -2517,7 +2871,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.111677999026142,
+            "elapsed_seconds": 0.9007414849475026,
             "ticker_ids_match": true
           },
           {
@@ -2528,7 +2882,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9779196429881267,
+            "elapsed_seconds": 1.0099286870099604,
             "ticker_ids_match": true
           }
         ],
@@ -2537,6 +2891,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"km\",\"km:BMNR\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2546,7 +2901,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9684758859802969,
+            "elapsed_seconds": 1.1261790910502896,
             "ticker_ids_match": true
           },
           {
@@ -2557,7 +2912,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.1074457420036197,
+            "elapsed_seconds": 1.3236861389596015,
             "ticker_ids_match": true
           },
           {
@@ -2568,7 +2923,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9952042700024322,
+            "elapsed_seconds": 0.9853314820211381,
             "ticker_ids_match": true
           }
         ],
@@ -2577,6 +2932,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"mkts\",\"mkts:AAPL\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2586,7 +2942,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0179853559820913,
+            "elapsed_seconds": 0.9546742360107601,
             "ticker_ids_match": true
           },
           {
@@ -2597,7 +2953,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9997405849862844,
+            "elapsed_seconds": 1.0241919619729742,
             "ticker_ids_match": true
           },
           {
@@ -2608,7 +2964,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0504202719894238,
+            "elapsed_seconds": 1.2305948779685423,
             "ticker_ids_match": true
           }
         ],
@@ -2617,6 +2973,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"mkts\",\"mkts:BABA\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2626,7 +2983,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.988710158970207,
+            "elapsed_seconds": 0.9727990089450032,
             "ticker_ids_match": true
           },
           {
@@ -2637,7 +2994,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9869824650231749,
+            "elapsed_seconds": 0.9711432999465615,
             "ticker_ids_match": true
           },
           {
@@ -2648,7 +3005,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9886308860150166,
+            "elapsed_seconds": 0.9239076829981059,
             "ticker_ids_match": true
           }
         ],
@@ -2657,6 +3014,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"mkts\",\"mkts:BMNR\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2666,7 +3024,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0498464920092374,
+            "elapsed_seconds": 0.9964246019953862,
             "ticker_ids_match": true
           },
           {
@@ -2677,7 +3035,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9777951870346442,
+            "elapsed_seconds": 0.9615335400449112,
             "ticker_ids_match": true
           },
           {
@@ -2688,7 +3046,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0437681169714779,
+            "elapsed_seconds": 1.1251399860484526,
             "ticker_ids_match": true
           }
         ],
@@ -2697,16 +3055,17 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"para\",\"para:10Y\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "4.9717",
-            "after_bid": "4.9575",
-            "ask": "4.9717",
+            "after_ask": "4.9641",
+            "after_bid": "4.9497",
+            "ask": "4.9641",
             "attempt": 1,
-            "before_ask": "4.9717",
-            "before_bid": "4.9575",
-            "bid": "4.9575",
-            "elapsed_seconds": 0.9751572189852595,
+            "before_ask": "4.9641",
+            "before_bid": "4.9497",
+            "bid": "4.9497",
+            "elapsed_seconds": 1.1433973299572244,
             "ticker_ids_match": true
           }
         ],
@@ -2715,6 +3074,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"para\",\"para:2Y\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2724,7 +3084,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.1881902739987709,
+            "elapsed_seconds": 0.979170014965348,
             "ticker_ids_match": true
           },
           {
@@ -2735,7 +3095,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.2424783339956775,
+            "elapsed_seconds": 1.1239212680375203,
             "ticker_ids_match": true
           },
           {
@@ -2746,7 +3106,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.3588864220073447,
+            "elapsed_seconds": 1.1278659029630944,
             "ticker_ids_match": true
           }
         ],
@@ -2755,6 +3115,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"para\",\"para:30Y\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2764,7 +3125,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.3357941780122928,
+            "elapsed_seconds": 1.3062606860185042,
             "ticker_ids_match": true
           },
           {
@@ -2775,7 +3136,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.1495959080057219,
+            "elapsed_seconds": 1.1646273259539157,
             "ticker_ids_match": true
           },
           {
@@ -2786,7 +3147,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.500476551009342,
+            "elapsed_seconds": 1.2118656700477004,
             "ticker_ids_match": true
           }
         ],
@@ -2795,16 +3156,17 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"spot\",\"AAPL/USDC:268\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "340.0",
+            "after_ask": "345.7",
             "after_bid": "306.0",
-            "ask": "340.0",
+            "ask": "345.7",
             "attempt": 1,
-            "before_ask": "340.0",
+            "before_ask": "345.7",
             "before_bid": "306.0",
             "bid": "306.0",
-            "elapsed_seconds": 1.679084105999209,
+            "elapsed_seconds": 1.8073064140044153,
             "ticker_ids_match": true
           }
         ],
@@ -2813,6 +3175,7 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"spot\",\"AAPLX/USDC:713\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2822,7 +3185,7 @@
             "before_ask": null,
             "before_bid": "10.0",
             "bid": "10.0",
-            "elapsed_seconds": 1.4702401860267855,
+            "elapsed_seconds": 1.881421644007787,
             "ticker_ids_match": true
           }
         ],
@@ -2831,16 +3194,17 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"spot\",\"AAVE0/USDC:227\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "147.39",
-            "after_bid": "145.63",
-            "ask": "147.39",
+            "after_ask": "149.54",
+            "after_bid": "144.82",
+            "ask": "149.54",
             "attempt": 1,
-            "before_ask": "147.39",
-            "before_bid": "145.63",
-            "bid": "145.63",
-            "elapsed_seconds": 1.4173952710116282,
+            "before_ask": "149.54",
+            "before_bid": "144.82",
+            "bid": "144.82",
+            "elapsed_seconds": 1.4552476480603218,
             "ticker_ids_match": true
           }
         ],
@@ -2849,16 +3213,17 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"spot\",\"UBTC/USDC:142\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "85484.0",
-            "after_bid": "85471.0",
-            "ask": "85484.0",
+            "after_ask": "85755.0",
+            "after_bid": "85754.0",
+            "ask": "85755.0",
             "attempt": 1,
-            "before_ask": "85472.0",
-            "before_bid": "85471.0",
-            "bid": "85471.0",
-            "elapsed_seconds": 1.32659519900335,
+            "before_ask": "85752.0",
+            "before_bid": "85751.0",
+            "bid": "85754.0",
+            "elapsed_seconds": 1.8271227199584246,
             "ticker_ids_match": true
           }
         ],
@@ -2867,6 +3232,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"vntl\",\"vntl:ANTHROPIC\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2876,7 +3242,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.050118280982133,
+            "elapsed_seconds": 0.9408396440558136,
             "ticker_ids_match": true
           },
           {
@@ -2887,7 +3253,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.4190083389985375,
+            "elapsed_seconds": 1.0786968889879063,
             "ticker_ids_match": true
           },
           {
@@ -2898,7 +3264,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.2090916539891623,
+            "elapsed_seconds": 0.9129042600980029,
             "ticker_ids_match": true
           }
         ],
@@ -2907,6 +3273,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"vntl\",\"vntl:BIOTECH\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2916,7 +3283,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9854704070021398,
+            "elapsed_seconds": 0.9647343240212649,
             "ticker_ids_match": true
           },
           {
@@ -2927,7 +3294,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9949618760147132,
+            "elapsed_seconds": 0.9243793230270967,
             "ticker_ids_match": true
           },
           {
@@ -2938,7 +3305,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9611781840212643,
+            "elapsed_seconds": 1.1346148540033028,
             "ticker_ids_match": true
           }
         ],
@@ -2947,6 +3314,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"vntl\",\"vntl:DEFENSE\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -2956,7 +3324,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.1517999059869908,
+            "elapsed_seconds": 0.9394662919221446,
             "ticker_ids_match": true
           },
           {
@@ -2967,7 +3335,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0119067369960248,
+            "elapsed_seconds": 0.9508658489212394,
             "ticker_ids_match": true
           },
           {
@@ -2978,7 +3346,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9906184040009975,
+            "elapsed_seconds": 0.9360460779862478,
             "ticker_ids_match": true
           }
         ],
@@ -2987,16 +3355,17 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"xyz\",\"xyz:AAOI\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "107.06",
-            "after_bid": "106.99",
-            "ask": "107.09",
+            "after_ask": "106.84",
+            "after_bid": "106.79",
+            "ask": "106.84",
             "attempt": 1,
-            "before_ask": "107.12",
-            "before_bid": "107.07",
-            "bid": "106.99",
-            "elapsed_seconds": 1.4851943510002457,
+            "before_ask": "106.85",
+            "before_bid": "106.78",
+            "bid": "106.79",
+            "elapsed_seconds": 1.1469104209681973,
             "ticker_ids_match": true
           }
         ],
@@ -3005,16 +3374,17 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"xyz\",\"xyz:AAPL\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "336.21",
-            "after_bid": "336.18",
-            "ask": "336.2",
+            "after_ask": "340.34",
+            "after_bid": "340.33",
+            "ask": "340.34",
             "attempt": 1,
-            "before_ask": "336.22",
-            "before_bid": "336.18",
-            "bid": "336.18",
-            "elapsed_seconds": 1.4258675299934112,
+            "before_ask": "340.34",
+            "before_bid": "340.33",
+            "bid": "340.33",
+            "elapsed_seconds": 0.9259614209877327,
             "ticker_ids_match": true
           }
         ],
@@ -3023,6 +3393,7 @@
       {
         "code": "empty_book",
         "id": "[\"ticker_depth\",\"xyz\",\"xyz:ALUMINIUM\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": null,
@@ -3032,7 +3403,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.4904215690330602,
+            "elapsed_seconds": 1.0675705630565062,
             "ticker_ids_match": true
           },
           {
@@ -3043,7 +3414,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.4599269479513168,
+            "elapsed_seconds": 0.9571261829696596,
             "ticker_ids_match": true
           },
           {
@@ -3054,7 +3425,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.982375516963657,
+            "elapsed_seconds": 0.9929292749147862,
             "ticker_ids_match": true
           }
         ],
@@ -3063,216 +3434,252 @@
       {
         "code": "ok",
         "id": "[\"tickers\",\"\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"abcd\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"abcd\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"abcd\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"cash\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"cash\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"cash\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"flx\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"flx\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"flx\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"hyna\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"hyna\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"hyna\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"io\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"io\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"io\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"km\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"km\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"km\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"mkts\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"mkts\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"mkts\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"para\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"para\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"para\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"spot\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"spot\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"spot\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"vntl\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"vntl\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"vntl\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"xyz\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"xyz\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"xyz\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       }
@@ -3610,7 +4017,8 @@
           "RAIN/USDC:716",
           "TREAD/USDC:719",
           "SYN/USDC:720",
-          "ZEC1/USDC:867"
+          "ZEC1/USDC:867",
+          "NAV/USDC:868"
         ]
       },
       {
@@ -3979,7 +4387,8 @@
           "xyz:SNXX",
           "xyz:CVX",
           "xyz:TLT",
-          "xyz:HO"
+          "xyz:HO",
+          "xyz:OURA"
         ]
       },
       {
@@ -4205,6 +4614,6 @@
       }
     ],
     "venue": "hyperliquid",
-    "version": 5
+    "version": 6
   }
 }
