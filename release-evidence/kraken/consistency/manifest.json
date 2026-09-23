@@ -1,6 +1,6 @@
 {
   "after": {
-    "catalogue_sha256": "066c09f09433d6b5d5129b4eb270eb8e471b5b2b5c83ef90e9e94bcffdea0ab0",
+    "catalogue_sha256": "033204478f57bfc6fee6615ac71dd13bee39d6450ed52803b4741808aaf92647",
     "dependencies": {
       "annotated-doc": {
         "files_sha256": "c566fc7785ed355930120476a82a381672cb77f95d528fcc449c758c617fbdc4",
@@ -294,7 +294,7 @@
     "venue": "kraken"
   },
   "before": {
-    "catalogue_sha256": "066c09f09433d6b5d5129b4eb270eb8e471b5b2b5c83ef90e9e94bcffdea0ab0",
+    "catalogue_sha256": "033204478f57bfc6fee6615ac71dd13bee39d6450ed52803b4741808aaf92647",
     "dependencies": {
       "annotated-doc": {
         "files_sha256": "c566fc7785ed355930120476a82a381672cb77f95d528fcc449c758c617fbdc4",
@@ -587,9 +587,9 @@
     "source_sha256": "7ae900bb76daa3fd2048221b57b51fb30368107fbfd395f9ce19fc5520979aa9",
     "venue": "kraken"
   },
-  "finished": "2026-09-23T09:35:23.515659Z",
-  "results_sha256": "39a517d1b4e31087c212017504f42fe475f389663be2e0265ea0107225c17199",
+  "finished": "2026-09-23T10:31:54.591948Z",
+  "results_sha256": "2fcb2fa6408eb1504222c9a1bfb3f9cf8d52f9d5ba96ee6686cbbce7312527b5",
   "schema_version": 1,
-  "started": "2026-09-23T09:35:19.258186Z",
-  "summary_sha256": "6157514040321d9b7fbe9365305ead4173cfc7751a29f4318159307b4788c08d"
+  "started": "2026-09-23T10:31:50.053938Z",
+  "summary_sha256": "bf7c90917d796833bc0323094d2ed8662890f51c01603baa554cdbb94636da22"
 }
