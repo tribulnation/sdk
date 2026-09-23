@@ -17,6 +17,7 @@ from typed_kucoin.schemas import FuturesContract, SpotSymbol
 
 from tribulnation.kucoin import KucoinMarket
 from tribulnation.kucoin.market.common import Shared
+from tribulnation.kucoin.market.exchanges import SpotExchange
 from tribulnation.kucoin.market.markets import LinearPerpMarket, SpotMarket
 from tribulnation.sdk import Context, MarketSDK, NetworkError
 from tribulnation.sdk.market.types.candles import CandleInterval
@@ -352,3 +353,51 @@ async def test_market_sdk_constructs_public_kucoin_without_credentials(
   assert sdk.all_accounts['kucoin'].public
   venue = await sdk.venue('kucoin')
   assert isinstance(venue, KucoinMarket)
+
+
+@pytest.mark.parametrize(
+  'prices',
+  [
+    (None, None, None),
+    (None, D(101), D(100)),
+    (D(99), None, None),
+    (D(0), D(0), D(0)),
+    (D(99), D(101), D(100)),
+  ],
+)
+@pytest.mark.parametrize('size', [None, D(3)])
+async def test_spot_ticker_preserves_nullable_prices_and_sizes(
+  prices: tuple[Decimal | None, Decimal | None, Decimal | None],
+  size: Decimal | None,
+):
+  """Active markets with missing quotes or trades remain present without fake values."""
+  bid, ask, last = prices
+  api = SimpleNamespace(
+    all_tickers=AsyncMock(
+      return_value={
+        'ticker': [
+          {
+            'symbol': 'BTC-USDT',
+            'buy': bid,
+            'sell': ask,
+            'last': last,
+            'bestBidSize': size,
+            'bestAskSize': size,
+            'vol': D(12),
+            'volValue': D(1200),
+          }
+        ]
+      }
+    )
+  )
+  exchange = SpotExchange(shared=shared_client(spot=api))
+  rows = await exchange.tickers()
+  assert set(rows) == {'BTC-USDT'}
+  ticker = rows['BTC-USDT']
+  assert ticker.bid == (bid if bid else None)
+  assert ticker.ask == (ask if ask else None)
+  assert ticker.last == (last if last else None)
+  assert ticker.bid_qty == (size if bid else None)
+  assert ticker.ask_qty == (size if ask else None)
+  assert ticker.base_volume_24h == D(12)
+  assert ticker.quote_volume_24h == D(1200)

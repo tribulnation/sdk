@@ -9,6 +9,11 @@ from .common import Public
 from .markets import LinearPerpMarket, SpotMarket
 
 
+def positive_price(value: Decimal | None) -> Decimal | None:
+  """Preserve absent prices and normalize nonpositive quotes to an empty side."""
+  return value if value is not None and value > 0 else None
+
+
 @dataclass(frozen=True, kw_only=True)
 class SpotExchange(Public, Exchange):
   """Classic spot public market data."""
@@ -45,11 +50,11 @@ class SpotExchange(Public, Exchange):
     rows = await self.shared.call(self.shared.client.spot.all_tickers)
     return {
       r['symbol']: Ticker(
-        last=r['last'] if r['last'] > 0 else None,
-        bid=r['buy'] if r['buy'] > 0 else None,
-        ask=r['sell'] if r['sell'] > 0 else None,
-        bid_qty=r['bestBidSize'] if r['buy'] > 0 else None,
-        ask_qty=r['bestAskSize'] if r['sell'] > 0 else None,
+        last=positive_price(r['last']),
+        bid=positive_price(r['buy']),
+        ask=positive_price(r['sell']),
+        bid_qty=r['bestBidSize'] if positive_price(r['buy']) is not None else None,
+        ask_qty=r['bestAskSize'] if positive_price(r['sell']) is not None else None,
         base_volume_24h=r['vol'],
         quote_volume_24h=r['volValue'],
       )
