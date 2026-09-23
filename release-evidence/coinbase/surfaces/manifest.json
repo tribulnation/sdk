@@ -1,6 +1,6 @@
 {
   "after": {
-    "catalogue_sha256": "066c09f09433d6b5d5129b4eb270eb8e471b5b2b5c83ef90e9e94bcffdea0ab0",
+    "catalogue_sha256": "033204478f57bfc6fee6615ac71dd13bee39d6450ed52803b4741808aaf92647",
     "dependencies": {
       "annotated-doc": {
         "files_sha256": "c566fc7785ed355930120476a82a381672cb77f95d528fcc449c758c617fbdc4",
@@ -309,7 +309,7 @@
     "venue": "coinbase"
   },
   "before": {
-    "catalogue_sha256": "066c09f09433d6b5d5129b4eb270eb8e471b5b2b5c83ef90e9e94bcffdea0ab0",
+    "catalogue_sha256": "033204478f57bfc6fee6615ac71dd13bee39d6450ed52803b4741808aaf92647",
     "dependencies": {
       "annotated-doc": {
         "files_sha256": "c566fc7785ed355930120476a82a381672cb77f95d528fcc449c758c617fbdc4",
@@ -617,9 +617,9 @@
     "source_sha256": "53b44d21a3ec5e448beec2d72bdbb31528a9dcf2c5ff8425c6e355c51b4ee205",
     "venue": "coinbase"
   },
-  "finished": "2026-09-23T09:34:50.828552Z",
+  "finished": "2026-09-23T10:31:23.572245Z",
   "results_sha256": "c32c824052572efec04688631f6c048452f0acdb1791c363e4bd6eec2c77ae3b",
   "schema_version": 1,
-  "started": "2026-09-23T09:34:35.148437Z",
-  "summary_sha256": "196f8918bab338c04c1b6db95c2b4825c50d9269835f58118b890aa3df835db1"
+  "started": "2026-09-23T10:31:02.528952Z",
+  "summary_sha256": "4b5a9f543c632a2eb5826cc4c9490fc8976ceb77251d30fd7ea1ea3ec5f3abe8"
 }
