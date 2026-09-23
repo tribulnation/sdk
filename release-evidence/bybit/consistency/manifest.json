@@ -1,6 +1,6 @@
 {
   "after": {
-    "catalogue_sha256": "066c09f09433d6b5d5129b4eb270eb8e471b5b2b5c83ef90e9e94bcffdea0ab0",
+    "catalogue_sha256": "033204478f57bfc6fee6615ac71dd13bee39d6450ed52803b4741808aaf92647",
     "dependencies": {
       "annotated-doc": {
         "files_sha256": "c566fc7785ed355930120476a82a381672cb77f95d528fcc449c758c617fbdc4",
@@ -294,7 +294,7 @@
     "venue": "bybit"
   },
   "before": {
-    "catalogue_sha256": "066c09f09433d6b5d5129b4eb270eb8e471b5b2b5c83ef90e9e94bcffdea0ab0",
+    "catalogue_sha256": "033204478f57bfc6fee6615ac71dd13bee39d6450ed52803b4741808aaf92647",
     "dependencies": {
       "annotated-doc": {
         "files_sha256": "c566fc7785ed355930120476a82a381672cb77f95d528fcc449c758c617fbdc4",
@@ -587,9 +587,9 @@
     "source_sha256": "554152f650aeb316f2623658c3c6eb26362ffdb7e24b028c09e6d730028088b9",
     "venue": "bybit"
   },
-  "finished": "2026-09-23T09:35:04.180192Z",
-  "results_sha256": "aa6493473670c2d0c233e525c0356b10d230b5e2e435e9fd71a94ec18e193112",
+  "finished": "2026-09-23T10:31:24.622197Z",
+  "results_sha256": "112ee5f997d33bf680adaeecf5e7ba525d5d64b8110d30123c9f6682e2fe9fc0",
   "schema_version": 1,
-  "started": "2026-09-23T09:34:47.790212Z",
-  "summary_sha256": "dfe9dbb556c5e407970a1675a3534c2acadbfbffbb19bf8363ee6966fd66cfa8"
+  "started": "2026-09-23T10:31:04.570948Z",
+  "summary_sha256": "e2b50eb1e66ca4c64c980b74e7b9499dccf7eb982372e739ca43c9ac17be15ed"
 }
