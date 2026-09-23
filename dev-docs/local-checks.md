@@ -109,7 +109,9 @@ Reviewed reports belong in `release-evidence/<venue>/surfaces/` and, for market
 implementations, also `release-evidence/<venue>/consistency/`. Verify a candidate with:
 
 ```sh
-sdk-dev results release sdk --catalogue /path/to/catalogue/data
+git -C /path/to/catalogue worktree add --detach /tmp/sdk-release-catalogue \
+  "$(cat release-evidence/catalogue-ref.txt)"
+sdk-dev results release sdk --catalogue /tmp/sdk-release-catalogue/data
 ```
 
 1. Core SDK releases require all supported read-suite reports for every declared
@@ -117,19 +119,42 @@ sdk-dev results release sdk --catalogue /path/to/catalogue/data
    Individual implementation releases require both applicable scopes for that
    implementation. A report of the wrong scope cannot substitute for required evidence.
 2. Reports expire after seven days and must match current relevant SDK, adapter,
-   test, support and dependency inputs, plus the Catalogue data. Git commit identity
-   alone is insufficient. Reports and generated documentation are not source inputs.
+   test, support and dependency inputs, plus their recorded Catalogue snapshot.
+   `release-evidence/catalogue-ref.txt` pins that snapshot to a full commit SHA.
+   Its actual data must still match every required report's content fingerprint;
+   a commit reference alone is insufficient. Reports and generated documentation
+   are not source inputs.
 3. Verification also checks the installed code, so a matching checkout cannot
    attest a run that imported a different editable installation. Reproduce the
    recorded dependency versions with each report's `dependency-pins.txt`; actual
    content fingerprints still govern. Conflicting report pins require reconciled
    runs, not resolver overrides. Evidence CI uses Python 3.12, matching local runs.
-4. Release PRs check evidence against their candidate and the current Catalogue
-   checkout. Publication verifies it again against the exact merged commit, not
-   whatever newer commit happens to be on `main`. CI makes no exchange API calls
-   and receives no exchange credentials.
+4. Release PRs and publication check out the Catalogue commit recorded in
+   `release-evidence/catalogue-ref.txt`, never its moving `main` branch.
+   Publication verifies the exact merged SDK candidate and its committed pin.
+   Later Catalogue edits do not invalidate the release. CI makes no exchange API
+   calls and receives no exchange credentials.
 5. A passing report is necessary, not release approval. Merge and publication
    still require explicit approval and the other release checks.
+
+### Choosing the qualification snapshot
+
+Use a clean Catalogue checkout for every report in a release evidence set. Before
+recording, save its commit locator:
+
+```sh
+git -C /path/to/catalogue rev-parse HEAD > release-evidence/catalogue-ref.txt
+```
+
+Record and verify using that checkout's `data/` directory, and commit the reference
+alongside the reports. Changing the reference without matching observations will
+fail the existing content-hash and inventory checks. Do not rewrite old report
+fingerprints to match newer Catalogue data.
+
+Checking compatibility with current Catalogue `main` is a separate live check:
+run `sdk-dev test consistency` against a current checkout into a new diagnostic
+output directory. It does not update the release's pin or invalidate otherwise
+current release evidence. See [ADR 0026](adr/0026-pin-qualification-catalogue.md).
 
 ## All supported read-only suites
 

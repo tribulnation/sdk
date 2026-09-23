@@ -86,10 +86,20 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Read the Catalogue snapshot used for qualification
+        id: catalogue
+        shell: bash
+        run: |
+          ref="$(cat release-evidence/catalogue-ref.txt)"
+          if [[ ! "$ref" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Catalogue evidence reference must be a full commit SHA" >&2
+            exit 1
+          fi
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v5
         with:
           repository: tribulnation/catalogue
-          ref: main
+          ref: ${{ steps.catalogue.outputs.ref }}
           path: release-catalogue
 
       # SDK routers type-check against the local implementation packages. Installing
