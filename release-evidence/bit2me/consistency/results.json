@@ -5,160 +5,185 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"B2M/EUR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"B2M/USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"BTC/EUR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"BTC/EURR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"BTC/USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"ETH/EUR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"ETH/USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"EUR/EURR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"EURC/EUR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"USDC/EUR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"B2M/EUR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"B2M/USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"BTC/EUR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"BTC/EURR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"BTC/USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"ETH/EUR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"ETH/USDC\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"EUR/EURR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"EURC/EUR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"USDC/EUR\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"discovery\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"exchange_identity\",\"spot\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"market_identity\",\"spot\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"setup\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"spot\",\"1INCH/EUR\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.0908",
-            "after_bid": "0.0906",
-            "ask": "0.0911",
+            "after_ask": "0.0919",
+            "after_bid": "0.0918",
+            "ask": "0.092",
             "attempt": 1,
-            "before_ask": "0.0908",
-            "before_bid": "0.0906",
-            "bid": "0.091",
-            "elapsed_seconds": 0.13980032200925052,
+            "before_ask": "0.0919",
+            "before_bid": "0.0918",
+            "bid": "0.0919",
+            "elapsed_seconds": 0.15952993801329285,
             "ticker_ids_match": true
           }
         ],
@@ -167,6 +192,7 @@
       {
         "code": "native_ticker_quotes",
         "id": "[\"ticker_depth\",\"spot\",\"A1X/USDC\"]",
+        "missing_data": null,
         "quotes": [
           {
             "after_ask": "0.0005999",
@@ -176,7 +202,7 @@
             "before_ask": "0.0005999",
             "before_bid": null,
             "bid": "0.0",
-            "elapsed_seconds": 0.1320110319647938,
+            "elapsed_seconds": 0.1385705809807405,
             "ticker_ids_match": true
           },
           {
@@ -187,7 +213,7 @@
             "before_ask": "0.0005999",
             "before_bid": null,
             "bid": "0.0",
-            "elapsed_seconds": 0.13494352798443288,
+            "elapsed_seconds": 0.1487181450938806,
             "ticker_ids_match": true
           },
           {
@@ -198,7 +224,7 @@
             "before_ask": "0.0005999",
             "before_bid": null,
             "bid": "0.0",
-            "elapsed_seconds": 0.1240558479912579,
+            "elapsed_seconds": 0.13875674596056342,
             "ticker_ids_match": true
           }
         ],
@@ -207,16 +233,17 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"spot\",\"AAVE/EUR\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "130.81",
-            "after_bid": "130.61",
-            "ask": "130.37",
+            "after_ask": "131.58",
+            "after_bid": "131.47",
+            "ask": "131.57",
             "attempt": 1,
-            "before_ask": "130.81",
-            "before_bid": "130.61",
-            "bid": "130.17",
-            "elapsed_seconds": 0.12227285001426935,
+            "before_ask": "131.58",
+            "before_bid": "131.47",
+            "bid": "131.44",
+            "elapsed_seconds": 0.15883133094757795,
             "ticker_ids_match": true
           }
         ],
@@ -225,16 +252,17 @@
       {
         "code": "ok",
         "id": "[\"ticker_depth\",\"spot\",\"BTC/EUR\"]",
+        "missing_data": null,
         "quotes": [
           {
-            "after_ask": "75111.0",
-            "after_bid": "75110.9",
-            "ask": "75113.5",
+            "after_ask": "75349.0",
+            "after_bid": "75348.9",
+            "ask": "75349.0",
             "attempt": 1,
-            "before_ask": "75113.4",
-            "before_bid": "75112.6",
-            "bid": "75112.2",
-            "elapsed_seconds": 0.12674192094709724,
+            "before_ask": "75349.0",
+            "before_bid": "75348.9",
+            "bid": "75348.9",
+            "elapsed_seconds": 0.1534133478999138,
             "ticker_ids_match": true
           }
         ],
@@ -243,18 +271,21 @@
       {
         "code": "ok",
         "id": "[\"tickers\",\"spot\",\"bulk\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"spot\",\"empty\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
         "id": "[\"tickers\",\"spot\",\"selected\"]",
+        "missing_data": null,
         "quotes": [],
         "status": "pass"
       }
@@ -555,6 +586,6 @@
       }
     ],
     "venue": "bit2me",
-    "version": 5
+    "version": 6
   }
 }
