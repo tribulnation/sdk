@@ -337,6 +337,58 @@ class Aster(BaseAccount):
 
 
 @_dataclass
+class Lighter(BaseAccount):
+  """Lighter account and API key, isolated by network."""
+
+  venue: _Literal['lighter', 'lighter_testnet'] = 'lighter'
+  account_index: int | str | None = None
+  """Account index; defaults to the network's `ACCOUNT_INDEX` variable."""
+  api_key_index: int | str | None = None
+  """API key slot; defaults to the network's `API_KEY_INDEX` variable."""
+  api_private_key: str | None = None
+  """API key private key; defaults to the network's `API_PRIVATE_KEY` variable."""
+  validate: bool = True
+  """Whether to type-validate incoming responses."""
+
+  @property
+  def prefix(self) -> str:
+    """The credential variables' prefix: `LIGHTER` on mainnet, `LIGHTER_TESTNET`."""
+    return 'LIGHTER' if self.venue == 'lighter' else 'LIGHTER_TESTNET'
+
+  def resolve_int(self, value: int | str | None, name: str) -> int | None:
+    """An integer setting, or the network's variable when unset."""
+    if isinstance(value, int):
+      return value
+    resolved = resolve_env_var(
+      value or f'${self.prefix}_{name}', require=not self.public
+    )
+    return None if resolved is None else int(resolved)
+
+  @property
+  def resolved_account_index(self) -> int | None:
+    """The account index."""
+    return self.resolve_int(self.account_index, 'ACCOUNT_INDEX')
+
+  @property
+  def resolved_api_key_index(self) -> int | None:
+    """The API key slot."""
+    return self.resolve_int(self.api_key_index, 'API_KEY_INDEX')
+
+  @property
+  def resolved_api_private_key(self) -> str | None:
+    """The API key's private key, never mixing networks."""
+    return resolve_env_var(
+      self.api_private_key or f'${self.prefix}_API_PRIVATE_KEY', require=not self.public
+    )
+
+  def verify_env_vars(self):
+    """Fail before constructing private clients when credentials are missing."""
+    self.resolved_account_index
+    self.resolved_api_key_index
+    self.resolved_api_private_key
+
+
+@_dataclass
 class Evm(BaseAccount):
   Venue = _Literal[
     'ethereum',
@@ -374,6 +426,7 @@ Account = _Annotated[
   | Kucoin
   | Deribit
   | Aster
+  | Lighter
   | Evm,
   _pydantic.Discriminator('venue'),
 ]

@@ -9,8 +9,13 @@ from .fees import Fees
 @dataclass(kw_only=True)
 class Rules:
   """Trading constraints; base and quote identities belong to the Catalogue."""
-  fee_asset: str
-  """Asset used for fees/funding payments."""
+
+  fee_asset: str | None
+  """Asset trading fees and funding are paid in, or `None` when it depends on the fill.
+
+  `None` is for venues charging fees in the asset each fill delivers (spot base on a
+  buy, quote on a sell); `Trade.fee.asset` then names it per fill.
+  """
   tick_size: Decimal
   """Tick size of the price (in quote units)."""
   step_size: Decimal

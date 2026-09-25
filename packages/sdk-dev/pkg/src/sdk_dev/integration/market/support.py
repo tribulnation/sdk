@@ -6,6 +6,8 @@ from datetime import datetime, timedelta, timezone
 
 from tribulnation.sdk.market import Candle
 
+from ..accounts import package_of
+
 END = (datetime.now(timezone.utc) - timedelta(days=1)).replace(
   minute=0,
   second=0,
@@ -79,8 +81,24 @@ CASES: Mapping[str, Sequence[CandleCase]] = {
     CandleCase(market_id='spot:XBTUSD', page=None),
     CandleCase(market_id='perp:PF_XBTUSD', page=2000),
   ],
+  # Numeric market ids differ by network: BTC and ETH/USDC are 1 and 2048 on mainnet.
+  'lighter': [
+    CandleCase(market_id='perp:1', page=500),
+    CandleCase(market_id='spot:2048', page=500),
+  ],
+  # Testnet serves thousands of candles per response, so one page cannot straddle two.
+  'lighter_testnet': [
+    CandleCase(market_id='perp:4096', page=None),
+    CandleCase(market_id='spot:4098', page=None),
+  ],
 }
-"""The BTC market(s) to fetch per venue slug, for every venue implementing `candles`."""
+"""The BTC market(s) to fetch per venue slug (or per network, where ids differ by
+network), for every venue implementing `candles`."""
+
+
+def cases_of(venue: str) -> Sequence[CandleCase]:
+  """The candle cases of a router venue: its network's own, else its package's."""
+  return CASES.get(venue) or CASES.get(package_of(venue), [])
 
 
 @dataclass(frozen=True, kw_only=True)

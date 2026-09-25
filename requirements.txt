@@ -20,3 +20,4 @@ pytest-asyncio
 -e packages/impl/kucoin/pkg
 -e packages/impl/deribit/pkg
 -e packages/impl/aster/pkg
+-e packages/impl/lighter/pkg

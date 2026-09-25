@@ -33,11 +33,8 @@ from ..accounts import (
 from ..support import describe_exception
 from ..runtime import loop_of
 from .conftest import market_sdk
-from .support import CASES, END
+from .support import END, cases_of
 
-MARKETS = {
-  **{venue: [case.market_id for case in cases] for venue, cases in CASES.items()},
-}
 READS = (
   'exchanges',
   'markets',
@@ -87,7 +84,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
     for account in selected_accounts(
       metafunc.config, sdk.all_accounts, surface='market'
     )
-    for market in MARKETS.get(package_of(sdk.all_accounts[account].venue), [])
+    for market in [c.market_id for c in cases_of(sdk.all_accounts[account].venue)]
   ]
   metafunc.parametrize('public_market', ids, ids=ids, scope='module')
 
@@ -248,7 +245,7 @@ def test_public_read(public_result: PublicResults, public_market: str, method: s
         value.fees.taker_sell,
       ):
         assert isinstance(rate, Decimal) and rate.is_finite()
-    assert value.fee_asset
+    assert value.fee_asset is None or value.fee_asset
     assert value.tick_size.is_finite() and value.tick_size > 0
     assert value.step_size.is_finite() and value.step_size > 0
   elif method == 'tickers':
