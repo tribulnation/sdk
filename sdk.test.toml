@@ -1,32 +1,21 @@
-[accounts.dydx]
-venue = "dydx_testnet"
-address = "$DYDX_TESTNET_ADDRESS"
-mnemonic = "$DYDX_TESTNET_MNEMONIC"
+# Accounts for integration tests and release qualification. No secrets: `$VAR` values
+# resolve from the `.env` beside this file. Mainnet accounts are named by venue slug, so
+# `sdk-dev test surfaces|consistency <venue> --accounts sdk.test.toml` selects them
+# without `--account`; Bitget and Deribit need explicit accounts (dev-docs/local-checks.md).
 
-[accounts.hyperliquid]
-venue = "hyperliquid_testnet"
-address = "$HYPERLIQUID_TESTNET_ADDRESS"
-private_key = "$HYPERLIQUID_TESTNET_PRIVATE_KEY"
+[accounts.aster]
+venue = "aster"
+public = true
 
-[accounts.mexc]
-venue = "mexc"
-api_key = "$MEXC_API_KEY"
-api_secret = "$MEXC_API_SECRET"
+[accounts.binance]
+venue = "binance"
+api_key = "$BINANCE_API_KEY"
+secret_key = "$BINANCE_SECRET_KEY"
 
 [accounts.bit2me]
 venue = "bit2me"
 api_key = "$BIT2ME_API_KEY"
 api_secret = "$BIT2ME_SECRET_KEY"
-
-[accounts.kraken]
-venue = "kraken"
-api_key = "$KRAKEN_API_KEY"
-private_key = "$KRAKEN_PRIVATE_KEY"
-
-[accounts.bybit]
-venue = "bybit"
-api_key = "$BYBIT_API_KEY"
-api_secret = "$BYBIT_API_SECRET"
 
 [accounts.bitget_classic]
 venue = "bitget"
@@ -42,15 +31,48 @@ secret_key = "$BITGET_UTA_SECRET_KEY"
 passphrase = "$BITGET_UTA_PASSPHRASE"
 uta = true
 
-[accounts.binance]
-venue = "binance"
-api_key = "$BINANCE_API_KEY"
-secret_key = "$BINANCE_SECRET_KEY"
+[accounts.bybit]
+venue = "bybit"
+api_key = "$BYBIT_API_KEY"
+api_secret = "$BYBIT_API_SECRET"
 
 [accounts.coinbase]
 venue = "coinbase"
 key_name = "$COINBASE_API_KEY_NAME"
 private_key = "$COINBASE_PRIVATE_KEY"
+
+[accounts.deribit_public]
+venue = "deribit"
+public = true
+
+[accounts.dydx]
+venue = "dydx"
+address = "$DYDX_ADDRESS"
+public = true
+
+[accounts.hyperliquid]
+venue = "hyperliquid"
+address = "$HYPERLIQUID_ADDRESS"
+public = true
+
+[accounts.kraken]
+venue = "kraken"
+api_key = "$KRAKEN_API_KEY"
+private_key = "$KRAKEN_PRIVATE_KEY"
+
+[accounts.kucoin]
+venue = "kucoin"
+
+[accounts.lighter]
+venue = "lighter"
+public = true
+
+[accounts.mexc]
+venue = "mexc"
+api_key = "$MEXC_ACCESS_KEY"
+api_secret = "$MEXC_SECRET_KEY"
+
+# EVM chains share one address.
 
 [accounts.ethereum]
 venue = "ethereum"
@@ -84,5 +106,20 @@ address = "$EVM_ADDRESS"
 venue = "hyperevm"
 address = "$EVM_ADDRESS"
 
-[accounts.lighter]
+# Testnets. Never selected by a mainnet venue slug; name them explicitly.
+
+[accounts.deribit_testnet]
+venue = "deribit_testnet"
+
+[accounts.dydx_testnet]
+venue = "dydx_testnet"
+address = "$DYDX_TESTNET_ADDRESS"
+mnemonic = "$DYDX_TESTNET_MNEMONIC"
+
+[accounts.hyperliquid_testnet]
+venue = "hyperliquid_testnet"
+address = "$HYPERLIQUID_TESTNET_ADDRESS"
+private_key = "$HYPERLIQUID_TESTNET_PRIVATE_KEY"
+
+[accounts.lighter_testnet]
 venue = "lighter_testnet"

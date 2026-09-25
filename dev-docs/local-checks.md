@@ -17,6 +17,26 @@ cannot compile. CI uses this same build recipe. This avoids comparing a locally
 pure build with a CI-compiled extension; installed contents are still fingerprinted.
 Run this before recording evidence, never modify dependencies during a live run.
 
+## Qualification accounts
+
+Record evidence with the tracked `sdk.test.toml`; do not write per-release accounts
+files. It holds no secrets: `$VAR` values resolve from the `.env` in the accounts
+file's own directory, so an accounts file elsewhere silently runs without credentials.
+
+1. Each mainnet account is named by its venue slug and is the only configured
+   account of that venue, so `sdk-dev test surfaces|consistency <venue>` selects it
+   without `--account`. dYdX, Hyperliquid, Lighter and Aster are `public = true`;
+   dYdX and Hyperliquid carry the mainnet address their Report reads need.
+2. Testnet accounts use `<venue>_testnet` ids and venues, so no mainnet slug
+   selects them. Name them explicitly for testnet diagnostics.
+3. Bitget has two mainnet accounts, each with an explicit `uta` mode. Qualify with
+   `--account bitget_classic`, the mode current evidence records.
+4. Deribit's split qualification pairs `deribit_public` with `deribit_testnet`
+   (see below).
+
+`packages/sdk-dev/test/test_qualification_accounts.py` enforces this layout for every
+venue the SDK release requires.
+
 ## Run and verify
 
 ```sh
