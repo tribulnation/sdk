@@ -40,6 +40,6 @@ for account, sdk in earn.all.items():
 
 ---
 
-← [Deribit Market](../market/implementations/deribit.md) · **Next:** [Methods](methods.md) →
+← [Lighter Market](../market/implementations/lighter.md) · **Next:** [Methods](methods.md) →
 
 <!-- /next -->

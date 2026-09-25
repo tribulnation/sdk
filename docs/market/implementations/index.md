@@ -24,6 +24,7 @@ Per-method differences are on the [Methods](../methods.md) page, under each meth
 - [Kraken](kraken.md) — spot only, read only; altname market ids
 
 - [Deribit](deribit.md) — public spot and linear perpetuals; four intraday candle intervals
+- [Lighter](lighter.md) — perpetuals and spot; numeric market ids, unified accounts for spot collateral
 
 <!-- next -->
 
