@@ -40,14 +40,12 @@ print(
 
 
 # %%
-# Unavailable: blocked by missing documented BAPI asset catalogues; see typed-client-issues.md
+# Not yet mapped: typed-aster 0.2.0 exposes client.bapi.wallet.deposit_assets
 async def deposit_methods(
   *, assets: Collection[str] | None = None
 ) -> Sequence[DepositMethod]:
-  """Leave the deposit catalogue unmapped instead of guessing asset/network pairs."""
-  raise NotImplementedError(
-    'Aster lacks the documented deposit and withdrawal asset catalogues'
-  )
+  """Leave the deposit catalogue unmapped until the mainnet-only BAPI is qualified."""
+  raise NotImplementedError('Aster deposit catalogue is not mapped yet')
 
 
 try:
@@ -65,14 +63,12 @@ else:
 
 
 # %%
-# Unavailable: blocked by missing documented BAPI asset catalogues; see typed-client-issues.md
+# Not yet mapped: typed-aster 0.2.0 exposes client.bapi.wallet.withdraw_assets
 async def withdrawal_methods(
   *, assets: Collection[str] | None = None, networks: Collection[str] | None = None
 ) -> Sequence[WithdrawalMethod]:
-  """Wait for a usable native withdrawal catalogue on testnet."""
-  raise NotImplementedError(
-    'Aster lacks the documented deposit and withdrawal asset catalogues'
-  )
+  """Leave the withdrawal catalogue unmapped until the mainnet-only BAPI is qualified."""
+  raise NotImplementedError('Aster withdrawal catalogue is not mapped yet')
 
 
 try:
@@ -88,8 +84,8 @@ else:
 #
 # | method | status | note |
 # |---|---|---|
-# | `deposit_methods` | blocked | Aster lacks the documented deposit and withdrawal asset catalogues; typed-client-issues.md |
-# | `withdrawal_methods` | blocked | Same missing catalogues; account-scoped withdrawal-info also returns a testnet venue error |
+# | `deposit_methods` | not attempted | typed-aster 0.2.0 adds the mainnet-only BAPI catalogue; mapping deferred to a follow-up |
+# | `withdrawal_methods` | not attempted | Same; account-scoped withdrawal-info also returns a testnet venue error |
 #
 # The probe below records the venue rejection separately from a typed validation issue:
 # code -1000 initially, and a gateway timeout on a subsequent run. No withdrawal or

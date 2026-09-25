@@ -19,6 +19,7 @@ from eth_utils.address import is_address, to_checksum_address
 from typed_aster import Aster
 from typed_aster.core.auth import Credentials, parse_wallet
 from typed_aster.core.base import ChainClients, SurfaceClients
+from typed_aster.core.transport.bapi import BapiClient
 from typed_aster.futures.market.exchange_info import FuturesSymbol
 from typed_aster.spot.market.exchange_info import SpotSymbol
 from tribulnation.sdk.core import (
@@ -76,6 +77,7 @@ def new_client(
     spot_clients=surface('spot', True),
     prediction_clients=surface('prediction', False),
     chain_clients=ChainClients.build(credentials=None, validate=validate),
+    bapi_client=BapiClient(validate=validate),
   )
 
 

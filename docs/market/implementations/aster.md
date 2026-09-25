@@ -57,9 +57,11 @@ never falls back to mainnet variables. `validate` toggles response validation.
   account's listen key concurrently.
 - Perpetual position and collateral support one-way (not hedge-mode) positions on the
   cross-margin bucket. Isolated-margin collateral raises `NotImplementedError`.
+- `perp_stats` joins the bulk premium index with the funding configuration in two
+  requests. Aster has no bulk open-interest source, so `open_interest` is `None`; a
+  symbol without a published funding interval reports `funding_interval=None`.
 - Unsupported, raising `NotImplementedError`: spot position and collateral, trade
-  history, funding payments, bulk `perp_stats`, `available_notional` and
-  `perp_collateral`.
+  history, funding payments, `available_notional` and `perp_collateral`.
 - Public reads are verified on mainnet. Account and trading methods are verified on
   testnet only.
 

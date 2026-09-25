@@ -1,14 +1,16 @@
 """Cached symbol metadata, missing-symbol errors and native request sizing."""
 
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from unittest.mock import AsyncMock
 from typing_extensions import Any
 import pytest
 from typed_aster.futures.market.depth import Depth as FuturesDepth
 from typed_aster.futures.market.exchange_info import ExchangeInfoEndpoint
+from typed_aster.futures.market.funding_info import FundingInfoEndpoint
 from typed_aster.futures.market.premium_index import PremiumIndex
 from tribulnation.aster import AsterMarket
-from tribulnation.aster.market.exchanges import join_tickers
+from tribulnation.aster.market.exchanges import join_perp_stats, join_tickers
 from tribulnation.aster.market.markets import PerpMarket, error_code
 from tribulnation.sdk import BadRequest
 from tribulnation.sdk.core import MissingData
@@ -112,3 +114,46 @@ def test_empty_ticker_sides_are_none():
   ticker = join_tickers(stats, quotes, {'ALLOUSDT'})['ALLOUSDT']
   assert ticker.bid == Decimal('0.2') and ticker.bid_qty == 5
   assert ticker.ask is None and ticker.ask_qty is None and ticker.last is None
+
+
+def test_perp_stats_join_premiums_with_intervals():
+  """Bulk rows are restricted to the selected symbols; a null interval stays `None`."""
+  time = datetime(2026, 9, 25, 16, tzinfo=timezone.utc)
+  premiums: list[Any] = [
+    {
+      'symbol': symbol,
+      'markPrice': Decimal(101),
+      'indexPrice': Decimal(100),
+      'lastFundingRate': Decimal('0.0001'),
+      'nextFundingTime': time,
+    }
+    for symbol in ('BTCUSDT', 'SUSHIUSDT', 'OLDUSDT')
+  ]
+  configs: list[Any] = [
+    {'symbol': 'BTCUSDT', 'fundingIntervalHours': 8},
+    {'symbol': 'SUSHIUSDT', 'fundingIntervalHours': None},
+  ]
+  stats = join_perp_stats(premiums, configs, {'BTCUSDT', 'SUSHIUSDT', 'ETHUSDT'})
+  assert set(stats) == {'BTCUSDT', 'SUSHIUSDT'}
+  btc = stats['BTCUSDT']
+  assert btc.index == 100 and btc.mark == 101 and btc.funding == Decimal('0.0001')
+  assert btc.next_funding_time == time and btc.funding_interval == timedelta(hours=8)
+  assert btc.open_interest is None
+  assert stats['SUSHIUSDT'].funding_interval is None
+
+
+async def test_null_funding_interval_is_missing_data(monkeypatch: pytest.MonkeyPatch):
+  """A single-market read cannot report a null interval, so it fails loudly."""
+  premium: dict[str, Any] = {
+    'symbol': 'BTCUSDT',
+    'lastFundingRate': Decimal(0),
+    'nextFundingTime': datetime(2026, 9, 25, tzinfo=timezone.utc),
+  }
+  config: dict[str, Any] = {'symbol': 'BTCUSDT', 'fundingIntervalHours': None}
+  monkeypatch.setattr(PremiumIndex, 'premium_index', AsyncMock(return_value=premium))
+  monkeypatch.setattr(
+    FundingInfoEndpoint, 'funding_info', AsyncMock(return_value=[config])
+  )
+  market = PerpMarket(shared=AsterMarket.new(public=True).shared, symbol='BTCUSDT')
+  with pytest.raises(MissingData, match='no interval'):
+    await market.next_funding()

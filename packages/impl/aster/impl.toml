@@ -5,9 +5,9 @@ methods = [
   "depth", "depth_stream", "tickers", "rules", "fees", "candles",
   "query_order", "open_orders", "trades_stream", "position", "collateral",
   "place_order", "place_orders", "cancel_order", "cancel_orders", "cancel_open_orders",
-  "index", "next_funding", "funding_rates", "perp_position",
+  "index", "next_funding", "funding_rates", "perp_stats", "perp_position",
 ]
-note = "Spot and linear perpetuals. Public reads are verified on mainnet; account and trading methods only on testnet. MARKET ignores the SDK price; LIMIT uses GTC and POST_ONLY uses GTX. Depth streams carry up to 20 levels. Position and collateral cover one-way, cross-margin perpetuals only. Unsupported: spot balances, trade history, funding payments, bulk perp_stats, available_notional and perp_collateral."
+note = "Spot and linear perpetuals. Public reads are verified on mainnet; account and trading methods only on testnet. MARKET ignores the SDK price; LIMIT uses GTC and POST_ONLY uses GTX. Depth streams carry up to 20 levels. Position and collateral cover one-way, cross-margin perpetuals only. perp_stats reports no open interest. Unsupported: spot balances, trade history, funding payments, available_notional and perp_collateral."
 
 [support.report]
 support = "none"

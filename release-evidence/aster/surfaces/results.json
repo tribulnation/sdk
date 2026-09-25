@@ -220,11 +220,11 @@
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": null,
         "failed": 0,
         "id": "market.test_public_read[\"perp:BTCUSDT\", \"perp_stats\"]",
         "network": "mainnet",
-        "passed": 0,
+        "passed": 1,
         "skipped": 0
       }
     ],

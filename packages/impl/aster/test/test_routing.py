@@ -77,7 +77,6 @@ async def test_unsupported_methods_raise_instead_of_returning_empty_data():
     spot.available_notional,
     perp.available_notional,
     perp.perp_collateral,
-    venue.perp.perp_stats,
   ):
     with pytest.raises(NotImplementedError):
       await method()

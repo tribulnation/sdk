@@ -1,6 +1,8 @@
 # Aster Market qualification
 
-Aster 0.1.0 adds spot and linear perpetual Market support on `typed-aster` 0.1.0.
+Aster 0.1.0 added spot and linear perpetual Market support on `typed-aster` 0.1.0.
+Aster 0.2.0 moves to `typed-aster` 0.2.0, adds bulk `perp_stats` and supports Python
+3.10.
 Public reads are release-qualified on mainnet. Account and trading methods, and the
 unrouted `Report`, are verified on testnet only; release evidence cannot attest them
 because the release gate accepts mainnet observations only.
@@ -16,6 +18,7 @@ because the release gate accepts mainnet observations only.
 | Depth stream | 1–20 levels | One shared 20-level `partial_depth` stream per symbol |
 | Candles | Six SDK intervals | `klines`, half-open 500-candle windows retried individually |
 | Funding | Index, next funding, settled rates | `premium_index`, per-symbol `funding_info`, `funding_rate_paged` |
+| Perpetual stats | All or selected contracts; no open interest | Unfiltered `premium_index` joined with unfiltered `funding_info` |
 | Orders | MARKET, LIMIT (GTC), POST_ONLY (GTX); query, open, cancel | Batch cancellation in native chunks of ten |
 | Fills | Shared account stream per exchange | Listen key renewed every 25 minutes, closed with the last subscriber |
 | Perpetual account | One-way position; cross-margin collateral | `position.risk`, `account.info_with_join_margin` |
@@ -29,17 +32,17 @@ resolves `ASTER_*` for `aster` and `TEST_ASTER_*` for `aster_testnet`, never mix
 
 ## Unsupported methods and why
 
-1. Trade history: `user_trades_paged` adds `fromId` while keeping the time filters,
-   which the venue rejects (`-1106`). See `typed-client-issues.md`.
-2. Bulk `perp_stats`: the unfiltered `funding_info` response has null fields that fail
-   validation. See `typed-client-issues.md`.
-3. Spot position and collateral: on testnet, `spot.account.info()` returned
+1. Trade history: `typed-aster` 0.1.0's `user_trades_paged` added `fromId` while
+   keeping the time filters, which the venue rejects (`-1106`). 0.2.0 fixes the
+   pager, but the mapping is not yet qualified, and spot is additionally blocked by
+   the missing buy fills below.
+2. Spot position and collateral: on testnet, `spot.account.info()` returned
    `balances=[]` after a confirmed 250 USDT transfer and filled orders, while the
    WebSocket reported nonzero balances. Zero would hide known holdings.
-4. Funding payments: only empty responses have been observed.
-5. `available_notional` and `perp_collateral`: the API publishes neither account-side
+3. Funding payments: only empty responses have been observed.
+4. `available_notional` and `perp_collateral`: the API publishes neither account-side
    buying capacity nor actual (rather than configured) leverage.
-6. Report snapshots, for the same reason as spot balances. Report history maps the
+5. Report snapshots, for the same reason as spot balances. Report history maps the
    perpetual income and spot transaction ledgers to `UnknownObservation`; one spot
    transaction ID spans several asset/type legs, so record IDs include both.
 
@@ -54,6 +57,11 @@ resolves `ASTER_*` for `aster` and `TEST_ASTER_*` for `aster_testnet`, never mix
 3. Fees were paid in the native asset of the fill: perpetuals in ASTER, spot buys in
    ASTER and spot sells in USDT.
 4. `futures.wallet.withdraw_info()` returned `-1000` or gateway timeouts.
+5. The unfiltered `funding_info` response carried null `fundingIntervalHours`,
+   `fundingFeeCap` and `fundingFeeFloor` for 501 of 758 rows, all symbols absent from
+   testnet exchange information. Mainnet rows were complete. `typed-aster` 0.2.0
+   accepts the nulls; bulk `perp_stats` reports them as `funding_interval=None` and
+   `next_funding` raises `MissingData`.
 
 ## PoC and live checks
 
