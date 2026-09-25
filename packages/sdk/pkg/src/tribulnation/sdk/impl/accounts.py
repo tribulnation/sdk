@@ -1,8 +1,13 @@
 from typing_extensions import Literal as _Literal, Annotated as _Annotated
 from dataclasses import dataclass as _dataclass
 from pathlib import Path as _Path
-import tomllib as _tomllib
+import sys as _sys
 import pydantic as _pydantic
+
+if _sys.version_info >= (3, 11):
+  import tomllib as _tomllib
+else:
+  import tomli as _tomllib
 
 
 def resolve_env_var(value: str | None, *, require: bool) -> str | None:
