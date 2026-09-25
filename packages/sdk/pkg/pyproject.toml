@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tribulnation-sdk"
-version = "2.6.0"
+version = "2.6.1"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
@@ -28,7 +28,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-aster = ["tribulnation-aster>=0.1.0"]
+aster = ["tribulnation-aster>=0.2.0"]
 lighter = ["tribulnation-lighter>=0.1.0"]
 mexc = ["tribulnation-mexc>=2.0.0"]
 dydx = ["tribulnation-dydx>=0.7.0"]
