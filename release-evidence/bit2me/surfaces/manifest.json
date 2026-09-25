@@ -253,9 +253,9 @@
         "version": "0.3.3"
       },
       "tribulnation-sdk": {
-        "files_sha256": "85f086900d989b60d7dfc495a724748243ce3584f68d1ed618a4756e5be88d17",
-        "metadata_sha256": "79d5a2571d1f7b7c9d6065330a5b6fd2305416d0b3e3fa1950c2b6069ee23464",
-        "version": "2.6.0"
+        "files_sha256": "74b2342c67d0a962e0509b98738873f3e4374ddf39910af601f5f1cc02e49707",
+        "metadata_sha256": "298a2623ddc4125306a40c2fc9ef255c4a9b60dbf9c7d4342713bf7d9f64dae7",
+        "version": "2.6.1"
       },
       "typed-bit2me": {
         "files_sha256": "880a8eb211c0a6341a4d10383acb282a76ce109ce14bce3fcb4f004dcabe9f23",
@@ -290,7 +290,7 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "4ef270856af336a751132417dfc19cd18b380600da7c07fdd474bbac952ea7e7",
+    "source_sha256": "269a85d83d2cb5fd44f096d1000f9b3e6ea1c899ff1f03000c536433c0938321",
     "venue": "bit2me"
   },
   "before": {
@@ -547,9 +547,9 @@
         "version": "0.3.3"
       },
       "tribulnation-sdk": {
-        "files_sha256": "85f086900d989b60d7dfc495a724748243ce3584f68d1ed618a4756e5be88d17",
-        "metadata_sha256": "79d5a2571d1f7b7c9d6065330a5b6fd2305416d0b3e3fa1950c2b6069ee23464",
-        "version": "2.6.0"
+        "files_sha256": "74b2342c67d0a962e0509b98738873f3e4374ddf39910af601f5f1cc02e49707",
+        "metadata_sha256": "298a2623ddc4125306a40c2fc9ef255c4a9b60dbf9c7d4342713bf7d9f64dae7",
+        "version": "2.6.1"
       },
       "typed-bit2me": {
         "files_sha256": "880a8eb211c0a6341a4d10383acb282a76ce109ce14bce3fcb4f004dcabe9f23",
@@ -584,12 +584,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "4ef270856af336a751132417dfc19cd18b380600da7c07fdd474bbac952ea7e7",
+    "source_sha256": "269a85d83d2cb5fd44f096d1000f9b3e6ea1c899ff1f03000c536433c0938321",
     "venue": "bit2me"
   },
-  "finished": "2026-09-25T19:25:08.354882Z",
+  "finished": "2026-09-25T21:45:03.716233Z",
   "results_sha256": "9d2e02e58135b3508d6b7bc39f29e0e6f9d8522d4c8e43afe6603776be039fda",
   "schema_version": 1,
-  "started": "2026-09-25T19:24:53.193729Z",
-  "summary_sha256": "3ae3b19b9c60bf3a543572a13d6dc4e957b7c807b6efd22dfeddf35b31de8272"
+  "started": "2026-09-25T21:44:50.520186Z",
+  "summary_sha256": "f4523f93a9e3ee1e73ff0e2bbfe3862a50295eab092a60b89e3f605d9a7d4de8"
 }
