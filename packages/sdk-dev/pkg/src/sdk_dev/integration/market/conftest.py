@@ -8,9 +8,9 @@ from tribulnation.sdk import Context, MarketSDK, NetworkError, RateLimited
 from tribulnation.sdk.market import Candle
 from ..support import describe_exception
 from ..runtime import loop_of
-from ..accounts import load_accounts, selected_accounts, require_credentials, package_of
+from ..accounts import load_accounts, selected_accounts, require_credentials
 from .support import (
-  CASES,
+  cases_of,
   HOUR,
   END,
   STRADDLE_EXTRA,
@@ -42,7 +42,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
     for account in selected_accounts(
       metafunc.config, sdk.all_accounts, surface='market'
     )
-    for case in CASES.get(package_of(sdk.all_accounts[account].venue), [])
+    for case in cases_of(sdk.all_accounts[account].venue)
   ]
   metafunc.parametrize('candle_market', markets, ids=markets, scope='module')
 
@@ -50,8 +50,8 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
 def case_of(sdk: MarketSDK, market: str) -> CandleCase:
   """The case a parametrized market id was built from."""
   account, market_id = market.split(':', 1)
-  venue = package_of(sdk.all_accounts[account].venue)
-  return next(case for case in CASES[venue] if case.market_id == market_id)
+  cases = cases_of(sdk.all_accounts[account].venue)
+  return next(case for case in cases if case.market_id == market_id)
 
 
 async def fetch_candles(

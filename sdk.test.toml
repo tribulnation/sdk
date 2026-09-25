@@ -83,3 +83,6 @@ address = "$EVM_ADDRESS"
 [accounts.hyperevm]
 venue = "hyperevm"
 address = "$EVM_ADDRESS"
+
+[accounts.lighter]
+venue = "lighter_testnet"

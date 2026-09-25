@@ -17,6 +17,11 @@ VENUE_OVERRIDES = {'ethereum': 'ethereum'}
 # These venues select defaults in properties rather than dataclass fields.
 # Keep the mainnet names explicit in the displayed credential configuration.
 CREDENTIAL_OVERRIDES = {
+  'lighter': {
+    'account_index': '$LIGHTER_ACCOUNT_INDEX',
+    'api_key_index': '$LIGHTER_API_KEY_INDEX',
+    'api_private_key': '$LIGHTER_API_PRIVATE_KEY',
+  },
   'aster': {
     'user': '$ASTER_USER',
     'signer': '$ASTER_SIGNER_PRIVATE_KEY',
@@ -54,6 +59,7 @@ def generate_accounts_toml(*, public: bool = False) -> dict[str, str]:
     Hyperliquid,
     Kraken,
     Kucoin,
+    Lighter,
     Mexc,
   )
 
@@ -70,6 +76,7 @@ def generate_accounts_toml(*, public: bool = False) -> dict[str, str]:
     'bybit': Bybit,
     'coinbase': Coinbase,
     'kucoin': Kucoin,
+    'lighter': Lighter,
     'deribit': Deribit,
   }
 

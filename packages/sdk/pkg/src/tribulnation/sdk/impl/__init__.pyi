@@ -8,6 +8,7 @@ from .accounts import (
   Bit2Me,
   Binance,
   Kraken,
+  Lighter,
   Evm,
 )
 from .market import MarketSDK
@@ -25,6 +26,7 @@ __all__ = [
   'Bit2Me',
   'Binance',
   'Kraken',
+  'Lighter',
   'Evm',
   'MarketSDK',
   'EarnSDK',

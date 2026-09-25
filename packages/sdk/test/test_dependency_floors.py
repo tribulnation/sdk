@@ -20,6 +20,7 @@ SDK_2_IMPLEMENTATIONS = {
   'hyperliquid': '0.7.0',
   'kraken': '0.2.0',
   'kucoin': '0.3.0',
+  'lighter': '0.1.0',
   'mexc': '2.0.0',
 }
 

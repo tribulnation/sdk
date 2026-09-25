@@ -17,6 +17,7 @@ from .accounts import (
   Hyperliquid,
   Kraken,
   Kucoin,
+  Lighter,
   Mexc,
   load_accounts,
 )
@@ -33,6 +34,7 @@ DEFAULT_ACCOUNTS: Mapping[str, Account] = {
   'kraken': Kraken(public=True),
   'kucoin': Kucoin(public=True),
   'deribit': Deribit(public=True),
+  'lighter': Lighter(public=True),
 }
 
 
@@ -218,6 +220,29 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       raise ImportError('Install tribulnation-deribit to use this venue.') from e
     return DeribitMarket.new(validate=account.validate)
 
+  def lighter(self, account: Lighter) -> TradingVenue:
+    """Build Lighter's perpetual and spot Market surface on one account."""
+    try:
+      from tribulnation.lighter import LighterMarket
+    except ImportError as e:
+      raise ImportError(
+        'lighter market is not installed. Please install it with `pip install tribulnation-lighter`.'
+      ) from e
+    account_index = account.resolved_account_index
+    api_key_index = account.resolved_api_key_index
+    api_private_key = account.resolved_api_private_key
+    return LighterMarket.new(
+      account_index,
+      api_key_index,
+      api_private_key,
+      network='mainnet' if account.venue == 'lighter' else 'testnet',
+      public=account.public
+      and account_index is None
+      and api_key_index is None
+      and api_private_key is None,
+      validate=account.validate,
+    )
+
   def _venue(self, id: str, /) -> TradingVenue:
     if (account := self.all_accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
@@ -246,6 +271,8 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
         return self.kucoin(account)
       case 'deribit' | 'deribit_testnet':
         return self.deribit(account)
+      case 'lighter' | 'lighter_testnet':
+        return self.lighter(account)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 

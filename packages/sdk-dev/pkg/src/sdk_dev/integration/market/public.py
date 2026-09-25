@@ -33,11 +33,8 @@ from ..accounts import (
 from ..support import describe_exception
 from ..runtime import loop_of
 from .conftest import market_sdk
-from .support import CASES, END
+from .support import END, cases_of
 
-MARKETS = {
-  **{venue: [case.market_id for case in cases] for venue, cases in CASES.items()},
-}
 READS = (
   'exchanges',
   'markets',
@@ -87,7 +84,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
     for account in selected_accounts(
       metafunc.config, sdk.all_accounts, surface='market'
     )
-    for market in MARKETS.get(package_of(sdk.all_accounts[account].venue), [])
+    for market in [c.market_id for c in cases_of(sdk.all_accounts[account].venue)]
   ]
   metafunc.parametrize('public_market', ids, ids=ids, scope='module')
 
