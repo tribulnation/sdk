@@ -2,6 +2,7 @@
 
 import ast
 from contextlib import redirect_stderr, redirect_stdout
+from datetime import date, datetime, timezone
 import io
 import json
 import os
@@ -19,6 +20,22 @@ from .integration.market.support import CASES
 from .repo import repo_root
 from .support import load_impl_files
 from .surface_evidence import Group, TESTS
+
+SUSPENSIONS: dict[tuple[str, str], date] = {
+  ('bitget', 'wallet.test_withdrawal_methods_not_empty'): date(2026, 10, 9),
+}
+"""Venue-wide withdrawal suspensions excluded until a fixed last day (ADR 0027)."""
+
+
+def today() -> date:
+  """The current UTC date; suspensions lapse on the day after their last day."""
+  return datetime.now(timezone.utc).date()
+
+
+def suspended(venue: str, check: str) -> bool:
+  """Whether a documented venue-wide withdrawal suspension excludes this check."""
+  until = SUSPENSIONS.get((venue, check))
+  return until is not None and today() <= until
 
 
 class Case(StrictModel):
@@ -89,12 +106,17 @@ def inventory(root: Path, venue: str) -> dict[str, Case]:
     enabled = set(methods) if support.support == 'full' else set(support.methods or ())
     for method, tests in methods.items():
       for test in tests:
+        exclusion = None
+        if method not in enabled:
+          exclusion = 'unsupported'
+        elif suspended(venue, f'{surface}.{test}'):
+          exclusion = 'venue_withdrawals_suspended'
         cases.append(
           Case(
             surface=surface,
             path=path,
             test=test,
-            exclusion=None if method in enabled else 'unsupported',
+            exclusion=exclusion,
           )
         )
   support = impl.support.get('market')

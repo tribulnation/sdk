@@ -3,6 +3,7 @@
 import asyncio
 from contextlib import redirect_stderr, redirect_stdout
 import io
+from datetime import date
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, Mock
 
@@ -85,7 +86,41 @@ def test_exclusions_are_specific_and_never_passes():
   mexc = evidence.inventory(repo_root(), 'mexc')
   assert sum(case.exclusion == 'unsupported_perp_stream' for case in mexc.values()) == 1
   kraken = evidence.inventory(repo_root(), 'kraken')
-  assert sum(case.exclusion == 'unsupported_perp_stream' for case in kraken.values()) == 1
+  assert (
+    sum(case.exclusion == 'unsupported_perp_stream' for case in kraken.values()) == 1
+  )
+
+
+SUSPENDED = 'wallet.test_withdrawal_methods_not_empty[null, null]'
+
+
+def test_withdrawal_suspension_is_narrow_and_dated(monkeypatch: pytest.MonkeyPatch):
+  """Only Bitget withdrawal non-emptiness is excluded, never passed, and only until its end."""
+  monkeypatch.setattr(evidence, 'today', lambda: date(2026, 10, 9))
+  bitget = evidence.inventory(repo_root(), 'bitget')
+  excluded = [
+    id for id, c in bitget.items() if c.exclusion == 'venue_withdrawals_suspended'
+  ]
+  assert excluded == [SUSPENDED]
+  assert (
+    bitget['wallet.test_withdrawal_methods_can_be_fetched[null, null]'].exclusion
+    is None
+  )
+  for venue in results.required_venues(repo_root(), 'sdk'):
+    if venue != 'bitget':
+      cases = evidence.inventory(repo_root(), venue).values()
+      assert all(c.exclusion != 'venue_withdrawals_suspended' for c in cases)
+  report = passing('bitget')
+  evidence.verify_payload(report.model_dump(mode='json'), root=repo_root())
+  forged = report.model_copy(deep=True)
+  row = next(r for r in forged.checks if r.id == SUSPENDED)
+  row.passed = 1
+  with pytest.raises(ValueError):
+    evidence.verify_payload(forged.model_dump(mode='json'), root=repo_root())
+  monkeypatch.setattr(evidence, 'today', lambda: date(2026, 10, 10))
+  assert evidence.inventory(repo_root(), 'bitget')[SUSPENDED].exclusion is None
+  with pytest.raises(ValueError):
+    evidence.verify_payload(report.model_dump(mode='json'), root=repo_root())
 
 
 def test_deribit_split_and_legacy_reports():

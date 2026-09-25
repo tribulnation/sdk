@@ -35,7 +35,7 @@ not a changelog or a substitute for API documentation and tests.
 | [0010](0010-defer-bitget-uta-coin.md) | Defer Bitget UTA coin support | Accepted; amended by 0018 |
 | [0011](0011-liquidity-independent-consistency.md) | Compare available quote sides without guaranteeing liquidity | Accepted |
 | [0012](0012-deribit-public-mainnet-private-testnet.md) | Deribit mainnet public metadata and testnet private Report evidence | Accepted |
-| [0013](0013-all-read-suites-release-gate.md) | Require all supported read-only suites alongside market consistency | Accepted; amends 0003 and 0006; amended by 0016 |
+| [0013](0013-all-read-suites-release-gate.md) | Require all supported read-only suites alongside market consistency | Accepted; amends 0003 and 0006; amended by 0016 and 0027 |
 | [0014](0014-bit2me-native-ticker-limitation.md) | Preserve Bit2Me native tickers with a visible upstream quote limitation | Accepted; amends 0003 and 0011; amended by 0022 |
 | [0015](0015-single-venue-doc-examples.md) | Linear per-venue documentation examples without hidden support | Accepted |
 | [0016](0016-report-snapshot-release-scope.md) | Qualify Report snapshots; application auditing owns history correctness | Accepted; amends 0013 |
@@ -49,3 +49,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0024](0024-exchange-account-history.md) | Native exchange-wide personal history with market-attributed records | Accepted |
 | [0025](0025-missing-market-data.md) | Structured missing market data and a narrow MEXC index exclusion | Accepted |
 | [0026](0026-pin-qualification-catalogue.md) | Verify releases against the recorded Catalogue snapshot instead of moving main | Accepted; amends 0003 |
+| [0027](0027-bitget-withdrawal-suspension.md) | Dated exclusion for Bitget's venue-wide withdrawal suspension | Accepted; amends 0013 |

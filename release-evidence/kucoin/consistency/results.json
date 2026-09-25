@@ -8760,11 +8760,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"WMTX-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -18565,14 +18565,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.26723",
-            "after_bid": "0.26683",
-            "ask": "0.26723",
+            "after_ask": "0.25486",
+            "after_bid": "0.25444",
+            "ask": "0.25487",
             "attempt": 1,
-            "before_ask": "0.26723",
-            "before_bid": "0.26683",
-            "bid": "0.26683",
-            "elapsed_seconds": 1.0945391840068623,
+            "before_ask": "0.25487",
+            "before_bid": "0.25446",
+            "bid": "0.25444",
+            "elapsed_seconds": 1.1241665439447388,
             "ticker_ids_match": true
           }
         ],
@@ -18584,14 +18584,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.1276",
-            "after_bid": "0.1268",
-            "ask": "0.1276",
+            "after_ask": "0.1282",
+            "after_bid": "0.1274",
+            "ask": "0.1282",
             "attempt": 1,
-            "before_ask": "0.1275",
-            "before_bid": "0.1268",
-            "bid": "0.1268",
-            "elapsed_seconds": 1.114924090099521,
+            "before_ask": "0.1282",
+            "before_bid": "0.1274",
+            "bid": "0.1274",
+            "elapsed_seconds": 1.0980265960097313,
             "ticker_ids_match": true
           }
         ],
@@ -18603,14 +18603,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.02268",
-            "after_bid": "0.0226",
-            "ask": "0.02268",
+            "after_ask": "0.02281",
+            "after_bid": "0.02277",
+            "ask": "0.02281",
             "attempt": 1,
-            "before_ask": "0.02268",
-            "before_bid": "0.0226",
-            "bid": "0.0226",
-            "elapsed_seconds": 1.1810133690014482,
+            "before_ask": "0.02281",
+            "before_bid": "0.02277",
+            "bid": "0.02277",
+            "elapsed_seconds": 1.0951305169146508,
             "ticker_ids_match": true
           }
         ],
@@ -18622,14 +18622,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "85628.3",
-            "after_bid": "85628.2",
-            "ask": "85627.8",
+            "after_ask": "84300.1",
+            "after_bid": "84300.0",
+            "ask": "84300.1",
             "attempt": 1,
-            "before_ask": "85628.3",
-            "before_bid": "85628.2",
-            "bid": "85627.7",
-            "elapsed_seconds": 1.1328061220701784,
+            "before_ask": "84300.1",
+            "before_bid": "84300.0",
+            "bid": "84300",
+            "elapsed_seconds": 1.120941958972253,
             "ticker_ids_match": true
           }
         ],
@@ -18641,14 +18641,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.2675",
-            "after_bid": "0.2669",
-            "ask": "0.2675",
+            "after_ask": "0.255",
+            "after_bid": "0.2545",
+            "ask": "0.255",
             "attempt": 1,
-            "before_ask": "0.2675",
-            "before_bid": "0.2669",
-            "bid": "0.2669",
-            "elapsed_seconds": 0.7991320920409635,
+            "before_ask": "0.255",
+            "before_bid": "0.2546",
+            "bid": "0.2545",
+            "elapsed_seconds": 0.8303684759885073,
             "ticker_ids_match": true
           }
         ],
@@ -18660,14 +18660,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.10303",
-            "after_bid": "0.10284",
-            "ask": "0.10303",
+            "after_ask": "0.10275",
+            "after_bid": "0.10261",
+            "ask": "0.10275",
             "attempt": 1,
-            "before_ask": "0.10303",
-            "before_bid": "0.10284",
-            "bid": "0.10284",
-            "elapsed_seconds": 0.7718324229354039,
+            "before_ask": "0.10275",
+            "before_bid": "0.10262",
+            "bid": "0.10262",
+            "elapsed_seconds": 0.7889695240883157,
             "ticker_ids_match": true
           }
         ],
@@ -18679,14 +18679,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.00665",
-            "after_bid": "0.00657",
-            "ask": "0.00665",
+            "after_ask": "0.00833",
+            "after_bid": "0.00825",
+            "ask": "0.00833",
             "attempt": 1,
-            "before_ask": "0.00665",
-            "before_bid": "0.00657",
-            "bid": "0.00657",
-            "elapsed_seconds": 0.7770803419407457,
+            "before_ask": "0.00833",
+            "before_bid": "0.00825",
+            "bid": "0.00825",
+            "elapsed_seconds": 0.7909085369901732,
             "ticker_ids_match": true
           }
         ],
@@ -18698,14 +18698,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "85660.4",
-            "after_bid": "85660.3",
-            "ask": "85660.4",
+            "after_ask": "84368.6",
+            "after_bid": "84368.5",
+            "ask": "84368.6",
             "attempt": 1,
-            "before_ask": "85660.4",
-            "before_bid": "85660.3",
-            "bid": "85660.3",
-            "elapsed_seconds": 0.7767060189507902,
+            "before_ask": "84368.6",
+            "before_bid": "84368.5",
+            "bid": "84368.5",
+            "elapsed_seconds": 0.772018363000825,
             "ticker_ids_match": true
           }
         ],
@@ -19302,7 +19302,6 @@
           "CARV-USDT",
           "HIPPO-USDT",
           "PUFFER-USDT",
-          "WMTX-USDT",
           "DEEP-USDT",
           "RMV-USDT",
           "DBR-USDT",
@@ -19496,6 +19495,7 @@
           "ES-USDT",
           "RION-USDT",
           "ERA-USDT",
+          "MSTRX-USDT",
           "TSLAX-USDT",
           "CRCLX-USDT",
           "MANYU-USDT",
@@ -19750,7 +19750,10 @@
           "TA-USDT",
           "TINA-USDT",
           "MHA-USDT",
-          "ON-USDT"
+          "ON-USDT",
+          "AAPLX-USDT",
+          "SPCXX-USDT",
+          "HOODX-USDT"
         ]
       },
       {
@@ -19941,6 +19944,8 @@
           "CRWDUSDTM",
           "CRWVUSDTM",
           "CSCOUSDTM",
+          "CSOPSAMSUNG2LUSDTM",
+          "CSOPSKHYNIX2LUSDTM",
           "CTCUSDTM",
           "CTRUSDTM",
           "CTSIUSDTM",
@@ -20088,7 +20093,6 @@
           "KCSUSDTM",
           "KERNELUSDTM",
           "KGENUSDTM",
-          "KIOXIAUSDTM",
           "KITEUSDTM",
           "KLACUSDTM",
           "KNCUSDTM",

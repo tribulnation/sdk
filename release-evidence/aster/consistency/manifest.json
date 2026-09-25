@@ -303,7 +303,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "d9efec712ad35cb937207539e6d4f37a4df91305a47acda07450fab6e8dafec5",
+        "files_sha256": "a92700ede0cffe85c7aefaa50a915a0b2bc3101b7e192127bc0720cf210a06fb",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -344,8 +344,8 @@
       },
       "tribulnation-sdk": {
         "files_sha256": "df92e24151edad88523d82743fae6c0b75f11d07629dcb39c0a2069437365a75",
-        "metadata_sha256": "a8c1edccd5f3ad538954d8a7af50a5eef5650422b98ee2cf9e288c4d6186a427",
-        "version": "2.4.0"
+        "metadata_sha256": "3839979f46564a228a8182ebfc1c0e6ccd8ec4a2d61d806eb791525184c68da7",
+        "version": "2.5.0"
       },
       "typed-aster": {
         "files_sha256": "e533b4984ffe44c2234cf5fcfe00fc65d9da8b3588bbab314dfbe592b58fc48d",
@@ -380,7 +380,7 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "fe068ef05e070e2ba26d833a8ac5c9acb3b986329ac584f3f358faa595528c90",
+    "source_sha256": "8ef79e4575f8660042b28b332afefd4048735b23b3f5402fde8c67f854cb6e25",
     "venue": "aster"
   },
   "before": {
@@ -687,7 +687,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "d9efec712ad35cb937207539e6d4f37a4df91305a47acda07450fab6e8dafec5",
+        "files_sha256": "a92700ede0cffe85c7aefaa50a915a0b2bc3101b7e192127bc0720cf210a06fb",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -728,8 +728,8 @@
       },
       "tribulnation-sdk": {
         "files_sha256": "df92e24151edad88523d82743fae6c0b75f11d07629dcb39c0a2069437365a75",
-        "metadata_sha256": "a8c1edccd5f3ad538954d8a7af50a5eef5650422b98ee2cf9e288c4d6186a427",
-        "version": "2.4.0"
+        "metadata_sha256": "3839979f46564a228a8182ebfc1c0e6ccd8ec4a2d61d806eb791525184c68da7",
+        "version": "2.5.0"
       },
       "typed-aster": {
         "files_sha256": "e533b4984ffe44c2234cf5fcfe00fc65d9da8b3588bbab314dfbe592b58fc48d",
@@ -764,12 +764,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "fe068ef05e070e2ba26d833a8ac5c9acb3b986329ac584f3f358faa595528c90",
+    "source_sha256": "8ef79e4575f8660042b28b332afefd4048735b23b3f5402fde8c67f854cb6e25",
     "venue": "aster"
   },
-  "finished": "2026-09-25T11:44:37.057223Z",
-  "results_sha256": "b9e2a23d31c592f955d0cc361fdd613cdcc3e8dd2f5a2ff4c08355d2ef882852",
+  "finished": "2026-09-25T12:52:06.939954Z",
+  "results_sha256": "2fa5d6c478ad034297f26f95057b6668da85beb7ee868ed15b99f4cd82460ab0",
   "schema_version": 1,
-  "started": "2026-09-25T11:44:11.852945Z",
-  "summary_sha256": "49a5fe1d73d12e81fa17ee95a791cc75f71a9594768af25e7dd557a96a236268"
+  "started": "2026-09-25T12:51:41.401119Z",
+  "summary_sha256": "2ac904bc0ba0e5843d5c3cd0816d925b26eee1486fcc38771ecbfd339919ef26"
 }
