@@ -2,7 +2,8 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: accepted; Report history scope amended by [ADR 0016](0016-report-snapshot-release-scope.md)
+1. Status: accepted; Report history scope amended by [ADR 0016](0016-report-snapshot-release-scope.md);
+   one Bitget Wallet check temporarily excluded by [ADR 0027](0027-bitget-withdrawal-suspension.md)
 2. Date: 2026-09-11
 3. Amends: ADRs 0003 and 0006. Preserves the Deribit network split in ADR 0012.
 

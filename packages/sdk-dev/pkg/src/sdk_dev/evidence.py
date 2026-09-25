@@ -416,6 +416,17 @@ def write_report(
         'unavailable. Every other discovered market must be observed in a separate '
         'stats read. See results.json and ADR 0025; this is not a passing bulk read.\n'
       )
+    suspended = sum(
+      isinstance(check, dict)
+      and check.get('exclusion') == 'venue_withdrawals_suspended'
+      for check in checks
+    )
+    if suspended:
+      summary += (
+        '\nVenue withdrawal suspension: withdrawal-method non-emptiness was not '
+        'checked while the venue suspended withdrawals venue-wide. Fetching '
+        'withdrawal methods still had to pass. See ADR 0027; this is not a pass.\n'
+      )
   summary = summary.encode()
   manifest = Manifest(
     before=before,
