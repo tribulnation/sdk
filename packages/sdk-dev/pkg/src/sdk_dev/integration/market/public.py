@@ -248,7 +248,7 @@ def test_public_read(public_result: PublicResults, public_market: str, method: s
         value.fees.taker_sell,
       ):
         assert isinstance(rate, Decimal) and rate.is_finite()
-    assert value.fee_asset
+    assert value.fee_asset is None or value.fee_asset
     assert value.tick_size.is_finite() and value.tick_size > 0
     assert value.step_size.is_finite() and value.step_size > 0
   elif method == 'tickers':

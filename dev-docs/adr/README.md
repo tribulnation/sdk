@@ -50,3 +50,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0025](0025-missing-market-data.md) | Structured missing market data and a narrow MEXC index exclusion | Accepted |
 | [0026](0026-pin-qualification-catalogue.md) | Verify releases against the recorded Catalogue snapshot instead of moving main | Accepted; amends 0003 |
 | [0027](0027-bitget-withdrawal-suspension.md) | Dated exclusion for Bitget's venue-wide withdrawal suspension | Accepted; amends 0013 |
+| [0028](0028-fill-dependent-fee-asset.md) | Fill-dependent fee asset in market rules | Accepted |
