@@ -19,3 +19,4 @@ pytest-asyncio
 -e packages/impl/kraken/pkg
 -e packages/impl/kucoin/pkg
 -e packages/impl/deribit/pkg
+-e packages/impl/aster/pkg

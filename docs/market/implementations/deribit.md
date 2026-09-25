@@ -60,6 +60,6 @@ SDK payment rates, and no next-payment time is invented. `funding_rates` and
 
 ---
 
-← [Coinbase Market](coinbase.md) · **Next:** [Earn](../../earn/index.md) →
+← [Aster Market](aster.md) · **Next:** [Earn](../../earn/index.md) →
 
 <!-- /next -->

@@ -1,0 +1,30 @@
+[support.market]
+support = "partial"
+auth = false
+methods = [
+  "depth", "depth_stream", "tickers", "rules", "fees", "candles",
+  "query_order", "open_orders", "trades_stream", "position", "collateral",
+  "place_order", "place_orders", "cancel_order", "cancel_orders", "cancel_open_orders",
+  "index", "next_funding", "funding_rates", "perp_position",
+]
+note = "Spot and linear perpetuals. Public reads are verified on mainnet; account and trading methods only on testnet. MARKET ignores the SDK price; LIMIT uses GTC and POST_ONLY uses GTX. Depth streams carry up to 20 levels. Position and collateral cover one-way, cross-margin perpetuals only. Unsupported: spot balances, trade history, funding payments, bulk perp_stats, available_notional and perp_collateral."
+
+[support.report]
+support = "none"
+auth = true
+note = "Cash-ledger history exists in the package (tribulnation.aster.Report) but is verified on testnet only and is not routed through ReportSDK."
+
+[support.wallet]
+support = "none"
+auth = true
+note = "typed-aster lacks the deposit and withdrawal asset catalogues."
+
+[support.earn]
+support = "none"
+auth = true
+note = "No native Earn instrument catalogue."
+
+[ids]
+asset = "symbol"
+market = "Native concatenated symbols such as BTCUSDT, under the spot and perp exchange IDs."
+note = "Asset IDs remain native (USDT, ASTER)."

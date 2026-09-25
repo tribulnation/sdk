@@ -22,6 +22,9 @@ for repository setup, development commands and implementation guidance.
 7. [Exchange-wide personal history](exchange-history-venues.md): native endpoint
    coverage, implemented exchange scopes and remaining venue gaps.
 
+8. [Aster Market qualification](aster-market.md): mappings, credential handling,
+   unsupported methods and testnet observations.
+
 ## Documentation boundaries
 
 1. [User documentation](../docs/index.md) explains installation, configuration,

@@ -16,6 +16,7 @@ from tribulnation.sdk.core import Context, ManagedResource, NetworkError
 
 # Each declaration is exercised through its real owner's inherited SDK lifecycle.
 OWNERS = [
+  ('tribulnation.aster.core', 'Shared', 'client'),
   ('tribulnation.binance.core', 'SdkMixin', 'client'),
   ('tribulnation.binance.market.impl.mixin', 'SharedMixin', 'client'),
   ('tribulnation.bit2me.core.mixin', 'Mixin', 'client'),

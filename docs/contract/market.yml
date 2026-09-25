@@ -60,6 +60,7 @@ methods:
     example:
       accountVenues: [mexc]
       constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', bid: '60123.00', ask: '60124.10'}
         deribit: {market_id: 'deribit:spot:BTC_USDT', bid: '60123.00', ask: '60124.10'}
         kucoin: {market_id: 'kucoin:spot:BTC-USDT', bid: '60123.00', ask: '60124.10'}
         mexc: {market_id: 'mexc:spot:BTCUSDT', bid: '60123.00', ask: '60124.10'}
@@ -100,6 +101,7 @@ methods:
     example:
       accountVenues: [mexc]
       constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', ticks: [{bid: '60123.40', ask: '60124.00'}, {bid: '60123.50', ask: '60124.00'}, {bid: '60122.90', ask: '60123.60'}, {bid: '60123.10', ask: '60123.90'}]}
         deribit: {market_id: 'deribit:spot:BTC_USDT', ticks: [{bid: '60123.40', ask: '60124.00'}, {bid: '60123.50', ask: '60124.00'}]}
         kucoin: {market_id: 'kucoin:spot:BTC-USDT', ticks: [{bid: '60123.40', ask: '60124.00'}, {bid: '60123.50', ask: '60124.00'}]}
         mexc:
@@ -157,6 +159,7 @@ methods:
     example:
       accountVenues: [mexc]
       constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', instrument_id: BTCUSDT, fee_asset: USDT, tick_size: '0.1', step_size: '0.001'}
         kucoin: {market_id: 'kucoin:spot:BTC-USDT', instrument_id: 'BTC-USDT', fee_asset: 'USDT', tick_size: '0.10', step_size: '0.000001', kind: 'spot'}
         mexc:
           market_id: 'mexc:spot:BTCUSDT'
@@ -220,6 +223,7 @@ methods:
     example:
       accountVenues: [binance]
       constants:
+        aster: {market_id: 'aster:perp:BTCUSDT'}
         binance: {market_id: 'binance:spot:BTCUSDT'}
         coinbase: {market_id: 'coinbase:intx:BTC-PERP-INTX'}
         hyperliquid: {market_id: 'hyperliquid::BTC'}
@@ -251,6 +255,7 @@ methods:
     example:
       accountVenues: [mexc]
       constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', open1: '60124.10', close1: '60151.30', open2: '60151.30', close2: '60099.00'}
         deribit: {market_id: 'deribit:perp:BTC_USDC-PERPETUAL', open1: '60123.40', close1: '60150.00', open2: '60150.00', close2: '60098.20'}
         kucoin: {market_id: 'kucoin:spot:BTC-USDT', open1: '60123.40', close1: '60150.00', open2: '60150.00', close2: '60098.20'}
         mexc: {market_id: 'mexc:spot:BTCUSDT', open1: '60123.40', close1: '60150.00', open2: '60150.00', close2: '60098.20'}
@@ -296,6 +301,7 @@ methods:
       # Exchange-level id (no market segment) — this method is defined on Exchange, not a
       # single Market, per docs/market/index.md's grammar table.
       constants:
+        aster: {exchange_id: 'aster:perp', markets: [{key: BTCUSDT, last: '60123.40', bid: '60123.00', ask: '60124.10'}]}
         deribit: {exchange_id: 'deribit:spot', markets: [{key: 'BTC_USDT', last: '60123.40', bid: '60123.00', ask: '60124.10'}]}
         kucoin: {exchange_id: 'kucoin:spot', markets: [{key: 'BTC-USDT', last: '60123.40', bid: '60123.00', ask: '60124.10'}]}
         mexc:
@@ -408,6 +414,7 @@ methods:
     example:
       accountVenues: [mexc]
       constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', order_id: '12345678', price: '59500', qty: '0.01'}
         mexc: {market_id: 'mexc:spot:BTCUSDT', order_id: '4834937', price: '59500', qty: '0.01'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id: '184920371', price: '59480', qty: '0.02'}
         binance: {market_id: 'binance:spot:BTCUSDT', order_id: '4834937', price: '59500', qty: '0.01'}
@@ -445,6 +452,7 @@ methods:
     example:
       accountVenues: [mexc]
       constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', order_id: '12345678', price: '59500', qty: '0.01'}
         mexc: {market_id: 'mexc:spot:BTCUSDT', order_id: '4834937', price: '59500', qty: '0.01'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id: '184920371', price: '59480', qty: '0.02'}
         binance: {market_id: 'binance:spot:BTCUSDT', order_id: '4834937', price: '59500', qty: '0.01'}
@@ -521,6 +529,7 @@ methods:
     example:
       accountVenues: [mexc]
       constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', ticks: [{price: '60123.40', qty: '0.01'}, {price: '60124.00', qty: '-0.02'}, {price: '60125.10', qty: '0.05'}]}
         mexc:
           market_id: 'mexc:spot:BTCUSDT'
           ticks:
@@ -572,6 +581,7 @@ methods:
     example:
       accountVenues: [mexc]
       constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', size: '0.014'}
         mexc: {market_id: 'mexc:spot:BTCUSDT', size: '0.014'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', size: '0.5'}
         kraken: {market_id: 'kraken:spot:XBTUSD', size: '0.014'}
@@ -608,6 +618,7 @@ methods:
     example:
       accountVenues: [mexc]
       constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', equity: '10240.55', free: '8120.00'}
         mexc: {market_id: 'mexc:spot:BTCUSDT', equity: '10240.55', free: '8120.00'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', equity: '9875.20', free: '7640.00'}
         bit2me: {market_id: 'bit2me:spot:BTC/EUR', equity: '10240.55', free: '8120.00'}
@@ -680,6 +691,7 @@ methods:
     example:
       accountVenues: [mexc]
       constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', order_id: '12345678'}
         mexc: {market_id: 'mexc:spot:BTCUSDT', order_id: '4834937'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id: '184920371'}
         bybit: {market_id: 'bybit:spot:BTCUSDT', order_id: '00000000-0000-4000-8000-000000000001'}
@@ -714,6 +726,7 @@ methods:
     example:
       accountVenues: [hyperliquid]
       constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', order_id1: '12345678', order_id2: '12345679'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id1: '184920371', order_id2: '184920372'}
         bybit: {market_id: 'bybit:spot:BTCUSDT', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
         coinbase: {market_id: 'coinbase:spot:BTC-USD', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
@@ -750,6 +763,7 @@ methods:
     example:
       accountVenues: [mexc]
       constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', order_id: '12345678'}
         mexc: {market_id: 'mexc:spot:BTCUSDT', order_id: '4834937'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id: '184920371'}
         bybit: {market_id: 'bybit:spot:BTCUSDT', order_id: '00000000-0000-4000-8000-000000000001'}
@@ -784,6 +798,7 @@ methods:
     example:
       accountVenues: [mexc]
       constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', order_id1: '12345678', order_id2: '12345679'}
         mexc: {market_id: 'mexc:spot:BTCUSDT', order_id1: '4834937', order_id2: '4834938'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id1: '184920371', order_id2: '184920372'}
         bybit: {market_id: 'bybit:spot:BTCUSDT', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
@@ -818,6 +833,7 @@ methods:
     example:
       accountVenues: [mexc]
       constants:
+        aster: {market_id: 'aster:perp:BTCUSDT'}
         mexc: {market_id: 'mexc:spot:BTCUSDT'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142'}
         bybit: {market_id: 'bybit:spot:BTCUSDT'}
@@ -851,6 +867,7 @@ methods:
     example:
       accountVenues: [dydx]
       constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', index: '60120.00'}
         kraken: {market_id: 'kraken:perp:PF_XBTUSD', index: '60120.00'}
         deribit: {market_id: 'deribit:perp:BTC_USDC-PERPETUAL', index: '60120.00'}
         kucoin: {market_id: 'kucoin:perp:XBTUSDTM', index: '60120.00'}
@@ -887,6 +904,7 @@ methods:
     example:
       accountVenues: [dydx]
       constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', rate: '0.0001', annualized: '0.1095'}
         kucoin: {market_id: 'kucoin:perp:XBTUSDTM', rate: '0.0001', annualized: '0.1095'}
         dydx: {market_id: 'dydx:perp:BTC-USD', rate: '0.0001', annualized: '0.876'}
         hyperliquid: {market_id: 'hyperliquid::BTC', rate: '0.00012', annualized: '1.0512'}
@@ -924,6 +942,7 @@ methods:
     example:
       accountVenues: [dydx]
       constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', rate1: '0.0001', rate2: '0.00012'}
         kraken: {market_id: 'kraken:perp:PF_XBTUSD', rate1: '0.0001', rate2: '0.00012'}
         kucoin: {market_id: 'kucoin:perp:XBTUSDTM', rate1: '0.0001', rate2: '0.00012'}
         dydx: {market_id: 'dydx:perp:BTC-USD', rate1: '0.0001', rate2: '0.00012'}
@@ -996,6 +1015,7 @@ methods:
     example:
       accountVenues: [dydx]
       constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', size: '0.5', entry_price: '58230.10'}
         dydx: {market_id: 'dydx:perp:BTC-USD', size: '0.5', entry_price: '58230.10'}
         hyperliquid: {market_id: 'hyperliquid::BTC', size: '0.3', entry_price: '58190.40'}
         bitget: {market_id: 'bitget:usdt:BTCUSDT', size: '0.5', entry_price: '58230.10'}

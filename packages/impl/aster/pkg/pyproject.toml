@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tribulnation-aster"
+version = "0.1.0"
+description = "Tribulnation SDK implementation for Aster spot and perpetual markets."
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+dependencies = ["tribulnation-sdk>=2.4.0", "typed-aster>=0.1.0"]
+readme = {file = "README.md", content-type = "text/markdown"}
+
+[project.urls]
+Repository = "https://github.com/tribulnation/sdk.git"

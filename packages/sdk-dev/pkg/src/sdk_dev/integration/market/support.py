@@ -34,6 +34,10 @@ class CandleCase:
 
 
 CASES: Mapping[str, Sequence[CandleCase]] = {
+  'aster': [
+    CandleCase(market_id='spot:BTCUSDT', page=500),
+    CandleCase(market_id='perp:BTCUSDT', page=500),
+  ],
   'binance': [
     CandleCase(market_id='spot:BTCUSDT', page=1000),
     CandleCase(market_id='usdm:BTCUSDT', page=1000),

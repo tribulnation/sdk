@@ -14,9 +14,13 @@ import dataclasses
 # this module needs to make.
 VENUE_OVERRIDES = {'ethereum': 'ethereum'}
 
-# Deribit selects these defaults in properties rather than dataclass fields.
+# These venues select defaults in properties rather than dataclass fields.
 # Keep the mainnet names explicit in the displayed credential configuration.
 CREDENTIAL_OVERRIDES = {
+  'aster': {
+    'user': '$ASTER_USER',
+    'signer': '$ASTER_SIGNER_PRIVATE_KEY',
+  },
   'deribit': {
     'client_id': '$DERIBIT_CLIENT_ID',
     'client_secret': '$DERIBIT_CLIENT_SECRET',
@@ -38,6 +42,7 @@ def generate_accounts_toml(*, public: bool = False) -> dict[str, str]:
   """
   from tribulnation.sdk.impl.accounts import (
     BaseAccount,
+    Aster,
     Binance,
     Bit2Me,
     Bitget,
@@ -53,6 +58,7 @@ def generate_accounts_toml(*, public: bool = False) -> dict[str, str]:
   )
 
   classes: dict[str, type[BaseAccount]] = {
+    'aster': Aster,
     'dydx': Dydx,
     'hyperliquid': Hyperliquid,
     'mexc': Mexc,

@@ -6,6 +6,7 @@ from tribulnation.sdk.market import TradingMarkets, TradingVenue
 from .ownership import VenueOwner
 from .accounts import (
   Account,
+  Aster,
   Binance,
   Bit2Me,
   Bitget,
@@ -21,6 +22,7 @@ from .accounts import (
 )
 
 DEFAULT_ACCOUNTS: Mapping[str, Account] = {
+  'aster': Aster(public=True),
   'dydx': Dydx(public=True),
   'hyperliquid': Hyperliquid(public=True),
   'mexc': Mexc(public=True),
@@ -50,6 +52,22 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       path: Path to a TOML file with an `[accounts]` table.
     """
     return cls(accounts=load_accounts(path))
+
+  def aster(self, account: Aster) -> TradingVenue:
+    try:
+      from tribulnation.aster import AsterMarket
+    except ImportError as e:
+      raise ImportError(
+        'aster market is not installed. Please install it with `pip install tribulnation-aster`.'
+      ) from e
+    user, signer = account.resolved_user, account.resolved_signer
+    return AsterMarket.new(
+      user=user,
+      signer=signer,
+      public=account.public and user is None and signer is None,
+      mainnet=account.venue == 'aster',
+      validate=account.validate,
+    )
 
   def dydx(self, account: Dydx) -> TradingVenue:
     try:
@@ -204,6 +222,8 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
     if (account := self.all_accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
     match account.venue:
+      case 'aster' | 'aster_testnet':
+        return self.aster(account)
       case 'dydx' | 'dydx_testnet':
         return self.dydx(account)
       case 'hyperliquid' | 'hyperliquid_testnet':
