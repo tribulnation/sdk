@@ -118,3 +118,12 @@ repo = "https://github.com/tribulnation/sdk"
 path = "packages/impl/deribit"
 pypi = "https://pypi.org/project/tribulnation-deribit/"
 icon = "https://catalogue.tribulnation.com/icons/platform/deribit.svg"
+
+[[venues]]
+slug = "aster"
+name = "Aster"
+tier = "development"
+repo = "https://github.com/tribulnation/sdk"
+path = "packages/impl/aster"
+pypi = "https://pypi.org/project/tribulnation-aster/"
+icon = "https://catalogue.tribulnation.com/icons/asset/aster.svg"

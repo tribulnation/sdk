@@ -5,6 +5,7 @@ from pathlib import Path
 from tribulnation.sdk.wallet import Wallet
 from .accounts import (
   Account,
+  Aster,
   Bit2Me,
   Bybit,
   Kraken,
@@ -35,6 +36,20 @@ class WalletSDK:
       path: Path to a TOML file with an `[accounts]` table.
     """
     return cls(accounts=load_accounts(path))
+
+  def aster(self, account: Aster) -> Wallet:
+    """Construct Aster with only the selected network's resolved credentials."""
+    try:
+      from tribulnation.aster import Wallet as AsterSurface
+    except ImportError as exc:
+      raise ImportError('Install tribulnation-aster to use Aster.') from exc
+    user, signer = account.resolved_user, account.resolved_signer
+    return AsterSurface.new(
+      user=user,
+      signer=signer,
+      public=account.public and user is None and signer is None,
+      mainnet=account.venue == 'aster',
+    )
 
   def binance(self, account: Binance) -> Wallet:
     try:
@@ -155,6 +170,8 @@ class WalletSDK:
     if (account := self.all_accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
     match account.venue:
+      case 'aster' | 'aster_testnet':
+        return self.aster(account)
       case 'binance':
         return self.binance(account)
       case 'bitget':

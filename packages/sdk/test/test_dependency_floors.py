@@ -8,6 +8,7 @@ from typing_extensions import cast
 
 ROOT = Path(__file__).resolve().parents[3]
 SDK_2_IMPLEMENTATIONS = {
+  'aster': '0.1.0',
   'binance': '0.3.0',
   'bit2me': '0.5.0',
   'bitget': '0.7.0',

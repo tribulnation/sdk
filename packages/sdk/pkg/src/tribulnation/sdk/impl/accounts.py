@@ -305,6 +305,36 @@ class Deribit(BaseAccount):
 
 
 @_dataclass
+class Aster(BaseAccount):
+  """Aster main-wallet address and trading agent, isolated by network."""
+
+  venue: _Literal['aster', 'aster_testnet'] = 'aster'
+  user: str | None = None
+  """Main-wallet address; defaults to the selected network's USER variable."""
+  signer: str | None = None
+  """Trading agent private key; no main-wallet signing key is needed."""
+
+  @property
+  def resolved_user(self) -> str | None:
+    """Resolve the account address without mixing mainnet and testnet defaults."""
+    prefix = 'ASTER' if self.venue == 'aster' else 'TEST_ASTER'
+    return resolve_env_var(self.user or f'${prefix}_USER', require=not self.public)
+
+  @property
+  def resolved_signer(self) -> str | None:
+    """Resolve only the selected network's trading-agent secret."""
+    prefix = 'ASTER' if self.venue == 'aster' else 'TEST_ASTER'
+    return resolve_env_var(
+      self.signer or f'${prefix}_SIGNER_PRIVATE_KEY', require=not self.public
+    )
+
+  def verify_env_vars(self):
+    """Fail before constructing private clients when credentials are missing."""
+    self.resolved_user
+    self.resolved_signer
+
+
+@_dataclass
 class Evm(BaseAccount):
   Venue = _Literal[
     'ethereum',
@@ -341,6 +371,7 @@ Account = _Annotated[
   | Kraken
   | Kucoin
   | Deribit
+  | Aster
   | Evm,
   _pydantic.Discriminator('venue'),
 ]

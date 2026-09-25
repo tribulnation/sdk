@@ -16,6 +16,7 @@ from tribulnation.sdk.core import Context, ManagedResource, NetworkError
 
 # Each declaration is exercised through its real owner's inherited SDK lifecycle.
 OWNERS = [
+  ('tribulnation.aster.core', 'Shared', 'client'),
   ('tribulnation.binance.core', 'SdkMixin', 'client'),
   ('tribulnation.binance.market.impl.mixin', 'SharedMixin', 'client'),
   ('tribulnation.bit2me.core.mixin', 'Mixin', 'client'),
@@ -69,6 +70,8 @@ def owner_for(module: str, name: str, attribute: str, client: AsyncMock) -> SDK:
   if attribute != 'node':
     object.__setattr__(owner, 'node', AsyncMock())
   object.__setattr__(owner, 'streams', {})
+  object.__setattr__(owner, 'books', {})
+  object.__setattr__(owner, 'trades', {})
   object.__setattr__(owner, 'ws_stack', None)
   return owner
 

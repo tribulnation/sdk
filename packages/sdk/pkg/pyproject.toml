@@ -27,6 +27,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
+aster = ["tribulnation-aster>=0.1.0"]
 mexc = ["tribulnation-mexc>=2.0.0"]
 dydx = ["tribulnation-dydx>=0.7.0"]
 hyperliquid = ["tribulnation-hyperliquid>=0.7.0"]

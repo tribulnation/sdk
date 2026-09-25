@@ -56,6 +56,7 @@ would raise instead.
 | Bybit | ✅ | ✅ |
 | KuCoin | ✅ | — |
 | Deribit | ✅ | — |
+| Aster | ✅ | ✅ |
 <!-- /streams -->
 
 Per-venue caveats are on the

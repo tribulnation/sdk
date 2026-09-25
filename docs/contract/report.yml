@@ -55,6 +55,7 @@ methods:
     example:
       accountVenues: [hyperliquid]
       constants:
+        aster: {count: 2}
         binance: {count: 2}
         bit2me: {count: 2}
         bybit: {count: 2}

@@ -5,6 +5,7 @@ from pathlib import Path
 from tribulnation.sdk.earn import Earn
 from .accounts import (
   Account,
+  Aster,
   Bybit,
   Coinbase,
   Kraken,
@@ -39,6 +40,20 @@ class EarnSDK:
       path: Path to a TOML file with an `[accounts]` table.
     """
     return cls(accounts=load_accounts(path))
+
+  def aster(self, account: Aster) -> Earn:
+    """Construct Aster with only the selected network's resolved credentials."""
+    try:
+      from tribulnation.aster import Earn as AsterSurface
+    except ImportError as exc:
+      raise ImportError('Install tribulnation-aster to use Aster.') from exc
+    user, signer = account.resolved_user, account.resolved_signer
+    return AsterSurface.new(
+      user=user,
+      signer=signer,
+      public=account.public and user is None and signer is None,
+      mainnet=account.venue == 'aster',
+    )
 
   def binance(self, account: Binance) -> Earn:
     try:
@@ -170,6 +185,8 @@ class EarnSDK:
     if (account := self.all_accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
     match account.venue:
+      case 'aster' | 'aster_testnet':
+        return self.aster(account)
       case 'binance':
         return self.binance(account)
       case 'bitget':

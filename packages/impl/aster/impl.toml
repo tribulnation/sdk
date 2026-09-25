@@ -1,0 +1,31 @@
+[support.market]
+support = "partial"
+auth = false
+methods = [
+  "depth", "depth_stream", "tickers", "rules", "fees", "candles",
+  "query_order", "open_orders", "trades_stream", "position", "collateral",
+  "place_order", "place_orders", "cancel_order", "cancel_orders", "cancel_open_orders",
+  "index", "next_funding", "funding_rates", "perp_position",
+]
+note = "Spot/perp mappings qualified on testnet; mainnet uses the same validated transports but private mainnet behavior is not qualified. Native MARKET ignores the SDK price argument; LIMIT uses GTC and POST_ONLY uses GTX. Book streams provide up to 20 levels. Position, collateral and perpetual-only reads are supported on one-way cross-margin perps; spot balances remain blocked. Trade history is blocked by pagination and missing spot buys. Bulk perp_stats, funding payments, available_notional and perp_collateral are unimplemented. Reported fees preserve their native asset."
+
+[support.report]
+support = "partial"
+auth = true
+methods = ["history"]
+note = "Testnet-qualified native spot/perp cash deltas retained as UnknownObservation, with category and raw source provenance; not a complete economic or position ledger. Defaults to seven days. Snapshot is blocked because testnet account information omits funded spot balances."
+
+[support.wallet]
+support = "none"
+auth = true
+note = "The typed client lacks the documented deposit and withdrawal asset catalogues."
+
+[support.earn]
+support = "none"
+auth = true
+note = "No verified Earn instrument/APR catalogue; testnet has no Earn surface."
+
+[ids]
+asset = "symbol"
+market = "Native concatenated symbols such as BTCUSDT, under spot and perp exchange IDs."
+note = "Asset IDs remain native (USDT, ASTER). Catalogue checks use the aster platform; testnet-only instruments remain explicit gaps."
