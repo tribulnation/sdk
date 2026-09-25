@@ -8,6 +8,7 @@ from typed_aster.futures.market.depth import Depth as FuturesDepth
 from typed_aster.futures.market.exchange_info import ExchangeInfoEndpoint
 from typed_aster.futures.market.premium_index import PremiumIndex
 from tribulnation.aster import AsterMarket
+from tribulnation.aster.market.exchanges import join_tickers
 from tribulnation.aster.market.markets import PerpMarket, error_code
 from tribulnation.sdk import BadRequest
 from tribulnation.sdk.core import MissingData
@@ -92,3 +93,22 @@ def test_error_code_tolerates_unexpected_payloads():
   assert error_code(BadRequest(400, {'code': -2013, 'msg': 'x'})) == -2013
   assert error_code(BadRequest(400, 'gateway timeout')) is None
   assert error_code(BadRequest('no payload')) is None
+
+
+def test_empty_ticker_sides_are_none():
+  """A zero native price marks an empty side or an untraded symbol, not a quote."""
+  stats: list[Any] = [
+    {'symbol': 'ALLOUSDT', 'lastPrice': Decimal(0), 'volume': 0, 'quoteVolume': 0}
+  ]
+  quotes: list[Any] = [
+    {
+      'symbol': 'ALLOUSDT',
+      'bidPrice': Decimal('0.2'),
+      'bidQty': Decimal(5),
+      'askPrice': Decimal(0),
+      'askQty': Decimal(0),
+    }
+  ]
+  ticker = join_tickers(stats, quotes, {'ALLOUSDT'})['ALLOUSDT']
+  assert ticker.bid == Decimal('0.2') and ticker.bid_qty == 5
+  assert ticker.ask is None and ticker.ask_qty is None and ticker.last is None

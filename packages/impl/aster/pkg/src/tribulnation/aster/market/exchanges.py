@@ -37,24 +37,31 @@ class Quote(TypedDict):
   askQty: Decimal
 
 
+def positive(value: Decimal) -> Decimal | None:
+  """Aster reports an empty book side, or a symbol never traded, as price zero."""
+  return value if value > 0 else None
+
+
 def join_tickers(
   stats: Sequence[Stats], quotes: Sequence[Quote], symbols: Collection[str]
 ) -> dict[str, Ticker]:
-  """Join rolling 24h statistics with best bid/ask by symbol."""
+  """Join rolling 24h statistics with best bid/ask by symbol; empty sides are `None`."""
   books = {q['symbol']: q for q in quotes}
   result: dict[str, Ticker] = {}
   for row in stats:
     if row['symbol'] not in symbols:
       continue
     quote = books.get(row['symbol'])
+    bid = positive(quote['bidPrice']) if quote else None
+    ask = positive(quote['askPrice']) if quote else None
     result[row['symbol']] = Ticker(
-      last=row['lastPrice'],
+      last=positive(row['lastPrice']),
       base_volume_24h=row['volume'],
       quote_volume_24h=row['quoteVolume'],
-      bid=quote['bidPrice'] if quote else None,
-      ask=quote['askPrice'] if quote else None,
-      bid_qty=quote['bidQty'] if quote else None,
-      ask_qty=quote['askQty'] if quote else None,
+      bid=bid,
+      ask=ask,
+      bid_qty=quote['bidQty'] if quote and bid is not None else None,
+      ask_qty=quote['askQty'] if quote and ask is not None else None,
     )
   return result
 

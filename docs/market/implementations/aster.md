@@ -45,6 +45,7 @@ never falls back to mainnet variables. `validate` toggles response validation.
 
 ## Venue-specific semantics
 
+- Tickers report an empty book side (native price `0`) as `None`, with no quantity.
 - REST depth reads up to 1000 levels. Depth streams carry up to 20 levels, shared per
   symbol and trimmed per subscriber.
 - Candles support all six SDK intervals in half-open 500-candle windows.
