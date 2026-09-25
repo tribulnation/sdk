@@ -1,0 +1,14 @@
+# auth = false means this surface has a real credential-free DEFAULT_ACCOUNTS entry —
+# auth = true means every call always needs a real accounts.Lighter() entry.
+
+[support.market]
+support = "full"
+auth = false
+note = "Perpetuals (`perp`) and spot (`spot`). Market ids are the venue's numeric `market_id` (`'1'` is mainnet BTC), which differ between mainnet and testnet. `depth` sums the top 250 resting orders per side (about 200 levels on busy books); `depth_stream` maintains the full book. Tickers carry no best-level sizes. `fees` reads the account's fee ticks (parts per million); trade fees are the role's tick on the notional, in USDC for perpetuals and in the received asset for spot, so spot `rules().fee_asset` is `None`. Order ids are client order indexes; `query_order` finds inactive orders for 24 hours only, and misses a just-cancelled order for a few seconds. `MARKET` is the venue's market order, bounded by `price`. Spot `cancel_open_orders` cancels order by order: the venue's market-scoped cancel-all rejects spot markets. Perpetual collateral covers cross and isolated positions; spot collateral supports unified accounts only. Funding is hourly; `funding_rates` and `funding_payments` apply inclusive bounds locally."
+# MarketSDK.DEFAULT_ACCOUNTS includes 'lighter' (Lighter(public=True)): public market data
+# only. Account-scoped and trading methods need an API key.
+
+[ids]
+asset = "index"
+market = "The venue's numeric `market_id` as a decimal string (`'0'` ETH and `'1'` BTC perpetuals, `'2048'` ETH/USDC spot on mainnet): the on-chain id orders are signed with. Symbols are API metadata only."
+note = "The venue's numeric `asset_id` as a decimal string (`'3'` is USDC, `'1'` ETH)."
