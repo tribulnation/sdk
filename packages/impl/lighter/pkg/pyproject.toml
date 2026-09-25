@@ -13,7 +13,9 @@ license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
 readme = {file="README.md", content-type="text/markdown"}
-dependencies = ["tribulnation-sdk>=2.6.0", "typed-lighter>=0.2.0"]
+# The SDK floor becomes >=2.6.0 (Rules.fee_asset: str | None, ADR 0028) in the release PR,
+# once that SDK version is published.
+dependencies = ["tribulnation-sdk>=2.5.0", "typed-lighter>=0.2.0"]
 
 [project.urls]
 Repository = "https://github.com/tribulnation/sdk.git"
