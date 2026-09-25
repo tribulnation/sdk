@@ -313,7 +313,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "a92700ede0cffe85c7aefaa50a915a0b2bc3101b7e192127bc0720cf210a06fb",
+        "files_sha256": "25b24dc2fe73e9f22bc0a55271d0274040842ef1b42983a72801b6f50acfe51b",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -363,14 +363,14 @@
         "version": "0.9.0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "df92e24151edad88523d82743fae6c0b75f11d07629dcb39c0a2069437365a75",
-        "metadata_sha256": "3839979f46564a228a8182ebfc1c0e6ccd8ec4a2d61d806eb791525184c68da7",
-        "version": "2.5.0"
+        "files_sha256": "85f086900d989b60d7dfc495a724748243ce3584f68d1ed618a4756e5be88d17",
+        "metadata_sha256": "79d5a2571d1f7b7c9d6065330a5b6fd2305416d0b3e3fa1950c2b6069ee23464",
+        "version": "2.6.0"
       },
       "typed-core": {
-        "files_sha256": "5fecdccc89907d537a4d20c11c3a494357b1c8c3f66c54de5729c92d9bee47ab",
-        "metadata_sha256": "0bec0107c1d72805e81e20c613ee9a361e022bae90de05e2665d4cee9571c28e",
-        "version": "0.9.0"
+        "files_sha256": "4c6915eb97aa8eff3fe3f17f7bdb3b20b008b13c2592479b55478d63bf31781d",
+        "metadata_sha256": "e752bb76b917309535c7a5096e3524f480220fb1da269e5c8a0cd92b39526996",
+        "version": "0.9.2"
       },
       "typed-hyperliquid": {
         "files_sha256": "6649c87fe03a862dc4b3b12fde594a93f887c724353043c686f4178ca000bd1c",
@@ -400,7 +400,7 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "a7582b7a37182b7ade0ea60d2dfe43ba1028a0c9dae717323fa47a43a362675d",
+    "source_sha256": "f9eca02f07958e6ccda5a60810eb9b3532a30b1b64db6567697701a71560f8da",
     "venue": "hyperliquid"
   },
   "before": {
@@ -717,7 +717,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "a92700ede0cffe85c7aefaa50a915a0b2bc3101b7e192127bc0720cf210a06fb",
+        "files_sha256": "25b24dc2fe73e9f22bc0a55271d0274040842ef1b42983a72801b6f50acfe51b",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -767,14 +767,14 @@
         "version": "0.9.0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "df92e24151edad88523d82743fae6c0b75f11d07629dcb39c0a2069437365a75",
-        "metadata_sha256": "3839979f46564a228a8182ebfc1c0e6ccd8ec4a2d61d806eb791525184c68da7",
-        "version": "2.5.0"
+        "files_sha256": "85f086900d989b60d7dfc495a724748243ce3584f68d1ed618a4756e5be88d17",
+        "metadata_sha256": "79d5a2571d1f7b7c9d6065330a5b6fd2305416d0b3e3fa1950c2b6069ee23464",
+        "version": "2.6.0"
       },
       "typed-core": {
-        "files_sha256": "5fecdccc89907d537a4d20c11c3a494357b1c8c3f66c54de5729c92d9bee47ab",
-        "metadata_sha256": "0bec0107c1d72805e81e20c613ee9a361e022bae90de05e2665d4cee9571c28e",
-        "version": "0.9.0"
+        "files_sha256": "4c6915eb97aa8eff3fe3f17f7bdb3b20b008b13c2592479b55478d63bf31781d",
+        "metadata_sha256": "e752bb76b917309535c7a5096e3524f480220fb1da269e5c8a0cd92b39526996",
+        "version": "0.9.2"
       },
       "typed-hyperliquid": {
         "files_sha256": "6649c87fe03a862dc4b3b12fde594a93f887c724353043c686f4178ca000bd1c",
@@ -804,12 +804,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "a7582b7a37182b7ade0ea60d2dfe43ba1028a0c9dae717323fa47a43a362675d",
+    "source_sha256": "f9eca02f07958e6ccda5a60810eb9b3532a30b1b64db6567697701a71560f8da",
     "venue": "hyperliquid"
   },
-  "finished": "2026-09-25T13:00:22.906837Z",
-  "results_sha256": "f98ba5011e2bea9a7140cfb52d71bb4d2e3b8e120cfdd649d979033006bd16e5",
+  "finished": "2026-09-25T19:31:48.846481Z",
+  "results_sha256": "919fa85c67ccb66f220d317f5e9f672a45c3a200dce615b7e6140b6495c4f945",
   "schema_version": 1,
-  "started": "2026-09-25T12:57:51.764243Z",
-  "summary_sha256": "ec959185b8cfaa422bc68dd532a6e41218ca0848529d9c71904652286a9eaf5e"
+  "started": "2026-09-25T19:29:38.053554Z",
+  "summary_sha256": "0d6819215bde9d247f4eb93d3ed336571ab5da6f0ac9e1e63499517bdb376c3e"
 }
