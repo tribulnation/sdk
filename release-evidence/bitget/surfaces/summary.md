@@ -1,5 +1,7 @@
 # Local SDK evidence: bitget
 
-Run completed: 2026-09-23T10:30:41.788556+00:00
+Run completed: 2026-09-25T12:54:21.378200+00:00
 
 This records a trusted local run, not cryptographic proof. Release policy must separately validate required check coverage and statuses.
+
+Venue withdrawal suspension: withdrawal-method non-emptiness was not checked while the venue suspended withdrawals venue-wide. Fetching withdrawal methods still had to pass. See ADR 0027; this is not a pass.

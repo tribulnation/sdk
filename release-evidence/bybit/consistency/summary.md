@@ -1,5 +1,5 @@
 # Local SDK evidence: bybit
 
-Run completed: 2026-09-23T10:31:24.622197+00:00
+Run completed: 2026-09-25T12:55:11.020961+00:00
 
 This records a trusted local run, not cryptographic proof. Release policy must separately validate required check coverage and statuses.

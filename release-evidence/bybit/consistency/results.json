@@ -4406,11 +4406,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"ICXUSDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -4679,11 +4679,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"LUNCUSDC\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -4945,11 +4945,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"NEONUSDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -5365,11 +5365,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"SANDUSDC\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -5645,11 +5645,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"SUNDOGUSDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -5687,11 +5687,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"SWELLUSDC\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -5708,11 +5708,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"TACUSDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -12699,14 +12699,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.2662",
-            "after_bid": "0.2659",
-            "ask": "0.2662",
+            "after_ask": "0.2550",
+            "after_bid": "0.2548",
+            "ask": "0.2550",
             "attempt": 1,
-            "before_ask": "0.2662",
-            "before_bid": "0.2659",
-            "bid": "0.2659",
-            "elapsed_seconds": 1.212420419906266,
+            "before_ask": "0.2550",
+            "before_bid": "0.2548",
+            "bid": "0.2548",
+            "elapsed_seconds": 1.5703440509969369,
             "ticker_ids_match": true
           }
         ],
@@ -12718,14 +12718,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.0004257",
-            "after_bid": "0.0004253",
-            "ask": "0.0004257",
+            "after_ask": "0.0004223",
+            "after_bid": "0.0004218",
+            "ask": "0.0004223",
             "attempt": 1,
-            "before_ask": "0.0004257",
-            "before_bid": "0.0004253",
-            "bid": "0.0004253",
-            "elapsed_seconds": 0.8296044940361753,
+            "before_ask": "0.0004223",
+            "before_bid": "0.0004218",
+            "bid": "0.0004218",
+            "elapsed_seconds": 1.2766111480304971,
             "ticker_ids_match": true
           }
         ],
@@ -12737,14 +12737,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.12890",
-            "after_bid": "0.12860",
-            "ask": "0.12890",
+            "after_ask": "0.12820",
+            "after_bid": "0.12790",
+            "ask": "0.12820",
             "attempt": 1,
-            "before_ask": "0.12890",
-            "before_bid": "0.12870",
-            "bid": "0.12870",
-            "elapsed_seconds": 1.0275569909717888,
+            "before_ask": "0.12820",
+            "before_bid": "0.12790",
+            "bid": "0.12790",
+            "elapsed_seconds": 2.1963893030770123,
             "ticker_ids_match": true
           }
         ],
@@ -12756,14 +12756,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "85736.40",
-            "after_bid": "85736.30",
-            "ask": "85736.40",
+            "after_ask": "84398.70",
+            "after_bid": "84398.60",
+            "ask": "84411.20",
             "attempt": 1,
-            "before_ask": "85736.40",
-            "before_bid": "85736.30",
-            "bid": "85736.30",
-            "elapsed_seconds": 0.7707211760571226,
+            "before_ask": "84411.20",
+            "before_bid": "84411.10",
+            "bid": "84411.10",
+            "elapsed_seconds": 1.5892083829967305,
             "ticker_ids_match": true
           }
         ],
@@ -12775,14 +12775,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.2666",
-            "after_bid": "0.2661",
-            "ask": "0.2667",
+            "after_ask": "0.255",
+            "after_bid": "0.2547",
+            "ask": "0.255",
             "attempt": 1,
-            "before_ask": "0.2667",
-            "before_bid": "0.2664",
-            "bid": "0.2664",
-            "elapsed_seconds": 0.8208876800490543,
+            "before_ask": "0.255",
+            "before_bid": "0.2547",
+            "bid": "0.2547",
+            "elapsed_seconds": 0.48459018603898585,
             "ticker_ids_match": true
           }
         ],
@@ -12794,14 +12794,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.10368",
-            "after_bid": "0.10359",
-            "ask": "0.10368",
+            "after_ask": "0.10303",
+            "after_bid": "0.10294",
+            "ask": "0.10303",
             "attempt": 1,
-            "before_ask": "0.10368",
-            "before_bid": "0.10359",
-            "bid": "0.10359",
-            "elapsed_seconds": 0.7404224849306047,
+            "before_ask": "0.10303",
+            "before_bid": "0.10294",
+            "bid": "0.10294",
+            "elapsed_seconds": 0.6369494210230187,
             "ticker_ids_match": true
           }
         ],
@@ -12813,14 +12813,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.05446",
-            "after_bid": "0.05438",
-            "ask": "0.05446",
+            "after_ask": "0.05564",
+            "after_bid": "0.05555",
+            "ask": "0.05564",
             "attempt": 1,
-            "before_ask": "0.05446",
-            "before_bid": "0.05438",
-            "bid": "0.05438",
-            "elapsed_seconds": 0.5837775880936533,
+            "before_ask": "0.05564",
+            "before_bid": "0.05551",
+            "bid": "0.05551",
+            "elapsed_seconds": 0.48372651694808155,
             "ticker_ids_match": true
           }
         ],
@@ -12832,14 +12832,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "85789.6",
-            "after_bid": "85789.5",
-            "ask": "85789.6",
+            "after_ask": "84447.8",
+            "after_bid": "84447.7",
+            "ask": "84447.8",
             "attempt": 1,
-            "before_ask": "85789.6",
-            "before_bid": "85789.5",
-            "bid": "85789.5",
-            "elapsed_seconds": 0.7263907380402088,
+            "before_ask": "84447.8",
+            "before_bid": "84447.7",
+            "bid": "84447.7",
+            "elapsed_seconds": 0.6477672159671783,
             "ticker_ids_match": true
           }
         ],
@@ -12970,7 +12970,6 @@
           "SOLUSDC",
           "XRPUSDC",
           "SOLBTC",
-          "ICXUSDT",
           "XDCUSDT",
           "HNTUSDT",
           "ZILUSDT",
@@ -12980,9 +12979,7 @@
           "LTCUSDC",
           "LTCBTC",
           "MANAUSDC",
-          "SANDUSDC",
           "DOTUSDC",
-          "LUNCUSDC",
           "GMXUSDT",
           "ACHUSDT",
           "JSTUSDT",
@@ -13072,7 +13069,6 @@
           "MNTUSDC",
           "MNTBTC",
           "ARKMUSDT",
-          "NEONUSDT",
           "WLDUSDC",
           "WLDUSDT",
           "SEIUSDT",
@@ -13203,7 +13199,6 @@
           "UNIUSDC",
           "TIAUSDC",
           "INJUSDC",
-          "SUNDOGUSDT",
           "CATIUSDT",
           "HMSTRUSDT",
           "CATIUSDC",
@@ -13222,7 +13217,6 @@
           "GRASSUSDT",
           "KAIAUSDT",
           "SWELLUSDT",
-          "SWELLUSDC",
           "NSUSDT",
           "GOATUSDT",
           "MORPHOUSDT",
@@ -13329,7 +13323,6 @@
           "HYPEUSDT",
           "JTOUSDC",
           "DYDXUSDC",
-          "TACUSDT",
           "PUMPUSDT",
           "ERAUSDT",
           "TAUSDT",

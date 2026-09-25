@@ -28,11 +28,11 @@
         "skipped": 0
       },
       {
-        "exclusion": null,
+        "exclusion": "venue_withdrawals_suspended",
         "failed": 0,
         "id": "wallet.test_withdrawal_methods_not_empty[null, null]",
         "network": "mainnet",
-        "passed": 1,
+        "passed": 0,
         "skipped": 0
       },
       {
