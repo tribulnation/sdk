@@ -1,50 +1,50 @@
-"""Account routing, credential isolation and explicit qualification gaps."""
+"""Account routing, credential isolation and explicitly unsupported methods."""
 
+from datetime import datetime, timezone
 from pathlib import Path
 from eth_account import Account
 import pytest
-from tribulnation.aster import AsterMarket, Earn, Report, Wallet
-from tribulnation.sdk import EarnSDK, MarketSDK, ReportSDK, WalletSDK
+from tribulnation.aster import AsterMarket, Report
+from tribulnation.aster.market.markets import PerpMarket, SpotMarket
+from tribulnation.sdk import AuthError, MarketSDK
 from tribulnation.sdk.impl.accounts import Aster, load_accounts
 
 
 def test_testnet_credentials_do_not_fall_back_to_mainnet(
   monkeypatch: pytest.MonkeyPatch,
 ):
-  """Mainnet keys, including the main-wallet key, cannot leak into testnet clients."""
+  """Mainnet keys, including the main-wallet key, never reach a testnet client."""
   monkeypatch.setenv('ASTER_USER', Account.create().address)
   monkeypatch.setenv('ASTER_SIGNER_PRIVATE_KEY', Account.create().key.hex())
   monkeypatch.setenv('ASTER_USER_PRIVATE_KEY', Account.create().key.hex())
-  monkeypatch.setenv('ASTER_SIGNER', Account.create().address)
   monkeypatch.delenv('TEST_ASTER_USER', raising=False)
   monkeypatch.delenv('TEST_ASTER_SIGNER_PRIVATE_KEY', raising=False)
   with pytest.raises(ValueError, match='TEST_ASTER_USER'):
     Aster(venue='aster_testnet').verify_env_vars()
-  from tribulnation.sdk import AuthError
-
-  with pytest.raises(AuthError, match='TEST_ASTER_USER'):
+  with pytest.raises(AuthError, match='signer'):
     AsterMarket.new(mainnet=False)
   user, agent = Account.create(), Account.create()
-  venue = AsterMarket.new(mainnet=False, user=user.address, signer=agent.key.hex())
+  venue = AsterMarket.new(user=user.address, signer=agent.key.hex(), mainnet=False)
   credentials = venue.client.futures.client.credentials
   assert credentials is not None and credentials.user == user.address
   assert credentials.agent is not None and credentials.agent.address == agent.address
   assert credentials.main is None
   assert venue.client.spot.client.credentials is credentials
+  assert venue.client.prediction.client.credentials is None
   assert venue.client.chain.client.credentials is None
 
 
-async def test_toml_routes_both_networks_and_preserves_explicit_public_credentials(
+async def test_toml_routes_both_networks(
   tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ):
-  """TOML discrimination, optional installation routes and resource sharing agree."""
+  """TOML accounts select the network, share one owner and resolve exchanges."""
   monkeypatch.setattr('os.environ', {})
   path = tmp_path / 'sdk.toml'
   path.write_text(
-    '[accounts.main]\nvenue="aster"\npublic=true\n[accounts.test]\nvenue="aster_testnet"\npublic=true\n'
+    '[accounts.main]\nvenue="aster"\npublic=true\n'
+    '[accounts.test]\nvenue="aster_testnet"\npublic=true\nvalidate=false\n'
   )
-  accounts = load_accounts(path)
-  sdk = MarketSDK(accounts=accounts)
+  sdk = MarketSDK(accounts=load_accounts(path))
   async with sdk:
     venue = await sdk.venue('test')
     assert venue is await sdk.venue('test')
@@ -53,12 +53,9 @@ async def test_toml_routes_both_networks_and_preserves_explicit_public_credentia
     assert await venue.perp_exchange('perp') is await venue.exchange('perp')
     with pytest.raises(ValueError, match='perpetual exchange'):
       await venue.perp_exchange('spot')
-    assert (await sdk.venue('main')).venue_id == 'aster'
     with pytest.raises(ValueError, match='Unknown Aster exchange'):
       await venue.exchange('inverse')
-  assert isinstance(ReportSDK(accounts=accounts).venue('test'), Report)
-  assert isinstance(WalletSDK(accounts=accounts).venue('test'), Wallet)
-  assert isinstance(EarnSDK(accounts=accounts).venue('test'), Earn)
+    assert (await sdk.venue('main')).venue_id == 'aster'
   user, agent = Account.create(), Account.create()
   private = Aster(
     venue='aster_testnet', user=user.address, signer=agent.key.hex(), public=True
@@ -68,37 +65,31 @@ async def test_toml_routes_both_networks_and_preserves_explicit_public_credentia
   assert authenticated.client.futures.client.credentials is not None
 
 
-async def test_unqualified_methods_fail_instead_of_returning_empty_data():
-  """Empty or blocked PoC methods must not look like implemented SDK support."""
-  venue = AsterMarket.new(mainnet=False, public=True)
-  from tribulnation.aster.market.market import PerpMarket, SpotMarket
-
-  perp = PerpMarket(exchange=venue.perp, symbol='ASTERUSDT')
-  spot = SpotMarket(exchange=venue.spot, symbol='ASTERUSDT')
-  from datetime import datetime, timezone
-
+async def test_unsupported_methods_raise_instead_of_returning_empty_data():
+  """Blocked mappings must not look like implemented support."""
+  venue = AsterMarket.new(public=True, mainnet=False)
+  perp = PerpMarket(shared=venue.shared, symbol='ASTERUSDT')
+  spot = SpotMarket(shared=venue.shared, symbol='ASTERUSDT')
   now = datetime.now(timezone.utc)
   for method in (
     spot.position,
     spot.collateral,
+    spot.available_notional,
     perp.available_notional,
     perp.perp_collateral,
     venue.perp.perp_stats,
   ):
     with pytest.raises(NotImplementedError):
       await method()
-  with pytest.raises(NotImplementedError, match='nonzero'):
-    await perp.funding_payments(now, now)
   for market in (spot, perp):
-    with pytest.raises(NotImplementedError):
-      await market.trades_history(now, now)
-    with pytest.raises(NotImplementedError, match='exchange-wide'):
-      await market.exchange.trades_history(None, now, now)
-  with pytest.raises(NotImplementedError, match='exchange-wide'):
+    with pytest.raises(NotImplementedError, match='trade history'):
+      market.trades_history(now, now)
+  with pytest.raises(NotImplementedError, match='funding payments'):
+    perp.funding_payments(now, now)
+  for exchange in (venue.spot, venue.perp):
+    with pytest.raises(NotImplementedError, match='Exchange-wide'):
+      await exchange.trades_history(None, now, now)
+  with pytest.raises(NotImplementedError, match='Exchange-wide'):
     await venue.perp.funding_payments(None, now, now)
-  with pytest.raises(NotImplementedError, match='funded balances'):
+  with pytest.raises(NotImplementedError, match='snapshots'):
     await Report.new(public=True, mainnet=False).snapshot()
-  with pytest.raises(NotImplementedError, match='catalogues'):
-    await Wallet.new(public=True).deposit_methods()
-  with pytest.raises(NotImplementedError, match='catalogue'):
-    await Earn.new(public=True).instruments()

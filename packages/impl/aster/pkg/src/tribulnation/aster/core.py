@@ -1,14 +1,16 @@
-"""Aster client ownership, isolated credentials and per-request SDK policies."""
+"""Aster client ownership, cached symbol metadata and the SDK request seam."""
 
-from contextlib import asynccontextmanager, suppress
+from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from functools import cached_property
 import asyncio
-import os
 from typing_extensions import (
   AsyncContextManager,
+  AsyncIterable,
+  AsyncIterator,
   Awaitable,
   Callable,
+  Hashable,
   Iterable,
   Literal,
   TypeVar,
@@ -17,109 +19,75 @@ from eth_utils.address import is_address, to_checksum_address
 from typed_aster import Aster
 from typed_aster.core.auth import Credentials, parse_wallet
 from typed_aster.core.base import ChainClients, SurfaceClients
+from typed_aster.futures.market.exchange_info import FuturesSymbol
+from typed_aster.spot.market.exchange_info import SpotSymbol
 from tribulnation.sdk.core import (
   AuthError,
   ManagedResource,
+  OverflowPolicy,
   SDK,
   Subscription,
   exception_wrapper,
 )
-from tribulnation.sdk.market import Book, Trade
+from tribulnation.sdk.market import Book, Collateral, Trade
 
 T = TypeVar('T')
+U = TypeVar('U')
+K = TypeVar('K', bound=Hashable)
 Scope = Literal['spot', 'perp']
 wrap_exceptions = exception_wrapper()
 
 
 @wrap_exceptions
 def new_client(
-  *, user: str | None, signer: str | None, public: bool, mainnet: bool
+  *,
+  user: str | None,
+  signer: str | None,
+  public: bool,
+  mainnet: bool,
+  validate: bool,
 ) -> Aster:
-  """Build validated transports without falling back to another network's secrets.
+  """Build transports signed by the trading agent only.
 
-  Only the trading agent is used. Management and main-wallet signing credentials
-  are deliberately absent from these SDK surfaces.
+  `Aster.new` also reads the main wallet's key from the environment; the SDK never
+  needs it, so credentials are built here from the arguments alone.
   """
   credentials = None
   if not public:
-    prefix = 'ASTER' if mainnet else 'TEST_ASTER'
-    user = user or os.getenv(f'{prefix}_USER')
-    signer = signer or os.getenv(f'{prefix}_SIGNER_PRIVATE_KEY')
     if not user or not signer:
-      raise AuthError(
-        f'Provide user and signer, or {prefix}_USER and {prefix}_SIGNER_PRIVATE_KEY'
-      )
+      raise AuthError('Aster requires `user` and `signer`, or `public=True`')
     if not is_address(user):
-      raise AuthError('Aster user must be an EVM wallet address')
+      raise AuthError('Aster `user` must be an EVM wallet address')
     credentials = Credentials(
       user=to_checksum_address(user), agent=parse_wallet(signer)
     )
+
+  def surface(name: Literal['futures', 'spot', 'prediction'], signed: bool):
+    """Build one surface's transports for the selected network."""
+    return SurfaceClients.build(
+      name,
+      credentials=credentials if signed else None,
+      mainnet=mainnet,
+      validate=validate,
+    )
+
   return Aster(
-    futures_clients=SurfaceClients.build(
-      'futures', credentials=credentials, mainnet=mainnet, validate=True
-    ),
-    spot_clients=SurfaceClients.build(
-      'spot', credentials=credentials, mainnet=mainnet, validate=True
-    ),
-    prediction_clients=SurfaceClients.build(
-      'prediction', credentials=credentials, mainnet=mainnet, validate=True
-    ),
-    chain_clients=ChainClients.build(credentials=None, validate=True),
+    futures_clients=surface('futures', True),
+    spot_clients=surface('spot', True),
+    prediction_clients=surface('prediction', False),
+    chain_clients=ChainClients.build(credentials=None, validate=validate),
   )
 
 
-class Calls(SDK):
-  """Translate each request before SDK retry middleware sees its failure."""
-
-  @SDK.method
-  @wrap_exceptions
-  async def call_aster(self, fn: Callable[[], Awaitable[T]]) -> T:
-    """Run one native request or one typed paginator page."""
-    return await fn()
-
-
-async def close_subscription(subscription: Subscription[T]):
-  """Release an active shared subscription when its owning SDK context exits."""
-  async with subscription.lock:
-    pump, context = subscription.pump, subscription.ctx
-    subscription.pump = subscription.ctx = None
-    inboxes = list(subscription.subscribers)
-    subscription.subscribers.clear()
-  try:
-    if pump is not None:
-      pump.cancel()
-      with suppress(asyncio.CancelledError):
-        await pump
-  finally:
-    try:
-      if context is not None:
-        await context.unsubscribe()
-    finally:
-      for inbox in inboxes:
-        inbox.close()
-
-
-@asynccontextmanager
-async def closing_streams(shared: 'Shared'):
-  """Close lazy sockets and listen keys before releasing the HTTP client."""
-  try:
-    yield
-  finally:
-    results = await asyncio.gather(
-      *(close_subscription(s) for s in shared.books.values()),
-      *(close_subscription(s) for s in shared.trades.values()),
-      return_exceptions=True,
-    )
-    for result in results:
-      if isinstance(result, BaseException):
-        raise result
-
-
-@dataclass(kw_only=True)
-class Shared(Calls):
-  """One client and shared subscriptions for all objects belonging to this account."""
+@dataclass(frozen=True, kw_only=True)
+class Shared(SDK):
+  """Own one client, its symbol metadata and the account's shared streams."""
 
   client: Aster
+  mainnet: bool
+  spot: dict[str, SpotSymbol] = field(default_factory=dict[str, SpotSymbol])
+  perp: dict[str, FuturesSymbol] = field(default_factory=dict[str, FuturesSymbol])
+  lock: asyncio.Lock = field(default_factory=asyncio.Lock)
   books: dict[tuple[Scope, str], Subscription[Book]] = field(
     default_factory=dict[tuple[Scope, str], Subscription[Book]]
   )
@@ -129,46 +97,90 @@ class Shared(Calls):
 
   @property
   def venue_id(self) -> str:
-    """Preserve network identity in direct SDK objects and report provenance."""
-    return 'aster' if self.client.futures.client.mainnet else 'aster_testnet'
+    """The network-specific venue ID."""
+    return 'aster' if self.mainnet else 'aster_testnet'
 
   @cached_property
   def client_resource(self) -> ManagedResource[object]:
-    """Translate entry/cleanup errors without retrying the entire lifecycle."""
+    """Own the client with the venue's entry and cleanup policies."""
     return ManagedResource(
       resource=self.client, wrap_enter=wrap_exceptions, wrap_exit=wrap_exceptions
     )
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:
-    """Own the client once, and close subscriptions first in reverse order."""
+    """The client root owns every transport."""
     yield self.client_resource
-    yield ManagedResource(
-      resource=closing_streams(self),
-      wrap_enter=wrap_exceptions,
-      wrap_exit=wrap_exceptions,
+
+  @SDK.method
+  @wrap_exceptions
+  async def call(self, fn: Callable[[], Awaitable[T]]) -> T:
+    """Translate and retry one request or one paginator page."""
+    return await fn()
+
+  async def spot_symbols(self, *, refetch: bool = False) -> dict[str, SpotSymbol]:
+    """Cache the spot symbols currently open for trading."""
+    async with self.lock:
+      if refetch or not self.spot:
+        info = await self.call(self.client.spot.market.exchange_info)
+        self.spot.clear()
+        self.spot.update(
+          (r['symbol'], r) for r in info['symbols'] if r['status'] == 'TRADING'
+        )
+    return self.spot
+
+  async def perp_symbols(self, *, refetch: bool = False) -> dict[str, FuturesSymbol]:
+    """Cache the perpetual contracts currently open for trading."""
+    async with self.lock:
+      if refetch or not self.perp:
+        info = await self.call(self.client.futures.market.exchange_info)
+        self.perp.clear()
+        self.perp.update(
+          (r['symbol'], r)
+          for r in info['symbols']
+          if r['status'] == 'TRADING' and r['contractType'] == 'PERPETUAL'
+        )
+    return self.perp
+
+  async def cross_collateral(self) -> Collateral:
+    """Read the perpetual cross-margin bucket's equity and available balance."""
+    row = await self.call(self.client.futures.account.info_with_join_margin)
+    return Collateral(
+      equity=row['totalMarginBalance'], free_collateral=row['availableBalance']
     )
 
-  def book_subscription(self, scope: Scope, symbol: str) -> Subscription[Book]:
-    """Reuse the same complete top-20 upstream for every subscriber to a symbol."""
-    from .streams import connect_books
+  @asynccontextmanager
+  async def stream(
+    self,
+    subscriptions: dict[K, Subscription[T]],
+    key: K,
+    connect: Callable[[], Awaitable[Subscription.Context[T]]],
+    *,
+    select: Callable[[T], U | None],
+    queue_size: int,
+    overflow: OverflowPolicy,
+  ) -> AsyncIterator[AsyncIterable[U]]:
+    """Subscribe to one shared upstream, mapping or dropping items per subscriber.
 
-    key = (scope, symbol)
-    if key not in self.books:
-      self.books[key] = Subscription(lambda: connect_books(self, scope, symbol))
-    return self.books[key]
+    The upstream opens with its first subscriber and closes with its last.
+    """
+    if key not in subscriptions:
+      subscriptions[key] = Subscription(connect)
+    async with subscriptions[key].subscribe(
+      queue_size=queue_size, overflow=overflow
+    ) as upstream:
 
-  def trade_subscription(self, scope: Scope) -> Subscription[tuple[str, Trade]]:
-    """Own one account listen key per venue, shared across symbols/subscribers."""
-    from .streams import connect_trades
+      async def selected() -> AsyncIterator[U]:
+        """Yield this subscriber's view of each shared item."""
+        async for item in upstream:
+          if (value := select(item)) is not None:
+            yield value
 
-    if scope not in self.trades:
-      self.trades[scope] = Subscription(lambda: connect_trades(self, scope))
-    return self.trades[scope]
+      yield selected()
 
 
 @dataclass(frozen=True, kw_only=True)
-class SharedMixin(Calls):
-  """Let venue, exchange, market and report objects borrow the same owned state."""
+class Public(SDK):
+  """Share one resource owner across venue, exchange, market and report objects."""
 
   shared: Shared
 
@@ -180,24 +192,32 @@ class SharedMixin(Calls):
     signer: str | None = None,
     public: bool = False,
     mainnet: bool = True,
+    validate: bool = True,
   ):
-    """Construct a validated Aster surface for the selected network."""
-    return cls(
-      shared=Shared(
-        client=new_client(user=user, signer=signer, public=public, mainnet=mainnet)
-      )
+    """Create a surface over a new client.
+
+    Args:
+      user: Main wallet address (the Aster account).
+      signer: Private key of the trading agent (API wallet) registered for `user`.
+      public: Build a credential-free client for market data.
+      mainnet: Use mainnet when true, testnet when false.
+      validate: Validate responses against the typed client's schemas.
+    """
+    client = new_client(
+      user=user, signer=signer, public=public, mainnet=mainnet, validate=validate
     )
+    return cls(shared=Shared(client=client, mainnet=mainnet))
 
   @property
   def client(self) -> Aster:
-    """The shared native typed client."""
+    """The shared typed client."""
     return self.shared.client
 
   @property
   def venue_id(self) -> str:
-    """The account's network-specific venue ID."""
+    """The network-specific venue ID."""
     return self.shared.venue_id
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:
-    """Delegate lifetime to the single shared owner."""
+    """Enter the shared owner through the SDK lifecycle."""
     yield self.shared

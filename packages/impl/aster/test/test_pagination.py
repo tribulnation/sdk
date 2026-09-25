@@ -11,7 +11,7 @@ from typed_aster.futures.market.funding_rate import FundingRateEndpoint
 from typed_aster.futures.account.income import IncomeEndpoint
 from typed_aster.spot.account.transaction_history import TransactionHistory
 from tribulnation.aster import AsterMarket, Report
-from tribulnation.aster.market.market import PerpMarket
+from tribulnation.aster.market.markets import PerpMarket
 from tribulnation.sdk import Context, NetworkError
 
 START = datetime(2026, 1, 1, tzinfo=timezone.utc)
@@ -39,7 +39,7 @@ async def test_candles_retry_only_failed_window(
   ]
   endpoint = AsyncMock(side_effect=[[], ClientNetworkError('offline'), [row]])
   monkeypatch.setattr(Klines, 'klines', endpoint)
-  market = PerpMarket(exchange=AsterMarket.new(public=True).perp, symbol='BTCUSDT')
+  market = PerpMarket(shared=AsterMarket.new(public=True).shared, symbol='BTCUSDT')
   with Context().retried(NetworkError, max_retries=1, base_delay=0).use():
     request = market.candles('1m', START, START + timedelta(minutes=501))
     result = await request if collect else [r async for page in request for r in page]
@@ -72,9 +72,9 @@ async def test_native_funding_pager_retry(monkeypatch: pytest.MonkeyPatch):
     return PaginatedResponse(0, fetch)
 
   monkeypatch.setattr(FundingRateEndpoint, 'funding_rate_paged', pages)
-  exchange = AsterMarket.new(public=True).perp
+  market = PerpMarket(shared=AsterMarket.new(public=True).shared, symbol='BTCUSDT')
   with Context().retried(NetworkError, max_retries=1, base_delay=0).use():
-    rows = await exchange.funding_rates('BTCUSDT', START, START)
+    rows = await market.funding_rates(START, START)
   assert calls == [0, 1, 1, 2]
   assert len(rows) == 1 and rows[0].rate == Decimal('.001')
 

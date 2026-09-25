@@ -70,8 +70,6 @@ def owner_for(module: str, name: str, attribute: str, client: AsyncMock) -> SDK:
   if attribute != 'node':
     object.__setattr__(owner, 'node', AsyncMock())
   object.__setattr__(owner, 'streams', {})
-  object.__setattr__(owner, 'books', {})
-  object.__setattr__(owner, 'trades', {})
   object.__setattr__(owner, 'ws_stack', None)
   return owner
 

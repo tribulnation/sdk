@@ -54,17 +54,19 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
     return cls(accounts=load_accounts(path))
 
   def aster(self, account: Aster) -> TradingVenue:
-    """Construct Aster with only the selected network's resolved credentials."""
     try:
-      from tribulnation.aster import AsterMarket as AsterSurface
-    except ImportError as exc:
-      raise ImportError('Install tribulnation-aster to use Aster.') from exc
+      from tribulnation.aster import AsterMarket
+    except ImportError as e:
+      raise ImportError(
+        'aster market is not installed. Please install it with `pip install tribulnation-aster`.'
+      ) from e
     user, signer = account.resolved_user, account.resolved_signer
-    return AsterSurface.new(
+    return AsterMarket.new(
       user=user,
       signer=signer,
       public=account.public and user is None and signer is None,
       mainnet=account.venue == 'aster',
+      validate=account.validate,
     )
 
   def dydx(self, account: Dydx) -> TradingVenue:

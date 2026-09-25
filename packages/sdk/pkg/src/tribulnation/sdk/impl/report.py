@@ -6,7 +6,6 @@ from tribulnation.sdk.reporting import Report
 from tribulnation.sdk.reporting.config import ProvidersConfig
 from .accounts import (
   Account,
-  Aster,
   Dydx,
   Evm,
   Binance,
@@ -50,20 +49,6 @@ class ReportSDK:
       path: Path to a TOML file with an `[accounts]` table.
     """
     return cls(accounts=load_accounts(path))
-
-  def aster(self, account: Aster, id: str) -> Report:
-    """Construct Aster with only the selected network's resolved credentials."""
-    try:
-      from tribulnation.aster import Report as AsterSurface
-    except ImportError as exc:
-      raise ImportError('Install tribulnation-aster to use Aster.') from exc
-    user, signer = account.resolved_user, account.resolved_signer
-    return AsterSurface.new(
-      user=user,
-      signer=signer,
-      public=account.public and user is None and signer is None,
-      mainnet=account.venue == 'aster',
-    )
 
   def evm(self, account: Evm, id: str) -> Report:
     try:
@@ -227,8 +212,6 @@ class ReportSDK:
     if (account := self.accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
     match account.venue:
-      case 'aster' | 'aster_testnet':
-        return self.aster(account, id)
       case (
         'ethereum'
         | 'arbitrum'

@@ -10,9 +10,17 @@ from typed_aster.futures.trade.order import Order as PerpQuery
 from typed_aster.spot.trade.order import Order as SpotQuery
 from typed_aster.futures.trade.cancel_batch_orders import CancelBatchOrders
 from tribulnation.aster import AsterMarket
+from tribulnation.aster.market.markets import PerpMarket, SpotMarket
 from tribulnation.sdk import AuthError, BadRequest
 from tribulnation.sdk.market import Order
 from typing_extensions import Literal
+
+
+def market(scope: str) -> SpotMarket | PerpMarket:
+  """A testnet market over a public client, without catalogue requests."""
+  shared = AsterMarket.new(public=True, mainnet=False).shared
+  cls = PerpMarket if scope == 'perp' else SpotMarket
+  return cls(shared=shared, symbol='ASTERUSDT')
 
 
 @pytest.mark.parametrize('scope', ['spot', 'perp'])
@@ -29,10 +37,8 @@ async def test_signed_order_types(
   monkeypatch.setattr(
     PerpOrders if scope == 'perp' else SpotOrders, 'place_order', endpoint
   )
-  venue = AsterMarket.new(public=True, mainnet=False)
-  exchange = venue.perp if scope == 'perp' else venue.spot
   order: Order = {'type': kind, 'qty': qty, 'price': '0.75'}
-  placed = await exchange.place_order('ASTERUSDT', order)
+  placed = await market(scope).place_order(order)
   assert endpoint.await_args is not None
   request = endpoint.await_args.args[0]
   assert placed.id == '123'
@@ -58,13 +64,12 @@ async def test_only_documented_not_found_is_none(
     ]
   )
   monkeypatch.setattr(PerpQuery if scope == 'perp' else SpotQuery, 'order', endpoint)
-  venue = AsterMarket.new(public=True, mainnet=False)
-  exchange = venue.perp if scope == 'perp' else venue.spot
-  assert await exchange.query_order('ASTERUSDT', '123') is None
+  target = market(scope)
+  assert await target.query_order('123') is None
   with pytest.raises(BadRequest):
-    await exchange.query_order('ASTERUSDT', '123')
+    await target.query_order('123')
   with pytest.raises(AuthError):
-    await exchange.query_order('ASTERUSDT', '123')
+    await target.query_order('123')
 
 
 async def test_batch_boundary_retains_partial_errors(monkeypatch: pytest.MonkeyPatch):
@@ -74,13 +79,11 @@ async def test_batch_boundary_retains_partial_errors(monkeypatch: pytest.MonkeyP
   ]
   endpoint = AsyncMock(side_effect=[results[:10], results[10:]])
   monkeypatch.setattr(CancelBatchOrders, 'cancel_batch_orders', endpoint)
-  exchange = AsterMarket.new(public=True, mainnet=False).perp
-  assert (
-    await exchange.cancel_orders('ASTERUSDT', [str(n) for n in range(11)]) == results
-  )
+  target = market('perp')
+  assert await target.cancel_orders([str(n) for n in range(11)]) == results
   assert [c.args[0]['orderIdList'] for c in endpoint.await_args_list] == [
     list(range(10)),
     [10],
   ]
-  assert await exchange.cancel_orders('ASTERUSDT', []) == []
+  assert await target.cancel_orders([]) == []
   assert endpoint.await_count == 2

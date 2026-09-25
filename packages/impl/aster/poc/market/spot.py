@@ -413,7 +413,7 @@ async def trades_history(
 ) -> AsyncIterable[Sequence[Trade]]:
   """Do not return a partial history when confirmed testnet buys are missing."""
   raise NotImplementedError(
-    'Testnet spot user_trades omits confirmed buy fills; see testnet-issues.md'
+    'Testnet spot user_trades omits confirmed buy fills; see dev-docs/aster-market.md'
   )
   yield []  # Retain the SDK async-generator contract for the blocked method.
 
@@ -502,7 +502,7 @@ async def trades_stream(
 async def position(market_id: str, /) -> Position:
   """Do not report zero when the testnet omits known funded spot balances."""
   raise NotImplementedError(
-    'Testnet spot account.info omits funded balances; see testnet-issues.md'
+    'Testnet spot account.info omits funded balances; see dev-docs/aster-market.md'
   )
 
 
@@ -522,7 +522,7 @@ except NotImplementedError as exc:
 async def collateral(market_id: str | None = None, /) -> Collateral:
   """Wait for an accurate native spot balance view before reporting collateral."""
   raise NotImplementedError(
-    'Testnet spot account.info omits funded balances; see testnet-issues.md'
+    'Testnet spot account.info omits funded balances; see dev-docs/aster-market.md'
   )
 
 
@@ -876,10 +876,10 @@ evidence
 # | `candles` | verified | All six SDK intervals on BTCUSDT/ASTERUSDT; 510 one-minute rows cross the 500-row boundary |
 # | `query_order` | verified | Missing, resting, filled and cancelled native orders; signed buy/sell quantities |
 # | `open_orders` | verified | Resting orders observed; confirmed empty after cancellation |
-# | `trades_history` | blocked | Native REST omits confirmed buys; pagination also sends exclusive filters; testnet-issues.md and typed-client-issues.md |
+# | `trades_history` | blocked | Native REST omits confirmed buys; pagination also sends exclusive filters; dev-docs/aster-market.md and typed-client-issues.md |
 # | `trades_stream` | verified | Four real buy/sell fills with native fees; REST matching checked for returned sells; listen-key cleanup |
-# | `position` | blocked | Native account.info returns balances=[] after funding and fills; testnet-issues.md |
-# | `collateral` | blocked | Native account.info omits funded USDT and ASTER balances; testnet-issues.md |
+# | `position` | blocked | Native account.info returns balances=[] after funding and fills; dev-docs/aster-market.md |
+# | `collateral` | blocked | Native account.info omits funded USDT and ASTER balances; dev-docs/aster-market.md |
 # | `available_notional` | not supported | No native account-side buy/sell capacity; no derived buying-power estimate |
 # | `place_order` | verified | Real MARKET and marketable GTC fills on both sides; resting GTX buys and sells |
 # | `cancel_order` | verified | Single resting buy and post-only sell cancelled and queried |

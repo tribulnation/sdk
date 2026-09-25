@@ -53,7 +53,7 @@ print(
 async def snapshot(assets: Collection[str] | None = None) -> SnapshotRecord:
   """Avoid an incomplete account snapshot while native spot balances are missing."""
   raise NotImplementedError(
-    'Testnet spot account.info omits funded balances; see testnet-issues.md'
+    'Testnet spot account.info omits funded balances; see dev-docs/aster-market.md'
   )
 
 
@@ -157,7 +157,7 @@ len(records), records
 #
 # | method | status | note |
 # |---|---|---|
-# | `snapshot` | blocked | Spot native balances remain empty despite confirmed funding and fills; testnet-issues.md |
+# | `snapshot` | blocked | Spot native balances remain empty despite confirmed funding and fills; dev-docs/aster-market.md |
 # | `history` | verified | Nonempty native spot/perp cash ledgers; distinct IDs for shared-transaction asset/category legs; unclassified observations |
 
 # %% [markdown]

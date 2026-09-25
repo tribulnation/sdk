@@ -313,6 +313,8 @@ class Aster(BaseAccount):
   """Main-wallet address; defaults to the selected network's USER variable."""
   signer: str | None = None
   """Trading agent private key; no main-wallet signing key is needed."""
+  validate: bool = True
+  """Whether to type-validate incoming responses."""
 
   @property
   def resolved_user(self) -> str | None:

@@ -14,8 +14,16 @@ from typed_aster.spot.listen_key import ListenKey as SpotListenKey
 from typed_aster.spot.user_stream.events import Events as SpotEvents
 from tribulnation.aster import AsterMarket
 from tribulnation.aster.core import Scope
-from tribulnation.aster.streams import parse_fill, with_renewal
+from tribulnation.aster.market.markets import PerpMarket, SpotMarket
+from tribulnation.aster.market.streams import parse_fill, with_renewal
 from tribulnation.sdk import NetworkError
+from tribulnation.sdk.core import MissingData
+
+
+def market(venue: AsterMarket, scope: Scope, symbol: str) -> SpotMarket | PerpMarket:
+  """A market sharing the venue's owner, without catalogue requests."""
+  cls = PerpMarket if scope == 'perp' else SpotMarket
+  return cls(shared=venue.shared, symbol=symbol)
 
 
 def fill(scope: Scope, symbol: str, side: str) -> dict[str, Any]:
@@ -41,10 +49,10 @@ def fill(scope: Scope, symbol: str, side: str) -> dict[str, Any]:
 
 
 @pytest.mark.parametrize('scope', ['spot', 'perp'])
-async def test_shared_fills_and_owner_cleanup(
+async def test_shared_fills_and_last_subscriber_cleanup(
   scope: Scope, monkeypatch: pytest.MonkeyPatch
 ):
-  """One account socket serves symbols independently and outlives an early subscriber."""
+  """One account socket serves symbols independently until its last subscriber leaves."""
   keys = FuturesListenKey if scope == 'perp' else SpotListenKey
   events = FuturesEvents if scope == 'perp' else SpotEvents
   start = AsyncMock(return_value={'listenKey': 'test-lease'})
@@ -70,34 +78,24 @@ async def test_shared_fills_and_owner_cleanup(
       closed += 1
 
   monkeypatch.setattr(events, 'events', stream)
-  venue = AsterMarket.new(public=True, mainnet=False)
-  exchange = await venue.exchange(scope)
-  async with venue:
-    second = exchange.trades_stream('ETHUSDT')
-    async with exchange.trades_stream('BTCUSDT') as first:
-      remaining = await second.__aenter__()
-      await queue.put(fill(scope, 'ETHUSDT', 'SELL'))
-      await queue.put(fill(scope, 'BTCUSDT', 'BUY'))
+  async with AsterMarket.new(public=True, mainnet=False) as venue:
+    btc, eth = (market(venue, scope, symbol) for symbol in ('BTCUSDT', 'ETHUSDT'))
+    async with eth.trades_stream() as remaining:
+      async with btc.trades_stream() as first:
+        await queue.put(fill(scope, 'ETHUSDT', 'SELL'))
+        await queue.put(fill(scope, 'BTCUSDT', 'BUY'))
+        async with asyncio.timeout(2):
+          buy = await anext(aiter(first))
+          sell = await anext(aiter(remaining))
+        assert buy.qty == 2 and sell.qty == -2
+        assert buy.fee is not None and buy.fee.amount == Decimal('.01')
+      close.assert_not_awaited()
+      await queue.put(fill(scope, 'ETHUSDT', 'BUY'))
       async with asyncio.timeout(2):
-        buy = await anext(aiter(first))
-        sell = await anext(aiter(remaining))
-      assert buy.qty == 2 and sell.qty == -2
-      assert buy.fee is not None and buy.fee.amount == Decimal('.01')
-    close.assert_not_awaited()
-    await queue.put(fill(scope, 'ETHUSDT', 'BUY'))
-    async with asyncio.timeout(2):
-      assert (await anext(aiter(remaining))).qty == 2
-    assert opened == 1 and start.await_count == 1
-    subscription = venue.shared.trades[scope]
-    pump = subscription.pump
-  # Exiting the account also closes subscriptions the caller has not yet exited.
-  assert pump is not None and pump.done()
-  assert subscription.ctx is None and subscription.pump is None
-  assert not subscription.subscribers
-  close.assert_awaited_once()
-  assert closed == 1
-  await second.__aexit__(None, None, None)
-  close.assert_awaited_once()
+        assert (await anext(aiter(remaining))).qty == 2
+      assert opened == 1 and start.await_count == 1
+    close.assert_awaited_once()
+    assert closed == 1
 
 
 @pytest.mark.parametrize('scope', ['spot', 'perp'])
@@ -121,9 +119,8 @@ async def test_failed_socket_acquisition_releases_key(
 
   monkeypatch.setattr(events, 'events', fail)
   async with AsterMarket.new(public=True, mainnet=False) as venue:
-    exchange = await venue.exchange(scope)
     with pytest.raises(NetworkError):
-      async with exchange.trades_stream('BTCUSDT'):
+      async with market(venue, scope, 'BTCUSDT').trades_stream():
         pytest.fail('failed acquisition must not enter the subscriber body')
   close.assert_awaited_once()
 
@@ -158,5 +155,5 @@ def test_incomplete_fee_is_not_silently_dropped():
   """The adapter cannot report a fee without its native asset and amount together."""
   row: Any = fill('spot', 'BTCUSDT', 'BUY')
   del row['N']
-  with pytest.raises(NotImplementedError, match='commission'):
+  with pytest.raises(MissingData, match='commission'):
     parse_fill(row)

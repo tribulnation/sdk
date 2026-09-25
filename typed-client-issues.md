@@ -89,5 +89,5 @@ while retaining both caller-supplied time filters. Aster rejects that combinatio
 3. Blocks: `packages/impl/aster/poc/market/perp.py` cell 12 (`trades_history`).
    Cell 31 reproduces the continuation error using real account fills.
    Spot cell 23 reproduces the same error after two real sell fills. Spot cell 12
-   is additionally blocked by the venue's missing buy fills in `testnet-issues.md`.
+   is additionally blocked by the venue's missing buy fills in `dev-docs/aster-market.md`.
 4. Reference: [account trade list](https://asterdex.github.io/aster-api-website/futures-v3/account&trades/#account-trade-list-user_data).

@@ -1,1 +1,1 @@
-"""Aster spot and perpetual market adapters."""
+"""Aster spot and linear perpetual Market surfaces."""

@@ -74,6 +74,6 @@ atomic snapshot or a guarantee of equal freshness across endpoints.
 
 ---
 
-← [Kraken Market](kraken.md) · **Next:** [Deribit Market](deribit.md) →
+← [Kraken Market](kraken.md) · **Next:** [Aster Market](aster.md) →
 
 <!-- /next -->
