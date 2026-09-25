@@ -84,15 +84,13 @@ async def test_shared_fills_and_last_subscriber_cleanup(
       async with btc.trades_stream() as first:
         await queue.put(fill(scope, 'ETHUSDT', 'SELL'))
         await queue.put(fill(scope, 'BTCUSDT', 'BUY'))
-        async with asyncio.timeout(2):
-          buy = await anext(aiter(first))
-          sell = await anext(aiter(remaining))
+        buy = await asyncio.wait_for(anext(aiter(first)), 2)
+        sell = await asyncio.wait_for(anext(aiter(remaining)), 2)
         assert buy.qty == 2 and sell.qty == -2
         assert buy.fee is not None and buy.fee.amount == Decimal('.01')
       close.assert_not_awaited()
       await queue.put(fill(scope, 'ETHUSDT', 'BUY'))
-      async with asyncio.timeout(2):
-        assert (await anext(aiter(remaining))).qty == 2
+      assert (await asyncio.wait_for(anext(aiter(remaining)), 2)).qty == 2
       assert opened == 1 and start.await_count == 1
     close.assert_awaited_once()
     assert closed == 1
@@ -146,8 +144,7 @@ async def test_failed_renewal_interrupts_idle_stream():
 
   renewal = asyncio.create_task(renew())
   with pytest.raises(NetworkError, match='lease renewal failed'):
-    async with asyncio.timeout(2):
-      await anext(with_renewal(idle(), renewal))
+    await asyncio.wait_for(anext(with_renewal(idle(), renewal)), 2)
   assert released.is_set() and renewal.done()
 
 

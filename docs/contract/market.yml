@@ -362,6 +362,7 @@ methods:
       bybit: Linear perpetuals only.
       coinbase: INTX perpetuals, not domestic dated futures; explicit public=True accounts use the public product catalogue.
       mexc: Public perpetual metadata; account-specific futures permissions are not needed for this method.
+      aster: "Linear perpetual index, mark and predicted funding in two bulk requests; open interest is unset, and a symbol without a published interval reports funding_interval=None."
     example:
       accountVenues: [dydx]
       # Exchange-level id — same reasoning as tickers' constants above. Hyperliquid's
@@ -391,6 +392,7 @@ methods:
         coinbase: {exchange_id: 'coinbase:intx', key: 'BTC-PERP-INTX', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: '812.4'}
         mexc: {exchange_id: 'mexc:perp', key: 'BTC_USDT', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: '812.4'}
         lighter: {exchange_id: 'lighter:perp', key: '1', index: '60120.00', mark: '60125.50', funding: '0.000012', open_interest: '812.4'}
+        aster: {exchange_id: 'aster:perp', key: 'BTCUSDT', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: null}
       callTemplate: |
         stats = await sdk.perp_stats('{{ constants[accounts[0]].exchange_id }}')
       resultTemplate: |

@@ -505,10 +505,16 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
       raise MissingData(
         'Aster funding data omits the symbol', market_id=self.symbol, field='funding'
       )
+    if (hours := config['fundingIntervalHours']) is None:
+      raise MissingData(
+        'Aster funding configuration has no interval',
+        market_id=self.symbol,
+        field='fundingIntervalHours',
+      )
     return NextFunding(
       rate=premium['lastFundingRate'],
       time=premium['nextFundingTime'],
-      interval=timedelta(hours=config['fundingIntervalHours']),
+      interval=timedelta(hours=hours),
     )
 
   def funding_rates(

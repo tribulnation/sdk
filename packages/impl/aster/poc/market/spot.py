@@ -863,7 +863,7 @@ evidence
 # ## Coverage
 #
 # Testnet only. Mutating cells ran with explicit user authorization. Blocked
-# methods fail explicitly; independent native probes retain the failure evidence.
+# methods fail explicitly; dev-docs/aster-market.md records the failure evidence.
 #
 # | method | status | note |
 # |---|---|---|
@@ -876,7 +876,7 @@ evidence
 # | `candles` | verified | All six SDK intervals on BTCUSDT/ASTERUSDT; 510 one-minute rows cross the 500-row boundary |
 # | `query_order` | verified | Missing, resting, filled and cancelled native orders; signed buy/sell quantities |
 # | `open_orders` | verified | Resting orders observed; confirmed empty after cancellation |
-# | `trades_history` | blocked | Native REST omits confirmed buys; pagination also sends exclusive filters; dev-docs/aster-market.md and typed-client-issues.md |
+# | `trades_history` | blocked | Native REST omits confirmed buys; dev-docs/aster-market.md |
 # | `trades_stream` | verified | Four real buy/sell fills with native fees; REST matching checked for returned sells; listen-key cleanup |
 # | `position` | blocked | Native account.info returns balances=[] after funding and fills; dev-docs/aster-market.md |
 # | `collateral` | blocked | Native account.info omits funded USDT and ASTER balances; dev-docs/aster-market.md |
@@ -903,31 +903,6 @@ ids = Ids(
   },
 )
 gap('aster', ids, load_catalogue(root=repo_root()))
-
-# %% [markdown]
-# ## Native trade-history pagination failure
-#
-# The sell fills returned by REST are enough to exercise continuation independently of the missing buys.
-
-# %%
-pagination_rows = 0
-try:
-  async for page in client.spot.trade.user_trades_paged(
-    'ASTERUSDT',
-    start_time=datetime.now(timezone.utc) - timedelta(days=1),
-    end_time=datetime.now(timezone.utc),
-    limit=2,
-  ):
-    pagination_rows += len(page)
-except BadRequest as exc:
-  error = error_body.validate_python(exc.args[1])
-  if error['code'] != -1106:
-    raise
-  print({'rows_before_failure': pagination_rows, 'error': error})
-else:
-  print(
-    'Paginator now completes; missing buy fills must also be resolved before mapping history'
-  )
 
 # %%
 await client.__aexit__(None, None, None)  # pyright: ignore[reportUnknownMemberType] -- upstream lifecycle parameters are untyped

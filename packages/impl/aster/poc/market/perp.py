@@ -416,11 +416,11 @@ async def open_orders(market_id: str, /) -> Sequence[OrderState]:
 async def trades_history(
   market_id: str, /, start: datetime, end: datetime
 ) -> AsyncIterable[Sequence[Trade]]:
-  """Wait for the typed paginator to stop combining mutually exclusive filters."""
+  """Not yet mapped: the typed-aster 0.2.0 pager awaits qualification."""
   raise NotImplementedError(
-    'UserTrades.user_trades_paged combines exclusive time and ID filters; see typed-client-issues.md'
+    'Aster trade history is not mapped yet; typed-aster 0.2.0 fixes the pager'
   )
-  yield []  # Retain the SDK async-generator contract for the blocked method.
+  yield []  # Retain the SDK async-generator contract for the unmapped method.
 
 
 try:
@@ -682,10 +682,13 @@ async def next_funding(market_id: str, /) -> NextFunding:
     for r in await client.futures.market.funding_info(market_id)
     if r['symbol'] == market_id
   )
+  hours = config['fundingIntervalHours']
+  if hours is None:
+    raise ValueError(f'{market_id} publishes no funding interval')
   return NextFunding(
     rate=row['lastFundingRate'],
     time=row['nextFundingTime'],
-    interval=timedelta(hours=config['fundingIntervalHours']),
+    interval=timedelta(hours=hours),
   )
 
 
@@ -699,22 +702,45 @@ async def next_funding(market_id: str, /) -> NextFunding:
 
 
 # %%
-# Unavailable: blocked by FundingInfo null configuration fields; see typed-client-issues.md
 async def perp_stats(
   markets: Collection[str] | None = None, *, settings: Settings = {}
 ) -> Mapping[str, PerpStats]:
-  """Wait for the client to validate the complete native funding configuration."""
-  raise NotImplementedError(
-    'FundingInfo configuration fields are null on some testnet response rows'
-  )
+  """Join the unfiltered premium index with the unfiltered funding configuration."""
+  if markets is not None and not markets:
+    return {}
+  symbols = (await client.futures.market.exchange_info())['symbols']
+  wanted = {
+    r['symbol']
+    for r in symbols
+    if r['status'] == 'TRADING' and r['contractType'] == 'PERPETUAL'
+  }
+  if markets is not None:
+    wanted.intersection_update(markets)
+  premiums = await client.futures.market.premium_index()
+  premiums = premiums if isinstance(premiums, list) else [premiums]
+  hours = {
+    r['symbol']: r['fundingIntervalHours']
+    for r in await client.futures.market.funding_info()
+  }
+  result: dict[str, PerpStats] = {}
+  for row in premiums:
+    if row['symbol'] not in wanted:
+      continue
+    interval = hours.get(row['symbol'])
+    result[row['symbol']] = PerpStats(
+      index=row['indexPrice'],
+      mark=row['markPrice'],
+      funding=row['lastFundingRate'],
+      next_funding_time=row['nextFundingTime'],
+      funding_interval=timedelta(hours=interval) if interval is not None else None,
+    )
+  return result
 
 
-try:
-  await perp_stats()
-except NotImplementedError as exc:
-  print(str(exc))
-else:
-  raise AssertionError('Review coverage: the method is no longer unavailable')
+stats = await perp_stats()
+missing = sorted(set(listed) - set(stats))
+no_interval = sorted(m for m, s in stats.items() if s.funding_interval is None)
+len(stats), missing, no_interval, {m: stats[m] for m in MARKETS}
 
 
 # %% [markdown]
@@ -1027,8 +1053,8 @@ evidence
 # %% [markdown]
 # ## Coverage
 #
-# Testnet only. Mutating cells ran with explicit user authorization. Blocked
-# methods fail explicitly; independent native probes retain the failure evidence.
+# Testnet only. Mutating cells ran with explicit user authorization. Unmapped
+# methods fail explicitly.
 #
 # | method | status | note |
 # |---|---|---|
@@ -1041,7 +1067,7 @@ evidence
 # | `candles` | verified | All six SDK intervals on BTCUSDT/ASTERUSDT; 510 one-minute rows cross the 500-row boundary |
 # | `query_order` | verified | Missing, resting, filled and cancelled native orders; signed buy/sell quantities |
 # | `open_orders` | verified | Resting orders observed; confirmed empty after cancellation |
-# | `trades_history` | blocked | UserTrades.user_trades_paged combines exclusive time and ID filters; typed-client-issues.md |
+# | `trades_history` | not attempted | typed-aster 0.2.0 fixes the pager; mapping deferred to a follow-up |
 # | `trades_stream` | verified | Six real fills matched to one native REST page, including time, fee asset and maker flag; listen-key cleanup |
 # | `position` | verified | Nonzero long, short and flat one-way positions |
 # | `available_notional` | not supported | No native account-side buy/sell capacity; no derived buying-power estimate |
@@ -1051,7 +1077,7 @@ evidence
 # | `cancel_open_orders` | verified | Two resting orders removed; waits for the confirmed REST state |
 # | `index` | verified | Native premium_index indexPrice for BTCUSDT and ASTERUSDT |
 # | `next_funding` | verified | Native indicative rate and next time; 8h BTC and 4h ASTER intervals |
-# | `perp_stats` | blocked | FundingInfo configuration fields are null on some testnet response rows; typed-client-issues.md |
+# | `perp_stats` | verified | Two unfiltered calls joined by symbol; null testnet intervals stay None; no open interest |
 # | `funding_rates` | verified | Native settlements over seven days; no inferred premium |
 # | `funding_payments` | empty | Live call returned no funding cashflows; test positions were closed before settlement |
 # | `perp_position` | verified | Native long/short quantities and positive entry prices; flat after cleanup |
@@ -1075,52 +1101,6 @@ ids = Ids(
 # Instrument base identities, including 1000-token multipliers, are checked through
 # perp_markets. They are not wallet asset IDs emitted by these verified methods.
 gap('aster', ids, load_catalogue(root=repo_root()))
-
-# %% [markdown]
-# ## Funding configuration validation evidence
-#
-# The method above stays blocked. This diagnostic calls the unmodified typed endpoint.
-
-# %%
-from typed_aster import ValidationError
-
-try:
-  await client.futures.market.funding_info()
-except ValidationError:
-  print(
-    'FundingInfo rejected null fundingIntervalHours/fundingFeeCap/fundingFeeFloor; see typed-client-issues.md'
-  )
-else:
-  print(
-    'FundingInfo now validates; re-run and map perp_stats before removing the issue'
-  )
-
-{m: await client.futures.market.funding_info(m) for m in MARKETS}
-
-# %% [markdown]
-# ## Native trade-history pagination failure
-#
-# Use two rows per page to exercise the continuation with real fills. The unmodified typed paginator sends time filters together with `fromId` on page two.
-
-# %%
-pagination_rows = 0
-try:
-  async for page in client.futures.trade.user_trades_paged(
-    'ASTERUSDT',
-    start_time=datetime.now(timezone.utc) - timedelta(days=1),
-    end_time=datetime.now(timezone.utc),
-    limit=2,
-  ):
-    pagination_rows += len(page)
-except BadRequest as exc:
-  error = error_body.validate_python(exc.args[1])
-  if error['code'] != -1106:
-    raise
-  print({'rows_before_failure': pagination_rows, 'error': error})
-else:
-  print(
-    'Paginator now completes; re-run and map trades_history before removing the issue'
-  )
 
 # %%
 await client.__aexit__(None, None, None)  # pyright: ignore[reportUnknownMemberType] -- upstream lifecycle parameters are untyped
