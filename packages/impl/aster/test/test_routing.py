@@ -2,12 +2,36 @@
 
 from datetime import datetime, timezone
 from pathlib import Path
+from typing_extensions import Literal
 from eth_account import Account
 import pytest
 from tribulnation.aster import AsterMarket, Report
 from tribulnation.aster.market.markets import PerpMarket, SpotMarket
 from tribulnation.sdk import AuthError, MarketSDK
 from tribulnation.sdk.impl.accounts import Aster, load_accounts
+
+
+@pytest.mark.parametrize('venue_id', ['aster', 'aster_testnet'])
+@pytest.mark.parametrize('validate', [None, True, False])
+async def test_account_validation_reaches_every_transport(
+  venue_id: Literal['aster', 'aster_testnet'], validate: bool | None
+):
+  """Public construction accepts the router's validate argument and propagates it."""
+  account = Aster(venue=venue_id, public=True)
+  if validate is not None:
+    account = Aster(venue=venue_id, public=True, validate=validate)
+  async with MarketSDK({venue_id: account}) as sdk:
+    venue = await sdk.venue(venue_id)
+    assert isinstance(venue, AsterMarket)
+    client = venue.client
+    expected = True if validate is None else validate
+    for surface in (client.futures, client.spot, client.prediction):
+      assert surface.client.validate is expected
+      assert surface.streams_client.validate is expected
+      assert surface.user_stream_client.validate is expected
+    assert client.chain.client.validate is expected
+    assert client.chain.rpc_client.validate is expected
+    assert client.bapi_client.validate is expected
 
 
 def test_testnet_credentials_do_not_fall_back_to_mainnet(
