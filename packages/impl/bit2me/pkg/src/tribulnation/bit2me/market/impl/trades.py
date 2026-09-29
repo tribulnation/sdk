@@ -26,6 +26,8 @@ def parse_trade(row: TradeResponse) -> Trade:
   fee_asset = row.get('feeCurrency')
   return Trade(
     id=row.get('id'),
+    order_id=row.get('orderId'),
+    client_order_id=row.get('clientOrderId') or None,
     price=Decimal(str(price)) if price is not None else Decimal(0),
     qty=qty if row.get('side') == 'buy' else -qty,
     time=row.get('createdAt') or datetime.now(timezone.utc),
@@ -43,6 +45,8 @@ def parse_update(update: MyTradeUpdate) -> Trade:
   fee = update.get('fee')
   return Trade(
     id=update['id'],
+    order_id=update.get('order'),
+    client_order_id=update.get('clientOrderId') or None,
     price=Decimal(str(update['price'])),
     qty=qty if update['side'] == 'buy' else -qty,
     time=update.get('datetime') or datetime.now(timezone.utc),
