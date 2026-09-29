@@ -1,16 +1,10 @@
-# tribulnation-bybit 0.2.2
+# tribulnation-bybit 0.4.0 release candidate
 
-Bybit earn instruments now leave the optional `id` unset (`None`). Native
-`productId` values are reused across savings and staking products, including
-different fixed terms, and cannot serve as unique SDK instrument identifiers.
-All other product fields remain unchanged.
+Client order IDs and order IDs on fills.
 
-Consumers should handle absent IDs using their own product identity policy.
-Consumers that persisted the previous IDs should reconcile their existing keys
-when upgrading to avoid retaining stale rows.
+- `place_order` sends `Order['client_order_id']` unchanged as `orderLinkId` (up to 36 characters) on spot and linear perpetuals. `random_client_order_id()` returns 32 random hex digits.
+- Fills from history and streams report `Trade.order_id` and `Trade.client_order_id`; an empty `orderLinkId` reads as `None`.
 
-Requires tribulnation-sdk >=2.0.2. See SDK issue #67.
+Requires tribulnation-sdk >=2.7.0 (`Trade.order_id`, `Trade.client_order_id` and `Order['client_order_id']`, ADR 0029).
 
-Release qualification was refreshed after the Coinbase 0.2.2 merge changed the
-shared SDK development test inputs. Both Bybit read-only suites and market
-consistency must match the final merged candidate before publication.
+Client order IDs and order IDs on fills are covered by unit fixtures; no live trading round trip is recorded.
