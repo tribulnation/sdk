@@ -18,5 +18,6 @@ Requires tribulnation-sdk >=2.7.0 (`Order['client_order_id']`, `Trade.order_id` 
 `Trade.client_order_id`, ADR 0029) and typed-aster >=0.2.0.
 
 Release qualification records mainnet public read suites and Market consistency
-against the pinned Catalogue snapshot. Account and trading methods, including trade
-history and client order IDs, were verified on testnet only.
+against the pinned Catalogue snapshot. Account and trading methods, including
+perpetual trade history, were verified on testnet only. Client order IDs and order IDs
+on fills are covered by unit fixtures; no live trading round trip is recorded.
