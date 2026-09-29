@@ -27,6 +27,8 @@ def trade(**fields: Any) -> TradeRow:
     'size': Decimal('0.0050'),
     'price': Decimal('2500.00'),
     'usd_amount': Decimal('12.500000'),
+    'ask_client_id_str': '1759000000000001',
+    'bid_client_id_str': '0',
   }
   row.update(fields)
   return cast(TradeRow, row)
@@ -48,6 +50,28 @@ def test_perp_taker_fee_is_the_tick_on_usdc_notional():
   assert fee.asset == '3' and fee.amount == Decimal('0.007614068')
   fill = parse_trade(row, ACCOUNT, fee)
   assert fill.qty == Decimal('0.0100') and not fill.maker
+
+
+def test_order_id_is_the_accounts_side_client_index():
+  """Fills carry the SDK order id (the side's `client_order_index`), not `order_index`,
+  and no client order id: the venue has no field for the caller's."""
+  sell = trade(ask_account_id=ACCOUNT, bid_account_id=9, is_maker_ask=True)
+  buy = trade(
+    ask_account_id=9,
+    bid_account_id=ACCOUNT,
+    is_maker_ask=True,
+    bid_client_id_str='1759000000000002',
+  )
+  fee = history.perp_fee(sell, ACCOUNT)
+  assert parse_trade(sell, ACCOUNT, fee).order_id == '1759000000000001'
+  assert parse_trade(buy, ACCOUNT, fee).order_id == '1759000000000002'
+  assert parse_trade(sell, ACCOUNT, fee).client_order_id is None
+
+
+def test_fills_of_orders_without_a_client_index_name_no_order():
+  """Index 0 marks an order placed outside the SDK; many share it, so it names none."""
+  buy = trade(ask_account_id=9, bid_account_id=ACCOUNT, is_maker_ask=True)
+  assert parse_trade(buy, ACCOUNT, history.perp_fee(buy, ACCOUNT)).order_id is None
 
 
 def spot_fee(t: TradeRow, account_index: int):

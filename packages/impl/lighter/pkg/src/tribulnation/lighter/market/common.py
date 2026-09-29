@@ -64,10 +64,18 @@ def role(t: TradeRow, account: int) -> tuple[bool, bool, Decimal]:
 
 
 def parse_trade(t: TradeRow, account: int, fee: Trade.Fee) -> Trade:
-  """The account's fill; `time` is the trade's block timestamp, the venue's own sort key."""
+  """The account's fill; `time` is the trade's block timestamp, the venue's own sort key.
+
+  `order_id` is the client order index of the account's side, the SDK order id; orders
+  placed without one (in the app, or liquidations) carry index 0 and give `None`. The
+  venue has no free field for a caller's client order id, so `client_order_id` stays
+  `None`.
+  """
   is_ask = t['ask_account_id'] == account
+  client_index = t['ask_client_id_str'] if is_ask else t['bid_client_id_str']
   return Trade(
     id=t['trade_id_str'],
+    order_id=client_index if client_index != '0' else None,
     price=t['price'],
     qty=-t['size'] if is_ask else t['size'],
     time=t['timestamp'],
