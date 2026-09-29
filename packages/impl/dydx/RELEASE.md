@@ -1,10 +1,9 @@
-# tribulnation-dydx 0.7.3
+# tribulnation-dydx 0.10.0 release candidate
 
-Translate native client acquisition and cleanup failures through managed resource
-adapters. Entry and exit policies remain independent; this release adds no automatic
-resource retries. Decorated calls inside the lifecycle retain context middleware.
+Order IDs on streamed fills.
 
-Requires tribulnation-sdk >=2.0.2. Publish after the SDK patch release.
+- Streamed fills report `Trade.order_id` in the SDK's order ID form. dYdX has no free-form client order ID (its client ID is part of the SDK order ID), so `Order['client_order_id']` is ignored, `random_client_order_id()` returns `None`, and `Trade.client_order_id` is `None`.
 
-The release workflow requires fresh passing read-only qualification for this exact
-version and dependency floor before publication.
+Requires tribulnation-sdk >=2.7.0 (`Trade.order_id`, `Trade.client_order_id` and `Order['client_order_id']`, ADR 0029).
+
+Order IDs on fills are covered by unit fixtures.
