@@ -58,7 +58,7 @@ class Snapshots(Mixin, _Snapshots):
     INTX perpetual positions are deliberately absent: reaching them needs a key scoped
     to an INTX portfolio, and a retail key gets `PERMISSION_DENIED` rather than an
     empty book, so including them would turn every snapshot on a retail key into an
-    error. Read them from `PerpMarket.perp_position` on a key that has the scope.
+    error. Coinbase also retires them on the Advanced Trade API on 2026-10-01.
     """
     response = await self.app.advanced_trade.http.futures.positions.list()
     return {

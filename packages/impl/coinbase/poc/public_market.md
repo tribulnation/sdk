@@ -11,6 +11,10 @@ tribulnation-sdk 2.0.2. Reproduce with:
 .venv/bin/sdk-dev poc run packages/impl/coinbase/poc/public_market.py --cells 1-6
 ```
 
+INTX findings below are historical: the SDK dropped INTX perpetuals in
+[ADR 0031](../../../../dev-docs/adr/0031-coinbase-drop-intx.md), and the single-product
+cell now compares spot only.
+
 ## Findings
 
 - Default catalogue reads returned identical sets: 925 spot and 131 INTX perpetuals,

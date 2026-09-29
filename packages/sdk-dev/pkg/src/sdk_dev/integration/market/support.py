@@ -59,10 +59,7 @@ CASES: Mapping[str, Sequence[CandleCase]] = {
     CandleCase(market_id='spot:BTCUSDT', page=999),
     CandleCase(market_id='perp:BTCUSDT', page=999),
   ],
-  'coinbase': [
-    CandleCase(market_id='spot:BTC-USD', page=299),
-    CandleCase(market_id='intx:BTC-PERP-INTX', page=299),
-  ],
+  'coinbase': [CandleCase(market_id='spot:BTC-USD', page=299)],
   'dydx': [CandleCase(market_id='perp:BTC-USD', page=999)],
   'mexc': [
     CandleCase(market_id='spot:BTCUSDT', page=500),

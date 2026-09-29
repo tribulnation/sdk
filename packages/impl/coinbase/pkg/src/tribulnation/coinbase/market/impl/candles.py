@@ -11,12 +11,11 @@ from typed_coinbase.schemas import Candle as CandleRow
 from .mixin import MarketMixin
 
 CANDLES_PAGE = 300
-"""Candles per `candles` request: the most every Coinbase product answers whole.
+"""Candles per `candles` request, safely under the documented cap.
 
 The documented cap is 350, and spot honours it: a range holding one more is refused
-(`INVALID_ARGUMENT`), and at exactly 351 the oldest is dropped instead. INTX
-perpetuals answer at most 300 whatever `limit` says, silently dropping the oldest of a
-wider range -- all verified live -- so a range is swept in windows of this size.
+(`INVALID_ARGUMENT`), and at exactly 351 the oldest is dropped instead (verified live),
+so a range is swept in windows of this size.
 """
 
 Granularity = Literal[

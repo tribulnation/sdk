@@ -54,8 +54,8 @@ class SpotMarket(impl.MarketMixin, Market):
     return await impl.rules(self, refetch=refetch)
 
   async def fees(self, *, refetch: bool = False) -> Fees:
-    """Fetch the configured account's current trading rates."""
-    return await impl.fees(self, 'spot', refetch=refetch)
+    """Unsupported until product-specific stablepair pricing is resolved."""
+    return await impl.fees(self)
 
   def candles(
     self,

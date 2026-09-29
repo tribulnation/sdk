@@ -20,23 +20,15 @@ makes one public book request per selected product, so pass market IDs
 to limit request volume. Authentication failures never trigger an automatic switch
 to public endpoints.
 
-## Public perpetual funding history
-
-INTX markets expose `funding_rates(start=None, end=None)` through Coinbase's
-credential-free International Exchange API. SDK IDs remain Advanced Trade IDs,
-such as `BTC-PERP-INTX`; the adapter resolves the corresponding native instrument
-before reading history. Bounds are inclusive; omitted start walks the earliest
-available history. Offset pages are not atomic, and repeated events are
-deduplicated. Private funding payments and INTX portfolio access are separate.
-
 ## Ticker quotes and product identity
 
-`spot` represents Coinbase Advanced Trade spot products; `intx` represents
-International Exchange perpetuals accessed through Advanced Trade. IDs remain
-native Advanced Trade product IDs, such as `BTC-USD` and `BTC-PERP-INTX`.
+`spot` represents Coinbase Advanced Trade spot products. IDs remain native Advanced
+Trade product IDs, such as `BTC-USD`. INTX perpetuals are not supported: Coinbase
+retires them on the Advanced Trade API on 2026-10-01, moving international
+derivatives to a Deribit-powered gateway ([ADR 0031](https://github.com/tribulnation/sdk/blob/main/dev-docs/adr/0031-coinbase-drop-intx.md)).
 
-`Coinbase(public=True)` supports spot and INTX market discovery, rules, tickers,
-index prices and funding state without credentials. Public discovery uses the
+`Coinbase(public=True)` supports spot market discovery, rules and tickers without
+credentials. Public discovery uses the
 complete default product response. A response indicating more pages, missing
 completion metadata or duplicate IDs raises an error: live small-page sweeps can
 omit products, so deduplication cannot guarantee completeness.

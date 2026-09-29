@@ -14,7 +14,7 @@ from .mixin import MarketMixin
 async def depth(self: MarketMixin, *, levels: int | None = None) -> Book:
   """Fetch the product's order book.
 
-  The public pricebook serves perpetuals as well as spot, and needs no credentials.
+  The public pricebook needs no credentials.
   """
   raw = await self.app.advanced_trade.http.products.public.book(
     self.product_id, limit=levels

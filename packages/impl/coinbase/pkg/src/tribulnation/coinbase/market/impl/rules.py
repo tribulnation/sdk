@@ -4,7 +4,7 @@ from tribulnation.sdk.market import Fees, Rules
 
 from typed_coinbase.schemas import Product
 
-from tribulnation.coinbase.core import FeeScope, wrap_exceptions
+from tribulnation.coinbase.core import wrap_exceptions
 from .mixin import MarketMixin
 
 
@@ -44,16 +44,8 @@ async def rules(self: MarketMixin, *, refetch: bool = False) -> Rules:
   )
 
 
-@wrap_exceptions
-async def fees(self: MarketMixin, scope: FeeScope, *, refetch: bool = False) -> Fees:
-  """Fetch combined account rates only where product adjustments are resolved."""
-  if scope == 'spot':
-    raise NotImplementedError(
-      'Coinbase spot fee tiers do not resolve product-specific stablepair pricing'
-    )
-  tier = await self.shared.load_fee_tier(scope, refetch=refetch)
-  maker = tier.get('maker_fee_rate')
-  taker = tier.get('taker_fee_rate')
-  if maker is None or taker is None:
-    raise ValueError('Coinbase account fee tier is missing rates')
-  return Fees.symmetric(maker=maker, taker=taker)
+async def fees(self: MarketMixin) -> Fees:
+  """Unsupported: spot fee tiers do not resolve product-specific stablepair pricing."""
+  raise NotImplementedError(
+    'Coinbase spot fee tiers do not resolve product-specific stablepair pricing'
+  )

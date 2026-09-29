@@ -12,7 +12,7 @@
 
 # Coinbase Market
 
-> Advanced Trade spot and INTX perpetuals. Package: `tribulnation-coinbase`.
+> Advanced Trade spot. Package: `tribulnation-coinbase`.
 
 ## Account configuration
 
@@ -32,9 +32,9 @@ async with MarketSDK({'coinbase': accounts.Coinbase()}) as sdk:
 `accounts.Coinbase(public=True)` is an explicit fallback when credentials are
 unavailable. When credentials resolve from configuration or the environment, the
 router still prefers authenticated access. With no credentials, it supports public
-market data on both exchanges. Authentication
-failures on a configured private account remain errors; they do not silently
-switch to public access. Account fees, balances and trading require credentials.
+spot market data. Authentication failures on a configured private account remain
+errors; they do not silently switch to public access. Balances and trading require
+credentials.
 
 ## Ticker request cost
 
@@ -61,14 +61,14 @@ atomic snapshot or a guarantee of equal freshness across endpoints.
 ## Exchanges and discovery
 
 - `spot` uses Advanced Trade IDs such as `BTC-USD`.
-- `intx` uses perpetual IDs such as `BTC-PERP-INTX`; domestic dated futures are excluded.
 - Public discovery requests the full default catalogue and checks completion
   metadata and unique IDs. If Coinbase reports another page or an inconsistent
   response, discovery fails rather than presenting a partial catalogue. Small-page
   spot sweeps were observed to omit and duplicate products on both endpoint families.
-- Public rules do not fetch personal fee tiers. INTX index and funding state come
-  from the public product details; funding-rate history uses the public International
-  Exchange API. Private INTX portfolio reads need an INTX-scoped key.
+- Public rules do not fetch personal fee tiers, and account `fees()` is unsupported.
+- INTX perpetuals are not supported: Coinbase retires them on the Advanced Trade API
+  on 2026-10-01, moving international derivatives to a Deribit-powered gateway
+  ([ADR 0031](https://github.com/tribulnation/sdk/blob/main/dev-docs/adr/0031-coinbase-drop-intx.md)).
 
 <!-- next -->
 

@@ -218,7 +218,6 @@ methods:
       binance: Combined spot standard/tax/special commissions; USD-M ordinary-order rates. Optional BNB payment discounts and RPI orders excluded.
       bitget: Symbol-scoped Classic or UTA account rates.
       bybit: Symbol-scoped account rates, including the account's applicable fee tier.
-      coinbase: INTX only; cost-plus and unresolved GST adjustments are unsupported. Spot pricing remains unsupported.
       dydx: Account tier, market fee holidays and staking adjustments with protocol rounding.
       hyperliquid: Native USDC perpetuals only; HIP-3 and spot require additional verified fee metadata.
       kraken: Account TradeVolume schedule, converted from percent to fractions.
@@ -228,7 +227,6 @@ methods:
       constants:
         aster: {market_id: 'aster:perp:BTCUSDT'}
         binance: {market_id: 'binance:spot:BTCUSDT'}
-        coinbase: {market_id: 'coinbase:intx:BTC-PERP-INTX'}
         hyperliquid: {market_id: 'hyperliquid::BTC'}
         kraken: {market_id: 'kraken:spot:XBTUSD'}
         bitget: {market_id: 'bitget:spot:BTCUSDT'}
@@ -360,7 +358,6 @@ methods:
       binance: USD-M perpetuals; bulk price/funding plus per-market open-interest reads. Component observations are not atomic.
       bitget: USDT, USDC and Classic coin-margined perpetuals. UTA coin is unsupported.
       bybit: Linear perpetuals only.
-      coinbase: INTX perpetuals, not domestic dated futures; explicit public=True accounts use the public product catalogue.
       mexc: Public perpetual metadata; account-specific futures permissions are not needed for this method. A full read leaves out contracts MEXC lists without an index price; naming one raises `MissingData`.
       aster: "Linear perpetual index, mark and predicted funding in two bulk requests; open interest is unset, and a symbol without a published interval reports funding_interval=None."
     example:
@@ -389,7 +386,6 @@ methods:
         binance: {exchange_id: 'binance:usdm', key: 'BTCUSDT', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: '812.4'}
         bitget: {exchange_id: 'bitget:usdt', key: 'BTCUSDT', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: '812.4'}
         bybit: {exchange_id: 'bybit:perp', key: 'BTCUSDT', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: '812.4'}
-        coinbase: {exchange_id: 'coinbase:intx', key: 'BTC-PERP-INTX', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: '812.4'}
         mexc: {exchange_id: 'mexc:perp', key: 'BTC_USDT', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: '812.4'}
         lighter: {exchange_id: 'lighter:perp', key: '1', index: '60120.00', mark: '60125.50', funding: '0.000012', open_interest: '812.4'}
         aster: {exchange_id: 'aster:perp', key: 'BTCUSDT', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: null}
@@ -899,7 +895,6 @@ methods:
         mexc: {market_id: 'mexc:perp:BTC_USDT', index: '60120.00'}
         binance: {market_id: 'binance:usdm:BTCUSDT', index: '60120.00'}
         bitget: {market_id: 'bitget:usdt:BTCUSDT', index: '60120.00'}
-        coinbase: {market_id: 'coinbase:intx:BTC-PERP-INTX', index: '60120.00'}
         lighter: {market_id: 'lighter:perp:1', index: '60120.00'}
       callTemplate: |
         price = await sdk.index('{{ constants[accounts[0]].market_id }}')
@@ -931,7 +926,6 @@ methods:
         kucoin: {market_id: 'kucoin:perp:XBTUSDTM', rate: '0.0001', annualized: '0.1095'}
         dydx: {market_id: 'dydx:perp:BTC-USD', rate: '0.0001', annualized: '0.876'}
         hyperliquid: {market_id: 'hyperliquid::BTC', rate: '0.00012', annualized: '1.0512'}
-        coinbase: {market_id: 'coinbase:intx:BTC-PERP-INTX', rate: '0.0001', annualized: '0.876'}
         binance: {market_id: 'binance:usdm:BTCUSDT', rate: '0.0001', annualized: '0.1095'}
         bitget: {market_id: 'bitget:usdt:BTCUSDT', rate: '0.0001', annualized: '0.1095'}
         bybit: {market_id: 'bybit:perp:BTCUSDT', rate: '0.0001', annualized: '0.1095'}
@@ -975,7 +969,6 @@ methods:
         mexc: {market_id: 'mexc:perp:BTC_USDT', rate1: '0.0001', rate2: '0.00012'}
         binance: {market_id: 'binance:usdm:BTCUSDT', rate1: '0.0001', rate2: '0.00012'}
         bitget: {market_id: 'bitget:usdt:BTCUSDT', rate1: '0.0001', rate2: '0.00012'}
-        coinbase: {market_id: 'coinbase:intx:BTC-PERP-INTX', rate1: '0.0001', rate2: '0.00012'}
         lighter: {market_id: 'lighter:perp:1', rate1: '0.0001', rate2: '0.00012'}
       callTemplate: |
         async for page in sdk.funding_rates('{{ constants[accounts[0]].market_id }}', start, end):
@@ -1046,7 +1039,6 @@ methods:
         hyperliquid: {market_id: 'hyperliquid::BTC', size: '0.3', entry_price: '58190.40'}
         bitget: {market_id: 'bitget:usdt:BTCUSDT', size: '0.5', entry_price: '58230.10'}
         bybit: {market_id: 'bybit:perp:BTCUSDT', size: '0.5', entry_price: '58230.10'}
-        coinbase: {market_id: 'coinbase:intx:BTC-PERP-INTX', size: '0.5', entry_price: '58230.10'}
         lighter: {market_id: 'lighter:perp:1', size: '0.5', entry_price: '58230.10'}
       callTemplate: |
         pos = await sdk.perp_position('{{ constants[accounts[0]].market_id }}')
@@ -1077,7 +1069,6 @@ methods:
       constants:
         dydx: {market_id: 'dydx:perp:BTC-USD', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
         hyperliquid: {market_id: 'hyperliquid::BTC', equity: '9875.20', leverage: '1.85', maintenance_ratio: '0.201'}
-        coinbase: {market_id: 'coinbase:intx:BTC-PERP-INTX', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
         bitget: {market_id: 'bitget:usdt:BTCUSDT', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
         bybit: {market_id: 'bybit:perp:BTCUSDT', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
         lighter: {market_id: 'lighter:perp:1', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}

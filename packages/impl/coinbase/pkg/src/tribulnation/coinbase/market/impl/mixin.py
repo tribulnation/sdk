@@ -6,8 +6,6 @@ from tribulnation.coinbase.core import Mixin
 
 VENUE_ID = 'coinbase'
 SPOT_EXCHANGE_ID = 'spot'
-INTX_EXCHANGE_ID = 'intx'
-"""Coinbase International Exchange, the venue's only perpetual-swap product family."""
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -21,12 +19,7 @@ class ExchangeMixin(Mixin):
 
 @dataclass(frozen=True, kw_only=True)
 class MarketMixin(ExchangeMixin):
-  """One Advanced Trade product.
-
-  Spot and perpetuals share every endpoint on this surface -- `BTC-USD` and
-  `BTC-PERP-INTX` differ only in which product id they name -- so `market_id` is the
-  Coinbase product id verbatim.
-  """
+  """One Advanced Trade product; `market_id` is the Coinbase product id verbatim."""
 
   product_id: str
 

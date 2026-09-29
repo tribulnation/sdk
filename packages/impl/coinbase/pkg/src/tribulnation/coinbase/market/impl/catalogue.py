@@ -1,21 +1,19 @@
-"""Product-catalogue reads shared by both Advanced Trade exchanges."""
+"""Product-catalogue reads behind the Advanced Trade spot exchange."""
 
 from typing_extensions import Collection, Literal, Mapping
 
-from tribulnation.sdk.market import PerpStats, Ticker
+from tribulnation.sdk.market import Ticker
 from tribulnation.sdk.core import ApiError
 
 from typed_coinbase.schemas import PriceBook, Product
 from typed_coinbase.app.advanced_trade.http.products.public.list import PublicProduct
 
-from .funding import funding_interval, funding_rate, next_funding_time
 from .mixin import ExchangeMixin
 from .numbers import parse_optional_decimal
 
 CatalogueProduct = Product | PublicProduct
 """Validated rows from either Advanced Trade catalogue endpoint."""
 
-INTX = 'INTX'
 QUOTE_BATCH_SIZE = 100
 """Bound quote query sizes without making one request per product."""
 
@@ -23,23 +21,18 @@ QUOTE_BATCH_SIZE = 100
 async def list_products(
   self: ExchangeMixin,
   *,
-  product_type: Literal['SPOT', 'FUTURE'],
-  perpetual: bool = False,
+  product_type: Literal['SPOT'],
 ) -> list[CatalogueProduct]:
   """Read a complete public catalogue or sweep authenticated pages.
 
   Args:
     product_type: Which product family to list.
-    perpetual: Restrict futures to perpetual contracts on INTX.
   """
   products = self.app.advanced_trade.http.products
   out: list[CatalogueProduct]
   if self.shared.public:
     response = await self.call_app(
-      lambda: products.public.list(
-        product_type=product_type,
-        contract_expiry_type='PERPETUAL' if perpetual else None,
-      )
+      lambda: products.public.list(product_type=product_type)
     )
     pagination = response.get('pagination')
     # Live small-page sweeps omit products even after removing duplicates.
@@ -54,13 +47,8 @@ async def list_products(
         'Coinbase public catalogue returned inconsistent product identities.'
       )
   else:
-    paging = products.list_paged(
-      product_type=product_type,
-      contract_expiry_type='PERPETUAL' if perpetual else None,
-    )
+    paging = products.list_paged(product_type=product_type)
     out = list(await paging.via(self.call_app))
-  if perpetual:
-    return [p for p in out if p.get('product_venue') == INTX]
   return out
 
 
@@ -79,29 +67,6 @@ def parse_ticker(product: CatalogueProduct, book: PriceBook | None) -> Ticker:
     bid_qty=bid['size'] if bid else None,
     ask_qty=ask['size'] if ask else None,
     base_volume_24h=parse_optional_decimal(product['volume_24h']),
-  )
-
-
-def parse_perp_stats(product: CatalogueProduct) -> PerpStats | None:
-  """Map one INTX perpetual's catalogue entry onto a `PerpStats`.
-
-  Returns `None` for a product carrying no `future_product_details`, or none whose
-  details name an index price: everything a `PerpStats` needs lives in that object,
-  and `index` is the one field it has no optional form for.
-  """
-  details = product.get('future_product_details')
-  if not details:
-    return None
-  index = parse_optional_decimal(details.get('index_price'))
-  if index is None:
-    return None
-  return PerpStats(
-    index=index,
-    mark=parse_optional_decimal(product.get('mid_market_price')),
-    funding=funding_rate(details),
-    next_funding_time=next_funding_time(details),
-    funding_interval=funding_interval(details),
-    open_interest=details.get('open_interest'),
   )
 
 

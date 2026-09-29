@@ -11,7 +11,7 @@ import pytest
 from typed_coinbase.app.advanced_trade.http.orders.create import CreateOrderSuccess
 from typed_coinbase.app.advanced_trade.http.orders.historical.fills import Fill
 
-from tribulnation.coinbase.market import PerpMarket, SpotMarket
+from tribulnation.coinbase.market import SpotMarket
 from tribulnation.coinbase.market.impl.mixin import MarketMixin
 from tribulnation.coinbase.market.impl.orders import place_order
 from tribulnation.coinbase.market.impl.trades import parse_fill
@@ -84,10 +84,9 @@ def test_history_fills_name_their_order_but_not_its_client_id():
   assert trade.qty == Decimal('-0.5')
 
 
-@pytest.mark.parametrize('cls', [SpotMarket, PerpMarket])
-def test_random_client_order_id_generates_uuids(cls: type[SpotMarket | PerpMarket]):
+def test_random_client_order_id_generates_uuids():
   """Fresh IDs are distinct UUIDs; the generator reads no market state."""
-  market = object.__new__(cls)
+  market = object.__new__(SpotMarket)
   ids = {market.random_client_order_id() for _ in range(100)}
   assert len(ids) == 100
   assert all(str(uuid.UUID(value)) == value for value in ids)
