@@ -97,6 +97,8 @@ async def user_trades_stream(
             order['product_id'],
             Trade(
               id=f'{order["order_id"]}:{cumulative_quantity}',
+              order_id=order['order_id'],
+              client_order_id=order['client_order_id'] or None,
               price=order.get('avg_price') or Decimal(0),
               qty=sign * (cumulative_quantity - previous),
               time=message['timestamp'],

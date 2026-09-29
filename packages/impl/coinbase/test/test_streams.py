@@ -117,7 +117,7 @@ def level2(kind: str, *, bids: list[tuple[str, str]], asks: list[tuple[str, str]
   return message
 
 
-def user_orders(order_id: str, cumulative: str):
+def user_orders(order_id: str, cumulative: str, *, client_order_id: str = 'c-1'):
   """Build one `user` frame carrying an order's cumulative filled quantity."""
   message: UserOrdersMessage = {
     'channel': 'user',
@@ -128,7 +128,7 @@ def user_orders(order_id: str, cumulative: str):
         'type': 'update',
         'orders': [
           {
-            'client_order_id': 'c-1',
+            'client_order_id': client_order_id,
             'order_id': order_id,
             'order_side': 'BUY',
             'order_type': 'LIMIT',
@@ -198,3 +198,20 @@ async def test_a_repeated_order_frame_does_not_invent_a_trade() -> None:
     await source.send(user_orders('o-1', '3'))
     _, second = cast(tuple[str, Trade], await take(stream))
     assert second.qty == Decimal('2')
+
+
+async def test_streamed_fills_name_their_order_and_its_client_id() -> None:
+  """Each reconstructed fill carries its order's ids; an empty client id is none."""
+  source = FakeSource()
+  shared = Shared(client=fake_client(source))
+
+  async with shared.user_trades_sub().subscribe(
+    queue_size=100, overflow='fail'
+  ) as stream:
+    await source.send(user_orders('o-1', '1', client_order_id='hedge-42'))
+    _, tagged = cast(tuple[str, Trade], await take(stream))
+    await source.send(user_orders('o-2', '1', client_order_id=''))
+    _, untagged = cast(tuple[str, Trade], await take(stream))
+
+  assert (tagged.order_id, tagged.client_order_id) == ('o-1', 'hedge-42')
+  assert (untagged.order_id, untagged.client_order_id) == ('o-2', None)
