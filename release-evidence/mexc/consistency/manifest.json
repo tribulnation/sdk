@@ -254,8 +254,8 @@
       },
       "tribulnation-mexc": {
         "files_sha256": "f049885f90ab04958773d2299c4acfa30efa16e64b9fe4698e405fdeb560d9d6",
-        "metadata_sha256": "628c643263cb404e7202375bc3e4133ac0b9d89ce228cdc70fe03bbcb6f96eac",
-        "version": "2.1.0"
+        "metadata_sha256": "9b3003bc5114dde37bf4b805b0b25ae4ad8a61d5980c4d0cb899db97b9bff223",
+        "version": "2.2.0"
       },
       "tribulnation-sdk": {
         "files_sha256": "4ef6c26b916efe53be569c0433ccf48f0706f8ad3809fa5095c46cd35fc9e6f0",
@@ -295,7 +295,7 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "729238bbe630b0dfb2902c720678ed1434d0b37374ac21214028b9ffd8e31450",
+    "source_sha256": "8a6b041650b3ecf30498621c17ccd76780526700fe4b93b23c4b3d0bcce4aafe",
     "venue": "mexc"
   },
   "before": {
@@ -553,8 +553,8 @@
       },
       "tribulnation-mexc": {
         "files_sha256": "f049885f90ab04958773d2299c4acfa30efa16e64b9fe4698e405fdeb560d9d6",
-        "metadata_sha256": "628c643263cb404e7202375bc3e4133ac0b9d89ce228cdc70fe03bbcb6f96eac",
-        "version": "2.1.0"
+        "metadata_sha256": "9b3003bc5114dde37bf4b805b0b25ae4ad8a61d5980c4d0cb899db97b9bff223",
+        "version": "2.2.0"
       },
       "tribulnation-sdk": {
         "files_sha256": "4ef6c26b916efe53be569c0433ccf48f0706f8ad3809fa5095c46cd35fc9e6f0",
@@ -594,12 +594,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "729238bbe630b0dfb2902c720678ed1434d0b37374ac21214028b9ffd8e31450",
+    "source_sha256": "8a6b041650b3ecf30498621c17ccd76780526700fe4b93b23c4b3d0bcce4aafe",
     "venue": "mexc"
   },
-  "finished": "2026-09-29T17:02:08.485284Z",
-  "results_sha256": "78d1bd36b700fe4e53f8512d523cd9a5fbb9c470cfd7c30be777db1cbfe69465",
+  "finished": "2026-09-29T18:50:07.672360Z",
+  "results_sha256": "fe65d39495540615d442327c6f51eba4e7e0908860706715130bb5ada70c5690",
   "schema_version": 1,
-  "started": "2026-09-29T17:02:01.088912Z",
-  "summary_sha256": "1971c432ab19556008a499827dfe7e8d85f1e2ed46503d79d40fe636dce7105b"
+  "started": "2026-09-29T18:50:01.013085Z",
+  "summary_sha256": "7807718eee7830f2e8fdca51d67b1bfd527bca064af370b27642f0391fd5be71"
 }
