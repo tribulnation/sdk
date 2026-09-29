@@ -1,13 +1,19 @@
-# tribulnation-sdk 2.6.1 release candidate
+# tribulnation-sdk 2.7.0 release candidate
 
-Python 3.10 support for account loading, and a safe Aster extra.
+Client order IDs on orders, and order IDs on fills.
 
-- `tribulnation.sdk.impl.accounts` (`load_accounts`, TOML-configured `MarketSDK`
-  and other routers) imported `tomllib`, which exists only on Python 3.11+, despite
-  the package's `>=3.10` floor. It now falls back to `tomli`, a new dependency
-  installed only below 3.11.
-- The `aster` extra requires `tribulnation-aster>=0.2.0`. Aster 0.1.0 cannot build
-  its client once `typed-aster` 0.2.0 is installed, which a fresh install resolves.
+- `Order` takes an optional `client_order_id` (`str | None`, where `None` is the same as
+  leaving it out). Venues with native client order IDs send it unchanged; the rest
+  ignore it.
+- `Market.random_client_order_id()` generates a fresh ID in the form that market's
+  `place_order` sends, or returns `None` where the market ignores the IDs.
+- `Trade` (and so `ExchangeTrade`) gains `order_id` and `client_order_id`, both
+  defaulting to `None` where the venue does not report them.
 
-No SDK interfaces change. Publication requires fresh all-venue read-suite and
-applicable Market consistency evidence against the pinned Catalogue snapshot.
+Existing `Order`, `Trade` and `Market` code keeps working. Implementations reporting the
+new fields need this version, so their floors rise when they are released. See
+[ADR 0029](../../dev-docs/adr/0029-client-order-ids.md) and
+[Client Order IDs](../../docs/market/client-order-ids.md).
+
+Publication requires fresh all-venue read-suite and applicable Market consistency
+evidence against the pinned Catalogue snapshot.
