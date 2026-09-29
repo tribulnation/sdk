@@ -159,22 +159,26 @@ async def test_book_stream_folds_snapshot_then_updates():
   assert len(books[0].bids) == 2, 'the first yielded book was mutated by the update'
 
 
+XBTUSDC_TRADE: HistoricalTrade = {
+  'ordertxid': 'ODLOMH-T4FBZ-A7DZ4O',
+  'pair': 'XBTUSDC',
+  'time': TIME,
+  'type': 'buy',
+  'ordertype': 'market',
+  'price': Decimal('79746.95000'),
+  'cost': Decimal('4.78482'),
+  'fee': Decimal('0.03828'),
+  'vol': Decimal('0.00006000'),
+  'trade_id': 7311667,
+  'maker': False,
+}
+"""`TradesHistory` row of the account's one XBTUSDC fill."""
+
+
 def test_historical_trade_is_signed_and_fee_is_in_quote():
   """`TradesHistory` reports `vol` unsigned with a `type`, and `fee` in the quote
   asset without naming it. Recorded from the account's one XBTUSDC fill."""
-  row: HistoricalTrade = {
-    'ordertxid': 'ODLOMH-T4FBZ-A7DZ4O',
-    'pair': 'XBTUSDC',
-    'time': TIME,
-    'type': 'buy',
-    'ordertype': 'market',
-    'price': Decimal('79746.95000'),
-    'cost': Decimal('4.78482'),
-    'fee': Decimal('0.03828'),
-    'vol': Decimal('0.00006000'),
-    'trade_id': 7311667,
-    'maker': False,
-  }
+  row = XBTUSDC_TRADE
   trade = parse_trade('TKH2SE-M7IF5-CFI7LT', row, quote='USDC')
   assert trade.id == '7311667'
   assert trade.qty == Decimal('0.00006000') and trade.time == TIME
@@ -205,6 +209,60 @@ def test_streamed_fill_transcribes_floats_through_their_repr():
   assert trade.price == Decimal('79746.95') and trade.qty == Decimal('-0.00006')
   assert trade.maker is True
   assert trade.fee == trade.Fee(amount=Decimal('0.03828'), asset='USD')
+
+
+def test_historical_trade_names_its_order_but_no_client_id():
+  """`ordertxid` is the order's txid; `TradesHistory` never carries `cl_ord_id`."""
+  trade = parse_trade('TKH2SE-M7IF5-CFI7LT', XBTUSDC_TRADE, quote='USDC')
+  assert (trade.order_id, trade.client_order_id) == ('ODLOMH-T4FBZ-A7DZ4O', None)
+  row: HistoricalTrade = {**XBTUSDC_TRADE}
+  del row['ordertxid']
+  bare = parse_trade('T', row, quote='USDC')
+  assert (bare.order_id, bare.client_order_id) == (None, None)
+
+
+def fill_event(cl_ord_id: str | None) -> ExecutionTradeEvent:
+  """One `executions` fill of order `OXZ5TE-QZDNW-HXS4DQ`, `cl_ord_id` omitted if `None`."""
+  event: ExecutionTradeEvent = {
+    'order_id': 'OXZ5TE-QZDNW-HXS4DQ',
+    'order_userref': 0,
+    'exec_type': 'trade',
+    'order_status': 'filled',
+    'timestamp': TIME,
+    'symbol': 'BTC/USD',
+    'side': 'buy',
+    'order_type': 'limit',
+    'cum_qty': 0.00006,
+    'cum_cost': 4.78482,
+    'avg_price': 79746.95,
+    'exec_id': 'TXSB7J-4DGZF-XUV3SN',
+    'trade_id': 7311668,
+    'last_price': 79746.95,
+    'last_qty': 0.00006,
+    'cost': 4.78482,
+    'liquidity_ind': 't',
+    'fees': [{'asset': 'USD', 'qty': 0.03828}],
+  }
+  if cl_ord_id is not None:
+    event['cl_ord_id'] = cl_ord_id
+  return event
+
+
+@pytest.mark.parametrize(
+  'cl_ord_id,expected',
+  [
+    ('2c6be801-1f53-4f79-a0bb-4ea1c95dfae9', '2c6be801-1f53-4f79-a0bb-4ea1c95dfae9'),
+    ('', None),
+    (None, None),
+  ],
+)
+def test_streamed_fill_reports_order_and_client_ids(
+  cl_ord_id: str | None, expected: str | None
+):
+  """A fill names its order; a missing or empty `cl_ord_id` means no client id, and
+  the numeric `order_userref` is never taken for one."""
+  trade = parse_fill(fill_event(cl_ord_id))
+  assert (trade.order_id, trade.client_order_id) == ('OXZ5TE-QZDNW-HXS4DQ', expected)
 
 
 def test_open_order_is_signed_and_pending_counts_as_active():

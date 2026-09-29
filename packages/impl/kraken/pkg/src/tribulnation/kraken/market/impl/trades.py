@@ -21,6 +21,9 @@ TRADES_PAGE = 100
 def parse_trade(txid: str, trade: HistoricalTrade, *, quote: str) -> Trade:
   """Map one historical fill onto a `Trade`.
 
+  The row names its order (`ordertxid`, the txid `OpenOrders` keys it by) but not the
+  order's `cl_ord_id`.
+
   Args:
     txid: The trade's transaction id, the key it is listed under.
     trade: The fill.
@@ -31,6 +34,7 @@ def parse_trade(txid: str, trade: HistoricalTrade, *, quote: str) -> Trade:
   trade_id = trade.get('trade_id')
   return Trade(
     id=str(trade_id) if trade_id is not None else txid,
+    order_id=trade.get('ordertxid') or None,
     price=trade.get('price', Decimal(0)),
     qty=vol if trade.get('type') == 'buy' else -vol,
     time=trade['time'],
@@ -44,12 +48,16 @@ def parse_fill(event: ExecutionTradeEvent) -> Trade:
   """Map one streamed fill onto a `Trade`.
 
   Prices, quantities and fees arrive as JSON numbers, which the client keeps as
-  `float`; each is transcribed through its shortest string representation.
+  `float`; each is transcribed through its shortest string representation. The client
+  order id is `cl_ord_id`, absent when the order was placed without one; the numeric
+  `order_userref` is a tag several orders may share, not an order's own id.
   """
   qty = Decimal(str(event['last_qty']))
   fees = event.get('fees') or []
   return Trade(
     id=str(event['trade_id']),
+    order_id=event['order_id'],
+    client_order_id=event.get('cl_ord_id') or None,
     price=Decimal(str(event['last_price'])),
     qty=qty if event['side'] == 'buy' else -qty,
     time=event['timestamp'],
