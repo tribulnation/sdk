@@ -244,6 +244,8 @@ class SpotMarket(SharedMixin, Market):
         yield [
           Trade(
             id=str(t['id']),
+            order_id=str(t['orderId']),
+            # `myTrades` rows carry no client order id; only the order endpoints do.
             price=t['price'],
             qty=t['qty'] if t['isBuyer'] else -t['qty'],
             time=t['time'],
@@ -278,6 +280,9 @@ class SpotMarket(SharedMixin, Market):
       fee_asset = event['N']
       return Trade(
         id=str(event['t']),
+        order_id=str(event['i']),
+        # `c` is the filled order's own client id; `C` is only set on cancel reports.
+        client_order_id=event['c'] or None,
         price=event['L'],
         qty=qty if event['S'] == 'BUY' else -qty,
         time=event['T'],
