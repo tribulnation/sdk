@@ -502,6 +502,7 @@ methods:
     example:
       accountVenues: [mexc]
       constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'USDT'}
         mexc: {market_id: 'mexc:spot:BTCUSDT', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: USDT}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', price1: '60095.60', qty1: '0.01', price2: '60040.00', qty2: '-0.02', fee_asset: '0'}
         coinbase: {market_id: 'coinbase:spot:BTC-USD', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'USD'}

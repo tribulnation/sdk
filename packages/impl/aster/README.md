@@ -22,11 +22,11 @@ venue = AsterMarket.new(user='0x…', signer='0x…', mainnet=False)
 2. Public data: discovery, tickers, rules, REST depth (up to 1000 levels), shared
    depth streams (up to 20 levels), candles in the six SDK intervals, perpetual index,
    next funding, funding-rate history and bulk `perp_stats` (without open interest).
-3. Account and trading: fees, order queries, open orders, fill streams, `MARKET`,
-   `LIMIT` (GTC) and `POST_ONLY` (GTX) orders, and all cancellation methods. Market
-   orders ignore the SDK `price`. Perpetual position and collateral cover one-way,
-   cross-margin accounts. These are verified on testnet only.
-4. Unsupported methods raise `NotImplementedError`: spot balances, trade history,
+3. Account and trading: fees, order queries, open orders, fill streams, perpetual
+   trade history, `MARKET`, `LIMIT` (GTC) and `POST_ONLY` (GTX) orders, and all
+   cancellation methods. Market orders ignore the SDK `price`. Perpetual position and
+   collateral cover one-way, cross-margin accounts. These are verified on testnet only.
+4. Unsupported methods raise `NotImplementedError`: spot balances, spot trade history,
    funding payments, `available_notional` and `perp_collateral`.
 5. `tribulnation.aster.Report` streams perpetual income and spot transactions as
    unclassified cash deltas. It is verified on testnet only and not routed through

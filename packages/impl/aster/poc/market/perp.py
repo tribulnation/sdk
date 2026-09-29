@@ -413,21 +413,89 @@ async def open_orders(market_id: str, /) -> Sequence[OrderState]:
 
 
 # %%
-async def trades_history(
-  market_id: str, /, start: datetime, end: datetime
-) -> AsyncIterable[Sequence[Trade]]:
-  """Not yet mapped: the typed-aster 0.2.0 pager awaits qualification."""
-  raise NotImplementedError(
-    'Aster trade history is not mapped yet; typed-aster 0.2.0 fixes the pager'
+from typed_aster.futures.trade.user_trades import AccountTradeItem
+
+TRADES_WINDOW = timedelta(days=7)
+"""Widest `startTime`/`endTime` span `userTrades` accepts; wider ones fail `-4165`."""
+
+
+def parse_trade(row: AccountTradeItem) -> Trade:
+  """Map one native fill; the lifecycle cell matches these fields to streamed fills."""
+  if (
+    'side' not in row
+    or 'maker' not in row
+    or 'commission' not in row
+    or 'commissionAsset' not in row
+  ):
+    raise NotImplementedError('Native fill fields are incomplete')
+  return Trade(
+    id=str(row['id']),
+    qty=row['qty'] if row['side'] == 'BUY' else -row['qty'],
+    price=row['price'],
+    time=row['time'],
+    maker=row['maker'],
+    fee=Trade.Fee(amount=row['commission'], asset=row['commissionAsset']),
+    details=row,
   )
-  yield []  # Retain the SDK async-generator contract for the unmapped method.
 
 
-try:
-  async for page in trades_history('ASTERUSDT', start, end):
-    pass
-except NotImplementedError as exc:
-  print(str(exc))
+async def trades_history(
+  market_id: str, /, start: datetime, end: datetime, *, limit: int = 1000
+) -> AsyncIterable[Sequence[Trade]]:
+  """Walk inclusive seven-day windows, each with the typed `fromId` pager.
+
+  The venue refuses a future `startTime` (`-4181`) and an `endTime` more than
+  about a day ahead (`-4165`), so the walk stops at the current time.
+  """
+  horizon = min(end, datetime.now(timezone.utc))
+  lower = start
+  while lower <= horizon:
+    upper = min(lower + TRADES_WINDOW, horizon)
+    pages = client.futures.trade.user_trades_paged(
+      market_id, start_time=lower, end_time=upper, limit=limit
+    )
+    async for rows in pages:
+      if page := [parse_trade(r) for r in rows if start <= r['time'] <= end]:
+        yield page
+    lower = upper + timedelta(milliseconds=1)
+
+
+# Three windows, only one of them holding the account's testnet fills.
+history_start = end - timedelta(days=20)
+full = [
+  t async for page in trades_history('ASTERUSDT', history_start, end) for t in page
+]
+paged = [
+  [t.id for t in page]
+  async for page in trades_history('ASTERUSDT', history_start, end, limit=3)
+]
+single = await client.futures.trade.user_trades(
+  'ASTERUSDT', start_time=end - timedelta(days=7), end_time=end, limit=1000
+)
+lo, hi = full[1].time, full[-2].time
+bounded = [t async for page in trades_history('ASTERUSDT', lo, hi) for t in page]
+beyond = [
+  t
+  async for page in trades_history('ASTERUSDT', end, end + timedelta(days=30))
+  for t in page
+]
+{
+  'rows': len(full),
+  'buys/sells': (sum(t.qty > 0 for t in full), sum(t.qty < 0 for t in full)),
+  'ids unique and ascending': (ids := [int(str(t.id)) for t in full])
+  == sorted(set(ids)),
+  'matches one native page': [t.id for t in full] == [str(r['id']) for r in single],
+  'limit=3 page sizes': [len(p) for p in paged],
+  'limit=3 walk matches': [i for p in paged for i in p] == [t.id for t in full],
+  'inclusive bounds keep both edge rows': [t.id for t in bounded]
+  == [t.id for t in full if lo <= t.time <= hi]
+  and (bounded[0].time, bounded[-1].time) == (lo, hi),
+  'future window rows': len(beyond),
+  'BTCUSDT rows': sum(
+    [len(p) async for p in trades_history('BTCUSDT', history_start, end)]
+  ),
+  'sample': full[:2],
+}
 
 
 # %% [markdown]
@@ -1067,7 +1135,7 @@ evidence
 # | `candles` | verified | All six SDK intervals on BTCUSDT/ASTERUSDT; 510 one-minute rows cross the 500-row boundary |
 # | `query_order` | verified | Missing, resting, filled and cancelled native orders; signed buy/sell quantities |
 # | `open_orders` | verified | Resting orders observed; confirmed empty after cancellation |
-# | `trades_history` | not attempted | typed-aster 0.2.0 fixes the pager; mapping deferred to a follow-up |
+# | `trades_history` | verified | 16 ASTERUSDT fills over three 7-day windows; a limit-3 walk (8 pages) matches one native page; inclusive bounds; future windows empty |
 # | `trades_stream` | verified | Six real fills matched to one native REST page, including time, fee asset and maker flag; listen-key cleanup |
 # | `position` | verified | Nonzero long, short and flat one-way positions |
 # | `available_notional` | not supported | No native account-side buy/sell capacity; no derived buying-power estimate |
