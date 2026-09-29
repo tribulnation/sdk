@@ -2,7 +2,7 @@
 
 from abc import abstractmethod
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 import secrets
 from typing_extensions import (
@@ -19,6 +19,7 @@ from pydantic import TypeAdapter, ValidationError
 from typed_aster.futures import Futures
 from typed_aster.futures.trade.place_order import Request as FuturesOrderRequest
 from typed_aster.futures.trade.schemas import FuturesOrder
+from typed_aster.futures.trade.user_trades import AccountTradeItem
 from typed_aster.schemas import BatchError
 from typed_aster.spot import Spot
 from typed_aster.spot.trade.cancel_batch_orders import SpotBatchCancelledOrder
@@ -61,6 +62,9 @@ CANDLE_PAGE = 500
 BATCH_SIZE = 10
 """Native maximum orders per batch cancellation."""
 ORDER_NOT_FOUND = -2013
+TRADES_WINDOW = timedelta(days=7)
+"""Widest `userTrades` time window; a wider one is refused with `-4165`."""
+TRADES_PAGE = 1000
 
 
 class ErrorBody(TypedDict):
@@ -95,6 +99,39 @@ def order_state(row: SpotOrder | FuturesOrder) -> OrderState:
     qty=sign * row['origQty'],
     filled_qty=sign * row['executedQty'],
     active=row['status'] in ('NEW', 'PARTIALLY_FILLED'),
+    details=row,
+  )
+
+
+def parse_trade(row: AccountTradeItem) -> Trade:
+  """Map one perpetual account trade with a signed base quantity.
+
+  Raises:
+    MissingData: The row lacks its side or maker flag, or has a fee amount without
+      its asset (or vice versa). An incomplete trade is never emitted.
+  """
+  if 'side' not in row or 'maker' not in row:
+    raise MissingData(
+      'Aster trade lacks its side or maker flag',
+      market_id=row['symbol'],
+      field='side/maker',
+    )
+  fee = None
+  if 'commission' in row and 'commissionAsset' in row:
+    fee = Trade.Fee(amount=row['commission'], asset=row['commissionAsset'])
+  elif 'commission' in row or 'commissionAsset' in row:
+    raise MissingData(
+      'Aster trade has an incomplete commission',
+      market_id=row['symbol'],
+      field='commission/commissionAsset',
+    )
+  return Trade(
+    id=str(row['id']),
+    price=row['price'],
+    qty=row['qty'] if row['side'] == 'BUY' else -row['qty'],
+    time=row['time'],
+    maker=row['maker'],
+    fee=fee,
     details=row,
   )
 
@@ -285,12 +322,6 @@ class NativeMarket(Public, Market):
     rows = await self.shared.call(lambda: self.api.trade.open_orders(self.symbol))
     return [order_state(r) for r in rows]
 
-  def trades_history(self, start: datetime, end: datetime) -> PaginatedResponse[Trade]:
-    """Unsupported: typed-aster 0.1.0 cannot paginate account trades."""
-    raise NotImplementedError(
-      'Aster trade history is not supported: typed-aster cannot paginate account trades'
-    )
-
   def trades_stream(
     self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
@@ -399,6 +430,12 @@ class SpotMarket(NativeMarket):
       rel_max_price=rel_max,
       api=True,
       details=row,
+    )
+
+  def trades_history(self, start: datetime, end: datetime) -> PaginatedResponse[Trade]:
+    """Unsupported: testnet spot `userTrades` omits confirmed buy fills."""
+    raise NotImplementedError(
+      'Aster spot trade history is not supported: userTrades omits confirmed buy fills'
     )
 
   async def position(self) -> Position:
@@ -550,6 +587,32 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     )
     async for page in pages.via(self.shared.call):
       yield [FundingRate(rate=r['fundingRate'], time=r['fundingTime']) for r in page]
+
+  def trades_history(self, start: datetime, end: datetime) -> PaginatedResponse[Trade]:
+    """Read this symbol's fills within inclusive `[start, end]` bounds.
+
+    The venue refuses a future `startTime` (`-4181`) and an `endTime` more than
+    about a day ahead (`-4165`), so the walk stops at the current time.
+    """
+    if start.tzinfo is None or end.tzinfo is None:
+      raise ValueError('Trade history bounds must be timezone-aware')
+    return PaginatedResponse(self.trade_pages(start, end))
+
+  async def trade_pages(
+    self, start: datetime, end: datetime
+  ) -> AsyncIterable[Sequence[Trade]]:
+    """Walk seven-day windows with the typed `fromId` pager, retrying each page."""
+    horizon = min(end, datetime.now(timezone.utc))
+    lower = start
+    while lower <= horizon:
+      upper = min(lower + TRADES_WINDOW, horizon)
+      pages = self.api.trade.user_trades_paged(
+        self.symbol, start_time=lower, end_time=upper, limit=TRADES_PAGE
+      )
+      async for rows in pages.via(self.shared.call):
+        if page := [parse_trade(r) for r in rows if start <= r['time'] <= end]:
+          yield page
+      lower = upper + timedelta(milliseconds=1)
 
   def funding_payments(
     self, start: datetime, end: datetime

@@ -55,12 +55,15 @@ never falls back to mainnet variables. `validate` toggles response validation.
 - Fill streams share one account listen key per exchange, renewed every 25 minutes
   and closed when the last subscriber leaves. Do not run another consumer of the same
   account's listen key concurrently.
+- Perpetual `trades_history` reads inclusive `[start, end]` bounds in native
+  seven-day windows, each walked by trade ID, and stops at the current time because
+  Aster refuses future bounds.
 - Perpetual position and collateral support one-way (not hedge-mode) positions on the
   cross-margin bucket. Isolated-margin collateral raises `NotImplementedError`.
 - `perp_stats` joins the bulk premium index with the funding configuration in two
   requests. Aster has no bulk open-interest source, so `open_interest` is `None`; a
   symbol without a published funding interval reports `funding_interval=None`.
-- Unsupported, raising `NotImplementedError`: spot position and collateral, trade
+- Unsupported, raising `NotImplementedError`: spot position, collateral and trade
   history, funding payments, `available_notional` and `perp_collateral`.
 - Public reads are verified on mainnet. Account and trading methods are verified on
   testnet only.
