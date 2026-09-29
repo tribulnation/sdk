@@ -28,6 +28,8 @@ def execution(exec_id: str) -> dict[str, Any]:
   """One spot fill, with only the fields the mapping reads."""
   return {
     'execId': exec_id,
+    'orderId': f'order-{exec_id}',
+    'orderLinkId': '',
     'execQty': Decimal('1'),
     'execPrice': Decimal('1'),
     'execTime': START,

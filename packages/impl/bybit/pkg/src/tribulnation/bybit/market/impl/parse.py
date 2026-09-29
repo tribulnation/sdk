@@ -50,10 +50,15 @@ def parse_execution(execution: 'Execution | ExecutionUpdate') -> Trade:
   `execFee` is required and already a parsed `Decimal`, so it is read with no
   truthiness guard: a zero fee is a real fee, and 40 of the 55 spot fills on the
   account this was derived against carry exactly `0`.
+
+  An order placed without an `orderLinkId` reports `""` (read as `None`) on linear;
+  spot generates one.
   """
   qty = execution['execQty']
   return Trade(
     id=execution['execId'],
+    order_id=execution['orderId'],
+    client_order_id=execution['orderLinkId'] or None,
     price=execution['execPrice'],
     qty=qty if execution['side'] == 'Buy' else -qty,
     time=execution['execTime'],
@@ -70,12 +75,13 @@ def order_request(
 
   `'MARKET'` becomes a native Bybit market order, which carries its own slippage
   protection and ignores a limit price; `'POST_ONLY'` becomes a `PostOnly` limit
-  order, and `'LIMIT'` a `GTC` one.
+  order, and `'LIMIT'` a `GTC` one. A `client_order_id` is sent as `orderLinkId`.
   """
   qty = Decimal(order['qty'])
   side: Literal['Buy', 'Sell'] = 'Buy' if qty > 0 else 'Sell'
+  request: CreateMarketOrderRequest | CreateLimitOrderRequest
   if order['type'] == 'MARKET':
-    return CreateMarketOrderRequest(
+    request = CreateMarketOrderRequest(
       category=category,
       symbol=symbol,
       side=side,
@@ -83,12 +89,16 @@ def order_request(
       qty=str(abs(qty)),
       timeInForce='IOC',
     )
-  return CreateLimitOrderRequest(
-    category=category,
-    symbol=symbol,
-    side=side,
-    orderType='Limit',
-    qty=str(abs(qty)),
-    price=str(Decimal(order['price'])),
-    timeInForce='PostOnly' if order['type'] == 'POST_ONLY' else 'GTC',
-  )
+  else:
+    request = CreateLimitOrderRequest(
+      category=category,
+      symbol=symbol,
+      side=side,
+      orderType='Limit',
+      qty=str(abs(qty)),
+      price=str(Decimal(order['price'])),
+      timeInForce='PostOnly' if order['type'] == 'POST_ONLY' else 'GTC',
+    )
+  if 'client_order_id' in order:
+    request['orderLinkId'] = order['client_order_id']
+  return request
