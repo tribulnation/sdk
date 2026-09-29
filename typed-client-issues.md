@@ -1,5 +1,29 @@
 # Open typed-client issues
 
+## typed-hyperliquid
+
+### `UserFill` shapes omit `cloid`
+
+Fills of an order placed with a client order id carry it as `cloid`; fills of other orders
+leave the key out. None of the three fill shapes declares it, so the SDK reads it off the
+validated mapping (`extra='allow'` keeps it) instead of through the type.
+
+`info/user_fills.py:15`, `info/user_fills_by_time.py:22`, `streams/user_fills.py:29`:
+
+```python
+class UserFill(TypedDict):
+  ...
+  oid: int
+  """Order id."""
+```
+
+- Kind: missing-field (optional; present only on fills of orders placed with a `cloid`)
+- Observed: public `userFills` for 12 addresses from `recentTrades` BTC on 2026-09-29: 9
+  returned fills with `"cloid": "0xcf7f7ce851dc4da48d5420150d06cb8f"`-style values, 3 had
+  no `cloid` key on any fill. The websocket `userFills` shape was not captured.
+- Blocks: `fill_cloid` in `tribulnation/hyperliquid/market/impl/trades.py`, which can read
+  `f.get('cloid')` directly once `cloid: NotRequired[str]` is declared
+
 ## typed-lighter
 
 ### `Candle` OHLCV fields are `float`

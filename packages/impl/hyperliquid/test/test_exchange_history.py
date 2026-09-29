@@ -25,6 +25,7 @@ def fill(coin: str, tid: int) -> dict[str, Any]:
   return {
     'coin': coin,
     'tid': tid,
+    'oid': 1000 + tid,
     'px': Decimal('12'),
     'sz': Decimal('3'),
     'side': 'A',

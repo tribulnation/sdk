@@ -38,7 +38,7 @@ def _export_order(
 
   qty = Decimal(o['qty'])
   price = round_price(Decimal(o['price']))
-  return {
+  wire: HyperliquidOrder = {
     'a': self.asset_id,
     'b': qty >= 0,
     'p': price,
@@ -46,6 +46,10 @@ def _export_order(
     'r': settings.get('reduce_only', False),
     't': {'limit': {'tif': tif}},
   }
+  if 'client_order_id' in o:
+    # Sent as-is: the venue rejects anything but a 128-bit hex string (`0x` + 32 hex).
+    wire['c'] = o['client_order_id']
+  return wire
 
 
 @wrap_exceptions
