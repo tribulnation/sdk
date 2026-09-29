@@ -86,6 +86,49 @@ market orders places a limit order there instead.
 > `settings={'dydx': {...}}`. If a venue can't do what you asked for it raises, rather than
 > quietly placing a different order.
 
+### Tag it with your own ID
+
+Add a `client_order_id` to tag the order with an ID of your own:
+
+```python
+response = await sdk.place_order('mexc_account1:spot:BTCUSDT', {
+  'type': 'LIMIT', 'qty': qty, 'price': price, 'client_order_id': 'hedge-42',
+})
+```
+
+Its fills carry it back as `Trade.client_order_id`, next to `Trade.order_id`, which is
+`response.id`. A strategy following its own fills can then tell its orders apart:
+
+```python
+async with sdk.trades_stream('mexc_account1:spot:BTCUSDT') as my_trades:
+  async for trade in my_trades:
+    if trade.client_order_id == 'hedge-42':
+      print(trade.order_id, trade.qty, '@', trade.price)
+```
+
+The SDK sends the string unchanged, so the venue's rules apply: most limit its length and
+characters and reject an ID already in use. Venues without client order IDs ignore it,
+and either field is `None` on fills that don't report it:
+
+| Venue | Sent as | `order_id` on fills | `client_order_id` on fills |
+| --- | --- | --- | --- |
+| Aster | `newClientOrderId`; perpetuals take up to 36 of `A-Z a-z 0-9 . : / _ -` | Stream | Stream |
+| Binance | No trading | History and stream | Stream |
+| Bit2Me | `clientOrderId` | History and stream | History and stream |
+| Bitget | No trading | History and stream | UTA history and stream; Classic futures stream |
+| Bybit | `orderLinkId`, up to 36 characters | History and stream | History and stream |
+| Coinbase | `client_order_id` | History and stream | Stream |
+| dYdX | Ignored | Stream | — |
+| Hyperliquid | `cloid`: `0x` and 32 hex digits | History and stream | History and stream |
+| Kraken | No trading | History and stream | Stream |
+| Lighter | Ignored | History and stream | — |
+| MEXC | `newClientOrderId` (spot) | History and stream | History and stream |
+
+Where you give none, Aster, Binance and Bybit spot generate an ID, and so does the SDK on
+Coinbase, which requires one: fills report that one. On Coinbase, reusing an ID doesn't
+place a second order; you get back the order already placed under it. Deribit and KuCoin
+serve public data only.
+
 ## 4. Check on it, or cancel it
 
 `response.id` is what the rest of the surface takes:

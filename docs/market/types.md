@@ -35,6 +35,7 @@ An `Order` is what you pass to `place_order`:
   'qty': Num,  # signed base units: positive buys, negative sells
   'price': Num,  # always required by the SDK order shape
   'type': 'MARKET' | 'LIMIT' | 'POST_ONLY',
+  'client_order_id': str,  # optional: your own ID for the order
 }
 ```
 
@@ -65,7 +66,9 @@ raises, rather than quietly placing a different order.
   Base/quote identities come from the Catalogue instrument, not `Rules`.
 - `Ticker`: `last`, `bid`, `ask`, `bid_qty`, `ask_qty` and `base_volume_24h`, all optional.
 - `Trade`: `id`, `price`, signed `qty`, `time`, a `maker` flag, and an optional `fee`
-  (`amount` plus `asset`).
+  (`amount` plus `asset`). `order_id` is the filled order's `OrderResponse.id`, and
+  `client_order_id` the ID it was placed with; either is `None` where the venue
+  doesn't report it. See [client order IDs](first-order.md#tag-it-with-your-own-id).
 
 ### Trading fees
 
