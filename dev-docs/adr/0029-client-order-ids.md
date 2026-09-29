@@ -35,6 +35,11 @@ ID, and on Lighter the client order index is the SDK's order ID.
    orders placed without one. Either is `None` when the fill payload does not carry it.
 5. Implementations fill both from the fill payload they already read. They make no extra
    requests per fill.
+6. `Rules.client_order_id_format` names the form a market's `place_order` sends: `'hex'`
+   (32 hex digits) or `'0x-hex'` (the same after `0x`, Hyperliquid's `cloid`). It is
+   `None`, the default, where the market ignores the IDs. `Rules.random_client_id()`
+   generates 128 random bits in that form. Plain hex fits every venue that sends the IDs
+   except Hyperliquid, whose documented form is the `0x` variant.
 
 ## Alternatives considered
 
@@ -49,6 +54,11 @@ ID, and on Lighter the client order index is the SDK's order ID.
   in the venue table.
 - `OrderState.client_order_id`: not needed to attribute fills. It stays outside this
   decision.
+- One universal generated form, such as `0x` plus 32 hex digits for every venue: it fits
+  today's trading venues, but not Kraken's `cl_ord_id` (a UUID or at most 18 characters),
+  and gives no way to tell which markets ignore the IDs.
+- A generator function stored on `Rules`: `Rules` crosses JSON boundaries, such as the
+  engine gateway, so the format is data and the method derives the value from it.
 
 ## Consequences
 

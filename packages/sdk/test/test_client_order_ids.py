@@ -4,13 +4,18 @@ from typing_extensions import Any, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from decimal import Decimal
+import re
+
+import pytest
 
 from tribulnation.sdk.market import (
+  ClientOrderIdFormat,
   Exchange,
   ExchangeTrade,
   Market,
   Order,
   OrderResponse,
+  Rules,
   Trade,
   TradingMarkets,
   TradingVenue,
@@ -171,3 +176,38 @@ async def test_routing_forwards_client_order_ids_unchanged():
   )
   assert [o.get('client_order_id') for o in market.placed] == ['a', 'b', None]
   assert market.placed[0] is order
+
+
+def rules(client_order_id_format: ClientOrderIdFormat | None) -> Rules:
+  """Minimal rules in the given client order ID format."""
+  return Rules(
+    fee_asset='USDT',
+    tick_size=Decimal('0.01'),
+    step_size=Decimal('0.001'),
+    api=True,
+    client_order_id_format=client_order_id_format,
+  )
+
+
+@pytest.mark.parametrize(
+  'client_order_id_format,pattern',
+  [
+    ('hex', r'[0-9a-f]{32}'),
+    ('0x-hex', r'0x[0-9a-f]{32}'),
+    (None, r'[0-9a-f]{32}'),
+  ],
+)
+def test_random_client_id_follows_the_market_format(
+  client_order_id_format: ClientOrderIdFormat | None, pattern: str
+):
+  """Each ID carries 128 fresh random bits in the market's format."""
+  market = rules(client_order_id_format)
+  ids = {market.random_client_id() for _ in range(100)}
+  assert len(ids) == 100
+  assert all(re.fullmatch(pattern, value) for value in ids)
+
+
+def test_rules_default_to_ignoring_client_order_ids():
+  """Rules that do not state a format describe a market ignoring the IDs."""
+  market = Rules(fee_asset='USDT', tick_size=Decimal(1), step_size=Decimal(1), api=True)
+  assert market.client_order_id_format is None
