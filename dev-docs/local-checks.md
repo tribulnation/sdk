@@ -74,6 +74,9 @@ sdk-dev results verify /path/to/new-run \
    Catalogue coverage, checking instrument URLs, and Terminal cross-venue outliers
    remain separate work. The runner neither fixes data nor opens issues.
 6. Bitget UTA `coin` remains an explicitly excluded capability, not a passing check.
+   Coinbase `intx` Catalogue rows are excluded the same way since the adapter dropped
+   INTX perpetuals ahead of their Advanced Trade retirement; see
+   [ADR 0031](adr/0031-coinbase-drop-intx.md).
    Until 2026-10-09, Bitget's venue-wide withdrawal suspension excludes only the
    withdrawal-method non-emptiness check; see [ADR 0027](adr/0027-bitget-withdrawal-suspension.md).
    Kraken linear perpetuals are now in scope under `perp`; see

@@ -28,10 +28,13 @@ T = TypeVar('T')
 Kind = Literal['spot', 'perp']
 Status = Literal['pass', 'fail', 'unavailable', 'excluded', 'deferred', 'limitation']
 
-# Bitget UTA coin is an explicitly deferred product.
-# Keep its Catalogue rows visible as exclusions; never infer scope from discovery
+# Bitget UTA coin is an explicitly deferred product, and Coinbase INTX perpetuals were
+# dropped ahead of their Advanced Trade retirement (ADR 0031).
+# Keep their Catalogue rows visible as exclusions; never infer scope from discovery
 # failures or automatically exclude other unrecognized exchange IDs.
-CATALOGUE_EXCLUSIONS = frozenset({('bitget', 'perp', 'coin')})
+CATALOGUE_EXCLUSIONS = frozenset(
+  {('bitget', 'perp', 'coin'), ('coinbase', 'perp', 'intx')}
+)
 
 
 class StrictModel(BaseModel):
