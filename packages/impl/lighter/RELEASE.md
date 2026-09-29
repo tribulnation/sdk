@@ -1,18 +1,17 @@
-# tribulnation-lighter 0.1.0 release candidate
+# tribulnation-lighter 0.2.0 release candidate
 
-First release: perpetual and spot Market support for Lighter, on `typed-lighter`
-0.2.0. Exchange IDs are `perp` and `spot`; market and asset ids are the venue's numeric
-ids.
+Order IDs on fills.
 
-- Public: discovery, tickers, rules, REST depth (top 250 orders per side), shared
-  full-book streams, six candle intervals (walked in `count_back`-keyed windows, since
-  the venue's CDN caches candles without the start), perpetual index, `perp_stats`,
-  next funding and funding-rate history.
-- Account and trading: fees, order queries, open orders, trade history and streams,
-  positions, cross and isolated perpetual collateral, unified-account spot collateral,
-  available notional, funding payments, MARKET, LIMIT and POST_ONLY orders and every
-  cancellation path.
+- Fills from history and streams report `Trade.order_id`: the client order index of
+  the account's side, which is the SDK's order ID on Lighter. An order placed outside
+  the SDK (index 0) reports `None`.
+- `Order['client_order_id']` is ignored, since Lighter's only client-chosen field is
+  that order index, and `random_client_order_id()` returns `None`.
+  `Trade.client_order_id` is always `None`.
+
+Requires tribulnation-sdk >=2.7.0 (`Trade.order_id` and `Trade.client_order_id`,
+ADR 0029) and typed-lighter >=0.2.0.
 
 Public reads are qualified on mainnet; account and trading methods are verified on
-testnet. Requires tribulnation-sdk >=2.6.0 (`Rules.fee_asset: str | None`, ADR 0028,
-and `MarketSDK` routing through `accounts.Lighter`) and typed-lighter >=0.2.0.
+testnet. Order IDs on fills are covered by unit fixtures; no live trading round trip
+is recorded.
