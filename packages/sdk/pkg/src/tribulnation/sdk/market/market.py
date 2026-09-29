@@ -213,6 +213,12 @@ class Market(SDK):
       IOC. A market order may partially fill unless venue/settings semantics are
       stricter, such as FOK.
 
+    ``order["client_order_id"]`` is optional. Venues with native client order
+    IDs send it unchanged, so a value breaking the venue's format or uniqueness
+    rules raises the venue's error, and report it back on the order's fills as
+    ``Trade.client_order_id``. Venues without them ignore it: it identifies the
+    order without changing how it executes.
+
     Venue-specific ``settings`` may refine time-in-force, reduce-only, expiry,
     or other execution flags. If a venue cannot support the requested semantics,
     it should raise an API/validation error rather than silently placing a

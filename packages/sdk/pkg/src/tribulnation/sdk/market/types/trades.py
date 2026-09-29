@@ -13,6 +13,10 @@ class Trade:
     asset: str
 
   id: str | None
+  order_id: str | None = None
+  """ID of the order this fill executed, as `place_order` returns it and `OrderState.id` reports it. `None` if the venue does not report it."""
+  client_order_id: str | None = None
+  """Client order ID of that order: the `Order['client_order_id']` it was placed with, or one generated for it. `None` if the order has none or the venue does not report it."""
   price: Decimal
   qty: Decimal
   """Signed quantity (netagive -> sell, positive -> buy)"""
