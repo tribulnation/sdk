@@ -8,6 +8,7 @@ from tribulnation.sdk.core import PaginatedResponse, OverflowPolicy
 
 from tribulnation.dydx.core import wrap_exceptions
 from .mixin import MarketMixin
+from .orders import stream_order_ids
 
 
 @PaginatedResponse.lift
@@ -15,6 +16,11 @@ from .mixin import MarketMixin
 async def trades_history(
   self: MarketMixin, start: datetime, end: datetime
 ) -> AsyncIterable[Sequence[Trade]]:
+  """The market's fills across every address subaccount.
+
+  Fills name their order by its indexer id alone, a hash of the protocol order id, so
+  `order_id` is `None`.
+  """
   start = start.astimezone()
   end = end.astimezone()
 
@@ -60,24 +66,37 @@ async def trades_history(
 async def trades_stream(
   self: MarketMixin, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'
 ):
+  """The market's fills across the parent subaccount and its children.
+
+  The indexer pushes an order's fill together with the order, which gives its
+  `order_id`. Fills without an order of the account's (the liquidated or deleveraged
+  side) have none.
+  """
+  parent = self.shared.parent_subaccount
   async with self.subscribe_parent_subaccount(
-    self.shared.parent_subaccount,
+    parent,
     queue_size=queue_size,
     overflow=overflow,
   ) as parent_subaccounts:
 
     @wrap_exceptions
     async def gen() -> AsyncIterable[Trade]:
+      address = self.address
       async for log in parent_subaccounts:
         fills = log.get('fills')
         if fills is None:
           continue
+        order_ids = stream_order_ids(
+          log.get('orders') or [], address=address, parent=parent
+        )
         for fill in fills:
           if fill['ticker'] != self.market:
             continue
           sign = 1 if fill['side'] == 'BUY' else -1
+          order_id = fill.get('orderId')
           yield Trade(
             id=fill['id'],
+            order_id=order_ids.get(order_id) if order_id else None,
             price=Decimal(fill['price']),
             qty=Decimal(fill['size']) * sign,
             time=fill['createdAt'],

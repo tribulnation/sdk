@@ -41,6 +41,7 @@ async def test_exchange_history_scope_bounds_retry(
         'createdAt': time,
         'liquidity': 'MAKER',
         'fee': '0.1',
+        'orderId': f'order-{state}',
       }
       if kind == 'trades'
       else {'ticker': ticker, 'payment': '-0.5', 'createdAt': time}
@@ -77,6 +78,12 @@ async def test_exchange_history_scope_bounds_retry(
   if kind == 'trades':
     assert all(
       isinstance(row, ExchangeTrade) and row.qty == Decimal('-2') for row in rows
+    )
+    assert all(
+      isinstance(row, ExchangeTrade)
+      and row.order_id is None
+      and row.client_order_id is None
+      for row in rows
     )
   else:
     assert all(
@@ -170,6 +177,7 @@ async def test_selected_market_history_subaccount(
         'liquidity': 'MAKER',
         'fee': '0',
         'payment': '2',
+        'orderId': 'order',
       }
     ], None
 
@@ -196,6 +204,7 @@ async def test_selected_market_history_subaccount(
     expected.update(
       market='BTC-USD', market_type='PERPETUAL', created_before_or_at=start
     )
+    assert all(row.order_id is None and row.client_order_id is None for row in rows)
   else:
     expected.update(ticker='BTC-USD', after_or_at=start)
     assert rows[0].amount == Decimal('-2')
