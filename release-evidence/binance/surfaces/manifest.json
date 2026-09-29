@@ -244,8 +244,8 @@
       },
       "tribulnation-binance": {
         "files_sha256": "fda1feb88c3f6c2de02b219ea252f190262e24c56e8f9b8079c3786c5238f6c3",
-        "metadata_sha256": "b1caae15e1e373d746036e058c35176fe2a6ad8a8c0b7ce40a0a49bfd4c54120",
-        "version": "0.4.0"
+        "metadata_sha256": "74fe8d3abf92e5c2aed3fa07394acfd9114584cb5dc9d88147196628a40bd778",
+        "version": "0.5.0"
       },
       "tribulnation-catalogue": {
         "files_sha256": "07225a2d329bf2f29bd5ef71e5df6ed66093f799c2bfe8a00ad788cf854e7167",
@@ -290,7 +290,7 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "16f755960a157fae7eea6186f3f1893c279fd3c8e1fa2f85d9676eb251d81f10",
+    "source_sha256": "770be7e11286dc933605a6032384edc90bd978ce33495a476d0bb5f77b96ecc6",
     "venue": "binance"
   },
   "before": {
@@ -538,8 +538,8 @@
       },
       "tribulnation-binance": {
         "files_sha256": "fda1feb88c3f6c2de02b219ea252f190262e24c56e8f9b8079c3786c5238f6c3",
-        "metadata_sha256": "b1caae15e1e373d746036e058c35176fe2a6ad8a8c0b7ce40a0a49bfd4c54120",
-        "version": "0.4.0"
+        "metadata_sha256": "74fe8d3abf92e5c2aed3fa07394acfd9114584cb5dc9d88147196628a40bd778",
+        "version": "0.5.0"
       },
       "tribulnation-catalogue": {
         "files_sha256": "07225a2d329bf2f29bd5ef71e5df6ed66093f799c2bfe8a00ad788cf854e7167",
@@ -584,12 +584,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "16f755960a157fae7eea6186f3f1893c279fd3c8e1fa2f85d9676eb251d81f10",
+    "source_sha256": "770be7e11286dc933605a6032384edc90bd978ce33495a476d0bb5f77b96ecc6",
     "venue": "binance"
   },
-  "finished": "2026-09-29T17:02:19.194622Z",
+  "finished": "2026-09-29T18:50:17.580974Z",
   "results_sha256": "07bd59e1b26f7cb9cf6ff851183b1a05fd97634beb1c7b562c32e0169a6b9ac8",
   "schema_version": 1,
-  "started": "2026-09-29T17:01:38.690270Z",
-  "summary_sha256": "42365529498b58a88366d92e5064cf3a5ba6f6181b284d18679c5f124f54db69"
+  "started": "2026-09-29T18:49:42.625395Z",
+  "summary_sha256": "7fd91315eba03f448f657b71bb72424edbb9bb7d0bc2be08c359021a7c99ef02"
 }
