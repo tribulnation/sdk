@@ -31,6 +31,8 @@ def fill(scope: Scope, symbol: str, side: str) -> dict[str, Any]:
   row = dict(
     s=symbol,
     S=side,
+    c='web_fixture',
+    i=7,
     x='TRADE',
     l=Decimal(2),
     L=Decimal(3),
