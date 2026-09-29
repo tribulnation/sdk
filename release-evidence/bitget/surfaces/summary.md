@@ -1,6 +1,6 @@
 # Local SDK evidence: bitget
 
-Run completed: 2026-09-29T17:02:24.898200+00:00
+Run completed: 2026-09-29T18:50:23.710782+00:00
 
 This records a trusted local run, not cryptographic proof. Release policy must separately validate required check coverage and statuses.
 
