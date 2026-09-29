@@ -127,6 +127,7 @@ def parse_trade(row: AccountTradeItem) -> Trade:
     )
   return Trade(
     id=str(row['id']),
+    order_id=str(row['orderId']),
     price=row['price'],
     qty=row['qty'] if row['side'] == 'BUY' else -row['qty'],
     time=row['time'],

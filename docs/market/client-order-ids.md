@@ -45,7 +45,7 @@ above runs unchanged everywhere. Either field is `None` on fills that don't repo
 
 | Venue | Sent as | `order_id` on fills | `client_order_id` on fills |
 | --- | --- | --- | --- |
-| Aster | `newClientOrderId`; perpetuals take up to 36 of `A-Z a-z 0-9 . : / _ -` | Stream | Stream |
+| Aster | `newClientOrderId`; perpetuals take up to 36 of `A-Z a-z 0-9 . : / _ -` | Perpetual history and stream | Stream |
 | Binance | No trading | History and stream | Stream |
 | Bit2Me | `clientOrderId` | History and stream | History and stream |
 | Bitget | No trading | History and stream | UTA history and stream; Classic futures stream |
