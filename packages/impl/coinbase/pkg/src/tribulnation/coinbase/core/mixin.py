@@ -9,7 +9,6 @@ from typing_extensions import (
   Awaitable,
   Callable,
   Iterable,
-  Literal,
   TypeVar,
 )
 from dataclasses import dataclass, field
@@ -19,18 +18,12 @@ from tribulnation.sdk.core import ManagedResource, SDK, OverflowPolicy, Subscrip
 from tribulnation.sdk.market import Book, Trade
 
 from typed_coinbase import Coinbase
-from typed_coinbase.app.advanced_trade.http.fees.transaction_summary import (
-  FeeTierFeeTier,
-)
 from typed_coinbase.schemas import Product
 
 from .exc import wrap_exceptions
 from .streams import book_stream, user_trades_stream
 
 T = TypeVar('T')
-
-FeeScope = Literal['spot', 'intx']
-"""Which fee schedule to read: Advanced Trade spot, or INTX perpetuals."""
 
 
 def subscription(
@@ -55,15 +48,12 @@ def subscription(
 class Shared(SDK):
   """Venue-wide state shared by every Coinbase SDK object built from one client.
 
-  One owner of the client, one product/fee cache and one WebSocket subscription per
+  One owner of the client, one product cache and one WebSocket subscription per
   channel, however many exchanges and markets are handed out on top of it.
   """
 
   client: Coinbase
   products: dict[str, Product] = field(default_factory=dict[str, Product])
-  fee_tiers: dict[FeeScope, FeeTierFeeTier] = field(
-    default_factory=dict[FeeScope, FeeTierFeeTier]
-  )
   book_subscriptions: dict[str, Subscription[Book]] = field(
     default_factory=dict[str, Subscription[Book]]
   )
@@ -71,7 +61,6 @@ class Shared(SDK):
   product_lock: asyncio.Lock = field(
     default_factory=asyncio.Lock, init=False, repr=False
   )
-  fee_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
 
   @cached_property
   def client_resource(self) -> ManagedResource[object]:
@@ -107,46 +96,6 @@ class Shared(SDK):
       product = await (products.public if self.public else products).get(product_id)
       self.products[product_id] = product
       return product
-
-  @wrap_exceptions
-  async def load_fee_tier(
-    self, scope: FeeScope, /, *, refetch: bool = False
-  ) -> FeeTierFeeTier:
-    """Fetch the account's current maker/taker tier, caching it for later reads.
-
-    Args:
-      scope: Which fee schedule to read.
-      refetch: Fetch even when the tier is already cached.
-    """
-    if not refetch and scope in self.fee_tiers:
-      return self.fee_tiers[scope]
-    async with self.fee_lock:
-      if not refetch and scope in self.fee_tiers:
-        return self.fee_tiers[scope]
-      fees = self.client.app.advanced_trade.http.fees
-      summary = (
-        await fees.transaction_summary(product_type='SPOT')
-        if scope == 'spot'
-        else await fees.transaction_summary(
-          product_type='FUTURE',
-          contract_expiry_type='PERPETUAL',
-          product_venue='INTX',
-        )
-      )
-      if summary.get('has_cost_plus_commission'):
-        raise NotImplementedError(
-          'Coinbase cost-plus commissions need product-level pricing'
-        )
-      tax = summary.get('goods_and_services_tax')
-      if tax is not None and tax.get('type') != 'INCLUSIVE':
-        # Upstream exposes a rate but does not specify its unit in this endpoint.
-        # Do not guess percent versus fraction or silently omit an exclusive tax.
-        raise NotImplementedError(
-          'Coinbase exclusive or unspecified GST needs verified composition'
-        )
-      tier = summary.get('fee_tier') or FeeTierFeeTier()
-      self.fee_tiers[scope] = tier
-      return tier
 
   def book_subscription(self, product_id: str, /) -> Subscription[Book]:
     """The shared `level2` subscription for one product, created on first use."""

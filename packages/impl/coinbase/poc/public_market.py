@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from typed_coinbase import Coinbase
 from typed_coinbase.schemas import Product
 from typed_coinbase.app.advanced_trade.http.products.public.list import PublicProduct
-from tribulnation.coinbase.market.impl.catalogue import parse_perp_stats, parse_ticker
+from tribulnation.coinbase.market.impl.catalogue import parse_ticker
 
 load_dotenv()
 print(
@@ -150,7 +150,7 @@ await compare_catalogue('FUTURE')
 
 # %%
 async def compare_product(product_id: str):
-  """Compare single-product rules and actual SDK ticker/stats parser outputs."""
+  """Compare single-product rules and actual SDK ticker parser outputs."""
   async with Coinbase.new() as private, Coinbase.new(public=True) as public:
     auth: Product = await private.app.advanced_trade.http.products.get(product_id)
     anon: Product = await public.app.advanced_trade.http.products.public.get(product_id)
@@ -175,20 +175,11 @@ async def compare_product(product_id: str):
           )
         ),
         'public_ticker': asdict(parse_ticker(anon, book['pricebook'])),
-        'private_stats': parse_perp_stats(auth),
-        'public_stats': parse_perp_stats(anon),
       }
     )
 
 
-for product_id in (
-  'BTC-USD',
-  'ETH-USD',
-  'SOL-USD',
-  'BTC-PERP-INTX',
-  'ETH-PERP-INTX',
-  'SOL-PERP-INTX',
-):
+for product_id in ('BTC-USD', 'ETH-USD', 'SOL-USD'):
   try:
     await compare_product(product_id)
   except Exception as error:

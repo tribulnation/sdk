@@ -38,15 +38,9 @@ def book(identifier: str) -> PriceBook:
   }
 
 
-@pytest.mark.parametrize(
-  'exchange_id,identifier', [('spot', 'BTC-USD'), ('intx', 'BTC-PERP-INTX')]
-)
-async def test_both_exchanges_enrich_only_selected_products(
-  monkeypatch: pytest.MonkeyPatch,
-  exchange_id: str,
-  identifier: str,
-):
-  """Spot and INTX use the same quote join without mixing product identities."""
+async def test_spot_enriches_only_selected_products(monkeypatch: pytest.MonkeyPatch):
+  """The quote join keeps the selected product and never mixes identities."""
+  identifier = 'BTC-USD'
   monkeypatch.setattr(
     impl,
     'list_products',
@@ -55,7 +49,7 @@ async def test_both_exchanges_enrich_only_selected_products(
   request = AsyncMock(return_value={'pricebooks': [book(identifier)]})
   monkeypatch.setattr(BestBidAsk, 'best_bid_ask', request)
   async with CoinbaseMarket.new(key_name='test', private_key='test') as sdk:
-    exchange = await sdk.exchange(exchange_id)
+    exchange = await sdk.exchange('spot')
     result = await exchange.tickers([identifier])
   assert list(result) == [identifier]
   ticker = result[identifier]

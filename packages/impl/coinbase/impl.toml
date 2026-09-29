@@ -20,9 +20,7 @@ methods = [
   "depth",
   "depth_stream",
   "rules",
-  "fees",
   "tickers",
-  "perp_stats",
   "query_order",
   "open_orders",
   "trades_history",
@@ -35,18 +33,13 @@ methods = [
   "cancel_order",
   "cancel_orders",
   "cancel_open_orders",
-  "index",
-  "next_funding",
-  "funding_rates",
-  "perp_position",
-  "perp_collateral",
   "candles",
 ]
-note = "Coinbase is not a default account. Authenticated access is recommended, especially for bulk tickers; public=True is an explicit credential-free fallback, never an automatic fallback on authentication errors. Explicit public=True accounts support spot and INTX discovery, rules, tickers, index and funding state without credentials. Public catalogue reads reject incomplete or duplicate responses. Public tickers fetch one book per selected product; authenticated tickers retain batched quotes. Spot serves market data and trading. Account fees() is unsupported on spot until product-specific stablepair pricing is resolved; INTX fees reject cost-plus commissions and exclusive or unspecified GST instead of returning incomplete rates. Public rules().fees remains None. INTX perpetuals serve market data, orders, funding state and public funding-rate history. History resolves the Advanced Trade -INTX product ID to an International Exchange instrument and pages its credential-free endpoint with inclusive optional bounds. Offset pages are not an atomic snapshot; duplicate settlements are removed. funding_payments remains unsupported; perp_position/perp_collateral need an INTX-scoped key. Candles use required [start, end) bounds, page 299 opens per window and carry no quote_volume."
-# Two exchanges: `spot` (Advanced Trade SPOT products) and `intx` (perpetual swaps).
-# `trades_stream` is best-effort on both: the `user` channel carries order-level
-# cumulative quantities rather than itemized fills, so it loses per-fill maker/taker and
-# fee. `trades_history` is the reliable source for those.
+note = "Coinbase is not a default account. Authenticated access is recommended, especially for bulk tickers; public=True is an explicit credential-free fallback, never an automatic fallback on authentication errors. Explicit public=True accounts support spot discovery, rules and tickers without credentials. Public catalogue reads reject incomplete or duplicate responses. Public tickers fetch one book per selected product; authenticated tickers retain batched quotes. Spot serves market data and trading. Account fees() is unsupported until product-specific stablepair pricing is resolved. Public rules().fees remains None. INTX perpetuals are not served: Coinbase retires them on the Advanced Trade API on 2026-10-01 (ADR 0031). Candles use required [start, end) bounds, page 299 opens per window and carry no quote_volume."
+# One exchange: `spot` (Advanced Trade SPOT products). `trades_stream` is best-effort:
+# the `user` channel carries order-level cumulative quantities rather than itemized
+# fills, so it loses per-fill maker/taker and fee. `trades_history` is the reliable
+# source for those.
 
 [support.report]
 support = "full"
@@ -56,8 +49,7 @@ note = "History merges the v2 per-account transaction stream with Advanced Trade
 # the same asset appears in both, so summing them would double-count — plus the CFM
 # futures book. INTX perpetual positions are deliberately left out of the snapshot: they
 # need an INTX-scoped key, and a retail key gets PERMISSION_DENIED rather than an empty
-# book, which would turn every snapshot into an error. Read them from
-# `PerpMarket.perp_position` instead.
+# book, which would turn every snapshot into an error.
 
 [support.earn]
 support = "partial"
@@ -97,4 +89,4 @@ note = "No wallet implementation: the Coinbase App tier publishes no per-asset n
 
 [ids]
 asset = "symbol"
-note = "The venue's currency code (`BTC`, `USD`); market ids are `<base>-<quote>` product ids (`BTC-USD`, `BTC-PERP-INTX`)."
+note = "The venue's currency code (`BTC`, `USD`); market ids are `<base>-<quote>` product ids (`BTC-USD`)."

@@ -1,6 +1,5 @@
 """Credential-free market reads use validated public endpoints and native quotes."""
 
-from datetime import datetime, timezone
 from decimal import Decimal
 from unittest.mock import AsyncMock
 
@@ -16,17 +15,16 @@ from typed_coinbase.schemas import Product, ProductBookResponse
 from typed_core import exceptions as core
 
 from tribulnation.coinbase import CoinbaseMarket
-from tribulnation.coinbase.market import PerpExchange
 from tribulnation.coinbase.market.impl.catalogue import tickers
 from tribulnation.sdk import MarketSDK
 from tribulnation.sdk.impl import accounts
 from tribulnation.sdk.core import ApiError, Context, RateLimited
 
 
-def product(*, perpetual: bool = False) -> Product:
-  """Create a fully validated spot or INTX product with nonzero public rules."""
+def product(product_id: str = 'BTC-USD') -> Product:
+  """Create a fully validated spot product with nonzero public rules."""
   row: Product = {
-    'product_id': 'BTC-PERP-INTX' if perpetual else 'BTC-USD',
+    'product_id': product_id,
     'price': Decimal('100'),
     'volume_24h': Decimal('9'),
     'price_percentage_change_24h': Decimal('1'),
@@ -48,22 +46,13 @@ def product(*, perpetual: bool = False) -> Product:
     'post_only': False,
     'trading_disabled': False,
     'auction_mode': False,
-    'base_display_symbol': '' if perpetual else 'BTC',
+    'base_display_symbol': 'BTC',
     'quote_display_symbol': 'USD',
-    'product_type': 'FUTURE' if perpetual else 'SPOT',
-    'product_venue': 'INTX' if perpetual else 'CBE',
+    'product_type': 'SPOT',
+    'product_venue': 'CBE',
     'approximate_quote_24h_volume': Decimal('900'),
     'new_at': None,
   }
-  if perpetual:
-    row['future_product_details'] = {
-      'contract_code': 'BTC',
-      'contract_expiry_type': 'PERPETUAL',
-      'index_price': Decimal('99'),
-      'funding_rate': Decimal('0.0001'),
-      'funding_interval': '3600s',
-      'funding_time': datetime(2026, 9, 18, 12, tzinfo=timezone.utc),
-    }
   return row
 
 
@@ -78,14 +67,11 @@ def page(row: Product) -> PublicProductsPage:
   }
 
 
-@pytest.mark.parametrize('perpetual', [False, True])
-async def test_public_router_reads_without_credentials(
-  monkeypatch: pytest.MonkeyPatch, perpetual: bool
-):
+async def test_public_router_reads_without_credentials(monkeypatch: pytest.MonkeyPatch):
   """Exercise real endpoint validation and auth guards through MarketSDK."""
   monkeypatch.delenv('COINBASE_API_KEY_NAME', raising=False)
   monkeypatch.delenv('COINBASE_PRIVATE_KEY', raising=False)
-  row = product(perpetual=perpetual)
+  row = product()
   identifier = row['product_id']
   catalogue = page(row)
   quote: ProductBookResponse = {
@@ -118,7 +104,7 @@ async def test_public_router_reads_without_credentials(
     assert isinstance(venue, CoinbaseMarket)
     assert venue.client.app_client.credentials is None
     monkeypatch.setattr(venue.client.app_client.http, 'request', request)
-    exchange = await venue.exchange('intx' if perpetual else 'spot')
+    exchange = await venue.exchange('spot')
     assert list(await exchange.markets()) == [identifier]
     ticker = (await exchange.tickers([identifier]))[identifier]
     assert (ticker.last, ticker.base_volume_24h) == (Decimal('100'), Decimal('9'))
@@ -134,9 +120,6 @@ async def test_public_router_reads_without_credentials(
     assert paths.count(f'/api/v3/brokerage/market/products/{identifier}') == 1
     await market.rules(refetch=True)
     assert paths.count(f'/api/v3/brokerage/market/products/{identifier}') == 2
-    if isinstance(exchange, PerpExchange):
-      stats = (await exchange.perp_stats([identifier]))[identifier]
-      assert stats.index == Decimal('99') and stats.funding == Decimal('0.0001')
 
 
 @pytest.mark.parametrize('defect', ['next', 'cursor', 'metadata', 'duplicate', 'count'])
@@ -166,7 +149,7 @@ async def test_incomplete_public_catalogue_is_rejected(
     exchange = await venue.exchange('spot')
     with pytest.raises(ApiError):
       await exchange.markets()
-  request.assert_awaited_once_with(product_type='SPOT', contract_expiry_type=None)
+  request.assert_awaited_once_with(product_type='SPOT')
 
 
 async def test_public_quotes_retry_only_the_failed_product(
@@ -176,7 +159,7 @@ async def test_public_quotes_retry_only_the_failed_product(
   from typed_coinbase.app.advanced_trade.http.products.public.book import Book
 
   first = product()
-  second = product(perpetual=True)
+  second = product('ETH-USD')
   request = AsyncMock(
     side_effect=[
       {'pricebook': {'product_id': first['product_id'], 'bids': [], 'asks': []}},
@@ -210,26 +193,6 @@ async def test_authenticated_product_lookup_stays_private(
     market = await exchange.market('BTC-USD')
     await market.rules()
   request.assert_awaited_once_with('BTC-USD')
-
-
-async def test_public_catalogue_keeps_only_intx_perpetuals(
-  monkeypatch: pytest.MonkeyPatch,
-):
-  """The public futures response cannot leak other Coinbase product venues."""
-  response = page(product(perpetual=True))
-  other = response['products'][0].copy()
-  other['product_id'] = 'OTHER-FUTURE'
-  other['product_venue'] = 'FCM'
-  response['products'].append(other)
-  response['num_products'] = 2
-  request = AsyncMock(return_value=response)
-  monkeypatch.setattr(List, 'list', request)
-  async with CoinbaseMarket.new(public=True) as venue:
-    exchange = await venue.exchange('intx')
-    assert list(await exchange.markets()) == ['BTC-PERP-INTX']
-  request.assert_awaited_once_with(
-    product_type='FUTURE', contract_expiry_type='PERPETUAL'
-  )
 
 
 @pytest.mark.parametrize('failure', ['identity', 'request'])

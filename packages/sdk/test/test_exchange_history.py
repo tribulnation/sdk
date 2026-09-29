@@ -88,10 +88,13 @@ def test_exchange_records_preserve_base_shape_and_native_identity():
   'module,class_name',
   [
     (f'tribulnation.{venue}.market.{kind}_exchange', f'{kind.title()}Exchange')
-    for venue in ('binance', 'bitget', 'bybit', 'coinbase', 'kraken', 'mexc')
+    for venue in ('binance', 'bitget', 'bybit', 'kraken', 'mexc')
     for kind in ('spot', 'perp')
   ]
-  + [('tribulnation.bit2me.market.spot_exchange', 'SpotExchange')]
+  + [
+    ('tribulnation.bit2me.market.spot_exchange', 'SpotExchange'),
+    ('tribulnation.coinbase.market.spot_exchange', 'SpotExchange'),
+  ]
   + [
     (f'tribulnation.{venue}.market.exchanges', class_name)
     for venue in ('deribit', 'kucoin')

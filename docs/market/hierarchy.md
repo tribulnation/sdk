@@ -30,8 +30,8 @@ The markets implementation is structured following the market IDs: `account` →
 HTTPS `url`. Names describe product families within a venue, not necessarily
 distinct legal entities. They may change and are never identifiers.
 
-For Coinbase, `spot` is named `Advanced Trade` and `intx` is named
-`International Exchange`. Resolve the object with `await venue.exchange(id)`;
+For Coinbase, `spot` is named `Advanced Trade`. Resolve the object with
+`await venue.exchange(id)`;
 never substitute its display name. Hyperliquid's empty default ID stays empty,
 and dynamically discovered DEXs carry their API-provided full names. Consumers
 persisting metadata should key it by `(venue_id, exchange_id)`. URLs may be
