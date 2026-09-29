@@ -5,6 +5,8 @@
 1. Status: accepted; implementation and release qualification remain separate.
 2. Date: 2026-09-23
 3. Amends: ADR 0003 market consistency qualification.
+4. Amended by: [ADR 0030](0030-mexc-bulk-stats-omit-missing-index.md), for MEXC bulk
+   `perp_stats`.
 
 ## Context
 

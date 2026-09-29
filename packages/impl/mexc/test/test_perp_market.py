@@ -477,14 +477,38 @@ async def test_perpetual_personal_fees_do_not_guess_api_channel(
 
 
 @pytest.mark.parametrize('missing', [True, False])
-@pytest.mark.parametrize('markets', [None, ['BTC_USDT']])
-async def test_perp_stats_requires_index_price(
-  venue: MexcMarket,
-  monkeypatch: pytest.MonkeyPatch,
-  missing: bool,
-  markets: list[str] | None,
+async def test_perp_stats_bulk_omits_markets_without_index_price(
+  venue: MexcMarket, monkeypatch: pytest.MonkeyPatch, missing: bool
 ):
-  """Missing or null index prices raise the SDK API error for bulk and selected reads."""
+  """One contract lacking its index is left out of a full read; the rest still return."""
+  api = venue.client.futures.http.market
+  monkeypatch.setattr(
+    api,
+    'contract_info',
+    AsyncMock(
+      return_value={'success': True, 'data': [contract(), contract('ETH_USDT')]}
+    ),
+  )
+  row = dict(ticker('ETH_USDT'))
+  if missing:
+    del row['indexPrice']
+  else:
+    row['indexPrice'] = None
+  monkeypatch.setattr(
+    api, 'ticker', AsyncMock(return_value={'success': True, 'data': [ticker(), row]})
+  )
+  exchange = await venue.perp_exchange('perp')
+  stats = await exchange.perp_stats()
+  assert list(stats) == ['BTC_USDT']
+  assert stats['BTC_USDT'].index == Decimal('100.3')
+
+
+@pytest.mark.parametrize('missing', [True, False])
+async def test_perp_stats_selection_requires_index_price(
+  venue: MexcMarket, monkeypatch: pytest.MonkeyPatch, missing: bool
+):
+  """A market named in the selection without its index raises the SDK API error."""
+  markets = ['BTC_USDT']
   row = dict(ticker())
   if missing:
     del row['indexPrice']

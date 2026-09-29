@@ -47,8 +47,9 @@ not a changelog or a substitute for API documentation and tests.
 | [0022](0022-bit2me-one-sided-ticker-limitation.md) | Extend the Bit2Me native ticker limitation to stable one-sided books | Accepted; amends 0014 |
 | [0023](0023-ticker-quote-volume.md) | Native 24-hour quote volume in tickers | Accepted |
 | [0024](0024-exchange-account-history.md) | Native exchange-wide personal history with market-attributed records | Accepted |
-| [0025](0025-missing-market-data.md) | Structured missing market data and a narrow MEXC index exclusion | Accepted |
+| [0025](0025-missing-market-data.md) | Structured missing market data and a narrow MEXC index exclusion | Accepted; amended by 0030 |
 | [0026](0026-pin-qualification-catalogue.md) | Verify releases against the recorded Catalogue snapshot instead of moving main | Accepted; amends 0003 |
 | [0027](0027-bitget-withdrawal-suspension.md) | Dated exclusion for Bitget's venue-wide withdrawal suspension | Accepted; amends 0013 |
 | [0028](0028-fill-dependent-fee-asset.md) | Fill-dependent fee asset in market rules | Accepted |
 | [0029](0029-client-order-ids.md) | Client order IDs on orders, order and client order IDs on fills | Accepted |
+| [0030](0030-mexc-bulk-stats-omit-missing-index.md) | MEXC bulk stats omit markets without an index | Accepted |

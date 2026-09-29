@@ -361,7 +361,7 @@ methods:
       bitget: USDT, USDC and Classic coin-margined perpetuals. UTA coin is unsupported.
       bybit: Linear perpetuals only.
       coinbase: INTX perpetuals, not domestic dated futures; explicit public=True accounts use the public product catalogue.
-      mexc: Public perpetual metadata; account-specific futures permissions are not needed for this method.
+      mexc: Public perpetual metadata; account-specific futures permissions are not needed for this method. A full read leaves out contracts MEXC lists without an index price; naming one raises `MissingData`.
       aster: "Linear perpetual index, mark and predicted funding in two bulk requests; open interest is unset, and a symbol without a published interval reports funding_interval=None."
     example:
       accountVenues: [dydx]

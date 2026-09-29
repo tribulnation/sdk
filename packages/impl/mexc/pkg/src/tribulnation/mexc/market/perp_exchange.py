@@ -118,8 +118,11 @@ class PerpExchange(ExchangeMixin, BasePerpExchange):
     MEXC's bulk ticker does not report the settlement time or interval. Those fields
     remain absent rather than synthesizing a schedule or issuing one request per market.
 
+    MEXC omits the index price of some listed contracts. Reading every market leaves
+    those out of the result rather than failing the whole snapshot; naming one raises.
+
     Raises:
-      MissingData: A selected ticker omits its required index price.
+      MissingData: An explicitly selected ticker omits its required index price.
     """
     if markets is not None and not markets:
       return {}
@@ -128,6 +131,8 @@ class PerpExchange(ExchangeMixin, BasePerpExchange):
     for row in await self.contract_tickers(contracts):
       index = row.get('indexPrice')
       if index is None:
+        if markets is None:
+          continue
         raise MissingData(
           f'MEXC perpetual ticker missing index price: {row["symbol"]}',
           market_id=row['symbol'],
