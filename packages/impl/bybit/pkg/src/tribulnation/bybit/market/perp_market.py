@@ -231,7 +231,7 @@ class PerpMarket(MarketMixin, _PerpMarket):
     """Fetch your funding payments history."""
     return PaginatedResponse(funding_payments(self, start, end))
 
-  def client_order_id(self) -> str:
+  def random_client_order_id(self) -> str:
     """Generate 128 random bits as 32 hex digits, within `orderLinkId`'s 36 characters."""
     return secrets.token_hex(16)
 

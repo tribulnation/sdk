@@ -136,7 +136,7 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
 
     return Decimal(0)
 
-  def client_order_id(self) -> str:
+  def random_client_order_id(self) -> str:
     """Generate a `cloid`: `0x` and 128 random bits as 32 hex digits."""
     return f'0x{secrets.token_hex(16)}'
 

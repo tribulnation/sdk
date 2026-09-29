@@ -170,9 +170,9 @@ async def test_spot_fill_order_ids(client_order_id: str, expected: str | None):
 
 
 @pytest.mark.parametrize('scope', ['spot', 'perp'])
-def test_client_order_id_generates_hex(scope: Scope):
+def test_random_client_order_id_generates_hex(scope: Scope):
   """Fresh IDs are 32 hex digits, within `newClientOrderId`'s 36 characters."""
   target = market(scope)
-  ids = {target.client_order_id() for _ in range(100)}
+  ids = {target.random_client_order_id() for _ in range(100)}
   assert len(ids) == 100
   assert all(re.fullmatch(r'[0-9a-f]{32}', value) for value in ids)

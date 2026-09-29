@@ -140,7 +140,7 @@ class SpotMarket(MarketMixin, Market):
         return Collateral(equity=free + locked, free_collateral=free)
     return Collateral(equity=Decimal(0), free_collateral=Decimal(0))
 
-  def client_order_id(self) -> str:
+  def random_client_order_id(self) -> str:
     """Generate 128 random bits as 32 hex digits, sent as `newClientOrderId`."""
     return secrets.token_hex(16)
 

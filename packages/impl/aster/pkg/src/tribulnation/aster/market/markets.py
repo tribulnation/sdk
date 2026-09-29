@@ -308,7 +308,7 @@ class NativeMarket(Public, Market):
     """Unsupported: Aster publishes no account-side buying capacity."""
     raise NotImplementedError('Aster publishes no account-side buying capacity')
 
-  def client_order_id(self) -> str:
+  def random_client_order_id(self) -> str:
     """Generate 128 random bits as 32 hex digits, within `newClientOrderId`'s 36 characters."""
     return secrets.token_hex(16)
 

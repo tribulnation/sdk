@@ -35,8 +35,8 @@ ID, and on Lighter the client order index is the SDK's order ID.
    orders placed without one. Either is `None` when the fill payload does not carry it.
 5. Implementations fill both from the fill payload they already read. They make no extra
    requests per fill.
-6. `Market.client_order_id()` is a sync method generating a fresh ID in the form that
-   market's `place_order` sends, or returning `None` where the market ignores the IDs.
+6. `Market.random_client_order_id()` is a sync method generating a fresh ID in the form
+   that market's `place_order` sends, or returning `None` where the market ignores the IDs.
    `None` is the base class default, so only markets that send IDs override it. Each
    venue owns its form: 32 random hex digits on most, `0x` and 32 hex digits for
    Hyperliquid's `cloid`, a UUID on Coinbase.
@@ -75,7 +75,7 @@ ID, and on Lighter the client order index is the SDK's order ID.
 Existing `Trade` and `Order` constructors keep working. Venue packages that set the new
 fields need the SDK version containing them, so their floors rise when they are released.
 The per-venue behaviour table in
-[Your First Order](../../docs/market/first-order.md#tag-it-with-your-own-id) is
+[Client Order IDs](../../docs/market/client-order-ids.md) is
 hand-maintained, since `impl.toml` does not describe it.
 
 Read-only live suites place no orders, so they do not cover placement. A live round trip

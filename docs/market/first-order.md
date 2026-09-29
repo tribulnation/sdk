@@ -86,55 +86,6 @@ market orders places a limit order there instead.
 > `settings={'dydx': {...}}`. If a venue can't do what you asked for it raises, rather than
 > quietly placing a different order.
 
-### Tag it with your own ID
-
-Add a `client_order_id` to tag the order with an ID of your own. The market's
-`client_order_id()` generates one in the form it accepts:
-
-```python
-market = await sdk.market('mexc_account1:spot:BTCUSDT')
-client_order_id = market.client_order_id()
-response = await sdk.place_order('mexc_account1:spot:BTCUSDT', {
-  'type': 'LIMIT', 'qty': qty, 'price': price, 'client_order_id': client_order_id,
-})
-```
-
-Its fills carry it back as `Trade.client_order_id`, next to `Trade.order_id`, which is
-`response.id`. A strategy following its own fills can then tell its orders apart:
-
-```python
-async with sdk.trades_stream('mexc_account1:spot:BTCUSDT') as my_trades:
-  async for trade in my_trades:
-    if trade.client_order_id == client_order_id:
-      print(trade.order_id, trade.qty, '@', trade.price)
-```
-
-The SDK sends the string unchanged, so an ID of your own must follow the venue's rules:
-most limit its length and characters and reject an ID already in use. `client_order_id()`
-follows them by construction: 128 random bits as 32 hex digits on most venues, with `0x` in
-front on Hyperliquid, and a UUID on Coinbase. On markets without client order IDs it returns
-`None`, which `place_order` treats like no ID at all, so the code above runs unchanged
-everywhere. Either field is `None` on fills that don't report it:
-
-| Venue | Sent as | `order_id` on fills | `client_order_id` on fills |
-| --- | --- | --- | --- |
-| Aster | `newClientOrderId`; perpetuals take up to 36 of `A-Z a-z 0-9 . : / _ -` | Stream | Stream |
-| Binance | No trading | History and stream | Stream |
-| Bit2Me | `clientOrderId` | History and stream | History and stream |
-| Bitget | No trading | History and stream | UTA history and stream; Classic futures stream |
-| Bybit | `orderLinkId`, up to 36 characters | History and stream | History and stream |
-| Coinbase | `client_order_id` | History and stream | Stream |
-| dYdX | Ignored | Stream | — |
-| Hyperliquid | `cloid`: `0x` and 32 hex digits | History and stream | History and stream |
-| Kraken | No trading | History and stream | Stream |
-| Lighter | Ignored | History and stream | — |
-| MEXC | `newClientOrderId` (spot) | History and stream | History and stream |
-
-Where you give none, Aster, Binance and Bybit spot generate an ID, and so does the SDK on
-Coinbase, which requires one: fills report that one. On Coinbase, reusing an ID doesn't
-place a second order; you get back the order already placed under it. Deribit and KuCoin
-serve public data only.
-
 ## 4. Check on it, or cancel it
 
 `response.id` is what the rest of the surface takes:
@@ -164,7 +115,8 @@ expired isn't an error either, so check the state if you need to know which happ
 Fills arrive on `trades_stream` instead of by polling `query_order`: see
 [Streaming](streaming.md). If the market is a perpetual, `perp_collateral()` tells you how
 much room the position has left, in [Collateral & Risk](collateral.md). Every signature is
-in [Methods](methods.md), and every type they return in [Types](types.md).
+in [Methods](methods.md), and every type they return in [Types](types.md). To tell your
+own orders' fills apart, tag orders with [Client Order IDs](client-order-ids.md).
 
 <!-- next -->
 

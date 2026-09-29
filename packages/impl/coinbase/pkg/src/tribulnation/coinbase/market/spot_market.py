@@ -86,7 +86,7 @@ class SpotMarket(impl.MarketMixin, Market):
   async def available_notional(self) -> Decimal:
     return (await impl.collateral(self)).free_collateral
 
-  def client_order_id(self) -> str:
+  def random_client_order_id(self) -> str:
     """Generate a random UUID, the form Coinbase's own examples use."""
     return str(uuid.uuid4())
 

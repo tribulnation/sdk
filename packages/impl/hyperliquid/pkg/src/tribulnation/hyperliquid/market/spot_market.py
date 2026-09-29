@@ -125,7 +125,7 @@ class SpotMarket(SpotMarketMixin, Market):
   async def query_order(self, id: str) -> OrderState | None:
     return await query_order(self, id)
 
-  def client_order_id(self) -> str:
+  def random_client_order_id(self) -> str:
     """Generate a `cloid`: `0x` and 128 random bits as 32 hex digits."""
     return f'0x{secrets.token_hex(16)}'
 

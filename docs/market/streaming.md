@@ -94,6 +94,6 @@ async with sdk.depth_stream(market_id, queue_size=10_000, overflow='fail') as bo
 
 ---
 
-← [Collateral & Risk](collateral.md) · **Next:** [Types](types.md) →
+← [Collateral & Risk](collateral.md) · **Next:** [Client Order IDs](client-order-ids.md) →
 
 <!-- /next -->

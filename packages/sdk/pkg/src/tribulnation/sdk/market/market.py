@@ -189,7 +189,7 @@ class Market(SDK):
     - For futures, returns the available collateral times the maximum leverage
     """
 
-  def client_order_id(self) -> str | None:
+  def random_client_order_id(self) -> str | None:
     """Generate a fresh client order ID in the form this market's `place_order` sends.
 
     Returns `None` where the market ignores client order IDs, so the result can go
@@ -225,7 +225,7 @@ class Market(SDK):
     leaving it out. Venues with native client order IDs send it unchanged, so a
     value breaking the venue's format or uniqueness rules raises the venue's
     error, and report it back on the order's fills as ``Trade.client_order_id``;
-    ``client_order_id()`` generates a valid one. Venues without them ignore it:
+    ``random_client_order_id()`` generates a valid one. Venues without them ignore it:
     it identifies the order without changing how it executes.
 
     Venue-specific ``settings`` may refine time-in-force, reduce-only, expiry,

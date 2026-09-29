@@ -12,6 +12,7 @@
     - first-order.md
     - collateral.md
     - streaming.md
+    - client-order-ids.md
     - types.md
     - methods.md
     - implementations:

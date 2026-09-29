@@ -68,7 +68,7 @@ raises, rather than quietly placing a different order.
 - `Trade`: `id`, `price`, signed `qty`, `time`, a `maker` flag, and an optional `fee`
   (`amount` plus `asset`). `order_id` is the filled order's `OrderResponse.id`, and
   `client_order_id` the ID it was placed with; either is `None` where the venue
-  doesn't report it. See [client order IDs](first-order.md#tag-it-with-your-own-id).
+  doesn't report it. See [Client Order IDs](client-order-ids.md).
 
 ### Trading fees
 
@@ -129,6 +129,6 @@ is computed from, and it's `None` on venues that don't report it, like dYdX.
 
 ---
 
-← [Streaming](streaming.md) · **Next:** [Methods](methods.md) →
+← [Client Order IDs](client-order-ids.md) · **Next:** [Methods](methods.md) →
 
 <!-- /next -->

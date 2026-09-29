@@ -211,9 +211,9 @@ async def test_exchange_history_order_ids(monkeypatch: pytest.MonkeyPatch):
 
 
 @pytest.mark.parametrize('cls', [SpotMarket, PerpMarket])
-def test_client_order_id_generates_cloids(cls: type[SpotMarket | PerpMarket]):
+def test_random_client_order_id_generates_cloids(cls: type[SpotMarket | PerpMarket]):
   """Fresh IDs are `0x` and 32 hex digits; the generator reads no market state."""
   market = object.__new__(cls)
-  ids = {market.client_order_id() for _ in range(100)}
+  ids = {market.random_client_order_id() for _ in range(100)}
   assert len(ids) == 100
   assert all(re.fullmatch(r'0x[0-9a-f]{32}', value) for value in ids)

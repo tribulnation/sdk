@@ -109,7 +109,7 @@ class SpotMarket(MarketMixin, Market):
   async def available_notional(self) -> Decimal:
     return await available_notional(self)
 
-  def client_order_id(self) -> str:
+  def random_client_order_id(self) -> str:
     """Generate 128 random bits as 32 hex digits, sent as `clientOrderId`."""
     return secrets.token_hex(16)
 

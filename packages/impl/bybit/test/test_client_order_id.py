@@ -191,10 +191,10 @@ async def test_trades_stream_order_ids(link_id: str, expected: str | None):
 
 
 @pytest.mark.parametrize('category', ['spot', 'linear'])
-def test_client_order_id_generates_hex(category: Literal['spot', 'linear']):
+def test_random_client_order_id_generates_hex(category: Literal['spot', 'linear']):
   """Fresh IDs are 32 hex digits, within `orderLinkId`'s 36 characters."""
   cls = SpotMarket if category == 'spot' else PerpMarket
   market = cls(client=cast(Bybit, FakeClient()), cache=Cache(), symbol='BTCUSDT')
-  ids = {market.client_order_id() for _ in range(100)}
+  ids = {market.random_client_order_id() for _ in range(100)}
   assert len(ids) == 100
   assert all(re.fullmatch(r'[0-9a-f]{32}', value) for value in ids)

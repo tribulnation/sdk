@@ -115,7 +115,7 @@ class PerpMarket(impl.MarketMixin, _PerpMarket):
   async def available_notional(self) -> Decimal:
     return (await impl.perp_collateral(self)).free_collateral
 
-  def client_order_id(self) -> str:
+  def random_client_order_id(self) -> str:
     """Generate a random UUID, the form Coinbase's own examples use."""
     return str(uuid.uuid4())
 

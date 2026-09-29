@@ -88,9 +88,9 @@ def test_streamed_fills_name_their_order_and_client_id():
   )
 
 
-def test_client_order_id_generates_hex():
+def test_random_client_order_id_generates_hex():
   """Fresh `clientOrderId`s are 32 hex digits; the generator reads no market state."""
   market = object.__new__(SpotMarket)
-  ids = {market.client_order_id() for _ in range(100)}
+  ids = {market.random_client_order_id() for _ in range(100)}
   assert len(ids) == 100
   assert all(re.fullmatch(r'[0-9a-f]{32}', value) for value in ids)

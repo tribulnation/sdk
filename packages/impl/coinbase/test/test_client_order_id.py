@@ -85,9 +85,9 @@ def test_history_fills_name_their_order_but_not_its_client_id():
 
 
 @pytest.mark.parametrize('cls', [SpotMarket, PerpMarket])
-def test_client_order_id_generates_uuids(cls: type[SpotMarket | PerpMarket]):
+def test_random_client_order_id_generates_uuids(cls: type[SpotMarket | PerpMarket]):
   """Fresh IDs are distinct UUIDs; the generator reads no market state."""
   market = object.__new__(cls)
-  ids = {market.client_order_id() for _ in range(100)}
+  ids = {market.random_client_order_id() for _ in range(100)}
   assert len(ids) == 100
   assert all(str(uuid.UUID(value)) == value for value in ids)

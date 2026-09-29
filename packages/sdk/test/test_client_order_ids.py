@@ -176,13 +176,18 @@ async def test_routing_forwards_client_order_ids_unchanged():
 def test_markets_default_to_ignoring_client_order_ids():
   """A market that does not override the generator ignores client order IDs."""
   market, _ = fixture()
-  assert market.client_order_id() is None
+  assert market.random_client_order_id() is None
 
 
 async def test_generated_id_goes_into_the_order_unchecked():
   """A `None` from the generator is a valid `client_order_id`, reaching the market as given."""
   market, _ = fixture()
   await market.place_order(
-    {'type': 'LIMIT', 'qty': 1, 'price': 2, 'client_order_id': market.client_order_id()}
+    {
+      'type': 'LIMIT',
+      'qty': 1,
+      'price': 2,
+      'client_order_id': market.random_client_order_id(),
+    }
   )
   assert market.placed[0].get('client_order_id') is None
