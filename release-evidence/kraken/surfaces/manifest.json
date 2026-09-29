@@ -249,8 +249,8 @@
       },
       "tribulnation-kraken": {
         "files_sha256": "0854d90e3e3df71e5994649a2291e93ca98452c0a4e6e4e31d6384b4df04d40d",
-        "metadata_sha256": "4d3c740d29ba35e9370e54f79d53cd2a0f9192ef2b4444ddd25860a3d45cd1de",
-        "version": "0.4.1"
+        "metadata_sha256": "5c1286090e03cc2db911e587b9dbd81326db01421836f9ea00031bcb0abc0e13",
+        "version": "0.5.0"
       },
       "tribulnation-sdk": {
         "files_sha256": "4ef6c26b916efe53be569c0433ccf48f0706f8ad3809fa5095c46cd35fc9e6f0",
@@ -290,7 +290,7 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "b8ea4bb108891f3251916491e301a325597093f0702c98b6fbf6277156ff9614",
+    "source_sha256": "cad7007f448d3a22a24378bb15da351c052e95291c56946088665264ae8e6043",
     "venue": "kraken"
   },
   "before": {
@@ -543,8 +543,8 @@
       },
       "tribulnation-kraken": {
         "files_sha256": "0854d90e3e3df71e5994649a2291e93ca98452c0a4e6e4e31d6384b4df04d40d",
-        "metadata_sha256": "4d3c740d29ba35e9370e54f79d53cd2a0f9192ef2b4444ddd25860a3d45cd1de",
-        "version": "0.4.1"
+        "metadata_sha256": "5c1286090e03cc2db911e587b9dbd81326db01421836f9ea00031bcb0abc0e13",
+        "version": "0.5.0"
       },
       "tribulnation-sdk": {
         "files_sha256": "4ef6c26b916efe53be569c0433ccf48f0706f8ad3809fa5095c46cd35fc9e6f0",
@@ -584,12 +584,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "b8ea4bb108891f3251916491e301a325597093f0702c98b6fbf6277156ff9614",
+    "source_sha256": "cad7007f448d3a22a24378bb15da351c052e95291c56946088665264ae8e6043",
     "venue": "kraken"
   },
-  "finished": "2026-09-29T17:01:53.112106Z",
+  "finished": "2026-09-29T18:49:51.999864Z",
   "results_sha256": "198b3e9dfc1bae17825555abcaad878570bcda007f8e3e4244ceb65e763b0d73",
   "schema_version": 1,
-  "started": "2026-09-29T17:01:38.298261Z",
-  "summary_sha256": "daf896bb65492b460d51788c5443073ffb9b13293b720312305b0c71b2a5fd44"
+  "started": "2026-09-29T18:49:42.424029Z",
+  "summary_sha256": "5f8823031275bc42def03be672f40a1f8986e6cd232afc083ffd35be5fd3f2b8"
 }
