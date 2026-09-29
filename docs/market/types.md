@@ -63,6 +63,8 @@ raises, rather than quietly placing a different order.
   the instrument is tradable through the API at all. The helpers round, truncate and
   validate against those constraints (`round_price`, `trunc_qty`, `min_qty`, `notional2qty`,
   and so on): see [Your First Order](first-order.md). Fees are fractions of 1.
+  `client_order_id_format` is the form of client order IDs the market sends (`'hex'`,
+  `'0x-hex'`, or `None` when it ignores them), and `random_client_id()` generates one.
   Base/quote identities come from the Catalogue instrument, not `Rules`.
 - `Ticker`: `last`, `bid`, `ask`, `bid_qty`, `ask_qty` and `base_volume_24h`, all optional.
 - `Trade`: `id`, `price`, signed `qty`, `time`, a `maker` flag, and an optional `fee`

@@ -88,11 +88,13 @@ market orders places a limit order there instead.
 
 ### Tag it with your own ID
 
-Add a `client_order_id` to tag the order with an ID of your own:
+Add a `client_order_id` to tag the order with an ID of your own.
+`rules.random_client_id()` generates one in the format the market accepts:
 
 ```python
+client_order_id = rules.random_client_id()
 response = await sdk.place_order('mexc_account1:spot:BTCUSDT', {
-  'type': 'LIMIT', 'qty': qty, 'price': price, 'client_order_id': 'hedge-42',
+  'type': 'LIMIT', 'qty': qty, 'price': price, 'client_order_id': client_order_id,
 })
 ```
 
@@ -102,13 +104,16 @@ Its fills carry it back as `Trade.client_order_id`, next to `Trade.order_id`, wh
 ```python
 async with sdk.trades_stream('mexc_account1:spot:BTCUSDT') as my_trades:
   async for trade in my_trades:
-    if trade.client_order_id == 'hedge-42':
+    if trade.client_order_id == client_order_id:
       print(trade.order_id, trade.qty, '@', trade.price)
 ```
 
-The SDK sends the string unchanged, so the venue's rules apply: most limit its length and
-characters and reject an ID already in use. Venues without client order IDs ignore it,
-and either field is `None` on fills that don't report it:
+The SDK sends the string unchanged, so an ID of your own must follow the venue's rules:
+most limit its length and characters and reject an ID already in use. `random_client_id`
+follows them by construction: 128 random bits as 32 hex digits, with `0x` in front on
+Hyperliquid, as `rules.client_order_id_format` says (`'hex'` or `'0x-hex'`). Venues
+without client order IDs ignore it, their `client_order_id_format` is `None`, and either
+field is `None` on fills that don't report it:
 
 | Venue | Sent as | `order_id` on fills | `client_order_id` on fills |
 | --- | --- | --- | --- |
