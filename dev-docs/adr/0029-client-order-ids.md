@@ -20,7 +20,7 @@ ID, and on Lighter the client order index is the SDK's order ID.
 
 ## Decision
 
-1. `Order` gains an optional `client_order_id: str`. It travels inside the order, not as
+1. `Order` gains an optional `client_order_id`. It travels inside the order, not as
    a `place_order` argument, so `place_orders` tags each order separately and no method
    signature changes.
 2. Venues with a native client order ID send the string unchanged: no validation,
@@ -35,11 +35,15 @@ ID, and on Lighter the client order index is the SDK's order ID.
    orders placed without one. Either is `None` when the fill payload does not carry it.
 5. Implementations fill both from the fill payload they already read. They make no extra
    requests per fill.
-6. `Rules.client_order_id_format` names the form a market's `place_order` sends: `'hex'`
-   (32 hex digits) or `'0x-hex'` (the same after `0x`, Hyperliquid's `cloid`). It is
-   `None`, the default, where the market ignores the IDs. `Rules.random_client_id()`
-   generates 128 random bits in that form. Plain hex fits every venue that sends the IDs
-   except Hyperliquid, whose documented form is the `0x` variant.
+6. `Market.client_order_id()` is a sync method generating a fresh ID in the form that
+   market's `place_order` sends, or returning `None` where the market ignores the IDs.
+   `None` is the base class default, so only markets that send IDs override it. Each
+   venue owns its form: 32 random hex digits on most, `0x` and 32 hex digits for
+   Hyperliquid's `cloid`, a UUID on Coinbase.
+7. `Order['client_order_id']` accepts `None`, meaning the same as leaving it out, so the
+   generator's result goes into the order unchecked and portable code does not branch.
+8. The generator lives on `Market` only. Neither the routing roots nor `Exchange` expose
+   it; callers resolve the market first.
 
 ## Alternatives considered
 
@@ -57,8 +61,14 @@ ID, and on Lighter the client order index is the SDK's order ID.
 - One universal generated form, such as `0x` plus 32 hex digits for every venue: it fits
   today's trading venues, but not Kraken's `cl_ord_id` (a UUID or at most 18 characters),
   and gives no way to tell which markets ignore the IDs.
-- A generator function stored on `Rules`: `Rules` crosses JSON boundaries, such as the
-  engine gateway, so the format is data and the method derives the value from it.
+- A format field on `Rules` (`'hex'`, `'0x-hex'` or `None`) with a generator method
+  deriving the value from it: every new venue form, such as an integer ID, would extend a
+  core `Literal` and need an SDK release. Formats belong to venues.
+- An abstract generator on `Rules`: every venue would have to return a `Rules` subclass,
+  and since `Rules` crosses JSON boundaries such as the engine gateway, the method would
+  not survive a round trip.
+- A default generator raising `NotImplementedError`: portable code would have to catch it,
+  though ignoring an ID changes nothing about execution (decision 3).
 
 ## Consequences
 

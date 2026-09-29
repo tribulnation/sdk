@@ -4,6 +4,7 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
+import secrets
 from typing_extensions import (
   Any,
   AsyncContextManager,
@@ -307,6 +308,10 @@ class NativeMarket(Public, Market):
     """Unsupported: Aster publishes no account-side buying capacity."""
     raise NotImplementedError('Aster publishes no account-side buying capacity')
 
+  def client_order_id(self) -> str:
+    """Generate 128 random bits as 32 hex digits, within `newClientOrderId`'s 36 characters."""
+    return secrets.token_hex(16)
+
   async def place_order(
     self, order: Order, *, settings: Settings = {}
   ) -> OrderResponse:
@@ -393,7 +398,6 @@ class SpotMarket(NativeMarket):
       rel_min_price=rel_min,
       rel_max_price=rel_max,
       api=True,
-      client_order_id_format='hex',
       details=row,
     )
 
@@ -489,7 +493,6 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
       rel_min_price=rel_min,
       rel_max_price=rel_max,
       api=True,
-      client_order_id_format='hex',
       details=row,
     )
 

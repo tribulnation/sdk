@@ -26,7 +26,6 @@ async def test_spot_rules_do_not_fetch_user_fees():
   )
   rules = await spot_rules(target)
   assert rules.fee_asset == '0'
-  assert rules.client_order_id_format == '0x-hex'
   assert rules.fees is None
   assert 'user_fees' not in rules.details
   personal.assert_not_awaited()
@@ -48,7 +47,6 @@ async def test_perp_rules_do_not_fetch_user_fees():
   )
   rules = await perp_rules(target)
   assert rules.fee_asset == 'USDC'
-  assert rules.client_order_id_format == '0x-hex'
   assert rules.fees is None
   assert 'user_fees' not in rules.details
   personal.assert_not_awaited()

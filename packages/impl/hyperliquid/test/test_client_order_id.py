@@ -6,6 +6,7 @@ from decimal import Decimal
 from types import SimpleNamespace
 from typing_extensions import Any, AsyncIterator, cast
 from unittest.mock import AsyncMock, Mock
+import re
 
 import pytest
 from typed_core import PaginatedResponse
@@ -17,6 +18,7 @@ from typed_hyperliquid.streams.user_fills import UserFill as StreamFill, UserFil
 from tribulnation.hyperliquid.market.impl import trades
 from tribulnation.hyperliquid.market.impl.mixin import PerpMarketMixin, Shared
 from tribulnation.hyperliquid.market.impl.orders import place_order
+from tribulnation.hyperliquid.market import PerpMarket, SpotMarket
 from tribulnation.hyperliquid.market.perps_exchange import PerpExchange
 from tribulnation.sdk.market import Order, Trade
 
@@ -74,8 +76,7 @@ async def test_place_order_cloid(client_order_id: str | None):
     ),
   )
   order: Order = {'qty': Decimal('-2'), 'price': Decimal('10'), 'type': 'POST_ONLY'}
-  if client_order_id is not None:
-    order['client_order_id'] = client_order_id
+  order['client_order_id'] = client_order_id
 
   response = await place_order(market, order)
 
@@ -207,3 +208,12 @@ async def test_exchange_history_order_ids(monkeypatch: pytest.MonkeyPatch):
     ('1', '77', CLOID),
     ('2', '78', None),
   ]
+
+
+@pytest.mark.parametrize('cls', [SpotMarket, PerpMarket])
+def test_client_order_id_generates_cloids(cls: type[SpotMarket | PerpMarket]):
+  """Fresh IDs are `0x` and 32 hex digits; the generator reads no market state."""
+  market = object.__new__(cls)
+  ids = {market.client_order_id() for _ in range(100)}
+  assert len(ids) == 100
+  assert all(re.fullmatch(r'0x[0-9a-f]{32}', value) for value in ids)

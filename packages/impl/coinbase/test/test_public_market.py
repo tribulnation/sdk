@@ -130,7 +130,6 @@ async def test_public_router_reads_without_credentials(
     assert rules.step_size == Decimal('0.001')
     assert rules.min_value == Decimal('1') and rules.max_qty == Decimal('100')
     assert rules.fees is None and rules.api
-    assert rules.client_order_id_format == 'hex'
     await market.rules()
     assert paths.count(f'/api/v3/brokerage/market/products/{identifier}') == 1
     await market.rules(refetch=True)

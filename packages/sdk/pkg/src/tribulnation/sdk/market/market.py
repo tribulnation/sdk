@@ -189,6 +189,14 @@ class Market(SDK):
     - For futures, returns the available collateral times the maximum leverage
     """
 
+  def client_order_id(self) -> str | None:
+    """Generate a fresh client order ID in the form this market's `place_order` sends.
+
+    Returns `None` where the market ignores client order IDs, so the result can go
+    into `Order['client_order_id']` unchecked.
+    """
+    return None
+
   @SDK.method
   @abstractmethod
   async def place_order(
@@ -213,11 +221,12 @@ class Market(SDK):
       IOC. A market order may partially fill unless venue/settings semantics are
       stricter, such as FOK.
 
-    ``order["client_order_id"]`` is optional. Venues with native client order
-    IDs send it unchanged, so a value breaking the venue's format or uniqueness
-    rules raises the venue's error, and report it back on the order's fills as
-    ``Trade.client_order_id``. Venues without them ignore it: it identifies the
-    order without changing how it executes.
+    ``order["client_order_id"]`` is optional, and ``None`` means the same as
+    leaving it out. Venues with native client order IDs send it unchanged, so a
+    value breaking the venue's format or uniqueness rules raises the venue's
+    error, and report it back on the order's fills as ``Trade.client_order_id``;
+    ``client_order_id()`` generates a valid one. Venues without them ignore it:
+    it identifies the order without changing how it executes.
 
     Venue-specific ``settings`` may refine time-in-force, reduce-only, expiry,
     or other execution flags. If a venue cannot support the requested semantics,

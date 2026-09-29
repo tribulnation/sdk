@@ -46,9 +46,9 @@ def _export_order(
     'r': settings.get('reduce_only', False),
     't': {'limit': {'tif': tif}},
   }
-  if 'client_order_id' in o:
+  if (client_order_id := o.get('client_order_id')) is not None:
     # Sent as-is: the venue rejects anything but a 128-bit hex string (`0x` + 32 hex).
-    wire['c'] = o['client_order_id']
+    wire['c'] = client_order_id
   return wire
 
 

@@ -88,11 +88,12 @@ market orders places a limit order there instead.
 
 ### Tag it with your own ID
 
-Add a `client_order_id` to tag the order with an ID of your own.
-`rules.random_client_id()` generates one in the format the market accepts:
+Add a `client_order_id` to tag the order with an ID of your own. The market's
+`client_order_id()` generates one in the form it accepts:
 
 ```python
-client_order_id = rules.random_client_id()
+market = await sdk.market('mexc_account1:spot:BTCUSDT')
+client_order_id = market.client_order_id()
 response = await sdk.place_order('mexc_account1:spot:BTCUSDT', {
   'type': 'LIMIT', 'qty': qty, 'price': price, 'client_order_id': client_order_id,
 })
@@ -109,11 +110,11 @@ async with sdk.trades_stream('mexc_account1:spot:BTCUSDT') as my_trades:
 ```
 
 The SDK sends the string unchanged, so an ID of your own must follow the venue's rules:
-most limit its length and characters and reject an ID already in use. `random_client_id`
-follows them by construction: 128 random bits as 32 hex digits, with `0x` in front on
-Hyperliquid, as `rules.client_order_id_format` says (`'hex'` or `'0x-hex'`). Venues
-without client order IDs ignore it, their `client_order_id_format` is `None`, and either
-field is `None` on fills that don't report it:
+most limit its length and characters and reject an ID already in use. `client_order_id()`
+follows them by construction: 128 random bits as 32 hex digits on most venues, with `0x` in
+front on Hyperliquid, and a UUID on Coinbase. On markets without client order IDs it returns
+`None`, which `place_order` treats like no ID at all, so the code above runs unchanged
+everywhere. Either field is `None` on fills that don't report it:
 
 | Venue | Sent as | `order_id` on fills | `client_order_id` on fills |
 | --- | --- | --- | --- |

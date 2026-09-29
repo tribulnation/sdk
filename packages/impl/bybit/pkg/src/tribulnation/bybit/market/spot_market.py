@@ -4,6 +4,7 @@ from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
+import secrets
 
 from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
@@ -97,7 +98,6 @@ class SpotMarket(MarketMixin, Market):
       max_qty=lot['maxOrderQty'],
       fees=None,
       api=info['status'] == 'Trading',
-      client_order_id_format='hex',
       details=info,
     )
 
@@ -159,6 +159,10 @@ class SpotMarket(MarketMixin, Market):
   async def available_notional(self) -> Decimal:
     """Fetch the free quote-asset balance."""
     return (await self.collateral()).free_collateral
+
+  def client_order_id(self) -> str:
+    """Generate 128 random bits as 32 hex digits, within `orderLinkId`'s 36 characters."""
+    return secrets.token_hex(16)
 
   async def place_order(
     self, order: Order, *, settings: Settings = {}

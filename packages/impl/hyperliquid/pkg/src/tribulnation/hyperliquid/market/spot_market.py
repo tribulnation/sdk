@@ -2,6 +2,7 @@ from typing_extensions import AsyncContextManager, AsyncIterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
+import secrets
 
 from tribulnation.sdk.core import PaginatedResponse, LogicError, OverflowPolicy
 from tribulnation.sdk.market import (
@@ -123,6 +124,10 @@ class SpotMarket(SpotMarketMixin, Market):
   @wrap_exceptions
   async def query_order(self, id: str) -> OrderState | None:
     return await query_order(self, id)
+
+  def client_order_id(self) -> str:
+    """Generate a `cloid`: `0x` and 128 random bits as 32 hex digits."""
+    return f'0x{secrets.token_hex(16)}'
 
   @wrap_exceptions
   async def place_order(

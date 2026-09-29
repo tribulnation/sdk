@@ -7,5 +7,5 @@ from .position import Position, PerpPosition
 from .stats import PerpStats
 from .ticker import Ticker
 from .trades import Trade, ExchangeTrade
-from .rules import Rules, ClientOrderIdFormat
+from .rules import Rules
 from .fees import Fees

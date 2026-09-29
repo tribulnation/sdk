@@ -35,7 +35,6 @@ async def rules(self: SpotMarketMixin, *, refetch: bool = False) -> Rules:
     rel_max_price=MAX_RELATIVE_PRICE,
     fees=None,
     api=True,
-    client_order_id_format='0x-hex',
     details={
       'base_meta': self.meta['base_meta'],
       'quote_meta': self.meta['quote_meta'],

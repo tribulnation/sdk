@@ -434,7 +434,6 @@ async def test_perpetual_rules_convert_contract_lots(venue: MexcMarket):
     assert rules.max_qty == 1
     assert rules.api is False
     assert rules.fees is None
-    assert rules.client_order_id_format is None
 
 
 @pytest.mark.parametrize('enabled,state', [(True, 0), (False, 0), (True, 4)])

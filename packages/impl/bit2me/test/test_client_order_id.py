@@ -2,13 +2,14 @@
 
 from typing_extensions import cast
 from datetime import datetime, timezone
+import re
 
 import pytest
 from typed_bit2me.schemas import TradeResponse
 from typed_bit2me.trading_ws.my_trades import MyTradeUpdate
 
 from tribulnation.bit2me.market.impl.orders import dump_order
-from tribulnation.bit2me.market.impl.rules import parse_rules
+from tribulnation.bit2me.market import SpotMarket
 from tribulnation.bit2me.market.impl.trades import parse_trade, parse_update
 from tribulnation.sdk.market import Order
 
@@ -23,8 +24,7 @@ def test_dump_order_sends_client_order_id_only_when_given(
 ):
   """`clientOrderId` carries the caller's id unchanged, and is absent otherwise."""
   order = cast(Order, {'type': order_type, 'qty': '-0.5', 'price': '100'})
-  if client_order_id is not None:
-    order['client_order_id'] = client_order_id
+  order['client_order_id'] = client_order_id
   request = dump_order('BTC/EUR', order)
   if client_order_id is None:
     assert 'clientOrderId' not in request
@@ -88,7 +88,9 @@ def test_streamed_fills_name_their_order_and_client_id():
   )
 
 
-def test_rules_ask_for_hex_client_order_ids():
-  """`random_client_id` gives Bit2Me plain hex IDs, like its UUID examples."""
-  rules = parse_rules({'symbol': 'BTC/EUR', 'tickSize': 0.01, 'amountPrecision': 8})
-  assert rules.client_order_id_format == 'hex'
+def test_client_order_id_generates_hex():
+  """Fresh `clientOrderId`s are 32 hex digits; the generator reads no market state."""
+  market = object.__new__(SpotMarket)
+  ids = {market.client_order_id() for _ in range(100)}
+  assert len(ids) == 100
+  assert all(re.fullmatch(r'[0-9a-f]{32}', value) for value in ids)

@@ -5,11 +5,13 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from decimal import Decimal
 from types import SimpleNamespace
+import re
 
 import pytest
 from typed_mexc.spot.http.account.trades import AccountTrade
 from typed_mexc.spot.streams.core.proto import PrivateDealsV3Api
 
+from tribulnation.mexc.market import SpotMarket
 from tribulnation.mexc.market.impl.mixin import MarketMixin
 from tribulnation.mexc.market.impl.orders import _dump_order
 from tribulnation.mexc.market.impl.trades import _parse_trade, trades_stream
@@ -25,8 +27,7 @@ def test_dump_order_sends_client_order_id_only_when_given(
 ):
   """`newClientOrderId` carries the caller's id unchanged, and is absent otherwise."""
   order = cast(Order, {'type': order_type, 'qty': '-0.5', 'price': '100'})
-  if client_order_id is not None:
-    order['client_order_id'] = client_order_id
+  order['client_order_id'] = client_order_id
   request = _dump_order('BTCUSDT', order, recv_window=None)
   assert request.get('newClientOrderId') == client_order_id
   assert (request['side'], request['quantity']) == ('SELL', Decimal('0.5'))
@@ -100,3 +101,11 @@ async def test_streamed_fills_name_their_order_and_client_id():
     ('d-2', None, None),
   ]
   assert rows[0].qty == Decimal('-0.5')
+
+
+def test_client_order_id_generates_hex():
+  """Fresh `newClientOrderId`s are 32 hex digits; the generator reads no market state."""
+  market = object.__new__(SpotMarket)
+  ids = {market.client_order_id() for _ in range(100)}
+  assert len(ids) == 100
+  assert all(re.fullmatch(r'[0-9a-f]{32}', value) for value in ids)

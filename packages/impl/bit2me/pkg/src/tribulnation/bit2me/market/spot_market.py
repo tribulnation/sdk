@@ -4,6 +4,7 @@ from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
+import secrets
 
 from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
@@ -107,6 +108,10 @@ class SpotMarket(MarketMixin, Market):
 
   async def available_notional(self) -> Decimal:
     return await available_notional(self)
+
+  def client_order_id(self) -> str:
+    """Generate 128 random bits as 32 hex digits, sent as `clientOrderId`."""
+    return secrets.token_hex(16)
 
   async def place_order(
     self, order: Order, *, settings: Settings = {}

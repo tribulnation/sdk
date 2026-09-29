@@ -20,7 +20,6 @@ from .types import (
   Trade,
   ExchangeTrade,
   Rules,
-  ClientOrderIdFormat,
   Fees,
 )
 from .settings import Settings

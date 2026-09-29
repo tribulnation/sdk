@@ -11,6 +11,7 @@ import pytest
 from typed_coinbase.app.advanced_trade.http.orders.create import CreateOrderSuccess
 from typed_coinbase.app.advanced_trade.http.orders.historical.fills import Fill
 
+from tribulnation.coinbase.market import PerpMarket, SpotMarket
 from tribulnation.coinbase.market.impl.mixin import MarketMixin
 from tribulnation.coinbase.market.impl.orders import place_order
 from tribulnation.coinbase.market.impl.trades import parse_fill
@@ -51,11 +52,11 @@ async def test_place_order_sends_the_callers_client_order_id(order_type: str):
 
 
 async def test_place_order_generates_a_client_order_id_when_none_is_given():
-  """Advanced Trade requires one, so each order without it gets a fresh UUID."""
+  """Advanced Trade requires one, so each order without it, or with `None`, gets a fresh UUID."""
   create = AsyncMock(return_value=created('generated'))
   order: Order = {'type': 'LIMIT', 'qty': 1, 'price': 100}
   await place_order(market(create), order)
-  await place_order(market(create), order)
+  await place_order(market(create), {**order, 'client_order_id': None})
   sent = [call.kwargs['client_order_id'] for call in create.await_args_list]
   assert len({uuid.UUID(value) for value in sent}) == 2
 
@@ -81,3 +82,12 @@ def test_history_fills_name_their_order_but_not_its_client_id():
   trade = parse_fill(fill, quote='USD')
   assert (trade.id, trade.order_id, trade.client_order_id) == ('t-1', 'o-1', None)
   assert trade.qty == Decimal('-0.5')
+
+
+@pytest.mark.parametrize('cls', [SpotMarket, PerpMarket])
+def test_client_order_id_generates_uuids(cls: type[SpotMarket | PerpMarket]):
+  """Fresh IDs are distinct UUIDs; the generator reads no market state."""
+  market = object.__new__(cls)
+  ids = {market.client_order_id() for _ in range(100)}
+  assert len(ids) == 100
+  assert all(str(uuid.UUID(value)) == value for value in ids)

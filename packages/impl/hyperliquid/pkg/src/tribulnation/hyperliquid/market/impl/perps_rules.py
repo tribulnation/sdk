@@ -33,7 +33,6 @@ async def rules(self: PerpMarketMixin, *, refetch: bool = False) -> Rules:
     rel_max_price=MAX_RELATIVE_PRICE,
     fees=await standard_perp_fees(self, refetch=refetch),
     api=not self.asset_meta.get('isDelisted', False),
-    client_order_id_format='0x-hex',
     details={
       'collateral_meta': self.collateral_meta,
       'asset_meta': self.asset_meta,

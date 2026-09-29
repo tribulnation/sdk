@@ -11,8 +11,8 @@ class Order(TypedDict):
   price: Num
   type: Literal['MARKET', 'LIMIT', 'POST_ONLY']
   """Market orders are only partially supported. If not supported, the market will place a limit order at the indicated price."""
-  client_order_id: NotRequired[str]
-  """Your own ID for the order, sent unchanged as the venue's client order ID and reported back on its fills as `Trade.client_order_id`. Format and uniqueness rules are the venue's. Venues without client order IDs ignore it."""
+  client_order_id: NotRequired[str | None]
+  """Your own ID for the order, sent unchanged as the venue's client order ID and reported back on its fills as `Trade.client_order_id`. Format and uniqueness rules are the venue's; `Market.client_order_id()` generates a valid one. `None` is the same as leaving it out. Venues without client order IDs ignore it."""
 
 
 @dataclass(kw_only=True)

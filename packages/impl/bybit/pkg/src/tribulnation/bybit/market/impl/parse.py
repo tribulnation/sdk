@@ -99,6 +99,6 @@ def order_request(
       price=str(Decimal(order['price'])),
       timeInForce='PostOnly' if order['type'] == 'POST_ONLY' else 'GTC',
     )
-  if 'client_order_id' in order:
-    request['orderLinkId'] = order['client_order_id']
+  if (client_order_id := order.get('client_order_id')) is not None:
+    request['orderLinkId'] = client_order_id
   return request

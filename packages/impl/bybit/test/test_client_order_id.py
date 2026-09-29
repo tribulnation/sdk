@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from decimal import Decimal
 from types import SimpleNamespace
 from typing_extensions import Any, AsyncIterator, Literal, cast
-from unittest.mock import AsyncMock
+import re
 
 import pytest
 from typed_bybit import Bybit
@@ -129,8 +129,7 @@ async def test_place_order_order_link_id(
   cls = SpotMarket if category == 'spot' else PerpMarket
   market = cls(client=cast(Bybit, client), cache=Cache(), symbol='BTCUSDT')
   order: Order = {'type': kind, 'qty': Decimal('0.5'), 'price': Decimal('65000')}
-  if client_order_id is not None:
-    order['client_order_id'] = client_order_id
+  order['client_order_id'] = client_order_id
   placed = await market.place_order(order)
   assert placed.id == '1f1a8b6c'
   expected: dict[str, Any] = {
@@ -192,31 +191,10 @@ async def test_trades_stream_order_ids(link_id: str, expected: str | None):
 
 
 @pytest.mark.parametrize('category', ['spot', 'linear'])
-async def test_rules_ask_for_hex_client_order_ids(
-  monkeypatch: pytest.MonkeyPatch, category: Literal['spot', 'linear']
-):
-  """36-character `orderLinkId`s fit `random_client_id`'s 32 hex digits."""
-  info: dict[str, Any] = {
-    'status': 'Trading',
-    'quoteCoin': 'USDT',
-    'settleCoin': 'USDT',
-    'priceFilter': {
-      'tickSize': Decimal('0.1'),
-      'minPrice': Decimal('0.1'),
-      'maxPrice': Decimal('1999999'),
-    },
-    'lotSizeFilter': {
-      'basePrecision': Decimal('0.000001'),
-      'qtyStep': Decimal('0.001'),
-      'minOrderQty': Decimal('0.001'),
-      'minOrderAmt': Decimal('5'),
-      'minNotionalValue': Decimal('5'),
-      'maxOrderQty': Decimal('100'),
-    },
-  }
+def test_client_order_id_generates_hex(category: Literal['spot', 'linear']):
+  """Fresh IDs are 32 hex digits, within `orderLinkId`'s 36 characters."""
   cls = SpotMarket if category == 'spot' else PerpMarket
-  catalogue = 'spot_instruments' if category == 'spot' else 'perp_instruments'
-  monkeypatch.setattr(cls, catalogue, AsyncMock(return_value={'BTCUSDT': info}))
   market = cls(client=cast(Bybit, FakeClient()), cache=Cache(), symbol='BTCUSDT')
-  rules = await market.rules()
-  assert rules.client_order_id_format == 'hex'
+  ids = {market.client_order_id() for _ in range(100)}
+  assert len(ids) == 100
+  assert all(re.fullmatch(r'[0-9a-f]{32}', value) for value in ids)

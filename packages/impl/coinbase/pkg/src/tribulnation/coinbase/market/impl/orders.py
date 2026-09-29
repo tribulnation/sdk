@@ -77,9 +77,9 @@ async def place_order(
   when `order` carries none. Reusing an id does not place a second order: Coinbase
   answers with the order already placed under it.
   """
-  client_order_id = (
-    order['client_order_id'] if 'client_order_id' in order else str(uuid.uuid4())
-  )
+  client_order_id = order.get('client_order_id')
+  if client_order_id is None:
+    client_order_id = str(uuid.uuid4())
   response = await self.app.advanced_trade.http.orders.create(
     client_order_id=client_order_id,
     product_id=self.product_id,

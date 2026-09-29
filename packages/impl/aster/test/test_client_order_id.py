@@ -4,6 +4,8 @@ from datetime import datetime, timezone
 from decimal import Decimal
 from unittest.mock import AsyncMock
 
+import re
+
 import pytest
 from typed_aster.futures.trade.place_order import PlaceOrder as PerpOrders
 from typed_aster.futures.user_stream.events import OrderTradeUpdate, OrderUpdate
@@ -42,8 +44,7 @@ async def test_place_order_client_order_id(
     PerpOrders if scope == 'perp' else SpotOrders, 'place_order', endpoint
   )
   order: Order = {'type': kind, 'qty': Decimal('-5'), 'price': '0.75'}
-  if client_order_id is not None:
-    order['client_order_id'] = client_order_id
+  order['client_order_id'] = client_order_id
   await market(scope).place_order(order)
   assert endpoint.await_args is not None
   request = endpoint.await_args.args[0]
@@ -166,3 +167,12 @@ async def test_spot_fill_order_ids(client_order_id: str, expected: str | None):
   assert [(s, t.id, t.order_id, t.client_order_id) for s, t in fills] == [
     ('ASTERUSDT', '902', '4471', expected)
   ]
+
+
+@pytest.mark.parametrize('scope', ['spot', 'perp'])
+def test_client_order_id_generates_hex(scope: Scope):
+  """Fresh IDs are 32 hex digits, within `newClientOrderId`'s 36 characters."""
+  target = market(scope)
+  ids = {target.client_order_id() for _ in range(100)}
+  assert len(ids) == 100
+  assert all(re.fullmatch(r'[0-9a-f]{32}', value) for value in ids)

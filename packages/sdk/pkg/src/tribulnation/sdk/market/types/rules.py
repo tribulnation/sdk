@@ -1,13 +1,9 @@
-from typing_extensions import Any, Literal
+from typing_extensions import Any
 from dataclasses import dataclass
 from decimal import Decimal
-import secrets
 
 from tribulnation.sdk.util import ceil2tick, trunc2tick, round2tick
 from .fees import Fees
-
-ClientOrderIdFormat = Literal['hex', '0x-hex']
-"""How a market writes client order IDs: 32 hex digits, or the same after `0x`."""
 
 
 @dataclass(kw_only=True)
@@ -46,23 +42,8 @@ class Rules:
   """
   api: bool
   """Whether the instrument can be traded via API."""
-  client_order_id_format: ClientOrderIdFormat | None = None
-  """Format of the `Order['client_order_id']` values `place_order` sends, or `None` if the market ignores them.
-
-  `'hex'` is 32 hex digits; `'0x-hex'` puts `0x` in front, as Hyperliquid's `cloid` requires.
-  """
   details: Any = None
   """Raw details of the rules."""
-
-  def random_client_id(self) -> str:
-    """Generate a random client order ID in the format this market accepts.
-
-    128 random bits as 32 lowercase hex digits, prefixed with `0x` where
-    `client_order_id_format` asks for it. A market that ignores client order IDs
-    gets the plain form, which its `place_order` then ignores.
-    """
-    value = secrets.token_hex(16)
-    return f'0x{value}' if self.client_order_id_format == '0x-hex' else value
 
   def min_price(self, mark_price: Decimal, /) -> Decimal | None:
     """Minimum price of the order (in quote units), accounting for the minimum value and fixed minimum price."""
