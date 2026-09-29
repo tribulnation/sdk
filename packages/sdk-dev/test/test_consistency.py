@@ -268,6 +268,8 @@ async def test_product_exclusions_are_explicit_not_inferred_from_missing_discove
   assert consistency.catalogue_excluded('bitget', 'perp', 'coin')
   assert not consistency.catalogue_excluded('bitget', 'perp', 'coin-classic')
   assert not consistency.catalogue_excluded('bitget', 'spot', 'coin')
+  assert consistency.catalogue_excluded('coinbase', 'perp', 'intx')
+  assert not consistency.catalogue_excluded('coinbase', 'spot', 'intx')
   monkeypatch.setattr(
     consistency, 'CATALOGUE_EXCLUSIONS', frozenset({('fixture', 'perp', 'future')})
   )
