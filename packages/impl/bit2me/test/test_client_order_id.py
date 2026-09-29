@@ -8,6 +8,7 @@ from typed_bit2me.schemas import TradeResponse
 from typed_bit2me.trading_ws.my_trades import MyTradeUpdate
 
 from tribulnation.bit2me.market.impl.orders import dump_order
+from tribulnation.bit2me.market.impl.rules import parse_rules
 from tribulnation.bit2me.market.impl.trades import parse_trade, parse_update
 from tribulnation.sdk.market import Order
 
@@ -85,3 +86,9 @@ def test_streamed_fills_name_their_order_and_client_id():
     None,
     None,
   )
+
+
+def test_rules_ask_for_hex_client_order_ids():
+  """`random_client_id` gives Bit2Me plain hex IDs, like its UUID examples."""
+  rules = parse_rules({'symbol': 'BTC/EUR', 'tickSize': 0.01, 'amountPrecision': 8})
+  assert rules.client_order_id_format == 'hex'

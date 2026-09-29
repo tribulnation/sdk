@@ -97,6 +97,7 @@ class SpotMarket(MarketMixin, Market):
       max_qty=lot['maxOrderQty'],
       fees=None,
       api=info['status'] == 'Trading',
+      client_order_id_format='hex',
       details=info,
     )
 

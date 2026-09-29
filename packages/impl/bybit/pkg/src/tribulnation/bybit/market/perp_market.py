@@ -105,6 +105,7 @@ class PerpMarket(MarketMixin, _PerpMarket):
       fixed_max_price=prices['maxPrice'],
       fees=None,
       api=info['status'] == 'Trading',
+      client_order_id_format='hex',
       details=info,
     )
 

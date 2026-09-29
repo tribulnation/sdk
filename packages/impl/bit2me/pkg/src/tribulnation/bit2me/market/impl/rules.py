@@ -57,6 +57,7 @@ def parse_rules(info: MarketInfo) -> Rules:
     fixed_max_price=Decimal(str(max_price)) if max_price is not None else None,
     fees=standard_fees(base, quote),
     api=info.get('marketEnabled') == 'enabled',
+    client_order_id_format='hex',
     details=info,
   )
 

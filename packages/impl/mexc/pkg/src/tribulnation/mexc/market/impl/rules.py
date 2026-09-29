@@ -40,5 +40,6 @@ async def rules(self: MarketMixin, *, refetch: bool = False) -> Rules:
     min_value=MIN_ORDER_VALUE,
     rel_min_price=rel_min_price,
     rel_max_price=rel_max_price,
+    client_order_id_format='hex',
     details=info,
   )

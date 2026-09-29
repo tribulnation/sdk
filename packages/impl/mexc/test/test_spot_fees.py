@@ -39,10 +39,9 @@ async def test_standard_spot_fees_use_public_metadata(monkeypatch: pytest.Monkey
   async with MexcMarket.public() as venue:
     private = AsyncMock(side_effect=AssertionError('Personal fees requested'))
     monkeypatch.setattr(venue.client.spot.http.account, 'trade_fee', private)
-    assert (await market(venue).rules()).fees == Fees.symmetric(
-      maker=Decimal(0),
-      taker=Decimal('0.0005'),
-    )
+    rules = await market(venue).rules()
+    assert rules.fees == Fees.symmetric(maker=Decimal(0), taker=Decimal('0.0005'))
+    assert rules.client_order_id_format == 'hex'
     private.assert_not_awaited()
 
 

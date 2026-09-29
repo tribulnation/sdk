@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from decimal import Decimal
 from types import SimpleNamespace
 from typing_extensions import Any, AsyncIterator, Literal, cast
+from unittest.mock import AsyncMock
 
 import pytest
 from typed_bybit import Bybit
@@ -188,3 +189,34 @@ async def test_trades_stream_order_ids(link_id: str, expected: str | None):
   assert [(t.order_id, t.client_order_id) for t in trades] == [
     ('1f1a8b6c-2d44-4e6f-9a3b-5c1d2e3f4a5b', expected)
   ]
+
+
+@pytest.mark.parametrize('category', ['spot', 'linear'])
+async def test_rules_ask_for_hex_client_order_ids(
+  monkeypatch: pytest.MonkeyPatch, category: Literal['spot', 'linear']
+):
+  """36-character `orderLinkId`s fit `random_client_id`'s 32 hex digits."""
+  info: dict[str, Any] = {
+    'status': 'Trading',
+    'quoteCoin': 'USDT',
+    'settleCoin': 'USDT',
+    'priceFilter': {
+      'tickSize': Decimal('0.1'),
+      'minPrice': Decimal('0.1'),
+      'maxPrice': Decimal('1999999'),
+    },
+    'lotSizeFilter': {
+      'basePrecision': Decimal('0.000001'),
+      'qtyStep': Decimal('0.001'),
+      'minOrderQty': Decimal('0.001'),
+      'minOrderAmt': Decimal('5'),
+      'minNotionalValue': Decimal('5'),
+      'maxOrderQty': Decimal('100'),
+    },
+  }
+  cls = SpotMarket if category == 'spot' else PerpMarket
+  catalogue = 'spot_instruments' if category == 'spot' else 'perp_instruments'
+  monkeypatch.setattr(cls, catalogue, AsyncMock(return_value={'BTCUSDT': info}))
+  market = cls(client=cast(Bybit, FakeClient()), cache=Cache(), symbol='BTCUSDT')
+  rules = await market.rules()
+  assert rules.client_order_id_format == 'hex'

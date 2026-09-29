@@ -40,6 +40,7 @@ async def rules(self: MarketMixin, *, refetch: bool = False) -> Rules:
     max_qty=product['base_max_size'],
     fees=None,
     api=not product['trading_disabled'],
+    client_order_id_format='hex',
     details=product,
   )
 

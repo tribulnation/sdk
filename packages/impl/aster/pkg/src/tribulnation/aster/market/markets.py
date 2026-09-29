@@ -393,6 +393,7 @@ class SpotMarket(NativeMarket):
       rel_min_price=rel_min,
       rel_max_price=rel_max,
       api=True,
+      client_order_id_format='hex',
       details=row,
     )
 
@@ -488,6 +489,7 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
       rel_min_price=rel_min,
       rel_max_price=rel_max,
       api=True,
+      client_order_id_format='hex',
       details=row,
     )
 
