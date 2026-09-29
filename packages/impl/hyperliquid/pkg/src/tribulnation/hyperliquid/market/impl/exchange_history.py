@@ -65,6 +65,8 @@ async def exchange_trades_history(
         ExchangeTrade(
           market_id=market_id,
           id=str(fill['tid']),
+          order_id=str(fill['oid']),
+          client_order_id=fill.get('cloid'),
           price=Decimal(fill['px']),
           qty=Decimal(fill['sz']) * (1 if fill['side'] == 'B' else -1),
           time=time,

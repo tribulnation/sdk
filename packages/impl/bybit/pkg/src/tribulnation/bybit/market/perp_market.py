@@ -4,6 +4,7 @@ from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
+import secrets
 
 from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
@@ -229,6 +230,10 @@ class PerpMarket(MarketMixin, _PerpMarket):
   ) -> PaginatedResponse[FundingPayment]:
     """Fetch your funding payments history."""
     return PaginatedResponse(funding_payments(self, start, end))
+
+  def random_client_order_id(self) -> str:
+    """Generate 128 random bits as 32 hex digits, within `orderLinkId`'s 36 characters."""
+    return secrets.token_hex(16)
 
   async def place_order(
     self, order: Order, *, settings: Settings = {}

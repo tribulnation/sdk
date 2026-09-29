@@ -45,11 +45,12 @@ def dump_order(symbol: str, order: Order) -> OrderRequest:
 
   `MARKET` becomes a native market order, which executes at the best available price
   and ignores the SDK's `price` protection -- Bit2Me offers no worst-price bound on
-  one.
+  one. A `client_order_id` is sent as `clientOrderId`.
   """
   qty = Decimal(order['qty'])
   side: OrderSide = 'buy' if qty > 0 else 'sell'
   amount = str(abs(qty))
+  client_order_id = order.get('client_order_id')
   match order['type']:
     case 'MARKET':
       market: MarketOrderRequest = {
@@ -58,6 +59,8 @@ def dump_order(symbol: str, order: Order) -> OrderRequest:
         'amount': amount,
         'orderType': 'market',
       }
+      if client_order_id is not None:
+        market['clientOrderId'] = client_order_id
       return market
     case 'LIMIT' | 'POST_ONLY':
       limit: LimitOrderRequest = {
@@ -69,6 +72,8 @@ def dump_order(symbol: str, order: Order) -> OrderRequest:
       }
       if order['type'] == 'POST_ONLY':
         limit['postOnly'] = True
+      if client_order_id is not None:
+        limit['clientOrderId'] = client_order_id
       return limit
     case _:
       raise ValidationError(f'Unknown order type: {order["type"]}')

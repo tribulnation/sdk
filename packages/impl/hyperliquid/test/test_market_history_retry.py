@@ -52,6 +52,7 @@ async def test_market_page_retry(
       'fee': '0',
       'feeToken': 'USDC',
       'tid': state,
+      'oid': state,
     }
     return [row], state + 1 if state < 2 else None
 

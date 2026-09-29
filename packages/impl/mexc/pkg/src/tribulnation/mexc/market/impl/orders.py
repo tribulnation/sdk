@@ -81,6 +81,8 @@ def _dump_order(
       raise ValidationError(f'Unknown order type: {order["type"]}')
   if recv_window is not None:
     request['recvWindow'] = recv_window
+  if (client_order_id := order.get('client_order_id')) is not None:
+    request['newClientOrderId'] = client_order_id
   return request
 
 

@@ -353,8 +353,10 @@ class TradingMarkets(SDK):
     placing a materially different order.
 
     Args:
-      order: `qty` in signed base units (positive buys, negative sells), `price`, and
-        `type`.
+      order: `qty` in signed base units (positive buys, negative sells), `price`,
+        `type`, and an optional `client_order_id` of your own: fills report it back
+        as `Trade.client_order_id` on venues with client order IDs, and the rest
+        ignore it.
       settings: Venue-specific options keyed by venue name, e.g. `{'dydx': {...}}`; see
         each venue page for accepted keys.
     """

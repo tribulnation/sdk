@@ -1,8 +1,13 @@
-from typing_extensions import Literal, Sequence, TypedDict
+from typing_extensions import Literal, Mapping, Sequence, TypedDict
 from decimal import Decimal
+from functools import cache
 import base64
+import uuid
 
-from typed_dydx.indexer.schemas import Order as IndexerOrder
+from typed_dydx.indexer.schemas import (
+  Order as IndexerOrder,
+  OrderSubaccountMessage,
+)
 from typed_dydx.node.orders.types import (
   ConditionalOrderParams,
   Flags,
@@ -51,22 +56,77 @@ def _sign(side: str | None) -> int:
   raise ValidationError(f'Unknown order side: {side}')
 
 
-def _protobuf_id(order: IndexerOrder, *, address: str) -> clob.OrderId:
-  """Build a protocol order ID for an indexer order."""
-  subaccount = order.get('subaccountNumber')
-  if subaccount is None:
+INDEXER_NAMESPACE = uuid.UUID('0f9da948-a6fb-4c45-9edc-4685c3f3317d')
+"""Namespace of the indexer's uuid5 ids (v4-chain `indexer/packages/postgres/src/helpers/uuid.ts`)."""
+MAX_SUBACCOUNT = 128_000
+"""The highest valid subaccount number."""
+
+
+def _protobuf_id(
+  order: IndexerOrder | OrderSubaccountMessage,
+  *,
+  address: str,
+  subaccount: int | None = None,
+) -> clob.OrderId:
+  """Build a protocol order ID for an indexer order.
+
+  Args:
+    order: A REST order, or one pushed on a subaccounts stream.
+    address: The subaccount owner.
+    subaccount: The subaccount number, for an order that does not carry it.
+  """
+  number = order.get('subaccountNumber')
+  if number is None:
+    number = subaccount
+  if number is None:
     raise ValidationError(f'Order {order["id"]} carries no subaccountNumber')
+  flags = order.get('orderFlags')
+  if flags is None:
+    raise ValidationError(f'Order {order["id"]} carries no orderFlags')
   return clob.OrderId(
     client_id=int(order['clientId']),
-    order_flags=int(order['orderFlags']),
+    order_flags=int(flags),
     clob_pair_id=int(order['clobPairId']),
-    subaccount_id=subaccounts.SubaccountId(owner=address, number=int(subaccount)),
+    subaccount_id=subaccounts.SubaccountId(owner=address, number=int(number)),
   )
 
 
 def serialize_id(order_id: clob.OrderId) -> str:
   """Serialize a dYdX protocol order ID for the SDK order API."""
   return base64.b64encode(bytes(order_id)).decode()
+
+
+@cache
+def subaccount_numbers(address: str, parent: int) -> Mapping[str, int]:
+  """A parent subaccount's and its children's numbers, by indexer subaccount id.
+
+  The indexer's subaccount id is the uuid5 of `<address>-<number>`; the children of
+  parent `p` are `p + 128`, `p + 256`, ...
+  """
+  return {
+    str(uuid.uuid5(INDEXER_NAMESPACE, f'{address}-{number}')): number
+    for number in range(parent, MAX_SUBACCOUNT + 1, 128)
+  }
+
+
+def stream_order_ids(
+  orders: Sequence[OrderSubaccountMessage], *, address: str, parent: int
+) -> dict[str, str]:
+  """SDK ids of the orders in a parent subaccounts message, by indexer order id.
+
+  Pushed orders carry the indexer's subaccount id, not its number, which is recovered
+  from the parent's subaccount ids. Orders without flags are left out.
+  """
+  numbers = subaccount_numbers(address, parent)
+  ids: dict[str, str] = {}
+  for order in orders:
+    number = numbers.get(order['subaccountId'])
+    if number is None or order.get('orderFlags') is None:
+      continue
+    ids[order['id']] = serialize_id(
+      _protobuf_id(order, address=address, subaccount=number)
+    )
+  return ids
 
 
 def parse_id(id: str) -> clob.OrderId:

@@ -278,10 +278,14 @@ def uta_fee(details: Sequence[tuple[str, Decimal]]) -> Trade.Fee | None:
 
 
 def parse_spot_fill(fill: SpotOwnFill) -> Trade:
-  """Map one Classic spot fill onto a `Trade`."""
+  """Map one Classic spot fill onto a `Trade`.
+
+  The row names its order but not the order's client order id.
+  """
   detail = fill['feeDetail']
   return Trade(
     id=fill['tradeId'],
+    order_id=fill['orderId'],
     price=Decimal(fill['priceAvg']),
     qty=sign(fill['side']) * Decimal(fill['size']),
     time=fill['cTime'],
@@ -292,9 +296,13 @@ def parse_spot_fill(fill: SpotOwnFill) -> Trade:
 
 
 def parse_mix_fill(fill: MixOrderFill) -> Trade:
-  """Map one Classic futures fill onto a `Trade`."""
+  """Map one Classic futures fill onto a `Trade`.
+
+  The row names its order but not the order's client order id.
+  """
   return Trade(
     id=fill['tradeId'],
+    order_id=fill['orderId'],
     price=fill['price'],
     qty=sign(fill['side']) * fill['baseVolume'],
     time=fill['cTime'],
@@ -308,14 +316,17 @@ def parse_classic_stream_fill(fill: 'SpotFill | MixFill1') -> Trade:
   """Map one Classic `fill` channel push onto a `Trade`.
 
   The spot and futures shapes name their price and size differently (`priceAvg`/`size`
-  against `price`/`baseVolume`) and send every number as a string.
+  against `price`/`baseVolume`) and send every number as a string. Only the futures
+  shape carries the order's `clientOid`.
   """
   if 'priceAvg' in fill:
-    price, size = fill['priceAvg'], fill['size']
+    price, size, client_oid = fill['priceAvg'], fill['size'], None
   else:
-    price, size = fill['price'], fill['baseVolume']
+    price, size, client_oid = fill['price'], fill['baseVolume'], fill['clientOid']
   return Trade(
     id=fill['tradeId'],
+    order_id=fill['orderId'],
+    client_order_id=client_oid or None,
     price=Decimal(price),
     qty=sign(fill['side']) * Decimal(size),
     time=fill['cTime'],
@@ -333,6 +344,8 @@ def uta_trade(fill: 'Fill | FillUpdate', time: datetime) -> Trade:
   """
   return Trade(
     id=fill['execId'],
+    order_id=fill['orderId'],
+    client_order_id=fill['clientOid'] or None,
     price=fill['execPrice'],
     qty=sign(fill['side']) * fill['execQty'],
     time=time,

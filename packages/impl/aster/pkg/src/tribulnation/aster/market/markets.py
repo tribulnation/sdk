@@ -4,6 +4,7 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
+import secrets
 from typing_extensions import (
   Any,
   AsyncContextManager,
@@ -16,11 +17,13 @@ from typing_extensions import (
 )
 from pydantic import TypeAdapter, ValidationError
 from typed_aster.futures import Futures
+from typed_aster.futures.trade.place_order import Request as FuturesOrderRequest
 from typed_aster.futures.trade.schemas import FuturesOrder
 from typed_aster.futures.trade.user_trades import AccountTradeItem
 from typed_aster.schemas import BatchError
 from typed_aster.spot import Spot
 from typed_aster.spot.trade.cancel_batch_orders import SpotBatchCancelledOrder
+from typed_aster.spot.trade.place_order import Request as SpotOrderRequest
 from typed_aster.spot.trade.schemas import SpotOrder
 from tribulnation.sdk.core import (
   BadRequest,
@@ -124,6 +127,7 @@ def parse_trade(row: AccountTradeItem) -> Trade:
     )
   return Trade(
     id=str(row['id']),
+    order_id=str(row['orderId']),
     price=row['price'],
     qty=row['qty'] if row['side'] == 'BUY' else -row['qty'],
     time=row['time'],
@@ -142,6 +146,8 @@ class NativeOrder:
   price: Decimal | None
   """Limit price; `None` for a market order, which ignores the SDK price."""
   time_in_force: Literal['GTC', 'GTX']
+  client_order_id: str | None = None
+  """Sent as `newClientOrderId`; the venue generates one when `None`."""
 
 
 def native_order(order: Order) -> NativeOrder:
@@ -150,8 +156,15 @@ def native_order(order: Order) -> NativeOrder:
   if not qty.is_finite() or not qty:
     raise ValueError('Order quantity must be finite and nonzero')
   side = 'BUY' if qty > 0 else 'SELL'
+  client_order_id = order.get('client_order_id')
   if order['type'] == 'MARKET':
-    return NativeOrder(side=side, quantity=abs(qty), price=None, time_in_force='GTC')
+    return NativeOrder(
+      side=side,
+      quantity=abs(qty),
+      price=None,
+      time_in_force='GTC',
+      client_order_id=client_order_id,
+    )
   price = Decimal(str(order['price']))
   if not price.is_finite() or price <= 0:
     raise ValueError('Limit price must be finite and positive')
@@ -160,6 +173,7 @@ def native_order(order: Order) -> NativeOrder:
     quantity=abs(qty),
     price=price,
     time_in_force='GTX' if order['type'] == 'POST_ONLY' else 'GTC',
+    client_order_id=client_order_id,
   )
 
 
@@ -326,6 +340,10 @@ class NativeMarket(Public, Market):
     """Unsupported: Aster publishes no account-side buying capacity."""
     raise NotImplementedError('Aster publishes no account-side buying capacity')
 
+  def random_client_order_id(self) -> str:
+    """Generate 128 random bits as 32 hex digits, within `newClientOrderId`'s 36 characters."""
+    return secrets.token_hex(16)
+
   async def place_order(
     self, order: Order, *, settings: Settings = {}
   ) -> OrderResponse:
@@ -435,17 +453,16 @@ class SpotMarket(NativeMarket):
 
   def submit(self, order: NativeOrder):
     """Place one spot order."""
+    request: SpotOrderRequest
     if order.price is None:
-      return self.api.trade.place_order(
-        {
-          'symbol': self.symbol,
-          'side': order.side,
-          'type': 'MARKET',
-          'quantity': order.quantity,
-        }
-      )
-    return self.api.trade.place_order(
-      {
+      request = {
+        'symbol': self.symbol,
+        'side': order.side,
+        'type': 'MARKET',
+        'quantity': order.quantity,
+      }
+    else:
+      request = {
         'symbol': self.symbol,
         'side': order.side,
         'type': 'LIMIT',
@@ -453,7 +470,9 @@ class SpotMarket(NativeMarket):
         'price': order.price,
         'timeInForce': order.time_in_force,
       }
-    )
+    if order.client_order_id is not None:
+      request['newClientOrderId'] = order.client_order_id
+    return self.api.trade.place_order(request)
 
   def cancel(self, order_id: int):
     """Cancel one spot order."""
@@ -631,18 +650,17 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
 
   def submit(self, order: NativeOrder):
     """Place one perpetual order, returning its final state."""
+    request: FuturesOrderRequest
     if order.price is None:
-      return self.api.trade.place_order(
-        {
-          'symbol': self.symbol,
-          'side': order.side,
-          'type': 'MARKET',
-          'quantity': order.quantity,
-          'newOrderRespType': 'RESULT',
-        }
-      )
-    return self.api.trade.place_order(
-      {
+      request = {
+        'symbol': self.symbol,
+        'side': order.side,
+        'type': 'MARKET',
+        'quantity': order.quantity,
+        'newOrderRespType': 'RESULT',
+      }
+    else:
+      request = {
         'symbol': self.symbol,
         'side': order.side,
         'type': 'LIMIT',
@@ -651,7 +669,9 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
         'timeInForce': order.time_in_force,
         'newOrderRespType': 'RESULT',
       }
-    )
+    if order.client_order_id is not None:
+      request['newClientOrderId'] = order.client_order_id
+    return self.api.trade.place_order(request)
 
   def cancel(self, order_id: int):
     """Cancel one perpetual order."""

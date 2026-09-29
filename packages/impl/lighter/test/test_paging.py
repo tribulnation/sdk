@@ -76,6 +76,7 @@ async def test_trade_pages_retry_without_duplicates(shared: Shared):
       'usd_amount': Decimal(1),
       'ask_account_id': 1,
       'bid_account_id': 476,
+      'bid_client_id_str': f'{state + 100}',
       'is_maker_ask': True,
       'taker_fee': 280,
     }
@@ -95,6 +96,7 @@ async def test_trade_pages_retry_without_duplicates(shared: Shared):
     ]
   assert calls == [0, 1, 1, 2]
   assert [t.id for page in pages for t in page] == ['0', '1', '2']
+  assert [t.order_id for page in pages for t in page] == ['100', '101', '102']
   assert all(getattr(t, 'market_id') == '4095' for page in pages for t in page)
 
 

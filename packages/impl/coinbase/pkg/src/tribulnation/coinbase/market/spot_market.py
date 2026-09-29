@@ -4,6 +4,7 @@ from typing_extensions import AsyncContextManager, AsyncIterable, Any, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
+import uuid
 
 from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
@@ -84,6 +85,10 @@ class SpotMarket(impl.MarketMixin, Market):
 
   async def available_notional(self) -> Decimal:
     return (await impl.collateral(self)).free_collateral
+
+  def random_client_order_id(self) -> str:
+    """Generate a random UUID, the form Coinbase's own examples use."""
+    return str(uuid.uuid4())
 
   async def place_order(
     self, order: Order, *, settings: Settings = {}

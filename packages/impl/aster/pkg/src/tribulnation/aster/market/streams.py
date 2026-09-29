@@ -53,6 +53,8 @@ def parse_fill(row: OrderUpdate | ExecutionReport) -> Trade:
     )
   return Trade(
     id=str(row['t']),
+    order_id=str(row['i']),
+    client_order_id=row['c'] or None,
     price=row['L'],
     qty=row['l'] if row['S'] == 'BUY' else -row['l'],
     time=row['T'],

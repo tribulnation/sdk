@@ -21,6 +21,8 @@ def _parse_trade(t: AccountTrade) -> Trade:
     fee = Trade.Fee(asset=a, amount=Decimal(c))
   return Trade(
     id=str(t.get('id')),
+    order_id=str(t['orderId']),
+    client_order_id=t.get('clientOrderId') or None,
     price=Decimal(t.get('price') or '0'),
     qty=Decimal(t.get('qty') or '0') * sign,
     time=t['time'].astimezone(),
@@ -49,6 +51,9 @@ async def trades_stream(
         sign = 1 if side == 'BUY' else -1
         yield Trade(
           id=msg.trade_id,
+          # Unset proto strings arrive empty.
+          order_id=msg.order_id or None,
+          client_order_id=msg.client_order_id or None,
           price=Decimal(msg.price),
           qty=Decimal(msg.quantity) * sign,
           time=ts.parse(msg.time).astimezone(),

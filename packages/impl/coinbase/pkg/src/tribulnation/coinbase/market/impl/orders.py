@@ -71,9 +71,17 @@ def order_configuration(order: Order) -> OrderConfiguration:
 async def place_order(
   self: MarketMixin, order: Order, *, settings: Settings = {}
 ) -> OrderResponse:
-  """Place an order on the product."""
+  """Place an order on the product.
+
+  Advanced Trade requires a client order id on every order, so a fresh UUID stands in
+  when `order` carries none. Reusing an id does not place a second order: Coinbase
+  answers with the order already placed under it.
+  """
+  client_order_id = order.get('client_order_id')
+  if client_order_id is None:
+    client_order_id = str(uuid.uuid4())
   response = await self.app.advanced_trade.http.orders.create(
-    client_order_id=str(uuid.uuid4()),
+    client_order_id=client_order_id,
     product_id=self.product_id,
     side='BUY' if Decimal(order['qty']) > 0 else 'SELL',
     order_configuration=order_configuration(order),

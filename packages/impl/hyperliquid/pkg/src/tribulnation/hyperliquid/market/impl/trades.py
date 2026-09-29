@@ -41,6 +41,8 @@ async def trades_stream(
             sign = 1 if f['side'] == 'B' else -1
             yield Trade(
               id=str(f.get('tid')),
+              order_id=str(f['oid']),
+              client_order_id=f.get('cloid'),
               price=Decimal(f['px']),
               qty=Decimal(f['sz']) * sign,
               time=_parse_time(f['time']),
@@ -74,6 +76,8 @@ def trades_history(
         trades.append(
           Trade(
             id=str(f.get('tid')),
+            order_id=str(f['oid']),
+            client_order_id=f.get('cloid'),
             price=Decimal(f['px']),
             qty=Decimal(f['sz']) * sign,
             time=f['time'].astimezone(),

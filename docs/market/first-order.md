@@ -115,7 +115,8 @@ expired isn't an error either, so check the state if you need to know which happ
 Fills arrive on `trades_stream` instead of by polling `query_order`: see
 [Streaming](streaming.md). If the market is a perpetual, `perp_collateral()` tells you how
 much room the position has left, in [Collateral & Risk](collateral.md). Every signature is
-in [Methods](methods.md), and every type they return in [Types](types.md).
+in [Methods](methods.md), and every type they return in [Types](types.md). To tell your
+own orders' fills apart, tag orders with [Client Order IDs](client-order-ids.md).
 
 <!-- next -->
 

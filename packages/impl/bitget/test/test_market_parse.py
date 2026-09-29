@@ -283,6 +283,7 @@ def mix_fill(**overrides: Any) -> MixOrderFill:
     MixOrderFill,
     {
       'tradeId': '1',
+      'orderId': '1385741937125322752',
       'price': Decimal('63636.4'),
       'baseVolume': Decimal('0.0001'),
       'side': 'sell',
@@ -345,71 +346,85 @@ def test_a_zero_fee_is_a_fee_and_no_line_items_is_no_fee():
   assert parse_mix_fill(mix_fill(feeDetail=[])).fee is None
 
 
+def spot_fill() -> SpotOwnFill:
+  """One live spot history fill: a maker buy charged `-0.0011002` XRP."""
+  return cast(
+    SpotOwnFill,
+    {
+      'tradeId': '9',
+      'orderId': '1385742101890166784',
+      'side': 'buy',
+      'priceAvg': '1.42',
+      'size': '1.1002',
+      'tradeScope': 'maker',
+      'feeDetail': {
+        'deduction': 'no',
+        'feeCoin': 'XRP',
+        'totalDeductionFee': '0',
+        'totalFee': '-0.0011002',
+      },
+      'cTime': T,
+    },
+  )
+
+
 def test_a_classic_spot_fill_reads_its_single_fee_detail():
   """The spot history nests one fee object rather than a list."""
-  trade = parse_spot_fill(
-    cast(
-      SpotOwnFill,
-      {
-        'tradeId': '9',
-        'side': 'buy',
-        'priceAvg': '1.42',
-        'size': '1.1002',
-        'tradeScope': 'maker',
-        'feeDetail': {
-          'deduction': 'no',
-          'feeCoin': 'XRP',
-          'totalDeductionFee': '0',
-          'totalFee': '-0.0011002',
-        },
-        'cTime': T,
-      },
-    )
-  )
+  trade = parse_spot_fill(spot_fill())
   assert trade.qty == Decimal('1.1002') and trade.maker
   assert trade.fee is not None
   assert (trade.fee.amount, trade.fee.asset) == (Decimal('0.0011002'), 'XRP')
 
 
+def spot_push() -> SpotFill:
+  """One Classic spot `fill` push: a maker buy charged `-0.000001` BTC."""
+  return cast(
+    SpotFill,
+    {
+      'tradeId': '1',
+      'orderId': '1385743312604094464',
+      'symbol': 'BTCUSDT',
+      'side': 'buy',
+      'priceAvg': '78400',
+      'size': '0.001',
+      'tradeScope': 'maker',
+      'feeDetail': [
+        {
+          'deduction': 'no',
+          'totalDeductionFee': '0',
+          'totalFee': '-0.000001',
+          'feeCoin': 'BTC',
+        }
+      ],
+      'cTime': T,
+    },
+  )
+
+
+def mix_push(**overrides: Any) -> MixFill1:
+  """One Classic futures `fill` push: a taker sell with no fee line items."""
+  return cast(
+    MixFill1,
+    {
+      'tradeId': '2',
+      'orderId': '1385743312604094465',
+      'clientOid': '1385743312612483072',
+      'symbol': 'BTCUSDT',
+      'side': 'sell',
+      'price': '78400',
+      'baseVolume': '0.001',
+      'tradeScope': 'taker',
+      'feeDetail': [],
+      'cTime': T,
+      **overrides,
+    },
+  )
+
+
 def test_classic_stream_fills_map_spot_and_futures_shapes_alike():
   """The `fill` channel names price and size differently per product line."""
-  spot = parse_classic_stream_fill(
-    cast(
-      SpotFill,
-      {
-        'tradeId': '1',
-        'symbol': 'BTCUSDT',
-        'side': 'buy',
-        'priceAvg': '78400',
-        'size': '0.001',
-        'tradeScope': 'maker',
-        'feeDetail': [
-          {
-            'deduction': 'no',
-            'totalDeductionFee': '0',
-            'totalFee': '-0.000001',
-            'feeCoin': 'BTC',
-          }
-        ],
-        'cTime': T,
-      },
-    )
-  )
-  mix = parse_classic_stream_fill(
-    cast(
-      MixFill1,
-      {
-        'tradeId': '2',
-        'symbol': 'BTCUSDT',
-        'side': 'sell',
-        'price': '78400',
-        'baseVolume': '0.001',
-        'tradeScope': 'taker',
-        'feeDetail': [],
-        'cTime': T,
-      },
-    )
-  )
+  spot = parse_classic_stream_fill(spot_push())
+  mix = parse_classic_stream_fill(mix_push())
   assert (spot.price, spot.qty, spot.maker) == (Decimal(78400), Decimal('0.001'), True)
   assert spot.fee is not None and spot.fee.amount == Decimal('0.000001')
   assert (mix.price, mix.qty, mix.maker, mix.fee) == (
@@ -422,6 +437,8 @@ def test_classic_stream_fills_map_spot_and_futures_shapes_alike():
 
 UTA_FILL: dict[str, Any] = {
   'execId': '7',
+  'orderId': '1385744520546926592',
+  'clientOid': 'grid-xrp-0042',
   'symbol': 'XRPUSDT',
   'side': 'buy',
   'tradeScope': 'taker',
@@ -456,6 +473,42 @@ def test_a_uta_fee_keeps_its_sign_and_a_streamed_fill_maps_like_its_rest_twin():
     cast(Fill, {**UTA_FILL, 'tradeScope': 'MAKER', 'createdTime': T})
   )
   assert upper.maker
+
+
+def test_classic_history_fills_report_their_order_but_no_client_id():
+  """Classic history rows name the order they filled, never its `clientOid`."""
+  spot = parse_spot_fill(spot_fill())
+  mix = parse_mix_fill(mix_fill())
+  assert (spot.order_id, spot.client_order_id) == ('1385742101890166784', None)
+  assert (mix.order_id, mix.client_order_id) == ('1385741937125322752', None)
+
+
+def test_classic_stream_fills_report_order_and_client_ids():
+  """Only the futures push carries `clientOid`; an empty one means none."""
+  spot = parse_classic_stream_fill(spot_push())
+  mix = parse_classic_stream_fill(mix_push())
+  blank = parse_classic_stream_fill(mix_push(clientOid=''))
+  assert (spot.order_id, spot.client_order_id) == ('1385743312604094464', None)
+  assert (mix.order_id, mix.client_order_id) == (
+    '1385743312604094465',
+    '1385743312612483072',
+  )
+  assert (blank.order_id, blank.client_order_id) == ('1385743312604094465', None)
+
+
+def test_uta_fills_report_order_and_client_ids_in_both_shapes():
+  """The REST row and the stream push both carry `orderId` and `clientOid`."""
+  rest = parse_uta_fill(cast(Fill, {**UTA_FILL, 'createdTime': T}))
+  streamed = parse_uta_stream_fill(cast(FillUpdate, {**UTA_FILL, 'execTime': T}))
+  expected = ('1385744520546926592', 'grid-xrp-0042')
+  assert (rest.order_id, rest.client_order_id) == expected
+  assert (streamed.order_id, streamed.client_order_id) == expected
+  blank: dict[str, Any] = {**UTA_FILL, 'clientOid': ''}
+  assert parse_uta_fill(cast(Fill, {**blank, 'createdTime': T})).client_order_id is None
+  assert (
+    parse_uta_stream_fill(cast(FillUpdate, {**blank, 'execTime': T})).client_order_id
+    is None
+  )
 
 
 def test_candle_rows_keep_the_base_and_quote_volumes():

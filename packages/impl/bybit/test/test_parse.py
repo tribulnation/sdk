@@ -10,6 +10,8 @@ from typed_bybit.trade.trade_history import Execution
 
 ROW: dict[str, Any] = {
   'execId': '1',
+  'orderId': '2291037215381679872',
+  'orderLinkId': '2291037215381679873',
   'execQty': Decimal('200'),
   'execPrice': Decimal('0.9997'),
   'execTime': datetime(2025, 7, 23, 17, 42, 37, tzinfo=timezone.utc),

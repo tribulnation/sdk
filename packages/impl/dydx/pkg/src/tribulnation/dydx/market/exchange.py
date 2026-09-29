@@ -109,7 +109,10 @@ class Exchange(ExchangeMixin, PerpExchange):
   async def trades_history(
     self, market_id: str | None, /, start: datetime, end: datetime
   ) -> AsyncIterable[Sequence[Trade]]:
-    """Fetch fills across all address subaccounts, optionally selecting one market."""
+    """Fetch fills across all address subaccounts, optionally selecting one market.
+
+    Fills name their order by its indexer id alone, so `order_id` is `None`.
+    """
     if market_id is not None:
       async for page in super().trades_history(market_id, start, end):
         yield page

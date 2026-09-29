@@ -117,6 +117,7 @@ def test_trade_rows_map_signed_quantities_and_fees():
   row = trade(2, START, 'SELL')
   assert parse_trade(row) == Trade(
     id='2',
+    order_id='2',
     price=Decimal(100),
     qty=Decimal(-2),
     time=START,

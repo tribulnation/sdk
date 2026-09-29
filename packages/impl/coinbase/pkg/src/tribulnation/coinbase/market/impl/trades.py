@@ -13,11 +13,16 @@ from .mixin import MarketMixin
 
 
 def parse_fill(fill: Fill, *, quote: str) -> Trade:
-  """Map one Advanced Trade fill onto a `Trade`."""
+  """Map one Advanced Trade fill onto a `Trade`.
+
+  A fill carries its order's id but not its client order id -- that lives only on the
+  order itself -- so `client_order_id` stays `None`.
+  """
   sign = 1 if fill['side'] == 'BUY' else -1
   commission = fill['commission']
   return Trade(
     id=fill['trade_id'],
+    order_id=fill['order_id'],
     price=fill['price'],
     qty=sign * fill['size'],
     time=fill['trade_time'],
