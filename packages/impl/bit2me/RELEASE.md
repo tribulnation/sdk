@@ -1,10 +1,10 @@
-# tribulnation-bit2me 0.5.1
+# tribulnation-bit2me 0.7.0 release candidate
 
-Translate native client acquisition and cleanup failures through managed resource
-adapters. Entry and exit policies remain independent; this release adds no automatic
-resource retries. Decorated calls inside the lifecycle retain context middleware.
+Client order IDs and order IDs on fills.
 
-Requires tribulnation-sdk >=2.0.2. Publish after the SDK patch release.
+- `place_order` sends `Order['client_order_id']` unchanged as `clientOrderId`; `None` or no key sends none. `random_client_order_id()` returns 32 random hex digits.
+- Fills from history and streams report `Trade.order_id` and `Trade.client_order_id`.
 
-The release workflow requires fresh passing read-only qualification for this exact
-version and dependency floor before publication.
+Requires tribulnation-sdk >=2.7.0 (`Trade.order_id`, `Trade.client_order_id` and `Order['client_order_id']`, ADR 0029).
+
+Client order IDs and order IDs on fills are covered by unit fixtures; no live trading round trip is recorded.
