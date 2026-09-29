@@ -25,16 +25,6 @@ END = START + timedelta(days=1)
 CLOID = '0x1234567890abcdef1234567890abcdef'
 
 
-def with_cloid(fill: UserFill | StreamFill, cloid: str | None) -> Any:
-  """Add the `cloid` the venue sends on fills of orders placed with one.
-
-  typed-hyperliquid does not declare the key, but its validation keeps it.
-  """
-  if cloid is not None:
-    cast(dict[str, object], fill)['cloid'] = cloid
-  return fill
-
-
 def rest_fill(
   *, oid: int, tid: int, coin: str = 'BTC', cloid: str | None = None
 ) -> UserFill:
@@ -56,7 +46,9 @@ def rest_fill(
     'feeToken': 'USDC',
     'twapId': None,
   }
-  return with_cloid(fill, cloid)
+  if cloid is not None:
+    fill['cloid'] = cloid
+  return fill
 
 
 async def resolve_asset_index(name: str) -> str:
@@ -158,7 +150,7 @@ async def test_trades_stream_order_ids():
   chunks: list[UserFills] = [
     {'fills': [{**fill, 'oid': 1}], 'isSnapshot': True, 'user': '0xfixture'},
     {
-      'fills': [with_cloid({**fill}, CLOID), {**fill, 'oid': 2}],
+      'fills': [{**fill, 'cloid': CLOID}, {**fill, 'oid': 2}],
       'isSnapshot': False,
       'user': '0xfixture',
     },

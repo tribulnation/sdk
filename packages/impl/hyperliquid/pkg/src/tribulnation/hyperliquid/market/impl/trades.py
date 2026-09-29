@@ -1,4 +1,4 @@
-from typing_extensions import AsyncIterable, Mapping, Sequence, Any
+from typing_extensions import AsyncIterable, Sequence, Any
 from contextlib import asynccontextmanager
 from datetime import datetime
 from decimal import Decimal
@@ -8,16 +8,6 @@ from tribulnation.sdk.core import OverflowPolicy
 
 from tribulnation.hyperliquid.core import wrap_exceptions
 from .mixin import SpotMarketMixin, PerpMarketMixin
-
-
-def fill_cloid(fill: Mapping[str, object]) -> str | None:
-  """The `cloid` of the fill's order, if it was placed with one.
-
-  The venue sends `cloid` only on such fills, and typed-hyperliquid does not declare
-  it yet (see `typed-client-issues.md`), so it is read off the validated mapping.
-  """
-  cloid = fill.get('cloid')
-  return cloid if isinstance(cloid, str) else None
 
 
 def _parse_time(value: Any) -> datetime:
@@ -52,7 +42,7 @@ async def trades_stream(
             yield Trade(
               id=str(f.get('tid')),
               order_id=str(f['oid']),
-              client_order_id=fill_cloid(f),
+              client_order_id=f.get('cloid'),
               price=Decimal(f['px']),
               qty=Decimal(f['sz']) * sign,
               time=_parse_time(f['time']),
@@ -87,7 +77,7 @@ def trades_history(
           Trade(
             id=str(f.get('tid')),
             order_id=str(f['oid']),
-            client_order_id=fill_cloid(f),
+            client_order_id=f.get('cloid'),
             price=Decimal(f['px']),
             qty=Decimal(f['sz']) * sign,
             time=f['time'].astimezone(),

@@ -7,7 +7,6 @@ from typing_extensions import AsyncIterable, Callable, Sequence
 from tribulnation.sdk.market import ExchangeFundingPayment, ExchangeTrade, Trade
 
 from .mixin import PerpMixin, SpotMixin
-from .trades import fill_cloid
 
 
 def perp_market_id(coin: str, dex: str | None) -> str | None:
@@ -67,7 +66,7 @@ async def exchange_trades_history(
           market_id=market_id,
           id=str(fill['tid']),
           order_id=str(fill['oid']),
-          client_order_id=fill_cloid(fill),
+          client_order_id=fill.get('cloid'),
           price=Decimal(fill['px']),
           qty=Decimal(fill['sz']) * (1 if fill['side'] == 'B' else -1),
           time=time,
