@@ -1,24 +1,22 @@
-# tribulnation-aster 0.2.0 release candidate
+# tribulnation-aster 0.3.0 release candidate
 
-Moves to `typed-aster` 0.2.0, adds bulk perpetual statistics and supports
-Python 3.10.
+Client order IDs, order IDs on fills, and perpetual trade history.
 
-- `perp_stats` returns index, mark, predicted funding, next funding time and
-  funding interval for all or the selected perpetuals, from the unfiltered premium
-  index and funding configuration (two requests). Open interest is `None`: Aster
-  has no bulk source. A symbol without a published interval reports
-  `funding_interval=None`.
-- `next_funding` raises `MissingData` when the venue publishes no funding interval
-  for the symbol, instead of failing validation.
-- `requires-python` is now `>=3.10`, matching the other implementations.
+- `place_order` sends `Order['client_order_id']` unchanged as `newClientOrderId`
+  (perpetuals take up to 36 of `A-Z a-z 0-9 . : / _ -`); `None` or no key lets the
+  venue generate one. `random_client_order_id()` returns 32 random hex digits.
+- Fills report `Trade.order_id`, and streamed fills also `Trade.client_order_id`.
+- `PerpMarket.trades_history` reads inclusive bounds in native seven-day windows up to
+  the current time, each paged and retried inside the SDK request boundary. Its fills
+  carry `order_id`; the venue's history rows have no client order ID.
 
-Spot balances, trade history, funding payments, available notional and perpetual
-collateral remain unsupported. Wallet, Earn and Report are not routed. See
-dev-docs/aster-market.md.
+Spot trade history stays unsupported: on testnet, spot `userTrades` omits confirmed
+buy fills. Spot balances, funding payments, available notional and perpetual
+collateral remain unsupported. See dev-docs/aster-market.md.
 
-Requires tribulnation-sdk >=2.4.0 and typed-aster >=0.2.0; 0.2.0 adds a required
-client transport, so earlier `typed-aster` versions are incompatible.
+Requires tribulnation-sdk >=2.7.0 (`Order['client_order_id']`, `Trade.order_id` and
+`Trade.client_order_id`, ADR 0029) and typed-aster >=0.2.0.
 
 Release qualification records mainnet public read suites and Market consistency
-against the pinned Catalogue snapshot. Account and trading methods were verified
-live on testnet only; private mainnet behavior is unverified.
+against the pinned Catalogue snapshot. Account and trading methods, including trade
+history and client order IDs, were verified on testnet only.
