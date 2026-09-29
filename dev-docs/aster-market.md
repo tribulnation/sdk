@@ -21,6 +21,7 @@ because the release gate accepts mainnet observations only.
 | Perpetual stats | All or selected contracts; no open interest | Unfiltered `premium_index` joined with unfiltered `funding_info` |
 | Orders | MARKET, LIMIT (GTC), POST_ONLY (GTX); query, open, cancel | Batch cancellation in native chunks of ten |
 | Fills | Shared account stream per exchange | Listen key renewed every 25 minutes, closed with the last subscriber |
+| Trade history | Perpetuals only; inclusive bounds, up to the current time | `user_trades_paged` per seven-day window, each `fromId` page retried alone |
 | Perpetual account | One-way position; cross-margin collateral | `position.risk`, `account.info_with_join_margin` |
 
 ## Credentials
@@ -32,10 +33,10 @@ resolves `ASTER_*` for `aster` and `TEST_ASTER_*` for `aster_testnet`, never mix
 
 ## Unsupported methods and why
 
-1. Trade history: `typed-aster` 0.1.0's `user_trades_paged` added `fromId` while
-   keeping the time filters, which the venue rejects (`-1106`). 0.2.0 fixes the
-   pager, but the mapping is not yet qualified, and spot is additionally blocked by
-   the missing buy fills below.
+1. Spot trade history: spot `user_trades` omits confirmed buy fills (testnet
+   observation 1 below, still true on 2026-09-29). Perpetual trade history is
+   supported on `typed-aster` 0.2.0, whose pager no longer sends the time filters
+   beside `fromId` (`-1106` on 0.1.0).
 2. Spot position and collateral: on testnet, `spot.account.info()` returned
    `balances=[]` after a confirmed 250 USDT transfer and filled orders, while the
    WebSocket reported nonzero balances. Zero would hide known holdings.
@@ -62,6 +63,18 @@ resolves `ASTER_*` for `aster` and `TEST_ASTER_*` for `aster_testnet`, never mix
    testnet exchange information. Mainnet rows were complete. `typed-aster` 0.2.0
    accepts the nulls; bulk `perp_stats` reports them as `funding_interval=None` and
    `next_funding` raises `MissingData`.
+
+## Testnet observations (2026-09-29)
+
+1. Perpetual `userTrades` refuses a window wider than seven days (`-4165`, "Maximum
+   time interval is 7 days."), a future `startTime` (`-4181`) and an `endTime` more
+   than about a day ahead (`-4165`, "Invalid time interval."), even within seven days.
+   Both bounds are inclusive. Windows back to 2020 answer empty, with no retention
+   error.
+2. The 16 ASTERUSDT fills walked at `limit=3` (8 pages) matched one native page
+   exactly, with no repeated or missing trade ID.
+3. Spot `userTrades` still omits buys: over six days of ASTERUSDT, the spot
+   transaction ledger names 12 trade IDs and `userTrades` lists 6, all sells.
 
 ## PoC and live checks
 
