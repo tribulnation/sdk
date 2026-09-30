@@ -17,6 +17,7 @@ component:
 methods:
   snapshot:
     venues:
+      aster: Mainnet perp, spot and Aster Chain staking, signed by the trading agent.
       binance: Spot, Funding and Simple Earn only; no futures compartment.
       kucoin: Classic main/trade and Earn only; futures and legacy margin compartments excluded.
       deribit: Accessible subaccounts; cash balances and signed base-unit positions, not equity-as-cash.
@@ -25,6 +26,7 @@ methods:
     example:
       accountVenues: [hyperliquid]
       constants:
+        aster: {subaccounts: 1, balances: 2}
         binance: {subaccounts: 1, balances: 2}
         bit2me: {subaccounts: 1, balances: 2}
         bybit: {subaccounts: 1, balances: 2}

@@ -11,9 +11,10 @@ methods = [
 note = "Spot and linear perpetuals. Public reads are verified on mainnet; account and trading methods only on testnet. MARKET ignores the SDK price; LIMIT uses GTC and POST_ONLY uses GTX. Depth streams carry up to 20 levels. Position and collateral cover one-way, cross-margin perpetuals only. perp_stats reports no open interest. Perpetual trades_history reads inclusive bounds in native seven-day windows up to the current time. Unsupported: spot balances, spot trade history, funding payments, available_notional and perp_collateral."
 
 [support.report]
-support = "none"
+support = "partial"
 auth = true
-note = "Cash-ledger history exists in the package (tribulnation.aster.Report) but is verified on testnet only and is not routed through ReportSDK."
+methods = ["snapshot"]
+note = "Mainnet snapshots, signed by the trading agent: a `perp` subaccount with the futures wallet balances (without unrealized PnL) and open positions by symbol, a `spot` subaccount with free plus locked balances, and a `staking` subaccount with ASTER staked on Aster Chain (active, pending and unstaking) plus unclaimed rewards. Testnet snapshots raise NotImplementedError: its spot account information omits funded balances. Cash-ledger history exists in the package (tribulnation.aster.Report) but is verified on testnet only."
 
 [support.wallet]
 support = "none"
