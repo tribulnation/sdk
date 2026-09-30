@@ -1,23 +1,21 @@
-# tribulnation-aster 0.3.0 release candidate
+# tribulnation-aster 0.4.0 release candidate
 
-Client order IDs, order IDs on fills, and perpetual trade history.
+Report snapshots.
 
-- `place_order` sends `Order['client_order_id']` unchanged as `newClientOrderId`
-  (perpetuals take up to 36 of `A-Z a-z 0-9 . : / _ -`); `None` or no key lets the
-  venue generate one. `random_client_order_id()` returns 32 random hex digits.
-- Fills report `Trade.order_id`, and streamed fills also `Trade.client_order_id`.
-- `PerpMarket.trades_history` reads inclusive bounds in native seven-day windows up to
-  the current time, each paged and retried inside the SDK request boundary. Its fills
-  carry `order_id`; the venue's history rows have no client order ID.
+- `Report.snapshot()` reads mainnet, signed by the trading agent: a `perp` subaccount
+  with the futures wallet balances (no unrealized PnL) and open positions by symbol
+  with their entry prices, a `spot` subaccount with free plus locked balances, and a
+  `staking` subaccount with ASTER staked on Aster Chain (active, pending and
+  unstaking) plus unclaimed rewards. Hedge-mode legs merge into one net position.
+- `ReportSDK` routes Aster accounts for snapshots.
+- Testnet snapshots raise `NotImplementedError`: testnet spot account information
+  omits funded balances. `history()` is unchanged and verified on testnet only.
 
-Spot trade history stays unsupported: on testnet, spot `userTrades` omits confirmed
-buy fills. Spot balances, funding payments, available notional and perpetual
-collateral remain unsupported. See dev-docs/aster-market.md.
+Requires tribulnation-sdk >=2.8.0 (`ReportSDK` routing) and typed-aster >=0.2.0.
 
-Requires tribulnation-sdk >=2.7.0 (`Order['client_order_id']`, `Trade.order_id` and
-`Trade.client_order_id`, ADR 0029) and typed-aster >=0.2.0.
-
-Release qualification records mainnet public read suites and Market consistency
-against the pinned Catalogue snapshot. Account and trading methods, including
-perpetual trade history, were verified on testnet only. Client order IDs and order IDs
-on fills are covered by unit fixtures; no live trading round trip is recorded.
+Release qualification records mainnet read suites, including the signed Report
+snapshot of a funded account, and Market consistency against the pinned Catalogue
+snapshot. The snapshot matched the address-only `aster_getBalance` wallets and its
+implied entry price. The qualification account holds no spot balance or stake, so
+those subaccounts were read empty. Account and trading methods remain verified on
+testnet.
