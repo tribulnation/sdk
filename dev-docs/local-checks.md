@@ -26,7 +26,9 @@ file's own directory, so an accounts file elsewhere silently runs without creden
 1. Each mainnet account is named by its venue slug and is the only configured
    account of that venue, so `sdk-dev test surfaces|consistency <venue>` selects it
    without `--account`. dYdX, Hyperliquid, Lighter and Aster are `public = true`;
-   dYdX and Hyperliquid carry the mainnet address their Report reads need.
+   dYdX, Hyperliquid and Lighter carry the mainnet address their Report reads need.
+   Aster's Report is signed: it reads `ASTER_USER` and `ASTER_SIGNER_PRIVATE_KEY`,
+   which also make its otherwise public Market client signed.
 2. Testnet accounts use `<venue>_testnet` ids and venues, so no mainnet slug
    selects them. Name them explicitly for testnet diagnostics.
 3. Bitget has two mainnet accounts, each with an explicit `uta` mode. Qualify with
