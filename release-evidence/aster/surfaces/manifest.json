@@ -334,8 +334,8 @@
       },
       "tribulnation-aster": {
         "files_sha256": "9e7713c2a70e98638677e24aea8dbc40033d0189442f006f0286a09dc42f5eda",
-        "metadata_sha256": "22b3798b54006a5035e79cb26ccce45fe26200fce0a30682fea32289d55f823e",
-        "version": "0.3.0"
+        "metadata_sha256": "3af0288c606a4eeea840d21854b09edfbd859c4ea0b3e4d7b0a2575235a02a1c",
+        "version": "0.4.0"
       },
       "tribulnation-catalogue": {
         "files_sha256": "cc0f80b637e99025143487234b15bb04a485f7617c5bbde9a8ffa58ea714bd76",
@@ -380,7 +380,7 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "0c4f620e2c8a6e4e2689200b0903aa976a41ecbdc7e03454f6bfddf5fd94c204",
+    "source_sha256": "e73edee045d9b4ee4c714b0bafda3f448d12258cdacc4a588611f075264de40b",
     "venue": "aster"
   },
   "before": {
@@ -718,8 +718,8 @@
       },
       "tribulnation-aster": {
         "files_sha256": "9e7713c2a70e98638677e24aea8dbc40033d0189442f006f0286a09dc42f5eda",
-        "metadata_sha256": "22b3798b54006a5035e79cb26ccce45fe26200fce0a30682fea32289d55f823e",
-        "version": "0.3.0"
+        "metadata_sha256": "3af0288c606a4eeea840d21854b09edfbd859c4ea0b3e4d7b0a2575235a02a1c",
+        "version": "0.4.0"
       },
       "tribulnation-catalogue": {
         "files_sha256": "cc0f80b637e99025143487234b15bb04a485f7617c5bbde9a8ffa58ea714bd76",
@@ -764,12 +764,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "0c4f620e2c8a6e4e2689200b0903aa976a41ecbdc7e03454f6bfddf5fd94c204",
+    "source_sha256": "e73edee045d9b4ee4c714b0bafda3f448d12258cdacc4a588611f075264de40b",
     "venue": "aster"
   },
-  "finished": "2026-09-30T17:46:00.835845Z",
+  "finished": "2026-09-30T18:09:13.798306Z",
   "results_sha256": "1315b920fdb4179d9fb56b40586f290bc5021501abf58678b2bf602ef91213ae",
   "schema_version": 1,
-  "started": "2026-09-30T17:45:45.499490Z",
-  "summary_sha256": "b9230e52a75b2dfa1879bd651977c70c51e38ac13a117b5f3d7c6341fa7f5077"
+  "started": "2026-09-30T18:08:57.456144Z",
+  "summary_sha256": "a17e8c1ba598b36ea9f9ad199ef5f7110d16ffbd2a8723c829d9bfe99d0c3778"
 }
