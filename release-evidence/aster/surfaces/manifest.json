@@ -168,9 +168,9 @@
         "version": "1.19.5"
       },
       "lazy-loader": {
-        "files_sha256": "c952ac820a93855d91b1aed4ba349585e8dcf83a3f346dae9c93b2e262bd3386",
-        "metadata_sha256": "1cbda4f55b3645a44e4469118964308571542162859fa10b125bb6971fb5040d",
-        "version": "0.5"
+        "files_sha256": "451dd1ed216742bf51dc526921c329d1459ab93b552f0c098a3b4d9a4751ae53",
+        "metadata_sha256": "ed9318b126e496e01296ed839cefd998df3af74a83c1206153663958f3a40a44",
+        "version": "0.6"
       },
       "markdown-it-py": {
         "files_sha256": "a1a1d006f83a291479299b548dabd85cb0290e46aa5e9987003abc282050833c",
@@ -303,7 +303,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "7d75de4ab699b0434cd8d3533ac2cac7d3caa54fd5c7cc6ab3ac894901efb5e9",
+        "files_sha256": "4cee34d7b939b2975d626834bfbe0c435df2dbe29192bae759a80a3d9ed43370",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -333,19 +333,19 @@
         "version": "5.16.1"
       },
       "tribulnation-aster": {
-        "files_sha256": "ed6932bffc1849f19a88a00cca6f9c8700dbd7b4876fdd1140584bc219db8b06",
+        "files_sha256": "9e7713c2a70e98638677e24aea8dbc40033d0189442f006f0286a09dc42f5eda",
         "metadata_sha256": "22b3798b54006a5035e79cb26ccce45fe26200fce0a30682fea32289d55f823e",
         "version": "0.3.0"
       },
       "tribulnation-catalogue": {
-        "files_sha256": "07225a2d329bf2f29bd5ef71e5df6ed66093f799c2bfe8a00ad788cf854e7167",
-        "metadata_sha256": "e30c61eb1be805f5af1cc27d1d153a4c9e1866c7cdfe8ed6cd8252df4357bd38",
-        "version": "0.3.3"
+        "files_sha256": "cc0f80b637e99025143487234b15bb04a485f7617c5bbde9a8ffa58ea714bd76",
+        "metadata_sha256": "b7c43ed2be8d3dcd146c3eca52dd234a4bf4ccbdfd697152c6c3b798f1f0d970",
+        "version": "0.3.7"
       },
       "tribulnation-sdk": {
-        "files_sha256": "4ef6c26b916efe53be569c0433ccf48f0706f8ad3809fa5095c46cd35fc9e6f0",
-        "metadata_sha256": "08df6686141fce020d15cc9eeafc043a38a851e1a07756655aae4b9253fef0a8",
-        "version": "2.7.0"
+        "files_sha256": "7fb69e5213a679b6e7a9be4923f8b0123a42b0b5df91e66395a16c8a18b30685",
+        "metadata_sha256": "5ed9cf987dea8d46a9a2f2200531f4d289307cdd7fbf9c5ae0429d6329b4270f",
+        "version": "2.8.0"
       },
       "typed-aster": {
         "files_sha256": "f22319c550e30d7a5d8aa0d14c8bba61c742d5d60fd2248bdc7b382aaf718aa5",
@@ -380,7 +380,7 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "086645e184f0b22aa15db8b8702a152002ad4c4a3ccaadd676869e8c0a707b95",
+    "source_sha256": "0c4f620e2c8a6e4e2689200b0903aa976a41ecbdc7e03454f6bfddf5fd94c204",
     "venue": "aster"
   },
   "before": {
@@ -552,9 +552,9 @@
         "version": "1.19.5"
       },
       "lazy-loader": {
-        "files_sha256": "c952ac820a93855d91b1aed4ba349585e8dcf83a3f346dae9c93b2e262bd3386",
-        "metadata_sha256": "1cbda4f55b3645a44e4469118964308571542162859fa10b125bb6971fb5040d",
-        "version": "0.5"
+        "files_sha256": "451dd1ed216742bf51dc526921c329d1459ab93b552f0c098a3b4d9a4751ae53",
+        "metadata_sha256": "ed9318b126e496e01296ed839cefd998df3af74a83c1206153663958f3a40a44",
+        "version": "0.6"
       },
       "markdown-it-py": {
         "files_sha256": "a1a1d006f83a291479299b548dabd85cb0290e46aa5e9987003abc282050833c",
@@ -687,7 +687,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "7d75de4ab699b0434cd8d3533ac2cac7d3caa54fd5c7cc6ab3ac894901efb5e9",
+        "files_sha256": "4cee34d7b939b2975d626834bfbe0c435df2dbe29192bae759a80a3d9ed43370",
         "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
         "version": "0.1.0"
       },
@@ -717,19 +717,19 @@
         "version": "5.16.1"
       },
       "tribulnation-aster": {
-        "files_sha256": "ed6932bffc1849f19a88a00cca6f9c8700dbd7b4876fdd1140584bc219db8b06",
+        "files_sha256": "9e7713c2a70e98638677e24aea8dbc40033d0189442f006f0286a09dc42f5eda",
         "metadata_sha256": "22b3798b54006a5035e79cb26ccce45fe26200fce0a30682fea32289d55f823e",
         "version": "0.3.0"
       },
       "tribulnation-catalogue": {
-        "files_sha256": "07225a2d329bf2f29bd5ef71e5df6ed66093f799c2bfe8a00ad788cf854e7167",
-        "metadata_sha256": "e30c61eb1be805f5af1cc27d1d153a4c9e1866c7cdfe8ed6cd8252df4357bd38",
-        "version": "0.3.3"
+        "files_sha256": "cc0f80b637e99025143487234b15bb04a485f7617c5bbde9a8ffa58ea714bd76",
+        "metadata_sha256": "b7c43ed2be8d3dcd146c3eca52dd234a4bf4ccbdfd697152c6c3b798f1f0d970",
+        "version": "0.3.7"
       },
       "tribulnation-sdk": {
-        "files_sha256": "4ef6c26b916efe53be569c0433ccf48f0706f8ad3809fa5095c46cd35fc9e6f0",
-        "metadata_sha256": "08df6686141fce020d15cc9eeafc043a38a851e1a07756655aae4b9253fef0a8",
-        "version": "2.7.0"
+        "files_sha256": "7fb69e5213a679b6e7a9be4923f8b0123a42b0b5df91e66395a16c8a18b30685",
+        "metadata_sha256": "5ed9cf987dea8d46a9a2f2200531f4d289307cdd7fbf9c5ae0429d6329b4270f",
+        "version": "2.8.0"
       },
       "typed-aster": {
         "files_sha256": "f22319c550e30d7a5d8aa0d14c8bba61c742d5d60fd2248bdc7b382aaf718aa5",
@@ -764,12 +764,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "086645e184f0b22aa15db8b8702a152002ad4c4a3ccaadd676869e8c0a707b95",
+    "source_sha256": "0c4f620e2c8a6e4e2689200b0903aa976a41ecbdc7e03454f6bfddf5fd94c204",
     "venue": "aster"
   },
-  "finished": "2026-09-29T17:12:42.668162Z",
-  "results_sha256": "ed165371e0a17b0a2f1019d234e8b2c22247c5a82c5e56bcdc9825b2177f84ec",
+  "finished": "2026-09-30T17:46:00.835845Z",
+  "results_sha256": "1315b920fdb4179d9fb56b40586f290bc5021501abf58678b2bf602ef91213ae",
   "schema_version": 1,
-  "started": "2026-09-29T17:12:25.032931Z",
-  "summary_sha256": "e6cb4c54592404d1cd44c05e20122258818d9a9ab365ddfc42e17d56cf8a6d79"
+  "started": "2026-09-30T17:45:45.499490Z",
+  "summary_sha256": "b9230e52a75b2dfa1879bd651977c70c51e38ac13a117b5f3d7c6341fa7f5077"
 }
