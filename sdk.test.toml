@@ -65,6 +65,7 @@ venue = "kucoin"
 
 [accounts.lighter]
 venue = "lighter"
+address = "$LIGHTER_ADDRESS"
 public = true
 
 [accounts.mexc]
