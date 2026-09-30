@@ -339,8 +339,8 @@
       },
       "tribulnation-lighter": {
         "files_sha256": "ed47402271e6e4edc619792d3d9d7d02edb2cb7d1e6959aa55a3ba1c3e6ded0f",
-        "metadata_sha256": "98ce881b4f5871e31079cbe2286b36c85adf8dba733b5abacab866fce6f04f22",
-        "version": "0.2.0"
+        "metadata_sha256": "0d565abf44629c6faa5b10aae7fc3e6d694398a094f328863d781e526be30e2b",
+        "version": "0.3.0"
       },
       "tribulnation-sdk": {
         "files_sha256": "7fb69e5213a679b6e7a9be4923f8b0123a42b0b5df91e66395a16c8a18b30685",
@@ -380,7 +380,7 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "6db27d135fb65320f519ae716cf79eff26f0f5373474c73c94165c5dd8f05305",
+    "source_sha256": "cc28fc8363840c59614a76b9bef428ebdbe19aa87ffdfb3e80f6f1cebb14373e",
     "venue": "lighter"
   },
   "before": {
@@ -723,8 +723,8 @@
       },
       "tribulnation-lighter": {
         "files_sha256": "ed47402271e6e4edc619792d3d9d7d02edb2cb7d1e6959aa55a3ba1c3e6ded0f",
-        "metadata_sha256": "98ce881b4f5871e31079cbe2286b36c85adf8dba733b5abacab866fce6f04f22",
-        "version": "0.2.0"
+        "metadata_sha256": "0d565abf44629c6faa5b10aae7fc3e6d694398a094f328863d781e526be30e2b",
+        "version": "0.3.0"
       },
       "tribulnation-sdk": {
         "files_sha256": "7fb69e5213a679b6e7a9be4923f8b0123a42b0b5df91e66395a16c8a18b30685",
@@ -764,12 +764,12 @@
     },
     "python": "3.12",
     "schema_version": 1,
-    "source_sha256": "6db27d135fb65320f519ae716cf79eff26f0f5373474c73c94165c5dd8f05305",
+    "source_sha256": "cc28fc8363840c59614a76b9bef428ebdbe19aa87ffdfb3e80f6f1cebb14373e",
     "venue": "lighter"
   },
-  "finished": "2026-09-30T17:55:06.400411Z",
+  "finished": "2026-09-30T18:08:19.506831Z",
   "results_sha256": "e3aceed97c6cf971dccaf93aa5035b05650b589cd84fdefb77098e23950c68df",
   "schema_version": 1,
-  "started": "2026-09-30T17:54:54.710832Z",
-  "summary_sha256": "fe17fa24515c652d57783666a067d05b24e93ce57bf7f4410d4da20148e021ff"
+  "started": "2026-09-30T18:08:08.344373Z",
+  "summary_sha256": "b0c3f2a3cf13efaf99747f0e501d292c26f2bb89113582cbcadd69868ae1532c"
 }
