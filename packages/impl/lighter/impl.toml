@@ -8,6 +8,13 @@ note = "Perpetuals (`perp`) and spot (`spot`). Market ids are the venue's numeri
 # MarketSDK.DEFAULT_ACCOUNTS includes 'lighter' (Lighter(public=True)): public market data
 # only. Account-scoped and trading methods need an API key.
 
+[support.report]
+support = "partial"
+auth = true
+methods = ["snapshot"]
+note = "Snapshots read every account (master and sub-accounts) of an L1 `address`, credential-free; without one, the address is resolved from the configured `account_index`. Each account is a `<index>` subaccount: spot plus margin balances, isolated positions' allocated margin, and open positions by `market_id`, without unrealized PnL. Pool shares (public pools, the LLP and LIT staking) are `<index>:pool:<pool>` subaccounts holding the pro-rata part of the pool's USDC equity and other balances; LIT in its unstaking lockup is `<index>:unlocking`. A pool the address operates contributes only the operator's shares, as `<pool>:operator`. History is not supported."
+# ReportSDK never has a DEFAULT_ACCOUNTS entry for any venue.
+
 [ids]
 asset = "index"
 market = "The venue's numeric `market_id` as a decimal string (`'0'` ETH and `'1'` BTC perpetuals, `'2048'` ETH/USDC spot on mainnet): the on-chain id orders are signed with. Symbols are API metadata only."

@@ -5,6 +5,7 @@
 
 # %%
 from datetime import datetime, timedelta, timezone
+import asyncio
 from typing_extensions import AsyncIterable, Collection
 from dotenv import dotenv_values
 from typed_aster import Aster
@@ -38,7 +39,7 @@ print(
   surface(
     'typed_aster',
     'Aster',
-    grep=r'(spot|futures)\.account\.(info|balance|income|transaction_history)|futures\.position\.risk',
+    grep=r'(spot|futures)\.account\.(info|balance|income|transaction_history)|futures\.position\.risk|chain\.rpc\.get_balance',
   )
 )
 
@@ -47,38 +48,104 @@ print(
 # ## `snapshot`
 #
 # Fetch the current balances and positions of the account.
-
+#
+# **Mainnet**, signed by the trading agent (`ASTER_USER`, `ASTER_SIGNER_PRIVATE_KEY` in the
+# repo's `.env`). Two subaccounts, named as `history` names them: `perp` holds the
+# futures wallet balances (`balance`, without unrealized PnL) and the open positions by
+# symbol with their `entryPrice`; `spot` holds free plus locked spot balances. The
+# address-only `aster_getBalance` RPC reports the same wallets but no entry price; it is
+# read beside them as a cross-check.
+#
+# `staking` is ASTER delegated on Aster Chain, which only Aster's API serves: the RPC's
+# staking summary, summing active, pending and unstaking amounts with unclaimed rewards.
 
 # %%
+from decimal import Decimal
+import os
+
+from dotenv import load_dotenv
+from tribulnation.sdk.reporting import Position, Snapshot, SubaccountSnapshot
+
+load_dotenv(repo_root() / '.env')
+mainnet = await Aster.new(
+  user=os.environ['ASTER_USER'], signer=os.environ['ASTER_SIGNER_PRIVATE_KEY']
+).__aenter__()
+
+
 async def snapshot(assets: Collection[str] | None = None) -> SnapshotRecord:
-  """Avoid an incomplete account snapshot while native spot balances are missing."""
-  raise NotImplementedError(
-    'Testnet spot account.info omits funded balances; see dev-docs/aster-market.md'
+  """Perp wallet balances and positions, and spot balances."""
+  futures, risks, spot, chain = await asyncio.gather(
+    mainnet.futures.account.balance(),
+    mainnet.futures.position.risk(),
+    mainnet.spot.account.info(),
+    mainnet.chain.rpc.get_balance(address=os.environ['ASTER_USER']),
+  )
+  summary = chain.get('staking') or {}
+  staked: dict[str, Decimal] = {}
+  for amount in (
+    summary.get('totalStakedAmount'),
+    summary.get('totalPendingStakeAmount'),
+    summary.get('totalPendingUnstakeAmount'),
+  ):
+    if amount:
+      staked['ASTER'] = staked.get('ASTER', Decimal(0)) + amount
+  for reward in summary.get('totalUnclaimedRewards') or []:
+    if reward['amount']:
+      staked[reward['asset']] = (
+        staked.get(reward['asset'], Decimal(0)) + reward['amount']
+      )
+  sides: dict[str, list[Position]] = {}
+  for r in risks:
+    if r['positionAmt']:
+      sides.setdefault(r['symbol'], []).append(
+        Position(size=r['positionAmt'], avg_price=r['entryPrice'])
+      )
+  snap = Snapshot(
+    subaccounts=[
+      SubaccountSnapshot(
+        subaccount='perp',
+        balances={r['asset']: r['balance'] for r in futures if r['balance']},
+        positions={s: Position.merge(p) for s, p in sides.items()},
+      ),
+      SubaccountSnapshot(
+        subaccount='spot',
+        balances={
+          b['asset']: b['free'] + b['locked']
+          for b in spot['balances']
+          if b['free'] + b['locked']
+        },
+      ),
+      SubaccountSnapshot(subaccount='staking', balances=staked),
+    ]
+  )
+  return SnapshotRecord(
+    snapshot=snap,
+    provenance={'source': 'api', 'service': 'aster', 'id': snap.time.isoformat()},
   )
 
 
-try:
-  await snapshot()
-except NotImplementedError as exc:
-  print(str(exc))
+record = await snapshot()
+record.snapshot.subaccounts
 
-# Keep the conflicting native sources visible without emitting a partial Snapshot.
-spot = await client.spot.account.info()
-futures = await client.futures.account.balance()
-spot_transfers = await client.spot.account.transaction_history(
-  type='TRANSFER_FUTURE_TO_SPOT'
-)
+# %% [markdown]
+# Cross-check against the address-only RPC: the same perp and spot wallets, and position
+# sizes; `notionalValue - unrealizedProfit` over the size reproduces `entryPrice`.
+
+# %%
+rpc = await mainnet.chain.rpc.get_balance(address=os.environ['ASTER_USER'])
 {
-  'spot_balances': spot['balances'],
-  'spot_transfers': [
-    (r['tranId'], r['asset'], r['balanceDelta']) for r in spot_transfers
+  'perp': {a['asset']: a['walletBalance'] for a in rpc.get('perpAssets', [])},
+  'spot': {a['asset']: a['walletBalance'] for a in rpc.get('spotAssets', [])},
+  'positions': [
+    (
+      p['symbol'],
+      p['positionAmount'],
+      p.get('notionalValue', Decimal(0)) - p.get('unrealizedProfit', Decimal(0)),
+    )
+    for group in rpc.get('positions', [])
+    for p in group['positions']
   ],
-  'futures_balances': {r['asset']: r['balance'] for r in futures if r['balance']},
-  'futures_positions': [
-    (r['symbol'], r['positionAmt'], r['entryPrice'])
-    for r in await client.futures.position.risk()
-    if r['positionAmt']
-  ],
+  'staking': rpc.get('staking'),
 }
 
 
@@ -89,6 +156,7 @@ spot_transfers = await client.spot.account.transaction_history(
 
 
 # %%
+# not executed: testnet history needs `ASTER_*` testnet credentials in packages/impl/aster/poc/.env; verified there before this snapshot work
 async def history(
   start: datetime | None = None, end: datetime | None = None
 ) -> AsyncIterable[HistoryRecord]:
@@ -150,14 +218,16 @@ len(records), records
 # %% [markdown]
 # ## Coverage
 #
-# Testnet only. Snapshot is blocked by the missing native spot balance view.
+# Snapshot ran on mainnet: the signed wallets match the RPC, and `entryPrice` reproduces
+# its `notionalValue - unrealizedProfit`. Testnet snapshots stay unsupported: testnet spot
+# `account.info` omits funded balances. History ran on testnet only.
 # History preserves signed native cash deltas as `UnknownObservation`, with endpoint-scoped
 # provenance and the original category in details. It does not classify trades, internal
 # transfers, deposits or staking; it is not a complete position ledger.
 #
 # | method | status | note |
 # |---|---|---|
-# | `snapshot` | blocked | Spot native balances remain empty despite confirmed funding and fills; dev-docs/aster-market.md |
+# | `snapshot` | verified | Mainnet: USDC and a negative USDT perp wallet, a FOLKSUSDT long. Spot and staking empty (all staking fields `null`); no public staker was found to populate them |
 # | `history` | verified | Nonempty native spot/perp cash ledgers; distinct IDs for shared-transaction asset/category legs; unclassified observations |
 
 # %% [markdown]
@@ -168,6 +238,15 @@ len(records), records
 # %%
 from sdk_dev.catalogue import Ids, gap, load_catalogue
 
+record = await snapshot()
+gap(
+  'aster',
+  Ids(assets=set(record.snapshot.balances), positions=set(record.snapshot.positions)),
+  load_catalogue(root=repo_root()),
+)
+
+# %%
+# not executed: testnet history needs `ASTER_*` testnet credentials in packages/impl/aster/poc/.env
 records = [r async for r in history(start, end)]
 ids = Ids(
   assets={
@@ -181,3 +260,4 @@ gap('aster', ids, load_catalogue(root=repo_root()))
 
 # %%
 await client.__aexit__(None, None, None)  # pyright: ignore[reportUnknownMemberType] -- upstream lifecycle parameters are untyped
+await mainnet.__aexit__(None, None, None)  # pyright: ignore[reportUnknownMemberType] -- upstream lifecycle parameters are untyped

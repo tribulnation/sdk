@@ -352,6 +352,9 @@ class Lighter(BaseAccount):
   """API key slot; defaults to the network's `API_KEY_INDEX` variable."""
   api_private_key: str | None = None
   """API key private key; defaults to the network's `API_PRIVATE_KEY` variable."""
+  address: str | None = None
+  """L1 address owning the accounts, for reports; defaults to the network's `ADDRESS`
+  variable. Optional: reports otherwise resolve it from the account index."""
   validate: bool = True
   """Whether to type-validate incoming responses."""
 
@@ -385,6 +388,11 @@ class Lighter(BaseAccount):
     return resolve_env_var(
       self.api_private_key or f'${self.prefix}_API_PRIVATE_KEY', require=not self.public
     )
+
+  @property
+  def resolved_address(self) -> str | None:
+    """The L1 address, never mixing networks; optional even for private accounts."""
+    return resolve_env_var(self.address or f'${self.prefix}_ADDRESS', require=False)
 
   def verify_env_vars(self):
     """Fail before constructing private clients when credentials are missing."""

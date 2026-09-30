@@ -17,13 +17,16 @@ component:
 methods:
   snapshot:
     venues:
+      aster: Mainnet perp, spot and Aster Chain staking, signed by the trading agent.
       binance: Spot, Funding and Simple Earn only; no futures compartment.
       kucoin: Classic main/trade and Earn only; futures and legacy margin compartments excluded.
       deribit: Accessible subaccounts; cash balances and signed base-unit positions, not equity-as-cash.
       ethereum: Requires an address and configured data providers; provider settings can be supplied in Python.
+      lighter: Every account of the L1 address (or of the account index's owner), credential-free; pool shares as pro-rata pool holdings.
     example:
       accountVenues: [hyperliquid]
       constants:
+        aster: {subaccounts: 1, balances: 2}
         binance: {subaccounts: 1, balances: 2}
         bit2me: {subaccounts: 1, balances: 2}
         bybit: {subaccounts: 1, balances: 2}
@@ -34,6 +37,7 @@ methods:
         hyperliquid: {subaccounts: 1, balances: 2}
         kraken: {subaccounts: 1, balances: 2}
         kucoin: {subaccounts: 1, balances: 2}
+        lighter: {subaccounts: 1, balances: 2}
         mexc: {subaccounts: 1, balances: 2}
       callTemplate: |
         sdk = report.venue('{{ accounts[0] }}')

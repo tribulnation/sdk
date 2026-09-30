@@ -37,5 +37,23 @@ With no arguments, the client reads `LIGHTER_ACCOUNT_INDEX`, `LIGHTER_API_KEY_IN
 5. Perpetual collateral covers cross and isolated positions. Spot collateral supports
    unified accounts only.
 
+`Report` snapshots every account (master and sub-accounts) of an L1 address, with no
+credentials:
+
+```python
+from tribulnation.lighter import Report
+
+async with Report.new('0x…') as report:
+  record = await report.snapshot()
+```
+
+Each account is a `<index>` subaccount with its spot and margin balances, isolated
+margin, and positions. Pool shares (public pools, the LLP, LIT staking) are
+`<index>:pool:<pool>` subaccounts holding the pro-rata part of the pool's balances; an
+operated pool contributes only the operator's shares. `Report.new` also takes the index
+of any account instead, and looks up its address. Through `ReportSDK`, the account's
+`address` (default `LIGHTER_ADDRESS`) is used when set, else its `account_index`, so a
+`MarketSDK` account configuration works unchanged. `history()` is not supported.
+
 See [Lighter Market](../../../docs/market/implementations/lighter.md) for account
 configuration through `MarketSDK` and venue-specific semantics.

@@ -28,9 +28,12 @@ venue = AsterMarket.new(user='0x…', signer='0x…', mainnet=False)
    collateral cover one-way, cross-margin accounts. These are verified on testnet only.
 4. Unsupported methods raise `NotImplementedError`: spot balances, spot trade history,
    funding payments, `available_notional` and `perp_collateral`.
-5. `tribulnation.aster.Report` streams perpetual income and spot transactions as
-   unclassified cash deltas. It is verified on testnet only and not routed through
-   `ReportSDK`.
+5. `tribulnation.aster.Report` snapshots, through `ReportSDK`, the mainnet `perp` wallet
+   (without unrealized PnL) and positions with their entry prices, the `spot` wallet,
+   and ASTER staked on Aster Chain with its unclaimed rewards, signed by the trading
+   agent. Testnet snapshots are unsupported. Its
+   `history()` streams perpetual income and spot transactions as unclassified cash
+   deltas, verified on testnet only.
 
 See [Aster Market](../../../docs/market/implementations/aster.md) for account
 configuration through `MarketSDK`.

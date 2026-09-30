@@ -8,7 +8,7 @@ import pydantic
 import pytest
 from typing_extensions import cast
 
-from tribulnation.sdk.impl.accounts import Account, Dydx, Hyperliquid
+from tribulnation.sdk.impl.accounts import Account, Aster, Dydx, Hyperliquid, Lighter
 from sdk_dev.repo import IMPL_DIR, repo_root
 from sdk_dev.support import ImplSurfaceSupport, load_impl_files
 
@@ -82,7 +82,24 @@ def require_credentials(account: Account, *, auth: bool = False):
 
 
 def require_report_credentials(account: Account):
-  """Public chain/indexer reports need an address, never a signing secret."""
+  """Public chain/indexer reports need an address, never a signing secret; Aster's
+  are signed by the trading agent, even on an account whose market data is public."""
+  if isinstance(account, Aster):
+    try:
+      configured = account.resolved_user and account.resolved_signer
+    except ValueError:
+      configured = None
+    if not configured:
+      pytest.skip('Report checks require a configured user and signer')
+    return
+  if isinstance(account, Lighter):
+    try:
+      owner = account.resolved_address or account.resolved_account_index
+    except ValueError:
+      owner = None
+    if owner is None:
+      pytest.skip('Report checks require a configured address or account index')
+    return
   if isinstance(account, (Dydx, Hyperliquid)):
     try:
       address = account.resolved_address

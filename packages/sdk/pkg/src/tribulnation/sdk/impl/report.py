@@ -6,6 +6,7 @@ from tribulnation.sdk.reporting import Report
 from tribulnation.sdk.reporting.config import ProvidersConfig
 from .accounts import (
   Account,
+  Aster,
   Dydx,
   Evm,
   Binance,
@@ -18,6 +19,7 @@ from .accounts import (
   Deribit,
   Mexc,
   Hyperliquid,
+  Lighter,
   load_accounts,
 )
 
@@ -208,6 +210,39 @@ class ReportSDK:
       },
     )
 
+  def aster(self, account: Aster, id: str) -> Report:
+    """Build Aster's snapshots, signed by the account's trading agent."""
+    try:
+      from tribulnation.aster import Report as AsterReport
+    except ImportError as e:
+      raise ImportError(
+        'aster sdk is not installed. Please install it with `pip install tribulnation-aster`.'
+      ) from e
+    return AsterReport.new(
+      user=account.resolved_user,
+      signer=account.resolved_signer,
+      mainnet=account.venue == 'aster',
+      validate=account.validate,
+    )
+
+  def lighter(self, account: Lighter, id: str) -> Report:
+    """Build Lighter's credential-free snapshots of every account of the L1 address,
+    given directly or resolved from the account index."""
+    try:
+      from tribulnation.lighter import Report as LighterReport
+    except ImportError as e:
+      raise ImportError(
+        'lighter sdk is not installed. Please install it with `pip install tribulnation-lighter`.'
+      ) from e
+    owner = account.resolved_address or account.resolved_account_index
+    if owner is None:
+      raise ValueError(f'Account {id} has neither an address nor an account index.')
+    return LighterReport.new(
+      owner,
+      network='mainnet' if account.venue == 'lighter' else 'testnet',
+      validate=account.validate,
+    )
+
   def venue(self, id: str, /) -> Report:
     if (account := self.accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
@@ -245,6 +280,10 @@ class ReportSDK:
         return self.kucoin(account, id)
       case 'deribit' | 'deribit_testnet':
         return self.deribit(account, id)
+      case 'lighter' | 'lighter_testnet':
+        return self.lighter(account, id)
+      case 'aster' | 'aster_testnet':
+        return self.aster(account, id)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 
