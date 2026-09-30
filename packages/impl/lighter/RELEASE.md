@@ -1,17 +1,25 @@
-# tribulnation-lighter 0.2.0 release candidate
+# tribulnation-lighter 0.3.0 release candidate
 
-Order IDs on fills.
+Report snapshots.
 
-- Fills from history and streams report `Trade.order_id`: the client order index of
-  the account's side, which is the SDK's order ID on Lighter. An order placed outside
-  the SDK (index 0) reports `None`.
-- `Order['client_order_id']` is ignored, since Lighter's only client-chosen field is
-  that order index, and `random_client_order_id()` returns `None`.
-  `Trade.client_order_id` is always `None`.
+- `Report.new(owner)` snapshots every account (master and sub-accounts) of an L1
+  address, credential-free; given an account index instead, it looks up that
+  account's address first. `ReportSDK` uses the account's `address`, else its
+  `account_index`.
+- Each account is a `<index>` subaccount: spot plus margin balances and the margin
+  allocated to isolated positions (no unrealized PnL), and signed positions by
+  `market_id`.
+- Pool shares (public pools, the LLP, LIT staking) are `<index>:pool:<pool>`
+  subaccounts holding the pro-rata part of the pool's USDC equity and other balances.
+  A pool the address operates contributes only the operator's shares
+  (`<pool>:operator`); LIT in its unstaking lockup is `<index>:unlocking`.
+- `history()` raises `NotImplementedError`.
 
-Requires tribulnation-sdk >=2.7.0 (`Trade.order_id` and `Trade.client_order_id`,
-ADR 0029) and typed-lighter >=0.2.0.
+Requires tribulnation-sdk >=2.8.0 (`ReportSDK` routing and `accounts.Lighter.address`)
+and typed-lighter >=0.2.0.
 
-Public reads are qualified on mainnet; account and trading methods are verified on
-testnet. Order IDs on fills are covered by unit fixtures; no live trading round trip
-is recorded.
+Release qualification records mainnet read suites, including the Report snapshot of a
+funded account, and Market consistency against the pinned Catalogue snapshot. Pool
+claims were checked live on public accounts against the venue's PnL chart; the
+qualification account holds no pool shares. Account and trading methods remain
+verified on testnet.
