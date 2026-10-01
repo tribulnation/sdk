@@ -18,6 +18,17 @@ MAX_RELATIVE_PRICE = Decimal('1.8')
 """Not specified in the docs, but the API returns errors for orders >80% away from the current price."""
 
 
+def plain_decimal(x: Decimal) -> Decimal:
+  """
+  Write `x` in positional form without fractional trailing zeros, as the venue parses and signs it.
+
+  `Decimal.normalize()`, which the SDK's tick and step rounding applies, turns round
+  numbers into exponent form (`40` into `4E+1`). The typed client serializes that as is,
+  and the API rejects it with a 422 ("Failed to deserialize the JSON body").
+  """
+  return Decimal(f'{x.normalize():f}')
+
+
 def round_price(price: Decimal, max_sig_figs: int = MAX_SIGNIFICANT_FIGURES) -> Decimal:
   """
   Round `price` to at most `max_sig_figs` significant figures without trailing zeros.
@@ -32,7 +43,7 @@ def round_price(price: Decimal, max_sig_figs: int = MAX_SIGNIFICANT_FIGURES) -> 
     return Decimal(0)
 
   if price >= 10000:
-    return price.to_integral_value()
+    return plain_decimal(price.to_integral_value())
 
   x = price.normalize()
   k = x.adjusted()
