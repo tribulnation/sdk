@@ -63,8 +63,10 @@ never falls back to mainnet variables. `validate` toggles response validation.
 - `perp_stats` joins the bulk premium index with the funding configuration in two
   requests. Aster has no bulk open-interest source, so `open_interest` is `None`; a
   symbol without a published funding interval reports `funding_interval=None`.
+- Perpetual funding payments are available per market or exchange-wide, with positive
+  amounts paid; verified on mainnet.
 - Unsupported, raising `NotImplementedError`: spot position, collateral and trade
-  history, funding payments, `available_notional` and `perp_collateral`.
+  history, `available_notional` and `perp_collateral`.
 - Public reads are verified on mainnet. Account and trading methods are verified on
   testnet only.
 

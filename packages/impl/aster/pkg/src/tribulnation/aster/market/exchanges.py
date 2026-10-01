@@ -4,19 +4,29 @@ Per-market methods use the SDK's default delegation to `market(market_id)`.
 """
 
 from dataclasses import dataclass
-from datetime import timedelta
-from typing_extensions import Collection, Mapping, Sequence, TypedDict
+from datetime import datetime, timedelta
+from typing_extensions import (
+  AsyncIterable,
+  Collection,
+  Mapping,
+  Sequence,
+  TypedDict,
+  overload,
+)
 from decimal import Decimal
 from typed_aster.futures.market.funding_info import FundingInfo
 from typed_aster.futures.market.schemas import FuturesMarkPrice
 from tribulnation.sdk.market import (
   Collateral,
   Exchange,
+  ExchangeFundingPayment,
+  FundingPayment,
   PerpExchange as SDKPerpExchange,
   PerpStats,
   Settings,
   Ticker,
 )
+from tribulnation.sdk.core import PaginatedResponse, SDK
 from ..core import Public
 from .markets import PerpMarket, SpotMarket
 
@@ -153,6 +163,39 @@ class PerpExchange(Public, SDKPerpExchange):
     if market_id not in await self.shared.perp_symbols():
       raise ValueError(f'Unknown Aster perpetual: {market_id}')
     return PerpMarket(shared=self.shared, symbol=market_id)
+
+  @overload
+  def funding_payments(
+    self, market_id: None, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[ExchangeFundingPayment]: ...
+
+  @overload
+  def funding_payments(
+    self, market_id: str, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[FundingPayment]: ...
+
+  @SDK.method
+  @PaginatedResponse.lift
+  async def funding_payments(
+    self, market_id: str | None, /, start: datetime, end: datetime
+  ) -> AsyncIterable[Sequence[FundingPayment]]:
+    """Read funding for one market or every perpetual market."""
+    if market_id is not None:
+      async for page in (await self.market(market_id)).funding_payments(start, end):
+        yield page
+      return
+    if start.tzinfo is None or end.tzinfo is None:
+      raise ValueError('Funding history bounds must be timezone-aware')
+    pages = self.client.futures.account.income_paged(
+      income_type='FUNDING_FEE', start_time=start, end_time=end, limit=1000
+    )
+    async for page in pages.via(self.shared.call):
+      yield [
+        ExchangeFundingPayment(
+          market_id=r['symbol'], amount=-r['income'], time=r['time']
+        )
+        for r in page
+      ]
 
   async def tickers(
     self, markets: Collection[str] | None = None, *, settings: Settings = {}

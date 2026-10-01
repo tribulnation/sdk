@@ -7,8 +7,9 @@ methods = [
   "position", "collateral",
   "place_order", "place_orders", "cancel_order", "cancel_orders", "cancel_open_orders",
   "index", "next_funding", "funding_rates", "perp_stats", "perp_position",
+  "funding_payments",
 ]
-note = "Spot and linear perpetuals. Public reads are verified on mainnet; account and trading methods only on testnet. MARKET ignores the SDK price; LIMIT uses GTC and POST_ONLY uses GTX. Depth streams carry up to 20 levels. Position and collateral cover one-way, cross-margin perpetuals only. perp_stats reports no open interest. Perpetual trades_history reads inclusive bounds in native seven-day windows up to the current time. Unsupported: spot balances, spot trade history, funding payments, available_notional and perp_collateral."
+note = "Spot and linear perpetuals. Public reads and perpetual funding payments are verified on mainnet; other account and trading methods only on testnet. MARKET ignores the SDK price; LIMIT uses GTC and POST_ONLY uses GTX. Depth streams carry up to 20 levels. Position and collateral cover one-way, cross-margin perpetuals only. perp_stats reports no open interest. Perpetual trades_history reads inclusive bounds in native seven-day windows up to the current time. Funding payments use native income history, with positive amounts paid, for one market or all perpetuals. Unsupported: spot balances, spot trade history, available_notional and perp_collateral."
 
 [support.report]
 support = "partial"

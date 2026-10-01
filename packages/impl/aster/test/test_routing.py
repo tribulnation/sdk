@@ -106,12 +106,8 @@ async def test_unsupported_methods_raise_instead_of_returning_empty_data():
       await method()
   with pytest.raises(NotImplementedError, match='trade history'):
     spot.trades_history(now, now)
-  with pytest.raises(NotImplementedError, match='funding payments'):
-    perp.funding_payments(now, now)
   for exchange in (venue.spot, venue.perp):
     with pytest.raises(NotImplementedError, match='Exchange-wide'):
       await exchange.trades_history(None, now, now)
-  with pytest.raises(NotImplementedError, match='Exchange-wide'):
-    await venue.perp.funding_payments(None, now, now)
   with pytest.raises(NotImplementedError, match='snapshots'):
     await Report.new(public=True, mainnet=False).snapshot()

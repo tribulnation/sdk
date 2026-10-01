@@ -1,21 +1,15 @@
-# tribulnation-aster 0.4.0 release candidate
+# tribulnation-aster 0.4.1 release candidate
 
-Report snapshots.
+Perpetual funding payment history is available for a selected market and for the
+whole perpetual exchange. Both paths read Aster's native `FUNDING_FEE` income with
+inclusive bounds and paginated, retryable requests. SDK amounts are positive when
+funding was paid and negative when received; exchange-wide rows include their native
+market ID.
 
-- `Report.snapshot()` reads mainnet, signed by the trading agent: a `perp` subaccount
-  with the futures wallet balances (no unrealized PnL) and open positions by symbol
-  with their entry prices, a `spot` subaccount with free plus locked balances, and a
-  `staking` subaccount with ASTER staked on Aster Chain (active, pending and
-  unstaking) plus unclaimed rewards. Hedge-mode legs merge into one net position.
-- `ReportSDK` routes Aster accounts for snapshots.
-- Testnet snapshots raise `NotImplementedError`: testnet spot account information
-  omits funded balances. `history()` is unchanged and verified on testnet only.
+An authenticated mainnet read returned settled funding payments through both SDK
+paths, with matching amounts and timestamps. Regression tests cover pagination
+retries, both amount signs and exchange-wide market identity. The received sign is
+verified by a deterministic test.
 
-Requires tribulnation-sdk >=2.8.0 (`ReportSDK` routing) and typed-aster >=0.2.0.
-
-Release qualification records mainnet read suites, including the signed Report
-snapshot of a funded account, and Market consistency against the pinned Catalogue
-snapshot. The snapshot matched the address-only `aster_getBalance` wallets and its
-implied entry price. The qualification account holds no spot balance or stake, so
-those subaccounts were read empty. Account and trading methods remain verified on
-testnet.
+Other Market and Report behavior is unchanged from 0.4.0. Requires
+tribulnation-sdk >=2.8.0 and typed-aster >=0.2.0.

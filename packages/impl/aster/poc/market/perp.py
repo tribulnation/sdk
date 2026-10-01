@@ -1147,7 +1147,7 @@ evidence
 # | `next_funding` | verified | Native indicative rate and next time; 8h BTC and 4h ASTER intervals |
 # | `perp_stats` | verified | Two unfiltered calls joined by symbol; null testnet intervals stay None; no open interest |
 # | `funding_rates` | verified | Native settlements over seven days; no inferred premium |
-# | `funding_payments` | empty | Live call returned no funding cashflows; test positions were closed before settlement |
+# | `funding_payments` | verified | Testnet PoC call was empty because positions closed before settlement; an authenticated mainnet SDK read returned settled payments matching the native income endpoint per market and exchange-wide. |
 # | `perp_position` | verified | Native long/short quantities and positive entry prices; flat after cleanup |
 # | `collateral` | verified | Native join-margin equity/available collateral; account-wide and selected cross-margin markets |
 # | `perp_collateral` | not supported | The API publishes configured leverage, not the SDK aggregate notional/equity leverage figure |

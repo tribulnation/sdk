@@ -1000,6 +1000,7 @@ methods:
     example:
       accountVenues: [dydx]
       constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', amount1: '0.25', amount2: '-0.10'}
         dydx: {market_id: 'dydx:perp:BTC-USD', amount1: '-1.24', amount2: '0.86'}
         hyperliquid: {market_id: 'hyperliquid::BTC', amount1: '-1.05', amount2: '0.74'}
         bybit: {market_id: 'bybit:perp:BTCUSDT', amount1: '-1.24', amount2: '0.86'}

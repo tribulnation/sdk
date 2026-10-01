@@ -13,6 +13,7 @@ from typed_aster.spot.account.transaction_history import TransactionHistory
 from tribulnation.aster import AsterMarket, Report
 from tribulnation.aster.market.markets import PerpMarket
 from tribulnation.sdk import Context, NetworkError
+from tribulnation.sdk.market import ExchangeFundingPayment
 
 START = datetime(2026, 1, 1, tzinfo=timezone.utc)
 
@@ -77,6 +78,60 @@ async def test_native_funding_pager_retry(monkeypatch: pytest.MonkeyPatch):
     rows = await market.funding_rates(START, START)
   assert calls == [0, 1, 1, 2]
   assert len(rows) == 1 and rows[0].rate == Decimal('.001')
+
+
+@pytest.mark.parametrize('symbol', ['BTCUSDT', None])
+async def test_funding_payments_retry_and_sign(
+  symbol: str | None, monkeypatch: pytest.MonkeyPatch
+):
+  """Native funding pages retry individually and preserve paid-positive amounts."""
+  calls: list[int] = []
+  arguments: list[tuple[Any, dict[str, Any]]] = []
+  end = START + timedelta(hours=8)
+
+  async def fetch(state: int) -> tuple[list[Any], int | None]:
+    """Fail page two once, then return both funding directions."""
+    calls.append(state)
+    if calls == [0, 1]:
+      raise ClientNetworkError('offline')
+    row: dict[str, Any] = {
+      'symbol': 'BTCUSDT',
+      'income': Decimal('-0.25') if state == 0 else Decimal('0.1'),
+      'time': START if state == 0 else end,
+    }
+    return [row], 1 if state == 0 else None
+
+  def pages(self: IncomeEndpoint, native_symbol: Any = None, **kwargs: Any):
+    """Record filters while returning a retryable native pager."""
+    arguments.append((native_symbol, kwargs))
+    return PaginatedResponse(0, fetch)
+
+  monkeypatch.setattr(IncomeEndpoint, 'income_paged', pages)
+  venue = AsterMarket.new(public=True)
+  with Context().retried(NetworkError, max_retries=1, base_delay=0).use():
+    rows = await (
+      PerpMarket(shared=venue.shared, symbol=symbol).funding_payments(START, end)
+      if symbol is not None
+      else venue.perp.funding_payments(None, START, end)
+    )
+  assert calls == [0, 1, 1]
+  assert arguments == [
+    (
+      symbol,
+      {
+        'income_type': 'FUNDING_FEE',
+        'start_time': START,
+        'end_time': end,
+        'limit': 1000,
+      },
+    )
+  ]
+  assert [r.amount for r in rows] == [Decimal('0.25'), Decimal('-0.1')]
+  assert [r.time for r in rows] == [START, end]
+  if symbol is None:
+    assert all(
+      isinstance(r, ExchangeFundingPayment) and r.market_id == 'BTCUSDT' for r in rows
+    )
 
 
 async def test_report_retry_and_distinct_cash_legs(monkeypatch: pytest.MonkeyPatch):
