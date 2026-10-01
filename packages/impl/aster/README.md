@@ -26,8 +26,10 @@ venue = AsterMarket.new(user='0x…', signer='0x…', mainnet=False)
    trade history, `MARKET`, `LIMIT` (GTC) and `POST_ONLY` (GTX) orders, and all
    cancellation methods. Market orders ignore the SDK `price`. Perpetual position and
    collateral cover one-way, cross-margin accounts. These are verified on testnet only.
+   Perpetual funding payments are available per market or exchange-wide, with positive
+   amounts paid, and are verified on mainnet.
 4. Unsupported methods raise `NotImplementedError`: spot balances, spot trade history,
-   funding payments, `available_notional` and `perp_collateral`.
+   `available_notional` and `perp_collateral`.
 5. `tribulnation.aster.Report` snapshots, through `ReportSDK`, the mainnet `perp` wallet
    (without unrealized PnL) and positions with their entry prices, the `spot` wallet,
    and ASTER staked on Aster Chain with its unclaimed rewards, signed by the trading
