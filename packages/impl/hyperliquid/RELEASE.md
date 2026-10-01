@@ -1,11 +1,13 @@
-# tribulnation-hyperliquid 0.10.0 release candidate
+# tribulnation-hyperliquid 0.10.1 release candidate
 
-Client order IDs (cloids) and order IDs on fills.
+Fix order payloads rejected by Hyperliquid when rounded quantities or prices
+serialize in exponent form, or quantities retain fractional trailing zeros.
 
-- `place_order` sends `Order['client_order_id']` unchanged as the order's `cloid` (`0x` and 32 hex digits). `random_client_order_id()` generates one.
-- Fills from history, streams and exchange-wide history report `Trade.order_id` and `Trade.client_order_id`.
-- Requires typed-hyperliquid >=2.3.0, which types `cloid` on fills.
+- Order sizes now serialize as positional decimals without trailing zeros.
+- Prices of 10000 or more also serialize in positional form after rounding.
+- Regression fixtures check the typed client's pre-signing payload for normalized
+  quantities, trailing zeros, and a six-figure price.
 
-Requires tribulnation-sdk >=2.7.0 (`Trade.order_id`, `Trade.client_order_id` and `Order['client_order_id']`, ADR 0029).
+Requires tribulnation-sdk >=2.7.0 and typed-hyperliquid >=2.3.0.
 
-Client order IDs and order IDs on fills are covered by unit fixtures; no live trading round trip is recorded.
+No live trading round trip is recorded; release qualification uses read-only suites.
