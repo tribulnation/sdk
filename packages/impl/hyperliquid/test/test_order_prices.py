@@ -27,6 +27,7 @@ from tribulnation.hyperliquid.market.impl.orders import _export_order
     ('100', '100'),
     ('9999.99', '10000'),
     ('123456', '123456'),
+    ('1.2E+5', '120000'),
     ('0.0000', '0'),
   ],
 )
@@ -47,3 +48,40 @@ def test_exported_order_price_serialization(price: str):
   request = Request(orders=[order], grouping='na')
   wire = dump_request(request, Request)
   assert wire['orders'][0]['p'] == price
+
+
+@pytest.mark.parametrize(
+  ('qty', 'expected'),
+  [
+    ('4E+1', '40'),
+    ('-4E+1', '40'),
+    ('1E+2', '100'),
+    ('35', '35'),
+    ('0.5', '0.5'),
+    ('2.50', '2.5'),
+  ],
+)
+def test_exported_order_size_serialization(qty: str, expected: str):
+  """Sizes rounded by the SDK rules arrive normalized (`40` is `4E+1`); the venue only parses positional decimals."""
+  market = cast(PerpMarketMixin, SimpleNamespace(asset_id=0))
+  order = _export_order(
+    market,
+    {'type': 'LIMIT', 'price': Decimal('4.9557'), 'qty': Decimal(qty)},
+    {},
+  )
+  request = Request(orders=[order], grouping='na')
+  wire = dump_request(request, Request)
+  assert wire['orders'][0]['s'] == expected
+
+
+def test_exported_order_price_serialization_from_normalized_integer():
+  """A tick-rounded price above 10000 arrives as `1.2E+5` and must still be sent positionally."""
+  market = cast(PerpMarketMixin, SimpleNamespace(asset_id=0))
+  order = _export_order(
+    market,
+    {'type': 'LIMIT', 'price': Decimal('1.2E+5'), 'qty': Decimal('0.01')},
+    {},
+  )
+  request = Request(orders=[order], grouping='na')
+  wire = dump_request(request, Request)
+  assert wire['orders'][0]['p'] == '120000'

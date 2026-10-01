@@ -13,7 +13,12 @@ from typed_hyperliquid.exchange.cancel import CancelRequestItem
 from typed_hyperliquid.exchange.order import HyperliquidOrder
 from typed_hyperliquid.info.order_status import OrderFound, OrderNotFound
 
-from tribulnation.hyperliquid.core import Settings, round_price, wrap_exceptions
+from tribulnation.hyperliquid.core import (
+  Settings,
+  plain_decimal,
+  round_price,
+  wrap_exceptions,
+)
 from .mixin import SpotMarketMixin, PerpMarketMixin
 
 
@@ -42,7 +47,7 @@ def _export_order(
     'a': self.asset_id,
     'b': qty >= 0,
     'p': price,
-    's': abs(qty),
+    's': plain_decimal(abs(qty)),
     'r': settings.get('reduce_only', False),
     't': {'limit': {'tif': tif}},
   }
