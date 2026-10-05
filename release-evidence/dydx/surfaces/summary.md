@@ -1,5 +1,5 @@
 # Local SDK evidence: dydx
 
-Run completed: 2026-09-30T17:50:46.792979+00:00
+Run completed: 2026-10-05T16:12:33.215402+00:00
 
 This records a trusted local run, not cryptographic proof. Release policy must separately validate required check coverage and statuses.
