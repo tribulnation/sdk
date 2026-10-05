@@ -1,5 +1,26 @@
 # Open typed-client issues
 
+## typed-aster
+
+### Request decimals reach the wire as their `str()`, in exponent form when round or tiny
+
+`dump_request` round-trips every request through the validator's JSON dump, so a
+`Decimal` reaches the transport already turned into its `str()`. `wire_value` writes a
+`Decimal` positionally (`format(value, 'f')`, `core/transport/http.py:48`), but it only
+ever sees the string. `Decimal('1.9E+2')` goes out as `quantity=1.9E%2B2`, and so does any
+decimal below `1E-6`, even one built positionally (`Decimal('0.0000001')` is `1E-7`). The
+venue rejects both.
+
+`core/endpoint/wire.py:20`:
+
+```python
+  return json.loads(validator(cast(type, request_type)).dump(request))
+```
+
+- Kind: wrong-serialization (a valid `Decimal` the venue cannot parse)
+- Observed: `{'code': -1102, 'msg': "Mandatory parameter 'quantity' was not sent, was empty/null, or malformed."}` for a step-rounded 190-unit `ENAUSDT` order
+- Blocks: nothing listed today. `native_order` writes quantities and prices through `plain_decimal`, which is enough for every value of `1E-6` or more. A price below `1E-6` would still be rejected; the lowest Aster price is `0.0000095` (`1000SATSUSDT`), against a smallest tick of `1E-8`.
+
 ## typed-lighter
 
 ### `Candle` OHLCV fields are `float`

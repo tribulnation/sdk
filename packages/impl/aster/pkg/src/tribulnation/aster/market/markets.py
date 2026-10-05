@@ -150,17 +150,29 @@ class NativeOrder:
   """Sent as `newClientOrderId`; the venue generates one when `None`."""
 
 
+def plain_decimal(x: Decimal) -> Decimal:
+  """Write `x` in positional form without fractional trailing zeros, as the venue parses it.
+
+  `Decimal.normalize()`, which the SDK's tick and step rounding applies, turns round
+  numbers into exponent form (`190` into `1.9E+2`). typed-aster sends a request decimal
+  as its `str()`, and the venue rejects exponent form with -1102 ("Mandatory parameter
+  'quantity' was not sent, was empty/null, or malformed").
+  """
+  return Decimal(f'{x.normalize():f}')
+
+
 def native_order(order: Order) -> NativeOrder:
   """Map MARKET, LIMIT (GTC) and POST_ONLY (GTX) orders."""
   qty = Decimal(str(order['qty']))
   if not qty.is_finite() or not qty:
     raise ValueError('Order quantity must be finite and nonzero')
   side = 'BUY' if qty > 0 else 'SELL'
+  quantity = plain_decimal(abs(qty))
   client_order_id = order.get('client_order_id')
   if order['type'] == 'MARKET':
     return NativeOrder(
       side=side,
-      quantity=abs(qty),
+      quantity=quantity,
       price=None,
       time_in_force='GTC',
       client_order_id=client_order_id,
@@ -170,8 +182,8 @@ def native_order(order: Order) -> NativeOrder:
     raise ValueError('Limit price must be finite and positive')
   return NativeOrder(
     side=side,
-    quantity=abs(qty),
-    price=price,
+    quantity=quantity,
+    price=plain_decimal(price),
     time_in_force='GTX' if order['type'] == 'POST_ONLY' else 'GTC',
     client_order_id=client_order_id,
   )
