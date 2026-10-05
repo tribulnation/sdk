@@ -24,8 +24,8 @@ Funding rates keep their existing convention: positive means longs pay shorts.
 Trading fees also retain their expense-positive convention. Report observations
 already use credited-positive amounts and do not change.
 
-Release this breaking contract as SDK 3.0.0 and new minor versions of the five
-pre-1.0 adapters, each requiring SDK >=3.0.0. Consumers must upgrade those adapters
+Release this breaking contract as SDK 2.10.0 and new minor versions of the five
+pre-1.0 adapters, each requiring SDK >=2.10.0. Consumers must upgrade those adapters
 together with the SDK; older published adapters have unbounded SDK requirements
 and cannot be made compatible retroactively. Negate stored amounts from the
 previous paid-positive versions exactly once, or refetch history. Do not negate

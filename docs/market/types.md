@@ -127,7 +127,7 @@ fee-token conversion or rounding.
 Rates are fractions of 1, so `0.01` is 1%. `premium` is the mark-vs-index quantity funding
 is computed from, and it's `None` on venues that don't report it, like dYdX.
 
-## Funding payment migration in SDK 3
+## Funding payment migration in SDK 2.10
 
 Upgrade the SDK and your funding-capable adapters together: Hyperliquid 0.11.0,
 dYdX 0.11.0, Bybit 0.5.0, Aster 0.5.0, and Lighter 0.4.0 (or newer). Older adapter

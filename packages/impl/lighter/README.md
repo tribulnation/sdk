@@ -61,5 +61,5 @@ configuration through `MarketSDK` and venue-specific semantics.
 ## Funding payment signs
 
 Since 0.4.0, funding payments are positive when received and negative when
-paid, for every supported history scope. Requires SDK >=3.0.0. Funding rates keep
+paid, for every supported history scope. Requires SDK >=2.10.0. Funding rates keep
 their existing signs. See [migration notes](RELEASE.md) before upgrading.

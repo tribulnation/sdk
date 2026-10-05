@@ -83,4 +83,4 @@ def test_funding_adapters_require_received_positive_sdk():
       if Requirement(value).name == 'tribulnation-sdk'
     )
     assert Version('2.9.0') not in requirement.specifier, venue
-    assert Version('3.0.0') in requirement.specifier, venue
+    assert Version('2.10.0') in requirement.specifier, venue

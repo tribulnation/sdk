@@ -5,7 +5,7 @@ negative means paid**. Zero remains zero. This applies to market-specific histor
 and exchange-wide history where supported. Funding rates, trading fee signs,
 pagination, account scope and Report cash-flow signs are unchanged.
 
-This is a breaking sign change from the previous release. Upgrade SDK >=3.0.0
+This is a breaking sign change from the previous release. Upgrade SDK >=2.10.0
 together with Hyperliquid >=0.11.0, dYdX >=0.11.0, Bybit >=0.5.0, Aster >=0.5.0,
 and Lighter >=0.4.0 for whichever adapters you use. Older published adapters do
 not declare an SDK upper bound, so upgrading the SDK alone cannot enforce this
