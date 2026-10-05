@@ -1,15 +1,22 @@
-# tribulnation-aster 0.4.1 release candidate
+# tribulnation-aster 0.4.2 release candidate
 
-Perpetual funding payment history is available for a selected market and for the
-whole perpetual exchange. Both paths read Aster's native `FUNDING_FEE` income with
-inclusive bounds and paginated, retryable requests. SDK amounts are positive when
-funding was paid and negative when received; exchange-wide rows include their native
-market ID.
+Fix Aster order quantities and prices serialized in exponent notation after SDK
+step/tick rounding. Spot and perpetual MARKET, LIMIT and POST_ONLY requests now
+preserve positional integer quantities such as 190 and limit prices such as 120,
+with fractional trailing zeros removed.
 
-An authenticated mainnet read returned settled funding payments through both SDK
-paths, with matching amounts and timestamps. Regression tests cover pagination
-retries, both amount signs and exchange-wide market identity. The received sign is
-verified by a deterministic test.
+Regression tests exercise the typed-client serialization and query encoding for
+both venues and all supported order kinds. Market orders still ignore SDK price;
+LIMIT uses GTC and POST_ONLY uses GTX.
 
-Other Market and Report behavior is unchanged from 0.4.0. Requires
-tribulnation-sdk >=2.8.0 and typed-aster >=0.2.0.
+Known upstream limitation: typed-aster 0.2.0 still serializes Decimal values below
+1E-6 in exponent notation. This patch does not fix that range; see
+`typed-client-issues.md`. Live release qualification covers read-only Market and
+Report surfaces and market consistency, not order placement.
+
+Requires tribulnation-sdk >=2.8.0 and typed-aster >=0.2.0.
+
+Read-only mainnet qualification passed on 2026-10-05: 27 Market/Report cases
+passed, with four declared spot-only exclusions and no failures or unexpected
+skips. Market consistency also passed. Fresh schema-2 reports are committed under
+`release-evidence/aster/` against the existing pinned Catalogue snapshot.
