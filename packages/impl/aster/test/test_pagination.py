@@ -80,11 +80,12 @@ async def test_native_funding_pager_retry(monkeypatch: pytest.MonkeyPatch):
   assert len(rows) == 1 and rows[0].rate == Decimal('.001')
 
 
+@pytest.mark.parametrize('amount', [Decimal('-0.25'), Decimal('0.1'), Decimal('0')])
 @pytest.mark.parametrize('symbol', ['BTCUSDT', None])
 async def test_funding_payments_retry_and_sign(
-  symbol: str | None, monkeypatch: pytest.MonkeyPatch
+  symbol: str | None, monkeypatch: pytest.MonkeyPatch, amount: Decimal
 ):
-  """Native funding pages retry individually and preserve paid-positive amounts."""
+  """Native funding pages retry individually and preserve received-positive amounts."""
   calls: list[int] = []
   arguments: list[tuple[Any, dict[str, Any]]] = []
   end = START + timedelta(hours=8)
@@ -96,7 +97,7 @@ async def test_funding_payments_retry_and_sign(
       raise ClientNetworkError('offline')
     row: dict[str, Any] = {
       'symbol': 'BTCUSDT',
-      'income': Decimal('-0.25') if state == 0 else Decimal('0.1'),
+      'income': amount,
       'time': START if state == 0 else end,
     }
     return [row], 1 if state == 0 else None
@@ -126,7 +127,7 @@ async def test_funding_payments_retry_and_sign(
       },
     )
   ]
-  assert [r.amount for r in rows] == [Decimal('0.25'), Decimal('-0.1')]
+  assert [r.amount for r in rows] == [amount, amount]
   assert [r.time for r in rows] == [START, end]
   if symbol is None:
     assert all(

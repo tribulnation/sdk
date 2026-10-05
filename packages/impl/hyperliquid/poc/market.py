@@ -517,14 +517,14 @@ await funding_rates(PERP_MARKET, start, end)
 
 
 # %%
+# not executed: received-positive contract update; not rerun live; adapter regression fixtures cover signs.
 async def funding_payments(
   coin: str, start: datetime, end: datetime
 ) -> list[FundingPayment]:
-  # Hyperliquid's `usdc` is positive when *received*; `FundingPayment.amount` is positive
-  # when *paid* -- opposite sign conventions, so this negates it.
+  # Preserve Hyperliquid's received-positive USDC cash flow.
   raw = await client.info.user_funding(user=ADDRESS, start_time=start, end_time=end)
   return [
-    FundingPayment(amount=-Decimal(p['delta']['usdc']), time=p['time'])
+    FundingPayment(amount=Decimal(p['delta']['usdc']), time=p['time'])
     for p in raw
     if p['delta']['coin'] == coin
   ]

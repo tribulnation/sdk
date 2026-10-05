@@ -555,6 +555,7 @@ start = end - timedelta(days=2)
 
 
 # %%
+# not executed: received-positive contract update; not rerun live; adapter regression fixtures cover signs.
 async def funding_payments(
   ticker: str, start: datetime, end: datetime
 ) -> list[FundingPayment]:

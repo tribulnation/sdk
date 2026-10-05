@@ -186,7 +186,7 @@ class Exchange(ExchangeMixin, PerpExchange):
         payments = [
           ExchangeFundingPayment(
             market_id=item['ticker'],
-            amount=-Decimal(item['payment']),
+            amount=Decimal(item['payment']),
             time=item['createdAt'],
           )
           for item in batch

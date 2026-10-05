@@ -37,3 +37,9 @@ Version 0.7.1 restores native snapshot delegation to fix the equity distortion i
 0.7.0 ([issue #39](https://github.com/tribulnation/sdk/issues/39)). This correction
 applies to newly fetched snapshots; downstream dependency rollout and correction of
 stored snapshots are separate work.
+
+## Funding payment signs
+
+Since 0.11.0, funding payments are positive when received and negative when
+paid, for every supported history scope. Requires SDK >=2.10.0. Funding rates keep
+their existing signs. See [migration notes](RELEASE.md) before upgrading.

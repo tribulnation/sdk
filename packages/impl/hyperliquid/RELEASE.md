@@ -1,13 +1,22 @@
-# tribulnation-hyperliquid 0.10.1 release candidate
+# tribulnation-hyperliquid 0.11.0
 
-Fix order payloads rejected by Hyperliquid when rounded quantities or prices
-serialize in exponent form, or quantities retain fractional trailing zeros.
+Funding payment amounts are now account cash flows: **positive means received,
+negative means paid**. Zero remains zero. This applies to market-specific history
+and exchange-wide history where supported. Funding rates, trading fee signs,
+pagination, account scope and Report cash-flow signs are unchanged.
 
-- Order sizes now serialize as positional decimals without trailing zeros.
-- Prices of 10000 or more also serialize in positional form after rounding.
-- Regression fixtures check the typed client's pre-signing payload for normalized
-  quantities, trailing zeros, and a six-figure price.
+This is a breaking sign change from the previous release. Upgrade SDK >=2.10.0
+together with Hyperliquid >=0.11.0, dYdX >=0.11.0, Bybit >=0.5.0, Aster >=0.5.0,
+and Lighter >=0.4.0 for whichever adapters you use. Older published adapters do
+not declare an SDK upper bound, so upgrading the SDK alone cannot enforce this
+migration. Do not mix old and new adapter sign conventions.
 
-Requires tribulnation-sdk >=2.7.0 and typed-hyperliquid >=2.3.0.
+For persisted funding history, refetch or negate records from the paid-positive
+versions exactly once. Older Hyperliquid/dYdX records predating the exchange-wide
+history sign change already used received-positive amounts; leave those alone.
+Never apply this conversion to funding rates or Report observations.
 
-No live trading round trip is recorded; release qualification uses read-only suites.
+Offline regression tests cover funding income, expense and zero, plus history
+scope, filtering and page retry behavior. Release qualification uses the normal
+read-only surfaces and consistency suites; it does not assert personal history
+completeness. Deribit Report qualification is testnet-only under ADR 0012.

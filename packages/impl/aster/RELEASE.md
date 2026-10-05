@@ -1,22 +1,22 @@
-# tribulnation-aster 0.4.2 release candidate
+# tribulnation-aster 0.5.0
 
-Fix Aster order quantities and prices serialized in exponent notation after SDK
-step/tick rounding. Spot and perpetual MARKET, LIMIT and POST_ONLY requests now
-preserve positional integer quantities such as 190 and limit prices such as 120,
-with fractional trailing zeros removed.
+Funding payment amounts are now account cash flows: **positive means received,
+negative means paid**. Zero remains zero. This applies to market-specific history
+and exchange-wide history where supported. Funding rates, trading fee signs,
+pagination, account scope and Report cash-flow signs are unchanged.
 
-Regression tests exercise the typed-client serialization and query encoding for
-both venues and all supported order kinds. Market orders still ignore SDK price;
-LIMIT uses GTC and POST_ONLY uses GTX.
+This is a breaking sign change from the previous release. Upgrade SDK >=2.10.0
+together with Hyperliquid >=0.11.0, dYdX >=0.11.0, Bybit >=0.5.0, Aster >=0.5.0,
+and Lighter >=0.4.0 for whichever adapters you use. Older published adapters do
+not declare an SDK upper bound, so upgrading the SDK alone cannot enforce this
+migration. Do not mix old and new adapter sign conventions.
 
-Known upstream limitation: typed-aster 0.2.0 still serializes Decimal values below
-1E-6 in exponent notation. This patch does not fix that range; see
-`typed-client-issues.md`. Live release qualification covers read-only Market and
-Report surfaces and market consistency, not order placement.
+For persisted funding history, refetch or negate records from the paid-positive
+versions exactly once. Older Hyperliquid/dYdX records predating the exchange-wide
+history sign change already used received-positive amounts; leave those alone.
+Never apply this conversion to funding rates or Report observations.
 
-Requires tribulnation-sdk >=2.8.0 and typed-aster >=0.2.0.
-
-Read-only mainnet qualification passed on 2026-10-05: 27 Market/Report cases
-passed, with four declared spot-only exclusions and no failures or unexpected
-skips. Market consistency also passed. Fresh schema-2 reports are committed under
-`release-evidence/aster/` against the existing pinned Catalogue snapshot.
+Offline regression tests cover funding income, expense and zero, plus history
+scope, filtering and page retry behavior. Release qualification uses the normal
+read-only surfaces and consistency suites; it does not assert personal history
+completeness. Deribit Report qualification is testnet-only under ADR 0012.

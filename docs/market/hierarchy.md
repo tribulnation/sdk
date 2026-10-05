@@ -87,8 +87,8 @@ async for page in exchange.funding_payments(None, start, end):
 
 Both datetime bounds are required and inclusive. Exchange-wide rows are
 `ExchangeTrade` or `ExchangeFundingPayment`, with the existing record fields plus
-`market_id`, the native ID within that exchange. Funding paid is positive and
-funding received is negative. Hyperliquid and dYdX now apply that sign convention
+`market_id`, the native ID within that exchange. Funding received is positive and
+funding paid is negative. All implementations apply that sign convention
 to both exchange-wide and selected-market results. Passing a string market ID
 keeps the existing single-market API and base record types.
 
@@ -96,8 +96,10 @@ Hyperliquid supports trades on spot and perpetual exchanges, and funding payment
 on perpetual exchanges. Each builder DEX is scoped separately. dYdX supports both
 methods across all subaccounts of the configured address, for both `perp` and
 `perp.<N>` exchange objects; selecting one market still includes every subaccount.
-All other venues currently raise `NotImplementedError` for exchange-wide reads; single-market
-support is unchanged.
+Aster also supports exchange-wide perpetual funding payments. Lighter supports
+exchange-wide trades and perpetual funding payments. Other implementations raise
+`NotImplementedError` where exchange-wide reads are unsupported; consult their
+support declarations for method coverage.
 
 These reads use native account feeds, with their retention and pagination limits.
 Pages have no global ordering guarantee. Hyperliquid's fills feed retains only its

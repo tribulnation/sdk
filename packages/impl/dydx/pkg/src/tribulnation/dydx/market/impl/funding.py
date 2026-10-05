@@ -67,7 +67,7 @@ async def funding_payments(
       next_state = state
       batch, state = await self.call_dydx(lambda: paging.next(next_state))
       payments = [
-        FundingPayment(amount=-Decimal(item['payment']), time=item['createdAt'])
+        FundingPayment(amount=Decimal(item['payment']), time=item['createdAt'])
         for item in batch
         if start <= item['createdAt'] <= end
       ]

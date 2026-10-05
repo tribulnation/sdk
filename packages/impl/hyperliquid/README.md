@@ -29,5 +29,5 @@ Trade history uses `userFillsByTime`, subject to its 10,000-fill retention limit
 TWAP slice fills require a separate endpoint and are not included. Spot history
 requires current metadata to resolve canonical market IDs and raises if a
 historical spot pair cannot be resolved. Funding amounts follow the SDK convention:
-positive means paid, negative means received. This also corrects the previous
-reversed sign in the single-market funding mapper.
+positive means received, negative means paid. This restores the single-market
+sign used before the exchange-wide history change.

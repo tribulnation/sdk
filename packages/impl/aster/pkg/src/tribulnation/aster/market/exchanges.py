@@ -192,7 +192,7 @@ class PerpExchange(Public, SDKPerpExchange):
     async for page in pages.via(self.shared.call):
       yield [
         ExchangeFundingPayment(
-          market_id=r['symbol'], amount=-r['income'], time=r['time']
+          market_id=r['symbol'], amount=r['income'], time=r['time']
         )
         for r in page
       ]

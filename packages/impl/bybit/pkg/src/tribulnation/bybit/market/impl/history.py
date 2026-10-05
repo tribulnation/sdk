@@ -159,9 +159,8 @@ async def funding_payments(
         )
       )
       yield [
-        # A settlement charged to the account is money paid, which the SDK's
-        # `FundingPayment` reports positive; Bybit signs `funding` the other way.
-        FundingPayment(amount=-Decimal(e['funding']), time=e['transactionTime'])
+        # Both Bybit and the SDK report funding received as positive.
+        FundingPayment(amount=Decimal(e['funding']), time=e['transactionTime'])
         for e in page['list']
         if e['symbol'] == self.symbol and 'funding' in e and e['funding']
       ]

@@ -107,11 +107,12 @@ async def test_exchange_fills_scope_and_retry(
   )
 
 
+@pytest.mark.parametrize('amount', [Decimal('1.25'), Decimal('-2'), Decimal('0')])
 @pytest.mark.parametrize('dex', [None, 'xyz'])
 async def test_exchange_funding_scope_and_retry(
-  monkeypatch: pytest.MonkeyPatch, dex: str | None
+  monkeypatch: pytest.MonkeyPatch, dex: str | None, amount: Decimal
 ):
-  """Funding uses positive-paid signs and excludes other DEXs and times."""
+  """Funding uses received-positive signs and excludes other DEXs and times."""
   calls: list[int] = []
 
   async def fetch(state: int):
@@ -124,7 +125,7 @@ async def test_exchange_funding_scope_and_retry(
       {
         'delta': {
           'coin': coin,
-          'usdc': Decimal('1.25') if state == 0 else Decimal('-2'),
+          'usdc': amount,
         },
         'time': time,
       }
@@ -148,7 +149,7 @@ async def test_exchange_funding_scope_and_retry(
   endpoint.assert_called_once_with(user='0xfixture', start_time=START, end_time=END)
   assert all(isinstance(row, ExchangeFundingPayment) for row in rows)
   assert [row.market_id for row in rows] == ['xyz:GOLD' if dex else 'BTC'] * 2
-  assert [row.amount for row in rows] == [Decimal('-1.25'), Decimal('2')]
+  assert [row.amount for row in rows] == [amount, amount]
   assert [row.time for row in rows] == [START, END]
 
 

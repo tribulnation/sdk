@@ -10,11 +10,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_2ZUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -38,32 +38,32 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_AEVOUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_AIXBTUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_AKTUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ALCHUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -80,25 +80,25 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ALTUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ANIMEUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ANKRUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -108,11 +108,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_API3USD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -136,18 +136,18 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ARKMUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ARUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -157,18 +157,18 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ASTRUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ATHUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -178,11 +178,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_AUCTIONUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -199,11 +199,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_BANDUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -220,11 +220,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_BERAUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -234,11 +234,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_BIGTIMEUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -248,11 +248,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_BLURUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -290,18 +290,18 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_CELOUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_CELRUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -346,11 +346,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_COWUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -388,11 +388,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_CYBERUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -402,18 +402,18 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_DEEPUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_DEGENUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -430,11 +430,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_DOGSUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -451,11 +451,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_DYMUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -479,11 +479,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ENJUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -556,11 +556,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_FLUXUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -577,18 +577,18 @@
         "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_GMTUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_GMXUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -605,11 +605,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_GRIFFAINUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -626,18 +626,18 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_HFTUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_HMSTRUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -661,11 +661,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_INITUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -682,18 +682,18 @@
         "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_IOTAUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_IOUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -745,18 +745,18 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_KSMUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_LAYERUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -787,11 +787,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_LSKUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -822,11 +822,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_METISUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -836,11 +836,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_MINAUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -892,11 +892,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_NEOUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -906,11 +906,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_NMRUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -920,11 +920,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_OGNUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -955,11 +955,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ORCAUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -1032,18 +1032,18 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_POWRUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_PROMPTUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -1074,11 +1074,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_RAREUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -1095,11 +1095,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_REZUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -1109,11 +1109,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_RLCUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -1179,11 +1179,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_SPELLUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -1207,11 +1207,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_STGUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -1249,11 +1249,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_SUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -1263,11 +1263,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_SWARMSUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -1291,11 +1291,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_THETAUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -1312,11 +1312,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_TNSRUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -1347,18 +1347,18 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_TUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_UMAUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -1389,18 +1389,18 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_VELOUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_VETUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -1459,11 +1459,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_XCNUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -1508,11 +1508,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_YGGUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -1529,18 +1529,18 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ZEREBROUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ZETAUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -1564,11 +1564,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ZRXUSD\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "coverage_deferred",
@@ -21141,33 +21141,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.10178",
-            "after_bid": "0.1009",
-            "ask": "0.10178",
+            "after_ask": "0.1061",
+            "after_bid": "0.10564",
+            "ask": "0.1061",
             "attempt": 1,
-            "before_ask": "0.10178",
-            "before_bid": "0.1009",
-            "bid": "0.1009",
-            "elapsed_seconds": 0.18069228110834956,
-            "ticker_ids_match": true
-          }
-        ],
-        "status": "pass"
-      },
-      {
-        "code": "ok",
-        "id": "[\"ticker_depth\",\"perp\",\"PF_2ZUSD\"]",
-        "missing_data": null,
-        "quotes": [
-          {
-            "after_ask": "0.0628",
-            "after_bid": "0.06237",
-            "ask": "0.0628",
-            "attempt": 1,
-            "before_ask": "0.0628",
-            "before_bid": "0.06237",
-            "bid": "0.06237",
-            "elapsed_seconds": 0.18533266498707235,
+            "before_ask": "0.1061",
+            "before_bid": "0.10564",
+            "bid": "0.10564",
+            "elapsed_seconds": 0.13802588498219848,
             "ticker_ids_match": true
           }
         ],
@@ -21179,14 +21160,33 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "336.7",
-            "after_bid": "336.6",
-            "ask": "336.7",
+            "after_ask": "334.57",
+            "after_bid": "334.4",
+            "ask": "334.57",
             "attempt": 1,
-            "before_ask": "336.7",
-            "before_bid": "336.6",
-            "bid": "336.6",
-            "elapsed_seconds": 0.16803840990178287,
+            "before_ask": "334.57",
+            "before_bid": "334.4",
+            "bid": "334.4",
+            "elapsed_seconds": 0.13735520793125033,
+            "ticker_ids_match": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"perp\",\"PF_AAVEUSD\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": "182.4",
+            "after_bid": "182.22",
+            "ask": "182.4",
+            "attempt": 1,
+            "before_ask": "182.4",
+            "before_bid": "182.22",
+            "bid": "182.22",
+            "elapsed_seconds": 0.13670912384986877,
             "ticker_ids_match": true
           }
         ],
@@ -21198,14 +21198,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "84002.0",
-            "after_bid": "84001.0",
-            "ask": "84002.0",
+            "after_ask": "85243.0",
+            "after_bid": "85242.0",
+            "ask": "85243.0",
             "attempt": 1,
-            "before_ask": "84002.0",
-            "before_bid": "84001.0",
-            "bid": "84001.0",
-            "elapsed_seconds": 0.24253801489248872,
+            "before_ask": "85243.0",
+            "before_bid": "85242.0",
+            "bid": "85242.0",
+            "elapsed_seconds": 0.173017991008237,
             "ticker_ids_match": true
           }
         ],
@@ -21217,14 +21217,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.2800000",
-            "after_bid": "0.2790000",
-            "ask": "0.2800000",
+            "after_ask": "0.2740000",
+            "after_bid": "0.2720000",
+            "ask": "0.2740000",
             "attempt": 1,
-            "before_ask": "0.2800000",
-            "before_bid": "0.2790000",
-            "bid": "0.2790000",
-            "elapsed_seconds": 0.12553438008762896,
+            "before_ask": "0.2740000",
+            "before_bid": "0.2720000",
+            "bid": "0.2720000",
+            "elapsed_seconds": 0.11372866691090167,
             "ticker_ids_match": true
           }
         ],
@@ -21236,14 +21236,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.3180000",
-            "after_bid": "0.3160000",
-            "ask": "0.3180000",
+            "after_ask": "0.3070000",
+            "after_bid": "0.3050000",
+            "ask": "0.3070000",
             "attempt": 1,
-            "before_ask": "0.3180000",
-            "before_bid": "0.3160000",
-            "bid": "0.3160000",
-            "elapsed_seconds": 0.12580232601612806,
+            "before_ask": "0.3070000",
+            "before_bid": "0.3050000",
+            "bid": "0.3050000",
+            "elapsed_seconds": 0.10922664892859757,
             "ticker_ids_match": true
           }
         ],
@@ -21255,14 +21255,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.08930",
-            "after_bid": "0.08910",
-            "ask": "0.08930",
+            "after_ask": "0.09460",
+            "after_bid": "0.09440",
+            "ask": "0.09460",
             "attempt": 1,
-            "before_ask": "0.08930",
-            "before_bid": "0.08910",
-            "bid": "0.08910",
-            "elapsed_seconds": 0.13648439291864634,
+            "before_ask": "0.09460",
+            "before_bid": "0.09440",
+            "bid": "0.09440",
+            "elapsed_seconds": 0.10582874296233058,
             "ticker_ids_match": true
           }
         ],
@@ -21274,14 +21274,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "83992.20000",
-            "after_bid": "83992.10000",
-            "ask": "83992.10000",
+            "after_ask": "85242.10000",
+            "after_bid": "85242.00000",
+            "ask": "85242.10000",
             "attempt": 1,
-            "before_ask": "83992.20000",
-            "before_bid": "83992.10000",
-            "bid": "83992.00000",
-            "elapsed_seconds": 0.11512212199158967,
+            "before_ask": "85242.10000",
+            "before_bid": "85242.00000",
+            "bid": "85242.00000",
+            "elapsed_seconds": 0.10101663880050182,
             "ticker_ids_match": true
           }
         ],
@@ -21676,6 +21676,7 @@
           "DBREUR",
           "DBRUSD",
           "DCRUSD",
+          "DEBITUSD",
           "DEEPEUR",
           "DEEPUSD",
           "DEGENEUR",
@@ -22200,6 +22201,7 @@
           "PLAYUSD",
           "PLUMEEUR",
           "PLUMEUSD",
+          "PNTUSD",
           "PNUTEUR",
           "PNUTUSD",
           "POLEUR",
@@ -22567,6 +22569,7 @@
           "USDRUSDT",
           "USDSEUR",
           "USDSMUSD",
+          "USDSUIUSD",
           "USDSUSD",
           "USDTAUD",
           "USDTCAD",
@@ -22810,7 +22813,6 @@
           "PF_LTCUSD",
           "PF_AVAXUSD",
           "PF_XMRUSD",
-          "PF_GMTUSD",
           "PF_LUNA2USD",
           "PF_OPUSD",
           "PF_NEARUSD",
@@ -22825,7 +22827,6 @@
           "PF_XLMUSD",
           "PF_ALGOUSD",
           "PF_SANDUSD",
-          "PF_ENJUSD",
           "PF_COMPUSD",
           "PF_YFIUSD",
           "PF_CHZUSD",
@@ -22835,30 +22836,22 @@
           "PF_GALAUSD",
           "PF_ETCUSD",
           "PF_KAVAUSD",
-          "PF_KSMUSD",
           "PF_GRTUSD",
           "PF_FLOWUSD",
           "PF_ZECUSD",
           "PF_QTUMUSD",
           "PF_DASHUSD",
           "PF_1INCHUSD",
-          "PF_OGNUSD",
           "PF_SUSHIUSD",
           "PF_RUNEUSD",
           "PF_EGLDUSD",
           "PF_DYDXUSD",
-          "PF_ANKRUSD",
           "PF_ICPUSD",
-          "PF_BANDUSD",
           "PF_ALICEUSD",
           "PF_ENSUSD",
-          "PF_MINAUSD",
-          "PF_THETAUSD",
           "PF_QNTUSD",
           "PF_IMXUSD",
           "PF_APTUSD",
-          "PF_BLURUSD",
-          "PF_GMXUSD",
           "PF_LDOUSD",
           "PF_USDCUSD",
           "PF_USDTUSD",
@@ -22868,13 +22861,9 @@
           "PF_CVXUSD",
           "PF_JASMYUSD",
           "PF_INJUSD",
-          "PF_ZRXUSD",
-          "PF_RLCUSD",
           "PF_SUIUSD",
           "PF_PEPEUSD",
           "PF_SHIBUSD",
-          "PF_STGUSD",
-          "PF_HFTUSD",
           "PF_WLDUSD",
           "PF_CFXUSD",
           "PF_PAXGUSD",
@@ -22888,135 +22877,77 @@
           "PF_KASUSD",
           "PF_WIFUSD",
           "PF_ORDIUSD",
-          "PF_UMAUSD",
-          "PF_LSKUSD",
-          "PF_API3USD",
           "PF_JUPUSD",
-          "PF_DYMUSD",
           "PF_STRKUSD",
-          "PF_SPELLUSD",
           "PF_WUSD",
-          "PF_YGGUSD",
           "PF_ONDOUSD",
           "PF_SAGAUSD",
           "PF_BOMEUSD",
           "PF_ENAUSD",
-          "PF_NEOUSD",
           "PF_SUPERUSD",
           "PF_BICOUSD",
-          "PF_ASTRUSD",
-          "PF_TUSD",
-          "PF_ARUSD",
           "PF_ETHFIUSD",
-          "PF_ZETAUSD",
-          "PF_POWRUSD",
           "PF_MOVRUSD",
           "PF_FLOKIUSD",
-          "PF_ARKMUSD",
-          "PF_AEVOUSD",
           "PF_C98USD",
           "PF_PENDLEUSD",
           "PF_CTSIUSD",
-          "PF_ALTUSD",
           "PF_TURBOUSD",
           "PF_TLMUSD",
-          "PF_TNSRUSD",
           "PF_PIXELUSD",
           "PF_PEOPLEUSD",
           "PF_BRETTUSD",
           "PF_POPCATUSD",
           "PF_MEWUSD",
           "PF_BBUSD",
-          "PF_STEEMUSD",
           "PF_TRBUSD",
           "PF_ZROUSD",
           "PF_PORTALUSD",
           "PF_HBARUSD",
-          "PF_BIGTIMEUSD",
           "PF_TAOUSD",
-          "PF_NMRUSD",
           "PF_NOTUSD",
           "PF_MNTUSD",
-          "PF_REZUSD",
           "PF_RENDERUSD",
           "PF_ZKUSD",
           "PF_MOGUSD",
-          "PF_AUCTIONUSD",
-          "PF_RAREUSD",
           "PF_SYNUSD",
-          "PF_CELRUSD",
           "PF_POLUSD",
           "PF_RSRUSD",
-          "PF_BANANAUSD",
           "PF_EIGENUSD",
           "PF_NEIROUSD",
-          "PF_DOGSUSD",
           "PF_ACEUSD",
-          "PF_CELOUSD",
           "PF_CATIUSD",
           "PF_LQTYUSD",
           "PF_RAYUSD",
-          "PF_CYBERUSD",
-          "PF_HMSTRUSD",
           "PF_ROSEUSD",
           "PF_GOATUSD",
-          "PF_CKBUSD",
-          "PF_CETUSUSD",
           "PF_MOODENGUSD",
-          "PF_VETUSD",
-          "PF_BELUSD",
           "PF_SSVUSD",
-          "PF_METISUSD",
-          "PF_ATHUSD",
-          "PF_DEGENUSD",
           "PF_ONTUSD",
           "PF_KAIAUSD",
-          "PF_DEEPUSD",
           "PF_GRASSUSD",
           "PF_CAKEUSD",
-          "PF_AKTUSD",
           "PF_PNUTUSD",
           "PF_MORPHOUSD",
-          "PF_COWUSD",
-          "PF_ZILUSD",
-          "PF_FLUXUSD",
           "PF_ZENUSD",
           "PF_CSPRUSD",
-          "PF_IOTAUSD",
           "PF_IOTXUSD",
-          "PF_ORCAUSD",
           "PF_SPXUSD",
           "PF_CROUSD",
           "PF_PENGUUSD",
           "PF_USUALUSD",
           "PF_CHILLGUYUSD",
           "PF_TRUMPUSD",
-          "PF_SUSD",
           "PF_MELANIAUSD",
           "PF_FARTCOINUSD",
           "PF_VIRTUALUSD",
-          "PF_AIXBTUSD",
-          "PF_ZEREBROUSD",
-          "PF_GRIFFAINUSD",
-          "PF_ANIMEUSD",
           "PF_HYPEUSD",
-          "PF_XCNUSD",
-          "PF_IOUSD",
-          "PF_ALCHUSD",
           "PF_ARCUSD",
-          "PF_CGPTUSD",
-          "PF_SKLUSD",
           "PF_BIOUSD",
           "PF_COOKIEUSD",
           "PF_DEXEUSD",
-          "PF_VELOUSD",
-          "PF_SWARMSUSD",
-          "PF_BERAUSD",
-          "PF_IDUSD",
-          "PF_LAYERUSD",
           "PF_KAITOUSD",
           "PF_GPSUSD",
-          "PF_INITUSD",
           "PF_SYRUPUSD",
           "PF_MUBARAKUSD",
           "PF_SPKUSD",
@@ -23026,14 +22957,10 @@
           "PF_SOONUSD",
           "PF_ASTERUSD",
           "PF_XPLUSD",
-          "PF_PROMPTUSD",
-          "PF_MIRAUSD",
-          "PF_2ZUSD",
           "PF_OPENUSD",
           "PF_RIVERUSD",
           "PF_ZBTUSD",
           "PF_NIGHTUSD",
-          "PF_LCAPUSD",
           "PF_GLDXUSD",
           "PF_QQQXUSD",
           "PF_SPYXUSD",
@@ -23070,7 +22997,9 @@
           "PF_INTCUSD",
           "PF_MUUSD",
           "PF_TREADUSD",
-          "PF_PONSUSD"
+          "PF_PONSUSD",
+          "PF_OURAXUSD",
+          "PF_MOONSHOTXUSD"
         ]
       }
     ],

@@ -313,9 +313,9 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "4cee34d7b939b2975d626834bfbe0c435df2dbe29192bae759a80a3d9ed43370",
-        "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
-        "version": "0.1.0"
+        "files_sha256": "166ae622e597ab3b27cf6ec884d75b4489dc4d52f7b00626fb8360cd5be50598",
+        "metadata_sha256": "6e562fabf4a160a2f9a213337f73d5c2de2fd5d05e67d330443c4c67f88b21dc",
+        "version": "0"
       },
       "shellingham": {
         "files_sha256": "d3daec68962a14c952093d227c6fb09e66d76f0946cadc2fb940498bb6c39c65",
@@ -358,14 +358,14 @@
         "version": "0.3.7"
       },
       "tribulnation-hyperliquid": {
-        "files_sha256": "65a7783dcc4072ea8f833b362d23583d802ade3a987f42b76f5fc682e0565f4d",
-        "metadata_sha256": "3af0c3c491612eb37018b0f75a2ba55bfe3af09fd08ae64ad4c5a426782c2974",
-        "version": "0.10.1"
+        "files_sha256": "aa52c81c30a7ebdd47cd196dc5c961a78dc7331007b4de4ad4d3c9e679aec263",
+        "metadata_sha256": "fdd81e11ad84f5ec14ff2a21fc5c644a23b8d1ca2da40f7640d970f7bc47de14",
+        "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "7fb69e5213a679b6e7a9be4923f8b0123a42b0b5df91e66395a16c8a18b30685",
-        "metadata_sha256": "5ed9cf987dea8d46a9a2f2200531f4d289307cdd7fbf9c5ae0429d6329b4270f",
-        "version": "2.8.0"
+        "files_sha256": "57caab854f627fd3129661a820c456567e368a0d21578b5e5a46c40c2a40dc8d",
+        "metadata_sha256": "57ea35902375de590c97f298bcaf6e7ce590bb164ecb6d0d5b6eca5c4c39408d",
+        "version": "0"
       },
       "typed-core": {
         "files_sha256": "4c6915eb97aa8eff3fe3f17f7bdb3b20b008b13c2592479b55478d63bf31781d",
@@ -399,8 +399,8 @@
       }
     },
     "python": "3.12",
-    "schema_version": 1,
-    "source_sha256": "91fbcb4a93688de95fb54169cbe827a0a9ea0168663714699bd78a3322048853",
+    "schema_version": 2,
+    "source_sha256": "202f82c0dd2ca2ba81e443e458a4280abb214417100cae1b981b7adad7e69013",
     "venue": "hyperliquid"
   },
   "before": {
@@ -717,9 +717,9 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "4cee34d7b939b2975d626834bfbe0c435df2dbe29192bae759a80a3d9ed43370",
-        "metadata_sha256": "ccffff760353469aaf37ceadf6e96f68259aa0ac2addab16e8869017e07f03f2",
-        "version": "0.1.0"
+        "files_sha256": "166ae622e597ab3b27cf6ec884d75b4489dc4d52f7b00626fb8360cd5be50598",
+        "metadata_sha256": "6e562fabf4a160a2f9a213337f73d5c2de2fd5d05e67d330443c4c67f88b21dc",
+        "version": "0"
       },
       "shellingham": {
         "files_sha256": "d3daec68962a14c952093d227c6fb09e66d76f0946cadc2fb940498bb6c39c65",
@@ -762,14 +762,14 @@
         "version": "0.3.7"
       },
       "tribulnation-hyperliquid": {
-        "files_sha256": "65a7783dcc4072ea8f833b362d23583d802ade3a987f42b76f5fc682e0565f4d",
-        "metadata_sha256": "3af0c3c491612eb37018b0f75a2ba55bfe3af09fd08ae64ad4c5a426782c2974",
-        "version": "0.10.1"
+        "files_sha256": "aa52c81c30a7ebdd47cd196dc5c961a78dc7331007b4de4ad4d3c9e679aec263",
+        "metadata_sha256": "fdd81e11ad84f5ec14ff2a21fc5c644a23b8d1ca2da40f7640d970f7bc47de14",
+        "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "7fb69e5213a679b6e7a9be4923f8b0123a42b0b5df91e66395a16c8a18b30685",
-        "metadata_sha256": "5ed9cf987dea8d46a9a2f2200531f4d289307cdd7fbf9c5ae0429d6329b4270f",
-        "version": "2.8.0"
+        "files_sha256": "57caab854f627fd3129661a820c456567e368a0d21578b5e5a46c40c2a40dc8d",
+        "metadata_sha256": "57ea35902375de590c97f298bcaf6e7ce590bb164ecb6d0d5b6eca5c4c39408d",
+        "version": "0"
       },
       "typed-core": {
         "files_sha256": "4c6915eb97aa8eff3fe3f17f7bdb3b20b008b13c2592479b55478d63bf31781d",
@@ -803,13 +803,13 @@
       }
     },
     "python": "3.12",
-    "schema_version": 1,
-    "source_sha256": "91fbcb4a93688de95fb54169cbe827a0a9ea0168663714699bd78a3322048853",
+    "schema_version": 2,
+    "source_sha256": "202f82c0dd2ca2ba81e443e458a4280abb214417100cae1b981b7adad7e69013",
     "venue": "hyperliquid"
   },
-  "finished": "2026-10-01T14:55:18.717220Z",
-  "results_sha256": "8595aa90852e2d2ef0c18b954b8c517e948a46c867c608c9c56ff9750d2ee7c8",
-  "schema_version": 1,
-  "started": "2026-10-01T14:53:06.354015Z",
-  "summary_sha256": "d54f054092e26fdc2e8d9fd941dd21fa96d383e5fc1659815f50a06c7121a069"
+  "finished": "2026-10-05T16:36:03.998842Z",
+  "results_sha256": "2e8ec75ae6751b1b79a5d405472e27c5b850d955c5825428da5ea2bbe27c7d37",
+  "schema_version": 2,
+  "started": "2026-10-05T16:33:51.524765Z",
+  "summary_sha256": "93b434e21afedf2b52d5efa3f32c08a8e6d3e8dd7d954a52ec60178b464979df"
 }

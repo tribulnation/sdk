@@ -7,20 +7,20 @@ import tomllib
 from typing_extensions import cast
 
 ROOT = Path(__file__).resolve().parents[3]
-SDK_2_IMPLEMENTATIONS = {
-  'aster': '0.2.0',
+COMPATIBLE_IMPLEMENTATIONS = {
+  'aster': '0.5.0',
   'binance': '0.3.0',
   'bit2me': '0.5.0',
   'bitget': '0.7.0',
-  'bybit': '0.2.0',
+  'bybit': '0.5.0',
   'coinbase': '0.2.0',
   'deribit': '0.3.0',
-  'dydx': '0.7.0',
+  'dydx': '0.11.0',
   'ethereum': '0.6.0',
-  'hyperliquid': '0.7.0',
+  'hyperliquid': '0.11.0',
   'kraken': '0.2.0',
   'kucoin': '0.3.0',
-  'lighter': '0.1.0',
+  'lighter': '0.4.0',
   'mexc': '2.0.0',
 }
 
@@ -49,11 +49,21 @@ def test_implementations_require_the_current_sdk_contract():
 
 
 def test_sdk_extras_exclude_pre_migration_implementations():
-  """SDK 2 extras must not resolve to older, incompatible venue packages."""
+  """SDK extras must not resolve to older, incompatible venue packages."""
   project = tomllib.loads((ROOT / 'packages/sdk/pkg/pyproject.toml').read_text())
   extras = project['project']['optional-dependencies']
-  for venue, version in SDK_2_IMPLEMENTATIONS.items():
-    assert f'tribulnation-{venue}>={version}' in extras[venue], venue
+  for venue, version in COMPATIBLE_IMPLEMENTATIONS.items():
+    requirement = next(
+      Requirement(value)
+      for value in extras[venue]
+      if Requirement(value).name == f'tribulnation-{venue}'
+    )
+    floors = [
+      Version(value.version)
+      for value in requirement.specifier
+      if value.operator == '>='
+    ]
+    assert floors and max(floors) >= Version(version), venue
 
 
 def test_ethereum_requires_the_renamed_typed_namespace():
@@ -61,3 +71,16 @@ def test_ethereum_requires_the_renamed_typed_namespace():
   assert 'typed-ethereum>=0.2.0' in dependencies(
     ROOT / 'packages/impl/ethereum/pkg/pyproject.toml',
   )
+
+
+def test_funding_adapters_require_received_positive_sdk():
+  """Do not install the cash-flow adapters against the old paid-positive contract."""
+  for venue in ('hyperliquid', 'dydx', 'bybit', 'aster', 'lighter'):
+    manifest = ROOT / f'packages/impl/{venue}/pkg/pyproject.toml'
+    requirement = next(
+      Requirement(value)
+      for value in dependencies(manifest)
+      if Requirement(value).name == 'tribulnation-sdk'
+    )
+    assert Version('2.9.0') not in requirement.specifier, venue
+    assert Version('2.10.0') in requirement.specifier, venue

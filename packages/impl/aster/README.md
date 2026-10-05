@@ -39,3 +39,9 @@ venue = AsterMarket.new(user='0x…', signer='0x…', mainnet=False)
 
 See [Aster Market](../../../docs/market/implementations/aster.md) for account
 configuration through `MarketSDK`.
+
+## Funding payment signs
+
+Since 0.5.0, funding payments are positive when received and negative when
+paid, for every supported history scope. Requires SDK >=2.10.0. Funding rates keep
+their existing signs. See [migration notes](RELEASE.md) before upgrading.

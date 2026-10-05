@@ -142,3 +142,42 @@ def test_stream_snapshots_accept_one_market_or_all():
 
   assert selected(None, [0, 1]) == [0, 1]
   assert selected(['1', 'x', '7'], [0, 1]) == [1]
+
+
+@pytest.mark.parametrize('market_id', [1, None])
+async def test_funding_payments_preserve_cash_flows(
+  shared: Shared, market_id: int | None
+):
+  """Both scopes preserve received, paid and zero amounts across page retries."""
+  calls: list[int] = []
+  seen: dict[str, Any] = {}
+  amounts = [Decimal('2'), Decimal('-3'), Decimal('0')]
+
+  async def fetch(state: int) -> tuple[list[dict[str, Any]], int | None]:
+    """Include an out-of-range row and fail the second page once."""
+    calls.append(state)
+    if calls == [0, 1]:
+      raise ClientNetworkError('disconnected')
+    return [
+      {'timestamp': END, 'change': amounts[state], 'market_id': 1},
+      {'timestamp': END + HOUR, 'change': Decimal('99'), 'market_id': 1},
+    ], state + 1 if state < 2 else None
+
+  def pages(**kwargs: Any) -> PaginatedResponse[Any, int]:
+    """Record native query arguments and serve the fixture pages."""
+    seen.update(kwargs)
+    return PaginatedResponse(0, fetch)
+
+  shared.client.api.account.position_funding_paged = pages  # type: ignore[method-assign]
+  with Context().retried(NetworkError, max_retries=1, base_delay=0).use():
+    rows = [
+      row
+      async for page in history.funding_payments(shared, market_id, END, END)
+      for row in page
+    ]
+  assert [row.amount for row in rows] == amounts
+  assert [row.time for row in rows] == [END] * 3
+  assert calls == [0, 1, 1, 2]
+  assert seen['market_ids'] == (None if market_id is None else [1])
+  if market_id is None:
+    assert all(getattr(row, 'market_id') == '1' for row in rows)

@@ -274,9 +274,9 @@ history_result
 #
 # Two sign-convention caveats, both a direct consequence of the account-scope block making
 # live verification impossible: `funding`'s sign (`positive = credited`) and
-# `market.ipynb`'s `FundingPayment.amount` (`positive = paid`) are the same underlying
-# value read two different ways for two different abstractions -- neither could be
-# confirmed against a real settled MEXC funding row here.
+# the market funding mapping could not be confirmed against a real settled MEXC
+# funding row here. The market prototype now raises rather than guessing; the SDK
+# contract for both abstractions is positive received, negative paid.
 
 # %% [markdown]
 # ## `Snapshots`

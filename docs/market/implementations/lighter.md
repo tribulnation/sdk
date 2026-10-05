@@ -68,7 +68,7 @@ response validation.
   margin reports its own bucket. Spot collateral supports unified accounts only; classic
   accounts raise `ApiError`.
 - Funding settles hourly. Funding-rate history is signed by the paying side (positive
-  when longs pay); funding payments are positive when paid.
+  when longs pay); funding payments are positive when received.
 - Public reads are verified on mainnet. Account and trading methods are verified on
   testnet only.
 

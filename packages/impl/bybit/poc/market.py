@@ -537,6 +537,7 @@ start = end - timedelta(days=7)
 
 
 # %%
+# not executed: received-positive contract update; not rerun live; adapter regression fixtures cover signs.
 async def funding_payments(
   symbol: str, start: datetime, end: datetime
 ) -> list[FundingPayment]:
@@ -553,7 +554,7 @@ async def funding_payments(
   # this account has never held a perp position, so `transaction_log` returns no
   # SETTLEMENT row anywhere in the two years Bybit will serve.
   return [
-    FundingPayment(amount=-Decimal(e['funding']), time=e['transactionTime'])
+    FundingPayment(amount=Decimal(e['funding']), time=e['transactionTime'])
     for e in raw['list']
     if e['symbol'] == symbol and 'funding' in e and e['funding']
   ]

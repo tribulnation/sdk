@@ -630,7 +630,7 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
   def funding_payments(
     self, start: datetime, end: datetime
   ) -> PaginatedResponse[FundingPayment]:
-    """Read settled funding cashflows, positive when paid."""
+    """Read settled funding cashflows, positive when received."""
     if start.tzinfo is None or end.tzinfo is None:
       raise ValueError('Funding history bounds must be timezone-aware')
     return PaginatedResponse(self.funding_payment_pages(start, end))
@@ -643,7 +643,7 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
       self.symbol, income_type='FUNDING_FEE', start_time=start, end_time=end, limit=1000
     )
     async for page in pages.via(self.shared.call):
-      yield [FundingPayment(amount=-r['income'], time=r['time']) for r in page]
+      yield [FundingPayment(amount=r['income'], time=r['time']) for r in page]
 
   async def one_way_position(self):
     """Read the symbol's single one-way (`BOTH`) position row."""

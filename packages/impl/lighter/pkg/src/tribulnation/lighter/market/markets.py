@@ -207,7 +207,7 @@ class LighterPerpMarket(MarketBase, PerpMarket):
   def funding_payments(
     self, start: datetime, end: datetime
   ) -> PaginatedResponse[FundingPayment]:
-    """Personal funding payments, paid-positive."""
+    """Personal funding payments, received-positive."""
     return PaginatedResponse(
       history.funding_payments(self.shared, self.market_index, start, end)
     )
