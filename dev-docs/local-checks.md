@@ -141,11 +141,13 @@ git -C /path/to/catalogue worktree add --detach /tmp/sdk-release-catalogue \
 sdk-dev results release sdk --catalogue /tmp/sdk-release-catalogue/data
 ```
 
-1. Core SDK releases require all supported read-suite reports for every declared
-   implementation. Market implementations additionally require market consistency.
-   Individual implementation releases require both applicable scopes for that
-   implementation. A report of the wrong scope cannot substitute for required evidence.
-2. Reports expire after seven days and must match current relevant SDK, adapter,
+1. Releases require reports for venues affected since the previous published
+   package tag. Shared SDK or qualification changes affect all declared venues;
+   adapter changes affect that adapter. Gateway-only and version-only changes
+   require no live evidence, including no seven-day freshness check. First releases
+   require every venue in scope. Market implementations additionally require market
+   consistency. See [ADR 0033](adr/0033-change-scoped-release-evidence.md). A report of the wrong scope cannot substitute for required evidence.
+2. Required reports expire after seven days and must match current relevant SDK, adapter,
    test, support and dependency inputs, plus their recorded Catalogue snapshot.
    `release-evidence/catalogue-ref.txt` pins that snapshot to a full commit SHA.
    Its actual data must still match every required report's content fingerprint;
@@ -243,3 +245,17 @@ checked on mainnet; only private Report functionality is checked on testnet.
 Every result records its network. Mainnet private-account behavior remains
 unverified and must be noted in the release. This exception cannot qualify market
 data or other venues. See [ADR 0012](adr/0012-deribit-public-mainnet-private-testnet.md).
+
+### Release impact and fingerprint migration
+
+`sdk-dev results release-scope sdk` prints the venues requiring evidence. Use a
+checkout with full history and tags and commit relevant edits before checking
+release impact. The comparison includes all changes since the prior package tag,
+not just the release PR. Unrelated local files and the CI Catalogue checkout do
+not affect this calculation.
+
+Schema-2 fingerprints exclude gateway source/tests and gateway-only packaging,
+and normalize candidate version labels. Runtime dependencies, shared SDK and
+qualification behavior still invalidate evidence. Installed imports and candidate
+versions must still match the checkout. Old reports require new recorded runs;
+do not edit their manifests. This policy migration itself requires qualification.

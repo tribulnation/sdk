@@ -211,6 +211,7 @@ def test_release_demands_both_scopes(tmp_path: Path, monkeypatch: pytest.MonkeyP
 
   check = Mock(side_effect=ValueError('missing read evidence'))
   monkeypatch.setattr(results, 'verify_one', check)
+  monkeypatch.setattr(results, 'affected_venues', lambda root, package, venues: venues)
   result = CliRunner().invoke(
     results.app,
     ['release', 'binance', '--reports', str(tmp_path), '--catalogue', str(tmp_path)],

@@ -5,6 +5,9 @@
 1. Status: proposed; implemented in this PR, not release-verified
 2. Date: 2026-10-05
 
+Amended by [ADR 0033](0033-change-scoped-release-evidence.md): release evidence is
+required only for venues affected since the previous package release.
+
 ## Context
 
 A gateway server, wire codec and remote SDK proxy closely follow SDK market types.

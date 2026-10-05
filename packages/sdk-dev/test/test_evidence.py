@@ -380,3 +380,56 @@ def test_missing_report_and_symlink_fail(candidate: tuple[Path, Path], tmp_path:
   body.symlink_to(other)
   with pytest.raises(ValueError, match='symlinks'):
     evidence.verify_report(root, output, catalogue)
+
+
+def test_candidate_installed_hash_ignores_only_gateway_and_version(
+  tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+  """Installed SDK hashing preserves core drift while allowing gateway-only edits."""
+  package = tmp_path / 'sdk'
+  source = package / 'src/tribulnation/sdk'
+  source.mkdir(parents=True)
+  (source / '__init__.py').write_text('CORE = 1\n')
+  gateway = source / 'gateway'
+  gateway.mkdir()
+  (gateway / 'server.py').write_text('GATEWAY = 1\n')
+  project = package / 'pyproject.toml'
+  project.write_text('[project]\nname="tribulnation-sdk"\nversion="1"\n')
+  info = tmp_path / 'tribulnation_sdk-1.dist-info'
+  info.mkdir()
+  meta = info / 'METADATA'
+  meta.write_text('Name: tribulnation-sdk\nVersion: 1\nRequires-Dist: runtime>=1\n')
+  (info / 'direct_url.json').write_text(
+    json.dumps(
+      {
+        'url': package.as_uri(),
+        'dir_info': {'editable': True},
+      }
+    )
+  )
+  monkeypatch.setattr(evidence, 'verify_imports', Mock())
+  before = evidence.dependency(metadata.Distribution.at(info), candidate=package)
+  project.write_text(
+    project.read_text().replace('version="1"', 'version="2"')
+    + '\n[project.optional-dependencies]\ngateway=["aiohttp"]\n'
+  )
+  meta.write_text(
+    meta.read_text().replace('Version: 1', 'Version: 2')
+    + 'Requires-Dist: aiohttp; extra == "gateway"\n'
+  )
+  (info / 'entry_points.txt').write_text(
+    '[tribulnation.commands]\ngateway=tribulnation.sdk.gateway.cli:app\n'
+  )
+  (gateway / 'server.py').write_text('GATEWAY = 2\n')
+  assert (
+    evidence.dependency(metadata.Distribution.at(info), candidate=package) == before
+  )
+  meta.write_text(meta.read_text().replace('runtime>=1', 'runtime>=2'))
+  assert (
+    evidence.dependency(metadata.Distribution.at(info), candidate=package) != before
+  )
+  meta.write_text(meta.read_text().replace('runtime>=2', 'runtime>=1'))
+  (source / '__init__.py').write_text('CORE = 2\n')
+  assert (
+    evidence.dependency(metadata.Distribution.at(info), candidate=package) != before
+  )

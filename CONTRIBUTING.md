@@ -210,10 +210,13 @@ Bump `version` in the package's `pkg/pyproject.toml` on a branch named `release/
 `release/<venue>`, and open a PR touching that package. Merging it tags the commit and
 publishes to PyPI (`.github/workflows/release.yml`).
 
-Publication additionally requires matching, passing local read-suite reports in
+For venues affected since the previous package release, publication requires
+matching, passing local read-suite reports in
 `release-evidence/<venue>/surfaces/` and market consistency reports in
 `release-evidence/<venue>/consistency/`; missing evidence blocks both release PR verification
-and publication. Report evidence covers snapshots, not history correctness or completeness
+and publication for affected venues. Gateway-only and version-only releases need
+no live venue evidence; shared SDK and qualification changes require all venues.
+See [ADR 0033](dev-docs/adr/0033-change-scoped-release-evidence.md). Report evidence covers snapshots, not history correctness or completeness
 (ADR 0016). The publication job checks the exact merged commit. Passing
 evidence does not constitute approval to merge or publish.
 

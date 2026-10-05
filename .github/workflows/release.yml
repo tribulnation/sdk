@@ -85,8 +85,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
+      - run: pip install packaging
+      - name: Determine qualification scope since previous release
+        id: scope
+        env:
+          PYTHONPATH: packages/sdk-dev/pkg/src
+          RELEASE_BRANCH: ${{ github.head_ref }}
+        run: python -m sdk_dev.release_scope "${{ needs.check.outputs.slug }}"
       - name: Read the Catalogue snapshot used for qualification
+        if: steps.scope.outputs.venues != ''
         id: catalogue
         shell: bash
         run: |
@@ -97,6 +104,7 @@ jobs:
           fi
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v5
+        if: steps.scope.outputs.venues != ''
         with:
           repository: tribulnation/catalogue
           ref: ${{ steps.catalogue.outputs.ref }}
@@ -106,16 +114,22 @@ jobs:
       # the complete candidate also avoids requiring implementations to be published
       # before the SDK version they depend on.
       - name: Install reproducible crcmod runtime
+        if: steps.scope.outputs.venues != ''
         env:
           CC: /bin/false
         run: pip install --no-cache-dir --no-binary=crcmod crcmod==1.7
       - name: Install candidate with recorded dependency versions
+        env:
+          EVIDENCE_VENUES: ${{ steps.scope.outputs.venues }}
         run: |
           constraints=()
-          for report in release-evidence/*/*/dependency-pins.txt; do
-            if [ -f "$report" ]; then
-              constraints+=(-c "$report")
-            fi
+          IFS=',' read -ra venues <<< "$EVIDENCE_VENUES"
+          for venue in "${venues[@]}"; do
+            for report in release-evidence/"$venue"/*/dependency-pins.txt; do
+              if [ -f "$report" ]; then
+                constraints+=(-c "$report")
+              fi
+            done
           done
           pip install "${constraints[@]}" -r requirements.txt
           # These wheels share docs/* paths. Install hexbytes last so the complete
