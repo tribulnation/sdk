@@ -27,7 +27,7 @@ against Catalogue commit `1851660ac2bed8243dd9ce9c7297fe05c7130973`. Bit2Me's fi
 two attempts failed transient reads; only the subsequent fully passing fresh run
 is committed. The existing Bit2Me native-ticker limitation remains visible.
 
-All 1,302 repository unit tests pass, and the six release packages pass Ruff and
+All 1,303 repository unit tests pass, and the six release packages pass Ruff and
 Pyright. The broader PoC check reports 22 pre-existing fee/type errors, reproduced
 on the pre-change baseline. Updated funding example cells are marked not rerun
 live; regression fixtures establish their new sign mapping.
