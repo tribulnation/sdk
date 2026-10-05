@@ -15,3 +15,8 @@ Known upstream limitation: typed-aster 0.2.0 still serializes Decimal values bel
 Report surfaces and market consistency, not order placement.
 
 Requires tribulnation-sdk >=2.8.0 and typed-aster >=0.2.0.
+
+Read-only mainnet qualification passed on 2026-10-05: 27 Market/Report cases
+passed, with four declared spot-only exclusions and no failures or unexpected
+skips. Market consistency also passed. Fresh schema-2 reports are committed under
+`release-evidence/aster/` against the existing pinned Catalogue snapshot.
