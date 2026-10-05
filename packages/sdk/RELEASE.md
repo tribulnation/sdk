@@ -20,3 +20,14 @@ Offline regression tests cover funding income, expense and zero, plus history
 scope, filtering and page retry behavior. Release qualification uses the normal
 read-only surfaces and consistency suites; it does not assert personal history
 completeness. Deribit Report qualification is testnet-only under ADR 0012.
+
+Qualification on 2026-10-05: all 14 declared venues have passing, verified
+read-suite evidence, and all 13 market venues have passing consistency evidence,
+against Catalogue commit `1851660ac2bed8243dd9ce9c7297fe05c7130973`. Bit2Me's first
+two attempts failed transient reads; only the subsequent fully passing fresh run
+is committed. The existing Bit2Me native-ticker limitation remains visible.
+
+All 1,302 repository unit tests pass, and the six release packages pass Ruff and
+Pyright. The broader PoC check reports 22 pre-existing fee/type errors, reproduced
+on the pre-change baseline. Updated funding example cells are marked not rerun
+live; regression fixtures establish their new sign mapping.
