@@ -7,6 +7,9 @@
 2. Date: 2026-09-11
 3. Amends: ADRs 0003 and 0006. Preserves the Deribit network split in ADR 0012.
 
+Amended by [ADR 0033](0033-change-scoped-release-evidence.md): release evidence is
+required only for venues affected since the previous package release.
+
 ## Context
 
 The previous gate selected market consistency OR non-market evidence. Consequently,

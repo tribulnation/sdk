@@ -5,7 +5,7 @@ pyright
 python-dotenv
 pytest
 pytest-asyncio
--e packages/sdk/pkg
+-e packages/sdk/pkg[gateway]
 -e packages/sdk-dev/pkg
 -e packages/impl/binance/pkg
 -e packages/impl/bitget/pkg

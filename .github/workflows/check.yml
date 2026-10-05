@@ -114,7 +114,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install packaging
+      - name: Determine qualification scope since previous release
+        id: scope
+        env:
+          PYTHONPATH: packages/sdk-dev/pkg/src
+          RELEASE_BRANCH: ${{ github.head_ref }}
+        run: python -m sdk_dev.release_scope "${RELEASE_BRANCH#release/}"
       - name: Read the Catalogue snapshot used for qualification
+        if: steps.scope.outputs.venues != ''
         id: catalogue
         shell: bash
         run: |
@@ -125,26 +138,31 @@ jobs:
           fi
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v5
+        if: steps.scope.outputs.venues != ''
         with:
           repository: tribulnation/catalogue
           ref: ${{ steps.catalogue.outputs.ref }}
           path: release-catalogue
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
       # crcmod 1.7 optionally builds a host-specific C extension. Match the
       # portable pure-Python build used by local qualification, without waiving hashes.
       - name: Install reproducible crcmod runtime
+        if: steps.scope.outputs.venues != ''
         env:
           CC: /bin/false
         run: pip install --no-cache-dir --no-binary=crcmod crcmod==1.7
       - name: Install candidate with recorded dependency versions
+        if: steps.scope.outputs.venues != ''
+        env:
+          EVIDENCE_VENUES: ${{ steps.scope.outputs.venues }}
         run: |
           constraints=()
-          for report in release-evidence/*/*/dependency-pins.txt; do
-            if [ -f "$report" ]; then
-              constraints+=(-c "$report")
-            fi
+          IFS=',' read -ra venues <<< "$EVIDENCE_VENUES"
+          for venue in "${venues[@]}"; do
+            for report in release-evidence/"$venue"/*/dependency-pins.txt; do
+              if [ -f "$report" ]; then
+                constraints+=(-c "$report")
+              fi
+            done
           done
           pip install "${constraints[@]}" -r requirements.txt
           # These wheels share docs/* paths. Install hexbytes last so the complete
@@ -152,6 +170,7 @@ jobs:
           hexbytes_version=$(python -c 'from importlib.metadata import version; print(version("hexbytes"))')
           pip install --no-deps --force-reinstall "hexbytes==$hexbytes_version"
       - name: Verify local evidence without exchange credentials
+        if: steps.scope.outputs.venues != ''
         env:
           RELEASE_BRANCH: ${{ github.head_ref }}
         run: sdk-dev results release "${RELEASE_BRANCH#release/}" --catalogue release-catalogue/data

@@ -83,6 +83,6 @@ Here `Fn` is a callable type and `Context.path: tuple[str, ...]` is a tuple of t
 
 ---
 
-← [Error Handling](error-handling.md)
+← [Error Handling](error-handling.md) · **Next:** [SDK gateway](../gateway.md) →
 
 <!-- /next -->

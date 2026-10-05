@@ -15,6 +15,13 @@ from packaging.utils import canonicalize_name
 from packaging.version import Version
 from pydantic import BaseModel, ConfigDict, Field, JsonValue
 
+from sdk_dev.release_scope import (
+  normalized_input,
+  relevant_path,
+  project_inputs,
+  sdk_requirement,
+)
+
 MAX_AGE = timedelta(days=7)
 SKIP_DIRS = frozenset({'.git', '.venv', '__pycache__', '.pytest_cache', '.ruff_cache'})
 SENSITIVE_KEYS = frozenset(
@@ -51,7 +58,7 @@ class Dependency(FrozenModel):
 class Snapshot(FrozenModel):
   """Relevant candidate, installed dependency, interpreter and Catalogue inputs."""
 
-  schema_version: int = Field(default=1, ge=1, le=1)
+  schema_version: int = Field(default=2, ge=2, le=2)
   venue: str = Field(pattern=r'^[a-z][a-z0-9_-]*$')
   python: str = Field(pattern=r'^\d+\.\d+$')
   source_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
@@ -62,7 +69,7 @@ class Snapshot(FrozenModel):
 class Manifest(FrozenModel):
   """Inputs and timestamps binding a completed run to its public results."""
 
-  schema_version: int = Field(default=1, ge=1, le=1)
+  schema_version: int = Field(default=2, ge=2, le=2)
   before: Snapshot
   after: Snapshot
   started: datetime
@@ -169,7 +176,21 @@ def candidate_files(root: Path, venue: str) -> dict[str, Path]:
   if integration.is_dir():
     for path in tree_files(integration).values():
       files[path.relative_to(root).as_posix()] = path
-  return files
+  return {name: path for name, path in files.items() if relevant_path(name, venue)}
+
+
+def candidate_digest(root: Path, venue: str) -> str:
+  """Hash normalized qualification inputs without gateway or release-label drift."""
+  files = candidate_files(root, venue)
+  files_digest(files)  # Retain missing-file and symlink rejection.
+  return digest(
+    json_bytes(
+      {
+        name: digest(normalized_input(name, path.read_bytes()))
+        for name, path in files.items()
+      }
+    )
+  )
 
 
 def editable_root(dist: metadata.Distribution) -> Path | None:
@@ -211,7 +232,9 @@ def verify_imports(dist: metadata.Distribution, source: Path, files: dict[str, P
         raise ValueError(f'Dependency import is shadowed: {name}')
 
 
-def dependency(dist: metadata.Distribution) -> Dependency:
+def dependency(
+  dist: metadata.Distribution, *, candidate: Path | None = None
+) -> Dependency:
   """Hash actual installed code; editable and wheel source layouts normalize alike."""
   editable = editable_root(dist)
   if editable is not None:
@@ -247,12 +270,49 @@ def dependency(dist: metadata.Distribution) -> Dependency:
       (entry.group, entry.name, entry.value) for entry in dist.entry_points
     ),
   }
+  # Validate the full installed inventory before applying qualification exclusions.
+  file_hash = files_digest(files) if files else digest(json_bytes({}))
+  if candidate is not None:
+    name = canonicalize_name(dist.metadata['Name'])
+    sdk = name == 'tribulnation-sdk'
+    prefix = (
+      'packages/sdk/pkg/src/'
+      if sdk
+      else 'packages/sdk-dev/pkg/src/'
+      if name == 'sdk-dev'
+      else f'packages/impl/{name.removeprefix("tribulnation-")}/pkg/src/'
+    )
+    venue = name.removeprefix('tribulnation-')
+    files = {
+      key: path for key, path in files.items() if relevant_path(prefix + key, venue)
+    }
+    identity.pop('version')
+    if sdk:
+      identity['requires_dist'] = sorted(
+        raw for raw in dist.requires or () if sdk_requirement(raw)
+      )
+      identity['entry_points'] = sorted(
+        (entry.group, entry.name, entry.value)
+        for entry in dist.entry_points
+        if (entry.group, entry.name) != ('tribulnation.commands', 'gateway')
+      )
+    identity['declared'] = project_inputs(
+      (candidate / 'pyproject.toml').read_bytes(), sdk=sdk
+    )
+    file_hash = digest(
+      json_bytes(
+        {
+          key: digest(normalized_input(prefix + key, path.read_bytes()))
+          for key, path in files.items()
+        }
+      )
+    )
   return Dependency(
-    version=dist.version,
+    version='0' if candidate is not None else dist.version,
     metadata_sha256=digest(json_bytes(identity)),
     # Metadata-only metapackages (e.g. griffe) have no importable files. Their
     # requirements and entry points are hashed above; dependencies are traversed.
-    files_sha256=files_digest(files) if files else digest(json_bytes({})),
+    files_sha256=file_hash,
   )
 
 
@@ -304,8 +364,10 @@ def installed_dependencies(root: Path, venue: str) -> dict[str, Dependency]:
           f'Candidate package requirements differ from installed metadata: {name}'
         )
     if name not in result:
-      result[name] = dependency(dist)
+      result[name] = dependency(dist, candidate=packages.get(name))
     for raw in dist.requires or ():
+      if name == 'tribulnation-sdk' and not sdk_requirement(raw):
+        continue
       child = Requirement(raw)
       if child.marker is None or any(
         child.marker.evaluate({'extra': extra}) for extra in extras
@@ -324,7 +386,7 @@ def capture(root: Path, venue: str, catalogue: Path) -> Snapshot:
   return Snapshot(
     venue=venue,
     python=f'{sys.version_info.major}.{sys.version_info.minor}',
-    source_sha256=files_digest(candidate_files(root, venue)),
+    source_sha256=candidate_digest(root, venue),
     catalogue_sha256=files_digest(catalogue_files),
     dependencies=installed_dependencies(root, venue),
   )
