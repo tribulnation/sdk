@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tribulnation-aster"
-version = "0.4.1"
+version = "0.4.2"
 description = "Tribulnation SDK implementation for Aster spot and perpetual markets."
 license = "MIT"
 license-files = ["LICENSE"]
