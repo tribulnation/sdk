@@ -515,7 +515,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "6f2822ddf8e7d6d86acd47cc49eeb8572377aa6318a3938be4db024c02ccb100",
+    "source_sha256": "86a0488f2e78ec883fa7c68b665d876d617e1e980478769c1ac91dd31da90b8e",
     "venue": "dydx"
   },
   "before": {
@@ -1034,12 +1034,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "6f2822ddf8e7d6d86acd47cc49eeb8572377aa6318a3938be4db024c02ccb100",
+    "source_sha256": "86a0488f2e78ec883fa7c68b665d876d617e1e980478769c1ac91dd31da90b8e",
     "venue": "dydx"
   },
-  "finished": "2026-10-05T16:13:35.350719Z",
-  "results_sha256": "136473ce5275cc6b67fe107b10c767e0eca3e40d6771e710f9b7195c67d56991",
+  "finished": "2026-10-05T16:25:34.479634Z",
+  "results_sha256": "b6bb7ca02819bd06183deffbdf43798809129964fcd242c82ce0e28e45990d44",
   "schema_version": 2,
-  "started": "2026-10-05T16:12:34.039691Z",
-  "summary_sha256": "4c563c79a42ac26d1b0e90c523a258e6f700c76f5a2bc4d6309453c5fa82c8ce"
+  "started": "2026-10-05T16:24:39.585272Z",
+  "summary_sha256": "dc2290136806bd5411b24469df03e4948303de661711a7bfdab92dd63cd62670"
 }

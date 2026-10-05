@@ -290,7 +290,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "739281b78b7944f822e568919066f82fd7dd5616917547539fb0a8d035b8148e",
+    "source_sha256": "561355e54f591f1cb3ed6cd0d4da1d42b7f323ecd06dfc1ba34358c5c6eab3c1",
     "venue": "binance"
   },
   "before": {
@@ -584,12 +584,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "739281b78b7944f822e568919066f82fd7dd5616917547539fb0a8d035b8148e",
+    "source_sha256": "561355e54f591f1cb3ed6cd0d4da1d42b7f323ecd06dfc1ba34358c5c6eab3c1",
     "venue": "binance"
   },
-  "finished": "2026-10-05T16:14:59.411240Z",
-  "results_sha256": "1090c7dafb5eca599867ab36188d134715a6e8d2c42b4542a5b69024672494ba",
+  "finished": "2026-10-05T16:27:13.904375Z",
+  "results_sha256": "6b3320865ea822471ca8f74ff0592a8dbeb150370b7b489f65593eac3374f16f",
   "schema_version": 2,
-  "started": "2026-10-05T16:14:12.719876Z",
-  "summary_sha256": "f740e24f10ddb6b91f26b9ca7ea25bb24d5bae3baa84766f60145638e1db65d2"
+  "started": "2026-10-05T16:26:28.318139Z",
+  "summary_sha256": "d25bb3a3850561c40b18692fb454fd2720b5d3f5e3b64d2d7b87308fad13c7e0"
 }

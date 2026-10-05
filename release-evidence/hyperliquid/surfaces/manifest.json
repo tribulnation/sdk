@@ -400,7 +400,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "ef8f2c6a54be9626ead4461cd87b9f26e464641b17b52a0cbf7b62cdf3c627cb",
+    "source_sha256": "f9ba24ca030214d5aab0b30e7fe2a68d2abb5260ed679c716d93129f459f67e9",
     "venue": "hyperliquid"
   },
   "before": {
@@ -804,12 +804,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "ef8f2c6a54be9626ead4461cd87b9f26e464641b17b52a0cbf7b62cdf3c627cb",
+    "source_sha256": "f9ba24ca030214d5aab0b30e7fe2a68d2abb5260ed679c716d93129f459f67e9",
     "venue": "hyperliquid"
   },
-  "finished": "2026-10-05T16:12:34.311676Z",
+  "finished": "2026-10-05T16:24:46.886182Z",
   "results_sha256": "6430cb107a5e7d786fa74401c8cb89de34d375a853bd6bc2f3ce8eb4d1774b6b",
   "schema_version": 2,
-  "started": "2026-10-05T16:12:11.872945Z",
-  "summary_sha256": "65da6565f0c5184588a74cf94f52dc6d5bb728e011a6e80220d79871e413e9f7"
+  "started": "2026-10-05T16:24:23.596148Z",
+  "summary_sha256": "095fd279b0cbf2aea141c7595921377cf7defca6f3644d1ea75315aea2221bea"
 }

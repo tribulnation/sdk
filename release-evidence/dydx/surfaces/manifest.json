@@ -515,7 +515,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "6f2822ddf8e7d6d86acd47cc49eeb8572377aa6318a3938be4db024c02ccb100",
+    "source_sha256": "86a0488f2e78ec883fa7c68b665d876d617e1e980478769c1ac91dd31da90b8e",
     "venue": "dydx"
   },
   "before": {
@@ -1034,12 +1034,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "6f2822ddf8e7d6d86acd47cc49eeb8572377aa6318a3938be4db024c02ccb100",
+    "source_sha256": "86a0488f2e78ec883fa7c68b665d876d617e1e980478769c1ac91dd31da90b8e",
     "venue": "dydx"
   },
-  "finished": "2026-10-05T16:12:33.215402Z",
+  "finished": "2026-10-05T16:24:38.915220Z",
   "results_sha256": "e36ad329027c8aca9e32406a42cd488a7e67bf6659724e4dec53eed111736833",
   "schema_version": 2,
-  "started": "2026-10-05T16:12:11.879847Z",
-  "summary_sha256": "c8824e7eee9fcde8fd8d5d021742764dd73bb3125ca0ad5cac767066ff54ec9b"
+  "started": "2026-10-05T16:24:23.639008Z",
+  "summary_sha256": "e40ff777974d3af64b3b57c3b84edcf22df322b8341dfe8d95e3e24faca718f7"
 }
