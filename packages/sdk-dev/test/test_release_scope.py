@@ -61,7 +61,15 @@ def add(root: Path, name: str):
     ('packages/impl/binance/impl.toml', ['binance']),
     ('packages/impl/binance/test/test_adapter.py', ['binance']),
     ('packages/sdk/pkg/src/tribulnation/sdk/core/sdk.py', ['binance', 'mexc']),
-    ('packages/sdk-dev/pkg/src/sdk_dev/evidence.py', ['binance', 'mexc']),
+    ('packages/sdk-dev/pkg/src/sdk_dev/evidence.py', []),
+    ('packages/sdk-dev/pkg/src/sdk_dev/release_scope.py', []),
+    ('packages/sdk-dev/test/test_read_evidence.py', []),
+    ('packages/sdk-dev/pkg/src/sdk_dev/read_evidence.py', ['binance', 'mexc']),
+    ('packages/sdk-dev/pkg/src/sdk_dev/consistency.py', ['binance', 'mexc']),
+    (
+      'packages/sdk-dev/pkg/src/sdk_dev/integration/market/public.py',
+      ['binance', 'mexc'],
+    ),
     ('requirements.txt', ['binance', 'mexc']),
   ],
 )
@@ -161,3 +169,60 @@ def test_catalogue_checkout_does_not_block_scope(history: Path):
   folder.mkdir()
   (folder / 'data.json').write_text('{}')
   assert affected_venues(history, 'sdk', ['binance']) == []
+
+
+def test_mixed_results_module_keeps_live_behavior_in_scope():
+  """Offline commands do not affect observations; runner and import changes do."""
+  name = 'packages/sdk-dev/pkg/src/sdk_dev/cli/results.py'
+  before = b'def test_surfaces():\n  collect()\n\ndef verify_one():\n  verify()\n'
+  assert normalized_input(name, before) == normalized_input(
+    name,
+    before.replace(b'  verify()', b'  stricter_verify()')
+    + b'\ndef release_scope():\n  scope()\n',
+  )
+  assert normalized_input(name, before) != normalized_input(
+    name, before.replace(b'  collect()', b'  collect_other_cases()')
+  )
+  assert normalized_input(name, before) != normalized_input(
+    name, b'import new_runtime\n' + before
+  )
+
+
+def test_command_provider_dependency_is_not_a_venue_dependency():
+  """Adding CLI discovery leaves SDK runtime requirements otherwise unchanged."""
+  name = 'packages/sdk/pkg/pyproject.toml'
+  before = b'[project]\ndependencies=["typed-core>=1"]\n'
+  after = b'[project]\ndependencies=["typed-core>=1", "tribulnation-cli>=0.1.0,<1"]\n'
+  assert normalized_input(name, before) == normalized_input(name, after)
+  assert normalized_input(name, before) != normalized_input(
+    name, after.replace(b'typed-core>=1', b'typed-core>=2')
+  )
+
+
+def test_sdk_release_reuses_published_adapter_baseline(history: Path):
+  """Already shipped adapter changes need no rerun; later changes still do."""
+  project = history / 'packages/impl/binance/pkg/pyproject.toml'
+  project.parent.mkdir(parents=True)
+  project.write_text('[project]\nversion="1.0"\n')
+  name = 'packages/impl/binance/pkg/src/adapter.py'
+  add(history, name)
+  subprocess.run(['git', '-C', str(history), 'tag', 'binance-v1.0'], check=True)
+  assert affected_venues(history, 'sdk', ['binance', 'mexc']) == []
+  (history / name).write_text('new behavior\n')
+  commit(history)
+  assert affected_venues(history, 'sdk', ['binance', 'mexc']) == ['binance']
+  add(history, 'packages/sdk/pkg/src/tribulnation/sdk/core.py')
+  assert affected_venues(history, 'sdk', ['binance', 'mexc']) == ['binance', 'mexc']
+
+
+def test_impl_release_cannot_use_its_candidate_tag_as_baseline(history: Path):
+  """Only SDK aggregation can reuse an adapter's current published version."""
+  project = history / 'packages/impl/binance/pkg/pyproject.toml'
+  project.parent.mkdir(parents=True)
+  project.write_text('[project]\nversion="1.0"\n')
+  commit(history)
+  subprocess.run(['git', '-C', str(history), 'tag', 'binance-v1.0'], check=True)
+  project.write_text('[project]\nversion="1.1"\n')
+  add(history, 'packages/impl/binance/pkg/src/adapter.py')
+  subprocess.run(['git', '-C', str(history), 'tag', 'binance-v1.1'], check=True)
+  assert affected_venues(history, 'binance', ['binance']) == ['binance']

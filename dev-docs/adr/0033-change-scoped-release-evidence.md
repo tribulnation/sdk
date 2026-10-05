@@ -7,6 +7,10 @@
    [ADR 0032](0032-sdk-gateway.md).
 2. Date: 2026-10-05
 
+Amended by [ADR 0034](0034-offline-evidence-maintenance.md): verifier-only changes
+and this schema migration require offline checks, not fresh live qualification.
+Already-published adapter releases may advance each venue’s baseline.
+
 ## Context
 
 The SDK now ships a gateway alongside its interfaces. Requiring fresh live venue

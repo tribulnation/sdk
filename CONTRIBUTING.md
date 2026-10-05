@@ -215,8 +215,11 @@ matching, passing local read-suite reports in
 `release-evidence/<venue>/surfaces/` and market consistency reports in
 `release-evidence/<venue>/consistency/`; missing evidence blocks both release PR verification
 and publication for affected venues. Gateway-only and version-only releases need
-no live venue evidence; shared SDK and qualification changes require all venues.
-See [ADR 0033](dev-docs/adr/0033-change-scoped-release-evidence.md). Report evidence covers snapshots, not history correctness or completeness
+no live venue evidence. Offline verifier maintenance also needs no live runs;
+shared SDK and live qualification behavior changes require affected venues.
+Already-published adapter releases count as qualification baselines.
+See [ADR 0033](dev-docs/adr/0033-change-scoped-release-evidence.md) and
+[ADR 0034](dev-docs/adr/0034-offline-evidence-maintenance.md). Report evidence covers snapshots, not history correctness or completeness
 (ADR 0016). The publication job checks the exact merged commit. Passing
 evidence does not constitute approval to merge or publish.
 

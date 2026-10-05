@@ -60,7 +60,7 @@ account/configuration loading, lazy imports and owned SDK resource lifetime.
 Gateway-only installation is checked without venue packages. This does not
 qualify live venue trading, fill delivery or general SDK parity.
 
-SDK releases still require the repository's fingerprinted read-suite and
-consistency evidence for every supported implementation. No evidence is forged,
-updated by hand or waived for this addition; missing/stale qualification keeps
-the release PR unready to merge.
+Under [ADR 0034](0034-offline-evidence-maintenance.md), this gateway and verifier
+migration requires offline regression checks without new venue runs. Relevant
+adapter, shared SDK and live-check behavior changes still require fingerprinted
+read-suite/consistency evidence. Existing reports remain untouched.

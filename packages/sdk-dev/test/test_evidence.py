@@ -124,7 +124,7 @@ def test_candidate_content_drift_fails(
   report(root, catalogue, output)
   paths = {
     'source': root / 'packages/sdk/pkg/src/code.py',
-    'test': root / 'packages/sdk-dev/test/code.py',
+    'test': root / 'packages/sdk/test/code.py',
     'support': root / 'packages/impl/binance/impl.toml',
     'catalogue': catalogue / 'markets.json',
   }
@@ -411,11 +411,11 @@ def test_candidate_installed_hash_ignores_only_gateway_and_version(
   before = evidence.dependency(metadata.Distribution.at(info), candidate=package)
   project.write_text(
     project.read_text().replace('version="1"', 'version="2"')
-    + '\n[project.optional-dependencies]\ngateway=["aiohttp"]\n'
+    + '\ndependencies=["tribulnation-cli>=0.1.0,<1"]\n[project.optional-dependencies]\ngateway=["aiohttp"]\n'
   )
   meta.write_text(
     meta.read_text().replace('Version: 1', 'Version: 2')
-    + 'Requires-Dist: aiohttp; extra == "gateway"\n'
+    + 'Requires-Dist: aiohttp; extra == "gateway"\nRequires-Dist: tribulnation-cli>=0.1.0,<1\n'
   )
   (info / 'entry_points.txt').write_text(
     '[tribulnation.commands]\ngateway=tribulnation.sdk.gateway.cli:app\n'
@@ -433,3 +433,43 @@ def test_candidate_installed_hash_ignores_only_gateway_and_version(
   assert (
     evidence.dependency(metadata.Distribution.at(info), candidate=package) != before
   )
+
+
+def test_offline_plumbing_does_not_drift_source_or_installed_hashes(
+  candidate: tuple[Path, Path], monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+):
+  """Both fingerprint layers ignore verifier changes but retain live collection."""
+  root, catalogue = candidate
+  package = root / 'packages/sdk-dev/pkg'
+  source = package / 'src/sdk_dev'
+  source.mkdir()
+  (source / 'read_evidence.py').write_text('CASES = 1\n')
+  cli = source / 'cli'
+  cli.mkdir()
+  (cli / 'results.py').write_text(
+    'def test_surfaces():\n  collect()\n\ndef verify_one():\n  verify()\n'
+  )
+  info = tmp_path / 'sdk_dev-1.dist-info'
+  info.mkdir()
+  (info / 'METADATA').write_text('Name: sdk-dev\nVersion: 1\n')
+  (info / 'direct_url.json').write_text(
+    json.dumps({'url': package.as_uri(), 'dir_info': {'editable': True}})
+  )
+  monkeypatch.setattr(evidence, 'verify_imports', Mock())
+  before = evidence.dependency(metadata.Distribution.at(info), candidate=package)
+  snapshot = evidence.capture(root, 'binance', catalogue)
+  (source / 'evidence.py').write_text('SCHEMA = 3\n')
+  (source / 'release_scope.py').write_text('POLICY = 2\n')
+  (cli / 'results.py').write_text(
+    (cli / 'results.py').read_text().replace('  verify()', '  verify_more()')
+  )
+  (package.parent / 'test/code.py').write_text('OFFLINE_TEST = 2\n')
+  assert (
+    evidence.dependency(metadata.Distribution.at(info), candidate=package) == before
+  )
+  assert evidence.capture(root, 'binance', catalogue) == snapshot
+  (source / 'read_evidence.py').write_text('CASES = 2\n')
+  assert (
+    evidence.dependency(metadata.Distribution.at(info), candidate=package) != before
+  )
+  assert evidence.capture(root, 'binance', catalogue) != snapshot

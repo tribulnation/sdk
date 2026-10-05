@@ -1,10 +1,13 @@
 """Share venue qualification boundaries between fingerprints and release impact."""
 
+import ast
 from pathlib import Path
 import subprocess
 import tomllib
 
 from packaging.version import Version
+from packaging.requirements import Requirement
+from packaging.utils import canonicalize_name
 
 GATEWAY_SOURCE = 'packages/sdk/pkg/src/tribulnation/sdk/gateway/'
 GATEWAY_TEST = 'packages/sdk/test/gateway/'
@@ -17,10 +20,35 @@ SHARED = {
   'conftest.py',
 }
 
+OFFLINE_SOURCES = {'sdk_dev/evidence.py', 'sdk_dev/release_scope.py'}
+"""Report integrity and impact verification do not execute venue observations."""
+OFFLINE_COMMANDS = {
+  'verify_one',
+  'verify',
+  'required_venues',
+  'required_scopes',
+  'release_scope',
+  'release',
+}
+"""Only these commands in the mixed results module are offline-only."""
+
+
+def sdk_requirement(raw: str) -> bool:
+  """Exclude command-provider wiring from venue runtime dependencies."""
+  requirement = Requirement(raw)
+  return (
+    canonicalize_name(requirement.name) != 'tribulnation-cli'
+    and str(requirement.marker) != 'extra == "gateway"'
+  )
+
 
 def relevant_path(name: str, venue: str) -> bool:
   """Include shared SDK and qualification inputs plus the selected adapter."""
   if name.startswith((GATEWAY_SOURCE, GATEWAY_TEST)):
+    return False
+  if name.startswith('packages/sdk-dev/test/') or name in {
+    f'packages/sdk-dev/pkg/src/{path}' for path in OFFLINE_SOURCES
+  }:
     return False
   roots = ('packages/sdk', 'packages/sdk-dev', f'packages/impl/{venue}')
   return (
@@ -52,6 +80,13 @@ def project_inputs(data: bytes, *, sdk: bool) -> dict[str, object]:
   ):
     project.pop(key, None)
   if sdk:
+    dependencies = [
+      raw for raw in project.get('dependencies', []) if sdk_requirement(raw)
+    ]
+    if dependencies:
+      project['dependencies'] = dependencies
+    else:
+      project.pop('dependencies', None)
     project.get('optional-dependencies', {}).pop('gateway', None)
     if not project.get('optional-dependencies'):
       project.pop('optional-dependencies', None)
@@ -68,6 +103,19 @@ def normalized_input(name: str, data: bytes) -> bytes:
   """Normalize only documented non-qualification packaging changes."""
   import json
 
+  if name == 'packages/sdk-dev/pkg/src/sdk_dev/cli/results.py':
+    module = ast.parse(data)
+    module.body = [
+      node
+      for node in module.body
+      if not (
+        isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.name in OFFLINE_COMMANDS
+        or isinstance(node, ast.ImportFrom)
+        and node.module == 'sdk_dev.release_scope'
+      )
+    ]
+    return ast.dump(module, include_attributes=False).encode()
   if name.endswith('/pkg/pyproject.toml'):
     return json.dumps(
       project_inputs(data, sdk=name == 'packages/sdk/pkg/pyproject.toml'),
@@ -120,15 +168,42 @@ def affected_venues(root: Path, package: str, venues: list[str]) -> list[str]:
   baseline = previous_release(root, package)
   if baseline is None:
     return venues
+  affected: list[str] = []
+  for venue in venues:
+    qualified = baseline
+    if package == 'sdk':
+      # An independently published adapter has already qualified shared inputs
+      # through its release commit. Never use an unmerged or future-version tag.
+      project = root / f'packages/impl/{venue}/pkg/pyproject.toml'
+      if project.is_file():
+        version = Version(tomllib.loads(project.read_text())['project']['version'])
+        tags = (
+          git(root, 'tag', '--merged', 'HEAD', '--list', f'{venue}-v*')
+          .decode()
+          .splitlines()
+        )
+        prior = [(Version(tag.removeprefix(f'{venue}-v')), tag) for tag in tags]
+        released = max(
+          (item for item in prior if item[0] <= version), default=(None, None)
+        )[1]
+        if released is not None:
+          ancestor = git(root, 'merge-base', baseline, released).strip()
+          if ancestor == git(root, 'rev-parse', f'{baseline}^{{commit}}').strip():
+            qualified = released
+    if venue_changed(root, venue, qualified):
+      affected.append(venue)
+  return sorted(affected)
+
+
+def venue_changed(root: Path, venue: str, baseline: str) -> bool:
+  """Compare every relevant input since this venue's latest qualification release."""
   changed = (
     git(root, 'diff', '--no-renames', '--name-only', '-z', baseline, 'HEAD')
     .decode()
     .split('\0')
   )
-  affected: set[str] = set()
   for name in filter(None, changed):
-    selected = [venue for venue in venues if relevant_path(name, venue)]
-    if not selected:
+    if not relevant_path(name, venue):
       continue
     contents: list[bytes | None] = []
     for ref in (baseline, 'HEAD'):
@@ -137,8 +212,8 @@ def affected_venues(root: Path, package: str, venues: list[str]) -> list[str]:
         normalized_input(name, git(root, 'show', f'{ref}:{name}')) if exists else None
       )
     if contents[0] != contents[1]:
-      affected.update(selected)
-  return sorted(affected)
+      return True
+  return False
 
 
 def declared_venues(root: Path, package: str) -> list[str]:

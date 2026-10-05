@@ -15,7 +15,12 @@ from packaging.utils import canonicalize_name
 from packaging.version import Version
 from pydantic import BaseModel, ConfigDict, Field, JsonValue
 
-from sdk_dev.release_scope import normalized_input, relevant_path, project_inputs
+from sdk_dev.release_scope import (
+  normalized_input,
+  relevant_path,
+  project_inputs,
+  sdk_requirement,
+)
 
 MAX_AGE = timedelta(days=7)
 SKIP_DIRS = frozenset({'.git', '.venv', '__pycache__', '.pytest_cache', '.ruff_cache'})
@@ -265,20 +270,26 @@ def dependency(
       (entry.group, entry.name, entry.value) for entry in dist.entry_points
     ),
   }
+  # Validate the full installed inventory before applying qualification exclusions.
+  file_hash = files_digest(files) if files else digest(json_bytes({}))
   if candidate is not None:
-    sdk = canonicalize_name(dist.metadata['Name']) == 'tribulnation-sdk'
-    if sdk:
-      files = {
-        name: path
-        for name, path in files.items()
-        if not name.startswith('tribulnation/sdk/gateway/')
-      }
+    name = canonicalize_name(dist.metadata['Name'])
+    sdk = name == 'tribulnation-sdk'
+    prefix = (
+      'packages/sdk/pkg/src/'
+      if sdk
+      else 'packages/sdk-dev/pkg/src/'
+      if name == 'sdk-dev'
+      else f'packages/impl/{name.removeprefix("tribulnation-")}/pkg/src/'
+    )
+    venue = name.removeprefix('tribulnation-')
+    files = {
+      key: path for key, path in files.items() if relevant_path(prefix + key, venue)
+    }
     identity.pop('version')
     if sdk:
       identity['requires_dist'] = sorted(
-        raw
-        for raw in dist.requires or ()
-        if str(Requirement(raw).marker) != 'extra == "gateway"'
+        raw for raw in dist.requires or () if sdk_requirement(raw)
       )
       identity['entry_points'] = sorted(
         (entry.group, entry.name, entry.value)
@@ -288,12 +299,20 @@ def dependency(
     identity['declared'] = project_inputs(
       (candidate / 'pyproject.toml').read_bytes(), sdk=sdk
     )
+    file_hash = digest(
+      json_bytes(
+        {
+          key: digest(normalized_input(prefix + key, path.read_bytes()))
+          for key, path in files.items()
+        }
+      )
+    )
   return Dependency(
     version='0' if candidate is not None else dist.version,
     metadata_sha256=digest(json_bytes(identity)),
     # Metadata-only metapackages (e.g. griffe) have no importable files. Their
     # requirements and entry points are hashed above; dependencies are traversed.
-    files_sha256=files_digest(files) if files else digest(json_bytes({})),
+    files_sha256=file_hash,
   )
 
 
@@ -347,6 +366,8 @@ def installed_dependencies(root: Path, venue: str) -> dict[str, Dependency]:
     if name not in result:
       result[name] = dependency(dist, candidate=packages.get(name))
     for raw in dist.requires or ():
+      if name == 'tribulnation-sdk' and not sdk_requirement(raw):
+        continue
       child = Requirement(raw)
       if child.marker is None or any(
         child.marker.evaluate({'extra': extra}) for extra in extras

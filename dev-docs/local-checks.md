@@ -142,10 +142,11 @@ sdk-dev results release sdk --catalogue /tmp/sdk-release-catalogue/data
 ```
 
 1. Releases require reports for venues affected since the previous published
-   package tag. Shared SDK or qualification changes affect all declared venues;
+   package tag. Shared SDK or live qualification changes affect all declared venues;
    adapter changes affect that adapter. Gateway-only and version-only changes
    require no live evidence, including no seven-day freshness check. First releases
-   require every venue in scope. Market implementations additionally require market
+   require every venue in scope. Already-published adapter releases can advance
+   their venue’s baseline (ADR 0034). Market implementations additionally require market
    consistency. See [ADR 0033](adr/0033-change-scoped-release-evidence.md). A report of the wrong scope cannot substitute for required evidence.
 2. Required reports expire after seven days and must match current relevant SDK, adapter,
    test, support and dependency inputs, plus their recorded Catalogue snapshot.
@@ -256,6 +257,9 @@ not affect this calculation.
 
 Schema-2 fingerprints exclude gateway source/tests and gateway-only packaging,
 and normalize candidate version labels. Runtime dependencies, shared SDK and
-qualification behavior still invalidate evidence. Installed imports and candidate
-versions must still match the checkout. Old reports require new recorded runs;
-do not edit their manifests. This policy migration itself requires qualification.
+live qualification behavior still invalidate evidence. Offline report verification,
+release selection, their regression tests and SDK command discovery do not. Installed imports and candidate
+versions must still match the checkout. Old reports remain untouched;
+do not edit their manifests. Schema-2 reports are needed when relevant behavior
+changes next require qualification, not merely to migrate the verifier. See
+[ADR 0034](adr/0034-offline-evidence-maintenance.md).
