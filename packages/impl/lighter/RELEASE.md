@@ -1,25 +1,22 @@
-# tribulnation-lighter 0.3.0 release candidate
+# tribulnation-lighter 0.4.0
 
-Report snapshots.
+Funding payment amounts are now account cash flows: **positive means received,
+negative means paid**. Zero remains zero. This applies to market-specific history
+and exchange-wide history where supported. Funding rates, trading fee signs,
+pagination, account scope and Report cash-flow signs are unchanged.
 
-- `Report.new(owner)` snapshots every account (master and sub-accounts) of an L1
-  address, credential-free; given an account index instead, it looks up that
-  account's address first. `ReportSDK` uses the account's `address`, else its
-  `account_index`.
-- Each account is a `<index>` subaccount: spot plus margin balances and the margin
-  allocated to isolated positions (no unrealized PnL), and signed positions by
-  `market_id`.
-- Pool shares (public pools, the LLP, LIT staking) are `<index>:pool:<pool>`
-  subaccounts holding the pro-rata part of the pool's USDC equity and other balances.
-  A pool the address operates contributes only the operator's shares
-  (`<pool>:operator`); LIT in its unstaking lockup is `<index>:unlocking`.
-- `history()` raises `NotImplementedError`.
+This is a breaking sign change from the previous release. Upgrade SDK >=3.0.0
+together with Hyperliquid >=0.11.0, dYdX >=0.11.0, Bybit >=0.5.0, Aster >=0.5.0,
+and Lighter >=0.4.0 for whichever adapters you use. Older published adapters do
+not declare an SDK upper bound, so upgrading the SDK alone cannot enforce this
+migration. Do not mix old and new adapter sign conventions.
 
-Requires tribulnation-sdk >=2.8.0 (`ReportSDK` routing and `accounts.Lighter.address`)
-and typed-lighter >=0.2.0.
+For persisted funding history, refetch or negate records from the paid-positive
+versions exactly once. Older Hyperliquid/dYdX records predating the exchange-wide
+history sign change already used received-positive amounts; leave those alone.
+Never apply this conversion to funding rates or Report observations.
 
-Release qualification records mainnet read suites, including the Report snapshot of a
-funded account, and Market consistency against the pinned Catalogue snapshot. Pool
-claims were checked live on public accounts against the venue's PnL chart; the
-qualification account holds no pool shares. Account and trading methods remain
-verified on testnet.
+Offline regression tests cover funding income, expense and zero, plus history
+scope, filtering and page retry behavior. Release qualification uses the normal
+read-only surfaces and consistency suites; it does not assert personal history
+completeness. Deribit Report qualification is testnet-only under ADR 0012.

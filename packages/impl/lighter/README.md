@@ -57,3 +57,9 @@ of any account instead, and looks up its address. Through `ReportSDK`, the accou
 
 See [Lighter Market](../../../docs/market/implementations/lighter.md) for account
 configuration through `MarketSDK` and venue-specific semantics.
+
+## Funding payment signs
+
+Since 0.4.0, funding payments are positive when received and negative when
+paid, for every supported history scope. Requires SDK >=3.0.0. Funding rates keep
+their existing signs. See [migration notes](RELEASE.md) before upgrading.

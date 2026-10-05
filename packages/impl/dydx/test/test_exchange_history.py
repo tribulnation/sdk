@@ -44,7 +44,7 @@ async def test_exchange_history_scope_bounds_retry(
         'orderId': f'order-{state}',
       }
       if kind == 'trades'
-      else {'ticker': ticker, 'payment': '-0.5', 'createdAt': time}
+      else {'ticker': ticker, 'payment': ['-0.5', '0', '2'][state], 'createdAt': time}
     )
     return [row], state + 1 if state < 2 else None
 
@@ -86,10 +86,12 @@ async def test_exchange_history_scope_bounds_retry(
       for row in rows
     )
   else:
-    assert all(
-      isinstance(row, ExchangeFundingPayment) and row.amount == Decimal('0.5')
-      for row in rows
-    )
+    assert [row.amount for row in rows if isinstance(row, ExchangeFundingPayment)] == [
+      Decimal('-0.5'),
+      Decimal('2'),
+      Decimal('-0.5'),
+      Decimal('2'),
+    ]
   expected: dict[str, object] = {'address': 'dydx1fixture', 'subaccount': subaccount}
   if kind == 'trades':
     expected.update(created_before_or_at=end, market_type='PERPETUAL')
@@ -126,8 +128,11 @@ async def test_selected_market_history_delegates(
   history.assert_called_once_with(start, start)
 
 
-async def test_market_funding_payment_sign(monkeypatch: pytest.MonkeyPatch):
-  """Selected market history also reports received funding as negative."""
+@pytest.mark.parametrize('amount', [Decimal('2'), Decimal('-3'), Decimal('0')])
+async def test_market_funding_payment_sign(
+  monkeypatch: pytest.MonkeyPatch, amount: Decimal
+):
+  """Selected market history also reports received funding as positive."""
   from tribulnation.dydx.market.impl.funding import funding_payments
   from tribulnation.dydx.market.impl.mixin import MarketMixin
 
@@ -135,7 +140,7 @@ async def test_market_funding_payment_sign(monkeypatch: pytest.MonkeyPatch):
 
   async def fetch(state: int) -> tuple[list[dict[str, Any]], None]:
     """Return one native payment received by the account."""
-    return [{'payment': Decimal('2'), 'createdAt': start}], None
+    return [{'payment': amount, 'createdAt': start}], None
 
   exchange = Exchange.new(address='dydx1fixture')
   monkeypatch.setattr(
@@ -151,13 +156,14 @@ async def test_market_funding_payment_sign(monkeypatch: pytest.MonkeyPatch):
   monkeypatch.setattr(MarketMixin, 'market', 'BTC-USD')
   market = MarketMixin(shared=exchange.shared, perpetual_market=Mock())
   rows = [row async for page in funding_payments(market, start, start) for row in page]
-  assert [row.amount for row in rows] == [Decimal('-2')]
+  assert [row.amount for row in rows] == [amount]
 
 
+@pytest.mark.parametrize('amount', ['2', '-3', '0'])
 @pytest.mark.parametrize('subaccount', [0, 128])
 @pytest.mark.parametrize('method', ['trades_history', 'funding_payments'])
 async def test_selected_market_history_subaccount(
-  monkeypatch: pytest.MonkeyPatch, subaccount: int, method: str
+  monkeypatch: pytest.MonkeyPatch, subaccount: int, method: str, amount: str
 ):
   """A selected market retains history from every address subaccount."""
   from tribulnation.dydx.market.impl.mixin import Shared
@@ -176,7 +182,7 @@ async def test_selected_market_history_subaccount(
         'createdAt': start,
         'liquidity': 'MAKER',
         'fee': '0',
-        'payment': '2',
+        'payment': amount,
         'orderId': 'order',
       }
     ], None
@@ -207,7 +213,7 @@ async def test_selected_market_history_subaccount(
     assert all(row.order_id is None and row.client_order_id is None for row in rows)
   else:
     expected.update(ticker='BTC-USD', after_or_at=start)
-    assert rows[0].amount == Decimal('-2')
+    assert all(row.amount == Decimal(amount) for row in rows)
   paging.assert_has_calls(
     [call(**(expected | {'subaccount': number})) for number in (0, 128)]
   )

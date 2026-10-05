@@ -483,7 +483,7 @@ class TradingMarkets(SDK):
   ) -> AsyncIterable[Sequence[FundingPayment]]:
     """Fetch your own settled funding cashflows over a window, paginated.
 
-    Paid is positive, received is negative, in quote units. Credential-scoped, unlike
+    Received is positive, paid is negative, in quote units. Credential-scoped, unlike
     `funding_rates`.
 
     Args:

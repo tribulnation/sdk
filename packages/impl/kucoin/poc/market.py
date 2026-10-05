@@ -604,16 +604,16 @@ start = end - timedelta(days=7)
 
 
 # %%
+# not executed: received-positive contract update; not rerun live; adapter regression fixtures cover signs.
 async def funding_payments(
   symbol: str, start: datetime, end: datetime
 ) -> list[FundingPayment]:
   page = await client.futures.funding_fees.private_funding_history(
     symbol=symbol, start_at=start, end_at=end
   )
-  # KuCoin's `funding` is positive when *received*; the SDK's `FundingPayment.amount` is
-  # positive when *paid* -- opposite sign conventions, so this flips it.
+  # Preserve KuCoin's received-positive funding cash flow.
   return [
-    FundingPayment(amount=-Decimal(str(f['funding'])), time=f['timePoint'])
+    FundingPayment(amount=Decimal(str(f['funding'])), time=f['timePoint'])
     for f in page['dataList']
   ]
 

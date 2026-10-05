@@ -511,7 +511,7 @@ async def funding_payments(
     end_time=end,
   )
   return [
-    FundingPayment(amount=-Decimal(i['income']), time=i['time'])
+    FundingPayment(amount=Decimal(i['income']), time=i['time'])
     for i in raw
     if 'income' in i and 'time' in i
   ]

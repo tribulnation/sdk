@@ -838,14 +838,15 @@ async def funding_rates(
 
 
 # %%
+# not executed: received-positive contract update; not rerun live; adapter regression fixtures cover signs.
 async def funding_payments(
   market_id: str, /, start: datetime, end: datetime
 ) -> AsyncIterable[Sequence[FundingPayment]]:
-  """Negate venue income so SDK positive means funding paid."""
+  """Preserve venue income so SDK positive means funding received."""
   async for page in client.futures.account.income_paged(
     market_id, income_type='FUNDING_FEE', start_time=start, end_time=end, limit=1000
   ):
-    yield [FundingPayment(amount=-r['income'], time=r['time']) for r in page]
+    yield [FundingPayment(amount=r['income'], time=r['time']) for r in page]
 
 
 {

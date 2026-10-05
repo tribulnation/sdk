@@ -1178,10 +1178,11 @@ for f in rows['fundings']:
 #
 # Fetch personal funding payments for one market or the whole exchange.
 #
-# `position_funding`, newest first. The venue's `change` is received-positive; the SDK's amount is paid-positive, so it is negated. The exchange-wide form omits `market_ids`. The request window is widened by one interval, as for `funding_rates`, and the inclusive bounds are applied locally.
+# `position_funding`, newest first. The venue's `change` is received-positive; the SDK preserves that cash-flow sign. The exchange-wide form omits `market_ids`. The request window is widened by one interval, as for `funding_rates`, and the inclusive bounds are applied locally.
 
 
 # %%
+# not executed: received-positive contract update; not rerun live; adapter regression fixtures cover signs.
 FUNDING_PAGE = 100
 
 
@@ -1204,11 +1205,11 @@ async def funding_payments(
       if market_id is None:
         rows.append(
           ExchangeFundingPayment(
-            amount=-f['change'], time=f['timestamp'], market_id=str(f['market_id'])
+            amount=f['change'], time=f['timestamp'], market_id=str(f['market_id'])
           )
         )
       else:
-        rows.append(FundingPayment(amount=-f['change'], time=f['timestamp']))
+        rows.append(FundingPayment(amount=f['change'], time=f['timestamp']))
     if rows:
       yield rows
 
@@ -1509,7 +1510,7 @@ await asyncio.sleep(2)
 # | `next_funding` | verified | `market_stats` `current_funding_rate` (percent) and `premium`; time is the hour after `funding_timestamp`. |
 # | `perp_stats` | verified | Index, mark and funding from `market_stats:all`; base-unit open interest from `orderBookDetails` (through `float`, see issues). |
 # | `funding_rates` | verified | Hourly `fundings`, signed by `direction`; inclusive bounds applied locally over a widened request (the venue's are exclusive and hour-granular). |
-# | `funding_payments` | verified | `position_funding`, per market and exchange-wide; `change` negated to paid-positive; exact-bound query returns the payment. |
+# | `funding_payments` | verified | `position_funding`, per market and exchange-wide; `change` preserved as received-positive; exact-bound query returns the payment. |
 # | `perp_position` | verified | Signed from `position` and `sign`; the account holds a live ETH long. |
 # | `collateral` | verified | Defers to `perp_collateral`. |
 # | `perp_collateral` | verified | Cross: account figures, free = equity - IM (= `user_stats` cross available; the account's `available_balance` adds isolated free margin). Isolated: allocated + uPnL, IMF/MMF requirements; equity matches `user_stats`, MM reproduces `liquidation_price` (to 4e-6 relative across runs, exactly in the last), free bounds `update_margin` removals. |

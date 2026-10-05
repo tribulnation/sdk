@@ -246,7 +246,7 @@ async def funding_payments(
   shared: Shared, market_id: int | None, start: datetime, end: datetime
 ) -> AsyncIterable[Sequence[FundingPayment]]:
   """Personal payments with `start <= time <= end`, newest first; the venue's
-  received-positive `change` becomes the SDK's paid-positive amount. The request window
+  received-positive `change` is preserved as the SDK's cash-flow amount. The request window
   is widened by one interval, as for `funding_rates`."""
   account = shared.account_index
   pages = shared.client.api.account.position_funding_paged(
@@ -264,10 +264,10 @@ async def funding_payments(
       if market_id is None:
         rows.append(
           ExchangeFundingPayment(
-            amount=-f['change'], time=f['timestamp'], market_id=str(f['market_id'])
+            amount=f['change'], time=f['timestamp'], market_id=str(f['market_id'])
           )
         )
       else:
-        rows.append(FundingPayment(amount=-f['change'], time=f['timestamp']))
+        rows.append(FundingPayment(amount=f['change'], time=f['timestamp']))
     if rows:
       yield rows

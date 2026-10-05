@@ -44,7 +44,7 @@ async def test_market_page_retry(
     row: dict[str, Any] = {
       'time': START,
       'fundingRate': '0.01',
-      'delta': {'coin': 'BTC', 'usdc': '1'},
+      'delta': {'coin': 'BTC', 'usdc': ['2', '-3', '0'][state]},
       'coin': 'BTC',
       'side': 'B',
       'px': '1',
@@ -86,7 +86,6 @@ async def test_market_page_retry(
     assert [trade.id for page in pages for trade in page] == ['0', '1', '2']
 
   if method == 'funding_payments':
-    for page in pages:
-      for payment in page:
-        assert isinstance(payment, FundingPayment)
-        assert payment.amount == -1
+    payments = [payment for page in pages for payment in page]
+    assert all(isinstance(payment, FundingPayment) for payment in payments)
+    assert [payment.amount for payment in payments] == [2, -3, 0]

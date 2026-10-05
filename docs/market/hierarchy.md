@@ -87,8 +87,8 @@ async for page in exchange.funding_payments(None, start, end):
 
 Both datetime bounds are required and inclusive. Exchange-wide rows are
 `ExchangeTrade` or `ExchangeFundingPayment`, with the existing record fields plus
-`market_id`, the native ID within that exchange. Funding paid is positive and
-funding received is negative. Hyperliquid and dYdX now apply that sign convention
+`market_id`, the native ID within that exchange. Funding received is positive and
+funding paid is negative. All implementations apply that sign convention
 to both exchange-wide and selected-market results. Passing a string market ID
 keeps the existing single-market API and base record types.
 

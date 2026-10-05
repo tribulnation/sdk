@@ -2,7 +2,7 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: accepted
+1. Status: accepted; funding sign superseded by [ADR 0035](0035-funding-cash-flow-sign.md)
 2. Date: 2026-09-22
 
 ## Context

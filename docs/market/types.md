@@ -118,12 +118,25 @@ fee-token conversion or rounding.
 
 - `FundingRate`: `rate`, `time`, and an optional `premium`.
 - `NextFunding`: the same plus `interval` and an `.annualized` property.
-- `FundingPayment`: `amount` and `time`.
+- `FundingPayment`: `amount` and `time`. The amount is a signed cash flow in quote
+  units: positive when received, negative when paid. Funding rates retain their
+  separate convention: a positive rate means longs pay shorts.
 - `PerpStats`: `index`, always present, plus optional `mark`, `funding` (the predicted rate
   for the next settlement), `next_funding_time`, `funding_interval` and `open_interest`.
 
 Rates are fractions of 1, so `0.01` is 1%. `premium` is the mark-vs-index quantity funding
 is computed from, and it's `None` on venues that don't report it, like dYdX.
+
+## Funding payment migration in SDK 3
+
+Upgrade the SDK and your funding-capable adapters together: Hyperliquid 0.11.0,
+dYdX 0.11.0, Bybit 0.5.0, Aster 0.5.0, and Lighter 0.4.0 (or newer). Older adapter
+releases do not cap their SDK dependency and still return paid-positive amounts.
+
+Refetch stored history or negate records from paid-positive versions exactly
+once. Earlier Hyperliquid/dYdX data stored before the exchange-wide history sign
+change already used received-positive amounts. Funding rates, trading fees and
+Report observations are unchanged.
 
 <!-- next -->
 

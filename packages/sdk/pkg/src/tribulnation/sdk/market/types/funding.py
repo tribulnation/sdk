@@ -31,7 +31,7 @@ class NextFunding(FundingRate):
 @dataclass
 class FundingPayment:
   amount: Decimal
-  """Funding paid (if positive) or received (in quote units)"""
+  """Funding received (positive) or paid (negative), in quote units."""
   time: datetime
 
 

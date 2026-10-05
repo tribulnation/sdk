@@ -107,7 +107,7 @@ await future_trades(fills_start, end)
 async def funding(start: datetime, end: datetime) -> list[Funding]:
   # Hyperliquid's `usdc` is positive when *received*, matching `Funding.amount`'s
   # (a `SingleAssetObservation`) "positive = credited" convention directly -- no sign flip
-  # needed here, unlike `market.ipynb`'s `FundingPayment` (which uses the opposite convention).
+  # needed here or in the market `FundingPayment` mapping.
   raw = await client.info.user_funding(user=ADDRESS, start_time=start, end_time=end)
   return [
     Funding(

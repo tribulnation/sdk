@@ -55,3 +55,9 @@ truncating it — 7 days for trade history and the transaction log, 30 for depos
 withdrawal records — and refuses any window starting more than two years back. Both
 `Market.trades_history()` and `Report.history()` take whatever window you give them and
 split it to fit; `Report.history()` with no window sweeps the full two years.
+
+## Funding payment signs
+
+Since 0.5.0, funding payments are positive when received and negative when
+paid, for every supported history scope. Requires SDK >=3.0.0. Funding rates keep
+their existing signs. See [migration notes](RELEASE.md) before upgrading.

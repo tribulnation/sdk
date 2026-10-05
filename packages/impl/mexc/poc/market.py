@@ -660,42 +660,9 @@ start = end - timedelta(days=7)
 async def funding_payments(
   symbol: str, start: datetime, end: datetime
 ) -> list[FundingPayment]:
-  # MEXC's `funding` field convention (positive = received vs. paid) isn't verifiable
-  # live here (blocked by the same futures-read-access scope) -- assumed by symmetry
-  # with typed_binance's `income`, i.e. negated to match FundingPayment's
-  # "positive = paid" convention.
-  # funding_records has no start/end params either -- only page_num/page_size, newest
-  # settlement first, same client-side windowing as funding_rates above.
-  out: list[FundingPayment] = []
-  page_num = 1
-  while True:
-    raw = await client.futures.http.account.funding_records(
-      symbol=symbol,
-      page_num=page_num,
-      page_size=100,
-    )
-    page = raw.get('data')
-    assert page is not None, f'no funding records for {symbol}: {raw}'
-    for r in page['resultList']:
-      time = r['settleTime']
-      if time < start:
-        return out
-      if time <= end:
-        out.append(FundingPayment(amount=-Decimal(str(r['funding'])), time=time))
-    if page_num >= page['totalPage']:
-      return out
-    page_num += 1
-
-
-end = datetime.now(timezone.utc)
-start = end - timedelta(days=7)
-try:
-  funding_payments_result = {
-    symbol: await funding_payments(symbol, start, end) for symbol in MARKETS['perp']
-  }
-except ApiError as e:
-  funding_payments_result = e
-funding_payments_result
+  """Reject an unverified native funding sign."""
+  # not executed: futures account reads are blocked; native funding sign is unverified.
+  raise NotImplementedError('MEXC funding payment sign is not verified')
 
 
 # %% [markdown]
@@ -790,6 +757,5 @@ await perp_cancel_order('123456')
 # required. `position.leverage` exposes the account's current `mmr`, but a figure computed
 # from it would be derived, not read.
 #
-# One unverified assumption remains: `funding_payments`' sign (`positive = paid`) is
-# asserted by symmetry with `typed_binance`'s equivalent `income` field, not confirmed
-# against a live MEXC response, because the account-scoped call fails with `703`.
+# `funding_payments` remains blocked: its native sign cannot be verified because
+# the account-scoped call fails with `703`. It raises instead of guessing a sign.

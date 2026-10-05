@@ -98,7 +98,7 @@ async def exchange_funding_payments(
       payments.append(
         ExchangeFundingPayment(
           market_id=market_id,
-          amount=-Decimal(payment['delta']['usdc']),
+          amount=Decimal(payment['delta']['usdc']),
           time=time,
         )
       )

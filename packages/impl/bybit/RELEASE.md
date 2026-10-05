@@ -1,10 +1,22 @@
-# tribulnation-bybit 0.4.0 release candidate
+# tribulnation-bybit 0.5.0
 
-Client order IDs and order IDs on fills.
+Funding payment amounts are now account cash flows: **positive means received,
+negative means paid**. Zero remains zero. This applies to market-specific history
+and exchange-wide history where supported. Funding rates, trading fee signs,
+pagination, account scope and Report cash-flow signs are unchanged.
 
-- `place_order` sends `Order['client_order_id']` unchanged as `orderLinkId` (up to 36 characters) on spot and linear perpetuals. `random_client_order_id()` returns 32 random hex digits.
-- Fills from history and streams report `Trade.order_id` and `Trade.client_order_id`; an empty `orderLinkId` reads as `None`.
+This is a breaking sign change from the previous release. Upgrade SDK >=3.0.0
+together with Hyperliquid >=0.11.0, dYdX >=0.11.0, Bybit >=0.5.0, Aster >=0.5.0,
+and Lighter >=0.4.0 for whichever adapters you use. Older published adapters do
+not declare an SDK upper bound, so upgrading the SDK alone cannot enforce this
+migration. Do not mix old and new adapter sign conventions.
 
-Requires tribulnation-sdk >=2.7.0 (`Trade.order_id`, `Trade.client_order_id` and `Order['client_order_id']`, ADR 0029).
+For persisted funding history, refetch or negate records from the paid-positive
+versions exactly once. Older Hyperliquid/dYdX records predating the exchange-wide
+history sign change already used received-positive amounts; leave those alone.
+Never apply this conversion to funding rates or Report observations.
 
-Client order IDs and order IDs on fills are covered by unit fixtures; no live trading round trip is recorded.
+Offline regression tests cover funding income, expense and zero, plus history
+scope, filtering and page retry behavior. Release qualification uses the normal
+read-only surfaces and consistency suites; it does not assert personal history
+completeness. Deribit Report qualification is testnet-only under ADR 0012.
