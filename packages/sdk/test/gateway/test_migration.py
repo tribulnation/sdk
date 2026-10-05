@@ -1,4 +1,4 @@
-"""Gateway ownership, packaging and legacy wire/configuration regressions."""
+"""Gateway ownership, packaging and SDK configuration regressions."""
 
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
@@ -19,7 +19,7 @@ from tribulnation.sdk.gateway.config import gateway_socket
 from tribulnation.sdk.gateway.server import gateway_app
 
 
-def test_codec_does_not_import_engine_or_optional_venues():
+def test_codec_does_not_import_optional_venues():
   """Remote clients only need the gateway extra, not local venue drivers."""
   result = subprocess.run(
     [
@@ -30,7 +30,7 @@ import sys
 from tribulnation.sdk.gateway import ProxySDK, Gateway
 from tribulnation.sdk.gateway import codec
 for module in sys.modules:
-    assert not module.startswith(('tribulnation.engine', 'tribulnation.dydx',
+    assert not module.startswith(('tribulnation.dydx',
                                   'tribulnation.hyperliquid', 'tribulnation.lighter'))
 """,
     ],
@@ -71,23 +71,22 @@ def test_settings_preserve_wire_values_and_new_venue_keys():
 @pytest.mark.parametrize(
   ('contents', 'expected'),
   [
-    ('', '/tmp/engine-gateway.sock'),
-    ('[daemon]\nsocket="/tmp/legacy.sock"', '/tmp/legacy.sock'),
+    ('', '/tmp/tribulnation-sdk.sock'),
     (
-      '[gateway]\nsocket="/tmp/sdk.sock"\n[daemon]\nsocket="/tmp/legacy.sock"',
+      '[gateway]\nsocket="/tmp/sdk.sock"',
       '/tmp/sdk.sock',
     ),
   ],
 )
 def test_socket_configuration(tmp_path: Path, contents: str, expected: str):
-  """Read standalone and legacy engine socket configuration."""
+  """Read SDK socket configuration and its default."""
   path = tmp_path / 'sdk.toml'
   path.write_text(contents)
   assert gateway_socket(path) == expected
 
 
 def test_cli_defaults_overrides_and_account_loading(tmp_path: Path, monkeypatch):
-  """Keep aliases and verbosity while ignoring engine-only configuration."""
+  """Keep CLI aliases, verbosity, account loading and socket override."""
   from tribulnation.sdk.gateway import server
 
   seen = []
@@ -106,10 +105,8 @@ def test_cli_defaults_overrides_and_account_loading(tmp_path: Path, monkeypatch)
   assert result.exit_code == 0, result.output
   assert seen[-1][0] == '/tmp/sdk.sock'
   assert seen[-1][1].accounts['observer'].public
-  (tmp_path / 'engine.toml').write_text(
-    '[daemon]\nsocket="/tmp/old.sock"\n[tasks]\narbitrary="ignored"\n'
-  )
-  result = runner.invoke(app, ['-c', 'engine.toml', '-s', '/tmp/override.sock', '-vv'])
+  (tmp_path / 'custom.toml').write_text('[gateway]\nsocket="/tmp/configured.sock"\n')
+  result = runner.invoke(app, ['-c', 'custom.toml', '-s', '/tmp/override.sock', '-vv'])
   assert result.exit_code == 0, result.output
   assert seen[-1][0] == '/tmp/override.sock'
 
@@ -151,3 +148,20 @@ async def test_application_owns_injected_sdk():
   assert sdk.events == ['enter']
   await runner.cleanup()
   assert sdk.events == ['enter', 'exit']
+
+
+def test_proxy_uses_sdk_socket_default():
+  """Keep the remote client default aligned with CLI configuration."""
+  from tribulnation.sdk.gateway import ProxySDK
+  from tribulnation.sdk.gateway.config import DEFAULT_SOCKET
+
+  assert ProxySDK.at()._conn.url == f'unix://{DEFAULT_SOCKET}'
+
+
+@pytest.mark.parametrize('value', ['42', '""'])
+def test_socket_rejects_invalid_values(tmp_path: Path, value: str):
+  """Reject non-string or empty socket settings."""
+  path = tmp_path / 'sdk.toml'
+  path.write_text(f'[gateway]\nsocket={value}\n')
+  with pytest.raises(ValueError, match='non-empty string'):
+    gateway_socket(path)

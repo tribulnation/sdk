@@ -22,7 +22,7 @@ def gateway(
     typer.Option(
       '--socket',
       '-s',
-      help='Unix socket path (overrides gateway.socket or daemon.socket).',
+      help='Unix socket path (overrides gateway.socket).',
     ),
   ] = None,
   config: Annotated[

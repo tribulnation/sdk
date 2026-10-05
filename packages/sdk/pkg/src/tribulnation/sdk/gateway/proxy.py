@@ -43,6 +43,7 @@ from tribulnation.sdk.market import (
 )
 
 from . import codec
+from .config import DEFAULT_SOCKET
 
 log = logging.getLogger(__name__)
 
@@ -659,7 +660,7 @@ class ProxySDK(TradingMarkets):
   _conn: Connection
 
   @classmethod
-  def at(cls, url: str = 'unix:///tmp/engine-gateway.sock') -> 'ProxySDK':
+  def at(cls, url: str = f'unix://{DEFAULT_SOCKET}') -> 'ProxySDK':
     """Construct a remote SDK at a Unix socket or WebSocket URL."""
     return cls(Connection(url))
 
