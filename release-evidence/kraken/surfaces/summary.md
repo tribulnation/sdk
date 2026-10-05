@@ -1,5 +1,5 @@
 # Local SDK evidence: kraken
 
-Run completed: 2026-10-05T16:27:22.021489+00:00
+Run completed: 2026-10-05T16:36:30.686133+00:00
 
 This records a trusted local run, not cryptographic proof. Release policy must separately validate required check coverage and statuses.

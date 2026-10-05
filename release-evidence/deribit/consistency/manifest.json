@@ -290,7 +290,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "4e1afe0b46bbc8730a7b68ed430f6a8821e8950288a91713b72fbc1514225d71",
+    "source_sha256": "5e9bbd98dd57c41621c7690ac0d86df89b99546d8b13a78583037ed8d07cec1e",
     "venue": "deribit"
   },
   "before": {
@@ -584,12 +584,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "4e1afe0b46bbc8730a7b68ed430f6a8821e8950288a91713b72fbc1514225d71",
+    "source_sha256": "5e9bbd98dd57c41621c7690ac0d86df89b99546d8b13a78583037ed8d07cec1e",
     "venue": "deribit"
   },
-  "finished": "2026-10-05T16:27:38.849769Z",
-  "results_sha256": "7c8555444233723db47adbef569b4d8dade543117ecdcac5d11ab63267f63dee",
+  "finished": "2026-10-05T16:36:44.947952Z",
+  "results_sha256": "93952639adb482b59ad6e7c6606c0b500f79c9e267ce68e5d3787fd36efad0e1",
   "schema_version": 2,
-  "started": "2026-10-05T16:27:14.075389Z",
-  "summary_sha256": "19ceb4f6f774e8bae46a858d26c08446e2b8012fadec14b02d3dd0956840d1e8"
+  "started": "2026-10-05T16:36:20.488551Z",
+  "summary_sha256": "42dadec81705e9dc9edf9a74c19409381d7fbf8e31360020e8eacdc99128360b"
 }
