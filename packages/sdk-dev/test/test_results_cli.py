@@ -57,6 +57,7 @@ def test_release_cli_rejects_failed_report(monkeypatch: pytest.MonkeyPatch):
   """The release command must propagate provenance or inventory failures."""
   check = Mock(side_effect=ValueError('missing required checks'))
   monkeypatch.setattr(results, 'verify_one', check)
+  monkeypatch.setattr(results, 'affected_venues', lambda root, package, venues: venues)
   result = CliRunner().invoke(
     app, ['release', 'binance', '--catalogue', 'catalogue/data']
   )
@@ -126,3 +127,16 @@ async def test_consistency_retries_only_throttled_reads(
     [1, 2, 4, 8, 8] if limited else []
   )
   assert not capsys.readouterr().out
+
+
+def test_gateway_release_does_not_require_expired_or_missing_reports(
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """No-impact releases skip both report reads and their seven-day expiry check."""
+  check = Mock(side_effect=AssertionError('Evidence must not be read'))
+  monkeypatch.setattr(results, 'verify_one', check)
+  monkeypatch.setattr(results, 'affected_venues', lambda root, package, venues: [])
+  result = CliRunner().invoke(app, ['release', 'sdk', '--catalogue', 'missing'])
+  assert result.exit_code == 0
+  assert 'live evidence is not required' in result.output
+  check.assert_not_called()

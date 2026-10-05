@@ -16,6 +16,13 @@ pip install tribulnation-sdk[dydx,hyperliquid,mexc]
 
 See the [support matrix](docs/support.md) for details on extras.
 
+## Standalone gateway
+
+Install `tribulnation-sdk[gateway]` for `tn gateway` and the remote `ProxySDK`.
+Venue adapters are installed separately on the server. See the
+[gateway guide](https://github.com/tribulnation/sdk/blob/main/docs/gateway.md)
+for configuration, supported operations and migration details.
+
 ## Trading Quick Start
 
 ```python

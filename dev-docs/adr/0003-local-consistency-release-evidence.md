@@ -5,6 +5,9 @@
 1. Status: accepted; amended by [ADR 0026](0026-pin-qualification-catalogue.md) (Catalogue pinning), [ADR 0004](0004-empty-book-consistency-coverage.md), [ADR 0006](0006-release-evidence-scope.md), [ADR 0009](0009-catalogue-owned-asset-identity.md), [ADR 0013](0013-all-read-suites-release-gate.md) and [ADR 0014](0014-bit2me-native-ticker-limitation.md)
 2. Date: 2026-09-10
 
+Amended by [ADR 0033](0033-change-scoped-release-evidence.md): release evidence is
+required only for venues affected since the previous package release.
+
 ## Context
 
 Live SDK checks may require credentials or a network location unavailable in CI.

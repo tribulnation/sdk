@@ -54,3 +54,6 @@ not a changelog or a substitute for API documentation and tests.
 | [0029](0029-client-order-ids.md) | Client order IDs on orders, order and client order IDs on fills | Accepted |
 | [0030](0030-mexc-bulk-stats-omit-missing-index.md) | MEXC bulk stats omit markets without an index | Accepted |
 | [0031](0031-coinbase-drop-intx.md) | Drop Coinbase INTX perpetuals ahead of their Advanced Trade retirement | Accepted |
+| [0032](0032-sdk-gateway.md) | SDK-owned gateway and lazy tn command | Proposed; implemented, not release-verified |
+| [0033](0033-change-scoped-release-evidence.md) | Change-scoped venue release evidence | Accepted; amends 0003, 0013 and 0032; amended by 0034 |
+| [0034](0034-offline-evidence-maintenance.md) | Offline evidence maintenance without repeated live qualification | Accepted; amends 0033 |

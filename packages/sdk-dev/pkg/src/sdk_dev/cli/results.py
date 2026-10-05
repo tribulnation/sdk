@@ -15,6 +15,7 @@ from tribulnation.sdk import MarketSDK, RateLimited
 from tribulnation.sdk.core import Context
 from tribulnation.sdk.core.invocations import retry
 from tribulnation.sdk.impl.accounts import Account
+from sdk_dev.release_scope import affected_venues, declared_venues
 from sdk_dev.repo import repo_root
 from sdk_dev.support import load_impl_files
 
@@ -234,19 +235,7 @@ def verify(
 
 def required_venues(root: Path, package: str) -> list[str]:
   """Core requires every shipped implementation, each under its applicable policy."""
-  implementations = load_impl_files(root / 'packages' / 'impl')
-  venues = sorted(
-    venue
-    for venue, impl in implementations.items()
-    if any(support.support != 'none' for support in impl.support.values())
-  )
-  if package == 'sdk':
-    if not venues:
-      raise ValueError('No declared implementations to verify')
-    return venues
-  if package in venues:
-    return [package]
-  raise ValueError('No consistency release-evidence policy for this package yet')
+  return declared_venues(root, package)
 
 
 def required_scopes(root: Path, venue: str) -> list[Literal['surfaces', 'consistency']]:
@@ -260,6 +249,18 @@ def required_scopes(root: Path, venue: str) -> list[Literal['surfaces', 'consist
   )
 
 
+@app.command('release-scope')
+def release_scope(package: str):
+  """Print affected venues before installing or validating live evidence."""
+  try:
+    root = repo_root()
+    venues = affected_venues(root, package, required_venues(root, package))
+  except Exception as exception:
+    typer.echo(f'Release blocked: {exception}', err=True)
+    raise typer.Exit(1) from None
+  typer.echo(','.join(venues))
+
+
 @app.command('release')
 def release(
   package: str,
@@ -271,7 +272,12 @@ def release(
   """Fail closed unless the release candidate has every required matching report."""
   try:
     root = repo_root()
-    for venue in required_venues(root, package):
+    venues = affected_venues(root, package, required_venues(root, package))
+    if not venues:
+      typer.echo(
+        'No venue-relevant changes since the previous release; live evidence is not required.'
+      )
+    for venue in venues:
       for scope in required_scopes(root, venue):
         report = reports / venue / scope
         verify_one(root, report, catalogue, venue=venue, scope=scope)
