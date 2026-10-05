@@ -44,3 +44,16 @@ migration, not a claim that the old adapters violated their documented contract.
 Fixtures cover positive, negative and zero amounts and both history scopes where
 supported. Read-only release suites qualify the candidate surfaces; they do not
 prove personal history completeness or replace sign regression fixtures.
+
+## Native sign evidence
+
+- [Bybit transaction log](https://bybit-exchange.github.io/docs/v5/account/transaction-log)
+  explicitly defines positive `funding` as received and negative as paid.
+- [Hyperliquid user funding examples](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates)
+  show a positive-rate long with negative `usdc` and a short with positive `usdc`.
+- [dYdX funding payment calculation](https://github.com/dydxprotocol/v4-chain/blob/main/indexer/services/roundtable/src/scripts/update_funding_payments.sql)
+  computes `payment` as negative signed position size times the funding-index
+  delta, yielding negative cash flow for longs paying a positive rate.
+- Aster maps native ledger `income`; Lighter maps position funding `change`.
+  Their existing Report/native cash-flow mappings use the same received-positive
+  direction; the Market conversion no longer negates those amounts.
