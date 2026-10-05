@@ -19,4 +19,10 @@ Never apply this conversion to funding rates or Report observations.
 Offline regression tests cover funding income, expense and zero, plus history
 scope, filtering and page retry behavior. Release qualification uses the normal
 read-only surfaces and consistency suites; it does not assert personal history
-completeness. Deribit Report qualification is testnet-only under ADR 0012.
+completeness.
+
+Release qualification on 2026-10-05 passed: 27 read-suite cases, 4 declared
+exclusions, and market consistency. Committed evidence under
+`release-evidence/lighter/` matches pinned Catalogue
+`1851660ac2bed8243dd9ce9c7297fe05c7130973`. Offline release verification passes.
+This adapter release follows SDK 2.10.0 publication.
