@@ -15,7 +15,7 @@ from typed_kraken.futures.instruments import FuturesInstrument, Instruments
 from typed_kraken.futures.historical_funding_rates import HistoricalFundingRates
 from typed_kraken.schemas import FuturesMarketTicker
 
-from tribulnation.sdk import Context, MarketSDK, NetworkError
+from tribulnation.sdk import Context, MarketSDK, NetworkError, accounts
 from tribulnation.kraken import KrakenMarket
 from tribulnation.kraken.market import SpotExchange
 from tribulnation.kraken.market.impl.mixin import Shared
@@ -399,7 +399,7 @@ async def test_public_factory_perpetual_accessors_and_helpers(
 
 async def test_root_public_perpetual_helpers(public_futures: AsyncMock):
   """The aggregate SDK uses the same public factory and typed perpetual route."""
-  async with MarketSDK() as sdk:
+  async with MarketSDK({'kraken': accounts.Kraken(public=True)}) as sdk:
     exchange = await sdk.perp_exchange('kraken:perp')
     assert isinstance(exchange, PerpExchange)
     market = await sdk.perp_market('kraken:perp:PF_XBTUSD')

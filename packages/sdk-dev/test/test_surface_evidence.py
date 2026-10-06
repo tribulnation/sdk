@@ -190,8 +190,7 @@ def test_worker_runs_real_pytest_and_sanitizes_failures(
   def configured(accounts: Path) -> SimpleNamespace:
     """Supply only the selected account identity to the worker."""
     return SimpleNamespace(
-      all_accounts={'local': SimpleNamespace(venue='ethereum')},
-      accounts={'local': object()},
+      accounts={'local': SimpleNamespace(venue='ethereum')},
     )
 
   monkeypatch.setattr(evidence, 'inventory', inventory)

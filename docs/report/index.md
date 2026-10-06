@@ -18,7 +18,7 @@ Method reference: [Methods](methods.md). Per-venue specifics: [Implementations](
 
 ## Accounts & providers
 
-`ReportSDK` has no built-in default accounts (unlike `MarketSDK`/`WalletSDK`/`EarnSDK`) — every account must be listed explicitly. Both record types carry a `Provenance` (api/tabular/manual/derived) tracing where they came from. `providers` (BigQuery/Alchemy/Etherscan/Moralis credentials) are only needed by chain-based venues that use them.
+Like every SDK root, `ReportSDK` has no implicit accounts: every account must be listed explicitly. Both record types carry a `Provenance` (api/tabular/manual/derived) tracing where they came from. `providers` (BigQuery/Alchemy/Etherscan/Moralis credentials) are only needed by chain-based venues that use them.
 
 ## Example
 

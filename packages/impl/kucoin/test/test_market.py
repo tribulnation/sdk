@@ -19,7 +19,7 @@ from tribulnation.kucoin import KucoinMarket
 from tribulnation.kucoin.market.common import Shared
 from tribulnation.kucoin.market.exchanges import SpotExchange
 from tribulnation.kucoin.market.markets import LinearPerpMarket, SpotMarket
-from tribulnation.sdk import Context, MarketSDK, NetworkError
+from tribulnation.sdk import Context, MarketSDK, NetworkError, accounts
 from tribulnation.sdk.market.types.candles import CandleInterval
 
 NOW = datetime(2026, 9, 1, tzinfo=timezone.utc)
@@ -345,12 +345,11 @@ async def test_stream_fans_out_once_and_unsubscribes_after_last_reader():
 async def test_market_sdk_constructs_public_kucoin_without_credentials(
   monkeypatch: pytest.MonkeyPatch,
 ):
-  """The router installs a genuine public default and never resolves private keys."""
+  """A public KuCoin account routes without ever resolving private keys."""
   monkeypatch.delenv('KUCOIN_API_KEY', raising=False)
   monkeypatch.delenv('KUCOIN_API_SECRET', raising=False)
   monkeypatch.delenv('KUCOIN_API_PASSPHRASE', raising=False)
-  sdk = MarketSDK()
-  assert sdk.all_accounts['kucoin'].public
+  sdk = MarketSDK({'kucoin': accounts.Kucoin(public=True)})
   venue = await sdk.venue('kucoin')
   assert isinstance(venue, KucoinMarket)
 

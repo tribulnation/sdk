@@ -373,7 +373,6 @@ async def test_sdk_uses_no_credentials_and_rejects_testnet():
       'test': accounts.Deribit(venue='deribit_testnet'),
     }
   )
-  assert sdk.all_accounts['deribit'].public
   assert isinstance(await sdk.venue('alias'), DeribitMarket)
   with pytest.raises(ValueError, match='mainnet'):
     await sdk.venue('test')

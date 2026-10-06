@@ -81,10 +81,8 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
   sdk = market_sdk(metafunc.config)
   ids = [
     f'{account}:{market}'
-    for account in selected_accounts(
-      metafunc.config, sdk.all_accounts, surface='market'
-    )
-    for market in [c.market_id for c in cases_of(sdk.all_accounts[account].venue)]
+    for account in selected_accounts(metafunc.config, sdk.accounts, surface='market')
+    for market in [c.market_id for c in cases_of(sdk.accounts[account].venue)]
   ]
   metafunc.parametrize('public_market', ids, ids=ids, scope='module')
 
@@ -122,7 +120,7 @@ async def collect_public(sdk: MarketSDK, id: str) -> PublicResults:
   """Acquire one managed venue and call only a fixed allowlist of market-data reads."""
   result = PublicResults()
   account_id, exchange_id, symbol = id.split(':', 2)
-  venue_slug = package_of(sdk.all_accounts[account_id].venue)
+  venue_slug = package_of(sdk.accounts[account_id].venue)
   support = surface_support('market')[venue_slug]
   try:
     async with sdk:
@@ -165,9 +163,7 @@ async def collect_public(sdk: MarketSDK, id: str) -> PublicResults:
           result.skips[name] = (
             f'{venue_slug} perpetual streams are explicitly unsupported (impl.toml note)'
           )
-        elif needs_account(
-          venue_slug, name, public=sdk.all_accounts[account_id].public
-        ):
+        elif needs_account(venue_slug, name, public=sdk.accounts[account_id].public):
           result.skips[name] = (
             'Current SDK path requires a configured private account (fee tier or catalogue)'
           )
@@ -184,7 +180,7 @@ async def collect_public(sdk: MarketSDK, id: str) -> PublicResults:
 def public_result(public_market: str, pytestconfig: pytest.Config) -> PublicResults:
   """Collect all public reads once per account and reference market."""
   sdk = market_sdk(pytestconfig)
-  require_credentials(sdk.all_accounts[public_market.split(':', 1)[0]])
+  require_credentials(sdk.accounts[public_market.split(':', 1)[0]])
   return loop_of(pytestconfig).run_until_complete(collect_public(sdk, public_market))
 
 

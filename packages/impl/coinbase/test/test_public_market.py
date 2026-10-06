@@ -213,11 +213,6 @@ async def test_public_quote_failures_are_not_hidden(
       await tickers(venue, [product()])
 
 
-def test_coinbase_requires_explicit_account_configuration():
-  """Public ticker fan-out must remain an explicit caller choice."""
-  assert 'coinbase' not in MarketSDK().all_accounts
-
-
 async def test_public_fallback_prefers_available_credentials(
   monkeypatch: pytest.MonkeyPatch,
 ):

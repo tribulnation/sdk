@@ -51,8 +51,8 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
   sdk = market_sdk(metafunc.config)
   ids = [
     id
-    for id in selected_accounts(metafunc.config, sdk.all_accounts, surface='market')
-    if sdk.all_accounts[id].venue == VENUE
+    for id in selected_accounts(metafunc.config, sdk.accounts, surface='market')
+    if sdk.accounts[id].venue == VENUE
   ]
   metafunc.parametrize('market_account', ids, ids=ids, scope='module')
 
@@ -215,7 +215,7 @@ async def collect(sdk: MarketSDK, account_id: str, public: bool, results: Result
 def bitget(market_account: str, pytestconfig: pytest.Config) -> Results:
   """Every method's outcome for one account."""
   sdk = market_sdk(pytestconfig)
-  account = sdk.all_accounts[market_account]
+  account = sdk.accounts[market_account]
   require_credentials(account)
   assert isinstance(account, Bitget)
   results = Results()

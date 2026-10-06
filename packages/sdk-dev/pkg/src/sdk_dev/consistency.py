@@ -559,7 +559,7 @@ async def collect(
       add(id, False, 'request_failed', quotes=quotes)
 
   try:
-    account = sdk.all_accounts[account_id]
+    account = sdk.accounts[account_id]
     if account.venue != venue or venue.endswith('_testnet'):
       raise ValueError('Account is not the requested mainnet venue')
     owner = await request(sdk.venue(account_id))

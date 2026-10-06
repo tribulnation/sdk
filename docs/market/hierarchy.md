@@ -16,7 +16,7 @@ The markets implementation is structured following the market IDs: `account` →
 
 | Level | Instantiation | Example |
 | --- | --- | --- |
-| Top-level | `sdk = MarketSDK()` | `sdk.depth('mexc:spot:BTCUSDT')` |
+| Top-level | `sdk = MarketSDK({'mexc': accounts.Mexc(public=True)})` | `sdk.depth('mexc:spot:BTCUSDT')` |
 | Venue | `venue = await sdk.venue('mexc')` | `venue.depth('spot:BTCUSDT')` |
 | Exchange | `exchange = await sdk.exchange('mexc:spot')` | `exchange.depth('BTCUSDT')` |
 | Market | `market = await sdk.market('mexc:spot:BTCUSDT')` | `market.depth()` |
@@ -41,7 +41,10 @@ is implied by a name.
 **Top-level**: For example, if you're working across multiple venues, you'd likely work at the top level:
 
 ```python
-sdk = MarketSDK()
+sdk = MarketSDK({
+  'mexc': accounts.Mexc(public=True),
+  'binance': accounts.Binance(public=True),
+})
 
 mexc_book, binance_book = await asyncio.gather(
   sdk.depth('mexc:spot:BTCUSDT'),

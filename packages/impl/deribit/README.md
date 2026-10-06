@@ -30,7 +30,7 @@ async with reports.venue('deribit') as report:
    hosts and `TEST_DERIBIT_CLIENT_ID` / `TEST_DERIBIT_CLIENT_SECRET` defaults; mainnet
    never falls back to those test credentials.
 
-Public `MarketSDK()` discovery uses `spot` and `perp`, preserving native instrument
+Public `accounts.Deribit(public=True)` discovery uses `spot` and `perp`, preserving native instrument
 names. Books, tickers, streams, native index/mark and linear open interest require
 no credentials. Trade candles support `1m`, `5m`, `15m`, `1h` through validated
 WebSocket calls and aware half-open windows. Routed spot has no candles; `4h` and

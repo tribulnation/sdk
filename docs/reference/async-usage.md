@@ -22,9 +22,9 @@
 Every method works on an object you never entered:
 
 ```python
-from tribulnation.sdk import MarketSDK
+from tribulnation.sdk import MarketSDK, accounts
 
-sdk = MarketSDK()
+sdk = MarketSDK({'hyperliquid': accounts.Hyperliquid(public=True)})
 book = await sdk.depth('hyperliquid::BTC')
 ```
 
