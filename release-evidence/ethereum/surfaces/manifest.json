@@ -348,7 +348,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "166ae622e597ab3b27cf6ec884d75b4489dc4d52f7b00626fb8360cd5be50598",
+        "files_sha256": "7413f3a94223bbc931c9e46b035c25d04c6e60116f6c2527fe7ae0e490d3042c",
         "metadata_sha256": "6e562fabf4a160a2f9a213337f73d5c2de2fd5d05e67d330443c4c67f88b21dc",
         "version": "0"
       },
@@ -388,7 +388,7 @@
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "57caab854f627fd3129661a820c456567e368a0d21578b5e5a46c40c2a40dc8d",
+        "files_sha256": "302e416303fcb7f990c3b4984013848f570e2a1adbc9939c3452d6f1031af8d2",
         "metadata_sha256": "57ea35902375de590c97f298bcaf6e7ce590bb164ecb6d0d5b6eca5c4c39408d",
         "version": "0"
       },
@@ -455,7 +455,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "aa4968be05ed6538996fb32f5bbc76b1a9609bbd2c59f5092da29ccdc7be284e",
+    "source_sha256": "d0c9dc4123572568d1a8e90c3130f4402d9e6d9fa4ed0edba20f9b8d3c24d366",
     "venue": "ethereum"
   },
   "before": {
@@ -807,7 +807,7 @@
         "version": "2026.6.3"
       },
       "sdk-dev": {
-        "files_sha256": "166ae622e597ab3b27cf6ec884d75b4489dc4d52f7b00626fb8360cd5be50598",
+        "files_sha256": "7413f3a94223bbc931c9e46b035c25d04c6e60116f6c2527fe7ae0e490d3042c",
         "metadata_sha256": "6e562fabf4a160a2f9a213337f73d5c2de2fd5d05e67d330443c4c67f88b21dc",
         "version": "0"
       },
@@ -847,7 +847,7 @@
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "57caab854f627fd3129661a820c456567e368a0d21578b5e5a46c40c2a40dc8d",
+        "files_sha256": "302e416303fcb7f990c3b4984013848f570e2a1adbc9939c3452d6f1031af8d2",
         "metadata_sha256": "57ea35902375de590c97f298bcaf6e7ce590bb164ecb6d0d5b6eca5c4c39408d",
         "version": "0"
       },
@@ -914,12 +914,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "aa4968be05ed6538996fb32f5bbc76b1a9609bbd2c59f5092da29ccdc7be284e",
+    "source_sha256": "d0c9dc4123572568d1a8e90c3130f4402d9e6d9fa4ed0edba20f9b8d3c24d366",
     "venue": "ethereum"
   },
-  "finished": "2026-10-05T16:36:27.681515Z",
+  "finished": "2026-10-06T15:38:06.336573Z",
   "results_sha256": "dae17bd88826beea9270824c4c487c754600ed50c5945bf9cd9b5ca52176bb03",
   "schema_version": 2,
-  "started": "2026-10-05T16:36:23.176739Z",
-  "summary_sha256": "2545ee9d4957a524c975a8c6b348583cb363efba4457262a444f34f0d410aaf5"
+  "started": "2026-10-06T15:37:58.576434Z",
+  "summary_sha256": "5ca41bc751fdc2721f0d043a59bddd3e019ac8c659ba1e34bd09fa52a26b512f"
 }
