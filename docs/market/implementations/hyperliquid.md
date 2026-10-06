@@ -20,8 +20,8 @@ covers only what is Hyperliquid-specific.
 ## Account
 
 `venue` selects the network: `hyperliquid` is mainnet, `hyperliquid_testnet` is testnet. An
-`address` without a `private_key` is read-only. The built-in `hyperliquid` account is
-`accounts.Hyperliquid(public=True)`, read-only.
+`address` without a `private_key` is read-only, and so is
+`accounts.Hyperliquid(public=True)`.
 
 ## Exchanges & ID conventions
 

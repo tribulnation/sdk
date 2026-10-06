@@ -15,16 +15,16 @@
 Spot and linear perpetual tickers return `quote_volume_24h` when native `volume_notional` is present. Missing quote turnover remains `None`; USD-normalized volume is not substituted.
 
 Public mainnet spot and linear perpetual data through `tribulnation-deribit`.
-Requires `tribulnation-sdk` >=2.2.0 and `tribulnation-deribit` >=0.3.0.
+Requires `tribulnation-sdk` >=2.11.0 and `tribulnation-deribit` >=0.3.0.
 
 ```python
 from tribulnation.sdk import MarketSDK
 
-async with MarketSDK() as sdk:
+async with MarketSDK.public('deribit') as sdk:
   book = await sdk.depth('deribit:perp:BTC_USDC-PERPETUAL', levels=5)
 ```
 
-The built-in Deribit Market account needs no credentials. Market ignores private
+Deribit Market needs no credentials. Market ignores private
 credential settings and rejects testnet accounts. Existing Wallet/Earn/Report
 capabilities retain their own scope.
 

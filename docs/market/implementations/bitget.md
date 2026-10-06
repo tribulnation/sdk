@@ -23,8 +23,8 @@ covers only what is Bitget-specific.
 `accounts.Bitget` takes an `access_key`, `secret_key` and `passphrase`. `uta` says whether
 the account is a Unified Trading Account (`True`), a Classic account (`False`), or should
 be auto-detected on the first account-scoped call (`None`, the default). `validate`
-toggles pydantic validation of API responses. The built-in `bitget` account is
-`accounts.Bitget(public=True)`: every public method works on it, implemented account-scoped methods raise `AuthError`.
+toggles pydantic validation of API responses. On a public
+`accounts.Bitget(public=True)` account every public method works and implemented account-scoped methods raise `AuthError`.
 USDC futures expose public data only; their account methods raise
 `NotImplementedError`, including when credentials are configured.
 
@@ -127,7 +127,7 @@ load_dotenv()
 
 sdk = MarketSDK({'bg': accounts.Bitget()})
 
-# public, works on the built-in `bitget` account too
+# public, works on an `accounts.Bitget(public=True)` account too
 book = await sdk.depth('bg:spot:BTCUSDT', levels=5)
 tickers = await sdk.tickers('bg:spot')
 stats = await sdk.perp_stats('bg:usdt', markets=['BTCUSDT', 'ETHUSDT'])

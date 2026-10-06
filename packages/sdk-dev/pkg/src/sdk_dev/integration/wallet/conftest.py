@@ -26,7 +26,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
   if sdk is None:
     sdk = WalletSDK(accounts=load_accounts(metafunc.config))
     metafunc.config.stash[SDK] = sdk
-  ids = selected_accounts(metafunc.config, sdk.all_accounts, surface='wallet')
+  ids = selected_accounts(metafunc.config, sdk.accounts, surface='wallet')
   metafunc.parametrize(
     'wallet_account',
     ids,
@@ -83,7 +83,7 @@ def wallet_result(
 ) -> WalletResult:
   """Fetch and cache one wallet implementation's result for the test module."""
   sdk = pytestconfig.stash[SDK]
-  account = sdk.all_accounts[wallet_account]
+  account = sdk.accounts[wallet_account]
   support = surface_support('wallet')[package_of(account.venue)]
   require_credentials(account, auth=support.auth)
   methods = support.methods if support.support == 'partial' else None

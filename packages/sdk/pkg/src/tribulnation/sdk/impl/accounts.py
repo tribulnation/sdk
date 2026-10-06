@@ -478,3 +478,36 @@ def load_accounts(path: _Path | str) -> dict[str, Account]:
   for acc in accounts.values():
     acc.verify_env_vars()
   return accounts
+
+
+PublicVenue = _Literal[
+  'aster',
+  'binance',
+  'bit2me',
+  'bitget',
+  'bybit',
+  'coinbase',
+  'deribit',
+  'dydx',
+  'hyperliquid',
+  'kraken',
+  'kucoin',
+  'lighter',
+  'mexc',
+]
+"""A mainnet venue whose account can be configured credential-free."""
+
+
+def public_accounts(*venues: PublicVenue) -> dict[str, Account]:
+  """Build credential-free mainnet accounts, keyed by their venue slug.
+
+  Args:
+    venues: Venues to configure, each as `<Venue>(public=True)`.
+
+  Examples:
+    ```python
+    MarketSDK(accounts=public_accounts('hyperliquid', 'mexc'))
+    ```
+  """
+  data: dict[str, object] = {v: {'venue': v, 'public': True} for v in venues}
+  return _pydantic.TypeAdapter(dict[str, Account]).validate_python(data)

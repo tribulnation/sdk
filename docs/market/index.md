@@ -18,12 +18,13 @@
 
 ## Getting started — Public data
 
-You can start with public data right away, no credentials required:
+You can start with public data right away, no credentials required. Name the venues you
+want; `MarketSDK.public()` configures a credential-free account for each:
 
 ```python
 from tribulnation.sdk import MarketSDK
 
-sdk = MarketSDK()
+sdk = MarketSDK.public('hyperliquid')
 book = await sdk.depth('hyperliquid::BTC')
 # Book(bids=[...], asks=[...])
 ```

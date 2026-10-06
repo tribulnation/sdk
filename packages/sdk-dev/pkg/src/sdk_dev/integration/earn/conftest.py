@@ -29,7 +29,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
   if sdk is None:
     sdk = EarnSDK(accounts=load_accounts(metafunc.config))
     metafunc.config.stash[SDK] = sdk
-  ids = selected_accounts(metafunc.config, sdk.all_accounts, surface='earn')
+  ids = selected_accounts(metafunc.config, sdk.accounts, surface='earn')
   metafunc.parametrize(
     'earn_account',
     ids,
@@ -57,7 +57,7 @@ def earn_result(
 ) -> EarnResult:
   """Fetch and cache one implementation's result for the test module."""
   sdk = pytestconfig.stash[SDK]
-  account = sdk.all_accounts[earn_account]
+  account = sdk.accounts[earn_account]
   support = surface_support('earn')[package_of(account.venue)]
   require_credentials(account, auth=support.auth)
   try:

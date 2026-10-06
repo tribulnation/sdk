@@ -399,7 +399,7 @@ async def test_public_factory_perpetual_accessors_and_helpers(
 
 async def test_root_public_perpetual_helpers(public_futures: AsyncMock):
   """The aggregate SDK uses the same public factory and typed perpetual route."""
-  async with MarketSDK() as sdk:
+  async with MarketSDK.public('kraken') as sdk:
     exchange = await sdk.perp_exchange('kraken:perp')
     assert isinstance(exchange, PerpExchange)
     market = await sdk.perp_market('kraken:perp:PF_XBTUSD')

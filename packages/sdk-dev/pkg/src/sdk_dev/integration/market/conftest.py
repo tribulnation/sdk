@@ -39,10 +39,8 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
   sdk = market_sdk(metafunc.config)
   markets = [
     f'{account}:{case.market_id}'
-    for account in selected_accounts(
-      metafunc.config, sdk.all_accounts, surface='market'
-    )
-    for case in cases_of(sdk.all_accounts[account].venue)
+    for account in selected_accounts(metafunc.config, sdk.accounts, surface='market')
+    for case in cases_of(sdk.accounts[account].venue)
   ]
   metafunc.parametrize('candle_market', markets, ids=markets, scope='module')
 
@@ -50,7 +48,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
 def case_of(sdk: MarketSDK, market: str) -> CandleCase:
   """The case a parametrized market id was built from."""
   account, market_id = market.split(':', 1)
-  cases = cases_of(sdk.all_accounts[account].venue)
+  cases = cases_of(sdk.accounts[account].venue)
   return next(case for case in cases if case.market_id == market_id)
 
 
@@ -67,7 +65,7 @@ def result_of(
   config: pytest.Config, sdk: MarketSDK, market: str, *, count: int
 ) -> CandlesResult:
   """Fetch one market's candles, describing rather than raising a failure."""
-  require_credentials(sdk.all_accounts[market.split(':', 1)[0]])
+  require_credentials(sdk.accounts[market.split(':', 1)[0]])
   try:
     pages = loop_of(config).run_until_complete(fetch_candles(sdk, market, count=count))
   except Exception as exception:

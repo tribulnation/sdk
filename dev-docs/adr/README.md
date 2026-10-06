@@ -58,3 +58,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0033](0033-change-scoped-release-evidence.md) | Change-scoped venue release evidence | Accepted; amends 0003, 0013 and 0032; amended by 0034 |
 | [0034](0034-offline-evidence-maintenance.md) | Offline evidence maintenance without repeated live qualification | Accepted; amends 0033 |
 | [0035](0035-funding-cash-flow-sign.md) | Funding payments use received-positive account cash flows | Accepted; supersedes the sign decision in 0024 |
+| [0036](0036-no-implicit-accounts.md) | SDK roots have no implicit accounts | Accepted |

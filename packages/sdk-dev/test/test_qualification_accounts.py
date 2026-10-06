@@ -25,9 +25,7 @@ def test_release_venue_selects_its_mainnet_account(venue: str):
   """Qualification needs no ad hoc accounts file and no guessed `--account`."""
   sdk = tracked_sdk()
   selected = select_account(sdk, venue, EXPLICIT.get(venue))
-  assert sdk.all_accounts[selected].venue == venue
-  if venue not in EXPLICIT:
-    assert selected in sdk.accounts, 'a public default would hide a misconfiguration'
+  assert sdk.accounts[selected].venue == venue
 
 
 def test_bitget_accounts_declare_their_mode():

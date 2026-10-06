@@ -1,6 +1,7 @@
 """Aggregates every `packages/impl/*/impl.toml` into a per-surface support matrix —
-which venues offer a given surface (`supportedVenues`) and which of those have a real
-credential-free `DEFAULT_ACCOUNTS` entry for it (`defaultVenues`). This is what the /sdk
+which venues offer a given surface (`supportedVenues`) and which of those work with a
+credential-free `public = true` account (`defaultVenues`, from `auth = false`; the name
+predates the removal of SDK default accounts and is kept for the site). This is what the /sdk
 wizard's venue picker and sdk.toml generation are driven by, so a venue only ever shows up
 there once its own package's impl.toml says it's ready — never derived from router code
 alone (a venue can be wired into an *SDK's router ahead of being ready to announce; see

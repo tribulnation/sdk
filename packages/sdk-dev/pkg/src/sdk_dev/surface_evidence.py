@@ -188,7 +188,7 @@ def run_worker(
     result = pytest.main(args, plugins=[recorder])
   return Payload(
     venue=venue,
-    account_venue=sdk.all_accounts[selected].venue,
+    account_venue=sdk.accounts[selected].venue,
     completed=result == pytest.ExitCode.OK,
     checks=list(recorder.checks.values()),
   ).model_dump(mode='json')

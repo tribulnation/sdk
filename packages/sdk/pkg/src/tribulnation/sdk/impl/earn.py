@@ -14,22 +14,15 @@ from .accounts import (
   Bitget,
   Binance,
   Bit2Me,
+  PublicVenue,
   load_accounts,
+  public_accounts,
 )
-
-DEFAULT_ACCOUNTS: Mapping[str, Account] = {
-  'mexc': Mexc(public=True),
-  'bit2me': Bit2Me(public=True),
-}
 
 
 @dataclass
 class EarnSDK:
   accounts: Mapping[str, Account] = field(default_factory=dict[str, Account])
-
-  @property
-  def all_accounts(self) -> Mapping[str, Account]:
-    return {**DEFAULT_ACCOUNTS, **self.accounts}
 
   @classmethod
   def load(cls, path: Path | str = 'sdk.toml') -> 'EarnSDK':
@@ -39,6 +32,18 @@ class EarnSDK:
       path: Path to a TOML file with an `[accounts]` table.
     """
     return cls(accounts=load_accounts(path))
+
+  @classmethod
+  def public(cls, *venues: PublicVenue) -> 'EarnSDK':
+    """Construct an `EarnSDK` with a credential-free account per venue.
+
+    Each account is keyed by its venue slug. There are no implicit accounts:
+    a venue is only available once it is configured, here or explicitly.
+
+    Args:
+      venues: Mainnet venues to configure as `<Venue>(public=True)`.
+    """
+    return cls(accounts=public_accounts(*venues))
 
   def binance(self, account: Binance) -> Earn:
     try:
@@ -159,7 +164,7 @@ class EarnSDK:
   @property
   def all(self) -> dict[str, Earn]:
     out: dict[str, Earn] = {}
-    for id, account in self.all_accounts.items():
+    for id, account in self.accounts.items():
       try:
         out[id] = self.venue(id)
       except NotImplementedError:
@@ -167,7 +172,7 @@ class EarnSDK:
     return out
 
   def venue(self, id: str, /) -> Earn:
-    if (account := self.all_accounts.get(id)) is None:
+    if (account := self.accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
     match account.venue:
       case 'binance':
@@ -192,4 +197,4 @@ class EarnSDK:
         raise NotImplementedError(f'Unsupported venue: {account.venue}')
 
   def venues(self) -> list[str]:
-    return list(self.all_accounts)
+    return list(self.accounts)

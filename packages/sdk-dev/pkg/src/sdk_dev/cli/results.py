@@ -29,10 +29,8 @@ def load_snapshot(path: Path) -> Catalogue:
   return Catalogue.load(path)
 
 
-def configured_sdk(accounts: Path | None) -> MarketSDK:
+def configured_sdk(accounts: Path) -> MarketSDK:
   """Parse accounts without validating credentials for unrelated venues."""
-  if accounts is None:
-    return MarketSDK()
   load_dotenv(accounts.resolve().parent / '.env')
   with accounts.open('rb') as stream:
     data = tomllib.load(stream)
@@ -44,16 +42,13 @@ def configured_sdk(accounts: Path | None) -> MarketSDK:
 
 def select_account(sdk: MarketSDK, venue: str, account: str | None) -> str:
   """Choose one exact mainnet account, rejecting ambiguous aliases or testnets."""
-  matches = [key for key, value in sdk.all_accounts.items() if value.venue == venue]
+  matches = [key for key, value in sdk.accounts.items() if value.venue == venue]
   if account is not None:
     if account not in matches:
       raise ValueError('Selected account does not match the requested mainnet venue')
     return account
-  configured = [key for key in matches if key in sdk.accounts]
-  if len(configured) == 1:
-    return configured[0]
-  if not configured and venue in matches:
-    return venue
+  if len(matches) == 1:
+    return matches[0]
   raise ValueError(
     'Configure a matching account or select one explicitly with --account'
   )
@@ -73,8 +68,8 @@ def test_consistency(
     Path, typer.Option(help='New report directory; never overwrite an old run.')
   ],
   accounts: Annotated[
-    Path | None, typer.Option(help='Optional accounts TOML; public defaults otherwise.')
-  ] = None,
+    Path, typer.Option(help='Accounts TOML; every venue is configured explicitly.')
+  ],
   account: Annotated[
     str | None,
     typer.Option(help='Exact account alias when configuration is ambiguous.'),

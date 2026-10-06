@@ -42,7 +42,7 @@ async def test_account_fee_routing_preserves_refetch(monkeypatch: pytest.MonkeyP
   """Root, venue and exchange fee calls reach the exact market and refresh flag."""
   expected = Fees.symmetric(maker=Decimal('0.001'), taker=Decimal('0.002'))
   call = AsyncMock(return_value=expected)
-  async with MarketSDK() as sdk:
+  async with MarketSDK.public('binance') as sdk:
     venue = await sdk.venue('binance')
     exchange = await venue.exchange('spot')
     for router, identifier in (

@@ -345,12 +345,11 @@ async def test_stream_fans_out_once_and_unsubscribes_after_last_reader():
 async def test_market_sdk_constructs_public_kucoin_without_credentials(
   monkeypatch: pytest.MonkeyPatch,
 ):
-  """The router installs a genuine public default and never resolves private keys."""
+  """A public KuCoin account routes without ever resolving private keys."""
   monkeypatch.delenv('KUCOIN_API_KEY', raising=False)
   monkeypatch.delenv('KUCOIN_API_SECRET', raising=False)
   monkeypatch.delenv('KUCOIN_API_PASSPHRASE', raising=False)
-  sdk = MarketSDK()
-  assert sdk.all_accounts['kucoin'].public
+  sdk = MarketSDK.public('kucoin')
   venue = await sdk.venue('kucoin')
   assert isinstance(venue, KucoinMarket)
 

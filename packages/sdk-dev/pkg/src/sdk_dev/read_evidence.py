@@ -327,7 +327,7 @@ def run_worker(
   selected = select_account(
     sdk, 'deribit_testnet' if group == 'report_testnet' else venue, account
   )
-  configured = sdk.all_accounts[selected]
+  configured = sdk.accounts[selected]
   mode = getattr(configured, 'uta', None) if venue == 'bitget' else None
   if venue == 'bitget' and (configured.public or not isinstance(mode, bool)):
     raise ValueError('Bitget requires a private account with expected uta mode')

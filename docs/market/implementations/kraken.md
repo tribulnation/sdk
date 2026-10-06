@@ -19,8 +19,8 @@ covers only what is Kraken-specific.
 
 ## Account
 
-Mainnet only, no testnet. `validate` toggles pydantic validation of API responses. The
-built-in `kraken` account is `accounts.Kraken(public=True)`, read-only: market data works
+Mainnet only, no testnet. `validate` toggles pydantic validation of API responses. A
+public `accounts.Kraken(public=True)` account is read-only: market data works
 without credentials; Spot balances, open orders, fills and the fills stream need an API key. Private
 Futures operations are unsupported. Public perpetual support requires
 `tribulnation-kraken >=0.3.0` (with `typed-kraken >=0.4.0`).

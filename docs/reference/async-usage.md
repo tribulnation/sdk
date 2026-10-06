@@ -24,7 +24,7 @@ Every method works on an object you never entered:
 ```python
 from tribulnation.sdk import MarketSDK
 
-sdk = MarketSDK()
+sdk = MarketSDK.public('hyperliquid')
 book = await sdk.depth('hyperliquid::BTC')
 ```
 

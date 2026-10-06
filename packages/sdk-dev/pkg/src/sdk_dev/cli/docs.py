@@ -119,8 +119,7 @@ def _build_generated(root: Path) -> Generated:
     if METHODS_MARKER not in page.read_text():
       raise FileNotFoundError(f'{page}: missing the {METHODS_MARKER} marker')
     universes = {
-      name: method_universe(impl_files, surface, name)
-      for name in contract.methods
+      name: method_universe(impl_files, surface, name) for name in contract.methods
     }
     source_methods = {
       name: source.method(method.ref or contract.component.ref, name)
@@ -242,10 +241,9 @@ def sync(
     - support.json, from every packages/impl/*/impl.toml (sdk_dev.support) — which
       venues offer a given surface at all, each one's own `[support.<surface>]` table
       (`support`, `auth`, `methods`, `note`) under `venues`, and which are credential-free
-      (`auth: false` in `impl.toml` — a real fact about `DEFAULT_ACCOUNTS`, not derived
-      from it, since a venue can have a default account that still needs real
-      credentials). Feeds the wizard's sdk.toml generation (skip an entry for a venue
-      that's both a public default *and* not required by the current method).
+      (`auth: false` in `impl.toml`). Feeds the wizard's sdk.toml generation: a
+      credential-free venue whose selected method is public gets its
+      public_accounts.json block instead of the credentialed one.
 
   Every source file is validated and rendered (same schemas as `sdk-dev docs check`)
   before anything is written — an error aborts the sync with nothing written, the

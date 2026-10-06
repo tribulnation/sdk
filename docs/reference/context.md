@@ -24,7 +24,7 @@ The SDK's methods run plainly by default. But you can easily wrap them to add ex
 ```python
 from tribulnation.sdk import EarnSDK, Context, NetworkError, RateLimited
 
-earn = EarnSDK()
+earn = EarnSDK.public('mexc', 'bit2me')
 
 with Context().retried(NetworkError, RateLimited, max_retries=5).use():
   instruments = await earn.instruments(tags=['flexible'])
@@ -41,7 +41,7 @@ You can also add logging, or you own middleware. Let's see logging first:
 ```python
 from tribulnation.sdk import MarketSDK, Context, NetworkError, RateLimited
 
-market = MarketSDK()
+market = MarketSDK.public('mexc')
 
 with Context().logged().use():
   tickers = await market.tickers('mexc:spot')
