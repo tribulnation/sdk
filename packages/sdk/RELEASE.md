@@ -18,4 +18,11 @@ This is a breaking change:
 Adapters do not use the removed members; their SDK floors are unchanged.
 `sdk-dev test consistency` now requires `--accounts`.
 
-QUALIFICATION
+Qualification on 2026-10-06: all 14 declared venues have passing, verified
+read-suite evidence, and all 13 market venues have passing consistency evidence,
+against the unchanged Catalogue pin `1851660ac2bed8243dd9ce9c7297fe05c7130973`.
+Every run passed on its first attempt. The existing Bit2Me native-ticker
+limitation (ADR 0014) remains visible. Qualification accounts were already
+explicit in `sdk.test.toml`, so recorded coverage is unchanged.
+
+All 1,305 repository unit tests pass.
