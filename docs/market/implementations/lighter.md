@@ -19,7 +19,7 @@ covers only what is Lighter-specific.
 
 ## Account
 
-The built-in `lighter` account is public: market data works without credentials.
+A public `accounts.Lighter(public=True)` account is enough for market data.
 Account and trading methods need an API key registered for the account.
 
 ```toml

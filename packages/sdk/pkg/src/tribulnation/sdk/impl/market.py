@@ -22,29 +22,10 @@ from .accounts import (
   load_accounts,
 )
 
-DEFAULT_ACCOUNTS: Mapping[str, Account] = {
-  'aster': Aster(public=True),
-  'dydx': Dydx(public=True),
-  'hyperliquid': Hyperliquid(public=True),
-  'mexc': Mexc(public=True),
-  'binance': Binance(public=True),
-  'bit2me': Bit2Me(public=True),
-  'bitget': Bitget(public=True),
-  'bybit': Bybit(public=True),
-  'kraken': Kraken(public=True),
-  'kucoin': Kucoin(public=True),
-  'deribit': Deribit(public=True),
-  'lighter': Lighter(public=True),
-}
-
 
 @dataclass(frozen=True)
 class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
   accounts: Mapping[str, Account] = field(default_factory=dict[str, Account])
-
-  @property
-  def all_accounts(self) -> Mapping[str, Account]:
-    return {**DEFAULT_ACCOUNTS, **self.accounts}
 
   @classmethod
   def load(cls, path: Path | str = 'sdk.toml') -> 'MarketSDK':
@@ -244,7 +225,7 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
     )
 
   def _venue(self, id: str, /) -> TradingVenue:
-    if (account := self.all_accounts.get(id)) is None:
+    if (account := self.accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
     match account.venue:
       case 'aster' | 'aster_testnet':
@@ -281,7 +262,7 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
     return await self.venue_registry.get(id, lambda: self._venue(id))
 
   async def venues(self) -> Sequence[str]:
-    return list(self.all_accounts)
+    return list(self.accounts)
 
   @property
   def all(self) -> dict[str, TradingVenue]:
@@ -292,5 +273,5 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
     """
     return {
       id: self.venue_registry.unmanaged(id, lambda: self._venue(id))
-      for id in self.all_accounts
+      for id in self.accounts
     }

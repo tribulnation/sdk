@@ -89,7 +89,7 @@ def sdk() -> MarketSDK:
   return cast(
     MarketSDK,
     SimpleNamespace(
-      all_accounts={'local': SimpleNamespace(venue='fixture')},
+      accounts={'local': SimpleNamespace(venue='fixture')},
       venue=AsyncMock(return_value=owner),
     ),
   )
@@ -347,7 +347,7 @@ async def bit2me_sdk(
     (root / 'packages/impl/fixture/impl.toml').read_text()
   )
   monkeypatch.setitem(consistency.CASES, 'bit2me', [])
-  monkeypatch.setattr(sdk.all_accounts['local'], 'venue', 'bit2me')
+  monkeypatch.setattr(sdk.accounts['local'], 'venue', 'bit2me')
   owner = await sdk.venue('local')
   exchange = await owner.exchange('')
   market = await exchange.market('BTC/USD')
@@ -732,7 +732,7 @@ async def test_wrong_account_venue_is_not_mainnet_evidence(
   root: Path, sdk: MarketSDK, catalogue: Catalogue
 ):
   """An account alias may be arbitrary, but its configured venue must match exactly."""
-  cast(SimpleNamespace, sdk.all_accounts['local']).venue = 'fixture_testnet'
+  cast(SimpleNamespace, sdk.accounts['local']).venue = 'fixture_testnet'
   with pytest.raises(ValueError):
     verify_payload(await payload(sdk, catalogue), catalogue=catalogue, root=root)
 
@@ -803,7 +803,7 @@ async def mexc_missing_sdk(
   directory = root / 'packages/impl/mexc'
   directory.mkdir()
   (directory / 'impl.toml').write_text('[support.market]\nsupport="full"\nauth=false\n')
-  monkeypatch.setattr(sdk.all_accounts['local'], 'venue', 'mexc')
+  monkeypatch.setattr(sdk.accounts['local'], 'venue', 'mexc')
   owner = await sdk.venue('local')
   monkeypatch.setattr(owner, 'venue_id', 'mexc')
   symbols = ['AAA_USDT', 'BBB_USDT', 'CCC_USDT', 'BTC_USDT', 'KOKUSAISTOCK_USDT']

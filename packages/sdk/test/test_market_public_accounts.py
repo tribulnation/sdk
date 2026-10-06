@@ -1,10 +1,11 @@
 """Public account routing must work without credentials and preserve configured keys."""
 
+from collections.abc import Awaitable
 from unittest.mock import Mock
 
 import pytest
 
-from tribulnation.sdk import AuthError, MarketSDK
+from tribulnation.sdk import AuthError, EarnSDK, MarketSDK, WalletSDK
 from tribulnation.sdk.impl import accounts
 
 
@@ -73,10 +74,9 @@ def test_anonymous_dydx_account_operations_require_an_address():
     venue.shared.require_address()
 
 
-async def test_bybit_public_default_has_owned_lifetime_and_configured_override():
-  """Bybit is covered without config; one default root owns a reusable venue lifetime."""
-  sdk = MarketSDK()
-  assert sdk.all_accounts['bybit'].public
+async def test_public_bybit_root_has_owned_lifetime():
+  """A public Bybit account works credential-free; one root owns a reusable lifetime."""
+  sdk = MarketSDK({'bybit': accounts.Bybit(public=True)})
   async with sdk:
     first = await sdk.venue('bybit')
     assert first.venue_id == 'bybit'
@@ -87,5 +87,17 @@ async def test_bybit_public_default_has_owned_lifetime_and_configured_override()
     ]
   async with sdk:
     assert await sdk.venue('bybit') is not first
-  configured = accounts.Bybit(api_key='explicit-key', api_secret='explicit-secret')
-  assert MarketSDK(accounts={'bybit': configured}).all_accounts['bybit'] is configured
+
+
+@pytest.mark.parametrize('root_type', [MarketSDK, EarnSDK, WalletSDK])
+async def test_roots_have_no_implicit_accounts(
+  root_type: type[MarketSDK] | type[EarnSDK] | type[WalletSDK],
+):
+  """Only configured venues exist: an unconfigured one is an error, never a fallback."""
+  root = root_type()
+  assert not root.accounts
+  assert not root.all
+  with pytest.raises(ValueError, match='No account found'):
+    venue = root.venue('mexc')
+    if isinstance(venue, Awaitable):
+      await venue

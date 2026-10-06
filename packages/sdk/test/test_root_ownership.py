@@ -79,6 +79,11 @@ class Venue(TradingVenue):
 Factory = tuple[list[str], list[Venue], list[Venue]]
 
 
+def market_root() -> MarketSDK:
+  """A root with two explicitly configured accounts, `one` and `two`."""
+  return MarketSDK(accounts={'one': Bybit(public=True), 'two': Bybit(public=True)})
+
+
 @pytest.fixture
 def factory(monkeypatch: pytest.MonkeyPatch) -> Factory:
   """Replace venue construction, leaving the real root router lifecycle intact."""
@@ -101,7 +106,7 @@ async def test_root_reuses_one_venue_per_account_and_closes_in_reverse(
 ):
   """Repeated and concurrent lookups reuse account-local resources."""
   events, created, _ = factory
-  async with MarketSDK() as root:
+  async with market_root() as root:
     assert created == []
     first, repeated = await asyncio.gather(root.venue('one'), root.venue('one'))
     second = await root.venue('two')
@@ -116,21 +121,21 @@ async def test_root_reuses_one_venue_per_account_and_closes_in_reverse(
 
 async def test_root_instances_do_not_share_venues(factory: Factory):
   """The same account in independent roots has independent ownership."""
-  async with MarketSDK() as first, MarketSDK() as second:
+  async with market_root() as first, market_root() as second:
     assert await first.venue('one') is not await second.venue('one')
 
 
 async def test_unused_accounts_are_never_constructed(factory: Factory):
   """Entering and listing a root do not initialize any venue clients."""
   _, created, _ = factory
-  async with MarketSDK() as root:
+  async with market_root() as root:
     assert await root.venues()
   assert created == []
 
 
 async def test_root_reentry_gets_fresh_clients(factory: Factory):
   """A closed venue is never returned when the same root is entered again."""
-  root = MarketSDK()
+  root = market_root()
   async with root:
     first = await root.venue('one')
   async with root:
@@ -141,7 +146,7 @@ async def test_root_reentry_gets_fresh_clients(factory: Factory):
 
 async def test_unmanaged_lookup_can_be_entered_independently(factory: Factory):
   """Outside a root context the caller can explicitly own the returned venue."""
-  root = MarketSDK()
+  root = market_root()
   venue = await root.venue('one')
   assert factory[0] == []
   async with venue:
@@ -151,7 +156,7 @@ async def test_unmanaged_lookup_can_be_entered_independently(factory: Factory):
 
 async def test_unmanaged_lookups_stay_fresh_after_caller_closes_child(factory: Factory):
   """Standalone callers never receive a previously closed client's cached state."""
-  root = MarketSDK()
+  root = market_root()
   first = await root.venue('one')
   async with first:
     pass
@@ -165,7 +170,7 @@ async def test_all_outside_root_constructs_fresh_caller_managed_venues(
   factory: Factory,
 ):
   """The existing synchronous factory collection stays independently enterable."""
-  root = MarketSDK()
+  root = market_root()
   first = root.all
   second = root.all
   assert list(first) == await root.venues()
@@ -178,7 +183,7 @@ async def test_all_outside_root_constructs_fresh_caller_managed_venues(
 
 async def test_all_inside_root_requires_previously_acquired_venues(factory: Factory):
   """The synchronous property cannot introduce an unowned venue into the context."""
-  async with MarketSDK() as root:
+  async with market_root() as root:
     with pytest.raises(RuntimeError, match=r'await sdk.venue\(id\)'):
       _ = root.all
     assert factory[1] == []
@@ -189,7 +194,7 @@ async def test_all_inside_root_requires_previously_acquired_venues(factory: Fact
 
 async def test_all_preconstructed_before_entry_remains_caller_owned(factory: Factory):
   """Entering a root never takes over objects handed to independent callers."""
-  root = MarketSDK()
+  root = market_root()
   first = root.all
   async with root:
     for id, venue in first.items():
@@ -201,7 +206,7 @@ async def test_root_does_not_adopt_or_close_independently_active_venue(
   factory: Factory,
 ):
   """An independently entered child remains untouched by a later root context."""
-  root = MarketSDK()
+  root = market_root()
   standalone = await root.venue('one')
   async with standalone:
     async with root:
@@ -216,7 +221,7 @@ async def test_concurrent_lookup_waits_for_acquisition(factory: Factory):
   events, created, queued = factory
   resource = Resource('slow', events, enter_gate=asyncio.Event())
   queued.append(Venue((resource,)))
-  async with MarketSDK() as root:
+  async with market_root() as root:
     first = asyncio.create_task(root.venue('one'))
     await resource.enter_started.wait()
     second = asyncio.create_task(root.venue('one'))
@@ -236,7 +241,7 @@ async def test_failed_acquisition_rolls_back_and_does_not_poison_cache(
   queued.append(
     Venue((Resource('first', events), Resource('bad', events, fail_enter=True)))
   )
-  async with MarketSDK() as root:
+  async with market_root() as root:
     with pytest.raises(RuntimeError, match='enter:bad'):
       await root.venue('one')
     assert events == ['enter:first', 'enter:bad', 'exit:first']
@@ -250,7 +255,7 @@ async def test_cancelled_acquisition_rolls_back_and_allows_retry(factory: Factor
   events, _, queued = factory
   slow = Resource('slow', events, enter_gate=asyncio.Event())
   queued.append(Venue((Resource('first', events), slow)))
-  async with MarketSDK() as root:
+  async with market_root() as root:
     lookup = asyncio.create_task(root.venue('one'))
     await slow.enter_started.wait()
     lookup.cancel()
@@ -268,7 +273,7 @@ async def test_exit_waits_for_inflight_acquisition_and_rejects_new_lookups(
   events, _, queued = factory
   slow = Resource('slow', events, enter_gate=asyncio.Event())
   queued.append(Venue((slow,)))
-  root = await MarketSDK().__aenter__()
+  root = await market_root().__aenter__()
   lookup = asyncio.create_task(root.venue('one'))
   await slow.enter_started.wait()
   exiting = asyncio.create_task(root.__aexit__(None, None, None))
@@ -292,7 +297,7 @@ async def test_teardown_failure_closes_other_venues_and_clears_cache(factory: Fa
       Venue((Resource('bad', events, fail_exit=True),)),
     ]
   )
-  root = MarketSDK()
+  root = market_root()
   with pytest.raises(RuntimeError, match='exit:bad'):
     async with root:
       await root.venue('one')
@@ -308,7 +313,7 @@ async def test_cancelling_exit_waits_for_cleanup_before_propagating(factory: Fac
   events, _, queued = factory
   slow = Resource('slow', events, exit_gate=asyncio.Event())
   queued.append(Venue((slow,)))
-  root = await MarketSDK().__aenter__()
+  root = await market_root().__aenter__()
   await root.venue('one')
   exiting = asyncio.create_task(root.__aexit__(None, None, None))
   await slow.exit_started.wait()
@@ -331,7 +336,7 @@ async def test_root_preserves_resource_exception_suppression(factory: Factory):
   """The dynamic ownership stack follows the existing SDK suppression contract."""
   events, _, queued = factory
   queued.append(Venue((Resource('suppress', events, suppress=True),)))
-  async with MarketSDK() as root:
+  async with market_root() as root:
     await root.venue('one')
     raise ValueError('suppressed by the owned resource')
   assert events == ['enter:suppress', 'exit:suppress']

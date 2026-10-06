@@ -10,8 +10,7 @@ pip install tribulnation-coinbase
 
 ## Recommended account configuration
 
-Coinbase is not a default `MarketSDK` account. Configure it explicitly and prefer
-an authenticated `accounts.Coinbase()` account, especially for `tickers()`:
+Prefer an authenticated `accounts.Coinbase()` account, especially for `tickers()`:
 authenticated quotes are batched in groups of up to 100 products.
 
 Use `accounts.Coinbase(public=True)` to allow a credential-free fallback. The router

@@ -19,7 +19,7 @@ covers only what is Aster-specific.
 
 ## Account
 
-The built-in `aster` account is public: market data works without credentials. Account
+A public `accounts.Aster(public=True)` account is enough for market data. Account
 and trading methods need the main wallet's address and the private key of a trading
 agent (API wallet) registered for it. The main wallet's own key is never used.
 

@@ -17,19 +17,10 @@ from .accounts import (
   load_accounts,
 )
 
-DEFAULT_ACCOUNTS: Mapping[str, Account] = {
-  'mexc': Mexc(public=True),
-  'bit2me': Bit2Me(public=True),
-}
-
 
 @dataclass
 class EarnSDK:
   accounts: Mapping[str, Account] = field(default_factory=dict[str, Account])
-
-  @property
-  def all_accounts(self) -> Mapping[str, Account]:
-    return {**DEFAULT_ACCOUNTS, **self.accounts}
 
   @classmethod
   def load(cls, path: Path | str = 'sdk.toml') -> 'EarnSDK':
@@ -159,7 +150,7 @@ class EarnSDK:
   @property
   def all(self) -> dict[str, Earn]:
     out: dict[str, Earn] = {}
-    for id, account in self.all_accounts.items():
+    for id, account in self.accounts.items():
       try:
         out[id] = self.venue(id)
       except NotImplementedError:
@@ -167,7 +158,7 @@ class EarnSDK:
     return out
 
   def venue(self, id: str, /) -> Earn:
-    if (account := self.all_accounts.get(id)) is None:
+    if (account := self.accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
     match account.venue:
       case 'binance':
@@ -192,4 +183,4 @@ class EarnSDK:
         raise NotImplementedError(f'Unsupported venue: {account.venue}')
 
   def venues(self) -> list[str]:
-    return list(self.all_accounts)
+    return list(self.accounts)

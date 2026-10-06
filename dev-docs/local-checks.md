@@ -51,7 +51,8 @@ sdk-dev results verify /path/to/new-run \
   --catalogue /path/to/catalogue/data
 ```
 
-1. Omit `--accounts` to use public defaults. With multiple matching configured
+1. `--accounts` is required: SDK roots have no implicit public accounts
+   ([ADR 0036](adr/0036-no-implicit-accounts.md)). With multiple matching configured
    accounts, select one explicitly with `--account`. Only mainnet matches count
    toward this release policy; testnet observations cannot attest mainnet behavior.
 2. The output must be a new directory: recording never silently replaces old

@@ -16,7 +16,6 @@
 
 ## Account configuration
 
-Coinbase is **not a default account** in `MarketSDK`. Configure it explicitly.
 Authenticated access is recommended, especially for `tickers()` over many markets:
 
 ```python

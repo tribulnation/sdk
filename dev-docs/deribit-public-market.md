@@ -22,7 +22,8 @@ Deribit 0.3.0 and SDK 2.2.0, separate from Terminal collection/serving rollout.
 | Earn | Existing partial public `instruments` | Seven-day SMA APRs; no subscription/eligibility guarantee |
 | Report | Existing partial private `history`/`snapshot` | Cash balances/positions; ambiguous ledger rows retained |
 
-`MarketSDK()` now has a credential-free mainnet Deribit default. Private credential
+Deribit Market is credential-free on mainnet with `accounts.Deribit(public=True)` (SDK roots
+have had no implicit accounts since [ADR 0036](adr/0036-no-implicit-accounts.md)). Private credential
 settings are not resolved by this adapter; testnet Market accounts are rejected.
 Exchange IDs are `spot` and `perp`. Reference IDs are
 `deribit:spot:BTC_USDT` and `deribit:perp:BTC_USDC-PERPETUAL`; native spelling is

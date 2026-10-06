@@ -106,7 +106,7 @@ def loaders(accounts: str) -> dict[str, tuple[dict[str, Any], Collector]]:
 
   def safe(sdk: Any) -> dict[str, Any]:
     out: dict[str, Any] = {}
-    for id in sdk.all_accounts if hasattr(sdk, 'all_accounts') else sdk.accounts:
+    for id in sdk.accounts:
       try:
         impl = sdk.venue(id)
         out[id] = impl if not asyncio.iscoroutine(impl) else asyncio.run(impl)

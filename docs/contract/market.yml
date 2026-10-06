@@ -298,7 +298,7 @@ methods:
     group: Bulk market data
     venues:
       kucoin: "Credential-free spot and linear perpetual tickers; quantities use base units."
-      coinbase: "Authenticated access is recommended: quotes are batched in groups of up to 100 products. Explicit public=True accounts without resolved credentials use one public book request per selected product. Available credentials are still preferred. Coinbase is not a default account; select markets to limit public request volume. Authentication errors never trigger an automatic fallback."
+      coinbase: "Authenticated access is recommended: quotes are batched in groups of up to 100 products. Explicit public=True accounts without resolved credentials use one public book request per selected product. Available credentials are still preferred. Select markets to limit public request volume. Authentication errors never trigger an automatic fallback."
     example:
       accountVenues: [mexc]
       # Exchange-level id (no market segment) — this method is defined on Exchange, not a

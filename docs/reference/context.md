@@ -22,9 +22,9 @@
 The SDK's methods run plainly by default. But you can easily wrap them to add exponential backoff retries (and more):
 
 ```python
-from tribulnation.sdk import EarnSDK, Context, NetworkError, RateLimited
+from tribulnation.sdk import EarnSDK, Context, NetworkError, RateLimited, accounts
 
-earn = EarnSDK()
+earn = EarnSDK({'mexc': accounts.Mexc(public=True), 'bit2me': accounts.Bit2Me(public=True)})
 
 with Context().retried(NetworkError, RateLimited, max_retries=5).use():
   instruments = await earn.instruments(tags=['flexible'])
@@ -39,9 +39,9 @@ with Context().retried(NetworkError, RateLimited, max_retries=5).use():
 You can also add logging, or you own middleware. Let's see logging first:
 
 ```python
-from tribulnation.sdk import MarketSDK, Context, NetworkError, RateLimited
+from tribulnation.sdk import MarketSDK, Context, NetworkError, RateLimited, accounts
 
-market = MarketSDK()
+market = MarketSDK({'mexc': accounts.Mexc(public=True)})
 
 with Context().logged().use():
   tickers = await market.tickers('mexc:spot')
