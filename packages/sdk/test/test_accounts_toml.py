@@ -46,7 +46,7 @@ def test_load_accounts_parses_discriminated_union(
   dydx = accounts['dydx']
   assert isinstance(dydx, Dydx)
   assert dydx.resolved_address == 'dydx1abc'
-  assert dydx.resolved_mnemonic == 'word ' * 12
+  assert dydx.resolved_creds == {'mnemonic': 'word ' * 12, 'private_key': None}
 
 
 def test_load_accounts_fails_fast_on_missing_env_var(
@@ -88,3 +88,24 @@ def test_market_sdk_load_constructs_from_toml(
 
   assert set(sdk.accounts) == {'hl', 'dydx'}
   assert isinstance(sdk.accounts['hl'], Hyperliquid)
+
+
+async def test_dydx_api_wallet_account_signs_for_its_address() -> None:
+  """A dYdX API wallet key with an account address signs for that account."""
+  from tribulnation.dydx import DydxMarket
+
+  account = 'dydx1039f5sxkl0t39vxcsnmlu62ly22typdap0zkyn'
+  sdk = MarketSDK({'dydx': Dydx(address=account, private_key='0x' + '11' * 32)})
+  venue = await sdk.venue('dydx')
+  assert isinstance(venue, DydxMarket)
+  wallet = venue.shared.client.node.require_wallet()
+  assert venue.shared.address == account
+  assert wallet.address == account
+  assert wallet.is_api_wallet
+
+
+def test_dydx_account_requires_an_address(monkeypatch: pytest.MonkeyPatch) -> None:
+  """A non-public dYdX account fails fast without an address, even with a key."""
+  monkeypatch.delenv('DYDX_ADDRESS', raising=False)
+  with pytest.raises(ValueError, match='DYDX_ADDRESS'):
+    Dydx(private_key='0x' + '11' * 32).verify_env_vars()

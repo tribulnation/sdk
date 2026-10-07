@@ -18,7 +18,7 @@ async def test_request_boundary_retries_translated_rate_limit():
       raise core.ApiError(429, {'code': 429, 'msg': 'rate limited'})
     return 'page'
 
-  async with ExchangeMixin.new() as exchange:
+  async with ExchangeMixin.new(public=True) as exchange:
     with Context().retried(RateLimited, max_retries=1, base_delay=0).use():
       assert await exchange.call_dydx(read) == 'page'
   assert attempts == 2

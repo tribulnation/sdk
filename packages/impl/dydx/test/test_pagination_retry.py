@@ -143,7 +143,7 @@ async def test_market_fills_retry(monkeypatch: pytest.MonkeyPatch):
       }
     ], state + 1 if state < 2 else None
 
-  async with ExchangeMixin.new() as owner:
+  async with ExchangeMixin.new(public=True) as owner:
     data = owner.indexer.data
     monkeypatch.setattr(
       type(data), 'get_fills_paged', Mock(return_value=PaginatedResponse(0, fetch))

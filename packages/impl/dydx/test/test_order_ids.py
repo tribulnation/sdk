@@ -144,7 +144,7 @@ async def test_stream_fills_carry_the_sdk_id_of_their_pushed_order(
 
   monkeypatch.setattr(MarketMixin, 'subscribe_parent_subaccount', subscribe)
   market = MarketMixin(
-    shared=Exchange.new(address=ADDRESS).shared, perpetual_market=MARKET
+    shared=Exchange.new(address=ADDRESS, public=True).shared, perpetual_market=MARKET
   )
   async with trades_stream(market) as stream:
     trades = [t async for t in stream]
@@ -178,7 +178,7 @@ async def test_client_order_id_leaves_the_order_unchanged(
     clob_pair_id=94,
     subaccount_id=subaccounts.SubaccountId(owner=ADDRESS, number=0),
   )
-  exchange = Exchange.new(address=ADDRESS)
+  exchange = Exchange.new(address=ADDRESS, public=True)
   node = AsyncMock(
     return_value=SimpleNamespace(order=SimpleNamespace(order_id=order_id))
   )

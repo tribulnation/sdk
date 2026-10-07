@@ -221,21 +221,25 @@ class ExchangeMixin(SDK):
   @classmethod
   def new(
     cls,
-    mnemonic: str | None = None,
     *,
+    mnemonic: str | None = None,
+    private_key: str | None = None,
+    public: bool = False,
     address: str | None = None,
     mainnet: bool = True,
     validate: bool = True,
     parent_subaccount: int = 0,
   ):
     client = (
-      Dydx.mainnet(mnemonic, indexer={'validate': validate}, public=mnemonic is None)
+      Dydx.mainnet(
+        mnemonic, private_key=private_key, address=address, indexer={'validate': validate}, public=public
+      )
       if mainnet
       else Dydx.testnet(
-        mnemonic, indexer={'validate': validate}, public=mnemonic is None
+        mnemonic, private_key=private_key, address=address, indexer={'validate': validate}, public=public
       )
     )
-    if address is None and mnemonic is not None:
+    if address is None and client.node.wallet is not None:
       address = client.node.require_wallet().address
     return cls(
       shared=Shared(client=client, address=address, parent_subaccount=parent_subaccount)

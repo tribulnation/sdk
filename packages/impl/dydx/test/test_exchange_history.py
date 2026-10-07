@@ -48,7 +48,7 @@ async def test_exchange_history_scope_bounds_retry(
     )
     return [row], state + 1 if state < 2 else None
 
-  exchange = Exchange.new(address='dydx1fixture')
+  exchange = Exchange.new(address='dydx1fixture', public=True)
   exchange = Exchange(shared=exchange.shared, subaccount=subaccount)
   endpoint = 'get_fills_paged' if kind == 'trades' else 'get_funding_payments_paged'
   paging = Mock(return_value=PaginatedResponse(0, fetch))
@@ -122,7 +122,7 @@ async def test_selected_market_history_delegates(
   market = Mock(**{method: history})
   lookup = AsyncMock(return_value=market)
   monkeypatch.setattr(Exchange, 'market', lookup)
-  exchange = Exchange.new(address='dydx1fixture')
+  exchange = Exchange.new(address='dydx1fixture', public=True)
   assert await getattr(exchange, method)('BTC-USD', start, start) == rows
   lookup.assert_awaited_once_with('BTC-USD')
   history.assert_called_once_with(start, start)
@@ -142,7 +142,7 @@ async def test_market_funding_payment_sign(
     """Return one native payment received by the account."""
     return [{'payment': amount, 'createdAt': start}], None
 
-  exchange = Exchange.new(address='dydx1fixture')
+  exchange = Exchange.new(address='dydx1fixture', public=True)
   monkeypatch.setattr(
     type(exchange.indexer.data),
     'get_subaccounts',
@@ -187,7 +187,7 @@ async def test_selected_market_history_subaccount(
       }
     ], None
 
-  owner = Exchange.new(address='dydx1fixture')
+  owner = Exchange.new(address='dydx1fixture', public=True)
   exchange = Exchange(shared=owner.shared, subaccount=subaccount)
   monkeypatch.setattr(
     Shared,

@@ -60,7 +60,8 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
         'dydx market is not installed. Please install it with `pip install tribulnation-dydx`.'
       ) from e
     return DydxMarket.new(
-      account.resolved_mnemonic,
+      **account.resolved_creds,
+      public=account.public,
       address=account.resolved_address,
       mainnet=account.venue == 'dydx',
       parent_subaccount=account.parent_subaccount,
