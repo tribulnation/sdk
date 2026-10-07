@@ -1,4 +1,4 @@
-from typing_extensions import Literal as _Literal, Annotated as _Annotated
+from typing_extensions import Literal as _Literal, Annotated as _Annotated, TypedDict as _TypedDict
 from dataclasses import dataclass as _dataclass
 from pathlib import Path as _Path
 import sys as _sys
@@ -31,14 +31,19 @@ class BaseAccount:
     """Verify that all required environment variables are set."""
     raise NotImplementedError('Subclasses must implement verify_env_vars()')
 
+class DydxCreds(_TypedDict, total=False):
+  mnemonic: str | None
+  private_key: str | None
 
 @_dataclass
 class Dydx(BaseAccount):
   venue: _Literal['dydx', 'dydx_testnet'] = 'dydx'
   address: str = '$DYDX_ADDRESS'
-  """Account address (`dydx1...`)"""
-  mnemonic: str = '$DYDX_MNEMONIC'
+  """Account address (`dydx1...`). For an API wallet, the account it trades for."""
+  mnemonic: str | None = None
   """Account mnemonic (12-24 words)"""
+  private_key: str | None = None
+  """Account or API wallet private key (`0x...`)"""
   parent_subaccount: int = 0
   """dYdX parent subaccount number"""
 
@@ -47,12 +52,20 @@ class Dydx(BaseAccount):
     return resolve_env_var(self.address, require=not self.public)
 
   @property
-  def resolved_mnemonic(self) -> str | None:
-    return resolve_env_var(self.mnemonic, require=not self.public)
+  def resolved_creds(self) -> DydxCreds:
+    mnemonic = resolve_env_var(self.mnemonic, require=False)
+    private_key = resolve_env_var(self.private_key, require=False)
+    if not self.public and mnemonic is None and private_key is None:
+      raise ValueError(
+        'Either mnemonic or private_key must be set for a non-public dYdX account. '
+        'Either provide a mnemonic (12-24 words) or a private key (0x...) in the account configuration.'
+      )
+    else:
+      return {'mnemonic': mnemonic, 'private_key': private_key}
 
   def verify_env_vars(self):
     self.resolved_address
-    self.resolved_mnemonic
+    self.resolved_creds
 
 
 @_dataclass
