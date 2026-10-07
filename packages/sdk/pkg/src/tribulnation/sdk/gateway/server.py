@@ -146,7 +146,10 @@ class Gateway:
           # failure surfaces from the `async with`, not here. This `try`
           # still matters for `self._market(...)` itself, though.
           stream_cm = market.depth_stream(
-            levels=msg.levels, queue_size=msg.queue_size, overflow=msg.overflow
+            levels=msg.levels,
+            queue_size=msg.queue_size,
+            overflow=msg.overflow,
+            settings=msg.settings,
           )
         case codec.TradesStreamReq():
           market = await self._market(msg.market_id)
@@ -212,7 +215,9 @@ class Gateway:
       case codec.DepthReq():
         return codec.DepthResp(
           id=msg.id,
-          book=await (await self._market(msg.market_id)).depth(levels=msg.levels),
+          book=await (await self._market(msg.market_id)).depth(
+            levels=msg.levels, settings=msg.settings
+          ),
         )
       case codec.FeesReq():
         return codec.FeesResp(

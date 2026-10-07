@@ -68,7 +68,7 @@ class Market(MarketMixin, PerpMarket):
     return 'dydx'
 
   @wrap_exceptions
-  async def depth(self, *, levels: int | None = None) -> Book:
+  async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
     book = await self.indexer.data.get_order_book(self.market)
     return parse_book(book)
 
@@ -79,6 +79,7 @@ class Market(MarketMixin, PerpMarket):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
+    settings: Settings = {},
   ) -> AsyncGenerator[AsyncIterable[Book]]:
     async with self.subscribe_depth(
       self.market, queue_size=queue_size, overflow=overflow

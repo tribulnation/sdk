@@ -62,8 +62,9 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
     return self.asset_name
 
   @wrap_exceptions
-  async def depth(self, *, levels: int | None = None) -> Book:
-    return await depth(self)
+  async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
+    """Fetch the REST book, shaped by `hyperliquid.depth_source` (see `Settings`)."""
+    return await depth(self, levels=levels, settings=settings)
 
   def depth_stream(
     self,
@@ -71,8 +72,16 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Book]]:
-    return depth_stream(self, queue_size=queue_size, overflow=overflow)
+    """Stream the feed selected by `hyperliquid.depth_source` (see `Settings`)."""
+    return depth_stream(
+      self,
+      levels=levels,
+      queue_size=queue_size,
+      overflow=overflow,
+      settings=settings,
+    )
 
   @wrap_exceptions
   async def rules(self, *, refetch: bool = False) -> Rules:

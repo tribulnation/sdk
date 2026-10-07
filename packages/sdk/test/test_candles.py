@@ -69,7 +69,7 @@ class FakeMarket(Market):
 
     return PaginatedResponse(pages())
 
-  async def depth(self, *, levels: int | None = None) -> Any:
+  async def depth(self, *, levels: int | None = None, settings: Any = {}) -> Any:
     raise NotImplementedError
 
   def depth_stream(self, **kwargs: Any) -> Any:

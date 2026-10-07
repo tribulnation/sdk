@@ -54,8 +54,9 @@ class SpotMarket(SpotMarketMixin, Market):
   def market_id(self) -> str:
     return f'{self.base_name}/{self.quote_name}:{self.asset_idx}'
 
-  async def depth(self, *, levels: int | None = None) -> Book:
-    return await depth(self)
+  async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
+    """Fetch the REST book, shaped by `hyperliquid.depth_source` (see `Settings`)."""
+    return await depth(self, levels=levels, settings=settings)
 
   def depth_stream(
     self,
@@ -63,8 +64,16 @@ class SpotMarket(SpotMarketMixin, Market):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Book]]:
-    return depth_stream(self, queue_size=queue_size, overflow=overflow)
+    """Stream the feed selected by `hyperliquid.depth_source` (see `Settings`)."""
+    return depth_stream(
+      self,
+      levels=levels,
+      queue_size=queue_size,
+      overflow=overflow,
+      settings=settings,
+    )
 
   async def rules(self, *, refetch: bool = False) -> Rules:
     return await spot_rules(self, refetch=refetch)

@@ -242,7 +242,7 @@ class NativeMarket(Public, Market):
     """`spot` or `perp`."""
     return self.scope
 
-  async def depth(self, *, levels: int | None = None) -> Book:
+  async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
     """Read up to 1000 levels per side; quantities are in base units."""
     if levels is not None and not 1 <= levels <= DEPTH_LIMITS[-1]:
       raise ValueError(f'levels must be between 1 and {DEPTH_LIMITS[-1]}')
@@ -265,6 +265,7 @@ class NativeMarket(Public, Market):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Book]]:
     """Subscribe to 20-level snapshots, trimmed per subscriber."""
     if levels is not None and not 1 <= levels <= 20:

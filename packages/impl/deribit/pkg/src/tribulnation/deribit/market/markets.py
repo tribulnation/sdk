@@ -46,7 +46,7 @@ class SpotMarket(Public, Market):
     """Spot's explicit product identity."""
     return 'spot'
 
-  async def depth(self, *, levels: int | None = None) -> Book:
+  async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
     """Read up to one hundred levels in base units."""
     return await books.depth(self.shared, self.symbol, levels=levels)
 
@@ -56,6 +56,7 @@ class SpotMarket(Public, Market):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Book]]:
     """Subscribe to up to twenty levels of native full snapshots."""
     return books.depth_stream(

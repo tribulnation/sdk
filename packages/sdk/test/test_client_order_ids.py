@@ -41,7 +41,7 @@ class FakeMarket(Market):
     self.placed.append(order)
     return OrderResponse(id=str(len(self.placed)))
 
-  async def depth(self, *, levels: int | None = None) -> Any:
+  async def depth(self, *, levels: int | None = None, settings: Any = {}) -> Any:
     raise NotImplementedError
 
   def depth_stream(self, **kwargs: Any) -> Any:

@@ -10,4 +10,4 @@ from .constants import (
   plain_decimal,
   round_price,
 )
-from .settings import Settings
+from .settings import Settings, DepthSource

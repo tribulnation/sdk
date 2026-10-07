@@ -50,7 +50,7 @@ class PerpMarket(SharedMixin, BasePerpMarket):
     """Keep the exact case and spelling of the instrument symbol."""
     return self.symbol
 
-  async def depth(self, *, levels: int | None = None) -> Book:
+  async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
     """Fetch the full public book, sort by price, and trim to the requested depth."""
     if levels is not None and levels < 1:
       raise ValueError('levels must be positive')
@@ -65,6 +65,7 @@ class PerpMarket(SharedMixin, BasePerpMarket):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Book]]:
     """Futures WebSocket books need their own typed subscription qualification."""
     raise NotImplementedError('Kraken Futures depth streams are not implemented')

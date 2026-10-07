@@ -76,7 +76,7 @@ class PerpMarket(ExchangeMixin, BasePerpMarket):
     """Base units in one linear contract."""
     return Decimal(str(self.info['contractSize']))
 
-  async def depth(self, *, levels: int | None = None) -> Book:
+  async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
     """Read a public snapshot and convert quantities to base units."""
     response = await self.call_mexc(
       lambda: self.client.futures.http.market.depth(
@@ -224,6 +224,7 @@ class PerpMarket(ExchangeMixin, BasePerpMarket):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Book]]:
     """Perpetual streams are not part of this public REST implementation."""
     raise unsupported('depth_stream')

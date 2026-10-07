@@ -48,17 +48,48 @@ Market IDs by exchange:
 
 ## Settings
 
-`place_order` and `index` accept `settings={'hyperliquid': {...}}`, typed by the
-`Settings` TypedDict (`core/settings.py`). All keys are optional:
+`place_order`, `index`, `depth` and `depth_stream` accept `settings={'hyperliquid': {...}}`,
+typed by the `Settings` TypedDict (`core/settings.py`). All keys are optional:
 
 | Key | Type | Applies to | Meaning |
 | --- | --- | --- | --- |
 | `reduce_only` | `bool` | `place_order` | Place as reduce-only. |
 | `limit_tif` | `TimeInForce` | `place_order` | Time-in-force for limit orders. |
 | `index_price` | `'oracle' \| 'mark'` | `index` (perp) | Which price `index()` returns; defaults to `'oracle'`. |
+| `depth_source` | `'l2' \| 'fast' \| 'bbo'` | `depth_stream`, `depth` | Which order-book feed to read; defaults to `'l2'`. |
 
 `index_price='mark'` returns the market's mark price, falling back to the oracle price when
 mark is unavailable; the default `'oracle'` always returns the oracle price.
+
+### Depth sources
+
+`depth_source` picks one of three Hyperliquid WebSocket feeds for `depth_stream`, on spot,
+default-DEX and builder-DEX perp markets alike:
+
+| `depth_source` | Feed | Levels per side | Typical cadence |
+| --- | --- | --- | --- |
+| `'l2'` (default) | `l2Book` | 20 | ~5.4 s |
+| `'fast'` | `l2Book` with `fast=True` | 5 | ~0.5 s |
+| `'bbo'` | `bbo` | 1 (best bid/ask with sizes) | on change: ~100–150 ms on liquid markets |
+
+```python
+async with sdk.depth_stream('hl::ETH', settings={'hyperliquid': {'depth_source': 'bbo'}}) as books:
+  async for book in books:
+    print(book.time, book.best_bid.price, book.best_ask.price)
+```
+
+- These are different feeds, not one feed at different speeds, and they won't agree
+  tick-for-tick: `'bbo'` usually leads the best level of `'l2'` by up to seconds. Every
+  book carries the feed's own exchange time in `Book.time`.
+- `levels` only trims what the feed delivers (`levels=3` on `'fast'` gives 3 levels; on
+  `'bbo'` it still gives 1). It never selects the feed.
+- On `'bbo'` a side Hyperliquid reports as empty comes back as an empty `bids` or `asks`.
+- All consumers of one coin and source share a single upstream subscription. Hyperliquid
+  tags `'l2'` and `'fast'` pushes identically, so `'fast'` subscriptions are held on a
+  second WebSocket connection, opened on first use and closed with the SDK.
+- REST `depth` has no faster endpoint. Every source reads the same `l2Book` snapshot
+  (20 levels), trimmed to 5 levels for `'fast'` and 1 for `'bbo'`, and to `levels` when
+  lower. The setting changes the shape, not the freshness.
 
 ## Venue-specific semantics
 

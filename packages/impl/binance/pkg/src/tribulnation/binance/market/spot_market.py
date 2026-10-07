@@ -92,7 +92,7 @@ class SpotMarket(SharedMixin, Market):
     return self.symbol
 
   @wrap_exceptions
-  async def depth(self, *, levels: int | None = None) -> Book:
+  async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
     raw = await self.client.spot.http.market.order_book(
       symbol=self.symbol, limit=levels
     )
@@ -107,6 +107,7 @@ class SpotMarket(SharedMixin, Market):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Book]]:
     """Subscribe to the order book over Binance's public partial-depth WS stream.
 

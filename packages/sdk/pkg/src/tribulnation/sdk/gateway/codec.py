@@ -88,6 +88,7 @@ class DepthReq:
   id: str
   market_id: str
   levels: int | None = None
+  settings: WireSettings = field(default_factory=Settings)
   tag: Literal['depth'] = 'depth'
 
 
@@ -307,6 +308,7 @@ class DepthStreamReq:
   levels: int | None = None
   queue_size: int = 1
   overflow: OverflowPolicy = 'latest'
+  settings: WireSettings = field(default_factory=Settings)
   tag: Literal['depth_stream'] = 'depth_stream'
 
 

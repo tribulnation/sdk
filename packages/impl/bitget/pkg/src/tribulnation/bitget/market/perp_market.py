@@ -69,7 +69,7 @@ class PerpMarket(MarketMixin, _PerpMarket):
   def venue_id(self) -> str:
     return 'bitget'
 
-  async def depth(self, *, levels: int | None = None) -> Book:
+  async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
     """Fetch the market order book (100 levels a side when `levels` is omitted).
 
     The futures book takes a fixed depth enum, so `levels` is served by the next
@@ -92,6 +92,7 @@ class PerpMarket(MarketMixin, _PerpMarket):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Book]]:
     """Subscribe to the market order book."""
     return depth_stream(self, levels=levels, queue_size=queue_size, overflow=overflow)

@@ -77,10 +77,12 @@ class Exchange(SDK):
     """List available markets."""
 
   @SDK.method
-  async def depth(self, market_id: str, /, *, levels: int | None = None) -> Book:
+  async def depth(
+    self, market_id: str, /, *, levels: int | None = None, settings: Settings = {}
+  ) -> Book:
     """Fetch the market order book."""
     market = await self.market(market_id)
-    return await market.depth(levels=levels)
+    return await market.depth(levels=levels, settings=settings)
 
   @SDK.method
   @asynccontextmanager
@@ -92,6 +94,7 @@ class Exchange(SDK):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
+    settings: Settings = {},
   ) -> AsyncGenerator[AsyncIterable[Book]]:
     """Subscribe to the market order book.
 
@@ -100,7 +103,7 @@ class Exchange(SDK):
     """
     market = await self.market(market_id)
     async with market.depth_stream(
-      levels=levels, queue_size=queue_size, overflow=overflow
+      levels=levels, queue_size=queue_size, overflow=overflow, settings=settings
     ) as stream:
       yield stream
 

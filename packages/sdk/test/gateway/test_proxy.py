@@ -49,6 +49,8 @@ class MockState:
   depth_stream_wait: bool = False
   depth_stream_started: asyncio.Event = field(default_factory=asyncio.Event)
   depth_stream_unsubscribed: int = 0
+  depth_settings: list[Settings] = field(default_factory=list[Settings])
+  """The `settings` every `depth`/`depth_stream` call received, in call order."""
 
 
 def book(price: str = '100') -> Book:
@@ -85,7 +87,8 @@ class MockMarket(PerpMarket):
   def market_id(self) -> str:
     return 'BTC-USD'
 
-  async def depth(self, *, levels: int | None = None) -> Book:
+  async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
+    self.state.depth_settings.append(settings)
     if self.state.depth_error is not None:
       raise self.state.depth_error
     b = book()
@@ -98,10 +101,19 @@ class MockMarket(PerpMarket):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
+    settings: Settings = {},
   ):
+    self.state.depth_settings.append(settings)
+    source = settings.get('hyperliquid', {}).get('depth_source')
+    items = (
+      self.state.depth_stream_items
+      if source is None
+      else [book('200')] * len(self.state.depth_stream_items)
+    )
+
     async def gen() -> AsyncIterator[Book]:
       self.state.depth_stream_started.set()
-      for item in self.state.depth_stream_items:
+      for item in items:
         if isinstance(item, Exception):
           raise item
         yield item.limit(levels) if levels is not None else item
@@ -292,6 +304,7 @@ class WaitingMarket(MockMarket):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
+    settings: Settings = {},
   ):
     async def gen() -> AsyncIterator[Book]:
       self.started.set()
@@ -385,6 +398,82 @@ async def test_depth_stream_clean_completion(
   assert mock_state.depth_stream_unsubscribed == 1
   ctx = await sdk._conn.ctx
   assert ctx.subs == {}
+
+
+@pytest.mark.parametrize(
+  'msg',
+  [
+    codec.DepthReq(id='d', market_id=MARKET_ID, levels=1),
+    codec.DepthReq(
+      id='d', market_id=MARKET_ID, settings={'hyperliquid': {'depth_source': 'bbo'}}
+    ),
+    codec.DepthStreamReq(id='s', market_id=MARKET_ID),
+    codec.DepthStreamReq(
+      id='s',
+      market_id=MARKET_ID,
+      levels=3,
+      settings={'hyperliquid': {'depth_source': 'fast'}},
+    ),
+  ],
+)
+def test_depth_requests_roundtrip_settings(
+  msg: codec.DepthReq | codec.DepthStreamReq,
+) -> None:
+  """Depth requests carry `settings` through the codec, empty by default."""
+  assert codec.decode_client(codec.encode_client(msg)) == msg
+
+
+@pytest.mark.parametrize('tag', ['depth', 'depth_stream'])
+def test_depth_frames_without_settings_decode(tag: str) -> None:
+  """Frames from clients that predate depth `settings` decode to empty settings."""
+  frame = f'{{"tag": "{tag}", "id": "x", "market_id": "{MARKET_ID}"}}'
+  msg = codec.decode_client(frame)
+  assert isinstance(msg, codec.DepthReq | codec.DepthStreamReq)
+  assert msg.settings == {}
+
+
+@pytest.mark.asyncio
+async def test_depth_settings_pass_through_gateway(
+  sdk: ProxySDK, mock_state: MockState
+) -> None:
+  """`depth`/`depth_stream` settings reach the gateway-side market unchanged."""
+  settings: Settings = {'hyperliquid': {'depth_source': 'bbo'}}
+  mock_state.depth_stream_items = [book('100')]
+  market = await sdk.perp_market(MARKET_ID)
+
+  await market.depth()
+  await market.depth(settings=settings)
+  async with market.depth_stream(settings=settings) as stream:
+    [item async for item in stream]
+
+  assert mock_state.depth_settings == [{}, settings, settings]
+
+
+@pytest.mark.asyncio
+async def test_depth_streams_with_different_settings_are_independent(
+  sdk: ProxySDK, mock_state: MockState
+) -> None:
+  """Two streams on one market with different settings are separate subscriptions."""
+  mock_state.depth_stream_items = [book('100'), book('110')]
+  mock_state.depth_stream_wait = True
+  market = await sdk.perp_market(MARKET_ID)
+
+  async with (
+    market.depth_stream(queue_size=10, overflow='fail') as default,
+    market.depth_stream(
+      queue_size=10,
+      overflow='fail',
+      settings={'hyperliquid': {'depth_source': 'bbo'}},
+    ) as bbo,
+  ):
+    default_items, bbo_items = aiter(default), aiter(bbo)
+    default_prices = [(await anext(default_items)).best_bid.price for _ in range(2)]
+    bbo_prices = [(await anext(bbo_items)).best_bid.price for _ in range(2)]
+    assert len((await sdk._conn.ctx).subs) == 2
+
+  assert default_prices == [Decimal('99'), Decimal('109')]
+  assert bbo_prices == [Decimal('199'), Decimal('199')]
+  assert (await sdk._conn.ctx).subs == {}
 
 
 @pytest.mark.asyncio

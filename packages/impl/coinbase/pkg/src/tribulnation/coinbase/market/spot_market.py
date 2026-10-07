@@ -36,7 +36,7 @@ class SpotMarket(impl.MarketMixin, Market):
   def exchange_id(self) -> str:
     return impl.SPOT_EXCHANGE_ID
 
-  async def depth(self, *, levels: int | None = None) -> Book:
+  async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
     return await impl.depth(self, levels=levels)
 
   def depth_stream(
@@ -45,6 +45,7 @@ class SpotMarket(impl.MarketMixin, Market):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Book]]:
     return impl.depth_stream(
       self, levels=levels, queue_size=queue_size, overflow=overflow

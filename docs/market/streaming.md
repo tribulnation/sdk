@@ -65,6 +65,22 @@ Per-venue caveats are on the
 for one, reports order-level cumulative quantities rather than itemized fills, so
 `trades_history` is the reliable source there for per-fill maker/taker and fee.
 
+## Choosing a venue's depth feed
+
+Some venues publish more than one order-book feed. `depth` and `depth_stream` take the
+same venue-keyed `settings` as orders, so one dict can cover every venue you stream; each
+venue reads only its own key and ignores the rest:
+
+```python
+settings = {'hyperliquid': {'depth_source': 'bbo'}}
+async with sdk.depth_stream(market_id, settings=settings) as books:
+  ...
+```
+
+Different feeds are different streams and need not agree tick-for-tick. `levels` only trims
+the books a feed delivers; it never picks the feed. The options are documented per venue,
+e.g. [Hyperliquid](implementations/hyperliquid.md#depth-sources).
+
 ## When your consumer falls behind
 
 A venue opens one shared upstream subscription and fans it out to every subscriber through a

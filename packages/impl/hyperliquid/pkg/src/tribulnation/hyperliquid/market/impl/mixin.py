@@ -2,12 +2,16 @@ from functools import cached_property
 from typing_extensions import (
   Any,
   AsyncContextManager,
+  AsyncIterable,
+  AsyncGenerator,
   Awaitable,
   Callable,
   Iterable,
   TypedDict,
   TypeVar,
+  cast,
 )
+from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 import asyncio
 import os
@@ -15,6 +19,8 @@ import os
 from tribulnation.sdk.core import ManagedResource, SDK, Subscription, OverflowPolicy
 
 from typed_hyperliquid import Hyperliquid, Wallet
+from typed_hyperliquid.core.ws import SocketClient
+from typed_hyperliquid.streams import Streams
 from typed_hyperliquid.info.spot_meta import (
   SpotMeta as SpotMetaResponse,
   SpotPair,
@@ -29,10 +35,27 @@ from typed_hyperliquid.info.perp_meta_and_asset_ctxs import (
 from typed_hyperliquid.info.perp_dexs import PerpDex
 from typed_hyperliquid.streams.user_fills import UserFills
 from typed_hyperliquid.streams.l2_book import L2BookUpdate
+from typed_hyperliquid.streams.bbo import BboLevel0, BboLevel1
+from typed_hyperliquid.core import TimestampMillis
+from typed_core.validation import validator
 
-from tribulnation.hyperliquid.core import Settings, wrap_exceptions
+from tribulnation.hyperliquid.core import DepthSource, Settings, wrap_exceptions
 
 T = TypeVar('T')
+
+
+class BboUpdate(TypedDict):
+  """A `bbo` push. Unlike the client's `WsBbo`, a side may be `null` when it is empty."""
+
+  coin: str
+  bbo: tuple[BboLevel0 | None, BboLevel1 | None]
+  """Best bid and ask, as `[bid, ask]`; `None` for an empty side."""
+  time: TimestampMillis
+  """Update timestamp, epoch milliseconds."""
+
+
+DepthMessage = L2BookUpdate | BboUpdate
+"""A raw depth push: an `l2Book` snapshot (`'l2'`/`'fast'`) or a `bbo` update."""
 
 
 class DEX(TypedDict):
@@ -83,6 +106,45 @@ def spot_meta_of(spot_index: int, /, *, spot_meta: SpotMetaResponse) -> SpotMeta
   }
 
 
+@wrap_exceptions
+async def translated(stream: AsyncIterable[T]) -> AsyncGenerator[T]:
+  """Iterate `stream`, re-raising client errors (e.g. a dropped socket) as SDK errors."""
+  async for item in stream:
+    yield item
+
+
+@wrap_exceptions
+async def bbo_updates(
+  stream: AsyncIterable[object], *, validate: bool
+) -> AsyncGenerator[BboUpdate]:
+  """Iterate raw `bbo` pushes as `BboUpdate`s, translating client errors.
+
+  Args:
+    stream: The client's `bbo` stream, subscribed without its own validation.
+    validate: Validate each push against `BboUpdate`; otherwise pass it through as is.
+  """
+  check = validator(BboUpdate).python
+  async for item in stream:
+    yield check(item) if validate else cast(BboUpdate, item)
+
+
+@asynccontextmanager
+async def closing_fast_streams(shared: 'Shared'):
+  """Close the dedicated `'fast'` connection at exit, if a subscription ever opened it.
+
+  Checked only on exit, so a connection created lazily inside the block is still
+  closed; one never created is never dialled.
+  """
+  try:
+    yield shared
+  finally:
+    if (streams := shared.fast_streams) is not None:
+      shared.fast_streams = None
+      # The client's `__aexit__` leaves its parameters unannotated.
+      socket = cast(AsyncContextManager[object], streams.client)
+      await socket.__aexit__(None, None, None)
+
+
 @dataclass(kw_only=True)
 class Shared(SDK):
   client: Hyperliquid
@@ -110,9 +172,12 @@ class Shared(SDK):
 
   # Stream subscriptions.
   user_fills_subscription: Subscription[UserFills] | None = None
-  l2_book_subscriptions: dict[str, Subscription[L2BookUpdate]] = field(
-    default_factory=dict[str, Subscription[L2BookUpdate]]
+  depth_subscriptions: dict[tuple[str, DepthSource], Subscription[DepthMessage]] = (
+    field(default_factory=dict[tuple[str, DepthSource], Subscription[DepthMessage]])
   )
+  """Upstream depth feeds keyed by `(coin, source)`, each fanned out to its consumers."""
+  fast_streams: Streams | None = None
+  """Streams over the dedicated `'fast'` connection; `None` until first needed."""
 
   # Locks for concurrent lazy loads.
   _spot_meta_lock: asyncio.Lock = field(
@@ -134,6 +199,27 @@ class Shared(SDK):
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield self.client_resource
+    yield ManagedResource(
+      resource=closing_fast_streams(self),
+      wrap_enter=wrap_exceptions,
+      wrap_exit=wrap_exceptions,
+    )
+
+  def fast_streams_client(self) -> Streams:
+    """The dedicated `'fast'` connection's streams, created on first use.
+
+    Hyperliquid tags `l2Book` pushes with the coin only, not the `fast` flag, so one
+    connection subscribed to both variants of a coin cannot route them apart. `'fast'`
+    subscriptions therefore live on their own socket, copied from the main one's
+    settings. It connects lazily on the first subscribe and is closed with `Shared`.
+    """
+    if self.fast_streams is None:
+      main = self.client.streams_client
+      socket = SocketClient(
+        url=main.url, timeout=main.timeout, ping_interval=main.ping_interval
+      )
+      self.fast_streams = Streams.new(socket, validate=self.client.validate)
+    return self.fast_streams
 
   @wrap_exceptions
   async def load_spot_meta(self, *, refetch: bool = False) -> SpotMetaResponse:
@@ -227,15 +313,37 @@ class Shared(SDK):
       self.user_fills_subscription = Subscription.of(subscribe_user_fills)
     return self.user_fills_subscription
 
-  def l2_book_subscription(self, coin: str, /) -> Subscription[L2BookUpdate]:
-    if coin not in self.l2_book_subscriptions:
+  def depth_subscription(
+    self, coin: str, source: DepthSource, /
+  ) -> Subscription[DepthMessage]:
+    """The shared upstream for `coin`'s `source` feed, one per `(coin, source)`.
 
+    Args:
+      coin: Hyperliquid coin name, e.g. `ETH`, `@107` or `dex:ASSET`.
+      source: Which feed; see `Settings.depth_source`.
+    """
+    key = (coin, source)
+    if key not in self.depth_subscriptions:
+
+      @wrap_exceptions
       async def subscribe():
-        stream = await self.client.streams.l2_book(coin)
-        return stream, stream.unsubscribe
+        """Open the upstream feed for `key` on the connection that serves it."""
+        if source == 'bbo':
+          # Validated here, not by the client: its `WsBbo` rejects an empty (`null`) side.
+          raw = await self.client.streams.bbo(coin, validate=False)
+          return Subscription.Context[DepthMessage](
+            bbo_updates(raw, validate=self.client.validate), raw.unsubscribe
+          )
+        if source == 'fast':
+          stream = await self.fast_streams_client().l2_book(coin, fast=True)
+        else:
+          stream = await self.client.streams.l2_book(coin)
+        return Subscription.Context[DepthMessage](
+          translated(stream), stream.unsubscribe
+        )
 
-      self.l2_book_subscriptions[coin] = Subscription.of(subscribe)
-    return self.l2_book_subscriptions[coin]
+      self.depth_subscriptions[key] = Subscription(subscribe)
+    return self.depth_subscriptions[key]
 
   @wrap_exceptions
   async def spot_meta_of(
@@ -357,10 +465,17 @@ class SharedMixin(SDK):
       queue_size=queue_size, overflow=overflow
     )
 
-  def subscribe_l2_book(
-    self, coin: str, /, *, queue_size: int = 1, overflow: OverflowPolicy = 'latest'
+  def subscribe_depth(
+    self,
+    coin: str,
+    source: DepthSource,
+    /,
+    *,
+    queue_size: int = 1,
+    overflow: OverflowPolicy = 'latest',
   ):
-    return self.shared.l2_book_subscription(coin).subscribe(
+    """Subscribe to the shared `(coin, source)` depth feed through a bounded inbox."""
+    return self.shared.depth_subscription(coin, source).subscribe(
       queue_size=queue_size, overflow=overflow
     )
 

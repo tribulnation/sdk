@@ -47,7 +47,8 @@ An `Order` is what you pass to `place_order`:
 
 Venue-specific options travel separately, in `settings`: a dict keyed by venue name
 (`{'dydx': {...}}`, `{'hyperliquid': {...}}`), documented per venue under
-[Implementations](implementations/index.md). If a venue can't do what you asked for it
+[Implementations](implementations/index.md). Orders, `index`, `depth` and `depth_stream`
+all take it, and each venue reads only its own key. If a venue can't do what you asked for it
 raises, rather than quietly placing a different order.
 
 ## Market data

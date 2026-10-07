@@ -94,14 +94,18 @@ class TradingMarkets(SDK):
     return await exchange.market(market_id)
 
   @SDK.method
-  async def depth(self, market_id: str, /, *, levels: int | None = None) -> Book:
+  async def depth(
+    self, market_id: str, /, *, levels: int | None = None, settings: Settings = {}
+  ) -> Book:
     """Fetch the market order book, bids and asks best-first.
 
     Args:
       levels: Cap the number of levels per side. `None` returns the full book.
+      settings: Venue-specific options keyed by venue name, e.g.
+        `{'hyperliquid': {'depth_source': 'bbo'}}`; each venue reads only its own key.
     """
     market = await self.market(market_id)
-    return await market.depth(levels=levels)
+    return await market.depth(levels=levels, settings=settings)
 
   @SDK.method
   @asynccontextmanager
@@ -113,6 +117,7 @@ class TradingMarkets(SDK):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
+    settings: Settings = {},
   ) -> AsyncGenerator[AsyncIterable[Book]]:
     """Subscribe to the market order book.
 
@@ -126,10 +131,14 @@ class TradingMarkets(SDK):
       queue_size: Books buffered for this subscriber.
       overflow: `'latest'` silently drops stale books when the buffer is full;
         `'fail'` raises `NetworkError` instead, so you can reconnect.
+      settings: Venue-specific options keyed by venue name, e.g.
+        `{'hyperliquid': {'depth_source': 'bbo'}}` to pick a venue's depth feed;
+        each venue reads only its own key. Different feeds are different
+        streams and need not agree tick-for-tick.
     """
     market = await self.market(market_id)
     async with market.depth_stream(
-      levels=levels, queue_size=queue_size, overflow=overflow
+      levels=levels, queue_size=queue_size, overflow=overflow, settings=settings
     ) as stream:
       yield stream
 

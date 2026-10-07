@@ -261,10 +261,12 @@ class ProxyMarket(Market):
 
   # ── Market ────────────────────────────────────────────────────────────
 
-  async def depth(self, *, levels: int | None = None) -> Book:
+  async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
     """Forward depth through the gateway."""
     resp: codec.DepthResp = await self._conn.call(
-      codec.DepthReq(id=self._mid(), market_id=self.id, levels=levels)
+      codec.DepthReq(
+        id=self._mid(), market_id=self.id, levels=levels, settings=settings
+      )
     )
     return resp.book
 
@@ -275,8 +277,13 @@ class ProxyMarket(Market):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
+    settings: Settings = {},
   ):
-    """Forward depth stream through the gateway."""
+    """Forward depth stream through the gateway.
+
+    Every call is its own remote subscription under a fresh request ID, so two
+    streams on one market with different `settings` never share an inbox.
+    """
     inbox, sub_id = await self._conn.subscribe(
       codec.DepthStreamReq(
         id=self._mid(),
@@ -284,6 +291,7 @@ class ProxyMarket(Market):
         levels=levels,
         queue_size=queue_size,
         overflow=overflow,
+        settings=settings,
       ),
       queue_size=queue_size,
       overflow=overflow,

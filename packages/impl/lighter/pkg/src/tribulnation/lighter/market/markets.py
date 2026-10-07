@@ -47,7 +47,7 @@ class MarketBase(Public, Market):
     """The venue's market id, as a decimal string."""
     return str(self.market_index)
 
-  async def depth(self, *, levels: int | None = None) -> Book:
+  async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
     """The book from the top 250 resting orders per side, summed per price."""
     return await books.depth(self.shared, self.market_index, levels=levels)
 
@@ -57,6 +57,7 @@ class MarketBase(Public, Market):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Book]]:
     """The full book, maintained from the `order_book` snapshot and 50 ms deltas."""
     return books.depth_stream(

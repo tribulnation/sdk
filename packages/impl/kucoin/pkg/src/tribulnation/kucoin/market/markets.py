@@ -53,7 +53,7 @@ class SpotMarket(Public, Market):
     """Spot quantities already use base units."""
     return Decimal(1)
 
-  async def depth(self, *, levels: int | None = None) -> Book:
+  async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
     """Fetch up to 100 public price levels per side."""
     return await books.depth(
       self.shared, self.exchange_id, self.symbol, self.multiplier, levels=levels
@@ -65,6 +65,7 @@ class SpotMarket(Public, Market):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Book]]:
     """Subscribe to up to five levels with bounded per-subscriber buffering."""
     return books.depth_stream(

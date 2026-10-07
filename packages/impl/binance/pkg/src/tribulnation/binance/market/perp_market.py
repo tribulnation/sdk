@@ -112,7 +112,7 @@ class PerpMarket(SharedMixin, _PerpMarket):
     return self.symbol
 
   @wrap_exceptions
-  async def depth(self, *, levels: int | None = None) -> Book:
+  async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
     raw = await self.client.usdm_futures.http.market.depth(
       symbol=self.symbol, limit=rest_levels(levels)
     )
@@ -127,6 +127,7 @@ class PerpMarket(SharedMixin, _PerpMarket):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Book]]:
     """Subscribe to the order book over Binance's public partial-depth WS stream.
 

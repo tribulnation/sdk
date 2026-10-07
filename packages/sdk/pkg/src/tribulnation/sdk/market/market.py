@@ -55,8 +55,13 @@ class Market(SDK):
 
   @SDK.method
   @abstractmethod
-  async def depth(self, *, levels: int | None = None) -> Book:
-    """Fetch the market order book."""
+  async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
+    """Fetch the market order book.
+
+    - `levels`: cap the number of levels per side; `None` returns the full book.
+    - `settings`: venue-specific options keyed by venue name; each venue reads only
+      its own key and ignores the rest.
+    """
 
   @SDK.method
   @abstractmethod
@@ -66,16 +71,23 @@ class Market(SDK):
     levels: int | None = None,
     queue_size: int = 1,
     overflow: OverflowPolicy = 'latest',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Book]]:
     """Subscribe to the market order book.
 
     Venues fan out a shared upstream to each subscriber through a bounded queue:
 
+    - `levels`: cap the number of levels per side; `None` streams the full book.
+      It trims whatever the feed delivers and never selects the feed.
     - `queue_size`: how many books to buffer for this subscriber.
     - `overflow`: what to do when the buffer is full. The default `'latest'`
       keeps only the newest book (a slow consumer skips stale books); pass
       `overflow='fail'` with a larger `queue_size` to capture every book
       instead (e.g. to record a full depth history).
+    - `settings`: venue-specific options keyed by venue name, e.g.
+      `{'hyperliquid': {'depth_source': 'bbo'}}` to choose a venue's depth feed.
+      Each venue reads only its own key and ignores the rest. Different feeds are
+      different streams and need not agree tick-for-tick.
     """
 
   @SDK.method
