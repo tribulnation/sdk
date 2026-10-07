@@ -69,7 +69,7 @@ def test_anonymous_dydx_account_operations_require_an_address():
   """Public indexer use does not fabricate an address for private operations."""
   from tribulnation.dydx.market.impl.mixin import ExchangeMixin
 
-  venue = ExchangeMixin.new()
+  venue = ExchangeMixin.new(public=True)
   with pytest.raises(AuthError, match='address or mnemonic'):
     venue.shared.require_address()
 

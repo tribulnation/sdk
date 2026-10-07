@@ -230,7 +230,6 @@ class ExchangeMixin(SDK):
     validate: bool = True,
     parent_subaccount: int = 0,
   ):
-    public = public or (mnemonic is None and private_key is None)
     client = (
       Dydx.mainnet(
         mnemonic, private_key=private_key, address=address, indexer={'validate': validate}, public=public
