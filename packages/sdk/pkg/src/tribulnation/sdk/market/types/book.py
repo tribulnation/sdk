@@ -1,5 +1,6 @@
 from typing_extensions import Sequence, overload
 from dataclasses import dataclass, field
+from datetime import datetime
 from decimal import Decimal
 from .fees import Fees
 
@@ -26,6 +27,14 @@ class Book:
   """Bids, sorted by price descending (best bid first)."""
   asks: list[Entry] = field(default_factory=list[Entry])
   """Asks, sorted by price ascending (best ask first)."""
+  time: datetime | None = None
+  """Time of the latest exchange event reflected in this book, timezone-aware UTC.
+
+  The matching-engine or transaction time where the venue offers several timestamps.
+  None when the venue provides no such timestamp; never local receive time or HTTP
+  response time. On incremental (diff) feeds it only advances when the book changes, so
+  an old time on a quiet book means unchanged, not necessarily stale.
+  """
 
   def __post_init__(self):
     self.bids.sort(key=lambda e: e.price, reverse=True)
@@ -98,9 +107,17 @@ class Book:
     return fill(self.bids, qty=qty)
 
   def merge(self, *others: 'Book') -> 'Book':
+    """Combine the levels of several books.
+
+    The merged `time` is the oldest input timestamp, so the result is only as fresh
+    as its stalest input; it is None if any input lacks one.
+    """
+    books = (self, *others)
+    times = [b.time for b in books if b.time is not None]
     return Book(
       bids=self.bids + [e for other in others for e in other.bids],
       asks=self.asks + [e for other in others for e in other.asks],
+      time=min(times) if len(times) == len(books) else None,
     )
 
   def with_fees(self, fee: Decimal | Fees, *, maker: bool = False) -> 'Book':
@@ -117,6 +134,7 @@ class Book:
     return Book(
       bids=[Book.Entry(e.price * (1 - sell), e.qty) for e in self.bids],
       asks=[Book.Entry(e.price * (1 + buy), e.qty) for e in self.asks],
+      time=self.time,
     )
 
   def limit(self, levels: int) -> 'Book':
@@ -124,6 +142,7 @@ class Book:
     return Book(
       bids=self.bids[:levels],
       asks=self.asks[:levels],
+      time=self.time,
     )
 
   @property
@@ -146,6 +165,7 @@ class Book:
     - Matching entries are replaced with the new values.
     - New entries are added to the book.
     - Entries with zero quantity are removed from the book.
+    - `time` takes the update's timestamp, when it carries one.
     """
     bids = {e.price: e for e in self.bids}
     asks = {e.price: e for e in self.asks}
@@ -162,6 +182,8 @@ class Book:
 
     self.bids = [bids[p] for p in sorted(bids.keys(), reverse=True)]
     self.asks = [asks[p] for p in sorted(asks.keys())]
+    if updates.time is not None:
+      self.time = updates.time
 
 
 def avg_price(entries: Sequence['Book.Entry']) -> Decimal:

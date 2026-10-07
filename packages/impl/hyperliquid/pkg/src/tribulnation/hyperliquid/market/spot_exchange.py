@@ -20,6 +20,7 @@ from tribulnation.sdk.market.exchange import ticker_from_book
 
 from tribulnation.hyperliquid.core import wrap_exceptions
 from .impl import SpotMixin
+from .impl.depth import parse_book
 from .spot_market import SpotMarket
 from .impl.exchange_history import exchange_trades_history
 
@@ -39,15 +40,7 @@ def parse_market_id(market_id: str) -> tuple[str, str, int]:
 @wrap_exceptions
 async def fetch_l2_book(self: SpotMixin, coin: str) -> Book:
   raw = await self.shared.client.info.l2_book(coin=coin)
-  bids_raw, asks_raw = raw['levels']
-  return Book(
-    bids=[
-      Book.Entry(price=Decimal(b['px']), qty=Decimal(b['sz'])) for b in bids_raw[:1]
-    ],
-    asks=[
-      Book.Entry(price=Decimal(a['px']), qty=Decimal(a['sz'])) for a in asks_raw[:1]
-    ],
-  )
+  return parse_book(raw, levels=1)
 
 
 @dataclass(frozen=True, kw_only=True)

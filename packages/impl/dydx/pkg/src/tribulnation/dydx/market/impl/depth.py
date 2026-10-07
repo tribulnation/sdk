@@ -17,6 +17,7 @@ def parse_update(update: BookUpdate) -> Book:
 
 
 def parse_book(book: OrderBook) -> Book:
+  # dYdX's Indexer exposes no book timestamp (REST or WS), so `time` stays None.
   return Book(
     asks=[
       Book.Entry(price=Decimal(level['price']), qty=Decimal(level['size']))

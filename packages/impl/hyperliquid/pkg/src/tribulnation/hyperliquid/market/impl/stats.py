@@ -11,6 +11,7 @@ from tribulnation.sdk.market.exchange import ticker_from_book
 
 from tribulnation.hyperliquid.core import wrap_exceptions
 from .mixin import PerpMixin
+from .depth import parse_book
 
 FUNDING_INTERVAL = timedelta(hours=1)
 """Hyperliquid settles funding every hour, on the hour."""
@@ -74,15 +75,7 @@ async def perp_stats(
 @wrap_exceptions
 async def fetch_l2_book(self: PerpMixin, coin: str) -> Book:
   raw = await self.shared.client.info.l2_book(coin=coin)
-  bids_raw, asks_raw = raw['levels']
-  return Book(
-    bids=[
-      Book.Entry(price=Decimal(b['px']), qty=Decimal(b['sz'])) for b in bids_raw[:1]
-    ],
-    asks=[
-      Book.Entry(price=Decimal(a['px']), qty=Decimal(a['sz'])) for a in asks_raw[:1]
-    ],
-  )
+  return parse_book(raw, levels=1)
 
 
 @wrap_exceptions

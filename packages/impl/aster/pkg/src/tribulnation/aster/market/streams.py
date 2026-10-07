@@ -2,6 +2,7 @@
 
 import asyncio
 from contextlib import AsyncExitStack, suppress
+from datetime import datetime
 from typing_extensions import (
   AsyncIterable,
   AsyncIterator,
@@ -9,14 +10,18 @@ from typing_extensions import (
   Callable,
   TypeVar,
 )
+from typed_aster.core import timestamp_millis
+from typed_aster.futures.market.depth import OrderBookResponse
 from typed_aster.schemas import (
   DepthUpdate,
   ExecutionReport,
+  OrderBook,
   OutboundAccountPosition,
 )
 from typed_aster.futures.user_stream.events import FuturesUserEvent, OrderUpdate
 from tribulnation.sdk.core import MissingData, NetworkError, Subscription
 from tribulnation.sdk.market import Book, Trade
+from tribulnation.sdk.util import epoch_time
 from ..core import Scope, Shared, wrap_exceptions
 
 T = TypeVar('T')
@@ -24,10 +29,18 @@ RENEWAL_INTERVAL = 25 * 60
 """Seconds between keepalives; listen keys expire after 60 minutes."""
 
 
+def book_time(row: DepthUpdate | OrderBook | OrderBookResponse) -> datetime | None:
+  """The book's transaction time `T` (matching-engine time), or None if absent."""
+  time = row.get('T')
+  return None if time is None else epoch_time(time, timestamp_millis)
+
+
 def parse_book(row: DepthUpdate) -> Book:
   """Convert a partial-depth snapshot; quantities are in base units."""
   return Book(
-    bids=[Book.Entry(*r) for r in row['b']], asks=[Book.Entry(*r) for r in row['a']]
+    bids=[Book.Entry(*r) for r in row['b']],
+    asks=[Book.Entry(*r) for r in row['a']],
+    time=book_time(row),
   )
 
 

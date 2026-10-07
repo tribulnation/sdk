@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from decimal import Decimal
 
 from typing_extensions import AsyncIterable, AsyncIterator, Sequence
+from typed_lighter.core import timestamp_micros
 from typed_lighter.schemas import PriceLevel, SimpleOrder
 from tribulnation.sdk.core import (
   NetworkError,
@@ -12,6 +13,7 @@ from tribulnation.sdk.core import (
   exception_wrapper,
 )
 from tribulnation.sdk.market import Book
+from tribulnation.sdk.util import epoch_time
 
 from ..core import Shared
 
@@ -36,6 +38,7 @@ async def depth(shared: Shared, market_id: int, *, levels: int | None = None) ->
       market_id=market_id, limit=BOOK_ORDERS_LIMIT
     )
   )
+  # `orderBookOrders` carries no snapshot timestamp, so `time` stays None.
   book = Book(
     bids=aggregate(raw['bids'], full=raw['total_bids'] == BOOK_ORDERS_LIMIT),
     asks=aggregate(raw['asks'], full=raw['total_asks'] == BOOK_ORDERS_LIMIT),
@@ -64,7 +67,11 @@ def subscription(shared: Shared, market_id: int) -> Subscription[Book]:
         nonce: int | None = None
         async for frame in stream:
           state = frame['order_book']
-          delta = Book(bids=levels_of(state['bids']), asks=levels_of(state['asks']))
+          delta = Book(
+            bids=levels_of(state['bids']),
+            asks=levels_of(state['asks']),
+            time=epoch_time(state['last_updated_at'], timestamp_micros),
+          )
           if frame['type'] == 'subscribed/order_book':
             book = delta
           elif nonce is not None and state['begin_nonce'] != nonce:

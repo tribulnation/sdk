@@ -54,7 +54,7 @@ from tribulnation.sdk.market import (
 )
 from tribulnation.sdk.market.types.candles import candle_windows
 from ..core import Public, Scope
-from .streams import connect_books, connect_trades
+from .streams import book_time, connect_books, connect_trades
 
 DepthLimit = Literal[5, 10, 20, 50, 100, 500, 1000]
 DEPTH_LIMITS: tuple[DepthLimit, ...] = (5, 10, 20, 50, 100, 500, 1000)
@@ -255,6 +255,7 @@ class NativeMarket(Public, Market):
     book = Book(
       bids=[Book.Entry(*r) for r in raw['bids']],
       asks=[Book.Entry(*r) for r in raw['asks']],
+      time=book_time(raw),
     )
     return book if levels is None else book.limit(levels)
 
