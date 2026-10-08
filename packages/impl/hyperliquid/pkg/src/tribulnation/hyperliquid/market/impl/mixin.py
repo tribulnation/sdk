@@ -14,6 +14,7 @@ from typing_extensions import (
 )
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
+from decimal import Decimal
 import asyncio
 import os
 
@@ -173,6 +174,8 @@ class Shared(SDK):
     default_factory=dict[int | None, list[PerpAssetContext]]
   )
   user_fees: UserFeesResponse | None = None
+  leverages: dict[str, Decimal] = field(default_factory=dict[str, Decimal])
+  """The account's leverage per perpetual coin (`dex:`-prefixed off the default dex)."""
   standard_fee_schedule: FeeSchedule | None = None
 
   # Stream subscriptions.

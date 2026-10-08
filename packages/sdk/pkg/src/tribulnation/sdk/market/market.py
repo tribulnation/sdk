@@ -210,13 +210,18 @@ class Market(SDK):
     """Fetch the collateral bucket backing this market."""
 
   @SDK.method
-  @abstractmethod
   async def available_notional(self) -> Decimal:
-    """Fetch the max. notional position you can open.
+    """Fetch the maximum notional position you can open right now.
 
-    - For spot, returns the free quote token balance
-    - For futures, returns the available collateral times the maximum leverage
+    - Spot: the free quote-token balance. The default returns
+      `collateral().free_collateral`, the free part of the quote bucket.
+    - Perpetuals: the free collateral times the account's leverage on the market;
+      see `PerpMarket.available_notional`.
+
+    This is opening capacity, deliberately separate from `collateral()`, which is
+    about liquidation distance. Venues may override it with a more precise figure.
     """
+    return (await self.collateral()).free_collateral
 
   def random_client_order_id(self) -> str | None:
     """Generate a fresh client order ID in the form this market's `place_order` sends.
@@ -339,6 +344,37 @@ class PerpMarket(Market):
   async def collateral(self) -> Collateral:
     """Fetch the collateral bucket backing this market."""
     return await self.perp_collateral()
+
+  @SDK.method
+  async def leverage(self, *, refetch: bool = False) -> Decimal:
+    """Fetch the leverage this account can open at on this market.
+
+    The multiple of free collateral the account can open as notional here: opening
+    `n` of notional needs `n / leverage` of collateral. It is account-specific (for
+    example a per-market leverage setting, or the venue's default for a market the
+    account never configured), which is why it is neither part of the public
+    `rules()` nor of `collateral()`. It is cached after the first call.
+
+    Perpetual-only: spot markets trade on their cash balance, so the SDK defines no
+    spot leverage. Unsupported implementations raise `NotImplementedError`.
+
+    Args:
+      refetch: Fetch again even if the leverage is already cached.
+    """
+    raise NotImplementedError(f'Account leverage is not implemented: {self.id}')
+
+  @SDK.method
+  async def available_notional(self) -> Decimal:
+    """Fetch the maximum notional position you can open right now.
+
+    The default is `collateral().free_collateral * leverage()`: the free part of the
+    bucket backing this market (mode-aware) times the account's leverage on it. It
+    raises `NotImplementedError` where either is unsupported. Venues override it
+    when they publish a more precise figure, e.g. where an isolated position is
+    funded from the cross pool rather than from its own bucket.
+    """
+    leverage = await self.leverage()
+    return (await self.collateral()).free_collateral * leverage
 
   @SDK.method
   @abstractmethod

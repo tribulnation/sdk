@@ -175,12 +175,24 @@ class LighterPerpMarket(MarketBase, PerpMarket):
     )
     return account.market_bucket(acct, self.market_index, detail)
 
-  async def available_notional(self) -> Decimal:
-    """Free cross collateral times this market's configured leverage."""
+  async def leverage(self, *, refetch: bool = False) -> Decimal:
+    """`1 / initial margin fraction`: the account's configured fraction for this
+    market, else the market default. Cached per market on `Shared`."""
+    cached = self.shared.leverages.get(self.market_index)
+    if cached is not None and not refetch:
+      return cached
     acct, detail = await asyncio.gather(
-      self.shared.account(), self.shared.perp(self.market_index)
+      self.shared.account(), self.shared.perp(self.market_index, refetch=refetch)
     )
-    return account.perp_available_notional(acct, self.market_index, detail)
+    leverage = account.perp_leverage(acct, self.market_index, detail)
+    self.shared.leverages[self.market_index] = leverage
+    return leverage
+
+  async def available_notional(self) -> Decimal:
+    """Free cross collateral times `leverage()`. Kept over the mode-aware default:
+    isolated positions are funded from cross collateral, not their own bucket."""
+    leverage = await self.leverage()
+    return account.cross_free(await self.shared.account()) * leverage
 
   async def index(self, *, settings: Settings = {}) -> Decimal:
     """The market's index price, fresh from `orderBookDetails`."""
@@ -277,7 +289,3 @@ class LighterSpotMarket(MarketBase):
   async def collateral(self) -> Collateral:
     """The quote asset's collateral (unified accounts only)."""
     return account.spot_collateral(await self.shared.account(), self.quote_asset)
-
-  async def available_notional(self) -> Decimal:
-    """The free quote balance (unified accounts only)."""
-    return (await self.collateral()).free_collateral

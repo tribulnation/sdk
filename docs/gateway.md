@@ -100,7 +100,8 @@ as access to the configured accounts, including their trading operations.
    Decimal/time serialization, error transport, bounded stream inboxes and
    reconnection behavior retain the existing implementation.
 2. Supported calls include venue/exchange discovery, market rules, fees, books,
-   tickers, statistics, candles, orders, positions, collateral and funding. Streams
+   tickers, statistics, candles, orders, positions, collateral, account leverage and
+   funding. Streams
    cover depth and trades. Wallet, Earn, Report, and newer exchange history methods
    are not added by this migration. Unsupported inherited SDK methods remain
    unsupported; this is not a general RPC adapter for arbitrary SDK methods.

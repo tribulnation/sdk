@@ -65,8 +65,17 @@ never falls back to mainnet variables. `validate` toggles response validation.
   symbol without a published funding interval reports `funding_interval=None`.
 - Perpetual funding payments are available per market or exchange-wide, with positive
   amounts paid; verified on mainnet.
-- Unsupported, raising `NotImplementedError`: spot position, collateral and trade
-  history, `available_notional` and `perp_collateral`.
+- Perpetual `leverage` is the symbol's configured initial leverage, the `leverage` field
+  of its `positionRisk` rows (one per side in hedge mode; the lowest is used should they
+  differ). Aster lists flat symbols too, so a missing row raises `MissingData` rather than
+  falling back. The setting applies to cross and isolated margin. Cached per symbol;
+  `refetch=True` reads it again.
+- Perpetual `available_notional` is the SDK default: the cross bucket's
+  `availableBalance` (`collateral().free_collateral`) times `leverage()`, so it raises
+  `NotImplementedError` for isolated positions, as `collateral()` does. It ignores the
+  leverage bracket's notional cap (`maxNotionalValue`).
+- Unsupported, raising `NotImplementedError`: spot position, collateral, trade
+  history and `available_notional`, and `perp_collateral`.
 - Public reads are verified on mainnet. Account and trading methods are verified on
   testnet only.
 

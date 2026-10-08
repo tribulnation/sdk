@@ -94,9 +94,14 @@ guarantee ordering. `volume` is `baseTokenVolume`, `quote_volume` is
 
 ## Venue-specific semantics
 
-- **`available_notional`** = subaccount `freeCollateral` × the market's maximum leverage,
-  where max leverage is `1 / effective_IMF` (the initial-margin fraction, adjusted upward
-  by open-interest caps per the dYdX margining docs).
+- **`leverage`** = `1 / effective_IMF`: the market's initial-margin fraction, adjusted
+  upward by open-interest caps per the dYdX margining docs. dYdX has no per-account
+  leverage setting, so it is the same for every subaccount, cross (parent, `< 128`) or
+  isolated (child): an isolated market only changes which subaccount's collateral backs
+  the position. The open interest and oracle price come from the cached market list
+  shared with `rules()`; `refetch=True` reloads it.
+- **`available_notional`** is the SDK default: the addressed subaccount's
+  `freeCollateral` (its `perp_collateral().free_collateral`) × `leverage()`.
 - **`perp_collateral`** returns the addressed subaccount's bucket. `equity` and
   `free_collateral` come straight from the indexer `get_subaccount` fields;
   `initial_margin` = `equity - free_collateral` (what dYdX's UI shows as "margin usage");

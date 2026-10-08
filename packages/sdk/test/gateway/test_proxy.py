@@ -149,6 +149,10 @@ class MockMarket(PerpMarket):
       taker_sell=Decimal('0.004'),
     )
 
+  async def leverage(self, *, refetch: bool = False) -> Decimal:
+    """Report a refetched setting distinct from the cached one."""
+    return Decimal('4') if refetch else Decimal('5')
+
   def candles(self, interval, start, end):
     """Provide an empty fixture candle window."""
 
@@ -636,6 +640,35 @@ async def test_sdk2_account_fees_and_funding_interval(sdk: ProxySDK):
   assert funding.annualized == Decimal('8.760')
   assert await sdk.funding_rates(MARKET_ID) == []
   assert (await sdk.collateral('mock:perp')).maintenance_ratio == Decimal('0.1')
+
+
+@pytest.mark.asyncio
+async def test_leverage_forwards_refetch_through_gateway(sdk: ProxySDK) -> None:
+  """The gateway-side market owns the cache; `refetch` crosses the wire."""
+  sent = record_calls(sdk)
+  assert await sdk.leverage(MARKET_ID) == Decimal('5')
+  assert await sdk.leverage(MARKET_ID, refetch=True) == Decimal('4')
+  requests = [req for req in sent if isinstance(req, codec.LeverageReq)]
+  assert [req.refetch for req in requests] == [False, True]
+  assert all(req.market_id == MARKET_ID for req in requests)
+
+
+@pytest.mark.parametrize(
+  'msg',
+  [
+    codec.LeverageReq(id='l', market_id=MARKET_ID),
+    codec.LeverageReq(id='l', market_id=MARKET_ID, refetch=True),
+  ],
+)
+def test_leverage_request_roundtrips(msg: codec.LeverageReq) -> None:
+  """The leverage request keeps its market and refetch flag on the wire."""
+  assert codec.decode_client(codec.encode_client(msg)) == msg
+
+
+def test_leverage_response_keeps_decimal_value() -> None:
+  """Fractional leverage (dYdX's `1 / effective IMF`) survives as a `Decimal`."""
+  msg = codec.LeverageResp(id='l', value=Decimal('1.818181818181818181818181818'))
+  assert codec.decode_server(codec.encode_server(msg)) == msg
 
 
 def record_calls(sdk: ProxySDK) -> list[codec.CallReq]:

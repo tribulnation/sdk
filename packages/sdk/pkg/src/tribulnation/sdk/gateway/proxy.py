@@ -521,6 +521,13 @@ class ProxyPerpMarket(ProxyMarket, PerpMarket):
     )
     return resp.position
 
+  async def leverage(self, *, refetch: bool = False) -> Decimal:
+    """Forward account leverage through the gateway, which owns its cache."""
+    resp: codec.LeverageResp = await self._conn.call(
+      codec.LeverageReq(id=self._mid(), market_id=self.id, refetch=refetch)
+    )
+    return resp.value
+
   async def collateral(self) -> Collateral:
     """Forward collateral through the gateway."""
     return await self.perp_collateral()

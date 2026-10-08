@@ -2,6 +2,7 @@
 
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
+from decimal import Decimal
 from functools import cached_property
 import asyncio
 from typing_extensions import (
@@ -98,6 +99,8 @@ class Shared(SDK):
   trades: dict[Scope, Subscription[tuple[str, Trade]]] = field(
     default_factory=dict[Scope, Subscription[tuple[str, Trade]]]
   )
+  leverages: dict[str, Decimal] = field(default_factory=dict[str, Decimal])
+  """The account's initial leverage per perpetual symbol, filled by `leverage()`."""
 
   @property
   def venue_id(self) -> Literal['aster', 'aster_testnet']:

@@ -87,6 +87,8 @@ class Shared(SDK):
     default_factory=dict[int, Subscription[Trade]]
   )
   client_indexes: ClientIndexes = field(default_factory=ClientIndexes)
+  leverages: dict[int, Decimal] = field(default_factory=dict[int, Decimal])
+  """The account's leverage per perpetual market, filled by `leverage()`."""
 
   @classmethod
   def new(

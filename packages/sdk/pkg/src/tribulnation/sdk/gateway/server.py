@@ -224,6 +224,13 @@ class Gateway:
           id=msg.id,
           fees=await (await self._market(msg.market_id)).fees(refetch=msg.refetch),
         )
+      case codec.LeverageReq():
+        return codec.LeverageResp(
+          id=msg.id,
+          value=await (await self._perp_market(msg.market_id)).leverage(
+            refetch=msg.refetch
+          ),
+        )
       case codec.CandlesReq():
         return codec.CandlesResp(
           id=msg.id,

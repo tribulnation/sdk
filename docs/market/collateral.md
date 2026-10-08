@@ -68,6 +68,39 @@ truthfully.
 > There's no per-position `liquidation_price`: not every venue can give one, and
 > `maintenance_ratio` answers the same question.
 
+## How big can you open?
+
+Collateral tells you how far you are from liquidation. To size a new position, ask for
+opening capacity instead:
+
+```python
+notional = await sdk.available_notional('dydx:perp:ETC-USD')
+leverage = await sdk.leverage('dydx:perp:ETC-USD')
+price = (await sdk.depth('dydx:perp:ETC-USD')).best_ask.price
+qty = notional / price  # the largest buy the account can open right now
+```
+
+```
+Decimal('1200.00')  # free collateral 120 x leverage 10
+Decimal('10')
+```
+
+- `leverage()` (perpetuals only) is the multiple of free collateral this account can open
+  as notional on this market: opening `n` of notional takes `n / leverage` of collateral.
+  It is account-specific, e.g. Hyperliquid's per-asset leverage setting, which is why it
+  lives on the market and not in the public `rules()`, nor in `collateral()` (a bucket
+  shared by many markets has no single leverage). It's cached after the first call; pass
+  `refetch=True` after changing the setting elsewhere. Spot markets have no leverage.
+- `available_notional()` is `free_collateral × leverage()` for perpetuals, using the
+  collateral backing that market. For spot it's the free quote balance. A venue may
+  override it with a more precise figure, e.g. when an isolated position is funded from
+  the cross pool rather than its own bucket; each
+  [implementation page](implementations/index.md) says what it uses.
+
+Venues without account leverage raise `NotImplementedError` from `leverage()` and keep
+their own venue-specific `available_notional()`. Neither figure subtracts fees, nor checks a venue's
+notional caps or margin tiers beyond what its leverage already reflects.
+
 ## Which pool are you looking at?
 
 Collateral only means something per **bucket**: a set of markets sharing one collateral pool

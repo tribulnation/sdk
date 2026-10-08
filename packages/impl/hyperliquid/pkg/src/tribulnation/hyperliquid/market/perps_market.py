@@ -4,7 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 import secrets
 
-from tribulnation.sdk.core import PaginatedResponse, LogicError, OverflowPolicy
+from tribulnation.sdk.core import PaginatedResponse, OverflowPolicy
 from tribulnation.sdk.market import (
   Candle,
   CandleInterval,
@@ -38,6 +38,8 @@ from .impl import (
   funding_payments,
   perps_position,
   perp_market_collateral,
+  perp_leverage,
+  perp_available_notional,
   open_orders,
   place_order,
   cancel_order,
@@ -124,22 +126,13 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
   async def perp_collateral(self) -> PerpCollateral:
     return await perp_market_collateral(self)
 
-  @wrap_exceptions
-  async def available_notional(self) -> Decimal:
-    state = await self.client.info.spot_clearinghouse_state(user=self.address)
-    for balance in state['balances']:
-      if balance['token'] == self.collateral_meta['index']:
-        if balance['coin'] != self.collateral_name:
-          raise LogicError(
-            f'Found balance with matching index {balance["token"]}, but wrong coin "{balance["coin"]}" != "{self.collateral_name}"'
-          )
-        total = Decimal(balance['total'])
-        locked = Decimal(balance['hold'])
-        collateral = total - locked
-        leverage = self.asset_meta['maxLeverage']
-        return collateral * leverage
+  async def leverage(self, *, refetch: bool = False) -> Decimal:
+    """The account's `activeAssetData` leverage setting, capped at `maxLeverage`."""
+    return await perp_leverage(self, refetch=refetch)
 
-    return Decimal(0)
+  async def available_notional(self) -> Decimal:
+    """Free unified collateral times `leverage()`, for cross and isolated alike."""
+    return await perp_available_notional(self)
 
   def random_client_order_id(self) -> str:
     """Generate a `cloid`: `0x` and 128 random bits as 32 hex digits."""

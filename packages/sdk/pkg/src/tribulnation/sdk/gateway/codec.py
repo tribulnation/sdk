@@ -359,6 +359,16 @@ class FeesReq:
 
 
 @dataclass(kw_only=True)
+class LeverageReq:
+  """Fetch the leverage the account can open at on a perpetual market."""
+
+  id: str
+  market_id: str
+  refetch: bool = False
+  tag: Literal['leverage'] = 'leverage'
+
+
+@dataclass(kw_only=True)
 class CandlesReq:
   """Fetch candles in a half-open time window."""
 
@@ -424,6 +434,7 @@ class ExchangeCollateralReq:
 CallReq = (
   DepthReq
   | FeesReq
+  | LeverageReq
   | CandlesReq
   | ExchangeReq
   | TickersReq
@@ -457,6 +468,7 @@ StreamReq = DepthStreamReq | TradesStreamReq
 ClientMsg = Annotated[
   DepthReq
   | FeesReq
+  | LeverageReq
   | CandlesReq
   | ExchangeReq
   | TickersReq
@@ -739,6 +751,15 @@ class FeesResp:
 
 
 @dataclass(kw_only=True)
+class LeverageResp:
+  """Account leverage on a perpetual market."""
+
+  id: str
+  value: Decimal
+  tag: Literal['leverage'] = 'leverage'
+
+
+@dataclass(kw_only=True)
 class CandlesResp:
   """Historical candles, preserving the SDK's value types."""
 
@@ -789,6 +810,7 @@ class PerpStatsResp:
 ServerMsg = Annotated[
   DepthResp
   | FeesResp
+  | LeverageResp
   | CandlesResp
   | ExchangeResp
   | TickersResp

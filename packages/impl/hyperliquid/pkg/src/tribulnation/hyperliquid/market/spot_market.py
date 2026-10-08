@@ -1,10 +1,9 @@
 from typing_extensions import AsyncContextManager, AsyncIterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime
-from decimal import Decimal
 import secrets
 
-from tribulnation.sdk.core import PaginatedResponse, LogicError, OverflowPolicy
+from tribulnation.sdk.core import PaginatedResponse, OverflowPolicy
 from tribulnation.sdk.market import (
   Candle,
   CandleInterval,
@@ -108,20 +107,6 @@ class SpotMarket(SpotMarketMixin, Market):
 
   async def collateral(self) -> Collateral:
     return await spot_market_collateral(self)
-
-  @wrap_exceptions
-  async def available_notional(self) -> Decimal:
-    state = await self.client.info.spot_clearinghouse_state(user=self.address)
-    for balance in state['balances']:
-      if balance['token'] == self.quote_meta['index']:
-        if balance['coin'] != self.quote_meta['name']:
-          raise LogicError(
-            f'Found balance with matching index {balance["token"]}, but wrong coin "{balance["coin"]}" != "{self.quote_name}"'
-          )
-        total = Decimal(balance['total'])
-        locked = Decimal(balance['hold'])
-        return total - locked
-    return Decimal(0)
 
   def trades_history(self, start: datetime, end: datetime) -> PaginatedResponse[Trade]:
     return PaginatedResponse(trades_history(self, start, end))
