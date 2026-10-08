@@ -14,3 +14,8 @@ sequencer afterwards; that surfaces as a `canceled-*` order status, not an error
 
 Cancellation is unchanged. Verified by unit fixtures only; no live trading run
 covers `OrderRejected`.
+
+Release qualification on 2026-10-08 passed the read suites and market
+consistency. Committed evidence under `release-evidence/lighter/` matches pinned
+Catalogue `1851660ac2bed8243dd9ce9c7297fe05c7130973`; offline release
+verification passes. This adapter release follows SDK 2.15.0 publication.
