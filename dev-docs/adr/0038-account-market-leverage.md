@@ -2,7 +2,8 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: proposed; implemented, not release-verified
+1. Status: proposed; implemented, not release-verified; amended by
+   [ADR 0039](0039-venue-notional-caps.md)
 2. Date: 2026-10-08
 
 ## Context
