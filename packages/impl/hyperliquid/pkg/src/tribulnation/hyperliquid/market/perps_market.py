@@ -26,6 +26,7 @@ from tribulnation.sdk.market import (
 
 from tribulnation.hyperliquid.core import wrap_exceptions
 from .impl.candles import CANDLE_INTERVALS, candles
+from .impl.fees import personal_perp_fees
 
 from .impl import (
   PerpMarketMixin,
@@ -92,9 +93,7 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
     return trades_history(self, start, end)
 
   async def fees(self, *, refetch: bool = False) -> Fees:
-    """Fetch complete rates for supported perpetual market configurations."""
-    from .impl.fees import personal_perp_fees
-
+    """The account's rates for USDC-collateral perpetuals, HIP-3 included."""
     return await personal_perp_fees(self, refetch=refetch)
 
   def candles(

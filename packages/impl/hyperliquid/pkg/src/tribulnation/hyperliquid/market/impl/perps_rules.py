@@ -1,3 +1,5 @@
+"""Public perpetual market rules."""
+
 from decimal import Decimal
 
 from tribulnation.sdk.market import Rules
@@ -15,6 +17,7 @@ from .fees import standard_perp_fees
 
 
 async def rules(self: PerpMarketMixin, *, refetch: bool = False) -> Rules:
+  """Instrument precision and the standard schedule; fees and funding settle in collateral."""
   tick_decimals = min(
     PRICE_MAX_DECIMALS,
     FUTURES_PRICE_MAX_DECIMALS - self.asset_meta['szDecimals'],
@@ -25,7 +28,8 @@ async def rules(self: PerpMarketMixin, *, refetch: bool = False) -> Rules:
   lot_size = Decimal(10) ** -lot_decimals
 
   return Rules(
-    fee_asset=self.collateral_name,
+    # Same numeric token index as wallet/report balances and `Trade.fee.asset`.
+    fee_asset=str(self.collateral_meta['index']),
     tick_size=tick_size,
     step_size=lot_size,
     min_value=MIN_ORDER_VALUE,

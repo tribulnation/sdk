@@ -79,7 +79,7 @@ def test_exclusions_are_specific_and_never_passes():
   """Retention, spot-only methods and known unsupported streams are explicit."""
   hl = passing('hyperliquid')
   exclusions = [row for row in hl.checks if row.exclusion == 'retention_single_page']
-  assert len(exclusions) == 2
+  assert len(exclusions) == 3
   exclusions[0].passed = 1
   with pytest.raises(ValueError):
     evidence.verify_payload(hl.model_dump(mode='json'), root=repo_root())
@@ -88,6 +88,19 @@ def test_exclusions_are_specific_and_never_passes():
   kraken = evidence.inventory(repo_root(), 'kraken')
   assert (
     sum(case.exclusion == 'unsupported_perp_stream' for case in kraken.values()) == 1
+  )
+
+
+def test_account_fee_reads_are_required_only_where_an_address_suffices():
+  """Hyperliquid account fees are required evidence; other venues' are excluded."""
+  hl = evidence.inventory(repo_root(), 'hyperliquid')
+  fees = [case for case in hl.values() if case.method == 'fees']
+  assert len(fees) == 3 and all(case.exclusion is None for case in fees)
+  binance = evidence.inventory(repo_root(), 'binance')
+  assert all(
+    case.exclusion == 'private_account_fees'
+    for case in binance.values()
+    if case.method == 'fees'
   )
 
 

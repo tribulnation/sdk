@@ -15,7 +15,7 @@ import pytest
 from typing_extensions import Literal
 
 from .consistency import StrictModel
-from .integration.market.public import READS
+from .integration.market.public import ADDRESS_FEE_READS, READS
 from .integration.market.support import CASES
 from .repo import repo_root
 from .support import load_impl_files
@@ -163,6 +163,8 @@ def inventory(root: Path, venue: str) -> dict[str, Case]:
           exclusion = 'spot_only'
         elif method not in {'exchanges', 'markets'} and method not in enabled:
           exclusion = 'unsupported'
+        elif method == 'fees' and venue not in ADDRESS_FEE_READS:
+          exclusion = 'private_account_fees'
         elif (
           venue in {'mexc', 'kraken'}
           and reference.market_id.startswith('perp:')

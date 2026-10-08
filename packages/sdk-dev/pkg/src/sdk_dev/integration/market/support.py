@@ -51,8 +51,10 @@ CASES: Mapping[str, Sequence[CandleCase]] = {
   ],
   'bit2me': [CandleCase(market_id='spot:BTC/EUR', page=998)],
   # The retained 5000 opens fit one response; asking for 5050 cannot prove paging.
+  # `xyz:SILVER` is a HIP-3 USDC-collateral market in growth mode.
   'hyperliquid': [
     CandleCase(market_id=':BTC', page=None),
+    CandleCase(market_id='xyz:xyz:SILVER', page=None),
     CandleCase(market_id='spot:UBTC/USDC:142', page=None),
   ],
   'bybit': [
