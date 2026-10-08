@@ -10,7 +10,6 @@ from tribulnation.aster import AsterMarket
 from tribulnation.aster.core import Shared
 from tribulnation.aster.market.markets import PerpMarket, position_leverage
 from tribulnation.sdk.core import MissingData
-from tribulnation.sdk.market import Collateral
 
 SYMBOL = 'ASTERUSDT'
 
@@ -66,11 +65,13 @@ async def test_leverage_is_cached_until_refetch(monkeypatch: pytest.MonkeyPatch)
   assert endpoint.await_count == 2
 
 
-async def test_available_notional_is_free_cross_balance_times_leverage(
+async def test_unsupported_leverage_raises_before_account_reads(
   monkeypatch: pytest.MonkeyPatch,
 ):
-  """The SDK default: the cross bucket's free collateral times the leverage."""
-  monkeypatch.setattr(Risk, 'risk', AsyncMock(return_value=[risk(leverage=4)]))
-  collateral = Collateral(equity=Decimal(120), free_collateral=Decimal(100))
-  monkeypatch.setattr(Shared, 'cross_collateral', AsyncMock(return_value=collateral))
-  assert await market().available_notional() == Decimal(400)
+  """`available_notional` reads the leverage first, as the SDK default does."""
+  monkeypatch.setattr(Risk, 'risk', AsyncMock(return_value=[]))
+  account = AsyncMock()
+  monkeypatch.setattr(Shared, 'futures_account', account)
+  with pytest.raises(MissingData):
+    await market().available_notional()
+  assert account.await_count == 0

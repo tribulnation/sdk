@@ -4,7 +4,7 @@ Per-market methods use the SDK's default delegation to `market(market_id)`.
 """
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing_extensions import (
   AsyncIterable,
   Collection,
@@ -14,21 +14,39 @@ from typing_extensions import (
   overload,
 )
 from decimal import Decimal
+import asyncio
 from typed_aster.futures.market.funding_info import FundingInfo
 from typed_aster.futures.market.schemas import FuturesMarkPrice
 from tribulnation.sdk.market import (
-  Collateral,
   Exchange,
   ExchangeFundingPayment,
+  ExchangeTrade,
   FundingPayment,
+  PerpCollateral,
   PerpExchange as SDKPerpExchange,
   PerpStats,
   Settings,
   Ticker,
+  Trade,
 )
 from tribulnation.sdk.core import PaginatedResponse, SDK
+from tribulnation.sdk.core.concurrency import managed_tasks
 from ..core import Public
-from .markets import PerpMarket, SpotMarket
+from .markets import (
+  PerpMarket,
+  SpotMarket,
+  cross_collateral,
+  exchange_trade,
+  spot_trade_rows,
+  trade_windows,
+)
+
+OPEN_INTEREST_MARKETS = 5
+"""Most explicitly requested contracts `perp_stats` reads open interest for.
+
+Open interest is served one symbol per request, so larger and unfiltered requests
+leave it `None` rather than issuing hundreds of reads.
+"""
 
 
 class Stats(TypedDict):
@@ -83,10 +101,12 @@ def join_perp_stats(
   premiums: Sequence[FuturesMarkPrice],
   configs: Sequence[FundingInfo],
   symbols: Collection[str],
+  interest: Mapping[str, Decimal] = {},
 ) -> dict[str, PerpStats]:
-  """Join premium-index rows with funding intervals by symbol.
+  """Join premium-index rows with funding intervals and open interest by symbol.
 
-  A missing or null interval (testnet serves some) is `None`, not an error.
+  A missing or null interval (testnet serves some) is `None`, not an error; so is the
+  open interest of a symbol absent from `interest`.
   """
   hours = {c['symbol']: c['fundingIntervalHours'] for c in configs}
   result: dict[str, PerpStats] = {}
@@ -100,6 +120,7 @@ def join_perp_stats(
       funding=row['lastFundingRate'],
       next_funding_time=row['nextFundingTime'],
       funding_interval=timedelta(hours=interval) if interval is not None else None,
+      open_interest=interest.get(row['symbol']),
     )
   return result
 
@@ -144,10 +165,45 @@ class SpotExchange(Public, Exchange):
       symbols,
     )
 
+  @overload
+  def trades_history(
+    self, market_id: None, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[ExchangeTrade]: ...
+
+  @overload
+  def trades_history(
+    self, market_id: str, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[Trade]: ...
+
+  @SDK.method
+  @PaginatedResponse.lift
+  async def trades_history(
+    self, market_id: str | None, /, start: datetime, end: datetime
+  ) -> AsyncIterable[Sequence[Trade]]:
+    """Read fills for one pair or every pair, within inclusive bounds up to now.
+
+    Exchange-wide reads come from symbol-less `userTrades` in seven-day windows,
+    halving any window that fills a page. Mainnet only: testnet omits buy fills.
+    """
+    if market_id is not None:
+      async for page in (await self.market(market_id)).trades_history(start, end):
+        yield page
+      return
+    if start.tzinfo is None or end.tzinfo is None:
+      raise ValueError('Trade history bounds must be timezone-aware')
+    if not self.shared.mainnet:
+      raise NotImplementedError(
+        'Aster testnet spot trade history is not supported: userTrades omits buy fills'
+      )
+    for lower, upper in trade_windows(start, end, datetime.now(timezone.utc)):
+      async for rows in spot_trade_rows(self.shared, lower, upper):
+        if page := [exchange_trade(r) for r in rows if start <= r['time'] <= end]:
+          yield page
+
 
 @dataclass(frozen=True, kw_only=True)
 class PerpExchange(Public, SDKPerpExchange):
-  """Aster linear perpetuals, on a single cross-margin bucket."""
+  """Aster linear perpetuals: one cross-margin bucket, plus isolated positions."""
 
   @property
   def exchange_id(self) -> str:
@@ -218,7 +274,9 @@ class PerpExchange(Public, SDKPerpExchange):
   ) -> Mapping[str, PerpStats]:
     """Read pricing and funding for all or the selected contracts in two bulk calls.
 
-    Aster has no bulk open-interest source, so `open_interest` is `None`.
+    Open interest (base units) is read per contract, concurrently, only when at most
+    `OPEN_INTEREST_MARKETS` contracts are named explicitly; otherwise it is `None`,
+    since the venue has no bulk source. Observations are not atomic.
     """
     if markets is not None and not markets:
       return {}
@@ -226,12 +284,30 @@ class PerpExchange(Public, SDKPerpExchange):
     market = self.client.futures.market
     premiums = await self.shared.call(market.premium_index)
     configs = await self.shared.call(market.funding_info)
+    interest: dict[str, Decimal] = {}
+    if markets is not None and len(symbols) <= OPEN_INTEREST_MARKETS:
+      interest = await self.open_interest(symbols)
     return join_perp_stats(
-      premiums if isinstance(premiums, list) else [premiums], configs, symbols
+      premiums if isinstance(premiums, list) else [premiums],
+      configs,
+      symbols,
+      interest,
     )
 
-  async def collateral(self, market_id: str | None = None, /) -> Collateral:
-    """Read the cross-margin bucket, or a market's own collateral."""
+  async def open_interest(self, symbols: Collection[str]) -> dict[str, Decimal]:
+    """Read each contract's open interest, in base units, one retried request each."""
+    market = self.client.futures.market
+
+    async def read(symbol: str) -> tuple[str, Decimal]:
+      """One contract's open interest."""
+      row = await self.shared.call(lambda: market.open_interest(symbol))
+      return symbol, row['openInterest']
+
+    async with managed_tasks(read(symbol) for symbol in symbols) as tasks:
+      return dict(await asyncio.gather(*tasks))
+
+  async def perp_collateral(self, market_id: str | None = None, /) -> PerpCollateral:
+    """Read the cross-margin bucket, or a market's own (cross or isolated) bucket."""
     if market_id is not None:
-      return await (await self.market(market_id)).collateral()
-    return await self.shared.cross_collateral()
+      return await (await self.market(market_id)).perp_collateral()
+    return cross_collateral(await self.shared.futures_account())
