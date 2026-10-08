@@ -25,3 +25,8 @@ Behaviour changes:
 
 Verified against 27,018 public mainnet fills across default and HIP-3
 perpetuals and USDC, USDT0/USDC and USDE spot pairs.
+
+Release qualification on 2026-10-08 passed the read suites and market
+consistency. Committed evidence under `release-evidence/hyperliquid/` matches pinned
+Catalogue `1851660ac2bed8243dd9ce9c7297fe05c7130973`; offline release
+verification passes. This adapter release follows SDK 2.14.0 publication.
