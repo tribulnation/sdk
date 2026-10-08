@@ -20,3 +20,8 @@ including top-of-book tickers. Testnet objects now report
 `venue_id == 'hyperliquid_testnet'`.
 
 Upgrade the SDK and this adapter together.
+
+Release qualification on 2026-10-08 passed the read suites and market
+consistency. Committed evidence under `release-evidence/hyperliquid/` matches pinned
+Catalogue `1851660ac2bed8243dd9ce9c7297fe05c7130973`; offline release
+verification passes. This adapter release follows SDK 2.12.0 publication.
