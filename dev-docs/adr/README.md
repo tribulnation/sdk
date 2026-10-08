@@ -60,4 +60,5 @@ not a changelog or a substitute for API documentation and tests.
 | [0035](0035-funding-cash-flow-sign.md) | Funding payments use received-positive account cash flows | Accepted; supersedes the sign decision in 0024 |
 | [0036](0036-no-implicit-accounts.md) | SDK roots have no implicit accounts | Accepted |
 | [0037](0037-account-scoped-ids.md) | Account-scoped market and exchange IDs | Proposed; implemented, not release-verified |
-| [0038](0038-account-market-leverage.md) | Account-scoped perpetual market leverage and the default available notional | Proposed; implemented, not release-verified |
+| [0038](0038-account-market-leverage.md) | Account-scoped perpetual market leverage and the default available notional | Proposed; implemented, not release-verified; amended by 0041 |
+| [0041](0041-venue-notional-caps.md) | Venue notional caps in available notional | Proposed; implemented for Aster, not release-verified |

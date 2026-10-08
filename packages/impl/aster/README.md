@@ -21,16 +21,20 @@ venue = AsterMarket.new(user='0x…', signer='0x…', mainnet=False)
 1. Exchanges are `spot` and `perp`, with native symbols such as `BTCUSDT`.
 2. Public data: discovery, tickers, rules, REST depth (up to 1000 levels), shared
    depth streams (up to 20 levels), candles in the six SDK intervals, perpetual index,
-   next funding, funding-rate history and bulk `perp_stats` (without open interest).
-3. Account and trading: fees, order queries, open orders, fill streams, perpetual
-   trade history, `MARKET`, `LIMIT` (GTC) and `POST_ONLY` (GTX) orders, and all
-   cancellation methods. Market orders ignore the SDK `price`. Perpetual position and
-   collateral cover one-way, cross-margin accounts. These are verified on testnet only.
-   Perpetual funding payments are available per market or exchange-wide, with positive
-   amounts paid, and are verified on mainnet.
-4. Unsupported methods raise `NotImplementedError`: spot balances, spot trade history,
-   `available_notional` and `perp_collateral`.
-5. `tribulnation.aster.Report` snapshots, through `ReportSDK`, the mainnet `perp` wallet
+   next funding, funding-rate history and bulk `perp_stats` (open interest for at most
+   five named contracts).
+3. Account reads, verified on mainnet: fees, spot balances (mainnet only), spot and
+   perpetual trade history (spot also exchange-wide), one-way perpetual position,
+   cross or isolated `perp_collateral`, `leverage` and capped `available_notional`.
+   Perpetual funding payments are available per market or exchange-wide, positive when
+   received.
+4. Trading, verified on testnet only: order queries, open orders, fill streams,
+   `MARKET`, `LIMIT` (GTC) and `POST_ONLY` (GTX) orders, and all cancellation methods.
+   Market orders ignore the SDK `price`.
+5. Unsupported methods raise `NotImplementedError`: hedge-mode positions, exchange-wide
+   perpetual trade history, order settings, and spot balances and trade history on
+   testnet.
+6. `tribulnation.aster.Report` snapshots, through `ReportSDK`, the mainnet `perp` wallet
    (without unrealized PnL) and positions with their entry prices, the `spot` wallet,
    and ASTER staked on Aster Chain with its unclaimed rewards, signed by the trading
    agent. Testnet snapshots are unsupported. Its

@@ -39,9 +39,13 @@ never falls back to mainnet variables. `validate` toggles response validation.
 - Exchanges are `spot` and `perp`, with native symbols: `aster:spot:ASTERUSDT`,
   `aster:perp:BTCUSDT`. Discovery lists symbols currently trading; perpetual discovery
   excludes dated contracts.
-- `Rules.fee_asset` is the quote asset on spot and the margin asset on perpetuals.
-  Actual fills can pay fees in another asset (e.g. `ASTER`); `Trade.fee` keeps the
-  native one. Standard fee rates are unknown; `fees()` reads the account's rates.
+- `Rules.fee_asset` is `None`: the fee asset depends on the fill. A spot fill pays in
+  the asset it delivers, the base asset on a buy and the quote asset on a sell. A
+  perpetual fill pays ASTER when the account's futures fee-burn setting is on and its
+  futures wallet holds ASTER, and the margin asset otherwise; rules read no account
+  setting, so they claim neither. `Trade.fee.asset` keeps each fill's native fee asset. Standard
+  fee rates are unknown (`rules().fees` is `None`); `fees()` reads the account's rates
+  and needs `user` and `signer`.
 
 ## Venue-specific semantics
 
@@ -55,29 +59,43 @@ never falls back to mainnet variables. `validate` toggles response validation.
 - Fill streams share one account listen key per exchange, renewed every 25 minutes
   and closed when the last subscriber leaves. Do not run another consumer of the same
   account's listen key concurrently.
-- Perpetual `trades_history` reads inclusive `[start, end]` bounds in native
-  seven-day windows, each walked by trade ID, and stops at the current time because
-  Aster refuses future bounds.
-- Perpetual position and collateral support one-way (not hedge-mode) positions on the
-  cross-margin bucket. Isolated-margin collateral raises `NotImplementedError`.
+- `trades_history` reads inclusive `[start, end]` bounds in native seven-day windows
+  and stops at the current time because Aster refuses future bounds. One pair or
+  contract is walked by trade ID. Spot also serves every pair at once
+  (`trades_history(None, ...)`), splitting any window that fills a page; exchange-wide
+  perpetual history raises `NotImplementedError`.
+- Spot `position` is the base asset's balance and `collateral` the quote asset's, free
+  plus locked; free collateral is the free quote balance. Spot balances and trade
+  history are mainnet-only: testnet omits them, so they raise `NotImplementedError`.
+- Perpetual position and collateral support one-way (not hedge-mode) positions.
+  `perp_collateral` reads the join-margin account, whose totals value every margin
+  asset in USDT. The cross bucket is those totals less isolated positions' own margin
+  and requirements; its leverage is the cross positions' notional over equity. An
+  isolated market reports its position's own margin (isolated wallet plus unrealized
+  PnL), with any margin above its initial margin as free collateral. The exchange-level
+  `perp_collateral()` is the cross bucket.
 - `perp_stats` joins the bulk premium index with the funding configuration in two
-  requests. Aster has no bulk open-interest source, so `open_interest` is `None`; a
-  symbol without a published funding interval reports `funding_interval=None`.
-- Perpetual funding payments are available per market or exchange-wide, with positive
-  amounts paid; verified on mainnet.
+  requests. Open interest (base units) has no bulk source: it is read per contract only
+  when at most five contracts are named, and is `None` otherwise. A symbol without a
+  published funding interval reports `funding_interval=None`.
+- Perpetual funding payments are available per market or exchange-wide, positive when
+  received.
 - Perpetual `leverage` is the symbol's configured initial leverage, the `leverage` field
   of its `positionRisk` rows (one per side in hedge mode; the lowest is used should they
   differ). Aster lists flat symbols too, so a missing row raises `MissingData` rather than
   falling back. The setting applies to cross and isolated margin. Cached per symbol;
   `refetch=True` reads it again.
-- Perpetual `available_notional` is the SDK default: the cross bucket's
-  `availableBalance` (`collateral().free_collateral`) times `leverage()`, so it raises
-  `NotImplementedError` for isolated positions, as `collateral()` does. It ignores the
-  leverage bracket's notional cap (`maxNotionalValue`).
-- Unsupported, raising `NotImplementedError`: spot position, collateral, trade
-  history and `available_notional`, and `perp_collateral`.
-- Public reads are verified on mainnet. Account and trading methods are verified on
-  testnet only.
+- Perpetual `available_notional` is the account's `availableBalance` times
+  `leverage()`, in either margin mode (new margin comes from the available balance),
+  capped by the room left in the leverage bracket at that leverage (`maxNotional` less
+  the position's own notional) and by the symbol's remaining open-interest allowance
+  (`remainingOpenableNotionalValue`). It is the same-direction room; reducing or
+  reversing a position is not modelled. Spot `available_notional` is the free quote
+  balance.
+- Unsupported, raising `NotImplementedError`: hedge-mode positions, exchange-wide
+  perpetual trade history and order settings.
+- Public reads and the account reads are verified on mainnet. Order placement and
+  cancellation are verified on testnet only.
 
 <!-- next -->
 

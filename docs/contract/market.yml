@@ -161,7 +161,7 @@ methods:
     example:
       accountVenues: [mexc]
       constants:
-        aster: {market_id: 'aster:perp:BTCUSDT', instrument_id: BTCUSDT, fee_asset: USDT, tick_size: '0.1', step_size: '0.001'}
+        aster: {market_id: 'aster:perp:BTCUSDT', instrument_id: BTCUSDT, fee_asset: null, tick_size: '0.1', step_size: '0.001'}
         kucoin: {market_id: 'kucoin:spot:BTC-USDT', instrument_id: 'BTC-USDT', fee_asset: 'USDT', tick_size: '0.10', step_size: '0.000001', kind: 'spot'}
         mexc:
           market_id: 'mexc:spot:BTCUSDT'
@@ -359,7 +359,7 @@ methods:
       bitget: USDT, USDC and Classic coin-margined perpetuals. UTA coin is unsupported.
       bybit: Linear perpetuals only.
       mexc: Public perpetual metadata; account-specific futures permissions are not needed for this method. A full read leaves out contracts MEXC lists without an index price; naming one raises `MissingData`.
-      aster: "Linear perpetual index, mark and predicted funding in two bulk requests; open interest is unset, and a symbol without a published interval reports funding_interval=None."
+      aster: "Linear perpetual index, mark and predicted funding in two bulk requests; base-unit open interest is read per contract only when at most five are named, and is unset otherwise. A symbol without a published interval reports funding_interval=None."
     example:
       accountVenues: [dydx]
       # Exchange-level id — same reasoning as tickers' constants above. Hyperliquid's
@@ -388,7 +388,7 @@ methods:
         bybit: {exchange_id: 'bybit:perp', key: 'BTCUSDT', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: '812.4'}
         mexc: {exchange_id: 'mexc:perp', key: 'BTC_USDT', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: '812.4'}
         lighter: {exchange_id: 'lighter:perp', key: '1', index: '60120.00', mark: '60125.50', funding: '0.000012', open_interest: '812.4'}
-        aster: {exchange_id: 'aster:perp', key: 'BTCUSDT', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: null}
+        aster: {exchange_id: 'aster:perp', key: 'BTCUSDT', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: '812.4'}
       callTemplate: |
         stats = await sdk.perp_stats('{{ constants[accounts[0]].exchange_id }}')
       resultTemplate: |
@@ -1074,6 +1074,7 @@ methods:
         bitget: {market_id: 'bitget:usdt:BTCUSDT', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
         bybit: {market_id: 'bybit:perp:BTCUSDT', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
         lighter: {market_id: 'lighter:perp:1', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
+        aster: {market_id: 'aster:perp:BTCUSDT', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
       callTemplate: |
         c = await sdk.perp_collateral('{{ constants[accounts[0]].market_id }}')
         print(c.maintenance_ratio)

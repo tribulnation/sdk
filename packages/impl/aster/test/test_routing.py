@@ -6,7 +6,7 @@ from typing_extensions import Literal
 from eth_account import Account
 import pytest
 from tribulnation.aster import AsterMarket, Report
-from tribulnation.aster.market.markets import PerpMarket, SpotMarket
+from tribulnation.aster.market.markets import SpotMarket
 from tribulnation.sdk import AuthError, MarketSDK
 from tribulnation.sdk.impl.accounts import Aster, load_accounts
 
@@ -92,21 +92,16 @@ async def test_toml_routes_both_networks(
 async def test_unsupported_methods_raise_instead_of_returning_empty_data():
   """Blocked mappings must not look like implemented support."""
   venue = AsterMarket.new(public=True, mainnet=False)
-  perp = PerpMarket(shared=venue.shared, symbol='ASTERUSDT')
   spot = SpotMarket(shared=venue.shared, symbol='ASTERUSDT')
   now = datetime.now(timezone.utc)
-  for method in (
-    spot.position,
-    spot.collateral,
-    spot.available_notional,
-    perp.perp_collateral,
-  ):
-    with pytest.raises(NotImplementedError):
+  for method in (spot.position, spot.collateral, spot.available_notional):
+    with pytest.raises(NotImplementedError, match='testnet'):
       await method()
   with pytest.raises(NotImplementedError, match='trade history'):
     spot.trades_history(now, now)
-  for exchange in (venue.spot, venue.perp):
-    with pytest.raises(NotImplementedError, match='Exchange-wide'):
-      await exchange.trades_history(None, now, now)
+  with pytest.raises(NotImplementedError, match='trade history'):
+    await venue.spot.trades_history(None, now, now)
+  with pytest.raises(NotImplementedError, match='Exchange-wide'):
+    await venue.perp.trades_history(None, now, now)
   with pytest.raises(NotImplementedError, match='snapshots'):
     await Report.new(public=True, mainnet=False).snapshot()

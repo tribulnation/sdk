@@ -54,7 +54,9 @@ async def test_catalogue_is_cached_and_refetched_on_request(
   market = await exchange.market('BTCUSDT')
   rules = await market.rules()
   assert rules.tick_size == Decimal('0.1') and rules.min_value == 5
-  assert rules.fixed_max_price is None and rules.fee_asset == 'USDT'
+  assert rules.fixed_max_price is None
+  # The margin asset or ASTER, per fill and the account's `feeBurn` setting.
+  assert rules.fee_asset is None
   assert info.await_count == 1
   await market.rules(refetch=True)
   assert info.await_count == 2

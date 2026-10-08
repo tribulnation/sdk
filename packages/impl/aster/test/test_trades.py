@@ -136,3 +136,23 @@ def test_trade_rows_map_signed_quantities_and_fees():
   del sideless['side']
   with pytest.raises(MissingData, match='side'):
     parse_trade(sideless)
+
+
+async def test_perpetual_fills_keep_their_own_fee_asset(
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """With `feeBurn` on, fills pay ASTER while the wallet holds it, else the margin asset."""
+  burned: dict[str, Any] = {
+    **trade(1, START),
+    'commission': Decimal('0.02'),
+    'commissionAsset': 'ASTER',
+  }
+  plain = trade(2, START + MS, 'SELL')
+  monkeypatch.setattr(
+    UserTrades, 'user_trades', AsyncMock(return_value=[burned, plain])
+  )
+  fills = await market().trades_history(START, START + timedelta(minutes=1))
+  assert [t.fee for t in fills] == [
+    Trade.Fee(amount=Decimal('0.02'), asset='ASTER'),
+    Trade.Fee(amount=Decimal('0.1'), asset='USDT'),
+  ]
