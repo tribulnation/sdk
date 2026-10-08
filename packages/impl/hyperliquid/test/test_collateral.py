@@ -3,6 +3,8 @@
 from datetime import datetime, timezone
 from decimal import Decimal
 
+from typing_extensions import Any
+
 from typed_hyperliquid.info.clearinghouse_state import (
   ClearinghouseState,
   IsolatedLeverage,
@@ -11,6 +13,7 @@ from typed_hyperliquid.info.clearinghouse_state import (
 
 from tribulnation.hyperliquid.market.impl.collateral import (
   cross_collateral,
+  spot_collateral,
   isolated_collateral,
 )
 
@@ -112,3 +115,16 @@ def test_isolated_collateral_without_a_liquidation_price() -> None:
   i = isolated_collateral(isolated_position(liquidation_px=None), LEVERAGE)
   assert i.equity == Decimal('620')
   assert i.maintenance_margin == Decimal('50')
+
+
+def test_spot_collateral_free_is_total_minus_hold() -> None:
+  spot_state: dict[str, Any] = {
+    'balances': [
+      {'coin': 'HYPE', 'token': 150, 'total': '5', 'hold': '0'},
+      {'coin': 'USDC', 'token': 0, 'total': '16254', 'hold': '10771'},
+    ],
+    # Nets out maintenance margin only; must not be used as opening capacity.
+    'tokenToAvailableAfterMaintenance': [[0, '10885']],
+  }
+  assert spot_collateral(spot_state, 0) == (Decimal('16254'), Decimal('5483'))
+  assert spot_collateral(spot_state, 7) == (Decimal(0), Decimal(0))

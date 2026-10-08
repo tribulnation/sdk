@@ -1,3 +1,4 @@
+from typing_extensions import Any
 from decimal import Decimal
 import asyncio
 
@@ -24,8 +25,9 @@ def cross_collateral(
 
   In unified mode the real equity backing perps is the spot collateral token
   balance, not `crossMarginSummary.accountValue` (which only reflects USDC
-  deposited into the perps engine). `free_collateral` comes from the spot
-  state's `tokenToAvailableAfterMaintenance` for the collateral token.
+  deposited into the perps engine). `free_collateral` is that balance minus its
+  `hold` (see `spot_collateral`), so `initial_margin = equity - free_collateral`
+  is the hold.
   """
   ntl = Decimal(state['crossMarginSummary']['totalNtlPos'])
   leverage = ntl / spot_equity if spot_equity > 0 else Decimal(0)
@@ -81,6 +83,22 @@ def isolated_collateral(
   )
 
 
+def spot_collateral(spot_state: Any, token_idx: int, /) -> tuple[Decimal, Decimal]:
+  """`(equity, free)` of a unified account's collateral token: its spot `total` and `total - hold`.
+
+  The spot clearinghouse is the source of truth for a unified account's trading
+  balance, and its `hold` is what backs positions and open orders (initial margin
+  included), so `total - hold` is what can be opened with or withdrawn, matching
+  Hyperliquid's "available to trade". `tokenToAvailableAfterMaintenance` is not
+  used: it only nets out maintenance margin, overstating opening capacity.
+  """
+  for balance in spot_state.get('balances', []):
+    if int(balance['token']) == token_idx:
+      total = Decimal(balance['total'])
+      return total, total - Decimal(balance['hold'])
+  return Decimal(0), Decimal(0)
+
+
 async def _unified_cross_collateral(self: PerpMixin) -> PerpCollateral:
   """Fetch the unified cross collateral, asserting unified account mode."""
   mode = await self.client.info.user_abstraction(user=self.address)
@@ -96,20 +114,7 @@ async def _unified_cross_collateral(self: PerpMixin) -> PerpCollateral:
     self.client.info.spot_clearinghouse_state(user=self.address),
   )
 
-  # Equity = total spot balance of the collateral token
-  spot_equity = Decimal(0)
-  for balance in spot_state.get('balances', []):
-    if int(balance['token']) == collateral_token_idx:
-      spot_equity = Decimal(balance['total'])
-      break
-
-  # Free collateral from tokenToAvailableAfterMaintenance
-  free_collateral = Decimal(0)
-  for token_idx, available in spot_state.get('tokenToAvailableAfterMaintenance', []):
-    if int(token_idx) == collateral_token_idx:
-      free_collateral = Decimal(available)
-      break
-
+  spot_equity, free_collateral = spot_collateral(spot_state, collateral_token_idx)
   return cross_collateral(
     state, spot_equity=spot_equity, free_collateral=free_collateral
   )
