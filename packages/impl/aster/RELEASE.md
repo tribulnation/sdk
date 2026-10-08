@@ -9,3 +9,8 @@ the root SDK account key they were opened under, and build their IDs from it;
 perpetuals.
 
 Upgrade the SDK and this adapter together.
+
+Release qualification on 2026-10-08 passed the read suites and market
+consistency. Committed evidence under `release-evidence/aster/` matches pinned
+Catalogue `1851660ac2bed8243dd9ce9c7297fe05c7130973`; offline release
+verification passes. This adapter release follows SDK 2.12.0 publication.
