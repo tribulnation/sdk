@@ -68,6 +68,13 @@ raises, rather than quietly placing a different order.
   Aster the transaction time `T` on REST and WS; Lighter the WS `last_updated_at`
   (REST `depth` is `None`); dYdX never sets it. Derived books (`limit`, `with_fees`,
   `copy`) keep it, `merge` takes the oldest input's, and `update` takes the diff's.
+  `update` replaces, adds and removes (zero quantity) levels, then uncrosses the book:
+  some venues' diff streams can cross (dYdX's Indexer does by design, see
+  [Uncrossing the orderbook](https://docs.dydx.xyz/interaction/data/watch-orderbook))
+  and expect clients to drop the older level. While the best ask is at or below the best
+  bid, a level the diff sets removes the existing level it crosses; if both come from
+  the diff, the larger quantity wins (an equal one keeps the ask). Removals cross
+  nothing, and crossings between existing levels are left as they are.
 - `Rules`: `fee_asset`, `tick_size`, `step_size`, min and max qty and
   price (fixed and price-relative), optional standard `fees`, and an `api` flag for whether
   the instrument is tradable through the API at all. The helpers round, truncate and

@@ -162,10 +162,20 @@ class Book:
 
   def update(self, updates: 'Book'):
     """Update the local book with an incoming update.
+
     - Matching entries are replaced with the new values.
     - New entries are added to the book.
     - Entries with zero quantity are removed from the book.
+    - Crossed levels are removed. Some venues' delta streams can cross (dYdX's
+      Indexer does by design) and expect clients to drop the older level. While the
+      best ask is at or below the best bid, a level set by this update removes the
+      existing level it crosses; if both come from this update, the larger quantity
+      wins (an equal one keeps the ask). Removals cross nothing, and crossings
+      between existing levels are left as they are.
     - `time` takes the update's timestamp, when it carries one.
+
+    References:
+      - [dYdX: Uncrossing the orderbook](https://docs.dydx.xyz/interaction/data/watch-orderbook)
     """
     bids = {e.price: e for e in self.bids}
     asks = {e.price: e for e in self.asks}
@@ -180,8 +190,32 @@ class Book:
       else:
         asks.pop(e.price, None)
 
-    self.bids = [bids[p] for p in sorted(bids.keys(), reverse=True)]
-    self.asks = [asks[p] for p in sorted(asks.keys())]
+    sorted_bids = [bids[p] for p in sorted(bids.keys(), reverse=True)]
+    sorted_asks = [asks[p] for p in sorted(asks.keys())]
+    new_bids = {e.price for e in updates.bids if e.qty > 0}
+    new_asks = {e.price for e in updates.asks if e.qty > 0}
+    i = j = 0
+    while (
+      i < len(sorted_bids)
+      and j < len(sorted_asks)
+      and sorted_asks[j].price <= sorted_bids[i].price
+    ):
+      bid, ask = sorted_bids[i], sorted_asks[j]
+      new_bid, new_ask = bid.price in new_bids, ask.price in new_asks
+      if new_bid and new_ask:
+        if ask.qty >= bid.qty:
+          i += 1
+        else:
+          j += 1
+      elif new_bid:
+        j += 1
+      elif new_ask:
+        i += 1
+      else:
+        break
+
+    self.bids = sorted_bids[i:]
+    self.asks = sorted_asks[j:]
     if updates.time is not None:
       self.time = updates.time
 

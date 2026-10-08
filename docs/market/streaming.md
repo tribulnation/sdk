@@ -27,6 +27,10 @@ async with sdk.depth_stream('mexc_account1:spot:BTCUSDT') as books:
 (Decimal('60122.90'), Decimal('60123.60'))
 ```
 
+Venues that stream incremental diffs fold them into the book with `Book.update`, which
+also uncrosses it: a level a diff sets removes the existing levels on the other side that
+it crosses (see [Types](types.md#market-data)).
+
 `trades_stream()` works the same way and yields your own fills, which is how you follow an
 order from [Your First Order](first-order.md) without polling `query_order`:
 
