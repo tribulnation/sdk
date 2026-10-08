@@ -140,6 +140,14 @@
         "skipped": 0
       },
       {
+        "exclusion": "private_account_fees",
+        "failed": 0,
+        "id": "market.test_public_read[\"spot:BTCUSDT\", \"fees\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
         "exclusion": null,
         "failed": 0,
         "id": "market.test_candle_values_are_decimals_and_ordered[\"perp:BTCUSDT\", null]",
@@ -249,6 +257,14 @@
         "id": "market.test_public_read[\"perp:BTCUSDT\", \"perp_stats\"]",
         "network": "mainnet",
         "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "private_account_fees",
+        "failed": 0,
+        "id": "market.test_public_read[\"perp:BTCUSDT\", \"fees\"]",
+        "network": "mainnet",
+        "passed": 0,
         "skipped": 0
       }
     ],
