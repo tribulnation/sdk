@@ -8,20 +8,20 @@ from typing_extensions import cast
 
 ROOT = Path(__file__).resolve().parents[3]
 COMPATIBLE_IMPLEMENTATIONS = {
-  'aster': '0.5.0',
-  'binance': '0.3.0',
-  'bit2me': '0.5.0',
-  'bitget': '0.7.0',
-  'bybit': '0.5.0',
-  'coinbase': '0.2.0',
-  'deribit': '0.3.0',
-  'dydx': '0.11.0',
+  'aster': '0.6.0',
+  'binance': '0.6.0',
+  'bit2me': '0.8.0',
+  'bitget': '0.10.0',
+  'bybit': '0.6.0',
+  'coinbase': '0.4.0',
+  'deribit': '0.5.0',
+  'dydx': '0.12.0',
   'ethereum': '0.6.0',
-  'hyperliquid': '0.11.0',
-  'kraken': '0.2.0',
-  'kucoin': '0.3.0',
-  'lighter': '0.4.0',
-  'mexc': '2.0.0',
+  'hyperliquid': '0.12.0',
+  'kraken': '0.6.0',
+  'kucoin': '0.5.0',
+  'lighter': '0.5.0',
+  'mexc': '2.3.0',
 }
 
 
@@ -83,4 +83,18 @@ def test_funding_adapters_require_received_positive_sdk():
       if Requirement(value).name == 'tribulnation-sdk'
     )
     assert Version('2.9.0') not in requirement.specifier, venue
-    assert Version('2.10.0') in requirement.specifier, venue
+
+
+def test_market_adapters_require_account_scoped_sdk():
+  """Adapters passing `account_id` and depth `settings` need SDK 2.12."""
+  for manifest in sorted((ROOT / 'packages/impl').glob('*/pkg/pyproject.toml')):
+    venue = manifest.parents[1].name
+    if venue.startswith('.') or venue == 'ethereum':
+      continue
+    requirement = next(
+      Requirement(value)
+      for value in dependencies(manifest)
+      if Requirement(value).name == 'tribulnation-sdk'
+    )
+    assert Version('2.11.0') not in requirement.specifier, venue
+    assert Version('2.12.0') in requirement.specifier, venue
