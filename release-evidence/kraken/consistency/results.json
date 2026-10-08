@@ -21141,14 +21141,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.098",
-            "after_bid": "0.09765",
-            "ask": "0.098",
+            "after_ask": "0.09834",
+            "after_bid": "0.098",
+            "ask": "0.09834",
             "attempt": 1,
-            "before_ask": "0.098",
-            "before_bid": "0.09765",
-            "bid": "0.09765",
-            "elapsed_seconds": 0.13931928601232357,
+            "before_ask": "0.09834",
+            "before_bid": "0.098",
+            "bid": "0.098",
+            "elapsed_seconds": 0.1490049319982063,
             "ticker_ids_match": true
           }
         ],
@@ -21160,14 +21160,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "336.5",
-            "after_bid": "336.48",
-            "ask": "336.5",
+            "after_ask": "336.78",
+            "after_bid": "336.68",
+            "ask": "336.78",
             "attempt": 1,
-            "before_ask": "336.5",
-            "before_bid": "336.48",
-            "bid": "336.48",
-            "elapsed_seconds": 0.12987783300923184,
+            "before_ask": "336.78",
+            "before_bid": "336.68",
+            "bid": "336.68",
+            "elapsed_seconds": 0.1488884260179475,
             "ticker_ids_match": true
           }
         ],
@@ -21179,14 +21179,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "172.53",
-            "after_bid": "172.41",
-            "ask": "172.53",
+            "after_ask": "172.93",
+            "after_bid": "172.8",
+            "ask": "172.93",
             "attempt": 1,
-            "before_ask": "172.53",
-            "before_bid": "172.41",
-            "bid": "172.41",
-            "elapsed_seconds": 0.13249252800596878,
+            "before_ask": "172.93",
+            "before_bid": "172.8",
+            "bid": "172.8",
+            "elapsed_seconds": 0.1405215029953979,
             "ticker_ids_match": true
           }
         ],
@@ -21198,14 +21198,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "83035.0",
-            "after_bid": "83034.0",
-            "ask": "83035.0",
+            "after_ask": "83094.0",
+            "after_bid": "83093.0",
+            "ask": "83094.0",
             "attempt": 1,
-            "before_ask": "83035.0",
-            "before_bid": "83034.0",
-            "bid": "83034.0",
-            "elapsed_seconds": 0.16466663099708967,
+            "before_ask": "83094.0",
+            "before_bid": "83093.0",
+            "bid": "83093.0",
+            "elapsed_seconds": 0.1767688010004349,
             "ticker_ids_match": true
           }
         ],
@@ -21217,14 +21217,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.2800000",
-            "after_bid": "0.2790000",
-            "ask": "0.2800000",
+            "after_ask": "0.2760000",
+            "after_bid": "0.2750000",
+            "ask": "0.2760000",
             "attempt": 1,
-            "before_ask": "0.2800000",
-            "before_bid": "0.2790000",
-            "bid": "0.2790000",
-            "elapsed_seconds": 0.09615521598607302,
+            "before_ask": "0.2760000",
+            "before_bid": "0.2750000",
+            "bid": "0.2750000",
+            "elapsed_seconds": 0.10982370501733385,
             "ticker_ids_match": true
           }
         ],
@@ -21236,14 +21236,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.3140000",
-            "after_bid": "0.3120000",
-            "ask": "0.3130000",
+            "after_ask": "0.3080000",
+            "after_bid": "0.3070000",
+            "ask": "0.3080000",
             "attempt": 1,
-            "before_ask": "0.3140000",
-            "before_bid": "0.3120000",
-            "bid": "0.3120000",
-            "elapsed_seconds": 0.09357998799532652,
+            "before_ask": "0.3080000",
+            "before_bid": "0.3070000",
+            "bid": "0.3070000",
+            "elapsed_seconds": 0.09748399999807589,
             "ticker_ids_match": true
           }
         ],
@@ -21255,14 +21255,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.08750",
-            "after_bid": "0.08740",
-            "ask": "0.08750",
+            "after_ask": "0.08790",
+            "after_bid": "0.08780",
+            "ask": "0.08790",
             "attempt": 1,
-            "before_ask": "0.08750",
-            "before_bid": "0.08740",
-            "bid": "0.08740",
-            "elapsed_seconds": 0.09619506998569705,
+            "before_ask": "0.08790",
+            "before_bid": "0.08780",
+            "bid": "0.08780",
+            "elapsed_seconds": 0.10679664599592797,
             "ticker_ids_match": true
           }
         ],
@@ -21274,14 +21274,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "83017.60000",
-            "after_bid": "83017.50000",
-            "ask": "83016.10000",
+            "after_ask": "83075.40000",
+            "after_bid": "83075.30000",
+            "ask": "83075.40000",
             "attempt": 1,
-            "before_ask": "83017.60000",
-            "before_bid": "83017.50000",
-            "bid": "83016.00000",
-            "elapsed_seconds": 0.08963078600936569,
+            "before_ask": "83075.40000",
+            "before_bid": "83075.30000",
+            "bid": "83075.30000",
+            "elapsed_seconds": 0.0876405079907272,
             "ticker_ids_match": true
           }
         ],

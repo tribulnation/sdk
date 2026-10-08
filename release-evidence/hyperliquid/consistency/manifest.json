@@ -358,13 +358,13 @@
         "version": "0.3.7"
       },
       "tribulnation-hyperliquid": {
-        "files_sha256": "681b74cb3f33d256336bf6086f1ea2ecd2909e5ca6c322f5dc89727d3e0682ac",
-        "metadata_sha256": "c720310ab3314e8963dc52b4649685a09cd8a794aff898fd593d2a5cd70fbd13",
+        "files_sha256": "c73e937bf9ba65071cb4d487add63d8d69bb32e14176148254145fc92d3d8729",
+        "metadata_sha256": "8b9c698be6a11927b98b2cf162332c457c9eee08567165acb137c9d80798fa84",
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "aa9169f8f122c4ec5e27012d5c7a39ceb421036914a2eeada53146b180581240",
-        "metadata_sha256": "68943238fcb3db2705833ed28f172b687955d9430e6183320cccdef7cd4fef85",
+        "files_sha256": "ad394310b80cf885e1fee471550825d81e3bccf5faac91de69b1e0863f8c0257",
+        "metadata_sha256": "e01c52d3a5d46a283b80d3654031bfbc32bbee2434494b3fc01982cf5f3e5c79",
         "version": "0"
       },
       "typed-core": {
@@ -400,7 +400,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "11e7555e8f0fa84d762d5bec36d42f8c3c1e03fd90d119cba3e28c75c291cfaf",
+    "source_sha256": "9800779aad56f973233fce1bcf38849ee443a734de7e0419f82e1f6090382b36",
     "venue": "hyperliquid"
   },
   "before": {
@@ -762,13 +762,13 @@
         "version": "0.3.7"
       },
       "tribulnation-hyperliquid": {
-        "files_sha256": "681b74cb3f33d256336bf6086f1ea2ecd2909e5ca6c322f5dc89727d3e0682ac",
-        "metadata_sha256": "c720310ab3314e8963dc52b4649685a09cd8a794aff898fd593d2a5cd70fbd13",
+        "files_sha256": "c73e937bf9ba65071cb4d487add63d8d69bb32e14176148254145fc92d3d8729",
+        "metadata_sha256": "8b9c698be6a11927b98b2cf162332c457c9eee08567165acb137c9d80798fa84",
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "aa9169f8f122c4ec5e27012d5c7a39ceb421036914a2eeada53146b180581240",
-        "metadata_sha256": "68943238fcb3db2705833ed28f172b687955d9430e6183320cccdef7cd4fef85",
+        "files_sha256": "ad394310b80cf885e1fee471550825d81e3bccf5faac91de69b1e0863f8c0257",
+        "metadata_sha256": "e01c52d3a5d46a283b80d3654031bfbc32bbee2434494b3fc01982cf5f3e5c79",
         "version": "0"
       },
       "typed-core": {
@@ -804,12 +804,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "11e7555e8f0fa84d762d5bec36d42f8c3c1e03fd90d119cba3e28c75c291cfaf",
+    "source_sha256": "9800779aad56f973233fce1bcf38849ee443a734de7e0419f82e1f6090382b36",
     "venue": "hyperliquid"
   },
-  "finished": "2026-10-08T08:59:48.876718Z",
-  "results_sha256": "dda85d79f717a835673220abfbee8d7c7a93a7f4b455702e5c64dedf7632f1c8",
+  "finished": "2026-10-08T09:54:04.645646Z",
+  "results_sha256": "b04f3692edd6e0f8b630352b38c2f6cc2a504581843f4c6365b430f18301ae73",
   "schema_version": 2,
-  "started": "2026-10-08T08:57:14.972671Z",
-  "summary_sha256": "0a3556c57fd73de905b4c7a8cd5176d4ef250ecc780cedef4e4ade0229df07bc"
+  "started": "2026-10-08T09:51:53.205115Z",
+  "summary_sha256": "95fc61619e3fe414ac2f982804ebad6d072061440cac7c882c21c00da5ad4cfb"
 }
