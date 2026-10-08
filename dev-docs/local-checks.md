@@ -26,7 +26,9 @@ file's own directory, so an accounts file elsewhere silently runs without creden
 1. Each mainnet account is named by its venue slug and is the only configured
    account of that venue, so `sdk-dev test surfaces|consistency <venue>` selects it
    without `--account`. dYdX and Hyperliquid are `public = true` and carry the
-   mainnet address their Report and account Market reads need. Lighter carries its
+   mainnet address their Report and account Market reads need. The Hyperliquid
+   address must be in unified account mode: perpetual collateral reads raise on
+   default-mode accounts. Lighter carries its
    address plus a read-only `LIGHTER_AUTH_TOKEN`; Aster is signed with `ASTER_USER`
    and `ASTER_SIGNER_PRIVATE_KEY`.
 2. Each account must reach its venue's `[qualification.market] min_mode` in
@@ -224,7 +226,11 @@ carry their own codes: `order_lifecycle` (`query_order`), `perp_only`,
 `unsupported` (undeclared, or listed per exchange in `impl.toml`),
 `credential_mode` (the recorded account mode cannot serve the method) and
 `bitget_classic`. A declared read raising `NotImplementedError` or `AuthError`
-fails. Bitget additionally requires its existing private
+fails, unless `impl.toml` waives it (`waived:credential_scope` for `AuthError`,
+`waived:account_setting` for `NotImplementedError`). A waived read still runs: its
+expected error is a visible, non-blocking skip, a pass is recorded as a pass (the
+waiver may be stale), and any other failure blocks. The summary lists every waived
+case. Current waivers: Binance USD-M `fees` and MEXC spot `fees` (ADR 0042). Bitget additionally requires its existing private
 read tests and mode detection, with an explicit expected `uta` account setting.
 No trading or transfers are tested.
 Hyperliquid and dYdX Report reads require a configured mainnet address only; a

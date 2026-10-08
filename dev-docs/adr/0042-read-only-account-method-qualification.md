@@ -80,7 +80,27 @@ Kraken and MEXC perpetuals, Bitget USDC), which the surface-level `methods` list
 7. Evidence stores only the case ID, network, counts, exclusion code and account
    mode. Account checks fail with fixed messages (`pytest.fail(..., pytrace=False)`)
    so balances, identifiers and raw errors never appear in output or evidence.
-8. The Bitget suite keeps its public reads, private streams and mode-specific
+8. Waivers cover declared reads the single qualification account cannot observe.
+   `[[qualification.market.waived]]` entries name an `exchange`, a `method`, a
+   `reason` from a closed set and a non-empty `note`. The verifier rebuilds them as
+   `waived:<reason>` exclusions. It rejects duplicates and waivers naming an unknown
+   reference exchange, a non-account method or a read that is already excluded. A
+   waived read still runs. Only its reason's expected error becomes a visible skip:
+   `credential_scope` takes `AuthError` and `account_setting` takes
+   `NotImplementedError`. Any other failure or malformed value still fails. If the read
+   works, it passes and is recorded as passed: the simplest honest outcome, which
+   shows that the waiver may be stale. A waived row must be exactly one pass or one
+   skip, never a failure. The evidence summary lists every waived case and its outcome.
+   The initial waivers are:
+   1. Binance `usdm` `fees`, `credential_scope`: the qualification key has no USD-M
+      Futures permission, and it cannot be granted from the maintainer's region.
+   2. MEXC `spot` `fees`, `account_setting`: the account has MX deduction enabled,
+      for which personal spot fees are declared unsupported. The setting is not
+      changed for qualification.
+9. Hyperliquid's perpetual `collateral`/`perp_collateral` support unified accounts
+   only and raise `ApiError` on default-mode accounts. This is documented in
+   impl.toml, not waived. The qualification address must be in unified mode.
+10. The Bitget suite keeps its public reads, private streams and mode-specific
    rejections; its generic account-read tests are removed as duplicates.
 
 ## Alternatives considered
@@ -103,6 +123,10 @@ Kraken and MEXC perpetuals, Bitget USDC), which the surface-level `methods` list
 2. Evidence attests one account in one mode, not every account type: for example a
    Bitget UTA run, a Hyperliquid unified account or MEXC with MX deduction are only
    covered when the qualification account is in that state.
-3. `available_notional()` is now attested for non-negativity only (amends ADR 0041's
+3. Waived reads are unverified by release evidence. Binance USD-M account fees and
+   MEXC spot fees with MX deduction disabled remain unobserved until a key or account
+   can serve them. Release notes must carry the summary's waiver list. A waiver is
+   removed once its read passes. It never covers other failures of the same read.
+4. `available_notional()` is now attested for non-negativity only (amends ADR 0041's
    last consequence); its caps are not compared with collateral.
-4. Acceptance is not release readiness; recorded evidence remains separate.
+5. Acceptance is not release readiness; recorded evidence remains separate.
