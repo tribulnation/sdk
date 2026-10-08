@@ -7,11 +7,38 @@ the venue accepts the client index wherever it takes an `order_index`.
 
 from decimal import Decimal
 
-from typing_extensions import Any, Sequence
+from typing_extensions import Any, Awaitable, Callable, Sequence
+from typed_lighter.core.envelope import INVALID_NONCE, error_code
+from typed_lighter.core.exc import BadRequest as ClientBadRequest
+from tribulnation.sdk.core import BadRequest, OrderRejected
 from tribulnation.sdk.market import Order, OrderResponse, OrderState, Settings
 
 from ..core import Shared
 from .common import parse_order
+
+
+def refused(exc: BadRequest) -> bool:
+  """Whether a submission `BadRequest` is the API layer refusing the transaction.
+
+  `typed_lighter` raises `BadRequest` with Lighter's business code for a refusal the
+  sequencer never saw (see `typed_lighter.tx.nonce`). `21104` (invalid nonce), a
+  code-less HTTP status and any `5XX` are not certain refusals.
+  """
+  cause = exc.__cause__
+  if not isinstance(cause, ClientBadRequest):
+    return False
+  code = error_code(cause)
+  return code is not None and code != INVALID_NONCE
+
+
+async def submit(shared: Shared, send: Callable[[], Awaitable[Any]]) -> Any:
+  """Send a create-order transaction, raising `OrderRejected` for a certain refusal."""
+  try:
+    return await shared.call(send)
+  except BadRequest as exc:
+    if refused(exc):
+      raise OrderRejected(*exc.args) from exc
+    raise
 
 
 async def place_order(
@@ -23,6 +50,10 @@ async def place_order(
   rejected rather than taking liquidity, and `MARKET` is the venue's market order with
   `price` as the worst acceptable price. Off-grid prices and sizes raise before signing.
   Acceptance is not execution: a sequencer rejection shows as a `canceled-*` status.
+
+  Raises:
+    OrderRejected: The API refused the transaction with a business code before the
+      sequencer saw it (other than `21104` invalid nonce).
   """
   shared.require_api_key()
   lighter = settings.get('lighter', {})
@@ -33,7 +64,8 @@ async def place_order(
   price = scaler.price(Decimal(order['price']))
   reduce_only = lighter.get('reduce_only', False)
   if order['type'] == 'MARKET':
-    response = await shared.call(
+    response = await submit(
+      shared,
       lambda: shared.client.tx.create_order(
         {
           'order_type': 'market',
@@ -44,10 +76,11 @@ async def place_order(
           'price': price,
           'reduce_only': reduce_only,
         }
-      )
+      ),
     )
   else:
-    response = await shared.call(
+    response = await submit(
+      shared,
       lambda: shared.client.tx.create_order(
         {
           'order_type': 'limit',
@@ -61,7 +94,7 @@ async def place_order(
           else 'good-till-time',
           'reduce_only': reduce_only,
         }
-      )
+      ),
     )
   return OrderResponse(id=str(client_index), details=response)
 

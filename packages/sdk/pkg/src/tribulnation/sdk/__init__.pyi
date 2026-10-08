@@ -10,6 +10,7 @@ from .core import (
   BadRequest,
   AuthError,
   RateLimited,
+  OrderRejected,
   LogicError,
 )
 from .earn import Earn
@@ -37,6 +38,7 @@ __all__ = [
   'BadRequest',
   'AuthError',
   'RateLimited',
+  'OrderRejected',
   'LogicError',
   'Earn',
   'Wallet',

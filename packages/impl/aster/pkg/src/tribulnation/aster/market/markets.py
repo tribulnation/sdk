@@ -33,6 +33,7 @@ from tribulnation.sdk.core import (
   ApiError,
   BadRequest,
   MissingData,
+  OrderRejected,
   OverflowPolicy,
   PaginatedResponse,
 )
@@ -71,6 +72,11 @@ ORDER_NOT_FOUND = -2013
 TRADES_WINDOW = timedelta(days=7)
 """Widest `userTrades` time window; a wider one is refused with `-4165`."""
 TRADES_PAGE = 1000
+AMBIGUOUS_CODES = frozenset({-1000, -1001, -1006, -1007, -1008})
+"""UNKNOWN, DISCONNECTED, UNEXPECTED_RESP, TIMEOUT and server-busy: Binance-style codes
+under which the order's execution status is unknown, even on a `4XX`."""
+DEAD_STATUSES = frozenset({'EXPIRED', 'REJECTED'})
+"""Final statuses of an order that will never rest."""
 NO_OPEN_INTEREST_CAP = Decimal(-1)
 """`remainingOpenableNotionalValue` when the symbol has no open-interest cap."""
 
@@ -90,6 +96,28 @@ def error_code(exc: BadRequest) -> int | None:
     return error_body.validate_python(exc.args[1])['code']
   except (IndexError, ValidationError):
     return None
+
+
+def rejected(exc: BadRequest) -> bool:
+  """Whether a placement `BadRequest` is the venue refusing the order outright.
+
+  Aster answers malformed or refused requests with a `4XX` `{code, msg}` body before the
+  order reaches the matching engine. The codes in `AMBIGUOUS_CODES`, a `408`, or a body
+  without a code leave the outcome unknown.
+  """
+  code = error_code(exc)
+  return (
+    code is not None
+    and code not in AMBIGUOUS_CODES
+    and bool(exc.args)
+    and exc.args[0] != 408
+  )
+
+
+def dead_on_arrival(row: SpotOrder | FuturesOrder) -> bool:
+  """Whether a placement result is final with nothing filled, e.g. a GTX that would
+  have crossed or a market order with no liquidity."""
+  return row.get('status') in DEAD_STATUSES and row.get('executedQty') == 0
 
 
 def order_state(row: SpotOrder | FuturesOrder) -> OrderState:
@@ -524,10 +552,21 @@ class NativeMarket(Public, Market):
     """Place a MARKET, LIMIT (GTC) or POST_ONLY (GTX) order.
 
     Market orders ignore the SDK `price`.
+
+    Raises:
+      OrderRejected: Aster refused the order with a definitive `4XX` code, or answered
+        that it ended `EXPIRED`/`REJECTED` with nothing filled.
     """
     reject_settings(settings)
     native = native_order(order)
-    row = await self.shared.call(lambda: self.submit(native))
+    try:
+      row = await self.shared.call(lambda: self.submit(native))
+    except BadRequest as exc:
+      if rejected(exc):
+        raise OrderRejected(*exc.args) from exc
+      raise
+    if dead_on_arrival(row):
+      raise OrderRejected(f'Order {row["orderId"]} ended {row.get("status")}', row)
     return OrderResponse(id=str(row['orderId']), details=row)
 
   async def cancel_order(self, id: str, *, settings: Settings = {}) -> Any:

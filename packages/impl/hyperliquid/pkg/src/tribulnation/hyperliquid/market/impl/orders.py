@@ -1,7 +1,7 @@
 from typing_extensions import Any, Sequence
 from decimal import Decimal
 
-from tribulnation.sdk.core import ApiError
+from tribulnation.sdk.core import ApiError, OrderRejected
 from tribulnation.sdk.market import (
   Order,
   OrderResponse,
@@ -90,11 +90,19 @@ async def place_order(
   *,
   settings: MarketSettings = {},
 ) -> OrderResponse:
+  """
+  Place one order and map Hyperliquid's answer to the SDK contract.
+
+  Raises:
+    OrderRejected: The action was refused as a whole (`status == 'err'`), or the
+      order's own status carries an `error` (e.g. an IOC that could not match).
+    ApiError: The response carried no order status, so the outcome is unknown.
+  """
   s: Settings = settings.get('hyperliquid', {})
   wire = _export_order(self, order, s)
   result = await self.client.exchange.order(orders=[wire], grouping='na')
   if result['status'] == 'err':
-    raise ApiError(result['response'])
+    raise OrderRejected(result['response'])
 
   statuses = result['response']['data']['statuses']
   if not statuses:
@@ -102,7 +110,7 @@ async def place_order(
 
   stat = statuses[0]
   if 'error' in stat:
-    raise ApiError(stat['error'])
+    raise OrderRejected(stat['error'])
   if 'resting' in stat:
     return OrderResponse(id=str(stat['resting']['oid']), details=stat)
   return OrderResponse(id=str(stat['filled']['oid']), details=stat)

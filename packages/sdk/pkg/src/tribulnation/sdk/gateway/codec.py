@@ -16,6 +16,7 @@ from tribulnation.sdk import (
   BadRequest,
   AuthError,
   RateLimited,
+  OrderRejected,
   LogicError,
 )
 from tribulnation.sdk.market import (
@@ -65,6 +66,7 @@ EXCEPTIONS: dict[str, type[Exception]] = {
   'BadRequest': BadRequest,
   'AuthError': AuthError,
   'RateLimited': RateLimited,
+  'OrderRejected': OrderRejected,
   'LogicError': LogicError,
 }
 

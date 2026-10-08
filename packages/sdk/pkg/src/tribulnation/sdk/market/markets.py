@@ -369,6 +369,14 @@ class TradingMarkets(SDK):
         ignore it.
       settings: Venue-specific options keyed by venue name, e.g. `{'dydx': {...}}`; see
         each venue page for accepted keys.
+
+    Raises:
+      OrderRejected: The venue definitively refused the order: nothing rests and
+        nothing filled, so it is safe to treat as dead.
+      ApiError: Any other venue error; it may be ambiguous (e.g. a 5xx), so the order
+        may have been placed.
+      NetworkError: The venue could not be reached or timed out; the order may have
+        been placed.
     """
     market = await self.market(market_id)
     return await market.place_order(order, settings=settings)

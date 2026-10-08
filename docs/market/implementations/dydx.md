@@ -120,6 +120,9 @@ guarantee ordering. `volume` is `baseTokenVolume`, `quote_volume` is
 - **`cancel_orders`** splits by flag: short-term orders (`order_flags == 0`) go through a
   batch cancel, long-term orders are cancelled one by one.
 - Order IDs returned by the SDK are base64-encoded dYdX protocol `OrderId`s.
+- **`place_order`** never raises `OrderRejected` yet: a failed broadcast arrives without
+  its CheckTx code, so a refusal cannot be told from a transaction already pending in the
+  mempool. Treat every placement error as ambiguous and check `open_orders`/fills.
 
 ## Example: short-term IOC order
 

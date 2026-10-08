@@ -18,7 +18,7 @@ from tribulnation.sdk.gateway import codec
 from tribulnation.sdk.impl.accounts import VenueId
 from tribulnation.sdk.gateway.proxy import ProxySDK
 from tribulnation.sdk.gateway.server import Gateway
-from tribulnation.sdk import ApiError, NetworkError
+from tribulnation.sdk import ApiError, NetworkError, OrderRejected
 from tribulnation.sdk.core import PaginatedResponse, OverflowPolicy
 from tribulnation.sdk.market import (
   Book,
@@ -53,6 +53,7 @@ ALIAS_MARKET_ID = f'{ALIAS}:perp:BTC-USD'
 @dataclass
 class MockState:
   depth_error: Exception | None = None
+  place_order_error: Exception | None = None
   depth_stream_items: list[Book | Exception] = field(default_factory=list)
   depth_stream_wait: bool = False
   depth_stream_started: asyncio.Event = field(default_factory=asyncio.Event)
@@ -201,6 +202,8 @@ class MockMarket(PerpMarket):
   async def place_order(
     self, order: Order, *, settings: Settings = {}
   ) -> OrderResponse:
+    if self.state.place_order_error is not None:
+      raise self.state.place_order_error
     return OrderResponse(id='order-1')
 
   async def cancel_order(self, id: str, *, settings: Settings = {}) -> Any:
@@ -592,6 +595,39 @@ def test_exception_codec_roundtrip() -> None:
 
   assert isinstance(exc, ApiError)
   assert str(exc) == 'ApiError(boom)'
+
+
+def test_order_rejected_codec_roundtrip() -> None:
+  exc_cls = codec.decode_exception(codec.encode_exception(OrderRejected('no match')))
+
+  assert exc_cls is OrderRejected
+  assert issubclass(exc_cls, ApiError)
+
+
+@pytest.mark.asyncio
+async def test_order_rejected_survives_gateway(
+  sdk: ProxySDK, mock_state: MockState
+) -> None:
+  mock_state.place_order_error = OrderRejected('could not immediately match')
+  market = await sdk.perp_market(MARKET_ID)
+  order: Order = {'type': 'MARKET', 'qty': Decimal('1'), 'price': Decimal('100')}
+
+  with pytest.raises(OrderRejected, match='could not immediately match'):
+    await market.place_order(order)
+
+
+@pytest.mark.asyncio
+async def test_ambiguous_api_error_is_not_order_rejected_through_gateway(
+  sdk: ProxySDK, mock_state: MockState
+) -> None:
+  mock_state.place_order_error = ApiError(502, 'Bad Gateway')
+  market = await sdk.perp_market(MARKET_ID)
+  order: Order = {'type': 'MARKET', 'qty': Decimal('1'), 'price': Decimal('100')}
+
+  with pytest.raises(ApiError) as raised:
+    await market.place_order(order)
+
+  assert not isinstance(raised.value, OrderRejected)
 
 
 def test_error_messages_share_exception_field_shape() -> None:

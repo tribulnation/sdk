@@ -77,6 +77,11 @@ toggles response validation.
   a side at the limit drops its possibly partial last level. Depth streams maintain the
   full book, shared per market, and fail on a sequence gap.
 - Tickers carry no best-level sizes.
+- `place_order` raises `OrderRejected` when the API refuses the transaction with a
+  business code before the sequencer sees it. Code `21104` (invalid nonce), a code-less
+  HTTP status and any `5XX` stay `BadRequest`/`ApiError`. An accepted transaction can
+  still be refused by the sequencer later; that shows as a `canceled-*` order status,
+  not as an error.
 - Candles support all six SDK intervals, walked in 500-candle windows.
 - Orders: `LIMIT` rests good-till-time (28 days), `POST_ONLY` is rejected rather than
   taking liquidity, `MARKET` is the venue's market order bounded by `price`. Prices and

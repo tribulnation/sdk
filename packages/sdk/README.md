@@ -129,7 +129,7 @@ Every SDK object is an async context manager: call methods on it directly, or en
 
 ## Error Handling
 
-All errors subclass `Error`: `NetworkError`, `ValidationError`, `ApiError` (`BadRequest`, `AuthError`, `RateLimited`), `LogicError`.
+All errors subclass `Error`: `NetworkError`, `ValidationError`, `ApiError` (`BadRequest`, `AuthError`, `RateLimited`, `OrderRejected`), `LogicError`.
 
 ## Context, Logging & Retries
 
