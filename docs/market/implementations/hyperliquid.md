@@ -106,8 +106,10 @@ async with sdk.depth_stream('hl::ETH', settings={'hyperliquid': {'depth_source':
   on other modes. In unified mode, the real equity backing perps is the **spot collateral token
   balance** (determined by `perp_meta['collateralToken']`, USDC for the default DEX), not
   `crossMarginSummary.accountValue` (which only reflects USDC deposited into the perps engine).
-  Fields: `equity=spot_collateral_balance`, `free_collateral=tokenToAvailableAfterMaintenance`
-  for the collateral token, `initial_margin=equity-free_collateral`,
+  Fields: `equity=spot_collateral_balance` (its spot `total`), `free_collateral=total-hold`
+  for the collateral token (what backs positions and open orders is held, so this matches
+  Hyperliquid's "available to trade"; `tokenToAvailableAfterMaintenance` only nets out
+  maintenance margin and overstates it), `initial_margin=equity-free_collateral` (the hold),
   `maintenance_margin=crossMaintenanceMarginUsed`, `leverage=totalNtlPos/equity`,
   `margin_mode='cross'`. `Market.perp_collateral()` is **mode-aware**: it finds the asset in
   `assetPositions` and branches on the position's leverage type — a cross position reports the
