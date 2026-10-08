@@ -56,6 +56,12 @@ never falls back to mainnet variables. `validate` toggles response validation.
 - Orders: `MARKET` ignores the SDK `price`; `LIMIT` is GTC and `POST_ONLY` is GTX.
   `cancel_orders` sends native batches of ten and returns every per-order result,
   including per-order errors. Venue-specific order settings are rejected.
+- `place_order` raises `OrderRejected` for a `4XX` refusal carrying a business code
+  (e.g. `-2019` insufficient margin, `-1111` bad precision), and for a result that ended
+  `EXPIRED` or `REJECTED` with nothing filled, such as a `POST_ONLY` that would have
+  crossed. Codes `-1000`, `-1001`, `-1006`, `-1007` and `-1008`, a `408`, a code-less
+  body and any `5XX` leave the outcome unknown and stay `BadRequest`/`ApiError`;
+  throttling stays `RateLimited`.
 - Fill streams share one account listen key per exchange, renewed every 25 minutes
   and closed when the last subscriber leaves. Do not run another consumer of the same
   account's listen key concurrently.

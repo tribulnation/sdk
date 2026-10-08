@@ -249,7 +249,11 @@ class TradingVenue(SDK):
   ) -> OrderResponse:
     """Place an order in the market.
 
-    See ``Market.place_order`` for SDK order type semantics.
+    See ``Market.place_order`` for SDK order type semantics and errors.
+
+    Raises:
+      OrderRejected: The venue definitively refused the order: nothing rests and
+        nothing filled. Other errors may be ambiguous.
     """
     market = await self.market(market_id)
     return await market.place_order(order, settings=settings)

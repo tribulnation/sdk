@@ -86,6 +86,10 @@ market orders places a limit order there instead.
 > `settings={'dydx': {...}}`. If a venue can't do what you asked for it raises, rather than
 > quietly placing a different order.
 
+If the venue refuses the order outright, `place_order` raises `OrderRejected`: nothing was
+placed. Other errors, like a timeout, can leave you not knowing whether it went through;
+see [Error Handling](../reference/error-handling.md#rejected-or-unknown).
+
 ## 4. Check on it, or cancel it
 
 `response.id` is what the rest of the surface takes:

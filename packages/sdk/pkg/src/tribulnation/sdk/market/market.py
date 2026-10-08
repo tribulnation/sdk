@@ -266,6 +266,15 @@ class Market(SDK):
     or other execution flags. If a venue cannot support the requested semantics,
     it should raise an API/validation error rather than silently placing a
     materially different order.
+
+    Raises:
+      OrderRejected: The venue definitively refused the order: nothing rests and
+        nothing filled, so it is safe to treat as dead (e.g. an IOC that could not
+        match). Venues raise it only where their answer makes that certain.
+      ApiError: Any other venue error. Unlike `OrderRejected`, it may be ambiguous
+        (e.g. a 5xx): the order may have been placed.
+      NetworkError: The venue could not be reached or the request timed out; the
+        order may have been placed.
     """
 
   @SDK.method

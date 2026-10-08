@@ -150,6 +150,10 @@ async with sdk.depth_stream('hl::ETH', settings={'hyperliquid': {'depth_source':
 - **Funding** settles hourly on the default and HIP-3 dexes, in the dex's collateral token.
   A non-USDC-collateral dex would settle in that token; every such dex is currently
   delisted.
+- **`place_order`** raises `OrderRejected` when the action is refused as a whole
+  (`status: "err"`) or the order's own status is an `error`, e.g. an IOC (`MARKET`) that
+  "could not immediately match against any resting orders". A non-200 HTTP response
+  stays a plain `ApiError` (or `RateLimited` for 429): the order may have been placed.
 - Builder-DEX perps use a DEX-scoped asset-id formula (`100000 + dex_idx*10000 + asset_idx`);
   default-DEX perps use the plain asset index. This only matters internally — you address
   markets by name.

@@ -38,10 +38,35 @@ except Error as e:
     - `BadRequest` — invalid request or input.
     - `AuthError` — invalid or missing credentials.
     - `RateLimited` — the venue's rate limit was hit.
+    - `OrderRejected` — the venue answered that an order was not accepted: nothing
+      rests and nothing filled.
   - `LogicError` — a bad assumption on the SDK's side, i.e. a bug.
 
 Implementations translate their venue's errors into these classes at the edge, so
 `RateLimited` from MEXC and `RateLimited` from dYdX are the same exception.
+
+## Rejected or unknown?
+
+When `place_order` fails, the question that matters is whether the order exists.
+`OrderRejected` is the only definitive answer: the venue processed the request and
+refused the order, so it is dead and can be sent again, e.g. an IOC with nothing to
+match against. Every other error may be ambiguous. A `NetworkError` or a 5xx `ApiError`
+can arrive after the venue accepted the order, so check `open_orders` or your fills
+before re-sending. Venues raise `OrderRejected` only where their answer makes the
+refusal certain (currently Hyperliquid, Aster and Lighter); elsewhere refusals stay
+`ApiError` or `BadRequest`.
+
+```python
+from tribulnation.sdk import OrderRejected
+
+try:
+  await sdk.place_order(market_id, order)
+except OrderRejected:
+  ...  # nothing was placed: safe to re-send
+```
+
+`OrderRejected` subclasses `ApiError`, so existing `except ApiError` handlers still catch
+it. It keeps its class across the [gateway](../gateway.md).
 
 Two related notes: [Context](context.md) retries whichever of these you choose — usually
 `NetworkError` and `RateLimited` — and errors raised while *acquiring* a resource are not

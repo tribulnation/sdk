@@ -66,6 +66,19 @@ class RateLimited(ApiError):
     return super().__str__()
 
 
+class OrderRejected(ApiError):
+  """
+  The venue answered that the order was not accepted: nothing rests and nothing filled.
+
+  Safe to treat the order as dead, e.g. to re-send it. Ambiguous failures (network
+  errors, 5xx responses, timeouts) are never `OrderRejected`: the order may have gone
+  through.
+  """
+
+  def __str__(self):
+    return super().__str__()
+
+
 class LogicError(Error):
   """Logic error: invalid assumptions, logic, or other bugs on the SDK side."""
 
