@@ -35,7 +35,7 @@ not a changelog or a substitute for API documentation and tests.
 | [0010](0010-defer-bitget-uta-coin.md) | Defer Bitget UTA coin support | Accepted; amended by 0018 |
 | [0011](0011-liquidity-independent-consistency.md) | Compare available quote sides without guaranteeing liquidity | Accepted |
 | [0012](0012-deribit-public-mainnet-private-testnet.md) | Deribit mainnet public metadata and testnet private Report evidence | Accepted |
-| [0013](0013-all-read-suites-release-gate.md) | Require all supported read-only suites alongside market consistency | Accepted; amends 0003 and 0006; amended by 0016 and 0027 |
+| [0013](0013-all-read-suites-release-gate.md) | Require all supported read-only suites alongside market consistency | Accepted; amends 0003 and 0006; amended by 0016, 0027 and 0042 |
 | [0014](0014-bit2me-native-ticker-limitation.md) | Preserve Bit2Me native tickers with a visible upstream quote limitation | Accepted; amends 0003 and 0011; amended by 0022 |
 | [0015](0015-single-venue-doc-examples.md) | Linear per-venue documentation examples without hidden support | Accepted |
 | [0016](0016-report-snapshot-release-scope.md) | Qualify Report snapshots; application auditing owns history correctness | Accepted; amends 0013 |
@@ -61,6 +61,7 @@ not a changelog or a substitute for API documentation and tests.
 | [0036](0036-no-implicit-accounts.md) | SDK roots have no implicit accounts | Accepted |
 | [0037](0037-account-scoped-ids.md) | Account-scoped market and exchange IDs | Proposed; implemented, not release-verified |
 | [0038](0038-account-market-leverage.md) | Account-scoped perpetual market leverage and the default available notional | Proposed; implemented, not release-verified; amended by 0041 |
-| [0039](0039-hyperliquid-hip3-spot-fees.md) | Hyperliquid HIP-3 and spot fees via the official formula | Accepted; implemented, not release-verified |
+| [0039](0039-hyperliquid-hip3-spot-fees.md) | Hyperliquid HIP-3 and spot fees via the official formula | Accepted; implemented, not release-verified; amended by 0042 |
 | [0040](0040-lighter-credential-modes.md) | Lighter credential modes: read-only tokens and public account reads | Proposed; implemented, not release-verified |
-| [0041](0041-venue-notional-caps.md) | Venue notional caps in available notional | Proposed; implemented for Aster, not release-verified |
+| [0041](0041-venue-notional-caps.md) | Venue notional caps in available notional | Proposed; implemented for Aster, not release-verified; amended by 0042 |
+| [0042](0042-read-only-account-method-qualification.md) | Read-only account-method qualification | Proposed; implemented, not release-verified; amends 0013, 0039 and 0041 |

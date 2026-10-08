@@ -13,7 +13,7 @@ from typer.testing import CliRunner
 from typing_extensions import cast
 
 from tribulnation.sdk import ApiError, Earn, Wallet
-from tribulnation.sdk.impl.accounts import Account, Bybit, Hyperliquid, Kraken, Mexc
+from tribulnation.sdk.impl.accounts import Account, Bybit, Kraken, Mexc
 from tribulnation.sdk.market import (
   Candle,
   Exchange,
@@ -26,7 +26,7 @@ from sdk_dev.cli import test as cli
 from sdk_dev.cli.test import runner
 from sdk_dev.integration import accounts, conftest
 from sdk_dev.integration.earn.conftest import fetch_instruments
-from sdk_dev.integration.market import suite, public
+from sdk_dev.integration.market import account, suite, public
 from sdk_dev.integration.market.support import END, HOUR, CandlesResult
 from sdk_dev.integration.runtime import loop_of
 from sdk_dev.integration.support import describe_exception
@@ -230,15 +230,6 @@ def test_account_dependent_market_reads_are_explicit():
   assert not public.needs_account('coinbase', 'perp_stats', public=True)
 
 
-def test_account_fee_reads_need_only_an_address(monkeypatch: pytest.MonkeyPatch):
-  """Hyperliquid fees run on public accounts with an address; other venues skip."""
-  monkeypatch.setenv('HYPERLIQUID_ADDRESS', '0x' + '1' * 40)
-  assert public.fee_read_skip(Hyperliquid(public=True), 'hyperliquid') is None
-  monkeypatch.delenv('HYPERLIQUID_ADDRESS')
-  assert public.fee_read_skip(Hyperliquid(public=True), 'hyperliquid')
-  assert public.fee_read_skip(Mexc(public=True), 'mexc')
-
-
 @pytest.mark.parametrize(
   'fees, valid',
   [
@@ -248,12 +239,11 @@ def test_account_fee_reads_need_only_an_address(monkeypatch: pytest.MonkeyPatch)
 )
 def test_fees_conformance(fees: Fees, valid: bool):
   """Account fees allow maker rebates but never a negative taker rate."""
-  result = public.PublicResults(values={'fees': fees})
   if valid:
-    public.test_public_read(result, 'hyperliquid:xyz:xyz:SILVER', 'fees')
+    account.check_fees(fees)
   else:
-    with pytest.raises(AssertionError):
-      public.test_public_read(result, 'hyperliquid:xyz:xyz:SILVER', 'fees')
+    with pytest.raises(account.AccountCheckError):
+      account.check_fees(fees)
 
 
 def test_perp_stats_conformance_accepts_unknown_optional_fields():

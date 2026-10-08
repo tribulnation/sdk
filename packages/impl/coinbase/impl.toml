@@ -90,3 +90,7 @@ note = "No wallet implementation: the Coinbase App tier publishes no per-asset n
 [ids]
 asset = "symbol"
 note = "The venue's currency code (`BTC`, `USD`); market ids are `<base>-<quote>` product ids (`BTC-USD`)."
+
+# Release qualification of account reads (ADR 0042); not shown in the support matrix.
+[qualification.market]
+min_mode = "private"

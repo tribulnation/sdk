@@ -2,7 +2,9 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: proposed; amends [ADR 0038](0038-account-market-leverage.md)
+1. Status: proposed; amends [ADR 0038](0038-account-market-leverage.md); consequence 3
+   amended by [ADR 0042](0042-read-only-account-method-qualification.md), whose read
+   suite now calls `available_notional()`
 2. Date: 2026-10-08
 
 ## Context

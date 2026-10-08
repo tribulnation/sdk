@@ -5,7 +5,8 @@
 
 [accounts.aster]
 venue = "aster"
-public = true
+user = "$ASTER_USER"
+signer = "$ASTER_SIGNER_PRIVATE_KEY"
 
 [accounts.binance]
 venue = "binance"
@@ -66,7 +67,7 @@ venue = "kucoin"
 [accounts.lighter]
 venue = "lighter"
 address = "$LIGHTER_ADDRESS"
-public = true
+auth_token = "$LIGHTER_AUTH_TOKEN"
 
 [accounts.mexc]
 venue = "mexc"

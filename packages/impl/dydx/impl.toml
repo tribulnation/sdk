@@ -17,3 +17,11 @@ auth = true
 [ids]
 asset = "symbol"
 note = "The venue's token denom symbol (`USDC`); market ids are `<base>-<quote>` tickers (`BTC-USD`)."
+
+# Release qualification of account reads (ADR 0042); not shown in the support matrix.
+[qualification.market]
+min_mode = "address"
+address_methods = [
+  "fees", "open_orders", "query_order", "trades_history", "funding_payments", "position",
+  "perp_position", "collateral", "perp_collateral", "leverage", "available_notional",
+]

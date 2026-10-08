@@ -15,10 +15,16 @@ import pytest
 from typing_extensions import Literal
 
 from .consistency import StrictModel
-from .integration.market.public import ADDRESS_FEE_READS, READS
+from .integration.market.account import (
+  ACCOUNT_READS,
+  account_exclusion,
+  check_waivers,
+  runs,
+)
+from .integration.market.public import READS
 from .integration.market.support import CASES
 from .repo import repo_root
-from .support import load_impl_files
+from .support import AccountMode, load_impl_files, mode_rank
 from .surface_evidence import Group, TESTS
 
 SUSPENSIONS: dict[tuple[str, str], date] = {
@@ -68,10 +74,12 @@ class Outcome(StrictModel):
 class Payload(StrictModel):
   """Required read suites for one selected account, not all account modes."""
 
-  version: Literal[4] = 4
+  version: Literal[5] = 5
   scope: Literal['surfaces'] = 'surfaces'
   venue: str
   account_venue: str
+  account_mode: AccountMode
+  """Authority of the selected mainnet account, which decides its account reads."""
   private_account_venue: str | None = None
   bitget_uta: bool | None = None
   completed: bool
@@ -88,8 +96,11 @@ def test_names(path: Path) -> set[str]:
   }
 
 
-def inventory(root: Path, venue: str) -> dict[str, Case]:
-  """Reconstruct all required cases and narrow exclusions from committed support."""
+def inventory(
+  root: Path, venue: str, *, mode: AccountMode, bitget_uta: bool | None = None
+) -> dict[str, Case]:
+  """Reconstruct all required cases and narrow exclusions from committed support and
+  the recorded account mode."""
   impl = load_impl_files(root / 'packages/impl').get(venue)
   if impl is None or venue.endswith('_testnet'):
     raise ValueError('Unknown mainnet implementation')
@@ -124,6 +135,7 @@ def inventory(root: Path, venue: str) -> dict[str, Case]:
     references = CASES.get(venue, ())
     if not references:
       raise ValueError('Supported market implementation has no reference cases')
+    check_waivers(impl, {case.market_id.split(':', 1)[0] for case in references})
     enabled = (
       set(READS) | {'candles'}
       if support.support == 'full'
@@ -131,8 +143,11 @@ def inventory(root: Path, venue: str) -> dict[str, Case]:
     )
     candle_path = base / 'market/suite.py'
     public_path = base / 'market/public.py'
+    account_path = base / 'market/account.py'
     if test_names(public_path) != {'test_public_read'}:
       raise ValueError('Unmapped public market tests')
+    if test_names(account_path) != {'test_account_read'}:
+      raise ValueError('Unmapped account market tests')
     for reference in references:
       for test in sorted(test_names(candle_path)):
         exclusion = None
@@ -163,8 +178,6 @@ def inventory(root: Path, venue: str) -> dict[str, Case]:
           exclusion = 'spot_only'
         elif method not in {'exchanges', 'markets'} and method not in enabled:
           exclusion = 'unsupported'
-        elif method == 'fees' and venue not in ADDRESS_FEE_READS:
-          exclusion = 'private_account_fees'
         elif (
           venue in {'mexc', 'kraken'}
           and reference.market_id.startswith('perp:')
@@ -181,6 +194,25 @@ def inventory(root: Path, venue: str) -> dict[str, Case]:
             exclusion=exclusion,
           )
         )
+      exchange_id = reference.market_id.split(':', 1)[0]
+      for method in ACCOUNT_READS:
+        cases.append(
+          Case(
+            surface='market',
+            path=account_path,
+            test='test_account_read',
+            market=reference.market_id,
+            method=method,
+            exclusion=account_exclusion(
+              impl,
+              venue=venue,
+              exchange_id=exchange_id,
+              method=method,
+              mode=mode,
+              bitget_uta=bitget_uta,
+            ),
+          )
+        )
     # New venue-specific modules must not silently disappear from qualification.
     modules = {path.name for path in (base / 'market').glob('*.py')}
     if modules - {
@@ -189,6 +221,7 @@ def inventory(root: Path, venue: str) -> dict[str, Case]:
       'support.py',
       'suite.py',
       'public.py',
+      'account.py',
       'bitget.py',
     }:
       raise ValueError('Unmapped venue-specific market suite')
@@ -204,9 +237,16 @@ def inventory(root: Path, venue: str) -> dict[str, Case]:
   return {case.id: case for case in cases}
 
 
-def group_inventory(root: Path, venue: str, group: Group) -> dict[str, Case]:
+def group_inventory(
+  root: Path,
+  venue: str,
+  group: Group,
+  *,
+  mode: AccountMode,
+  bitget_uta: bool | None = None,
+) -> dict[str, Case]:
   """Split only Deribit public mainnet metadata from private testnet Report."""
-  cases = inventory(root, venue)
+  cases = inventory(root, venue, mode=mode, bitget_uta=bitget_uta)
   if group == 'all':
     return cases
   if venue != 'deribit':
@@ -221,7 +261,15 @@ def group_inventory(root: Path, venue: str, group: Group) -> dict[str, Case]:
 def verify_payload(payload: dict[str, object], *, root: Path):
   """Reject incomplete tests, unexpected skips, wrong scope and invented exclusions."""
   report = Payload.model_validate(payload)
-  expected = inventory(root, report.venue)
+  impl = load_impl_files(root / 'packages/impl').get(report.venue)
+  qualification = impl.qualification.market if impl is not None else None
+  if qualification is not None and mode_rank(report.account_mode) < mode_rank(
+    qualification.min_mode
+  ):
+    raise ValueError('Account mode is below the venue qualification minimum')
+  expected = inventory(
+    root, report.venue, mode=report.account_mode, bitget_uta=report.bitget_uta
+  )
   if not report.completed or report.account_venue != report.venue:
     raise ValueError('Read suites did not complete on the selected mainnet venue')
   split = report.private_account_venue is not None
@@ -240,7 +288,11 @@ def verify_payload(payload: dict[str, object], *, root: Path):
     network = 'testnet' if split and case.surface == 'report' else 'mainnet'
     if row.network != network or row.exclusion != case.exclusion:
       raise ValueError('Read-suite network or exclusion does not match policy')
-    if case.exclusion is not None:
+    if case.exclusion is not None and runs(case.exclusion):
+      # A waived read either passes or skips with its waiver's expected error.
+      if row.failed or row.passed + row.skipped != 1:
+        raise ValueError(f'Waived read test failed or did not run: {row.id}')
+    elif case.exclusion is not None:
       if row.passed or row.failed or row.skipped:
         raise ValueError('Excluded checks must not be represented as executed tests')
     elif row.passed != 1 or row.failed or row.skipped:
@@ -287,9 +339,11 @@ class Recorder:
         }.get(case.surface)
         wanted = {account_param: self.account} if account_param else {}
         if case.market is not None:
-          wanted['public_market' if case.method else 'candle_market'] = (
-            f'{self.account}:{case.market}'
-          )
+          market_param = {
+            'test_public_read': 'public_market',
+            'test_account_read': 'account_market',
+          }.get(case.test, 'candle_market')
+          wanted[market_param] = f'{self.account}:{case.market}'
         if case.method is not None:
           wanted['method'] = case.method
         if params == wanted:
@@ -298,7 +352,7 @@ class Recorder:
         raise pytest.UsageError('Unexpected or duplicate live test parameterization')
       id = matches[0]
       found.add(id)
-      if self.cases[id].exclusion is None:
+      if runs(self.cases[id].exclusion):
         kept.append(item)
         self.nodes[item.nodeid] = id
     if found != set(self.cases):
@@ -324,16 +378,20 @@ def run_worker(
 ) -> dict[str, object]:
   """Run the actual existing suites in an isolated, read-only pytest session."""
   from .cli.results import configured_sdk, select_account
+  from .integration.accounts import account_mode
 
   sdk = configured_sdk(accounts)
   selected = select_account(
     sdk, 'deribit_testnet' if group == 'report_testnet' else venue, account
   )
   configured = sdk.accounts[selected]
-  mode = getattr(configured, 'uta', None) if venue == 'bitget' else None
-  if venue == 'bitget' and (configured.public or not isinstance(mode, bool)):
+  uta = getattr(configured, 'uta', None) if venue == 'bitget' else None
+  if venue == 'bitget' and (configured.public or not isinstance(uta, bool)):
     raise ValueError('Bitget requires a private account with expected uta mode')
-  cases = group_inventory(repo_root(), venue, group)
+  # Derived from the resolved environment: a missing variable lowers the mode, which
+  # the verifier then rejects, rather than silently dropping account reads.
+  mode = account_mode(configured)
+  cases = group_inventory(repo_root(), venue, group, mode=mode, bitget_uta=uta)
   recorder = Recorder(
     cases, account, network='testnet' if group == 'report_testnet' else 'mainnet'
   )
@@ -357,7 +415,8 @@ def run_worker(
   return Payload(
     venue=venue,
     account_venue=configured.venue,
-    bitget_uta=mode,
+    account_mode=mode,
+    bitget_uta=uta,
     completed=result == pytest.ExitCode.OK,
     checks=list(recorder.checks.values()),
   ).model_dump(mode='json')
@@ -368,7 +427,11 @@ def collect(
 ) -> dict[str, object]:
   """Keep worker failures private and bounded; never turn them into skipped passes."""
   failed = Payload(
-    venue=venue, account_venue=venue, completed=False, checks=[]
+    venue=venue,
+    account_venue=venue,
+    account_mode='public',
+    completed=False,
+    checks=[],
   ).model_dump(mode='json')
   try:
     result = subprocess.run(
@@ -407,6 +470,7 @@ def collect_deribit(
   return Payload(
     venue='deribit',
     account_venue=public.account_venue,
+    account_mode=public.account_mode,
     private_account_venue=private.account_venue,
     completed=public.completed and private.completed,
     checks=[*public.checks, *private.checks],
