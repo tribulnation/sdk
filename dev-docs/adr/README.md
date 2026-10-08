@@ -64,4 +64,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0039](0039-hyperliquid-hip3-spot-fees.md) | Hyperliquid HIP-3 and spot fees via the official formula | Accepted; implemented, not release-verified; amended by 0042 |
 | [0040](0040-lighter-credential-modes.md) | Lighter credential modes: read-only tokens and public account reads | Proposed; implemented, not release-verified |
 | [0041](0041-venue-notional-caps.md) | Venue notional caps in available notional | Proposed; implemented for Aster, not release-verified; amended by 0042 |
-| [0042](0042-read-only-account-method-qualification.md) | Read-only account-method qualification | Proposed; implemented, not release-verified; amends 0013, 0039 and 0041 |
+| [0042](0042-read-only-account-method-qualification.md) | Read-only account-method qualification | Accepted; implemented, not release-verified; amends 0013, 0039 and 0041 |
