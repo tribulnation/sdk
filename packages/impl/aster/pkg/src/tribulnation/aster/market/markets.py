@@ -720,7 +720,13 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     return self.client.futures
 
   async def rules(self, *, refetch: bool = False) -> Rules:
-    """Read the contract's filters; the standard fee asset is the margin asset."""
+    """Read the contract's filters. The fee asset depends on the fill (ADR 0028).
+
+    With the account's futures `feeBurn` setting on, fees are paid in ASTER while the
+    futures wallet holds it, and in the margin asset otherwise; with it off, in the
+    margin asset. Rules read no account settings (ADR 0001, 0002), so no single asset
+    is claimed: `Trade.fee.asset` names it per fill.
+    """
     row = (await self.shared.perp_symbols(refetch=refetch)).get(self.symbol)
     if row is None:
       raise ValueError(f'Aster perpetual is not trading: {self.symbol}')
@@ -742,7 +748,7 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
         field='filters',
       )
     return Rules(
-      fee_asset=row['marginAsset'],
+      fee_asset=None,
       tick_size=tick,
       step_size=step,
       fixed_min_qty=min_qty or None,
@@ -898,7 +904,7 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     position's own notional) and the symbol's remaining open-interest allowance at that
     leverage (`remainingOpenableNotionalValue`, uncapped at `-1`). Reducing or
     reversing a position is not modelled: the result is the same-direction room
-    (ADR 0039).
+    (ADR 0041).
     """
     leverage = await self.leverage()
     account = await self.shared.futures_account()

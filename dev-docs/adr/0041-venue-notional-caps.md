@@ -1,4 +1,4 @@
-# ADR 0039: Venue notional caps in available notional
+# ADR 0041: Venue notional caps in available notional
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 

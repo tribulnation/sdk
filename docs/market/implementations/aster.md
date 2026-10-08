@@ -39,9 +39,11 @@ never falls back to mainnet variables. `validate` toggles response validation.
 - Exchanges are `spot` and `perp`, with native symbols: `aster:spot:ASTERUSDT`,
   `aster:perp:BTCUSDT`. Discovery lists symbols currently trading; perpetual discovery
   excludes dated contracts.
-- `Rules.fee_asset` is `None` on spot: a spot fill pays its fee in the asset it
-  delivers, the base asset on a buy and the quote asset on a sell. Perpetuals name the
-  margin asset. `Trade.fee.asset` always keeps each fill's native fee asset. Standard
+- `Rules.fee_asset` is `None`: the fee asset depends on the fill. A spot fill pays in
+  the asset it delivers, the base asset on a buy and the quote asset on a sell. A
+  perpetual fill pays ASTER when the account's futures fee-burn setting is on and its
+  futures wallet holds ASTER, and the margin asset otherwise; rules read no account
+  setting, so they claim neither. `Trade.fee.asset` keeps each fill's native fee asset. Standard
   fee rates are unknown (`rules().fees` is `None`); `fees()` reads the account's rates
   and needs `user` and `signer`.
 

@@ -15,7 +15,7 @@ cancellation are verified on testnet only.
 | --- | --- | --- |
 | Discovery | Symbols with status `TRADING`; perpetual contracts only | `exchange_info`, cached per owner; `rules(refetch=True)` and `tickers` refresh it |
 | Tickers | All or selected symbols | `ticker_24hr` joined with `book_ticker` |
-| Rules | Price, lot, notional and percent-price filters | Spot fee asset is `None` (fill-dependent, ADR 0028); perpetual fee asset is the margin asset |
+| Rules | Price, lot, notional and percent-price filters | Fee asset is `None` (fill-dependent, ADR 0028) on spot and perpetuals |
 | Depth | 1–1000 levels | Smallest native `limit` covering the request |
 | Depth stream | 1–20 levels | One shared 20-level `partial_depth` stream per symbol |
 | Candles | Six SDK intervals | `klines`, half-open 500-candle windows retried individually |
@@ -101,7 +101,13 @@ Read-only, with the trading agent of one mainnet account.
    symbol `leverageBrackets` lists.
 5. `GET /fapi/v3/openInterest?symbol=` (also `/fapi/v1`) is public and undocumented;
    without a symbol it answers `-1102`. `typed-aster` 0.4.0 adds it.
-6. Perpetual commissions were paid in USDT, the margin asset.
+6. Perpetual commissions were paid in USDT, the margin asset, although the undocumented
+   signed `GET /fapi/v3/feeBurn` reported `{"feeBurn": true}`: the futures wallet held
+   no ASTER (only USDT and USDC). Testnet fills, on an ASTER-holding account, paid ASTER
+   (2026-09-25 observation 3). So the perpetual fee asset depends on an account setting
+   and balance, and rules report `None`. `typed-aster` does not wrap `feeBurn`; spot has
+   no such route (`404`). The fallback to the margin asset when ASTER runs out is
+   inferred, not observed within one account.
 
 ## PoC and live checks
 

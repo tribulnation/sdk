@@ -161,7 +161,7 @@ methods:
     example:
       accountVenues: [mexc]
       constants:
-        aster: {market_id: 'aster:perp:BTCUSDT', instrument_id: BTCUSDT, fee_asset: USDT, tick_size: '0.1', step_size: '0.001'}
+        aster: {market_id: 'aster:perp:BTCUSDT', instrument_id: BTCUSDT, fee_asset: null, tick_size: '0.1', step_size: '0.001'}
         kucoin: {market_id: 'kucoin:spot:BTC-USDT', instrument_id: 'BTC-USDT', fee_asset: 'USDT', tick_size: '0.10', step_size: '0.000001', kind: 'spot'}
         mexc:
           market_id: 'mexc:spot:BTCUSDT'
