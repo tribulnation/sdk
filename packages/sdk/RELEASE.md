@@ -34,3 +34,12 @@ record the account mode (ADR 0042). This is a live qualification change: every
 declared venue was requalified (ADR 0033).
 
 `OrderRejected` is verified by unit fixtures only; no live trading run covers it.
+
+Qualification on 2026-10-08: all 14 declared venues have passing, verified
+read-suite evidence (payload version 5, including the account reads), and all 13
+market venues have passing consistency evidence, against the unchanged Catalogue pin
+`1851660ac2bed8243dd9ce9c7297fe05c7130973`. The existing Bit2Me native-ticker
+limitation (ADR 0014), Bitget's venue-wide withdrawal suspension (ADR 0027) and the
+Binance USD-M and MEXC spot `fees` waivers (ADR 0042) remain visible.
+
+All 1,603 repository unit tests pass.

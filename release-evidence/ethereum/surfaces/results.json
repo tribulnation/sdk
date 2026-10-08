@@ -1,5 +1,6 @@
 {
   "payload": {
+    "account_mode": "private",
     "account_venue": "ethereum",
     "bitget_uta": null,
     "checks": [
@@ -32,6 +33,6 @@
     "private_account_venue": null,
     "scope": "surfaces",
     "venue": "ethereum",
-    "version": 4
+    "version": 5
   }
 }

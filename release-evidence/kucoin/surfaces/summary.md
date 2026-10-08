@@ -1,5 +1,5 @@
 # Local SDK evidence: kucoin
 
-Run completed: 2026-10-08T13:02:30.324484+00:00
+Run completed: 2026-10-08T18:21:48.411738+00:00
 
 This records a trusted local run, not cryptographic proof. Release policy must separately validate required check coverage and statuses.
