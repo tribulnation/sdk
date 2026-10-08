@@ -27,11 +27,6 @@ class PerpExchange(ExchangeMixin, BasePerpExchange):
   """MEXC linear perpetual public market data; private methods are not enabled."""
 
   @property
-  def venue_id(self) -> str:
-    """The venue identifier."""
-    return 'mexc'
-
-  @property
   def exchange_id(self) -> str:
     """The linear perpetual exchange identifier."""
     return 'perp'

@@ -7,6 +7,7 @@ from typing_extensions import AsyncContextManager, Iterable
 
 import pytest
 
+from tribulnation.sdk.impl.accounts import VenueId
 from tribulnation.sdk import EarnSDK, MarketSDK, ReportSDK, WalletSDK
 from tribulnation.sdk.impl.accounts import Bybit
 from tribulnation.sdk.market import Exchange, TradingVenue
@@ -59,7 +60,12 @@ class Venue(TradingVenue):
   owned: tuple[AsyncContextManager[object], ...]
 
   @property
-  def venue_id(self):
+  def venue_id(self) -> VenueId:
+    """Report a real venue for this test-only venue."""
+    return 'kraken'
+
+  @property
+  def account_id(self) -> str:
     """Identify this test-only venue."""
     return 'test'
 

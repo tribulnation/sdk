@@ -12,6 +12,7 @@ from decimal import Decimal
 import asyncio
 
 from tribulnation.sdk.core import SDK, PaginatedResponse, OverflowPolicy
+from tribulnation.sdk.impl.accounts import VenueId
 from .types import (
   Book,
   Candle,
@@ -41,17 +42,33 @@ class Market(SDK):
   outside it raises `ValueError` without a request being made."""
 
   @property
-  def market_id(self) -> str: ...
+  def market_id(self) -> str:
+    """Venue-native market ID, the last segment of `id`."""
+    ...
 
   @property
-  def exchange_id(self) -> str: ...
+  def exchange_id(self) -> str:
+    """Exchange (product family) ID within the venue, e.g. `'spot'` or `'perp'`."""
+    ...
 
   @property
-  def venue_id(self) -> str: ...
+  @abstractmethod
+  def venue_id(self) -> VenueId:
+    """The venue this object trades on, e.g. `'hyperliquid'` or `'dydx_testnet'`;
+    never an account key."""
+
+  @property
+  @abstractmethod
+  def account_id(self) -> str:
+    """Key of the account this object was opened under: `'hl'` for
+    `MarketSDK({'hl': accounts.Hyperliquid(...)})`. Objects built directly, outside a
+    root SDK, default to their `venue_id`."""
 
   @property
   def id(self) -> str:
-    return f'{self.venue_id}:{self.exchange_id}:{self.market_id}'
+    """Full market ID, `<account_id>:<exchange_id>:<market_id>`, accepted by
+    `TradingMarkets.market` on the root SDK that opened this market."""
+    return f'{self.account_id}:{self.exchange_id}:{self.market_id}'
 
   @SDK.method
   @abstractmethod

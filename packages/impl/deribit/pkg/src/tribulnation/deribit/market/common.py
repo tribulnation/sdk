@@ -33,6 +33,8 @@ def product(row: InstrumentItem) -> Product | None:
 class Shared(Mixin):
   """Own one credential-free client and cache its supported native definitions."""
 
+  account_id: str | None = None
+  """Root SDK account key; `None` when built directly, reporting `venue_id` instead."""
   inventory: dict[Literal['instruments'], dict[str, InstrumentItem]] = field(
     default_factory=dict[Literal['instruments'], dict[str, InstrumentItem]]
   )
@@ -67,9 +69,14 @@ class Public(SDK):
   shared: Shared
 
   @property
-  def venue_id(self) -> str:
+  def venue_id(self) -> Literal['deribit']:
     """The mainnet Catalogue platform identity."""
     return 'deribit'
+
+  @property
+  def account_id(self) -> str:
+    """Root SDK account key this object was opened under, else `venue_id`."""
+    return self.shared.account_id or self.venue_id
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     """Enter the shared managed client owner."""

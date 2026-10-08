@@ -17,10 +17,6 @@ class CoinbaseMarket(impl.ExchangeMixin, TradingVenue):
   `perp_exchange` therefore keeps the base class's `NotImplementedError`.
   """
 
-  @property
-  def venue_id(self) -> str:
-    return impl.VENUE_ID
-
   async def exchanges(self) -> list[TradingVenue.ExchangeDescription]:
     return [{'id': impl.SPOT_EXCHANGE_ID, 'type': 'spot', 'name': 'Advanced Trade'}]
 

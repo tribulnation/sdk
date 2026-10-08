@@ -9,10 +9,6 @@ from .spot_exchange import SpotExchange
 
 @dataclass(frozen=True)
 class HyperliquidMarket(SharedMixin, TradingVenue):
-  @property
-  def venue_id(self) -> str:
-    return 'hyperliquid'
-
   async def exchange(self, exchange_id: str, /):
     if exchange_id == 'spot':
       return SpotExchange(shared=self.shared)

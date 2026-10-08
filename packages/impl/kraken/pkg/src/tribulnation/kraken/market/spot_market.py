@@ -46,10 +46,6 @@ class SpotMarket(MarketMixin, Market):
   """
 
   @property
-  def venue_id(self) -> str:
-    return 'kraken'
-
-  @property
   def exchange_id(self) -> str:
     return 'spot'
 

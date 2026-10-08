@@ -21,11 +21,6 @@ class PerpExchange(SharedMixin, BasePerpExchange):
   """Active non-tradfi linear perpetuals with USD quote and unit contract size."""
 
   @property
-  def venue_id(self) -> str:
-    """The Kraken platform owns every emitted native ID."""
-    return 'kraken'
-
-  @property
   def exchange_id(self) -> str:
     """Use the existing Catalogue perpetual identity."""
     return 'perp'

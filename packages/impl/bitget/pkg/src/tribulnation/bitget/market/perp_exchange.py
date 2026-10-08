@@ -31,10 +31,6 @@ class PerpExchange(VenueMixin, _PerpExchange):
   product: PerpProduct = PERP
 
   @property
-  def venue_id(self) -> str:
-    return 'bitget'
-
-  @property
   def exchange_id(self) -> str:
     return perp_exchange_id(self.product)
 

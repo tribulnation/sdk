@@ -10,10 +10,6 @@ from .spot_market import SpotMarket
 @dataclass(frozen=True, kw_only=True)
 class SpotExchange(ExchangeMixin, Exchange):
   @property
-  def venue_id(self) -> str:
-    return 'mexc'
-
-  @property
   def exchange_id(self) -> str:
     return 'spot'
 

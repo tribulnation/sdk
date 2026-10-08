@@ -50,10 +50,6 @@ from .impl import (
 @dataclass(frozen=True, kw_only=True)
 class PerpMarket(PerpMarketMixin, _PerpMarket):
   @property
-  def venue_id(self) -> str:
-    return 'hyperliquid'
-
-  @property
   def exchange_id(self) -> str:
     return self.dex_name or ''
 

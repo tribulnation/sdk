@@ -1,5 +1,6 @@
 from .accounts import (
   Account,
+  VenueId,
   Aster,
   Dydx,
   Hyperliquid,
@@ -18,6 +19,7 @@ from .report import ReportSDK
 
 __all__ = [
   'Account',
+  'VenueId',
   'Aster',
   'Dydx',
   'Hyperliquid',

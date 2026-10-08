@@ -44,10 +44,6 @@ class SpotMarket(MarketMixin, Market):
   CANDLE_INTERVALS = CANDLE_INTERVALS
 
   @property
-  def venue_id(self) -> str:
-    return 'mexc'
-
-  @property
   def exchange_id(self) -> str:
     return 'spot'
 

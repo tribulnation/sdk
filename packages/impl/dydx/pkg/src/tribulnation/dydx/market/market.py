@@ -63,10 +63,6 @@ class Market(MarketMixin, PerpMarket):
   def exchange_id(self) -> str:
     return 'perp'
 
-  @property
-  def venue_id(self) -> str:
-    return 'dydx'
-
   @wrap_exceptions
   async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
     book = await self.indexer.data.get_order_book(self.market)

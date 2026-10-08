@@ -37,10 +37,6 @@ class SpotExchange(ExchangeMixin, Exchange):
   """Bit2Me implementation of `Exchange`."""
 
   @property
-  def venue_id(self) -> str:
-    return 'bit2me'
-
-  @property
   def exchange_id(self) -> str:
     return 'spot'
 

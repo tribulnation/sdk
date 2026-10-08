@@ -56,10 +56,6 @@ class SpotMarket(MarketMixin, Market):
   def exchange_id(self) -> str:
     return 'spot'
 
-  @property
-  def venue_id(self) -> str:
-    return 'bybit'
-
   async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
     """Fetch the market order book."""
     book = await self.call_bybit(

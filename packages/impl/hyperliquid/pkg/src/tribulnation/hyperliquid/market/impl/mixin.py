@@ -7,6 +7,7 @@ from typing_extensions import (
   Awaitable,
   Callable,
   Iterable,
+  Literal,
   TypedDict,
   TypeVar,
   cast,
@@ -149,6 +150,10 @@ async def closing_fast_streams(shared: 'Shared'):
 class Shared(SDK):
   client: Hyperliquid
   maybe_address: str | None = None
+  venue_id: Literal['hyperliquid', 'hyperliquid_testnet'] = 'hyperliquid'
+  """The network this client is connected to, as a venue ID."""
+  account_id: str | None = None
+  """Root SDK account key; `None` when built directly, reporting `venue_id` instead."""
 
   @property
   def address(self) -> str:
@@ -414,7 +419,18 @@ class SharedMixin(SDK):
     wallet: Wallet | None = None,
     mainnet: bool = True,
     validate: bool = True,
+    account_id: str | None = None,
   ):
+    """Create a surface over a new HTTP client.
+
+    Args:
+      address: Account address; read from the network's environment variable when omitted.
+      wallet: Private key or account object for signing.
+      mainnet: Use mainnet when true, testnet when false.
+      validate: Validate responses.
+      account_id: Root SDK account key, the first segment of every ID; defaults to
+        the venue ID.
+    """
     if address is None:
       env_var = 'HYPERLIQUID_ADDRESS' if mainnet else 'HYPERLIQUID_TESTNET_ADDRESS'
       address = os.environ.get(env_var)
@@ -424,7 +440,14 @@ class SharedMixin(SDK):
       validate=validate,
       public=True,
     )
-    return cls(shared=Shared(client=client, maybe_address=address))
+    return cls(
+      shared=Shared(
+        client=client,
+        maybe_address=address,
+        venue_id='hyperliquid' if mainnet else 'hyperliquid_testnet',
+        account_id=account_id,
+      )
+    )
 
   @classmethod
   def ws(
@@ -435,7 +458,19 @@ class SharedMixin(SDK):
     mainnet: bool = True,
     validate: bool = True,
     public: bool = False,
+    account_id: str | None = None,
   ):
+    """Create a surface over a new client.
+
+    Args:
+      address: Account address; read from the network's environment variable when omitted.
+      wallet: Private key or account object for signing.
+      mainnet: Use mainnet when true, testnet when false.
+      validate: Validate responses.
+      public: Accepted for compatibility; the client is always built public-capable.
+      account_id: Root SDK account key, the first segment of every ID; defaults to
+        the venue ID.
+    """
     if address is None:
       env_var = 'HYPERLIQUID_ADDRESS' if mainnet else 'HYPERLIQUID_TESTNET_ADDRESS'
       address = os.environ.get(env_var)
@@ -445,7 +480,24 @@ class SharedMixin(SDK):
       validate=validate,
       public=True,
     )
-    return cls(shared=Shared(client=client, maybe_address=address))
+    return cls(
+      shared=Shared(
+        client=client,
+        maybe_address=address,
+        venue_id='hyperliquid' if mainnet else 'hyperliquid_testnet',
+        account_id=account_id,
+      )
+    )
+
+  @property
+  def venue_id(self) -> Literal['hyperliquid', 'hyperliquid_testnet']:
+    """The venue this object trades on: `'hyperliquid'` or `'hyperliquid_testnet'`."""
+    return self.shared.venue_id
+
+  @property
+  def account_id(self) -> str:
+    """Root SDK account key this object was opened under, else `venue_id`."""
+    return self.shared.account_id or self.shared.venue_id
 
   @property
   def client(self) -> Hyperliquid:

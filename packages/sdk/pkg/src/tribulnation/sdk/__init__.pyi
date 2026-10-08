@@ -23,7 +23,7 @@ from .market import (
   TradingVenue,
   TradingMarkets,
 )
-from .impl import MarketSDK, EarnSDK, WalletSDK, ReportSDK, Account, accounts
+from .impl import MarketSDK, EarnSDK, WalletSDK, ReportSDK, Account, VenueId, accounts
 
 __all__ = [
   'SDK',
@@ -52,5 +52,6 @@ __all__ = [
   'WalletSDK',
   'ReportSDK',
   'Account',
+  'VenueId',
   'accounts',
 ]

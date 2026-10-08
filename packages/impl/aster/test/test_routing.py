@@ -84,7 +84,7 @@ async def test_toml_routes_both_networks(
   private = Aster(
     venue='aster_testnet', user=user.address, signer=agent.key.hex(), public=True
   )
-  authenticated = sdk.aster(private)
+  authenticated = sdk.aster(private, 'private')
   assert isinstance(authenticated, AsterMarket)
   assert authenticated.client.futures.client.credentials is not None
 

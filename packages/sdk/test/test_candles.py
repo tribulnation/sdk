@@ -10,6 +10,7 @@ from decimal import Decimal
 
 import pytest
 
+from tribulnation.sdk.impl.accounts import VenueId
 from tribulnation.sdk.core import PaginatedResponse
 from tribulnation.sdk.market import (
   Candle,
@@ -51,7 +52,11 @@ class FakeMarket(Market):
     return 'spot'
 
   @property
-  def venue_id(self) -> str:
+  def venue_id(self) -> VenueId:
+    return 'kraken'
+
+  @property
+  def account_id(self) -> str:
     return 'fake'
 
   def candles(
@@ -110,7 +115,11 @@ class FakeExchange(Exchange):
   fake: FakeMarket
 
   @property
-  def venue_id(self) -> str:
+  def venue_id(self) -> VenueId:
+    return 'kraken'
+
+  @property
+  def account_id(self) -> str:
     return 'fake'
 
   @property
@@ -134,7 +143,11 @@ class FakeVenue(TradingVenue):
   fake: FakeExchange
 
   @property
-  def venue_id(self) -> str:
+  def venue_id(self) -> VenueId:
+    return 'kraken'
+
+  @property
+  def account_id(self) -> str:
     return 'fake'
 
   async def exchange(self, exchange_id: str, /) -> Exchange:

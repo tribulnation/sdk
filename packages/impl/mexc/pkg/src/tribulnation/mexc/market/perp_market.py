@@ -57,11 +57,6 @@ class PerpMarket(ExchangeMixin, BasePerpMarket):
   CANDLE_INTERVALS = frozenset(INTERVALS)
 
   @property
-  def venue_id(self) -> str:
-    """The venue identifier."""
-    return 'mexc'
-
-  @property
   def exchange_id(self) -> str:
     """The linear perpetual exchange identifier."""
     return 'perp'

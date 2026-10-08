@@ -12,6 +12,7 @@ from contextlib import asynccontextmanager
 from datetime import datetime
 
 from tribulnation.sdk.core import SDK, PaginatedResponse, OverflowPolicy
+from tribulnation.sdk.impl.accounts import VenueId
 from .types import (
   Book,
   CandleInterval,
@@ -59,14 +60,28 @@ class Exchange(SDK):
   """An abstract multi-market exchange interface."""
 
   @property
-  def venue_id(self) -> str: ...
+  @abstractmethod
+  def venue_id(self) -> VenueId:
+    """The venue this object trades on, e.g. `'hyperliquid'` or `'dydx_testnet'`;
+    never an account key."""
 
   @property
-  def exchange_id(self) -> str: ...
+  @abstractmethod
+  def account_id(self) -> str:
+    """Key of the account this object was opened under: `'hl'` for
+    `MarketSDK({'hl': accounts.Hyperliquid(...)})`. Objects built directly, outside a
+    root SDK, default to their `venue_id`."""
+
+  @property
+  def exchange_id(self) -> str:
+    """Exchange (product family) ID within the venue, e.g. `'spot'` or `'perp'`."""
+    ...
 
   @property
   def id(self) -> str:
-    return f'{self.venue_id}:{self.exchange_id}'
+    """Full exchange ID, `<account_id>:<exchange_id>`, accepted by
+    `TradingMarkets.exchange` on the root SDK that opened this exchange."""
+    return f'{self.account_id}:{self.exchange_id}'
 
   @abstractmethod
   async def market(self, market_id: str, /) -> Market:

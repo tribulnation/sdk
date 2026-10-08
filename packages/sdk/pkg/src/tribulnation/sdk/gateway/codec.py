@@ -40,6 +40,7 @@ from tribulnation.sdk.market import (
   FundingPayment,
 )
 from tribulnation.sdk.market.venue import ExchangeDescription
+from tribulnation.sdk.impl.accounts import VenueId
 
 
 def settings_schema(_source: Any, _handler: Any) -> core_schema.CoreSchema:
@@ -258,7 +259,8 @@ class ExchangePerpCollateralReq:
   """Wire message for exchange perp collateral req."""
 
   id: str
-  venue_id: str
+  account_id: str
+  """Account key addressing the venue, e.g. `\'hl\'`."""
   exchange_id: str
   tag: Literal['exchange_perp_collateral'] = 'exchange_perp_collateral'
 
@@ -268,7 +270,8 @@ class MarketsReq:
   """Wire message for markets req."""
 
   id: str
-  venue_id: str
+  account_id: str
+  """Account key addressing the venue, e.g. `\'hl\'`."""
   exchange_id: str
   tag: Literal['markets'] = 'markets'
 
@@ -281,11 +284,22 @@ class ExchangesReq:
   """Wire message for exchanges req."""
 
   id: str
-  venue_id: str
+  account_id: str
+  """Account key addressing the venue, e.g. `\'hl\'`."""
   tag: Literal['exchanges'] = 'exchanges'
 
 
 # ── SDK-level call requests ──────────────────────────────────────────────────
+
+
+@dataclass(kw_only=True)
+class VenueReq:
+  """Resolve the venue behind an account key."""
+
+  id: str
+  account_id: str
+  """Account key addressing the venue, e.g. `'hl'`."""
+  tag: Literal['venue'] = 'venue'
 
 
 @dataclass(kw_only=True)
@@ -361,7 +375,8 @@ class ExchangeReq:
   """Resolve an exchange's actual product type, including qualified IDs."""
 
   id: str
-  venue_id: str
+  account_id: str
+  """Account key addressing the venue, e.g. `\'hl\'`."""
   exchange_id: str
   tag: Literal['exchange'] = 'exchange'
 
@@ -371,7 +386,8 @@ class TickersReq:
   """Fetch bulk tickers from an exchange."""
 
   id: str
-  venue_id: str
+  account_id: str
+  """Account key addressing the venue, e.g. `\'hl\'`."""
   exchange_id: str
   markets: list[str] | None = None
   settings: WireSettings = field(default_factory=Settings)
@@ -383,7 +399,8 @@ class PerpStatsReq:
   """Fetch bulk perpetual statistics."""
 
   id: str
-  venue_id: str
+  account_id: str
+  """Account key addressing the venue, e.g. `\'hl\'`."""
   exchange_id: str
   markets: list[str] | None = None
   settings: WireSettings = field(default_factory=Settings)
@@ -395,7 +412,8 @@ class ExchangeCollateralReq:
   """Fetch a spot or perpetual exchange's collateral bucket."""
 
   id: str
-  venue_id: str
+  account_id: str
+  """Account key addressing the venue, e.g. `\'hl\'`."""
   exchange_id: str
   tag: Literal['exchange_collateral'] = 'exchange_collateral'
 
@@ -430,6 +448,7 @@ CallReq = (
   | ExchangePerpCollateralReq
   | MarketsReq
   | ExchangesReq
+  | VenueReq
   | VenuesReq
 )
 
@@ -462,6 +481,7 @@ ClientMsg = Annotated[
   | ExchangePerpCollateralReq
   | MarketsReq
   | ExchangesReq
+  | VenueReq
   | VenuesReq
   | DepthStreamReq
   | TradesStreamReq
@@ -729,11 +749,23 @@ class CandlesResp:
 
 @dataclass(kw_only=True)
 class ExchangeResp:
-  """Resolved exchange product type."""
+  """Resolved exchange product type and venue."""
 
   id: str
   type: Literal['spot', 'perp']
+  venue_id: VenueId
+  """Venue the gateway-side exchange reports, e.g. `'hyperliquid'`."""
   tag: Literal['exchange'] = 'exchange'
+
+
+@dataclass(kw_only=True)
+class VenueResp:
+  """Resolved venue of an account."""
+
+  id: str
+  venue_id: VenueId
+  """Venue the gateway-side venue reports, e.g. `'hyperliquid'`."""
+  tag: Literal['venue'] = 'venue'
 
 
 @dataclass(kw_only=True)
@@ -779,6 +811,7 @@ ServerMsg = Annotated[
   | PerpCollateralResp
   | MarketsResp
   | ExchangesResp
+  | VenueResp
   | VenuesResp
   | DepthDataMsg
   | TradesDataMsg

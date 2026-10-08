@@ -53,6 +53,8 @@ class Shared(SDK):
   """
 
   client: Coinbase
+  account_id: str | None = None
+  """Root SDK account key; `None` when built directly, reporting `'coinbase'` instead."""
   products: dict[str, Product] = field(default_factory=dict[str, Product])
   book_subscriptions: dict[str, Subscription[Book]] = field(
     default_factory=dict[str, Subscription[Book]]
@@ -131,6 +133,7 @@ class Mixin(SDK):
     *,
     public: bool = False,
     validate: bool = True,
+    account_id: str | None = None,
   ):
     """Build a Coinbase SDK surface over a fresh client.
 
@@ -141,11 +144,13 @@ class Mixin(SDK):
       public: Skip credential resolution, leaving only the unauthenticated routes
         usable.
       validate: Validate responses against their declared schema.
+      account_id: Root SDK account key, the first segment of every market ID;
+        defaults to the venue ID.
     """
     client = Coinbase.new(
       key_name=key_name, private_key=private_key, public=public, validate=validate
     )
-    return cls(shared=Shared(client=client))
+    return cls(shared=Shared(client=client, account_id=account_id))
 
   @property
   def client(self) -> Coinbase:

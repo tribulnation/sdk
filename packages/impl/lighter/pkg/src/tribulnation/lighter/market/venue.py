@@ -28,6 +28,7 @@ class LighterMarket(Public, TradingVenue):
     network: Network = 'mainnet',
     public: bool = False,
     validate: bool = True,
+    account_id: str | None = None,
   ):
     """Build a venue from an API key, or credential-free for public data.
 
@@ -38,6 +39,8 @@ class LighterMarket(Public, TradingVenue):
       network: Lighter deployment.
       public: Skip credentials: public market data only.
       validate: Validate responses.
+      account_id: Root SDK account key, the first segment of every market ID;
+        defaults to the venue ID.
     """
     return cls(
       shared=Shared.new(
@@ -47,6 +50,7 @@ class LighterMarket(Public, TradingVenue):
         network=network,
         public=public,
         validate=validate,
+        account_id=account_id,
       )
     )
 

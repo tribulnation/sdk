@@ -24,10 +24,6 @@ class PerpExchange(VenueMixin, _PerpExchange):
   """Bybit linear perpetuals."""
 
   @property
-  def venue_id(self) -> str:
-    return 'bybit'
-
-  @property
   def exchange_id(self) -> str:
     return 'perp'
 

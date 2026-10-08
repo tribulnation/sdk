@@ -65,10 +65,6 @@ class PerpMarket(MarketMixin, _PerpMarket):
   def exchange_id(self) -> str:
     return perp_exchange_id(self.product)
 
-  @property
-  def venue_id(self) -> str:
-    return 'bitget'
-
   async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
     """Fetch the market order book (100 levels a side when `levels` is omitted).
 

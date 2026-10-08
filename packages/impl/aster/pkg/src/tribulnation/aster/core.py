@@ -87,6 +87,8 @@ class Shared(SDK):
 
   client: Aster
   mainnet: bool
+  account_id: str | None = None
+  """Root SDK account key; `None` when built directly, reporting `venue_id` instead."""
   spot: dict[str, SpotSymbol] = field(default_factory=dict[str, SpotSymbol])
   perp: dict[str, FuturesSymbol] = field(default_factory=dict[str, FuturesSymbol])
   lock: asyncio.Lock = field(default_factory=asyncio.Lock)
@@ -98,7 +100,7 @@ class Shared(SDK):
   )
 
   @property
-  def venue_id(self) -> str:
+  def venue_id(self) -> Literal['aster', 'aster_testnet']:
     """The network-specific venue ID."""
     return 'aster' if self.mainnet else 'aster_testnet'
 
@@ -195,6 +197,7 @@ class Public(SDK):
     public: bool = False,
     mainnet: bool = True,
     validate: bool = True,
+    account_id: str | None = None,
   ):
     """Create a surface over a new client.
 
@@ -204,11 +207,13 @@ class Public(SDK):
       public: Build a credential-free client for market data.
       mainnet: Use mainnet when true, testnet when false.
       validate: Validate responses against the typed client's schemas.
+      account_id: Root SDK account key, the first segment of every market ID;
+        defaults to the venue ID.
     """
     client = new_client(
       user=user, signer=signer, public=public, mainnet=mainnet, validate=validate
     )
-    return cls(shared=Shared(client=client, mainnet=mainnet))
+    return cls(shared=Shared(client=client, mainnet=mainnet, account_id=account_id))
 
   @property
   def client(self) -> Aster:
@@ -216,9 +221,14 @@ class Public(SDK):
     return self.shared.client
 
   @property
-  def venue_id(self) -> str:
+  def venue_id(self) -> Literal['aster', 'aster_testnet']:
     """The network-specific venue ID."""
     return self.shared.venue_id
+
+  @property
+  def account_id(self) -> str:
+    """Root SDK account key this object was opened under, else `venue_id`."""
+    return self.shared.account_id or self.shared.venue_id
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     """Enter the shared owner through the SDK lifecycle."""

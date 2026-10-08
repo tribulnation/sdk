@@ -20,6 +20,7 @@ from tribulnation.sdk.core import (
 from tribulnation.sdk.market import TradingMarkets, Market, PerpMarket
 from tribulnation.sdk.market.venue import TradingVenue, ExchangeDescription
 from tribulnation.sdk.market.exchange import Exchange, PerpExchange
+from tribulnation.sdk.impl.accounts import VenueId
 from tribulnation.sdk.market import (
   Book,
   Candle,
@@ -227,32 +228,38 @@ class Connection:
 
 @dataclass
 class ProxyMarket(Market):
-  """A spot market forwarding calls to the gateway over WebSocket."""
+  """A spot market forwarding calls to the gateway over WebSocket.
+
+  `id` is the address this proxy was resolved with,
+  `<account_id>:<exchange_id>:<market_id>`, and routes every request. `venue_id` is
+  the venue the gateway-side object reports (e.g. `'hyperliquid'` for an
+  account named `hl`), as with the direct SDK.
+  """
 
   _conn: Connection
-  _venue_id: str
+  _account_id: str
   _exchange_id: str
   _market_id: str
-
-  @classmethod
-  def of(cls, conn: Connection, full_id: str):
-    """Return the of."""
-    venue_id, exchange_id, market_id = full_id.split(':', 2)
-    return cls(conn, venue_id, exchange_id, market_id)
+  _venue_id: VenueId
 
   @property
-  def venue_id(self) -> str:
-    """Return the venue id."""
+  def account_id(self) -> str:
+    """Account key this market is addressed with through the gateway."""
+    return self._account_id
+
+  @property
+  def venue_id(self) -> VenueId:
+    """Venue reported by the gateway at resolution, e.g. `'hyperliquid'`; not the account key."""
     return self._venue_id
 
   @property
   def exchange_id(self) -> str:
-    """Return the exchange id."""
+    """Exchange ID as addressed through the gateway."""
     return self._exchange_id
 
   @property
   def market_id(self) -> str:
-    """Return the market id."""
+    """Market ID as addressed through the gateway."""
     return self._market_id
 
   def _mid(self) -> str:
@@ -528,31 +535,43 @@ class ProxyPerpMarket(ProxyMarket, PerpMarket):
 
 @dataclass
 class ProxyExchange(Exchange):
-  """A spot exchange constructing markets and forwarding bulk calls."""
+  """A spot exchange constructing markets and forwarding bulk calls.
+
+  `id` is the address `<account_id>:<exchange_id>` that routes every request;
+  `venue_id` is the venue the gateway reported when the exchange was resolved.
+  """
 
   _conn: Connection
-  _venue_id: str
+  _account_id: str
   _exchange_id: str
+  _venue_id: VenueId
 
   @property
-  def venue_id(self) -> str:
-    """Return the venue id."""
+  def account_id(self) -> str:
+    """Account key this exchange is addressed with through the gateway."""
+    return self._account_id
+
+  @property
+  def venue_id(self) -> VenueId:
+    """Venue reported by the gateway at resolution, e.g. `'hyperliquid'`; not the account key."""
     return self._venue_id
 
   @property
   def exchange_id(self) -> str:
-    """Return the exchange id."""
+    """Exchange ID as addressed through the gateway."""
     return self._exchange_id
 
   async def market(self, market_id: str, /) -> Market:
-    """Forward market through the gateway."""
-    return ProxyMarket(self._conn, self._venue_id, self._exchange_id, market_id)
+    """Construct a market proxy without a round trip; the gateway resolves on use."""
+    return ProxyMarket(
+      self._conn, self._account_id, self._exchange_id, market_id, self._venue_id
+    )
 
   async def markets(self) -> Sequence[str]:
     """Forward markets through the gateway."""
     resp: codec.MarketsResp = await self._conn.call(
       codec.MarketsReq(
-        id=str(uuid4()), venue_id=self._venue_id, exchange_id=self._exchange_id
+        id=str(uuid4()), account_id=self._account_id, exchange_id=self._exchange_id
       )
     )
     return resp.markets
@@ -564,7 +583,7 @@ class ProxyExchange(Exchange):
     resp: codec.TickersResp = await self._conn.call(
       codec.TickersReq(
         id=str(uuid4()),
-        venue_id=self._venue_id,
+        account_id=self._account_id,
         exchange_id=self._exchange_id,
         markets=list(markets) if markets is not None else None,
         settings=settings,
@@ -578,7 +597,7 @@ class ProxyExchange(Exchange):
       return await (await self.market(market_id)).collateral()
     resp: codec.CollateralResp = await self._conn.call(
       codec.ExchangeCollateralReq(
-        id=str(uuid4()), venue_id=self._venue_id, exchange_id=self._exchange_id
+        id=str(uuid4()), account_id=self._account_id, exchange_id=self._exchange_id
       )
     )
     return resp.collateral
@@ -590,7 +609,9 @@ class ProxyPerpExchange(ProxyExchange, PerpExchange):
 
   async def market(self, market_id: str, /) -> PerpMarket:
     """Borrow a perpetual market on this connection."""
-    return ProxyPerpMarket(self._conn, self._venue_id, self._exchange_id, market_id)
+    return ProxyPerpMarket(
+      self._conn, self._account_id, self._exchange_id, market_id, self._venue_id
+    )
 
   async def perp_stats(
     self, markets: Collection[str] | None = None, *, settings: Settings = {}
@@ -599,7 +620,7 @@ class ProxyPerpExchange(ProxyExchange, PerpExchange):
     resp: codec.PerpStatsResp = await self._conn.call(
       codec.PerpStatsReq(
         id=str(uuid4()),
-        venue_id=self._venue_id,
+        account_id=self._account_id,
         exchange_id=self._exchange_id,
         markets=list(markets) if markets is not None else None,
         settings=settings,
@@ -618,54 +639,105 @@ class ProxyPerpExchange(ProxyExchange, PerpExchange):
       return await market.perp_collateral()
     resp: codec.PerpCollateralResp = await self._conn.call(
       codec.ExchangePerpCollateralReq(
-        id=str(uuid4()), venue_id=self._venue_id, exchange_id=self._exchange_id
+        id=str(uuid4()), account_id=self._account_id, exchange_id=self._exchange_id
       )
     )
     return resp.collateral
 
 
+async def resolve_exchange(
+  conn: Connection,
+  cache: dict[str, ProxyExchange],
+  *,
+  account_id: str,
+  exchange_id: str,
+) -> ProxyExchange:
+  """Resolve an exchange at the gateway once per address, then reuse the proxy.
+
+  One `ExchangeReq` round trip returns the product type and the venue. Failed
+  resolutions are not cached.
+  """
+  address = f'{account_id}:{exchange_id}'
+  if (exchange := cache.get(address)) is None:
+    resp: codec.ExchangeResp = await conn.call(
+      codec.ExchangeReq(id=str(uuid4()), account_id=account_id, exchange_id=exchange_id)
+    )
+    cls = ProxyPerpExchange if resp.type == 'perp' else ProxyExchange
+    exchange = cls(conn, account_id, exchange_id, resp.venue_id)
+    cache[address] = exchange
+  return exchange
+
+
+def require_perp(exchange: Exchange) -> PerpExchange:
+  """Require a perpetual product before exposing perpetual operations."""
+  if not isinstance(exchange, PerpExchange):
+    raise ValueError(f'Exchange {exchange.id} is not perpetual')
+  return exchange
+
+
 @dataclass
 class ProxyVenue(TradingVenue):
-  """A TradingVenue that constructs ProxyExchanges and forwards list calls."""
+  """A TradingVenue that resolves ProxyExchanges and forwards list calls.
+
+  `id` is the account key that routes every request; `venue_id` is the venue
+  the gateway reported when the venue was resolved.
+  """
 
   _conn: Connection
-  _venue_id: str
+  _account_id: str
+  _venue_id: VenueId
+  _exchanges: dict[str, ProxyExchange] = field(
+    default_factory=dict[str, ProxyExchange], repr=False
+  )
+  """Resolved exchanges by address, shared with the owning `ProxySDK`."""
 
   @property
-  def venue_id(self) -> str:
-    """Return the venue id."""
+  def account_id(self) -> str:
+    """Account key addressing this venue through the gateway."""
+    return self._account_id
+
+  @property
+  def venue_id(self) -> VenueId:
+    """Venue reported by the gateway at resolution, e.g. `'hyperliquid'`; not the account key."""
     return self._venue_id
 
   async def exchange(self, exchange_id: str, /) -> Exchange:
     """Resolve product type at the gateway instead of guessing from the ID."""
-    resp: codec.ExchangeResp = await self._conn.call(
-      codec.ExchangeReq(
-        id=str(uuid4()), venue_id=self._venue_id, exchange_id=exchange_id
-      )
+    return await resolve_exchange(
+      self._conn, self._exchanges, account_id=self._account_id, exchange_id=exchange_id
     )
-    cls = ProxyPerpExchange if resp.type == 'perp' else ProxyExchange
-    return cls(self._conn, self._venue_id, exchange_id)
 
   async def perp_exchange(self, exchange_id: str, /) -> PerpExchange:
     """Require a perpetual product before exposing perpetual operations."""
-    exchange = await self.exchange(exchange_id)
-    if not isinstance(exchange, PerpExchange):
-      raise ValueError(f'Exchange {exchange.id} is not perpetual')
-    return exchange
+    return require_perp(await self.exchange(exchange_id))
 
   async def exchanges(self) -> Sequence[ExchangeDescription]:
     """Forward exchanges through the gateway."""
     resp: codec.ExchangesResp = await self._conn.call(
-      codec.ExchangesReq(id=str(uuid4()), venue_id=self._venue_id)
+      codec.ExchangesReq(id=str(uuid4()), account_id=self._account_id)
     )
     return resp.exchanges
 
 
 @dataclass
 class ProxySDK(TradingMarkets):
-  """TradingMarkets backed by the SDK gateway WebSocket."""
+  """TradingMarkets backed by the SDK gateway WebSocket.
+
+  IDs passed in are account-based addresses (`<account_id>:<exchange_id>:<market_id>`)
+  and remain the proxies' `id`s. Resolving a venue or exchange (and so a market) makes
+  one round trip, which reports the venue exposed as `venue_id`; resolutions are
+  cached per address for the lifetime of this object.
+  """
 
   _conn: Connection
+  _venues: dict[str, ProxyVenue] = field(
+    default_factory=dict[str, ProxyVenue], init=False, repr=False
+  )
+  """Resolved venues by account key."""
+  _exchanges: dict[str, ProxyExchange] = field(
+    default_factory=dict[str, ProxyExchange], init=False, repr=False
+  )
+  """Resolved exchanges by `<account_id>:<exchange_id>`."""
 
   @classmethod
   def at(cls, url: str = f'unix://{DEFAULT_SOCKET}') -> 'ProxySDK':
@@ -682,5 +754,45 @@ class ProxySDK(TradingMarkets):
     return resp.venues
 
   async def venue(self, id: str, /) -> TradingVenue:
-    """Forward venue through the gateway."""
-    return ProxyVenue(self._conn, id)
+    """Resolve an account's venue at the gateway once, then reuse the proxy."""
+    if (venue := self._venues.get(id)) is None:
+      resp: codec.VenueResp = await self._conn.call(
+        codec.VenueReq(id=str(uuid4()), account_id=id)
+      )
+      venue = ProxyVenue(self._conn, id, resp.venue_id, self._exchanges)
+      self._venues[id] = venue
+    return venue
+
+  async def exchange(self, id: str, /) -> Exchange:
+    """Resolve an exchange in one round trip, skipping venue resolution."""
+    account_id, exchange_id = id.split(':', 1)
+    return await resolve_exchange(
+      self._conn, self._exchanges, account_id=account_id, exchange_id=exchange_id
+    )
+
+  async def perp_exchange(self, id: str, /) -> PerpExchange:
+    """Resolve an exchange and require a perpetual product."""
+    account_id, exchange_id = id.split(':', 1)
+    return require_perp(
+      await resolve_exchange(
+        self._conn, self._exchanges, account_id=account_id, exchange_id=exchange_id
+      )
+    )
+
+  async def market(self, id: str, /) -> Market:
+    """Resolve a market through its exchange: one round trip, then cached."""
+    account_id, exchange_id, market_id = id.split(':', 2)
+    exchange = await resolve_exchange(
+      self._conn, self._exchanges, account_id=account_id, exchange_id=exchange_id
+    )
+    return await exchange.market(market_id)
+
+  async def perp_market(self, id: str, /) -> PerpMarket:
+    """Resolve a perpetual market through its exchange: one round trip, then cached."""
+    account_id, exchange_id, market_id = id.split(':', 2)
+    exchange = require_perp(
+      await resolve_exchange(
+        self._conn, self._exchanges, account_id=account_id, exchange_id=exchange_id
+      )
+    )
+    return await exchange.market(market_id)

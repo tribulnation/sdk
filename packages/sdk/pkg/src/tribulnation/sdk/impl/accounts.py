@@ -1,4 +1,8 @@
-from typing_extensions import Literal as _Literal, Annotated as _Annotated, TypedDict as _TypedDict
+from typing_extensions import (
+  Literal as _Literal,
+  Annotated as _Annotated,
+  TypedDict as _TypedDict,
+)
 from dataclasses import dataclass as _dataclass
 from pathlib import Path as _Path
 import sys as _sys
@@ -22,8 +26,34 @@ def resolve_env_var(value: str | None, *, require: bool) -> str | None:
   return value
 
 
-@_dataclass(kw_only=True)
+VenueId = _Literal[
+  'dydx',
+  'dydx_testnet',
+  'hyperliquid',
+  'hyperliquid_testnet',
+  'deribit',
+  'deribit_testnet',
+  'aster',
+  'aster_testnet',
+  'lighter',
+  'lighter_testnet',
+  'mexc',
+  'bit2me',
+  'bitget',
+  'binance',
+  'bybit',
+  'coinbase',
+  'kraken',
+  'kucoin',
+]
+"""A trading venue, testnets included: the `venue` of a trading account and the
+`venue_id` its venues, exchanges and markets report."""
+
+
+@_dataclass(kw_only=True, frozen=True)
 class BaseAccount:
+  """Account configuration; immutable once constructed."""
+
   public: bool = False
   """Whether to allow public usage (i.e. whether unset credentials are OK)."""
 
@@ -31,12 +61,22 @@ class BaseAccount:
     """Verify that all required environment variables are set."""
     raise NotImplementedError('Subclasses must implement verify_env_vars()')
 
+
+@_dataclass(kw_only=True, frozen=True)
+class VenueAccount(BaseAccount):
+  """An account on a trading venue; each subclass narrows `venue` to its own venues."""
+
+  venue: VenueId
+  """The venue this account trades on, e.g. `'dydx'` or `'dydx_testnet'`."""
+
+
 class DydxCreds(_TypedDict, total=False):
   mnemonic: str | None
   private_key: str | None
 
-@_dataclass
-class Dydx(BaseAccount):
+
+@_dataclass(frozen=True)
+class Dydx(VenueAccount):
   venue: _Literal['dydx', 'dydx_testnet'] = 'dydx'
   address: str = '$DYDX_ADDRESS'
   """Account address (`dydx1...`). For an API wallet, the account it trades for."""
@@ -68,8 +108,8 @@ class Dydx(BaseAccount):
     self.resolved_creds
 
 
-@_dataclass
-class Hyperliquid(BaseAccount):
+@_dataclass(frozen=True)
+class Hyperliquid(VenueAccount):
   venue: _Literal['hyperliquid', 'hyperliquid_testnet'] = 'hyperliquid'
   address: str = '$HYPERLIQUID_ADDRESS'
   """Wallet address (`0x...`). Read-only if no private key is provided."""
@@ -89,8 +129,8 @@ class Hyperliquid(BaseAccount):
     self.resolved_private_key
 
 
-@_dataclass
-class Mexc(BaseAccount):
+@_dataclass(frozen=True)
+class Mexc(VenueAccount):
   venue: _Literal['mexc'] = 'mexc'
   api_key: str = '$MEXC_API_KEY'
   """MEXC API key"""
@@ -112,8 +152,8 @@ class Mexc(BaseAccount):
     self.resolved_api_secret
 
 
-@_dataclass
-class Bit2Me(BaseAccount):
+@_dataclass(frozen=True)
+class Bit2Me(VenueAccount):
   venue: _Literal['bit2me'] = 'bit2me'
   api_key: str = '$BIT2ME_API_KEY'
   """Bit2Me API key"""
@@ -135,8 +175,8 @@ class Bit2Me(BaseAccount):
     self.resolved_api_secret
 
 
-@_dataclass
-class Bitget(BaseAccount):
+@_dataclass(frozen=True)
+class Bitget(VenueAccount):
   venue: _Literal['bitget'] = 'bitget'
   access_key: str = '$BITGET_ACCESS_KEY'
   """Bitget API access key"""
@@ -167,8 +207,8 @@ class Bitget(BaseAccount):
     self.resolved_passphrase
 
 
-@_dataclass
-class Binance(BaseAccount):
+@_dataclass(frozen=True)
+class Binance(VenueAccount):
   venue: _Literal['binance'] = 'binance'
   api_key: str = '$BINANCE_API_KEY'
   """Binance API key"""
@@ -190,8 +230,8 @@ class Binance(BaseAccount):
     self.resolved_secret_key
 
 
-@_dataclass
-class Bybit(BaseAccount):
+@_dataclass(frozen=True)
+class Bybit(VenueAccount):
   venue: _Literal['bybit'] = 'bybit'
   api_key: str = '$BYBIT_API_KEY'
   """Bybit API key"""
@@ -213,8 +253,8 @@ class Bybit(BaseAccount):
     self.resolved_api_secret
 
 
-@_dataclass
-class Coinbase(BaseAccount):
+@_dataclass(frozen=True)
+class Coinbase(VenueAccount):
   venue: _Literal['coinbase'] = 'coinbase'
   key_name: str = '$COINBASE_API_KEY_NAME'
   private_key: str = '$COINBASE_PRIVATE_KEY'
@@ -232,8 +272,8 @@ class Coinbase(BaseAccount):
     self.resolved_private_key
 
 
-@_dataclass
-class Kraken(BaseAccount):
+@_dataclass(frozen=True)
+class Kraken(VenueAccount):
   venue: _Literal['kraken'] = 'kraken'
   api_key: str = '$KRAKEN_API_KEY'
   """Kraken API key"""
@@ -255,8 +295,8 @@ class Kraken(BaseAccount):
     self.resolved_private_key
 
 
-@_dataclass
-class Kucoin(BaseAccount):
+@_dataclass(frozen=True)
+class Kucoin(VenueAccount):
   """Kucoin Classic API account."""
 
   venue: _Literal['kucoin'] = 'kucoin'
@@ -287,8 +327,8 @@ class Kucoin(BaseAccount):
     self.resolved_api_passphrase
 
 
-@_dataclass
-class Deribit(BaseAccount):
+@_dataclass(frozen=True)
+class Deribit(VenueAccount):
   """Deribit account with separate mainnet and testnet credential defaults."""
 
   venue: _Literal['deribit', 'deribit_testnet'] = 'deribit'
@@ -322,8 +362,8 @@ class Deribit(BaseAccount):
     self.resolved_client_secret
 
 
-@_dataclass
-class Aster(BaseAccount):
+@_dataclass(frozen=True)
+class Aster(VenueAccount):
   """Aster main-wallet address and trading agent, isolated by network."""
 
   venue: _Literal['aster', 'aster_testnet'] = 'aster'
@@ -354,8 +394,8 @@ class Aster(BaseAccount):
     self.resolved_signer
 
 
-@_dataclass
-class Lighter(BaseAccount):
+@_dataclass(frozen=True)
+class Lighter(VenueAccount):
   """Lighter account and API key, isolated by network."""
 
   venue: _Literal['lighter', 'lighter_testnet'] = 'lighter'
@@ -414,7 +454,7 @@ class Lighter(BaseAccount):
     self.resolved_api_private_key
 
 
-@_dataclass
+@_dataclass(frozen=True)
 class Evm(BaseAccount):
   Venue = _Literal[
     'ethereum',

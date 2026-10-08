@@ -1,5 +1,6 @@
 """Credential-free Deribit public spot and linear perpetual Market support."""
 
+from typed_deribit import Deribit
 from tribulnation.sdk.market import TradingVenue
 from .common import Public, Shared
 from .exchanges import SpotExchange, LinearPerpExchange
@@ -9,9 +10,13 @@ class DeribitMarket(Public, TradingVenue):
   """Mainnet public data, independent of credentials on private SDK surfaces."""
 
   @classmethod
-  def new(cls, *, validate: bool = True):
+  def new(cls, *, validate: bool = True, account_id: str | None = None):
     """Construct only a credential-free mainnet client."""
-    return cls(shared=Shared.new(public=True, validate=validate))
+    return cls(
+      shared=Shared(
+        client=Deribit.new(public=True, validate=validate), account_id=account_id
+      )
+    )
 
   async def exchanges(self) -> list[TradingVenue.ExchangeDescription]:
     """Expose native spot and supported linear perpetual product identities."""

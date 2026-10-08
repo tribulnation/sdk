@@ -18,10 +18,6 @@ class BybitMarket(VenueMixin, TradingVenue):
   one instrument cache and one private stream.
   """
 
-  @property
-  def venue_id(self) -> str:
-    return 'bybit'
-
   async def exchange(self, exchange_id: str, /) -> SpotExchange | PerpExchange:
     """Resolve an exchange by id: `spot` or `perp`."""
     if exchange_id == 'spot':

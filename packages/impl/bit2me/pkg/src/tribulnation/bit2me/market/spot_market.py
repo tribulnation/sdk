@@ -45,10 +45,6 @@ class SpotMarket(MarketMixin, Market):
   """Bit2Me implementation of `Market`, for one Trading Spot pair."""
 
   @property
-  def venue_id(self) -> str:
-    return 'bit2me'
-
-  @property
   def exchange_id(self) -> str:
     return 'spot'
 

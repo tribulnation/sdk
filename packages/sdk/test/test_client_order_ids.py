@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from decimal import Decimal
 
+from tribulnation.sdk.impl.accounts import VenueId
 from tribulnation.sdk.market import (
   Exchange,
   ExchangeTrade,
@@ -34,7 +35,11 @@ class FakeMarket(Market):
     return 'spot'
 
   @property
-  def venue_id(self) -> str:
+  def venue_id(self) -> VenueId:
+    return 'kraken'
+
+  @property
+  def account_id(self) -> str:
     return 'fake'
 
   async def place_order(self, order: Order, *, settings: Any = {}) -> OrderResponse:
@@ -82,7 +87,11 @@ class FakeExchange(Exchange):
   fake: FakeMarket
 
   @property
-  def venue_id(self) -> str:
+  def venue_id(self) -> VenueId:
+    return 'kraken'
+
+  @property
+  def account_id(self) -> str:
     return 'fake'
 
   @property
@@ -106,7 +115,11 @@ class FakeVenue(TradingVenue):
   fake: FakeExchange
 
   @property
-  def venue_id(self) -> str:
+  def venue_id(self) -> VenueId:
+    return 'kraken'
+
+  @property
+  def account_id(self) -> str:
     return 'fake'
 
   async def exchange(self, exchange_id: str, /) -> Exchange:

@@ -100,10 +100,6 @@ class PerpMarket(SharedMixin, _PerpMarket):
   CANDLE_INTERVALS = frozenset[CandleInterval]({'1m', '5m', '15m', '1h', '4h', '1d'})
 
   @property
-  def venue_id(self) -> str:
-    return 'binance'
-
-  @property
   def exchange_id(self) -> str:
     return 'usdm'
 

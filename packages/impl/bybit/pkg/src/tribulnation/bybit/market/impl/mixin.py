@@ -13,19 +13,22 @@ from typing_extensions import (
   Callable,
   Literal,
   Mapping,
+  Self,
   TypeVar,
 )
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 import asyncio
 
 from tribulnation.sdk.core import OverflowPolicy, Subscription
 from tribulnation.sdk.market import Book
+from typed_bybit.core.http import Region
 from typed_bybit.linear.orderbook import LinearOrderbookUpdate
 from typed_bybit.market.instruments import ContractInstrument, SpotInstrument
 from typed_bybit.private.execution import ExecutionUpdate
 from typed_bybit.spot.orderbook import OrderbookUpdate
 
 from tribulnation.bybit.core import Mixin, wrap_exceptions
+from tribulnation.bybit.core.settings import Settings
 from .parse import Category, parse_book
 
 Depth = Literal[1, 50, 200]
@@ -94,8 +97,11 @@ async def flatten_executions(
 
 @dataclass
 class Cache:
-  """Catalogues and subscriptions shared by every market built off one client."""
+  """Account key, catalogues and subscriptions shared by every market built off one
+  client."""
 
+  account_id: str | None = None
+  """Root SDK account key; `None` when built directly, reporting `'bybit'` instead."""
   spot: dict[str, SpotInstrument] = field(default_factory=dict[str, SpotInstrument])
   perp: dict[str, ContractInstrument] = field(
     default_factory=dict[str, ContractInstrument]
@@ -113,6 +119,50 @@ class VenueMixin(Mixin):
   """Everything the venue, its exchanges and its markets all need."""
 
   cache: Cache = field(default_factory=Cache)
+
+  @classmethod
+  def new(
+    cls,
+    api_key: str | None = None,
+    api_secret: str | None = None,
+    *,
+    public: bool = False,
+    region: Region = 'global',
+    testnet: bool = False,
+    settings: Settings = {},
+    account_id: str | None = None,
+  ) -> Self:
+    """Build a market surface over a fresh Bybit client.
+
+    Args:
+      api_key: Bybit API key; read from the environment when omitted.
+      api_secret: Bybit API secret; read from the environment when omitted.
+      public: Build a credential-free client, restricted to public endpoints.
+      region: Bybit legal entity to target.
+      testnet: Target the region's testnet host instead of mainnet.
+      settings: Client-level settings.
+      account_id: Root SDK account key, the first segment of every market ID;
+        defaults to the venue ID.
+    """
+    surface = super().new(
+      api_key,
+      api_secret,
+      public=public,
+      region=region,
+      testnet=testnet,
+      settings=settings,
+    )
+    return replace(surface, cache=Cache(account_id=account_id))
+
+  @property
+  def venue_id(self) -> Literal['bybit']:
+    """The venue ID."""
+    return 'bybit'
+
+  @property
+  def account_id(self) -> str:
+    """Root SDK account key this object was opened under, else `venue_id`."""
+    return self.cache.account_id or self.venue_id
 
   async def spot_instruments(
     self, *, refetch: bool = False

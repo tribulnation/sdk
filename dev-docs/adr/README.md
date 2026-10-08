@@ -59,3 +59,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0034](0034-offline-evidence-maintenance.md) | Offline evidence maintenance without repeated live qualification | Accepted; amends 0033 |
 | [0035](0035-funding-cash-flow-sign.md) | Funding payments use received-positive account cash flows | Accepted; supersedes the sign decision in 0024 |
 | [0036](0036-no-implicit-accounts.md) | SDK roots have no implicit accounts | Accepted |
+| [0037](0037-account-scoped-ids.md) | Account-scoped market and exchange IDs | Proposed; implemented, not release-verified |

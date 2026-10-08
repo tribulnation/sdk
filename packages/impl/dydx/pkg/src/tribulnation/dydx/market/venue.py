@@ -13,10 +13,6 @@ from .exchange import Exchange
 
 @dataclass(frozen=True)
 class DydxMarket(ExchangeMixin, TradingVenue):
-  @property
-  def venue_id(self) -> str:
-    return 'dydx'
-
   async def exchange(self, exchange_id: str, /) -> Exchange:
     """Resolve a perpetual exchange (margin bucket) by id.
 

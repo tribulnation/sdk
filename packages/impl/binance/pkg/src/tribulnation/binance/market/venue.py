@@ -11,10 +11,6 @@ from .perp_exchange import PerpExchange
 class BinanceMarket(SharedMixin, TradingVenue):
   """Binance trading venue: `spot` and `usdm` (USD-M futures) exchanges."""
 
-  @property
-  def venue_id(self) -> str:
-    return 'binance'
-
   async def exchange(self, exchange_id: str, /):
     if exchange_id == 'spot':
       return SpotExchange(shared=self.shared)

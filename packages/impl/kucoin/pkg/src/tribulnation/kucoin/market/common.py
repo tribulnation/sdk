@@ -2,7 +2,7 @@
 
 import asyncio
 from dataclasses import dataclass, field
-from typing_extensions import AsyncContextManager, Iterable
+from typing_extensions import AsyncContextManager, Iterable, Literal
 
 from typed_kucoin.schemas import FuturesContract, SpotSymbol
 from tribulnation.sdk import SDK
@@ -25,6 +25,8 @@ def linear_perpetual(row: FuturesContract) -> bool:
 class Shared(Mixin):
   """Own one client and cache instrument definitions and shared book feeds."""
 
+  account_id: str | None = None
+  """Root SDK account key; `None` when built directly, reporting `venue_id` instead."""
   spot: dict[str, SpotSymbol] = field(default_factory=dict[str, SpotSymbol])
   perp: dict[str, FuturesContract] = field(default_factory=dict[str, FuturesContract])
   lock: asyncio.Lock = field(default_factory=asyncio.Lock)
@@ -62,9 +64,14 @@ class Public(SDK):
   shared: Shared
 
   @property
-  def venue_id(self) -> str:
+  def venue_id(self) -> Literal['kucoin']:
     """The Catalogue platform ID."""
     return 'kucoin'
+
+  @property
+  def account_id(self) -> str:
+    """Root SDK account key this object was opened under, else `venue_id`."""
+    return self.shared.account_id or self.venue_id
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     """Enter the shared owner through the SDK lifecycle."""

@@ -16,10 +16,6 @@ class SpotExchange(VenueMixin, Exchange):
   """Bybit spot."""
 
   @property
-  def venue_id(self) -> str:
-    return 'bybit'
-
-  @property
   def exchange_id(self) -> str:
     return 'spot'
 

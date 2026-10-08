@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing_extensions import (
   AsyncContextManager,
+  Literal,
   Iterable,
   TypedDict,
   Callable,
@@ -59,6 +60,10 @@ class Shared(SDK):
   client: Dydx
   parent_subaccount: int = 0
   address: str | None
+  venue_id: Literal['dydx', 'dydx_testnet'] = 'dydx'
+  """The network this client is connected to, as a venue ID."""
+  account_id: str | None = None
+  """Root SDK account key; `None` when built directly, reporting `venue_id` instead."""
   perpetual_markets: dict[str, PerpetualMarket] | None = None
   fee_tier: feetiers_proto.PerpetualFeeTier | None = None
   standard_fee_tier: feetiers_proto.PerpetualFeeTier | None = None
@@ -229,21 +234,59 @@ class ExchangeMixin(SDK):
     mainnet: bool = True,
     validate: bool = True,
     parent_subaccount: int = 0,
+    account_id: str | None = None,
   ):
+    """Create a surface over a new client.
+
+    Args:
+      mnemonic: Account mnemonic.
+      private_key: Account or API wallet private key.
+      public: Allow credential-free usage for public data.
+      address: Account address; derived from the wallet when omitted.
+      mainnet: Use mainnet when true, testnet when false.
+      validate: Validate indexer responses.
+      parent_subaccount: Parent subaccount number.
+      account_id: Root SDK account key, the first segment of every ID; defaults to
+        the venue ID.
+    """
     client = (
       Dydx.mainnet(
-        mnemonic, private_key=private_key, address=address, indexer={'validate': validate}, public=public
+        mnemonic,
+        private_key=private_key,
+        address=address,
+        indexer={'validate': validate},
+        public=public,
       )
       if mainnet
       else Dydx.testnet(
-        mnemonic, private_key=private_key, address=address, indexer={'validate': validate}, public=public
+        mnemonic,
+        private_key=private_key,
+        address=address,
+        indexer={'validate': validate},
+        public=public,
       )
     )
     if address is None and client.node.wallet is not None:
       address = client.node.require_wallet().address
     return cls(
-      shared=Shared(client=client, address=address, parent_subaccount=parent_subaccount)
+      shared=Shared(
+        client=client,
+        address=address,
+        parent_subaccount=parent_subaccount,
+        venue_id='dydx' if mainnet else 'dydx_testnet',
+        account_id=account_id,
+      )
     )
+
+  @property
+  def venue_id(self) -> Literal['dydx', 'dydx_testnet']:
+    """The venue this object trades on: `'dydx'` or `'dydx_testnet'`."""
+    return self.shared.venue_id
+
+  @property
+  def account_id(self) -> str:
+    """Root SDK account key this object was opened under, else `venue_id`."""
+    return self.shared.account_id or self.shared.venue_id
 
   @property
   def client(self):

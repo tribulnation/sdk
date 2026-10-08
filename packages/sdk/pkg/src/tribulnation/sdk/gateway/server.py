@@ -232,18 +232,24 @@ class Gateway:
           ),
         )
       case codec.ExchangeReq():
-        exchange = await (await self._sdk.venue(msg.venue_id)).exchange(msg.exchange_id)
+        exchange = await (await self._sdk.venue(msg.account_id)).exchange(
+          msg.exchange_id
+        )
         return codec.ExchangeResp(
-          id=msg.id, type='perp' if isinstance(exchange, PerpExchange) else 'spot'
+          id=msg.id,
+          type='perp' if isinstance(exchange, PerpExchange) else 'spot',
+          venue_id=exchange.venue_id,
         )
       case codec.TickersReq():
-        exchange = await (await self._sdk.venue(msg.venue_id)).exchange(msg.exchange_id)
+        exchange = await (await self._sdk.venue(msg.account_id)).exchange(
+          msg.exchange_id
+        )
         return codec.TickersResp(
           id=msg.id,
           tickers=dict(await exchange.tickers(msg.markets, settings=msg.settings)),
         )
       case codec.PerpStatsReq():
-        perp_exchange = await (await self._sdk.venue(msg.venue_id)).perp_exchange(
+        perp_exchange = await (await self._sdk.venue(msg.account_id)).perp_exchange(
           msg.exchange_id
         )
         return codec.PerpStatsResp(
@@ -253,7 +259,9 @@ class Gateway:
           ),
         )
       case codec.ExchangeCollateralReq():
-        exchange = await (await self._sdk.venue(msg.venue_id)).exchange(msg.exchange_id)
+        exchange = await (await self._sdk.venue(msg.account_id)).exchange(
+          msg.exchange_id
+        )
         return codec.CollateralResp(id=msg.id, collateral=await exchange.collateral())
       case codec.RulesReq():
         return codec.RulesResp(
@@ -349,20 +357,23 @@ class Gateway:
           collateral=await (await self._perp_market(msg.market_id)).perp_collateral(),
         )
       case codec.ExchangePerpCollateralReq():
-        venue = await self._sdk.venue(msg.venue_id)
+        venue = await self._sdk.venue(msg.account_id)
         exchange = await venue.perp_exchange(msg.exchange_id)
         return codec.PerpCollateralResp(
           id=msg.id,
           collateral=await exchange.perp_collateral(),
         )
       case codec.MarketsReq():
-        exc = await (await self._sdk.venue(msg.venue_id)).exchange(msg.exchange_id)
+        exc = await (await self._sdk.venue(msg.account_id)).exchange(msg.exchange_id)
         return codec.MarketsResp(id=msg.id, markets=list(await exc.markets()))
       case codec.ExchangesReq():
         return codec.ExchangesResp(
           id=msg.id,
-          exchanges=list(await (await self._sdk.venue(msg.venue_id)).exchanges()),
+          exchanges=list(await (await self._sdk.venue(msg.account_id)).exchanges()),
         )
+      case codec.VenueReq():
+        venue = await self._sdk.venue(msg.account_id)
+        return codec.VenueResp(id=msg.id, venue_id=venue.venue_id)
       case codec.VenuesReq():
         return codec.VenuesResp(id=msg.id, venues=list(await self._sdk.venues()))
 

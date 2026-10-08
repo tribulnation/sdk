@@ -34,7 +34,8 @@ For Coinbase, `spot` is named `Advanced Trade`. Resolve the object with
 `await venue.exchange(id)`;
 never substitute its display name. Hyperliquid's empty default ID stays empty,
 and dynamically discovered DEXs carry their API-provided full names. Consumers
-persisting metadata should key it by `(venue_id, exchange_id)`. URLs may be
+persisting metadata should key it by `(venue_id, exchange_id)`, the venue
+rather than the account key. URLs may be
 omitted rather than guessed. No discovery ordering or trading-access guarantee
 is implied by a name.
 
