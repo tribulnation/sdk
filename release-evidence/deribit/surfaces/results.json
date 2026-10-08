@@ -164,6 +164,14 @@
         "skipped": 0
       },
       {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_public_read[\"spot:BTC_USDT\", \"fees\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
         "exclusion": null,
         "failed": 0,
         "id": "market.test_candle_values_are_decimals_and_ordered[\"perp:BTC_USDC-PERPETUAL\", null]",
@@ -273,6 +281,14 @@
         "id": "market.test_public_read[\"perp:BTC_USDC-PERPETUAL\", \"perp_stats\"]",
         "network": "mainnet",
         "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_public_read[\"perp:BTC_USDC-PERPETUAL\", \"fees\"]",
+        "network": "mainnet",
+        "passed": 0,
         "skipped": 0
       },
       {

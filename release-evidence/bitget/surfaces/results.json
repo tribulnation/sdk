@@ -164,6 +164,14 @@
         "skipped": 0
       },
       {
+        "exclusion": "private_account_fees",
+        "failed": 0,
+        "id": "market.test_public_read[\"spot:BTCUSDT\", \"fees\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
         "exclusion": null,
         "failed": 0,
         "id": "market.test_candle_values_are_decimals_and_ordered[\"usdt:BTCUSDT\", null]",
@@ -276,6 +284,14 @@
         "skipped": 0
       },
       {
+        "exclusion": "private_account_fees",
+        "failed": 0,
+        "id": "market.test_public_read[\"usdt:BTCUSDT\", \"fees\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
         "exclusion": null,
         "failed": 0,
         "id": "market.test_candle_values_are_decimals_and_ordered[\"usdc:BTCPERP\", null]",
@@ -385,6 +401,14 @@
         "id": "market.test_public_read[\"usdc:BTCPERP\", \"perp_stats\"]",
         "network": "mainnet",
         "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "private_account_fees",
+        "failed": 0,
+        "id": "market.test_public_read[\"usdc:BTCPERP\", \"fees\"]",
+        "network": "mainnet",
+        "passed": 0,
         "skipped": 0
       },
       {

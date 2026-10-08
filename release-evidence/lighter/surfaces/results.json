@@ -140,6 +140,14 @@
         "skipped": 0
       },
       {
+        "exclusion": "private_account_fees",
+        "failed": 0,
+        "id": "market.test_public_read[\"perp:1\", \"fees\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
         "exclusion": null,
         "failed": 0,
         "id": "market.test_candle_values_are_decimals_and_ordered[\"spot:2048\", null]",
@@ -247,6 +255,14 @@
         "exclusion": "spot_only",
         "failed": 0,
         "id": "market.test_public_read[\"spot:2048\", \"perp_stats\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "private_account_fees",
+        "failed": 0,
+        "id": "market.test_public_read[\"spot:2048\", \"fees\"]",
         "network": "mainnet",
         "passed": 0,
         "skipped": 0
