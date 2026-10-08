@@ -56,3 +56,9 @@ min_mode = "private"
 
 [qualification.market.unsupported]
 usdm = ["open_orders", "trades_history", "position", "collateral", "available_notional"]
+
+[[qualification.market.waived]]
+exchange = "usdm"
+method = "fees"
+reason = "credential_scope"
+note = "The qualification API key has no USD-M Futures permission, which cannot be granted from the maintainer's region."

@@ -15,7 +15,12 @@ import pytest
 from typing_extensions import Literal
 
 from .consistency import StrictModel
-from .integration.market.account import ACCOUNT_READS, account_exclusion
+from .integration.market.account import (
+  ACCOUNT_READS,
+  account_exclusion,
+  check_waivers,
+  runs,
+)
 from .integration.market.public import READS
 from .integration.market.support import CASES
 from .repo import repo_root
@@ -130,6 +135,7 @@ def inventory(
     references = CASES.get(venue, ())
     if not references:
       raise ValueError('Supported market implementation has no reference cases')
+    check_waivers(impl, {case.market_id.split(':', 1)[0] for case in references})
     enabled = (
       set(READS) | {'candles'}
       if support.support == 'full'
@@ -282,7 +288,11 @@ def verify_payload(payload: dict[str, object], *, root: Path):
     network = 'testnet' if split and case.surface == 'report' else 'mainnet'
     if row.network != network or row.exclusion != case.exclusion:
       raise ValueError('Read-suite network or exclusion does not match policy')
-    if case.exclusion is not None:
+    if case.exclusion is not None and runs(case.exclusion):
+      # A waived read either passes or skips with its waiver's expected error.
+      if row.failed or row.passed + row.skipped != 1:
+        raise ValueError(f'Waived read test failed or did not run: {row.id}')
+    elif case.exclusion is not None:
       if row.passed or row.failed or row.skipped:
         raise ValueError('Excluded checks must not be represented as executed tests')
     elif row.passed != 1 or row.failed or row.skipped:
@@ -342,7 +352,7 @@ class Recorder:
         raise pytest.UsageError('Unexpected or duplicate live test parameterization')
       id = matches[0]
       found.add(id)
-      if self.cases[id].exclusion is None:
+      if runs(self.cases[id].exclusion):
         kept.append(item)
         self.nodes[item.nodeid] = id
     if found != set(self.cases):

@@ -6,7 +6,7 @@ Failures use fixed messages, so balances, identifiers and raw errors never reach
 output or the recorded evidence.
 """
 
-from collections.abc import Awaitable, Callable, Sequence
+from collections.abc import Awaitable, Callable, Collection, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
@@ -15,7 +15,7 @@ import asyncio
 import pytest
 from typing_extensions import TypeVar, cast
 
-from tribulnation.sdk import Context, MarketSDK, NetworkError, RateLimited
+from tribulnation.sdk import AuthError, Context, MarketSDK, NetworkError, RateLimited
 from tribulnation.sdk.core import PaginatedResponse
 from tribulnation.sdk.market import (
   Collateral,
@@ -109,11 +109,13 @@ def account_exclusion(
   method: str,
   mode: AccountMode,
   bitget_uta: bool | None,
+  apply_waivers: bool = True,
 ) -> str | None:
   """The policy exclusion of one account read on one market, or `None` if required.
 
   Reconstructed from committed declarations and the recorded account mode only, so the
-  offline verifier reaches the same answer as the live run.
+  offline verifier reaches the same answer as the live run. A `waived:<reason>` code
+  still runs the read: only the waiver's expected error becomes a visible skip.
 
   Raises:
     ValueError: Account methods are declared without a `[qualification.market]` table.
@@ -145,7 +147,54 @@ def account_exclusion(
     and method in ('collateral', 'perp_collateral')
   ):
     return 'bitget_classic'
+  if apply_waivers:
+    for waiver in qualification.waived:
+      if waiver.exchange == exchange_id and waiver.method == method:
+        return f'{WAIVED}{waiver.reason}'
   return None
+
+
+WAIVED = 'waived:'
+"""Prefix of waiver exclusion codes, followed by the waiver's reason."""
+
+WAIVED_ERRORS: dict[str, type[Exception]] = {
+  'credential_scope': AuthError,
+  'account_setting': NotImplementedError,
+}
+"""The only failure each waiver reason turns into a skip; anything else still fails."""
+
+
+def check_waivers(impl: ImplFile, exchanges: Collection[str]):
+  """Reject waivers naming an unknown exchange or a read that is not otherwise required.
+
+  Checked against the reference markets' exchanges and the declarations alone, in the
+  strongest mode, so a stale waiver fails instead of silently matching nothing.
+
+  Raises:
+    ValueError: A waiver is duplicated or does not name a required account read.
+  """
+  qualification = impl.qualification.market
+  if qualification is None:
+    return
+  seen: set[tuple[str, str]] = set()
+  for waiver in qualification.waived:
+    key = (waiver.exchange, waiver.method)
+    if key in seen:
+      raise ValueError('Duplicate account-read waiver')
+    seen.add(key)
+    if waiver.exchange not in exchanges or waiver.method not in ACCOUNT_READS:
+      raise ValueError('Waiver names an unknown exchange or account read')
+    code = account_exclusion(
+      impl,
+      venue='',
+      exchange_id=waiver.exchange,
+      method=waiver.method,
+      mode='private',
+      bitget_uta=None,
+      apply_waivers=False,
+    )
+    if code is not None:
+      raise ValueError('Waiver names an account read that is already excluded')
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -193,6 +242,8 @@ class AccountResults:
   end: datetime
   values: dict[str, object] = field(default_factory=dict[str, object])
   failures: dict[str, str] = field(default_factory=dict[str, str])
+  errors: dict[str, type[Exception]] = field(default_factory=dict[str, type[Exception]])
+  """Exception class per failed read, matched against waivers; never exported."""
 
   async def attempt(self, name: str, call: Callable[[], Awaitable[object]]):
     """Bound each read, retaining a sanitized failure without hiding later reads."""
@@ -201,6 +252,7 @@ class AccountResults:
         self.values[name] = await asyncio.wait_for(call(), TIMEOUT)
     except Exception as exception:
       self.failures[name] = describe_exception(exception)
+      self.errors[name] = type(exception)
 
 
 T = TypeVar('T')
@@ -500,11 +552,16 @@ def account_result(
   account_market: str, account_plan: AccountPlan, pytestconfig: pytest.Config
 ) -> AccountResults:
   """Collect every required read once per account and reference market."""
-  methods = [m for m, code in account_plan.exclusions.items() if code is None]
+  methods = [m for m, code in account_plan.exclusions.items() if runs(code)]
   sdk = market_sdk(pytestconfig)
   return loop_of(pytestconfig).run_until_complete(
     collect_account(sdk, account_market, methods)
   )
+
+
+def runs(exclusion: str | None) -> bool:
+  """Whether a case runs: required reads and waived reads, which may still pass."""
+  return exclusion is None or exclusion.startswith(WAIVED)
 
 
 @pytest.mark.parametrize('method', ACCOUNT_READS)
@@ -514,13 +571,23 @@ def test_account_read(
   account_plan: AccountPlan,
   request: pytest.FixtureRequest,
 ):
-  """Validate one account read; declared reads that raise are failures."""
-  if (exclusion := account_plan.exclusions[method]) is not None:
+  """Validate one account read; declared reads that raise are failures.
+
+  A waived read still runs and passes when it works; only its waiver's expected
+  error becomes a skip, so a stale waiver shows up as a pass in the evidence.
+  """
+  exclusion = account_plan.exclusions[method]
+  if not runs(exclusion):
     pytest.skip(f'Excluded by policy: {exclusion}')
   if account_plan.below_minimum:
     pytest.skip("Account credentials are below the venue's qualification mode")
   result = cast(AccountResults, request.getfixturevalue('account_result'))
   if method in result.failures:
+    if exclusion is not None and issubclass(
+      result.errors.get(method, Exception),
+      WAIVED_ERRORS[exclusion.removeprefix(WAIVED)],
+    ):
+      pytest.skip(f'Waived ({exclusion}): {result.failures[method]}')
     pytest.fail(f'{method}: {result.failures[method]}', pytrace=False)
   try:
     check(method, result)

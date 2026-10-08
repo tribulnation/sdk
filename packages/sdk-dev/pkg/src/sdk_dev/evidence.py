@@ -427,6 +427,26 @@ def dependency_pins(snapshot: Snapshot) -> str:
   return '\n'.join(lines) + '\n'
 
 
+def waiver_summary(checks: list[JsonValue]) -> str:
+  """List every waived account read and its outcome, so waivers stay visible (ADR 0042)."""
+  lines: list[str] = []
+  for check in checks:
+    if not isinstance(check, dict):
+      continue
+    exclusion = check.get('exclusion')
+    if isinstance(exclusion, str) and exclusion.startswith('waived:'):
+      outcome = 'passed' if check.get('passed') else 'skipped'
+      lines.append(f'- `{check.get("id")}`: {exclusion}, {outcome}\n')
+  if not lines:
+    return ''
+  return (
+    '\nWaived account reads: declared reads the qualification account cannot '
+    'observe, recorded as skips that do not block release. A waived read that '
+    'passed means its waiver may be stale. See impl.toml and ADR 0042.\n\n'
+    + ''.join(lines)
+  )
+
+
 def write_report(
   output: Path,
   *,
@@ -489,6 +509,7 @@ def write_report(
         'checked while the venue suspended withdrawals venue-wide. Fetching '
         'withdrawal methods still had to pass. See ADR 0027; this is not a pass.\n'
       )
+    summary += waiver_summary(checks)
   summary = summary.encode()
   manifest = Manifest(
     before=before,

@@ -78,6 +78,27 @@ def mode_rank(mode: AccountMode) -> int:
   return ACCOUNT_MODES.index(mode)
 
 
+WaiverReason = Literal['credential_scope', 'account_setting']
+"""Why a declared account read cannot be observed on the qualification account:
+its credentials lack a permission scope the read needs (`AuthError`), or an account
+setting puts the read outside the adapter's declared support (`NotImplementedError`)."""
+
+
+class Waiver(pydantic.BaseModel):
+  """One `[[qualification.market.waived]]` entry: a declared account read that may
+  skip, visibly and without blocking release, on the qualification account."""
+
+  model_config = pydantic.ConfigDict(extra='forbid')
+
+  exchange: str
+  """Exchange ID of the reference markets the waiver covers."""
+  method: str
+  """The account read waived."""
+  reason: WaiverReason
+  note: str = pydantic.Field(min_length=1)
+  """Short explanation, kept with the declaration for reviewers and release notes."""
+
+
 class MarketQualification(pydantic.BaseModel):
   """The `[qualification.market]` table: how release evidence reads account methods.
 
@@ -96,6 +117,8 @@ class MarketQualification(pydantic.BaseModel):
   unsupported: dict[str, list[str]] = {}
   """Declared methods an exchange does not serve, keyed by exchange ID: the
   surface-level `methods` list cannot say that one product line lacks them."""
+  waived: list[Waiver] = []
+  """Declared reads the qualification account cannot observe (ADR 0042)."""
 
 
 class ImplQualification(pydantic.BaseModel):

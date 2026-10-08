@@ -12,8 +12,14 @@ from typing_extensions import Literal
 
 from sdk_dev import read_evidence as evidence
 from sdk_dev.cli import results
+from sdk_dev.integration.market.account import WAIVED, check_waivers, runs
 from sdk_dev.repo import repo_root
-from sdk_dev.support import AccountMode, load_impl_files
+from sdk_dev.support import AccountMode, ImplFile, Waiver, load_impl_files
+
+
+def waived(exclusion: str | None) -> bool:
+  """Whether an exclusion code is a waiver, whose read still runs."""
+  return exclusion is not None and exclusion.startswith(WAIVED)
 
 
 def minimum(venue: str) -> AccountMode:
@@ -46,7 +52,10 @@ def passing(venue: str, mode: AccountMode | None = None) -> evidence.Payload:
     completed=True,
     checks=[
       evidence.Outcome(
-        id=id, passed=0 if case.exclusion else 1, exclusion=case.exclusion
+        id=id,
+        passed=int(case.exclusion is None),
+        skipped=int(waived(case.exclusion)),
+        exclusion=case.exclusion,
       )
       for id, case in cases_of(venue, mode).items()
     ],
@@ -199,7 +208,7 @@ def test_real_pytest_collection_matches_inventory_without_network(
   with redirect_stdout(output), redirect_stderr(output):
     code = pytest.main(args, plugins=[recorder])
   assert code == pytest.ExitCode.OK, output.getvalue()
-  assert len(recorder.nodes) == sum(case.exclusion is None for case in cases.values())
+  assert len(recorder.nodes) == sum(runs(case.exclusion) for case in cases.values())
 
 
 def test_recorded_failures_do_not_export_account_details(tmp_path: Path):
@@ -401,7 +410,7 @@ def test_account_inventory_follows_support_modes_and_exchanges():
   )
   binance = account_cases('binance')
   assert binance['spot:BTCUSDT fees'] is None
-  assert binance['usdm:BTCUSDT fees'] is None
+  assert binance['usdm:BTCUSDT fees'] == 'waived:credential_scope'
   assert binance['usdm:BTCUSDT open_orders'] == 'unsupported'
   assert binance['usdm:BTCUSDT leverage'] == 'unsupported'
   lighter = account_cases('lighter', 'address')
@@ -495,3 +504,101 @@ def test_version_four_reports_are_rejected_not_relabelled():
   del legacy['account_mode']
   with pytest.raises(ValueError):
     evidence.verify_payload(legacy, root=repo_root())
+
+
+def test_declared_waivers_are_visible_non_blocking_codes():
+  """Binance USD-M and MEXC spot fees are waived with their reason, nothing else."""
+  assert account_cases('binance')['usdm:BTCUSDT fees'] == 'waived:credential_scope'
+  assert account_cases('binance')['spot:BTCUSDT fees'] is None
+  assert account_cases('mexc')['spot:BTCUSDT fees'] == 'waived:account_setting'
+  for venue in results.required_venues(repo_root(), 'sdk'):
+    codes = {code for code in account_cases(venue).values() if waived(code)}
+    expected = {
+      'binance': {'waived:credential_scope'},
+      'mexc': {'waived:account_setting'},
+    }.get(venue, set())
+    assert codes == expected
+
+
+@pytest.mark.parametrize(
+  'values, valid',
+  [
+    ({'passed': 0, 'skipped': 1}, True),
+    ({'passed': 1, 'skipped': 0}, True),
+    ({'passed': 0, 'skipped': 0}, False),
+    ({'passed': 0, 'skipped': 0, 'failed': 1}, False),
+    ({'passed': 1, 'skipped': 1}, False),
+    ({'passed': 0, 'skipped': 1, 'exclusion': 'unsupported'}, False),
+    ({'passed': 0, 'skipped': 1, 'exclusion': 'waived:account_setting'}, False),
+  ],
+)
+def test_waived_reads_skip_or_pass_but_never_fail(
+  values: dict[str, object], valid: bool
+):
+  """A waived read may skip or (if its waiver went stale) pass; failures still block."""
+  report = passing('binance')
+  index = next(
+    i
+    for i, row in enumerate(report.checks)
+    if row.exclusion == 'waived:credential_scope'
+  )
+  report.checks[index] = report.checks[index].model_copy(update=values)
+  payload = report.model_dump(mode='json')
+  if valid:
+    evidence.verify_payload(payload, root=repo_root())
+  else:
+    with pytest.raises(ValueError):
+      evidence.verify_payload(payload, root=repo_root())
+
+
+def with_waiver(venue: str, **fields: str) -> ImplFile:
+  """The venue's declarations with one added waiver."""
+  impl = load_impl_files(repo_root() / 'packages/impl')[venue]
+  market = impl.qualification.market
+  assert market is not None
+  waiver = Waiver.model_validate({'reason': 'account_setting', 'note': 'x', **fields})
+  market = market.model_copy(update={'waived': [*market.waived, waiver]})
+  qualification = impl.qualification.model_copy(update={'market': market})
+  return impl.model_copy(update={'qualification': qualification})
+
+
+@pytest.mark.parametrize(
+  'fields',
+  [
+    {'exchange': 'coin', 'method': 'fees'},
+    {'exchange': 'spot', 'method': 'place_order'},
+    {'exchange': 'spot', 'method': 'leverage'},
+    {'exchange': 'spot', 'method': 'query_order'},
+    {'exchange': 'perp', 'method': 'open_orders'},
+    {'exchange': 'spot', 'method': 'fees'},
+  ],
+)
+def test_waivers_must_name_a_required_read(fields: dict[str, str]):
+  """Unknown exchanges or methods, excluded reads and duplicates are rejected."""
+  with pytest.raises(ValueError):
+    check_waivers(with_waiver('mexc', **fields), {'spot', 'perp'})
+  check_waivers(
+    with_waiver('mexc', exchange='spot', method='position'), {'spot', 'perp'}
+  )
+
+
+def test_waiver_reasons_and_notes_are_closed():
+  """Only the closed reason set is accepted, and every waiver explains itself."""
+  import pydantic
+
+  for raw in (
+    {'exchange': 'spot', 'method': 'fees', 'reason': 'flaky', 'note': 'x'},
+    {'exchange': 'spot', 'method': 'fees', 'reason': 'account_setting', 'note': ''},
+  ):
+    with pytest.raises(pydantic.ValidationError):
+      Waiver.model_validate(raw)
+
+
+def test_summary_lists_every_waiver():
+  """Release notes see each waived read and whether it skipped or passed."""
+  from sdk_dev.evidence import waiver_summary
+
+  checks = passing('binance').model_dump(mode='json')['checks']
+  summary = waiver_summary(checks)
+  assert 'usdm:BTCUSDT' in summary and 'waived:credential_scope, skipped' in summary
+  assert waiver_summary(passing('bybit').model_dump(mode='json')['checks']) == ''
