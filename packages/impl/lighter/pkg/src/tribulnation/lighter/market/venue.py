@@ -25,19 +25,27 @@ class LighterMarket(Public, TradingVenue):
     api_key_index: int | None = None,
     api_private_key: str | None = None,
     *,
+    auth_token: str | None = None,
+    address: str | None = None,
     network: Network = 'mainnet',
     public: bool = False,
     validate: bool = True,
     account_id: str | None = None,
   ):
-    """Build a venue from an API key, or credential-free for public data.
+    """Build a venue from an API key (trading and private reads), a read-only auth
+    token (private reads), or credential-free (public data, and the public reads of
+    `account_index` or the master account of `address`).
 
     Args:
-      account_index: Account the API key belongs to.
+      account_index: Account the credentials belong to; in public mode, the account
+        public account reads use.
       api_key_index: Slot of the API key.
       api_private_key: Private key of the API key.
+      auth_token: Read-only auth token, for private reads without an API key.
+      address: L1 address whose master account public account reads use when no
+        account index is known.
       network: Lighter deployment.
-      public: Skip credentials: public market data only.
+      public: Skip credentials.
       validate: Validate responses.
       account_id: Root SDK account key, the first segment of every market ID;
         defaults to the venue ID.
@@ -47,6 +55,8 @@ class LighterMarket(Public, TradingVenue):
         account_index,
         api_key_index,
         api_private_key,
+        auth_token=auth_token,
+        address=address,
         network=network,
         public=public,
         validate=validate,

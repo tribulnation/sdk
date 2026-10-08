@@ -71,7 +71,7 @@ class MarketBase(Public, Market):
   async def fees(self, *, refetch: bool = False) -> Fees:
     """The account's current fee ticks (`account/limits`), the same for buys and sells
     and for perp and spot fills."""
-    account_index = self.shared.account_index
+    account_index = self.shared.private_index
     limits = await self.shared.call(
       lambda: self.shared.client.api.account.limits(account_index)
     )
@@ -157,6 +157,7 @@ class LighterPerpMarket(MarketBase, PerpMarket):
 
   async def cancel_open_orders(self, *, settings: Settings = {}) -> Any:
     """The venue's cancel-all, scoped to this market."""
+    self.shared.require_api_key()
     market_index = self.market_index
     return await self.shared.call(
       lambda: self.shared.client.tx.cancel_all_orders(
@@ -287,5 +288,5 @@ class LighterSpotMarket(MarketBase):
     return account.spot_position(await self.shared.account(), self.base_asset)
 
   async def collateral(self) -> Collateral:
-    """The quote asset's collateral (unified accounts only)."""
+    """The quote asset's collateral; classic accounts raise `NotImplementedError`."""
     return account.spot_collateral(await self.shared.account(), self.quote_asset)

@@ -88,7 +88,7 @@ async def trades_history(
 ) -> AsyncIterable[Sequence[Trade]]:
   """Personal fills with `start <= time <= end`, newest first; exchange-wide rows are
   `ExchangeTrade`s. Paging stops at the first fill older than `start`."""
-  account = shared.account_index
+  account = await shared.account_index()
   pages = shared.client.api.account.orders.trades_paged(
     'timestamp',
     limit=TRADES_PAGE,
@@ -118,7 +118,7 @@ async def trades_history(
 def fills_subscription(shared: Shared, market_id: int, fee: Fee) -> Subscription[Trade]:
   """One `account_market` feed per market, yielding the account's new fills."""
   if market_id not in shared.fills:
-    account = shared.account_index
+    account = shared.private_index
 
     @exception_wrapper()
     async def connect() -> Subscription.Context[Trade]:
@@ -248,7 +248,7 @@ async def funding_payments(
   """Personal payments with `start <= time <= end`, newest first; the venue's
   received-positive `change` is preserved as the SDK's cash-flow amount. The request window
   is widened by one interval, as for `funding_rates`."""
-  account = shared.account_index
+  account = shared.private_index
   pages = shared.client.api.account.position_funding_paged(
     account_index=account,
     limit=FUNDING_PAGE,

@@ -19,7 +19,11 @@ venue = LighterMarket.new(account_index=476, api_key_index=4, api_private_key='0
 ```
 
 With no arguments, the client reads `LIGHTER_ACCOUNT_INDEX`, `LIGHTER_API_KEY_INDEX` and
-`LIGHTER_API_PRIVATE_KEY` (`LIGHTER_TESTNET_*` with `network='testnet'`).
+`LIGHTER_API_PRIVATE_KEY` (`LIGHTER_TESTNET_*` with `network='testnet'`), else a
+read-only `LIGHTER_AUTH_TOKEN`. A token (`auth_token='ro:…'`) allows every read but no
+trading. Without credentials, `public=True` with an `account_index`, or an `address`
+whose master account is used, still reads positions, collateral, leverage and trade
+history; fees, orders and funding payments need a token or an API key.
 
 1. Exchanges are `perp` and `spot`. Market ids are the venue's numeric `market_id`
    (`'0'` ETH and `'1'` BTC perpetuals, `'2048'` ETH/USDC spot on mainnet): the ids orders
@@ -35,7 +39,7 @@ With no arguments, the client reads `LIGHTER_ACCOUNT_INDEX`, `LIGHTER_API_KEY_IN
 4. Perpetual fees, margin and funding are in USDC. Spot fees are charged in the asset a
    fill delivers, so spot `rules().fee_asset` is `None` and each `Trade.fee` names it.
 5. Perpetual collateral covers cross and isolated positions. Spot collateral supports
-   unified accounts only.
+   unified accounts only, and raises `NotImplementedError` on classic accounts.
 
 `Report` snapshots every account (master and sub-accounts) of an L1 address, with no
 credentials:

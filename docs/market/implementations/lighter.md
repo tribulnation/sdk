@@ -19,21 +19,42 @@ covers only what is Lighter-specific.
 
 ## Account
 
-A public `accounts.Lighter(public=True)` account is enough for market data.
-Account and trading methods need an API key registered for the account.
+Three credential modes, by what the account configures:
+
+| Method | Public | Read-only token | API key |
+| --- | --- | --- | --- |
+| Market data | yes | yes | yes |
+| `position`, `collateral`, `perp_position`, `perp_collateral`, `leverage`, `available_notional`, `trades_history` | with `account_index` or `address` | yes | yes |
+| `fees`, `open_orders`, `query_order`, `funding_payments`, `trades_stream` | no | yes | yes |
+| `place_order`, `cancel_order`, `cancel_open_orders` | no | no | yes |
 
 ```toml
-[accounts.lighter]
-venue = "lighter"          # or "lighter_testnet"
+[accounts.lighter]           # API key: trading and every read
+venue = "lighter"            # or "lighter_testnet"
 account_index = "$LIGHTER_ACCOUNT_INDEX"
 api_key_index = "$LIGHTER_API_KEY_INDEX"
 api_private_key = "$LIGHTER_API_PRIVATE_KEY"
+
+[accounts.lighter_readonly]  # read-only token, which names its account
+venue = "lighter"
+auth_token = "$LIGHTER_AUTH_TOKEN"
+
+[accounts.lighter_public]    # public reads of the address's master account
+venue = "lighter"
+address = "$LIGHTER_ADDRESS"
+public = true
 ```
 
-With the fields omitted, `lighter` reads `LIGHTER_ACCOUNT_INDEX`, `LIGHTER_API_KEY_INDEX`
-and `LIGHTER_API_PRIVATE_KEY`, and `lighter_testnet` the same names prefixed
-`LIGHTER_TESTNET_`. Testnet never falls back to mainnet variables. `validate` toggles
-response validation.
+Without credentials, account reads use `account_index` when configured, else the master
+account (the venue's `account_type` 0) of `address`: sub-accounts need their own
+`account_index`. Methods outside the account's mode raise `AuthError` naming what is
+missing.
+
+With the fields omitted, `lighter` reads `LIGHTER_ACCOUNT_INDEX`, `LIGHTER_API_KEY_INDEX`,
+`LIGHTER_API_PRIVATE_KEY`, `LIGHTER_AUTH_TOKEN` and `LIGHTER_ADDRESS`, and
+`lighter_testnet` the same names prefixed `LIGHTER_TESTNET_`. Testnet never falls back to
+mainnet variables. A private account needs either the API key or the token. `validate`
+toggles response validation.
 
 ## Exchange & ID conventions
 
@@ -48,7 +69,8 @@ response validation.
 ## Venue-specific semantics
 
 - `fees()` reads the account's fee ticks, in parts per million, the same for buys and
-  sells, perpetuals and spot. Trade fees are the tick of the account's role times the
+  sells, perpetuals and spot (mainnet fills of one account on both kinds carry the
+  same tick). Trade fees are the tick of the account's role times the
   amount it pays on.
 - REST depth sums the top 250 resting orders per side (about 200 levels on busy books);
   a side at the limit drops its possibly partial last level. Depth streams maintain the
@@ -74,11 +96,11 @@ response validation.
   cross collateral times it, kept over the SDK default because isolated positions are
   funded from cross collateral rather than their own bucket. Spot `available_notional`
   is the SDK default, the quote asset's free collateral. Spot collateral supports unified accounts only; classic
-  accounts raise `ApiError`.
+  accounts raise `NotImplementedError`.
 - Funding settles hourly. Funding-rate history is signed by the paying side (positive
   when longs pay); funding payments are positive when received.
-- Public reads are verified on mainnet. Account and trading methods are verified on
-  testnet only.
+- Public reads, including public account reads, are verified on mainnet. Token reads
+  and trading methods are verified on testnet only.
 
 <!-- next -->
 

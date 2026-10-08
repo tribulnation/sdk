@@ -24,6 +24,7 @@ async def place_order(
   `price` as the worst acceptable price. Off-grid prices and sizes raise before signing.
   Acceptance is not execution: a sequencer rejection shows as a `canceled-*` status.
   """
+  shared.require_api_key()
   lighter = settings.get('lighter', {})
   scaler = await shared.scaler(market_id)
   qty = Decimal(order['qty'])
@@ -75,6 +76,7 @@ def client_index(id: str) -> int:
 
 async def cancel_order(shared: Shared, market_id: int, id: str) -> Any:
   """Cancel by client order index."""
+  shared.require_api_key()
   index = client_index(id)
   return await shared.call(
     lambda: shared.client.tx.cancel_order(market_index=market_id, order_index=index)
@@ -87,7 +89,7 @@ async def query_order(shared: Shared, market_id: int, id: str) -> OrderState | N
   A cancelled order leaves the active set seconds before it is indexed as inactive; in
   that window, and after 24h, it is not found.
   """
-  index, account = client_index(id), shared.account_index
+  index, account = client_index(id), shared.private_index
   orders = await shared.call(
     lambda: shared.client.api.account.orders.by_client_index(
       [index], account_index=account
@@ -100,7 +102,7 @@ async def query_order(shared: Shared, market_id: int, id: str) -> OrderState | N
 
 async def open_orders(shared: Shared, market_id: int) -> Sequence[OrderState]:
   """The market's active orders."""
-  account = shared.account_index
+  account = shared.private_index
   orders = await shared.call(
     lambda: shared.client.api.account.orders.active(
       account_index=account, market_id=market_id

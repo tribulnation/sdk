@@ -62,4 +62,5 @@ not a changelog or a substitute for API documentation and tests.
 | [0037](0037-account-scoped-ids.md) | Account-scoped market and exchange IDs | Proposed; implemented, not release-verified |
 | [0038](0038-account-market-leverage.md) | Account-scoped perpetual market leverage and the default available notional | Proposed; implemented, not release-verified; amended by 0041 |
 | [0039](0039-hyperliquid-hip3-spot-fees.md) | Hyperliquid HIP-3 and spot fees via the official formula | Accepted; implemented, not release-verified |
+| [0039](0039-lighter-credential-modes.md) | Lighter credential modes: read-only tokens and public account reads | Proposed; implemented, not release-verified |
 | [0041](0041-venue-notional-caps.md) | Venue notional caps in available notional | Proposed; implemented for Aster, not release-verified |

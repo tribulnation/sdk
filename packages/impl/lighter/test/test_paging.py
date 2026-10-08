@@ -18,10 +18,10 @@ END = datetime(2026, 9, 24, 15, tzinfo=timezone.utc)
 
 
 class AccountShared(Shared):
-  """A public client posing as account 476."""
+  """A public client posing as account 476, with token-gated reads too."""
 
   @property
-  def account_index(self) -> int:
+  def private_index(self) -> int:
     """The fixture account."""
     return 476
 
@@ -30,7 +30,7 @@ class AccountShared(Shared):
 async def shared():
   """A shared owner around a credential-free client; endpoints are replaced per test."""
   async with Lighter.new(public=True) as client:
-    yield AccountShared(client=client)
+    yield AccountShared(client=client, public_index=476)
 
 
 async def test_candle_windows_carry_their_own_count_back(shared: Shared):
