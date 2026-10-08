@@ -1,4 +1,4 @@
-"""Read-only market checks, independent of personal trading fee tiers."""
+"""Read-only market checks; personal fee tiers only where an address suffices."""
 
 from collections.abc import Awaitable, Callable, Sequence
 from dataclasses import dataclass, field
@@ -12,8 +12,10 @@ from typing_extensions import cast
 from sdk_dev.narrow import is_mapping
 
 from tribulnation.sdk import Context, MarketSDK, NetworkError, RateLimited
+from tribulnation.sdk.impl.accounts import Account, Hyperliquid
 from tribulnation.sdk.market import (
   Book,
+  Fees,
   FundingRate,
   Market,
   NextFunding,
@@ -46,8 +48,12 @@ READS = (
   'next_funding',
   'funding_rates',
   'perp_stats',
+  'fees',
 )
 TIMEOUT = 30
+ADDRESS_FEE_READS = frozenset({'hyperliquid'})
+"""Venues whose account `fees()` is a read keyed by a public address, never by a secret,
+so the read-only suite covers it. Other venues' account fees need private credentials."""
 AUTHENTICATED_READS: dict[str, frozenset[str]] = {}
 """Explicit exceptions for market-data paths that require account credentials."""
 
@@ -55,6 +61,15 @@ AUTHENTICATED_READS: dict[str, frozenset[str]] = {}
 def needs_account(venue: str, method: str, *, public: bool) -> bool:
   """Whether this account-derived read lacks a configured private account."""
   return public and method in AUTHENTICATED_READS.get(venue, frozenset())
+
+
+def fee_read_skip(account: Account, venue: str) -> str | None:
+  """Why the account `fees()` read is not attempted for this account, if it is not."""
+  if venue not in ADDRESS_FEE_READS:
+    return 'Account fees need private credentials outside the read-only suite'
+  if isinstance(account, Hyperliquid) and not account.resolved_address:
+    return 'Account fee read requires a configured address'
+  return None
 
 
 @dataclass
@@ -120,7 +135,8 @@ async def collect_public(sdk: MarketSDK, id: str) -> PublicResults:
   """Acquire one managed venue and call only a fixed allowlist of market-data reads."""
   result = PublicResults()
   account_id, exchange_id, symbol = id.split(':', 2)
-  venue_slug = package_of(sdk.accounts[account_id].venue)
+  account = sdk.accounts[account_id]
+  venue_slug = package_of(account.venue)
   support = surface_support('market')[venue_slug]
   try:
     async with sdk:
@@ -135,6 +151,8 @@ async def collect_public(sdk: MarketSDK, id: str) -> PublicResults:
         'rules': market.rules,
         'tickers': lambda: exchange.tickers([symbol]),
       }
+      if (fee_skip := fee_read_skip(account, venue_slug)) is None:
+        calls['fees'] = market.fees
       if isinstance(market, PerpMarket):
         calls.update(
           {
@@ -146,7 +164,9 @@ async def collect_public(sdk: MarketSDK, id: str) -> PublicResults:
       if isinstance(exchange, PerpExchange):
         calls['perp_stats'] = lambda: exchange.perp_stats([symbol])
       for name in READS:
-        if name not in calls:
+        if name == 'fees' and fee_skip is not None:
+          result.skips[name] = fee_skip
+        elif name not in calls:
           result.skips[name] = 'Perpetual-only method on a spot market'
         elif (
           name not in ('markets', 'exchanges')
@@ -163,7 +183,7 @@ async def collect_public(sdk: MarketSDK, id: str) -> PublicResults:
           result.skips[name] = (
             f'{venue_slug} perpetual streams are explicitly unsupported (impl.toml note)'
           )
-        elif needs_account(venue_slug, name, public=sdk.accounts[account_id].public):
+        elif needs_account(venue_slug, name, public=account.public):
           result.skips[name] = (
             'Current SDK path requires a configured private account (fee tier or catalogue)'
           )
@@ -244,6 +264,11 @@ def test_public_read(public_result: PublicResults, public_market: str, method: s
     assert value.fee_asset is None or value.fee_asset
     assert value.tick_size.is_finite() and value.tick_size > 0
     assert value.step_size.is_finite() and value.step_size > 0
+  elif method == 'fees':
+    assert isinstance(value, Fees)
+    for rate in (value.maker_buy, value.maker_sell, value.taker_buy, value.taker_sell):
+      assert isinstance(rate, Decimal) and rate.is_finite()
+    assert value.taker_buy >= 0 and value.taker_sell >= 0
   elif method == 'tickers':
     assert is_mapping(value)
     assert symbol in value and isinstance(value[symbol], Ticker)

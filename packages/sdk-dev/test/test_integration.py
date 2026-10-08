@@ -13,10 +13,11 @@ from typer.testing import CliRunner
 from typing_extensions import cast
 
 from tribulnation.sdk import ApiError, Earn, Wallet
-from tribulnation.sdk.impl.accounts import Account, Bybit, Kraken, Mexc
+from tribulnation.sdk.impl.accounts import Account, Bybit, Hyperliquid, Kraken, Mexc
 from tribulnation.sdk.market import (
   Candle,
   Exchange,
+  Fees,
   PerpExchange,
   PerpStats,
   TradingVenue,
@@ -227,6 +228,32 @@ def test_account_dependent_market_reads_are_explicit():
   assert not public.needs_account('bybit', 'depth', public=True)
   assert not public.needs_account('kraken', 'rules', public=True)
   assert not public.needs_account('coinbase', 'perp_stats', public=True)
+
+
+def test_account_fee_reads_need_only_an_address(monkeypatch: pytest.MonkeyPatch):
+  """Hyperliquid fees run on public accounts with an address; other venues skip."""
+  monkeypatch.setenv('HYPERLIQUID_ADDRESS', '0x' + '1' * 40)
+  assert public.fee_read_skip(Hyperliquid(public=True), 'hyperliquid') is None
+  monkeypatch.delenv('HYPERLIQUID_ADDRESS')
+  assert public.fee_read_skip(Hyperliquid(public=True), 'hyperliquid')
+  assert public.fee_read_skip(Mexc(public=True), 'mexc')
+
+
+@pytest.mark.parametrize(
+  'fees, valid',
+  [
+    (Fees.symmetric(maker=Decimal('-0.00001'), taker=Decimal('0.00045')), True),
+    (Fees.symmetric(maker=Decimal('0'), taker=Decimal('-0.0001')), False),
+  ],
+)
+def test_fees_conformance(fees: Fees, valid: bool):
+  """Account fees allow maker rebates but never a negative taker rate."""
+  result = public.PublicResults(values={'fees': fees})
+  if valid:
+    public.test_public_read(result, 'hyperliquid:xyz:xyz:SILVER', 'fees')
+  else:
+    with pytest.raises(AssertionError):
+      public.test_public_read(result, 'hyperliquid:xyz:xyz:SILVER', 'fees')
 
 
 def test_perp_stats_conformance_accepts_unknown_optional_fields():

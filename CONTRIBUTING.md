@@ -74,6 +74,7 @@ to record every required read-only suite below, even for market implementations.
 2. These suites do not place/cancel orders, transfer funds, or subscribe/redeem Earn
    positions. Market checks cover reference-market discovery, books and public streams,
    rules, tickers, funding data, and candles. Rules do not fetch personal fee tiers;
+   account `fees()` is read only where an address suffices (Hyperliquid, ADR 0039);
    Coinbase catalogue reads also run on explicitly configured public-only accounts.
    Account-specific Bitget checks remain
    read-only. Earn enumerates instruments; Wallet enumerates methods; Report reads a
