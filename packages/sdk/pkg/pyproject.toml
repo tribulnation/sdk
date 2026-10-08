@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tribulnation-sdk"
-version = "2.13.1"
+version = "2.14.0"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
@@ -33,11 +33,11 @@ gateway = "tribulnation.sdk.gateway.cli:app"
 
 [project.optional-dependencies]
 gateway = ["aiohttp>=3.12,<4", "pydantic>=2,<3", "python-dotenv>=1,<2"]
-aster = ["tribulnation-aster>=0.7.0"]
-lighter = ["tribulnation-lighter>=0.6.0"]
+aster = ["tribulnation-aster>=0.8.0"]
+lighter = ["tribulnation-lighter>=0.7.0"]
 mexc = ["tribulnation-mexc>=2.3.0"]
 dydx = ["tribulnation-dydx>=0.13.0"]
-hyperliquid = ["tribulnation-hyperliquid>=0.13.0"]
+hyperliquid = ["tribulnation-hyperliquid>=0.14.0"]
 binance = ["tribulnation-binance>=0.6.0"]
 bitget = ["tribulnation-bitget>=0.10.0"]
 bit2me = ["tribulnation-bit2me>=0.8.0"]
