@@ -8,7 +8,7 @@ from typing_extensions import cast
 
 ROOT = Path(__file__).resolve().parents[3]
 COMPATIBLE_IMPLEMENTATIONS = {
-  'aster': '0.8.0',
+  'aster': '0.9.0',
   'binance': '0.6.0',
   'bit2me': '0.8.0',
   'bitget': '0.10.0',
@@ -17,10 +17,10 @@ COMPATIBLE_IMPLEMENTATIONS = {
   'deribit': '0.5.0',
   'dydx': '0.13.0',
   'ethereum': '0.6.0',
-  'hyperliquid': '0.14.0',
+  'hyperliquid': '0.15.0',
   'kraken': '0.6.0',
   'kucoin': '0.5.0',
-  'lighter': '0.7.0',
+  'lighter': '0.8.0',
   'mexc': '2.3.0',
 }
 
@@ -120,4 +120,16 @@ def test_lighter_requires_credential_modes_sdk():
     if Requirement(value).name == 'tribulnation-sdk'
   )
   assert Version('2.13.1') not in requirement.specifier
-  assert Version('2.14.0') in requirement.specifier
+
+
+def test_order_rejected_adapters_require_order_rejected_sdk():
+  """Adapters importing `OrderRejected` need SDK 2.15, which introduces it."""
+  for venue in ('aster', 'hyperliquid', 'lighter'):
+    manifest = ROOT / f'packages/impl/{venue}/pkg/pyproject.toml'
+    requirement = next(
+      Requirement(value)
+      for value in dependencies(manifest)
+      if Requirement(value).name == 'tribulnation-sdk'
+    )
+    assert Version('2.14.0') not in requirement.specifier, venue
+    assert Version('2.15.0') in requirement.specifier, venue
