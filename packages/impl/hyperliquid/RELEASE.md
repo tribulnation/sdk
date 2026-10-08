@@ -12,3 +12,8 @@ isolated positions are opened from the account pool. Spot `available_notional()`
 unchanged, now provided by the SDK default.
 
 Upgrade the SDK and this adapter together.
+
+Release qualification on 2026-10-08 passed the read suites and market
+consistency. Committed evidence under `release-evidence/hyperliquid/` matches pinned
+Catalogue `1851660ac2bed8243dd9ce9c7297fe05c7130973`; offline release
+verification passes. This adapter release follows SDK 2.13.1 publication.
