@@ -1,28 +1,22 @@
-# tribulnation-hyperliquid 0.11.0
+# tribulnation-hyperliquid 0.12.0
 
-Funding payment amounts are now account cash flows: **positive means received,
-negative means paid**. Zero remains zero. This applies to market-specific history
-and exchange-wide history where supported. Funding rates, trading fee signs,
-pagination, account scope and Report cash-flow signs are unchanged.
+Requires SDK >=2.12.0. Market, exchange and venue objects expose `account_id`,
+the root SDK account key they were opened under, and build their IDs from it;
+`venue_id` is the typed venue. Objects built directly keep their current IDs.
+`depth()` and `depth_stream()` accept the SDK's venue-keyed `settings`.
 
-This is a breaking sign change from the previous release. Upgrade SDK >=2.10.0
-together with Hyperliquid >=0.11.0, dYdX >=0.11.0, Bybit >=0.5.0, Aster >=0.5.0,
-and Lighter >=0.4.0 for whichever adapters you use. Older published adapters do
-not declare an SDK upper bound, so upgrading the SDK alone cannot enforce this
-migration. Do not mix old and new adapter sign conventions.
+Depth reads take `settings={'hyperliquid': {'depth_source': ...}}`:
 
-For persisted funding history, refetch or negate records from the paid-positive
-versions exactly once. Older Hyperliquid/dYdX records predating the exchange-wide
-history sign change already used received-positive amounts; leave those alone.
-Never apply this conversion to funding rates or Report observations.
+1. `'l2'` (default): `l2Book`, 20 levels per side, about every 5.4 s.
+2. `'fast'`: `l2Book` with `fast=True`, 5 levels per side, about every 0.5 s, on
+   a dedicated WebSocket connection, so `'fast'` and `'l2'` can run together.
+3. `'bbo'`: the `bbo` channel, top of book with sizes, pushed on change.
 
-Offline regression tests cover funding income, expense and zero, plus history
-scope, filtering and page retry behavior. Release qualification uses the normal
-read-only surfaces and consistency suites; it does not assert personal history
-completeness.
+Subscriptions are shared per coin and source. REST has no faster endpoint: every
+source reads the `l2Book` snapshot, trimmed to its level count. `levels` now
+trims books on REST and WebSocket (it was ignored) and never selects the source.
+`Book.time` is the `l2Book`/`bbo` block time on perps, spot and builder dexes,
+including top-of-book tickers. Testnet objects now report
+`venue_id == 'hyperliquid_testnet'`.
 
-Release qualification on 2026-10-05 passed: 25 read-suite cases, 6 declared
-exclusions, and market consistency. Committed evidence under
-`release-evidence/hyperliquid/` matches pinned Catalogue
-`1851660ac2bed8243dd9ce9c7297fe05c7130973`. Offline release verification passes.
-This adapter release follows SDK 2.10.0 publication.
+Upgrade the SDK and this adapter together.

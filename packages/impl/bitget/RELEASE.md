@@ -1,10 +1,8 @@
-# tribulnation-bitget 0.9.0 release candidate
+# tribulnation-bitget 0.10.0
 
-Order and client order IDs on fills.
+Requires SDK >=2.12.0. Market, exchange and venue objects expose `account_id`,
+the root SDK account key they were opened under, and build their IDs from it;
+`venue_id` is the typed venue. Objects built directly keep their current IDs.
+`depth()` and `depth_stream()` accept the SDK's venue-keyed `settings`.
 
-- Fills report `Trade.order_id` from history and streams. `Trade.client_order_id` comes from UTA history and streams, and from Classic futures streams.
-- The Bitget implementation does not trade, so `random_client_order_id()` returns `None`.
-
-Requires tribulnation-sdk >=2.7.0 (`Trade.order_id`, `Trade.client_order_id` and `Order['client_order_id']`, ADR 0029).
-
-Order IDs on fills are covered by unit fixtures.
+Bitget reads no depth settings yet. Upgrade the SDK and this adapter together.

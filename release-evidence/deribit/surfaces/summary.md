@@ -1,6 +1,6 @@
 # Local SDK evidence: deribit
 
-Run completed: 2026-10-06T16:22:31.725230+00:00
+Run completed: 2026-10-08T07:46:33.472972+00:00
 
 This records a trusted local run, not cryptographic proof. Release policy must separately validate required check coverage and statuses.
 
