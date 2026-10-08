@@ -23,8 +23,8 @@ not a changelog or a substitute for API documentation and tests.
 
 | Number | Decision | Status |
 | --- | --- | --- |
-| [0001](0001-public-rules-and-account-fees.md) | Separate public market rules from quoted account base fees | Superseded by 0002 |
-| [0002](0002-combined-side-specific-fees.md) | Combined maker/taker and buy/sell rates, without optional payment discounts | Accepted |
+| [0001](0001-public-rules-and-account-fees.md) | Separate public market rules from quoted account base fees | Superseded by 0002; Hyperliquid exclusion amended by 0039 |
+| [0002](0002-combined-side-specific-fees.md) | Combined maker/taker and buy/sell rates, without optional payment discounts | Accepted; amended by 0039 |
 | [0003](0003-local-consistency-release-evidence.md) | Local consistency checks and offline release evidence | Accepted; amended by 0004, 0006, 0009 |
 | [0004](0004-empty-book-consistency-coverage.md) | Empty books without invented price coverage | Amended by 0011 |
 | [0005](0005-bitget-product-identities.md) | Explicit Bitget futures product identities | Accepted; amended by 0008 |
@@ -61,3 +61,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0036](0036-no-implicit-accounts.md) | SDK roots have no implicit accounts | Accepted |
 | [0037](0037-account-scoped-ids.md) | Account-scoped market and exchange IDs | Proposed; implemented, not release-verified |
 | [0038](0038-account-market-leverage.md) | Account-scoped perpetual market leverage and the default available notional | Proposed; implemented, not release-verified |
+| [0039](0039-hyperliquid-hip3-spot-fees.md) | Hyperliquid HIP-3 and spot fees via the official formula | Accepted; implemented, not release-verified |

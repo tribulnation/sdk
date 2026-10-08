@@ -2,7 +2,7 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: accepted
+1. Status: accepted; amended by [ADR 0039](0039-hyperliquid-hip3-spot-fees.md) for Hyperliquid
 2. Date: 2026-09-10
 3. Supersedes: [ADR 0001](0001-public-rules-and-account-fees.md)
 

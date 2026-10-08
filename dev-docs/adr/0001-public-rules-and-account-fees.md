@@ -2,7 +2,8 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: superseded by [ADR 0002](0002-combined-side-specific-fees.md)
+1. Status: superseded by [ADR 0002](0002-combined-side-specific-fees.md); the Hyperliquid
+   exclusion below is amended by [ADR 0039](0039-hyperliquid-hip3-spot-fees.md)
 2. Date: 2026-09-10
 
 ## Context
