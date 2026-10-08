@@ -36,7 +36,7 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
     """
     return cls(accounts=load_accounts(path))
 
-  def aster(self, account: Aster) -> TradingVenue:
+  def aster(self, account: Aster, id: str) -> TradingVenue:
     try:
       from tribulnation.aster import AsterMarket
     except ImportError as e:
@@ -50,9 +50,10 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       public=account.public and user is None and signer is None,
       mainnet=account.venue == 'aster',
       validate=account.validate,
+      account_id=id,
     )
 
-  def dydx(self, account: Dydx) -> TradingVenue:
+  def dydx(self, account: Dydx, id: str) -> TradingVenue:
     try:
       from tribulnation.dydx import DydxMarket
     except ImportError as e:
@@ -65,9 +66,10 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       address=account.resolved_address,
       mainnet=account.venue == 'dydx',
       parent_subaccount=account.parent_subaccount,
+      account_id=id,
     )
 
-  def hyperliquid(self, account: Hyperliquid) -> TradingVenue:
+  def hyperliquid(self, account: Hyperliquid, id: str) -> TradingVenue:
     try:
       from tribulnation.hyperliquid import HyperliquidMarket
     except ImportError as e:
@@ -78,9 +80,10 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       account.resolved_address,
       wallet=account.resolved_private_key,
       mainnet=account.venue == 'hyperliquid',
+      account_id=id,
     )
 
-  def mexc(self, account: Mexc) -> TradingVenue:
+  def mexc(self, account: Mexc, id: str) -> TradingVenue:
     try:
       from tribulnation.mexc import MexcMarket
     except ImportError as e:
@@ -89,14 +92,15 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       ) from e
     api_key, api_secret = account.resolved_api_key, account.resolved_api_secret
     if account.public and api_key is None and api_secret is None:
-      return MexcMarket.public(validate=account.validate)
+      return MexcMarket.public(validate=account.validate, account_id=id)
     return MexcMarket.new(
       api_key=api_key,
       api_secret=api_secret,
       validate=account.validate,
+      account_id=id,
     )
 
-  def binance(self, account: Binance) -> TradingVenue:
+  def binance(self, account: Binance, id: str) -> TradingVenue:
     try:
       from tribulnation.binance import BinanceMarket
     except ImportError as e:
@@ -109,9 +113,10 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       secret_key=secret_key,
       public=account.public and api_key is None and secret_key is None,
       validate=account.validate,
+      account_id=id,
     )
 
-  def coinbase(self, account: Coinbase) -> TradingVenue:
+  def coinbase(self, account: Coinbase, id: str) -> TradingVenue:
     try:
       from tribulnation.coinbase import CoinbaseMarket
     except ImportError as e:
@@ -123,9 +128,10 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       key_name,
       private_key,
       public=account.public and key_name is None and private_key is None,
+      account_id=id,
     )
 
-  def bybit(self, account: Bybit) -> TradingVenue:
+  def bybit(self, account: Bybit, id: str) -> TradingVenue:
     try:
       from tribulnation.bybit import BybitMarket
     except ImportError as e:
@@ -138,9 +144,10 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       api_secret,
       public=account.public and api_key is None and api_secret is None,
       settings={'validate': account.validate},
+      account_id=id,
     )
 
-  def bitget(self, account: Bitget) -> TradingVenue:
+  def bitget(self, account: Bitget, id: str) -> TradingVenue:
     try:
       from tribulnation.bitget import BitgetMarket
     except ImportError as e:
@@ -154,9 +161,10 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       uta=account.uta,
       public=account.public,
       validate=account.validate,
+      account_id=id,
     )
 
-  def bit2me(self, account: Bit2Me) -> TradingVenue:
+  def bit2me(self, account: Bit2Me, id: str) -> TradingVenue:
     try:
       from tribulnation.bit2me import Bit2MeMarket
     except ImportError as e:
@@ -168,9 +176,10 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       account.resolved_api_secret,
       public=account.public,
       validate=account.validate,
+      account_id=id,
     )
 
-  def kraken(self, account: Kraken) -> TradingVenue:
+  def kraken(self, account: Kraken, id: str) -> TradingVenue:
     try:
       from tribulnation.kraken import KrakenMarket
     except ImportError as e:
@@ -182,17 +191,18 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       account.resolved_private_key,
       public=account.public,
       validate=account.validate,
+      account_id=id,
     )
 
-  def kucoin(self, account: Kucoin) -> TradingVenue:
+  def kucoin(self, account: Kucoin, id: str) -> TradingVenue:
     """Build KuCoin's credential-free public Market surface."""
     try:
       from tribulnation.kucoin import KucoinMarket
     except ImportError as e:
       raise ImportError('Install tribulnation-kucoin to use this venue.') from e
-    return KucoinMarket.new(validate=account.validate)
+    return KucoinMarket.new(validate=account.validate, account_id=id)
 
-  def deribit(self, account: Deribit) -> TradingVenue:
+  def deribit(self, account: Deribit, id: str) -> TradingVenue:
     """Build Deribit's credential-free mainnet public Market surface."""
     if account.venue != 'deribit':
       raise ValueError('Deribit Market is qualified on mainnet only')
@@ -200,9 +210,9 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       from tribulnation.deribit import DeribitMarket
     except ImportError as e:
       raise ImportError('Install tribulnation-deribit to use this venue.') from e
-    return DeribitMarket.new(validate=account.validate)
+    return DeribitMarket.new(validate=account.validate, account_id=id)
 
-  def lighter(self, account: Lighter) -> TradingVenue:
+  def lighter(self, account: Lighter, id: str) -> TradingVenue:
     """Build Lighter's perpetual and spot Market surface on one account."""
     try:
       from tribulnation.lighter import LighterMarket
@@ -223,6 +233,7 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       and api_key_index is None
       and api_private_key is None,
       validate=account.validate,
+      account_id=id,
     )
 
   def _venue(self, id: str, /) -> TradingVenue:
@@ -230,36 +241,40 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       raise ValueError(f'No account found for venue id: {id}')
     match account.venue:
       case 'aster' | 'aster_testnet':
-        return self.aster(account)
+        return self.aster(account, id)
       case 'dydx' | 'dydx_testnet':
-        return self.dydx(account)
+        return self.dydx(account, id)
       case 'hyperliquid' | 'hyperliquid_testnet':
-        return self.hyperliquid(account)
+        return self.hyperliquid(account, id)
       case 'mexc':
-        return self.mexc(account)
+        return self.mexc(account, id)
       case 'binance':
-        return self.binance(account)
+        return self.binance(account, id)
       case 'coinbase':
-        return self.coinbase(account)
+        return self.coinbase(account, id)
       case 'bybit':
-        return self.bybit(account)
+        return self.bybit(account, id)
       case 'bit2me':
-        return self.bit2me(account)
+        return self.bit2me(account, id)
       case 'bitget':
-        return self.bitget(account)
+        return self.bitget(account, id)
       case 'kraken':
-        return self.kraken(account)
+        return self.kraken(account, id)
       case 'kucoin':
-        return self.kucoin(account)
+        return self.kucoin(account, id)
       case 'deribit' | 'deribit_testnet':
-        return self.deribit(account)
+        return self.deribit(account, id)
       case 'lighter' | 'lighter_testnet':
-        return self.lighter(account)
+        return self.lighter(account, id)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 
   async def venue(self, id: str, /) -> TradingVenue:
-    """Borrow a cached venue inside an entered root, otherwise construct a fresh one."""
+    """Borrow a cached venue inside an entered root, otherwise construct a fresh one.
+
+    The venue is built with `account_id=id`, so it and the exchanges and markets it
+    creates report IDs that round-trip through this SDK.
+    """
     return await self.venue_registry.get(id, lambda: self._venue(id))
 
   async def venues(self) -> Sequence[str]:

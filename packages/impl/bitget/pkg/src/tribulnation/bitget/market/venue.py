@@ -20,10 +20,6 @@ class BitgetMarket(VenueMixin, TradingVenue):
   Exchanges share one connection and product-keyed caches and streams. USDC futures currently expose public market data only.
   """
 
-  @property
-  def venue_id(self) -> str:
-    return 'bitget'
-
   async def exchange(self, exchange_id: str, /) -> SpotExchange | PerpExchange:
     """Resolve `spot`, `usdt`, or `usdc`."""
     if exchange_id == 'coin-classic':

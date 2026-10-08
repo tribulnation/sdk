@@ -8,6 +8,7 @@ from typing_extensions import (
   Awaitable,
   Callable,
   Iterable,
+  Literal,
   TypeVar,
 )
 from dataclasses import dataclass, field
@@ -30,6 +31,8 @@ class Shared:
 
   client: Binance
   validate: bool = True
+  account_id: str | None = None
+  """Root SDK account key; `None` when built directly, reporting `'binance'` instead."""
 
   spot_symbols: dict[str, SpotSymbol] | None = None
   """Cached spot `exchangeInfo` symbols, keyed by symbol. See `load_spot_symbols`."""
@@ -65,6 +68,7 @@ class Shared:
     *,
     public: bool = False,
     validate: bool = True,
+    account_id: str | None = None,
   ):
     """Create a `Shared` backed by a new Binance client.
 
@@ -73,11 +77,13 @@ class Shared:
       secret_key: Binance API secret. Defaults to `BINANCE_SECRET_KEY`.
       public: Construct a credential-free client.
       validate: Validate responses against the typed client's schemas.
+      account_id: Root SDK account key, the first segment of every market ID;
+        defaults to the venue ID.
     """
     client = Binance.new(
       api_key=api_key, secret_key=secret_key, public=public, validate=validate
     )
-    return cls(client=client, validate=validate)
+    return cls(client=client, validate=validate, account_id=account_id)
 
   @wrap_exceptions
   async def load_spot_symbols(self, *, refetch: bool = False) -> dict[str, SpotSymbol]:
@@ -110,6 +116,7 @@ class SharedMixin(SDK):
     *,
     public: bool = False,
     validate: bool = True,
+    account_id: str | None = None,
   ):
     """Create a market object backed by a new Binance client.
 
@@ -118,12 +125,28 @@ class SharedMixin(SDK):
       secret_key: Binance API secret. Defaults to `BINANCE_SECRET_KEY`.
       public: Construct a credential-free client.
       validate: Validate responses against the typed client's schemas.
+      account_id: Root SDK account key, the first segment of every market ID;
+        defaults to the venue ID.
     """
     return cls(
       shared=Shared.new(
-        api_key=api_key, secret_key=secret_key, public=public, validate=validate
+        api_key=api_key,
+        secret_key=secret_key,
+        public=public,
+        validate=validate,
+        account_id=account_id,
       )
     )
+
+  @property
+  def venue_id(self) -> Literal['binance']:
+    """The venue ID."""
+    return 'binance'
+
+  @property
+  def account_id(self) -> str:
+    """Root SDK account key this object was opened under, else `venue_id`."""
+    return self.shared.account_id or self.venue_id
 
   @property
   def client(self) -> Binance:

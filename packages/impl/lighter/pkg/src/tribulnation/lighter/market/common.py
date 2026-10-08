@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-from typing_extensions import AsyncContextManager, Iterable, TypedDict
+from typing_extensions import AsyncContextManager, Iterable, Literal, TypedDict
 from typed_lighter.schemas import (
   Candle as CandleRow,
   Order as OrderRow,
@@ -33,9 +33,14 @@ class Public(SDK):
   shared: Shared
 
   @property
-  def venue_id(self) -> str:
-    """The Catalogue platform ID."""
-    return 'lighter'
+  def venue_id(self) -> Literal['lighter', 'lighter_testnet']:
+    """The deployment's venue ID: `'lighter'`, or `'lighter_testnet'` on testnets."""
+    return self.shared.venue_id
+
+  @property
+  def account_id(self) -> str:
+    """Root SDK account key this object was opened under, else `venue_id`."""
+    return self.shared.account_id or self.shared.venue_id
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     """Enter the shared owner through the SDK lifecycle."""

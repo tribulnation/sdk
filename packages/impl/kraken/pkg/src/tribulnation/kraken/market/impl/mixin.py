@@ -14,6 +14,7 @@ from typing_extensions import (
   Awaitable,
   Callable,
   Iterable,
+  Literal,
   TypedDict,
   TypeVar,
 )
@@ -114,6 +115,8 @@ class Shared(Calls):
   """State shared by every market of one Kraken client."""
 
   client: Kraken
+  account_id: str | None = None
+  """Root SDK account key; `None` when built directly, reporting `'kraken'` instead."""
   balance_ttl: timedelta = BALANCE_TTL
   pairs: dict[str, PairInfo] | None = None
   perp_instruments: dict[str, FuturesInstrument] | None = None
@@ -138,12 +141,14 @@ class Shared(Calls):
     *,
     public: bool = False,
     validate: bool = True,
+    account_id: str | None = None,
   ):
     """Build the shared state around a fresh Kraken client."""
     return cls(
       client=Kraken.new(
         api_key=api_key, private_key=private_key, public=public, validate=validate
-      )
+      ),
+      account_id=account_id,
     )
 
   @cached_property
@@ -279,6 +284,7 @@ class SharedMixin(Calls):
     *,
     public: bool = False,
     validate: bool = True,
+    account_id: str | None = None,
   ):
     """Build a market surface around a fresh Kraken client.
 
@@ -288,10 +294,24 @@ class SharedMixin(Calls):
       public: Build a credential-free client. Market data works without
         credentials; balances, orders and the private channels do not.
       validate: Validate responses.
+      account_id: Root SDK account key, the first segment of every market ID;
+        defaults to the venue ID.
     """
     return cls(
-      shared=Shared.new(api_key, private_key, public=public, validate=validate)
+      shared=Shared.new(
+        api_key, private_key, public=public, validate=validate, account_id=account_id
+      )
     )
+
+  @property
+  def venue_id(self) -> Literal['kraken']:
+    """The Kraken platform owns every emitted native ID."""
+    return 'kraken'
+
+  @property
+  def account_id(self) -> str:
+    """Root SDK account key this object was opened under, else `venue_id`."""
+    return self.shared.account_id or self.venue_id
 
   @property
   def client(self) -> Kraken:

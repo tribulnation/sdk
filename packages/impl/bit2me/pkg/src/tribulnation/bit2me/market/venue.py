@@ -17,10 +17,6 @@ class Bit2MeMarket(SharedMixin, TradingVenue):
   exchange to ask for.
   """
 
-  @property
-  def venue_id(self) -> str:
-    return 'bit2me'
-
   async def exchange(self, exchange_id: str, /) -> SpotExchange:
     if exchange_id != 'spot':
       raise ValueError(f'Invalid exchange ID: {exchange_id}. Only "spot" is supported.')

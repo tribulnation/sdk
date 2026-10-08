@@ -15,6 +15,7 @@ from typing_extensions import (
   Awaitable,
   Callable,
   Iterable,
+  Literal,
   TypedDict,
   TypeVar,
 )
@@ -95,6 +96,8 @@ class Shared(Calls):
   """State shared by every market of one Bit2Me client."""
 
   client: Bit2Me
+  account_id: str | None = None
+  """Root SDK account key; `None` when built directly, reporting `'bit2me'` instead."""
   balance_ttl: timedelta = BALANCE_TTL
   markets: dict[str, MarketInfo] | None = None
   balances: dict[str, WalletResponse] | None = None
@@ -122,12 +125,14 @@ class Shared(Calls):
     *,
     public: bool = False,
     validate: bool = True,
+    account_id: str | None = None,
   ):
     """Build the shared state around a fresh Bit2Me client."""
     return cls(
       client=Bit2Me.new(
         api_key=api_key, api_secret=api_secret, public=public, validate=validate
-      )
+      ),
+      account_id=account_id,
     )
 
   @cached_property
@@ -242,6 +247,7 @@ class SharedMixin(Calls):
     *,
     public: bool = False,
     validate: bool = True,
+    account_id: str | None = None,
   ):
     """Build a market surface around a fresh Bit2Me client.
 
@@ -251,8 +257,24 @@ class SharedMixin(Calls):
       public: Build a public-only client. Market data works without credentials;
         orders, balances and the private channels do not.
       validate: Validate responses.
+      account_id: Root SDK account key, the first segment of every market ID;
+        defaults to the venue ID.
     """
-    return cls(shared=Shared.new(api_key, api_secret, public=public, validate=validate))
+    return cls(
+      shared=Shared.new(
+        api_key, api_secret, public=public, validate=validate, account_id=account_id
+      )
+    )
+
+  @property
+  def venue_id(self) -> Literal['bit2me']:
+    """The venue ID."""
+    return 'bit2me'
+
+  @property
+  def account_id(self) -> str:
+    """Root SDK account key this object was opened under, else `venue_id`."""
+    return self.shared.account_id or self.venue_id
 
   @property
   def client(self) -> Bit2Me:

@@ -1,5 +1,6 @@
 """KuCoin's public Classic spot and linear perpetual Market surface."""
 
+from typed_kucoin import KuCoin
 from tribulnation.sdk.market import TradingVenue
 from .common import Public, Shared
 from .exchanges import LinearPerpExchange, SpotExchange
@@ -9,9 +10,13 @@ class KucoinMarket(Public, TradingVenue):
   """Public market data with explicit unsupported private trading methods."""
 
   @classmethod
-  def new(cls, *, validate: bool = True):
+  def new(cls, *, validate: bool = True, account_id: str | None = None):
     """Construct a credential-free client regardless of credential environment variables."""
-    return cls(shared=Shared.new(public=True, validate=validate))
+    return cls(
+      shared=Shared(
+        client=KuCoin.new(public=True, validate=validate), account_id=account_id
+      )
+    )
 
   async def exchanges(self) -> list[TradingVenue.ExchangeDescription]:
     """Expose explicit product identities for spot and linear perpetuals."""

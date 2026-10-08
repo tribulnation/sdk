@@ -68,6 +68,23 @@ async def read_book():
         return await market.depth()
 ```
 
+IDs given to `ProxySDK` are account-based addresses, and each proxy's `id` stays
+that address: every later request (`depth`, `place_order`, ...) is routed with it.
+As with the direct SDK, `account_id` is the address's account key and `venue_id` is
+the venue the gateway-side object reports, so a market resolved as
+`hl:perp:BTC` with the account above has `id == 'hl:perp:BTC'`,
+`account_id == 'hl'` and `venue_id == 'hyperliquid'`.
+
+1. `market`, `perp_market`, `exchange` and `perp_exchange` make one round trip,
+   which resolves the exchange at the gateway and returns its product type and
+   venue. `venue` makes one round trip (a `venue` request carrying the
+   `account_id`) returning the venue.
+2. Resolutions are cached per address for the lifetime of the `ProxySDK`; repeated
+   calls make no further round trips. Failed resolutions are not cached.
+3. Every request addressing a venue or exchange carries the account key as
+   `account_id`; replies carry `venue_id` as a `VenueId`. Upgrade the client and
+   the gateway together: older peers name the account field `venue_id`.
+
 Clients need the `gateway` extra but do not need installed venue adapters or
 credentials. The server needs the adapters and credentials for the accounts used.
 The server binds a Unix socket and exposes `/debug/memory` diagnostics.
@@ -76,7 +93,10 @@ as access to the configured accounts, including their trading operations.
 
 ## Preserved scope and compatibility
 
-1. Binary JSON WebSocket frames, request tags and correlation IDs are unchanged.
+1. Binary JSON WebSocket frames, request tags and correlation IDs are unchanged,
+   except for the added `venue` request, the `venue_id` on `exchange` replies, and
+   the account field of venue and exchange requests, renamed from `venue_id` to
+   `account_id`.
    Decimal/time serialization, error transport, bounded stream inboxes and
    reconnection behavior retain the existing implementation.
 2. Supported calls include venue/exchange discovery, market rules, fees, books,

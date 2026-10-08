@@ -58,10 +58,14 @@ def test_public_allowed_account_keeps_explicit_credentials(
   factory = Mock()
   monkeypatch.setattr(BybitMarket, 'new', factory)
   MarketSDK().bybit(
-    accounts.Bybit(public=True, api_key='test-key', api_secret='test-secret')
+    accounts.Bybit(public=True, api_key='test-key', api_secret='test-secret'), 'by'
   )
   factory.assert_called_once_with(
-    'test-key', 'test-secret', public=False, settings={'validate': True}
+    'test-key',
+    'test-secret',
+    public=False,
+    settings={'validate': True},
+    account_id='by',
   )
 
 

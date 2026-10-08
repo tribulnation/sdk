@@ -24,10 +24,6 @@ from .impl.exchange_history import exchange_trades_history, exchange_funding_pay
 @dataclass(frozen=True, kw_only=True)
 class PerpExchange(PerpMixin, _PerpExchange):
   @property
-  def venue_id(self) -> str:
-    return 'hyperliquid'
-
-  @property
   def exchange_id(self) -> str:
     return self.dex_name or ''
 

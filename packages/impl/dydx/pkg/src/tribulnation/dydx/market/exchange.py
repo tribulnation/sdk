@@ -42,10 +42,6 @@ class Exchange(ExchangeMixin, PerpExchange):
       return 'perp'
     return f'perp.{self.subaccount}'
 
-  @property
-  def venue_id(self) -> str:
-    return 'dydx'
-
   async def markets(self):
     markets = await self.shared.load_markets()
     return list(markets)

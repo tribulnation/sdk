@@ -46,10 +46,6 @@ async def fetch_l2_book(self: SpotMixin, coin: str) -> Book:
 @dataclass(frozen=True, kw_only=True)
 class SpotExchange(SpotMixin, _Exchange):
   @property
-  def venue_id(self) -> str:
-    return 'hyperliquid'
-
-  @property
   def exchange_id(self) -> str:
     return 'spot'
 

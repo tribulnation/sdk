@@ -55,10 +55,6 @@ class SpotMarket(MarketMixin, Market):
   def exchange_id(self) -> str:
     return 'spot'
 
-  @property
-  def venue_id(self) -> str:
-    return 'bitget'
-
   async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
     """Fetch the market order book (150 levels a side when `levels` is omitted)."""
     book = await self.call(

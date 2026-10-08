@@ -16,10 +16,6 @@ class SpotExchange(SharedMixin, Exchange):
   """Binance's spot exchange."""
 
   @property
-  def venue_id(self) -> str:
-    return 'binance'
-
-  @property
   def exchange_id(self) -> str:
     return 'spot'
 

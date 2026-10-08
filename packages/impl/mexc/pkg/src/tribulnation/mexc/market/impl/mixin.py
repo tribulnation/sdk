@@ -5,6 +5,7 @@ from typing_extensions import (
   Awaitable,
   Callable,
   Iterable,
+  Literal,
   TypeVar,
   TypedDict,
 )
@@ -34,6 +35,8 @@ class Shared(SDK):
   client: MEXC
   validate: bool = True
   recv_window: int | None = None
+  account_id: str | None = None
+  """Root SDK account key; `None` when built directly, reporting `'mexc'` instead."""
 
   spot_markets: dict[str, SpotInfo] | None = None
   perp_markets: dict[str, ContractSpec] | None = None
@@ -57,18 +60,26 @@ class Shared(SDK):
     *,
     validate: bool = True,
     recv_window: int | None = None,
+    account_id: str | None = None,
   ):
+    """Build the shared state around a fresh authenticated client."""
     import os
 
     api_key = api_key or os.environ.get('MEXC_API_KEY') or ''
     api_secret = api_secret or os.environ.get('MEXC_API_SECRET') or ''
     client = MEXC.new(api_key=api_key, api_secret=api_secret, validate=validate)
-    return cls(client=client, validate=validate, recv_window=recv_window)
+    return cls(
+      client=client,
+      validate=validate,
+      recv_window=recv_window,
+      account_id=account_id,
+    )
 
   @classmethod
-  def public(cls, *, validate: bool = True):
+  def public(cls, *, validate: bool = True, account_id: str | None = None):
+    """Build the shared state around a fresh credential-free client."""
     client = MEXC.new(public=True, validate=validate)
-    return cls(client=client, validate=validate)
+    return cls(client=client, validate=validate, account_id=account_id)
 
   @cached_property
   def client_resource(self) -> ManagedResource[object]:
@@ -164,19 +175,33 @@ class SharedMixin(SDK):
     *,
     validate: bool = True,
     recv_window: int | None = None,
+    account_id: str | None = None,
   ):
+    """Build a market surface around a fresh authenticated client."""
     return cls(
       shared=Shared.new(
         api_key=api_key,
         api_secret=api_secret,
         validate=validate,
         recv_window=recv_window,
+        account_id=account_id,
       )
     )
 
   @classmethod
-  def public(cls, *, validate: bool = True):
-    return cls(shared=Shared.public(validate=validate))
+  def public(cls, *, validate: bool = True, account_id: str | None = None):
+    """Build a market surface around a fresh credential-free client."""
+    return cls(shared=Shared.public(validate=validate, account_id=account_id))
+
+  @property
+  def venue_id(self) -> Literal['mexc']:
+    """The venue identifier."""
+    return 'mexc'
+
+  @property
+  def account_id(self) -> str:
+    """Root SDK account key this object was opened under, else `venue_id`."""
+    return self.shared.account_id or self.venue_id
 
   @property
   def client(self) -> MEXC:

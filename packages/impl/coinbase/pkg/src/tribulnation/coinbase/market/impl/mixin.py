@@ -1,10 +1,11 @@
 """Scoping shared by Coinbase's Advanced Trade exchanges and markets."""
 
 from dataclasses import dataclass
+from typing_extensions import Literal
 
 from tribulnation.coinbase.core import Mixin
 
-VENUE_ID = 'coinbase'
+VENUE_ID: Literal['coinbase'] = 'coinbase'
 SPOT_EXCHANGE_ID = 'spot'
 
 
@@ -13,8 +14,14 @@ class ExchangeMixin(Mixin):
   """An Advanced Trade exchange: one product family under one fee schedule."""
 
   @property
-  def venue_id(self) -> str:
+  def venue_id(self) -> Literal['coinbase']:
+    """The venue ID."""
     return VENUE_ID
+
+  @property
+  def account_id(self) -> str:
+    """Root SDK account key this object was opened under, else `venue_id`."""
+    return self.shared.account_id or self.venue_id
 
 
 @dataclass(frozen=True, kw_only=True)

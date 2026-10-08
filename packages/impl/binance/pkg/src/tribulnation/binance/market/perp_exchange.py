@@ -25,10 +25,6 @@ class PerpExchange(SharedMixin, _PerpExchange):
   """Binance's USD-M futures exchange."""
 
   @property
-  def venue_id(self) -> str:
-    return 'binance'
-
-  @property
   def exchange_id(self) -> str:
     return 'usdm'
 

@@ -14,6 +14,7 @@ from contextlib import asynccontextmanager
 from datetime import datetime
 
 from tribulnation.sdk.core import SDK, PaginatedResponse, OverflowPolicy
+from tribulnation.sdk.impl.accounts import VenueId
 from .types import (
   Book,
   CandleInterval,
@@ -54,11 +55,21 @@ class TradingVenue(SDK):
 
   @property
   @abstractmethod
-  def venue_id(self) -> str: ...
+  def venue_id(self) -> VenueId:
+    """The venue this object trades on, e.g. `'hyperliquid'` or `'dydx_testnet'`;
+    never an account key."""
+
+  @property
+  @abstractmethod
+  def account_id(self) -> str:
+    """Key of the account this object was opened under: `'hl'` for
+    `MarketSDK({'hl': accounts.Hyperliquid(...)})`. Objects built directly, outside a
+    root SDK, default to their `venue_id`."""
 
   @property
   def id(self) -> str:
-    return self.venue_id
+    """The account key, `account_id`: the first segment of every ID under this venue."""
+    return self.account_id
 
   @SDK.method
   @abstractmethod

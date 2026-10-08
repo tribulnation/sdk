@@ -36,11 +36,6 @@ class PerpMarket(SharedMixin, BasePerpMarket):
   CANDLE_INTERVALS = CANDLE_INTERVALS
 
   @property
-  def venue_id(self) -> str:
-    """Native symbols belong to the Kraken platform."""
-    return 'kraken'
-
-  @property
   def exchange_id(self) -> str:
     """Linear perpetuals use the existing perp exchange ID."""
     return 'perp'

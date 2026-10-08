@@ -43,10 +43,6 @@ from .impl import (
 @dataclass(frozen=True, kw_only=True)
 class SpotMarket(SpotMarketMixin, Market):
   @property
-  def venue_id(self) -> str:
-    return 'hyperliquid'
-
-  @property
   def exchange_id(self) -> str:
     return 'spot'
 

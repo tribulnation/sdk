@@ -12,6 +12,7 @@ from typing_extensions import (
   Awaitable,
   Callable,
   Iterable,
+  Literal,
   TypeVar,
 )
 from typed_lighter import Lighter
@@ -57,11 +58,20 @@ class ClientIndexes:
     return self.last % MAX_CLIENT_INDEX
 
 
+def network_venue_id(network: Network) -> Literal['lighter', 'lighter_testnet']:
+  """The venue ID of a deployment: testnet deployments report `'lighter_testnet'`."""
+  return 'lighter_testnet' if network.endswith('testnet') else 'lighter'
+
+
 @dataclass(frozen=True, kw_only=True)
 class Shared(SDK):
   """Own one client; cache market details, scalers and shared stream fan-outs."""
 
   client: Lighter
+  venue_id: Literal['lighter', 'lighter_testnet'] = 'lighter'
+  """The deployment this client is connected to, as a venue ID."""
+  account_id: str | None = None
+  """Root SDK account key; `None` when built directly, reporting `venue_id` instead."""
   perps: dict[int, PerpsOrderBookDetail] = field(
     default_factory=dict[int, PerpsOrderBookDetail]
   )
@@ -88,6 +98,7 @@ class Shared(SDK):
     network: Network = 'mainnet',
     public: bool = False,
     validate: bool = True,
+    account_id: str | None = None,
   ):
     """Build a client from explicit credentials, or the client's `LIGHTER_*` defaults.
 
@@ -98,8 +109,12 @@ class Shared(SDK):
       network: Lighter deployment.
       public: Skip credentials: public market data only.
       validate: Validate responses.
+      account_id: Root SDK account key, the first segment of every market ID;
+        defaults to the venue ID.
     """
     return cls(
+      venue_id=network_venue_id(network),
+      account_id=account_id,
       client=Lighter.new(
         network=network,
         account_index=account_index,
@@ -107,7 +122,7 @@ class Shared(SDK):
         api_private_key=api_private_key,
         public=public,
         validate=validate,
-      )
+      ),
     )
 
   @cached_property

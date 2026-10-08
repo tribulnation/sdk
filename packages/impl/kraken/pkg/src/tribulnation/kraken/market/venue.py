@@ -18,10 +18,6 @@ class KrakenMarket(SharedMixin, TradingVenue):
   through the independent Futures REST and Charts transports.
   """
 
-  @property
-  def venue_id(self) -> str:
-    return 'kraken'
-
   @overload
   async def exchange(self, exchange_id: Literal['spot'], /) -> SpotExchange:
     """Resolve Spot with its concrete type."""

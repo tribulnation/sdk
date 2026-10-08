@@ -6,13 +6,16 @@ from decimal import Decimal
 from pathlib import Path
 from typing_extensions import Any, Sequence
 import asyncio
+import json
 import os
 
+import pydantic
 import pytest
 import pytest_asyncio
 from aiohttp import web
 
 from tribulnation.sdk.gateway import codec
+from tribulnation.sdk.impl.accounts import VenueId
 from tribulnation.sdk.gateway.proxy import ProxySDK
 from tribulnation.sdk.gateway.server import Gateway
 from tribulnation.sdk import ApiError, NetworkError
@@ -40,6 +43,11 @@ from tribulnation.sdk.market.venue import ExchangeDescription, TradingVenue
 
 
 MARKET_ID = 'mock:perp:BTC-USD'
+VENUE: VenueId = 'hyperliquid_testnet'
+"""The venue every gateway-side mock object reports."""
+ALIAS = 'hl'
+"""An account key that differs from the venue (`VENUE`) it is configured with."""
+ALIAS_MARKET_ID = f'{ALIAS}:perp:BTC-USD'
 
 
 @dataclass
@@ -76,7 +84,11 @@ class MockMarket(PerpMarket):
   state: MockState
 
   @property
-  def venue_id(self) -> str:
+  def venue_id(self) -> VenueId:
+    return VENUE
+
+  @property
+  def account_id(self) -> str:
     return 'mock'
 
   @property
@@ -237,7 +249,11 @@ class MockExchange(PerpExchange):
     return await MockMarket(self.state).perp_collateral()
 
   @property
-  def venue_id(self) -> str:
+  def venue_id(self) -> VenueId:
+    return VENUE
+
+  @property
+  def account_id(self) -> str:
     return 'mock'
 
   @property
@@ -257,7 +273,11 @@ class MockVenue(TradingVenue):
   state: MockState
 
   @property
-  def venue_id(self) -> str:
+  def venue_id(self) -> VenueId:
+    return VENUE
+
+  @property
+  def account_id(self) -> str:
     return 'mock'
 
   async def exchange(self, exchange_id: str, /) -> MockExchange:
@@ -276,10 +296,11 @@ class MockSDK(TradingMarkets):
   state: MockState
 
   async def venues(self) -> Sequence[str]:
-    return ['mock']
+    return ['mock', ALIAS]
 
   async def venue(self, id: str, /) -> TradingVenue:
-    assert id == 'mock'
+    if id not in ('mock', ALIAS):
+      raise ValueError(f'No account found for venue id: {id}')
     return MockVenue(self.state)
 
 
@@ -357,7 +378,7 @@ async def sdk(gateway_url: str) -> AsyncIterator[ProxySDK]:
 
 @pytest.mark.asyncio
 async def test_unary_success_routes_through_gateway(sdk: ProxySDK) -> None:
-  assert await sdk.venues() == ['mock']
+  assert await sdk.venues() == ['mock', ALIAS]
   venue = await sdk.venue('mock')
   assert await venue.exchanges() == [
     {'id': 'perp', 'type': 'perp', 'name': 'Perpetuals'}
@@ -615,3 +636,121 @@ async def test_sdk2_account_fees_and_funding_interval(sdk: ProxySDK):
   assert funding.annualized == Decimal('8.760')
   assert await sdk.funding_rates(MARKET_ID) == []
   assert (await sdk.collateral('mock:perp')).maintenance_ratio == Decimal('0.1')
+
+
+def record_calls(sdk: ProxySDK) -> list[codec.CallReq]:
+  """Record every unary request the proxy sends, still forwarding it."""
+  sent: list[codec.CallReq] = []
+  call = sdk._conn.call
+
+  async def recording(req: codec.CallReq) -> Any:
+    """Record, then forward the request."""
+    sent.append(req)
+    return await call(req)
+
+  sdk._conn.call = recording  # type: ignore[method-assign]
+  return sent
+
+
+@pytest.mark.asyncio
+async def test_market_reports_venue_and_keeps_address(sdk: ProxySDK) -> None:
+  """An aliased account reports the gateway's venue; requests keep the account address."""
+  sent = record_calls(sdk)
+  market = await sdk.perp_market(ALIAS_MARKET_ID)
+
+  assert market.venue_id == VENUE
+  assert market.account_id == ALIAS
+  assert market.id == ALIAS_MARKET_ID
+  assert (market.exchange_id, market.market_id) == ('perp', 'BTC-USD')
+  assert (await market.depth()).best_bid.price == Decimal('99')
+  assert [type(req) for req in sent] == [codec.ExchangeReq, codec.DepthReq]
+  depth = sent[1]
+  assert isinstance(depth, codec.DepthReq)
+  assert depth.market_id == ALIAS_MARKET_ID
+
+
+@pytest.mark.asyncio
+async def test_resolutions_are_cached_per_address(sdk: ProxySDK) -> None:
+  """Repeated market, exchange and venue resolutions do not round-trip again."""
+  sent = record_calls(sdk)
+  await sdk.perp_market(ALIAS_MARKET_ID)
+  spot_view = await sdk.market(ALIAS_MARKET_ID)
+  exchange = await sdk.perp_exchange(f'{ALIAS}:perp')
+  venue = await sdk.venue(ALIAS)
+
+  assert (exchange.id, exchange.account_id, exchange.venue_id) == (
+    f'{ALIAS}:perp',
+    ALIAS,
+    VENUE,
+  )
+  assert (venue.id, venue.account_id, venue.venue_id) == (ALIAS, ALIAS, VENUE)
+  assert (spot_view.id, spot_view.account_id, spot_view.venue_id) == (
+    ALIAS_MARKET_ID,
+    ALIAS,
+    VENUE,
+  )
+  assert await sdk.venue(ALIAS) is venue
+  assert await venue.exchange('perp') is exchange
+  assert [type(req) for req in sent] == [codec.ExchangeReq, codec.VenueReq]
+
+
+@pytest.mark.asyncio
+async def test_unknown_account_fails_resolution_without_caching(sdk: ProxySDK) -> None:
+  """Resolution errors surface as before and leave nothing cached."""
+  for _ in range(2):
+    with pytest.raises(ValueError, match='No account found for venue id: nope'):
+      await sdk.market('nope:perp:BTC-USD')
+    with pytest.raises(ValueError, match='No account found for venue id: nope'):
+      await sdk.venue('nope')
+  assert sdk._exchanges == {}
+  assert sdk._venues == {}
+
+
+@pytest.mark.parametrize(
+  'msg',
+  [
+    codec.ExchangeResp(id='e', type='perp', venue_id='hyperliquid'),
+    codec.ExchangeResp(id='e', type='spot', venue_id='dydx_testnet'),
+    codec.VenueResp(id='v', venue_id='hyperliquid'),
+  ],
+)
+def test_resolution_replies_roundtrip(
+  msg: codec.ExchangeResp | codec.VenueResp,
+) -> None:
+  """Resolution replies carry the venue through the codec."""
+  assert codec.decode_server(codec.encode_server(msg)) == msg
+
+
+@pytest.mark.parametrize(
+  'raw',
+  [
+    '{"tag": "exchange", "id": "e", "type": "perp"}',
+    '{"tag": "exchange", "id": "e", "type": "perp", "venue_id": "hl"}',
+    '{"tag": "venue", "id": "v", "venue_id": "mock"}',
+  ],
+)
+def test_resolution_replies_require_a_known_venue(raw: str) -> None:
+  """A reply without a venue, or naming an account key instead, is rejected."""
+  with pytest.raises(pydantic.ValidationError):
+    codec.decode_server(raw)
+
+
+@pytest.mark.parametrize(
+  'msg',
+  [
+    codec.VenueReq(id='r', account_id=ALIAS),
+    codec.ExchangeReq(id='r', account_id=ALIAS, exchange_id='perp'),
+    codec.ExchangesReq(id='r', account_id=ALIAS),
+    codec.MarketsReq(id='r', account_id=ALIAS, exchange_id='perp'),
+    codec.TickersReq(id='r', account_id=ALIAS, exchange_id='perp'),
+    codec.PerpStatsReq(id='r', account_id=ALIAS, exchange_id='perp'),
+    codec.ExchangeCollateralReq(id='r', account_id=ALIAS, exchange_id='perp'),
+    codec.ExchangePerpCollateralReq(id='r', account_id=ALIAS, exchange_id='perp'),
+  ],
+)
+def test_account_requests_roundtrip(msg: codec.CallReq) -> None:
+  """Venue and exchange requests address the venue by `account_id` on the wire."""
+  assert codec.decode_client(codec.encode_client(msg)) == msg
+  wire = json.loads(codec.encode_client(msg))
+  assert wire['account_id'] == ALIAS
+  assert 'venue_id' not in wire

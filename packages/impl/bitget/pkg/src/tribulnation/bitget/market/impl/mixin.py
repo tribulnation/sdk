@@ -13,6 +13,7 @@ from typing_extensions import (
   Awaitable,
   Callable,
   Iterable,
+  Literal,
   Mapping,
   TypeVar,
 )
@@ -77,8 +78,11 @@ async def flatten(pushes: AsyncIterable[Mapping[str, Any]], key: str):
 
 @dataclass
 class Cache:
-  """Catalogues and subscriptions shared by every market built off one client."""
+  """Account key, catalogues and subscriptions shared by every market built off one
+  client."""
 
+  account_id: str | None = None
+  """Root SDK account key; `None` when built directly, reporting `'bitget'` instead."""
   spot: dict[str, SpotSymbol] = field(default_factory=dict[str, SpotSymbol])
   perp: dict[PerpProduct, dict[str, MixContract]] = field(
     default_factory=dict[PerpProduct, dict[str, MixContract]]
@@ -121,6 +125,7 @@ class VenueMixin(SDK):
     uta: bool | None = None,
     public: bool = False,
     validate: bool = True,
+    account_id: str | None = None,
   ):
     """Build a surface over a fresh Bitget client.
 
@@ -132,6 +137,8 @@ class VenueMixin(SDK):
         account-scoped call when omitted; public market data never needs it.
       public: Build a credential-free client, restricted to public endpoints.
       validate: Validate responses.
+      account_id: Root SDK account key, the first segment of every market ID;
+        defaults to the venue ID.
     """
     client = Bitget.new(
       access_key=access_key,
@@ -140,7 +147,20 @@ class VenueMixin(SDK):
       public=public,
       validate=validate,
     )
-    return cls(account=SdkMixin(client=client, uta=uta, validate=validate))
+    return cls(
+      account=SdkMixin(client=client, uta=uta, validate=validate),
+      cache=Cache(account_id=account_id),
+    )
+
+  @property
+  def venue_id(self) -> Literal['bitget']:
+    """The venue ID."""
+    return 'bitget'
+
+  @property
+  def account_id(self) -> str:
+    """Root SDK account key this object was opened under, else `venue_id`."""
+    return self.cache.account_id or self.venue_id
 
   def resources(self) -> Iterable[AsyncContextManager[Any]]:
     yield from super().resources()

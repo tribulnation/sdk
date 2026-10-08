@@ -6,10 +6,6 @@ from .perp_exchange import PerpExchange
 
 
 class MexcMarket(SharedMixin, TradingVenue):
-  @property
-  def venue_id(self) -> str:
-    return 'mexc'
-
   async def exchange(self, exchange_id: str, /):
     """Resolve spot or the public linear perpetual exchange."""
     if exchange_id == 'spot':

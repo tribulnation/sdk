@@ -48,6 +48,27 @@ Then the following are valid market identifiers:
 
 See the [venue-specific guidance](implementations/index.md) for full details.
 
+Venues, exchanges and markets report their own IDs, which round-trip through the SDK
+that opened them (`(await sdk.market(market.id)).id == market.id`):
+
+| Attribute | Example (account `hl`) | Meaning |
+| --- | --- | --- |
+| `market.id` | `hl::BTC-USD` | `<account_id>:<exchange_id>:<market_id>` |
+| `exchange.id` | `hl:` | `<account_id>:<exchange_id>` |
+| `venue.id` | `hl` | the account key |
+| `account_id` | `hl` | the account key the object was opened under |
+| `venue_id` | `hyperliquid` | the venue, the same for every account on that venue |
+
+Two accounts on the same venue therefore report distinct IDs and the same
+`venue_id`. A venue constructed directly from its package, outside `MarketSDK`, has
+no account key: its `account_id` is its `venue_id`.
+
+`venue_id` is a `VenueId` (`from tribulnation.sdk.impl.accounts import VenueId`): the
+`venue` of the account the object was built from. Testnets are separate venues, so an
+account with `venue = "hyperliquid_testnet"` reports `venue_id == 'hyperliquid_testnet'`.
+Venue-specific `settings` stay keyed by the venue's package name
+(`{'hyperliquid': {...}}`) and apply on its testnet too.
+
 Shorter forms work once you have scoped down on a venue: let's see this next.
 
 <!-- next -->
