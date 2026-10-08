@@ -268,7 +268,7 @@
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "ad394310b80cf885e1fee471550825d81e3bccf5faac91de69b1e0863f8c0257",
+        "files_sha256": "2289d394d7281cc14773bd7cd12ee6dc4fe97d947206f2a0060fddb00238be01",
         "metadata_sha256": "e01c52d3a5d46a283b80d3654031bfbc32bbee2434494b3fc01982cf5f3e5c79",
         "version": "0"
       },
@@ -305,7 +305,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "7a1ddde4df22e86c7e2424c7d68b05a600859c9c658b497b217e614cc303d0e2",
+    "source_sha256": "c9ea58c5e9774cf1eea2caecf4f4e3610adcc53ec88aa7c8847649bfc0f61f4e",
     "venue": "coinbase"
   },
   "before": {
@@ -577,7 +577,7 @@
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "ad394310b80cf885e1fee471550825d81e3bccf5faac91de69b1e0863f8c0257",
+        "files_sha256": "2289d394d7281cc14773bd7cd12ee6dc4fe97d947206f2a0060fddb00238be01",
         "metadata_sha256": "e01c52d3a5d46a283b80d3654031bfbc32bbee2434494b3fc01982cf5f3e5c79",
         "version": "0"
       },
@@ -614,12 +614,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "7a1ddde4df22e86c7e2424c7d68b05a600859c9c658b497b217e614cc303d0e2",
+    "source_sha256": "c9ea58c5e9774cf1eea2caecf4f4e3610adcc53ec88aa7c8847649bfc0f61f4e",
     "venue": "coinbase"
   },
-  "finished": "2026-10-08T09:46:58.165671Z",
-  "results_sha256": "21090e9d18d87297e3fd47a9d69d95d259492a61abb5f368c9245ee850ebb18a",
+  "finished": "2026-10-08T10:35:06.266354Z",
+  "results_sha256": "cbbac392c9c68d2958d48f271b36fdf419b266963d123fb04fff412e23b1d7e2",
   "schema_version": 2,
-  "started": "2026-10-08T09:46:50.220895Z",
-  "summary_sha256": "d98a7dc73377a2b3dbe5a90be3b84fbe42b06292a0fe2b59885d260ab25bdc71"
+  "started": "2026-10-08T10:34:57.201666Z",
+  "summary_sha256": "f74607d704cd10380a558619a4bd4d96d846b9e9863042f1159a6c90061f5347"
 }
