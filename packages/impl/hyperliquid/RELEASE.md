@@ -1,27 +1,16 @@
-# tribulnation-hyperliquid 0.12.0
+# tribulnation-hyperliquid 0.12.1
 
-Requires SDK >=2.12.0. Market, exchange and venue objects expose `account_id`,
-the root SDK account key they were opened under, and build their IDs from it;
-`venue_id` is the typed venue. Objects built directly keep their current IDs.
-`depth()` and `depth_stream()` accept the SDK's venue-keyed `settings`.
+Fix: in unified-account mode, `perp_collateral().free_collateral` is now the
+collateral token's spot `total - hold`, matching Hyperliquid's "available to
+trade". It previously used `tokenToAvailableAfterMaintenance`, which nets out
+only maintenance margin and overstated opening capacity (about 2x).
+`initial_margin` (`equity - free_collateral`) is now the hold. Equity and
+maintenance margin are unchanged, and `available_notional()` now agrees with
+`free_collateral`. Other margin modes are unaffected.
 
-Depth reads take `settings={'hyperliquid': {'depth_source': ...}}`:
-
-1. `'l2'` (default): `l2Book`, 20 levels per side, about every 5.4 s.
-2. `'fast'`: `l2Book` with `fast=True`, 5 levels per side, about every 0.5 s, on
-   a dedicated WebSocket connection, so `'fast'` and `'l2'` can run together.
-3. `'bbo'`: the `bbo` channel, top of book with sizes, pushed on change.
-
-Subscriptions are shared per coin and source. REST has no faster endpoint: every
-source reads the `l2Book` snapshot, trimmed to its level count. `levels` now
-trims books on REST and WebSocket (it was ignored) and never selects the source.
-`Book.time` is the `l2Book`/`bbo` block time on perps, spot and builder dexes,
-including top-of-book tickers. Testnet objects now report
-`venue_id == 'hyperliquid_testnet'`.
-
-Upgrade the SDK and this adapter together.
+Requires SDK >=2.12.0, unchanged from 0.12.0.
 
 Release qualification on 2026-10-08 passed the read suites and market
-consistency. Committed evidence under `release-evidence/hyperliquid/` matches pinned
-Catalogue `1851660ac2bed8243dd9ce9c7297fe05c7130973`; offline release
-verification passes. This adapter release follows SDK 2.12.0 publication.
+consistency. Committed evidence under `release-evidence/hyperliquid/` matches
+pinned Catalogue `1851660ac2bed8243dd9ce9c7297fe05c7130973`; offline release
+verification passes.
