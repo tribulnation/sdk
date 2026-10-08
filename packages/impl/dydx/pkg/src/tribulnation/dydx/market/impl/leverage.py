@@ -56,6 +56,11 @@ def effective_mmf(market: PerpetualMarket):
 
 
 def max_leverage(market: PerpetualMarket):
-  """Return the maximum leverage implied by market margin metadata."""
-  imf = effective_imf(market)
-  return Decimal(1) / imf
+  """Return the maximum leverage implied by market margin metadata.
+
+  A whole multiple is returned without an exponent (`10`, not `1E+1`).
+  """
+  leverage = Decimal(1) / effective_imf(market)
+  if leverage == leverage.to_integral_value():
+    return leverage.quantize(Decimal(1))
+  return leverage

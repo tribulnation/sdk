@@ -668,6 +668,7 @@ methods:
       accountVenues: [mexc]
       constants:
         mexc: {market_id: 'mexc:spot:BTCUSDT', notional: '8120.00'}
+        aster: {market_id: 'aster:perp:BTCUSDT', notional: '162400.00'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', notional: '7640.00'}
         bitget: {market_id: 'bitget:spot:BTCUSDT', notional: '8120.00'}
         binance: {market_id: 'binance:spot:BTCUSDT', notional: '8120.00'}
@@ -1095,3 +1096,20 @@ methods:
       resultTemplate: |
         dydx -> dydx:perp:BTC-USD
         hyperliquid -> hyperliquid::BTC
+
+  leverage:
+    group: Perpetual-only
+    public: false
+    example:
+      accountVenues: [hyperliquid]
+      constants:
+        hyperliquid: {market_id: 'hyperliquid::BTC', leverage: '20', free: '7640.00', notional: '152800.00'}
+        aster: {market_id: 'aster:perp:BTCUSDT', leverage: '20', free: '8120.00', notional: '162400.00'}
+        dydx: {market_id: 'dydx:perp:BTC-USD', leverage: '20', free: '8120.00', notional: '162400.00'}
+        lighter: {market_id: 'lighter:perp:1', leverage: '20', free: '8120.00', notional: '162400.00'}
+      callTemplate: |
+        leverage = await sdk.leverage('{{ constants[accounts[0]].market_id }}')
+        notional = await sdk.available_notional('{{ constants[accounts[0]].market_id }}')
+        print(leverage, notional)  # free collateral {{ constants[accounts[0]].free }} x leverage
+      resultTemplate: |
+        {{ constants[accounts[0]].leverage }} {{ constants[accounts[0]].notional }}

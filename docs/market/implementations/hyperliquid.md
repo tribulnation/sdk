@@ -101,6 +101,19 @@ async with sdk.depth_stream('hl::ETH', settings={'hyperliquid': {'depth_source':
 - Perp `available_notional`/leverage and spot balances are computed against
   Hyperliquid-native metadata (asset/collateral tokens, user fees), cached venue-wide and
   refreshed lazily.
+- **`leverage`** (perp) is the account's per-asset setting from the `activeAssetData`
+  info request (`leverage.value`), capped at the asset's `maxLeverage`; with no usable
+  setting it falls back to `maxLeverage`. Hyperliquid reports its default setting for an
+  asset the account never configured, so the fallback is defensive. Cross and isolated
+  settings mean the same multiple. HIP-3 (builder-dex) markets query their `dex:`-prefixed
+  coin. Cached per coin; `refetch=True` re-reads the setting and the dex universe.
+- **`available_notional`** (perp) is the collateral token's free spot balance
+  (`total - hold`, the same figure as the cross bucket's `free_collateral`) times
+  `leverage()`. It overrides the SDK default (`collateral().free_collateral × leverage()`)
+  because an isolated position is opened from that account pool, not from its own
+  bucket, and because it needs one request instead of the mode-aware collateral's four.
+  Like the old figure, it does not check the account abstraction mode. Spot
+  `available_notional` is the SDK default: the quote bucket's `total - hold`.
 - **`perp_collateral`** at the exchange level returns the account **cross** pool in **unified
   account** mode. The implementation asserts `user_abstraction == "unifiedAccount"` and raises
   on other modes. In unified mode, the real equity backing perps is the **spot collateral token

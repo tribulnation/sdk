@@ -65,7 +65,15 @@ response validation.
   rejects spot markets.
 - Trade times are the trade's block timestamp, a few seconds before execution.
 - Perpetual collateral: the exchange bucket is cross margin; a market held in isolated
-  margin reports its own bucket. Spot collateral supports unified accounts only; classic
+  margin reports its own bucket.
+- Perpetual `leverage` is `1 / initial margin fraction`: the account's configured fraction
+  for the market (the account's position entry, `initial_margin_fraction`, in percent), or
+  the market's `default_initial_margin_fraction` for a market the account never
+  configured. The fraction applies to cross and isolated positions alike. Cached per
+  market; `refetch=True` re-reads the account. Perpetual `available_notional` is the free
+  cross collateral times it, kept over the SDK default because isolated positions are
+  funded from cross collateral rather than their own bucket. Spot `available_notional`
+  is the SDK default, the quote asset's free collateral. Spot collateral supports unified accounts only; classic
   accounts raise `ApiError`.
 - Funding settles hourly. Funding-rate history is signed by the paying side (positive
   when longs pay); funding payments are positive when received.

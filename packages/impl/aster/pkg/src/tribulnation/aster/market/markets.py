@@ -17,6 +17,7 @@ from typing_extensions import (
 )
 from pydantic import TypeAdapter, ValidationError
 from typed_aster.futures import Futures
+from typed_aster.futures.position.risk import PositionRisk
 from typed_aster.futures.trade.place_order import Request as FuturesOrderRequest
 from typed_aster.futures.trade.schemas import FuturesOrder
 from typed_aster.futures.trade.user_trades import AccountTradeItem
@@ -159,6 +160,24 @@ def plain_decimal(x: Decimal) -> Decimal:
   'quantity' was not sent, was empty/null, or malformed").
   """
   return Decimal(f'{x.normalize():f}')
+
+
+def position_leverage(rows: Sequence[PositionRisk], symbol: str) -> Decimal:
+  """The symbol's initial leverage from its `positionRisk` rows.
+
+  Leverage is a per-symbol setting, so hedge-mode `LONG`/`SHORT` rows repeat it; the
+  lowest is used should they ever differ. Flat symbols are listed too, so a missing
+  row is a malformed response rather than an unconfigured symbol.
+
+  Raises:
+    MissingData: No row reports a positive leverage for the symbol.
+  """
+  values = [r['leverage'] for r in rows if r['symbol'] == symbol and r['leverage'] > 0]
+  if not values:
+    raise MissingData(
+      'Aster position risk omits the symbol', market_id=symbol, field='leverage'
+    )
+  return Decimal(min(values))
 
 
 def native_order(order: Order) -> NativeOrder:
@@ -349,10 +368,6 @@ class NativeMarket(Public, Market):
       queue_size=queue_size,
       overflow=overflow,
     )
-
-  async def available_notional(self) -> Decimal:
-    """Unsupported: Aster publishes no account-side buying capacity."""
-    raise NotImplementedError('Aster publishes no account-side buying capacity')
 
   def random_client_order_id(self) -> str:
     """Generate 128 random bits as 32 hex digits, within `newClientOrderId`'s 36 characters."""
@@ -665,6 +680,20 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     if row['marginType'] != 'cross':
       raise NotImplementedError('Aster isolated-margin collateral is not supported')
     return await self.shared.cross_collateral()
+
+  async def leverage(self, *, refetch: bool = False) -> Decimal:
+    """The symbol's configured initial leverage (`positionRisk`), cached per symbol.
+
+    The setting applies to cross and isolated margin alike. `available_notional` uses
+    the default: the cross bucket's `availableBalance` times this leverage.
+    """
+    cached = self.shared.leverages.get(self.symbol)
+    if cached is not None and not refetch:
+      return cached
+    rows = await self.shared.call(lambda: self.api.position.risk(self.symbol))
+    leverage = position_leverage(rows, self.symbol)
+    self.shared.leverages[self.symbol] = leverage
+    return leverage
 
   async def perp_collateral(self) -> PerpCollateral:
     """Unsupported: Aster publishes configured, not actual, leverage."""

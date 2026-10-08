@@ -341,8 +341,9 @@ class TradingMarkets(SDK):
   async def available_notional(self, market_id: str, /) -> Decimal:
     """Fetch the maximum notional position you could open right now.
 
-    Spot: the free quote-token balance. Perps: available collateral times the market's
-    maximum leverage. This is opening capacity, deliberately separate from `collateral()`,
+    Spot: the free quote-token balance. Perps: the free collateral of the bucket backing
+    the market times the account's `leverage()` on it, unless the venue publishes a more
+    precise figure. This is opening capacity, deliberately separate from `collateral()`,
     which is about liquidation distance.
     """
     market = await self.market(market_id)
@@ -428,6 +429,21 @@ class TradingMarkets(SDK):
     """Fetch your open perpetual position: signed `size` plus average `entry_price`."""
     market = await self.perp_market(market_id)
     return await market.perp_position()
+
+  @SDK.method
+  async def leverage(self, market_id: str, /, *, refetch: bool = False) -> Decimal:
+    """Fetch the leverage this account can open at on a perpetual market.
+
+    The multiple of free collateral the account can open as notional: opening `n` of
+    notional needs `n / leverage` of collateral. Account-specific (e.g. a per-market
+    leverage setting), so it is not part of `rules()`. Cached after the first call.
+    Spot markets have no leverage; unsupported venues raise `NotImplementedError`.
+
+    Args:
+      refetch: Fetch again even if the leverage is already cached.
+    """
+    market = await self.perp_market(market_id)
+    return await market.leverage(refetch=refetch)
 
   @SDK.method
   async def perp_collateral(self, id: str, /) -> PerpCollateral:

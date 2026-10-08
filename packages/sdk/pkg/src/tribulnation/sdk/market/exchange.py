@@ -10,6 +10,7 @@ from typing_extensions import (
 from abc import abstractmethod
 from contextlib import asynccontextmanager
 from datetime import datetime
+from decimal import Decimal
 
 from tribulnation.sdk.core import SDK, PaginatedResponse, OverflowPolicy
 from tribulnation.sdk.impl.accounts import VenueId
@@ -266,10 +267,10 @@ class Exchange(SDK):
 
   @SDK.method
   async def available_notional(self, market_id: str, /):
-    """Fetch the max. notional position you can open.
+    """Fetch the maximum notional position you can open right now.
 
-    - For spot, returns the free quote token balance
-    - For futures, returns the available collateral times the maximum leverage
+    - Spot: the free quote-token balance.
+    - Perpetuals: the free collateral times the account's `leverage()` on the market.
     """
     market = await self.market(market_id)
     return await market.available_notional()
@@ -404,6 +405,15 @@ class PerpExchange(Exchange):
     """Fetch your open position in the perpetual market."""
     market = await self.market(market_id)
     return await market.perp_position()
+
+  @SDK.method
+  async def leverage(self, market_id: str, /, *, refetch: bool = False) -> Decimal:
+    """Fetch the leverage this account can open at on the selected market.
+
+    See `PerpMarket.leverage`; cached after the first call.
+    """
+    market = await self.market(market_id)
+    return await market.leverage(refetch=refetch)
 
   @SDK.method
   async def collateral(self, market_id: str | None = None, /) -> Collateral:

@@ -1,4 +1,4 @@
-"""Positions, collateral buckets and available notional from the account endpoint.
+"""Positions, collateral buckets and leverage from the account endpoint.
 
 Perpetual figures read the same fields in classic and unified accounts. Spot collateral
 depends on the mode, and only unified accounts are supported, as for Hyperliquid.
@@ -86,19 +86,22 @@ def market_bucket(
   return cross_bucket(acct)
 
 
-def perp_available_notional(
+def perp_leverage(
   acct: DetailedAccount, market_id: int, detail: PerpsOrderBookDetail
 ) -> Decimal:
-  """Free cross collateral times the market's configured leverage (`100 /
-  initial_margin_fraction`), or the venue default for a market never configured.
-  Isolated positions are funded from cross collateral too."""
+  """`1 / initial margin fraction` for a market: the account's configured fraction
+  (`initial_margin_fraction`, in percent), or the market's default fixed-point fraction
+  (`default_initial_margin_fraction`, in 1/10000) for a market never configured. The
+  same fraction applies to cross and isolated positions."""
   p = position_of(acct, market_id)
-  fraction = (
-    percent(p['initial_margin_fraction'])
-    if p is not None
-    else Decimal(detail['default_initial_margin_fraction']) / 10_000
-  )
-  return cross_free(acct) / fraction
+  if p is not None and p['initial_margin_fraction'] > 0:
+    fraction = percent(p['initial_margin_fraction'])
+  else:
+    fraction = Decimal(detail['default_initial_margin_fraction']) / 10_000
+  leverage = 1 / fraction
+  if leverage == leverage.to_integral_value():
+    return leverage.quantize(Decimal(1))  # `10`, not `1E+1`
+  return leverage
 
 
 def balance_of(acct: DetailedAccount, asset_id: int) -> AccountAsset | None:

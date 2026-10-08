@@ -2,15 +2,19 @@
 
 from datetime import datetime, timezone
 from decimal import Decimal
+from types import SimpleNamespace
+from unittest.mock import AsyncMock
 from typing_extensions import Any, cast
 
 import pytest
+from typed_lighter import Lighter
 from typed_lighter.api.account.get import DetailedAccount
 from typed_lighter.api.markets.order_book_details import PerpsOrderBookDetail
 from typed_lighter.schemas import AccountPosition, SimpleOrder, Trade as TradeRow
 
-from tribulnation.lighter.core import ClientIndexes
+from tribulnation.lighter.core import ClientIndexes, Shared
 from tribulnation.lighter.market import account, books, history
+from tribulnation.lighter.market.markets import LighterPerpMarket
 from tribulnation.lighter.market.common import parse_trade
 from tribulnation.sdk.core import ApiError
 
@@ -177,11 +181,57 @@ def test_cross_free_excludes_isolated_free_margin():
   assert bucket.leverage == 0
 
 
-def test_available_notional_uses_the_configured_leverage():
-  """Free cross collateral over the position's initial margin fraction (10x)."""
+def test_leverage_is_the_configured_initial_margin_fraction():
+  """The position's 10% fraction is 10x; a never-configured market uses the default
+  fixed-point fraction (500 = 5%, 20x)."""
   acct = detailed()
-  assert account.perp_available_notional(acct, 4095, DETAIL) == Decimal('39570.86742')
-  assert account.perp_available_notional(acct, 4096, DETAIL) == Decimal('79141.73484')
+  assert account.perp_leverage(acct, 4095, DETAIL) == 10
+  assert account.perp_leverage(acct, 4096, DETAIL) == 20
+  assert str(account.perp_leverage(acct, 4095, DETAIL)) == '10'
+
+
+def test_leverage_ignores_an_unset_fraction():
+  """A zero fraction is no setting, never a division by zero."""
+  acct = detailed(positions=[position(initial_margin_fraction=Decimal('0'))])
+  assert account.perp_leverage(acct, 4095, DETAIL) == 20
+
+
+def perp_market(*accounts: DetailedAccount) -> tuple[LighterPerpMarket, AsyncMock]:
+  """Market 4095 over a stub client returning one account per `account.get` call."""
+  get = AsyncMock(side_effect=[{'accounts': [a]} for a in accounts])
+  details = AsyncMock(
+    return_value={
+      'order_book_details': [{'market_id': 4095, **DETAIL}],
+      'spot_order_book_details': [],
+    }
+  )
+  client = SimpleNamespace(
+    account_index=ACCOUNT,
+    api=SimpleNamespace(
+      account=SimpleNamespace(get=get),
+      markets=SimpleNamespace(order_book_details=details),
+    ),
+  )
+  shared = Shared(client=cast(Lighter, client))
+  return LighterPerpMarket(shared=shared, market_index=4095), get
+
+
+async def test_market_leverage_is_cached_until_refetch():
+  """One account read; `refetch=True` sees a changed setting (10% to 4%: 25x)."""
+  changed = detailed(positions=[position(initial_margin_fraction=Decimal('4.00'))])
+  market, get = perp_market(detailed(), changed)
+  assert await market.leverage() == 10
+  assert await market.leverage() == 10
+  assert get.await_count == 1
+  assert await market.leverage(refetch=True) == 25
+  assert get.await_count == 2
+
+
+async def test_available_notional_is_free_cross_collateral_times_leverage():
+  """Kept over the SDK default: an isolated market still opens from cross collateral."""
+  market, _ = perp_market(detailed(), detailed(), detailed())
+  assert await market.available_notional() == Decimal('39570.86742')
+  assert (await market.perp_collateral()).margin_mode == 'isolated'
 
 
 def test_perp_position_is_signed():

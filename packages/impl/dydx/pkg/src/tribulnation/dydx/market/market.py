@@ -9,7 +9,6 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
-import asyncio
 
 from tribulnation.sdk.core import PaginatedResponse, ApiError, OverflowPolicy
 from tribulnation.sdk.market import (
@@ -151,17 +150,19 @@ class Market(MarketMixin, PerpMarket):
 
     return PerpPosition(size=net_size, entry_price=avg_entry)
 
-  @wrap_exceptions
-  async def available_notional(self) -> Decimal:
-    sub, market = await asyncio.gather(
-      self.indexer.data.get_subaccount(
-        address=self.address, subaccount=self.subaccount
-      ),
-      self.indexer.data.get_market(self.market),
-    )
-    collateral = Decimal(sub['subaccount']['freeCollateral'])
-    leverage = max_leverage(market)
-    return collateral * leverage
+  async def leverage(self, *, refetch: bool = False) -> Decimal:
+    """`1 / effective initial margin fraction`, from the cached market metadata.
+
+    dYdX has no per-account leverage setting: every subaccount, cross or isolated,
+    opens at the market's initial margin fraction, scaled up by open interest (see
+    `effective_imf`). The open interest and oracle price are those of the cached
+    market list (shared with `rules()`); `refetch` reloads it.
+    """
+    markets = await self.shared.load_markets(refetch=refetch)
+    market = markets.get(self.market)
+    if market is None:
+      raise ApiError(f'dYdX market not found: {self.market}')
+    return max_leverage(market)
 
   async def place_order(
     self, order: Order, *, settings: Settings = {}
