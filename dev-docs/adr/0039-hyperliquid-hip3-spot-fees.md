@@ -2,7 +2,8 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: accepted; implemented, not release-verified
+1. Status: accepted; implemented, not release-verified; decision 7 (fee reads in the
+   public suite) amended by [ADR 0042](0042-read-only-account-method-qualification.md)
 2. Date: 2026-10-08
 3. Amends: [ADR 0002](0002-combined-side-specific-fees.md) for Hyperliquid, and the
    Hyperliquid exclusion recorded in [ADR 0001](0001-public-rules-and-account-fees.md)

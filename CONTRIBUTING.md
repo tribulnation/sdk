@@ -73,9 +73,14 @@ to record every required read-only suite below, even for market implementations.
    ([ADR 0036](dev-docs/adr/0036-no-implicit-accounts.md)). Support comes from `impl.toml`.
 2. These suites do not place/cancel orders, transfer funds, or subscribe/redeem Earn
    positions. Market checks cover reference-market discovery, books and public streams,
-   rules, tickers, funding data, and candles. Rules do not fetch personal fee tiers;
-   account `fees()` is read only where an address suffices (Hyperliquid, ADR 0039);
+   rules, tickers, funding data, and candles, plus read-only account methods (fees,
+   open orders, trade and funding history, positions, collateral, leverage, available
+   notional) checked for shape, never contents. Rules do not fetch personal fee tiers;
    Coinbase catalogue reads also run on explicitly configured public-only accounts.
+   Each venue's `[qualification.market]` table in `impl.toml` sets the weakest account
+   mode evidence may use and which reads an address or read-only token serves; a
+   declared read raising `NotImplementedError` or `AuthError` fails
+   ([ADR 0042](dev-docs/adr/0042-read-only-account-method-qualification.md)).
    Account-specific Bitget checks remain
    read-only. Earn enumerates instruments; Wallet enumerates methods; Report reads a
    snapshot. Report history is outside SDK live qualification: application-level

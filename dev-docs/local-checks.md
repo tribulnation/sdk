@@ -25,15 +25,19 @@ file's own directory, so an accounts file elsewhere silently runs without creden
 
 1. Each mainnet account is named by its venue slug and is the only configured
    account of that venue, so `sdk-dev test surfaces|consistency <venue>` selects it
-   without `--account`. dYdX, Hyperliquid, Lighter and Aster are `public = true`;
-   dYdX, Hyperliquid and Lighter carry the mainnet address their Report reads need.
-   Aster's Report is signed: it reads `ASTER_USER` and `ASTER_SIGNER_PRIVATE_KEY`,
-   which also make its otherwise public Market client signed.
-2. Testnet accounts use `<venue>_testnet` ids and venues, so no mainnet slug
+   without `--account`. dYdX and Hyperliquid are `public = true` and carry the
+   mainnet address their Report and account Market reads need. Lighter carries its
+   address plus a read-only `LIGHTER_AUTH_TOKEN`; Aster is signed with `ASTER_USER`
+   and `ASTER_SIGNER_PRIVATE_KEY`.
+2. Each account must reach its venue's `[qualification.market] min_mode` in
+   `impl.toml`: `address`, `token` or `private`. The recorded account mode is derived
+   from the credentials actually resolved, so a missing variable lowers it and the
+   verifier rejects the report ([ADR 0042](adr/0042-read-only-account-method-qualification.md)).
+3. Testnet accounts use `<venue>_testnet` ids and venues, so no mainnet slug
    selects them. Name them explicitly for testnet diagnostics.
-3. Bitget has two mainnet accounts, each with an explicit `uta` mode. Qualify with
+4. Bitget has two mainnet accounts, each with an explicit `uta` mode. Qualify with
    `--account bitget_classic`, the mode current evidence records.
-4. Deribit's split qualification pairs `deribit_public` with `deribit_testnet`
+5. Deribit's split qualification pairs `deribit_public` with `deribit_testnet`
    (see below).
 
 `packages/sdk-dev/test/test_qualification_accounts.py` enforces this layout for every
@@ -124,7 +128,7 @@ See [ADR 0014](adr/0014-bit2me-native-ticker-limitation.md) and
 [ADR 0022](adr/0022-bit2me-one-sided-ticker-limitation.md); this is not a general
 venue exemption or permission to relabel old reports.
 
-This suite does not call personal `fees()`, place orders, transfer funds, or claim
+This suite does not call personal `fees()` or other account reads, place orders, transfer funds, or claim
 every discovery-only instrument received a depth comparison. The report preserves
 its inventory so that sample coverage is inspectable. Existing `sdk-dev test
 market|earn|wallet|report` suites and adapter regression tests remain complementary;
@@ -210,9 +214,17 @@ block qualification. Market discovery also resolves every advertised perpetual e
 generic and typed accessors, checking perpetual types and matching venue/exchange IDs.
 An unexpected typed-accessor rejection fails discovery.
 Every supported market reference case must pass candles,
-rules, public depth/streams, ticker and applicable perpetual reads. The declared
-unsupported MEXC perpetual stream, spot-only methods and single-page retention
-cases are excluded, not passed. Bitget additionally requires its existing private
+rules, public depth/streams, ticker and applicable perpetual reads, plus the
+read-only account methods of `account.py` (fees, open orders, 30 days of trades and
+funding, positions, collateral, leverage and available notional) on the recorded
+account. Account reads check shapes and internal consistency, never contents: an
+empty account passes. The declared unsupported MEXC perpetual stream, spot-only
+methods and single-page retention cases are excluded, not passed. Account cases
+carry their own codes: `order_lifecycle` (`query_order`), `perp_only`,
+`unsupported` (undeclared, or listed per exchange in `impl.toml`),
+`credential_mode` (the recorded account mode cannot serve the method) and
+`bitget_classic`. A declared read raising `NotImplementedError` or `AuthError`
+fails. Bitget additionally requires its existing private
 read tests and mode detection, with an explicit expected `uta` account setting.
 No trading or transfers are tested.
 Hyperliquid and dYdX Report reads require a configured mainnet address only; a
@@ -222,7 +234,8 @@ returned-record bounds and provenance, not historical completeness.
 
 One report qualifies the selected mainnet account, not all account configurations,
 chains or providers. See [ADR 0013](adr/0013-all-read-suites-release-gate.md) for scope.
-Read reports use payload version 3; old non-market-only reports are not reusable.
+Read reports use payload version 5, which records the account mode; older reports
+are rejected, not relabelled.
 
 For dYdX Report checks, select an archive provider in the accounts TOML. The runner
 forwards the existing SDK configuration; it does not shorten history to a pruned
