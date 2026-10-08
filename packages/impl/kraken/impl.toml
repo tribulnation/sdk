@@ -50,3 +50,10 @@ note = "Spot retains its existing public/private reads; perp adds public non-tra
 asset = "symbol"
 market = "Spot REST pair altname (`XBTUSD`, `ETHUSDC`); perpetual instrument symbol (`PF_XBTUSD`, `PF_ETHUSD`) under exchange perp."
 note = "Kraken's internal asset id (`XXBT`, `XETH`, `ZUSD`, `USDC`, `SOL`): what `Balance`, `Ledgers`, `TradesHistory`, `WithdrawMethods` and the default `AssetPairs`/`Assets` listings name assets by. `Earn/Strategies` answers in display names (`BTC`) and is re-keyed to the internal id through the venue's own `Assets` join on `altname`. Networks are Kraken's display network names (`Bitcoin`, `Arbitrum One`)."
+
+# Release qualification of account reads (ADR 0042); not shown in the support matrix.
+[qualification.market]
+min_mode = "private"
+
+[qualification.market.unsupported]
+perp = ["fees", "open_orders", "trades_history", "position", "collateral", "available_notional"]

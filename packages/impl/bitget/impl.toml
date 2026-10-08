@@ -37,3 +37,13 @@ note = "`tribulnation.bitget.reporting.Reporting` implements snapshots and histo
 [ids]
 asset = "symbol"
 note = "The venue's coin name (`BTC`, `USDT`); market IDs use Classic API symbols (`BTCUSDT`, `BTCPERP`) under `spot`, `usdt`, or `usdc`. Historical `coin-classic` IDs remain distinct and delisted; they are never mapped to UTA. UTA `coin` (`*_CM`) is explicitly unsupported pending native quote-sized quantity support (SDK issue #32)."
+
+# Release qualification of account reads (ADR 0042); not shown in the support matrix.
+[qualification.market]
+min_mode = "private"
+
+[qualification.market.unsupported]
+usdc = [
+  "fees", "open_orders", "trades_history", "position", "perp_position", "collateral",
+  "perp_collateral", "available_notional",
+]

@@ -49,3 +49,10 @@ note = "Spot-side only: snapshots include Spot, Funding and Simple Earn balances
 [ids]
 asset = "symbol"
 note = "The venue's ticker symbol for spot, futures and earn alike (`BTC`, `USDT`); market ids are the venue's concatenated pair symbols (`BTCUSDT`)."
+
+# Release qualification of account reads (ADR 0042); not shown in the support matrix.
+[qualification.market]
+min_mode = "private"
+
+[qualification.market.unsupported]
+usdm = ["open_orders", "trades_history", "position", "collateral", "available_notional"]

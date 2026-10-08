@@ -53,3 +53,7 @@ note = "Spot only. `candles` sweeps bounded time windows, continuing through emp
 [ids]
 asset = "symbol"
 note = "The venue's ticker symbol (`BTC`, `EUR`); market ids are `<base>/<quote>` (`BTC/EUR`)."
+
+# Release qualification of account reads (ADR 0042); not shown in the support matrix.
+[qualification.market]
+min_mode = "private"

@@ -65,14 +65,56 @@ class ImplIds(pydantic.BaseModel):
   note: str | None = None
 
 
+AccountMode = Literal['public', 'address', 'token', 'private']
+"""What a configured account can authenticate, weakest first: nothing, a public
+address (or account index), a read-only token, or full private credentials."""
+
+ACCOUNT_MODES: tuple[AccountMode, ...] = ('public', 'address', 'token', 'private')
+"""Account modes in increasing order of authority."""
+
+
+def mode_rank(mode: AccountMode) -> int:
+  """Position of `mode` in `ACCOUNT_MODES`, for comparing modes."""
+  return ACCOUNT_MODES.index(mode)
+
+
+class MarketQualification(pydantic.BaseModel):
+  """The `[qualification.market]` table: how release evidence reads account methods.
+
+  Release qualification, not user-facing support: the support matrix ignores it.
+  """
+
+  model_config = pydantic.ConfigDict(extra='forbid')
+
+  min_mode: Literal['address', 'token', 'private']
+  """The weakest account mode release evidence may be recorded with."""
+  address_methods: list[str] = []
+  """Account reads served with only a public address or account index."""
+  token_methods: list[str] = []
+  """Account reads served with a read-only token; every other account read needs
+  private credentials."""
+  unsupported: dict[str, list[str]] = {}
+  """Declared methods an exchange does not serve, keyed by exchange ID: the
+  surface-level `methods` list cannot say that one product line lacks them."""
+
+
+class ImplQualification(pydantic.BaseModel):
+  """The optional `[qualification]` table of a package's `impl.toml`."""
+
+  model_config = pydantic.ConfigDict(extra='forbid')
+
+  market: MarketQualification | None = None
+
+
 class ImplFile(pydantic.BaseModel):
   """The full shape of a package's `impl.toml` — a `support` table of tables plus the
-  optional `ids` table."""
+  optional `ids` and `qualification` tables."""
 
   model_config = pydantic.ConfigDict(extra='forbid')
 
   support: dict[str, ImplSurfaceSupport] = {}
   ids: ImplIds | None = None
+  qualification: ImplQualification = ImplQualification()
 
 
 def load_impl_files(impl_dir: Path) -> dict[str, ImplFile]:

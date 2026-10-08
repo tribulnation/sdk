@@ -36,3 +36,10 @@ note = "`history()` defaults to the last 30 days and automatically sweeps all sp
 [ids]
 asset = "symbol"
 note = "The venue's coin name (`BTC`, `USDT`); spot market ids are concatenated pair symbols (`BTCUSDT`), futures `<base>_<quote>` (`BTC_USDT`)."
+
+# Release qualification of account reads (ADR 0042); not shown in the support matrix.
+[qualification.market]
+min_mode = "private"
+
+[qualification.market.unsupported]
+perp = ["fees", "open_orders", "trades_history", "position", "collateral", "available_notional"]

@@ -24,3 +24,12 @@ note = "Snapshots read every account (master and sub-accounts) of an L1 `address
 asset = "index"
 market = "The venue's numeric `market_id` as a decimal string (`'0'` ETH and `'1'` BTC perpetuals, `'2048'` ETH/USDC spot on mainnet): the on-chain id orders are signed with. Symbols are API metadata only."
 note = "The venue's numeric `asset_id` as a decimal string (`'3'` is USDC, `'1'` ETH)."
+
+# Release qualification of account reads (ADR 0042); not shown in the support matrix.
+[qualification.market]
+min_mode = "token"
+address_methods = [
+  "trades_history", "position", "perp_position", "collateral", "perp_collateral",
+  "leverage", "available_notional",
+]
+token_methods = ["fees", "open_orders", "query_order", "funding_payments"]

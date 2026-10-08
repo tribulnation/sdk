@@ -31,3 +31,7 @@ note = "No native Earn instrument catalogue."
 asset = "symbol"
 market = "Native concatenated symbols such as BTCUSDT, under the spot and perp exchange IDs."
 note = "Asset IDs remain native (USDT, ASTER)."
+
+# Release qualification of account reads (ADR 0042); not shown in the support matrix.
+[qualification.market]
+min_mode = "private"

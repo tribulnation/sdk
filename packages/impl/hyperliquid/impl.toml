@@ -71,3 +71,11 @@ note = "Hyperliquid offers nothing shaped like the Earn contract. Its three yiel
 [ids]
 asset = "index"
 note = "The spot token index as a decimal string (`'0'` is USDC, `'150'` is HYPE), never the token name; spot market ids are `<base>/<quote>:<spot index>`, perpetual market ids the coin name, prefixed `<dex>:` off the default dex."
+
+# Release qualification of account reads (ADR 0042); not shown in the support matrix.
+[qualification.market]
+min_mode = "address"
+address_methods = [
+  "fees", "open_orders", "query_order", "trades_history", "funding_payments", "position",
+  "perp_position", "collateral", "perp_collateral", "leverage", "available_notional",
+]

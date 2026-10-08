@@ -13,20 +13,42 @@ from typing_extensions import Literal
 from sdk_dev import read_evidence as evidence
 from sdk_dev.cli import results
 from sdk_dev.repo import repo_root
+from sdk_dev.support import AccountMode, load_impl_files
 
 
-def passing(venue: str) -> evidence.Payload:
+def minimum(venue: str) -> AccountMode:
+  """The venue's qualification minimum, or `public` without account reads."""
+  impl = load_impl_files(repo_root() / 'packages/impl')[venue]
+  market = impl.qualification.market
+  return market.min_mode if market is not None else 'public'
+
+
+def uta_of(venue: str) -> bool | None:
+  """Bitget qualifies its tracked Classic account; other venues have no mode flag."""
+  return False if venue == 'bitget' else None
+
+
+def cases_of(venue: str, mode: AccountMode | None = None) -> dict[str, evidence.Case]:
+  """The inventory for a venue's account at `mode`, by default its minimum."""
+  return evidence.inventory(
+    repo_root(), venue, mode=mode or minimum(venue), bitget_uta=uta_of(venue)
+  )
+
+
+def passing(venue: str, mode: AccountMode | None = None) -> evidence.Payload:
   """Synthetic results are used only to exercise the offline verifier."""
+  mode = mode or minimum(venue)
   return evidence.Payload(
     venue=venue,
     account_venue=venue,
-    bitget_uta=True if venue == 'bitget' else None,
+    account_mode=mode,
+    bitget_uta=uta_of(venue),
     completed=True,
     checks=[
       evidence.Outcome(
         id=id, passed=0 if case.exclusion else 1, exclusion=case.exclusion
       )
-      for id, case in evidence.inventory(repo_root(), venue).items()
+      for id, case in cases_of(venue, mode).items()
     ],
   )
 
@@ -40,7 +62,7 @@ def test_all_implementations_have_complete_read_inventories(venue: str):
 
 def test_market_packages_require_account_surfaces_too():
   """Market success does not replace Wallet/Earn/Report qualification."""
-  cases = evidence.inventory(repo_root(), 'binance')
+  cases = cases_of('binance')
   assert {case.surface for case in cases.values()} == {
     'market',
     'wallet',
@@ -83,24 +105,11 @@ def test_exclusions_are_specific_and_never_passes():
   exclusions[0].passed = 1
   with pytest.raises(ValueError):
     evidence.verify_payload(hl.model_dump(mode='json'), root=repo_root())
-  mexc = evidence.inventory(repo_root(), 'mexc')
+  mexc = cases_of('mexc')
   assert sum(case.exclusion == 'unsupported_perp_stream' for case in mexc.values()) == 1
-  kraken = evidence.inventory(repo_root(), 'kraken')
+  kraken = cases_of('kraken')
   assert (
     sum(case.exclusion == 'unsupported_perp_stream' for case in kraken.values()) == 1
-  )
-
-
-def test_account_fee_reads_are_required_only_where_an_address_suffices():
-  """Hyperliquid account fees are required evidence; other venues' are excluded."""
-  hl = evidence.inventory(repo_root(), 'hyperliquid')
-  fees = [case for case in hl.values() if case.method == 'fees']
-  assert len(fees) == 3 and all(case.exclusion is None for case in fees)
-  binance = evidence.inventory(repo_root(), 'binance')
-  assert all(
-    case.exclusion == 'private_account_fees'
-    for case in binance.values()
-    if case.method == 'fees'
   )
 
 
@@ -110,7 +119,7 @@ SUSPENDED = 'wallet.test_withdrawal_methods_not_empty[null, null]'
 def test_withdrawal_suspension_is_narrow_and_dated(monkeypatch: pytest.MonkeyPatch):
   """Only Bitget withdrawal non-emptiness is excluded, never passed, and only until its end."""
   monkeypatch.setattr(evidence, 'today', lambda: date(2026, 10, 9))
-  bitget = evidence.inventory(repo_root(), 'bitget')
+  bitget = cases_of('bitget')
   excluded = [
     id for id, c in bitget.items() if c.exclusion == 'venue_withdrawals_suspended'
   ]
@@ -121,7 +130,7 @@ def test_withdrawal_suspension_is_narrow_and_dated(monkeypatch: pytest.MonkeyPat
   )
   for venue in results.required_venues(repo_root(), 'sdk'):
     if venue != 'bitget':
-      cases = evidence.inventory(repo_root(), venue).values()
+      cases = cases_of(venue).values()
       assert all(c.exclusion != 'venue_withdrawals_suspended' for c in cases)
   report = passing('bitget')
   evidence.verify_payload(report.model_dump(mode='json'), root=repo_root())
@@ -131,7 +140,7 @@ def test_withdrawal_suspension_is_narrow_and_dated(monkeypatch: pytest.MonkeyPat
   with pytest.raises(ValueError):
     evidence.verify_payload(forged.model_dump(mode='json'), root=repo_root())
   monkeypatch.setattr(evidence, 'today', lambda: date(2026, 10, 10))
-  assert evidence.inventory(repo_root(), 'bitget')[SUSPENDED].exclusion is None
+  assert cases_of('bitget')[SUSPENDED].exclusion is None
   with pytest.raises(ValueError):
     evidence.verify_payload(report.model_dump(mode='json'), root=repo_root())
 
@@ -152,7 +161,7 @@ def test_deribit_split_and_legacy_reports():
   with pytest.raises(ValueError):
     evidence.verify_payload(report.model_dump(mode='json'), root=repo_root())
   with pytest.raises(ValueError):
-    evidence.group_inventory(repo_root(), 'binance', 'report_testnet')
+    evidence.group_inventory(repo_root(), 'binance', 'report_testnet', mode='private')
 
 
 @pytest.mark.parametrize(
@@ -167,12 +176,12 @@ def test_real_pytest_collection_matches_inventory_without_network(
   accounts = tmp_path / 'accounts.toml'
   accounts.write_text(
     f'[accounts.local]\nvenue = "{venue}"\n'
-    + ('uta = true\n' if venue == 'bitget' else '')
+    + ('uta = false\n' if venue == 'bitget' else '')
   )
   monkeypatch.setenv('SDK_DEV_ACCOUNTS_CONFIG', str(accounts))
   monkeypatch.setenv('SDK_DEV_ACCOUNT_ID', 'local')
   monkeypatch.setenv('PYTEST_DISABLE_PLUGIN_AUTOLOAD', '1')
-  cases = evidence.inventory(repo_root(), venue)
+  cases = cases_of(venue)
   recorder = evidence.Recorder(cases, 'local')
   args = sorted({f'{case.path}::{case.test}' for case in cases.values()})
   args += [
@@ -332,7 +341,7 @@ def test_report_runner_rejects_unknown_archive_provider(tmp_path: Path):
 @pytest.mark.parametrize('venue', results.required_venues(repo_root(), 'sdk'))
 def test_report_inventory_requires_only_snapshots(venue: str):
   """Report history is outside SDK live qualification under ADR 0016."""
-  cases = evidence.inventory(repo_root(), venue)
+  cases = cases_of(venue)
   report_tests = {case.test for case in cases.values() if case.surface == 'report'}
   assert report_tests <= {
     'test_snapshot_can_be_fetched',
@@ -368,5 +377,121 @@ def test_previous_history_qualification_version_is_rejected():
   """The changed qualification boundary requires newly recorded evidence."""
   legacy = passing('dydx').model_dump(mode='json')
   legacy['version'] = 3
+  with pytest.raises(ValueError):
+    evidence.verify_payload(legacy, root=repo_root())
+
+
+def account_cases(venue: str, mode: AccountMode | None = None) -> dict[str, str | None]:
+  """Account-read exclusions keyed by `<market> <method>`."""
+  return {
+    f'{case.market} {case.method}': case.exclusion
+    for case in cases_of(venue, mode).values()
+    if case.test == 'test_account_read'
+  }
+
+
+def test_account_inventory_follows_support_modes_and_exchanges():
+  """Exclusions come from impl.toml support, the recorded mode and the market kind."""
+  hl = account_cases('hyperliquid')
+  assert hl[':BTC fees'] is None and hl['xyz:xyz:SILVER leverage'] is None
+  assert hl['spot:UBTC/USDC:142 fees'] is None
+  assert hl['spot:UBTC/USDC:142 perp_position'] == 'perp_only'
+  assert all(
+    code == 'order_lifecycle' for key, code in hl.items() if 'query_order' in key
+  )
+  binance = account_cases('binance')
+  assert binance['spot:BTCUSDT fees'] is None
+  assert binance['usdm:BTCUSDT fees'] is None
+  assert binance['usdm:BTCUSDT open_orders'] == 'unsupported'
+  assert binance['usdm:BTCUSDT leverage'] == 'unsupported'
+  lighter = account_cases('lighter', 'address')
+  assert lighter['perp:1 position'] is None
+  assert lighter['perp:1 fees'] == 'credential_mode'
+  assert lighter['perp:1 funding_payments'] == 'credential_mode'
+  assert account_cases('lighter')['perp:1 fees'] is None
+  bitget = account_cases('bitget')
+  assert bitget['usdt:BTCUSDT perp_collateral'] == 'bitget_classic'
+  assert bitget['usdt:BTCUSDT collateral'] == 'bitget_classic'
+  assert bitget['spot:BTCUSDT collateral'] is None
+  assert bitget['usdc:BTCPERP fees'] == 'unsupported'
+  uta = evidence.inventory(repo_root(), 'bitget', mode='private', bitget_uta=True)
+  assert all(case.exclusion != 'bitget_classic' for case in uta.values())
+  for venue in ('deribit', 'kucoin'):
+    codes = set(account_cases(venue).values())
+    assert codes == {'unsupported', 'order_lifecycle', 'perp_only'}
+
+
+def test_qualification_tables_name_real_account_reads():
+  """Every listed method is an account read the venue declares, on a real exchange."""
+  from sdk_dev.integration.market.account import ACCOUNT_READS
+  from sdk_dev.integration.market.support import CASES
+
+  for venue, impl in load_impl_files(repo_root() / 'packages/impl').items():
+    market = impl.qualification.market
+    support = impl.support.get('market')
+    if market is None:
+      if support is not None and support.support != 'none':
+        assert all(code is not None for code in account_cases(venue).values())
+      continue
+    assert support is not None
+    declared = (
+      set(ACCOUNT_READS) if support.support == 'full' else set(support.methods or ())
+    )
+    assert set(market.address_methods) | set(market.token_methods) <= declared
+    assert not set(market.address_methods) & set(market.token_methods)
+    exchanges = {case.market_id.split(':', 1)[0] for case in CASES[venue]}
+    for exchange, methods in market.unsupported.items():
+      assert exchange in exchanges and set(methods) <= declared
+
+
+@pytest.mark.parametrize('venue', ['binance', 'hyperliquid', 'lighter'])
+def test_account_mode_below_minimum_is_rejected(venue: str):
+  """A weaker account cannot narrow its own required inventory."""
+  weaker: AccountMode = 'address' if minimum(venue) != 'address' else 'public'
+  report = passing(venue, weaker)
+  with pytest.raises(ValueError, match='below'):
+    evidence.verify_payload(report.model_dump(mode='json'), root=repo_root())
+  stronger = passing(venue, 'private')
+  evidence.verify_payload(stronger.model_dump(mode='json'), root=repo_root())
+
+
+def test_account_exclusions_cannot_be_invented_dropped_or_skipped():
+  """Account rows follow the reconstructed policy exactly."""
+  good = passing('binance')
+  required = next(
+    i
+    for i, row in enumerate(good.checks)
+    if 'test_account_read' in row.id and row.exclusion is None
+  )
+  excluded = next(
+    i
+    for i, row in enumerate(good.checks)
+    if 'test_account_read' in row.id and row.exclusion == 'unsupported'
+  )
+  updates: list[tuple[int, dict[str, object]]] = [
+    (required, {'passed': 0, 'exclusion': 'credential_mode'}),
+    (required, {'passed': 0, 'skipped': 1}),
+    (required, {'passed': 0, 'failed': 1}),
+    (excluded, {'exclusion': None, 'passed': 1}),
+    (excluded, {'exclusion': 'perp_only'}),
+  ]
+  for index, values in updates:
+    bad = good.model_copy(deep=True)
+    bad.checks[index] = bad.checks[index].model_copy(update=values)
+    with pytest.raises(ValueError):
+      evidence.verify_payload(bad.model_dump(mode='json'), root=repo_root())
+  missing = good.model_copy(deep=True)
+  del missing.checks[required]
+  with pytest.raises(ValueError):
+    evidence.verify_payload(missing.model_dump(mode='json'), root=repo_root())
+
+
+def test_version_four_reports_are_rejected_not_relabelled():
+  """Reports without a recorded account mode cannot qualify (ADR 0034)."""
+  legacy = passing('binance').model_dump(mode='json')
+  legacy['version'] = 4
+  with pytest.raises(ValueError):
+    evidence.verify_payload(legacy, root=repo_root())
+  del legacy['account_mode']
   with pytest.raises(ValueError):
     evidence.verify_payload(legacy, root=repo_root())

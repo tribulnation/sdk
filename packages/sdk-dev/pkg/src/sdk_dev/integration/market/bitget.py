@@ -1,6 +1,8 @@
 """Live conformance tests for the Bitget market implementation.
 
-The shared `suite.py` covers `candles`; this module covers the rest of the surface. One
+The shared `suite.py` covers `candles` and `account.py` the generic account reads; this
+module covers Bitget's own public expectations, private streams and the rejections each
+account mode declares. One
 event loop per account runs every method once (`Results`), and each test reads its
 outcome back, so a single account's run is one connection and one catalogue fetch
 rather than one per test. Accounts: the credential-free `bitget` default, plus every
@@ -188,23 +190,10 @@ async def collect(sdk: MarketSDK, account_id: str, public: bool, results: Result
     await results.attempt('spot.open_orders', spot_market.open_orders)
     if public:
       return
-    await results.attempt(
-      'spot.trades_history', lambda: spot_market.trades_history(start, end)
-    )
-    await results.attempt('spot.position', spot_market.position)
-    await results.attempt('spot.collateral', spot_market.collateral)
     await results.attempt('spot.collateral.pool', spot.collateral)
-    await results.attempt('spot.available_notional', spot_market.available_notional)
     await results.subscribes('spot.trades_stream', spot_market.trades_stream)
-    await results.attempt('perp.open_orders', perp_market.open_orders)
-    await results.attempt(
-      'perp.trades_history', lambda: perp_market.trades_history(start, end)
-    )
-    await results.attempt('perp.perp_position', perp_market.perp_position)
-    await results.attempt('perp.position', perp_market.position)
     await results.attempt('perp.perp_collateral', perp_market.perp_collateral)
     await results.attempt('perp.perp_collateral.pool', perp.perp_collateral)
-    await results.attempt('perp.available_notional', perp_market.available_notional)
     await results.attempt(
       'perp.funding_payments', lambda: perp_market.funding_payments(start, end)
     )
@@ -395,22 +384,8 @@ def test_spot_open_orders(bitget: Results):
     assert isinstance(bitget.check('spot.open_orders'), list)
 
 
-def test_spot_trades_history(bitget: Results):
-  """Fills over the last month parse, every one on the reference pair's own sign."""
-  for trade in bitget.check('spot.trades_history'):
-    assert trade.price > 0 and trade.qty != 0
-
-
-def test_spot_position(bitget: Results):
-  """A spot position is a non-negative base balance."""
-  assert bitget.check('spot.position').size >= 0
-
-
-def test_spot_collateral(bitget: Results):
-  """Market-level collateral is the quote balance; the pool exists only on UTA."""
-  collateral = bitget.check('spot.collateral')
-  assert collateral.equity >= collateral.free_collateral >= 0
-  assert bitget.check('spot.available_notional') == collateral.free_collateral
+def test_spot_collateral_pool(bitget: Results):
+  """The exchange-level spot pool exists only on UTA; Classic refuses it."""
   if is_classic(bitget):
     bitget.expect('spot.collateral.pool', NotImplementedError)
   else:
@@ -422,38 +397,14 @@ def test_spot_trades_stream(bitget: Results):
   assert bitget.check('spot.trades_stream') is True
 
 
-def test_perp_open_orders(bitget: Results):
-  """Open perpetual orders are listed."""
-  assert isinstance(bitget.check('perp.open_orders'), list)
-
-
-def test_perp_trades_history(bitget: Results):
-  """Perpetual fills over the last month parse with their fees."""
-  for trade in bitget.check('perp.trades_history'):
-    assert trade.price > 0 and trade.qty != 0
-    assert trade.fee is not None and trade.fee.asset == 'USDT'
-
-
-def test_perp_position(bitget: Results):
-  """The perpetual position is reported, and `position()` agrees with it."""
-  position = bitget.check('perp.perp_position')
-  assert bitget.check('perp.position').size == position.size
-
-
 def test_perp_collateral(bitget: Results):
-  """UTA reports its margin pool; Classic has no margin figures to report."""
+  """UTA reports a cross margin pool; Classic has no margin figures to report."""
   if is_classic(bitget):
     bitget.expect('perp.perp_collateral', NotImplementedError)
     bitget.expect('perp.perp_collateral.pool', NotImplementedError)
   else:
-    collateral: PerpCollateral = bitget.check('perp.perp_collateral')
-    assert collateral.equity >= 0 and collateral.margin_mode in ('cross', 'isolated')
-    assert bitget.check('perp.perp_collateral.pool').margin_mode == 'cross'
-
-
-def test_perp_available_notional(bitget: Results):
-  """Opening capacity is a non-negative figure in either mode."""
-  assert bitget.check('perp.available_notional') >= 0
+    pool: PerpCollateral = bitget.check('perp.perp_collateral.pool')
+    assert pool.margin_mode == 'cross'
 
 
 def test_perp_funding_payments_unsupported(bitget: Results):

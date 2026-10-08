@@ -48,3 +48,7 @@ note = "`history()` covers spot fills, linear funding settlements and crypto dep
 [ids]
 asset = "symbol"
 note = "The venue's coin name (`BTC`, `USDT`); market ids are concatenated pair symbols (`BTCUSDT`)."
+
+# Release qualification of account reads (ADR 0042); not shown in the support matrix.
+[qualification.market]
+min_mode = "private"
