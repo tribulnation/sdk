@@ -3139,11 +3139,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"A47-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -3706,11 +3706,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"B-USD1\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -3734,11 +3734,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"BAL-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -3993,11 +3993,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"BOBA-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -5169,11 +5169,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"FORTH-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -5267,11 +5267,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"GMRX-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -5911,11 +5911,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"KLINK-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -6002,11 +6002,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"L3-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -6261,11 +6261,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"MAN-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "coverage_deferred",
@@ -7150,18 +7150,18 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"PUSH-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"PVT-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -7353,11 +7353,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"RMV-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -7395,11 +7395,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"ROUTE-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -7444,18 +7444,18 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"RVN-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"RVV-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -7521,11 +7521,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"SCA-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -7535,11 +7535,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"SCRT-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -7563,11 +7563,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"SFP-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -8438,11 +8438,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"USDP-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -8494,11 +8494,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"VAI-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -8781,11 +8781,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"WSDM-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -8865,11 +8865,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"XLAB-USDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -18565,14 +18565,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.31311",
-            "after_bid": "0.31262",
-            "ask": "0.31311",
+            "after_ask": "0.30833",
+            "after_bid": "0.308",
+            "ask": "0.30834",
             "attempt": 1,
-            "before_ask": "0.31311",
-            "before_bid": "0.31262",
-            "bid": "0.31262",
-            "elapsed_seconds": 1.1351273869804572,
+            "before_ask": "0.30833",
+            "before_bid": "0.308",
+            "bid": "0.308",
+            "elapsed_seconds": 1.2086614079889841,
             "ticker_ids_match": true
           }
         ],
@@ -18584,14 +18584,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.1137",
-            "after_bid": "0.1135",
-            "ask": "0.1137",
+            "after_ask": "0.114",
+            "after_bid": "0.1138",
+            "ask": "0.114",
             "attempt": 1,
-            "before_ask": "0.1137",
-            "before_bid": "0.1135",
-            "bid": "0.1135",
-            "elapsed_seconds": 1.1775176459923387,
+            "before_ask": "0.114",
+            "before_bid": "0.1138",
+            "bid": "0.1138",
+            "elapsed_seconds": 1.6667013780097477,
             "ticker_ids_match": true
           }
         ],
@@ -18603,14 +18603,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.02121",
-            "after_bid": "0.02117",
-            "ask": "0.02121",
+            "after_ask": "0.02133",
+            "after_bid": "0.0213",
+            "ask": "0.02133",
             "attempt": 1,
-            "before_ask": "0.02121",
-            "before_bid": "0.02117",
-            "bid": "0.02117",
-            "elapsed_seconds": 1.2141022970026825,
+            "before_ask": "0.02133",
+            "before_bid": "0.0213",
+            "bid": "0.0213",
+            "elapsed_seconds": 1.3682089819922112,
             "ticker_ids_match": true
           }
         ],
@@ -18622,14 +18622,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "83032.2",
-            "after_bid": "83032.1",
-            "ask": "83042.2",
+            "after_ask": "83110.8",
+            "after_bid": "83110.7",
+            "ask": "83111.8",
             "attempt": 1,
-            "before_ask": "83042.2",
-            "before_bid": "83042.1",
-            "bid": "83042.1",
-            "elapsed_seconds": 1.1463223640166689,
+            "before_ask": "83111.8",
+            "before_bid": "83111.7",
+            "bid": "83111.7",
+            "elapsed_seconds": 1.0951446140243206,
             "ticker_ids_match": true
           }
         ],
@@ -18641,14 +18641,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.3134",
-            "after_bid": "0.3129",
-            "ask": "0.3134",
+            "after_ask": "0.3086",
+            "after_bid": "0.308",
+            "ask": "0.3086",
             "attempt": 1,
-            "before_ask": "0.3134",
-            "before_bid": "0.3129",
-            "bid": "0.3129",
-            "elapsed_seconds": 0.8281385680020321,
+            "before_ask": "0.3086",
+            "before_bid": "0.308",
+            "bid": "0.308",
+            "elapsed_seconds": 0.8352103070064913,
             "ticker_ids_match": true
           }
         ],
@@ -18660,14 +18660,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.09803",
-            "after_bid": "0.09796",
-            "ask": "0.09804",
+            "after_ask": "0.09833",
+            "after_bid": "0.09828",
+            "ask": "0.09833",
             "attempt": 1,
-            "before_ask": "0.09804",
-            "before_bid": "0.09796",
-            "bid": "0.09796",
-            "elapsed_seconds": 0.8010613649967127,
+            "before_ask": "0.09833",
+            "before_bid": "0.09828",
+            "bid": "0.09828",
+            "elapsed_seconds": 0.8380504740052857,
             "ticker_ids_match": true
           }
         ],
@@ -18679,14 +18679,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.02727",
-            "after_bid": "0.02698",
-            "ask": "0.02727",
+            "after_ask": "0.02687",
+            "after_bid": "0.02662",
+            "ask": "0.02687",
             "attempt": 1,
-            "before_ask": "0.02727",
-            "before_bid": "0.02698",
-            "bid": "0.02698",
-            "elapsed_seconds": 0.7879031929769553,
+            "before_ask": "0.02687",
+            "before_bid": "0.02662",
+            "bid": "0.02662",
+            "elapsed_seconds": 0.7797429960046429,
             "ticker_ids_match": true
           }
         ],
@@ -18698,14 +18698,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "83081.2",
-            "after_bid": "83081.1",
-            "ask": "83081.2",
+            "after_ask": "83136",
+            "after_bid": "83135.9",
+            "ask": "83136",
             "attempt": 1,
-            "before_ask": "83081.2",
-            "before_bid": "83081.1",
-            "bid": "83081.1",
-            "elapsed_seconds": 0.7732528940250631,
+            "before_ask": "83136",
+            "before_bid": "83135.9",
+            "bid": "83135.9",
+            "elapsed_seconds": 0.8254628750146367,
             "ticker_ids_match": true
           }
         ],
@@ -18924,15 +18924,12 @@
           "ORBS-USDT",
           "ANKR-USDT",
           "SAND-USDT",
-          "VAI-USDT",
           "FLUX-USDT",
           "ZIL-USDT",
           "DODO-USDT",
-          "MAN-USDT",
           "BOSON-USDT",
           "PUNDIX-USDT",
           "HAI-USDT",
-          "FORTH-USDT",
           "GHX-USDT",
           "TOWER-USDT",
           "XDC-USDT",
@@ -18960,7 +18957,6 @@
           "NEAR-BTC",
           "CFG-USDT",
           "AXS-USDT",
-          "ROUTE-USDT",
           "ERG-USDT",
           "ERG-BTC",
           "SOL-USDT",
@@ -18975,7 +18971,6 @@
           "MOVR-USDT",
           "WOO-USDT",
           "WILD-USDT",
-          "BAL-USDT",
           "STORJ-USDT",
           "YGG-USDT",
           "SKL-USDT",
@@ -19004,7 +18999,6 @@
           "RUNE-USDT",
           "RUNE-BTC",
           "C98-USDT",
-          "PUSH-USDT",
           "AGLD-USDT",
           "NAKA-USDT",
           "INJ-USDT",
@@ -19026,7 +19020,6 @@
           "NUM-USDT",
           "TRADE-USDT",
           "KAVA-USDT",
-          "SFP-USDT",
           "RSR-USDT",
           "RSR-BTC",
           "IMX-USDT",
@@ -19069,7 +19062,6 @@
           "OVR-USDT",
           "BRISE-USDT",
           "AKT-USDT",
-          "BOBA-USDT",
           "MBL-USDT",
           "DUSK-USDT",
           "USDD-USDT",
@@ -19082,7 +19074,6 @@
           "ZIL-USDC",
           "SOL-USDC",
           "ACH-USDT",
-          "SCRT-USDT",
           "CCD-USDT",
           "LUNC-USDT",
           "LUNC-USDC",
@@ -19099,10 +19090,8 @@
           "LUNA-USDC",
           "OP-USDT",
           "OP-USDC",
-          "ICX-USDT",
           "WELL-USDT",
           "FORT-USDT",
-          "USDP-USDT",
           "USDD-TRX",
           "BTC-EUR",
           "ETH-EUR",
@@ -19113,9 +19102,6 @@
           "LDO-USDC",
           "FIDA-USDT",
           "ETC-USDC",
-          "RVN-USDT",
-          "PIX-USDT",
-          "ETHW-USDT",
           "GMX-USDT",
           "POKT-USDT",
           "APT-USDT",
@@ -19190,7 +19176,6 @@
           "UQC-USDT",
           "LSK-USDT",
           "DENT-USDT",
-          "QKC-USDT",
           "BONK-USDT",
           "MNT-USDT",
           "AUCTION-USDT",
@@ -19225,7 +19210,6 @@
           "QORPO-USDT",
           "KAS-BTC",
           "TUSD-USDT",
-          "SCA-USDT",
           "NIBI-USDT",
           "AEVO-USDT",
           "HTX-USDT",
@@ -19233,7 +19217,6 @@
           "ETHFI-USDT",
           "MPC-USDT",
           "ZKJ-USDT",
-          "GMRX-USDT",
           "VENOM-USDT",
           "ENA-USDT",
           "USDE-USDT",
@@ -19256,7 +19239,6 @@
           "REZ-USDT",
           "KMNO-USDT",
           "ZBCN-USDT",
-          "WSDM-USDT",
           "BB-USDT",
           "DRIFT-USDT",
           "NOT-USDT",
@@ -19264,7 +19246,6 @@
           "TAIKO-USDT",
           "BRETT-USDT",
           "IO-USDT",
-          "UNA-USDT",
           "ATH-USDT",
           "COOKIE-USDT",
           "ARTFI-USDT",
@@ -19280,7 +19261,6 @@
           "ANYONE-USDT",
           "BANANA-USDT",
           "AVAIL-USDT",
-          "L3-USDT",
           "CXT-USDT",
           "G-USDT",
           "RENDER-USDT",
@@ -19303,7 +19283,6 @@
           "HIPPO-USDT",
           "PUFFER-USDT",
           "DEEP-USDT",
-          "RMV-USDT",
           "DBR-USDT",
           "SCR-USDT",
           "USDC-EUR",
@@ -19388,7 +19367,6 @@
           "VVV-USDT",
           "JELLYJELLY-USDT",
           "BERA-USDT",
-          "CHEEMS-USDT",
           "DATA-USDT",
           "LAYER-USDT",
           "DIN-USDT",
@@ -19398,7 +19376,6 @@
           "PEPE-USDC",
           "VR-USDC",
           "KAITO-USDT",
-          "B3-USDT",
           "SHELL-USDT",
           "ROAM-USDT",
           "HEI-USDT",
@@ -19456,7 +19433,6 @@
           "SOON-USDT",
           "HUMA-USDT",
           "SOPH-USDT",
-          "B-USD1",
           "A-USDT",
           "A-USDC",
           "A-BTC",
@@ -19503,7 +19479,6 @@
           "XNY-USDT",
           "XU3O8-USDT",
           "ELP-USDT",
-          "A47-USDT",
           "TREE-USDT",
           "IKA-USDT",
           "GAIA-USDT",
@@ -19528,7 +19503,6 @@
           "CAMP-USDT",
           "BTC-USD1",
           "ETH-USD1",
-          "XLAB-USDT",
           "WLFI-USDT",
           "WLFI-USD1",
           "Q-USDT",
@@ -19571,7 +19545,6 @@
           "MF-USDT",
           "LYN-USDT",
           "KGEN-USDT",
-          "KLINK-USDT",
           "PIPE-USDT",
           "GIGGLE-USDT",
           "CLO-USDT",
@@ -19584,7 +19557,6 @@
           "YB-USDT",
           "XMN-USDT",
           "ZBT-USDT",
-          "RVV-USDT",
           "BLUAI-USDT",
           "TURTLE-USDT",
           "MET-USDT",
@@ -19649,7 +19621,6 @@
           "PYBOBO-USDT",
           "BIRB-USDT",
           "ZAMA-USDT",
-          "PVT-USDT",
           "INX-USDT",
           "TRIA-USDT",
           "WARD-USDT",
@@ -19671,7 +19642,6 @@
           "XAUM-USDT",
           "ION-USDT",
           "PRL-USDT",
-          "WL-USDT",
           "BASED-USDT",
           "EDGE-USDT",
           "MEZO-USDT",

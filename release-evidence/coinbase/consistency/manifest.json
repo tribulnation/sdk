@@ -268,8 +268,8 @@
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "aa9169f8f122c4ec5e27012d5c7a39ceb421036914a2eeada53146b180581240",
-        "metadata_sha256": "68943238fcb3db2705833ed28f172b687955d9430e6183320cccdef7cd4fef85",
+        "files_sha256": "ad394310b80cf885e1fee471550825d81e3bccf5faac91de69b1e0863f8c0257",
+        "metadata_sha256": "e01c52d3a5d46a283b80d3654031bfbc32bbee2434494b3fc01982cf5f3e5c79",
         "version": "0"
       },
       "typed-coinbase": {
@@ -305,7 +305,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "899f0712dee1454c5673fabdd35651edb7f436241cf61a318b99ccf4dd954241",
+    "source_sha256": "7a1ddde4df22e86c7e2424c7d68b05a600859c9c658b497b217e614cc303d0e2",
     "venue": "coinbase"
   },
   "before": {
@@ -577,8 +577,8 @@
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "aa9169f8f122c4ec5e27012d5c7a39ceb421036914a2eeada53146b180581240",
-        "metadata_sha256": "68943238fcb3db2705833ed28f172b687955d9430e6183320cccdef7cd4fef85",
+        "files_sha256": "ad394310b80cf885e1fee471550825d81e3bccf5faac91de69b1e0863f8c0257",
+        "metadata_sha256": "e01c52d3a5d46a283b80d3654031bfbc32bbee2434494b3fc01982cf5f3e5c79",
         "version": "0"
       },
       "typed-coinbase": {
@@ -614,12 +614,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "899f0712dee1454c5673fabdd35651edb7f436241cf61a318b99ccf4dd954241",
+    "source_sha256": "7a1ddde4df22e86c7e2424c7d68b05a600859c9c658b497b217e614cc303d0e2",
     "venue": "coinbase"
   },
-  "finished": "2026-10-08T07:46:44.623786Z",
-  "results_sha256": "5afdd1e557f5de909c0c46be6674dadfc8a3cfd4302fc6feba13763e1af56214",
+  "finished": "2026-10-08T09:46:58.165671Z",
+  "results_sha256": "21090e9d18d87297e3fd47a9d69d95d259492a61abb5f368c9245ee850ebb18a",
   "schema_version": 2,
-  "started": "2026-10-08T07:46:36.652631Z",
-  "summary_sha256": "b1f1ca1daaa214ada60dd9a82e8a377aeaf0ca82839f4af040484fbbb8cf0cf1"
+  "started": "2026-10-08T09:46:50.220895Z",
+  "summary_sha256": "d98a7dc73377a2b3dbe5a90be3b84fbe42b06292a0fe2b59885d260ab25bdc71"
 }

@@ -258,8 +258,8 @@
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "aa9169f8f122c4ec5e27012d5c7a39ceb421036914a2eeada53146b180581240",
-        "metadata_sha256": "68943238fcb3db2705833ed28f172b687955d9430e6183320cccdef7cd4fef85",
+        "files_sha256": "ad394310b80cf885e1fee471550825d81e3bccf5faac91de69b1e0863f8c0257",
+        "metadata_sha256": "e01c52d3a5d46a283b80d3654031bfbc32bbee2434494b3fc01982cf5f3e5c79",
         "version": "0"
       },
       "typed-core": {
@@ -295,7 +295,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "ea3cc9a37587c25ad66c80cb495356820ac20c3cf8229f08f73897e0a69531a4",
+    "source_sha256": "4813422ece4ddb4d43a986eb7e9095627a2365649ff269c367db89751383196e",
     "venue": "mexc"
   },
   "before": {
@@ -557,8 +557,8 @@
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "aa9169f8f122c4ec5e27012d5c7a39ceb421036914a2eeada53146b180581240",
-        "metadata_sha256": "68943238fcb3db2705833ed28f172b687955d9430e6183320cccdef7cd4fef85",
+        "files_sha256": "ad394310b80cf885e1fee471550825d81e3bccf5faac91de69b1e0863f8c0257",
+        "metadata_sha256": "e01c52d3a5d46a283b80d3654031bfbc32bbee2434494b3fc01982cf5f3e5c79",
         "version": "0"
       },
       "typed-core": {
@@ -594,12 +594,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "ea3cc9a37587c25ad66c80cb495356820ac20c3cf8229f08f73897e0a69531a4",
+    "source_sha256": "4813422ece4ddb4d43a986eb7e9095627a2365649ff269c367db89751383196e",
     "venue": "mexc"
   },
-  "finished": "2026-10-08T07:46:37.383481Z",
+  "finished": "2026-10-08T09:46:55.120321Z",
   "results_sha256": "899a4c0bf448fcbfd13d1b4df6972ce4762ad87e79adf5ef810c8d4abfe14915",
   "schema_version": 2,
-  "started": "2026-10-08T07:46:20.590263Z",
-  "summary_sha256": "dc62510464efe6c22c2823ed3f1b58ef11c5e5af4cfcb1b7414ae0dd6201c492"
+  "started": "2026-10-08T09:46:34.375289Z",
+  "summary_sha256": "a22a5cb1fa791082fecfebeba8f07dfd2461e6042aee919d6d611c30efc2bc62"
 }
