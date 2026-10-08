@@ -1,28 +1,18 @@
-# tribulnation-dydx 0.11.0
+# tribulnation-dydx 0.12.0
 
-Funding payment amounts are now account cash flows: **positive means received,
-negative means paid**. Zero remains zero. This applies to market-specific history
-and exchange-wide history where supported. Funding rates, trading fee signs,
-pagination, account scope and Report cash-flow signs are unchanged.
+Requires SDK >=2.12.0. Market, exchange and venue objects expose `account_id`,
+the root SDK account key they were opened under, and build their IDs from it;
+`venue_id` is the typed venue. Objects built directly keep their current IDs.
+`depth()` and `depth_stream()` accept the SDK's venue-keyed `settings`.
 
-This is a breaking sign change from the previous release. Upgrade SDK >=2.10.0
-together with Hyperliquid >=0.11.0, dYdX >=0.11.0, Bybit >=0.5.0, Aster >=0.5.0,
-and Lighter >=0.4.0 for whichever adapters you use. Older published adapters do
-not declare an SDK upper bound, so upgrading the SDK alone cannot enforce this
-migration. Do not mix old and new adapter sign conventions.
+`accounts.Dydx` takes a `private_key` as an alternative to a mnemonic, and its
+`address` is the account traded for, so dYdX API wallets work with the address
+and private key the frontend provides. Requires typed-dydx >=3.6.0.
 
-For persisted funding history, refetch or negate records from the paid-positive
-versions exactly once. Older Hyperliquid/dYdX records predating the exchange-wide
-history sign change already used received-positive amounts; leave those alone.
-Never apply this conversion to funding rates or Report observations.
+Breaking: `DydxMarket.new()` without credentials now requires `public=True`,
+matching every other venue; missing credentials fail at construction instead of
+silently yielding a read-only client. Testnet objects now report
+`venue_id == 'dydx_testnet'`. dYdX books carry no timestamp, so `Book.time` is
+`None`.
 
-Offline regression tests cover funding income, expense and zero, plus history
-scope, filtering and page retry behavior. Release qualification uses the normal
-read-only surfaces and consistency suites; it does not assert personal history
-completeness.
-
-Release qualification on 2026-10-05 passed: 17 read-suite cases, 0 declared
-exclusions, and market consistency. Committed evidence under
-`release-evidence/dydx/` matches pinned Catalogue
-`1851660ac2bed8243dd9ce9c7297fe05c7130973`. Offline release verification passes.
-This adapter release follows SDK 2.10.0 publication.
+Upgrade the SDK and this adapter together.
