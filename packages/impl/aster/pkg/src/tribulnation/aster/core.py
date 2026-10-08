@@ -21,6 +21,7 @@ from typed_aster import Aster
 from typed_aster.core.auth import Credentials, parse_wallet
 from typed_aster.core.base import ChainClients, SurfaceClients
 from typed_aster.core.transport.bapi import BapiClient
+from typed_aster.futures.account.schemas import FuturesAccount
 from typed_aster.futures.market.exchange_info import FuturesSymbol
 from typed_aster.spot.market.exchange_info import SpotSymbol
 from tribulnation.sdk.core import (
@@ -31,7 +32,7 @@ from tribulnation.sdk.core import (
   Subscription,
   exception_wrapper,
 )
-from tribulnation.sdk.market import Book, Collateral, Trade
+from tribulnation.sdk.market import Book, Trade
 
 T = TypeVar('T')
 U = TypeVar('U')
@@ -148,12 +149,13 @@ class Shared(SDK):
         )
     return self.perp
 
-  async def cross_collateral(self) -> Collateral:
-    """Read the perpetual cross-margin bucket's equity and available balance."""
-    row = await self.call(self.client.futures.account.info_with_join_margin)
-    return Collateral(
-      equity=row['totalMarginBalance'], free_collateral=row['availableBalance']
-    )
+  async def futures_account(self) -> FuturesAccount:
+    """Read the join-margin futures account: totals value every margin asset in USDT.
+
+    The plain `account.info` totals count USDT alone, which misstates Multi-Assets
+    accounts margined in other assets.
+    """
+    return await self.call(self.client.futures.account.info_with_join_margin)
 
   @asynccontextmanager
   async def stream(

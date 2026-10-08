@@ -11,22 +11,26 @@ from typing_extensions import (
   AsyncIterable,
   Awaitable,
   ClassVar,
+  Iterable,
   Literal,
   Sequence,
   TypedDict,
 )
 from pydantic import TypeAdapter, ValidationError
 from typed_aster.futures import Futures
+from typed_aster.futures.account.schemas import FuturesAccount, FuturesAccountPosition
 from typed_aster.futures.position.risk import PositionRisk
 from typed_aster.futures.trade.place_order import Request as FuturesOrderRequest
 from typed_aster.futures.trade.schemas import FuturesOrder
 from typed_aster.futures.trade.user_trades import AccountTradeItem
-from typed_aster.schemas import BatchError
+from typed_aster.schemas import AccountInfo, AccountTrade, BatchError
 from typed_aster.spot import Spot
+from typed_aster.spot.market.exchange_info import SpotSymbol
 from typed_aster.spot.trade.cancel_batch_orders import SpotBatchCancelledOrder
 from typed_aster.spot.trade.place_order import Request as SpotOrderRequest
 from typed_aster.spot.trade.schemas import SpotOrder
 from tribulnation.sdk.core import (
+  ApiError,
   BadRequest,
   MissingData,
   OverflowPolicy,
@@ -37,6 +41,7 @@ from tribulnation.sdk.market import (
   Candle,
   CandleInterval,
   Collateral,
+  ExchangeTrade,
   Fees,
   FundingPayment,
   FundingRate,
@@ -54,7 +59,7 @@ from tribulnation.sdk.market import (
   Trade,
 )
 from tribulnation.sdk.market.types.candles import candle_windows
-from ..core import Public, Scope
+from ..core import Public, Scope, Shared
 from .streams import book_time, connect_books, connect_trades
 
 DepthLimit = Literal[5, 10, 20, 50, 100, 500, 1000]
@@ -66,6 +71,8 @@ ORDER_NOT_FOUND = -2013
 TRADES_WINDOW = timedelta(days=7)
 """Widest `userTrades` time window; a wider one is refused with `-4165`."""
 TRADES_PAGE = 1000
+NO_OPEN_INTEREST_CAP = Decimal(-1)
+"""`remainingOpenableNotionalValue` when the symbol has no open-interest cap."""
 
 
 class ErrorBody(TypedDict):
@@ -104,8 +111,11 @@ def order_state(row: SpotOrder | FuturesOrder) -> OrderState:
   )
 
 
-def parse_trade(row: AccountTradeItem) -> Trade:
-  """Map one perpetual account trade with a signed base quantity.
+def parse_trade(row: AccountTradeItem | AccountTrade) -> Trade:
+  """Map one spot or perpetual account trade with a signed base quantity.
+
+  The fee keeps the fill's own `commissionAsset`: spot fills pay in the asset they
+  deliver, so it differs between buys and sells.
 
   Raises:
     MissingData: The row lacks its side or maker flag, or has a fee amount without
@@ -135,6 +145,137 @@ def parse_trade(row: AccountTradeItem) -> Trade:
     maker=row['maker'],
     fee=fee,
     details=row,
+  )
+
+
+def exchange_trade(row: AccountTradeItem | AccountTrade) -> ExchangeTrade:
+  """Map one account trade, keeping its native symbol as the market ID."""
+  return ExchangeTrade(**vars(parse_trade(row)), market_id=row['symbol'])
+
+
+def trade_windows(
+  start: datetime, end: datetime, now: datetime
+) -> Iterable[tuple[datetime, datetime]]:
+  """Inclusive `userTrades` windows of at most seven days covering `[start, end]`.
+
+  The venue refuses a future `startTime` and an `endTime` well ahead of now, so the
+  walk stops at `now`.
+  """
+  horizon = min(end, now)
+  lower = start
+  while lower <= horizon:
+    upper = min(lower + TRADES_WINDOW, horizon)
+    yield lower, upper
+    lower = upper + timedelta(milliseconds=1)
+
+
+async def spot_trade_rows(
+  shared: Shared, lower: datetime, upper: datetime
+) -> AsyncIterable[Sequence[AccountTrade]]:
+  """Every spot fill of the account within inclusive `[lower, upper]`, any symbol.
+
+  Without a symbol, the order of `fromId` across symbols is unverified, so a window
+  that fills a page is halved and requested again instead of walked by ID. Each
+  request is retried on its own.
+
+  Raises:
+    ApiError: A single millisecond holds a full page, which halving cannot split.
+  """
+  pending = [(lower, upper)]
+  while pending:
+    lo, hi = pending.pop()
+    rows = await shared.call(
+      lambda: shared.client.spot.trade.user_trades(
+        start_time=lo, end_time=hi, limit=TRADES_PAGE
+      )
+    )
+    if len(rows) < TRADES_PAGE:
+      if rows:
+        yield rows
+      continue
+    if hi - lo < timedelta(milliseconds=1):
+      raise ApiError('Aster spot fills fill a page within one millisecond')
+    middle = lo + (hi - lo) / 2
+    middle = middle.replace(microsecond=middle.microsecond // 1000 * 1000)
+    pending.append((middle + timedelta(milliseconds=1), hi))
+    pending.append((lo, middle))
+
+
+def spot_balance(info: AccountInfo, asset: str) -> tuple[Decimal, Decimal]:
+  """The free and locked amounts of one spot asset; an unlisted asset holds zero."""
+  for row in info['balances']:
+    if row['asset'] == asset:
+      return row['free'], row['locked']
+  return Decimal(0), Decimal(0)
+
+
+def one_way_row(
+  positions: Sequence[FuturesAccountPosition], symbol: str
+) -> FuturesAccountPosition:
+  """The symbol's single one-way (`BOTH`) row of the futures account.
+
+  Raises:
+    NotImplementedError: The symbol has hedge-mode (`LONG`/`SHORT`) rows.
+    MissingData: The account lists no row for the symbol.
+  """
+  rows = [p for p in positions if p['symbol'] == symbol]
+  if any(p['positionSide'] != 'BOTH' for p in rows):
+    raise NotImplementedError('Aster hedge-mode positions are not supported')
+  if len(rows) != 1:
+    raise MissingData(
+      'Aster account information omits the symbol', market_id=symbol, field='positions'
+    )
+  return rows[0]
+
+
+def isolated_equity(row: FuturesAccountPosition) -> Decimal:
+  """An isolated position's own margin: its isolated wallet plus unrealized PnL."""
+  return row['isolatedWallet'] + row['unrealizedProfit']
+
+
+def notional_leverage(notional: Decimal, equity: Decimal) -> Decimal:
+  """Position notional over equity; zero when the bucket has no positive equity."""
+  return notional / equity if equity > 0 else Decimal(0)
+
+
+def cross_collateral(account: FuturesAccount) -> PerpCollateral:
+  """The cross-margin bucket from the join-margin account view.
+
+  The account totals value every margin asset in USDT (Multi-Assets mode included).
+  Isolated positions' own margin, initial and maintenance requirements are taken out
+  of them, and leverage counts only cross positions' notional. Free collateral is the
+  account's `availableBalance`.
+  """
+  isolated = [p for p in account['positions'] if p['isolated']]
+  equity = account['totalMarginBalance'] - sum(
+    (isolated_equity(p) for p in isolated), Decimal(0)
+  )
+  notional = sum(
+    (abs(p['notional']) for p in account['positions'] if not p['isolated']),
+    Decimal(0),
+  )
+  return PerpCollateral(
+    equity=equity,
+    free_collateral=account['availableBalance'],
+    initial_margin=account['totalInitialMargin']
+    - sum((p['initialMargin'] for p in isolated), Decimal(0)),
+    maintenance_margin=account['totalMaintMargin']
+    - sum((p['maintMargin'] for p in isolated), Decimal(0)),
+    leverage=notional_leverage(notional, equity),
+    margin_mode='cross',
+  )
+
+
+def isolated_collateral(row: FuturesAccountPosition) -> PerpCollateral:
+  """One isolated position's own bucket; margin above its initial margin is free."""
+  equity = isolated_equity(row)
+  return PerpCollateral(
+    equity=equity,
+    free_collateral=max(equity - row['initialMargin'], Decimal(0)),
+    initial_margin=row['initialMargin'],
+    maintenance_margin=row['maintMargin'],
+    leverage=notional_leverage(abs(row['notional']), equity),
+    margin_mode='isolated',
   )
 
 
@@ -299,7 +440,11 @@ class NativeMarket(Public, Market):
     )
 
   async def fees(self, *, refetch: bool = False) -> Fees:
-    """Read this account's maker and taker commission rates."""
+    """Read this account's maker and taker commission rates; needs `user` and `signer`.
+
+    The quoted rates apply to buys and sells alike and exclude any optional
+    fee-payment discount (ADR 0002).
+    """
     row = await self.shared.call(lambda: self.api.account.commission_rate(self.symbol))
     return Fees.symmetric(
       maker=row['makerCommissionRate'], taker=row['takerCommissionRate']
@@ -410,7 +555,7 @@ class NativeMarket(Public, Market):
 
 @dataclass(frozen=True, kw_only=True)
 class SpotMarket(NativeMarket):
-  """A spot pair. Balances are unsupported, so position and collateral raise."""
+  """A spot pair. Balances and fills are mainnet-only: testnet omits them."""
 
   @property
   def scope(self) -> Scope:
@@ -422,11 +567,20 @@ class SpotMarket(NativeMarket):
     """The typed spot surface."""
     return self.client.spot
 
-  async def rules(self, *, refetch: bool = False) -> Rules:
-    """Read the pair's filters; the standard fee asset is the quote asset."""
+  async def symbol_info(self, *, refetch: bool = False) -> SpotSymbol:
+    """The pair's cached exchange information."""
     row = (await self.shared.spot_symbols(refetch=refetch)).get(self.symbol)
     if row is None:
       raise ValueError(f'Aster spot market is not trading: {self.symbol}')
+    return row
+
+  async def rules(self, *, refetch: bool = False) -> Rules:
+    """Read the pair's filters. The fee asset depends on the fill (ADR 0028).
+
+    A spot fill pays its fee in the asset it delivers: the base asset on a buy and the
+    quote asset on a sell. `Trade.fee.asset` names it per fill.
+    """
+    row = await self.symbol_info(refetch=refetch)
     tick = step = min_qty = max_qty = min_price = max_price = None
     rel_min = rel_max = None
     notionals: list[Decimal] = []
@@ -448,7 +602,7 @@ class SpotMarket(NativeMarket):
         field='filters',
       )
     return Rules(
-      fee_asset=row['quoteAsset'],
+      fee_asset=None,
       tick_size=tick,
       step_size=step,
       fixed_min_qty=min_qty or None,
@@ -463,18 +617,57 @@ class SpotMarket(NativeMarket):
     )
 
   def trades_history(self, start: datetime, end: datetime) -> PaginatedResponse[Trade]:
-    """Unsupported: testnet spot `userTrades` omits confirmed buy fills."""
-    raise NotImplementedError(
-      'Aster spot trade history is not supported: userTrades omits confirmed buy fills'
+    """Read this pair's fills within inclusive `[start, end]` bounds, up to now.
+
+    Mainnet only: testnet `userTrades` omits confirmed buy fills.
+    """
+    if start.tzinfo is None or end.tzinfo is None:
+      raise ValueError('Trade history bounds must be timezone-aware')
+    if not self.shared.mainnet:
+      raise NotImplementedError(
+        'Aster testnet spot trade history is not supported: userTrades omits buy fills'
+      )
+    return PaginatedResponse(self.trade_pages(start, end))
+
+  async def trade_pages(
+    self, start: datetime, end: datetime
+  ) -> AsyncIterable[Sequence[Trade]]:
+    """Walk seven-day windows with the typed `fromId` pager, retrying each page."""
+    for lower, upper in trade_windows(start, end, datetime.now(timezone.utc)):
+      pages = self.api.trade.user_trades_paged(
+        self.symbol, start_time=lower, end_time=upper, limit=TRADES_PAGE
+      )
+      async for rows in pages.via(self.shared.call):
+        if page := [parse_trade(r) for r in rows if start <= r['time'] <= end]:
+          yield page
+
+  async def balances(self) -> tuple[Decimal, Decimal, Decimal, Decimal]:
+    """Free and locked base, then free and locked quote balances.
+
+    Raises:
+      NotImplementedError: On testnet, whose account information omits funded
+        balances.
+    """
+    if not self.shared.mainnet:
+      raise NotImplementedError(
+        'Aster testnet spot balances are not supported: account information omits them'
+      )
+    row = await self.symbol_info()
+    info = await self.shared.call(self.api.account.info)
+    return (
+      *spot_balance(info, row['baseAsset']),
+      *spot_balance(info, row['quoteAsset']),
     )
 
   async def position(self) -> Position:
-    """Unsupported: testnet account information omits funded spot balances."""
-    raise NotImplementedError('Aster spot balances are not supported')
+    """The base asset held, free plus locked in open orders."""
+    free, locked, _, _ = await self.balances()
+    return Position(size=free + locked)
 
   async def collateral(self) -> Collateral:
-    """Unsupported: testnet account information omits funded spot balances."""
-    raise NotImplementedError('Aster spot balances are not supported')
+    """The quote asset: equity is free plus locked, free collateral the free part."""
+    _, _, free, locked = await self.balances()
+    return Collateral(equity=free + locked, free_collateral=free)
 
   def fetch_order(self, order_id: int):
     """Query one spot order."""
@@ -514,7 +707,7 @@ class SpotMarket(NativeMarket):
 
 @dataclass(frozen=True, kw_only=True)
 class PerpMarket(NativeMarket, SDKPerpMarket):
-  """A linear perpetual, supporting one-way positions and cross margin."""
+  """A linear perpetual: one-way positions, in cross or isolated margin."""
 
   @property
   def scope(self) -> Scope:
@@ -527,7 +720,13 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     return self.client.futures
 
   async def rules(self, *, refetch: bool = False) -> Rules:
-    """Read the contract's filters; the standard fee asset is the margin asset."""
+    """Read the contract's filters. The fee asset depends on the fill (ADR 0028).
+
+    With the account's futures `feeBurn` setting on, fees are paid in ASTER while the
+    futures wallet holds it, and in the margin asset otherwise; with it off, in the
+    margin asset. Rules read no account settings (ADR 0001, 0002), so no single asset
+    is claimed: `Trade.fee.asset` names it per fill.
+    """
     row = (await self.shared.perp_symbols(refetch=refetch)).get(self.symbol)
     if row is None:
       raise ValueError(f'Aster perpetual is not trading: {self.symbol}')
@@ -549,7 +748,7 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
         field='filters',
       )
     return Rules(
-      fee_asset=row['marginAsset'],
+      fee_asset=None,
       tick_size=tick,
       step_size=step,
       fixed_min_qty=min_qty or None,
@@ -632,17 +831,13 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     self, start: datetime, end: datetime
   ) -> AsyncIterable[Sequence[Trade]]:
     """Walk seven-day windows with the typed `fromId` pager, retrying each page."""
-    horizon = min(end, datetime.now(timezone.utc))
-    lower = start
-    while lower <= horizon:
-      upper = min(lower + TRADES_WINDOW, horizon)
+    for lower, upper in trade_windows(start, end, datetime.now(timezone.utc)):
       pages = self.api.trade.user_trades_paged(
         self.symbol, start_time=lower, end_time=upper, limit=TRADES_PAGE
       )
       async for rows in pages.via(self.shared.call):
         if page := [parse_trade(r) for r in rows if start <= r['time'] <= end]:
           yield page
-      lower = upper + timedelta(milliseconds=1)
 
   def funding_payments(
     self, start: datetime, end: datetime
@@ -674,18 +869,10 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     row = await self.one_way_position()
     return PerpPosition(size=row['positionAmt'], entry_price=row['entryPrice'])
 
-  async def collateral(self) -> Collateral:
-    """Read equity and free collateral of the cross-margin bucket."""
-    row = await self.one_way_position()
-    if row['marginType'] != 'cross':
-      raise NotImplementedError('Aster isolated-margin collateral is not supported')
-    return await self.shared.cross_collateral()
-
   async def leverage(self, *, refetch: bool = False) -> Decimal:
     """The symbol's configured initial leverage (`positionRisk`), cached per symbol.
 
-    The setting applies to cross and isolated margin alike. `available_notional` uses
-    the default: the cross bucket's `availableBalance` times this leverage.
+    The setting applies to cross and isolated margin alike.
     """
     cached = self.shared.leverages.get(self.symbol)
     if cached is not None and not refetch:
@@ -696,8 +883,44 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     return leverage
 
   async def perp_collateral(self) -> PerpCollateral:
-    """Unsupported: Aster publishes configured, not actual, leverage."""
-    raise NotImplementedError('Aster does not publish actual account leverage')
+    """The bucket backing this one-way position: cross, or its own isolated margin.
+
+    Both come from the join-margin account view; see `cross_collateral` and
+    `isolated_collateral`. Leverage is the used leverage, notional over equity.
+
+    Raises:
+      NotImplementedError: The symbol is in hedge mode.
+    """
+    account = await self.shared.futures_account()
+    row = one_way_row(account['positions'], self.symbol)
+    return isolated_collateral(row) if row['isolated'] else cross_collateral(account)
+
+  async def available_notional(self) -> Decimal:
+    """The free cross balance times `leverage()`, capped by the venue's notional caps.
+
+    New margin comes from the account's `availableBalance` in either margin mode, so
+    isolated positions are sized against it too. Two venue caps also apply: the room
+    left in the leverage bracket (`maxNotional` at the current leverage, less the
+    position's own notional) and the symbol's remaining open-interest allowance at that
+    leverage (`remainingOpenableNotionalValue`, uncapped at `-1`). Reducing or
+    reversing a position is not modelled: the result is the same-direction room
+    (ADR 0041).
+    """
+    leverage = await self.leverage()
+    account = await self.shared.futures_account()
+    row = one_way_row(account['positions'], self.symbol)
+    remaining = await self.shared.call(
+      lambda: self.api.market.remaining_openable_notional_value(
+        self.symbol, leverage=int(leverage)
+      )
+    )
+    caps = [
+      account['availableBalance'] * leverage,
+      row['maxNotional'] - abs(row['notional']),
+    ]
+    if (cap := remaining['remainingOpenableNotionalValue']) != NO_OPEN_INTEREST_CAP:
+      caps.append(cap)
+    return max(min(caps), Decimal(0))
 
   def fetch_order(self, order_id: int):
     """Query one perpetual order."""
