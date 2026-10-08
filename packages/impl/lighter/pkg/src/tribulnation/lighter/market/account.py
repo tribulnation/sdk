@@ -9,7 +9,6 @@ from decimal import Decimal
 from typed_lighter.api.account.get import DetailedAccount
 from typed_lighter.api.markets.order_book_details import PerpsOrderBookDetail
 from typed_lighter.schemas import AccountAsset, AccountPosition
-from tribulnation.sdk.core import ApiError
 from tribulnation.sdk.market import Collateral, PerpCollateral, PerpPosition, Position
 
 from ..core import percent
@@ -123,10 +122,13 @@ def spot_collateral(acct: DetailedAccount, quote_asset_id: int) -> Collateral:
   spend `available_balance - locked_balance`. Any other quote asset is its spot balance.
 
   Raises:
-    ApiError: The account is in classic mode, which is unsupported.
+    NotImplementedError: The account is in classic mode, whose separate spot balances
+      are not mapped.
   """
   if acct['account_trading_mode'] != UNIFIED:
-    raise ApiError('Only unified Lighter accounts are supported for spot collateral')
+    raise NotImplementedError(
+      'Lighter spot collateral supports unified accounts only; this account is classic'
+    )
   row = balance_of(acct, quote_asset_id)
   if row is None:
     return Collateral(equity=Decimal(0), free_collateral=Decimal(0))

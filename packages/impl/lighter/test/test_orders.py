@@ -36,9 +36,11 @@ class Tx:
 
 @dataclass
 class Client:
-  """The one client attribute `place_order` reaches."""
+  """The client attributes `place_order` reaches."""
 
   tx: Tx = field(default_factory=Tx)
+  account_signer: object = field(default_factory=object)
+  """Any signer: trading checks one is configured."""
 
 
 @pytest.mark.parametrize('type', ['LIMIT', 'POST_ONLY', 'MARKET'])

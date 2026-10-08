@@ -213,25 +213,24 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
     return DeribitMarket.new(validate=account.validate, account_id=id)
 
   def lighter(self, account: Lighter, id: str) -> TradingVenue:
-    """Build Lighter's perpetual and spot Market surface on one account."""
+    """Build Lighter's perpetual and spot Market surface on one account: API key,
+    read-only auth token, or public (account reads from `account_index`/`address`)."""
     try:
       from tribulnation.lighter import LighterMarket
     except ImportError as e:
       raise ImportError(
         'lighter market is not installed. Please install it with `pip install tribulnation-lighter`.'
       ) from e
-    account_index = account.resolved_account_index
-    api_key_index = account.resolved_api_key_index
     api_private_key = account.resolved_api_private_key
+    auth_token = account.resolved_auth_token
     return LighterMarket.new(
-      account_index,
-      api_key_index,
+      account.resolved_account_index,
+      account.resolved_api_key_index,
       api_private_key,
+      auth_token=auth_token,
+      address=account.resolved_address,
       network='mainnet' if account.venue == 'lighter' else 'testnet',
-      public=account.public
-      and account_index is None
-      and api_key_index is None
-      and api_private_key is None,
+      public=account.public and api_private_key is None and auth_token is None,
       validate=account.validate,
       account_id=id,
     )

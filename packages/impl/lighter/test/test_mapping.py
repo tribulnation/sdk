@@ -16,7 +16,6 @@ from tribulnation.lighter.core import ClientIndexes, Shared
 from tribulnation.lighter.market import account, books, history
 from tribulnation.lighter.market.markets import LighterPerpMarket
 from tribulnation.lighter.market.common import parse_trade
-from tribulnation.sdk.core import ApiError
 
 ACCOUNT = 476
 TIME = datetime(2026, 9, 25, 13, 0, tzinfo=timezone.utc)
@@ -263,8 +262,9 @@ def test_unified_spot_collateral_is_available_balance_net_of_locks():
 
 
 def test_classic_accounts_are_unsupported_for_spot_collateral():
-  """Spot collateral is qualified for unified accounts only."""
-  with pytest.raises(ApiError):
+  """Spot collateral is qualified for unified accounts only: classic accounts are a
+  declared gap, not a venue error."""
+  with pytest.raises(NotImplementedError, match='unified accounts only'):
     account.spot_collateral(detailed(account_trading_mode=0, assets=[usdc()]), 3)
 
 

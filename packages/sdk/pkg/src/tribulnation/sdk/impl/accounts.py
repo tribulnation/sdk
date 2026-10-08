@@ -396,18 +396,25 @@ class Aster(VenueAccount):
 
 @_dataclass(frozen=True)
 class Lighter(VenueAccount):
-  """Lighter account and API key, isolated by network."""
+  """Lighter account, isolated by network: an API key (trading and private reads), a
+  read-only auth token (private reads), or neither (`public`, with an optional
+  `account_index` or `address` for the account's public reads)."""
 
   venue: _Literal['lighter', 'lighter_testnet'] = 'lighter'
   account_index: int | str | None = None
-  """Account index; defaults to the network's `ACCOUNT_INDEX` variable."""
+  """Account index; defaults to the network's `ACCOUNT_INDEX` variable. Optional with an
+  auth token, which names its account."""
   api_key_index: int | str | None = None
   """API key slot; defaults to the network's `API_KEY_INDEX` variable."""
   api_private_key: str | None = None
   """API key private key; defaults to the network's `API_PRIVATE_KEY` variable."""
+  auth_token: str | None = None
+  """Read-only (`ro:`) auth token, an alternative to the API key for private reads;
+  defaults to the network's `AUTH_TOKEN` variable."""
   address: str | None = None
-  """L1 address owning the accounts, for reports; defaults to the network's `ADDRESS`
-  variable. Optional: reports otherwise resolve it from the account index."""
+  """L1 address owning the accounts; defaults to the network's `ADDRESS` variable.
+  Optional: reports otherwise resolve it from the account index, and public market
+  reads use its master account when no account index is configured."""
   validate: bool = True
   """Whether to type-validate incoming responses."""
 
@@ -416,12 +423,24 @@ class Lighter(VenueAccount):
     """The credential variables' prefix: `LIGHTER` on mainnet, `LIGHTER_TESTNET`."""
     return 'LIGHTER' if self.venue == 'lighter' else 'LIGHTER_TESTNET'
 
+  @property
+  def resolved_auth_token(self) -> str | None:
+    """The read-only auth token, never mixing networks; always optional on its own."""
+    return resolve_env_var(
+      self.auth_token or f'${self.prefix}_AUTH_TOKEN', require=False
+    )
+
+  @property
+  def requires_api_key(self) -> bool:
+    """Whether the API key variables must be set: a private account without a token."""
+    return not self.public and self.resolved_auth_token is None
+
   def resolve_int(self, value: int | str | None, name: str) -> int | None:
     """An integer setting, or the network's variable when unset."""
     if isinstance(value, int):
       return value
     resolved = resolve_env_var(
-      value or f'${self.prefix}_{name}', require=not self.public
+      value or f'${self.prefix}_{name}', require=self.requires_api_key
     )
     return None if resolved is None else int(resolved)
 
@@ -439,7 +458,8 @@ class Lighter(VenueAccount):
   def resolved_api_private_key(self) -> str | None:
     """The API key's private key, never mixing networks."""
     return resolve_env_var(
-      self.api_private_key or f'${self.prefix}_API_PRIVATE_KEY', require=not self.public
+      self.api_private_key or f'${self.prefix}_API_PRIVATE_KEY',
+      require=self.requires_api_key,
     )
 
   @property
@@ -448,7 +468,8 @@ class Lighter(VenueAccount):
     return resolve_env_var(self.address or f'${self.prefix}_ADDRESS', require=False)
 
   def verify_env_vars(self):
-    """Fail before constructing private clients when credentials are missing."""
+    """Fail before constructing private clients when neither an API key nor an auth
+    token is configured."""
     self.resolved_account_index
     self.resolved_api_key_index
     self.resolved_api_private_key

@@ -13,6 +13,7 @@ from typing_extensions import (
   Callable,
   Iterable,
   Literal,
+  Sequence,
   TypeVar,
 )
 from typed_lighter import Lighter
@@ -43,6 +44,8 @@ FUNDING_INTERVAL = timedelta(hours=1)
 """Lighter settles funding every hour, on the hour."""
 MAX_CLIENT_INDEX = 2**48
 """Client order indexes are uint48."""
+MASTER = 0
+"""`account_type` of an L1 address's master account (sub-accounts are `1`, pools `2`-`4`)."""
 
 
 @dataclass
@@ -89,6 +92,13 @@ class Shared(SDK):
   client_indexes: ClientIndexes = field(default_factory=ClientIndexes)
   leverages: dict[int, Decimal] = field(default_factory=dict[int, Decimal])
   """The account's leverage per perpetual market, filled by `leverage()`."""
+  public_index: int | None = None
+  """Account for public account reads when the client has no credentials."""
+  address: str | None = None
+  """L1 address whose master account public account reads use, when neither the
+  credentials nor `public_index` name an account."""
+  masters: dict[str, int] = field(default_factory=dict[str, int])
+  """Master account index per resolved L1 address."""
 
   @classmethod
   def new(
@@ -97,6 +107,8 @@ class Shared(SDK):
     api_key_index: int | None = None,
     api_private_key: str | None = None,
     *,
+    auth_token: str | None = None,
+    address: str | None = None,
     network: Network = 'mainnet',
     public: bool = False,
     validate: bool = True,
@@ -105,11 +117,16 @@ class Shared(SDK):
     """Build a client from explicit credentials, or the client's `LIGHTER_*` defaults.
 
     Args:
-      account_index: Account the API key belongs to.
+      account_index: Account the credentials belong to; in public mode, the account
+        public account reads use.
       api_key_index: Slot of the API key.
       api_private_key: Private key of the API key.
+      auth_token: Read-only auth token, for private reads without an API key.
+      address: L1 address whose master account public account reads use when no
+        account index is known.
       network: Lighter deployment.
-      public: Skip credentials: public market data only.
+      public: Skip credentials: public market data, plus public account reads of
+        `account_index` or `address`.
       validate: Validate responses.
       account_id: Root SDK account key, the first segment of every market ID;
         defaults to the venue ID.
@@ -117,11 +134,14 @@ class Shared(SDK):
     return cls(
       venue_id=network_venue_id(network),
       account_id=account_id,
+      public_index=account_index if public else None,
+      address=address,
       client=Lighter.new(
         network=network,
         account_index=account_index,
         api_key_index=api_key_index,
         api_private_key=api_private_key,
+        auth_token=auth_token,
         public=public,
         validate=validate,
       ),
@@ -147,12 +167,56 @@ class Shared(SDK):
     return await fn()
 
   @property
-  def account_index(self) -> int:
-    """The configured account, for account-scoped reads and trading."""
+  def private_index(self) -> int:
+    """The credentials' account, for token-gated reads (an API key or auth token).
+
+    Raises:
+      AuthError: The client has neither.
+    """
     index = self.client.account_index
     if index is None:
-      raise AuthError('Account-scoped Lighter data needs API key credentials')
+      raise AuthError(
+        'This Lighter read needs an API key or a read-only auth token (`auth_token`)'
+      )
     return index
+
+  def require_api_key(self):
+    """Check the client can sign transactions, before trading.
+
+    Raises:
+      AuthError: The client has no API key (none, or only a read-only auth token).
+    """
+    if self.client.account_signer is None:
+      raise AuthError(
+        'Lighter trading needs an API key (`api_key_index` and `api_private_key`); '
+        'an auth token only allows reads'
+      )
+
+  async def account_index(self) -> int:
+    """The account public account reads use: the credentials' account, else the
+    configured `account_index`, else the master account of the configured `address`
+    (`account_type` 0), resolved once.
+
+    Raises:
+      AuthError: No credentials, account index or address is configured.
+      ValueError: The address has no master account.
+    """
+    if (index := self.client.account_index) is not None:
+      return index
+    if self.public_index is not None:
+      return self.public_index
+    address = self.address
+    if address is None:
+      raise AuthError(
+        'Account-scoped Lighter data needs an account: configure an API key, an auth '
+        'token, an `account_index` or an `address`'
+      )
+    if address not in self.masters:
+      response = await self.call(
+        lambda: self.client.api.account.get({'by': 'l1_address', 'value': address})
+      )
+      self.masters[address] = master_index(response['accounts'], address)
+    return self.masters[address]
 
   async def load_details(self, *, refetch: bool = False):
     """Cache every market's details, perpetual and spot, from one request."""
@@ -196,11 +260,23 @@ class Shared(SDK):
 
   async def account(self) -> DetailedAccount:
     """The configured account's positions, balances and margin figures."""
-    index = self.account_index
+    index = await self.account_index()
     accounts = await self.call(
       lambda: self.client.api.account.get({'by': 'index', 'value': index})
     )
     return accounts['accounts'][0]
+
+
+def master_index(accounts: Sequence[DetailedAccount], address: str) -> int:
+  """The master account's index among an L1 address's accounts.
+
+  Raises:
+    ValueError: None of them is a master account (an unknown address).
+  """
+  for a in accounts:
+    if a['account_type'] == MASTER:
+      return a['index']
+  raise ValueError(f'Lighter address {address} has no master account')
 
 
 def parse_market_id(market_id: str) -> int:
