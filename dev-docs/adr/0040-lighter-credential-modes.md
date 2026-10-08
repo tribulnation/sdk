@@ -1,4 +1,4 @@
-# ADR 0039: Lighter credential modes and public account reads
+# ADR 0040: Lighter credential modes and public account reads
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
