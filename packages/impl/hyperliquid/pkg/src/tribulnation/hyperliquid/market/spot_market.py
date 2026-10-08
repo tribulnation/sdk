@@ -22,6 +22,7 @@ from tribulnation.sdk.market import (
 
 from tribulnation.hyperliquid.core import wrap_exceptions
 from .impl.candles import CANDLE_INTERVALS, candles
+from .impl.fees import personal_spot_fees
 
 from .impl import (
   SpotMarketMixin,
@@ -74,10 +75,8 @@ class SpotMarket(SpotMarketMixin, Market):
     return await spot_rules(self, refetch=refetch)
 
   async def fees(self, *, refetch: bool = False) -> Fees:
-    """Decline incomplete spot rates until quote-token adjustments are resolvable."""
-    raise NotImplementedError(
-      'Hyperliquid spot fees require verified quote-token and stable-pair metadata'
-    )
+    """The account's spot rates for USDC- and USDE-quoted pairs; others are declined."""
+    return await personal_spot_fees(self, refetch=refetch)
 
   def candles(
     self,

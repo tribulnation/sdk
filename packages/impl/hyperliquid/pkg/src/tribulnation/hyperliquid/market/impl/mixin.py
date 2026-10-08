@@ -108,6 +108,11 @@ def spot_meta_of(spot_index: int, /, *, spot_meta: SpotMetaResponse) -> SpotMeta
   }
 
 
+def spot_quote_tokens_of(spot_meta: SpotMetaResponse) -> frozenset[int]:
+  """Token indices that quote at least one spot pair; a pair of two is a stable pair."""
+  return frozenset(pair['tokens'][1] for pair in spot_meta['universe'])
+
+
 @wrap_exceptions
 async def translated(stream: AsyncIterable[T]) -> AsyncGenerator[T]:
   """Iterate `stream`, re-raising client errors (e.g. a dropped socket) as SDK errors."""
@@ -164,6 +169,8 @@ class Shared(SDK):
 
   # Cached meta (venue-wide).
   spot_meta: SpotMetaResponse | None = None
+  spot_quote_tokens: frozenset[int] | None = None
+  """Token indices quoting at least one spot pair, derived with `spot_meta`."""
   # Lightweight DEX directory: idx -> PerpDex | None (wire type allows None entries).
   perp_dexs: dict[int, PerpDex | None] | None = None
   # Perp meta keyed by dex index; None key is used for the 'no dex' case.
@@ -237,7 +244,15 @@ class Shared(SDK):
       if not refetch and self.spot_meta is not None:
         return self.spot_meta
       self.spot_meta = await self.client.info.spot_meta()
+      self.spot_quote_tokens = spot_quote_tokens_of(self.spot_meta)
       return self.spot_meta
+
+  async def load_spot_quote_tokens(self, *, refetch: bool = False) -> frozenset[int]:
+    """Token indices quoting at least one spot pair (USDC, USDH, USDT0, USDE, ...)."""
+    spot_meta = await self.load_spot_meta(refetch=refetch)
+    if self.spot_quote_tokens is None:
+      self.spot_quote_tokens = spot_quote_tokens_of(spot_meta)
+    return self.spot_quote_tokens
 
   @wrap_exceptions
   async def load_perp_dexs(self, *, refetch: bool = False) -> dict[int, PerpDex | None]:

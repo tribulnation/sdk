@@ -172,7 +172,7 @@ methods:
         hyperliquid:
           market_id: 'hyperliquid:spot:UBTC/USDC:142'
           instrument_id: 'UBTC/USDC:142'
-          fee_asset: '0'
+          fee_asset: null  # fill-dependent on spot (ADR 0028)
           tick_size: '0.001'
           step_size: '0.00001'
         bitget: {market_id: 'bitget:spot:BTCUSDT', instrument_id: 'BTCUSDT', fee_asset: 'USDT', tick_size: '0.10', step_size: '0.00001', kind: 'spot'}
@@ -219,7 +219,7 @@ methods:
       bitget: Symbol-scoped Classic or UTA account rates.
       bybit: Symbol-scoped account rates, including the account's applicable fee tier.
       dydx: Account tier, market fee holidays and staking adjustments with protocol rounding.
-      hyperliquid: Native USDC perpetuals only; HIP-3 and spot require additional verified fee metadata.
+      hyperliquid: "USDC-collateral perpetuals (default and HIP-3) and USDC- or USDE-quoted spot, via the official fee formula: account tier with staking, referral, HIP-3 deployer scale and growth mode, and the 80% stable-pair discount. Other collateral or quote tokens raise NotImplementedError."
       kraken: Account TradeVolume schedule, converted from percent to fractions.
       mexc: Spot only with MX deduction disabled; personal perpetual fees are unsupported.
     example:
@@ -494,13 +494,14 @@ methods:
   trades_history:
     group: Your account data
     public: false
-    # Hyperliquid fee tokens use numeric indices, matching wallet/report balances.
+    # Hyperliquid fee tokens use numeric indices, matching wallet/report balances. A spot
+    # buy is charged in the base token (UBTC is 197).
     example:
       accountVenues: [mexc]
       constants:
         aster: {market_id: 'aster:perp:BTCUSDT', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'USDT'}
         mexc: {market_id: 'mexc:spot:BTCUSDT', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: USDT}
-        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', price1: '60095.60', qty1: '0.01', price2: '60040.00', qty2: '-0.02', fee_asset: '0'}
+        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', price1: '60095.60', qty1: '0.01', price2: '60040.00', qty2: '-0.02', fee_asset: '197'}
         coinbase: {market_id: 'coinbase:spot:BTC-USD', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'USD'}
         binance: {market_id: 'binance:spot:BTCUSDT', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'USDT'}
         bit2me: {market_id: 'bit2me:spot:BTC/EUR', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'EUR'}

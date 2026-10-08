@@ -133,6 +133,23 @@ async with sdk.depth_stream('hl::ETH', settings={'hyperliquid': {'depth_source':
   leverage).
 - **`collateral`** (spot) returns the quote-token balance (`equity=total`,
   `free_collateral=total-hold`).
+- **`fees`** and **`rules().fees`** apply Hyperliquid's published fee formula: the
+  account's `userFees` rates (tier and staking included) with the active referral
+  discount, or the standard schedule for `rules()`. Perpetuals add the asset's HIP-3
+  `deployerFeeScale` (`×(1+s)` below 1, `×2s` from 1) and growth mode (`×0.1`); maker
+  rebates get neither the HIP-3 scale nor the referral discount. Spot pairs between two
+  spot quote tokens (e.g. USDT0/USDC) get the 80% stable-pair discount. Supported:
+  USDC-collateral perpetuals, HIP-3 included, and USDC- or USDE-quoted spot. Other
+  collateral or quote tokens (USDH, USDT0, ...) raise `NotImplementedError`, and their
+  `rules().fees` is `None`: their aligned-quote-token adjustment cannot be read from the
+  API.
+- **Fee asset.** Perpetual `rules().fee_asset` is the collateral token index (`'0'`, USDC).
+  Spot `rules().fee_asset` is `None` because the token depends on the fill: charges are paid
+  in the token received (base on buys, quote on sells) and maker rebates are credited in
+  the token given. `Trade.fee.asset` names each fill's token.
+- **Funding** settles hourly on the default and HIP-3 dexes, in the dex's collateral token.
+  A non-USDC-collateral dex would settle in that token; every such dex is currently
+  delisted.
 - Builder-DEX perps use a DEX-scoped asset-id formula (`100000 + dex_idx*10000 + asset_idx`);
   default-DEX perps use the plain asset index. This only matters internally — you address
   markets by name.
