@@ -53,7 +53,8 @@ missing.
 With the fields omitted, `lighter` reads `LIGHTER_ACCOUNT_INDEX`, `LIGHTER_API_KEY_INDEX`,
 `LIGHTER_API_PRIVATE_KEY`, `LIGHTER_AUTH_TOKEN` and `LIGHTER_ADDRESS`, and
 `lighter_testnet` the same names prefixed `LIGHTER_TESTNET_`. Testnet never falls back to
-mainnet variables. A private account needs either the API key or the token. `validate`
+mainnet variables. A private account needs either the API key or the token; with the
+API key variables set, the client signs even when the account configures only a token. `validate`
 toggles response validation.
 
 ## Exchange & ID conventions
@@ -69,8 +70,8 @@ toggles response validation.
 ## Venue-specific semantics
 
 - `fees()` reads the account's fee ticks, in parts per million, the same for buys and
-  sells, perpetuals and spot (mainnet fills of one account on both kinds carry the
-  same tick). Trade fees are the tick of the account's role times the
+  sells, perpetuals and spot. Testnet maker and taker fills on both kinds were charged
+  exactly that tick, in the asset `Trade.fee` names. Trade fees are the tick of the account's role times the
   amount it pays on.
 - REST depth sums the top 250 resting orders per side (about 200 levels on busy books);
   a side at the limit drops its possibly partial last level. Depth streams maintain the

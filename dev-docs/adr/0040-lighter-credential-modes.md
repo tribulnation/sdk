@@ -52,5 +52,10 @@ user configured, and an account without either raises `AuthError`.
 `MarketSDK` builds Lighter from the new `auth_token` and `address` fields, so the
 Lighter adapter requires the SDK release containing them. Public `trades_history` was
 checked live on mainnet to carry the same rows, client order indexes included, as the
-private read. Token-mode reads and the trading rejections are covered by unit tests;
-live token qualification awaits a token on a qualification account.
+private read. On testnet, a read-only `ro:` token served every read above and
+trading raised `AuthError`; unit tests cover the same paths.
+
+`typed-lighter` falls back to the network's `API_KEY_INDEX`/`API_PRIVATE_KEY`
+variables when no API key is passed, so an account configured with only a token
+still signs when those variables are set. Token-only operation therefore needs them
+unset; an opt-out belongs in `typed-lighter`.
