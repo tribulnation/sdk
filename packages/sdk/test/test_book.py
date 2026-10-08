@@ -59,6 +59,118 @@ def test_update_takes_update_time():
   assert local.time == later
 
 
+def prices(entries: list[Book.Entry]) -> list[Decimal]:
+  """Prices of `entries`, in book order."""
+  return [e.price for e in entries]
+
+
+def test_update_without_crossing_is_unchanged():
+  """Replacing, adding and removing levels that cross nothing leaves the other side."""
+  local = book()
+  local.update(
+    Book(
+      bids=[
+        Book.Entry(Decimal('100'), Decimal('5')),
+        Book.Entry(Decimal('98'), Decimal('1')),
+        Book.Entry(Decimal('99'), Decimal('0')),
+      ],
+      asks=[Book.Entry(Decimal('103'), Decimal('1'))],
+    )
+  )
+  assert local.bids == [
+    Book.Entry(Decimal('100'), Decimal('5')),
+    Book.Entry(Decimal('98'), Decimal('1')),
+  ]
+  assert local.asks == [
+    Book.Entry(Decimal('101'), Decimal('3')),
+    Book.Entry(Decimal('102'), Decimal('4')),
+    Book.Entry(Decimal('103'), Decimal('1')),
+  ]
+
+
+def test_update_bid_removes_crossed_asks():
+  """A bid at `p` removes existing asks at or below `p`, including an equal price."""
+  local = book()
+  local.update(Book(bids=[Book.Entry(Decimal('101'), Decimal('2'))]))
+  assert prices(local.bids) == [Decimal('101'), Decimal('100'), Decimal('99')]
+  assert local.asks == [Book.Entry(Decimal('102'), Decimal('4'))]
+
+  local = book()
+  local.update(Book(bids=[Book.Entry(Decimal('101.5'), Decimal('2'))]))
+  assert prices(local.asks) == [Decimal('102')]
+
+
+def test_update_ask_removes_crossed_bids():
+  """An ask at `p` removes existing bids at or above `p`."""
+  local = book()
+  local.update(Book(asks=[Book.Entry(Decimal('99'), Decimal('1'))]))
+  assert local.bids == []
+  assert prices(local.asks) == [Decimal('99'), Decimal('101'), Decimal('102')]
+
+  local = book()
+  local.update(Book(asks=[Book.Entry(Decimal('99.5'), Decimal('1'))]))
+  assert prices(local.bids) == [Decimal('99')]
+
+
+def test_update_removal_does_not_uncross():
+  """A zero-quantity level only removes its own price, even past the other side."""
+  local = book()
+  local.update(
+    Book(
+      bids=[Book.Entry(Decimal('101'), Decimal('0'))],
+      asks=[Book.Entry(Decimal('100'), Decimal('0'))],
+    )
+  )
+  assert prices(local.bids) == [Decimal('100'), Decimal('99')]
+  assert prices(local.asks) == [Decimal('101'), Decimal('102')]
+
+
+def test_update_crossing_itself_keeps_larger_ask():
+  """Crossing levels from one update: the larger (or equal) ask removes the bid."""
+  for bid_qty in (Decimal('1'), Decimal('2')):
+    local = book()
+    local.update(
+      Book(
+        bids=[Book.Entry(Decimal('101'), bid_qty)],
+        asks=[Book.Entry(Decimal('100'), Decimal('2'))],
+      )
+    )
+    assert local.bids == [Book.Entry(Decimal('99'), Decimal('2'))]
+    assert local.asks == [
+      Book.Entry(Decimal('100'), Decimal('2')),
+      Book.Entry(Decimal('101'), Decimal('3')),
+      Book.Entry(Decimal('102'), Decimal('4')),
+    ]
+
+
+def test_update_crossing_itself_keeps_larger_bid():
+  """Crossing levels from one update: a larger bid removes the ask."""
+  local = book()
+  local.update(
+    Book(
+      bids=[Book.Entry(Decimal('101'), Decimal('3'))],
+      asks=[Book.Entry(Decimal('100'), Decimal('2'))],
+    )
+  )
+  assert local.bids == [
+    Book.Entry(Decimal('101'), Decimal('3')),
+    Book.Entry(Decimal('100'), Decimal('1')),
+    Book.Entry(Decimal('99'), Decimal('2')),
+  ]
+  assert local.asks == [Book.Entry(Decimal('102'), Decimal('4'))]
+
+
+def test_update_leaves_existing_crossings():
+  """Crossings between existing levels, e.g. from a crossed snapshot, are kept."""
+  local = Book(
+    bids=[Book.Entry(Decimal('101'), Decimal('1'))],
+    asks=[Book.Entry(Decimal('100'), Decimal('1'))],
+  )
+  local.update(Book(bids=[Book.Entry(Decimal('90'), Decimal('1'))]))
+  assert prices(local.bids) == [Decimal('101'), Decimal('90')]
+  assert prices(local.asks) == [Decimal('100')]
+
+
 def test_codec_round_trip():
   """Gateway depth responses and stream messages carry the time intact."""
   for time in (TIME, None):
