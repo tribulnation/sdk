@@ -73,7 +73,11 @@ never falls back to mainnet variables. `validate` toggles response validation.
   and requirements; its leverage is the cross positions' notional over equity. An
   isolated market reports its position's own margin (isolated wallet plus unrealized
   PnL), with any margin above its initial margin as free collateral. The exchange-level
-  `perp_collateral()` is the cross bucket.
+  `perp_collateral()` is the cross bucket. Both buckets were verified against a live
+  isolated position on testnet (2026-10-08): the isolated equity matches
+  `positionRisk`'s `isolatedMargin` and the cross equity matches the account's
+  `totalCrossWalletBalance` plus `totalCrossUnPnl`. Aster rejects isolated margin in
+  Multi-Assets mode, so isolated positions only exist on single-asset accounts.
 - `perp_stats` joins the bulk premium index with the funding configuration in two
   requests. Open interest (base units) has no bulk source: it is read per contract only
   when at most five contracts are named, and is `None` otherwise. A symbol without a
@@ -90,8 +94,9 @@ never falls back to mainnet variables. `validate` toggles response validation.
   capped by the room left in the leverage bracket at that leverage (`maxNotional` less
   the position's own notional) and by the symbol's remaining open-interest allowance
   (`remainingOpenableNotionalValue`). It is the same-direction room; reducing or
-  reversing a position is not modelled. Spot `available_notional` is the free quote
-  balance.
+  reversing a position is not modelled. Testnet does not serve
+  `remainingOpenableNotionalValue` (HTTP 404), so perpetual `available_notional` fails
+  there. Spot `available_notional` is the free quote balance.
 - Unsupported, raising `NotImplementedError`: hedge-mode positions, exchange-wide
   perpetual trade history and order settings.
 - Public reads and the account reads are verified on mainnet. Order placement and

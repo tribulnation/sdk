@@ -230,6 +230,69 @@ def test_cross_bucket_excludes_isolated_positions():
   )
 
 
+def test_buckets_match_venue_figures_with_live_isolated_shape():
+  """Testnet-observed shape: the buckets match the venue's own cross and isolated figures.
+
+  The account's wallet total includes the isolated wallet, while
+  `totalCrossWalletBalance` and `totalCrossUnPnl` exclude it; `positionRisk` reports the
+  isolated equity as `isolatedMargin`. Amounts are scaled stand-ins, not account data.
+  """
+  isolated = position(
+    'BTCUSDT',
+    isolated=True,
+    positionAmt=Decimal('0.001'),
+    notional=Decimal(80),
+    isolatedWallet=Decimal(6),
+    unrealizedProfit=Decimal('0.05'),
+    initialMargin=Decimal(4),
+    positionInitialMargin=Decimal(4),
+    maintMargin=Decimal('0.2'),
+    leverage=20,
+  )
+  cross = position(
+    'ETHUSDT',
+    positionAmt=Decimal('0.003'),
+    notional=Decimal(8),
+    unrealizedProfit=Decimal('0.01'),
+    initialMargin=Decimal('0.4'),
+    positionInitialMargin=Decimal('0.4'),
+    maintMargin=Decimal('0.02'),
+    leverage=20,
+  )
+  venue = account(
+    isolated,
+    cross,
+    totalInitialMargin='4.4',
+    totalMaintMargin='0.22',
+    totalWalletBalance='1006',
+    totalUnrealizedProfit='0.06',
+    totalMarginBalance='1006.06',
+    totalPositionInitialMargin='4.4',
+    totalCrossWalletBalance='1000',
+    totalCrossUnPnl='0.01',
+    availableBalance='999.6',
+    maxWithdrawAmount='999.6',
+  )
+  isolated_margin = Decimal('6.05')  # positionRisk's isolatedMargin for the row
+  bucket = cross_collateral(venue)
+  assert bucket == PerpCollateral(
+    equity=venue['totalCrossWalletBalance'] + venue['totalCrossUnPnl'],
+    free_collateral=Decimal('999.6'),
+    initial_margin=Decimal('0.4'),
+    maintenance_margin=Decimal('0.02'),
+    leverage=Decimal(8) / Decimal('1000.01'),
+    margin_mode='cross',
+  )
+  assert isolated_collateral(isolated) == PerpCollateral(
+    equity=isolated_margin,
+    free_collateral=Decimal('2.05'),
+    initial_margin=Decimal(4),
+    maintenance_margin=Decimal('0.2'),
+    leverage=Decimal(80) / isolated_margin,
+    margin_mode='isolated',
+  )
+
+
 def test_buckets_without_equity_report_zero_leverage():
   """Leverage is notional over positive equity, else zero, as on other venues."""
   assert cross_collateral(account(LONG, totalMarginBalance='0')).leverage == 0
