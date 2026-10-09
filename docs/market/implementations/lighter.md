@@ -86,7 +86,10 @@ toggles response validation.
 - Orders: `LIMIT` rests good-till-time (28 days), `POST_ONLY` is rejected rather than
   taking liquidity, `MARKET` is the venue's market order bounded by `price`. Prices and
   sizes off the market's grid raise before signing. `settings={'lighter': {'reduce_only':
-  True}}` places reduce-only orders.
+  True}}` places reduce-only orders, and `settings={'lighter': {'time_in_force':
+  'immediate-or-cancel'}}` sends a `LIMIT` order immediate-or-cancel with no expiry
+  (set on `MARKET` or `POST_ONLY`, it raises `ValueError`). An IOC that fills nothing is
+  still accepted; it ends with a `canceled-*` status.
 - Order ids are client order indexes. `query_order` finds inactive orders for 24 hours,
   and misses a just-cancelled order for a few seconds while the venue indexes it.
 - Spot `cancel_open_orders` cancels order by order: the venue's market-scoped cancel-all

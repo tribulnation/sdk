@@ -21,7 +21,7 @@ cancellation are verified on testnet only.
 | Candles | Six SDK intervals | `klines`, half-open 500-candle windows retried individually |
 | Funding | Index, next funding, settled rates | `premium_index`, per-symbol `funding_info`, `funding_rate_paged` |
 | Perpetual stats | All or selected contracts; open interest for at most five named contracts | Unfiltered `premium_index` joined with unfiltered `funding_info`, plus one undocumented `openInterest` read per named contract |
-| Orders | MARKET, LIMIT (GTC), POST_ONLY (GTX); query, open, cancel | Batch cancellation in native chunks of ten |
+| Orders | MARKET, LIMIT (GTC, or IOC via `settings['aster']`), POST_ONLY (GTX); query, open, cancel | Batch cancellation in native chunks of ten |
 | Fills | Shared account stream per exchange | Listen key renewed every 25 minutes, closed with the last subscriber |
 | Trade history | One pair or contract, or every spot pair; inclusive bounds, up to the current time | `user_trades_paged` per seven-day window, each `fromId` page retried alone; symbol-less spot windows are halved when a page fills |
 | Spot account | Mainnet only; base position, quote collateral | `spot.account.info`, free plus locked |
@@ -45,7 +45,8 @@ resolves `ASTER_*` for `aster` and `TEST_ASTER_*` for `aster_testnet`, never mix
    WebSocket reported nonzero balances. Zero would hide known holdings. Mainnet
    balances match the Report snapshot's source and are supported.
 3. Hedge-mode positions, exchange-wide perpetual trade history (the venue requires a
-   symbol) and order settings raise `NotImplementedError`.
+   symbol) and `aster` settings on cancellations raise `NotImplementedError`. The only
+   order setting is `place_order`'s `time_in_force: 'IOC'`.
 4. Report snapshots on testnet, for the same reason as spot balances. Report history
    maps the perpetual income and spot transaction ledgers to `UnknownObservation`; one
    spot transaction ID spans several asset/type legs, so record IDs include both.

@@ -61,6 +61,7 @@ from tribulnation.sdk.market import (
 )
 from tribulnation.sdk.market.types.candles import candle_windows
 from ..core import Public, Scope, Shared
+from .settings import Settings as AsterSettings
 from .streams import book_time, connect_books, connect_trades
 
 DepthLimit = Literal[5, 10, 20, 50, 100, 500, 1000]
@@ -116,7 +117,8 @@ def rejected(exc: BadRequest) -> bool:
 
 def dead_on_arrival(row: SpotOrder | FuturesOrder) -> bool:
   """Whether a placement result is final with nothing filled, e.g. a GTX that would
-  have crossed or a market order with no liquidity."""
+  have crossed, an IOC with nothing to match at its price or a market order with no
+  liquidity."""
   return row.get('status') in DEAD_STATUSES and row.get('executedQty') == 0
 
 
@@ -315,7 +317,7 @@ class NativeOrder:
   quantity: Decimal
   price: Decimal | None
   """Limit price; `None` for a market order, which ignores the SDK price."""
-  time_in_force: Literal['GTC', 'GTX']
+  time_in_force: Literal['GTC', 'GTX', 'IOC']
   client_order_id: str | None = None
   """Sent as `newClientOrderId`; the venue generates one when `None`."""
 
@@ -349,8 +351,18 @@ def position_leverage(rows: Sequence[PositionRisk], symbol: str) -> Decimal:
   return Decimal(min(values))
 
 
-def native_order(order: Order) -> NativeOrder:
-  """Map MARKET, LIMIT (GTC) and POST_ONLY (GTX) orders."""
+def native_order(order: Order, settings: AsterSettings = {}) -> NativeOrder:
+  """Map MARKET, LIMIT (GTC, or the `time_in_force` setting) and POST_ONLY (GTX) orders.
+
+  Raises:
+    ValueError: The quantity or price is invalid, or `time_in_force` is set on an
+      order other than `LIMIT`.
+  """
+  time_in_force = settings.get('time_in_force')
+  if time_in_force is not None and order['type'] != 'LIMIT':
+    raise ValueError(
+      f'Aster time_in_force applies to LIMIT orders only, not {order["type"]}'
+    )
   qty = Decimal(str(order['qty']))
   if not qty.is_finite() or not qty:
     raise ValueError('Order quantity must be finite and nonzero')
@@ -372,15 +384,20 @@ def native_order(order: Order) -> NativeOrder:
     side=side,
     quantity=quantity,
     price=plain_decimal(price),
-    time_in_force='GTX' if order['type'] == 'POST_ONLY' else 'GTC',
+    time_in_force='GTX' if order['type'] == 'POST_ONLY' else time_in_force or 'GTC',
     client_order_id=client_order_id,
   )
 
 
+def aster_settings(settings: Settings) -> AsterSettings:
+  """The `aster` settings; other venues' keys are ignored, so one dict serves every venue."""
+  return settings.get('aster', {})
+
+
 def reject_settings(settings: Settings):
-  """Aster declares no venue-specific order settings."""
-  if settings:
-    raise NotImplementedError('Aster does not support order settings')
+  """Refuse `aster` settings where no Aster setting applies (only `place_order` takes any)."""
+  if aster_settings(settings):
+    raise NotImplementedError('Aster order settings apply to place_order only')
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -555,14 +572,16 @@ class NativeMarket(Public, Market):
   ) -> OrderResponse:
     """Place a MARKET, LIMIT (GTC) or POST_ONLY (GTX) order.
 
-    Market orders ignore the SDK `price`.
+    Market orders ignore the SDK `price`. `settings={'aster': {'time_in_force': 'IOC'}}`
+    sends a LIMIT order immediate-or-cancel.
 
     Raises:
+      ValueError: `time_in_force` is set on a MARKET or POST_ONLY order.
       OrderRejected: Aster refused the order with a definitive `4XX` code, or answered
-        that it ended `EXPIRED`/`REJECTED` with nothing filled.
+        that it ended `EXPIRED`/`REJECTED` with nothing filled (e.g. an IOC that found
+        nothing to match).
     """
-    reject_settings(settings)
-    native = native_order(order)
+    native = native_order(order, aster_settings(settings))
     try:
       row = await self.shared.call(lambda: self.submit(native))
     except BadRequest as exc:

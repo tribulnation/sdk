@@ -160,3 +160,59 @@ async def test_batch_boundary_retains_partial_errors(monkeypatch: pytest.MonkeyP
   ]
   assert await target.cancel_orders([]) == []
   assert endpoint.await_count == 2
+
+
+@pytest.mark.parametrize('scope', ['spot', 'perp'])
+async def test_ioc_setting_sends_limit_ioc(scope: str, monkeypatch: pytest.MonkeyPatch):
+  """`time_in_force: IOC` turns a LIMIT order immediate-or-cancel, price kept."""
+  endpoint = AsyncMock(return_value={'orderId': 123})
+  monkeypatch.setattr(
+    PerpOrders if scope == 'perp' else SpotOrders, 'place_order', endpoint
+  )
+  order: Order = {'type': 'LIMIT', 'qty': Decimal('-2'), 'price': '0.75'}
+  placed = await market(scope).place_order(
+    order, settings={'aster': {'time_in_force': 'IOC'}}
+  )
+  assert endpoint.await_args is not None
+  request = endpoint.await_args.args[0]
+  assert placed.id == '123'
+  assert request['type'] == 'LIMIT' and request['side'] == 'SELL'
+  assert request['timeInForce'] == 'IOC'
+  assert request['price'] == Decimal('0.75')
+  assert sent_params(scope, request)['timeInForce'] == 'IOC'
+
+
+@pytest.mark.parametrize('scope', ['spot', 'perp'])
+@pytest.mark.parametrize('kind', ['MARKET', 'POST_ONLY'])
+async def test_ioc_setting_rejects_other_order_types(
+  scope: str,
+  kind: Literal['MARKET', 'POST_ONLY'],
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """The setting applies to LIMIT only; elsewhere it raises before anything is sent."""
+  endpoint = AsyncMock(return_value={'orderId': 123})
+  monkeypatch.setattr(
+    PerpOrders if scope == 'perp' else SpotOrders, 'place_order', endpoint
+  )
+  order: Order = {'type': kind, 'qty': Decimal('1'), 'price': '0.75'}
+  with pytest.raises(ValueError, match='LIMIT orders only'):
+    await market(scope).place_order(order, settings={'aster': {'time_in_force': 'IOC'}})
+  endpoint.assert_not_awaited()
+
+
+async def test_other_venues_settings_are_ignored(monkeypatch: pytest.MonkeyPatch):
+  """One settings dict can serve every venue: only the `aster` key is read."""
+  endpoint = AsyncMock(return_value={'orderId': 123})
+  monkeypatch.setattr(PerpOrders, 'place_order', endpoint)
+  order: Order = {'type': 'LIMIT', 'qty': Decimal('1'), 'price': '0.75'}
+  await market('perp').place_order(
+    order, settings={'hyperliquid': {'limit_tif': 'Ioc'}}
+  )
+  assert endpoint.await_args is not None
+  assert endpoint.await_args.args[0]['timeInForce'] == 'GTC'
+
+
+async def test_cancel_rejects_aster_settings():
+  """No Aster setting applies to cancellation."""
+  with pytest.raises(NotImplementedError):
+    await market('perp').cancel_order('1', settings={'aster': {'time_in_force': 'IOC'}})

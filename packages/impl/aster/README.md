@@ -30,9 +30,10 @@ venue = AsterMarket.new(user='0x…', signer='0x…', mainnet=False)
    received.
 4. Trading, verified on testnet only: order queries, open orders, fill streams,
    `MARKET`, `LIMIT` (GTC) and `POST_ONLY` (GTX) orders, and all cancellation methods.
-   Market orders ignore the SDK `price`.
+   Market orders ignore the SDK `price`. `settings={'aster': {'time_in_force': 'IOC'}}`
+   sends a `LIMIT` order immediate-or-cancel.
 5. Unsupported methods raise `NotImplementedError`: hedge-mode positions, exchange-wide
-   perpetual trade history, order settings, and spot balances and trade history on
+   perpetual trade history, and spot balances and trade history on
    testnet.
 6. `tribulnation.aster.Report` snapshots, through `ReportSDK`, the mainnet `perp` wallet
    (without unrealized PnL) and positions with their entry prices, the `spot` wallet,
