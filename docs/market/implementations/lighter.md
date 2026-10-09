@@ -82,6 +82,8 @@ toggles response validation.
   HTTP status and any `5XX` stay `BadRequest`/`ApiError`. An accepted transaction can
   still be refused by the sequencer later; that shows as a `canceled-*` order status,
   not as an error.
+- `OrderResponse.filled_qty` is `None`: the API acknowledges the signed transaction
+  before the sequencer matches it, so the response carries no execution.
 - Candles support all six SDK intervals, walked in 500-candle windows.
 - Orders: `LIMIT` rests good-till-time (28 days), `POST_ONLY` is rejected rather than
   taking liquidity, `MARKET` is the venue's market order bounded by `price`. Prices and

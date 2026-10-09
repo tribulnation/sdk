@@ -65,6 +65,10 @@ never falls back to mainnet variables. `validate` toggles response validation.
   crossed or an IOC that found nothing to match; a partially filled IOC is a response. Codes `-1000`, `-1001`, `-1006`, `-1007` and `-1008`, a `408`, a code-less
   body and any `5XX` leave the outcome unknown and stay `BadRequest`/`ApiError`;
   throttling stays `RateLimited`.
+- `OrderResponse.filled_qty` is the perpetual `RESULT` answer's `executedQty`: final for
+  `MARKET` and IOC orders, what filled on arrival for GTC. On spot it is `None`: spot
+  placement takes no `newOrderRespType` and answers `NEW` with `executedQty` 0 even for a
+  `MARKET` order that fills at once.
 - Fill streams share one account listen key per exchange, renewed every 25 minutes
   and closed when the last subscriber leaves. Do not run another consumer of the same
   account's listen key concurrently.

@@ -295,6 +295,7 @@ async def with_expiry(
 async def place_order(
   self: MarketMixin, order: Order, *, settings: MarketSettings = {}
 ) -> OrderResponse:
+  """Broadcast one order; `filled_qty` stays `None`, as the broadcast answers before matching."""
   s = settings_adapter.validate_python(settings.get('dydx', {}))
   response = await self.client.node.place_order(
     self.perpetual_market,

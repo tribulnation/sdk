@@ -17,8 +17,13 @@ class Order(TypedDict):
 
 @dataclass(kw_only=True)
 class OrderResponse:
+  """The venue's answer to a placed order."""
+
   id: str
   details: Any = None
+  """The venue's raw placement response."""
+  filled_qty: Decimal | None = None
+  """Unsigned base quantity the order filled at placement, as the venue's placement response reports it. `None` when the venue does not report execution at placement: accepting an order is not executing it. Final only for immediate orders (IOC or `MARKET`); for a resting order it is what filled on arrival, and later fills are not reflected."""
 
 
 @dataclass(kw_only=True)

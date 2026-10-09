@@ -212,7 +212,7 @@ class MockMarket(PerpMarket):
   ) -> OrderResponse:
     if self.state.place_order_error is not None:
       raise self.state.place_order_error
-    return OrderResponse(id='order-1')
+    return OrderResponse(id='order-1', filled_qty=Decimal('0.5'))
 
   async def cancel_order(self, id: str, *, settings: Settings = {}) -> Any:
     return {'cancelled': id}
@@ -677,6 +677,27 @@ async def test_ambiguous_api_error_is_not_order_rejected_through_gateway(
     await market.place_order(order)
 
   assert not isinstance(raised.value, OrderRejected)
+
+
+@pytest.mark.asyncio
+async def test_place_order_keeps_filled_qty_through_gateway(sdk: ProxySDK) -> None:
+  """The normalized fill crosses the gateway as a `Decimal`."""
+  market = await sdk.perp_market(MARKET_ID)
+  order: Order = {'type': 'MARKET', 'qty': Decimal('1'), 'price': Decimal('100')}
+
+  response = await market.place_order(order)
+
+  assert response.id == 'order-1'
+  assert response.filled_qty == Decimal('0.5')
+
+
+@pytest.mark.parametrize('filled_qty', [Decimal('0.123456789'), None])
+def test_place_order_response_roundtrips(filled_qty: Decimal | None) -> None:
+  """`filled_qty`, known or not, survives the server codec."""
+  msg = codec.PlaceOrderResp(
+    id='p', response=OrderResponse(id='o', filled_qty=filled_qty)
+  )
+  assert codec.decode_server(codec.encode_server(msg)) == msg
 
 
 def test_error_messages_share_exception_field_shape() -> None:
