@@ -154,6 +154,10 @@ async with sdk.depth_stream('hl::ETH', settings={'hyperliquid': {'depth_source':
   (`status: "err"`) or the order's own status is an `error`, e.g. an IOC (`MARKET`) that
   "could not immediately match against any resting orders". A non-200 HTTP response
   stays a plain `ApiError` (or `RateLimited` for 429): the order may have been placed.
+- **`OrderResponse.filled_qty`** is the `filled` status's `totalSz`, so it is final for
+  `MARKET` and IOC orders. A `resting` answer carries no fill size, and a GTC order that
+  partly crosses on arrival also answers `resting`, so `filled_qty` is `None` there; read
+  fills to learn what it took.
 - Builder-DEX perps use a DEX-scoped asset-id formula (`100000 + dex_idx*10000 + asset_idx`);
   default-DEX perps use the plain asset index. This only matters internally — you address
   markets by name.

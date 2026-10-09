@@ -187,6 +187,8 @@ guarantee ordering. `volume` is `baseTokenVolume`, `quote_volume` is
 - **`place_order`** never raises `OrderRejected` yet: a failed broadcast arrives without
   its CheckTx code, so a refusal cannot be told from a transaction already pending in the
   mempool. Treat every placement error as ambiguous and check `open_orders`/fills.
+- **`OrderResponse.filled_qty`** is `None`: the broadcast answers before the order is
+  matched in a block, so it carries no execution.
 
 ## Example: short-term IOC order
 

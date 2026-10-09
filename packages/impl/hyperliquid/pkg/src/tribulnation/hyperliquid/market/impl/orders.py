@@ -93,6 +93,10 @@ async def place_order(
   """
   Place one order and map Hyperliquid's answer to the SDK contract.
 
+  `filled_qty` is the `filled` status's `totalSz`. A `resting` status reports no fill
+  size, and a GTC order that partly crosses on arrival also answers `resting`, so its
+  `filled_qty` is `None`.
+
   Raises:
     OrderRejected: The action was refused as a whole (`status == 'err'`), or the
       order's own status carries an `error` (e.g. an IOC that could not match).
@@ -113,7 +117,10 @@ async def place_order(
     raise OrderRejected(stat['error'])
   if 'resting' in stat:
     return OrderResponse(id=str(stat['resting']['oid']), details=stat)
-  return OrderResponse(id=str(stat['filled']['oid']), details=stat)
+  filled = stat['filled']
+  return OrderResponse(
+    id=str(filled['oid']), details=stat, filled_qty=Decimal(filled['totalSz'])
+  )
 
 
 @wrap_exceptions

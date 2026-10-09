@@ -41,8 +41,11 @@ An `Order` is what you pass to `place_order`:
 
 `Num` is anything numeric: `Decimal`, `int`, `float` or `str`, converted on the way in.
 
-- `OrderResponse`: the order `id`, which `cancel_order` and `query_order` take, plus raw
-  `details`.
+- `OrderResponse`: the order `id`, which `cancel_order` and `query_order` take, raw
+  `details`, and `filled_qty`: the unsigned base quantity the venue's placement response
+  reports filled. It is final only for immediate orders (IOC or `MARKET`); for a resting
+  order it is what filled on arrival. It is `None` where the venue answers before
+  matching, since accepting an order is not executing it; each venue page says which.
 - `OrderState`: `id`, `price`, signed `qty`, signed `filled_qty`, and an `active` flag.
 
 Venue-specific options travel separately, in `settings`: a dict keyed by venue name

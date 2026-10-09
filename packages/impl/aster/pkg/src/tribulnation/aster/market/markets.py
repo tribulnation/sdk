@@ -411,6 +411,10 @@ class NativeMarket(Public, Market):
     """Place one native order."""
 
   @abstractmethod
+  def placement_fill(self, row: SpotOrder | FuturesOrder) -> Decimal | None:
+    """The base quantity `submit`'s answer reports filled, or `None` if it does not."""
+
+  @abstractmethod
   def cancel(self, order_id: int) -> Awaitable[object]:
     """Cancel one native order."""
 
@@ -571,7 +575,9 @@ class NativeMarket(Public, Market):
       raise
     if dead_on_arrival(row):
       raise OrderRejected(f'Order {row["orderId"]} ended {row.get("status")}', row)
-    return OrderResponse(id=str(row['orderId']), details=row)
+    return OrderResponse(
+      id=str(row['orderId']), details=row, filled_qty=self.placement_fill(row)
+    )
 
   async def cancel_order(self, id: str, *, settings: Settings = {}) -> Any:
     """Cancel one order and return the native acknowledgement."""
@@ -738,6 +744,11 @@ class SpotMarket(NativeMarket):
     if order.client_order_id is not None:
       request['newClientOrderId'] = order.client_order_id
     return self.api.trade.place_order(request)
+
+  def placement_fill(self, row: SpotOrder | FuturesOrder) -> Decimal | None:
+    """`None`: spot placement answers before matching (`NEW`, `executedQty` 0 even for
+    a `MARKET` order that fills at once) and takes no `newOrderRespType`."""
+    return None
 
   def cancel(self, order_id: int):
     """Cancel one spot order."""
@@ -993,6 +1004,11 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     if order.client_order_id is not None:
       request['newClientOrderId'] = order.client_order_id
     return self.api.trade.place_order(request)
+
+  def placement_fill(self, row: SpotOrder | FuturesOrder) -> Decimal | None:
+    """`executedQty` of the `RESULT` answer: final for `MARKET` and IOC orders, what
+    filled on arrival for GTC; `None` when the row omits it."""
+    return row.get('executedQty')
 
   def cancel(self, order_id: int):
     """Cancel one perpetual order."""
