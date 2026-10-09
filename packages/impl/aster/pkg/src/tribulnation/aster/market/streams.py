@@ -3,16 +3,22 @@
 import asyncio
 from contextlib import AsyncExitStack, suppress
 from datetime import datetime
+from decimal import Decimal
 from typing_extensions import (
+  Any,
   AsyncIterable,
   AsyncIterator,
   Awaitable,
   Callable,
+  Mapping,
   TypeVar,
 )
+from typed_core.util import StreamManager
 from typed_aster.core import timestamp_millis
 from typed_aster.futures.market.depth import OrderBookResponse
+from typed_aster.futures.streams.schemas import FuturesBookTickerEvent
 from typed_aster.schemas import (
+  BookTickerEvent,
   DepthUpdate,
   ExecutionReport,
   OrderBook,
@@ -20,18 +26,50 @@ from typed_aster.schemas import (
 )
 from typed_aster.futures.user_stream.events import FuturesUserEvent, OrderUpdate
 from tribulnation.sdk.core import MissingData, NetworkError, Subscription
-from tribulnation.sdk.market import Book, Trade
+from tribulnation.sdk.market import Book, Settings, Trade
 from tribulnation.sdk.util import epoch_time
-from ..core import Scope, Shared, wrap_exceptions
+from ..core import DepthSource, Scope, Shared, wrap_exceptions
 
 T = TypeVar('T')
+SOURCE_LEVELS: Mapping[DepthSource, int] = {'depth': 20, 'fast': 5, 'bbo': 1}
+"""Levels per side each depth source delivers; REST `depth` trims `'fast'` and `'bbo'`
+to the same shape."""
 RENEWAL_INTERVAL = 25 * 60
 """Seconds between keepalives; listen keys expire after 60 minutes."""
 
 
-def book_time(row: DepthUpdate | OrderBook | OrderBookResponse) -> datetime | None:
-  """The book's transaction time `T` (matching-engine time), or None if absent."""
-  time = row.get('T')
+def depth_source(settings: Settings) -> DepthSource:
+  """The `aster.depth_source` setting, defaulting to `'depth'`.
+
+  Args:
+    settings: Venue-keyed settings; only the `aster` key is read.
+
+  Raises:
+    ValueError: The setting names no known source.
+  """
+  source = settings.get('aster', {}).get('depth_source', 'depth')
+  if source not in SOURCE_LEVELS:
+    raise ValueError(
+      f'Unknown Aster depth_source {source!r}; expected one of {list(SOURCE_LEVELS)}'
+    )
+  return source
+
+
+def book_time(
+  row: DepthUpdate
+  | OrderBook
+  | OrderBookResponse
+  | FuturesBookTickerEvent
+  | BookTickerEvent,
+) -> datetime | None:
+  """The time a book snapshot was current: its event/output time `E`, else `T`.
+
+  Partial-depth pushes and REST `depth` are full top-N snapshots, not diffs, so each is
+  the book as of when Aster produced it (`E`, at or after the transaction time `T` of
+  the last change it includes). A message without `E` falls back to `T`; None when
+  neither is present.
+  """
+  time = row.get('E', row.get('T'))
   return None if time is None else epoch_time(time, timestamp_millis)
 
 
@@ -40,6 +78,23 @@ def parse_book(row: DepthUpdate) -> Book:
   return Book(
     bids=[Book.Entry(*r) for r in row['b']],
     asks=[Book.Entry(*r) for r in row['a']],
+    time=book_time(row),
+  )
+
+
+def parse_bbo(row: FuturesBookTickerEvent | BookTickerEvent) -> Book:
+  """Convert a `bookTicker` push into a one-level book, timed by its event time `E`.
+
+  Each push is a full best bid/ask snapshot, so it takes `E` like partial depth, else
+  `T`; spot pushes may carry neither, leaving the time None. Aster pushes only when
+  the best level changes, so `E` stays put on a quiet book. A side with a
+  zero price or quantity (an empty side) becomes an empty list.
+  """
+  bid = Book.Entry(Decimal(row['b']), Decimal(row['B']))
+  ask = Book.Entry(Decimal(row['a']), Decimal(row['A']))
+  return Book(
+    bids=[bid] if bid.price > 0 and bid.qty > 0 else [],
+    asks=[ask] if ask.price > 0 and ask.qty > 0 else [],
     time=book_time(row),
   )
 
@@ -84,19 +139,38 @@ async def translated(stream: AsyncIterable[T]) -> AsyncIterator[T]:
     yield item
 
 
+def depth_feed(
+  shared: Shared, scope: Scope, symbol: str, source: DepthSource
+) -> StreamManager[Book, Any, Any]:
+  """The native stream behind one depth source, parsed into books.
+
+  Args:
+    shared: The owner of the client.
+    scope: The exchange.
+    symbol: The native symbol.
+    source: Which feed to subscribe to; see `Settings.depth_source`.
+  """
+  name = symbol.lower()
+  if scope == 'perp':
+    streams = shared.client.futures.streams
+    if source == 'bbo':
+      return streams.book_ticker(name).map(parse_bbo)
+    if source == 'fast':
+      return streams.partial_depth_speed(name, levels=5, speed='100ms').map(parse_book)
+    return streams.partial_depth(name, levels=20).map(parse_book)
+  spot = shared.client.spot.streams
+  if source == 'bbo':
+    return spot.book_ticker(name).map(parse_bbo)
+  levels = 5 if source == 'fast' else 20
+  return spot.partial_depth(name, levels=levels, speed='100ms').map(parse_book)
+
+
 @wrap_exceptions
 async def connect_books(
-  shared: Shared, scope: Scope, symbol: str
+  shared: Shared, scope: Scope, symbol: str, source: DepthSource
 ) -> Subscription.Context[Book]:
-  """Open one 20-level stream per symbol, shared by every subscriber."""
-  manager = (
-    shared.client.futures.streams.partial_depth(symbol.lower(), levels=20)
-    if scope == 'perp'
-    else shared.client.spot.streams.partial_depth(
-      symbol.lower(), levels=20, speed='100ms'
-    )
-  )
-  stream = await manager.map(parse_book)
+  """Open one stream per symbol and source, shared by every subscriber."""
+  stream = await depth_feed(shared, scope, symbol, source)
   return Subscription.Context(translated(stream), wrap_exceptions(stream.unsubscribe))
 
 

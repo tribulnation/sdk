@@ -17,7 +17,7 @@ cancellation are verified on testnet only.
 | Tickers | All or selected symbols | `ticker_24hr` joined with `book_ticker` |
 | Rules | Price, lot, notional and percent-price filters | Fee asset is `None` (fill-dependent, ADR 0028) on spot and perpetuals |
 | Depth | 1–1000 levels | Smallest native `limit` covering the request |
-| Depth stream | 1–20 levels | One shared 20-level `partial_depth` stream per symbol |
+| Depth stream | 1–20 levels; `aster.depth_source` `depth`/`fast`/`bbo` | One shared stream per symbol and source: 20-level `partial_depth`, `@depth5@100ms`, or `book_ticker` |
 | Candles | Six SDK intervals | `klines`, half-open 500-candle windows retried individually |
 | Funding | Index, next funding, settled rates | `premium_index`, per-symbol `funding_info`, `funding_rate_paged` |
 | Perpetual stats | All or selected contracts; open interest for at most five named contracts | Unfiltered `premium_index` joined with unfiltered `funding_info`, plus one undocumented `openInterest` read per named contract |

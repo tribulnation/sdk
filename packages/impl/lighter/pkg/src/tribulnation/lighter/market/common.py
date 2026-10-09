@@ -12,11 +12,11 @@ from typed_lighter.schemas import (
 from tribulnation.sdk import SDK
 from tribulnation.sdk.market import Candle, OrderState, Trade
 
-from ..core import FEE_TICK, Shared
+from ..core import FEE_TICK, DepthSource, Shared
 
 
 class Settings(TypedDict, total=False):
-  """Lighter order settings, under `settings['lighter']`."""
+  """Lighter order and depth settings, under `settings['lighter']`."""
 
   reduce_only: bool
   """Only ever reduce the position. Defaults to false."""
@@ -24,6 +24,17 @@ class Settings(TypedDict, total=False):
   """Send a `LIMIT` order immediate-or-cancel instead of good-till-time: it fills what
   it can at the limit price or better and cancels the rest, with no expiry. `POST_ONLY`
   and `MARKET` orders raise `ValueError` when it is set."""
+  depth_source: DepthSource
+  """Which channel `depth_stream`/`depth` read. Defaults to `'order_book'`.
+
+  - `'order_book'`: the full book, from the `order_book` snapshot and its 50 ms deltas.
+  - `'bbo'`: the `ticker` channel, the best bid and ask with sizes, pushed on every
+    order book nonce.
+
+  The sources are different channels and need not agree tick-for-tick. REST `depth`
+  has no top-of-book endpoint: `'bbo'` reads the same resting-order snapshot, trimmed
+  to 1 level per side.
+  """
 
 
 ACTIVE_STATUSES = frozenset({'in-progress', 'pending', 'open'})

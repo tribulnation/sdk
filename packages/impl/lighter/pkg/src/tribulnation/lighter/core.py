@@ -46,6 +46,8 @@ MAX_CLIENT_INDEX = 2**48
 """Client order indexes are uint48."""
 MASTER = 0
 """`account_type` of an L1 address's master account (sub-accounts are `1`, pools `2`-`4`)."""
+DepthSource = Literal['order_book', 'bbo']
+"""Which Lighter WebSocket channel backs `depth_stream`; see `market.common.Settings`."""
 
 
 @dataclass
@@ -83,9 +85,10 @@ class Shared(SDK):
   )
   scalers: dict[int, Scaler] = field(default_factory=dict[int, Scaler])
   lock: asyncio.Lock = field(default_factory=asyncio.Lock)
-  books: dict[int, Subscription[Book]] = field(
-    default_factory=dict[int, Subscription[Book]]
+  books: dict[tuple[int, DepthSource], Subscription[Book]] = field(
+    default_factory=dict[tuple[int, DepthSource], Subscription[Book]]
   )
+  """One shared upstream per market and depth source."""
   fills: dict[int, Subscription[Trade]] = field(
     default_factory=dict[int, Subscription[Trade]]
   )

@@ -47,11 +47,64 @@ never falls back to mainnet variables. `validate` toggles response validation.
   fee rates are unknown (`rules().fees` is `None`); `fees()` reads the account's rates
   and needs `user` and `signer`.
 
+## Settings
+
+`depth` and `depth_stream` accept `settings={'aster': {...}}`, typed by the `Settings`
+TypedDict (`market/settings.py`):
+
+| Key | Type | Applies to | Meaning |
+| --- | --- | --- | --- |
+| `depth_source` | `'depth' \| 'fast' \| 'bbo'` | `depth_stream`, `depth` | Which order-book feed to read; defaults to `'depth'`. |
+
+### Depth sources
+
+`depth_source` picks one of three Aster WebSocket feeds for `depth_stream`, on spot and
+perpetuals alike:
+
+| `depth_source` | Feed | Levels per side | Cadence |
+| --- | --- | --- | --- |
+| `'depth'` (default) | `<symbol>@depth20` (perp), `<symbol>@depth20@100ms` (spot) | 20 | at most every 250 ms (perp), 100 ms (spot) |
+| `'fast'` | `<symbol>@depth5@100ms` | 5 | at most every 100 ms |
+| `'bbo'` | `<symbol>@bookTicker` | 1 (best bid/ask with sizes) | on every change |
+
+```python
+async with sdk.depth_stream('aster:perp:BTCUSDT', settings={'aster': {'depth_source': 'bbo'}}) as books:
+  async for book in books:
+    print(book.time, book.best_bid.price, book.best_ask.price)
+```
+
+- These are different feeds and won't agree tick-for-tick: `'bbo'` pushes on every
+  change of the best level, while partial depth is sampled at its cadence. `'fast'`
+  is faster than `'depth'` on perpetuals only; on spot both push every 100 ms and
+  `'fast'` is just shallower.
+- `Book.time` is each push's event time `E` (else `T`) on every source: partial depth
+  and `bookTicker` pushes are both full snapshots of what they cover. Spot
+  `bookTicker` pushes may omit both, leaving `time` `None`. Feeds skip pushes while
+  what they cover is unchanged (`'bbo'` always; partial depth observed doing so on
+  spot), so on a quiet book `time` stays put, as on a diff feed: old means unchanged,
+  not necessarily stale.
+- On `'bbo'` a side with a zero price or quantity (an empty side) comes back as an
+  empty `bids` or `asks`.
+- `levels` only trims what the feed delivers and never selects it; values outside
+  1-20 raise `ValueError` on every source, as does an unknown `depth_source`.
+- All consumers of one symbol and source share a single upstream subscription, so the
+  sources of one market can be open side by side. Every stream of an exchange is
+  multiplexed on that exchange's one combined-stream connection, which Aster caps at
+  200 streams and 10 inbound (subscribe/unsubscribe) messages per second; each new
+  symbol/source pair costs one stream and one subscribe message.
+- REST `depth` has no faster endpoint. `'fast'` and `'bbo'` read the smallest snapshot
+  (`limit=5`), trimmed to 5 and 1 levels per side (and to `levels` when lower), so its
+  shape matches the stream's; `'depth'` keeps REST's reach of up to 1000 levels.
+
 ## Venue-specific semantics
 
 - Tickers report an empty book side (native price `0`) as `None`, with no quantity.
 - REST depth reads up to 1000 levels. Depth streams carry up to 20 levels, shared per
-  symbol and trimmed per subscriber.
+  symbol and [depth source](#depth-sources) and trimmed per subscriber.
+- `Book.time` is the message's event/output time `E`: REST `depth` and partial-depth
+  pushes are full top-N snapshots, each current as of when Aster produced it, which is
+  at or after the transaction time `T` of the last change it includes. A message
+  without `E` falls back to `T`.
 - Candles support all six SDK intervals in half-open 500-candle windows.
 - Orders: `MARKET` ignores the SDK `price`; `LIMIT` is GTC and `POST_ONLY` is GTX.
   `settings={'aster': {'time_in_force': 'IOC'}}` sends a `LIMIT` order

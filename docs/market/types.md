@@ -62,14 +62,18 @@ raises, rather than quietly placing a different order.
   `market_buy_price`/`market_sell_price` (by `qty=` or `notional=`),
   `buyable_at`/`sellable_at`, `with_fees`, `limit`, `merge`, `update` (apply an incremental
   diff), and in-place `buy`/`sell`. Quantities are base units, and
-  `notional = price × qty`. `time` is the time of the latest exchange event reflected
-  in the book (the matching-engine or transaction time where the venue offers several),
-  timezone-aware UTC; it is `None` when the venue provides no such timestamp, and is
-  never local receive time or HTTP response time. On incremental (diff) feeds it only
-  advances when the book changes, so an old `time` on a quiet book means "unchanged",
-  not necessarily stale. Availability: Hyperliquid sets the block time on REST and WS;
-  Aster the transaction time `T` on REST and WS; Lighter the WS `last_updated_at`
-  (REST `depth` is `None`); dYdX never sets it. Derived books (`limit`, `with_fees`,
+  `notional = price × qty`. `time` is the exchange time the book was current as of,
+  timezone-aware UTC. For snapshot feeds (each message a complete book or its top
+  levels) it is the time the snapshot was current: the venue's push, event or output
+  time for it where the message carries one. For incremental (diff) and on-change
+  feeds it is the time of the latest exchange event reflected (the matching-engine or
+  transaction time where the venue offers several); it only advances when the book
+  changes, so an old `time` on a quiet book means "unchanged", not necessarily stale.
+  It is `None` when the venue provides no such timestamp, and is never local receive
+  time or a transport header such as HTTP `Date`. Availability: Hyperliquid sets the
+  block time on REST and WS; Aster the event/output time `E` (falling back to the
+  transaction time `T`) on REST and WS; Lighter the WS `last_updated_at` (REST `depth`
+  is `None`); dYdX never sets it. Derived books (`limit`, `with_fees`,
   `copy`) keep it, `merge` takes the oldest input's, and `update` takes the diff's.
   `update` replaces, adds and removes (zero quantity) levels, then uncrosses the book:
   some venues' diff streams can cross (dYdX's Indexer does by design, see

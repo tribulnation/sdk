@@ -30,7 +30,8 @@ history; fees, orders and funding payments need a token or an API key.
    are signed with. Symbols are API metadata only, and ids differ between networks.
    Asset ids are the venue's `asset_id` (`'3'` is USDC).
 2. Public data: discovery, tickers, rules, REST depth (the top 250 orders per side,
-   summed per price), a shared full-book stream, candles in the six SDK intervals,
+   summed per price), a shared full-book stream (or the `ticker` best bid/offer with
+   `settings={'lighter': {'depth_source': 'bbo'}}`), candles in the six SDK intervals,
    perpetual index, `perp_stats`, next funding and hourly funding-rate history.
 3. Account and trading: fees (the account's fee ticks, in parts per million), order
    queries, open orders, trade history and streams with fees, positions, collateral,
