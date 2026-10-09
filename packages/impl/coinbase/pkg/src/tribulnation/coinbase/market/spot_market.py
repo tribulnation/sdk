@@ -74,7 +74,11 @@ class SpotMarket(impl.MarketMixin, Market):
     return PaginatedResponse(impl.trades_history(self, start, end))
 
   def trades_stream(
-    self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'
+    self,
+    *,
+    queue_size: int = 1000,
+    overflow: OverflowPolicy = 'fail',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
     return impl.trades_stream(self, queue_size=queue_size, overflow=overflow)
 

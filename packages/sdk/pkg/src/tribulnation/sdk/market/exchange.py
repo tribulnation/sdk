@@ -236,13 +236,16 @@ class Exchange(SDK):
     *,
     queue_size: int = 1000,
     overflow: OverflowPolicy = 'fail',
+    settings: Settings = {},
   ) -> AsyncGenerator[AsyncIterable[Trade]]:
     """Subscribe to your real-time trades.
 
-    See `Market.trades_stream` for `queue_size`/`overflow`.
+    See `Market.trades_stream` for `queue_size`/`overflow`/`settings`.
     """
     market = await self.market(market_id)
-    async with market.trades_stream(queue_size=queue_size, overflow=overflow) as stream:
+    async with market.trades_stream(
+      queue_size=queue_size, overflow=overflow, settings=settings
+    ) as stream:
       yield stream
 
   @SDK.method

@@ -336,6 +336,7 @@ class TradesStreamReq:
   market_id: str
   queue_size: int = 1000
   overflow: OverflowPolicy = 'fail'
+  settings: WireSettings = field(default_factory=Settings)
   tag: Literal['trades_stream'] = 'trades_stream'
 
 

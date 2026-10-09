@@ -85,6 +85,20 @@ Different feeds are different streams and need not agree tick-for-tick. `levels`
 the books a feed delivers; it never picks the feed. The options are documented per venue,
 e.g. [Hyperliquid](implementations/hyperliquid.md#depth-sources).
 
+## Choosing a venue's fill source
+
+`trades_stream` takes the same venue-keyed `settings`, to pick where a venue reads your
+fills from:
+
+```python
+settings = {'dydx': {'trades_source': 'fastest'}}
+async with sdk.trades_stream(market_id, settings=settings) as my_trades:
+  ...
+```
+
+Venues without a choice ignore it. dYdX can read fills from your own full node ahead of
+the indexer, or race both: see [dYdX](implementations/dydx.md#fill-sources).
+
 ## When your consumer falls behind
 
 A venue opens one shared upstream subscription and fans it out to every subscriber through a

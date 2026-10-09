@@ -108,8 +108,13 @@ class Market(MarketMixin, PerpMarket):
     *,
     queue_size: int = 1000,
     overflow: OverflowPolicy = 'fail',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
-    return trades_stream(self, queue_size=queue_size, overflow=overflow)
+    """Your fills on this market; `settings={'dydx': {'trades_source': ...}}` picks
+    the indexer, the account's full node, or the fastest of both."""
+    return trades_stream(
+      self, queue_size=queue_size, overflow=overflow, settings=settings
+    )
 
   @wrap_exceptions
   async def perp_position(self) -> PerpPosition:

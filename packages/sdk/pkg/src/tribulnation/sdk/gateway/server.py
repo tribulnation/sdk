@@ -154,7 +154,9 @@ class Gateway:
         case codec.TradesStreamReq():
           market = await self._market(msg.market_id)
           stream_cm = market.trades_stream(
-            queue_size=msg.queue_size, overflow=msg.overflow
+            queue_size=msg.queue_size,
+            overflow=msg.overflow,
+            settings=msg.settings,
           )
     except Exception as e:
       await send_end(e)

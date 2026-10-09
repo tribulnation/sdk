@@ -29,6 +29,11 @@ signing (placing/canceling orders). When both are provided, `address` is used di
 when only `mnemonic` is given, the address is derived from it at construction time.
 `parent_subaccount` picks the parent subaccount (see below).
 
+`full_node_grpc` and `full_node_rpc` (both optional, `None` by default, `$ENV_VAR` allowed)
+point at a full node you run: its plaintext gRPC streaming endpoint (`host:port`, e.g.
+`'20.222.23.181:9090'`) and its CometBFT RPC URL (e.g. `'http://20.222.23.181:26657'`).
+They are only read by the [node fill sources](#fill-sources), which need both.
+
 ## Exchange & ID conventions
 
 - The only exchange is `perp` (`exchange_id == 'perp'`); any other exchange ID raises.
@@ -69,8 +74,8 @@ Exchange-wide records carry `market_id`, the native instrument ticker (for examp
 
 ## Settings
 
-`place_order` / `cancel_order` accept `settings={'dydx': {...}}`, typed by the dYdX
-`Settings` TypedDict (`market/impl/mixin.py`). All keys are optional:
+`place_order` / `cancel_order` and `trades_stream` accept `settings={'dydx': {...}}`, typed
+by the dYdX `Settings` TypedDict (`market/impl/mixin.py`). All keys are optional:
 
 | Key | Type | Default | Meaning |
 | --- | --- | --- | --- |
@@ -80,9 +85,68 @@ Exchange-wide records carry `market_id`, the native instrument ticker (for examp
 | `short_term_gtb` | `int` | — | GTB delta for short-term orders: good-til-block = `current_block + short_term_gtb`. Only applied when `order_flags == 'SHORT_TERM'`. |
 | `long_term_gtbt` | `int` | — | GTBT delta (seconds) for long-term orders: good-til-block-time = `current_block_time + long_term_gtbt`. Only applied for `LONG_TERM`/`CONDITIONAL` flags. |
 | `reduce_only` | `bool` | `False` | Place as reduce-only. |
+| `trades_source` | `'indexer' \| 'node' \| 'fastest'` | `'indexer'` | Where `trades_stream` reads fills from; see [Fill sources](#fill-sources). |
 
 Type mapping: `POST_ONLY` orders always use TIF `POST_ONLY`; `MARKET` uses `market_tif`;
 `LIMIT` uses `limit_tif`.
+
+## Fill sources
+
+`trades_stream` covers the parent subaccount and all its children. `trades_source` picks
+where it reads your fills from:
+
+| `trades_source` | Source | Notes |
+| --- | --- | --- |
+| `'indexer'` (default) | The indexer's `v4_subaccounts` WebSocket channel | Unchanged behaviour: indexer fill ids, block `time`. |
+| `'node'` | Your full node only | About 0.4 s ahead of the indexer. No fallback. |
+| `'fastest'` | Both, raced | Each fill once, from whichever source delivers it first. |
+
+`'node'` and `'fastest'` need both `full_node_grpc` and `full_node_rpc` on the account;
+without them, entering the stream raises `ValueError`. The node must run with
+`--grpc-streaming-enabled`, and with the fix for
+[v4-chain#3414](https://github.com/dydxprotocol/v4-chain/issues/3414): the SDK sets
+`filter_orders_by_subaccount_id`, which crashes an unpatched v9.7.1 node on a liquidation.
+
+How node fills are read:
+
+- One `StreamOrderbookUpdates` subscription per client, shared by every market: all CLOB
+  pairs listed when it connects, the parent subaccount and its children. Connecting costs
+  one snapshot of every book (a few MB); after that only your own updates flow. A market
+  listed after it connected is covered from the next reconnection.
+- Finalized updates only (`exec_mode == 7`). Optimistic updates (below 7) and post-commit
+  replays (102) can be reverted or name a different maker, and are ignored.
+- Fills of your orders (as maker or taker, including as maker against a liquidation) and
+  fills liquidating your subaccount come from the stream, priced at the maker order.
+  Deleveraging fills carry no price or side in the stream; they come from the block's
+  CometBFT `match` event (`block_results` on `full_node_rpc`), read as soon as the fill
+  arrives.
+- `time` is the local receive time: the stream carries block heights, not block times,
+  and waiting for the block time would delay the fill. It runs about 0.7–1.0 s after the
+  block time the indexer reports.
+- `id` is synthetic, `<height>:<subject>:<n>`: the subject is the SDK order id for your
+  orders, `<subaccount>:<kind>:<perpetual id>` for liquidated, deleveraged and offsetting
+  fills, and `n` counts that subject's fills in the block. It differs from the indexer's id.
+- `order_id` is the SDK (protocol) order id, `None` when you were liquidated or
+  deleveraged; `fee` is `None`; `details` is
+  `{'source': 'node', 'height', 'exec_mode', 'kind', 'subaccount'}`.
+- The node feed reconnects with backoff and never fails the stream. With `'node'`, fills
+  finalized while the node is unreachable are missed: reconcile with `trades_history`.
+
+With `'fastest'`, a fill is identified on both sources by its block height, order (the
+indexer's order id is derived from the protocol order id) and size; orderless fills by
+height, subaccount, market, side and size. Identical fills in one block are counted, not
+merged. The first copy wins and the other is dropped; indexer trades carry
+`details={'source': 'indexer', 'fill': <indexer fill>}`. Keys are kept for 1000 blocks;
+the indexer keeps delivering while the node is down, and an indexer failure ends the stream
+as it does with `'indexer'`.
+
+```python
+async with sdk.trades_stream(
+  'dydx-account1:perp:BTC-USD', settings={'dydx': {'trades_source': 'fastest'}}
+) as my_trades:
+  async for trade in my_trades:
+    print(trade.details['source'], trade.qty, trade.price)
+```
 
 ## Candles
 

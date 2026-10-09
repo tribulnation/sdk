@@ -86,10 +86,26 @@ class Dydx(VenueAccount):
   """Account or API wallet private key (`0x...`)"""
   parent_subaccount: int = 0
   """dYdX parent subaccount number"""
+  full_node_grpc: str | None = None
+  """`host:port` of a full node's plaintext gRPC streaming endpoint (`StreamOrderbookUpdates`,
+  started with `--grpc-streaming-enabled`), e.g. `'20.222.23.181:9090'`. Needed by the
+  `trades_source` settings `'node'` and `'fastest'`. May be a `$ENV_VAR`."""
+  full_node_rpc: str | None = None
+  """The same node's CometBFT RPC URL, e.g. `'http://20.222.23.181:26657'`; read for
+  deleveraging fills (`block_results`). Needed alongside `full_node_grpc`. May be a
+  `$ENV_VAR`."""
 
   @property
   def resolved_address(self) -> str | None:
     return resolve_env_var(self.address, require=not self.public)
+
+  @property
+  def resolved_full_node_grpc(self) -> str | None:
+    return resolve_env_var(self.full_node_grpc, require=True)
+
+  @property
+  def resolved_full_node_rpc(self) -> str | None:
+    return resolve_env_var(self.full_node_rpc, require=True)
 
   @property
   def resolved_creds(self) -> DydxCreds:
@@ -106,6 +122,8 @@ class Dydx(VenueAccount):
   def verify_env_vars(self):
     self.resolved_address
     self.resolved_creds
+    self.resolved_full_node_grpc
+    self.resolved_full_node_rpc
 
 
 @_dataclass(frozen=True)

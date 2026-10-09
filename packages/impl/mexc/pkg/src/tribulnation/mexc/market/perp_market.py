@@ -263,7 +263,11 @@ class PerpMarket(ExchangeMixin, BasePerpMarket):
     raise unsupported('trades_history')
 
   def trades_stream(
-    self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'
+    self,
+    *,
+    queue_size: int = 1000,
+    overflow: OverflowPolicy = 'fail',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
     """Private perpetual streams are not implemented."""
     raise unsupported('trades_stream')

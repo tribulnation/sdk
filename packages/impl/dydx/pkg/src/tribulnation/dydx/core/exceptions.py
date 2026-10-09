@@ -14,13 +14,14 @@ from functools import wraps
 from types import CoroutineType
 import inspect
 
-from grpc._channel import _InactiveRpcError
-
 from tribulnation.sdk.core import (
   NetworkError,
   ValidationError,
   ApiError,
+  AuthError,
+  BadRequest,
   Error,
+  LogicError,
   RateLimited,
 )
 from typed_core import exceptions as core
@@ -28,28 +29,33 @@ from typed_core import exceptions as core
 P = ParamSpec('P')
 R = TypeVar('R')
 
-VenueError = (core.Error, _InactiveRpcError)
-"""Every exception class a `typed_dydx` call can raise through its own transports."""
+VenueError = core.Error
+"""The root of every exception a `typed_dydx` call raises through its own transports,
+gRPC included (`typed_core.grpc` maps grpclib failures by status)."""
 
 
-def translate(e: 'core.Error | _InactiveRpcError') -> Error:
+def translate(e: core.Error) -> Error:
   """
-  The SDK exception matching a client or gRPC exception.
+  The SDK exception matching a client exception.
 
   Args:
-    e: The client or gRPC exception.
+    e: The client exception.
   """
-  if isinstance(e, _InactiveRpcError):
-    return ApiError(*e.args)
   if isinstance(e, core.NetworkError):
     return NetworkError(*e.args)
   if isinstance(e, core.ValidationError):
     return ValidationError(*e.args)
   if isinstance(e, core.RateLimited):
     return RateLimited(*e.args)
+  if isinstance(e, core.BadRequest):
+    return BadRequest(*e.args)
+  if isinstance(e, core.AuthError):
+    return AuthError(*e.args)
   if isinstance(e, core.ApiError):
     cls = RateLimited if e.args and e.args[0] == 429 else ApiError
     return cls(*e.args)
+  if isinstance(e, core.LogicError):
+    return LogicError(*e.args)
   return Error(*e.args)
 
 

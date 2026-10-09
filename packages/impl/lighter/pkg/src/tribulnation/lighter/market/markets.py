@@ -144,7 +144,11 @@ class LighterPerpMarket(MarketBase, PerpMarket):
     )
 
   def trades_stream(
-    self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'
+    self,
+    *,
+    queue_size: int = 1000,
+    overflow: OverflowPolicy = 'fail',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
     """The account's new fills on this market."""
     return history.trades_stream(
@@ -272,7 +276,11 @@ class LighterSpotMarket(MarketBase):
     )
 
   def trades_stream(
-    self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'
+    self,
+    *,
+    queue_size: int = 1000,
+    overflow: OverflowPolicy = 'fail',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
     """The account's new fills on this market."""
     return history.trades_stream(

@@ -120,6 +120,7 @@ class SpotMarket(Public, Market):
     *,
     queue_size: int = 1000,
     overflow: OverflowPolicy = 'fail',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
     """Private fill streams are outside the public Market surface."""
     raise NotImplementedError('KuCoin Market supports public data only')
