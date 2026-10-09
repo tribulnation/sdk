@@ -26,3 +26,13 @@ those versions. Ethereum is unchanged.
 
 dYdX 0.14.0 also translates `typed_core` errors by kind and releases stream
 subscriptions on exit; see its `RELEASE.md`.
+
+Qualification on 2026-10-09: all 14 declared venues have passing, verified
+read-suite evidence (payload version 5), and all 13 market venues have passing
+consistency evidence, against the unchanged Catalogue pin
+`1851660ac2bed8243dd9ce9c7297fe05c7130973`. Recorded dependency pins move to
+typed-core 0.11.0 and typed-dydx 3.7.0. The existing Bit2Me native-ticker limitation
+(ADR 0014) and the Binance USD-M and MEXC spot `fees` waivers (ADR 0042) remain
+visible.
+
+All 1,677 repository unit tests pass.
