@@ -288,6 +288,7 @@ class TradingMarkets(SDK):
     *,
     queue_size: int = 1000,
     overflow: OverflowPolicy = 'fail',
+    settings: Settings = {},
   ) -> AsyncGenerator[AsyncIterable[Trade]]:
     """Subscribe to your real-time fills.
 
@@ -298,9 +299,14 @@ class TradingMarkets(SDK):
       queue_size: Trades buffered for this subscriber.
       overflow: `'fail'` raises `NetworkError` when the buffer is full; `'latest'`
         silently keeps only the newest trade.
+      settings: Venue-specific options keyed by venue name, e.g.
+        `{'dydx': {'trades_source': 'fastest'}}` to pick a venue's fill source;
+        each venue reads only its own key.
     """
     market = await self.market(market_id)
-    async with market.trades_stream(queue_size=queue_size, overflow=overflow) as stream:
+    async with market.trades_stream(
+      queue_size=queue_size, overflow=overflow, settings=settings
+    ) as stream:
       yield stream
 
   @SDK.method

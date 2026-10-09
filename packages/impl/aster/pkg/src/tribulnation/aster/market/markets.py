@@ -530,7 +530,11 @@ class NativeMarket(Public, Market):
     return [order_state(r) for r in rows]
 
   def trades_stream(
-    self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'
+    self,
+    *,
+    queue_size: int = 1000,
+    overflow: OverflowPolicy = 'fail',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
     """Subscribe to this symbol's fills from the account's shared stream."""
     return self.shared.stream(

@@ -188,6 +188,7 @@ class Market(SDK):
     *,
     queue_size: int = 1000,
     overflow: OverflowPolicy = 'fail',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
     """Subscribe to your real-time trades.
 
@@ -197,6 +198,9 @@ class Market(SDK):
     - `overflow`: what to do when the buffer is full. The default `'fail'` fails
       the subscriber with a `NetworkError` (so the caller can reconnect) rather
       than dropping trades silently; `'latest'` keeps only the newest instead.
+    - `settings`: venue-specific options keyed by venue name, e.g.
+      `{'dydx': {'trades_source': 'fastest'}}` to choose a venue's fill source.
+      Each venue reads only its own key and ignores the rest.
     """
 
   @SDK.method

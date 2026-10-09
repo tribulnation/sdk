@@ -140,6 +140,7 @@ class PerpMarket(SharedMixin, BasePerpMarket):
     *,
     queue_size: int = 1000,
     overflow: OverflowPolicy = 'fail',
+    settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
     """Private Futures streams are outside this public implementation."""
     raise NotImplementedError('Kraken Futures supports public market data only')

@@ -385,14 +385,20 @@ class ProxyMarket(Market):
     *,
     queue_size: int = 1000,
     overflow: OverflowPolicy = 'fail',
+    settings: Settings = {},
   ):
-    """Forward trades stream through the gateway."""
+    """Forward trades stream through the gateway.
+
+    Every call is its own remote subscription, so streams with different `settings`
+    never share an inbox.
+    """
     inbox, sub_id = await self._conn.subscribe(
       codec.TradesStreamReq(
         id=self._mid(),
         market_id=self.id,
         queue_size=queue_size,
         overflow=overflow,
+        settings=settings,
       ),
       queue_size=queue_size,
       overflow=overflow,

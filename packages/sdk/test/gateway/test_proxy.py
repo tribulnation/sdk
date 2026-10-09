@@ -60,6 +60,8 @@ class MockState:
   depth_stream_unsubscribed: int = 0
   depth_settings: list[Settings] = field(default_factory=list[Settings])
   """The `settings` every `depth`/`depth_stream` call received, in call order."""
+  trades_settings: list[Settings] = field(default_factory=list[Settings])
+  """The `settings` every `trades_stream` call received, in call order."""
 
 
 def book(price: str = '100') -> Book:
@@ -185,8 +187,14 @@ class MockMarket(PerpMarket):
 
   @asynccontextmanager
   async def trades_stream(
-    self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'
+    self,
+    *,
+    queue_size: int = 1000,
+    overflow: OverflowPolicy = 'fail',
+    settings: Settings = {},
   ):
+    self.state.trades_settings.append(settings)
+
     async def gen() -> AsyncIterator[Trade]:
       return
       yield
@@ -458,6 +466,47 @@ def test_depth_frames_without_settings_decode(tag: str) -> None:
   msg = codec.decode_client(frame)
   assert isinstance(msg, codec.DepthReq | codec.DepthStreamReq)
   assert msg.settings == {}
+
+
+@pytest.mark.parametrize(
+  'msg',
+  [
+    codec.TradesStreamReq(id='t', market_id=MARKET_ID),
+    codec.TradesStreamReq(
+      id='t',
+      market_id=MARKET_ID,
+      queue_size=10,
+      settings={'dydx': {'trades_source': 'fastest'}},
+    ),
+  ],
+)
+def test_trades_stream_request_roundtrips_settings(msg: codec.TradesStreamReq) -> None:
+  """Trades stream requests carry `settings` through the codec, empty by default."""
+  assert codec.decode_client(codec.encode_client(msg)) == msg
+
+
+def test_trades_stream_frame_without_settings_decodes() -> None:
+  """Frames from clients that predate trades `settings` decode to empty settings."""
+  frame = f'{{"tag": "trades_stream", "id": "x", "market_id": "{MARKET_ID}"}}'
+  msg = codec.decode_client(frame)
+  assert isinstance(msg, codec.TradesStreamReq)
+  assert msg.settings == {}
+
+
+@pytest.mark.asyncio
+async def test_trades_stream_settings_pass_through_gateway(
+  sdk: ProxySDK, mock_state: MockState
+) -> None:
+  """`trades_stream` settings reach the gateway-side market unchanged."""
+  settings: Settings = {'dydx': {'trades_source': 'node'}}
+  market = await sdk.perp_market(MARKET_ID)
+
+  async with market.trades_stream() as stream:
+    [item async for item in stream]
+  async with market.trades_stream(settings=settings) as stream:
+    [item async for item in stream]
+
+  assert mock_state.trades_settings == [{}, settings]
 
 
 @pytest.mark.asyncio
