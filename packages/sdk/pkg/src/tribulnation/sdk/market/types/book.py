@@ -28,12 +28,18 @@ class Book:
   asks: list[Entry] = field(default_factory=list[Entry])
   """Asks, sorted by price ascending (best ask first)."""
   time: datetime | None = None
-  """Time of the latest exchange event reflected in this book, timezone-aware UTC.
+  """Exchange time the book was current as of, timezone-aware UTC.
 
-  The matching-engine or transaction time where the venue offers several timestamps.
-  None when the venue provides no such timestamp; never local receive time or HTTP
-  response time. On incremental (diff) feeds it only advances when the book changes, so
-  an old time on a quiet book means unchanged, not necessarily stale.
+  - Snapshot feeds (each message a complete book or top-N levels, pushed or polled):
+    the time the snapshot was current, i.e. the venue's push, event or output time for
+    it where the message carries one, else the latest exchange event it reflects.
+  - Incremental (diff) and on-change feeds: the time of the latest exchange event
+    reflected (matching-engine or transaction time where the venue offers several). It
+    only advances when the book changes, so an old time on a quiet book means
+    unchanged, not necessarily stale.
+
+  None when the venue provides no such timestamp; never local receive time nor a
+  transport header such as HTTP `Date`.
   """
 
   def __post_init__(self):

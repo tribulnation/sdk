@@ -30,8 +30,14 @@ RENEWAL_INTERVAL = 25 * 60
 
 
 def book_time(row: DepthUpdate | OrderBook | OrderBookResponse) -> datetime | None:
-  """The book's transaction time `T` (matching-engine time), or None if absent."""
-  time = row.get('T')
+  """The time a book snapshot was current: its event/output time `E`, else `T`.
+
+  Partial-depth pushes and REST `depth` are full top-N snapshots, not diffs, so each is
+  the book as of when Aster produced it (`E`, at or after the transaction time `T` of
+  the last change it includes). A message without `E` falls back to `T`; None when
+  neither is present.
+  """
+  time = row.get('E', row.get('T'))
   return None if time is None else epoch_time(time, timestamp_millis)
 
 

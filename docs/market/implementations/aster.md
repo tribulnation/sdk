@@ -52,6 +52,10 @@ never falls back to mainnet variables. `validate` toggles response validation.
 - Tickers report an empty book side (native price `0`) as `None`, with no quantity.
 - REST depth reads up to 1000 levels. Depth streams carry up to 20 levels, shared per
   symbol and trimmed per subscriber.
+- `Book.time` is the message's event/output time `E`: REST `depth` and partial-depth
+  pushes are full top-N snapshots, each current as of when Aster produced it, which is
+  at or after the transaction time `T` of the last change it includes. A message
+  without `E` falls back to `T`.
 - Candles support all six SDK intervals in half-open 500-candle windows.
 - Orders: `MARKET` ignores the SDK `price`; `LIMIT` is GTC and `POST_ONLY` is GTX.
   `settings={'aster': {'time_in_force': 'IOC'}}` sends a `LIMIT` order
