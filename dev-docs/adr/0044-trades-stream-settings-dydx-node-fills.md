@@ -23,7 +23,10 @@ stream, and a caller should be able to race it against the indexer.
 1. `trades_stream` takes `settings: Settings = {}` (keyword-only) on `Market`, `Exchange`,
    `TradingVenue` and `TradingMarkets`, in every venue market and through the gateway
    (`TradesStreamReq.settings`, empty when a client predates it). Venues read only their own
-   key; all except dYdX ignore it.
+   key; all except dYdX ignore it. Core and the gateway server pass `settings` to a
+   venue only when it is non-empty (`open_trades_stream`), so venue packages released
+   before the parameter existed keep working with a newer core until a caller asks for
+   a venue option.
 2. dYdX `Settings.trades_source: 'indexer' | 'node' | 'fastest'`, default `'indexer'`
    (unchanged behaviour).
 3. The node's endpoints are account configuration, not per-call settings:

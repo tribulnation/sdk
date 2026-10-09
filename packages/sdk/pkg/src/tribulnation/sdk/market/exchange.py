@@ -35,7 +35,7 @@ from .types import (
   Fees,
 )
 from .settings import Settings
-from .market import Market, PerpMarket
+from .market import Market, PerpMarket, open_trades_stream
 
 
 def ticker_from_book(book: Book) -> Ticker:
@@ -243,8 +243,8 @@ class Exchange(SDK):
     See `Market.trades_stream` for `queue_size`/`overflow`/`settings`.
     """
     market = await self.market(market_id)
-    async with market.trades_stream(
-      queue_size=queue_size, overflow=overflow, settings=settings
+    async with open_trades_stream(
+      market, queue_size=queue_size, overflow=overflow, settings=settings
     ) as stream:
       yield stream
 

@@ -14,6 +14,7 @@ from aiohttp.client_exceptions import ClientConnectionResetError
 from tribulnation.sdk.gateway.diagnostics import memory_snapshot
 from tribulnation.sdk import TradingMarkets, Market, PerpMarket
 from tribulnation.sdk.market import Book, Trade, PerpExchange
+from tribulnation.sdk.market.market import open_trades_stream
 
 from . import codec
 
@@ -153,7 +154,8 @@ class Gateway:
           )
         case codec.TradesStreamReq():
           market = await self._market(msg.market_id)
-          stream_cm = market.trades_stream(
+          stream_cm = open_trades_stream(
+            market,
             queue_size=msg.queue_size,
             overflow=msg.overflow,
             settings=msg.settings,

@@ -34,6 +34,26 @@ from .types import (
 from .settings import Settings
 
 
+def open_trades_stream(
+  market: 'Market',
+  *,
+  queue_size: int,
+  overflow: OverflowPolicy,
+  settings: Settings,
+) -> AsyncContextManager[AsyncIterable[Trade]]:
+  """Call `market.trades_stream`, passing `settings` only when there are any.
+
+  Venue packages released before `trades_stream` took `settings` have no such
+  parameter; leaving it out when empty keeps them working with this core until a caller
+  actually asks for a venue option.
+  """
+  if not settings:
+    return market.trades_stream(queue_size=queue_size, overflow=overflow)
+  return market.trades_stream(
+    queue_size=queue_size, overflow=overflow, settings=settings
+  )
+
+
 class Market(SDK):
   """An abstract market interface."""
 

@@ -33,7 +33,7 @@ from .types import (
   PerpStats,
 )
 from .settings import Settings
-from .market import Market, PerpMarket
+from .market import Market, PerpMarket, open_trades_stream
 from .exchange import Exchange, PerpExchange
 from .venue import TradingVenue
 
@@ -304,8 +304,8 @@ class TradingMarkets(SDK):
         each venue reads only its own key.
     """
     market = await self.market(market_id)
-    async with market.trades_stream(
-      queue_size=queue_size, overflow=overflow, settings=settings
+    async with open_trades_stream(
+      market, queue_size=queue_size, overflow=overflow, settings=settings
     ) as stream:
       yield stream
 
