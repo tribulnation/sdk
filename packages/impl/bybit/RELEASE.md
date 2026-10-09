@@ -10,3 +10,8 @@ Upgrade the SDK and this adapter together.
 The support matrix now lists Bybit Market as partial: account `leverage()` was
 never implemented and still raises `NotImplementedError`. Metadata only; no code
 change.
+
+Release qualification on 2026-10-09 passed the read suites and market
+consistency. Committed evidence under `release-evidence/bybit/` matches pinned
+Catalogue `1851660ac2bed8243dd9ce9c7297fe05c7130973`; offline release
+verification passes. This adapter release follows SDK 2.16.0 publication.
