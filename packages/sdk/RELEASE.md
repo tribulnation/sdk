@@ -1,38 +1,47 @@
-# tribulnation-sdk 2.16.0
+# tribulnation-sdk 2.17.0
 
-`trades_stream` takes venue settings, like `depth` and `depth_stream`, so dYdX can
-stream fills from the account's full node. See ADR 0044.
+Placement responses report what filled, `Trade.time` becomes optional, and Aster gets
+its own settings key. See ADR 0044 for `Trade.time`.
 
 New:
 
-1. `trades_stream(..., settings: Settings = {})`, keyword-only, on `Market`,
-   `Exchange`, `TradingVenue`, `TradingMarkets` and every venue market. Each venue
-   reads only its own key; only dYdX reads one (`trades_source`).
-2. The gateway carries it: `TradesStreamReq.settings`, sent by `ProxySDK`. Frames
-   from older clients decode to `{}`, and older gateway servers ignore the field.
-3. `accounts.Dydx.full_node_grpc` and `full_node_rpc`: optional, `$ENV` resolvable
-   endpoints of the account's own full node, passed by `MarketSDK` to dYdX.
+1. `OrderResponse.filled_qty: Decimal | None = None`: the unsigned base quantity the
+   venue's placement response reports filled. Final only for immediate orders (IOC or
+   `MARKET`); for a resting order it is what filled on arrival. `None` where the venue
+   answers before matching: accepting an order is not executing it. This release:
+   Hyperliquid 0.17.0 (`filled.totalSz`) and Aster 0.11.0 perpetuals (`executedQty`);
+   every other venue reports `None`. The field has a default, so existing
+   constructors keep working, and the gateway carries it.
+2. `Settings` gains the `aster` key (`tribulnation.aster.market.settings.Settings`):
+   `time_in_force: 'IOC'` for `LIMIT` orders and `depth_source` (`'depth'`, `'fast'`,
+   `'bbo'`). Lighter's settings gain `time_in_force: 'immediate-or-cancel'` and
+   `depth_source` (`'order_book'`, `'bbo'`). See the Aster and Lighter release notes.
+3. `Book.time` docs distinguish snapshot feeds (the time the snapshot was current)
+   from incremental and on-change feeds (the latest exchange event reflected). No
+   code change.
 
-Compatibility: core and the gateway server pass `settings` to a venue only when it
-is non-empty, so a venue package without the parameter keeps working with this core
-unless a caller asks for a venue option (then `TypeError`).
+Behaviour changes:
 
-This release requires dYdX 0.14.0: `MarketSDK` passes the node endpoints, which dYdX
-0.13.0 rejects. Every other adapter is released alongside (Aster 0.10.0, Binance
-0.7.0, Bit2Me 0.9.0, Bitget 0.11.0, Bybit 0.7.0, Coinbase 0.5.0, Deribit 0.6.0,
-Hyperliquid 0.16.0, Kraken 0.7.0, KuCoin 0.6.0, Lighter 0.9.0, MEXC 2.4.0): each
-accepts and ignores `settings` and requires SDK >=2.16.0. The SDK extras now require
-those versions. Ethereum is unchanged.
+1. `Trade.time` is `datetime | None`: the venue's execution time, `None` when the
+   venue doesn't report it on that feed. Only dYdX full-node fills (dYdX 0.15.0,
+   `trades_source` `'node'` or `'fastest'`) are `None`; `trades_history` always sets
+   it. Consumers handling arbitrary venues must allow `None`. The gateway carries it
+   as `null`; a `ProxySDK` client older than 2.17.0 cannot decode such a trade, so
+   upgrade clients with or before gateways.
 
-dYdX 0.14.0 also translates `typed_core` errors by kind and releases stream
-subscriptions on exit; see its `RELEASE.md`.
+This release requires Aster 0.11.0, dYdX 0.15.0, Hyperliquid 0.17.0, Kraken 0.7.1 and
+Lighter 0.10.0, which require SDK >=2.17.0; the SDK extras now require those versions.
+Upgrade the SDK and those adapters together. Other adapters are unaffected.
+
+`filled_qty` and the IOC settings are verified by unit fixtures only; no live trading
+run covers them, and the read suites place no orders.
 
 Qualification on 2026-10-09: all 14 declared venues have passing, verified
 read-suite evidence (payload version 5), and all 13 market venues have passing
 consistency evidence, against the unchanged Catalogue pin
-`1851660ac2bed8243dd9ce9c7297fe05c7130973`. Recorded dependency pins move to
-typed-core 0.11.0 and typed-dydx 3.7.0. The existing Bit2Me native-ticker limitation
-(ADR 0014) and the Binance USD-M and MEXC spot `fees` waivers (ADR 0042) remain
-visible.
+`1851660ac2bed8243dd9ce9c7297fe05c7130973`. Recorded dependency pins are unchanged.
+The existing Bit2Me native-ticker limitation (ADR 0014), Bitget's venue-wide
+withdrawal suspension (ADR 0027) and the Binance USD-M and MEXC spot `fees` waivers
+(ADR 0042) remain visible.
 
-All 1,677 repository unit tests pass.
+All 1,745 repository unit tests pass.

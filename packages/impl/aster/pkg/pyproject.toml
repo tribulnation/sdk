@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tribulnation-aster"
-version = "0.10.0"
+version = "0.11.0"
 description = "Tribulnation SDK implementation for Aster spot and perpetual markets."
 license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
-dependencies = ["tribulnation-sdk>=2.16.0", "typed-aster>=0.4.0"]
+dependencies = ["tribulnation-sdk>=2.17.0", "typed-aster>=0.4.0"]
 readme = {file = "README.md", content-type = "text/markdown"}
 
 [project.urls]

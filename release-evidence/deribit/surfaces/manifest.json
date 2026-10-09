@@ -253,8 +253,8 @@
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "84cf77c3afca0623b9d0d8df77ea9208017eae313e10190b4b84812f385ac790",
-        "metadata_sha256": "7e98d891626a1a9fd5f1a3c32a1bab387b6cf2c88c9508c06b7cee70bd05860f",
+        "files_sha256": "b7f9baec5fd4c191964ee5e350ec74e7de5ae8f2ede71cdf53b28271740b8dfc",
+        "metadata_sha256": "f47df0e52935585aae4ec374de8a9011f24fe6dbdbe2b742d7f95828275305b8",
         "version": "0"
       },
       "typed-core": {
@@ -290,7 +290,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "023fa2a0e2453470f29b1f2bc4ddeda9abc2681158283739b8fb321da7407a38",
+    "source_sha256": "0e237193779c9bbd24daa0b782e61e1518022c6711b2bc8b4a7d854865ee345b",
     "venue": "deribit"
   },
   "before": {
@@ -547,8 +547,8 @@
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "84cf77c3afca0623b9d0d8df77ea9208017eae313e10190b4b84812f385ac790",
-        "metadata_sha256": "7e98d891626a1a9fd5f1a3c32a1bab387b6cf2c88c9508c06b7cee70bd05860f",
+        "files_sha256": "b7f9baec5fd4c191964ee5e350ec74e7de5ae8f2ede71cdf53b28271740b8dfc",
+        "metadata_sha256": "f47df0e52935585aae4ec374de8a9011f24fe6dbdbe2b742d7f95828275305b8",
         "version": "0"
       },
       "typed-core": {
@@ -584,12 +584,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "023fa2a0e2453470f29b1f2bc4ddeda9abc2681158283739b8fb321da7407a38",
+    "source_sha256": "0e237193779c9bbd24daa0b782e61e1518022c6711b2bc8b4a7d854865ee345b",
     "venue": "deribit"
   },
-  "finished": "2026-10-09T14:44:10.919986Z",
+  "finished": "2026-10-09T20:02:33.928990Z",
   "results_sha256": "0c79f48da98be038c4d3818ca181b763b8e5b5f32cd4257c42cd1778e0d82405",
   "schema_version": 2,
-  "started": "2026-10-09T14:41:07.507967Z",
-  "summary_sha256": "59eb7a57cbe963fc146022471ade56d9331cca85fed0dd607ce4939cc31a77a4"
+  "started": "2026-10-09T20:02:25.114556Z",
+  "summary_sha256": "03abac976cbbad2d406dc1738785e253fe5cf3f294cffaff99d981caae0c647f"
 }
