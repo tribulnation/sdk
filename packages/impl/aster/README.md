@@ -20,7 +20,8 @@ venue = AsterMarket.new(user='0x…', signer='0x…', mainnet=False)
 
 1. Exchanges are `spot` and `perp`, with native symbols such as `BTCUSDT`.
 2. Public data: discovery, tickers, rules, REST depth (up to 1000 levels), shared
-   depth streams (up to 20 levels), candles in the six SDK intervals, perpetual index,
+   depth streams (up to 20 levels; `settings={'aster': {'depth_source': 'fast' | 'bbo'}}`
+   selects 5 levels at 100 ms or the real-time `bookTicker`), candles in the six SDK intervals, perpetual index,
    next funding, funding-rate history and bulk `perp_stats` (open interest for at most
    five named contracts).
 3. Account reads, verified on mainnet: fees, spot balances (mainnet only), spot and

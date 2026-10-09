@@ -67,6 +67,50 @@ toggles response validation.
   the asset each fill delivers (the base asset on a buy, the quote asset on a sell).
   `Trade.fee` names it. Rules carry the standard account's rates, which are zero.
 
+## Settings
+
+`depth` and `depth_stream` accept `settings={'lighter': {'depth_source': ...}}`, typed
+by the `Settings` TypedDict (`market/common.py`) alongside the order setting
+`reduce_only`:
+
+| Key | Type | Applies to | Meaning |
+| --- | --- | --- | --- |
+| `reduce_only` | `bool` | `place_order` | Place as reduce-only. |
+| `depth_source` | `'order_book' \| 'bbo'` | `depth_stream`, `depth` | Which order-book channel to read; defaults to `'order_book'`. |
+
+### Depth sources
+
+| `depth_source` | Channel | Levels per side | Cadence |
+| --- | --- | --- | --- |
+| `'order_book'` (default) | `order_book/<market_id>` | full book | snapshot, then deltas every 50 ms |
+| `'bbo'` | `ticker/<market_id>` | 1 (best bid/ask with sizes) | on every order book nonce |
+
+```python
+async with sdk.depth_stream('lighter:perp:1', settings={'lighter': {'depth_source': 'bbo'}}) as books:
+  async for book in books:
+    print(book.time, book.best_bid.price, book.best_ask.price)
+```
+
+- These are different channels and won't agree tick-for-tick: `'bbo'` pushes on
+  every book nonce, while `'order_book'` batches its deltas every 50 ms.
+- `Book.time` is the frame's `last_updated_at`, the time of the book change, on both
+  sources, so books from either compare on one clock. The frame's send `timestamp` is
+  not used. Both push only on change, so on a quiet book `time` stays put: old means
+  unchanged, not necessarily stale.
+- `'order_book'` verifies the delta chain (each frame's `begin_nonce` is the previous
+  `nonce`) and fails the stream on a gap. `'bbo'` frames each carry the whole best
+  bid/offer, so there is no chain to verify.
+- On `'bbo'` a side with a zero price or size (an empty side) comes back as an empty
+  `bids` or `asks`. `levels` only trims what the channel delivers and never selects
+  it; an unknown `depth_source` raises `ValueError`.
+- All consumers of one market and source share a single upstream subscription, so the
+  sources of one market can be open side by side. Every channel is held on the
+  client's one `/stream` connection, which Lighter caps at 500 subscriptions (and
+  200 client messages per minute); each new market/source pair costs one
+  subscription and one subscribe message.
+- REST `depth` has no top-of-book endpoint: `'bbo'` reads the same resting-order
+  snapshot, trimmed to 1 level per side, so its shape matches the stream's.
+
 ## Venue-specific semantics
 
 - `fees()` reads the account's fee ticks, in parts per million, the same for buys and
@@ -75,7 +119,8 @@ toggles response validation.
   amount it pays on.
 - REST depth sums the top 250 resting orders per side (about 200 levels on busy books);
   a side at the limit drops its possibly partial last level. Depth streams maintain the
-  full book, shared per market, and fail on a sequence gap.
+  full book, shared per market, and fail on a sequence gap; `depth_source='bbo'`
+  streams the best bid/offer instead (see [Depth sources](#depth-sources)).
 - Tickers carry no best-level sizes.
 - `place_order` raises `OrderRejected` when the API refuses the transaction with a
   business code before the sequencer sees it. Code `21104` (invalid nonce), a code-less

@@ -82,8 +82,10 @@ async with sdk.depth_stream(market_id, settings=settings) as books:
 ```
 
 Different feeds are different streams and need not agree tick-for-tick. `levels` only trims
-the books a feed delivers; it never picks the feed. The options are documented per venue,
-e.g. [Hyperliquid](implementations/hyperliquid.md#depth-sources).
+the books a feed delivers; it never picks the feed. The options are documented per venue:
+[Hyperliquid](implementations/hyperliquid.md#depth-sources),
+[Aster](implementations/aster.md#depth-sources) and
+[Lighter](implementations/lighter.md#depth-sources).
 
 ## Choosing a venue's fill source
 

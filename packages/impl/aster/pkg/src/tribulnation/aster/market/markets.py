@@ -62,7 +62,13 @@ from tribulnation.sdk.market import (
 from tribulnation.sdk.market.types.candles import candle_windows
 from ..core import Public, Scope, Shared
 from .settings import Settings as AsterSettings
-from .streams import book_time, connect_books, connect_trades
+from .streams import (
+  SOURCE_LEVELS,
+  book_time,
+  connect_books,
+  connect_trades,
+  depth_source,
+)
 
 DepthLimit = Literal[5, 10, 20, 50, 100, 500, 1000]
 DEPTH_LIMITS: tuple[DepthLimit, ...] = (5, 10, 20, 50, 100, 500, 1000)
@@ -448,9 +454,23 @@ class NativeMarket(Public, Market):
     return self.scope
 
   async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
-    """Read up to 1000 levels per side; quantities are in base units."""
+    """Read up to 1000 levels per side; quantities are in base units.
+
+    REST has no faster endpoint. With `aster.depth_source` set to `'fast'` or `'bbo'`,
+    the smallest snapshot is read and trimmed to 5 or 1 levels per side (and to
+    `levels` if lower), matching the stream's shape; `'depth'` (the default) keeps the
+    full reach.
+
+    Args:
+      levels: Keep at most this many levels per side.
+      settings: Venue settings; `aster.depth_source` selects the shape.
+    """
     if levels is not None and not 1 <= levels <= DEPTH_LIMITS[-1]:
       raise ValueError(f'levels must be between 1 and {DEPTH_LIMITS[-1]}')
+    source = depth_source(settings)
+    if source != 'depth':
+      cap = SOURCE_LEVELS[source]
+      levels = cap if levels is None else min(levels, cap)
     limit: DepthLimit = next(
       n for n in DEPTH_LIMITS if n >= (levels or DEPTH_LIMITS[-1])
     )
@@ -472,13 +492,28 @@ class NativeMarket(Public, Market):
     overflow: OverflowPolicy = 'latest',
     settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Book]]:
-    """Subscribe to 20-level snapshots, trimmed per subscriber."""
+    """Stream books from the `aster.depth_source` feed, `'depth'` (20 levels) by default.
+
+    Consumers of one symbol and source share a single upstream subscription; each
+    source is a different feed (see `Settings.depth_source`), so books from different
+    sources need not agree tick-for-tick.
+
+    Args:
+      levels: Keep at most this many levels per side; it never selects the source.
+      queue_size: Books buffered for this subscriber.
+      overflow: What to do when the buffer is full.
+      settings: Venue settings; `aster.depth_source` selects the feed.
+
+    Raises:
+      ValueError: `levels` is outside 1-20, or the source is unknown.
+    """
     if levels is not None and not 1 <= levels <= 20:
       raise ValueError('Aster depth streams support 1-20 levels')
+    source = depth_source(settings)
     return self.shared.stream(
       self.shared.books,
-      (self.scope, self.symbol),
-      lambda: connect_books(self.shared, self.scope, self.symbol),
+      (self.scope, self.symbol, source),
+      lambda: connect_books(self.shared, self.scope, self.symbol, source),
       select=lambda book: book if levels is None else book.limit(levels),
       queue_size=queue_size,
       overflow=overflow,

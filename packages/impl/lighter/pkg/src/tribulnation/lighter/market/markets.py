@@ -48,8 +48,19 @@ class MarketBase(Public, Market):
     return str(self.market_index)
 
   async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
-    """The book from the top 250 resting orders per side, summed per price."""
-    return await books.depth(self.shared, self.market_index, levels=levels)
+    """The book from the top 250 resting orders per side, summed per price.
+
+    REST has no top-of-book endpoint: with `lighter.depth_source = 'bbo'` the same
+    snapshot is trimmed to 1 level per side, matching the stream's shape.
+
+    Args:
+      levels: Keep at most this many levels per side.
+      settings: Venue settings; `lighter.depth_source` selects the shape.
+    """
+    source = books.depth_source(settings)
+    return await books.depth(
+      self.shared, self.market_index, levels=levels, source=source
+    )
 
   def depth_stream(
     self,
@@ -59,13 +70,28 @@ class MarketBase(Public, Market):
     overflow: OverflowPolicy = 'latest',
     settings: Settings = {},
   ) -> AsyncContextManager[AsyncIterable[Book]]:
-    """The full book, maintained from the `order_book` snapshot and 50 ms deltas."""
+    """Stream books from the `lighter.depth_source` channel, the full book by default.
+
+    `'order_book'` maintains the full book from the snapshot and 50 ms deltas; `'bbo'`
+    reads the `ticker` best bid/offer, pushed on every book nonce. Consumers of one
+    market and source share a single upstream subscription.
+
+    Args:
+      levels: Keep at most this many levels per side; it never selects the source.
+      queue_size: Books buffered for this subscriber.
+      overflow: What to do when the buffer is full.
+      settings: Venue settings; `lighter.depth_source` selects the channel.
+
+    Raises:
+      ValueError: The source is unknown.
+    """
     return books.depth_stream(
       self.shared,
       self.market_index,
       levels=levels,
       queue_size=queue_size,
       overflow=overflow,
+      source=books.depth_source(settings),
     )
 
   async def fees(self, *, refetch: bool = False) -> Fees:

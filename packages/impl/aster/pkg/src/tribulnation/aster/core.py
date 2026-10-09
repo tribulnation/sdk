@@ -38,6 +38,8 @@ T = TypeVar('T')
 U = TypeVar('U')
 K = TypeVar('K', bound=Hashable)
 Scope = Literal['spot', 'perp']
+DepthSource = Literal['depth', 'fast', 'bbo']
+"""Which Aster WebSocket feed backs `depth_stream`; see `market.settings.Settings`."""
 wrap_exceptions = exception_wrapper()
 
 
@@ -94,9 +96,10 @@ class Shared(SDK):
   spot: dict[str, SpotSymbol] = field(default_factory=dict[str, SpotSymbol])
   perp: dict[str, FuturesSymbol] = field(default_factory=dict[str, FuturesSymbol])
   lock: asyncio.Lock = field(default_factory=asyncio.Lock)
-  books: dict[tuple[Scope, str], Subscription[Book]] = field(
-    default_factory=dict[tuple[Scope, str], Subscription[Book]]
+  books: dict[tuple[Scope, str, DepthSource], Subscription[Book]] = field(
+    default_factory=dict[tuple[Scope, str, DepthSource], Subscription[Book]]
   )
+  """One shared upstream per exchange, symbol and depth source."""
   trades: dict[Scope, Subscription[tuple[str, Trade]]] = field(
     default_factory=dict[Scope, Subscription[tuple[str, Trade]]]
   )
