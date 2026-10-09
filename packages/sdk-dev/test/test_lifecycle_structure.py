@@ -27,6 +27,7 @@ OWNERS = [
   ('tribulnation.coinbase.core.mixin', 'Shared', 'client'),
   ('tribulnation.deribit.core', 'Mixin', 'client'),
   ('tribulnation.dydx.market.impl.mixin', 'Shared', 'client'),
+  ('tribulnation.dydx.market.impl.mixin', 'Shared', 'full_node'),
   ('tribulnation.dydx.report.history.chain', 'ChainHistory', 'comet'),
   ('tribulnation.dydx.report.history.indexer', 'IndexerHistory', 'indexer'),
   ('tribulnation.dydx.report.snapshots', 'Snapshots', 'client'),
@@ -70,6 +71,10 @@ def owner_for(module: str, name: str, attribute: str, client: AsyncMock) -> SDK:
   # Additional resources declared by Ethereum history and lazy stream owners.
   if attribute != 'node':
     object.__setattr__(owner, 'node', AsyncMock())
+  # dYdX's `Shared` owns its client and an optional full node chain client.
+  if module == 'tribulnation.dydx.market.impl.mixin':
+    other = 'client' if attribute == 'full_node' else 'full_node'
+    object.__setattr__(owner, other, AsyncMock() if other == 'client' else None)
   object.__setattr__(owner, 'streams', {})
   object.__setattr__(owner, 'ws_stack', None)
   return owner

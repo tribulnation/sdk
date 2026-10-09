@@ -66,3 +66,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0041](0041-venue-notional-caps.md) | Venue notional caps in available notional | Proposed; implemented for Aster, not release-verified; amended by 0042 |
 | [0042](0042-read-only-account-method-qualification.md) | Read-only account-method qualification | Accepted; implemented, not release-verified; amends 0013, 0039 and 0041 |
 | [0043](0043-order-rejected.md) | Definitive order rejections as `OrderRejected` | Accepted; implemented for Hyperliquid, Aster and Lighter, not release-verified |
+| [0044](0044-trades-stream-settings-dydx-node-fills.md) | `trades_stream` settings and dYdX full node fills | Proposed; implemented, not release-verified |

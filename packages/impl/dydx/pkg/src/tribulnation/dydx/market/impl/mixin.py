@@ -1,5 +1,6 @@
 from functools import cached_property
 from typing_extensions import (
+  TYPE_CHECKING,
   AsyncContextManager,
   Literal,
   Iterable,
@@ -14,6 +15,9 @@ import pydantic
 
 from typed_dydx.indexer.schemas import PerpetualMarket
 from typed_dydx import Dydx
+from typed_dydx.chain import Chain
+from typed_dydx.chain.comet.core import CometClient
+from typed_core.grpc import GrpcClient
 from typed_dydx.indexer.schemas import (
   SubaccountsNotification as ParentSubaccountNotification,
 )
@@ -32,7 +36,13 @@ from .rules import parse_rules, Rules
 from .fees import combined_fees, market_charge, market_discount_params, PPM
 from tribulnation.sdk.market import Fees
 
+if TYPE_CHECKING:
+  from .node_fills import NodeFill
+
 T = TypeVar('T')
+
+TradesSource = Literal['indexer', 'node', 'fastest']
+"""Where `trades_stream` reads fills from. See `Settings.trades_source`."""
 
 
 @pydantic.with_config({'extra': 'forbid'})
@@ -50,6 +60,22 @@ class Settings(TypedDict, total=False):
   long_term_gtbt: int
   """GTBT delta for long-term orders. The GTBT will be `current_block().time.seconds + long_term_gtbt`"""
   reduce_only: bool
+  trades_source: TradesSource
+  """Where `trades_stream` reads fills from. Defaults to `'indexer'`.
+
+  - `'indexer'`: the indexer's `v4_subaccounts` WebSocket channel.
+  - `'node'`: the account's full node (`full_node_grpc`/`full_node_rpc` on
+    `accounts.Dydx`) only, about 0.4 s ahead of the indexer: its gRPC
+    `StreamOrderbookUpdates` stream, finalized updates only. Fills of our orders and
+    fills liquidating us come from the stream; deleveraging fills also read the block's
+    `match` events (`block_results`) for side and price. `time` is the local receive
+    time (the stream has no block time), `id` is synthetic
+    (`<height>:<order id or subaccount:kind:perpetual>:<n>`) and `fee` is `None`. There
+    is no fallback: fills finalized while the node is unreachable are missed, so the
+    caller's reconciliation (e.g. `trades_history`) must cover them.
+  - `'fastest'`: `'node'` and `'indexer'` raced. Each fill is emitted once, by whichever
+    source delivers it first (`details['source']`), so the indexer covers node outages.
+  """
 
 
 settings_adapter = pydantic.TypeAdapter(Settings)
@@ -74,6 +100,12 @@ class Shared(SDK):
   depth_subscriptions: dict[str, Subscription[Book]] = field(
     default_factory=dict[str, Subscription[Book]]
   )
+  full_node: Chain | None = None
+  """Chain client of the account's own full node: its gRPC streams fills
+  (`StreamOrderbookUpdates`) and its CometBFT RPC serves `block_results` for
+  deleveraging fills. Separate from `client.chain`, the public endpoints."""
+  node_subscription: 'Subscription[NodeFill] | None' = None
+  """The full node fill feed, created by the first node-sourced `trades_stream`."""
 
   def require_address(self) -> str:
     """Require an account only when an account-scoped operation uses it."""
@@ -209,8 +241,39 @@ class Shared(SDK):
       wrap_exit=wrap_exceptions,
     )
 
+  @cached_property
+  def full_node_resource(self) -> ManagedResource[object] | None:
+    """Own the full node's chain client, when configured."""
+    if self.full_node is None:
+      return None
+    return ManagedResource(
+      resource=self.full_node, wrap_enter=wrap_exceptions, wrap_exit=wrap_exceptions
+    )
+
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield self.client_resource
+    if self.full_node_resource is not None:
+      yield self.full_node_resource
+
+
+FULL_NODE_GRPC_PORT = 9090
+"""Default gRPC port of a dYdX full node."""
+
+
+def full_node_chain(*, grpc: str, rpc: str) -> Chain:
+  """A chain client of one full node.
+
+  Args:
+    grpc: Plaintext gRPC `host:port`; the port defaults to 9090.
+    rpc: CometBFT RPC URL.
+  """
+  host, sep, port = grpc.rpartition(':')
+  if not sep or not port.isdigit():
+    host, port = grpc, str(FULL_NODE_GRPC_PORT)
+  return Chain.new(
+    GrpcClient(host=host, port=int(port), ssl=False),
+    chain_comet_client=CometClient(base_url=rpc.rstrip('/')),
+  )
 
 
 @dataclass(kw_only=True, frozen=True)
@@ -235,6 +298,8 @@ class ExchangeMixin(SDK):
     validate: bool = True,
     parent_subaccount: int = 0,
     account_id: str | None = None,
+    full_node_grpc: str | None = None,
+    full_node_rpc: str | None = None,
   ):
     """Create a surface over a new client.
 
@@ -248,6 +313,9 @@ class ExchangeMixin(SDK):
       parent_subaccount: Parent subaccount number.
       account_id: Root SDK account key, the first segment of every ID; defaults to
         the venue ID.
+      full_node_grpc: `host:port` of a full node's gRPC streaming endpoint, for the
+        `'node'` and `'fastest'` trades sources (with `full_node_rpc`).
+      full_node_rpc: The same node's CometBFT RPC URL, read for deleveraging fills.
     """
     client = (
       Dydx.mainnet(
@@ -275,6 +343,11 @@ class ExchangeMixin(SDK):
         parent_subaccount=parent_subaccount,
         venue_id='dydx' if mainnet else 'dydx_testnet',
         account_id=account_id,
+        full_node=(
+          full_node_chain(grpc=full_node_grpc, rpc=full_node_rpc)
+          if full_node_grpc is not None and full_node_rpc is not None
+          else None
+        ),
       )
     )
 

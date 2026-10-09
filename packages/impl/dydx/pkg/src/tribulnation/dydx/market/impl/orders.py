@@ -91,6 +91,25 @@ def _protobuf_id(
   )
 
 
+def indexer_subaccount_id(address: str, number: int) -> str:
+  """The indexer's id of a subaccount (`SubaccountTable.uuid`)."""
+  return str(uuid.uuid5(INDEXER_NAMESPACE, f'{address}-{number}'))
+
+
+def indexer_order_id(order_id: clob.OrderId) -> str:
+  """The indexer's id of a protocol order (`OrderTable.uuid`)."""
+  subaccount = order_id.subaccount_id
+  if subaccount is None:
+    raise ValidationError('dYdX order id carries no subaccount')
+  return str(
+    uuid.uuid5(
+      INDEXER_NAMESPACE,
+      f'{indexer_subaccount_id(subaccount.owner, subaccount.number)}'
+      f'-{order_id.client_id}-{order_id.clob_pair_id}-{order_id.order_flags}',
+    )
+  )
+
+
 def serialize_id(order_id: clob.OrderId) -> str:
   """Serialize a dYdX protocol order ID for the SDK order API."""
   return base64.b64encode(bytes(order_id)).decode()
@@ -104,7 +123,7 @@ def subaccount_numbers(address: str, parent: int) -> Mapping[str, int]:
   parent `p` are `p + 128`, `p + 256`, ...
   """
   return {
-    str(uuid.uuid5(INDEXER_NAMESPACE, f'{address}-{number}')): number
+    indexer_subaccount_id(address, number): number
     for number in range(parent, MAX_SUBACCOUNT + 1, 128)
   }
 

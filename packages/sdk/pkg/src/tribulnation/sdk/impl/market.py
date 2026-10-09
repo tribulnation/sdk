@@ -67,6 +67,8 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       mainnet=account.venue == 'dydx',
       parent_subaccount=account.parent_subaccount,
       account_id=id,
+      full_node_grpc=account.resolved_full_node_grpc,
+      full_node_rpc=account.resolved_full_node_rpc,
     )
 
   def hyperliquid(self, account: Hyperliquid, id: str) -> TradingVenue:
