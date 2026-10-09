@@ -872,3 +872,62 @@ def test_account_requests_roundtrip(msg: codec.CallReq) -> None:
   wire = json.loads(codec.encode_client(msg))
   assert wire['account_id'] == ALIAS
   assert 'venue_id' not in wire
+
+
+@dataclass
+class LegacyTradesMarket(MockMarket):
+  """A venue market from before `trades_stream` took `settings`."""
+
+  @asynccontextmanager
+  async def trades_stream(  # type: ignore[override]
+    self, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'
+  ):
+    async def gen() -> AsyncIterator[Trade]:
+      yield Trade(
+        id='t1',
+        price=Decimal('100'),
+        qty=Decimal('1'),
+        time=datetime(2026, 10, 9, tzinfo=timezone.utc),
+        maker=True,
+      )
+
+    yield gen()
+
+
+class LegacyTradesGateway(Gateway):
+  def __init__(self, sdk: TradingMarkets, market: LegacyTradesMarket):
+    super().__init__(sdk)
+    self.market = market
+
+  async def _market(self, market_id: str) -> PerpMarket:
+    assert market_id == MARKET_ID
+    return self.market
+
+
+@pytest.mark.asyncio
+async def test_gateway_trades_stream_serves_a_market_without_settings() -> None:
+  """Without settings the gateway leaves the argument out, so a venue released before
+  `trades_stream` took `settings` keeps streaming; asking for settings fails it."""
+  gateway = LegacyTradesGateway(
+    MockSDK(MockState()),  # type: ignore[arg-type]
+    market=LegacyTradesMarket(MockState()),
+  )
+  results: list[list[codec.ServerMsg]] = []
+  for req in [
+    codec.TradesStreamReq(id='plain', market_id=MARKET_ID),
+    codec.TradesStreamReq(
+      id='dydx', market_id=MARKET_ID, settings={'dydx': {'trades_source': 'node'}}
+    ),
+  ]:
+    ws = FakeWebSocket()
+    sub_tasks: dict[str, asyncio.Task[None]] = {}
+    task = asyncio.create_task(gateway._stream(ws, req, sub_tasks))  # type: ignore
+    sub_tasks[req.id] = task
+    await asyncio.wait_for(task, timeout=1)
+    results.append(ws.sent)
+
+  plain, dydx = results
+  assert [type(m) for m in plain] == [codec.TradesDataMsg, codec.EndMsg]
+  assert isinstance(plain[-1], codec.EndMsg) and plain[-1].exc is None
+  end = dydx[-1]
+  assert isinstance(end, codec.EndMsg) and end.exc is not None

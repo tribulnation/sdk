@@ -203,3 +203,41 @@ def test_every_venue_accepts_trades_stream_settings(module: str, name: str):
   parameter = inspect.signature(cls.trades_stream).parameters['settings']
   assert parameter.kind is inspect.Parameter.KEYWORD_ONLY
   assert parameter.default == {}
+
+
+@dataclass(frozen=True)
+class LegacyMarket(RecordingMarket):
+  """A venue market from before `trades_stream` took `settings`."""
+
+  @asynccontextmanager
+  async def trades_stream(  # type: ignore[override]
+    self, *, queue_size: int = 1000, overflow: Any = 'fail'
+  ):
+    self.calls.append({})
+
+    async def gen() -> AsyncIterator[Trade]:
+      return
+      yield
+
+    yield gen()
+
+
+async def test_routing_leaves_empty_settings_out_for_older_venues():
+  """Without settings, the wrappers call `trades_stream` without the argument, so a venue
+  package released before it existed keeps working; only asking for settings fails."""
+  market = LegacyMarket()
+  exchange = OneMarketExchange(only=market)
+  venue = OneExchangeVenue(only=exchange)
+  root = OneVenueMarkets(only=venue)
+  async with root.trades_stream('fake:perp:BTC-USD'):
+    pass
+  async with venue.trades_stream('perp:BTC-USD', settings={}):
+    pass
+  async with exchange.trades_stream('BTC-USD'):
+    pass
+  assert len(market.calls) == 3
+  with pytest.raises(TypeError):
+    async with root.trades_stream(
+      'fake:perp:BTC-USD', settings={'dydx': {'trades_source': 'node'}}
+    ):
+      pass
