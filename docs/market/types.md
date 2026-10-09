@@ -86,6 +86,10 @@ raises, rather than quietly placing a different order.
   (`amount` plus `asset`). `order_id` is the filled order's `OrderResponse.id`, and
   `client_order_id` the ID it was placed with; either is `None` where the venue
   doesn't report it. See [Client Order IDs](client-order-ids.md).
+  `time` is the venue's execution time (block time on chains), never local receive time.
+  It is `None` when the venue doesn't report it on that feed: dYdX full-node fills carry
+  the block height in `details['height']` instead (see
+  [Fill sources](implementations/dydx.md#fill-sources)). `trades_history` always sets it.
 
 ### Trading fees
 

@@ -62,6 +62,8 @@ class MockState:
   """The `settings` every `depth`/`depth_stream` call received, in call order."""
   trades_settings: list[Settings] = field(default_factory=list[Settings])
   """The `settings` every `trades_stream` call received, in call order."""
+  trades_stream_items: list[Trade] = field(default_factory=list[Trade])
+  """What every `trades_stream` yields."""
 
 
 def book(price: str = '100') -> Book:
@@ -194,10 +196,11 @@ class MockMarket(PerpMarket):
     settings: Settings = {},
   ):
     self.state.trades_settings.append(settings)
+    items = list(self.state.trades_stream_items)
 
     async def gen() -> AsyncIterator[Trade]:
-      return
-      yield
+      for item in items:
+        yield item
 
     yield gen()
 
@@ -491,6 +494,59 @@ def test_trades_stream_frame_without_settings_decodes() -> None:
   msg = codec.decode_client(frame)
   assert isinstance(msg, codec.TradesStreamReq)
   assert msg.settings == {}
+
+
+TIMED_TRADE = Trade(
+  id='t1',
+  price=Decimal('100'),
+  qty=Decimal('1'),
+  time=datetime(2026, 10, 9, tzinfo=timezone.utc),
+  maker=True,
+)
+"""A fill with the venue's execution time."""
+UNTIMED_TRADE = Trade(
+  id='10:fill:0',
+  price=Decimal('100'),
+  qty=Decimal('-1'),
+  time=None,
+  maker=False,
+  details={'source': 'node', 'height': 10},
+)
+"""A fill whose feed reports no execution time, like a dYdX full-node fill."""
+
+
+@pytest.mark.parametrize(
+  'msg',
+  [
+    codec.TradesDataMsg(id='t', trade=TIMED_TRADE),
+    codec.TradesDataMsg(id='t', trade=UNTIMED_TRADE),
+    codec.TradesHistoryResp(id='h', trades=[TIMED_TRADE, UNTIMED_TRADE]),
+  ],
+)
+def test_trades_roundtrip_with_and_without_time(
+  msg: codec.TradesDataMsg | codec.TradesHistoryResp,
+) -> None:
+  """Trades keep their `time`, including `None`, through the codec."""
+  decoded = codec.decode_server(codec.encode_server(msg))
+  if isinstance(msg, codec.TradesHistoryResp):
+    assert isinstance(decoded, codec.TradesHistoryResp)
+    assert list(decoded.trades) == list(msg.trades)
+  else:
+    assert decoded == msg
+
+
+@pytest.mark.asyncio
+async def test_untimed_trades_stream_through_gateway(
+  sdk: ProxySDK, mock_state: MockState
+) -> None:
+  """A trade without `time` reaches the proxy client with `time=None`."""
+  mock_state.trades_stream_items = [UNTIMED_TRADE, TIMED_TRADE]
+  market = await sdk.perp_market(MARKET_ID)
+
+  async with market.trades_stream() as stream:
+    got = [item async for item in stream]
+
+  assert got == [UNTIMED_TRADE, TIMED_TRADE]
 
 
 @pytest.mark.asyncio
