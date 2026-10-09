@@ -43,3 +43,8 @@ only.
 
 `MarketSDK` in SDK 2.16.0 passes the node endpoints to this package, so SDK 2.16.0
 requires dYdX 0.14.0 and this release requires SDK 2.16.0: upgrade them together.
+
+Release qualification on 2026-10-09 passed the read suites and market
+consistency. Committed evidence under `release-evidence/dydx/` matches pinned
+Catalogue `1851660ac2bed8243dd9ce9c7297fe05c7130973`; offline release
+verification passes. This adapter release follows SDK 2.16.0 publication.
