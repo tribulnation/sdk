@@ -152,11 +152,16 @@ def trades_stream(
 
 
 @asynccontextmanager
-@wrap_exceptions
 async def indexer_stream(
   self: MarketMixin, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'
 ):
-  """The market's fills from the indexer's parent subaccounts channel."""
+  """The market's fills from the indexer's parent subaccounts channel.
+
+  Not wrapped in `wrap_exceptions` itself: wrapping a context manager's generator
+  re-yields from an inner generator that the context's exit never reaches, so its
+  subscription would only be released when garbage collected. The subscription and the
+  stream translate their own errors.
+  """
   parent = self.shared.parent_subaccount
   async with self.subscribe_parent_subaccount(
     parent,
@@ -177,7 +182,6 @@ async def indexer_stream(
 
 
 @asynccontextmanager
-@wrap_exceptions
 async def node_stream(
   self: MarketMixin, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'
 ):
@@ -195,7 +199,6 @@ async def node_stream(
 
 
 @asynccontextmanager
-@wrap_exceptions
 async def fastest_stream(
   self: MarketMixin, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'
 ):

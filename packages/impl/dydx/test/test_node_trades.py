@@ -812,3 +812,26 @@ async def test_account_endpoints_reach_the_market():
   assert exchange.shared.full_node is not None
   assert exchange.shared.full_node.grpc_client.host == '10.0.0.1'
   assert plain.shared.full_node is None
+
+
+@pytest.mark.parametrize('source', ['indexer', 'node', 'fastest'])
+async def test_leaving_the_stream_releases_its_subscriptions_at_once(source: str):
+  """Exiting `trades_stream`, even cancelled mid-read, unsubscribes before returning,
+  not when the garbage collector gets to it."""
+  gate = Gate()
+  market = market_with(node=gate.stream('node', []), indexer=gate.stream('indexer', []))
+  settings: Any = {'dydx': {'trades_source': source}}
+
+  async def read():
+    """Read until cancelled."""
+    async with trades_stream(market, settings=settings) as stream:
+      async for _ in stream:
+        pass
+
+  with pytest.raises(asyncio.TimeoutError):
+    await asyncio.wait_for(read(), 0.1)
+  node = market.shared.node_subscription
+  indexer = market.shared.parent_subaccount_subscriptions[0]
+  assert node is not None
+  for subscription in (node, indexer):
+    assert subscription.subscribers == [] and subscription.pump is None
