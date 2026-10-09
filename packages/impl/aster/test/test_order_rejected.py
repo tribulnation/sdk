@@ -14,7 +14,7 @@ from typed_aster.spot.trade.place_order import PlaceOrder as SpotOrders
 from tribulnation.aster import AsterMarket
 from tribulnation.aster.market.markets import PerpMarket, SpotMarket
 from tribulnation.sdk.core import ApiError, BadRequest, OrderRejected, RateLimited
-from tribulnation.sdk.market import Order
+from tribulnation.sdk.market import Order, Settings
 
 ORDER: Order = {'type': 'POST_ONLY', 'qty': Decimal('1'), 'price': Decimal('0.75')}
 
@@ -126,3 +126,23 @@ async def test_live_or_filled_result_is_returned(
   response = await market('perp').place_order(ORDER)
 
   assert response.id == '9'
+
+
+@pytest.mark.parametrize(
+  ('executed', 'rejects'), [(Decimal('0'), True), (Decimal('0.4'), False)]
+)
+async def test_expired_ioc_is_rejected_only_when_unfilled(
+  executed: Decimal, rejects: bool, monkeypatch: pytest.MonkeyPatch
+):
+  """An IOC that expired unfilled is `OrderRejected`; a partial fill is a response."""
+  row: dict[str, object] = {'orderId': 9, 'status': 'EXPIRED', 'executedQty': executed}
+  patch('perp', monkeypatch, AsyncMock(return_value=row))
+  order: Order = {'type': 'LIMIT', 'qty': Decimal('1'), 'price': Decimal('0.75')}
+  settings: Settings = {'aster': {'time_in_force': 'IOC'}}
+
+  if rejects:
+    with pytest.raises(OrderRejected):
+      await market('perp').place_order(order, settings=settings)
+  else:
+    response = await market('perp').place_order(order, settings=settings)
+    assert response.id == '9'

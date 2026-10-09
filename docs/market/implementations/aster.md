@@ -54,12 +54,15 @@ never falls back to mainnet variables. `validate` toggles response validation.
   symbol and trimmed per subscriber.
 - Candles support all six SDK intervals in half-open 500-candle windows.
 - Orders: `MARKET` ignores the SDK `price`; `LIMIT` is GTC and `POST_ONLY` is GTX.
-  `cancel_orders` sends native batches of ten and returns every per-order result,
-  including per-order errors. Venue-specific order settings are rejected.
+  `settings={'aster': {'time_in_force': 'IOC'}}` sends a `LIMIT` order
+  immediate-or-cancel, on spot and perpetuals; set on `MARKET` or `POST_ONLY` it raises
+  `ValueError`. Other venues' settings keys are ignored; `aster` settings on a
+  cancellation raise `NotImplementedError`. `cancel_orders` sends native batches of ten
+  and returns every per-order result, including per-order errors.
 - `place_order` raises `OrderRejected` for a `4XX` refusal carrying a business code
   (e.g. `-2019` insufficient margin, `-1111` bad precision), and for a result that ended
   `EXPIRED` or `REJECTED` with nothing filled, such as a `POST_ONLY` that would have
-  crossed. Codes `-1000`, `-1001`, `-1006`, `-1007` and `-1008`, a `408`, a code-less
+  crossed or an IOC that found nothing to match; a partially filled IOC is a response. Codes `-1000`, `-1001`, `-1006`, `-1007` and `-1008`, a `408`, a code-less
   body and any `5XX` leave the outcome unknown and stay `BadRequest`/`ApiError`;
   throttling stays `RateLimited`.
 - Fill streams share one account listen key per exchange, renewed every 25 minutes
@@ -103,8 +106,8 @@ never falls back to mainnet variables. `validate` toggles response validation.
   reversing a position is not modelled. Testnet does not serve
   `remainingOpenableNotionalValue` (HTTP 404), so perpetual `available_notional` fails
   there. Spot `available_notional` is the free quote balance.
-- Unsupported, raising `NotImplementedError`: hedge-mode positions, exchange-wide
-  perpetual trade history and order settings.
+- Unsupported, raising `NotImplementedError`: hedge-mode positions and exchange-wide
+  perpetual trade history.
 - Public reads and the account reads are verified on mainnet. Order placement and
   cancellation are verified on testnet only.
 

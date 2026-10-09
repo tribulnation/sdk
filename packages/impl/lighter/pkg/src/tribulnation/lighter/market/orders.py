@@ -46,17 +46,25 @@ async def place_order(
 ) -> OrderResponse:
   """Sign and send a create-order transaction.
 
-  `LIMIT` rests good-till-time (the venue's 28-day default expiry), `POST_ONLY` is
-  rejected rather than taking liquidity, and `MARKET` is the venue's market order with
-  `price` as the worst acceptable price. Off-grid prices and sizes raise before signing.
-  Acceptance is not execution: a sequencer rejection shows as a `canceled-*` status.
+  `LIMIT` rests good-till-time (the venue's 28-day default expiry), or is
+  immediate-or-cancel (no expiry) with `settings={'lighter': {'time_in_force':
+  'immediate-or-cancel'}}`. `POST_ONLY` is rejected rather than taking liquidity, and
+  `MARKET` is the venue's market order with `price` as the worst acceptable price.
+  Off-grid prices and sizes raise before signing. Acceptance is not execution: a
+  sequencer rejection, or an IOC cancelled unfilled, shows as a `canceled-*` status.
 
   Raises:
+    ValueError: `time_in_force` is set on a `MARKET` or `POST_ONLY` order.
     OrderRejected: The API refused the transaction with a business code before the
       sequencer saw it (other than `21104` invalid nonce).
   """
-  shared.require_api_key()
   lighter = settings.get('lighter', {})
+  time_in_force = lighter.get('time_in_force')
+  if time_in_force is not None and order['type'] != 'LIMIT':
+    raise ValueError(
+      f'Lighter time_in_force applies to LIMIT orders only, not {order["type"]}'
+    )
+  shared.require_api_key()
   scaler = await shared.scaler(market_id)
   qty = Decimal(order['qty'])
   client_index = shared.client_indexes.next()
@@ -74,6 +82,22 @@ async def place_order(
           'base_amount': base_amount,
           'is_ask': qty < 0,
           'price': price,
+          'reduce_only': reduce_only,
+        }
+      ),
+    )
+  elif time_in_force == 'immediate-or-cancel':
+    response = await submit(
+      shared,
+      lambda: shared.client.tx.create_order(
+        {
+          'order_type': 'limit',
+          'market_index': market_id,
+          'client_order_index': client_index,
+          'base_amount': base_amount,
+          'is_ask': qty < 0,
+          'price': price,
+          'time_in_force': 'immediate-or-cancel',
           'reduce_only': reduce_only,
         }
       ),

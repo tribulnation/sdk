@@ -20,6 +20,10 @@ class Settings(TypedDict, total=False):
 
   reduce_only: bool
   """Only ever reduce the position. Defaults to false."""
+  time_in_force: Literal['immediate-or-cancel']
+  """Send a `LIMIT` order immediate-or-cancel instead of good-till-time: it fills what
+  it can at the limit price or better and cancels the rest, with no expiry. `POST_ONLY`
+  and `MARKET` orders raise `ValueError` when it is set."""
 
 
 ACTIVE_STATUSES = frozenset({'in-progress', 'pending', 'open'})
