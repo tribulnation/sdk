@@ -1,6 +1,11 @@
 """The full node fill feed a dYdX client shares across its markets."""
 
-from typing_extensions import TYPE_CHECKING, AsyncGenerator
+from typing_extensions import (
+  TYPE_CHECKING,
+  AsyncContextManager,
+  AsyncGenerator,
+  AsyncIterable,
+)
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 import asyncio
@@ -46,12 +51,13 @@ def stream_updates(
   *,
   clob_pair_ids: list[int],
   subaccount_ids: list[subaccounts.SubaccountId],
-) -> AsyncGenerator[StreamOrderbookUpdatesResponse, None]:
+) -> AsyncContextManager[AsyncIterable[StreamOrderbookUpdatesResponse]]:
   """The node's `StreamOrderbookUpdates`, filtered to `subaccount_ids`: the one place the
   stream is opened.
 
-  Failures raise `typed_core` errors; the node may also end the stream without one
-  (e.g. a subscriber too slow for its buffer).
+  Entering raises `typed_core` errors when the node rejects or cannot serve the stream;
+  iterating raises them on transport failures, and ends without one when the node drops
+  the subscription (e.g. a subscriber too slow for its buffer).
   """
   return node.clob.stream_orderbook_updates(
     clob_pair_id=clob_pair_ids,
@@ -105,12 +111,11 @@ class NodeFeed:
       parser.reconnected()
       try:
         markets = await self.shared.load_markets()
-        stream = stream_updates(
+        async with stream_updates(
           self.node,
           clob_pair_ids=sorted({int(m['clobPairId']) for m in markets.values()}),
           subaccount_ids=subaccount_ids(self.address, self.shared.parent_subaccount),
-        )
-        try:
+        ) as stream:
           async for response in stream:
             delay = RECONNECT_MIN
             received = datetime.now(timezone.utc)
@@ -133,8 +138,6 @@ class NodeFeed:
                 [p for p in pending if p.height == height]
               ):
                 yield fill
-        finally:
-          await stream.aclose()
         log.warning('dYdX full node stream ended; resubscribing')
       except asyncio.CancelledError:
         raise

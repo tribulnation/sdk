@@ -1,5 +1,6 @@
 """dYdX `trades_stream` from a full node: fill mapping, dedup, and source selection."""
 
+from contextlib import asynccontextmanager
 from dataclasses import replace
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -747,15 +748,21 @@ async def test_feed_reconnects_and_resolves_deleveraging(
   ]
   requests: list[dict[str, Any]] = []
 
+  @asynccontextmanager
   async def fake_stream(node: Any, **request: Any):
-    """Serve one scripted connection."""
+    """Serve one scripted connection: reject it on entry, or stream then end."""
     requests.append(request)
     script = connections.pop(0)
     if isinstance(script, Exception):
       raise script
-    yield clob.StreamOrderbookUpdatesResponse(updates=script)
-    if not connections:
-      await asyncio.Event().wait()
+
+    async def responses():
+      """The scripted batch, then idle on the last connection."""
+      yield clob.StreamOrderbookUpdatesResponse(updates=script)
+      if not connections:
+        await asyncio.Event().wait()
+
+    yield responses()
 
   monkeypatch.setattr(node_stream, 'stream_updates', fake_stream)
   shared = Exchange.new(
