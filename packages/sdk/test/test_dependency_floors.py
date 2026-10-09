@@ -8,20 +8,20 @@ from typing_extensions import cast
 
 ROOT = Path(__file__).resolve().parents[3]
 COMPATIBLE_IMPLEMENTATIONS = {
-  'aster': '0.9.0',
-  'binance': '0.6.0',
-  'bit2me': '0.8.0',
-  'bitget': '0.10.0',
-  'bybit': '0.6.0',
-  'coinbase': '0.4.0',
-  'deribit': '0.5.0',
-  'dydx': '0.13.0',
+  'aster': '0.10.0',
+  'binance': '0.7.0',
+  'bit2me': '0.9.0',
+  'bitget': '0.11.0',
+  'bybit': '0.7.0',
+  'coinbase': '0.5.0',
+  'deribit': '0.6.0',
+  'dydx': '0.14.0',
   'ethereum': '0.6.0',
-  'hyperliquid': '0.15.0',
-  'kraken': '0.6.0',
-  'kucoin': '0.5.0',
-  'lighter': '0.8.0',
-  'mexc': '2.3.0',
+  'hyperliquid': '0.16.0',
+  'kraken': '0.7.0',
+  'kucoin': '0.6.0',
+  'lighter': '0.9.0',
+  'mexc': '2.4.0',
 }
 
 
@@ -132,4 +132,18 @@ def test_order_rejected_adapters_require_order_rejected_sdk():
       if Requirement(value).name == 'tribulnation-sdk'
     )
     assert Version('2.14.0') not in requirement.specifier, venue
-    assert Version('2.15.0') in requirement.specifier, venue
+
+
+def test_market_adapters_require_trades_stream_settings_sdk():
+  """Adapters overriding `trades_stream(settings=...)` follow SDK 2.16's `Market` contract."""
+  for manifest in sorted((ROOT / 'packages/impl').glob('*/pkg/pyproject.toml')):
+    venue = manifest.parents[1].name
+    if venue.startswith('.') or venue == 'ethereum':
+      continue
+    requirement = next(
+      Requirement(value)
+      for value in dependencies(manifest)
+      if Requirement(value).name == 'tribulnation-sdk'
+    )
+    assert Version('2.15.0') not in requirement.specifier, venue
+    assert Version('2.16.0') in requirement.specifier, venue
