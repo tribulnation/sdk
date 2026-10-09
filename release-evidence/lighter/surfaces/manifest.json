@@ -338,19 +338,19 @@
         "version": "0.3.7"
       },
       "tribulnation-lighter": {
-        "files_sha256": "efbb9f9e55e418b057249269dabc3244a7a8309a3e2dd7e6f2e721e834ac2992",
-        "metadata_sha256": "0857875d90399ea1cae89435b3b67a86f8a526ba2240c06329e13bd4372875da",
+        "files_sha256": "84272f0de8fdccbb9e5d23c9a594c686265f6e767fd071b3cd4966dc53cead1c",
+        "metadata_sha256": "14898060f00382efd6de351400e8ab66150d9149ca4d82026681a011f7d06885",
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "4fa3462f866eb5341db4277d4f15c130347549837b48f82299c50a165cf3c730",
-        "metadata_sha256": "2d364ac53b66fbebe0d1e7359a150b6470c390cd1bef16cfa7dba26ec80b94e4",
+        "files_sha256": "84cf77c3afca0623b9d0d8df77ea9208017eae313e10190b4b84812f385ac790",
+        "metadata_sha256": "7e98d891626a1a9fd5f1a3c32a1bab387b6cf2c88c9508c06b7cee70bd05860f",
         "version": "0"
       },
       "typed-core": {
-        "files_sha256": "6f0a8a0845778be59f05b0035623e54d5a7d54951e13de97b6d21691885d6f3a",
-        "metadata_sha256": "73972480f464b75cafb2927db3970c78b6ce60f7b139cfde5e27c1b2a2e1ba4d",
-        "version": "0.10.0"
+        "files_sha256": "5840ab00ae258cca238e5cf41356b2e4bbfbb24be235301ae97555af2b11bd5a",
+        "metadata_sha256": "c88f12152efd501f15ff393ed8c895aaaf5cc0870bd8d87e8077d980a66eccca",
+        "version": "0.11.0"
       },
       "typed-lighter": {
         "files_sha256": "8f70f2bcc6f021f4e2981c71571080d0f5827ca94993726b38983fb61e81f030",
@@ -380,7 +380,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "fab8a33b9f0ad5e68cff4cdcead537bc87a17eaff76320df250d66064e87508e",
+    "source_sha256": "1fbfbefe21ed063a90c169cc129dddfbfd1ba09d49d68ca01ccdea6fc46ae666",
     "venue": "lighter"
   },
   "before": {
@@ -722,19 +722,19 @@
         "version": "0.3.7"
       },
       "tribulnation-lighter": {
-        "files_sha256": "efbb9f9e55e418b057249269dabc3244a7a8309a3e2dd7e6f2e721e834ac2992",
-        "metadata_sha256": "0857875d90399ea1cae89435b3b67a86f8a526ba2240c06329e13bd4372875da",
+        "files_sha256": "84272f0de8fdccbb9e5d23c9a594c686265f6e767fd071b3cd4966dc53cead1c",
+        "metadata_sha256": "14898060f00382efd6de351400e8ab66150d9149ca4d82026681a011f7d06885",
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "4fa3462f866eb5341db4277d4f15c130347549837b48f82299c50a165cf3c730",
-        "metadata_sha256": "2d364ac53b66fbebe0d1e7359a150b6470c390cd1bef16cfa7dba26ec80b94e4",
+        "files_sha256": "84cf77c3afca0623b9d0d8df77ea9208017eae313e10190b4b84812f385ac790",
+        "metadata_sha256": "7e98d891626a1a9fd5f1a3c32a1bab387b6cf2c88c9508c06b7cee70bd05860f",
         "version": "0"
       },
       "typed-core": {
-        "files_sha256": "6f0a8a0845778be59f05b0035623e54d5a7d54951e13de97b6d21691885d6f3a",
-        "metadata_sha256": "73972480f464b75cafb2927db3970c78b6ce60f7b139cfde5e27c1b2a2e1ba4d",
-        "version": "0.10.0"
+        "files_sha256": "5840ab00ae258cca238e5cf41356b2e4bbfbb24be235301ae97555af2b11bd5a",
+        "metadata_sha256": "c88f12152efd501f15ff393ed8c895aaaf5cc0870bd8d87e8077d980a66eccca",
+        "version": "0.11.0"
       },
       "typed-lighter": {
         "files_sha256": "8f70f2bcc6f021f4e2981c71571080d0f5827ca94993726b38983fb61e81f030",
@@ -764,12 +764,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "fab8a33b9f0ad5e68cff4cdcead537bc87a17eaff76320df250d66064e87508e",
+    "source_sha256": "1fbfbefe21ed063a90c169cc129dddfbfd1ba09d49d68ca01ccdea6fc46ae666",
     "venue": "lighter"
   },
-  "finished": "2026-10-08T18:21:34.020852Z",
+  "finished": "2026-10-09T14:50:25.206669Z",
   "results_sha256": "7c3548e0be9f44dc9e0349f4b7878faf1be7ce586bd42b10aede1ccb19ef4f70",
   "schema_version": 2,
-  "started": "2026-10-08T18:21:14.355579Z",
-  "summary_sha256": "3a79b57ccf9f2ddd46fcba22d9535ab3c2c0b7bca66a784b8dd92b264deb7476"
+  "started": "2026-10-09T14:50:10.719004Z",
+  "summary_sha256": "6743e3333d05270cf6acd7d06427adb522e7f98b98fdbfe9e152a74457650593"
 }

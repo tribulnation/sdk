@@ -253,19 +253,19 @@
         "version": "0.3.7"
       },
       "tribulnation-mexc": {
-        "files_sha256": "8e8083f7a143dfb659bd9f7492013fdfd67ddac95c1dee2ee891c20019433559",
-        "metadata_sha256": "e1610d5cc20b5bcfb29a147fe45087dd43394bf790dddb2ca833616950884f68",
+        "files_sha256": "27129d48aad2ffe0422daf4af85305deb8e2584c1c427cbb93d020d152432916",
+        "metadata_sha256": "5085275f66419ea78e5c24317c3aa15f21f7397803051649ed5fe890c0a2ec14",
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "4fa3462f866eb5341db4277d4f15c130347549837b48f82299c50a165cf3c730",
-        "metadata_sha256": "2d364ac53b66fbebe0d1e7359a150b6470c390cd1bef16cfa7dba26ec80b94e4",
+        "files_sha256": "84cf77c3afca0623b9d0d8df77ea9208017eae313e10190b4b84812f385ac790",
+        "metadata_sha256": "7e98d891626a1a9fd5f1a3c32a1bab387b6cf2c88c9508c06b7cee70bd05860f",
         "version": "0"
       },
       "typed-core": {
-        "files_sha256": "6f0a8a0845778be59f05b0035623e54d5a7d54951e13de97b6d21691885d6f3a",
-        "metadata_sha256": "73972480f464b75cafb2927db3970c78b6ce60f7b139cfde5e27c1b2a2e1ba4d",
-        "version": "0.10.0"
+        "files_sha256": "5840ab00ae258cca238e5cf41356b2e4bbfbb24be235301ae97555af2b11bd5a",
+        "metadata_sha256": "c88f12152efd501f15ff393ed8c895aaaf5cc0870bd8d87e8077d980a66eccca",
+        "version": "0.11.0"
       },
       "typed-mexc": {
         "files_sha256": "049afd3862f26d706ee682dd27898cc0371e1b3be395ff265e32d4a472e5fd94",
@@ -295,7 +295,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "ec9f0b6de1525f7c6b8ecb80287ce80f6ebc330e24ebaffe08aaf8bb5721b1d7",
+    "source_sha256": "ba178e6b4418843729e42a8c5efe84bc90e20f73feff7a21eabcdfc800354b58",
     "venue": "mexc"
   },
   "before": {
@@ -552,19 +552,19 @@
         "version": "0.3.7"
       },
       "tribulnation-mexc": {
-        "files_sha256": "8e8083f7a143dfb659bd9f7492013fdfd67ddac95c1dee2ee891c20019433559",
-        "metadata_sha256": "e1610d5cc20b5bcfb29a147fe45087dd43394bf790dddb2ca833616950884f68",
+        "files_sha256": "27129d48aad2ffe0422daf4af85305deb8e2584c1c427cbb93d020d152432916",
+        "metadata_sha256": "5085275f66419ea78e5c24317c3aa15f21f7397803051649ed5fe890c0a2ec14",
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "4fa3462f866eb5341db4277d4f15c130347549837b48f82299c50a165cf3c730",
-        "metadata_sha256": "2d364ac53b66fbebe0d1e7359a150b6470c390cd1bef16cfa7dba26ec80b94e4",
+        "files_sha256": "84cf77c3afca0623b9d0d8df77ea9208017eae313e10190b4b84812f385ac790",
+        "metadata_sha256": "7e98d891626a1a9fd5f1a3c32a1bab387b6cf2c88c9508c06b7cee70bd05860f",
         "version": "0"
       },
       "typed-core": {
-        "files_sha256": "6f0a8a0845778be59f05b0035623e54d5a7d54951e13de97b6d21691885d6f3a",
-        "metadata_sha256": "73972480f464b75cafb2927db3970c78b6ce60f7b139cfde5e27c1b2a2e1ba4d",
-        "version": "0.10.0"
+        "files_sha256": "5840ab00ae258cca238e5cf41356b2e4bbfbb24be235301ae97555af2b11bd5a",
+        "metadata_sha256": "c88f12152efd501f15ff393ed8c895aaaf5cc0870bd8d87e8077d980a66eccca",
+        "version": "0.11.0"
       },
       "typed-mexc": {
         "files_sha256": "049afd3862f26d706ee682dd27898cc0371e1b3be395ff265e32d4a472e5fd94",
@@ -594,12 +594,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "ec9f0b6de1525f7c6b8ecb80287ce80f6ebc330e24ebaffe08aaf8bb5721b1d7",
+    "source_sha256": "ba178e6b4418843729e42a8c5efe84bc90e20f73feff7a21eabcdfc800354b58",
     "venue": "mexc"
   },
-  "finished": "2026-10-08T18:21:32.698762Z",
+  "finished": "2026-10-09T14:44:14.732363Z",
   "results_sha256": "4fe8356c4b8c20b2038d5ad06df1ca20b993aa862196d1900af5025fef1d3dce",
   "schema_version": 2,
-  "started": "2026-10-08T18:21:15.621408Z",
-  "summary_sha256": "771ced479fa138a6f82c53d9236b8b350a145faa5f500c71065cf1f3e707954e"
+  "started": "2026-10-09T14:41:07.839668Z",
+  "summary_sha256": "61e336c5a8e4883c6b05a92876f72f5d64fda77acefe0d08ba6aa7c4c0e5196e"
 }
