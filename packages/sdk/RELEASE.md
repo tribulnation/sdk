@@ -35,3 +35,13 @@ Upgrade the SDK and those adapters together. Other adapters are unaffected.
 
 `filled_qty` and the IOC settings are verified by unit fixtures only; no live trading
 run covers them, and the read suites place no orders.
+
+Qualification on 2026-10-09: all 14 declared venues have passing, verified
+read-suite evidence (payload version 5), and all 13 market venues have passing
+consistency evidence, against the unchanged Catalogue pin
+`1851660ac2bed8243dd9ce9c7297fe05c7130973`. Recorded dependency pins are unchanged.
+The existing Bit2Me native-ticker limitation (ADR 0014), Bitget's venue-wide
+withdrawal suspension (ADR 0027) and the Binance USD-M and MEXC spot `fees` waivers
+(ADR 0042) remain visible.
+
+All 1,745 repository unit tests pass.

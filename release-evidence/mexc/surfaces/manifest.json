@@ -258,8 +258,8 @@
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "84cf77c3afca0623b9d0d8df77ea9208017eae313e10190b4b84812f385ac790",
-        "metadata_sha256": "7e98d891626a1a9fd5f1a3c32a1bab387b6cf2c88c9508c06b7cee70bd05860f",
+        "files_sha256": "b7f9baec5fd4c191964ee5e350ec74e7de5ae8f2ede71cdf53b28271740b8dfc",
+        "metadata_sha256": "f47df0e52935585aae4ec374de8a9011f24fe6dbdbe2b742d7f95828275305b8",
         "version": "0"
       },
       "typed-core": {
@@ -295,7 +295,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "ba178e6b4418843729e42a8c5efe84bc90e20f73feff7a21eabcdfc800354b58",
+    "source_sha256": "8507b988f6ab9fa202c47d92137dd22a9ac3849d2c9c08bf887c822e53f857ea",
     "venue": "mexc"
   },
   "before": {
@@ -557,8 +557,8 @@
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "84cf77c3afca0623b9d0d8df77ea9208017eae313e10190b4b84812f385ac790",
-        "metadata_sha256": "7e98d891626a1a9fd5f1a3c32a1bab387b6cf2c88c9508c06b7cee70bd05860f",
+        "files_sha256": "b7f9baec5fd4c191964ee5e350ec74e7de5ae8f2ede71cdf53b28271740b8dfc",
+        "metadata_sha256": "f47df0e52935585aae4ec374de8a9011f24fe6dbdbe2b742d7f95828275305b8",
         "version": "0"
       },
       "typed-core": {
@@ -594,12 +594,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "ba178e6b4418843729e42a8c5efe84bc90e20f73feff7a21eabcdfc800354b58",
+    "source_sha256": "8507b988f6ab9fa202c47d92137dd22a9ac3849d2c9c08bf887c822e53f857ea",
     "venue": "mexc"
   },
-  "finished": "2026-10-09T14:44:14.732363Z",
+  "finished": "2026-10-09T20:03:47.084370Z",
   "results_sha256": "4fe8356c4b8c20b2038d5ad06df1ca20b993aa862196d1900af5025fef1d3dce",
   "schema_version": 2,
-  "started": "2026-10-09T14:41:07.839668Z",
-  "summary_sha256": "61e336c5a8e4883c6b05a92876f72f5d64fda77acefe0d08ba6aa7c4c0e5196e"
+  "started": "2026-10-09T20:03:30.987318Z",
+  "summary_sha256": "b8efab578fd8d1a887df219cbc7b832d1fe828bc6d55426ac158083cee6eccce"
 }
