@@ -98,7 +98,7 @@ where it reads your fills from:
 | `trades_source` | Source | Notes |
 | --- | --- | --- |
 | `'indexer'` (default) | The indexer's `v4_subaccounts` WebSocket channel | Unchanged behaviour: indexer fill ids, block `time`. |
-| `'node'` | Your full node only | About 0.4 s ahead of the indexer. No fallback. |
+| `'node'` | Your full node only | About 0.4 s ahead of the indexer. No fallback. `time` is `None`. |
 | `'fastest'` | Both, raced | Each fill once, from whichever source delivers it first. |
 
 `'node'` and `'fastest'` need both `full_node_grpc` and `full_node_rpc` on the account;
@@ -120,9 +120,11 @@ How node fills are read:
   Deleveraging fills carry no price or side in the stream; they come from the block's
   CometBFT `match` event (`block_results` on `full_node_rpc`), read as soon as the fill
   arrives.
-- `time` is the local receive time: the stream carries block heights, not block times,
-  and waiting for the block time would delay the fill. It runs about 0.7–1.0 s after the
-  block time the indexer reports.
+- `time` is `None`: the stream carries block heights, not block times, and waiting for
+  the block time would delay the fill. `details['height']` is the fill's block height;
+  resolve its time later if you need it (the block header, or the matching indexer fill's
+  `createdAt`, which is the same block time), or reconcile with `trades_history`, whose
+  fills carry it.
 - `id` is synthetic, `<height>:<subject>:<n>`: the subject is the SDK order id for your
   orders, `<subaccount>:<kind>:<perpetual id>` for liquidated, deleveraged and offsetting
   fills, and `n` counts that subject's fills in the block. It differs from the indexer's id.
@@ -135,10 +137,10 @@ How node fills are read:
 With `'fastest'`, a fill is identified on both sources by its block height, order (the
 indexer's order id is derived from the protocol order id) and size; orderless fills by
 height, subaccount, market, side and size. Identical fills in one block are counted, not
-merged. The first copy wins and the other is dropped; indexer trades carry
-`details={'source': 'indexer', 'fill': <indexer fill>}`. Keys are kept for 1000 blocks;
-the indexer keeps delivering while the node is down, and an indexer failure ends the stream
-as it does with `'indexer'`.
+merged. The first copy wins and the other is dropped; indexer trades carry their block
+`time` and `details={'source': 'indexer', 'fill': <indexer fill>}`, node trades
+`time=None`. Keys are kept for 1000 blocks; the indexer keeps delivering while the node is
+down, and an indexer failure ends the stream as it does with `'indexer'`.
 
 ```python
 async with sdk.trades_stream(

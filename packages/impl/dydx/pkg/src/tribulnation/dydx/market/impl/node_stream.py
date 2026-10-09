@@ -7,7 +7,6 @@ from typing_extensions import (
   AsyncIterable,
 )
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
 import asyncio
 import logging
 
@@ -118,11 +117,10 @@ class NodeFeed:
         ) as stream:
           async for response in stream:
             delay = RECONNECT_MIN
-            received = datetime.now(timezone.utc)
             pending: list[PendingDeleveraging] = []
             for update in response.updates:
               try:
-                items = parser.parse(update, received=received)
+                items = parser.parse(update)
               except Exception:
                 log.exception(
                   'Unreadable dYdX full node fill at %d', update.block_height

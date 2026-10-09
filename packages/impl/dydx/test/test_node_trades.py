@@ -42,7 +42,8 @@ from tribulnation.sdk.market import Trade
 
 ADDRESS = 'dydx1039f5sxkl0t39vxcsnmlu62ly22typdap0zkyn'
 OTHER = 'dydx1other'
-RECEIVED = datetime(2026, 10, 9, 12, 0, tzinfo=timezone.utc)
+BLOCK_TIME = datetime(2026, 10, 9, 12, 0, tzinfo=timezone.utc)
+"""The indexer's block time of a fill."""
 MARKET = cast(
   PerpetualMarket,
   {
@@ -173,7 +174,7 @@ def parse(parser: FillParser, *updates: clob.StreamUpdate) -> list[NodeFill]:
   """Every node fill (deleveraging excluded) the updates yield."""
   out: list[NodeFill] = []
   for u in updates:
-    out += [f for f in parser.parse(u, received=RECEIVED) if isinstance(f, NodeFill)]
+    out += [f for f in parser.parse(u) if isinstance(f, NodeFill)]
   return out
 
 
@@ -236,7 +237,7 @@ def test_maker_fill_is_priced_at_our_order():
     Decimal('0.0025'),
     True,
   )
-  assert trade.fee is None and trade.time == RECEIVED
+  assert trade.fee is None and trade.time is None
   assert trade.id == f'10:{serialize_id(oid(1))}:0'
   assert trade.details == {
     'source': 'node',
@@ -405,9 +406,7 @@ def test_deleveraging_copies_stand_for_one_fill_each():
   """A match with two fills streams twice; copy `k` is fill `k`."""
   match = deleveraging(us(), [(them(1), 10_000_000), (them(2), 30_000_000)])
   parser = FillParser(ADDRESS, 0)
-  got = [
-    p for u in (update(10, match),) * 2 for p in parser.parse(u, received=RECEIVED)
-  ]
+  got = [p for u in (update(10, match),) * 2 for p in parser.parse(u)]
   assert all(isinstance(p, PendingDeleveraging) for p in got)
   pending = cast(list[PendingDeleveraging], got)
   assert [(p.kind, p.quantums, p.offsetting.number) for p in pending] == [
@@ -427,7 +426,7 @@ def test_deleveraged_and_offsetting_fills_take_side_and_price_from_the_event():
       update(10, deleveraging(us(), [(them(1), 10_000_000)])),
       update(10, deleveraging(them(5), [(us(128), 20_000_000)])),
     ]
-    for p in parser.parse(u, received=RECEIVED)
+    for p in parser.parse(u)
     if isinstance(p, PendingDeleveraging)
   ]
   results = block_results(
@@ -468,7 +467,7 @@ def test_deleveraged_and_offsetting_fills_take_side_and_price_from_the_event():
 def test_deleveraging_without_its_event_raises():
   """A fill no event accounts for is an error, not a guess."""
   [p] = FillParser(ADDRESS, 0).parse(
-    update(10, deleveraging(us(), [(them(1), 10_000_000)])), received=RECEIVED
+    update(10, deleveraging(us(), [(them(1), 10_000_000)]))
   )
   assert isinstance(p, PendingDeleveraging)
   with pytest.raises(ValueError, match='No deleveraging match event'):
@@ -552,7 +551,6 @@ def node_fill(height: int = 10, *, client_id: int = 1) -> NodeFill:
     subticks=6_000_000_000,
     maker=True,
     id=f'{height}:{client_id}:0',
-    received=RECEIVED,
   )
 
 
@@ -566,7 +564,7 @@ def indexer_message(height: int = 10, *, client_id: int = 1) -> dict[str, Any]:
         'side': 'BUY',
         'price': Decimal('60000'),
         'size': Decimal('0.001'),
-        'createdAt': RECEIVED,
+        'createdAt': BLOCK_TIME,
         'createdAtHeight': height,
         'liquidity': 'MAKER',
         'type': 'LIMIT',
@@ -651,6 +649,11 @@ async def test_fastest_emits_each_fill_once_from_the_first_source(first: Source)
       await asyncio.wait_for(anext(it), 0.2)
   assert [cast(dict[str, Any], t.details)['source'] for t in got] == [first] * 2
   assert [t.qty for t in got] == [Decimal('0.001')] * 2
+  # Only indexer fills carry the block time; node fills leave it to `details['height']`.
+  assert [t.time for t in got] == [BLOCK_TIME if first == 'indexer' else None] * 2
+  assert [cast(dict[str, Any], t.details).get('height') for t in got] == (
+    [10, 11] if first == 'node' else [None] * 2
+  )
 
 
 async def test_fastest_keeps_delivering_while_the_node_is_down():

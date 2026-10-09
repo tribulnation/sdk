@@ -92,9 +92,9 @@ async def trades_history(
     )
     rows = page.get('trades') or {}
     yield [
-      trade
+      parse_trade(txid, row, quote=quote)
       for txid, row in rows.items()
-      if start <= (trade := parse_trade(txid, row, quote=quote)).time <= end
+      if start <= row['time'] <= end
     ]
     offset += len(rows)
     if not rows or offset >= (page.get('count') or 0):

@@ -20,7 +20,8 @@ class Trade:
   price: Decimal
   qty: Decimal
   """Signed quantity (netagive -> sell, positive -> buy)"""
-  time: datetime
+  time: datetime | None
+  """Execution time (the venue's, e.g. block time); `None` when the venue doesn't report it on that feed, e.g. dYdX full-node fills (see `details['height']`)."""
   maker: bool
   fee: Fee | None = None
   details: Any = None

@@ -20,7 +20,6 @@ Protocol references (v4-chain `protocol/v9.7.1`):
 
 from typing_extensions import Iterable, Iterator, Literal, Mapping, Sequence
 from dataclasses import dataclass, field
-from datetime import datetime
 from decimal import Decimal
 
 from typed_dydx.chain.comet.schemas import BlockResultsResponse, Event
@@ -73,8 +72,6 @@ class NodeFill:
   maker: bool
   id: str
   """Synthetic, deterministic fill id (see `FillParser`)."""
-  received: datetime
-  """Local receive time of the stream response."""
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -90,7 +87,6 @@ class PendingDeleveraging:
   subaccount: int
   quantums: int
   id: str
-  received: datetime
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -165,14 +161,11 @@ class FillParser:
     self.counts[subject] = n + 1
     return f'{height}:{subject}:{n}'
 
-  def parse(
-    self, update: clob.StreamUpdate, *, received: datetime
-  ) -> list[NodeFill | PendingDeleveraging]:
+  def parse(self, update: clob.StreamUpdate) -> list[NodeFill | PendingDeleveraging]:
     """Our fills in one stream update; empty unless it is a finalized fill.
 
     Args:
       update: A `StreamOrderbookUpdatesResponse.updates` item.
-      received: Local receive time of its response.
     """
     fill = update.order_fill
     if (
@@ -188,17 +181,13 @@ class FillParser:
       self.deleveraging_copies.clear()
     match = fill.clob_match
     if match.match_orders is not None:
-      return list(self.match_orders(match.match_orders, fill, update, received))
+      return list(self.match_orders(match.match_orders, fill, update))
     if match.match_perpetual_liquidation is not None:
       return list(
-        self.match_liquidation(
-          match.match_perpetual_liquidation, fill, update, received
-        )
+        self.match_liquidation(match.match_perpetual_liquidation, fill, update)
       )
     if match.match_perpetual_deleveraging is not None:
-      return list(
-        self.match_deleveraging(match.match_perpetual_deleveraging, update, received)
-      )
+      return list(self.match_deleveraging(match.match_perpetual_deleveraging, update))
     return []
 
   def order_fill(
@@ -209,7 +198,6 @@ class FillParser:
     quantums: int,
     maker: bool,
     update: clob.StreamUpdate,
-    received: datetime,
   ) -> NodeFill:
     """A fill of one of our orders, priced at the maker order."""
     order_id = order.order_id
@@ -227,7 +215,6 @@ class FillParser:
       subticks=maker_order.subticks,
       maker=maker,
       id=self.next_id(update.block_height, sdk_id),
-      received=received,
     )
 
   def match_orders(
@@ -235,7 +222,6 @@ class FillParser:
     match: clob.MatchOrders,
     fill: clob.StreamOrderbookFill,
     update: clob.StreamUpdate,
-    received: datetime,
   ) -> Iterator[NodeFill]:
     """Our fills in a regular match: as its taker, as one of its makers, or both."""
     orders = orders_by_id(fill.orders)
@@ -257,7 +243,6 @@ class FillParser:
           quantums=maker_fill.fill_amount,
           maker=False,
           update=update,
-          received=received,
         )
       if maker_id is not None and self.ours(maker_id.subaccount_id):
         yield self.order_fill(
@@ -266,7 +251,6 @@ class FillParser:
           quantums=maker_fill.fill_amount,
           maker=True,
           update=update,
-          received=received,
         )
 
   def match_liquidation(
@@ -274,7 +258,6 @@ class FillParser:
     match: clob.MatchPerpetualLiquidation,
     fill: clob.StreamOrderbookFill,
     update: clob.StreamUpdate,
-    received: datetime,
   ) -> Iterator[NodeFill]:
     """Our fills in a liquidation: as the liquidated taker (one per maker fill), or as a
     maker against it."""
@@ -299,7 +282,6 @@ class FillParser:
           subticks=maker.subticks,
           maker=False,
           id=self.next_id(update.block_height, subject),
-          received=received,
         )
       if maker_id is not None and self.ours(maker_id.subaccount_id):
         yield self.order_fill(
@@ -308,14 +290,12 @@ class FillParser:
           quantums=maker_fill.fill_amount,
           maker=True,
           update=update,
-          received=received,
         )
 
   def match_deleveraging(
     self,
     match: clob.MatchPerpetualDeleveraging,
     update: clob.StreamUpdate,
-    received: datetime,
   ) -> Iterator[PendingDeleveraging]:
     """Our side of the one deleveraging fill this copy of the match stands for.
 
@@ -348,7 +328,6 @@ class FillParser:
         subaccount=number,
         quantums=deleveraging_fill.fill_amount,
         id=self.next_id(update.block_height, f'{number}:{kind}:{match.perpetual_id}'),
-        received=received,
       )
 
 
@@ -442,7 +421,6 @@ def resolve_deleveraging(
         quote_quantums=abs(m.offsetting_quote),
         maker=p.kind == 'offsetting',
         id=p.id,
-        received=p.received,
       )
     )
   return fills
@@ -511,8 +489,9 @@ def node_key(fill: NodeFill, market: PerpetualMarket, *, address: str) -> FillKe
 def node_trade(fill: NodeFill, market: PerpetualMarket) -> Trade:
   """An SDK trade from a node fill.
 
-  `time` is the local receive time: stream updates carry no block time, and waiting for
-  it would delay the fill.
+  `time` is `None`: stream updates carry no block time, and waiting for it would delay
+  the fill. `details['height']` is the fill's block height, from which the block time
+  can be resolved later.
   """
   sign = 1 if fill.side == 'BUY' else -1
   return Trade(
@@ -520,7 +499,7 @@ def node_trade(fill: NodeFill, market: PerpetualMarket) -> Trade:
     order_id=serialize_id(fill.order_id) if fill.order_id is not None else None,
     price=fill_price(fill, market),
     qty=base_size(fill.quantums, market) * sign,
-    time=fill.received,
+    time=None,
     maker=fill.maker,
     fee=None,
     details={
