@@ -1,5 +1,6 @@
 {
   "payload": {
+    "account_mode": "address",
     "account_venue": "dydx",
     "bitget_uta": null,
     "checks": [
@@ -140,11 +141,91 @@
         "skipped": 0
       },
       {
-        "exclusion": "private_account_fees",
+        "exclusion": null,
         "failed": 0,
-        "id": "market.test_public_read[\"perp:BTC-USD\", \"fees\"]",
+        "id": "market.test_account_read[\"perp:BTC-USD\", \"fees\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTC-USD\", \"open_orders\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "order_lifecycle",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTC-USD\", \"query_order\"]",
         "network": "mainnet",
         "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTC-USD\", \"trades_history\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTC-USD\", \"funding_payments\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTC-USD\", \"position\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTC-USD\", \"perp_position\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTC-USD\", \"collateral\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTC-USD\", \"perp_collateral\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTC-USD\", \"leverage\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTC-USD\", \"available_notional\"]",
+        "network": "mainnet",
+        "passed": 1,
         "skipped": 0
       }
     ],
@@ -152,6 +233,6 @@
     "private_account_venue": null,
     "scope": "surfaces",
     "venue": "dydx",
-    "version": 4
+    "version": 5
   }
 }

@@ -1,5 +1,6 @@
 {
   "payload": {
+    "account_mode": "private",
     "account_venue": "bitget",
     "bitget_uta": false,
     "checks": [
@@ -164,11 +165,91 @@
         "skipped": 0
       },
       {
-        "exclusion": "private_account_fees",
+        "exclusion": null,
         "failed": 0,
-        "id": "market.test_public_read[\"spot:BTCUSDT\", \"fees\"]",
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"fees\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"open_orders\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "order_lifecycle",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"query_order\"]",
         "network": "mainnet",
         "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"trades_history\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"funding_payments\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"position\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"perp_position\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"collateral\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"perp_collateral\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"leverage\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"available_notional\"]",
+        "network": "mainnet",
+        "passed": 1,
         "skipped": 0
       },
       {
@@ -284,11 +365,91 @@
         "skipped": 0
       },
       {
-        "exclusion": "private_account_fees",
+        "exclusion": null,
         "failed": 0,
-        "id": "market.test_public_read[\"usdt:BTCUSDT\", \"fees\"]",
+        "id": "market.test_account_read[\"usdt:BTCUSDT\", \"fees\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"usdt:BTCUSDT\", \"open_orders\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "order_lifecycle",
+        "failed": 0,
+        "id": "market.test_account_read[\"usdt:BTCUSDT\", \"query_order\"]",
         "network": "mainnet",
         "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"usdt:BTCUSDT\", \"trades_history\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"usdt:BTCUSDT\", \"funding_payments\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"usdt:BTCUSDT\", \"position\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"usdt:BTCUSDT\", \"perp_position\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "bitget_classic",
+        "failed": 0,
+        "id": "market.test_account_read[\"usdt:BTCUSDT\", \"collateral\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "bitget_classic",
+        "failed": 0,
+        "id": "market.test_account_read[\"usdt:BTCUSDT\", \"perp_collateral\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"usdt:BTCUSDT\", \"leverage\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"usdt:BTCUSDT\", \"available_notional\"]",
+        "network": "mainnet",
+        "passed": 1,
         "skipped": 0
       },
       {
@@ -404,9 +565,89 @@
         "skipped": 0
       },
       {
-        "exclusion": "private_account_fees",
+        "exclusion": "unsupported",
         "failed": 0,
-        "id": "market.test_public_read[\"usdc:BTCPERP\", \"fees\"]",
+        "id": "market.test_account_read[\"usdc:BTCPERP\", \"fees\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"usdc:BTCPERP\", \"open_orders\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "order_lifecycle",
+        "failed": 0,
+        "id": "market.test_account_read[\"usdc:BTCPERP\", \"query_order\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"usdc:BTCPERP\", \"trades_history\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"usdc:BTCPERP\", \"funding_payments\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"usdc:BTCPERP\", \"position\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"usdc:BTCPERP\", \"perp_position\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"usdc:BTCPERP\", \"collateral\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"usdc:BTCPERP\", \"perp_collateral\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"usdc:BTCPERP\", \"leverage\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"usdc:BTCPERP\", \"available_notional\"]",
         "network": "mainnet",
         "passed": 0,
         "skipped": 0
@@ -415,14 +656,6 @@
         "exclusion": null,
         "failed": 0,
         "id": "bitget.test_exchanges[null, null]",
-        "network": "mainnet",
-        "passed": 1,
-        "skipped": 0
-      },
-      {
-        "exclusion": null,
-        "failed": 0,
-        "id": "bitget.test_perp_available_notional[null, null]",
         "network": "mainnet",
         "passed": 1,
         "skipped": 0
@@ -494,22 +727,6 @@
       {
         "exclusion": null,
         "failed": 0,
-        "id": "bitget.test_perp_open_orders[null, null]",
-        "network": "mainnet",
-        "passed": 1,
-        "skipped": 0
-      },
-      {
-        "exclusion": null,
-        "failed": 0,
-        "id": "bitget.test_perp_position[null, null]",
-        "network": "mainnet",
-        "passed": 1,
-        "skipped": 0
-      },
-      {
-        "exclusion": null,
-        "failed": 0,
         "id": "bitget.test_perp_rules[null, null]",
         "network": "mainnet",
         "passed": 1,
@@ -527,14 +744,6 @@
         "exclusion": null,
         "failed": 0,
         "id": "bitget.test_perp_tickers[null, null]",
-        "network": "mainnet",
-        "passed": 1,
-        "skipped": 0
-      },
-      {
-        "exclusion": null,
-        "failed": 0,
-        "id": "bitget.test_perp_trades_history[null, null]",
         "network": "mainnet",
         "passed": 1,
         "skipped": 0
@@ -566,7 +775,7 @@
       {
         "exclusion": null,
         "failed": 0,
-        "id": "bitget.test_spot_collateral[null, null]",
+        "id": "bitget.test_spot_collateral_pool[null, null]",
         "network": "mainnet",
         "passed": 1,
         "skipped": 0
@@ -606,14 +815,6 @@
       {
         "exclusion": null,
         "failed": 0,
-        "id": "bitget.test_spot_position[null, null]",
-        "network": "mainnet",
-        "passed": 1,
-        "skipped": 0
-      },
-      {
-        "exclusion": null,
-        "failed": 0,
         "id": "bitget.test_spot_rules[null, null]",
         "network": "mainnet",
         "passed": 1,
@@ -623,14 +824,6 @@
         "exclusion": null,
         "failed": 0,
         "id": "bitget.test_spot_tickers[null, null]",
-        "network": "mainnet",
-        "passed": 1,
-        "skipped": 0
-      },
-      {
-        "exclusion": null,
-        "failed": 0,
-        "id": "bitget.test_spot_trades_history[null, null]",
         "network": "mainnet",
         "passed": 1,
         "skipped": 0
@@ -656,6 +849,6 @@
     "private_account_venue": null,
     "scope": "surfaces",
     "venue": "bitget",
-    "version": 4
+    "version": 5
   }
 }

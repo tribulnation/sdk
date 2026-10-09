@@ -1,5 +1,6 @@
 {
   "payload": {
+    "account_mode": "private",
     "account_venue": "kraken",
     "bitget_uta": null,
     "checks": [
@@ -188,11 +189,91 @@
         "skipped": 0
       },
       {
-        "exclusion": "private_account_fees",
+        "exclusion": null,
         "failed": 0,
-        "id": "market.test_public_read[\"spot:XBTUSD\", \"fees\"]",
+        "id": "market.test_account_read[\"spot:XBTUSD\", \"fees\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:XBTUSD\", \"open_orders\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "order_lifecycle",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:XBTUSD\", \"query_order\"]",
         "network": "mainnet",
         "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:XBTUSD\", \"trades_history\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:XBTUSD\", \"funding_payments\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:XBTUSD\", \"position\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:XBTUSD\", \"perp_position\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:XBTUSD\", \"collateral\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:XBTUSD\", \"perp_collateral\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:XBTUSD\", \"leverage\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:XBTUSD\", \"available_notional\"]",
+        "network": "mainnet",
+        "passed": 1,
         "skipped": 0
       },
       {
@@ -308,9 +389,89 @@
         "skipped": 0
       },
       {
-        "exclusion": "private_account_fees",
+        "exclusion": "unsupported",
         "failed": 0,
-        "id": "market.test_public_read[\"perp:PF_XBTUSD\", \"fees\"]",
+        "id": "market.test_account_read[\"perp:PF_XBTUSD\", \"fees\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:PF_XBTUSD\", \"open_orders\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "order_lifecycle",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:PF_XBTUSD\", \"query_order\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:PF_XBTUSD\", \"trades_history\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:PF_XBTUSD\", \"funding_payments\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:PF_XBTUSD\", \"position\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:PF_XBTUSD\", \"perp_position\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:PF_XBTUSD\", \"collateral\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:PF_XBTUSD\", \"perp_collateral\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:PF_XBTUSD\", \"leverage\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:PF_XBTUSD\", \"available_notional\"]",
         "network": "mainnet",
         "passed": 0,
         "skipped": 0
@@ -320,6 +481,6 @@
     "private_account_venue": null,
     "scope": "surfaces",
     "venue": "kraken",
-    "version": 4
+    "version": 5
   }
 }

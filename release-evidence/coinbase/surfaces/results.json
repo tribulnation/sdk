@@ -1,5 +1,6 @@
 {
   "payload": {
+    "account_mode": "private",
     "account_venue": "coinbase",
     "bitget_uta": null,
     "checks": [
@@ -158,9 +159,89 @@
       {
         "exclusion": "unsupported",
         "failed": 0,
-        "id": "market.test_public_read[\"spot:BTC-USD\", \"fees\"]",
+        "id": "market.test_account_read[\"spot:BTC-USD\", \"fees\"]",
         "network": "mainnet",
         "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTC-USD\", \"open_orders\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "order_lifecycle",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTC-USD\", \"query_order\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTC-USD\", \"trades_history\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTC-USD\", \"funding_payments\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTC-USD\", \"position\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTC-USD\", \"perp_position\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTC-USD\", \"collateral\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTC-USD\", \"perp_collateral\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTC-USD\", \"leverage\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTC-USD\", \"available_notional\"]",
+        "network": "mainnet",
+        "passed": 1,
         "skipped": 0
       }
     ],
@@ -168,6 +249,6 @@
     "private_account_venue": null,
     "scope": "surfaces",
     "venue": "coinbase",
-    "version": 4
+    "version": 5
   }
 }

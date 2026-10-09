@@ -1,5 +1,6 @@
 {
   "payload": {
+    "account_mode": "private",
     "account_venue": "bybit",
     "bitget_uta": null,
     "checks": [
@@ -188,11 +189,91 @@
         "skipped": 0
       },
       {
-        "exclusion": "private_account_fees",
+        "exclusion": null,
         "failed": 0,
-        "id": "market.test_public_read[\"spot:BTCUSDT\", \"fees\"]",
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"fees\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"open_orders\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "order_lifecycle",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"query_order\"]",
         "network": "mainnet",
         "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"trades_history\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"funding_payments\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"position\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"perp_position\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"collateral\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"perp_collateral\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"leverage\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"available_notional\"]",
+        "network": "mainnet",
+        "passed": 1,
         "skipped": 0
       },
       {
@@ -308,11 +389,91 @@
         "skipped": 0
       },
       {
-        "exclusion": "private_account_fees",
+        "exclusion": null,
         "failed": 0,
-        "id": "market.test_public_read[\"perp:BTCUSDT\", \"fees\"]",
+        "id": "market.test_account_read[\"perp:BTCUSDT\", \"fees\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSDT\", \"open_orders\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "order_lifecycle",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSDT\", \"query_order\"]",
         "network": "mainnet",
         "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSDT\", \"trades_history\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSDT\", \"funding_payments\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSDT\", \"position\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSDT\", \"perp_position\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSDT\", \"collateral\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSDT\", \"perp_collateral\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSDT\", \"leverage\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSDT\", \"available_notional\"]",
+        "network": "mainnet",
+        "passed": 1,
         "skipped": 0
       }
     ],
@@ -320,6 +481,6 @@
     "private_account_venue": null,
     "scope": "surfaces",
     "venue": "bybit",
-    "version": 4
+    "version": 5
   }
 }
