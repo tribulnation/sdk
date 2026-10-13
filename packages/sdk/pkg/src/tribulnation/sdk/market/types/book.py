@@ -143,6 +143,28 @@ class Book:
       time=self.time,
     )
 
+  def scaled(self, multiplier: Decimal) -> 'Book':
+    """The book in units of `multiplier` base units each, as a new book.
+
+    E.g. 1000 converts a `kPEPE` book (1 contract = 1000 PEPE) to PEPE: prices are
+    divided by `multiplier` and quantities multiplied by it, so every entry's
+    notional is preserved. `time` is kept; the book itself is not modified.
+
+    Args:
+      multiplier: Base units per new unit; must be positive.
+
+    Raises:
+      ValueError: If `multiplier` is not positive.
+    """
+    if multiplier <= 0:
+      raise ValueError(f'multiplier must be positive, got {multiplier}')
+    m = multiplier
+    return Book(
+      bids=[Book.Entry(e.price / m, e.qty * m) for e in self.bids],
+      asks=[Book.Entry(e.price / m, e.qty * m) for e in self.asks],
+      time=self.time,
+    )
+
   def limit(self, levels: int) -> 'Book':
     """Limit the book to `levels` levels."""
     return Book(

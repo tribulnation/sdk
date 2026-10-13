@@ -1,5 +1,5 @@
 from typing_extensions import Any
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from decimal import Decimal
 
 from tribulnation.sdk.util import ceil2tick, trunc2tick, round2tick
@@ -101,3 +101,36 @@ class Rules:
   def qty2notional(self, base_qty: Decimal, *, price: Decimal) -> Decimal:
     """Convert a base quantity to its notional value, in quote units."""
     return base_qty * price
+
+  def scaled(self, multiplier: Decimal) -> 'Rules':
+    """The rules in units of `multiplier` base units each, as new rules.
+
+    E.g. 1000 converts `kPEPE` rules (1 contract = 1000 PEPE) to PEPE: prices
+    (`tick_size`, `fixed_min_price`, `fixed_max_price`) are divided by `multiplier`
+    and quantities (`step_size`, `fixed_min_qty`, `max_qty`) multiplied by it.
+    `min_value` (a notional), the relative price bounds (ratios), `fees`,
+    `fee_asset` and `api` are unchanged. `details` stays the venue's raw data, in
+    the venue's units.
+
+    Args:
+      multiplier: Base units per new unit; must be positive.
+
+    Raises:
+      ValueError: If `multiplier` is not positive.
+    """
+    if multiplier <= 0:
+      raise ValueError(f'multiplier must be positive, got {multiplier}')
+    m = multiplier
+    return replace(
+      self,
+      tick_size=self.tick_size / m,
+      step_size=self.step_size * m,
+      fixed_min_qty=None if self.fixed_min_qty is None else self.fixed_min_qty * m,
+      max_qty=None if self.max_qty is None else self.max_qty * m,
+      fixed_min_price=None
+      if self.fixed_min_price is None
+      else self.fixed_min_price / m,
+      fixed_max_price=None
+      if self.fixed_max_price is None
+      else self.fixed_max_price / m,
+    )
