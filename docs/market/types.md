@@ -62,7 +62,9 @@ raises, rather than quietly placing a different order.
   `market_buy_price`/`market_sell_price` (by `qty=` or `notional=`),
   `buyable_at`/`sellable_at`, `with_fees`, `limit`, `merge`, `update` (apply an incremental
   diff), and in-place `buy`/`sell`. Quantities are base units, and
-  `notional = price × qty`. `time` is the exchange time the book was current as of,
+  `notional = price × qty`. `scaled(m)` returns the book in units of `m` base units each
+  (e.g. `m = 1000` turns a Hyperliquid `kPEPE` book into PEPE): prices divided by `m`,
+  quantities multiplied, notionals preserved. `time` is the exchange time the book was current as of,
   timezone-aware UTC. For snapshot feeds (each message a complete book or its top
   levels) it is the time the snapshot was current: the venue's push, event or output
   time for it where the message carries one. For incremental (diff) and on-change
@@ -74,7 +76,7 @@ raises, rather than quietly placing a different order.
   block time on REST and WS; Aster the event/output time `E` (falling back to the
   transaction time `T`) on REST and WS; Lighter the WS `last_updated_at` (REST `depth`
   is `None`); dYdX never sets it. Derived books (`limit`, `with_fees`,
-  `copy`) keep it, `merge` takes the oldest input's, and `update` takes the diff's.
+  `scaled`, `copy`) keep it, `merge` takes the oldest input's, and `update` takes the diff's.
   `update` replaces, adds and removes (zero quantity) levels, then uncrosses the book:
   some venues' diff streams can cross (dYdX's Indexer does by design, see
   [Uncrossing the orderbook](https://docs.dydx.xyz/interaction/data/watch-orderbook))
@@ -87,6 +89,9 @@ raises, rather than quietly placing a different order.
   the instrument is tradable through the API at all. The helpers round, truncate and
   validate against those constraints (`round_price`, `trunc_qty`, `min_qty`, `notional2qty`,
   and so on): see [Your First Order](first-order.md). Fees are fractions of 1.
+  `scaled(m)` converts the rules the same way as `Book.scaled`: `tick_size` and the fixed
+  price bounds are divided by `m`; `step_size`, `fixed_min_qty` and `max_qty` multiplied;
+  `min_value`, the relative price bounds, fees and `details` (raw, in venue units) unchanged.
   Base/quote identities come from the Catalogue instrument, not `Rules`.
 - `Ticker`: `last`, `bid`, `ask`, `bid_qty`, `ask_qty` and `base_volume_24h`, all optional.
 - `Trade`: `id`, `price`, signed `qty`, `time`, a `maker` flag, and an optional `fee`
