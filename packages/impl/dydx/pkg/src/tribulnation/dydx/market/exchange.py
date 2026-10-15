@@ -190,6 +190,10 @@ class Exchange(ExchangeMixin, PerpExchange):
         ]
         if payments:
           yield payments
+        # The indexer ignores `afterOrAt` and pages newest first through the whole
+        # history: stop once a page reaches before `start`.
+        if batch and batch[-1]['createdAt'] < start:
+          break
 
   @wrap_exceptions
   async def perp_collateral(self, market_id: str | None = None, /) -> PerpCollateral:

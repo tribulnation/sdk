@@ -73,3 +73,7 @@ async def funding_payments(
       ]
       if payments:
         yield payments
+      # The indexer ignores `afterOrAt` and pages newest first through the whole
+      # history: stop once a page reaches before `start`.
+      if batch and batch[-1]['createdAt'] < start:
+        break
