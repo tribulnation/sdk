@@ -14,3 +14,9 @@ Fixes:
 
 The typed-aster floor rises to 0.5.0, which defines the unknown-event types. The SDK
 floor is unchanged.
+
+Release qualification on 2026-10-15 passed the read suites and market
+consistency. Committed evidence under `release-evidence/aster/` matches pinned
+Catalogue `1851660ac2bed8243dd9ce9c7297fe05c7130973`; offline release
+verification passes. The recorded dependency pins differ from the previous
+evidence only in `typed-aster` (0.4.0 to 0.5.0).

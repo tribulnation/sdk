@@ -333,8 +333,8 @@
         "version": "5.16.1"
       },
       "tribulnation-aster": {
-        "files_sha256": "105d9c6eeb88041e1b24a21372c26f2c425890a47b14bc98d951aab107e8a68c",
-        "metadata_sha256": "c707aefc97dabc4fd951dbbb59a69b8494fd80edea2d52dccdf9eab0009aa129",
+        "files_sha256": "d00de8f9712562a22f0be4fce261efea8491ac76baaa6d0c4aa2b8e155b2d9d8",
+        "metadata_sha256": "fef7be48fabb523369ffb655e035c702d5a9edf09e2807ede1325e22730af342",
         "version": "0"
       },
       "tribulnation-catalogue": {
@@ -343,14 +343,14 @@
         "version": "0.3.7"
       },
       "tribulnation-sdk": {
-        "files_sha256": "b7f9baec5fd4c191964ee5e350ec74e7de5ae8f2ede71cdf53b28271740b8dfc",
+        "files_sha256": "33f8ad770e44a0bbd625e48227532166c2a576d25a12eabdc442c765f94b42b7",
         "metadata_sha256": "f47df0e52935585aae4ec374de8a9011f24fe6dbdbe2b742d7f95828275305b8",
         "version": "0"
       },
       "typed-aster": {
-        "files_sha256": "c02d5c782daa9ba97a034456dfcef7f68d2d5181ad62ae2a16bd964cc5d3625d",
-        "metadata_sha256": "b9cfdb7eb32bb88b2ef48e098751c0970915b863476fc93966382b24e33b1056",
-        "version": "0.4.0"
+        "files_sha256": "ea9681b5ea9aca449baadf0600b685a522a869a7fa057a215b965071629204db",
+        "metadata_sha256": "cfb238aef9f9b2d542cb56e0cf0e7592fd941d5bbdf3233b4860a224ce6490de",
+        "version": "0.5.0"
       },
       "typed-core": {
         "files_sha256": "5840ab00ae258cca238e5cf41356b2e4bbfbb24be235301ae97555af2b11bd5a",
@@ -380,7 +380,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "31eb5d86a775eada3ba46c00c037d1842609c23cfc7b58ad160326a462b3fb33",
+    "source_sha256": "4759cfd4f08e6a93e1d7c356926d813ef5b46d80b98dd986f987bf48b79a3044",
     "venue": "aster"
   },
   "before": {
@@ -717,8 +717,8 @@
         "version": "5.16.1"
       },
       "tribulnation-aster": {
-        "files_sha256": "105d9c6eeb88041e1b24a21372c26f2c425890a47b14bc98d951aab107e8a68c",
-        "metadata_sha256": "c707aefc97dabc4fd951dbbb59a69b8494fd80edea2d52dccdf9eab0009aa129",
+        "files_sha256": "d00de8f9712562a22f0be4fce261efea8491ac76baaa6d0c4aa2b8e155b2d9d8",
+        "metadata_sha256": "fef7be48fabb523369ffb655e035c702d5a9edf09e2807ede1325e22730af342",
         "version": "0"
       },
       "tribulnation-catalogue": {
@@ -727,14 +727,14 @@
         "version": "0.3.7"
       },
       "tribulnation-sdk": {
-        "files_sha256": "b7f9baec5fd4c191964ee5e350ec74e7de5ae8f2ede71cdf53b28271740b8dfc",
+        "files_sha256": "33f8ad770e44a0bbd625e48227532166c2a576d25a12eabdc442c765f94b42b7",
         "metadata_sha256": "f47df0e52935585aae4ec374de8a9011f24fe6dbdbe2b742d7f95828275305b8",
         "version": "0"
       },
       "typed-aster": {
-        "files_sha256": "c02d5c782daa9ba97a034456dfcef7f68d2d5181ad62ae2a16bd964cc5d3625d",
-        "metadata_sha256": "b9cfdb7eb32bb88b2ef48e098751c0970915b863476fc93966382b24e33b1056",
-        "version": "0.4.0"
+        "files_sha256": "ea9681b5ea9aca449baadf0600b685a522a869a7fa057a215b965071629204db",
+        "metadata_sha256": "cfb238aef9f9b2d542cb56e0cf0e7592fd941d5bbdf3233b4860a224ce6490de",
+        "version": "0.5.0"
       },
       "typed-core": {
         "files_sha256": "5840ab00ae258cca238e5cf41356b2e4bbfbb24be235301ae97555af2b11bd5a",
@@ -764,12 +764,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "31eb5d86a775eada3ba46c00c037d1842609c23cfc7b58ad160326a462b3fb33",
+    "source_sha256": "4759cfd4f08e6a93e1d7c356926d813ef5b46d80b98dd986f987bf48b79a3044",
     "venue": "aster"
   },
-  "finished": "2026-10-09T19:51:59.041706Z",
-  "results_sha256": "fc460c6845e519d6f7dd03adb4289522ca701c7259390ee1c8d0dd9be2f87361",
+  "finished": "2026-10-15T17:36:51.090896Z",
+  "results_sha256": "fc7bef4a4babd7a00afd9cc2a0457fd42478dacd8a58409fe9f6b4b30565e000",
   "schema_version": 2,
-  "started": "2026-10-09T19:51:28.601447Z",
-  "summary_sha256": "6fa2c339fc54820e3a9a50dc0eb8abec608ec140d859165b8ffafb456ba16bec"
+  "started": "2026-10-15T17:36:18.391919Z",
+  "summary_sha256": "4d45242c85369ed7d02dbf2fb713e93dd625ddbced2d5981dd889f9002cbd296"
 }
