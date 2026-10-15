@@ -7,13 +7,15 @@ from typing_extensions import (
   AsyncIterable,
 )
 from dataclasses import dataclass, field
+from datetime import datetime
 import asyncio
 import logging
 
 from typed_dydx.chain import Chain
+from typed_dydx.chain.comet.schemas import StatusResponse
 from typed_dydx.protos.dydxprotocol import subaccounts
 from typed_dydx.protos.dydxprotocol.clob import StreamOrderbookUpdatesResponse
-from tribulnation.sdk.core import Subscription
+from tribulnation.sdk.core import NetworkError, Subscription
 
 from .node_fills import (
   FillParser,
@@ -35,6 +37,29 @@ RECONNECT_MAX = 10.0
 """Cap of the exponential reconnection backoff, in seconds."""
 BLOCK_RESULTS_ATTEMPTS = 5
 """Tries to read a block's deleveraging events before dropping its deleveraging fills."""
+MAX_BLOCK_AGE = 10.0
+"""Seconds the node's latest block may trail our clock when the stream connects."""
+
+
+def node_behind(status: StatusResponse, *, now: datetime) -> str | None:
+  """Why a node is not at the chain tip, or `None` when it is.
+
+  A node that is catching up streams the blocks it replays as finalized updates, which
+  carry no block time, so their fills would read as new. `catching_up` alone is not
+  enough: it turns false when the node leaves block sync, not when it reaches the tip.
+
+  Args:
+    status: The node's CometBFT `/status`.
+    now: The current time, timezone-aware.
+  """
+  sync = status['sync_info']
+  height = sync['latest_block_height']
+  age = (now - sync['latest_block_time']).total_seconds()
+  if sync['catching_up']:
+    return f'catching up (latest block {height} is {age:.0f}s old)'
+  if age > MAX_BLOCK_AGE:
+    return f'behind (latest block {height} is {age:.0f}s old)'
+  return None
 
 
 def subaccount_ids(address: str, parent: int) -> list[subaccounts.SubaccountId]:
@@ -91,9 +116,13 @@ class NodeFeed:
   Connecting costs one snapshot of every book (a few MB); after that only our own
   updates flow.
 
-  The feed never fails: a transport error, a node rejection or a stream the node ends
-  is retried with exponential backoff, and fills finalized meanwhile are missed. Blocks
-  already read are not re-emitted after a reconnection.
+  Before every connection the feed reads the node's CometBFT `/status`, and fails with
+  `NetworkError` when the node is catching up or its latest block is older than
+  `MAX_BLOCK_AGE` (`node_behind`): such a node streams old blocks as new fills.
+  Otherwise the feed never fails: a transport error (of the stream or of `/status`), a
+  node rejection or a stream the node ends is retried with exponential backoff, and
+  fills finalized meanwhile are missed. Blocks already read are not re-emitted after a
+  reconnection. A node that falls behind while connected is not detected.
   """
 
   shared: 'Shared'
@@ -108,8 +137,13 @@ class NodeFeed:
     delay = RECONNECT_MIN
     while True:
       parser.reconnected()
+      behind: str | None = None
       try:
         markets = await self.shared.load_markets()
+        status = await self.node.comet.status()
+        behind = node_behind(status, now=datetime.now().astimezone())
+        if behind is not None:
+          break
         async with stream_updates(
           self.node,
           clob_pair_ids=sorted({int(m['clobPairId']) for m in markets.values()}),
@@ -144,6 +178,10 @@ class NodeFeed:
         self.node.grpc_client.close()
       await asyncio.sleep(delay)
       delay = min(delay * 2, RECONNECT_MAX)
+    raise NetworkError(
+      f'dYdX full node is {behind}: its stream would replay old blocks as new fills. '
+      "Use trades_source='indexer' until it is synced."
+    )
 
   async def perpetual_clob_pairs(self, *, refetch: bool) -> dict[int, int]:
     """CLOB pair id by perpetual id, from the chain."""

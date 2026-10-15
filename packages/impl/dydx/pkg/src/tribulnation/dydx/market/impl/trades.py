@@ -206,8 +206,9 @@ async def fastest_stream(
   first source to deliver it (`FillDedup`).
 
   Node trades carry `details['source'] == 'node'`; indexer trades carry
-  `{'source': 'indexer', 'fill': <indexer fill>}`. The node feed never fails, so an
-  indexer failure (or this subscriber overflowing) ends the stream with that error.
+  `{'source': 'indexer', 'fill': <indexer fill>}`. The stream ends with an error when
+  either source fails: the indexer, this subscriber overflowing, or the node feed, which
+  fails only when the node is not at the chain tip as it connects (`NodeFeed`).
   """
   subscription = node_fill_subscription(self.shared)
   parent = self.shared.parent_subaccount

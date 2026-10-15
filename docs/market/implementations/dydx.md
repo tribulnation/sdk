@@ -131,8 +131,14 @@ How node fills are read:
 - `order_id` is the SDK (protocol) order id, `None` when you were liquidated or
   deleveraged; `fee` is `None`; `details` is
   `{'source': 'node', 'height', 'exec_mode', 'kind', 'subaccount'}`.
-- The node feed reconnects with backoff and never fails the stream. With `'node'`, fills
-  finalized while the node is unreachable are missed: reconcile with `trades_history`.
+- The node feed reconnects with backoff. With `'node'`, fills finalized while the node is
+  unreachable are missed: reconcile with `trades_history`.
+- Before every connection, the first and each reconnection, the feed reads the node's
+  CometBFT `/status`. If the node is catching up, or its latest block is more than 10 s
+  old, the stream fails with `NetworkError` (with `'fastest'` too) instead of connecting:
+  a node replaying old blocks streams them as finalized updates, so their fills would
+  read as new. Use `'indexer'` until the node is synced. A node that falls behind while
+  connected is not detected.
 
 With `'fastest'`, a fill is identified on both sources by its block height, order (the
 indexer's order id is derived from the protocol order id) and size; orderless fills by
@@ -140,7 +146,8 @@ height, subaccount, market, side and size. Identical fills in one block are coun
 merged. The first copy wins and the other is dropped; indexer trades carry their block
 `time` and `details={'source': 'indexer', 'fill': <indexer fill>}`, node trades
 `time=None`. Keys are kept for 1000 blocks; the indexer keeps delivering while the node is
-down, and an indexer failure ends the stream as it does with `'indexer'`.
+unreachable, a node that is behind fails the stream (see above), and an indexer failure
+ends the stream as it does with `'indexer'`.
 
 ```python
 async with sdk.trades_stream(
