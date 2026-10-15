@@ -414,6 +414,7 @@ async def open_orders(market_id: str, /) -> Sequence[OrderState]:
 
 # %%
 from typed_aster.futures.trade.user_trades import AccountTradeItem
+from typed_aster.futures.user_stream.events import is_known_futures_user_event
 
 TRADES_WINDOW = timedelta(days=7)
 """Widest `startTime`/`endTime` span `userTrades` accepts; wider ones fail `-4165`."""
@@ -526,6 +527,8 @@ async def trades_stream(
       async def fills() -> AsyncGenerator[Trade]:
         """Ignore status changes and other symbols; never count cumulative fills twice."""
         async for event in upstream:
+          if not is_known_futures_user_event(event):
+            continue
           if event['e'] == 'listenKeyExpired':
             raise RuntimeError('The Aster listen key expired')
           if event['e'] != 'ORDER_TRADE_UPDATE':

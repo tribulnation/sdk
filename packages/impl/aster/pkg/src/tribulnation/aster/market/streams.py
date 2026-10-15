@@ -17,14 +17,13 @@ from typed_core.util import StreamManager
 from typed_aster.core import timestamp_millis
 from typed_aster.futures.market.depth import OrderBookResponse
 from typed_aster.futures.streams.schemas import FuturesBookTickerEvent
-from typed_aster.schemas import (
-  BookTickerEvent,
-  DepthUpdate,
-  ExecutionReport,
-  OrderBook,
-  OutboundAccountPosition,
+from typed_aster.schemas import BookTickerEvent, DepthUpdate, ExecutionReport, OrderBook
+from typed_aster.futures.user_stream.events import (
+  FuturesUserEvent,
+  OrderUpdate,
+  is_known_futures_user_event,
 )
-from typed_aster.futures.user_stream.events import FuturesUserEvent, OrderUpdate
+from typed_aster.spot.user_stream.events import SpotUserEvent, is_known_spot_user_event
 from tribulnation.sdk.core import MissingData, NetworkError, Subscription
 from tribulnation.sdk.market import Book, Settings, Trade
 from tribulnation.sdk.util import epoch_time
@@ -201,8 +200,11 @@ async def with_renewal(
 async def perp_fills(
   events: AsyncIterable[FuturesUserEvent],
 ) -> AsyncIterator[tuple[str, Trade]]:
-  """Keep perpetual trade executions; order-status and account events are not fills."""
+  """Keep perpetual trade executions; order-status, account and unmodelled events are
+  not fills."""
   async for event in events:
+    if not is_known_futures_user_event(event):
+      continue
     if event['e'] == 'listenKeyExpired':
       raise NetworkError('Aster listen key expired')
     if event['e'] == 'ORDER_TRADE_UPDATE' and event['o']['x'] == 'TRADE':
@@ -210,10 +212,13 @@ async def perp_fills(
 
 
 async def spot_fills(
-  events: AsyncIterable[OutboundAccountPosition | ExecutionReport],
+  events: AsyncIterable[SpotUserEvent],
 ) -> AsyncIterator[tuple[str, Trade]]:
-  """Keep spot trade executions; balance and order-status events are not fills."""
+  """Keep spot trade executions; balance, order-status and unmodelled events are not
+  fills."""
   async for event in events:
+    if not is_known_spot_user_event(event):
+      continue
     if event['e'] == 'executionReport' and event['x'] == 'TRADE':
       yield event['s'], parse_fill(event)
 

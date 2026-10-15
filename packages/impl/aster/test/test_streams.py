@@ -51,6 +51,48 @@ def fill(scope: Scope, symbol: str, side: str) -> dict[str, Any]:
 
 
 @pytest.mark.parametrize('scope', ['spot', 'perp'])
+async def test_unknown_account_event_does_not_end_fills(
+  scope: Scope, monkeypatch: pytest.MonkeyPatch
+):
+  """An event type the client does not model is skipped, and fills after it still arrive."""
+  keys = FuturesListenKey if scope == 'perp' else SpotListenKey
+  events = FuturesEvents if scope == 'perp' else SpotEvents
+  monkeypatch.setattr(
+    keys, 'start', AsyncMock(return_value={'listenKey': 'test-lease'})
+  )
+  monkeypatch.setattr(keys, 'close', AsyncMock())
+  unknown: dict[str, Any] = {'e': 'FUND_CHANGE_WS', 'fundChangeEventInfo': {'asset': 'USDT'}}
+
+  @asynccontextmanager
+  async def stream(*args: Any):
+    """Push an unmodelled event between two fills, then stay open."""
+
+    async def rows() -> AsyncIterator[dict[str, Any]]:
+      """The native events, as the client yields them."""
+      yield fill(scope, 'BTCUSDT', 'BUY')
+      yield unknown
+      yield fill(scope, 'BTCUSDT', 'SELL')
+      await asyncio.Event().wait()
+
+    yield rows()
+
+  monkeypatch.setattr(events, 'events', stream)
+  async with btc_market(scope) as btc:
+    async with btc.trades_stream() as trades:
+      iterator = aiter(trades)
+      first = await asyncio.wait_for(anext(iterator), 2)
+      second = await asyncio.wait_for(anext(iterator), 2)
+  assert (first.qty, second.qty) == (2, -2)
+
+
+@asynccontextmanager
+async def btc_market(scope: Scope) -> AsyncIterator[SpotMarket | PerpMarket]:
+  """A BTCUSDT market on a public testnet venue, open for the block."""
+  async with AsterMarket.new(public=True, mainnet=False) as venue:
+    yield market(venue, scope, 'BTCUSDT')
+
+
+@pytest.mark.parametrize('scope', ['spot', 'perp'])
 async def test_shared_fills_and_last_subscriber_cleanup(
   scope: Scope, monkeypatch: pytest.MonkeyPatch
 ):

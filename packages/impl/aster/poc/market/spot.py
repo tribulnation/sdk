@@ -42,6 +42,7 @@ from typed_aster import BadRequest
 from typed_aster.schemas import AccountTrade, BatchError, DepthUpdate
 from typed_aster.spot.trade.cancel_batch_orders import SpotBatchCancelledOrder
 from typed_aster.spot.trade.schemas import SpotOrder
+from typed_aster.spot.user_stream.events import is_known_spot_user_event
 from tribulnation.sdk.core.stream import Subscription
 from tribulnation.sdk.market import Candle
 from tribulnation.sdk.market.types.candles import candle_windows
@@ -453,6 +454,8 @@ async def trades_stream(
       async def fills() -> AsyncGenerator[Trade]:
         """Ignore status changes and other symbols; never count cumulative fills twice."""
         async for event in upstream:
+          if not is_known_spot_user_event(event):
+            continue
           if event['e'] != 'executionReport':
             continue
           r = event
