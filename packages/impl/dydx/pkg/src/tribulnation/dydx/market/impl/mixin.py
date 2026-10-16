@@ -72,9 +72,13 @@ class Settings(TypedDict, total=False):
     time (the stream has no block time), `id` is synthetic
     (`<height>:<order id or subaccount:kind:perpetual>:<n>`) and `fee` is `None`. There
     is no fallback: fills finalized while the node is unreachable are missed, so the
-    caller's reconciliation (e.g. `trades_history`) must cover them.
+    caller's reconciliation (e.g. `trades_history`) must cover them. The stream fails
+    with `NetworkError` when the node is catching up or its latest block is old as it
+    connects, since it would stream old blocks as new fills.
   - `'fastest'`: `'node'` and `'indexer'` raced. Each fill is emitted once, by whichever
-    source delivers it first (`details['source']`), so the indexer covers node outages.
+    source delivers it first (`details['source']`), so the indexer covers node outages;
+    a node that is not at the chain tip as it connects fails the stream, as with
+    `'node'`.
   """
 
 

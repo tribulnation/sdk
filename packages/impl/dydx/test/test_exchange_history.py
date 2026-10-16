@@ -159,6 +159,51 @@ async def test_market_funding_payment_sign(
   assert [row.amount for row in rows] == [amount]
 
 
+@pytest.mark.parametrize('scope', ['market', 'exchange'])
+async def test_funding_payments_stop_paging_before_start(
+  monkeypatch: pytest.MonkeyPatch, scope: str
+):
+  """Stop at the first page reaching before `start`: the indexer ignores `afterOrAt`."""
+  from tribulnation.dydx.market.impl.funding import funding_payments
+  from tribulnation.dydx.market.impl.mixin import MarketMixin
+
+  start = datetime(2026, 1, 2, tzinfo=timezone.utc)
+  end = start + timedelta(days=1)
+  pages = [
+    [end, start + timedelta(hours=12)],
+    [start, start - timedelta(hours=1)],
+    [start - timedelta(hours=2)],
+  ]
+  calls: list[int] = []
+
+  async def fetch(state: int) -> tuple[list[dict[str, Any]], int | None]:
+    """Return newest-first pages through the whole history."""
+    calls.append(state)
+    rows = [{'ticker': 'BTC-USD', 'payment': '1', 'createdAt': t} for t in pages[state]]
+    return rows, state + 1 if state + 1 < len(pages) else None
+
+  exchange = Exchange.new(address='dydx1fixture', public=True)
+  monkeypatch.setattr(
+    type(exchange.indexer.data),
+    'get_subaccounts',
+    AsyncMock(return_value={'subaccounts': [{'subaccountNumber': 0}]}),
+  )
+  monkeypatch.setattr(
+    type(exchange.indexer.data),
+    'get_funding_payments_paged',
+    Mock(return_value=PaginatedResponse(0, fetch)),
+  )
+  if scope == 'market':
+    monkeypatch.setattr(MarketMixin, 'market', 'BTC-USD')
+    market = MarketMixin(shared=exchange.shared, perpetual_market=Mock())
+    response = funding_payments(market, start, end)
+  else:
+    response = exchange.funding_payments(None, start, end)
+  times = [row.time async for page in response for row in page]
+  assert times == [end, start + timedelta(hours=12), start]
+  assert calls == [0, 1]
+
+
 @pytest.mark.parametrize('amount', ['2', '-3', '0'])
 @pytest.mark.parametrize('subaccount', [0, 128])
 @pytest.mark.parametrize('method', ['trades_history', 'funding_payments'])

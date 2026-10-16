@@ -463,12 +463,12 @@
         "version": "0.3.7"
       },
       "tribulnation-dydx": {
-        "files_sha256": "e609a03e97c34186998a50a369572324e6501edfe46f7678f762628d9eef11d4",
+        "files_sha256": "bf0059fee6788878587877686c92b83992c5dd5ebeacbb35ea07e57e8097a9c4",
         "metadata_sha256": "3a80a37af7984ccde9a43dbdee11d12145f5a73927a99d6af07d8dbe8ffb6986",
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "b7f9baec5fd4c191964ee5e350ec74e7de5ae8f2ede71cdf53b28271740b8dfc",
+        "files_sha256": "33f8ad770e44a0bbd625e48227532166c2a576d25a12eabdc442c765f94b42b7",
         "metadata_sha256": "f47df0e52935585aae4ec374de8a9011f24fe6dbdbe2b742d7f95828275305b8",
         "version": "0"
       },
@@ -515,7 +515,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "2d6f9a4c807675e2dcf46640bde0a5695b65585bed1c43c0b7173c9b1b182042",
+    "source_sha256": "a33c0c5704f7f1d4e07c843e0ccc0d362b2f5cb4890a1f41d2c50cfb6378e7b7",
     "venue": "dydx"
   },
   "before": {
@@ -982,12 +982,12 @@
         "version": "0.3.7"
       },
       "tribulnation-dydx": {
-        "files_sha256": "e609a03e97c34186998a50a369572324e6501edfe46f7678f762628d9eef11d4",
+        "files_sha256": "bf0059fee6788878587877686c92b83992c5dd5ebeacbb35ea07e57e8097a9c4",
         "metadata_sha256": "3a80a37af7984ccde9a43dbdee11d12145f5a73927a99d6af07d8dbe8ffb6986",
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "b7f9baec5fd4c191964ee5e350ec74e7de5ae8f2ede71cdf53b28271740b8dfc",
+        "files_sha256": "33f8ad770e44a0bbd625e48227532166c2a576d25a12eabdc442c765f94b42b7",
         "metadata_sha256": "f47df0e52935585aae4ec374de8a9011f24fe6dbdbe2b742d7f95828275305b8",
         "version": "0"
       },
@@ -1034,12 +1034,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "2d6f9a4c807675e2dcf46640bde0a5695b65585bed1c43c0b7173c9b1b182042",
+    "source_sha256": "a33c0c5704f7f1d4e07c843e0ccc0d362b2f5cb4890a1f41d2c50cfb6378e7b7",
     "venue": "dydx"
   },
-  "finished": "2026-10-09T19:57:34.607328Z",
+  "finished": "2026-10-15T23:26:11.818875Z",
   "results_sha256": "44a5572d1ae8a421e038ff7242d5f77ac0c28118ecb25937d5907013f7220c3b",
   "schema_version": 2,
-  "started": "2026-10-09T19:56:06.050652Z",
-  "summary_sha256": "552cd824f6281c01beb2039d65953338c86ee7a99377d602126e5a926f81024c"
+  "started": "2026-10-15T23:25:34.493388Z",
+  "summary_sha256": "cd106cd284dfbf9fbf435bfda6c397f6c9b6030fb8ae22fee7c00cd60b62f91d"
 }

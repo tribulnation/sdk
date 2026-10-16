@@ -1,8 +1,8 @@
 """dYdX `trades_stream` from a full node: fill mapping, dedup, and source selection."""
 
-from contextlib import asynccontextmanager
+from contextlib import aclosing, asynccontextmanager
 from dataclasses import replace
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from types import SimpleNamespace
 from typing_extensions import Any, AsyncIterator, cast
@@ -37,7 +37,7 @@ from tribulnation.dydx.market.impl.orders import (
   serialize_id,
 )
 from tribulnation.dydx.market.impl.trades import indexer_key, trades_stream
-from tribulnation.sdk.core import Subscription
+from tribulnation.sdk.core import NetworkError, Subscription
 from tribulnation.sdk.market import Trade
 
 ADDRESS = 'dydx1039f5sxkl0t39vxcsnmlu62ly22typdap0zkyn'
@@ -721,17 +721,182 @@ def test_endpoints_build_an_owned_node_chain_client():
 # ── The feed ────────────────────────────────────────────────────────────────
 
 
-class FakeComet:
-  """CometBFT RPC returning fixed block results."""
+def node_status(*, catching_up: bool = False, age: float = 1.0) -> Any:
+  """A CometBFT `/status` whose latest block is `age` seconds old."""
+  latest = datetime.now(timezone.utc) - timedelta(seconds=age)
+  return {
+    'sync_info': {
+      'latest_block_height': 109_551_010,
+      'latest_block_time': latest,
+      'catching_up': catching_up,
+    }
+  }
 
-  def __init__(self, results: BlockResultsResponse):
+
+class FakeComet:
+  """CometBFT RPC returning fixed block results and scripted statuses."""
+
+  def __init__(
+    self,
+    results: BlockResultsResponse | None = None,
+    statuses: list[Any | Exception] | None = None,
+  ):
     self.results = results
+    self.statuses = statuses or []
+    """One per `status` call, then a synced node."""
     self.heights: list[int] = []
+    self.status_calls = 0
 
   async def block_results(self, height: int, *, validate: bool | None = None):
     """Record and answer."""
     self.heights.append(height)
+    assert self.results is not None
     return self.results
+
+  async def status(self, *, validate: bool | None = None):
+    """The next scripted status: raise it if it is an error."""
+    self.status_calls += 1
+    status = self.statuses.pop(0) if self.statuses else node_status()
+    if isinstance(status, Exception):
+      raise status
+    return status
+
+
+def test_a_node_at_the_tip_is_not_behind():
+  """A synced node whose latest block is recent passes."""
+  assert (
+    node_stream.node_behind(node_status(age=2), now=datetime.now(timezone.utc)) is None
+  )
+
+
+def test_a_node_catching_up_is_behind_however_recent_its_block():
+  """`catching_up` alone rejects the node."""
+  reason = node_stream.node_behind(
+    node_status(catching_up=True, age=0), now=datetime.now(timezone.utc)
+  )
+  assert reason is not None and reason.startswith('catching up')
+
+
+def test_a_node_with_an_old_block_is_behind_even_when_not_catching_up():
+  """Out of block sync but still behind: the block age rejects it."""
+  now = datetime.now(timezone.utc)
+  age = node_stream.MAX_BLOCK_AGE + 5
+  reason = node_stream.node_behind(node_status(age=age), now=now)
+  assert reason is not None and reason.startswith('behind')
+  assert (
+    node_stream.node_behind(node_status(age=node_stream.MAX_BLOCK_AGE - 1), now=now)
+    is None
+  )
+
+
+def scripted_feed(
+  monkeypatch: pytest.MonkeyPatch,
+  comet: FakeComet,
+  connections: list[list[clob.StreamUpdate]],
+) -> tuple[node_stream.NodeFeed, list[dict[str, Any]]]:
+  """A feed over a fake node: each connection streams one batch then ends, except the
+  last, which idles."""
+  monkeypatch.setattr(node_stream, 'RECONNECT_MIN', 0)
+  requests: list[dict[str, Any]] = []
+
+  @asynccontextmanager
+  async def fake_stream(node: Any, **request: Any):
+    """Serve the next scripted connection."""
+    requests.append(request)
+    script = connections.pop(0)
+
+    async def responses():
+      """The scripted batch, then idle on the last connection."""
+      yield clob.StreamOrderbookUpdatesResponse(updates=script)
+      if not connections:
+        await asyncio.Event().wait()
+
+    yield responses()
+
+  monkeypatch.setattr(node_stream, 'stream_updates', fake_stream)
+  shared = Exchange.new(
+    address=ADDRESS,
+    public=True,
+    full_node_grpc='127.0.0.1:1',
+    full_node_rpc='http://127.0.0.1:2',
+  ).shared
+  shared.perpetual_markets = {'BTC-USD': MARKET}
+  node = SimpleNamespace(comet=comet, grpc_client=GrpcClient(host='127.0.0.1', port=1))
+  feed = node_stream.NodeFeed(
+    shared=cast(Shared, shared), node=cast(Any, node), address=ADDRESS
+  )
+  return feed, requests
+
+
+def mine_filled(height: int) -> clob.StreamUpdate:
+  """A finalized update in which our maker order fills."""
+  mine = order(oid(1), buy=True, subticks=6_000_000_000)
+  taker = order(oid(9, owner=OTHER), buy=False, subticks=1)
+  return update(height, match_orders(taker, [(mine, 10_000_000)]))
+
+
+@pytest.mark.parametrize(
+  'status',
+  [node_status(catching_up=True), node_status(age=node_stream.MAX_BLOCK_AGE + 60)],
+  ids=['catching-up', 'old-block'],
+)
+async def test_feed_refuses_a_node_behind_the_tip_without_streaming(
+  monkeypatch: pytest.MonkeyPatch, status: Any
+):
+  """The first connection checks the node: one behind fails the feed, and its stream,
+  which would replay old blocks as new fills, is never opened."""
+  feed, requests = scripted_feed(
+    monkeypatch, FakeComet(statuses=[status]), [[mine_filled(10)]]
+  )
+  async with aclosing(feed.fills()) as fills:
+    with pytest.raises(NetworkError, match="trades_source='indexer'"):
+      await asyncio.wait_for(anext(fills), 2)
+  assert requests == []
+
+
+async def test_feed_refuses_a_node_that_reconnects_behind_the_tip(
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """A node restarted under a running feed: the fill streamed before is delivered, and
+  the reconnection into the node now catching up fails the feed."""
+  comet = FakeComet(statuses=[node_status(), node_status(catching_up=True)])
+  feed, requests = scripted_feed(
+    monkeypatch, comet, [[mine_filled(10)], [mine_filled(11)]]
+  )
+  async with aclosing(feed.fills()) as fills:
+    first = await asyncio.wait_for(anext(fills), 2)
+    with pytest.raises(NetworkError, match='catching up'):
+      await asyncio.wait_for(anext(fills), 2)
+  assert first.height == 10 and len(requests) == 1 and comet.status_calls == 2
+
+
+async def test_feed_retries_an_unreachable_status_like_any_transport_error(
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """`/status` failing says nothing about the node's height: retry, then stream."""
+  comet = FakeComet(statuses=[RuntimeError('connection refused'), node_status()])
+  feed, requests = scripted_feed(monkeypatch, comet, [[mine_filled(10)]])
+  async with aclosing(feed.fills()) as fills:
+    fill = await asyncio.wait_for(anext(fills), 2)
+  assert fill.height == 10 and len(requests) == 1 and comet.status_calls == 2
+
+
+@pytest.mark.parametrize('source', ['node', 'fastest'])
+async def test_a_node_behind_the_tip_fails_the_trades_stream(source: str):
+  """The node feed's refusal reaches the caller with either source that reads it."""
+  gate = Gate()
+  gate.events['indexer'].set()
+
+  async def refused() -> AsyncIterator[NodeFill]:
+    """A node feed refusing its node."""
+    raise NetworkError('dYdX full node is catching up')
+    yield
+
+  market = market_with(node=refused(), indexer=gate.stream('indexer', []))
+  settings: Any = {'dydx': {'trades_source': source}}
+  async with trades_stream(market, settings=settings) as stream:
+    with pytest.raises(NetworkError, match='catching up'):
+      await asyncio.wait_for(anext(aiter(stream)), 2)
 
 
 async def test_feed_reconnects_and_resolves_deleveraging(
