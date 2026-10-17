@@ -256,10 +256,53 @@ def export_order(order: Order, settings: Settings) -> OrderParams:
       )
 
 
+def check_expiry(flags: Flags, settings: Settings):
+  """Reject expiry settings that conflict or do not apply to the order's flags.
+
+  Raises:
+    ValueError: An absolute expiry is set with its delta counterpart, or on the wrong
+      order kind.
+  """
+  if 'good_til_block' in settings and 'short_term_gtb' in settings:
+    raise ValueError('dYdX settings: set good_til_block or short_term_gtb, not both')
+  if 'good_til_block_time' in settings and 'long_term_gtbt' in settings:
+    raise ValueError(
+      'dYdX settings: set good_til_block_time or long_term_gtbt, not both'
+    )
+  if 'good_til_block' in settings and flags != 'SHORT_TERM':
+    raise ValueError(
+      f'dYdX settings: good_til_block applies to SHORT_TERM orders, not {flags}'
+    )
+  if 'good_til_block_time' in settings and flags == 'SHORT_TERM':
+    raise ValueError(
+      'dYdX settings: good_til_block_time applies to LONG_TERM and CONDITIONAL '
+      'orders, not SHORT_TERM'
+    )
+
+
 async def with_expiry(
   self: MarketMixin, params: OrderParams, settings: Settings
 ) -> OrderParams:
-  """Apply SDK-configured dYdX order expiry deltas."""
+  """Apply SDK-configured dYdX order expiry.
+
+  Absolute `good_til_block` / `good_til_block_time` are sent as is, without reading the
+  chain tip; the `short_term_gtb` / `long_term_gtbt` deltas are added to the latest block.
+  """
+  check_expiry(params['flags'], settings)
+  if (
+    params['flags'] == 'SHORT_TERM'
+    and (gtb := settings.get('good_til_block')) is not None
+  ):
+    updated = params.copy()
+    updated['good_til_block'] = gtb
+    return updated
+  if (
+    params['flags'] != 'SHORT_TERM'
+    and (gtbt := settings.get('good_til_block_time')) is not None
+  ):
+    updated = params.copy()
+    updated['good_til_block_time'] = int(gtbt.timestamp())
+    return updated
   if (
     params['flags'] == 'SHORT_TERM'
     and (delta := settings.get('short_term_gtb')) is not None
