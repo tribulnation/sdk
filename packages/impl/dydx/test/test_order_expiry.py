@@ -9,9 +9,11 @@ from unittest.mock import AsyncMock
 import pydantic
 import pytest
 
+from typed_dydx.node.orders.types import Flags
 from typed_dydx.protos.dydxprotocol import clob
 
 from tribulnation.dydx.market.impl.mixin import MarketMixin
+from tribulnation.dydx.market.impl.mixin import Settings as DydxSettings
 from tribulnation.dydx.market.impl.orders import place_order
 from tribulnation.sdk.market import Order, Settings
 
@@ -41,10 +43,10 @@ def fake_market() -> tuple[MarketMixin, AsyncMock, AsyncMock]:
   return cast(MarketMixin, market), place, latest
 
 
-async def placed(settings: dict[str, Any]) -> tuple[dict[str, Any], AsyncMock]:
+async def placed(settings: DydxSettings) -> tuple[dict[str, Any], AsyncMock]:
   """Place `ORDER` with dYdX settings; the order params sent and the tip mock."""
   market, place, latest = fake_market()
-  await place_order(market, ORDER, settings=cast(Settings, {'dydx': settings}))
+  await place_order(market, ORDER, settings={'dydx': settings})
   assert place.await_args is not None
   return place.await_args.kwargs['order'], latest
 
@@ -57,7 +59,7 @@ async def test_absolute_good_til_block_is_sent_without_reading_the_tip():
 
 
 @pytest.mark.parametrize('flags', ['LONG_TERM', 'CONDITIONAL'])
-async def test_absolute_good_til_block_time_is_sent_without_reading_the_tip(flags: str):
+async def test_absolute_good_til_block_time_is_sent_without_reading_the_tip(flags: Flags):
   expiry = datetime(2026, 10, 17, 12, 5, 30, 900_000, tzinfo=timezone.utc)
 
   order, latest = await placed({'flags': flags, 'good_til_block_time': expiry})
