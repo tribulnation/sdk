@@ -79,16 +79,40 @@ by the dYdX `Settings` TypedDict (`market/impl/mixin.py`). All keys are optional
 
 | Key | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `order_flags` | `'SHORT_TERM' \| 'LONG_TERM' \| 'CONDITIONAL'` | `'LONG_TERM'` | Order flags applied to all orders. |
-| `limit_tif` | `TimeInForce` | `'GOOD_TIL_TIME'` | Time-in-force for `LIMIT` orders. |
-| `market_tif` | `TimeInForce` | `'IMMEDIATE_OR_CANCEL'` | Time-in-force for `MARKET` orders. |
-| `short_term_gtb` | `int` | — | GTB delta for short-term orders: good-til-block = `current_block + short_term_gtb`. Only applied when `order_flags == 'SHORT_TERM'`. |
-| `long_term_gtbt` | `int` | — | GTBT delta (seconds) for long-term orders: good-til-block-time = `current_block_time + long_term_gtbt`. Only applied for `LONG_TERM`/`CONDITIONAL` flags. |
+| `flags` | `'SHORT_TERM' \| 'LONG_TERM' \| 'CONDITIONAL'` | `'SHORT_TERM'` for `MARKET`, else `'LONG_TERM'` | dYdX order flags. |
+| `tif` | `TimeInForce` | `'IMMEDIATE_OR_CANCEL'` for `MARKET`, `'POST_ONLY'` for `POST_ONLY`, else `'GOOD_TIL_TIME'` | Time-in-force, for any order type. |
+| `short_term_gtb` | `int` | — | GTB delta for short-term orders: good-til-block = `latest_block + short_term_gtb`. Only applied to `SHORT_TERM` orders. |
+| `long_term_gtbt` | `int` | — | GTBT delta (seconds) for stateful orders: good-til-block-time = `latest_block_time + long_term_gtbt`. Only applied to `LONG_TERM`/`CONDITIONAL` orders. |
+| `good_til_block` | `int` | — | Absolute good-til-block for `SHORT_TERM` orders, sent as is; see [Order expiry](#order-expiry). |
+| `good_til_block_time` | timezone-aware `datetime` | — | Absolute good-til-block-time for `LONG_TERM`/`CONDITIONAL` orders, sent as is (whole seconds); see [Order expiry](#order-expiry). |
 | `reduce_only` | `bool` | `False` | Place as reduce-only. |
+| `tickers_fetch_depth` | `bool` | `True` | Whether bulk tickers fetch order books for best bid and ask. |
+| `tickers_depth_concurrent` | `int` | `20` | Maximum concurrent order-book requests used to enrich bulk tickers. |
 | `trades_source` | `'indexer' \| 'node' \| 'fastest'` | `'indexer'` | Where `trades_stream` reads fills from; see [Fill sources](#fill-sources). |
 
-Type mapping: `POST_ONLY` orders always use TIF `POST_ONLY`; `MARKET` uses `market_tif`;
-`LIMIT` uses `limit_tif`.
+Unknown keys are rejected.
+
+## Order expiry
+
+Every dYdX order carries an expiry: a block height (good-til-block) for short-term
+orders, a block time (good-til-block-time) for long-term and conditional ones. The chain
+accepts a short-term good-til-block from the next block up to its short-term window
+(20 blocks) past the current height.
+
+1. **No expiry setting**: the dYdX client reads the latest block and uses the widest
+   window: `height + 20` for short-term orders, `time + 95 days` for stateful ones.
+2. **Delta** (`short_term_gtb`, `long_term_gtbt`): the SDK reads the latest block and adds
+   the delta to its height or time.
+3. **Absolute** (`good_til_block`, `good_til_block_time`): the value is sent as is, and
+   neither the SDK nor the client reads the chain tip. A caller already tracking the
+   height (for example from the indexer's `v4_block_height` stream) saves a request per
+   order and controls the expiry exactly. The chain validates the window: a height
+   already past, or too far ahead, is refused.
+
+An absolute setting and its delta counterpart are exclusive, and an absolute setting on
+the wrong order kind (`good_til_block` on a stateful order, `good_til_block_time` on a
+short-term one) raises `ValueError` before anything is sent. Cancellations always read
+the latest block, so a cancel's good-til-block covers any short-term order still live.
 
 ## Fill sources
 
@@ -221,8 +245,8 @@ await market.place_order(
   {'price': 10, 'qty': 0.00001, 'type': 'LIMIT'},
   settings={
     'dydx': {
-      'limit_tif': 'IMMEDIATE_OR_CANCEL',
-      'order_flags': 'SHORT_TERM',
+      'tif': 'IMMEDIATE_OR_CANCEL',
+      'flags': 'SHORT_TERM',
       'short_term_gtb': 2,
     }
   },

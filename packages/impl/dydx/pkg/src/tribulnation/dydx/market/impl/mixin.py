@@ -12,6 +12,7 @@ from typing_extensions import (
 from dataclasses import dataclass, field
 import asyncio
 import pydantic
+from pydantic import AwareDatetime
 
 from typed_dydx.indexer.schemas import PerpetualMarket
 from typed_dydx import Dydx
@@ -59,6 +60,15 @@ class Settings(TypedDict, total=False):
   """GTB delta for short-term orders. The GTB will be `current_block() + short_term_gtb`"""
   long_term_gtbt: int
   """GTBT delta for long-term orders. The GTBT will be `current_block().time.seconds + long_term_gtbt`"""
+  good_til_block: int
+  """Absolute GTB for short-term orders, sent as is without reading the chain tip.
+
+  The chain accepts heights from the next block up to its short-term window past the
+  tip. Exclusive with `short_term_gtb`; only valid for `SHORT_TERM` orders."""
+  good_til_block_time: AwareDatetime
+  """Absolute GTBT for long-term and conditional orders, sent as is (whole seconds)
+  without reading the chain tip. Exclusive with `long_term_gtbt`; not valid for
+  `SHORT_TERM` orders."""
   reduce_only: bool
   trades_source: TradesSource
   """Where `trades_stream` reads fills from. Defaults to `'indexer'`.
