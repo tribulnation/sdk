@@ -34,7 +34,7 @@ from tribulnation.dydx.core import wrap_exceptions
 from .depth import depth_stream, Book
 from .rules import parse_rules, Rules
 from .fees import combined_fees, market_charge, market_discount_params, PPM
-from .chain_tip import ChainTip, MAX_AGE, POLL_INTERVAL
+from .chain_tip import ChainTip, MAX_AGE, POLL_INTERVAL, stopping_poll
 from tribulnation.sdk.market import Fees
 
 if TYPE_CHECKING:
@@ -274,7 +274,12 @@ class Shared(SDK):
     yield self.client_resource
     if self.full_node_resource is not None:
       yield self.full_node_resource
-    yield self.chain_tip
+    # Last, so the poll stops before the clients it reads are closed.
+    yield ManagedResource(
+      resource=stopping_poll(self.chain_tip),
+      wrap_enter=wrap_exceptions,
+      wrap_exit=wrap_exceptions,
+    )
 
 
 FULL_NODE_GRPC_PORT = 9090

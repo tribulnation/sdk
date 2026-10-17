@@ -6,18 +6,22 @@ from typing_extensions import Any, cast
 import asyncio
 import logging
 import time
+from unittest.mock import AsyncMock
 
 import pytest
 from typed_dydx.node.constants import SHORT_BLOCK_WINDOW, STATEFUL_ORDER_TIME_WINDOW
 from typed_dydx.node.orders.types import OrderParams
 
 from tribulnation.dydx.market.impl import chain_tip as chain_tip_module
+from tribulnation.dydx.core import wrap_exceptions
 from tribulnation.dydx.market.impl.chain_tip import (
   ChainTip,
   Tip,
   long_term_max_age,
   short_term_max_age,
+  stopping_poll,
 )
+from tribulnation.sdk.core import ManagedResource
 from tribulnation.dydx.market.impl.mixin import MarketMixin, Settings, Shared
 from tribulnation.dydx.market.impl.orders import (
   MAX_LONG_TERM_GTBT,
@@ -314,9 +318,9 @@ async def test_idle_poll_stops_and_the_next_order_restarts_it():
     await tip.stop()
 
 
-async def test_exit_cancels_the_poll():
+async def test_stopping_poll_cancels_it_at_exit():
   chain = FakeChain()
-  async with tip_of(chain, poll_interval=60) as tip:
+  async with stopping_poll(tip_of(chain, poll_interval=60)) as tip:
     tip.start()
     task = tip.task
   assert task is not None and task.cancelled()
@@ -332,4 +336,24 @@ def test_shared_prefers_the_full_node():
   assert with_node.chain_tip.chain == 'full node'
   assert without.chain_tip.chain == 'public'
   assert without.chain_tip.max_age == 1.0
-  assert with_node.chain_tip in list(with_node.resources())
+
+
+async def test_shared_owns_the_poll_under_the_venue_policy():
+  """Exiting `Shared` stops the poll before closing the client, and every entry gets a
+  fresh closer, so the owner can be entered again; the closer carries the venue's
+  error policy."""
+  client = AsyncMock()
+  client.__aexit__.return_value = False
+  shared = Shared(client=cast(Any, client), address=None)
+  vars(shared)['chain_tip'] = tip_of(FakeChain(), poll_interval=60)
+  closers = [r for r in shared.resources() if isinstance(r, ManagedResource)][-1:]
+  assert closers and closers[0] is not list(shared.resources())[-1]
+  assert cast(ManagedResource[object], closers[0]).wrap_exit is wrap_exceptions
+
+  for _ in range(2):
+    async with shared:
+      shared.chain_tip.start()
+      task = shared.chain_tip.task
+      assert task is not None and not task.done()
+    assert task.cancelled() and shared.chain_tip.task is None
+  assert client.__aexit__.await_count == 2

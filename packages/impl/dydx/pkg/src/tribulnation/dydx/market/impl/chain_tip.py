@@ -10,6 +10,7 @@ refusing a tip old enough for the order to have expired before it reaches the ch
 tip older than that, or no tip at all, is read live with `get_latest_block`.
 """
 
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import datetime
 import asyncio
@@ -68,7 +69,8 @@ def long_term_max_age(delta: int) -> float:
 class ChainTip:
   """The latest block of one node, polled in the background once first read.
 
-  The poll starts on the first `latest` call and stops when the owner exits, or after
+  The poll starts on the first `latest` call and stops when the owner exits
+  (`stopping_poll`), or after
   `idle_after` seconds without a `latest` call (the next one restarts it). Its
   failures are logged and retried with backoff, never raised: the cached tip ages
   instead, and `latest` falls back to a live read. Heights never go backwards.
@@ -166,10 +168,14 @@ class ChainTip:
       task.cancel()
       await asyncio.wait([task])
 
-  async def __aenter__(self):
-    """Nothing to acquire: the poll starts on the first `latest` call."""
-    return self
 
-  async def __aexit__(self, *exc: object):
-    """Stop the background poll."""
-    await self.stop()
+@asynccontextmanager
+async def stopping_poll(tip: ChainTip):
+  """Stop the tip's background poll at exit, if an order ever started it.
+
+  Nothing is acquired on entry: the poll starts lazily inside the block.
+  """
+  try:
+    yield tip
+  finally:
+    await tip.stop()
