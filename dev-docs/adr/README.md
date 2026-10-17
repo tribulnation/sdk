@@ -68,3 +68,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0043](0043-order-rejected.md) | Definitive order rejections as `OrderRejected` | Accepted; implemented for Hyperliquid, Aster and Lighter, not release-verified |
 | [0044](0044-trades-stream-settings-dydx-node-fills.md) | `trades_stream` settings and dYdX full node fills | Proposed; implemented, not release-verified; amended by 0045 |
 | [0045](0045-dydx-node-feed-refuses-a-node-behind.md) | The dYdX node feed refuses a node behind the chain tip | Proposed; implemented, not release-verified; amends 0044 |
+| [0046](0046-dydx-cached-chain-tip.md) | dYdX order expiry from a cached chain tip | Proposed; implemented, not release-verified |

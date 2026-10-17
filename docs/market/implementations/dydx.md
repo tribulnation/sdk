@@ -32,7 +32,8 @@ when only `mnemonic` is given, the address is derived from it at construction ti
 `full_node_grpc` and `full_node_rpc` (both optional, `None` by default, `$ENV_VAR` allowed)
 point at a full node you run: its plaintext gRPC streaming endpoint (`host:port`, e.g.
 `'20.222.23.181:9090'`) and its CometBFT RPC URL (e.g. `'http://20.222.23.181:26657'`).
-They are only read by the [node fill sources](#fill-sources), which need both.
+They are read by the [node fill sources](#fill-sources), which need both, and by
+[order expiry](#order-expiry), which reads the chain tip from the node when both are set.
 
 ## Exchange & ID conventions
 
@@ -82,13 +83,30 @@ by the dYdX `Settings` TypedDict (`market/impl/mixin.py`). All keys are optional
 | `order_flags` | `'SHORT_TERM' \| 'LONG_TERM' \| 'CONDITIONAL'` | `'LONG_TERM'` | Order flags applied to all orders. |
 | `limit_tif` | `TimeInForce` | `'GOOD_TIL_TIME'` | Time-in-force for `LIMIT` orders. |
 | `market_tif` | `TimeInForce` | `'IMMEDIATE_OR_CANCEL'` | Time-in-force for `MARKET` orders. |
-| `short_term_gtb` | `int` | — | GTB delta for short-term orders: good-til-block = `current_block + short_term_gtb`. Only applied when `order_flags == 'SHORT_TERM'`. |
-| `long_term_gtbt` | `int` | — | GTBT delta (seconds) for long-term orders: good-til-block-time = `current_block_time + long_term_gtbt`. Only applied for `LONG_TERM`/`CONDITIONAL` flags. |
+| `short_term_gtb` | `int` | `18` | Blocks a short-term order lives past the chain tip: good-til-block = `tip_height + short_term_gtb`, capped at 18 (the 20-block `ShortBlockWindow` less 2). See [Order expiry](#order-expiry). |
+| `long_term_gtbt` | `int` | 95 days less 60 s | Seconds a `LONG_TERM`/`CONDITIONAL` order lives past the tip's block time: good-til-block-time = `tip_time + long_term_gtbt`, capped at the default (the 95-day `StatefulOrderTimeWindow` less a minute). |
 | `reduce_only` | `bool` | `False` | Place as reduce-only. |
 | `trades_source` | `'indexer' \| 'node' \| 'fastest'` | `'indexer'` | Where `trades_stream` reads fills from; see [Fill sources](#fill-sources). |
 
 Type mapping: `POST_ONLY` orders always use TIF `POST_ONLY`; `MARKET` uses `market_tif`;
 `LIMIT` uses `limit_tif`.
+
+## Order expiry
+
+Every order's expiry is set from the chain tip (latest block height and time). The
+client polls the tip in the background, every 0.2 s from the first order on, from the
+account's full node when `full_node_grpc` and `full_node_rpc` are set and from the public
+chain endpoint otherwise. It reads the CometBFT `/status`, and ignores a node that
+reports it is catching up. Orders then use the cached tip with no request of their own.
+
+The tip is never extrapolated, so an expiry is at most as late as one read live. A
+cached tip is used only while it is young enough that the order cannot have expired by
+the time it reaches the chain: at most 2 s (`block_max_age` on `Exchange.new`), and for
+short-term orders at most `(short_term_gtb - 1) * 0.4` s, as dYdX blocks come at least
+0.4 s apart. A `short_term_gtb` of 2 accepts a tip up to 0.4 s old, and 1 always reads
+live. An older tip, or a failing poll, falls back to a live `get_latest_block`, which also
+refreshes the cache. The poll stops after 30 s without an order, and when the client is
+closed.
 
 ## Fill sources
 

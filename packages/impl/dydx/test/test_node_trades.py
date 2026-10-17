@@ -713,9 +713,9 @@ def test_endpoints_build_an_owned_node_chain_client():
   grpc: GrpcClient = node.grpc_client
   assert (grpc.host, grpc.port, grpc.ssl) == ('20.222.23.181', 9090, False)
   assert node.comet_client.base_url == 'http://20.222.23.181:26657'
-  assert len(list(shared.resources())) == 2
+  assert len(list(shared.resources())) == 3
   half = Exchange.new(address=ADDRESS, public=True, full_node_grpc='h:1').shared
-  assert half.full_node is None and len(list(half.resources())) == 1
+  assert half.full_node is None and len(list(half.resources())) == 2
 
 
 # ── The feed ────────────────────────────────────────────────────────────────

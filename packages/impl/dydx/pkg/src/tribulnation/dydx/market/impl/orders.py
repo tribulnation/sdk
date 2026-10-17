@@ -26,7 +26,9 @@ from tribulnation.sdk.market import (
 from typed_dydx.protos.cosmos.tx.v1beta1 import BroadcastTxResponse
 from typed_dydx.protos.dydxprotocol import clob, subaccounts
 from tribulnation.dydx.core import wrap_exceptions
+from typed_dydx.node.constants import SHORT_BLOCK_WINDOW, STATEFUL_ORDER_TIME_WINDOW
 from .mixin import MarketMixin, Settings, settings_adapter
+from .chain_tip import long_term_max_age, short_term_max_age
 
 
 class CancelResults(TypedDict, total=False):
@@ -60,6 +62,12 @@ INDEXER_NAMESPACE = uuid.UUID('0f9da948-a6fb-4c45-9edc-4685c3f3317d')
 """Namespace of the indexer's uuid5 ids (v4-chain `indexer/packages/postgres/src/helpers/uuid.ts`)."""
 MAX_SUBACCOUNT = 128_000
 """The highest valid subaccount number."""
+MAX_SHORT_TERM_GTB = SHORT_BLOCK_WINDOW - 2
+"""The latest short-term expiry, in blocks past the tip: the chain's `ShortBlockWindow`
+less 2 blocks, for a tip node running ahead of the node that checks the order."""
+MAX_LONG_TERM_GTBT = STATEFUL_ORDER_TIME_WINDOW - 60
+"""The latest stateful expiry, in seconds past the tip's block time: the chain's
+`StatefulOrderTimeWindow` less a minute, for the same skew."""
 
 
 def _protobuf_id(
@@ -259,36 +267,24 @@ def export_order(order: Order, settings: Settings) -> OrderParams:
 async def with_expiry(
   self: MarketMixin, params: OrderParams, settings: Settings
 ) -> OrderParams:
-  """Apply SDK-configured dYdX order expiry deltas."""
-  if (
-    params['flags'] == 'SHORT_TERM'
-    and (delta := settings.get('short_term_gtb')) is not None
-  ):
-    latest = await self.client.chain.tendermint.get_latest_block()
-    block = latest.block
-    if block is None or block.header is None:
-      raise ValidationError('Latest dYdX block response did not include a header')
+  """Set the order's expiry past the chain tip, cached by `Shared.chain_tip`.
+
+  Short-term orders expire `short_term_gtb` blocks past the tip, stateful ones
+  `long_term_gtbt` seconds past its block time, each capped below the chain's window.
+  """
+  tip = self.shared.chain_tip
+  if params['flags'] == 'SHORT_TERM':
+    delta = min(settings.get('short_term_gtb', MAX_SHORT_TERM_GTB), MAX_SHORT_TERM_GTB)
+    latest = await tip.latest(max_age=short_term_max_age(delta))
     updated = params.copy()
-    updated['good_til_block'] = block.header.height + delta
+    updated['good_til_block'] = latest.height + delta
     return updated
-  if (
-    params['flags'] in {'LONG_TERM', 'CONDITIONAL'}
-    and (delta := settings.get('long_term_gtbt')) is not None
-  ):
-    latest = await self.client.chain.tendermint.get_latest_block()
-    block = latest.block
-    if block is None or block.header is None or block.header.time is None:
-      raise ValidationError('Latest dYdX block response did not include a timestamp')
-    good_til_block_time = int(block.header.time.timestamp()) + delta
-    if params['flags'] == 'LONG_TERM':
-      updated = params.copy()
-      updated['good_til_block_time'] = good_til_block_time
-      return updated
-    if params['flags'] == 'CONDITIONAL':
-      updated = params.copy()
-      updated['good_til_block_time'] = good_til_block_time
-      return updated
-  return params
+  else:
+    delta = min(settings.get('long_term_gtbt', MAX_LONG_TERM_GTBT), MAX_LONG_TERM_GTBT)
+    latest = await tip.latest(max_age=long_term_max_age(delta))
+    updated = params.copy()
+    updated['good_til_block_time'] = int(latest.time.timestamp()) + delta
+    return updated
 
 
 @wrap_exceptions

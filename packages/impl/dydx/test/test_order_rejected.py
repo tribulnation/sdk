@@ -1,13 +1,16 @@
 """dYdX placement failures stay ambiguous: none is `OrderRejected` yet (ADR 0043)."""
 
+from datetime import datetime, timezone
 from decimal import Decimal
 from types import SimpleNamespace
-from typing_extensions import cast
+from typing_extensions import Any, cast
+import time
 from unittest.mock import AsyncMock
 
 import pytest
 from typed_core import exceptions as core
 
+from tribulnation.dydx.market.impl.chain_tip import ChainTip, Tip
 from tribulnation.dydx.market.impl.mixin import MarketMixin
 from tribulnation.dydx.market.impl.orders import place_order
 from tribulnation.sdk.core import ApiError, OrderRejected
@@ -25,6 +28,8 @@ ORDER: Order = {'type': 'MARKET', 'qty': Decimal('1'), 'price': Decimal('100')}
 )
 async def test_broadcast_failure_is_not_rejected(error: Exception):
   """`typed_dydx` drops the CheckTx code, so a refusal cannot be told from a pending tx."""
+  tip = ChainTip(chain=cast(Any, None), poll_interval=60)
+  tip.tip = Tip(height=1, time=datetime.now(timezone.utc), observed=time.monotonic())
   market = cast(
     MarketMixin,
     SimpleNamespace(
@@ -33,10 +38,14 @@ async def test_broadcast_failure_is_not_rejected(error: Exception):
       ),
       perpetual_market=object(),
       subaccount=0,
+      shared=SimpleNamespace(chain_tip=tip),
     ),
   )
 
-  with pytest.raises(ApiError) as raised:
-    await place_order(market, ORDER)
+  try:
+    with pytest.raises(ApiError) as raised:
+      await place_order(market, ORDER)
+  finally:
+    await tip.stop()
 
   assert not isinstance(raised.value, OrderRejected)

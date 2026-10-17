@@ -34,6 +34,7 @@ from tribulnation.dydx.core import wrap_exceptions
 from .depth import depth_stream, Book
 from .rules import parse_rules, Rules
 from .fees import combined_fees, market_charge, market_discount_params, PPM
+from .chain_tip import ChainTip, MAX_AGE, POLL_INTERVAL
 from tribulnation.sdk.market import Fees
 
 if TYPE_CHECKING:
@@ -56,9 +57,11 @@ class Settings(TypedDict, total=False):
   tif: TimeInForce
   """Time in force for limit orders. Defaults to IOC for market orders and GTC for limit/post_only orders."""
   short_term_gtb: int
-  """GTB delta for short-term orders. The GTB will be `current_block() + short_term_gtb`"""
+  """Blocks a short-term order lives past the chain tip: its GTB is `tip.height +
+  short_term_gtb`. Defaults to, and is capped at, `MAX_SHORT_TERM_GTB` (18)."""
   long_term_gtbt: int
-  """GTBT delta for long-term orders. The GTBT will be `current_block().time.seconds + long_term_gtbt`"""
+  """Seconds a stateful order lives past the tip's block time: its GTBT is
+  `tip.time + long_term_gtbt`. Defaults to, and is capped at, `MAX_LONG_TERM_GTBT`."""
   reduce_only: bool
   trades_source: TradesSource
   """Where `trades_stream` reads fills from. Defaults to `'indexer'`.
@@ -110,6 +113,19 @@ class Shared(SDK):
   deleveraging fills. Separate from `client.chain`, the public endpoints."""
   node_subscription: 'Subscription[NodeFill] | None' = None
   """The full node fill feed, created by the first node-sourced `trades_stream`."""
+  block_max_age: float = MAX_AGE
+  """Seconds a cached chain tip may be old before order expiry reads it live."""
+  block_poll_interval: float = POLL_INTERVAL
+  """Seconds between the chain tip's background reads."""
+
+  @cached_property
+  def chain_tip(self) -> ChainTip:
+    """The chain tip for order expiry, from the full node when configured."""
+    return ChainTip(
+      chain=self.full_node or self.client.chain,
+      max_age=self.block_max_age,
+      poll_interval=self.block_poll_interval,
+    )
 
   def require_address(self) -> str:
     """Require an account only when an account-scoped operation uses it."""
@@ -258,6 +274,7 @@ class Shared(SDK):
     yield self.client_resource
     if self.full_node_resource is not None:
       yield self.full_node_resource
+    yield self.chain_tip
 
 
 FULL_NODE_GRPC_PORT = 9090
@@ -304,6 +321,8 @@ class ExchangeMixin(SDK):
     account_id: str | None = None,
     full_node_grpc: str | None = None,
     full_node_rpc: str | None = None,
+    block_max_age: float = MAX_AGE,
+    block_poll_interval: float = POLL_INTERVAL,
   ):
     """Create a surface over a new client.
 
@@ -320,6 +339,9 @@ class ExchangeMixin(SDK):
       full_node_grpc: `host:port` of a full node's gRPC streaming endpoint, for the
         `'node'` and `'fastest'` trades sources (with `full_node_rpc`).
       full_node_rpc: The same node's CometBFT RPC URL, read for deleveraging fills.
+      block_max_age: Seconds the cached chain tip may be old before order expiry
+        reads it live.
+      block_poll_interval: Seconds between the chain tip's background reads.
     """
     client = (
       Dydx.mainnet(
@@ -352,6 +374,8 @@ class ExchangeMixin(SDK):
           if full_node_grpc is not None and full_node_rpc is not None
           else None
         ),
+        block_max_age=block_max_age,
+        block_poll_interval=block_poll_interval,
       )
     )
 
