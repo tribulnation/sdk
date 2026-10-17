@@ -31,6 +31,12 @@ Formatting and the mechanical rules (indentation, quotes, `typing_extensions`, n
     assert isinstance(x, Type1) # WRONG
   ```
 
+### Package structure
+
+- Each repository's `docs/architecture.md` holds a normative module map (module, responsibility, allowed imports), enforced by `scripts/structure.py` from `scripts/check.py`. A new module requires a map row, and the change report must say why the code is not an extension of an existing module. Prefer extending an existing module.
+- Import direction follows the map: `domain` imports only `domain`; `parsing`, `providers` and `storage` import `domain` and themselves; `application` imports everything but `cli`; `cli` imports `application` and its own settings. A violation is a placement error, not a reason to widen the map.
+- A module the change pushes past 400 lines is split in the same change, following the map's boundaries.
+
 ### Docstrings
 
 - Use a Google-compatible section style. Structured sections should stay parseable by Griffe/mkdocstrings.
@@ -166,6 +172,38 @@ def http(
 - When the return type is `None`, don't annotate it (it's already implicit).
 - Prefer single-line headers when not too long; the formatter decides the layout of multi-line ones.
 - Avoid names starting with underscore unless they are really private, concrete and not reusable.
+
+### Control flow
+
+Branches describe cases, not exits.
+
+- A function returning `X | None` never writes `return None`. State the condition under which there is a result and let the rest fall through. The annotation already says it may be `None`.
+
+  ```python
+  def mid(self) -> Decimal | None:
+    if self.bid is not None and self.ask is not None:
+      return (self.bid.price + self.ask.price) / 2
+  ```
+
+- Equal alternatives get `if`/`else` (or `if`/`elif`/`else`), each with its own `return`, rather than a guard followed by an unindented `return` that reads as a fallback. Use a conditional expression when both arms fit on one line, and `match` for three or more cases of a `Literal`.
+
+  ```python
+  if side == 1:
+    return book.market_buy_price(qty=qty)
+  else:
+    return book.market_sell_price(qty=qty)
+  ```
+
+- A search loop states what a hit is, rather than skipping misses with `continue`:
+
+  ```python
+  for market in markets:
+    if (book := self.book(market)) is not None and (mid := book.mid()) is not None:
+      return mid
+  ```
+
+- When positive conditions start nesting, move the check into a small method on the data (e.g. `book.fresh_mid(max_age)`) instead of switching back to early exits.
+- Bare `return` and `continue` remain fine as guards in procedures that return nothing ("nothing to do", "not ready yet").
 
 ### Tooling
 
