@@ -1,5 +1,5 @@
 # Local SDK evidence: ethereum
 
-Run completed: 2026-10-09T20:04:02.195926+00:00
+Run completed: 2026-10-19T16:07:01.878170+00:00
 
 This records a trusted local run, not cryptographic proof. Release policy must separately validate required check coverage and statuses.
