@@ -29,6 +29,7 @@ from tribulnation.sdk.core import (
   ManagedResource,
   OverflowPolicy,
   SDK,
+  SkippingView,
   Subscription,
   exception_wrapper,
 )
@@ -170,13 +171,16 @@ class Shared(SDK):
     select: Callable[[T], U | None],
     queue_size: int,
     overflow: OverflowPolicy,
+    connect_latest: Callable[[], Awaitable[Subscription.Context[T]]] | None = None,
   ) -> AsyncIterator[AsyncIterable[U]]:
     """Subscribe to one shared upstream, mapping or dropping items per subscriber.
 
-    The upstream opens with its first subscriber and closes with its last.
+    The upstream opens with its first subscriber and closes with its last. It opens
+    with `connect_latest`, when given, while every subscriber keeps only the newest
+    item (see `Subscription`). The yielded stream reports this subscriber's `skipped`.
     """
     if key not in subscriptions:
-      subscriptions[key] = Subscription(connect)
+      subscriptions[key] = Subscription(connect, connect_latest)
     async with subscriptions[key].subscribe(
       queue_size=queue_size, overflow=overflow
     ) as upstream:
@@ -187,7 +191,7 @@ class Shared(SDK):
           if (value := select(item)) is not None:
             yield value
 
-      yield selected()
+      yield SkippingView(selected(), upstream)
 
 
 @dataclass(frozen=True, kw_only=True)

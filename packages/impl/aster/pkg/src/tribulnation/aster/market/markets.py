@@ -500,7 +500,10 @@ class NativeMarket(Public, Market):
 
     Consumers of one symbol and source share a single upstream subscription; each
     source is a different feed (see `Settings.depth_source`), so books from different
-    sources need not agree tick-for-tick.
+    sources need not agree tick-for-tick. While every consumer keeps only the newest
+    book (the default `queue_size=1, overflow='latest'`), the upstream keeps only the
+    newest frame, so a stale one is never decoded nor converted; the yielded stream's
+    `skipped` counts the books this consumer never saw.
 
     Args:
       levels: Keep at most this many levels per side; it never selects the source.
@@ -521,6 +524,9 @@ class NativeMarket(Public, Market):
       select=lambda book: book if levels is None else book.limit(levels),
       queue_size=queue_size,
       overflow=overflow,
+      connect_latest=lambda: connect_books(
+        self.shared, self.scope, self.symbol, source, keep_latest=True
+      ),
     )
 
   async def fees(self, *, refetch: bool = False) -> Fees:
