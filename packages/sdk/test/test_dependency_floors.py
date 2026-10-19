@@ -8,16 +8,16 @@ from typing_extensions import cast
 
 ROOT = Path(__file__).resolve().parents[3]
 COMPATIBLE_IMPLEMENTATIONS = {
-  'aster': '0.11.0',
-  'binance': '0.7.0',
+  'aster': '0.12.0',
+  'binance': '0.8.0',
   'bit2me': '0.9.0',
   'bitget': '0.11.0',
   'bybit': '0.7.0',
   'coinbase': '0.5.0',
   'deribit': '0.6.0',
-  'dydx': '0.15.0',
+  'dydx': '0.17.0',
   'ethereum': '0.6.0',
-  'hyperliquid': '0.17.0',
+  'hyperliquid': '0.18.0',
   'kraken': '0.7.1',
   'kucoin': '0.6.0',
   'lighter': '0.10.0',
@@ -159,4 +159,17 @@ def test_adapters_released_with_sdk_2_17_require_it():
       if Requirement(value).name == 'tribulnation-sdk'
     )
     assert Version('2.16.0') not in requirement.specifier, venue
-    assert Version('2.17.0') in requirement.specifier, venue
+
+
+def test_keep_latest_adapters_require_sdk_2_18():
+  """Adapters conflating snapshot feeds import `latest_only` and `SkippingView`, which
+  SDK 2.18 introduces, and are released with it."""
+  for venue in ('aster', 'binance', 'hyperliquid'):
+    manifest = ROOT / f'packages/impl/{venue}/pkg/pyproject.toml'
+    requirement = next(
+      Requirement(value)
+      for value in dependencies(manifest)
+      if Requirement(value).name == 'tribulnation-sdk'
+    )
+    assert Version('2.17.0') not in requirement.specifier, venue
+    assert Version('2.18.0') in requirement.specifier, venue
