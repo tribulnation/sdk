@@ -34,6 +34,11 @@ point at a full node you run: its plaintext gRPC streaming endpoint (`host:port`
 `'20.222.23.181:9090'`) and its CometBFT RPC URL (e.g. `'http://20.222.23.181:26657'`).
 They are only read by the [node fill sources](#fill-sources), which need both.
 
+`indexer_rest_url` and `indexer_ws_url` (optional, `$ENV_VAR` allowed) override the
+indexer's HTTP and WebSocket URLs. `validator_grpc` (plaintext `host:port`) and
+`validator_rpc` (CometBFT RPC URL), set together, replace the default chain provider for
+chain queries and order broadcasts. Unset, all four follow `venue`.
+
 ## Exchange & ID conventions
 
 - The only exchange is `perp` (`exchange_id == 'perp'`); any other exchange ID raises.
