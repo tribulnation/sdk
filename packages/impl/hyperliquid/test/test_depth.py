@@ -15,6 +15,7 @@ from typed_hyperliquid.streams import Streams
 from typed_hyperliquid.streams.l2_book import L2BookUpdate
 from typing_extensions import Any, AsyncIterator, cast
 
+from tribulnation.sdk.core import NetworkError, OverflowPolicy, skipped
 from tribulnation.sdk.market import Settings
 from tribulnation.hyperliquid.core import DepthSource
 from tribulnation.hyperliquid.market.impl.depth import (
@@ -239,6 +240,9 @@ class FakeStream:
 
   messages: list[dict[str, Any]]
   unsubscribed: int = 0
+  skips_per_message: int = 0
+  """Frames the fake pretends it dropped unread (`keep_latest`) before each message."""
+  skipped: int = 0
 
   def __aiter__(self) -> AsyncIterator[dict[str, Any]]:
     """Yield the messages."""
@@ -246,6 +250,7 @@ class FakeStream:
     async def gen():
       """Yield the messages."""
       for msg in self.messages:
+        self.skipped += self.skips_per_message
         yield msg
 
     return gen()
@@ -326,10 +331,10 @@ async def test_fast_uses_dedicated_connection():
   bbo = await first(shared, 'BTC', 'bbo')
 
   assert main.calls == [
-    ('l2Book', 'BTC', {}),
-    ('bbo', 'BTC', {'validate': False}),
+    ('l2Book', 'BTC', {'keep_latest': False}),
+    ('bbo', 'BTC', {'validate': False, 'keep_latest': False}),
   ]
-  assert fast.calls == [('l2Book', 'BTC', {'fast': True})]
+  assert fast.calls == [('l2Book', 'BTC', {'fast': True, 'keep_latest': False})]
   assert len(l2['levels'][0]) == 20
   assert len(fast_msg['levels'][0]) == 5
   assert 'bbo' in bbo
@@ -379,3 +384,73 @@ async def test_fast_connection_closed_at_exit():
   async with closing_fast_streams(shared):
     pass
   assert len(closed) == 1
+
+
+@pytest.mark.parametrize('source', ['l2', 'fast', 'bbo'])
+@pytest.mark.parametrize(
+  ('queue_size', 'overflow', 'keep_latest'),
+  [(1, 'latest', True), (5, 'latest', False), (100, 'fail', False)],
+)
+async def test_keep_latest_only_for_latest_only_subscribers(
+  source: DepthSource, queue_size: int, overflow: OverflowPolicy, keep_latest: bool
+):
+  """Snapshot feeds conflate upstream only when the subscriber wants the newest book."""
+  shared, main, fast = fake_shared()
+  sub = shared.depth_subscription('BTC', source)
+  async with sub.subscribe(queue_size=queue_size, overflow=overflow) as stream:
+    await anext(aiter(stream))
+  [(_, _, kwargs)] = main.calls + fast.calls
+  assert kwargs['keep_latest'] is keep_latest
+
+
+async def test_capturing_subscriber_reopens_a_conflated_feed():
+  """A subscriber wanting every book reopens the shared feed without `keep_latest`."""
+  shared, main, _ = fake_shared()
+  sub = shared.depth_subscription('BTC', 'l2')
+  async with sub.subscribe(queue_size=1, overflow='latest') as newest:
+    await anext(aiter(newest))
+    async with sub.subscribe(queue_size=100, overflow='fail') as every:
+      await anext(aiter(every))
+  assert [call[2]['keep_latest'] for call in main.calls] == [True, False]
+
+
+async def test_user_fills_never_keep_latest():
+  """Fills are never conflated: every push must reach the subscriber."""
+  calls: list[dict[str, Any]] = []
+
+  async def user_fills(*args: Any, **kwargs: Any) -> FakeStream:
+    """Record the subscribe."""
+    calls.append(kwargs)
+    return FakeStream([])
+
+  client = SimpleNamespace(streams=SimpleNamespace(user_fills=user_fills))
+  shared = Shared(client=cast(Hyperliquid, client), maybe_address='0x0')
+  async with shared.user_fills_sub().subscribe() as fills:
+    with pytest.raises(NetworkError):
+      await anext(aiter(fills))
+  assert calls and all(not kwargs.get('keep_latest') for kwargs in calls)
+
+
+async def test_skipped_reports_upstream_skips():
+  """The yielded stream counts the snapshots its conflated feed skipped."""
+  feed = FakeStreams()
+
+  async def l2_book(coin: str, **kwargs: Any) -> FakeStream:
+    """Return a stream that skipped 2 frames before its only message."""
+    return FakeStream([wire(20)], skips_per_message=2)
+
+  feed.l2_book = l2_book  # type: ignore[method-assign]
+  shared = Shared(client=cast(Hyperliquid, SimpleNamespace(streams=feed)))
+
+  def subscribe_depth(
+    coin: str, source: DepthSource, /, *, queue_size: int, overflow: OverflowPolicy
+  ):
+    """Subscribe like `SharedMixin.subscribe_depth`."""
+    return shared.depth_subscription(coin, source).subscribe(
+      queue_size=queue_size, overflow=overflow
+    )
+
+  market = SimpleNamespace(asset_name='BTC', subscribe_depth=subscribe_depth)
+  async with depth_stream(cast(PerpMarketMixin, market)) as books:
+    await anext(aiter(books))
+    assert skipped(books) == 2

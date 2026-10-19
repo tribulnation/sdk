@@ -18,6 +18,7 @@ from tribulnation.aster import AsterMarket
 from tribulnation.aster.core import DepthSource, Scope
 from tribulnation.aster.market.markets import PerpMarket, SpotMarket
 from tribulnation.aster.market.streams import depth_source, parse_bbo
+from tribulnation.sdk.core import OverflowPolicy, skipped
 from tribulnation.sdk.market import Settings
 
 TIME_MS = 1791370594322
@@ -134,28 +135,38 @@ async def test_invalid_stream_arguments(scope: Scope):
 class Feeds:
   """Fake combined-stream subscriptions, recording each native channel's lifetime."""
 
-  def __init__(self):
+  def __init__(self, *, skips_per_push: int = 0):
     self.subscribed: list[str] = []
     self.unsubscribed: list[str] = []
+    self.keep_latest: list[tuple[str, bool]] = []
+    """Each subscription's channel and its typed `keep_latest` flag, in order."""
+    self.skips_per_push = skips_per_push
+    """How many frames each push pretends were skipped upstream before it."""
+    self.skipped = 0
+    """What every fake subscription reports as skipped upstream so far."""
 
   def install(self, monkeypatch: pytest.MonkeyPatch):
     """Route every combined-stream subscription to this fake."""
 
-    def subscribe(client: object, channel: str, **_: Any) -> StreamManager:
+    def subscribe(
+      client: object, channel: str, *, keep_latest: bool = False, **_: Any
+    ) -> StreamManager:
       """Replace `SocketStreamClient.subscribe`."""
-      return self.subscribe(channel)
+      return self.subscribe(channel, keep_latest=keep_latest)
 
     monkeypatch.setattr(SocketStreamClient, 'subscribe', subscribe)
 
-  def subscribe(self, channel: str) -> StreamManager:
+  def subscribe(self, channel: str, *, keep_latest: bool = False) -> StreamManager:
     """Push one message for the channel, then idle until unsubscribed."""
 
     async def connect() -> Stream:
       """Open the fake subscription."""
       self.subscribed.append(channel)
+      self.keep_latest.append((channel, keep_latest))
 
       async def rows() -> AsyncIterator[Any]:
         """Yield one push, then wait."""
+        self.skipped += self.skips_per_push
         yield message(channel)
         await asyncio.Event().wait()
 
@@ -163,7 +174,12 @@ class Feeds:
         """Record the release."""
         self.unsubscribed.append(channel)
 
-      return Stream(reply=None, stream=rows(), unsubscribe=unsubscribe)
+      return Stream(
+        reply=None,
+        stream=rows(),
+        unsubscribe=unsubscribe,
+        skipped_count=lambda: self.skipped,
+      )
 
     return StreamManager(connect=connect)
 
@@ -249,3 +265,62 @@ async def test_rest_depth_shape(
   assert requested == [limit]
   assert len(book.bids) == len(book.asks) == kept
   assert book.time == EVENT
+
+
+@pytest.mark.parametrize('scope', ['spot', 'perp'])
+@pytest.mark.parametrize('source', ['depth', 'fast', 'bbo'])
+@pytest.mark.parametrize(
+  ('queue_size', 'overflow', 'keep_latest'),
+  [(1, 'latest', True), (5, 'latest', False), (100, 'fail', False)],
+)
+async def test_keep_latest_only_for_latest_only_subscribers(
+  scope: Scope,
+  source: DepthSource,
+  queue_size: int,
+  overflow: OverflowPolicy,
+  keep_latest: bool,
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """Snapshot feeds conflate upstream only when the subscriber wants the newest book."""
+  feeds = Feeds()
+  feeds.install(monkeypatch)
+  async with AsterMarket.new(public=True, mainnet=False) as venue:
+    stream = market(venue, scope).depth_stream(
+      queue_size=queue_size, overflow=overflow, settings=settings(source)
+    )
+    async with stream as books:
+      await anext(aiter(books))
+  assert feeds.keep_latest == [(CHANNELS[scope, source], keep_latest)]
+
+
+@pytest.mark.parametrize('scope', ['spot', 'perp'])
+async def test_capturing_subscriber_reopens_a_conflated_feed(
+  scope: Scope, monkeypatch: pytest.MonkeyPatch
+):
+  """A subscriber wanting every book reopens the shared feed without `keep_latest`."""
+  feeds = Feeds()
+  feeds.install(monkeypatch)
+  channel = CHANNELS[scope, 'depth']
+  async with AsterMarket.new(public=True, mainnet=False) as venue:
+    m = market(venue, scope)
+    async with m.depth_stream() as newest:
+      await anext(aiter(newest))
+      async with m.depth_stream(queue_size=100, overflow='fail') as every:
+        await anext(aiter(every))
+        await anext(aiter(newest))
+  assert feeds.keep_latest == [(channel, True), (channel, False)]
+  assert feeds.unsubscribed == [channel, channel]
+
+
+@pytest.mark.parametrize('scope', ['spot', 'perp'])
+async def test_skipped_reports_upstream_skips(
+  scope: Scope, monkeypatch: pytest.MonkeyPatch
+):
+  """The yielded stream counts the snapshots its conflated feed skipped."""
+  feeds = Feeds(skips_per_push=3)
+  feeds.install(monkeypatch)
+  async with AsterMarket.new(public=True, mainnet=False) as venue:
+    async with market(venue, scope).depth_stream() as books:
+      assert skipped(books) == 0
+      await anext(aiter(books))
+      assert skipped(books) == 3

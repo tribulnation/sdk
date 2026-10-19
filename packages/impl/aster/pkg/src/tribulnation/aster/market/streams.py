@@ -139,38 +139,71 @@ async def translated(stream: AsyncIterable[T]) -> AsyncIterator[T]:
 
 
 def depth_feed(
-  shared: Shared, scope: Scope, symbol: str, source: DepthSource
+  shared: Shared,
+  scope: Scope,
+  symbol: str,
+  source: DepthSource,
+  *,
+  keep_latest: bool = False,
 ) -> StreamManager[Book, Any, Any]:
   """The native stream behind one depth source, parsed into books.
+
+  Every source pushes full per-symbol snapshots (partial depth or `bookTicker`), never
+  diffs, so it may keep only the newest unread frame.
 
   Args:
     shared: The owner of the client.
     scope: The exchange.
     symbol: The native symbol.
     source: Which feed to subscribe to; see `Settings.depth_source`.
+    keep_latest: Drop a frame unread, undecoded and unconverted when a newer one
+      arrives first (typed `keep_latest`).
   """
   name = symbol.lower()
   if scope == 'perp':
     streams = shared.client.futures.streams
     if source == 'bbo':
-      return streams.book_ticker(name).map(parse_bbo)
+      return streams.book_ticker(name, keep_latest=keep_latest).map(parse_bbo)
     if source == 'fast':
-      return streams.partial_depth_speed(name, levels=5, speed='100ms').map(parse_book)
-    return streams.partial_depth(name, levels=20).map(parse_book)
+      return streams.partial_depth_speed(
+        name, levels=5, speed='100ms', keep_latest=keep_latest
+      ).map(parse_book)
+    return streams.partial_depth(name, levels=20, keep_latest=keep_latest).map(
+      parse_book
+    )
   spot = shared.client.spot.streams
   if source == 'bbo':
-    return spot.book_ticker(name).map(parse_bbo)
+    return spot.book_ticker(name, keep_latest=keep_latest).map(parse_bbo)
   levels = 5 if source == 'fast' else 20
-  return spot.partial_depth(name, levels=levels, speed='100ms').map(parse_book)
+  return spot.partial_depth(
+    name, levels=levels, speed='100ms', keep_latest=keep_latest
+  ).map(parse_book)
 
 
 @wrap_exceptions
 async def connect_books(
-  shared: Shared, scope: Scope, symbol: str, source: DepthSource
+  shared: Shared,
+  scope: Scope,
+  symbol: str,
+  source: DepthSource,
+  *,
+  keep_latest: bool = False,
 ) -> Subscription.Context[Book]:
-  """Open one stream per symbol and source, shared by every subscriber."""
-  stream = await depth_feed(shared, scope, symbol, source)
-  return Subscription.Context(translated(stream), wrap_exceptions(stream.unsubscribe))
+  """Open one stream per symbol and source, shared by every subscriber.
+
+  Args:
+    shared: The owner of the client.
+    scope: The exchange.
+    symbol: The native symbol.
+    source: Which feed to subscribe to.
+    keep_latest: Keep only the newest unread snapshot; see `depth_feed`.
+  """
+  stream = await depth_feed(shared, scope, symbol, source, keep_latest=keep_latest)
+  return Subscription.Context(
+    translated(stream),
+    wrap_exceptions(stream.unsubscribe),
+    lambda: stream.skipped,
+  )
 
 
 async def with_renewal(

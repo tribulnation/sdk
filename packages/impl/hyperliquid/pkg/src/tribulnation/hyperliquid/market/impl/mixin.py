@@ -349,23 +349,35 @@ class Shared(SDK):
     if key not in self.depth_subscriptions:
 
       @wrap_exceptions
-      async def subscribe():
-        """Open the upstream feed for `key` on the connection that serves it."""
+      async def subscribe(keep_latest: bool = False):
+        """Open the upstream feed for `key` on the connection that serves it.
+
+        Every source pushes a full snapshot per message (`l2Book`, `bbo`), so it may
+        keep only the newest unread one.
+        """
         if source == 'bbo':
           # Validated here, not by the client: its `WsBbo` rejects an empty (`null`) side.
-          raw = await self.client.streams.bbo(coin, validate=False)
+          raw = await self.client.streams.bbo(
+            coin, validate=False, keep_latest=keep_latest
+          )
           return Subscription.Context[DepthMessage](
-            bbo_updates(raw, validate=self.client.validate), raw.unsubscribe
+            bbo_updates(raw, validate=self.client.validate),
+            raw.unsubscribe,
+            lambda: raw.skipped,
           )
         if source == 'fast':
-          stream = await self.fast_streams_client().l2_book(coin, fast=True)
+          stream = await self.fast_streams_client().l2_book(
+            coin, fast=True, keep_latest=keep_latest
+          )
         else:
-          stream = await self.client.streams.l2_book(coin)
+          stream = await self.client.streams.l2_book(coin, keep_latest=keep_latest)
         return Subscription.Context[DepthMessage](
-          translated(stream), stream.unsubscribe
+          translated(stream), stream.unsubscribe, lambda: stream.skipped
         )
 
-      self.depth_subscriptions[key] = Subscription(subscribe)
+      self.depth_subscriptions[key] = Subscription(
+        subscribe, lambda: subscribe(keep_latest=True)
+      )
     return self.depth_subscriptions[key]
 
   @wrap_exceptions

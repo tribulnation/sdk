@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
-from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
+from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse, latest_only
 from tribulnation.sdk.market import (
   PerpMarket as _PerpMarket,
   Book,
@@ -127,8 +127,11 @@ class PerpMarket(SharedMixin, _PerpMarket):
   ) -> AsyncContextManager[AsyncIterable[Book]]:
     """Subscribe to the order book over Binance's public partial-depth WS stream.
 
-    `queue_size`/`overflow` are accepted for interface compatibility and ignored: each
-    call opens its own independent subscription rather than fanning out a shared one.
+    Each call opens its own independent subscription rather than fanning out a shared
+    one. With the default `queue_size=1, overflow='latest'` it keeps only the newest
+    snapshot (typed `keep_latest`): a frame replaced before it is read is never decoded
+    nor converted, and is counted in the yielded stream's `skipped`. Any other
+    `queue_size`/`overflow` delivers every snapshot, unbounded.
     """
 
     def to_book(event: PartialDepthEvent) -> Book:
@@ -141,6 +144,7 @@ class PerpMarket(SharedMixin, _PerpMarket):
       self.symbol.lower(),
       levels=stream_levels(levels),
       speed=DEFAULT_STREAM_SPEED,
+      keep_latest=latest_only(queue_size, overflow),
     ).map(to_book)
 
   @wrap_exceptions

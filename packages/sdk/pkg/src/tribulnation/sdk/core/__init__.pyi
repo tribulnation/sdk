@@ -23,7 +23,15 @@ from .invocations import (
 )
 from .concurrency import managed_tasks
 from .lifecycle import AsyncResourceState, ManagedResource, resource_state
-from .stream import Subscription, StreamInbox, OverflowPolicy
+from .stream import (
+  Subscription,
+  StreamInbox,
+  OverflowPolicy,
+  Skipping,
+  SkippingView,
+  latest_only,
+  skipped,
+)
 from .paging import PaginatedResponse
 
 __all__ = [
@@ -53,5 +61,9 @@ __all__ = [
   'Subscription',
   'StreamInbox',
   'OverflowPolicy',
+  'Skipping',
+  'SkippingView',
+  'latest_only',
+  'skipped',
   'PaginatedResponse',
 ]

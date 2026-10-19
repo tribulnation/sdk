@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from decimal import Decimal
 
 from tribulnation.sdk.market import Book, Settings
-from tribulnation.sdk.core import OverflowPolicy
+from tribulnation.sdk.core import OverflowPolicy, SkippingView
 from tribulnation.sdk.util import epoch_time
 
 from typed_hyperliquid.core import timestamp_millis
@@ -126,7 +126,10 @@ async def depth_stream(
   Consumers of one `(coin, source)` share a single upstream subscription. Each source
   is a different feed with its own cadence and depth (see `Settings.depth_source`), so
   books from different sources need not agree tick-for-tick: `'bbo'` usually leads
-  the best level of `'l2'` by up to seconds.
+  the best level of `'l2'` by up to seconds. While every consumer keeps only the
+  newest book (the default `queue_size=1, overflow='latest'`), the upstream keeps only
+  the newest frame, so a stale one is never validated nor converted; the yielded
+  stream's `skipped` counts the books this consumer never saw.
 
   Args:
     levels: Keep at most this many levels per side; it never selects the source.
@@ -144,4 +147,4 @@ async def depth_stream(
       async for raw in messages:
         yield parse_depth(raw, levels=levels)
 
-    yield gen()
+    yield SkippingView(gen(), messages)

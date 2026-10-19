@@ -8,6 +8,8 @@ from typing_extensions import (
   Literal,
   TypeVar,
   Callable,
+  Protocol,
+  runtime_checkable,
 )
 from contextlib import asynccontextmanager, suppress
 from dataclasses import dataclass, field
@@ -29,6 +31,58 @@ OverflowPolicy = Literal['fail', 'latest']
   depth / ticker) where an old snapshot is worthless once a newer one exists --
   use `queue_size=1` and each new item simply replaces the stale one.
 """
+
+
+def latest_only(queue_size: int, overflow: OverflowPolicy) -> bool:
+  """Whether a subscriber only ever wants the newest item (`queue_size=1`, `'latest'`).
+
+  Only then may the item source itself conflate (e.g. a typed `keep_latest`
+  subscription), dropping a frame unread when a newer one arrives before it is
+  read. Any other delivery asks for the items in between, so it reads every frame.
+  """
+  return overflow == 'latest' and queue_size == 1
+
+
+@runtime_checkable
+class Skipping(Protocol):
+  """A stream that counts the items it skipped: replaced by newer ones before being
+  read, at its source (a conflated upstream) or in its own inbox."""
+
+  @property
+  def skipped(self) -> int:
+    """Items skipped so far."""
+    ...
+
+
+def skipped(stream: object) -> int | None:
+  """Items `stream` has skipped so far, or None when it does not count them.
+
+  Book and ticker streams that keep only the newest item report how many stale ones
+  their subscriber never saw, a measure of how far it (or its loop) fell behind.
+
+  Args:
+    stream: The iterable a stream method yielded.
+  """
+  if isinstance(stream, Skipping):
+    return stream.skipped
+
+
+@dataclass(frozen=True)
+class SkippingView(AsyncIterable[T]):
+  """A transformed stream that still reports its source's skips."""
+
+  items: AsyncIterable[T]
+  """The transformed items."""
+  source: Skipping
+  """The stream the items come from."""
+
+  @property
+  def skipped(self) -> int:
+    """Items the source skipped so far."""
+    return self.source.skipped
+
+  def __aiter__(self) -> AsyncIterator[T]:
+    return aiter(self.items)
 
 
 @dataclass
@@ -66,6 +120,9 @@ class StreamInbox(Generic[T]):
   queue: asyncio.Queue['T | _Failed | _Closed']
   queue_size: int
   overflow: OverflowPolicy
+  skipped: int = field(init=False, default=0)
+  """Items this subscriber never received: dropped here by `'latest'` overflow, or
+  skipped upstream (credited by `Subscription`) while it was subscribed."""
   _closed: bool = field(init=False, default=False)
   _end: '_Closed | _Failed | None' = field(init=False, default=None)
 
@@ -104,6 +161,7 @@ class StreamInbox(Generic[T]):
     # intended queue_size=1 this is simply "newest replaces stale".
     q.get_nowait()
     q.put_nowait(item)
+    self.skipped += 1
     return True
 
   def close(self):
@@ -155,14 +213,24 @@ class Subscription(Generic[T]):
 
   Each subscriber's inbox is bounded (see `StreamInbox` / `OverflowPolicy`): a
   slow or dead consumer can never accumulate unbounded depth/trade backlog.
+
+  Pass `subscribe_latest` for a snapshot feed whose source can conflate (e.g. a typed
+  `keep_latest` subscription): the upstream is opened with it while every subscriber
+  wants only the newest item (`latest_only`), so stale frames are never decoded nor
+  converted. A subscriber that wants more (e.g. `overflow='fail'` to capture every
+  book) reopens the upstream with `subscribe_stream`, which then serves everyone until
+  it closes.
   """
 
   @dataclass
   class Context(Generic[U]):
     iterator: AsyncIterator[U]
     unsubscribe: Callable[[], Awaitable[Any]]
+    skipped: Callable[[], int] = lambda: 0
+    """Reads how many items the upstream skipped so far (conflated upstreams only)."""
 
   subscribe_stream: Callable[[], Awaitable[Context[T]]]
+  subscribe_latest: Callable[[], Awaitable[Context[T]]] | None = None
 
   lock: asyncio.Lock = field(init=False, default_factory=asyncio.Lock)
   ctx: Context[T] | None = field(init=False, default=None)
@@ -170,6 +238,8 @@ class Subscription(Generic[T]):
   subscribers: list[StreamInbox[T]] = field(
     init=False, default_factory=list['StreamInbox[T]']
   )
+  conflated: bool = field(init=False, default=False)
+  """Whether the running upstream was opened with `subscribe_latest`."""
 
   @classmethod
   def of(
@@ -187,10 +257,41 @@ class Subscription(Generic[T]):
     return cls(subscribe_stream)
 
   async def start(self):
+    """Open the upstream unless it is running in a mode every subscriber accepts."""
     async with self.lock:
-      if self.pump is None or self.pump.done():
-        self.ctx = await self.subscribe_stream()
-        self.pump = asyncio.create_task(self._pump(self.ctx))
+      latest = self.subscribe_latest is not None and all(
+        latest_only(inbox.queue_size, inbox.overflow) for inbox in self.subscribers
+      )
+      reopened = False
+      if self.pump is not None and not self.pump.done():
+        if latest or not self.conflated:
+          return
+        await self._reopen()
+        reopened = True
+      try:
+        if latest and self.subscribe_latest is not None:
+          self.ctx = await self.subscribe_latest()
+        else:
+          self.ctx = await self.subscribe_stream()
+      except Exception as exc:
+        # The subscribers of the closed conflated upstream have lost it too.
+        for inbox in self.subscribers if reopened else ():
+          inbox.fail(exc)
+        raise
+      self.conflated = latest
+      self.pump = asyncio.create_task(self._pump(self.ctx))
+
+  async def _reopen(self):
+    """Close a conflated upstream (lock held) so it can reopen delivering every item."""
+    pump, ctx = self.pump, self.ctx
+    self.pump = self.ctx = None
+    if pump is not None:
+      pump.cancel()
+      with suppress(asyncio.CancelledError):
+        await pump
+    if ctx is not None:
+      with suppress(Exception):
+        await ctx.unsubscribe()
 
   def _discard(self, inbox: StreamInbox[T]):
     with suppress(ValueError):
@@ -211,12 +312,16 @@ class Subscription(Generic[T]):
     would ever clean the orphan up. Cancellation is the other path: there the
     canceller in `subscribe()` owns the teardown instead.
     """
+    credited = 0
     try:
       async for item in ctx.iterator:
+        skipped = ctx.skipped()
         for inbox in list(self.subscribers):
+          inbox.skipped += skipped - credited
           if not inbox.push(item):
             # `fail` overflow: the inbox failed itself; stop delivering to it.
             self._discard(inbox)
+        credited = skipped
       # Ended on its own (e.g. a dropped connection) rather than being
       # cancelled below -- report it instead of leaking a bare
       # `StopAsyncIteration` as an opaque `RuntimeError`.
@@ -242,7 +347,7 @@ class Subscription(Generic[T]):
     *,
     queue_size: int = 1000,
     overflow: OverflowPolicy = 'fail',
-  ) -> AsyncGenerator[AsyncIterable[T], None]:
+  ) -> AsyncGenerator[StreamInbox[T], None]:
     """Subscribe to the shared upstream with a bounded delivery inbox.
 
     - `queue_size`: max data items buffered for this subscriber before the
@@ -251,7 +356,11 @@ class Subscription(Generic[T]):
     """
     inbox = StreamInbox[T].new(queue_size, overflow)
     self.subscribers.append(inbox)
-    await self.start()
+    try:
+      await self.start()
+    except BaseException:
+      self._discard(inbox)
+      raise
 
     try:
       yield inbox
