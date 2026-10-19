@@ -94,23 +94,37 @@ class Connection:
     Accepts a ``ws://`` / ``wss://`` TCP URL or a ``unix://path`` Unix-socket
     path.  For Unix sockets, ``aiohttp.UnixConnector`` is used and the HTTP
     upgrade request targets the dummy host ``localhost``.
+
+    The upgrade offers `codec.PROTOCOL`. A gateway that answers without a
+    subprotocol predates negotiation and speaks the same v1 frames.
+
+    Raises:
+      GatewayError: if the gateway refuses the protocol or answers with another.
     """
     if self.url.startswith('unix://'):
       path = self.url[len('unix://') :]
-      connector = aiohttp.UnixConnector(path=path)
-      session = aiohttp.ClientSession(connector=connector)
-      try:
-        ws = await session.ws_connect('http://localhost/')
-      except Exception:
-        await session.close()
-        raise
+      session = aiohttp.ClientSession(connector=aiohttp.UnixConnector(path=path))
+      url = 'http://localhost/'
     else:
       session = aiohttp.ClientSession()
-      try:
-        ws = await session.ws_connect(self.url)
-      except Exception:
-        await session.close()
-        raise
+      url = self.url
+    try:
+      ws = await session.ws_connect(url, protocols=(codec.PROTOCOL,))
+    except aiohttp.WSServerHandshakeError as e:
+      await session.close()
+      raise GatewayError(
+        f'gateway refused the {codec.PROTOCOL} handshake ({e.status}): '
+        'upgrade the gateway and its clients together'
+      ) from e
+    except Exception:
+      await session.close()
+      raise
+    if ws.protocol not in (codec.PROTOCOL, None):
+      await ws.close()
+      await session.close()
+      raise GatewayError(
+        f'gateway answered with protocol {ws.protocol}, expected {codec.PROTOCOL}'
+      )
 
     self._ctx = self.Context(
       ws=ws, session=session, recv_task=asyncio.create_task(self._recv_loop())

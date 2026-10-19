@@ -37,3 +37,5 @@
     - async-usage.md
     - error-handling.md
     - context.md
+- gateway.md
+- gateway-protocol.md

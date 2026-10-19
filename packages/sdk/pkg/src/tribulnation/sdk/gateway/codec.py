@@ -1,11 +1,25 @@
-"""Gateway codec: value serialization and wire protocol message types."""
+"""Gateway wire protocol: message types, framing codec and protocol version.
 
-from dataclasses import dataclass, field
+Messages are tagged `msgspec.Struct`s; domain payloads (`Book`, `Trade`, ...) are the
+SDK's own dataclasses, which msgspec encodes and decodes natively. The wire format is
+documented in `docs/gateway-protocol.md`, with its JSON Schema beside it.
+"""
+
+from typing_extensions import (
+  TYPE_CHECKING,
+  Any,
+  Literal,
+  NotRequired,
+  Sequence,
+  TypedDict,
+  Callable,
+  cast,
+)
+from abc import ABC
 from datetime import datetime
 from decimal import Decimal
-from typing_extensions import Literal, Annotated, Any, Sequence
-import pydantic
-from pydantic_core import core_schema
+
+import msgspec
 
 from tribulnation.sdk.core import OverflowPolicy
 from tribulnation.sdk import (
@@ -43,16 +57,67 @@ from tribulnation.sdk.market import (
 from tribulnation.sdk.market.venue import ExchangeDescription
 from tribulnation.sdk.impl.accounts import VenueId
 
+PROTOCOL = 'tribulnation-gateway.v1'
+"""WebSocket subprotocol naming this wire format and its version.
 
-def settings_schema(_source: Any, _handler: Any) -> core_schema.CoreSchema:
-  """Transport venue settings without importing optional venue implementations."""
-  return core_schema.dict_schema(
-    keys_schema=core_schema.str_schema(),
-    values_schema=core_schema.dict_schema(keys_schema=core_schema.str_schema()),
-  )
+Clients offer it in the upgrade and the gateway selects it, so peers on different
+versions fail to connect instead of misreading each other's frames. A peer naming no
+subprotocol predates negotiation (SDK 2.17 and earlier) and speaks the same v1 frames.
+"""
 
 
-WireSettings = Annotated[Settings, pydantic.GetPydanticSchema(settings_schema)]
+def offered_protocols(header: str | None) -> list[str]:
+  """Split a `Sec-WebSocket-Protocol` request header into the offered names."""
+  return [name.strip() for name in (header or '').split(',') if name.strip()]
+
+
+class WireOrderShape(TypedDict):
+  """Order as it crosses the wire: prices and quantities decode as `Decimal`."""
+
+  qty: Decimal
+  price: Decimal
+  type: Literal['MARKET', 'LIMIT', 'POST_ONLY']
+  client_order_id: NotRequired[str | None]
+
+
+class AnyCollateral(ABC):
+  """Decode marker for a `PerpCollateral` or a plain `Collateral` payload.
+
+  The two are untagged dataclasses, which msgspec cannot tell apart in a union, so
+  `dec_hook` picks `PerpCollateral` when the margin fields are present.
+  """
+
+
+AnyCollateral.register(Collateral)
+
+
+# Type checkers see the SDK's own types; msgspec, at runtime, sees shapes it can decode
+# without importing optional venue packages (`Settings` names their TypedDicts) or
+# guessing between `Order`'s `str | Decimal | float | int` prices.
+if TYPE_CHECKING:
+  WireSettings = Settings
+  WireOrder = Order
+  WireCollateral = PerpCollateral | Collateral
+else:
+  WireSettings = dict[str, dict[str, Any]]
+  """Venue settings, carried opaquely: each venue's adapter validates its own entry."""
+  WireOrder = WireOrderShape
+  WireCollateral = AnyCollateral
+
+
+no_settings = cast(Callable[[], WireSettings], dict)
+"""Default empty settings; the plain `dict` lets the schema record the `{}` default."""
+
+
+class Msg(msgspec.Struct, tag_field='tag', gc=False):
+  """A wire message: its kind in `tag`, its correlation ID in `id`.
+
+  Messages hold no reference cycles, so they skip garbage-collector tracking.
+  """
+
+  id: str
+  """Correlates a reply, stream item or end with its request."""
+
 
 # ── Exceptions ───────────────────────────────────────────────────────────────
 
@@ -84,356 +149,257 @@ def decode_exception(exc_type: str) -> type[Exception]:
 # ── Market-level call requests ───────────────────────────────────────────────
 
 
-@dataclass(kw_only=True)
-class DepthReq:
-  """Wire message for depth req."""
+class DepthReq(Msg, kw_only=True, tag='depth'):
+  """Fetch one order book snapshot (`Market.depth`)."""
 
-  id: str
   market_id: str
   levels: int | None = None
-  settings: WireSettings = field(default_factory=Settings)
-  tag: Literal['depth'] = 'depth'
+  settings: WireSettings = msgspec.field(default_factory=no_settings)
 
 
-@dataclass(kw_only=True)
-class RulesReq:
-  """Wire message for rules req."""
+class RulesReq(Msg, kw_only=True, tag='rules'):
+  """Fetch a market's trading rules (`Market.rules`)."""
 
-  id: str
   market_id: str
   refetch: bool = False
-  tag: Literal['rules'] = 'rules'
 
 
-@dataclass(kw_only=True)
-class OpenOrdersReq:
-  """Wire message for open orders req."""
+class OpenOrdersReq(Msg, kw_only=True, tag='open_orders'):
+  """List the account's open orders on a market."""
 
-  id: str
   market_id: str
-  tag: Literal['open_orders'] = 'open_orders'
 
 
-@dataclass(kw_only=True)
-class QueryOrderReq:
-  """Wire message for query order req."""
+class QueryOrderReq(Msg, kw_only=True, tag='query_order'):
+  """Look up one order by its venue order ID."""
 
-  id: str
   market_id: str
   order_id: str
-  tag: Literal['query_order'] = 'query_order'
 
 
-@dataclass(kw_only=True)
-class TradesHistoryReq:
-  """Wire message for trades history req."""
+class TradesHistoryReq(Msg, kw_only=True, tag='trades_history'):
+  """Fetch the account's fills in a time window."""
 
-  id: str
   market_id: str
   start: datetime
   end: datetime
-  tag: Literal['trades_history'] = 'trades_history'
 
 
-@dataclass(kw_only=True)
-class PositionReq:
-  """Wire message for position req."""
+class PositionReq(Msg, kw_only=True, tag='position'):
+  """Fetch the account's spot position on a market."""
 
-  id: str
   market_id: str
-  tag: Literal['position'] = 'position'
 
 
-@dataclass(kw_only=True)
-class AvailableNotionalReq:
-  """Wire message for available notional req."""
+class AvailableNotionalReq(Msg, kw_only=True, tag='available_notional'):
+  """Fetch the notional the account can still open on a market."""
 
-  id: str
   market_id: str
-  tag: Literal['available_notional'] = 'available_notional'
 
 
-@dataclass(kw_only=True)
-class PlaceOrderReq:
-  """Wire message for place order req."""
+class PlaceOrderReq(Msg, kw_only=True, tag='place_order'):
+  """Place one order."""
 
-  id: str
   market_id: str
-  order: Order
-  settings: WireSettings = field(default_factory=Settings)
-  tag: Literal['place_order'] = 'place_order'
+  order: WireOrder
+  settings: WireSettings = msgspec.field(default_factory=no_settings)
 
 
-@dataclass(kw_only=True)
-class CancelOrderReq:
-  """Wire message for cancel order req."""
+class CancelOrderReq(Msg, kw_only=True, tag='cancel_order'):
+  """Cancel one order by its venue order ID."""
 
-  id: str
   market_id: str
   order_id: str
-  settings: WireSettings = field(default_factory=Settings)
-  tag: Literal['cancel_order'] = 'cancel_order'
+  settings: WireSettings = msgspec.field(default_factory=no_settings)
 
 
-@dataclass(kw_only=True)
-class CancelOpenOrdersReq:
-  """Wire message for cancel open orders req."""
+class CancelOpenOrdersReq(Msg, kw_only=True, tag='cancel_open_orders'):
+  """Cancel every open order of the account on a market."""
 
-  id: str
   market_id: str
-  settings: WireSettings = field(default_factory=Settings)
-  tag: Literal['cancel_open_orders'] = 'cancel_open_orders'
+  settings: WireSettings = msgspec.field(default_factory=no_settings)
 
 
-@dataclass(kw_only=True)
-class IndexReq:
-  """Wire message for index req."""
+class IndexReq(Msg, kw_only=True, tag='index'):
+  """Fetch a perpetual market's index price."""
 
-  id: str
   market_id: str
-  settings: WireSettings = field(default_factory=Settings)
-  tag: Literal['index'] = 'index'
+  settings: WireSettings = msgspec.field(default_factory=no_settings)
 
 
-@dataclass(kw_only=True)
-class NextFundingReq:
-  """Wire message for next funding req."""
+class NextFundingReq(Msg, kw_only=True, tag='next_funding'):
+  """Fetch a perpetual market's upcoming funding rate."""
 
-  id: str
   market_id: str
-  tag: Literal['next_funding'] = 'next_funding'
 
 
-@dataclass(kw_only=True)
-class FundingRatesReq:
-  """Wire message for funding rates req."""
+class FundingRatesReq(Msg, kw_only=True, tag='funding_rates'):
+  """Fetch a perpetual market's historical funding rates."""
 
-  id: str
   market_id: str
   start: datetime | None = None
   end: datetime | None = None
-  tag: Literal['funding_rates'] = 'funding_rates'
 
 
-@dataclass(kw_only=True)
-class FundingPaymentsReq:
-  """Wire message for funding payments req."""
+class FundingPaymentsReq(Msg, kw_only=True, tag='funding_payments'):
+  """Fetch the account's funding payments in a time window."""
 
-  id: str
   market_id: str
   start: datetime
   end: datetime
-  tag: Literal['funding_payments'] = 'funding_payments'
 
 
-@dataclass(kw_only=True)
-class PerpPositionReq:
-  """Wire message for perp position req."""
+class PerpPositionReq(Msg, kw_only=True, tag='perp_position'):
+  """Fetch the account's perpetual position on a market."""
 
-  id: str
   market_id: str
-  tag: Literal['perp_position'] = 'perp_position'
 
 
-@dataclass(kw_only=True)
-class CollateralReq:
-  """Wire message for collateral req."""
+class CollateralReq(Msg, kw_only=True, tag='collateral'):
+  """Fetch the collateral bucket backing a market."""
 
-  id: str
   market_id: str
-  tag: Literal['collateral'] = 'collateral'
 
 
-@dataclass(kw_only=True)
-class PerpCollateralReq:
-  """Wire message for perp collateral req."""
+class PerpCollateralReq(Msg, kw_only=True, tag='perp_collateral'):
+  """Fetch the perpetual margin bucket backing a market."""
 
-  id: str
   market_id: str
-  tag: Literal['perp_collateral'] = 'perp_collateral'
 
 
 # ── Exchange-level call requests ─────────────────────────────────────────────
 
 
-@dataclass(kw_only=True)
-class ExchangePerpCollateralReq:
-  """Wire message for exchange perp collateral req."""
+class ExchangePerpCollateralReq(Msg, kw_only=True, tag='exchange_perp_collateral'):
+  """Fetch a perpetual exchange's margin bucket."""
 
-  id: str
   account_id: str
   """Account key addressing the venue, e.g. `\'hl\'`."""
   exchange_id: str
-  tag: Literal['exchange_perp_collateral'] = 'exchange_perp_collateral'
 
 
-@dataclass(kw_only=True)
-class MarketsReq:
-  """Wire message for markets req."""
+class MarketsReq(Msg, kw_only=True, tag='markets'):
+  """List an exchange's market IDs."""
 
-  id: str
   account_id: str
   """Account key addressing the venue, e.g. `\'hl\'`."""
   exchange_id: str
-  tag: Literal['markets'] = 'markets'
 
 
 # ── Venue-level call requests ────────────────────────────────────────────────
 
 
-@dataclass(kw_only=True)
-class ExchangesReq:
-  """Wire message for exchanges req."""
+class ExchangesReq(Msg, kw_only=True, tag='exchanges'):
+  """List a venue's exchanges."""
 
-  id: str
   account_id: str
   """Account key addressing the venue, e.g. `\'hl\'`."""
-  tag: Literal['exchanges'] = 'exchanges'
 
 
 # ── SDK-level call requests ──────────────────────────────────────────────────
 
 
-@dataclass(kw_only=True)
-class VenueReq:
+class VenueReq(Msg, kw_only=True, tag='venue'):
   """Resolve the venue behind an account key."""
 
-  id: str
   account_id: str
   """Account key addressing the venue, e.g. `'hl'`."""
-  tag: Literal['venue'] = 'venue'
 
 
-@dataclass(kw_only=True)
-class VenuesReq:
-  """Wire message for venues req."""
-
-  id: str
-  tag: Literal['venues'] = 'venues'
+class VenuesReq(Msg, kw_only=True, tag='venues'):
+  """List the gateway's account keys."""
 
 
 # ── Market-level stream requests ─────────────────────────────────────────────
 
 
-@dataclass(kw_only=True)
-class DepthStreamReq:
-  """Wire message for depth stream req."""
+class DepthStreamReq(Msg, kw_only=True, tag='depth_stream'):
+  """Subscribe to order book updates; items arrive as `depth_data`."""
 
-  id: str
   market_id: str
   levels: int | None = None
   queue_size: int = 1
   overflow: OverflowPolicy = 'latest'
-  settings: WireSettings = field(default_factory=Settings)
-  tag: Literal['depth_stream'] = 'depth_stream'
+  settings: WireSettings = msgspec.field(default_factory=no_settings)
 
 
-@dataclass(kw_only=True)
-class TradesStreamReq:
-  """Wire message for trades stream req."""
+class TradesStreamReq(Msg, kw_only=True, tag='trades_stream'):
+  """Subscribe to the account's fills; items arrive as `trades_data`."""
 
-  id: str
   market_id: str
   queue_size: int = 1000
   overflow: OverflowPolicy = 'fail'
-  settings: WireSettings = field(default_factory=Settings)
-  tag: Literal['trades_stream'] = 'trades_stream'
+  settings: WireSettings = msgspec.field(default_factory=no_settings)
 
 
 # ── Control ──────────────────────────────────────────────────────────────────
 
 
-@dataclass(kw_only=True)
-class UnsubMsg:
-  """Wire message for unsub msg."""
-
-  id: str
-  tag: Literal['unsub'] = 'unsub'
+class UnsubMsg(Msg, kw_only=True, tag='unsub'):
+  """Cancel the stream opened by the request with this `id`."""
 
 
-@dataclass(kw_only=True)
-class FeesReq:
+class FeesReq(Msg, kw_only=True, tag='fees'):
   """Fetch account-specific trading fees."""
 
-  id: str
   market_id: str
   refetch: bool = False
-  tag: Literal['fees'] = 'fees'
 
 
-@dataclass(kw_only=True)
-class LeverageReq:
+class LeverageReq(Msg, kw_only=True, tag='leverage'):
   """Fetch the leverage the account can open at on a perpetual market."""
 
-  id: str
   market_id: str
   refetch: bool = False
-  tag: Literal['leverage'] = 'leverage'
 
 
-@dataclass(kw_only=True)
-class CandlesReq:
+class CandlesReq(Msg, kw_only=True, tag='candles'):
   """Fetch candles in a half-open time window."""
 
-  id: str
   market_id: str
   interval: CandleInterval
   start: datetime
   end: datetime
-  tag: Literal['candles'] = 'candles'
 
 
-@dataclass(kw_only=True)
-class ExchangeReq:
+class ExchangeReq(Msg, kw_only=True, tag='exchange'):
   """Resolve an exchange's actual product type, including qualified IDs."""
 
-  id: str
   account_id: str
   """Account key addressing the venue, e.g. `\'hl\'`."""
   exchange_id: str
-  tag: Literal['exchange'] = 'exchange'
 
 
-@dataclass(kw_only=True)
-class TickersReq:
+class TickersReq(Msg, kw_only=True, tag='tickers'):
   """Fetch bulk tickers from an exchange."""
 
-  id: str
   account_id: str
   """Account key addressing the venue, e.g. `\'hl\'`."""
   exchange_id: str
   markets: list[str] | None = None
-  settings: WireSettings = field(default_factory=Settings)
-  tag: Literal['tickers'] = 'tickers'
+  settings: WireSettings = msgspec.field(default_factory=no_settings)
 
 
-@dataclass(kw_only=True)
-class PerpStatsReq:
+class PerpStatsReq(Msg, kw_only=True, tag='perp_stats'):
   """Fetch bulk perpetual statistics."""
 
-  id: str
   account_id: str
   """Account key addressing the venue, e.g. `\'hl\'`."""
   exchange_id: str
   markets: list[str] | None = None
-  settings: WireSettings = field(default_factory=Settings)
-  tag: Literal['perp_stats'] = 'perp_stats'
+  settings: WireSettings = msgspec.field(default_factory=no_settings)
 
 
-@dataclass(kw_only=True)
-class ExchangeCollateralReq:
+class ExchangeCollateralReq(Msg, kw_only=True, tag='exchange_collateral'):
   """Fetch a spot or perpetual exchange's collateral bucket."""
 
-  id: str
   account_id: str
   """Account key addressing the venue, e.g. `\'hl\'`."""
   exchange_id: str
-  tag: Literal['exchange_collateral'] = 'exchange_collateral'
 
 
-# ── Discriminated unions ─────────────────────────────────────────────────────
+# ── Message unions ───────────────────────────────────────────────────────────
 
-# Type aliases for annotations — not used as pydantic unions themselves
 CallReq = (
   DepthReq
   | FeesReq
@@ -468,349 +434,210 @@ CallReq = (
 
 StreamReq = DepthStreamReq | TradesStreamReq
 
-ClientMsg = Annotated[
-  DepthReq
-  | FeesReq
-  | LeverageReq
-  | CandlesReq
-  | ExchangeReq
-  | TickersReq
-  | PerpStatsReq
-  | ExchangeCollateralReq
-  | RulesReq
-  | OpenOrdersReq
-  | QueryOrderReq
-  | TradesHistoryReq
-  | PositionReq
-  | AvailableNotionalReq
-  | PlaceOrderReq
-  | CancelOrderReq
-  | CancelOpenOrdersReq
-  | IndexReq
-  | NextFundingReq
-  | FundingRatesReq
-  | FundingPaymentsReq
-  | PerpPositionReq
-  | CollateralReq
-  | PerpCollateralReq
-  | ExchangePerpCollateralReq
-  | MarketsReq
-  | ExchangesReq
-  | VenueReq
-  | VenuesReq
-  | DepthStreamReq
-  | TradesStreamReq
-  | UnsubMsg,
-  pydantic.Discriminator('tag'),
-]
-
-client_adapter: pydantic.TypeAdapter[ClientMsg] = pydantic.TypeAdapter(ClientMsg)
-
-
-def encode_client(msg: ClientMsg) -> bytes:
-  """Serialize a client request into a JSON frame."""
-  return client_adapter.dump_json(msg)
-
-
-def decode_client(data: str | bytes) -> ClientMsg:
-  """Validate and decode a client JSON frame."""
-  return client_adapter.validate_json(data)
+ClientMsg = CallReq | StreamReq | UnsubMsg
 
 
 # ── Call responses ───────────────────────────────────────────────────────────
 
 
-@dataclass(kw_only=True)
-class DepthResp:
-  """Wire message for depth resp."""
+class DepthResp(Msg, kw_only=True, tag='depth'):
+  """Order book snapshot."""
 
-  id: str
   book: Book
-  tag: Literal['depth'] = 'depth'
 
 
-@dataclass(kw_only=True)
-class RulesResp:
-  """Wire message for rules resp."""
+class RulesResp(Msg, kw_only=True, tag='rules'):
+  """Market trading rules."""
 
-  id: str
   rules: Rules
-  tag: Literal['rules'] = 'rules'
 
 
-@dataclass(kw_only=True)
-class OpenOrdersResp:
-  """Wire message for open orders resp."""
+class OpenOrdersResp(Msg, kw_only=True, tag='open_orders'):
+  """Open orders of the account on a market."""
 
-  id: str
   orders: Sequence[OrderState]
-  tag: Literal['open_orders'] = 'open_orders'
 
 
-@dataclass(kw_only=True)
-class QueryOrderResp:
-  """Wire message for query order resp."""
+class QueryOrderResp(Msg, kw_only=True, tag='query_order'):
+  """The order, or null when the venue does not know it."""
 
-  id: str
   order: OrderState | None
-  tag: Literal['query_order'] = 'query_order'
 
 
-@dataclass(kw_only=True)
-class TradesHistoryResp:
-  """Wire message for trades history resp."""
+class TradesHistoryResp(Msg, kw_only=True, tag='trades_history'):
+  """Fills of the account in the requested window."""
 
-  id: str
   trades: Sequence[Trade]
-  tag: Literal['trades_history'] = 'trades_history'
 
 
-@dataclass(kw_only=True)
-class PositionResp:
-  """Wire message for position resp."""
+class PositionResp(Msg, kw_only=True, tag='position'):
+  """Spot position."""
 
-  id: str
   position: Position
-  tag: Literal['position'] = 'position'
 
 
-@dataclass(kw_only=True)
-class AvailableNotionalResp:
-  """Wire message for available notional resp."""
+class AvailableNotionalResp(Msg, kw_only=True, tag='available_notional'):
+  """Notional the account can still open."""
 
-  id: str
   value: Decimal
-  tag: Literal['available_notional'] = 'available_notional'
 
 
-@dataclass(kw_only=True)
-class PlaceOrderResp:
-  """Wire message for place order resp."""
+class PlaceOrderResp(Msg, kw_only=True, tag='place_order'):
+  """Acknowledgement of a placed order."""
 
-  id: str
   response: OrderResponse
-  tag: Literal['place_order'] = 'place_order'
 
 
-@dataclass(kw_only=True)
-class CancelOrderResp:
-  """Wire message for cancel order resp."""
+class CancelOrderResp(Msg, kw_only=True, tag='cancel_order'):
+  """Venue-specific cancellation result."""
 
-  id: str
   result: Any
-  tag: Literal['cancel_order'] = 'cancel_order'
 
 
-@dataclass(kw_only=True)
-class CancelOpenOrdersResp:
-  """Wire message for cancel open orders resp."""
+class CancelOpenOrdersResp(Msg, kw_only=True, tag='cancel_open_orders'):
+  """Venue-specific cancellation result."""
 
-  id: str
   result: Any
-  tag: Literal['cancel_open_orders'] = 'cancel_open_orders'
 
 
-@dataclass(kw_only=True)
-class IndexResp:
-  """Wire message for index resp."""
+class IndexResp(Msg, kw_only=True, tag='index'):
+  """Index price."""
 
-  id: str
   value: Decimal
-  tag: Literal['index'] = 'index'
 
 
-@dataclass(kw_only=True)
-class NextFundingResp:
-  """Wire message for next funding resp."""
+class NextFundingResp(Msg, kw_only=True, tag='next_funding'):
+  """Upcoming funding rate."""
 
-  id: str
   rate: NextFunding
-  tag: Literal['next_funding'] = 'next_funding'
 
 
-@dataclass(kw_only=True)
-class FundingRatesResp:
-  """Wire message for funding rates resp."""
+class FundingRatesResp(Msg, kw_only=True, tag='funding_rates'):
+  """Historical funding rates."""
 
-  id: str
   rates: Sequence[FundingRate]
-  tag: Literal['funding_rates'] = 'funding_rates'
 
 
-@dataclass(kw_only=True)
-class FundingPaymentsResp:
-  """Wire message for funding payments resp."""
+class FundingPaymentsResp(Msg, kw_only=True, tag='funding_payments'):
+  """Funding payments of the account."""
 
-  id: str
   payments: Sequence[FundingPayment]
-  tag: Literal['funding_payments'] = 'funding_payments'
 
 
-@dataclass(kw_only=True)
-class PerpPositionResp:
-  """Wire message for perp position resp."""
+class PerpPositionResp(Msg, kw_only=True, tag='perp_position'):
+  """Perpetual position."""
 
-  id: str
   position: PerpPosition
-  tag: Literal['perp_position'] = 'perp_position'
 
 
-@dataclass(kw_only=True)
-class CollateralResp:
-  """Wire message for collateral resp."""
+class CollateralResp(Msg, kw_only=True, tag='collateral'):
+  """Collateral bucket: perpetual margin fields are present when the bucket has them."""
 
-  id: str
-  collateral: PerpCollateral | Collateral
-  tag: Literal['collateral'] = 'collateral'
+  collateral: WireCollateral
 
 
-@dataclass(kw_only=True)
-class PerpCollateralResp:
-  """Wire message for perp collateral resp."""
+class PerpCollateralResp(Msg, kw_only=True, tag='perp_collateral'):
+  """Perpetual margin bucket."""
 
-  id: str
   collateral: PerpCollateral
-  tag: Literal['perp_collateral'] = 'perp_collateral'
 
 
-@dataclass(kw_only=True)
-class MarketsResp:
-  """Wire message for markets resp."""
+class MarketsResp(Msg, kw_only=True, tag='markets'):
+  """Market IDs of an exchange."""
 
-  id: str
   markets: Sequence[str]
-  tag: Literal['markets'] = 'markets'
 
 
-@dataclass(kw_only=True)
-class ExchangesResp:
-  """Wire message for exchanges resp."""
+class ExchangesResp(Msg, kw_only=True, tag='exchanges'):
+  """Exchanges of a venue."""
 
-  id: str
   exchanges: Sequence[ExchangeDescription]
-  tag: Literal['exchanges'] = 'exchanges'
 
 
-@dataclass(kw_only=True)
-class VenuesResp:
-  """Wire message for venues resp."""
+class VenuesResp(Msg, kw_only=True, tag='venues'):
+  """Account keys configured on the gateway."""
 
-  id: str
   venues: Sequence[str]
-  tag: Literal['venues'] = 'venues'
 
 
 # ── Stream data messages ──────────────────────────────────────────────────────
 
 
-@dataclass(kw_only=True)
-class DepthDataMsg:
-  """Wire message for depth data msg."""
+class DepthDataMsg(Msg, kw_only=True, tag='depth_data'):
+  """One order book update of a `depth_stream` subscription."""
 
-  id: str
   book: Book
-  tag: Literal['depth_data'] = 'depth_data'
 
 
-@dataclass(kw_only=True)
-class TradesDataMsg:
-  """Wire message for trades data msg."""
+class TradesDataMsg(Msg, kw_only=True, tag='trades_data'):
+  """One fill of a `trades_stream` subscription."""
 
-  id: str
   trade: Trade
-  tag: Literal['trades_data'] = 'trades_data'
 
 
 # ── Control ───────────────────────────────────────────────────────────────────
 
 
-@dataclass(kw_only=True)
-class ErrMsg:
-  """Wire message for err msg."""
+class ErrMsg(Msg, kw_only=True, tag='err'):
+  """A call failed; `exc` names the SDK exception class when known."""
 
-  id: str
   error: str
   exc: str | None = None
-  tag: Literal['err'] = 'err'
 
 
-@dataclass(kw_only=True)
-class EndMsg:
-  """Wire message for end msg."""
+class EndMsg(Msg, kw_only=True, tag='end'):
+  """A stream ended: cleanly when `error` is null, else with that error."""
 
-  id: str
   exc: str | None = None
   error: str | None = None
-  tag: Literal['end'] = 'end'
 
 
-@dataclass(kw_only=True)
-class FeesResp:
+class FeesResp(Msg, kw_only=True, tag='fees'):
   """Account fee schedule."""
 
-  id: str
   fees: Fees
-  tag: Literal['fees'] = 'fees'
 
 
-@dataclass(kw_only=True)
-class LeverageResp:
+class LeverageResp(Msg, kw_only=True, tag='leverage'):
   """Account leverage on a perpetual market."""
 
-  id: str
   value: Decimal
-  tag: Literal['leverage'] = 'leverage'
 
 
-@dataclass(kw_only=True)
-class CandlesResp:
+class CandlesResp(Msg, kw_only=True, tag='candles'):
   """Historical candles, preserving the SDK's value types."""
 
-  id: str
   candles: Sequence[Candle]
-  tag: Literal['candles'] = 'candles'
 
 
-@dataclass(kw_only=True)
-class ExchangeResp:
+class ExchangeResp(Msg, kw_only=True, tag='exchange'):
   """Resolved exchange product type and venue."""
 
-  id: str
   type: Literal['spot', 'perp']
   venue_id: VenueId
   """Venue the gateway-side exchange reports, e.g. `'hyperliquid'`."""
-  tag: Literal['exchange'] = 'exchange'
 
 
-@dataclass(kw_only=True)
-class VenueResp:
+class VenueResp(Msg, kw_only=True, tag='venue'):
   """Resolved venue of an account."""
 
-  id: str
   venue_id: VenueId
   """Venue the gateway-side venue reports, e.g. `'hyperliquid'`."""
-  tag: Literal['venue'] = 'venue'
 
 
-@dataclass(kw_only=True)
-class TickersResp:
+class TickersResp(Msg, kw_only=True, tag='tickers'):
   """Tickers keyed by native market ID."""
 
-  id: str
   tickers: dict[str, Ticker]
-  tag: Literal['tickers'] = 'tickers'
 
 
-@dataclass(kw_only=True)
-class PerpStatsResp:
+class PerpStatsResp(Msg, kw_only=True, tag='perp_stats'):
   """Perpetual statistics keyed by native market ID."""
 
-  id: str
   stats: dict[str, PerpStats]
-  tag: Literal['perp_stats'] = 'perp_stats'
 
 
-ServerMsg = Annotated[
+ServerMsg = (
   DepthResp
   | FeesResp
   | LeverageResp
@@ -841,18 +668,85 @@ ServerMsg = Annotated[
   | DepthDataMsg
   | TradesDataMsg
   | ErrMsg
-  | EndMsg,
-  pydantic.Discriminator('tag'),
-]
+  | EndMsg
+)
 
-server_adapter: pydantic.TypeAdapter[ServerMsg] = pydantic.TypeAdapter(ServerMsg)
+
+# ── Framing ──────────────────────────────────────────────────────────────────
+
+
+def dec_hook(type: type, obj: Any) -> Any:
+  """Decode the wire types msgspec does not handle natively."""
+  if type is AnyCollateral:
+    perp = isinstance(obj, dict) and 'initial_margin' in obj
+    return msgspec.convert(obj, PerpCollateral if perp else Collateral)
+  raise NotImplementedError(f'Unsupported wire type {type}')
+
+
+encoder = msgspec.json.Encoder()
+client_decoder = msgspec.json.Decoder(ClientMsg, dec_hook=dec_hook)
+server_decoder = msgspec.json.Decoder(ServerMsg, dec_hook=dec_hook)
+
+
+def encode_client(msg: ClientMsg) -> bytes:
+  """Serialize a client request into a JSON frame."""
+  return encoder.encode(msg)
+
+
+def decode_client(data: str | bytes) -> ClientMsg:
+  """Validate and decode a client JSON frame.
+
+  Raises:
+    msgspec.ValidationError: if the frame does not match any client message.
+  """
+  return client_decoder.decode(data)
 
 
 def encode_server(msg: ServerMsg) -> bytes:
-  """Serialize a server response into a JSON frame."""
-  return server_adapter.dump_json(msg)
+  """Serialize a server reply or stream message into a JSON frame."""
+  return encoder.encode(msg)
 
 
 def decode_server(data: str | bytes) -> ServerMsg:
-  """Validate and decode a server JSON frame."""
-  return server_adapter.validate_json(data)
+  """Validate and decode a server JSON frame.
+
+  Raises:
+    msgspec.ValidationError: if the frame does not match any server message.
+  """
+  return server_decoder.decode(data)
+
+
+def tag(msg: Msg) -> str:
+  """Read a message's wire kind."""
+  return str(type(msg).__struct_config__.tag)
+
+
+def schema_hook(type: type) -> dict[str, Any]:
+  """Describe the wire types msgspec cannot describe natively."""
+  if type is AnyCollateral:
+    return {
+      'anyOf': [{'$ref': '#/$defs/PerpCollateral'}, {'$ref': '#/$defs/Collateral'}]
+    }
+  raise NotImplementedError(f'Unsupported wire type {type}')
+
+
+def protocol_schema() -> dict[str, Any]:
+  """Build the JSON Schema of every frame, checked in as `docs/gateway-protocol.schema.json`.
+
+  `$defs.ClientMsg` is any frame a client sends, `$defs.ServerMsg` any frame the
+  gateway sends.
+  """
+  (client, server, *_), defs = msgspec.json.schema_components(
+    (ClientMsg, ServerMsg, PerpCollateral, Collateral), schema_hook=schema_hook
+  )
+  return {
+    '$schema': 'https://json-schema.org/draft/2020-12/schema',
+    'title': 'Tribulnation SDK gateway protocol',
+    'description': (
+      f'WebSocket subprotocol {PROTOCOL}: one JSON object per binary frame. '
+      'Generated by tribulnation.sdk.gateway.codec.protocol_schema; '
+      'see docs/gateway-protocol.md.'
+    ),
+    'anyOf': [{'$ref': '#/$defs/ClientMsg'}, {'$ref': '#/$defs/ServerMsg'}],
+    '$defs': {'ClientMsg': client, 'ServerMsg': server, **defs},
+  }

@@ -46,9 +46,22 @@ class Gateway:
       raise ValueError(f'market {market_id} is not a perpetual market')
     return mkt
 
-  async def handler(self, request: web.Request) -> web.WebSocketResponse:
-    """Serve multiplexed requests and streams on one WebSocket."""
-    ws = web.WebSocketResponse()
+  async def handler(self, request: web.Request) -> web.StreamResponse:
+    """Serve multiplexed requests and streams on one WebSocket.
+
+    A client offering WebSocket subprotocols must offer `codec.PROTOCOL`, or the
+    upgrade is refused with 400. One offering none predates protocol negotiation
+    and speaks the same v1 frames.
+    """
+    offered = codec.offered_protocols(request.headers.get('Sec-WebSocket-Protocol'))
+    if offered and codec.PROTOCOL not in offered:
+      reason = (
+        f'gateway speaks {codec.PROTOCOL}, client offered {", ".join(offered)}; '
+        'upgrade the gateway and its clients together'
+      )
+      log.error('refused %s: %s', request.remote, reason)
+      return web.Response(status=400, text=reason)
+    ws = web.WebSocketResponse(protocols=(codec.PROTOCOL,))
     await ws.prepare(request)
     peer = request.remote
     log.debug('connect %s', peer)
@@ -71,7 +84,7 @@ class Gateway:
                 log.debug('← sub   [%s]', m.id[:8])
                 sub_tasks[m.id] = asyncio.create_task(self._stream(ws, m, sub_tasks))
               case _:
-                log.debug('← call  [%s] %s', m.id[:8], m.tag)
+                log.debug('← call  [%s] %s', m.id[:8], codec.tag(m))
                 task = asyncio.create_task(self._call(ws, m))
                 call_tasks.add(task)
                 task.add_done_callback(call_tasks.discard)
