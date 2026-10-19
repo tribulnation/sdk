@@ -9,7 +9,7 @@ import asyncio
 import json
 import os
 
-import pydantic
+import msgspec
 import pytest
 import pytest_asyncio
 from aiohttp import web
@@ -926,7 +926,7 @@ def test_resolution_replies_roundtrip(
 )
 def test_resolution_replies_require_a_known_venue(raw: str) -> None:
   """A reply without a venue, or naming an account key instead, is rejected."""
-  with pytest.raises(pydantic.ValidationError):
+  with pytest.raises(msgspec.ValidationError):
     codec.decode_server(raw)
 
 

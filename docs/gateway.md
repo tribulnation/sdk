@@ -93,29 +93,35 @@ as access to the configured accounts, including their trading operations.
 
 ## Preserved scope and compatibility
 
-1. Binary JSON WebSocket frames, request tags and correlation IDs are unchanged,
+1. The frames are specified in [Gateway wire protocol](gateway-protocol.md), with a
+   JSON Schema, for clients in other languages. The upgrade negotiates the
+   `tribulnation-gateway.v1` subprotocol; peers from SDK 2.17 and earlier name none and
+   still interoperate: only durations are now written in seconds (`PT28800S` rather
+   than `PT8H`), which both codecs read. The codec uses msgspec
+   instead of pydantic, so the `gateway` extra installs `msgspec`.
+2. Binary JSON WebSocket frames, request tags and correlation IDs are unchanged,
    except for the added `venue` request, the `venue_id` on `exchange` replies, and
    the account field of venue and exchange requests, renamed from `venue_id` to
    `account_id`.
    Decimal/time serialization, error transport, bounded stream inboxes and
    reconnection behavior retain the existing implementation.
-2. Supported calls include venue/exchange discovery, market rules, fees, books,
+3. Supported calls include venue/exchange discovery, market rules, fees, books,
    tickers, statistics, candles, orders, positions, collateral, account leverage and
    funding. Streams
    cover depth and trades. Wallet, Earn, Report, and newer exchange history methods
    are not added by this migration. Unsupported inherited SDK methods remain
    unsupported; this is not a general RPC adapter for arbitrary SDK methods.
-3. Public gateway types are `ProxySDK`, `Gateway` and `GatewayError`.
-4. Venue settings remain nested JSON objects, but the codec no longer imports
+4. Public gateway types are `ProxySDK`, `Gateway` and `GatewayError`.
+5. Venue settings remain nested JSON objects, but the codec no longer imports
    dYdX/Hyperliquid (or mutates the SDK Settings module) to build its schema. It
    preserves Lighter and future venue settings too. Validation of venue-specific
    values belongs to the selected adapter; the transport validates the object
    shape. This intentionally removes the old codec's eager venue validation and
    unknown-key dropping.
-5. This port does not add venue-native `random_client_order_id()` generation to
+6. This port does not add venue-native `random_client_order_id()` generation to
    proxy markets. Callers may supply an already-valid `Order.client_order_id`;
    the codec preserves it.
-6. No new fan-out, book-integrity, rate-limit, retry, replay, or slow-client
+7. No new fan-out, book-integrity, rate-limit, retry, replay, or slow-client
    guarantees are introduced here. These remain properties of the existing
    implementation and selected venue adapters.
 
@@ -126,6 +132,6 @@ The ownership decision and release qualification boundaries are recorded in
 
 ---
 
-← [Reference Context, Logging & Retries](reference/context.md)
+← [Reference Context, Logging & Retries](reference/context.md) · **Next:** [Gateway wire protocol](gateway-protocol.md) →
 
 <!-- /next -->
