@@ -113,7 +113,7 @@ await dydx.place_order(
     'qty': 0.01,
     'price': 60_000,
   },
-  settings={'dydx': {'order_flags': 'SHORT_TERM', 'short_term_gtb': 2}},
+  settings={'dydx': {'flags': 'SHORT_TERM', 'short_term_gtb': 2}},
 )
 ```
 
