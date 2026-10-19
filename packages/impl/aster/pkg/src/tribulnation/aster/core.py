@@ -20,6 +20,7 @@ from eth_utils.address import is_address, to_checksum_address
 from typed_aster import Aster
 from typed_aster.core.auth import Credentials, parse_wallet
 from typed_aster.core.base import ChainClients, SurfaceClients
+from typed_aster.core.urls import SurfaceUrls
 from typed_aster.core.transport.bapi import BapiClient
 from typed_aster.futures.account.schemas import FuturesAccount
 from typed_aster.futures.market.exchange_info import FuturesSymbol
@@ -52,11 +53,25 @@ def new_client(
   public: bool,
   mainnet: bool,
   validate: bool,
+  rest_url: str | None = None,
+  ws_url: str | None = None,
+  user_stream_url: str | None = None,
 ) -> Aster:
   """Build transports signed by the trading agent only.
 
   `Aster.new` also reads the main wallet's key from the environment; the SDK never
   needs it, so credentials are built here from the arguments alone.
+
+  Args:
+    user: Main wallet address (the Aster account).
+    signer: Private key of the trading agent registered for `user`.
+    public: Build a credential-free client.
+    mainnet: Use mainnet when true, testnet when false.
+    validate: Validate responses.
+    rest_url: Futures REST base URL, version prefix included; overrides `mainnet`'s.
+    ws_url: Futures combined market stream URL; overrides `mainnet`'s.
+    user_stream_url: Futures user-data stream base URL (the listenKey is appended);
+      overrides `mainnet`'s.
   """
   credentials = None
   if not public:
@@ -68,6 +83,14 @@ def new_client(
       user=to_checksum_address(user), agent=parse_wallet(signer)
     )
 
+  futures_urls: SurfaceUrls = {}
+  if rest_url is not None:
+    futures_urls['rest'] = rest_url
+  if ws_url is not None:
+    futures_urls['streams'] = ws_url
+  if user_stream_url is not None:
+    futures_urls['user_stream'] = user_stream_url
+
   def surface(name: Literal['futures', 'spot', 'prediction'], signed: bool):
     """Build one surface's transports for the selected network."""
     return SurfaceClients.build(
@@ -75,6 +98,7 @@ def new_client(
       credentials=credentials if signed else None,
       mainnet=mainnet,
       validate=validate,
+      urls=futures_urls if name == 'futures' else None,
     )
 
   return Aster(
@@ -210,6 +234,9 @@ class Public(SDK):
     mainnet: bool = True,
     validate: bool = True,
     account_id: str | None = None,
+    rest_url: str | None = None,
+    ws_url: str | None = None,
+    user_stream_url: str | None = None,
   ):
     """Create a surface over a new client.
 
@@ -221,9 +248,22 @@ class Public(SDK):
       validate: Validate responses against the typed client's schemas.
       account_id: Root SDK account key, the first segment of every market ID;
         defaults to the venue ID.
+      rest_url: Futures REST base URL, version prefix included (e.g.
+        `https://fapi.asterdex.com/fapi/v3`); overrides `mainnet`'s.
+      ws_url: Futures combined market stream URL (e.g.
+        `wss://fstream.asterdex.com/stream`); overrides `mainnet`'s.
+      user_stream_url: Futures user-data stream base URL, the listenKey appended (e.g.
+        `wss://fstream.asterdex.com/ws`); overrides `mainnet`'s.
     """
     client = new_client(
-      user=user, signer=signer, public=public, mainnet=mainnet, validate=validate
+      user=user,
+      signer=signer,
+      public=public,
+      mainnet=mainnet,
+      validate=validate,
+      rest_url=rest_url,
+      ws_url=ws_url,
+      user_stream_url=user_stream_url,
     )
     return cls(shared=Shared(client=client, mainnet=mainnet, account_id=account_id))
 
