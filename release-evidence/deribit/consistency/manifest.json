@@ -253,8 +253,8 @@
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "3273f40507cdb1eab84a7173a902d35b31e256af657a9f9b8c9ea95cf372f1cb",
-        "metadata_sha256": "6b74cda8cb1f3656d034c927fa0f5cf8fcb4facc0af3b1b052adc6e6bed3b04e",
+        "files_sha256": "f963cdef63de050694e7b45a7bc25c971367cf21d265f81199c06ed9f90e6b76",
+        "metadata_sha256": "53b19f4dd6a358edf874cdf3520ff184dd4a926f09fe8349abdebf70b2e0ad15",
         "version": "0"
       },
       "typed-core": {
@@ -290,7 +290,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "e0d418af953b77e24fe39c0442e71fbca7ea8d2dbd9d360a436043c12f519d0c",
+    "source_sha256": "3c358009e08781d308e6d43623ef7715f6701f6b9b087e27e7b43e585d7279ea",
     "venue": "deribit"
   },
   "before": {
@@ -547,8 +547,8 @@
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "3273f40507cdb1eab84a7173a902d35b31e256af657a9f9b8c9ea95cf372f1cb",
-        "metadata_sha256": "6b74cda8cb1f3656d034c927fa0f5cf8fcb4facc0af3b1b052adc6e6bed3b04e",
+        "files_sha256": "f963cdef63de050694e7b45a7bc25c971367cf21d265f81199c06ed9f90e6b76",
+        "metadata_sha256": "53b19f4dd6a358edf874cdf3520ff184dd4a926f09fe8349abdebf70b2e0ad15",
         "version": "0"
       },
       "typed-core": {
@@ -584,12 +584,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "e0d418af953b77e24fe39c0442e71fbca7ea8d2dbd9d360a436043c12f519d0c",
+    "source_sha256": "3c358009e08781d308e6d43623ef7715f6701f6b9b087e27e7b43e585d7279ea",
     "venue": "deribit"
   },
-  "finished": "2026-10-19T16:04:44.710566Z",
-  "results_sha256": "3f3fa4385d77b9f08e973b23a8c27ffed7bf1962929b2312cca5c7c0f56198b5",
+  "finished": "2026-10-20T10:40:15.477200Z",
+  "results_sha256": "2cd4e321c9f8e7980094d232b6e34156680be2476abafd2120bdac08e3d2f847",
   "schema_version": 2,
-  "started": "2026-10-19T16:04:17.947441Z",
-  "summary_sha256": "8e5a0023a189a3fe7909d09656eeef7f3e18bceeb39f0fe60a59aa73b4e66084"
+  "started": "2026-10-20T10:39:45.935248Z",
+  "summary_sha256": "e816bd5c8c0a058a37c8c91dd79858396ce9120fa8fd7e17dd774b92eb6e8530"
 }

@@ -388,8 +388,8 @@
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "3273f40507cdb1eab84a7173a902d35b31e256af657a9f9b8c9ea95cf372f1cb",
-        "metadata_sha256": "6b74cda8cb1f3656d034c927fa0f5cf8fcb4facc0af3b1b052adc6e6bed3b04e",
+        "files_sha256": "f963cdef63de050694e7b45a7bc25c971367cf21d265f81199c06ed9f90e6b76",
+        "metadata_sha256": "53b19f4dd6a358edf874cdf3520ff184dd4a926f09fe8349abdebf70b2e0ad15",
         "version": "0"
       },
       "typed-alchemy": {
@@ -455,7 +455,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "644af1fc196296843caf93941cd69c7087e6bee5a4be9e3eb36cfbed8e074d86",
+    "source_sha256": "888aeca78e9cb8f4e463cd052e90c44fc1deabff1b783f81c7f3ca27104f80ed",
     "venue": "ethereum"
   },
   "before": {
@@ -847,8 +847,8 @@
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "3273f40507cdb1eab84a7173a902d35b31e256af657a9f9b8c9ea95cf372f1cb",
-        "metadata_sha256": "6b74cda8cb1f3656d034c927fa0f5cf8fcb4facc0af3b1b052adc6e6bed3b04e",
+        "files_sha256": "f963cdef63de050694e7b45a7bc25c971367cf21d265f81199c06ed9f90e6b76",
+        "metadata_sha256": "53b19f4dd6a358edf874cdf3520ff184dd4a926f09fe8349abdebf70b2e0ad15",
         "version": "0"
       },
       "typed-alchemy": {
@@ -914,12 +914,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "644af1fc196296843caf93941cd69c7087e6bee5a4be9e3eb36cfbed8e074d86",
+    "source_sha256": "888aeca78e9cb8f4e463cd052e90c44fc1deabff1b783f81c7f3ca27104f80ed",
     "venue": "ethereum"
   },
-  "finished": "2026-10-19T16:07:01.878170Z",
+  "finished": "2026-10-20T10:39:37.809727Z",
   "results_sha256": "0557b1d5f48ed81065fb1f313245b8352bf1ca3f6df74e63a6298ff3a67a4f7e",
   "schema_version": 2,
-  "started": "2026-10-19T16:06:55.824137Z",
-  "summary_sha256": "04c85f7a8034f58ec627fb05c3e7c107f7614e802b37fe68512ba286f460dee1"
+  "started": "2026-10-20T10:39:21.702982Z",
+  "summary_sha256": "65106efb6e0b28f5d145bc4fc11c4ed9925378edf9e5998911562581450a19dd"
 }

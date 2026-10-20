@@ -258,8 +258,8 @@
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "3273f40507cdb1eab84a7173a902d35b31e256af657a9f9b8c9ea95cf372f1cb",
-        "metadata_sha256": "6b74cda8cb1f3656d034c927fa0f5cf8fcb4facc0af3b1b052adc6e6bed3b04e",
+        "files_sha256": "f963cdef63de050694e7b45a7bc25c971367cf21d265f81199c06ed9f90e6b76",
+        "metadata_sha256": "53b19f4dd6a358edf874cdf3520ff184dd4a926f09fe8349abdebf70b2e0ad15",
         "version": "0"
       },
       "typed-core": {
@@ -295,7 +295,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "56c67fc7c1f0d7c8b366d3b33ff40dcc286751f1ecb8f1dce1fdc6a0a092ca44",
+    "source_sha256": "4d5334786e06b6befb650c31edca1af429d9d880a3e61f3a2a5b6dba6b2148d4",
     "venue": "mexc"
   },
   "before": {
@@ -557,8 +557,8 @@
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "3273f40507cdb1eab84a7173a902d35b31e256af657a9f9b8c9ea95cf372f1cb",
-        "metadata_sha256": "6b74cda8cb1f3656d034c927fa0f5cf8fcb4facc0af3b1b052adc6e6bed3b04e",
+        "files_sha256": "f963cdef63de050694e7b45a7bc25c971367cf21d265f81199c06ed9f90e6b76",
+        "metadata_sha256": "53b19f4dd6a358edf874cdf3520ff184dd4a926f09fe8349abdebf70b2e0ad15",
         "version": "0"
       },
       "typed-core": {
@@ -594,12 +594,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "56c67fc7c1f0d7c8b366d3b33ff40dcc286751f1ecb8f1dce1fdc6a0a092ca44",
+    "source_sha256": "4d5334786e06b6befb650c31edca1af429d9d880a3e61f3a2a5b6dba6b2148d4",
     "venue": "mexc"
   },
-  "finished": "2026-10-20T10:23:24.040257Z",
+  "finished": "2026-10-20T10:39:48.038305Z",
   "results_sha256": "4fe8356c4b8c20b2038d5ad06df1ca20b993aa862196d1900af5025fef1d3dce",
   "schema_version": 2,
-  "started": "2026-10-20T10:23:04.300394Z",
-  "summary_sha256": "72e79619e48877676090c5681b2ad439dcb0becd1c69794760634e363af34ca8"
+  "started": "2026-10-20T10:39:21.686389Z",
+  "summary_sha256": "54d0434b274f4391d1ac664eab74f3627da14d79ee4dee26ae215cbb337dbfa1"
 }

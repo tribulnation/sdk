@@ -463,13 +463,13 @@
         "version": "0.3.7"
       },
       "tribulnation-dydx": {
-        "files_sha256": "1ee20e75fec12e8785841ea1c0e125fccc35ff70d7c07f54ac580678ce262f21",
+        "files_sha256": "8f19b63208fa17f55563264a6746076e33dad5d3c10d3487f6624e4e2105adb8",
         "metadata_sha256": "3a80a37af7984ccde9a43dbdee11d12145f5a73927a99d6af07d8dbe8ffb6986",
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "3273f40507cdb1eab84a7173a902d35b31e256af657a9f9b8c9ea95cf372f1cb",
-        "metadata_sha256": "6b74cda8cb1f3656d034c927fa0f5cf8fcb4facc0af3b1b052adc6e6bed3b04e",
+        "files_sha256": "f963cdef63de050694e7b45a7bc25c971367cf21d265f81199c06ed9f90e6b76",
+        "metadata_sha256": "53b19f4dd6a358edf874cdf3520ff184dd4a926f09fe8349abdebf70b2e0ad15",
         "version": "0"
       },
       "typed-core": {
@@ -515,7 +515,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "9252d37e54987f1a870d5b94991e26e84d8df30a2f6f31e8f0d160c57a8b75f0",
+    "source_sha256": "34f9e15b13410f4e0e2f33ab2ed35703641ac82c0681e1503dc61aca06194456",
     "venue": "dydx"
   },
   "before": {
@@ -982,13 +982,13 @@
         "version": "0.3.7"
       },
       "tribulnation-dydx": {
-        "files_sha256": "1ee20e75fec12e8785841ea1c0e125fccc35ff70d7c07f54ac580678ce262f21",
+        "files_sha256": "8f19b63208fa17f55563264a6746076e33dad5d3c10d3487f6624e4e2105adb8",
         "metadata_sha256": "3a80a37af7984ccde9a43dbdee11d12145f5a73927a99d6af07d8dbe8ffb6986",
         "version": "0"
       },
       "tribulnation-sdk": {
-        "files_sha256": "3273f40507cdb1eab84a7173a902d35b31e256af657a9f9b8c9ea95cf372f1cb",
-        "metadata_sha256": "6b74cda8cb1f3656d034c927fa0f5cf8fcb4facc0af3b1b052adc6e6bed3b04e",
+        "files_sha256": "f963cdef63de050694e7b45a7bc25c971367cf21d265f81199c06ed9f90e6b76",
+        "metadata_sha256": "53b19f4dd6a358edf874cdf3520ff184dd4a926f09fe8349abdebf70b2e0ad15",
         "version": "0"
       },
       "typed-core": {
@@ -1034,12 +1034,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "9252d37e54987f1a870d5b94991e26e84d8df30a2f6f31e8f0d160c57a8b75f0",
+    "source_sha256": "34f9e15b13410f4e0e2f33ab2ed35703641ac82c0681e1503dc61aca06194456",
     "venue": "dydx"
   },
-  "finished": "2026-10-19T16:01:14.792257Z",
-  "results_sha256": "cfc62b90c2bca68163d74c3e8a5c4a97cb7530cc2c68a74f86a9ced7fa9ec9b9",
+  "finished": "2026-10-20T10:41:23.485989Z",
+  "results_sha256": "264fd5d57edfbcd899db82e3cc17ba21423ecca80f60730d0a9661e6a5614fab",
   "schema_version": 2,
-  "started": "2026-10-19T16:00:27.320215Z",
-  "summary_sha256": "26c92dc420ffd4188eff4cad4e9f5cf305f11ee8240e4dca9706389dd0afe662"
+  "started": "2026-10-20T10:40:35.484917Z",
+  "summary_sha256": "da08e786a2d8994f02676dbaa2c920072b85ef3f8c700dd3de7013ec5cbd4ab7"
 }
