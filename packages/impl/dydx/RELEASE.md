@@ -26,3 +26,8 @@ The dYdX docs' Settings table listed keys `Settings` rejects (`order_flags`,
 
 Every other method is unchanged. The expiry settings are verified by unit fixtures
 only; the read suites place no orders.
+
+Release qualification on 2026-10-20 passed the read suites and market consistency.
+Committed evidence under `release-evidence/dydx/` matches pinned Catalogue
+`1851660ac2bed8243dd9ce9c7297fe05c7130973`; offline release verification passes.
+This adapter release follows SDK 2.18.0 publication.
