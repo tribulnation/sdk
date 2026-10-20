@@ -27,3 +27,8 @@ Every other method is unchanged.
 The SDK floor rises to 2.18.0, which adds `SkippingView` and `Subscription`'s
 latest-only connector, and the typed-hyperliquid floor to 2.6.0 (typed-core 0.12
 `keep_latest`). Upgrade the SDK and this adapter together.
+
+Release qualification on 2026-10-20 passed the read suites and market consistency.
+Committed evidence under `release-evidence/hyperliquid/` matches pinned Catalogue
+`1851660ac2bed8243dd9ce9c7297fe05c7130973`; offline release verification passes.
+This adapter release follows SDK 2.18.0 publication.
