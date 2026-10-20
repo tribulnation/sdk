@@ -34,6 +34,11 @@ With `user`/`signer` omitted, `aster` reads `ASTER_USER` and `ASTER_SIGNER_PRIVA
 and `aster_testnet` reads `TEST_ASTER_USER` and `TEST_ASTER_SIGNER_PRIVATE_KEY`. Testnet
 never falls back to mainnet variables. `validate` toggles response validation.
 
+`rest_url`, `ws_url` and `user_stream_url` (optional, `$ENV_VAR` allowed) override the
+futures REST base URL (version prefix included, e.g. `http://127.0.0.1:8080/fapi/v3`), the
+combined market stream URL and the user-data stream base URL, e.g. to run against a local
+test server. Unset, they follow `venue`; spot always uses the network default.
+
 ## Exchange & ID conventions
 
 - Exchanges are `spot` and `perp`, with native symbols: `aster:spot:ASTERUSDT`,

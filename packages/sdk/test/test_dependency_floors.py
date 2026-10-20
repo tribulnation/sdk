@@ -20,7 +20,7 @@ COMPATIBLE_IMPLEMENTATIONS = {
   'hyperliquid': '0.18.0',
   'kraken': '0.7.1',
   'kucoin': '0.6.0',
-  'lighter': '0.10.0',
+  'lighter': '0.11.0',
   'mexc': '2.4.0',
 }
 

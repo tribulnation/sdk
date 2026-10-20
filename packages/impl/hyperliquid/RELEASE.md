@@ -1,7 +1,16 @@
 # tribulnation-hyperliquid 0.18.0
 
 Requires SDK >=2.18.0 and typed-hyperliquid >=2.6.0. Depth streams skip stale
-snapshots before validating them and report how many they skipped. See ADR 0046.
+snapshots before validating them and report how many they skipped, and the endpoints
+can be overridden. See ADR 0046.
+
+New:
+
+1. Endpoint overrides for other servers (for example local fake exchanges in stress
+   tests): `rest_url` (the `/info` and `/exchange` root) and
+   `ws_url`. `HyperliquidMarket.new` takes the same keywords, and the SDK
+   `[accounts.<id>]` config accepts them (sdk#240). Unset, the endpoints are
+   unchanged.
 
 Behaviour changes:
 

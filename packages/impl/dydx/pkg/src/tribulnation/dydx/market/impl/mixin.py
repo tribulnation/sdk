@@ -18,6 +18,9 @@ from typed_dydx.indexer.schemas import PerpetualMarket
 from typed_dydx import Dydx
 from typed_dydx.chain import Chain
 from typed_dydx.chain.comet.core import CometClient
+from typed_dydx.indexer import Indexer
+from typed_dydx.indexer.core import IndexerOptions
+from typed_dydx.node.constants import DYDX_TESTNET_CHAIN_ID, DYDX_TESTNET_USDC_DENOM
 from typed_core.grpc import GrpcClient
 from typed_dydx.indexer.schemas import (
   SubaccountsNotification as ParentSubaccountNotification,
@@ -314,6 +317,10 @@ class ExchangeMixin(SDK):
     account_id: str | None = None,
     full_node_grpc: str | None = None,
     full_node_rpc: str | None = None,
+    indexer_rest_url: str | None = None,
+    indexer_ws_url: str | None = None,
+    validator_grpc: str | None = None,
+    validator_rpc: str | None = None,
   ):
     """Create a surface over a new client.
 
@@ -330,24 +337,65 @@ class ExchangeMixin(SDK):
       full_node_grpc: `host:port` of a full node's gRPC streaming endpoint, for the
         `'node'` and `'fastest'` trades sources (with `full_node_rpc`).
       full_node_rpc: The same node's CometBFT RPC URL, read for deleveraging fills.
+      indexer_rest_url: Indexer HTTP base URL (e.g. `https://indexer.dydx.trade/`);
+        overrides `mainnet`'s.
+      indexer_ws_url: Indexer WebSocket URL (e.g. `wss://indexer.dydx.trade/v4/ws`);
+        overrides `mainnet`'s.
+      validator_grpc: Plaintext gRPC `host:port` (port defaults to 9090) that chain
+        queries and order broadcasts use, instead of the default provider. Requires
+        `validator_rpc`.
+      validator_rpc: The same node's CometBFT RPC URL. Requires `validator_grpc`.
     """
-    client = (
-      Dydx.mainnet(
-        mnemonic,
-        private_key=private_key,
-        address=address,
-        indexer={'validate': validate},
-        public=public,
+    indexer: IndexerOptions = {'validate': validate}
+    if indexer_rest_url is not None:
+      indexer['http_url'] = indexer_rest_url
+    if indexer_ws_url is not None:
+      indexer['ws_url'] = indexer_ws_url
+    if (validator_grpc is None) != (validator_rpc is None):
+      raise ValueError('Set both `validator_grpc` and `validator_rpc`, or neither.')
+    if validator_grpc is not None and validator_rpc is not None:
+      chain = full_node_chain(grpc=validator_grpc, rpc=validator_rpc)
+      client = (
+        Dydx.new(
+          mnemonic,
+          private_key=private_key,
+          address=address,
+          indexer=Indexer.mainnet(**indexer),
+          chain=chain,
+          public=public,
+        )
+        if mainnet
+        else Dydx.new(
+          mnemonic,
+          private_key=private_key,
+          address=address,
+          indexer=Indexer.testnet(**indexer),
+          chain=chain,
+          public=public,
+          chain_id=DYDX_TESTNET_CHAIN_ID,
+          usdc_denom=DYDX_TESTNET_USDC_DENOM,
+          mnemonic_env='DYDX_TESTNET_MNEMONIC',
+          private_key_env='DYDX_TESTNET_PRIVATE_KEY',
+        )
       )
-      if mainnet
-      else Dydx.testnet(
-        mnemonic,
-        private_key=private_key,
-        address=address,
-        indexer={'validate': validate},
-        public=public,
+    else:
+      client = (
+        Dydx.mainnet(
+          mnemonic,
+          private_key=private_key,
+          address=address,
+          indexer=indexer,
+          public=public,
+        )
+        if mainnet
+        else Dydx.testnet(
+          mnemonic,
+          private_key=private_key,
+          address=address,
+          indexer=indexer,
+          public=public,
+        )
       )
-    )
     if address is None and client.node.wallet is not None:
       address = client.node.require_wallet().address
     return cls(

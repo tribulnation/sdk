@@ -17,6 +17,7 @@ import asyncio
 from tribulnation.sdk.core import ManagedResource, SDK, exception_wrapper
 
 from typed_binance import Binance
+from typed_binance.core.urls import UsdMFuturesUrls
 from typed_binance.spot.http.market.exchange_info import SpotSymbol
 from typed_binance.usdm_futures.http.market.exchange_info import ExchangeSymbol
 
@@ -69,6 +70,11 @@ class Shared:
     public: bool = False,
     validate: bool = True,
     account_id: str | None = None,
+    rest_url: str | None = None,
+    ws_url: str | None = None,
+    public_ws_url: str | None = None,
+    user_stream_url: str | None = None,
+    ws_api_url: str | None = None,
   ):
     """Create a `Shared` backed by a new Binance client.
 
@@ -79,9 +85,32 @@ class Shared:
       validate: Validate responses against the typed client's schemas.
       account_id: Root SDK account key, the first segment of every market ID;
         defaults to the venue ID.
+      rest_url: USDⓈ-M futures REST base URL (e.g. `https://fapi.binance.com`).
+      ws_url: USDⓈ-M futures combined market stream URL (e.g.
+        `wss://fstream.binance.com/market/stream`).
+      public_ws_url: USDⓈ-M futures combined public (book ticker, depth) stream URL
+        (e.g. `wss://fstream.binance.com/public/stream`).
+      user_stream_url: USDⓈ-M futures user-data stream base URL, the listenKey appended
+        (e.g. `wss://fstream.binance.com/private/ws`).
+      ws_api_url: USDⓈ-M futures WS API URL (e.g. `wss://ws-fapi.binance.com/ws-fapi/v1`).
     """
+    usdm: UsdMFuturesUrls = {}
+    if rest_url is not None:
+      usdm['http'] = rest_url
+    if ws_url is not None:
+      usdm['streams'] = ws_url
+    if public_ws_url is not None:
+      usdm['public_streams'] = public_ws_url
+    if user_stream_url is not None:
+      usdm['private_streams'] = user_stream_url
+    if ws_api_url is not None:
+      usdm['ws'] = ws_api_url
     client = Binance.new(
-      api_key=api_key, secret_key=secret_key, public=public, validate=validate
+      api_key=api_key,
+      secret_key=secret_key,
+      public=public,
+      validate=validate,
+      urls={'usdm_futures': usdm},
     )
     return cls(client=client, validate=validate, account_id=account_id)
 
@@ -117,6 +146,11 @@ class SharedMixin(SDK):
     public: bool = False,
     validate: bool = True,
     account_id: str | None = None,
+    rest_url: str | None = None,
+    ws_url: str | None = None,
+    public_ws_url: str | None = None,
+    user_stream_url: str | None = None,
+    ws_api_url: str | None = None,
   ):
     """Create a market object backed by a new Binance client.
 
@@ -127,6 +161,14 @@ class SharedMixin(SDK):
       validate: Validate responses against the typed client's schemas.
       account_id: Root SDK account key, the first segment of every market ID;
         defaults to the venue ID.
+      rest_url: USDⓈ-M futures REST base URL (e.g. `https://fapi.binance.com`).
+      ws_url: USDⓈ-M futures combined market stream URL (e.g.
+        `wss://fstream.binance.com/market/stream`).
+      public_ws_url: USDⓈ-M futures combined public (book ticker, depth) stream URL
+        (e.g. `wss://fstream.binance.com/public/stream`).
+      user_stream_url: USDⓈ-M futures user-data stream base URL, the listenKey appended
+        (e.g. `wss://fstream.binance.com/private/ws`).
+      ws_api_url: USDⓈ-M futures WS API URL (e.g. `wss://ws-fapi.binance.com/ws-fapi/v1`).
     """
     return cls(
       shared=Shared.new(
@@ -135,6 +177,11 @@ class SharedMixin(SDK):
         public=public,
         validate=validate,
         account_id=account_id,
+        rest_url=rest_url,
+        ws_url=ws_url,
+        public_ws_url=public_ws_url,
+        user_stream_url=user_stream_url,
+        ws_api_url=ws_api_url,
       )
     )
 

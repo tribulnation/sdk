@@ -1,8 +1,9 @@
 # tribulnation-sdk 2.18.0
 
 Book streams skip stale snapshots before decoding them and report how many they
-skipped, books and rules can be rescaled to asset units, and the gateway moves to
-msgspec with a negotiated protocol version. See ADR 0046.
+skipped, books and rules can be rescaled to asset units, accounts can point venues at
+other endpoints, and the gateway moves to msgspec with a negotiated protocol version.
+See ADR 0046.
 
 New:
 
@@ -20,6 +21,13 @@ New:
    the upstream unconflated. `StreamInbox.skipped` counts `'latest'` drops plus
    upstream skips credited while subscribed. `skipped(stream)` returns that count, or
    `None` for streams that do not count.
+3. Account configs take optional venue endpoint fields, passed to the typed clients
+   (for example to run against local fake exchanges in stress tests; sdk#240). Aster:
+   `rest_url`, `ws_url`, `user_stream_url` (perpetuals). Binance USD-M: `rest_url`,
+   `ws_url`, `public_ws_url`, `user_stream_url`, `ws_api_url`. Hyperliquid and
+   Lighter: `rest_url`, `ws_url`. dYdX: `indexer_rest_url`, `indexer_ws_url`, and
+   `validator_grpc` with `validator_rpc`, set together. Every field accepts
+   `$ENV_VAR`; unset fields keep today's endpoints.
 
 Behaviour changes:
 
@@ -40,25 +48,21 @@ Behaviour changes:
    streams report only the proxy-side inbox's skips.
 
 This release goes with Aster 0.12.0, Binance 0.8.0 and Hyperliquid 0.18.0, which
-import `latest_only`/`SkippingView` and require SDK >=2.18.0, and dYdX 0.17.0
-(absolute order expiry settings; still SDK >=2.17.0). The SDK extras now require
+import `latest_only`/`SkippingView` and require SDK >=2.18.0, dYdX 0.17.0 (absolute
+order expiry settings; still SDK >=2.17.0) and Lighter 0.11.0 (endpoint overrides;
+still SDK >=2.17.0). All five accept the endpoint fields. The SDK extras now require
 those versions. Upgrade the SDK and those adapters together; older adapters keep
-working with this core, without conflation. Other adapters are unaffected.
+working with this core, without conflation or endpoint overrides. Other adapters are
+unaffected.
 
 Conflation is verified by unit tests and a local synthetic burst benchmark; the read
-suites exercise these depth streams live but do not measure skipping.
+suites exercise these depth streams live but do not measure skipping. The endpoint
+fields are verified by unit tests; the read suites use the default endpoints.
 
-Qualification on 2026-10-19, against the unchanged Catalogue pin
-`1851660ac2bed8243dd9ce9c7297fe05c7130973`: Binance, Bit2Me, Deribit, dYdX,
-Hyperliquid and Lighter have passing, verified read-suite and consistency evidence,
-Ethereum passing read-suite evidence, and Aster, Bitget, Bybit, Kraken, KuCoin and
-MEXC passing consistency evidence. Still missing: read suites for Aster, Bitget,
-Bybit, Coinbase, Kraken, KuCoin and MEXC, and Coinbase consistency. The CEX API keys
-reject the new qualification host's IP addresses (IP allowlists), and Aster's perpetual
-`collateral`/`perp_collateral` fail the shape check because the venue reports
-`availableBalance` above `totalMarginBalance` on the qualification account (no
-positions; Aster code unchanged since 0.11.1). Their stale reports are removed. The
-recorded pins move to typed-core 0.12.0, typed-binance 1.5.0, typed-aster 0.6.0 and
-typed-hyperliquid 2.6.0.
+Qualification on 2026-10-20, against the unchanged Catalogue pin
+`1851660ac2bed8243dd9ce9c7297fe05c7130973`: all 14 venues have passing, verified
+read-suite evidence, and every market venue passing consistency evidence. The recorded
+pins move to typed-core 0.12.0, typed-binance 1.6.0, typed-aster 0.7.0,
+typed-lighter 0.3.0 and typed-hyperliquid 2.6.0.
 
-All 2,108 repository unit tests pass.
+All 2,115 repository unit tests pass.

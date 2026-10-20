@@ -31,6 +31,8 @@ class LighterMarket(Public, TradingVenue):
     public: bool = False,
     validate: bool = True,
     account_id: str | None = None,
+    rest_url: str | None = None,
+    ws_url: str | None = None,
   ):
     """Build a venue from an API key (trading and private reads), a read-only auth
     token (private reads), or credential-free (public data, and the public reads of
@@ -49,6 +51,10 @@ class LighterMarket(Public, TradingVenue):
       validate: Validate responses.
       account_id: Root SDK account key, the first segment of every market ID;
         defaults to the venue ID.
+      rest_url: REST API base URL (e.g. `https://mainnet.zklighter.elliot.ai`);
+        overrides `network`'s. The chain id still comes from `network`.
+      ws_url: WebSocket stream URL (e.g. `wss://mainnet.zklighter.elliot.ai/stream`);
+        overrides `network`'s.
     """
     return cls(
       shared=Shared.new(
@@ -61,6 +67,8 @@ class LighterMarket(Public, TradingVenue):
         public=public,
         validate=validate,
         account_id=account_id,
+        rest_url=rest_url,
+        ws_url=ws_url,
       )
     )
 
