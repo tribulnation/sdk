@@ -29,3 +29,8 @@ The SDK floor rises to 2.18.0 (from 2.16.0), which adds `latest_only`, and the
 typed-binance floor to 1.6.0 (typed-core 0.12 `keep_latest` and the endpoint
 overrides). Upgrade the SDK and
 this adapter together.
+
+Release qualification on 2026-10-20 passed the read suites and market consistency.
+Committed evidence under `release-evidence/binance/` matches pinned Catalogue
+`1851660ac2bed8243dd9ce9c7297fe05c7130973`; offline release verification passes.
+This adapter release follows SDK 2.18.0 publication.
