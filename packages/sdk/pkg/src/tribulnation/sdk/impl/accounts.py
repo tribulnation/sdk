@@ -26,6 +26,45 @@ def resolve_env_var(value: str | None, *, require: bool) -> str | None:
   return value
 
 
+def resolve_url(value: str | None) -> str | None:
+  """Resolve an optional venue URL setting; a `$ENV_VAR` that is set must resolve."""
+  return resolve_env_var(value, require=True)
+
+
+class AsterUrls(_TypedDict):
+  """Resolved Aster futures endpoint overrides; `None` keeps the default."""
+
+  rest_url: str | None
+  ws_url: str | None
+  user_stream_url: str | None
+
+
+class BinanceUrls(_TypedDict):
+  """Resolved Binance USDⓈ-M futures endpoint overrides; `None` keeps the default."""
+
+  rest_url: str | None
+  ws_url: str | None
+  public_ws_url: str | None
+  user_stream_url: str | None
+  ws_api_url: str | None
+
+
+class DydxUrls(_TypedDict):
+  """Resolved dYdX indexer and validator overrides; `None` keeps the default."""
+
+  indexer_rest_url: str | None
+  indexer_ws_url: str | None
+  validator_grpc: str | None
+  validator_rpc: str | None
+
+
+class RestWsUrls(_TypedDict):
+  """Resolved REST and WebSocket overrides; `None` keeps the default."""
+
+  rest_url: str | None
+  ws_url: str | None
+
+
 VenueId = _Literal[
   'dydx',
   'dydx_testnet',
@@ -94,6 +133,19 @@ class Dydx(VenueAccount):
   """The same node's CometBFT RPC URL, e.g. `'http://20.222.23.181:26657'`; read for
   deleveraging fills (`block_results`). Needed alongside `full_node_grpc`. May be a
   `$ENV_VAR`."""
+  indexer_rest_url: str | None = None
+  """Indexer HTTP base URL, e.g. `'http://127.0.0.1:8080'`; unset uses the network's
+  (`https://indexer.dydx.trade/`). May be a `$ENV_VAR`."""
+  indexer_ws_url: str | None = None
+  """Indexer WebSocket URL, e.g. `'ws://127.0.0.1:8080/v4/ws'`; unset uses the
+  network's (`wss://indexer.dydx.trade/v4/ws`). May be a `$ENV_VAR`."""
+  validator_grpc: str | None = None
+  """Plaintext gRPC `host:port` (port defaults to 9090) used for chain queries and
+  order broadcasts, instead of the default provider. Set with `validator_rpc`. May be
+  a `$ENV_VAR`."""
+  validator_rpc: str | None = None
+  """The same node's CometBFT RPC URL. Set with `validator_grpc`. May be a
+  `$ENV_VAR`."""
 
   @property
   def resolved_address(self) -> str | None:
@@ -106,6 +158,16 @@ class Dydx(VenueAccount):
   @property
   def resolved_full_node_rpc(self) -> str | None:
     return resolve_env_var(self.full_node_rpc, require=True)
+
+  @property
+  def resolved_urls(self) -> DydxUrls:
+    """Endpoint overrides; `None` keeps the network's default."""
+    return {
+      'indexer_rest_url': resolve_url(self.indexer_rest_url),
+      'indexer_ws_url': resolve_url(self.indexer_ws_url),
+      'validator_grpc': resolve_url(self.validator_grpc),
+      'validator_rpc': resolve_url(self.validator_rpc),
+    }
 
   @property
   def resolved_creds(self) -> DydxCreds:
@@ -124,6 +186,7 @@ class Dydx(VenueAccount):
     self.resolved_creds
     self.resolved_full_node_grpc
     self.resolved_full_node_rpc
+    self.resolved_urls
 
 
 @_dataclass(frozen=True)
@@ -133,6 +196,12 @@ class Hyperliquid(VenueAccount):
   """Wallet address (`0x...`). Read-only if no private key is provided."""
   private_key: str = '$HYPERLIQUID_PRIVATE_KEY'
   """Wallet private key (`0x...`)"""
+  rest_url: str | None = None
+  """HTTP API root serving `/info` and `/exchange`, e.g. `'http://127.0.0.1:8080'`;
+  unset uses the network's (`https://api.hyperliquid.xyz`). May be a `$ENV_VAR`."""
+  ws_url: str | None = None
+  """WebSocket URL, e.g. `'ws://127.0.0.1:8080/ws'`; unset uses the network's
+  (`wss://api.hyperliquid.xyz/ws`). May be a `$ENV_VAR`."""
 
   @property
   def resolved_address(self) -> str | None:
@@ -142,9 +211,15 @@ class Hyperliquid(VenueAccount):
   def resolved_private_key(self) -> str | None:
     return resolve_env_var(self.private_key, require=not self.public)
 
+  @property
+  def resolved_urls(self) -> RestWsUrls:
+    """Endpoint overrides; `None` keeps the network's default."""
+    return {'rest_url': resolve_url(self.rest_url), 'ws_url': resolve_url(self.ws_url)}
+
   def verify_env_vars(self):
     self.resolved_address
     self.resolved_private_key
+    self.resolved_urls
 
 
 @_dataclass(frozen=True)
@@ -234,6 +309,21 @@ class Binance(VenueAccount):
   """Binance API secret"""
   validate: bool = True
   """Whether to type-validate incoming responses."""
+  rest_url: str | None = None
+  """USDⓈ-M futures REST base URL, e.g. `'http://127.0.0.1:8080'`; unset uses
+  `https://fapi.binance.com`. May be a `$ENV_VAR`."""
+  ws_url: str | None = None
+  """USDⓈ-M futures combined market stream URL; unset uses
+  `wss://fstream.binance.com/market/stream`. May be a `$ENV_VAR`."""
+  public_ws_url: str | None = None
+  """USDⓈ-M futures combined public (book ticker, depth) stream URL; unset uses
+  `wss://fstream.binance.com/public/stream`. May be a `$ENV_VAR`."""
+  user_stream_url: str | None = None
+  """USDⓈ-M futures user-data stream base URL, the listenKey appended; unset uses
+  `wss://fstream.binance.com/private/ws`. May be a `$ENV_VAR`."""
+  ws_api_url: str | None = None
+  """USDⓈ-M futures WS API URL; unset uses `wss://ws-fapi.binance.com/ws-fapi/v1`. May
+  be a `$ENV_VAR`."""
 
   @property
   def resolved_api_key(self) -> str | None:
@@ -243,9 +333,21 @@ class Binance(VenueAccount):
   def resolved_secret_key(self) -> str | None:
     return resolve_env_var(self.secret_key, require=not self.public)
 
+  @property
+  def resolved_urls(self) -> BinanceUrls:
+    """USDⓈ-M futures endpoint overrides; `None` keeps the default."""
+    return {
+      'rest_url': resolve_url(self.rest_url),
+      'ws_url': resolve_url(self.ws_url),
+      'public_ws_url': resolve_url(self.public_ws_url),
+      'user_stream_url': resolve_url(self.user_stream_url),
+      'ws_api_url': resolve_url(self.ws_api_url),
+    }
+
   def verify_env_vars(self):
     self.resolved_api_key
     self.resolved_secret_key
+    self.resolved_urls
 
 
 @_dataclass(frozen=True)
@@ -391,6 +493,17 @@ class Aster(VenueAccount):
   """Trading agent private key; no main-wallet signing key is needed."""
   validate: bool = True
   """Whether to type-validate incoming responses."""
+  rest_url: str | None = None
+  """Futures REST base URL, version prefix included, e.g.
+  `'http://127.0.0.1:8080/fapi/v3'`; unset uses the network's
+  (`https://fapi.asterdex.com/fapi/v3`). May be a `$ENV_VAR`."""
+  ws_url: str | None = None
+  """Futures combined market stream URL, e.g. `'ws://127.0.0.1:8080/stream'`; unset
+  uses the network's (`wss://fstream.asterdex.com/stream`). May be a `$ENV_VAR`."""
+  user_stream_url: str | None = None
+  """Futures user-data stream base URL, the listenKey appended, e.g.
+  `'ws://127.0.0.1:8080/ws'`; unset uses the network's
+  (`wss://fstream.asterdex.com/ws`). May be a `$ENV_VAR`."""
 
   @property
   def resolved_user(self) -> str | None:
@@ -406,10 +519,20 @@ class Aster(VenueAccount):
       self.signer or f'${prefix}_SIGNER_PRIVATE_KEY', require=not self.public
     )
 
+  @property
+  def resolved_urls(self) -> AsterUrls:
+    """Futures endpoint overrides; `None` keeps the network's default."""
+    return {
+      'rest_url': resolve_url(self.rest_url),
+      'ws_url': resolve_url(self.ws_url),
+      'user_stream_url': resolve_url(self.user_stream_url),
+    }
+
   def verify_env_vars(self):
     """Fail before constructing private clients when credentials are missing."""
     self.resolved_user
     self.resolved_signer
+    self.resolved_urls
 
 
 @_dataclass(frozen=True)
@@ -435,6 +558,13 @@ class Lighter(VenueAccount):
   reads use its master account when no account index is configured."""
   validate: bool = True
   """Whether to type-validate incoming responses."""
+  rest_url: str | None = None
+  """REST API base URL, e.g. `'http://127.0.0.1:8080'`; unset uses the network's
+  (`https://mainnet.zklighter.elliot.ai`). The chain id still follows `venue`. May be
+  a `$ENV_VAR`."""
+  ws_url: str | None = None
+  """WebSocket stream URL, e.g. `'ws://127.0.0.1:8080/stream'`; unset uses the
+  network's (`wss://mainnet.zklighter.elliot.ai/stream`). May be a `$ENV_VAR`."""
 
   @property
   def prefix(self) -> str:
@@ -491,6 +621,12 @@ class Lighter(VenueAccount):
     self.resolved_account_index
     self.resolved_api_key_index
     self.resolved_api_private_key
+    self.resolved_urls
+
+  @property
+  def resolved_urls(self) -> RestWsUrls:
+    """Endpoint overrides; `None` keeps the network's default."""
+    return {'rest_url': resolve_url(self.rest_url), 'ws_url': resolve_url(self.ws_url)}
 
 
 @_dataclass(frozen=True)

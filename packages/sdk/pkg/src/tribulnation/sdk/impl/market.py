@@ -51,6 +51,7 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       mainnet=account.venue == 'aster',
       validate=account.validate,
       account_id=id,
+      **account.resolved_urls,
     )
 
   def dydx(self, account: Dydx, id: str) -> TradingVenue:
@@ -69,6 +70,7 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       account_id=id,
       full_node_grpc=account.resolved_full_node_grpc,
       full_node_rpc=account.resolved_full_node_rpc,
+      **account.resolved_urls,
     )
 
   def hyperliquid(self, account: Hyperliquid, id: str) -> TradingVenue:
@@ -83,6 +85,7 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       wallet=account.resolved_private_key,
       mainnet=account.venue == 'hyperliquid',
       account_id=id,
+      **account.resolved_urls,
     )
 
   def mexc(self, account: Mexc, id: str) -> TradingVenue:
@@ -116,6 +119,7 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       public=account.public and api_key is None and secret_key is None,
       validate=account.validate,
       account_id=id,
+      **account.resolved_urls,
     )
 
   def coinbase(self, account: Coinbase, id: str) -> TradingVenue:
@@ -235,6 +239,7 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       public=account.public and api_private_key is None and auth_token is None,
       validate=account.validate,
       account_id=id,
+      **account.resolved_urls,
     )
 
   def _venue(self, id: str, /) -> TradingVenue:

@@ -23,6 +23,10 @@ covers only what is Hyperliquid-specific.
 `address` without a `private_key` is read-only, and so is
 `accounts.Hyperliquid(public=True)`.
 
+`rest_url` and `ws_url` (optional, `$ENV_VAR` allowed) override the HTTP API root
+serving `/info` and `/exchange` and the WebSocket URL, e.g. to run against a local test
+server. Unset, they follow `venue`.
+
 ## Exchanges & ID conventions
 
 Hyperliquid exposes several exchanges under one venue. `exchanges()` reports:

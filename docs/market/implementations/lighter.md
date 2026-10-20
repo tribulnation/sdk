@@ -57,6 +57,10 @@ mainnet variables. A private account needs either the API key or the token; with
 API key variables set, the client signs even when the account configures only a token. `validate`
 toggles response validation.
 
+`rest_url` and `ws_url` (optional, `$ENV_VAR` allowed) override the REST API base URL
+and the WebSocket stream URL, e.g. to run against a local test server. Unset, they follow
+`venue`; the chain id always does.
+
 ## Exchange & ID conventions
 
 - Exchanges are `perp` and `spot`. Market ids are the venue's numeric `market_id`, the

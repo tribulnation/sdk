@@ -450,6 +450,8 @@ class SharedMixin(SDK):
     mainnet: bool = True,
     validate: bool = True,
     account_id: str | None = None,
+    rest_url: str | None = None,
+    ws_url: str | None = None,
   ):
     """Create a surface over a new HTTP client.
 
@@ -460,6 +462,10 @@ class SharedMixin(SDK):
       validate: Validate responses.
       account_id: Root SDK account key, the first segment of every ID; defaults to
         the venue ID.
+      rest_url: HTTP API root serving `/info` and `/exchange` (e.g.
+        `https://api.hyperliquid.xyz`); overrides `mainnet`'s.
+      ws_url: WebSocket URL (e.g. `wss://api.hyperliquid.xyz/ws`); overrides
+        `mainnet`'s.
     """
     if address is None:
       env_var = 'HYPERLIQUID_ADDRESS' if mainnet else 'HYPERLIQUID_TESTNET_ADDRESS'
@@ -469,6 +475,8 @@ class SharedMixin(SDK):
       mainnet=mainnet,
       validate=validate,
       public=True,
+      base_url=rest_url,
+      ws_url=ws_url,
     )
     return cls(
       shared=Shared(
@@ -489,6 +497,8 @@ class SharedMixin(SDK):
     validate: bool = True,
     public: bool = False,
     account_id: str | None = None,
+    rest_url: str | None = None,
+    ws_url: str | None = None,
   ):
     """Create a surface over a new client.
 
@@ -500,6 +510,10 @@ class SharedMixin(SDK):
       public: Accepted for compatibility; the client is always built public-capable.
       account_id: Root SDK account key, the first segment of every ID; defaults to
         the venue ID.
+      rest_url: HTTP API root serving `/info` and `/exchange` (e.g.
+        `https://api.hyperliquid.xyz`); overrides `mainnet`'s.
+      ws_url: WebSocket URL (e.g. `wss://api.hyperliquid.xyz/ws`); overrides
+        `mainnet`'s.
     """
     if address is None:
       env_var = 'HYPERLIQUID_ADDRESS' if mainnet else 'HYPERLIQUID_TESTNET_ADDRESS'
@@ -509,6 +523,8 @@ class SharedMixin(SDK):
       mainnet=mainnet,
       validate=validate,
       public=True,
+      base_url=rest_url,
+      ws_url=ws_url,
     )
     return cls(
       shared=Shared(

@@ -116,6 +116,8 @@ class Shared(SDK):
     public: bool = False,
     validate: bool = True,
     account_id: str | None = None,
+    rest_url: str | None = None,
+    ws_url: str | None = None,
   ):
     """Build a client from explicit credentials, or the client's `LIGHTER_*` defaults.
 
@@ -133,6 +135,10 @@ class Shared(SDK):
       validate: Validate responses.
       account_id: Root SDK account key, the first segment of every market ID;
         defaults to the venue ID.
+      rest_url: REST API base URL (e.g. `https://mainnet.zklighter.elliot.ai`);
+        overrides `network`'s. The chain id still comes from `network`.
+      ws_url: WebSocket stream URL (e.g. `wss://mainnet.zklighter.elliot.ai/stream`);
+        overrides `network`'s.
     """
     return cls(
       venue_id=network_venue_id(network),
@@ -147,6 +153,8 @@ class Shared(SDK):
         auth_token=auth_token,
         public=public,
         validate=validate,
+        api_url=rest_url,
+        ws_url=ws_url,
       ),
     )
 
