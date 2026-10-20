@@ -1,21 +1,29 @@
-# tribulnation-hyperliquid 0.17.0
+# tribulnation-hyperliquid 0.18.0
 
-Requires SDK >=2.17.0 and typed-hyperliquid >=2.5.0. Placements report
-`OrderResponse.filled_qty`.
+Requires SDK >=2.18.0 and typed-hyperliquid >=2.6.0. Depth streams skip stale
+snapshots before validating them and report how many they skipped, and the endpoints
+can be overridden. See ADR 0046.
 
 New:
 
-1. `OrderResponse.filled_qty` is the `filled` status's `totalSz`, final for `MARKET`
-   and IOC orders. A `resting` answer carries no fill size, and a GTC order that
-   partly crosses on arrival also answers `resting`, so `filled_qty` is `None` there.
+1. Endpoint overrides for other servers (for example local fake exchanges in stress
+   tests): `rest_url` (the `/info` and `/exchange` root) and
+   `ws_url`. `HyperliquidMarket.new` takes the same keywords, and the SDK
+   `[accounts.<id>]` config accepts them (sdk#240). Unset, the endpoints are
+   unchanged.
 
-Every other method is unchanged. Verified by unit fixtures only; no live trading run
-covers `filled_qty`.
+Behaviour changes:
 
-The SDK floor rises to 2.17.0, whose `OrderResponse` declares `filled_qty`. Upgrade
-the SDK and this adapter together.
+1. While every consumer of a coin and depth source keeps only the newest book (the
+   default `queue_size=1, overflow='latest'`), `depth_stream` subscribes `l2Book` (and
+   the fast `l2Book`) and `bbo` with typed `keep_latest`: a stale frame is decoded to
+   route it but never validated nor converted. A consumer asking for more (for example
+   `overflow='fail'`) reopens the shared feed unconflated, as before.
+2. The yielded stream reports `skipped`, read with `tribulnation.sdk.core.skipped`:
+   the books this consumer never saw, skipped upstream or in its own inbox.
 
-Release qualification on 2026-10-09 passed the read suites and market
-consistency. Committed evidence under `release-evidence/hyperliquid/` matches pinned
-Catalogue `1851660ac2bed8243dd9ce9c7297fe05c7130973`; offline release
-verification passes. This adapter release follows SDK 2.17.0 publication.
+Every other method is unchanged.
+
+The SDK floor rises to 2.18.0, which adds `SkippingView` and `Subscription`'s
+latest-only connector, and the typed-hyperliquid floor to 2.6.0 (typed-core 0.12
+`keep_latest`). Upgrade the SDK and this adapter together.

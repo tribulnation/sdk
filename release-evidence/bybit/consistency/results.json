@@ -2278,11 +2278,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"STGUSDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -3398,11 +3398,11 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"BLASTUSDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -12699,14 +12699,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.2529",
-            "after_bid": "0.2528",
-            "ask": "0.2529",
+            "after_ask": "0.2250",
+            "after_bid": "0.2249",
+            "ask": "0.2250",
             "attempt": 1,
-            "before_ask": "0.2530",
-            "before_bid": "0.2528",
-            "bid": "0.2528",
-            "elapsed_seconds": 0.5207105790032074,
+            "before_ask": "0.2250",
+            "before_bid": "0.2249",
+            "bid": "0.2249",
+            "elapsed_seconds": 0.8011541779851541,
             "ticker_ids_match": true
           }
         ],
@@ -12718,14 +12718,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.0003783",
-            "after_bid": "0.0003782",
-            "ask": "0.0003783",
+            "after_ask": "0.0003584",
+            "after_bid": "0.0003581",
+            "ask": "0.0003584",
             "attempt": 1,
-            "before_ask": "0.0003783",
-            "before_bid": "0.0003782",
-            "bid": "0.0003782",
-            "elapsed_seconds": 0.523276186955627,
+            "before_ask": "0.0003584",
+            "before_bid": "0.0003581",
+            "bid": "0.0003581",
+            "elapsed_seconds": 1.406182478996925,
             "ticker_ids_match": true
           }
         ],
@@ -12737,14 +12737,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.10920",
-            "after_bid": "0.10910",
-            "ask": "0.10920",
+            "after_ask": "0.10050",
+            "after_bid": "0.10040",
+            "ask": "0.10050",
             "attempt": 1,
-            "before_ask": "0.10920",
-            "before_bid": "0.10910",
-            "bid": "0.10910",
-            "elapsed_seconds": 0.5179109980235808,
+            "before_ask": "0.10050",
+            "before_bid": "0.10040",
+            "bid": "0.10040",
+            "elapsed_seconds": 0.8107917239831295,
             "ticker_ids_match": true
           }
         ],
@@ -12756,14 +12756,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "82347.80",
-            "after_bid": "82347.70",
-            "ask": "82347.80",
+            "after_ask": "81458.20",
+            "after_bid": "81458.10",
+            "ask": "81460.10",
             "attempt": 1,
-            "before_ask": "82345.20",
-            "before_bid": "82345.10",
-            "bid": "82347.70",
-            "elapsed_seconds": 0.9751407159492373,
+            "before_ask": "81460.10",
+            "before_bid": "81460.00",
+            "bid": "81460.00",
+            "elapsed_seconds": 1.0290901589905843,
             "ticker_ids_match": true
           }
         ],
@@ -12775,14 +12775,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.2537",
-            "after_bid": "0.2535",
-            "ask": "0.2538",
+            "after_ask": "0.2253",
+            "after_bid": "0.2251",
+            "ask": "0.2253",
             "attempt": 1,
-            "before_ask": "0.2538",
-            "before_bid": "0.2536",
-            "bid": "0.2537",
-            "elapsed_seconds": 0.9501366330077872,
+            "before_ask": "0.2253",
+            "before_bid": "0.2251",
+            "bid": "0.2251",
+            "elapsed_seconds": 0.5223758429929148,
             "ticker_ids_match": true
           }
         ],
@@ -12794,14 +12794,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.0965",
-            "after_bid": "0.09644",
-            "ask": "0.0965",
+            "after_ask": "0.09143",
+            "after_bid": "0.09139",
+            "ask": "0.09143",
             "attempt": 1,
-            "before_ask": "0.0965",
-            "before_bid": "0.09644",
-            "bid": "0.09644",
-            "elapsed_seconds": 0.7989392949966714,
+            "before_ask": "0.09143",
+            "before_bid": "0.09139",
+            "bid": "0.09139",
+            "elapsed_seconds": 1.0774998210254125,
             "ticker_ids_match": true
           }
         ],
@@ -12813,14 +12813,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.03576",
-            "after_bid": "0.03573",
-            "ask": "0.03576",
+            "after_ask": "0.02916",
+            "after_bid": "0.02898",
+            "ask": "0.02916",
             "attempt": 1,
-            "before_ask": "0.03576",
-            "before_bid": "0.03573",
-            "bid": "0.03573",
-            "elapsed_seconds": 0.4924092040164396,
+            "before_ask": "0.02916",
+            "before_bid": "0.02898",
+            "bid": "0.02898",
+            "elapsed_seconds": 0.5308545280131511,
             "ticker_ids_match": true
           }
         ],
@@ -12832,14 +12832,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "82382.4",
-            "after_bid": "82382.3",
-            "ask": "82382.4",
+            "after_ask": "81508.5",
+            "after_bid": "81508.4",
+            "ask": "81508.5",
             "attempt": 1,
-            "before_ask": "82382.4",
-            "before_bid": "82382.3",
-            "bid": "82382.3",
-            "elapsed_seconds": 0.49210814997786656,
+            "before_ask": "81508.5",
+            "before_bid": "81508.4",
+            "bid": "81508.4",
+            "elapsed_seconds": 0.536901476996718,
             "ticker_ids_match": true
           }
         ],
@@ -13151,7 +13151,6 @@
           "POPCATUSDT",
           "ZROUSDC",
           "ZROUSDT",
-          "BLASTUSDT",
           "BTCBRL",
           "ETHBRL",
           "SOLBRL",
@@ -13667,6 +13666,7 @@
           "DIAUSDT",
           "DJTUSDT",
           "DKNGUSDT",
+          "DNAUSDT",
           "DOGEPERP",
           "DOGEUSDT",
           "DOLOUSDT",
@@ -13676,6 +13676,7 @@
           "DOTUSDT",
           "DRAMUSDT",
           "DRIFTUSDT",
+          "DRVUSDT",
           "DUSKUSDT",
           "DYDXUSDT",
           "DYMUSDT",
@@ -13752,6 +13753,7 @@
           "GOOGLUSDT",
           "GPROUSDT",
           "GPSUSDT",
+          "GRALUSDT",
           "GRAMUSDT",
           "GRASSUSDT",
           "GRIFFAINUSDT",
@@ -13886,6 +13888,7 @@
           "MEITUANUSDT",
           "MEITUUSDT",
           "MELANIAUSDT",
+          "MELIUSDT",
           "MEMEUSDT",
           "MERLPERP",
           "MERLUSDT",
@@ -13946,6 +13949,7 @@
           "NOTPERP",
           "NOTUSDT",
           "NOWUSDT",
+          "NUSTOCKUSDT",
           "NVDAUSDT",
           "NVDLUSDT",
           "NVOUSDT",
@@ -13978,6 +13982,7 @@
           "PATHUSDT",
           "PAXGPERP",
           "PAXGUSDT",
+          "PBRUSDT",
           "PDDUSDT",
           "PEAQUSDT",
           "PENDLEPERP",
@@ -14009,7 +14014,6 @@
           "POWERUSDT",
           "POWRUSDT",
           "PRLUSDT",
-          "PROMPTUSDT",
           "PROVEUSDT",
           "PTBUSDT",
           "PUFFERUSDT",
@@ -14090,6 +14094,7 @@
           "SMICUSDT",
           "SNDKUSDT",
           "SNOWUSDT",
+          "SNPSUSDT",
           "SNTUSDT",
           "SNXUSDT",
           "SNXXUSDT",
@@ -14110,7 +14115,6 @@
           "SPCHUSDT",
           "SPCXUSDT",
           "SPKUSDT",
-          "SPORTFUNUSDT",
           "SPOTUSDT",
           "SPXLUSDT",
           "SPXPERP",
@@ -14123,7 +14127,6 @@
           "STABLEUSDT",
           "STBLUSDT",
           "STEEMUSDT",
-          "STGUSDT",
           "STONKUSDT",
           "STORJUSDT",
           "STOUSDT",
@@ -14210,6 +14213,7 @@
           "VETUSDT",
           "VIRTUALPERP",
           "VIRTUALUSDT",
+          "VISTUSDT",
           "VKTXUSDT",
           "VRTUSDT",
           "VRTXSTOCKUSDT",
@@ -14267,9 +14271,11 @@
           "YFIUSDT",
           "YGGUSDT",
           "YOFCUSDT",
+          "YPFUSDT",
           "ZAMAUSDT",
           "ZBCNUSDT",
           "ZBTUSDT",
+          "ZCSHUSDT",
           "ZECUSDT",
           "ZENUSDT",
           "ZEREBROUSDT",

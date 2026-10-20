@@ -1,22 +1,31 @@
-# tribulnation-aster 0.11.1
+# tribulnation-aster 0.12.0
 
-Requires SDK >=2.17.0 and typed-aster >=0.5.0. An account event type Aster does not
-document no longer ends the fills stream.
+Requires SDK >=2.18.0 and typed-aster >=0.7.0. Depth streams skip stale snapshots
+before decoding them and report how many they skipped, and the perpetual endpoints
+can be overridden. See ADR 0046.
 
-Fixes:
+New:
 
-1. `trades_stream` survives user-data events the client does not model. On
-   2026-10-15 Aster pushed an undocumented `FUND_CHANGE_WS` event, which failed
-   validation, ended the shared account stream and failed every subscriber on the
-   account at once. typed-aster 0.5.0 delivers such events as an unknown-event type,
-   and the perpetual and spot fill streams skip them, so fills after one are still
-   delivered. Known events are still validated strictly.
+1. Endpoint overrides for other servers (for example local fake exchanges in stress
+   tests): `rest_url` (futures REST, including `/fapi/v3`),
+   `ws_url` (futures market streams) and `user_stream_url` (futures user data); spot
+   keeps its endpoints. `AsterMarket.new` takes the same keywords, and the SDK
+   `[accounts.<id>]` config accepts them (sdk#240). Unset, the endpoints are
+   unchanged.
 
-The typed-aster floor rises to 0.5.0, which defines the unknown-event types. The SDK
-floor is unchanged.
+Behaviour changes:
 
-Release qualification on 2026-10-15 passed the read suites and market
-consistency. Committed evidence under `release-evidence/aster/` matches pinned
-Catalogue `1851660ac2bed8243dd9ce9c7297fe05c7130973`; offline release
-verification passes. The recorded dependency pins differ from the previous
-evidence only in `typed-aster` (0.4.0 to 0.5.0).
+1. While every consumer of a symbol and depth source keeps only the newest book (the
+   default `queue_size=1, overflow='latest'`), `depth_stream` subscribes partial depth
+   (`'depth'`, `'fast'`) and `bookTicker` (`'bbo'`) with typed `keep_latest`, on spot
+   and perpetuals: a stale frame is never decoded nor converted into a `Book`. A
+   consumer asking for more (for example `overflow='fail'`) reopens the shared feed
+   unconflated, as before.
+2. The yielded stream reports `skipped`, read with `tribulnation.sdk.core.skipped`:
+   the books this consumer never saw, skipped upstream or in its own inbox.
+
+Every other method is unchanged.
+
+The SDK floor rises to 2.18.0, which adds `SkippingView` and `Subscription`'s
+latest-only connector, and the typed-aster floor to 0.7.0 (typed-core 0.12
+`keep_latest` and the endpoint overrides). Upgrade the SDK and this adapter together.

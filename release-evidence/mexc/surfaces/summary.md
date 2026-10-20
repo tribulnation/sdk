@@ -1,6 +1,6 @@
 # Local SDK evidence: mexc
 
-Run completed: 2026-10-09T20:03:47.084370+00:00
+Run completed: 2026-10-20T10:39:48.038305+00:00
 
 This records a trusted local run, not cryptographic proof. Release policy must separately validate required check coverage and statuses.
 
