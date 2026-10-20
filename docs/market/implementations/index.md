@@ -25,6 +25,7 @@ Per-method differences are on the [Methods](../methods.md) page, under each meth
 
 - [Deribit](deribit.md) — public spot and linear perpetuals; four intraday candle intervals
 - [Lighter](lighter.md) — perpetuals and spot; numeric market ids, unified accounts for spot collateral
+- [Margin Trade](margintrade.md) — perpetuals, read only; coin-name market ids, public account reads by address
 
 <!-- next -->
 

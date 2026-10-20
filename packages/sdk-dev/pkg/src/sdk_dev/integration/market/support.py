@@ -85,6 +85,8 @@ CASES: Mapping[str, Sequence[CandleCase]] = {
     CandleCase(market_id='perp:1', page=500),
     CandleCase(market_id='spot:2048', page=500),
   ],
+  # No candle cap was observed (14,401 in one response); one window spans the test range.
+  'margintrade': [CandleCase(market_id='perp:BTC', page=None)],
   # Testnet serves thousands of candles per response, so one page cannot straddle two.
   'lighter_testnet': [
     CandleCase(market_id='perp:4096', page=None),

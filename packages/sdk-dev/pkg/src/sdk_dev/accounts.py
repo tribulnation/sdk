@@ -26,6 +26,9 @@ CREDENTIAL_OVERRIDES = {
     'user': '$ASTER_USER',
     'signer': '$ASTER_SIGNER_PRIVATE_KEY',
   },
+  'margintrade': {
+    'address': '$MARGINTRADE_ADDRESS',
+  },
   'deribit': {
     'client_id': '$DERIBIT_CLIENT_ID',
     'client_secret': '$DERIBIT_CLIENT_SECRET',
@@ -60,6 +63,7 @@ def generate_accounts_toml(*, public: bool = False) -> dict[str, str]:
     Kraken,
     Kucoin,
     Lighter,
+    MarginTrade,
     Mexc,
   )
 
@@ -77,6 +81,7 @@ def generate_accounts_toml(*, public: bool = False) -> dict[str, str]:
     'coinbase': Coinbase,
     'kucoin': Kucoin,
     'lighter': Lighter,
+    'margintrade': MarginTrade,
     'deribit': Deribit,
   }
 

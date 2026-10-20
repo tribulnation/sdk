@@ -76,6 +76,8 @@ VenueId = _Literal[
   'aster_testnet',
   'lighter',
   'lighter_testnet',
+  'margintrade',
+  'margintrade_testnet',
   'mexc',
   'bit2me',
   'bitget',
@@ -654,6 +656,55 @@ class Evm(BaseAccount):
     self.resolved_address
 
 
+@_dataclass(frozen=True)
+class MarginTrade(VenueAccount):
+  """Margin Trade account, isolated by network: a Solana wallet address, read without
+  credentials. The private key is optional; it only names the account when `address`
+  is unset."""
+
+  venue: _Literal['margintrade', 'margintrade_testnet'] = 'margintrade'
+  address: str | None = None
+  """Wallet address (base58); defaults to the network's `ADDRESS` variable."""
+  private_key: str | None = None
+  """Ed25519 private key (hex or base58); defaults to the network's `PRIVATE_KEY`
+  variable, which is optional."""
+  validate: bool = True
+  """Whether to type-validate incoming responses."""
+  rest_url: str | None = None
+  """HTTP API root, e.g. `'http://127.0.0.1:8080'`; unset uses the network's
+  (`https://api.margin.trade`). May be a `$ENV_VAR`."""
+  ws_url: str | None = None
+  """WebSocket URL, e.g. `'ws://127.0.0.1:8080/ws'`; unset uses the network's
+  (`wss://api.margin.trade/ws`). May be a `$ENV_VAR`."""
+
+  @property
+  def prefix(self) -> str:
+    """The credential variables' prefix: `MARGINTRADE` on mainnet, `MARGINTRADE_TESTNET`."""
+    return 'MARGINTRADE' if self.venue == 'margintrade' else 'MARGINTRADE_TESTNET'
+
+  @property
+  def resolved_private_key(self) -> str | None:
+    """The private key, never mixing networks; always optional."""
+    return resolve_env_var(
+      self.private_key or f'${self.prefix}_PRIVATE_KEY', require=False
+    )
+
+  @property
+  def resolved_address(self) -> str | None:
+    """The account address; required unless public or a private key names the account."""
+    require = not self.public and self.resolved_private_key is None
+    return resolve_env_var(self.address or f'${self.prefix}_ADDRESS', require=require)
+
+  @property
+  def resolved_urls(self) -> RestWsUrls:
+    """Endpoint overrides; `None` keeps the network's default."""
+    return {'rest_url': resolve_url(self.rest_url), 'ws_url': resolve_url(self.ws_url)}
+
+  def verify_env_vars(self):
+    self.resolved_address
+    self.resolved_urls
+
+
 Account = _Annotated[
   Dydx
   | Hyperliquid
@@ -668,6 +719,7 @@ Account = _Annotated[
   | Deribit
   | Aster
   | Lighter
+  | MarginTrade
   | Evm,
   _pydantic.Discriminator('venue'),
 ]

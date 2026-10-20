@@ -267,6 +267,8 @@ TRADING_ACCOUNTS: list[accounts.Account] = [
   accounts.Aster(venue='aster_testnet', public=True),
   accounts.Lighter(public=True),
   accounts.Lighter(venue='lighter_testnet', public=True),
+  accounts.MarginTrade(public=True),
+  accounts.MarginTrade(venue='margintrade_testnet', public=True),
   accounts.Deribit(public=True),
   accounts.Mexc(public=True),
   accounts.Bit2Me(public=True),

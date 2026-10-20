@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tribulnation-margintrade"
+version = "0.1.0"
+authors = [
+  {name="Marcel Claramunt", email="marcel@tribulnation.com"}
+]
+description = "Tribulnation SDK implementation for Margin Trade."
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+readme = {file="README.md", content-type="text/markdown"}
+dependencies = ["tribulnation-sdk>=2.17.0", "typed-margintrade>=0.1.0"]
+
+[project.urls]
+Repository = "https://github.com/tribulnation/sdk.git"

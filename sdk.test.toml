@@ -69,6 +69,10 @@ venue = "lighter"
 address = "$LIGHTER_ADDRESS"
 auth_token = "$LIGHTER_AUTH_TOKEN"
 
+[accounts.margintrade]
+venue = "margintrade"
+address = "$MARGINTRADE_ADDRESS"
+
 [accounts.mexc]
 venue = "mexc"
 api_key = "$MEXC_ACCESS_KEY"

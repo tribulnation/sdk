@@ -40,6 +40,6 @@ for account, sdk in earn.all.items():
 
 ---
 
-← [Lighter Market](../market/implementations/lighter.md) · **Next:** [Methods](methods.md) →
+← [Margin Trade Market](../market/implementations/margintrade.md) · **Next:** [Methods](methods.md) →
 
 <!-- /next -->
