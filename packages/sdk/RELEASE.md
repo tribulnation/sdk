@@ -25,6 +25,9 @@ and typed-margin-trade >=0.1.1. Other adapters are unaffected.
 Qualification on 2026-10-21, against the Catalogue pin
 `70d93fa09c351f5a24c915b348e8f38f31c7b6a6` (Catalogue main with the margin.trade
 platform; the pin moves from `1851660a`): all 15 venues have passing, verified
-read-suite evidence, and every market venue passing consistency evidence.
+read-suite evidence, and every market venue passing consistency evidence. Waived account
+reads (ADR 0042), skipped as expected: Binance `usdm` `fees` (`credential_scope`) and
+MEXC `spot` `fees` (`account_setting`). The venue renamed margin.trade's `PRL` token
+to `PEARL`, so its spot reference case is now `spot:PEARL/USDC`.
 
 All 2,149 repository unit tests pass.
