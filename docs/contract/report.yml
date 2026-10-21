@@ -23,6 +23,7 @@ methods:
       deribit: Accessible subaccounts; cash balances and signed base-unit positions, not equity-as-cash.
       ethereum: Requires an address and configured data providers; provider settings can be supplied in Python.
       lighter: Every account of the L1 address (or of the account index's owner), credential-free; pool shares as pro-rata pool holdings.
+      margin_trade: The perp wallet (USDC without unrealized PnL, positions) and the spot wallet, read by address.
     example:
       accountVenues: [hyperliquid]
       constants:
@@ -38,6 +39,7 @@ methods:
         kraken: {subaccounts: 1, balances: 2}
         kucoin: {subaccounts: 1, balances: 2}
         lighter: {subaccounts: 1, balances: 2}
+        margin_trade: {subaccounts: 2, balances: 2}
         mexc: {subaccounts: 1, balances: 2}
       callTemplate: |
         sdk = report.venue('{{ accounts[0] }}')
@@ -56,6 +58,7 @@ methods:
       dydx: Full older chain history requires an archive provider, not a shorter fallback window.
       ethereum: Requires configured data providers; chain history and interpretation depend on provider/configuration.
       deribit: Transaction-log rows include unknown observations for unsupported trade/settlement interpretations.
+      margin_trade: Fills (the 10000 most recent), funding and transfers; system and liquidation transfers are unclassified.
     example:
       accountVenues: [hyperliquid]
       constants:
@@ -69,6 +72,7 @@ methods:
         hyperliquid: {count: 2}
         kraken: {count: 2}
         kucoin: {count: 2}
+        margin_trade: {count: 2}
         mexc: {count: 2}
       callTemplate: |
         sdk = report.venue('{{ accounts[0] }}')

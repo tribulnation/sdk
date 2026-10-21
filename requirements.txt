@@ -21,3 +21,4 @@ pytest-asyncio
 -e packages/impl/deribit/pkg
 -e packages/impl/aster/pkg
 -e packages/impl/lighter/pkg
+-e packages/impl/margin_trade/pkg

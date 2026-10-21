@@ -62,6 +62,7 @@ would raise instead.
 | Deribit | ✅ | — |
 | Aster | ✅ | ✅ |
 | Lighter | ✅ | ✅ |
+| margin.trade | ✅ | ✅ |
 <!-- /streams -->
 
 Per-venue caveats are on the

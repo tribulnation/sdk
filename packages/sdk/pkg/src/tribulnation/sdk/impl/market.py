@@ -18,6 +18,7 @@ from .accounts import (
   Kraken,
   Kucoin,
   Lighter,
+  MarginTrade,
   Mexc,
   load_accounts,
 )
@@ -242,6 +243,23 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       **account.resolved_urls,
     )
 
+  def margin_trade(self, account: MarginTrade, id: str) -> TradingVenue:
+    """Build margin.trade's spot and perpetual Market surface, signed by the master's
+    or an approved agent's key, or public (account reads from `address`)."""
+    try:
+      from tribulnation.margin_trade import MarginTradeMarket
+    except ImportError as e:
+      raise ImportError(
+        'margin.trade market is not installed. Please install it with `pip install tribulnation-margin_trade`.'
+      ) from e
+    return MarginTradeMarket.new(
+      address=account.resolved_address,
+      private_key=account.resolved_private_key,
+      mainnet=account.venue == 'margin_trade',
+      validate=account.validate,
+      account_id=id,
+    )
+
   def _venue(self, id: str, /) -> TradingVenue:
     if (account := self.accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
@@ -272,6 +290,8 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
         return self.deribit(account, id)
       case 'lighter' | 'lighter_testnet':
         return self.lighter(account, id)
+      case 'margin_trade' | 'margin_trade_testnet':
+        return self.margin_trade(account, id)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 
