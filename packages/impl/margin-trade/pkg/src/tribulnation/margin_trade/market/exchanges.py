@@ -30,7 +30,7 @@ from .markets import PerpMarket, SpotMarket, next_settlement
 
 
 def is_spot(fill: Fill) -> bool:
-  """Spot coins are pair names (`PRL/USDC`); perpetual coins never contain a slash.
+  """Spot coins are pair names (`PEARL/USDC`); perpetual coins never contain a slash.
 
   Deciding by name, not by the listed markets, keeps delisted markets' fills.
   """

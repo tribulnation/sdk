@@ -90,7 +90,7 @@ class NativeMarket(Public, Market):
   @property
   @abstractmethod
   def coin(self) -> str:
-    """The venue's coin name: `BTC`, `PRL/USDC`."""
+    """The venue's coin name: `BTC`, `PEARL/USDC`."""
 
   @property
   @abstractmethod

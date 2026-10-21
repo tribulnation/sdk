@@ -22,7 +22,7 @@ reads = MarginTradeMarket.new(address='6dm8…')
 ```
 
 1. Exchanges are `perp` (coin names such as `BTC`, `XAU`, `NVDA`) and `spot` (pair names
-   such as `PRL/USDC`). Asset ids are token symbols (`USDC`, `PRL`); perpetual fees are
+   such as `PEARL/USDC`). Asset ids are token symbols (`USDC`, `PEARL`); perpetual fees are
    charged in `USD`.
 2. Public data: discovery, tickers (24h volumes, plus last and best bid/ask where the
    venue's CoinGecko feed lists the market), rules with each market's own fee rates,
@@ -38,5 +38,5 @@ reads = MarginTradeMarket.new(address='6dm8…')
 4. Report: a `perp` subaccount (USDC without unrealized PnL, positions) and a `spot`
    subaccount (token totals); history of fills, funding and transfers (on-chain deposits
    and withdrawals on `solana` or `pearl`, perp/spot transfers).
-5. With `typed-margin-trade` 0.1.0 the venue drops every WebSocket connection about 30 s
-   after a client ping, so streams end with `NetworkError` within about a minute.
+5. Streams need `typed-margin-trade` 0.1.1 or later, which pings every 10 s: the venue
+   drops a connection about 30 s after the client's last ping.

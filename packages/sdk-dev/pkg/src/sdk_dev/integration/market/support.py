@@ -88,7 +88,7 @@ CASES: Mapping[str, Sequence[CandleCase]] = {
   # One response serves the whole window (57601 one-minute candles over 40 days).
   'margin-trade': [
     CandleCase(market_id='perp:BTC', page=None),
-    CandleCase(market_id='spot:PRL/USDC', page=None),
+    CandleCase(market_id='spot:PEARL/USDC', page=None),
   ],
   # Testnet serves thousands of candles per response, so one page cannot straddle two.
   'lighter_testnet': [
