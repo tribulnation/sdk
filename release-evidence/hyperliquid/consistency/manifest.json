@@ -92,6 +92,11 @@
         "metadata_sha256": "ca1692c8dcc3ac71de03ca956f19e41b8032bd15d420d525e7ff219c91615657",
         "version": "2.22.2"
       },
+      "greenlet": {
+        "files_sha256": "d62119d398df27c8154aa4428d6ca1099914ab7f81290dc5bc0c0bc225bd7dc4",
+        "metadata_sha256": "981bdd2300ded3c41b71a1f7c8cb5d8df3f14a8403bb4aac5ccc0834256f3f00",
+        "version": "3.5.6"
+      },
       "griffe": {
         "files_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
         "metadata_sha256": "d6d35f01e6bade0d05c193dc19b92331873c9b45d676c8a5591d132320a2d016",
@@ -323,9 +328,9 @@
         "version": "1.17.0"
       },
       "sqlalchemy": {
-        "files_sha256": "89bf74eeb66e8dc96cc2007e64086ac91a43376fb309d68e26aee18fd9cd249f",
-        "metadata_sha256": "6c797d90a26e72bd60a0d8d4c344696964671d0157ed7e0575f6e265010027dd",
-        "version": "2.1.6"
+        "files_sha256": "4cf98cc6b8e3cb1cf085b270f08d33870f456a12aa8573545364edead169717f",
+        "metadata_sha256": "ed2c3c9627779a82d26ff5ec3bb85b5949e5b5fa8e4618611e0a32de98709027",
+        "version": "2.0.52"
       },
       "sqltypes": {
         "files_sha256": "d1f7e05c9c72ff7e9810be7f4de9edaf5a126187082b1401499a3437b7619db3",
@@ -491,6 +496,11 @@
         "metadata_sha256": "ca1692c8dcc3ac71de03ca956f19e41b8032bd15d420d525e7ff219c91615657",
         "version": "2.22.2"
       },
+      "greenlet": {
+        "files_sha256": "d62119d398df27c8154aa4428d6ca1099914ab7f81290dc5bc0c0bc225bd7dc4",
+        "metadata_sha256": "981bdd2300ded3c41b71a1f7c8cb5d8df3f14a8403bb4aac5ccc0834256f3f00",
+        "version": "3.5.6"
+      },
       "griffe": {
         "files_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
         "metadata_sha256": "d6d35f01e6bade0d05c193dc19b92331873c9b45d676c8a5591d132320a2d016",
@@ -722,9 +732,9 @@
         "version": "1.17.0"
       },
       "sqlalchemy": {
-        "files_sha256": "89bf74eeb66e8dc96cc2007e64086ac91a43376fb309d68e26aee18fd9cd249f",
-        "metadata_sha256": "6c797d90a26e72bd60a0d8d4c344696964671d0157ed7e0575f6e265010027dd",
-        "version": "2.1.6"
+        "files_sha256": "4cf98cc6b8e3cb1cf085b270f08d33870f456a12aa8573545364edead169717f",
+        "metadata_sha256": "ed2c3c9627779a82d26ff5ec3bb85b5949e5b5fa8e4618611e0a32de98709027",
+        "version": "2.0.52"
       },
       "sqltypes": {
         "files_sha256": "d1f7e05c9c72ff7e9810be7f4de9edaf5a126187082b1401499a3437b7619db3",
@@ -797,9 +807,9 @@
     "source_sha256": "69e433054075f7fbf899ffeb99f962d3ef36da359a2c694e72e438e37f719dc7",
     "venue": "hyperliquid"
   },
-  "finished": "2026-10-21T18:07:01.368980Z",
-  "results_sha256": "4e78ca9c8a2cb766532074b3fb0e804022b4074190db35ff305cc7a3a1d9e50b",
+  "finished": "2026-10-21T18:15:49.289226Z",
+  "results_sha256": "8ac6ffd92a148f958751907b9c90b85c10a5af0ff288a0c7f928888a9823259f",
   "schema_version": 2,
-  "started": "2026-10-21T18:05:28.594908Z",
-  "summary_sha256": "11f948ed0f4f213c8d920b521c66caf4434eb8183655459a4fd884c19764ebbd"
+  "started": "2026-10-21T18:14:14.961499Z",
+  "summary_sha256": "b20880b913c0c949916c64c87eef11fd57ae024f271f6131fe0741f4f30eaf9a"
 }

@@ -137,6 +137,11 @@
         "metadata_sha256": "3dd80ee47cf006e2d4fcc37c56644f7d8d92fbf5878ac32a1cc1601ae7ef390e",
         "version": "1.75.5"
       },
+      "greenlet": {
+        "files_sha256": "d62119d398df27c8154aa4428d6ca1099914ab7f81290dc5bc0c0bc225bd7dc4",
+        "metadata_sha256": "981bdd2300ded3c41b71a1f7c8cb5d8df3f14a8403bb4aac5ccc0834256f3f00",
+        "version": "3.5.6"
+      },
       "griffe": {
         "files_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
         "metadata_sha256": "d6d35f01e6bade0d05c193dc19b92331873c9b45d676c8a5591d132320a2d016",
@@ -433,9 +438,9 @@
         "version": "1.3.1"
       },
       "sqlalchemy": {
-        "files_sha256": "89bf74eeb66e8dc96cc2007e64086ac91a43376fb309d68e26aee18fd9cd249f",
-        "metadata_sha256": "6c797d90a26e72bd60a0d8d4c344696964671d0157ed7e0575f6e265010027dd",
-        "version": "2.1.6"
+        "files_sha256": "4cf98cc6b8e3cb1cf085b270f08d33870f456a12aa8573545364edead169717f",
+        "metadata_sha256": "ed2c3c9627779a82d26ff5ec3bb85b5949e5b5fa8e4618611e0a32de98709027",
+        "version": "2.0.52"
       },
       "sqltypes": {
         "files_sha256": "d1f7e05c9c72ff7e9810be7f4de9edaf5a126187082b1401499a3437b7619db3",
@@ -651,6 +656,11 @@
         "metadata_sha256": "3dd80ee47cf006e2d4fcc37c56644f7d8d92fbf5878ac32a1cc1601ae7ef390e",
         "version": "1.75.5"
       },
+      "greenlet": {
+        "files_sha256": "d62119d398df27c8154aa4428d6ca1099914ab7f81290dc5bc0c0bc225bd7dc4",
+        "metadata_sha256": "981bdd2300ded3c41b71a1f7c8cb5d8df3f14a8403bb4aac5ccc0834256f3f00",
+        "version": "3.5.6"
+      },
       "griffe": {
         "files_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
         "metadata_sha256": "d6d35f01e6bade0d05c193dc19b92331873c9b45d676c8a5591d132320a2d016",
@@ -947,9 +957,9 @@
         "version": "1.3.1"
       },
       "sqlalchemy": {
-        "files_sha256": "89bf74eeb66e8dc96cc2007e64086ac91a43376fb309d68e26aee18fd9cd249f",
-        "metadata_sha256": "6c797d90a26e72bd60a0d8d4c344696964671d0157ed7e0575f6e265010027dd",
-        "version": "2.1.6"
+        "files_sha256": "4cf98cc6b8e3cb1cf085b270f08d33870f456a12aa8573545364edead169717f",
+        "metadata_sha256": "ed2c3c9627779a82d26ff5ec3bb85b5949e5b5fa8e4618611e0a32de98709027",
+        "version": "2.0.52"
       },
       "sqltypes": {
         "files_sha256": "d1f7e05c9c72ff7e9810be7f4de9edaf5a126187082b1401499a3437b7619db3",
@@ -1027,9 +1037,9 @@
     "source_sha256": "89ae64aa6a4b38d28adaaea1598675fbce81e813da5ce2fccca01664dc793804",
     "venue": "dydx"
   },
-  "finished": "2026-10-21T17:50:16.221550Z",
-  "results_sha256": "2916781c86f9a95b4f8f943584d56055f8ab1ec0c2c3774828f9fe0e7fa721fb",
+  "finished": "2026-10-21T18:15:04.945842Z",
+  "results_sha256": "3e9e6d9b368fd7412b5f06fc20e85e0368a4322d4c4d1a49b1874e486c0c3159",
   "schema_version": 2,
-  "started": "2026-10-21T17:49:26.039136Z",
-  "summary_sha256": "6183e288533c402e712aaa08994ce2b811d766d9f41d217221d23aba3e37d642"
+  "started": "2026-10-21T18:14:00.938575Z",
+  "summary_sha256": "19af2cb234c238e200f89f6f88effe177f05f83d7b528153ff613e5519b15172"
 }

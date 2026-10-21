@@ -1443,14 +1443,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.09596",
-            "after_bid": "0.09569",
-            "ask": "0.09596",
+            "after_ask": "0.0962",
+            "after_bid": "0.09594",
+            "ask": "0.0962",
             "attempt": 1,
-            "before_ask": "0.09596",
-            "before_bid": "0.09569",
-            "bid": "0.09569",
-            "elapsed_seconds": 0.288887077011168,
+            "before_ask": "0.0962",
+            "before_bid": "0.09594",
+            "bid": "0.09594",
+            "elapsed_seconds": 0.10787939000874758,
             "ticker_ids_match": true
           }
         ],
@@ -1469,7 +1469,7 @@
             "before_ask": "0.05824",
             "before_bid": "0.05164",
             "bid": "0.05164",
-            "elapsed_seconds": 0.5275061749853194,
+            "elapsed_seconds": 0.5987976689939387,
             "ticker_ids_match": true
           }
         ],
@@ -1481,14 +1481,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "159.22",
-            "after_bid": "156.63",
-            "ask": "159.22",
+            "after_ask": "159.96",
+            "after_bid": "157.25",
+            "ask": "159.96",
             "attempt": 1,
-            "before_ask": "159.22",
-            "before_bid": "156.63",
-            "bid": "156.63",
-            "elapsed_seconds": 0.3363193519762717,
+            "before_ask": "159.96",
+            "before_bid": "157.25",
+            "bid": "157.25",
+            "elapsed_seconds": 0.18114129902096465,
             "ticker_ids_match": true
           }
         ],
@@ -1500,14 +1500,25 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "84580",
-            "after_bid": "84563",
-            "ask": "84580",
+            "after_ask": "84632",
+            "after_bid": "84620",
+            "ask": "84632",
             "attempt": 1,
-            "before_ask": "84580",
-            "before_bid": "84563",
-            "bid": "84563",
-            "elapsed_seconds": 0.3105725570349023,
+            "before_ask": "84653",
+            "before_bid": "84644",
+            "bid": "84620",
+            "elapsed_seconds": 15.746331007045228,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": "84632",
+            "after_bid": "84620",
+            "ask": "84632",
+            "attempt": 2,
+            "before_ask": "84632",
+            "before_bid": "84620",
+            "bid": "84620",
+            "elapsed_seconds": 0.21977374400012195,
             "ticker_ids_match": true
           }
         ],
