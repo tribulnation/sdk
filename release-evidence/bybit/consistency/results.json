@@ -172,6 +172,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ACNUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ACTUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -264,6 +271,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"AMZNUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AMZUUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -528,13 +542,6 @@
         "status": "pass"
       },
       {
-        "code": "coverage_deferred",
-        "id": "[\"catalogue_coverage\",\"perp\",\"BLASTUSDT\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "deferred"
-      },
-      {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BLENDUSDT\"]",
         "missing_data": null,
@@ -544,6 +551,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BLURUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BMNUUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -635,6 +649,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BTCUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BWETUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -767,6 +788,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CORZUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"COWUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -802,6 +830,20 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CVNAUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"CVXUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -810,6 +852,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"CYBERUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CYPHUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -845,6 +894,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"DEXEUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"DNAUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -894,6 +950,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"DRIFTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"DRVUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1173,6 +1236,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"GRALUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"GRAMUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -1195,6 +1265,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"GRVTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"GTLBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1265,6 +1342,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"HUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"HUTUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1446,6 +1530,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"KIIUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"KMNOUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -1523,6 +1614,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LULUUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"LUNA2USDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -1566,6 +1664,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"MEGAUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MELIUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1747,6 +1852,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"NKEUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"NOMUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -1768,6 +1880,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"NUSTOCKUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"NVDAUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -1783,6 +1902,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"OKBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"OKLOUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1867,6 +1993,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PAXGUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PBRUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -2097,6 +2230,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"RUMUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"RUNEUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -2133,6 +2273,20 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SANDUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SDGRUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SECZUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -2189,6 +2343,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SLXUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SNPSUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -2278,11 +2439,11 @@
         "status": "pass"
       },
       {
-        "code": "coverage_deferred",
-        "id": "[\"catalogue_coverage\",\"perp\",\"STGUSDT\"]",
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"STONKUSDT\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "deferred"
+        "status": "pass"
       },
       {
         "code": "ok",
@@ -2419,6 +2580,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TLTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"TNSRUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -2496,6 +2664,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TWSTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"TWTPERP\"]",
         "missing_data": null,
         "quotes": [],
@@ -2517,6 +2692,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"UMCUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"UNIPERP\"]",
         "missing_data": null,
         "quotes": [],
@@ -2525,6 +2707,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"UNIUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"URNMUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -2546,6 +2735,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"USDEUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"USDEXUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -2595,6 +2791,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"VIRTUALUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"VISTUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -2755,6 +2958,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"XDPUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"XLMPERP\"]",
         "missing_data": null,
         "quotes": [],
@@ -2832,6 +3042,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"YPFUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ZAMAUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -2840,6 +3057,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ZBTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ZCSHUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -2910,6 +3134,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ZRXUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ZSUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -3004,13 +3235,6 @@
         "missing_data": null,
         "quotes": [],
         "status": "pass"
-      },
-      {
-        "code": "coverage_deferred",
-        "id": "[\"catalogue_coverage\",\"spot\",\"AGIUSDT\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "deferred"
       },
       {
         "code": "ok",
@@ -3396,13 +3620,6 @@
         "missing_data": null,
         "quotes": [],
         "status": "pass"
-      },
-      {
-        "code": "coverage_deferred",
-        "id": "[\"catalogue_coverage\",\"spot\",\"BLASTUSDT\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "deferred"
       },
       {
         "code": "ok",
@@ -4406,13 +4623,6 @@
         "status": "pass"
       },
       {
-        "code": "coverage_deferred",
-        "id": "[\"catalogue_coverage\",\"spot\",\"ICXUSDT\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "deferred"
-      },
-      {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"IDUSDT\"]",
         "missing_data": null,
@@ -4679,13 +4889,6 @@
         "status": "pass"
       },
       {
-        "code": "coverage_deferred",
-        "id": "[\"catalogue_coverage\",\"spot\",\"LUNCUSDC\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "deferred"
-      },
-      {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"LUNCUSDT\"]",
         "missing_data": null,
@@ -4945,13 +5148,6 @@
         "status": "pass"
       },
       {
-        "code": "coverage_deferred",
-        "id": "[\"catalogue_coverage\",\"spot\",\"NEONUSDT\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "deferred"
-      },
-      {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"NEWTUSDT\"]",
         "missing_data": null,
@@ -5184,6 +5380,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"PONSUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"POPCATUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -5365,13 +5568,6 @@
         "status": "pass"
       },
       {
-        "code": "coverage_deferred",
-        "id": "[\"catalogue_coverage\",\"spot\",\"SANDUSDC\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "deferred"
-      },
-      {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"SANDUSDT\"]",
         "missing_data": null,
@@ -5384,13 +5580,6 @@
         "missing_data": null,
         "quotes": [],
         "status": "pass"
-      },
-      {
-        "code": "coverage_deferred",
-        "id": "[\"catalogue_coverage\",\"spot\",\"SCORUSDT\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "deferred"
       },
       {
         "code": "ok",
@@ -5645,13 +5834,6 @@
         "status": "pass"
       },
       {
-        "code": "coverage_deferred",
-        "id": "[\"catalogue_coverage\",\"spot\",\"SUNDOGUSDT\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "deferred"
-      },
-      {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"SUNUSDT\"]",
         "missing_data": null,
@@ -5687,13 +5869,6 @@
         "status": "pass"
       },
       {
-        "code": "coverage_deferred",
-        "id": "[\"catalogue_coverage\",\"spot\",\"SWELLUSDC\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "deferred"
-      },
-      {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"SWELLUSDT\"]",
         "missing_data": null,
@@ -5706,13 +5881,6 @@
         "missing_data": null,
         "quotes": [],
         "status": "pass"
-      },
-      {
-        "code": "coverage_deferred",
-        "id": "[\"catalogue_coverage\",\"spot\",\"TACUSDT\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "deferred"
       },
       {
         "code": "ok",
@@ -6486,6 +6654,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ACNUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ACTUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -6578,6 +6753,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"AMZNUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AMZUUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -6843,13 +7025,6 @@
       },
       {
         "code": "ok",
-        "id": "[\"catalogue_identity\",\"perp\",\"BLASTUSDT\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "pass"
-      },
-      {
-        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BLENDUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -6858,6 +7033,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BLURUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BMNUUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -6949,6 +7131,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BTCUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BWETUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -7081,6 +7270,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CORZUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"COWUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -7116,6 +7312,20 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CVNAUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"CVXUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -7124,6 +7334,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"CYBERUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CYPHUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -7159,6 +7376,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"DEXEUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"DNAUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -7208,6 +7432,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"DRIFTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"DRVUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -7487,6 +7718,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"GRALUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"GRAMUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -7509,6 +7747,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"GRVTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"GTLBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -7579,6 +7824,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"HUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"HUTUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -7760,6 +8012,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"KIIUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"KMNOUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -7837,6 +8096,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LULUUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"LUNA2USDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -7880,6 +8146,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"MEGAUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MELIUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -8061,6 +8334,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"NKEUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"NOMUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -8082,6 +8362,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"NUSTOCKUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"NVDAUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -8097,6 +8384,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"OKBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"OKLOUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -8181,6 +8475,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PAXGUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PBRUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -8411,6 +8712,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"RUMUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"RUNEUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -8447,6 +8755,20 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SANDUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SDGRUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SECZUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -8503,6 +8825,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SLXUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SNPSUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -8593,7 +8922,7 @@
       },
       {
         "code": "ok",
-        "id": "[\"catalogue_identity\",\"perp\",\"STGUSDT\"]",
+        "id": "[\"catalogue_identity\",\"perp\",\"STONKUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -8733,6 +9062,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TLTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"TNSRUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -8810,6 +9146,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TWSTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"TWTPERP\"]",
         "missing_data": null,
         "quotes": [],
@@ -8831,6 +9174,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"UMCUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"UNIPERP\"]",
         "missing_data": null,
         "quotes": [],
@@ -8839,6 +9189,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"UNIUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"URNMUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -8860,6 +9217,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"USDEUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"USDEXUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -8909,6 +9273,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"VIRTUALUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"VISTUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -9069,6 +9440,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"XDPUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"XLMPERP\"]",
         "missing_data": null,
         "quotes": [],
@@ -9146,6 +9524,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"YPFUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ZAMAUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -9154,6 +9539,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ZBTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ZCSHUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -9224,6 +9616,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ZRXUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ZSUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -9315,13 +9714,6 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"AEVOUSDT\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "pass"
-      },
-      {
-        "code": "ok",
-        "id": "[\"catalogue_identity\",\"spot\",\"AGIUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -9707,13 +10099,6 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"BIRBUSDT\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "pass"
-      },
-      {
-        "code": "ok",
-        "id": "[\"catalogue_identity\",\"spot\",\"BLASTUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -10721,13 +11106,6 @@
       },
       {
         "code": "ok",
-        "id": "[\"catalogue_identity\",\"spot\",\"ICXUSDT\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "pass"
-      },
-      {
-        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"IDUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -10994,13 +11372,6 @@
       },
       {
         "code": "ok",
-        "id": "[\"catalogue_identity\",\"spot\",\"LUNCUSDC\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "pass"
-      },
-      {
-        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"LUNCUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -11260,13 +11631,6 @@
       },
       {
         "code": "ok",
-        "id": "[\"catalogue_identity\",\"spot\",\"NEONUSDT\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "pass"
-      },
-      {
-        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"NEWTUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -11498,6 +11862,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"PONSUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"POPCATUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -11680,13 +12051,6 @@
       },
       {
         "code": "ok",
-        "id": "[\"catalogue_identity\",\"spot\",\"SANDUSDC\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "pass"
-      },
-      {
-        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"SANDUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -11695,13 +12059,6 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"SATSUSDT\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "pass"
-      },
-      {
-        "code": "ok",
-        "id": "[\"catalogue_identity\",\"spot\",\"SCORUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -11960,13 +12317,6 @@
       },
       {
         "code": "ok",
-        "id": "[\"catalogue_identity\",\"spot\",\"SUNDOGUSDT\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "pass"
-      },
-      {
-        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"SUNUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -12002,13 +12352,6 @@
       },
       {
         "code": "ok",
-        "id": "[\"catalogue_identity\",\"spot\",\"SWELLUSDC\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "pass"
-      },
-      {
-        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"SWELLUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -12017,13 +12360,6 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"SXTUSDT\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "pass"
-      },
-      {
-        "code": "ok",
-        "id": "[\"catalogue_identity\",\"spot\",\"TACUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -12699,14 +13035,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.2250",
-            "after_bid": "0.2249",
-            "ask": "0.2250",
+            "after_ask": "0.2427",
+            "after_bid": "0.2425",
+            "ask": "0.2427",
             "attempt": 1,
-            "before_ask": "0.2250",
-            "before_bid": "0.2249",
-            "bid": "0.2249",
-            "elapsed_seconds": 0.8011541779851541,
+            "before_ask": "0.2427",
+            "before_bid": "0.2425",
+            "bid": "0.2425",
+            "elapsed_seconds": 0.5723247049609199,
             "ticker_ids_match": true
           }
         ],
@@ -12718,14 +13054,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.0003584",
-            "after_bid": "0.0003581",
-            "ask": "0.0003584",
+            "after_ask": "0.0003756",
+            "after_bid": "0.0003753",
+            "ask": "0.0003756",
             "attempt": 1,
-            "before_ask": "0.0003584",
-            "before_bid": "0.0003581",
-            "bid": "0.0003581",
-            "elapsed_seconds": 1.406182478996925,
+            "before_ask": "0.0003756",
+            "before_bid": "0.0003753",
+            "bid": "0.0003753",
+            "elapsed_seconds": 1.0297518139705062,
             "ticker_ids_match": true
           }
         ],
@@ -12737,14 +13073,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.10050",
-            "after_bid": "0.10040",
-            "ask": "0.10050",
+            "after_ask": "0.10850",
+            "after_bid": "0.10840",
+            "ask": "0.10850",
             "attempt": 1,
-            "before_ask": "0.10050",
-            "before_bid": "0.10040",
-            "bid": "0.10040",
-            "elapsed_seconds": 0.8107917239831295,
+            "before_ask": "0.10850",
+            "before_bid": "0.10840",
+            "bid": "0.10840",
+            "elapsed_seconds": 0.5558818920399062,
             "ticker_ids_match": true
           }
         ],
@@ -12756,14 +13092,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "81458.20",
-            "after_bid": "81458.10",
-            "ask": "81460.10",
+            "after_ask": "84596.70",
+            "after_bid": "84596.60",
+            "ask": "84596.70",
             "attempt": 1,
-            "before_ask": "81460.10",
-            "before_bid": "81460.00",
-            "bid": "81460.00",
-            "elapsed_seconds": 1.0290901589905843,
+            "before_ask": "84596.70",
+            "before_bid": "84596.60",
+            "bid": "84596.60",
+            "elapsed_seconds": 0.569752301031258,
             "ticker_ids_match": true
           }
         ],
@@ -12775,14 +13111,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.2253",
-            "after_bid": "0.2251",
-            "ask": "0.2253",
+            "after_ask": "0.2427",
+            "after_bid": "0.2425",
+            "ask": "0.2427",
             "attempt": 1,
-            "before_ask": "0.2253",
-            "before_bid": "0.2251",
-            "bid": "0.2251",
-            "elapsed_seconds": 0.5223758429929148,
+            "before_ask": "0.2427",
+            "before_bid": "0.2425",
+            "bid": "0.2425",
+            "elapsed_seconds": 0.5231053470051847,
             "ticker_ids_match": true
           }
         ],
@@ -12794,14 +13130,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.09143",
-            "after_bid": "0.09139",
-            "ask": "0.09143",
+            "after_ask": "0.09591",
+            "after_bid": "0.09586",
+            "ask": "0.09591",
             "attempt": 1,
-            "before_ask": "0.09143",
-            "before_bid": "0.09139",
-            "bid": "0.09139",
-            "elapsed_seconds": 1.0774998210254125,
+            "before_ask": "0.09591",
+            "before_bid": "0.09586",
+            "bid": "0.09586",
+            "elapsed_seconds": 0.5517403869889677,
             "ticker_ids_match": true
           }
         ],
@@ -12813,14 +13149,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.02916",
-            "after_bid": "0.02898",
-            "ask": "0.02916",
+            "after_ask": "0.03203",
+            "after_bid": "0.03188",
+            "ask": "0.03203",
             "attempt": 1,
-            "before_ask": "0.02916",
-            "before_bid": "0.02898",
-            "bid": "0.02898",
-            "elapsed_seconds": 0.5308545280131511,
+            "before_ask": "0.03203",
+            "before_bid": "0.03188",
+            "bid": "0.03188",
+            "elapsed_seconds": 0.841237207991071,
             "ticker_ids_match": true
           }
         ],
@@ -12832,14 +13168,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "81508.5",
-            "after_bid": "81508.4",
-            "ask": "81508.5",
+            "after_ask": "84640.9",
+            "after_bid": "84640.8",
+            "ask": "84640.9",
             "attempt": 1,
-            "before_ask": "81508.5",
-            "before_bid": "81508.4",
-            "bid": "81508.4",
-            "elapsed_seconds": 0.536901476996718,
+            "before_ask": "84640.9",
+            "before_bid": "84640.8",
+            "bid": "84640.8",
+            "elapsed_seconds": 0.522346056997776,
             "ticker_ids_match": true
           }
         ],
@@ -13528,6 +13864,7 @@
           "AVNTPERP",
           "AVNTUSDT",
           "AWEUSDT",
+          "AXISUSDT",
           "AXLUSDT",
           "AXSUSDT",
           "AXTIUSDT",

@@ -1,5 +1,5 @@
 # Local SDK evidence: aster
 
-Run completed: 2026-10-20T10:40:06.661069+00:00
+Run completed: 2026-10-21T17:47:23.617396+00:00
 
 This records a trusted local run, not cryptographic proof. Release policy must separately validate required check coverage and statuses.
