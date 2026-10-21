@@ -20,6 +20,7 @@ from .accounts import (
   Mexc,
   Hyperliquid,
   Lighter,
+  MarginTrade,
   load_accounts,
 )
 
@@ -243,6 +244,23 @@ class ReportSDK:
       validate=account.validate,
     )
 
+  def margin_trade(self, account: MarginTrade, id: str) -> Report:
+    """Build margin.trade's snapshots and history; every read is by address and
+    unsigned, so the configured or key-derived master address is enough."""
+    try:
+      from tribulnation.margin_trade import Report as MarginTradeReport
+    except ImportError as e:
+      raise ImportError(
+        'margin.trade sdk is not installed. Please install it with `pip install tribulnation-margin-trade`.'
+      ) from e
+    return MarginTradeReport.new(
+      address=account.resolved_address,
+      private_key=account.resolved_private_key,
+      mainnet=account.venue == 'margin-trade',
+      validate=account.validate,
+      account_id=id,
+    )
+
   def venue(self, id: str, /) -> Report:
     if (account := self.accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
@@ -284,6 +302,8 @@ class ReportSDK:
         return self.lighter(account, id)
       case 'aster' | 'aster_testnet':
         return self.aster(account, id)
+      case 'margin-trade' | 'margin-trade-testnet':
+        return self.margin_trade(account, id)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 

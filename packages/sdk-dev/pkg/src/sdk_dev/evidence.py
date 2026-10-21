@@ -338,7 +338,11 @@ def installed_dependencies(root: Path, venue: str) -> dict[str, Dependency]:
         raise ValueError(
           f'Candidate package is not installed from this checkout: {name}'
         )
-      module = 'sdk_dev' if name == 'sdk-dev' else name.replace('-', '.')
+      module = (
+        'sdk_dev'
+        if name == 'sdk-dev'
+        else 'tribulnation.' + name.removeprefix('tribulnation-').replace('-', '_')
+      )
       spec = util.find_spec(module)
       if (
         spec is None

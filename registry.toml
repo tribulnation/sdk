@@ -136,3 +136,11 @@ repo = "https://github.com/tribulnation/sdk"
 path = "packages/impl/lighter"
 pypi = "https://pypi.org/project/tribulnation-lighter/"
 icon = "https://catalogue.tribulnation.com/icons/asset/lighter.svg"
+
+[[venues]]
+slug = "margin-trade"
+name = "margin.trade"
+tier = "development"
+repo = "https://github.com/tribulnation/sdk"
+path = "packages/impl/margin-trade"
+pypi = "https://pypi.org/project/tribulnation-margin-trade/"

@@ -50,6 +50,7 @@ def catalogue() -> Catalogue:
 def test_platform_of_maps_testnets_onto_mainnet():
   """Testnet accounts translate through the mainnet platform's tables."""
   assert platform_of('hyperliquid_testnet') == 'hyperliquid'
+  assert platform_of('margin-trade-testnet') == 'margin-trade'
   assert platform_of('dydx') == 'dydx'
 
 

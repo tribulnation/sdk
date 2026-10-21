@@ -1,0 +1,43 @@
+# auth = false means market data works on a credential-free (`public = true`) account;
+# auth = true means every call needs a real accounts.MarginTrade() entry.
+
+[support.market]
+support = "partial"
+auth = false
+methods = [
+  "depth", "depth_stream", "tickers", "rules", "candles",
+  "query_order", "open_orders", "trades_history", "trades_stream",
+  "position", "collateral", "available_notional",
+  "place_order", "place_orders", "cancel_order", "cancel_orders", "cancel_open_orders",
+  "index", "next_funding", "perp_stats", "funding_payments", "perp_position",
+  "leverage", "perp_collateral",
+]
+note = "USDC-margined perpetuals (`perp`) and spot (`spot`, `PRL/USDC`). Public reads need no credentials; account reads need the master `address` (or a key), trading the master's key or an approved agent's with `address` set to the master. Order placement and cancellation are verified on testnet only. `rules().fees` are each market's own `takerFee`/`makerFee`, the rates fills are charged; `fees` raises NotImplementedError because `userFees` reports one account-wide rate that fills do not use. Perpetual fees are charged in `USD` (`rules().fee_asset`); spot fills name their fee asset (`USDC`). Spot minimums are side-specific and stay in `rules().details`. `LIMIT` is `Gtc`, `POST_ONLY` `Alo`, `MARKET` an `Ioc` limit at `price`; the venue refuses an IOC priced too far through the book (`slippage exceeded`; 5% was refused, 1% accepted). `query_order` reads `orderStatus`, which trails placement and cancellation by about a second; `open_orders` is current. Tickers carry no best-level sizes, and the venue's CoinGecko feed omits `SPY` and `QQQ`, whose tickers keep volumes only. Funding settles hourly on the hour; `funding_rates` raises NotImplementedError: `fundingHistory` serves placeholder data only. Funding payments are received-positive, per market or exchange-wide. `perp_collateral` is the perp wallet's cross bucket (withdrawable as free collateral); a market with an isolated position raises NotImplementedError. `leverage` is the account's `activeAssetData` setting; `available_notional` its free collateral times leverage. With typed-margin-trade 0.1.0 every WebSocket subscription is dropped by the venue about 30 s after a ping (typed-client-issues.md)."
+
+[support.report]
+support = "full"
+auth = true
+note = "Snapshots and history read by address, unsigned. Snapshots: a `perp` subaccount with the USDC balance without unrealized PnL and positions by coin, and a `spot` subaccount with token totals, held parts included. History streams fills (`userFillsByTime`, at most the 10000 most recent; perpetual realized PnL is `closedPnl + fee`), funding settlements, and `getTransferHistory` rows: on-chain deposits and withdrawals with their network (`solana`, `pearl`), perp/spot transfers, testnet faucet credits as `Bonus`; `system` and `liquidation` rows are unclassified."
+
+[support.wallet]
+support = "none"
+auth = true
+note = "No endpoint lists deposit or withdrawal methods: deposit addresses need the asset and chain named, and withdrawal fees appear only per withdrawal."
+
+[support.earn]
+support = "none"
+auth = true
+note = "margin.trade offers no yield product."
+
+[ids]
+asset = "symbol"
+market = "Perpetual coin names (`BTC`, `PRL`) under `perp`, spot pair names (`PRL/USDC`) under `spot`."
+note = "Asset IDs are the venue's token symbols (`USDC`, `PRL`), and `USD` for perpetual fees, as fills name them."
+
+# Release qualification of account reads (ADR 0042); not shown in the support matrix.
+[qualification.market]
+min_mode = "address"
+address_methods = [
+  "open_orders", "query_order", "trades_history", "funding_payments", "position",
+  "perp_position", "collateral", "perp_collateral", "leverage", "available_notional",
+]

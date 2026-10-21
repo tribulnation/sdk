@@ -17,7 +17,7 @@ from tribulnation.sdk.market import Exchange, Market, PerpExchange
 
 from .integration.market.support import CASES
 from .repo import repo_root
-from .support import load_impl_files
+from .support import is_testnet, load_impl_files
 
 VERSION = 6
 REQUEST_TIMEOUT = 120
@@ -114,7 +114,7 @@ def methods(root: Path, venue: str) -> set[str]:
   """Resolve supported read methods only from the committed implementation policy."""
   entry = load_impl_files(root / 'packages' / 'impl').get(venue)
   support = entry.support.get('market') if entry is not None else None
-  if support is None or support.support == 'none' or venue.endswith('_testnet'):
+  if support is None or support.support == 'none' or is_testnet(venue):
     raise ValueError('Venue has no mainnet market consistency scope')
   return (
     {'rules', 'depth', 'tickers', 'perp_stats'}
@@ -560,7 +560,7 @@ async def collect(
 
   try:
     account = sdk.accounts[account_id]
-    if account.venue != venue or venue.endswith('_testnet'):
+    if account.venue != venue or is_testnet(venue):
       raise ValueError('Account is not the requested mainnet venue')
     owner = await request(sdk.venue(account_id))
     if owner.venue_id != venue:

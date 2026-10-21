@@ -78,6 +78,29 @@ def mode_rank(mode: AccountMode) -> int:
   return ACCOUNT_MODES.index(mode)
 
 
+TESTNET_SUFFIXES = ('_testnet', '-testnet')
+"""How a testnet venue id extends its mainnet slug: `_testnet`, or `-testnet` for a
+hyphenated slug (`margin-trade-testnet`)."""
+
+
+def mainnet_of(venue: str) -> str:
+  """
+  The mainnet slug a venue id belongs to: itself unless it is a testnet.
+
+  Args:
+    venue: An account's `venue` id, e.g. `hyperliquid_testnet`.
+  """
+  for suffix in TESTNET_SUFFIXES:
+    if venue.endswith(suffix):
+      return venue.removesuffix(suffix)
+  return venue
+
+
+def is_testnet(venue: str) -> bool:
+  """Whether a venue id names a testnet."""
+  return mainnet_of(venue) != venue
+
+
 WaiverReason = Literal['credential_scope', 'account_setting']
 """Why a declared account read cannot be observed on the qualification account:
 its credentials lack a permission scope the read needs (`AuthError`), or an account

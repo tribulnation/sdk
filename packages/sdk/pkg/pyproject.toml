@@ -35,6 +35,7 @@ gateway = "tribulnation.sdk.gateway.cli:app"
 gateway = ["aiohttp>=3.12,<4", "msgspec>=0.19,<1", "python-dotenv>=1,<2"]
 aster = ["tribulnation-aster>=0.12.0"]
 lighter = ["tribulnation-lighter>=0.11.0"]
+margin-trade = ["tribulnation-margin-trade>=0.1.0"]
 mexc = ["tribulnation-mexc>=2.4.0"]
 dydx = ["tribulnation-dydx>=0.17.0"]
 hyperliquid = ["tribulnation-hyperliquid>=0.18.0"]

@@ -69,6 +69,11 @@ venue = "lighter"
 address = "$LIGHTER_ADDRESS"
 auth_token = "$LIGHTER_AUTH_TOKEN"
 
+[accounts.margin-trade]
+venue = "margin-trade"
+address = "$MARGIN_TRADE_ADDRESS"
+public = true
+
 [accounts.mexc]
 venue = "mexc"
 api_key = "$MEXC_ACCESS_KEY"
@@ -125,3 +130,9 @@ private_key = "$HYPERLIQUID_TESTNET_PRIVATE_KEY"
 
 [accounts.lighter_testnet]
 venue = "lighter_testnet"
+
+# Signed by the approved agent (API wallet) of the master address.
+[accounts.margin-trade-testnet]
+venue = "margin-trade-testnet"
+address = "$MARGIN_TRADE_TESTNET_ADDRESS"
+private_key = "$MARGIN_TRADE_TESTNET_AGENT_PRIVATE_KEY"

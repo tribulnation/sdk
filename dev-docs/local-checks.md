@@ -30,13 +30,18 @@ file's own directory, so an accounts file elsewhere silently runs without creden
    address must be in unified account mode: perpetual collateral reads raise on
    default-mode accounts. Lighter carries its
    address plus a read-only `LIGHTER_AUTH_TOKEN`; Aster is signed with `ASTER_USER`
-   and `ASTER_SIGNER_PRIVATE_KEY`.
+   and `ASTER_SIGNER_PRIVATE_KEY`. margin.trade is `public = true` with a third-party
+   `MARGIN_TRADE_ADDRESS`, `ArYFxvQY7y33FgoCPSTJpzVcejzMP6ED5aFeVKKLkgJo`: picked from
+   the public `/public/leaderboard` because its whole fill history stays under the
+   venue's 10000-fill retention (perp and `PRL/USDC` spot fills from July 2026),
+   alongside hourly funding, on-chain deposits and withdrawals, perp/spot transfers and
+   non-zero perp and spot balances.
 2. Each account must reach its venue's `[qualification.market] min_mode` in
    `impl.toml`: `address`, `token` or `private`. The recorded account mode is derived
    from the credentials actually resolved, so a missing variable lowers it and the
    verifier rejects the report ([ADR 0042](adr/0042-read-only-account-method-qualification.md)).
-3. Testnet accounts use `<venue>_testnet` ids and venues, so no mainnet slug
-   selects them. Name them explicitly for testnet diagnostics.
+3. Testnet accounts use `<venue>_testnet` ids and venues (`<venue>-testnet` for a
+   hyphenated slug such as `margin-trade`), so no mainnet slug selects them. Name them explicitly for testnet diagnostics.
 4. Bitget has two mainnet accounts, each with an explicit `uta` mode. Qualify with
    `--account bitget_classic`, the mode current evidence records.
 5. Deribit's split qualification pairs `deribit_public` with `deribit_testnet`

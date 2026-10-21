@@ -21,6 +21,8 @@ from tribulnation.sdk.market import TradingVenue
 from tribulnation.sdk.reporting import Report
 from tribulnation.sdk.wallet import Wallet
 
+from .support import mainnet_of
+
 AssetIdKind = Literal['symbol', 'index', 'address']
 ASSET_ID_PATTERNS: dict[AssetIdKind, re.Pattern[str]] = {
   'symbol': re.compile(r'^(?!\d+$)(?!0x[0-9a-fA-F]{40}$)\S+$'),
@@ -28,7 +30,6 @@ ASSET_ID_PATTERNS: dict[AssetIdKind, re.Pattern[str]] = {
   'address': re.compile(r'^(native|0x[0-9a-fA-F]{40})$'),
 }
 """What a catalogue translation key must look like for each declared asset-ID form."""
-TESTNET_SUFFIX = '_testnet'
 
 
 def platform_of(venue: str) -> str:
@@ -38,7 +39,7 @@ def platform_of(venue: str) -> str:
   Args:
     venue: An account's `venue` id, e.g. `hyperliquid_testnet`.
   """
-  return venue.removesuffix(TESTNET_SUFFIX)
+  return mainnet_of(venue)
 
 
 def load_catalogue(path: Path | None = None, *, root: Path | None = None) -> Catalogue:

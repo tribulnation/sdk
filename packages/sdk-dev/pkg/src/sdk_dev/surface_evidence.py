@@ -14,7 +14,7 @@ from typing_extensions import Literal
 
 from .consistency import StrictModel
 from .repo import repo_root
-from .support import load_impl_files
+from .support import is_testnet, load_impl_files
 
 Group = Literal['all', 'public_mainnet', 'report_testnet']
 
@@ -69,7 +69,7 @@ class Payload(StrictModel):
 def inventory(root: Path, venue: str) -> dict[str, Path]:
   """Reconstruct required tests from supported read methods, not recorded outcomes."""
   impl = load_impl_files(root / 'packages/impl').get(venue)
-  if impl is None or venue.endswith('_testnet'):
+  if impl is None or is_testnet(venue):
     raise ValueError('Unknown mainnet implementation')
   checks: dict[str, Path] = {}
   for surface, methods in TESTS.items():

@@ -9,9 +9,16 @@ import pydantic
 import pytest
 from typing_extensions import cast
 
-from tribulnation.sdk.impl.accounts import Account, Aster, Dydx, Hyperliquid, Lighter
+from tribulnation.sdk.impl.accounts import (
+  Account,
+  Aster,
+  Dydx,
+  Hyperliquid,
+  Lighter,
+  MarginTrade,
+)
 from sdk_dev.repo import IMPL_DIR, repo_root
-from sdk_dev.support import AccountMode, ImplSurfaceSupport, load_impl_files
+from sdk_dev.support import AccountMode, ImplSurfaceSupport, load_impl_files, mainnet_of
 
 EVM_VENUES = {
   'ethereum',
@@ -27,7 +34,7 @@ EVM_VENUES = {
 
 def package_of(venue: str) -> str:
   """Map router venue names to their implementation package."""
-  return 'ethereum' if venue in EVM_VENUES else venue.removesuffix('_testnet')
+  return 'ethereum' if venue in EVM_VENUES else mainnet_of(venue)
 
 
 def load_accounts(config: pytest.Config) -> dict[str, Account]:
@@ -136,11 +143,11 @@ def account_mode(account: Account, *, resolve: bool = True) -> AccountMode:
     except ValueError:
       return 'public'
     return 'private'
-  if isinstance(account, Hyperliquid) and configured(
+  if isinstance(account, (Hyperliquid, MarginTrade)) and configured(
     account, 'private_key', resolve=resolve
   ):
     return 'private'
-  if isinstance(account, (Dydx, Hyperliquid)) and configured(
+  if isinstance(account, (Dydx, Hyperliquid, MarginTrade)) and configured(
     account, 'address', resolve=resolve
   ):
     return 'address'
@@ -165,6 +172,14 @@ def require_report_credentials(account: Account):
       owner = None
     if owner is None:
       pytest.skip('Report checks require a configured address or account index')
+    return
+  if isinstance(account, MarginTrade):
+    try:
+      owner = account.resolved_address or account.resolved_private_key
+    except ValueError:
+      owner = None
+    if owner is None:
+      pytest.skip('Report checks require a configured address or key')
     return
   if isinstance(account, (Dydx, Hyperliquid)):
     try:

@@ -76,6 +76,8 @@ VenueId = _Literal[
   'aster_testnet',
   'lighter',
   'lighter_testnet',
+  'margin-trade',
+  'margin-trade-testnet',
   'mexc',
   'bit2me',
   'bitget',
@@ -630,6 +632,45 @@ class Lighter(VenueAccount):
 
 
 @_dataclass(frozen=True)
+class MarginTrade(VenueAccount):
+  """margin.trade account, isolated by network: the master address, and the master's
+  key or an approved agent's (API wallet) key. With `public`, the address alone serves
+  the account's reads."""
+
+  venue: _Literal['margin-trade', 'margin-trade-testnet'] = 'margin-trade'
+  address: str | None = None
+  """Master account address (base58); defaults to the network's `ADDRESS` variable.
+  Optional with a key: derived from a master key."""
+  private_key: str | None = None
+  """The master's or an approved agent's private key (hex seed or base58 secret);
+  defaults to the network's `PRIVATE_KEY` variable."""
+  validate: bool = True
+  """Whether to type-validate incoming responses."""
+
+  @property
+  def prefix(self) -> str:
+    """The credential variables' prefix: `MARGIN_TRADE`, or `MARGIN_TRADE_TESTNET`."""
+    return 'MARGIN_TRADE' if self.venue == 'margin-trade' else 'MARGIN_TRADE_TESTNET'
+
+  @property
+  def resolved_address(self) -> str | None:
+    """The master address, never mixing networks; optional on its own."""
+    return resolve_env_var(self.address or f'${self.prefix}_ADDRESS', require=False)
+
+  @property
+  def resolved_private_key(self) -> str | None:
+    """The signing key, never mixing networks; required unless `public`."""
+    return resolve_env_var(
+      self.private_key or f'${self.prefix}_PRIVATE_KEY', require=not self.public
+    )
+
+  def verify_env_vars(self):
+    """Fail before constructing clients when a private account has no key."""
+    self.resolved_address
+    self.resolved_private_key
+
+
+@_dataclass(frozen=True)
 class Evm(BaseAccount):
   Venue = _Literal[
     'ethereum',
@@ -668,6 +709,7 @@ Account = _Annotated[
   | Deribit
   | Aster
   | Lighter
+  | MarginTrade
   | Evm,
   _pydantic.Discriminator('venue'),
 ]

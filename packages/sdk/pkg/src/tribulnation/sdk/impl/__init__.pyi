@@ -10,6 +10,7 @@ from .accounts import (
   Binance,
   Kraken,
   Lighter,
+  MarginTrade,
   Evm,
 )
 from .market import MarketSDK
@@ -29,6 +30,7 @@ __all__ = [
   'Binance',
   'Kraken',
   'Lighter',
+  'MarginTrade',
   'Evm',
   'MarketSDK',
   'EarnSDK',

@@ -24,7 +24,7 @@ from .integration.market.account import (
 from .integration.market.public import READS
 from .integration.market.support import CASES
 from .repo import repo_root
-from .support import AccountMode, load_impl_files, mode_rank
+from .support import AccountMode, is_testnet, load_impl_files, mode_rank
 from .surface_evidence import Group, TESTS
 
 SUSPENSIONS: dict[tuple[str, str], date] = {
@@ -102,7 +102,7 @@ def inventory(
   """Reconstruct all required cases and narrow exclusions from committed support and
   the recorded account mode."""
   impl = load_impl_files(root / 'packages/impl').get(venue)
-  if impl is None or venue.endswith('_testnet'):
+  if impl is None or is_testnet(venue):
     raise ValueError('Unknown mainnet implementation')
   base = root / 'packages/sdk-dev/pkg/src/sdk_dev/integration'
   cases: list[Case] = []

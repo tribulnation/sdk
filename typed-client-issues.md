@@ -65,3 +65,93 @@ prices beside them are `Decimal`.
 - Kind: wrong-type (too loose for money)
 - Observed: `daily_base_token_volume: 104077.34300000001`, `open_interest: 213.494`
 - Blocks: `poc/market/perp.py` cells 7 (`tickers`) and 28 (`perp_stats`); `poc/market/spot.py` cell 6 (`tickers`), where `SpotMarketStats` volumes are `float` likewise; tracked fleet-wide in typed-dev#229
+
+## typed-margin-trade
+
+### `SocketClient.ping_interval` defaults to 30 s, and the venue drops the socket by then
+
+Every WebSocket subscription dies with `NetworkError('Error receiving message')`
+(`ConnectionClosedError`, no close frame) about 30 s after the client's last ping, on both
+networks: an idle `userFills` subscription at 31.0 s, a busy mainnet `l2Book('BTC')` (99
+pushes) at 61.0 s. The same idle `userFills` subscription built with
+`ping_interval=timedelta(seconds=10)` was still open at 70 s, side by side with a 30 s one
+that died at 31.0 s. `spec/status.md` reads the drops as happening "right around a fill";
+they follow the ping cadence instead.
+
+`core/transport/ws.py:159` (and `SocketClient.new`, `:299`; `MarginTrade.new` exposes no
+override, `core/client.py:76`):
+
+```python
+  ping_interval: timedelta = field(kw_only=True, default=timedelta(seconds=30))
+```
+
+- Kind: transport default (no response shape involved)
+- Observed: drops at 31.0 s (idle, mainnet), 61.0 s (busy, mainnet); testnet user streams
+  dropped the same way during the client's own captures
+- Samples: 30 s ping dies at 31.0 s; 10 s ping alive at 70 s (`userFills`,
+  `HZEB64qX94oiDsKNisSxYSWuEaKdfsD4Rn1ZEToAw68a`, `PRL/USDC`, mainnet, 2026-10-21)
+- Blocks: every `depth_stream`/`trades_stream` subscription in `tribulnation.margin_trade`,
+  which lasts at most about a minute; `poc/market/spot.py` cell 13 (`trades_stream`) holds
+  its subscription on its own socket with a 10 s ping to see a fill at all
+- Suggestion (unverified): a ping interval well under 30 s, or one `MarginTrade.new` exposes
+
+### `DerivativeContract.next_funding_rate_timestamp` is epoch seconds, parsed as milliseconds
+
+`coingecko.derivatives.contracts` sends the next funding time in seconds; the declared
+`TimestampMillis` turns it into a January 1970 date.
+
+`coingecko/derivatives/contracts.py:47`:
+
+```python
+  next_funding_rate_timestamp: TimestampMillis
+```
+
+- Kind: wrong-type
+- Observed: `1970-01-21 17:56:38.400` for every contract at 15:2x UTC on 2026-10-21, i.e.
+  the raw `1792598400`, which as seconds is 2026-10-21 16:00 UTC, the next hourly settlement
+- Samples: BTC-USD and ETH-USD, testnet and mainnet
+- Blocks: nothing yet: `next_funding` and `perp_stats` use the documented hourly cadence
+  (settlements land on the hour in `userFunding`); the fix would let them read the venue's
+  own next time
+
+### `Info.order_status(cloid=...)` sends a field the venue does not read
+
+The venue looks a client order id up through `oid` (`{"oid": "0x..."}` finds the order),
+and answers a request carrying `cloid` instead with `oid or cloid is required`, raised as
+`BadRequest`.
+
+`info/order_status.py:60`:
+
+```python
+    if cloid is not None:
+      request['cloid'] = cloid
+```
+
+- Kind: wrong request shape
+- Observed: `order_status(user=..., cloid='0x1f1f...1f')` raises `BadRequest(oid or cloid is
+  required)` for a resting order that `order_status(user=..., oid='0x1f1f...1f')` returns
+  (testnet, 2026-10-21)
+- Blocks: nothing: the SDK queries by exchange order id
+
+### `Exchange.usd_class_transfer` amount is micro-USDC, and an agent signature moves the agent's own funds
+
+The docstring and the deposits/withdrawals how-to call `amount` a USDC amount
+(`usd_class_transfer(Decimal('1'), to_perp=False)` "perp -> spot"), but `'1'` moves
+`0.000001` USDC: the venue reads micro-units, as `withdraw` does (documented there).
+Signed by an approved agent with `vault`, the same call answers `failed to transfer:
+insufficient balance` while the master's perp wallet holds ~100k: the venue acts on the
+agent's own (empty) account, so the call is effectively master-only.
+
+`exchange/usd_class_transfer.py:27` and `:38`:
+
+```python
+      amount: USDC amount, as a decimal string.
+      ...
+      meta={'auth': 'signed'},
+```
+
+- Kind: wrong-type (unit), plus an auth scope (`signed` where only the master works)
+- Observed: master `amount='1'` moved `0.000001` (spot balance `0.000001`), `'20000000'`
+  moved 20; agent with `vault` refused with `insufficient balance` (testnet, 2026-10-21)
+- Blocks: nothing in the SDK (no transfer method); `poc/market/spot.py` lifecycle signs its
+  transfers with the master key and micro-units
