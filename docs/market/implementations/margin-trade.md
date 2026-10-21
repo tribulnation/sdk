@@ -12,7 +12,7 @@
 
 # margin.trade Market
 
-> Perpetuals and spot. `tribulnation-margin_trade`, venue names `margin_trade` and `margin_trade_testnet`.
+> Perpetuals and spot. `tribulnation-margin-trade`, venue names `margin-trade` and `margin-trade-testnet`.
 
 See the [generic market interface](../index.md) for the shared method surface. This page
 covers only what is margin.trade-specific.
@@ -20,20 +20,20 @@ covers only what is margin.trade-specific.
 ## Account
 
 ```toml
-[accounts.margin_trade]         # trading: the master's key or an approved agent's
-venue = "margin_trade"          # or "margin_trade_testnet"
+[accounts.margin-trade]         # trading: the master's key or an approved agent's
+venue = "margin-trade"          # or "margin-trade-testnet"
 address = "$MARGIN_TRADE_ADDRESS"
 private_key = "$MARGIN_TRADE_PRIVATE_KEY"
 
-[accounts.margin_trade_public]  # account reads by address, no key
-venue = "margin_trade"
+[accounts.margin-trade-public]  # account reads by address, no key
+venue = "margin-trade"
 address = "$MARGIN_TRADE_ADDRESS"
 public = true
 ```
 
 `address` is the master account (base58). With an agent key it must be set; with the
-master's key it is derived when omitted. With the fields omitted, `margin_trade` reads
-`MARGIN_TRADE_ADDRESS` and `MARGIN_TRADE_PRIVATE_KEY`, and `margin_trade_testnet` the
+master's key it is derived when omitted. With the fields omitted, `margin-trade` reads
+`MARGIN_TRADE_ADDRESS` and `MARGIN_TRADE_PRIVATE_KEY`, and `margin-trade-testnet` the
 same names prefixed `MARGIN_TRADE_TESTNET_`.
 
 ## IDs
@@ -57,7 +57,7 @@ same names prefixed `MARGIN_TRADE_TESTNET_`.
 - Funding settles hourly on the hour; there is no funding-rate history.
 - `perp_collateral` is the perp wallet's cross bucket; a market with an isolated
   position raises `NotImplementedError`.
-- Streams: with `typed-margin_trade` 0.1.0 the venue drops the connection about 30 s
+- Streams: with `typed-margin-trade` 0.1.0 the venue drops the connection about 30 s
   after a client ping, so `depth_stream` and `trades_stream` end with `NetworkError`.
 
 No `settings` are read.

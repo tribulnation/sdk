@@ -86,7 +86,7 @@ CASES: Mapping[str, Sequence[CandleCase]] = {
     CandleCase(market_id='spot:2048', page=500),
   ],
   # One response serves the whole window (57601 one-minute candles over 40 days).
-  'margin_trade': [
+  'margin-trade': [
     CandleCase(market_id='perp:BTC', page=None),
     CandleCase(market_id='spot:PRL/USDC', page=None),
   ],

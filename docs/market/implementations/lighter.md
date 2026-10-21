@@ -166,6 +166,6 @@ async with sdk.depth_stream('lighter:perp:1', settings={'lighter': {'depth_sourc
 
 ---
 
-← [Deribit Market](deribit.md) · **Next:** [margin.trade Market](margin_trade.md) →
+← [Deribit Market](deribit.md) · **Next:** [margin.trade Market](margin-trade.md) →
 
 <!-- /next -->

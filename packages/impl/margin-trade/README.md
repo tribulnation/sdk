@@ -1,8 +1,8 @@
 # margin.trade SDK
 
 Spot and USDC-margined perpetual Market support, and Report snapshots and history, for
-[margin.trade](https://margin.trade/), built on `typed-margin_trade`. Install with
-`pip install tribulnation-margin_trade`.
+[margin.trade](https://margin.trade/), built on `typed-margin-trade`. Install with
+`pip install tribulnation-margin-trade`.
 
 ```python
 from tribulnation.margin_trade import MarginTradeMarket
@@ -38,5 +38,5 @@ reads = MarginTradeMarket.new(address='6dm8…')
 4. Report: a `perp` subaccount (USDC without unrealized PnL, positions) and a `spot`
    subaccount (token totals); history of fills, funding and transfers (on-chain deposits
    and withdrawals on `solana` or `pearl`, perp/spot transfers).
-5. With `typed-margin_trade` 0.1.0 the venue drops every WebSocket connection about 30 s
+5. With `typed-margin-trade` 0.1.0 the venue drops every WebSocket connection about 30 s
    after a client ping, so streams end with `NetworkError` within about a minute.

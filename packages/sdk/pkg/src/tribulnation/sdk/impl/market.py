@@ -250,12 +250,12 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       from tribulnation.margin_trade import MarginTradeMarket
     except ImportError as e:
       raise ImportError(
-        'margin.trade market is not installed. Please install it with `pip install tribulnation-margin_trade`.'
+        'margin.trade market is not installed. Please install it with `pip install tribulnation-margin-trade`.'
       ) from e
     return MarginTradeMarket.new(
       address=account.resolved_address,
       private_key=account.resolved_private_key,
-      mainnet=account.venue == 'margin_trade',
+      mainnet=account.venue == 'margin-trade',
       validate=account.validate,
       account_id=id,
     )
@@ -290,7 +290,7 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
         return self.deribit(account, id)
       case 'lighter' | 'lighter_testnet':
         return self.lighter(account, id)
-      case 'margin_trade' | 'margin_trade_testnet':
+      case 'margin-trade' | 'margin-trade-testnet':
         return self.margin_trade(account, id)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')

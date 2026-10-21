@@ -1,5 +1,5 @@
 # %% [markdown]
-# # margin_trade `wallet` PoC
+# # margin-trade `wallet` PoC
 #
 # Maps `typed_margin_trade` onto the SDK `wallet` surface, one method per cell, each executed live. The rules, and how a typed-client issue is reported in `typed-client-issues.md`, are in `.agents/skills/sdk-poc/SKILL.md`.
 #

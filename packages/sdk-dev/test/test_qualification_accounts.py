@@ -8,7 +8,7 @@ from tribulnation.sdk.impl.accounts import Account
 from sdk_dev.cli.results import required_venues, select_account
 from sdk_dev.integration.accounts import account_mode
 from sdk_dev.repo import repo_root
-from sdk_dev.support import load_impl_files, mode_rank
+from sdk_dev.support import is_testnet, load_impl_files, mode_rank
 
 EXPLICIT = {'bitget': 'bitget_classic'}
 """Venues with several mainnet accounts, and the one qualification uses."""
@@ -60,5 +60,5 @@ def test_aster_and_lighter_qualify_authenticated_accounts():
 def test_testnet_accounts_are_named_as_testnets():
   """A testnet account under a mainnet slug hides that venue's mainnet account."""
   for key, account in tracked_sdk().accounts.items():
-    if account.venue.endswith('_testnet'):
+    if is_testnet(account.venue):
       assert key == account.venue

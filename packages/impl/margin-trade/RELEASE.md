@@ -1,7 +1,7 @@
-# tribulnation-margin_trade 0.1.0
+# tribulnation-margin-trade 0.1.0
 
 Requires SDK >=2.18.0 (account routing needs the SDK release carrying the
-`margin_trade` accounts) and typed-margin_trade >=0.1.0.
+`margin-trade` accounts) and typed-margin-trade >=0.1.0.
 
 New:
 

@@ -25,7 +25,7 @@ Per-method differences are on the [Methods](../methods.md) page, under each meth
 
 - [Deribit](deribit.md) — public spot and linear perpetuals; four intraday candle intervals
 - [Lighter](lighter.md) — perpetuals and spot; numeric market ids, unified accounts for spot collateral
-- [margin.trade](margin_trade.md) — perpetuals and spot; Solana keys with agent wallets, per-market fee rates
+- [margin.trade](margin-trade.md) — perpetuals and spot; Solana keys with agent wallets, per-market fee rates
 
 <!-- next -->
 

@@ -1,5 +1,5 @@
 # %% [markdown]
-# # margin_trade `market` PoC: perpetuals
+# # margin-trade `market` PoC: perpetuals
 #
 # Maps `typed_margin_trade` onto the SDK `market` surface for the perpetual exchange, one method per cell, each executed live. The rules, and how a typed-client issue is reported in `typed-client-issues.md`, are in `.agents/skills/sdk-poc/SKILL.md`.
 #
@@ -711,7 +711,7 @@ from sdk_dev.catalogue import Ids, gap, load_catalogue
 
 listed = await markets()
 ids = Ids(perp_markets={f'perp:{m}' for m in listed}, assets={'USD'})
-gap('margin_trade', ids, load_catalogue(root=repo_root()))
+gap('margin-trade', ids, load_catalogue(root=repo_root()))
 
 # %%
 await client.__aexit__(None, None, None)  # pyright: ignore[reportUnknownMemberType] -- upstream lifecycle parameters are untyped

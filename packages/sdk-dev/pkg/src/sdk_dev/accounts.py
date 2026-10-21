@@ -26,7 +26,7 @@ CREDENTIAL_OVERRIDES = {
     'user': '$ASTER_USER',
     'signer': '$ASTER_SIGNER_PRIVATE_KEY',
   },
-  'margin_trade': {
+  'margin-trade': {
     'address': '$MARGIN_TRADE_ADDRESS',
     'private_key': '$MARGIN_TRADE_PRIVATE_KEY',
   },
@@ -82,7 +82,7 @@ def generate_accounts_toml(*, public: bool = False) -> dict[str, str]:
     'coinbase': Coinbase,
     'kucoin': Kucoin,
     'lighter': Lighter,
-    'margin_trade': MarginTrade,
+    'margin-trade': MarginTrade,
     'deribit': Deribit,
   }
 

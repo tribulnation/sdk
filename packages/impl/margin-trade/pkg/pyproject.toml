@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tribulnation-margin_trade"
+name = "tribulnation-margin-trade"
 version = "0.1.0"
 description = "Tribulnation SDK implementation for margin.trade spot and perpetual markets."
 license = "MIT"

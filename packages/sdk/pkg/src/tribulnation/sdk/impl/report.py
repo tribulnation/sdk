@@ -251,12 +251,12 @@ class ReportSDK:
       from tribulnation.margin_trade import Report as MarginTradeReport
     except ImportError as e:
       raise ImportError(
-        'margin.trade sdk is not installed. Please install it with `pip install tribulnation-margin_trade`.'
+        'margin.trade sdk is not installed. Please install it with `pip install tribulnation-margin-trade`.'
       ) from e
     return MarginTradeReport.new(
       address=account.resolved_address,
       private_key=account.resolved_private_key,
-      mainnet=account.venue == 'margin_trade',
+      mainnet=account.venue == 'margin-trade',
       validate=account.validate,
       account_id=id,
     )
@@ -302,7 +302,7 @@ class ReportSDK:
         return self.lighter(account, id)
       case 'aster' | 'aster_testnet':
         return self.aster(account, id)
-      case 'margin_trade' | 'margin_trade_testnet':
+      case 'margin-trade' | 'margin-trade-testnet':
         return self.margin_trade(account, id)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')

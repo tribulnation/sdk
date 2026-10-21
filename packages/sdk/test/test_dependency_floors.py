@@ -21,7 +21,7 @@ COMPATIBLE_IMPLEMENTATIONS = {
   'kraken': '0.7.1',
   'kucoin': '0.6.0',
   'lighter': '0.11.0',
-  'margin_trade': '0.1.0',
+  'margin-trade': '0.1.0',
   'mexc': '2.4.0',
 }
 

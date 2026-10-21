@@ -1,5 +1,5 @@
 # %% [markdown]
-# # margin_trade `market` PoC: spot
+# # margin-trade `market` PoC: spot
 #
 # Maps `typed_margin_trade` onto the SDK `market` surface for the spot exchange, one method per cell, each executed live. The rules, and how a typed-client issue is reported in `typed-client-issues.md`, are in `.agents/skills/sdk-poc/SKILL.md`.
 #
@@ -502,7 +502,7 @@ from sdk_dev.catalogue import Ids, gap, load_catalogue
 listed = await markets()
 tokens = {t['name'] for t in (await client.info.spot_meta())['tokens']}
 ids = Ids(spot_markets={f'spot:{m}' for m in listed}, assets=tokens | {t.fee.asset for t in mainnet if t.fee})
-gap('margin_trade', ids, load_catalogue(root=repo_root()))
+gap('margin-trade', ids, load_catalogue(root=repo_root()))
 
 # %%
 await client.__aexit__(None, None, None)  # pyright: ignore[reportUnknownMemberType] -- upstream lifecycle parameters are untyped

@@ -76,8 +76,8 @@ VenueId = _Literal[
   'aster_testnet',
   'lighter',
   'lighter_testnet',
-  'margin_trade',
-  'margin_trade_testnet',
+  'margin-trade',
+  'margin-trade-testnet',
   'mexc',
   'bit2me',
   'bitget',
@@ -637,7 +637,7 @@ class MarginTrade(VenueAccount):
   key or an approved agent's (API wallet) key. With `public`, the address alone serves
   the account's reads."""
 
-  venue: _Literal['margin_trade', 'margin_trade_testnet'] = 'margin_trade'
+  venue: _Literal['margin-trade', 'margin-trade-testnet'] = 'margin-trade'
   address: str | None = None
   """Master account address (base58); defaults to the network's `ADDRESS` variable.
   Optional with a key: derived from a master key."""
@@ -650,7 +650,7 @@ class MarginTrade(VenueAccount):
   @property
   def prefix(self) -> str:
     """The credential variables' prefix: `MARGIN_TRADE`, or `MARGIN_TRADE_TESTNET`."""
-    return 'MARGIN_TRADE' if self.venue == 'margin_trade' else 'MARGIN_TRADE_TESTNET'
+    return 'MARGIN_TRADE' if self.venue == 'margin-trade' else 'MARGIN_TRADE_TESTNET'
 
   @property
   def resolved_address(self) -> str | None:

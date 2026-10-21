@@ -1,5 +1,5 @@
 # %% [markdown]
-# # margin_trade `report` PoC
+# # margin-trade `report` PoC
 #
 # Maps `typed_margin_trade` onto the SDK `report` surface, one method per cell, each executed live. The rules, and how a typed-client issue is reported in `typed-client-issues.md`, are in `.agents/skills/sdk-poc/SKILL.md`.
 #
@@ -82,7 +82,7 @@ async def snapshot(assets: Collection[str] | None = None, user: str = ADDRESS, v
       SubaccountSnapshot(subaccount='spot', balances={b['coin']: b['total'] for b in spot['balances'] if b['total']}),
     ]
   )
-  return SnapshotRecord(snapshot=snap, provenance={'source': 'api', 'service': 'margin_trade_testnet', 'id': snap.time.isoformat()})
+  return SnapshotRecord(snapshot=snap, provenance={'source': 'api', 'service': 'margin-trade-testnet', 'id': snap.time.isoformat()})
 
 
 await snapshot(), await snapshot(user=SPOT_TRADER, via=mainnet), await snapshot(user=PERP_TRADER, via=mainnet)
@@ -135,7 +135,7 @@ def transfer_observation(row: TransferHistoryItem, id: str) -> Observation:
 
 
 async def history(start: datetime | None = None, end: datetime | None = None, user: str = ADDRESS, via: MarginTrade = testnet) -> AsyncIterator[HistoryRecord]:
-  service = 'margin_trade_testnet' if via is testnet else 'margin_trade'
+  service = 'margin-trade-testnet' if via is testnet else 'margin-trade'
   upper = end or datetime.now(timezone.utc)
   lower = start or datetime(2025, 1, 1, tzinfo=timezone.utc)
   perps = {item['name'] for item in (await via.info.meta())['universe']}
@@ -263,7 +263,7 @@ for obs in [r.observations[0] for r in records + spot_records + perp_records] + 
     found.networks.add(network)
   if (fee := getattr(obs, 'fee', None)) is not None:
     found.assets.add(fee.asset)
-gap('margin_trade', found, load_catalogue(root=repo_root()))
+gap('margin-trade', found, load_catalogue(root=repo_root()))
 
 # %%
 await testnet.__aexit__(None, None, None)  # pyright: ignore[reportUnknownMemberType] -- upstream lifecycle parameters are untyped

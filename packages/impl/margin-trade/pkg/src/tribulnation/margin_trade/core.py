@@ -42,7 +42,7 @@ from tribulnation.sdk.market import Book, OrderState, Trade
 
 T = TypeVar('T')
 U = TypeVar('U')
-VenueId = Literal['margin_trade', 'margin_trade_testnet']
+VenueId = Literal['margin-trade', 'margin-trade-testnet']
 wrap_exceptions = exception_wrapper()
 
 MAX_SIGNIFICANT_FIGURES = 5
@@ -178,7 +178,7 @@ class Shared(SDK):
   @property
   def venue_id(self) -> VenueId:
     """The network-specific venue ID."""
-    return 'margin_trade' if self.mainnet else 'margin_trade_testnet'
+    return 'margin-trade' if self.mainnet else 'margin-trade-testnet'
 
   @property
   def address(self) -> str:

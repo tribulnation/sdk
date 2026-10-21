@@ -1565,8 +1565,8 @@
             "kucoin",
             "lighter",
             "lighter_testnet",
-            "margin_trade",
-            "margin_trade_testnet",
+            "margin-trade",
+            "margin-trade-testnet",
             "mexc"
           ]
         }
@@ -2739,8 +2739,8 @@
             "kucoin",
             "lighter",
             "lighter_testnet",
-            "margin_trade",
-            "margin_trade_testnet",
+            "margin-trade",
+            "margin-trade-testnet",
             "mexc"
           ]
         }
