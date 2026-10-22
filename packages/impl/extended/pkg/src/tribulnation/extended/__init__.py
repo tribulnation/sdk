@@ -1,4 +1,5 @@
-"""Extended perpetual Market, and Report snapshot and history, implementations."""
+"""Load the Extended Market and Report surfaces independently when an application requests them."""
 
-from .market import ExtendedMarket
-from .report import Report
+import lazy_loader as lazy
+
+__getattr__, __dir__, __all__ = lazy.attach_stub(__name__, __file__)
