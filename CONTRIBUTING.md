@@ -68,7 +68,8 @@ to record every required read-only suite below, even for market implementations.
 
 1. Run `sdk-dev test market|earn|wallet|report [venue-or-account] --accounts sdk.test.toml`.
    The optional selector matches an exact venue slug or account id, including aliases
-   that do not contain the venue name. Without it, every eligible configured account
+   that do not contain the venue name; an account id wins, so `grvt` selects that
+   account and not `grvt_trade`. Without it, every eligible configured account
    is selected; SDK roots have no implicit accounts
    ([ADR 0036](dev-docs/adr/0036-no-implicit-accounts.md)). Support comes from `impl.toml`.
 2. These suites do not place/cancel orders, transfer funds, or subscribe/redeem Earn
