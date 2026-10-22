@@ -36,7 +36,7 @@ not a changelog or a substitute for API documentation and tests.
 | [0011](0011-liquidity-independent-consistency.md) | Compare available quote sides without guaranteeing liquidity | Accepted |
 | [0012](0012-deribit-public-mainnet-private-testnet.md) | Deribit mainnet public metadata and testnet private Report evidence | Accepted |
 | [0013](0013-all-read-suites-release-gate.md) | Require all supported read-only suites alongside market consistency | Accepted; amends 0003 and 0006; amended by 0016, 0027 and 0042 |
-| [0014](0014-bit2me-native-ticker-limitation.md) | Preserve Bit2Me native tickers with a visible upstream quote limitation | Accepted; amends 0003 and 0011; amended by 0022 |
+| [0014](0014-bit2me-native-ticker-limitation.md) | Preserve Bit2Me native tickers with a visible upstream quote limitation | Accepted; amends 0003 and 0011; amended by 0022 and 0048 |
 | [0015](0015-single-venue-doc-examples.md) | Linear per-venue documentation examples without hidden support | Accepted |
 | [0016](0016-report-snapshot-release-scope.md) | Qualify Report snapshots; application auditing owns history correctness | Accepted; amends 0013 |
 | [0017](0017-venue-resource-policies.md) | Venue-owned resource policies without whole-lifecycle middleware | Accepted |
@@ -44,7 +44,7 @@ not a changelog or a substitute for API documentation and tests.
 | [0019](0019-kucoin-public-market.md) | KuCoin public spot and linear perpetual data with native identities and base units | Accepted |
 | [0020](0020-kraken-public-perpetuals.md) | Kraken public linear perpetual data with native identities and hourly funding settlement conversion | Accepted |
 | [0021](0021-deribit-public-market.md) | Deribit public spot and linear perpetuals with explicit candle and funding limits | Accepted |
-| [0022](0022-bit2me-one-sided-ticker-limitation.md) | Extend the Bit2Me native ticker limitation to stable one-sided books | Accepted; amends 0014 |
+| [0022](0022-bit2me-one-sided-ticker-limitation.md) | Extend the Bit2Me native ticker limitation to stable one-sided books | Accepted; amends 0014; amended by 0048 |
 | [0023](0023-ticker-quote-volume.md) | Native 24-hour quote volume in tickers | Accepted |
 | [0024](0024-exchange-account-history.md) | Native exchange-wide personal history with market-attributed records | Accepted |
 | [0025](0025-missing-market-data.md) | Structured missing market data and a narrow MEXC index exclusion | Accepted; amended by 0030 |
@@ -65,8 +65,9 @@ not a changelog or a substitute for API documentation and tests.
 | [0040](0040-lighter-credential-modes.md) | Lighter credential modes: read-only tokens and public account reads | Proposed; implemented, not release-verified |
 | [0041](0041-venue-notional-caps.md) | Venue notional caps in available notional | Proposed; implemented for Aster, not release-verified; amended by 0042 |
 | [0042](0042-read-only-account-method-qualification.md) | Read-only account-method qualification | Accepted; implemented, not release-verified; amends 0013, 0039 and 0041 |
-| [0043](0043-order-rejected.md) | Definitive order rejections as `OrderRejected` | Accepted; implemented for Hyperliquid, Aster and Lighter, not release-verified |
+| [0043](0043-order-rejected.md) | Definitive order rejections as `OrderRejected` | Accepted; implemented for Hyperliquid, Aster, Lighter and Extended, not release-verified |
 | [0044](0044-trades-stream-settings-dydx-node-fills.md) | `trades_stream` settings and dYdX full node fills | Proposed; implemented, not release-verified; amended by 0045 |
 | [0045](0045-dydx-node-feed-refuses-a-node-behind.md) | The dYdX node feed refuses a node behind the chain tip | Proposed; implemented, not release-verified; amends 0044 |
 | [0046](0046-conflated-snapshot-streams.md) | Conflate snapshot streams before decoding, and report skipped books | Proposed; implemented for Binance, Aster and Hyperliquid, not release-verified |
 | [0047](0047-grvt-credential-modes.md) | GRVT credential modes and definitive order refusals | Proposed; implemented, not release-verified |
+| [0048](0048-extended-rfq-indicative-tickers.md) | Extended RFQ depth from quotes, with indicative tickers as a visible limitation | Accepted; implemented, not release-verified; amends 0014 and 0022 |

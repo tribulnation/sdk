@@ -2,8 +2,8 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: accepted; implemented for Hyperliquid, Aster and Lighter, which unit fixtures
-   verify; dYdX deliberately unchanged. Not release-verified, and no live trading run
+1. Status: accepted; implemented for Hyperliquid, Aster, Lighter and Extended, which unit
+   fixtures verify; dYdX deliberately unchanged. Not release-verified, and no live trading run
    covers it.
 2. Date: 2026-10-08
 
@@ -64,6 +64,15 @@ HTTP transport also raises a bare `ApiError(status, body)` for every non-200 res
 8. The gateway encodes exceptions by class name, and `OrderRejected` is in its codec
    table, so a strategy behind `ProxySDK` receives the same class.
 9. `place_order` docstrings document it under `Raises:`.
+
+## Later adoptions
+
+1. Extended (2026-10-22): `place_order` raises it for an error envelope carrying an
+   application code (a `4XX`, or a `2XX` with `status: ERROR`), other than `1134`
+   DuplicateOrder (an earlier, ambiguous submission with the same client id may rest)
+   and `1006` UnhandledError. Code-less statuses, `5XX`, auth errors and `429` keep
+   their classes. Acceptance is asynchronous: an order the matching engine refuses
+   later shows as `REJECTED` in `query_order`, not as an error from `place_order`.
 
 ## Alternatives considered
 

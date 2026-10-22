@@ -2,7 +2,8 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: accepted; implementation and release qualification remain separate.
+1. Status: accepted; implementation and release qualification remain separate; amended by
+   [ADR 0048](0048-extended-rfq-indicative-tickers.md)
 2. Date: 2026-09-19
 3. Amends: [ADR 0014](0014-bit2me-native-ticker-limitation.md).
 
