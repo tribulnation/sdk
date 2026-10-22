@@ -7,6 +7,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"B2M/EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -14,6 +15,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"B2M/USDC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -21,6 +23,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"BTC/EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -28,6 +31,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"BTC/EURR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -35,6 +39,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"BTC/USDC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -42,6 +47,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ETH/EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -49,6 +55,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ETH/USDC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -56,6 +63,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"EUR/EURR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -63,6 +71,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"EURC/EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -70,6 +79,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"USDC/EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -77,6 +87,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"B2M/EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -84,6 +95,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"B2M/USDC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -91,6 +103,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"BTC/EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -98,6 +111,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"BTC/EURR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -105,6 +119,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"BTC/USDC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -112,6 +127,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ETH/EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -119,6 +135,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ETH/USDC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -126,6 +143,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"EUR/EURR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -133,6 +151,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"EURC/EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -140,6 +159,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"USDC/EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -147,6 +167,7 @@
         "id": "[\"discovery\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -154,6 +175,7 @@
         "id": "[\"exchange_identity\",\"spot\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -161,6 +183,7 @@
         "id": "[\"market_identity\",\"spot\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -168,6 +191,7 @@
         "id": "[\"setup\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -176,17 +200,18 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.0853",
-            "after_bid": "0.0852",
-            "ask": "0.0855",
+            "after_ask": "0.0815",
+            "after_bid": "0.0813",
+            "ask": "0.0815",
             "attempt": 1,
-            "before_ask": "0.0853",
-            "before_bid": "0.0852",
-            "bid": "0.0854",
-            "elapsed_seconds": 0.16556052101077512,
+            "before_ask": "0.0815",
+            "before_bid": "0.0813",
+            "bid": "0.0813",
+            "elapsed_seconds": 0.2371503229951486,
             "ticker_ids_match": true
           }
         ],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -202,10 +227,11 @@
             "before_ask": "0.0001434",
             "before_bid": "0.0001335",
             "bid": "0.0001335",
-            "elapsed_seconds": 0.14901384798577055,
+            "elapsed_seconds": 0.23107443301705644,
             "ticker_ids_match": true
           }
         ],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -214,17 +240,18 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "141.66",
-            "after_bid": "141.59",
-            "ask": "141.99",
+            "after_ask": "131.04",
+            "after_bid": "130.92",
+            "ask": "130.84",
             "attempt": 1,
-            "before_ask": "141.66",
-            "before_bid": "141.59",
-            "bid": "141.93",
-            "elapsed_seconds": 0.15036636998411268,
+            "before_ask": "131.04",
+            "before_bid": "130.92",
+            "bid": "130.73",
+            "elapsed_seconds": 0.21587830601492897,
             "ticker_ids_match": true
           }
         ],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -233,17 +260,18 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "75272.1",
-            "after_bid": "75272.0",
-            "ask": "75237.3",
+            "after_ask": "72795.6",
+            "after_bid": "72795.5",
+            "ask": "72782.1",
             "attempt": 1,
-            "before_ask": "75272.1",
-            "before_bid": "75272.0",
-            "bid": "75237.2",
-            "elapsed_seconds": 0.12582429795293137,
+            "before_ask": "72795.6",
+            "before_bid": "72795.5",
+            "bid": "72782.0",
+            "elapsed_seconds": 0.1278465479845181,
             "ticker_ids_match": true
           }
         ],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -251,6 +279,7 @@
         "id": "[\"tickers\",\"spot\",\"bulk\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -258,6 +287,7 @@
         "id": "[\"tickers\",\"spot\",\"empty\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -265,6 +295,7 @@
         "id": "[\"tickers\",\"spot\",\"selected\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       }
     ],
@@ -294,7 +325,6 @@
           "APE/USDC",
           "API3/EUR",
           "APT/EUR",
-          "APU/EUR",
           "ARB/EUR",
           "AR/EUR",
           "ARKM/EUR",
@@ -313,7 +343,6 @@
           "BAND/EUR",
           "BAT/EUR",
           "BCH/EUR",
-          "BDXN/EUR",
           "BEAM/EUR",
           "BERA/EUR",
           "BERA/USDC",
@@ -413,7 +442,6 @@
           "HTX/USDC",
           "HYPE/EUR",
           "ICP/EUR",
-          "IDEX/EUR",
           "IMX/EUR",
           "INIT/EUR",
           "INJ/EUR",

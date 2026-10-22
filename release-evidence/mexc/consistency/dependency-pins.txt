@@ -6,9 +6,9 @@ betterproto2==0.9.1
 certifi==2026.10.19
 colorama==0.4.6
 fastjsonschema==2.22.2
-griffe==2.4.0
-griffecli==2.4.0
-griffelib==2.4.0
+griffe==2.4.1
+griffecli==2.4.1
+griffelib==2.4.1
 h11==0.16.0
 httpcore==1.0.9
 httpx==0.28.1

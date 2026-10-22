@@ -8,9 +8,9 @@ cffi==2.1.1
 colorama==0.4.6
 cryptography==50.0.2
 fastjsonschema==2.22.2
-griffe==2.4.0
-griffecli==2.4.0
-griffelib==2.4.0
+griffe==2.4.1
+griffecli==2.4.1
+griffelib==2.4.1
 h11==0.16.0
 httpcore==1.0.9
 httpx==0.28.1
@@ -33,7 +33,7 @@ orjson==3.13.0
 packaging==26.3
 platformdirs==4.13.5
 pluggy==1.7.0
-pycparser==3.11
+pycparser==3.12
 pydantic==2.14.1
 pydantic-core==2.50.1
 pygments==2.21.0
