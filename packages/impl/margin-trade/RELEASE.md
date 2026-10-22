@@ -14,3 +14,8 @@ New:
 The venue renamed its token from `PRL` to `PEARL` (spot pair and perpetual). Depth
 streams (perpetual and spot, mainnet) and the fill stream (testnet) stayed open for
 75 s on typed-margin-trade 0.1.1.
+
+Release qualification on 2026-10-21 passed the read suites and market consistency.
+Committed evidence under `release-evidence/margin-trade/` matches pinned Catalogue
+`70d93fa09c351f5a24c915b348e8f38f31c7b6a6`; offline release verification passes.
+This adapter release follows SDK 2.19.0 publication.
