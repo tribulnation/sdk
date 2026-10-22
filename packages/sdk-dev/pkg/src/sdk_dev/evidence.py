@@ -490,7 +490,8 @@ def write_report(
       summary += (
         f'\nKnown upstream limitations: {limitations} quote comparisons did not pass. '
         'See results.json for retained brackets. ADR 0014 permits only Bit2Me '
-        'native ticker/depth discrepancies; all other required checks still apply.\n'
+        "native ticker/depth discrepancies, and ADR 0048 Extended RFQ markets' "
+        'indicative tickers; all other required checks still apply.\n'
       )
     missing_indexes = sum(
       isinstance(check, dict) and check.get('code') == 'missing_index'
