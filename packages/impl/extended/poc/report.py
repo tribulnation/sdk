@@ -8,7 +8,8 @@
 # the repo-root `.env`:
 #
 # 1. Mainnet (`EXTENDED_API_KEY`): the primary account, a main sub-account with no funds,
-#    which proves the empty paths (the venue answers `404` instead of an empty balance).
+#    which proves the empty paths (the venue answers `404` instead of an empty balance,
+#    which the client reads as `None` and `[]`).
 # 2. Testnet (`EXTENDED_TESTNET_API_KEY`): a throwaway Sepolia main sub-account with about
 #    1000 test USD, closed ETH-USD round trips, transfers to and from sub-account 1 and one
 #    bridge withdrawal, which proves the non-empty shapes.
@@ -26,10 +27,9 @@ from typing_extensions import Any, AsyncIterator, Awaitable, Collection
 
 from dotenv import dotenv_values
 from sdk_dev.repo import repo_root
-from typed_extended import AuthError, BadRequest, Extended
+from typed_extended import AuthError, Extended
 from typed_extended.account.asset_operations import AssetOperation
 from typed_extended.account.positions_history import PositionHistory
-from typed_extended.account.spot_balances import SpotBalance
 from typed_extended.account.trades import AccountTrade
 from typed_extended.info.markets import Market
 
@@ -95,27 +95,16 @@ print(
 # One subaccount, the API key's own sub-account (`<accountId>`): `spot_balances` lists
 # every asset it holds, the collateral (`USD`) included, and `positions` its open
 # perpetual positions by market. The venue answers `404` instead of an empty list when the
-# sub-account holds nothing at all (the mainnet account), raised as `BadRequest(404, '')`;
-# the status is only reachable as `exc.args[0]`.
+# sub-account holds nothing at all (the mainnet account), which the client returns as `[]`.
 
 
 # %%
-async def spot_rows(client: Extended) -> list[SpotBalance]:
-  """The sub-account's holdings, collateral included; none when the venue answers 404."""
-  try:
-    return await client.account.spot_balances()
-  except BadRequest as exc:
-    if exc.args[:1] == (404,):
-      return []
-    raise
-
-
 async def snapshot(
   assets: Collection[str] | None = None, client: Extended = mainnet
 ) -> SnapshotRecord:
   """The API key's sub-account: its holdings and open perpetual positions."""
   info, rows, positions = await asyncio.gather(
-    client.account.info(), spot_rows(client), client.account.positions()
+    client.account.info(), client.account.spot_balances(), client.account.positions()
   )
   sub = SubaccountSnapshot(
     subaccount=str(info['accountId']),
@@ -147,17 +136,14 @@ async def snapshot(
 # Reconcile with the venue's own balance: the collateral row of `spot_balances` is the
 # wallet balance (`deposits - withdrawals + realised PnL`, without unrealised PnL), and the
 # other rows' `equityContribution` sum to `spotEquity`. Checked on testnet while flat (no
-# position may be opened here). The mainnet account answers `404` on `balance` as well.
+# position may be opened here). The mainnet account's `balance` is `None` (the venue's
+# `404`) as well.
 
 # %%
 bal = await testnet.account.balance()
-rows = await spot_rows(testnet)
+assert bal is not None
+rows = await testnet.account.spot_balances()
 collateral = bal['collateralName']
-try:
-  await mainnet.account.balance()
-  mainnet_balance: Any = 'answered'
-except BadRequest as exc:
-  mainnet_balance = exc.args[:1]
 {
   'collateral row == balance': next(
     r['balance'] for r in rows if r['asset'] == collateral
@@ -168,17 +154,16 @@ except BadRequest as exc:
     (r['equityContribution'] for r in rows if r['asset'] != collateral), Decimal(0)
   )
   == bal.get('spotEquity', Decimal(0)),
-  'mainnet balance()': mainnet_balance,
+  'mainnet balance()': await mainnet.account.balance(),
 }
 
 # %% [markdown]
 # ### What one API key reads
 #
 # `sub_accounts` lists every sub-account of the wallet, but every balance, position and
-# history read is scoped to the key's own sub-account. `spot_balances(account_id=...)`
-# documents a repeatable filter for other sub-accounts of the wallet; live it returns the
-# key's own rows whatever it is given (sub-account 1, or an id outside the wallet). The
-# account-scoped `portfolio` and `interest` reads answer `403` for sub-account 1.
+# history read is scoped to the key's own sub-account; the client offers no filter for
+# another sub-account's balances. The account-scoped `portfolio` and `interest` reads
+# answer `403` for sub-account 1.
 
 
 # %%
@@ -195,12 +180,8 @@ subs = await testnet.account.sub_accounts()
 other = next(s['accountId'] for s in subs if s['accountId'] != own)
 {
   'sub_accounts': [(s['accountId'], s['accountIndex'], s['status']) for s in subs],
-  'spot_balances([other])': [
-    (r['accountId'], r['asset']) for r in await testnet.account.spot_balances([other])
-  ],
-  'spot_balances([999999999])': [
-    (r['accountId'], r['asset'])
-    for r in await testnet.account.spot_balances([999999999])
+  'spot_balances()': [
+    (r['accountId'], r['asset']) for r in await testnet.account.spot_balances()
   ],
   'portfolio.health([other])': await outcome(testnet.portfolio.health([other])),
   'portfolio.summary([own, other])': await outcome(
@@ -460,7 +441,7 @@ for r in records:
 #
 # | method | status | note |
 # |---|---|---|
-# | `snapshot` | verified | The API key's own sub-account (`<accountId>`): `spot_balances`, collateral included, and `positions` by market. Testnet: 994.79 USD, matching `balance` and `spotEquity`; mainnet: the empty account's `404`, read as no balances through `exc.args[0]`. Another sub-account needs its own key. No open position or non-USD holding on either account (opening one changes state); `XVS` vault shares would be a spot row, not observed |
+# | `snapshot` | verified | The API key's own sub-account (`<accountId>`): `spot_balances`, collateral included, and `positions` by market. Testnet: 994.79 USD, matching `balance` and `spotEquity`; mainnet: the empty account, whose `404` the client reads as no rows. Another sub-account needs its own key. No open position or non-USD holding on either account (opening one changes state); `XVS` vault shares would be a spot row, not observed |
 # | `history` | verified | Testnet: the faucet claim, transfers to and from sub-account 1, an in-progress BASE withdrawal, 4 ETH-USD fills and 2 closed positions; operations plus positions' realised PnL reconcile with the balance, fill fees with the positions' fees. Mainnet: nothing to show. Not exercised: deposits, spot fills. Funding payments and borrow interest raise `NotImplementedError`: their sign is undocumented and neither account has one |
 
 # %% [markdown]

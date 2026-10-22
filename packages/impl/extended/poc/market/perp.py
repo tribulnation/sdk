@@ -31,7 +31,6 @@ from typed_extended import Extended
 from typed_extended.account.balance import Balance
 from typed_extended.account.schemas import Order as ExtendedOrder
 from typed_extended.account.trades import AccountTrade
-from typed_extended.core.exc import BadRequest
 from typed_extended.info.candles import Candle as ExtendedCandle
 from typed_extended.info.markets import Market as ExtendedMarket
 from typed_extended.info.schemas import OrderbookLevel
@@ -64,7 +63,7 @@ from tribulnation.sdk.market import (
   Trade,
 )
 from tribulnation.sdk.market.exchange import OverflowPolicy
-from tribulnation.sdk.market.types.candles import EPOCH, candle_width, candle_windows
+from tribulnation.sdk.market.types.candles import EPOCH, candle_width
 
 load_dotenv()
 
@@ -103,17 +102,13 @@ def listed_perps(table: Mapping[str, ExtendedMarket]) -> list[str]:
 
 
 async def balance(on: Extended = client) -> Balance | None:
-  """The account's balance, or `None` on the venue's documented zero-balance answer.
+  """The account's balance; `None` for a sub-account holding nothing.
 
-  The docs: "Returns a 404 error if the user's balance is 0". The account stream's
-  `BALANCE` snapshot of the same account carries every figure as `0` (cell below).
+  The docs: "Returns a 404 error if the user's balance is 0", which the client reads as
+  `None`. The account stream's `BALANCE` snapshot of the same account carries every
+  figure as `0` (cell below).
   """
-  try:
-    return await on.account.balance()
-  except BadRequest as e:
-    if e.args[:1] == (404,):
-      return None
-    raise
+  return await on.account.balance()
 
 
 async def account_leverage(market_id: str, on: Extended = client) -> Decimal:
@@ -155,7 +150,7 @@ print(
 #
 # List available markets.
 #
-# Every perpetual that is not `DELISTED`, from `info.markets`: `ACTIVE`, `REDUCE_ONLY` and `PRELISTED` ones (`rules().api` says which trade). Delisted markets are left out: an inactive one (`active: false`) answers its order book with no `data` at all, which `info.orderbook` fails to validate (a typed-client issue), and has an index price of `0`. Their fills still show up in exchange-wide history, which never consults this list.
+# Every perpetual that is not `DELISTED`, from `info.markets`: `ACTIVE`, `REDUCE_ONLY` and `PRELISTED` ones (`rules().api` says which trade). Delisted markets are left out: an inactive one (`active: false`) has no order book at all (`info.orderbook` returns `None`) and an index price of `0`. Their fills still show up in exchange-wide history, which never consults this list.
 
 
 # %%
@@ -179,7 +174,7 @@ assert set(MARKETS) | {RFQ} <= set(listed)
 #
 # Fetch the market order book.
 #
-# Order-book markets: `info.orderbook`, the whole aggregated book (thousands of levels on BTC), with no timestamp, so `time` is `None`. RFQ markets: the REST book is the venue's *indicative* book (empty on `OP-USD`); the real book is the quotes, which the venue publishes only on the `orderbooks/rfq` stream, so `depth` takes that stream's first snapshot, stamped with its `ts`.
+# Order-book markets: `info.orderbook`, the whole aggregated book (thousands of levels on BTC), with no timestamp, so `time` is `None`; an inactive or unknown market has no book (`None`), which raises. RFQ markets: the REST book is the venue's *indicative* book (empty on `OP-USD`); the real book is the quotes, which the venue publishes only on the `orderbooks/rfq` stream, so `depth` takes that stream's first snapshot, stamped with its `ts`.
 
 # %%
 def book_entries(rows: Sequence[OrderbookLevel]) -> list[Book.Entry]:
@@ -218,6 +213,8 @@ async def depth(
     book = await rfq_book(market_id, on)
   else:
     raw = await on.info.orderbook(market_id)
+    if raw is None:
+      raise RuntimeError(f'{market_id} has no order book: inactive or unknown')
     book = Book(bids=book_entries(raw['bid']), asks=book_entries(raw['ask']))
   return book.limit(levels) if levels is not None else book
 
@@ -231,7 +228,8 @@ books = {m: await depth(m) for m in [*MARKETS, RFQ]}
 
 # %%
 # REST against the stream's snapshot (the same full book), the `depth='1'` best-level
-# feed, and the indicative REST book of an RFQ market against its quotes.
+# feed, the indicative REST book of an RFQ market against its quotes, and the missing
+# book of an inactive delisted market and of an unknown one.
 async def stream_snapshot(market_id: str, *, bbo: bool = False) -> tuple[int, int]:
   """Level counts of the first `orderbooks` frame."""
   manager = (
@@ -246,12 +244,15 @@ async def stream_snapshot(market_id: str, *, bbo: bool = False) -> tuple[int, in
 
 
 indicative = await client.info.orderbook(RFQ)
+assert indicative is not None
 {
   'BTC rest': (len(books['BTC-USD'].bids), len(books['BTC-USD'].asks)),
   'BTC stream snapshot': await stream_snapshot('BTC-USD'),
   'BTC depth=1': await stream_snapshot('BTC-USD', bbo=True),
   'RFQ rest (indicative)': (len(indicative['bid']), len(indicative['ask'])),
   'RFQ quotes': (len(books[RFQ].bids), len(books[RFQ].asks)),
+  'inactive MATIC-USD': await client.info.orderbook('MATIC-USD'),
+  'unknown NOPE-USD': await client.info.orderbook('NOPE-USD'),
 }
 
 
@@ -446,7 +447,7 @@ async def fees(market_id: str, /, *, refetch: bool = False, on: Extended = clien
 #
 # Fetch the market's historical trade candles.
 #
-# `info.candles` with `candleType='trades'`, newest first, stamped with the open time; `endTime` is exclusive. A request returns at most 2800 rows live (the client documents 10,000), so the walk requests grid-aligned windows of at most 1000 opens, each with its own number of opens as `limit` and its upper bound as `endTime`; rows outside the window are dropped. Volume is `v` (base); there is no quote volume or trade count. Daily candles are `P1D`, aligned to UTC midnight.
+# `info.candles_paged` with `candleType='trades'`, newest first, stamped with the open time; `endTime` is exclusive. A request covers the `limit` intervals before `endTime` (at most 2800), and the client's walk moves `endTime` back to each page's oldest open. The walk starts at `end` with `limit` the number of grid opens in `[start, end)`, at most 1000, and stops once a page reaches `start`; older rows are dropped. Volume is `v` (base); there is no quote volume or trade count. Daily candles are `P1D`, aligned to UTC midnight.
 
 # %%
 INTERVALS: dict[CandleInterval, Literal['PT1M', 'PT5M', 'PT15M', 'PT1H', 'PT4H', 'P1D']] = {
@@ -476,22 +477,26 @@ async def candles(
   *,
   on: Extended = client,
 ):
-  """Candles opening in `[start, end)`, one window per request."""
+  """Candles opening in `[start, end)`, newest first, walked back from `end`."""
   width = candle_width(interval)
-  for lower, upper in candle_windows(start, end, interval, size=CANDLES_PAGE):
-    offset = (lower - EPOCH) % width
-    first = lower if not offset else lower - offset + width
-    count = -((first - upper) // width)
-    if count <= 0:
-      continue
-    rows = await on.info.candles(
-      market_id,
-      candle_type='trades',
-      interval=INTERVALS[interval],
-      limit=count,
-      end_time=upper,
-    )
-    yield [parse_candle(c) for c in rows if lower <= c['T'] < upper]
+  offset = (start - EPOCH) % width
+  first = start if not offset else start - offset + width
+  count = -((first - end) // width)
+  if count <= 0:
+    return
+  pages = on.info.candles_paged(
+    market_id,
+    candle_type='trades',
+    interval=INTERVALS[interval],
+    limit=min(count, CANDLES_PAGE),
+    end_time=end,
+  )
+  async for page in pages:
+    rows = [parse_candle(c) for c in page if c['T'] >= start]
+    if rows:
+      yield rows
+    if not page or min(c['T'] for c in page) <= first:
+      return
 
 
 candle_end = datetime.now(timezone.utc).replace(second=0, microsecond=0)
@@ -503,8 +508,8 @@ for interval in INTERVALS:
 candle_probe
 
 # %%
-# Cross-page: 2500 one-minute candles (three windows), without duplicates or gaps, and an
-# unaligned start; then the per-request cap the window size stays under.
+# Cross-page: 2500 one-minute candles (three pages), without duplicates or gaps, and an
+# unaligned start; then the per-request cap the page size stays under.
 cross_start = candle_end - timedelta(minutes=2500)
 pages = [page async for page in candles('BTC-USD', '1m', cross_start, candle_end)]
 times = sorted(c.time for page in pages for c in page)
@@ -534,7 +539,7 @@ capped = await client.info.candles(
 #
 # Fetch the state of the order with the given ID.
 #
-# The SDK order id is Extended's order `id` (a 64-bit integer, as a string): `place_order` gets it back on acceptance and cancels take it. `account.order` looks it up, open or closed; an unknown id is a bodiless `404`, mapped to `None`. Prices and sizes are unsigned with `side` beside them. On mainnet an unknown id; on testnet a closed order of the account.
+# The SDK order id is Extended's order `id` (a 64-bit integer, as a string): `place_order` gets it back on acceptance and cancels take it. `account.order` looks it up, open or closed; an unknown id is `None` (the venue's bodiless `404`). Prices and sizes are unsigned with `side` beside them. On mainnet an unknown id; on testnet a closed order of the account.
 
 # %%
 ACTIVE_STATUSES = {'NEW', 'PARTIALLY_FILLED', 'UNTRIGGERED'}
@@ -558,13 +563,8 @@ def parse_order(o: ExtendedOrder) -> OrderState:
 
 async def query_order(market_id: str, /, id: str, *, on: Extended = client) -> OrderState | None:
   """Look the order up by its Extended id."""
-  try:
-    o = await on.account.order(int(id))
-  except BadRequest as e:
-    if e.args[:1] == (404,):
-      return None
-    raise
-  return parse_order(o) if o['market'] == market_id else None
+  o = await on.account.order(int(id))
+  return parse_order(o) if o is not None and o['market'] == market_id else None
 
 
 closed = (await testnet.account.orders_history(limit=1))['data'][0]
@@ -1033,7 +1033,7 @@ all_stats = await perp_stats()
 #
 # Fetch the market's historical funding rates.
 #
-# `info.funding_rates`: the applied hourly rates, newest first, as fractions (positive: longs pay shorts, Funding Payments docs). Both bounds are inclusive to the millisecond (stamps carry ~1 s of jitter past the hour). A request returns at most 1000 rows (the documented `limit` and `cursor` are ignored live: no `pagination` comes back), so the walk moves `endTime` to 1 ms before the oldest row until a page comes back empty or reaches `start`. `start=None` starts at the market's `createdAt`.
+# `info.funding_rates_paged`: the applied hourly rates, newest first, as fractions (positive: longs pay shorts, Funding Payments docs). Both bounds are inclusive to the millisecond (stamps carry ~1 s of jitter past the hour). A request returns at most 1000 rows (the documented `limit` and `cursor` are ignored live), and the client's walk moves `endTime` to the oldest row of each full page until it reaches `start`. `start=None` starts at the market's `createdAt`.
 
 
 # %%
@@ -1043,12 +1043,10 @@ async def funding_rates(
   """Applied hourly rates with `start <= time <= end`, newest first."""
   lower = start or details[market_id].get('createdAt') or EPOCH
   upper = end or datetime.now(timezone.utc)
-  while upper >= lower:
-    rows = await client.info.funding_rates(market_id, start_time=lower, end_time=upper)
-    if not rows:
-      return
-    yield [FundingRate(rate=r['f'], time=r['T']) for r in rows]
-    upper = min(r['T'] for r in rows) - timedelta(milliseconds=1)
+  pages = client.info.funding_rates_paged(market_id, start_time=lower, end_time=upper)
+  async for page in pages:
+    if page:
+      yield [FundingRate(rate=r['f'], time=r['T']) for r in page]
 
 
 rates = {
@@ -1183,7 +1181,7 @@ async def collateral(market_id: str | None = None, /, *, on: Extended = client) 
 #
 # Fetch perpetual collateral.
 #
-# Extended margins at account level only (cross; no isolated mode is documented), so every market shares one bucket, `account.balance`: equity (`balance + spot equity + unrealised PnL`), free collateral `availableForTrade` (equity less margin reserved for perps and for spot buy orders), `initialMargin`, and leverage `exposure / equity`. There is no maintenance-margin figure, only `marginRatio`, documented as the sum of maintenance requirements over equity, so the requirement is `marginRatio x equity`; both accounts are flat (ratio `0`), so the ratio's unit (fraction or percent) is unconfirmed. A zero balance is the documented `404`, read as all zeros; the account stream's `BALANCE` snapshot of the same account sends exactly that.
+# Extended margins at account level only (cross; no isolated mode is documented), so every market shares one bucket, `account.balance`: equity (`balance + spot equity + unrealised PnL`), free collateral `availableForTrade` (equity less margin reserved for perps and for spot buy orders), `initialMargin`, and leverage `exposure / equity`. There is no maintenance-margin figure, only `marginRatio`, documented as the sum of maintenance requirements over equity, so the requirement is `marginRatio x equity`; both accounts are flat (ratio `0`), so the ratio's unit (fraction or percent) is unconfirmed. A zero balance (the documented `404`) is `None` from the client, read as all zeros; the account stream's `BALANCE` snapshot of the same account sends exactly that.
 
 
 # %%
@@ -1246,13 +1244,13 @@ mainnet_stream = await stream_balance(client)
 # | method | status | note |
 # |---|---|---|
 # | `markets` | verified | 343 listed perps (`ACTIVE`, `REDUCE_ONLY`, `PRELISTED`) from `info.markets`, 295 of them RFQ; the 61 `DELISTED` ones are left out (inactive ones have no book and index `0`). |
-# | `depth` | verified | Order-book markets: the full REST book (BTC 3634/3592 levels, equal to the stream snapshot), `time` `None`. RFQ markets: the first `orderbooks/rfq` snapshot, since the REST book is only indicative. |
+# | `depth` | verified | Order-book markets: the full REST book (BTC 3601/3697 levels, equal to the stream snapshot), `time` `None`; an inactive or unknown market has no book (`None`, MATIC-USD and NOPE-USD), which raises. RFQ markets: the first `orderbooks/rfq` snapshot, since the REST book is only indicative. |
 # | `depth_stream` | verified | Snapshot, then deltas at their absolute size `c`; the minute snapshots replace the book; `seq` continuity checked. RFQ markets use the quotes stream. |
 # | `tickers` | verified | One `info.markets` read: last, bid, ask, base and USD 24h volume. A `0` price maps to `None` (reduce-only MKR). No best-level sizes. RFQ bid/ask are the indicative book's. |
 # | `rules` | verified | Tick, step and minimum size from `tradingConfig`; side-specific band `1 ± floor/cap` against mark; value caps in `details`; `fees=None` (no public schedule); `api` is `ACTIVE`; `fee_asset` `USD`. |
 # | `fees` | verified | `account.fees` per market, symmetric by side: mainnet 0 / 2.5 bp (1 bp on 182 markets), testnet 2 / 5 bp. |
-# | `candles` | verified | All six intervals in windows of at most 1000 opens, under the measured 2800-row cap; `endTime` exclusive; a 2500-row walk has no gaps or duplicates. No quote volume. |
-# | `query_order` | verified | `account.order` by Extended id: a closed testnet order parses; an unknown id (bodiless `404`) is `None`. Live open orders wait for testnet qualification. |
+# | `candles` | verified | All six intervals through the client's `candles_paged` walk from `end`, `limit` the window's opens up to 1000 (the venue caps a request at 2800); `endTime` exclusive; a 2500-row walk (pages of 1000, 1000, 500) has no gaps or duplicates. No quote volume. |
+# | `query_order` | verified | `account.order` by Extended id: a closed testnet order parses; an unknown id is `None` (the venue's bodiless `404`). Live open orders wait for testnet qualification. |
 # | `open_orders` | empty | Open `LIMIT` orders, none on either account; a resting limit order would populate it. Qualification places one on testnet. |
 # | `trades_history` | verified | Testnet: 4 ETH fills, per market and exchange-wide (identical). The USD fee equals value × taker rate floored to 1e-6. Order and client ids are carried. Mainnet: empty. |
 # | `trades_stream` | empty | Mainnet account stream: snapshots arrive, but no fill within 10 s; a fill while subscribed would populate it. The testnet stream host answers `503`. |
@@ -1265,12 +1263,12 @@ mainnet_stream = await stream_balance(client)
 # | `index` | verified | `marketStats.indexPrice` via `info.markets([m])`, which refuses an unknown market (`market_stats` answers zeros instead). |
 # | `next_funding` | verified | `fundingRate` (the one-minute estimate of the hourly rate, a fraction) and `nextFundingRate` (a time); no premium reported. |
 # | `perp_stats` | verified | Bulk `info.markets`: index, mark, funding estimate and time, `openInterestBase`. No listed market reads a zero index. |
-# | `funding_rates` | verified | Applied hourly rates, newest first, with inclusive ms bounds; the 1000-row cap is walked by `endTime`. BTC's full history (12 pages) comes back unique; 1547 of its rates are negative. |
+# | `funding_rates` | verified | Applied hourly rates, newest first, with inclusive ms bounds, through the client's `funding_rates_paged` walk over the 1000-row cap. BTC's full history (12 pages) comes back unique; 1547 of its rates are negative. |
 # | `funding_payments` | empty | `funding_history` from `start`, per market and exchange-wide; none on either account. The received-positive sign is read from the docs and is unconfirmed. A testnet position held across the hour would populate it. |
 # | `perp_position` | empty | Signed `size` by `side`, entry `openPrice`; both accounts are flat. An open testnet position would populate it. |
 # | `leverage` | verified | The per-market setting: 10 (5.00 on AIA-USD). |
 # | `collateral` | verified | Defers to `perp_collateral`. |
-# | `perp_collateral` | verified | One cross bucket from `account.balance`: testnet equity 994.79, free `availableForTrade`. Mainnet's zero balance is the documented `404` and matches the stream's zero snapshot. MM is `marginRatio × equity`, its unit unconfirmed while flat. |
+# | `perp_collateral` | verified | One cross bucket from `account.balance`: testnet equity 994.79, free `availableForTrade`. Mainnet's zero balance is `None` (the documented `404`) and matches the stream's zero snapshot. MM is `marginRatio × equity`, its unit unconfirmed while flat. |
 
 # %% [markdown]
 # ## Catalogue
