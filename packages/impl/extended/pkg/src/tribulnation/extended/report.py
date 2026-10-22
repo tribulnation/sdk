@@ -10,6 +10,7 @@ import asyncio
 
 from typing_extensions import Any, AsyncIterable, Collection
 from typed_extended.account.asset_operations import AssetOperation
+from typed_extended.account.funding_history import FundingPayment
 from typed_extended.account.positions_history import PositionHistory
 from typed_extended.account.schemas import Position as PositionRow
 from typed_extended.account.spot_balances import SpotBalance
@@ -22,6 +23,7 @@ from tribulnation.sdk.reporting import (
   CryptoWithdrawal,
   Fee,
   FeeLeg,
+  Funding,
   FuturePositionSummary,
   FutureTrade,
   HistoryRecord,
@@ -36,15 +38,15 @@ from tribulnation.sdk.reporting import (
 )
 
 from .core import Shared
-from .market.common import Public
+from .market.common import Public, funding_received
 
 EARLIEST = datetime(2024, 1, 1, tzinfo=timezone.utc)
 """The default history start, before Extended's launch: `funding_history` needs one."""
 WITHDRAWALS = frozenset({'WITHDRAWAL', 'FAST_WITHDRAWAL', 'SLOW_WITHDRAWAL'})
 """Operation types that move funds off the venue."""
-FUNDING_OR_INTEREST = (
-  'Extended funding and interest payments are not supported yet: the signs of '
-  '`fundingFee` and `paymentAmount` are documented, not observed'
+INTEREST_UNOBSERVED = (
+  'Extended interest payments are not supported yet: the sign of `paymentAmount` is '
+  'documented, not observed'
 )
 
 
@@ -161,6 +163,19 @@ def fill(row: AccountTrade, markets: dict[str, MarketRow]) -> Observation:
   return FutureTrade(**common, instrument=row['market'], settle=quote)
 
 
+def funding(row: FundingPayment, markets: dict[str, MarketRow]) -> Observation:
+  """One hourly funding payment of a position, positive when received."""
+  return Funding(
+    id=f'funding:{row["id"]}',
+    time=row['paidTime'],
+    subaccount=str(row['accountId']),
+    asset=markets[row['market']]['collateralAssetName'],
+    amount=funding_received(row),
+    instrument=row['market'],
+    position_id=str(row['positionId']),
+  )
+
+
 def position(row: PositionHistory, markets: dict[str, MarketRow]) -> Observation:
   """One closed position's realised PnL breakdown.
 
@@ -261,18 +276,20 @@ class Report(Public, SDKReport):
   async def history(
     self, start: datetime | None = None, end: datetime | None = None
   ) -> AsyncIterable[HistoryRecord]:
-    """Stream the sub-account's asset operations, then fills, then closed positions.
+    """Stream the sub-account's asset operations, then funding payments, fills and
+    closed positions.
 
-    Fills (`trades`, newest first) are read back to `start`, at most the 10,000 most
-    recent; closed positions carry the realised PnL, its fees and funding.
+    Funding payments are positive when received. Fills (`trades`, newest first) are read
+    back to `start`, at most the 10,000 most recent; closed positions carry the realised
+    PnL, its fees and funding.
 
     Args:
       start: Inclusive lower bound; defaults to before Extended's launch.
       end: Inclusive upper bound; defaults to now.
 
     Raises:
-      NotImplementedError: The window holds a funding or interest payment, whose sign
-        is unobserved; nothing is yielded then.
+      NotImplementedError: The window holds a borrow-interest payment, whose sign is
+        unobserved; nothing is yielded then.
     """
     lower = start or EARLIEST
     upper = end or datetime.now(timezone.utc)
@@ -282,16 +299,11 @@ class Report(Public, SDKReport):
       raise ValueError('History end precedes start')
     client = self.shared.client
     me = (await self.shared.call(client.account.info))['accountId']
-    funding = await client.account.funding_history_paged(start_time=lower).via(
-      self.shared.call
-    )
     interest = await self.shared.call(
       lambda: client.interest.payments([me], interval='ALL')
     )
-    if any(p['paidTime'] <= upper for p in funding) or any(
-      lower <= p['timestamp'] <= upper for p in interest['items']
-    ):
-      raise NotImplementedError(FUNDING_OR_INTEREST)
+    if any(lower <= p['timestamp'] <= upper for p in interest['items']):
+      raise NotImplementedError(INTEREST_UNOBSERVED)
     assets = await self.shared.call(lambda: client.info.assets(type='SPOT'))
     names = {a['id']: a['name'] for a in assets}
     markets = dict(await self.shared.load_markets())
@@ -302,6 +314,13 @@ class Report(Public, SDKReport):
       for row in page:
         if observations := operation(row, names):
           yield self.record(observations, row)
+    payments = client.account.funding_history_paged(start_time=lower).via(
+      self.shared.call
+    )
+    async for page in payments:
+      for row in page:
+        if lower <= row['paidTime'] <= upper:
+          yield self.record([funding(row, markets)], row)
     trades = client.account.trades_paged().via(self.shared.call)
     async for page in trades:
       for row in page:

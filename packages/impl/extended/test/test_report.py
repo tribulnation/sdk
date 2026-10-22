@@ -15,6 +15,7 @@ from tribulnation.sdk.reporting import (
   CryptoDeposit,
   CryptoWithdrawal,
   FeeLeg,
+  Funding,
   FuturePositionSummary,
   FutureTrade,
   InternalTransfer,
@@ -234,15 +235,44 @@ async def test_history_streams_operations_fills_and_positions():
   assert {r.provenance.get('service') for r in records} == {'extended_testnet'}
 
 
-@pytest.mark.parametrize('kind', ['funding', 'interest'])
-async def test_history_refuses_unobserved_payment_signs(kind: str):
-  """A funding or interest payment in the window raises before anything is yielded."""
-  funding = [{'paidTime': T}] if kind == 'funding' else []
-  interest = [{'timestamp': T}] if kind == 'interest' else []
+async def test_history_refuses_unobserved_interest_signs():
+  """A borrow-interest payment in the window raises before anything is yielded."""
   async with Report.new('key') as report:
-    serve(report, funding=funding, interest=interest)
+    serve(report, interest=[{'timestamp': T}])
     with pytest.raises(NotImplementedError, match='sign'):
       [r async for r in report.history(T - HOUR, T + HOUR)]
+
+
+def payment(id: int, paid: datetime, fee: str) -> Any:
+  """A funding payment row of the key's sub-account; `fee` is the venue's `fundingFee`."""
+  return {
+    'id': id,
+    'accountId': 3880,
+    'market': 'ETH-USD',
+    'positionId': 77,
+    'side': 'LONG',
+    'value': Decimal('3.07'),
+    'markPrice': Decimal('2400'),
+    'fundingFee': Decimal(fee),
+    'fundingRate': Decimal('0.000013'),
+    'paidTime': paid,
+  }
+
+
+async def test_history_yields_funding_payments():
+  """Payments in the window are `Funding`, received-positive as `fundingFee` is (the
+  testnet long paying a positive rate read `-0.000041`)."""
+  async with Report.new('key') as report:
+    serve(report, funding=[payment(1, T, '-0.000041'), payment(2, T + 2 * HOUR, '0.1')])
+    records = [r async for r in report.history(T - HOUR, T + HOUR)]
+  (paid,) = [o for r in records for o in r.observations if isinstance(o, Funding)]
+  assert (paid.id, paid.amount, paid.asset, paid.subaccount) == (
+    'funding:1',
+    Decimal('-0.000041'),
+    'USD',
+    '3880',
+  )
+  assert (paid.instrument, paid.position_id, paid.time) == ('ETH-USD', '77', T)
 
 
 async def test_snapshot_is_the_keys_sub_account():

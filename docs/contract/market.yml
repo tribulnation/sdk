@@ -1073,6 +1073,7 @@ methods:
         hyperliquid: {market_id: 'hyperliquid::BTC', amount1: '-1.05', amount2: '0.74'}
         bybit: {market_id: 'bybit:perp:BTCUSDT', amount1: '-1.24', amount2: '0.86'}
         lighter: {market_id: 'lighter:perp:1', amount1: '-1.24', amount2: '0.86'}
+        extended: {market_id: 'extended:perp:BTC-USD', amount1: '-1.24', amount2: '0.86'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', amount1: '-1.24', amount2: '0.86'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', amount1: '-1.24', amount2: '0.86'}
       callTemplate: |

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from typing_extensions import AsyncContextManager, Iterable, Mapping
+from typed_extended.account.funding_history import FundingPayment as FundingRow
 from typed_extended.account.schemas import Order as OrderRow
 from typed_extended.account.trades import AccountTrade
 from typed_extended.info.candles import Candle as CandleRow
@@ -90,6 +91,17 @@ def parse_trade(t: AccountTrade | StreamTrade, fee_asset: str) -> Trade:
     fee=Trade.Fee(amount=t['fee'], asset=fee_asset),
     details=t,
   )
+
+
+def funding_received(row: FundingRow) -> Decimal:
+  """A funding payment's amount, positive when received: `fundingFee` as the venue
+  signs it.
+
+  Observed on testnet (2026-10-22, `1000BONK-USD` at a rate of `+0.000013`, so longs
+  paid): the long's row read `-0.000041` and the short's `0.00004`, the changes to their
+  balances.
+  """
+  return row['fundingFee']
 
 
 def parse_candle(c: CandleRow) -> Candle:

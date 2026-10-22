@@ -7,7 +7,9 @@ from typing_extensions import AsyncIterable, Collection, Mapping, Sequence, over
 from typed_extended.info.markets import Market as MarketRow
 from tribulnation.sdk.core import PaginatedResponse
 from tribulnation.sdk.market import (
+  ExchangeFundingPayment,
   ExchangeTrade,
+  FundingPayment,
   PerpCollateral,
   PerpExchange,
   PerpStats,
@@ -111,6 +113,25 @@ class ExtendedPerpExchange(Public, PerpExchange):
   ) -> AsyncIterable[Sequence[Trade]]:
     """Personal perpetual fills, of one market or every market (delisted included)."""
     async for page in history.trades_history(self.shared, market_id, start, end):
+      yield page
+
+  @overload
+  def funding_payments(
+    self, market_id: None, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[ExchangeFundingPayment]: ...
+  @overload
+  def funding_payments(
+    self, market_id: str, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[FundingPayment]: ...
+  @PaginatedResponse.lift
+  async def funding_payments(
+    self, market_id: str | None, /, start: datetime, end: datetime
+  ) -> AsyncIterable[Sequence[FundingPayment]]:
+    """Funding payments, positive when received, of one market or every perpetual
+    (delisted included)."""
+    if market_id is not None:
+      await self.shared.perp(market_id)
+    async for page in history.funding_payments(self.shared, market_id, start, end):
       yield page
 
   async def perp_collateral(self, market_id: str | None = None, /) -> PerpCollateral:

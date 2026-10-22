@@ -29,11 +29,6 @@ from ..core import FUNDING_INTERVAL
 from . import account, books, history, orders
 from .common import Public
 
-FUNDING_UNVERIFIED = (
-  'Extended funding payments are not supported yet: the sign of `fundingFee` is '
-  'documented, not observed'
-)
-
 
 @dataclass(frozen=True, kw_only=True)
 class ExtendedPerpMarket(Public, PerpMarket):
@@ -242,10 +237,12 @@ class ExtendedPerpMarket(Public, PerpMarket):
   def funding_payments(
     self, start: datetime, end: datetime
   ) -> PaginatedResponse[FundingPayment]:
-    """Not supported yet.
+    """The sub-account's hourly funding payments on the market, with inclusive bounds,
+    positive when received, in the collateral asset (`USD`).
 
     Raises:
-      NotImplementedError: Always: the received-positive sign of the venue's
-        `fundingFee` is documented but has not been observed on a payment.
+      ValueError: A bound is not timezone-aware.
     """
-    raise NotImplementedError(FUNDING_UNVERIFIED)
+    return PaginatedResponse(
+      history.funding_payments(self.shared, self.name, start, end)
+    )

@@ -1,4 +1,4 @@
-"""Candles, funding rates, personal fills and the account's fills stream."""
+"""Candles, funding rates and payments, personal fills and the account's fills stream."""
 
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
@@ -8,7 +8,9 @@ from tribulnation.sdk.core import OverflowPolicy, Subscription, exception_wrappe
 from tribulnation.sdk.market import (
   Candle,
   CandleInterval,
+  ExchangeFundingPayment,
   ExchangeTrade,
+  FundingPayment,
   FundingRate,
   Trade,
   candle_width,
@@ -16,7 +18,7 @@ from tribulnation.sdk.market import (
 from tribulnation.sdk.market.types.candles import EPOCH
 
 from ..core import COLLATERAL, Shared
-from .common import parse_candle, parse_trade
+from .common import funding_received, parse_candle, parse_trade
 
 INTERVALS: Mapping[
   CandleInterval, Literal['PT1M', 'PT5M', 'PT15M', 'PT1H', 'PT4H', 'P1D']
@@ -96,6 +98,41 @@ async def funding_rates(
   async for page in pages:
     if page:
       yield [FundingRate(rate=r['f'], time=r['T']) for r in page]
+
+
+async def funding_payments(
+  shared: Shared, market: str | None, start: datetime, end: datetime
+) -> AsyncIterable[Sequence[FundingPayment]]:
+  """The sub-account's hourly funding payments with `start <= time <= end`, positive
+  when received, in the collateral asset.
+
+  `account.funding_history` returns every payment from `startTime` on, at most 10,000
+  records, so the walk reads every page and drops payments after `end`. The
+  exchange-wide form returns `ExchangeFundingPayment`s, delisted perpetuals included.
+
+  Raises:
+    ValueError: A bound is not timezone-aware.
+  """
+  if start.tzinfo is None or end.tzinfo is None:
+    raise ValueError('Funding history bounds must be timezone-aware')
+  pages = shared.client.account.funding_history_paged(
+    None if market is None else [market], start_time=start
+  ).via(shared.call)
+  async for page in pages:
+    rows: list[FundingPayment] = []
+    for r in page:
+      if not start <= r['paidTime'] <= end:
+        continue
+      amount = funding_received(r)
+      rows.append(
+        FundingPayment(amount=amount, time=r['paidTime'])
+        if market is not None
+        else ExchangeFundingPayment(
+          amount=amount, time=r['paidTime'], market_id=r['market']
+        )
+      )
+    if rows:
+      yield rows
 
 
 async def trades_history(

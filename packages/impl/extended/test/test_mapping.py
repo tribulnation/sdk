@@ -6,10 +6,12 @@ from decimal import Decimal
 from typing_extensions import Any
 
 import pytest
+from typed_core import PaginatedResponse
 
 from tribulnation.extended import ExtendedMarket
 from tribulnation.extended.market import ExtendedPerpExchange
 from tribulnation.extended.market.account import bucket
+from tribulnation.sdk.market import ExchangeFundingPayment
 
 NEXT = datetime(2026, 10, 22, 13, tzinfo=timezone.utc)
 
@@ -208,13 +210,45 @@ def test_no_balance_is_an_empty_bucket():
   assert (empty.equity, empty.free_collateral, empty.leverage) == (0, 0, 0)
 
 
-async def test_funding_payments_are_not_supported_yet(exchange: ExtendedPerpExchange):
-  """Their sign is unobserved, so both scopes raise rather than guess it."""
+async def test_funding_payments_per_market_and_exchange_wide(
+  exchange: ExtendedPerpExchange,
+):
+  """A market's payments ask for that market; the exchange-wide form asks for every
+  market; an unknown market raises before any request."""
   start = datetime(2026, 10, 1, tzinfo=timezone.utc)
-  with pytest.raises(NotImplementedError, match='sign'):
-    await exchange.funding_payments('BTC-USD', start, NEXT)
-  with pytest.raises(NotImplementedError):
-    await exchange.funding_payments(None, start, NEXT)
+  asked: list[Any] = []
+  row: dict[str, Any] = {
+    'id': 1,
+    'accountId': 3880,
+    'market': 'BTC-USD',
+    'positionId': 7,
+    'side': 'LONG',
+    'value': Decimal('3.07'),
+    'markPrice': Decimal('81799.5'),
+    'fundingFee': Decimal('-0.000041'),
+    'fundingRate': Decimal('0.000013'),
+    'paidTime': NEXT,
+  }
+
+  def funding_history_paged(market: Any = None, **kwargs: Any) -> Any:
+    """One page holding one payment."""
+    asked.append(market)
+
+    async def fetch(state: int) -> tuple[list[Any], None]:
+      return [row], None
+
+    return PaginatedResponse(0, fetch)
+
+  exchange.shared.client.account.funding_history_paged = funding_history_paged  # type: ignore[method-assign]
+  (one,) = await exchange.funding_payments('BTC-USD', start, NEXT)
+  (every,) = await exchange.funding_payments(None, start, NEXT)
+  market = await exchange.market('BTC-USD')
+  (direct,) = await market.funding_payments(start, NEXT)
+  assert asked == [['BTC-USD'], None, ['BTC-USD']]
+  assert one.amount == direct.amount == Decimal('-0.000041')
+  assert isinstance(every, ExchangeFundingPayment) and every.market_id == 'BTC-USD'
+  with pytest.raises(ValueError):
+    await exchange.funding_payments('XYZ-USD', start, NEXT)
 
 
 async def test_venue_ids_follow_the_network():

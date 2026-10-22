@@ -13,7 +13,7 @@ from typed_extended import Extended
 from tribulnation.extended.core import Shared
 from tribulnation.extended.market import history
 from tribulnation.sdk import Context, NetworkError
-from tribulnation.sdk.market import ExchangeTrade
+from tribulnation.sdk.market import ExchangeFundingPayment, ExchangeTrade
 
 HOUR = timedelta(hours=1)
 END = datetime(2026, 10, 20, 12, tzinfo=timezone.utc)
@@ -230,3 +230,65 @@ async def test_market_trades_history_filters_by_market(shared: Shared):
   assert seen == {'market': ['BTC-USD']}
   assert len(rows) == 1 and not isinstance(rows[0], ExchangeTrade)
   assert rows[0].qty == Decimal('-0.01') and rows[0].maker
+
+
+def payment(id: int, market: str, paid: datetime, fee: str, side: str) -> Any:
+  """A funding payment row; `fee` is the venue's `fundingFee`."""
+  return {
+    'id': id,
+    'accountId': 3880,
+    'market': market,
+    'positionId': 900 + id,
+    'side': side,
+    'size': Decimal('1000'),
+    'value': Decimal('3.07'),
+    'markPrice': Decimal('0.00307'),
+    'fundingFee': Decimal(fee),
+    'fundingRate': Decimal('0.000013'),
+    'paidTime': paid,
+  }
+
+
+async def test_funding_payments_are_signed_and_bounded(shared: Shared):
+  """`fundingFee` is received-positive as the venue sends it (testnet: a long paying a
+  positive rate read `-0.000041`, the short `0.00004`); payments after `end` are dropped
+  and the exchange-wide form names each market, delisted included."""
+  seen: dict[str, Any] = {}
+  rows = [
+    payment(1, 'BTC-USD', END - 3 * HOUR, '-0.000041', 'LONG'),
+    payment(2, 'OLD-USD', END - 2 * HOUR, '0.00004', 'SHORT'),
+    payment(3, 'BTC-USD', END + HOUR, '-0.000041', 'LONG'),
+  ]
+
+  def funding_history_paged(
+    market: Any = None, **kwargs: Any
+  ) -> PaginatedResponse[Any, int]:
+    """Record the query and serve the rows in two pages."""
+    seen.update(kwargs, market=market)
+
+    async def fetch(state: int) -> tuple[list[Any], int | None]:
+      return ([rows[0]], 1) if state == 0 else (rows[1:], None)
+
+    return PaginatedResponse(0, fetch)
+
+  shared.client.account.funding_history_paged = funding_history_paged  # type: ignore[method-assign]
+  every = [
+    p
+    async for page in history.funding_payments(shared, None, END - 5 * HOUR, END)
+    for p in page
+  ]
+  assert seen == {'market': None, 'start_time': END - 5 * HOUR}
+  assert [(getattr(p, 'market_id'), p.amount, p.time) for p in every] == [
+    ('BTC-USD', Decimal('-0.000041'), END - 3 * HOUR),
+    ('OLD-USD', Decimal('0.00004'), END - 2 * HOUR),
+  ]
+  assert all(isinstance(p, ExchangeFundingPayment) for p in every)
+  one = [
+    p
+    async for page in history.funding_payments(shared, 'BTC-USD', END - 5 * HOUR, END)
+    for p in page
+  ]
+  assert seen['market'] == ['BTC-USD']
+  assert not isinstance(one[0], ExchangeFundingPayment)
+  with pytest.raises(ValueError, match='timezone'):
+    [p async for p in history.funding_payments(shared, None, datetime(2026, 1, 1), END)]
