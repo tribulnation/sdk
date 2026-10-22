@@ -41,11 +41,13 @@ from .fees import combined_fees, market_charge, market_discount_params, PPM
 from tribulnation.sdk.market import Fees
 
 if TYPE_CHECKING:
+  from .dedup import FillRace
   from .node_fills import NodeFill
+  from .socket_fills import SocketItem
 
 T = TypeVar('T')
 
-TradesSource = Literal['indexer', 'node', 'fastest']
+TradesSource = Literal['indexer', 'node', 'socket', 'fastest']
 """Where `trades_stream` reads fills from. See `Settings.trades_source`."""
 
 
@@ -74,24 +76,34 @@ class Settings(TypedDict, total=False):
   `SHORT_TERM` orders."""
   reduce_only: bool
   trades_source: TradesSource
-  """Where `trades_stream` reads fills from. Defaults to `'indexer'`.
+  """Where `trades_stream` reads fills from. Defaults to the account's `fill_source`,
+  else `'indexer'`.
 
   - `'indexer'`: the indexer's `v4_subaccounts` WebSocket channel.
   - `'node'`: the account's full node (`full_node_grpc`/`full_node_rpc` on
     `accounts.Dydx`) only, about 0.4 s ahead of the indexer: its gRPC
     `StreamOrderbookUpdates` stream, finalized updates only. Fills of our orders and
     fills liquidating us come from the stream; deleveraging fills also read the block's
-    `match` events (`block_results`) for side and price. `time` is the local receive
-    time (the stream has no block time), `id` is synthetic
+    `match` events (`block_results`) for side and price. `time` is `None`
+    (the stream has no block time; `details['height']` has the block), `id` is synthetic
     (`<height>:<order id or subaccount:kind:perpetual>:<n>`) and `fee` is `None`. There
     is no fallback: fills finalized while the node is unreachable are missed, so the
     caller's reconciliation (e.g. `trades_history`) must cover them. The stream fails
     with `NetworkError` when the node is catching up or its latest block is old as it
     connects, since it would stream old blocks as new fills.
-  - `'fastest'`: `'node'` and `'indexer'` raced. Each fill is emitted once, by whichever
-    source delivers it first (`details['source']`), so the indexer covers node outages;
-    a node that is not at the chain tip as it connects fails the stream, as with
-    `'node'`.
+  - `'socket'`: a local fill daemon's unix socket (`fill_socket` on `accounts.Dydx`)
+    only.
+    Fills are built like node fills (synthetic `id`, `time` `None`, `fee` `None`) with
+    `details['source'] == 'socket'`, `details['level']` (`'committed'` or `'proposed'`,
+    the daemon's setting) and `details['round']`. When a proposed fill's proposal does
+    not commit, a reversing trade follows (opposite `qty`, `details['revert']`). The
+    feed reconnects forever and replays what it missed (up to 300 blocks).
+  - `'fastest'`: every configured source raced: the indexer, plus the node and the
+    socket when the account configures them (at least one is required). Each fill is
+    emitted once, by whichever source delivers it first (`details['source']`); the
+    client's `fill_race` keeps which source was first and by how many milliseconds. A
+    node or socket source that fails is dropped with a warning and the stream goes on;
+    the indexer is the floor, and its failure ends the stream.
   """
 
 
@@ -123,6 +135,16 @@ class Shared(SDK):
   deleveraging fills. Separate from `client.chain`, the public endpoints."""
   node_subscription: 'Subscription[NodeFill] | None' = None
   """The full node fill feed, created by the first node-sourced `trades_stream`."""
+  fill_source: TradesSource | None = None
+  """The account's default `trades_source`; a per-call setting overrides it."""
+  fill_socket: str | None = None
+  """Path of a local fill daemon's unix socket, for the `'socket'` and `'fastest'`
+  trades sources."""
+  socket_subscription: 'Subscription[SocketItem] | None' = None
+  """The socket fill feed, created by the first socket-sourced `trades_stream`."""
+  fill_race: 'FillRace | None' = None
+  """Which source delivered each fill first, across this client's `'fastest'` streams;
+  created by the first one."""
 
   def require_address(self) -> str:
     """Require an account only when an account-scoped operation uses it."""
@@ -317,6 +339,8 @@ class ExchangeMixin(SDK):
     account_id: str | None = None,
     full_node_grpc: str | None = None,
     full_node_rpc: str | None = None,
+    fill_source: TradesSource | None = None,
+    fill_socket: str | None = None,
     indexer_rest_url: str | None = None,
     indexer_ws_url: str | None = None,
     validator_grpc: str | None = None,
@@ -337,6 +361,9 @@ class ExchangeMixin(SDK):
       full_node_grpc: `host:port` of a full node's gRPC streaming endpoint, for the
         `'node'` and `'fastest'` trades sources (with `full_node_rpc`).
       full_node_rpc: The same node's CometBFT RPC URL, read for deleveraging fills.
+      fill_source: Default `trades_source` of `trades_stream` (see `Settings`).
+      fill_socket: Path of a local fill daemon's unix socket, for the `'socket'` and
+        `'fastest'` trades sources.
       indexer_rest_url: Indexer HTTP base URL (e.g. `https://indexer.dydx.trade/`);
         overrides `mainnet`'s.
       indexer_ws_url: Indexer WebSocket URL (e.g. `wss://indexer.dydx.trade/v4/ws`);
@@ -410,6 +437,8 @@ class ExchangeMixin(SDK):
           if full_node_grpc is not None and full_node_rpc is not None
           else None
         ),
+        fill_source=fill_source,
+        fill_socket=fill_socket,
       )
     )
 

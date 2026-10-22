@@ -58,6 +58,17 @@ class DydxUrls(_TypedDict):
   validator_rpc: str | None
 
 
+class DydxFills(_TypedDict, total=False):
+  """Resolved dYdX fill-source options; only the ones the account sets."""
+
+  fill_source: 'DydxFillSource'
+  fill_socket: str
+
+
+DydxFillSource = _Literal['indexer', 'node', 'socket', 'fastest']
+"""Where a dYdX account's `trades_stream` reads fills from by default."""
+
+
 class RestWsUrls(_TypedDict):
   """Resolved REST and WebSocket overrides; `None` keeps the default."""
 
@@ -139,6 +150,14 @@ class Dydx(VenueAccount):
   """The same node's CometBFT RPC URL, e.g. `'http://20.222.23.181:26657'`; read for
   deleveraging fills (`block_results`). Needed alongside `full_node_grpc`. May be a
   `$ENV_VAR`."""
+  fill_source: DydxFillSource | None = None
+  """Default `trades_source` of this account's `trades_stream`: `'indexer'`, `'node'`
+  (the full node above), `'socket'` (a local fill daemon, see `fill_socket`) or
+  `'fastest'` (every configured source raced, the indexer as the floor). Unset keeps
+  `'indexer'`; a per-call `trades_source` setting overrides it."""
+  fill_socket: str | None = None
+  """Unix socket of a fill daemon on this host, e.g. `'/run/dydx-fills.sock'`, for the
+  `trades_source` settings `'socket'` and `'fastest'`. May be a `$ENV_VAR`."""
   indexer_rest_url: str | None = None
   """Indexer HTTP base URL, e.g. `'http://127.0.0.1:8080'`; unset uses the network's
   (`https://indexer.dydx.trade/`). May be a `$ENV_VAR`."""
@@ -164,6 +183,17 @@ class Dydx(VenueAccount):
   @property
   def resolved_full_node_rpc(self) -> str | None:
     return resolve_env_var(self.full_node_rpc, require=True)
+
+  @property
+  def resolved_fills(self) -> DydxFills:
+    """Fill-source options to pass on: only those set, so a dYdX package that predates
+    them keeps working until an account uses them."""
+    fills: DydxFills = {}
+    if self.fill_source is not None:
+      fills['fill_source'] = self.fill_source
+    if (socket := resolve_env_var(self.fill_socket, require=True)) is not None:
+      fills['fill_socket'] = socket
+    return fills
 
   @property
   def resolved_urls(self) -> DydxUrls:
@@ -192,6 +222,7 @@ class Dydx(VenueAccount):
     self.resolved_creds
     self.resolved_full_node_grpc
     self.resolved_full_node_rpc
+    self.resolved_fills
     self.resolved_urls
 
 

@@ -73,6 +73,7 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       account_id=id,
       full_node_grpc=account.resolved_full_node_grpc,
       full_node_rpc=account.resolved_full_node_rpc,
+      **account.resolved_fills,
       **account.resolved_urls,
     )
 

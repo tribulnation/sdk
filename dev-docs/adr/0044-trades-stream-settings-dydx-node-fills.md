@@ -5,7 +5,8 @@
 1. Status: proposed; implemented, unit-tested with fake streams; checked live read-only
    for regular maker fills (node vs indexer vs `'fastest'`). Liquidation and deleveraging
    fills are not live-verified; not release-verified. Decision 4 and consequence 1 are
-   amended by [0045](0045-dydx-node-feed-refuses-a-node-behind.md).
+   amended by [0045](0045-dydx-node-feed-refuses-a-node-behind.md); decisions 2 and 7 by
+   [0049](0049-dydx-fill-socket.md).
 2. Date: 2026-10-09
 
 ## Context

@@ -5,7 +5,8 @@
 1. Status: proposed; implemented, unit-tested with fake nodes; checked live read-only on
    2026-10-15: refused a node catching up (latest block 25 minutes old) before opening
    the stream, and streamed normally once it was synced. Amends [0044](0044-trades-stream-settings-dydx-node-fills.md)
-   decision 4 and consequence 1. Not release-verified.
+   decision 4 and consequence 1. Decision 1 is amended for `'fastest'` by
+   [0049](0049-dydx-fill-socket.md). Not release-verified.
 2. Date: 2026-10-15
 
 ## Context
