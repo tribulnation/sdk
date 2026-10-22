@@ -281,17 +281,49 @@ def position(name: str, size: str, margin_type: str = 'CROSS') -> dict[str, Any]
     'size': Decimal(size),
     'notional': Decimal(size) * 81835,
     'entry_price': Decimal('81835.0'),
+    'unrealized_pnl': Decimal(0),
     'margin_type': margin_type,
   }
 
 
 def summary(*positions: dict[str, Any]) -> dict[str, Any]:
-  """Testnet's sub-account summary while holding 0.002 BTC (2026-10-22)."""
+  """Testnet's sub-account summary while holding 0.002 BTC cross (2026-10-22)."""
   return {
     'total_equity': Decimal('20019.300099'),
+    'total_cross_equity': Decimal('20019.300099'),
     'initial_margin': Decimal('16.367512'),
     'maintenance_margin': Decimal('1.636751'),
     'positions': list(positions),
+  }
+
+
+def mixed_summary() -> dict[str, Any]:
+  """Testnet's sub-account summary while holding 0.009 ETH cross and 0.002 BTC isolated
+  at 10x (2026-10-22): the account margins are the cross position's alone."""
+  return {
+    'total_equity': Decimal('20018.510663'),
+    'total_cross_equity': Decimal('20002.175121'),
+    'initial_margin': Decimal('2.162061'),
+    'maintenance_margin': Decimal('0.216206'),
+    'positions': [
+      {
+        'instrument': ETH,
+        'size': Decimal('0.009'),
+        'notional': Decimal('21.620618'),
+        'unrealized_pnl': Decimal('-0.023481'),
+        'margin_type': 'CROSS',
+      },
+      {
+        'instrument': BTC,
+        'size': Decimal('0.002'),
+        'notional': Decimal('163.361428'),
+        'unrealized_pnl': Decimal('-0.164571'),
+        'margin_type': 'ISOLATED',
+        'isolated_balance': Decimal('16.500113'),
+        'isolated_im': Decimal('16.336142'),
+        'isolated_mm': Decimal('1.633614'),
+      },
+    ],
   }
 
 
@@ -353,17 +385,79 @@ async def test_flat_cross_bucket_has_zero_leverage(shared: Shared, fake: Any):
   assert bucket.leverage == 0 and bucket.initial_margin == Decimal('16.367512')
 
 
-async def test_isolated_bucket_is_unsupported(shared: Shared, fake: Any):
-  """A market holding an isolated position raises; other markets read cross."""
+async def test_isolated_position_has_its_own_bucket(shared: Shared, fake: Any):
+  """An isolated position's bucket is its own balance plus unrealized PnL against its
+  own margins; the cross bucket and every other market exclude it."""
 
   async def account_summary() -> dict[str, Any]:
-    """BTC isolated."""
+    """ETH cross, BTC isolated."""
+    return mixed_summary()
+
+  async def all_initial_leverage() -> dict[str, Any]:
+    """Both at the default 10x."""
+    rows: list[dict[str, Any]] = [
+      {'instrument': m, 'leverage': Decimal('10.0')} for m in (BTC, ETH)
+    ]
+    return {'results': rows}
+
+  fake.trading.account_summary = account_summary
+  fake.trading.all_initial_leverage = all_initial_leverage
+  btc = market(shared)
+  isolated = await btc.perp_collateral()
+  assert isolated.margin_mode == 'isolated'
+  assert isolated.equity == Decimal('16.335542')
+  assert (isolated.initial_margin, isolated.maintenance_margin) == (
+    Decimal('16.336142'),
+    Decimal('1.633614'),
+  )
+  assert isolated.free_collateral == 0
+  assert isolated.leverage == Decimal('163.361428') / Decimal('16.335542')
+  cross = await market(shared, ETH).perp_collateral()
+  assert cross.margin_mode == 'cross'
+  assert cross.equity == Decimal('20002.175121')
+  assert cross.free_collateral == Decimal('20000.013060')
+  assert cross.leverage == Decimal('21.620618') / Decimal('20002.175121')
+  assert await GrvtPerpExchange(shared=shared).perp_collateral() == cross
+  assert await btc.available_notional() == Decimal('200000.13060')
+
+
+async def test_added_isolated_margin_is_free(shared: Shared, fake: Any):
+  """Margin added above the initial margin is free; testnet's `max_removable_amount`
+  after adding 5 USDT was `4.959468`, a micro-unit below (read a moment apart)."""
+  row: dict[str, Any] = {
+    'instrument': BTC,
+    'size': Decimal('0.002'),
+    'notional': Decimal('163.293325'),
+    'unrealized_pnl': Decimal('-0.158674'),
+    'margin_type': 'ISOLATED',
+    'isolated_balance': Decimal('21.447475'),
+    'isolated_im': Decimal('16.329332'),
+    'isolated_mm': Decimal('1.632933'),
+  }
+
+  async def account_summary() -> dict[str, Any]:
+    """BTC isolated, 5 USDT added."""
+    return summary(row)
+
+  fake.trading.account_summary = account_summary
+  bucket = await market(shared).perp_collateral()
+  assert bucket.free_collateral == Decimal('4.959469')
+
+
+async def test_isolated_position_without_its_figures_is_missing_data(
+  shared: Shared, fake: Any
+):
+  """An isolated row without `isolated_balance` raises rather than reading zero."""
+
+  async def account_summary() -> dict[str, Any]:
+    """BTC isolated, its figures omitted."""
     return summary(position(BTC, '0.002', 'ISOLATED'))
 
   fake.trading.account_summary = account_summary
-  with pytest.raises(NotImplementedError):
+  with pytest.raises(MissingData) as raised:
     await market(shared).perp_collateral()
-  assert (await market(shared, ETH).perp_collateral()).leverage == 0
+  assert (raised.value.market_id, raised.value.field) == (BTC, 'isolated_balance')
+  assert (await market(shared, ETH).perp_collateral()).margin_mode == 'cross'
 
 
 async def test_account_reads_need_an_api_key(make_fake: Any, make_shared: Any):

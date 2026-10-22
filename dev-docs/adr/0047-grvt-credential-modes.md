@@ -55,5 +55,6 @@ The mainnet qualification account carries `GRVT_API_KEY` and
 `GRVT_TRADING_ACCOUNT_ID` only. Testnet trading verification uses `grvt_testnet` with
 the private key. `OrderRejected` mapping is covered by unit fixtures; the live testnet
 round trip exercised `2064` and `2065` as refusals in the PoC, not through the adapter.
-The isolated-margin bucket stays unverified: `typed-grvt` lacks `set_position_config`,
-so no position could be made isolated.
+The isolated-margin bucket was unverified here, since `typed-grvt` 0.1.0 lacked
+`set_position_config`; with 0.2.0 it is implemented and verified on testnet, and margin
+types are still set on the venue, not through the SDK.

@@ -53,9 +53,28 @@ def positions(s: SubAccount) -> dict[str, Position]:
   }
 
 
+def futures_balances(s: SubAccount) -> dict[str, Decimal]:
+  """A trading sub-account's cash: its spot balances plus every isolated position's
+  `isolated_balance`, in the settlement currency.
+
+  Opening an isolated position moves its margin out of the spot balance into the
+  position, and closing it moves the remainder back, so the cash is their sum.
+
+  Raises:
+    NotImplementedError: A currency is borrowed.
+  """
+  balances = held(s['spot_balances'])
+  for p in s['positions']:
+    if amount := p.get('isolated_balance'):
+      currency = s['settle_currency']
+      balances[currency] = balances.get(currency, Decimal(0)) + amount
+  return balances
+
+
 def futures_wallet(id: str, s: SubAccount) -> SubaccountSnapshot:
-  """A trading sub-account's futures wallet: its cash balances, without unrealized PnL
-  (GRVT's `total_equity` is their index value plus `unrealized_pnl`), and positions.
+  """A trading sub-account's futures wallet: its cash balances (`futures_balances`),
+  without unrealized PnL (GRVT's `total_equity` is their index value plus
+  `unrealized_pnl`), and positions.
 
   Raises:
     NotImplementedError: The sub-account is a vault, whose holdings belong to every
@@ -67,7 +86,7 @@ def futures_wallet(id: str, s: SubAccount) -> SubaccountSnapshot:
     )
   return SubaccountSnapshot(
     subaccount=f'{id}:futures',
-    balances=held(s['spot_balances']),
+    balances=futures_balances(s),
     positions=positions(s),
   )
 

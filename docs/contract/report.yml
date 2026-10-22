@@ -24,7 +24,7 @@ methods:
       ethereum: Requires an address and configured data providers; provider settings can be supplied in Python.
       lighter: Every account of the L1 address (or of the account index's owner), credential-free; pool shares as pro-rata pool holdings.
       margin-trade: The perp wallet (USDC without unrealized PnL, positions) and the spot wallet, read by address.
-      grvt: The funding wallet and each readable trading sub-account's futures (cash without unrealized PnL, positions) and spot wallets, with an API key.
+      grvt: The funding wallet and each readable trading sub-account's futures (cash, isolated positions' balances included, without unrealized PnL; positions) and spot wallets, with an API key.
     example:
       accountVenues: [hyperliquid]
       constants:

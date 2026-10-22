@@ -11,7 +11,7 @@ license-files = ["LICENSE"]
 requires-python = ">=3.10"
 dependencies = [
   "tribulnation-sdk>=2.18.0",
-  "typed-grvt>=0.1.0",
+  "typed-grvt>=0.2.0",
   "typed-core>=0.13",
 ]
 readme = {file = "README.md", content-type = "text/markdown"}
