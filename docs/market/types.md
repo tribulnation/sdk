@@ -75,7 +75,9 @@ raises, rather than quietly placing a different order.
   time or a transport header such as HTTP `Date`. Availability: Hyperliquid sets the
   block time on REST and WS; Aster the event/output time `E` (falling back to the
   transaction time `T`) on REST and WS; Lighter the WS `last_updated_at` (REST `depth`
-  is `None`); GRVT the `event_time` on REST and WS; dYdX never sets it. Derived books (`limit`, `with_fees`,
+  is `None`); GRVT the `event_time` on REST and WS; Extended the WS frame `ts` (REST
+  `depth` is `None`, except on RFQ markets, whose `depth` is a quotes-stream snapshot);
+  dYdX never sets it. Derived books (`limit`, `with_fees`,
   `scaled`, `copy`) keep it, `merge` takes the oldest input's, and `update` takes the diff's.
   `update` replaces, adds and removes (zero quantity) levels, then uncrosses the book:
   some venues' diff streams can cross (dYdX's Indexer does by design, see
