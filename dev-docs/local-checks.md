@@ -37,7 +37,9 @@ file's own directory, so an accounts file elsewhere silently runs without creden
    alongside hourly funding, on-chain deposits and withdrawals, perp/spot transfers and
    non-zero perp and spot balances. GRVT carries a read-only `GRVT_API_KEY` and its
    `GRVT_TRADING_ACCOUNT_ID`: an API key without its private key is a `token`
-   ([ADR 0047](adr/0047-grvt-credential-modes.md)).
+   ([ADR 0047](adr/0047-grvt-credential-modes.md)). Extended carries
+   `EXTENDED_API_KEY`, a read-only key of one mainnet sub-account with no funds: every
+   account read is private, and an Extended account is one sub-account (the key's).
 2. Each account must reach its venue's `[qualification.market] min_mode` in
    `impl.toml`: `address`, `token` or `private`. The recorded account mode is derived
    from the credentials actually resolved, so a missing variable lowers it and the
