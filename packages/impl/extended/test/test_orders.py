@@ -253,6 +253,7 @@ async def test_trading_needs_the_stark_key():
   ('status', 'code', 'expected'),
   [
     (400, 1140, OrderRejected),
+    (400, 1120, OrderRejected),
     (422, 1121, OrderRejected),
     (200, 1001, OrderRejected),
     (400, 1134, BadRequest),
@@ -265,8 +266,9 @@ async def test_trading_needs_the_stark_key():
 async def test_only_coded_refusals_are_rejections(
   status: int, code: int | None, expected: type[Exception]
 ):
-  """A coded refusal is `OrderRejected`; a duplicate client id, the catch-all code, a
-  code-less status and a server error stay ambiguous."""
+  """A coded refusal is `OrderRejected` (`1140` and `1120` were observed on testnet); a
+  resubmitted signed order (`1134`), the catch-all code, a code-less status and a server
+  error stay ambiguous."""
   client = Client(orders=Orders(error=venue_error(status, code)))
   with pytest.raises(expected) as raised:
     await orders.place_order(

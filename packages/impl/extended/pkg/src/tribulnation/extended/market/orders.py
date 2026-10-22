@@ -21,8 +21,9 @@ from ..core import EXPIRY_MARGIN, ORDER_LIFETIME, Shared
 from .common import parse_order
 
 DUPLICATE_ORDER = 1134
-"""`DuplicateOrder`: an order with this client id already exists, so the refusal does not
-say nothing rests (an earlier, ambiguous submission may have gone through)."""
+"""`DuplicateOrder`: the same signed order (the same settlement nonce) was already
+submitted, so the refusal does not say nothing rests: the earlier submission may have
+gone through. A reused client id alone is not refused (testnet, 2026-10-22)."""
 UNHANDLED_ERROR = 1006
 """`UnhandledError`: the venue's catch-all, which says nothing certain about the order."""
 UNCERTAIN_CODES = frozenset({DUPLICATE_ORDER, UNHANDLED_ERROR})
@@ -99,7 +100,8 @@ async def place_order(shared: Shared, row: MarketRow, order: Order) -> OrderResp
   it; `MARKET` is the venue's market order (immediate-or-cancel) bounded by `price`.
   Self-trade protection is `ACCOUNT`. The fee cap is the account's maker rate for
   post-only orders and its taker rate otherwise, and `client_order_id` is sent as the
-  order's `id` (its `externalId`; the order hash when omitted).
+  order's `id` (its `externalId`; the order hash when omitted). The venue does not keep
+  client ids unique: reusing one places a second order.
 
   Acceptance is asynchronous: the response carries the order id and `filled_qty` stays
   `None`. A later refusal by the matching engine shows as `REJECTED` in `query_order`.
@@ -109,7 +111,9 @@ async def place_order(shared: Shared, row: MarketRow, order: Order) -> OrderResp
     ValueError: Zero size, non-positive or off-grid price or size, or `POST_ONLY` on an
       RFQ market.
     OrderRejected: The venue refused the order with an error code (other than `1134`
-      DuplicateOrder and `1006` UnhandledError): nothing rests.
+      DuplicateOrder and `1006` UnhandledError): nothing rests. Observed: `1140`, the
+      order's cost exceeds the available balance, and `1120`, a size below the
+      minimum.
   """
   market, rfq = row['name'], row['isRfq']
   qty = Decimal(order['qty'])

@@ -40,6 +40,10 @@ file's own directory, so an accounts file elsewhere silently runs without creden
    ([ADR 0047](adr/0047-grvt-credential-modes.md)). Extended carries
    `EXTENDED_API_KEY`, a read-only key of one mainnet sub-account with no funds: every
    account read is private, and an Extended account is one sub-account (the key's).
+   `extended_testnet` signs for the testnet wallet's main sub-account
+   (`EXTENDED_TESTNET_*`); the same wallet's sub-account 1 has its own key and Stark key
+   (`EXTENDED_TESTNET_SUB1_*`), the counterparty and transfer target of testnet trading
+   runs, since testnet order books are usually empty.
 2. Each account must reach its venue's `[qualification.market] min_mode` in
    `impl.toml`: `address`, `token` or `private`. The recorded account mode is derived
    from the credentials actually resolved, so a missing variable lowers it and the

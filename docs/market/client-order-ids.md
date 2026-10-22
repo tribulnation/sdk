@@ -53,7 +53,7 @@ above runs unchanged everywhere. Either field is `None` on fills that don't repo
 | Bybit | `orderLinkId`, up to 36 characters | History and stream | History and stream |
 | Coinbase | `client_order_id` | History and stream | Stream |
 | dYdX | Ignored | Stream | — |
-| Extended | The order's `id` (`externalId`); 32 hex digits generated | History and stream (stream fills not yet observed) | History and stream (stream fills not yet observed) |
+| Extended | The order's `id` (`externalId`), not kept unique; 32 hex digits generated | History (testnet) and stream (stream fills not yet observed) | History (testnet) and stream (stream fills not yet observed) |
 | GRVT | `client_order_id`: an integer, also the SDK order id | History and stream | History and stream |
 | Hyperliquid | `cloid`: `0x` and 32 hex digits | History and stream | History and stream |
 | Kraken | No trading | History and stream | Stream |
@@ -62,7 +62,8 @@ above runs unchanged everywhere. Either field is `None` on fills that don't repo
 
 Where you give none, Aster, Binance and Bybit spot generate an ID, and so does the SDK on
 Coinbase, which requires one: fills report that one. On Coinbase, reusing an ID doesn't
-place a second order; you get back the order already placed under it. Deribit and KuCoin
+place a second order; you get back the order already placed under it. On Extended it
+does: the venue accepts a second order under the same ID. Deribit and KuCoin
 serve public data only.
 
 <!-- next -->

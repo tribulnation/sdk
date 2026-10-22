@@ -63,21 +63,34 @@ market data only.
   (RFQ markets refuse it, before signing), and `MARKET` is the venue's IOC market order
   bounded by `price`. RFQ markets' orders go through the RFQ endpoint. Off-grid prices
   and sizes raise `ValueError` before signing. `client_order_id` is the order's client
-  id (`externalId`), 32 hex digits from `random_client_order_id()`.
+  id (`externalId`), 32 hex digits from `random_client_order_id()`. The venue does not
+  keep client ids unique: reusing one places a second order.
 - Acceptance is asynchronous: `OrderResponse.filled_qty` is `None`, and an order the
-  matching engine refuses later shows as `REJECTED` in `query_order`. `OrderRejected` is
-  raised only for a refusal the venue answers with an error code, other than `1134`
-  (duplicate client id) and `1006` (unhandled error).
+  matching engine refuses later shows as `REJECTED` in `query_order` (a crossing
+  `POST_ONLY` ends `REJECTED` with `statusReason` `POST_ONLY_FAILED`). `OrderRejected` is
+  raised only for a refusal the venue answers with an error code, such as `1140` (the
+  order's cost exceeds the available balance) or `1120` (a size below the minimum),
+  other than `1134` (the same signed order sent twice, so the first may rest) and `1006`
+  (unhandled error).
 - `open_orders` lists the market's open `LIMIT` orders, and `cancel_open_orders` cancels
   exactly those, in one mass cancel: conditional, TP/SL and TWAP orders placed elsewhere
-  are neither listed nor cancelled. Cancellation is asynchronous.
+  are neither listed nor cancelled. `cancel_order` takes any order id, a conditional
+  order's included. Cancellation is asynchronous.
 - Trade history reads the 10,000 most recent fills; the exchange-wide form leaves out
   spot fills and keeps delisted perpetuals.
 - Collateral is the sub-account's one cross bucket, whatever the market; the maintenance
-  requirement is `marginRatio x equity`. `available_notional` is free collateral times
-  the account's leverage, without the margin schedule's position-value cap.
-- Funding is hourly. `funding_payments` raises `NotImplementedError` until the sign of
-  the venue's payment amount has been observed.
+  requirement is `marginRatio x equity`. `marginRatio` is a fraction rounded up to four
+  decimals, so the figure can overstate the requirement by up to `0.0001 x equity`.
+  `available_notional` is free collateral times the account's leverage, without the
+  margin schedule's position-value cap.
+- Funding settles hourly, on the hour, and the payment is stamped shortly after (45 s
+  on testnet). Funding-rate history is positive when longs pay; `funding_payments`, per
+  market or exchange-wide, are positive when received, as the venue signs them.
+- Public and account reads are verified on mainnet, the account reads on an account
+  without funds. Order placement and cancellation, fills and funding payments are
+  verified on testnet only, where no RFQ quote was available to fill an RFQ order.
+  Streams are verified on mainnet only: the testnet stream host refuses connections
+  (`503`).
 
 No `settings` are read.
 
