@@ -10,7 +10,7 @@ license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
 dependencies = [
-  "tribulnation-sdk>=2.18.0",
+  "tribulnation-sdk>=2.20.0",
   "typed-grvt>=0.2.0",
   "typed-core>=0.13",
 ]
