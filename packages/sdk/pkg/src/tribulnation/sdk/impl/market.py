@@ -17,6 +17,7 @@ from .accounts import (
   Hyperliquid,
   Kraken,
   Kucoin,
+  Grvt,
   Lighter,
   MarginTrade,
   Mexc,
@@ -260,6 +261,25 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       account_id=id,
     )
 
+  def grvt(self, account: Grvt, id: str) -> TradingVenue:
+    """Build GRVT's perpetual Market surface: an API key reads the account, its
+    private key also places orders, and neither (public) serves market data only."""
+    try:
+      from tribulnation.grvt import GrvtMarket
+    except ImportError as e:
+      raise ImportError(
+        'grvt market is not installed. Please install it with `pip install tribulnation-grvt`.'
+      ) from e
+    api_key = account.resolved_api_key
+    return GrvtMarket.new(
+      env='prod' if account.venue == 'grvt' else 'testnet',
+      api_key=api_key,
+      private_key=account.resolved_private_key if api_key else None,
+      trading_account_id=account.resolved_trading_account_id if api_key else None,
+      validate=account.validate,
+      account_id=id,
+    )
+
   def _venue(self, id: str, /) -> TradingVenue:
     if (account := self.accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
@@ -292,6 +312,8 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
         return self.lighter(account, id)
       case 'margin-trade' | 'margin-trade-testnet':
         return self.margin_trade(account, id)
+      case 'grvt' | 'grvt_testnet':
+        return self.grvt(account, id)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 

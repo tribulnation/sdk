@@ -53,7 +53,7 @@ refused the order, so it is dead and can be sent again, e.g. an IOC with nothing
 match against. Every other error may be ambiguous. A `NetworkError` or a 5xx `ApiError`
 can arrive after the venue accepted the order, so check `open_orders` or your fills
 before re-sending. Venues raise `OrderRejected` only where their answer makes the
-refusal certain (currently Hyperliquid, Aster and Lighter); elsewhere refusals stay
+refusal certain (currently Hyperliquid, Aster, Lighter and GRVT); elsewhere refusals stay
 `ApiError` or `BadRequest`.
 
 ```python

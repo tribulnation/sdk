@@ -74,6 +74,7 @@ methods:
         kraken: {market_id: 'kraken:spot:XBTUSD', bid: '60123.00', ask: '60124.10'}
         lighter: {market_id: 'lighter:perp:1', bid: '60123.00', ask: '60124.10'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', bid: '60123.00', ask: '60124.10'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', bid: '60123.00', ask: '60124.10'}
       callTemplate: |
         book = await sdk.depth('{{ constants[accounts[0]].market_id }}', levels=5)
         bid = book.best_bid.price if book.bids else None
@@ -129,6 +130,7 @@ methods:
         kraken: {market_id: 'kraken:spot:XBTUSD', ticks: [{bid: '60123.40', ask: '60124.00'}, {bid: '60123.50', ask: '60124.00'}, {bid: '60122.90', ask: '60123.60'}, {bid: '60123.10', ask: '60123.90'}]}
         lighter: {market_id: 'lighter:perp:1', ticks: [{bid: '60123.40', ask: '60124.00'}, {bid: '60123.50', ask: '60124.00'}, {bid: '60122.90', ask: '60123.60'}, {bid: '60123.10', ask: '60123.90'}]}
         margin-trade: {market_id: 'margin-trade:perp:BTC', ticks: [{bid: '60123.40', ask: '60124.00'}, {bid: '60123.50', ask: '60124.00'}, {bid: '60122.90', ask: '60123.60'}, {bid: '60123.10', ask: '60123.90'}]}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', ticks: [{bid: '60123.40', ask: '60124.00'}, {bid: '60123.50', ask: '60124.00'}, {bid: '60122.90', ask: '60123.60'}, {bid: '60123.10', ask: '60123.90'}]}
       callTemplate: |
         async with sdk.depth_stream('{{ constants[accounts[0]].market_id }}') as books:
           async for book in books:
@@ -186,6 +188,7 @@ methods:
         dydx: {market_id: 'dydx:perp:BTC-USD', instrument_id: 'BTC-USD', fee_asset: 'USDC', tick_size: '0.10', step_size: '0.00001'}
         lighter: {market_id: 'lighter:perp:1', instrument_id: '1', fee_asset: '3', tick_size: '0.1', step_size: '0.00001'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', instrument_id: 'BTC', fee_asset: 'USD', tick_size: '0.1', step_size: '0.00001'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', instrument_id: 'BTC_USDT_Perp', fee_asset: 'USDT', tick_size: '0.1', step_size: '0.001'}
       callTemplate: |
         rules = await sdk.rules('{{ constants[accounts[0]].market_id }}')
         price = rules.round_price(Decimal('60123.456'))
@@ -238,6 +241,7 @@ methods:
         mexc: {market_id: 'mexc:spot:BTCUSDT'}
         lighter: {market_id: 'lighter:perp:1'}
         margin-trade: {market_id: 'margin-trade:perp:BTC'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp'}
       callTemplate: |
         fees = await sdk.fees('{{ constants[accounts[0]].market_id }}')
         print(fees.taker_buy, fees.taker_sell)
@@ -275,6 +279,7 @@ methods:
         kraken: {market_id: 'kraken:spot:XBTUSD', open1: '60123.40', close1: '60150.00', open2: '60150.00', close2: '60098.20'}
         lighter: {market_id: 'lighter:perp:1', open1: '60124.10', close1: '60151.30', open2: '60151.30', close2: '60099.00'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', open1: '60124.10', close1: '60151.30', open2: '60151.30', close2: '60099.00'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', open1: '60124.10', close1: '60151.30', open2: '60151.30', close2: '60099.00'}
       callTemplate: |
         async for page in sdk.candles('{{ constants[accounts[0]].market_id }}', '1h', start, end):
           for candle in page:
@@ -330,6 +335,7 @@ methods:
         kraken: {exchange_id: 'kraken:spot', markets: [{key: 'XBTUSD', last: '60123.40', bid: '60123.00', ask: '60124.10'}]}
         lighter: {exchange_id: 'lighter:perp', markets: [{key: '1', last: '60123.40', bid: '60123.00', ask: '60124.10'}]}
         margin-trade: {exchange_id: 'margin-trade:perp', markets: [{key: 'BTC', last: '60123.40', bid: '60123.00', ask: '60124.10'}]}
+        grvt: {exchange_id: 'grvt:perp', markets: [{key: 'BTC_USDT_Perp', last: '60123.40', bid: '60123.00', ask: '60124.10'}]}
       callTemplate: |
         snapshot = await sdk.tickers('{{ constants[accounts[0]].exchange_id }}')
       resultTemplate: |
@@ -395,6 +401,7 @@ methods:
         mexc: {exchange_id: 'mexc:perp', key: 'BTC_USDT', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: '812.4'}
         lighter: {exchange_id: 'lighter:perp', key: '1', index: '60120.00', mark: '60125.50', funding: '0.000012', open_interest: '812.4'}
         margin-trade: {exchange_id: 'margin-trade:perp', key: 'BTC', index: '60120.00', mark: '60125.50', funding: '0.000012', open_interest: '812.4'}
+        grvt: {exchange_id: 'grvt:perp', key: 'BTC_USDT_Perp', index: '60120.00', mark: '60125.50', funding: '0.000012', open_interest: '812.4'}
         aster: {exchange_id: 'aster:perp', key: 'BTCUSDT', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: '812.4'}
       callTemplate: |
         stats = await sdk.perp_stats('{{ constants[accounts[0]].exchange_id }}')
@@ -438,6 +445,7 @@ methods:
         kraken: {market_id: 'kraken:spot:XBTUSD', order_id: 'OABC12-DE345-FGHI61', price: '59500', qty: '0.01'}
         lighter: {market_id: 'lighter:perp:1', order_id: '101492020762855', price: '59500', qty: '0.01'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', order_id: '38549392126', price: '59500', qty: '0.01'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id: '13835058055282163712', price: '59500', qty: '0.01'}
       callTemplate: |
         state = await sdk.query_order('{{ constants[accounts[0]].market_id }}', '{{ constants[accounts[0]].order_id }}')
       resultTemplate: |
@@ -478,6 +486,7 @@ methods:
         kraken: {market_id: 'kraken:spot:XBTUSD', order_id: 'OABC12-DE345-FGHI61', price: '59500', qty: '0.01'}
         lighter: {market_id: 'lighter:perp:1', order_id: '101492020762855', price: '59500', qty: '0.01'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', order_id: '38549392126', price: '59500', qty: '0.01'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id: '13835058055282163712', price: '59500', qty: '0.01'}
       callTemplate: |
         orders = await sdk.open_orders('{{ constants[accounts[0]].market_id }}')
       resultTemplate: |
@@ -520,6 +529,7 @@ methods:
         kraken: {market_id: 'kraken:spot:XBTUSD', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'ZUSD'}
         lighter: {market_id: 'lighter:perp:1', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: '3'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'USD'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'USDT'}
       callTemplate: |
         trades = []
         async for page in sdk.trades_history('{{ constants[accounts[0]].market_id }}', start, end):
@@ -571,6 +581,7 @@ methods:
         kraken: {market_id: 'kraken:spot:XBTUSD', ticks: [{price: '60123.40', qty: '0.01'}, {price: '60124.00', qty: '-0.02'}, {price: '60125.10', qty: '0.05'}]}
         lighter: {market_id: 'lighter:perp:1', ticks: [{price: '60123.40', qty: '0.01'}, {price: '60124.00', qty: '-0.02'}, {price: '60125.10', qty: '0.05'}]}
         margin-trade: {market_id: 'margin-trade:perp:BTC', ticks: [{price: '60123.40', qty: '0.01'}, {price: '60124.00', qty: '-0.02'}, {price: '60125.10', qty: '0.05'}]}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', ticks: [{price: '60123.40', qty: '0.01'}, {price: '60124.00', qty: '-0.02'}, {price: '60125.10', qty: '0.05'}]}
       callTemplate: |
         async with sdk.trades_stream('{{ constants[accounts[0]].market_id }}') as trades:
           async for trade in trades:
@@ -615,6 +626,7 @@ methods:
         dydx: {market_id: 'dydx:perp:BTC-USD', size: '0.014'}
         lighter: {market_id: 'lighter:perp:1', size: '0.014'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', size: '0.014'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', size: '0.014'}
       callTemplate: |
         pos = await sdk.position('{{ constants[accounts[0]].market_id }}')
       resultTemplate: |
@@ -654,6 +666,7 @@ methods:
         kraken: {market_id: 'kraken:spot:XBTUSD', equity: '10240.55', free: '8120.00'}
         lighter: {market_id: 'lighter:perp:1', equity: '10240.55', free: '8120.00'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', equity: '10240.55', free: '8120.00'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', equity: '10240.55', free: '8120.00'}
       callTemplate: |
         c = await sdk.collateral('{{ constants[accounts[0]].market_id }}')
       resultTemplate: |
@@ -693,6 +706,7 @@ methods:
         kraken: {market_id: 'kraken:spot:XBTUSD', notional: '8120.00'}
         lighter: {market_id: 'lighter:perp:1', notional: '8120.00'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', notional: '8120.00'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', notional: '8120.00'}
       callTemplate: |
         notional = await sdk.available_notional('{{ constants[accounts[0]].market_id }}')
       resultTemplate: |
@@ -729,6 +743,7 @@ methods:
         dydx: {market_id: 'dydx:perp:BTC-USD', order_id: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAQAAABhA'}
         lighter: {market_id: 'lighter:perp:1', order_id: '101492020762855'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', order_id: '38549392126'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id: '13835058055282163712'}
       callTemplate: |
         order = {'type': 'LIMIT', 'qty': 0.01, 'price': 60_000}
         response = await sdk.place_order('{{ constants[accounts[0]].market_id }}', order)
@@ -765,6 +780,7 @@ methods:
         dydx: {market_id: 'dydx:perp:BTC-USD', order_id1: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAQAAABhA', order_id2: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAgAAABhA'}
         lighter: {market_id: 'lighter:perp:1', order_id1: '101492020762855', order_id2: '101492020762856'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', order_id1: '38549392126', order_id2: '38549396356'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id1: '13835058055282163712', order_id2: '13835058055282163713'}
       callTemplate: |
         orders = [
           {'type': 'LIMIT', 'qty': 0.01, 'price': 60_000},
@@ -805,6 +821,7 @@ methods:
         dydx: {market_id: 'dydx:perp:BTC-USD', order_id: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAQAAABhA'}
         lighter: {market_id: 'lighter:perp:1', order_id: '101492020762855'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', order_id: '38549392126'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id: '13835058055282163712'}
       callTemplate: |
         await sdk.cancel_order('{{ constants[accounts[0]].market_id }}', '{{ constants[accounts[0]].order_id }}')
         print('Cancellation request completed')
@@ -842,6 +859,7 @@ methods:
         dydx: {market_id: 'dydx:perp:BTC-USD', order_id1: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAQAAABhA', order_id2: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAgAAABhA'}
         lighter: {market_id: 'lighter:perp:1', order_id1: '101492020762855', order_id2: '101492020762856'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', order_id1: '38549392126', order_id2: '38549396356'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id1: '13835058055282163712', order_id2: '13835058055282163713'}
       callTemplate: |
         await sdk.cancel_orders('{{ constants[accounts[0]].market_id }}', ['{{ constants[accounts[0]].order_id1 }}', '{{ constants[accounts[0]].order_id2 }}'])
         print('Cancellation request completed')
@@ -879,6 +897,7 @@ methods:
         dydx: {market_id: 'dydx:perp:BTC-USD'}
         lighter: {market_id: 'lighter:perp:1'}
         margin-trade: {market_id: 'margin-trade:perp:BTC'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp'}
       callTemplate: |
         await sdk.cancel_open_orders('{{ constants[accounts[0]].market_id }}')
         print('Cancellation request completed')
@@ -918,6 +937,7 @@ methods:
         bitget: {market_id: 'bitget:usdt:BTCUSDT', index: '60120.00'}
         lighter: {market_id: 'lighter:perp:1', index: '60120.00'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', index: '60120.00'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', index: '60120.00'}
       callTemplate: |
         price = await sdk.index('{{ constants[accounts[0]].market_id }}')
       resultTemplate: |
@@ -954,6 +974,7 @@ methods:
         mexc: {market_id: 'mexc:perp:BTC_USDT', rate: '0.0001', annualized: '0.1095'}
         lighter: {market_id: 'lighter:perp:1', rate: '0.0001', annualized: '0.876'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', rate: '0.0001', annualized: '0.876'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', rate: '0.0001', annualized: '0.1095'}
       callTemplate: |
         funding = await sdk.next_funding('{{ constants[accounts[0]].market_id }}')
         print(funding.rate, funding.annualized)
@@ -994,6 +1015,7 @@ methods:
         bitget: {market_id: 'bitget:usdt:BTCUSDT', rate1: '0.0001', rate2: '0.00012'}
         lighter: {market_id: 'lighter:perp:1', rate1: '0.0001', rate2: '0.00012'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', rate1: '0.0001', rate2: '0.00012'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', rate1: '0.0001', rate2: '0.00012'}
       callTemplate: |
         async for page in sdk.funding_rates('{{ constants[accounts[0]].market_id }}', start, end):
           for rate in page:
@@ -1030,6 +1052,7 @@ methods:
         bybit: {market_id: 'bybit:perp:BTCUSDT', amount1: '-1.24', amount2: '0.86'}
         lighter: {market_id: 'lighter:perp:1', amount1: '-1.24', amount2: '0.86'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', amount1: '-1.24', amount2: '0.86'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', amount1: '-1.24', amount2: '0.86'}
       callTemplate: |
         async for page in sdk.funding_payments('{{ constants[accounts[0]].market_id }}', start, end):
           for payment in page:
@@ -1067,6 +1090,7 @@ methods:
         bybit: {market_id: 'bybit:perp:BTCUSDT', size: '0.5', entry_price: '58230.10'}
         lighter: {market_id: 'lighter:perp:1', size: '0.5', entry_price: '58230.10'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', size: '0.5', entry_price: '58230.10'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', size: '0.5', entry_price: '58230.10'}
       callTemplate: |
         pos = await sdk.perp_position('{{ constants[accounts[0]].market_id }}')
       resultTemplate: |
@@ -1100,6 +1124,7 @@ methods:
         bybit: {market_id: 'bybit:perp:BTCUSDT', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
         lighter: {market_id: 'lighter:perp:1', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
         aster: {market_id: 'aster:perp:BTCUSDT', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
       callTemplate: |
         c = await sdk.perp_collateral('{{ constants[accounts[0]].market_id }}')
@@ -1135,6 +1160,7 @@ methods:
         dydx: {market_id: 'dydx:perp:BTC-USD', leverage: '20', free: '8120.00', notional: '162400.00'}
         lighter: {market_id: 'lighter:perp:1', leverage: '20', free: '8120.00', notional: '162400.00'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', leverage: '20', free: '8120.00', notional: '162400.00'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', leverage: '20', free: '8120.00', notional: '162400.00'}
       callTemplate: |
         leverage = await sdk.leverage('{{ constants[accounts[0]].market_id }}')
         notional = await sdk.available_notional('{{ constants[accounts[0]].market_id }}')

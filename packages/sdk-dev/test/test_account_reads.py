@@ -14,6 +14,7 @@ from tribulnation.sdk.impl.accounts import (
   Aster,
   Binance,
   Dydx,
+  Grvt,
   Hyperliquid,
   Kucoin,
   Lighter,
@@ -51,6 +52,8 @@ def clean_env(monkeypatch: pytest.MonkeyPatch):
     'HYPERLIQUID_PRIVATE_KEY',
     'BINANCE_API_KEY',
     'BINANCE_SECRET_KEY',
+    'GRVT_API_KEY',
+    'GRVT_PRIVATE_KEY',
   ):
     monkeypatch.delenv(name, raising=False)
   return monkeypatch
@@ -71,6 +74,21 @@ def test_declared_modes_ignore_the_environment(clean_env: pytest.MonkeyPatch):
   assert account_mode(Lighter(address='$A', public=True), resolve=False) == 'address'
   assert account_mode(Aster(), resolve=False) == 'private'
   assert account_mode(Aster(public=True), resolve=False) == 'public'
+
+
+def test_grvt_api_key_reads_as_a_token(clean_env: pytest.MonkeyPatch):
+  """A GRVT API key alone serves every account read, a read-only token's role; its
+  signer key adds trading."""
+  assert account_mode(Grvt(), resolve=False) == 'token'
+  assert account_mode(Grvt(private_key='$K'), resolve=False) == 'private'
+  assert account_mode(Grvt(public=True), resolve=False) == 'public'
+  assert account_mode(Grvt(api_key='$K', public=True), resolve=False) == 'token'
+  assert account_mode(Grvt()) == 'public'
+  clean_env.setenv('GRVT_API_KEY', 'k')
+  assert account_mode(Grvt()) == 'token'
+  assert account_mode(Grvt(public=True)) == 'token'
+  clean_env.setenv('GRVT_PRIVATE_KEY', '0xkey')
+  assert account_mode(Grvt()) == 'private'
 
 
 def test_resolved_modes_reflect_what_the_client_receives(clean_env: pytest.MonkeyPatch):
@@ -300,6 +318,8 @@ def test_exclusion_policy_order():
   assert code('mexc', 'perp', 'open_orders') == 'unsupported'
   assert code('lighter', 'perp', 'open_orders', 'address') == 'credential_mode'
   assert code('lighter', 'perp', 'position', 'address') is None
+  assert code('grvt', 'perp', 'position', 'address') == 'credential_mode'
+  assert code('grvt', 'perp', 'fees', 'token') is None
   assert code('aster', 'perp', 'fees', 'public') == 'credential_mode'
   assert code('bitget', 'usdt', 'perp_collateral', uta=False) == 'bitget_classic'
   assert code('bitget', 'usdt', 'perp_collateral', uta=True) is None

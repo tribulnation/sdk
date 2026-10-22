@@ -21,6 +21,7 @@ from .accounts import (
   Hyperliquid,
   Lighter,
   MarginTrade,
+  Grvt,
   load_accounts,
 )
 
@@ -261,6 +262,25 @@ class ReportSDK:
       account_id=id,
     )
 
+  def grvt(self, account: Grvt, id: str) -> Report:
+    """Build GRVT's snapshots of the funding wallet and every trading sub-account the
+    API key can read; a read-only key is enough."""
+    try:
+      from tribulnation.grvt import Report as GrvtReport
+    except ImportError as e:
+      raise ImportError(
+        'grvt sdk is not installed. Please install it with `pip install tribulnation-grvt`.'
+      ) from e
+    api_key = account.resolved_api_key
+    if api_key is None:
+      raise ValueError(f'Account {id} has no GRVT API key.')
+    return GrvtReport.new(
+      api_key=api_key,
+      env='prod' if account.venue == 'grvt' else 'testnet',
+      trading_account_id=account.resolved_trading_account_id,
+      validate=account.validate,
+    )
+
   def venue(self, id: str, /) -> Report:
     if (account := self.accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
@@ -304,6 +324,8 @@ class ReportSDK:
         return self.aster(account, id)
       case 'margin-trade' | 'margin-trade-testnet':
         return self.margin_trade(account, id)
+      case 'grvt' | 'grvt_testnet':
+        return self.grvt(account, id)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 

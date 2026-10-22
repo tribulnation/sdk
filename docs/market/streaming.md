@@ -63,6 +63,7 @@ would raise instead.
 | Aster | ✅ | ✅ |
 | Lighter | ✅ | ✅ |
 | margin.trade | ✅ | ✅ |
+| GRVT | ✅ | ✅ |
 <!-- /streams -->
 
 Per-venue caveats are on the

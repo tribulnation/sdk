@@ -13,6 +13,7 @@ from tribulnation.sdk.impl.accounts import (
   Account,
   Aster,
   Dydx,
+  Grvt,
   Hyperliquid,
   Lighter,
   MarginTrade,
@@ -128,6 +129,15 @@ def account_mode(account: Account, *, resolve: bool = True) -> AccountMode:
     ):
       return 'address'
     return 'public'
+  if isinstance(account, Grvt):
+    # An API key alone reads every account method, as a read-only token does (ADR
+    # 0042); its signer's private key adds trading.
+    keyed = (not account.public and not resolve) or configured(
+      account, 'api_key', resolve=resolve
+    )
+    if not keyed:
+      return 'public'
+    return 'private' if configured(account, 'private_key', resolve=resolve) else 'token'
   if isinstance(account, Aster):
     if not account.public and not resolve:
       return 'private'

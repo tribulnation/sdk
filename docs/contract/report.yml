@@ -24,6 +24,7 @@ methods:
       ethereum: Requires an address and configured data providers; provider settings can be supplied in Python.
       lighter: Every account of the L1 address (or of the account index's owner), credential-free; pool shares as pro-rata pool holdings.
       margin-trade: The perp wallet (USDC without unrealized PnL, positions) and the spot wallet, read by address.
+      grvt: The funding wallet and each readable trading sub-account's futures (cash without unrealized PnL, positions) and spot wallets, with an API key.
     example:
       accountVenues: [hyperliquid]
       constants:
@@ -40,6 +41,7 @@ methods:
         kucoin: {subaccounts: 1, balances: 2}
         lighter: {subaccounts: 1, balances: 2}
         margin-trade: {subaccounts: 2, balances: 2}
+        grvt: {subaccounts: 3, balances: 2}
         mexc: {subaccounts: 1, balances: 2}
       callTemplate: |
         sdk = report.venue('{{ accounts[0] }}')

@@ -1,0 +1,209 @@
+"""The perpetual Market object; market ids are GRVT instrument names (`BTC_USDT_Perp`)."""
+
+from dataclasses import dataclass
+from datetime import datetime
+from decimal import Decimal
+
+from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
+from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
+from tribulnation.sdk.market import (
+  Book,
+  Candle,
+  CandleInterval,
+  Fees,
+  FundingPayment,
+  FundingRate,
+  NextFunding,
+  Order,
+  OrderResponse,
+  OrderState,
+  PerpCollateral,
+  PerpMarket,
+  PerpPosition,
+  Rules,
+  Settings,
+  Trade,
+)
+
+from ..core import random_client_order_id
+from . import account, books, history, orders, stats
+from .common import Public
+
+STANDARD_FEES = Fees.symmetric(maker=Decimal('-0.000001'), taker=Decimal('0.00045'))
+"""Tier 1 of GRVT's published perpetual schedule (help.grvt.io, "How does Grvt's Fee
+Model work?", read 2026-10-22: maker -0.0001%, taker 0.0450%), which the API also reports
+as tier 1 (`-1`/`450` millionths). Account tiers are `fees()`."""
+
+
+@dataclass(frozen=True, kw_only=True)
+class GrvtPerpMarket(Public, PerpMarket):
+  """A USDT-margined perpetual."""
+
+  instrument: str
+  """The instrument name, the market id."""
+  CANDLE_INTERVALS = history.CANDLE_INTERVALS
+
+  @property
+  def market_id(self) -> str:
+    """The instrument name."""
+    return self.instrument
+
+  @property
+  def exchange_id(self) -> str:
+    """The perpetual exchange."""
+    return 'perp'
+
+  async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
+    """The aggregated book at the smallest venue depth (10, 50, 100 or 500 levels per
+    side) covering `levels`; 500 when `levels` is `None`."""
+    return await books.depth(self.shared, self.instrument, levels=levels)
+
+  def depth_stream(
+    self,
+    *,
+    levels: int | None = None,
+    queue_size: int = 1,
+    overflow: OverflowPolicy = 'latest',
+    settings: Settings = {},
+  ) -> AsyncContextManager[AsyncIterable[Book]]:
+    """The full book from `v1.book.d` (snapshot, then 50 ms deltas), shared by every
+    consumer of the market."""
+    return books.depth_stream(
+      self.shared,
+      self.instrument,
+      levels=levels,
+      queue_size=queue_size,
+      overflow=overflow,
+    )
+
+  async def rules(self, *, refetch: bool = False) -> Rules:
+    """The instrument's tick, size step (`min_size`, also the minimum) and minimum
+    notional, with the published tier-1 rates; fees are charged in the quote (USDT).
+    `max_position_size` caps a position, not an order, and stays in `details`."""
+    i = await self.shared.instrument(self.instrument, refetch=refetch)
+    return Rules(
+      fee_asset=i['quote'],
+      tick_size=i['tick_size'],
+      step_size=i['min_size'],
+      fixed_min_qty=i['min_size'],
+      min_value=i['min_notional'],
+      fees=STANDARD_FEES,
+      api=i.get('status') == 'ACTIVE',
+      details=i,
+    )
+
+  async def fees(self, *, refetch: bool = False) -> Fees:
+    """The account tier's futures rates, the same for every perpetual and both sides."""
+    return await account.fees(self.shared)
+
+  def candles(
+    self, interval: CandleInterval, start: datetime, end: datetime
+  ) -> PaginatedResponse[Candle]:
+    """Trade candles opening in `[start, end)`, newest first, up to 1000 per page."""
+    self.check_candles(interval, start, end)
+    return PaginatedResponse(
+      history.candles(self.shared, self.instrument, interval, start, end)
+    )
+
+  async def query_order(self, id: str) -> OrderState | None:
+    """Look the order up by client order id."""
+    return await orders.query_order(self.shared, self.instrument, id)
+
+  async def open_orders(self) -> Sequence[OrderState]:
+    """The market's open orders."""
+    return await orders.open_orders(self.shared, self.instrument)
+
+  def random_client_order_id(self) -> str:
+    """A fresh client order id in `[2^63, 2^64)`, the range GRVT reserves for API
+    clients."""
+    return random_client_order_id()
+
+  async def place_order(
+    self, order: Order, *, settings: Settings = {}
+  ) -> OrderResponse:
+    """Place a `MARKET` (the venue's immediate-or-cancel market order, `price` not
+    sent), `LIMIT` or `POST_ONLY` order (good-till-time, expiring 29 days after
+    signing); the id is its client order id.
+
+    Raises:
+      AuthError: The client has no private key to sign with.
+      OrderRejected: The venue refused the order before accepting it (off-tick price,
+        size off the step, below the minimum notional, margin, ...).
+    """
+    return await orders.place_order(self.shared, self.instrument, order)
+
+  async def cancel_order(self, id: str, *, settings: Settings = {}) -> Any:
+    """Cancel by client order id."""
+    return await orders.cancel_order(self.shared, id)
+
+  async def cancel_orders(self, ids: Sequence[str], *, settings: Settings = {}) -> Any:
+    """Cancel by client order ids, 100 per request."""
+    return await orders.cancel_orders(self.shared, ids)
+
+  async def cancel_open_orders(self, *, settings: Settings = {}) -> Any:
+    """The venue's cancel-all, scoped to this market."""
+    return await orders.cancel_open_orders(self.shared, self.instrument)
+
+  def trades_history(self, start: datetime, end: datetime) -> PaginatedResponse[Trade]:
+    """Personal fills, with fees in USDT."""
+    return PaginatedResponse(
+      history.trades_history(self.shared, self.instrument, start, end)
+    )
+
+  def trades_stream(
+    self,
+    *,
+    queue_size: int = 1000,
+    overflow: OverflowPolicy = 'fail',
+    settings: Settings = {},
+  ) -> AsyncContextManager[AsyncIterable[Trade]]:
+    """The account's new fills on this market."""
+    return history.trades_stream(
+      self.shared, self.instrument, queue_size=queue_size, overflow=overflow
+    )
+
+  async def perp_position(self) -> PerpPosition:
+    """The signed position and average entry."""
+    return await account.perp_position(self.shared, self.instrument)
+
+  async def perp_collateral(self) -> PerpCollateral:
+    """The cross bucket; a market holding an isolated position raises
+    `NotImplementedError`."""
+    return account.market_bucket(await account.summary(self.shared), self.instrument)
+
+  async def leverage(self, *, refetch: bool = False) -> Decimal:
+    """The account's initial leverage on this market."""
+    return await account.leverage(self.shared, self.instrument, refetch=refetch)
+
+  async def available_notional(self) -> Decimal:
+    """Free cross collateral times `leverage()`, without the venue's position-size cap
+    or risk brackets."""
+    leverage = await self.leverage()
+    return (
+      account.cross_bucket(await account.summary(self.shared)).free_collateral
+      * leverage
+    )
+
+  async def index(self, *, settings: Settings = {}) -> Decimal:
+    """The index price."""
+    return await stats.index(self.shared, self.instrument)
+
+  async def next_funding(self) -> NextFunding:
+    """The indicative rate of the current interval, positive when longs pay."""
+    return await stats.next_funding(self.shared, self.instrument)
+
+  def funding_rates(
+    self, start: datetime | None = None, end: datetime | None = None
+  ) -> PaginatedResponse[FundingRate]:
+    """Settled rates, newest first, positive when longs pay."""
+    return PaginatedResponse(
+      history.funding_rates(self.shared, self.instrument, start, end)
+    )
+
+  def funding_payments(
+    self, start: datetime, end: datetime
+  ) -> PaginatedResponse[FundingPayment]:
+    """Personal funding payments, received-positive."""
+    return PaginatedResponse(
+      history.funding_payments(self.shared, self.instrument, start, end)
+    )

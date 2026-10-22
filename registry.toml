@@ -144,3 +144,11 @@ tier = "development"
 repo = "https://github.com/tribulnation/sdk"
 path = "packages/impl/margin-trade"
 pypi = "https://pypi.org/project/tribulnation-margin-trade/"
+
+[[venues]]
+slug = "grvt"
+name = "GRVT"
+tier = "development"
+repo = "https://github.com/tribulnation/sdk"
+path = "packages/impl/grvt"
+pypi = "https://pypi.org/project/tribulnation-grvt/"

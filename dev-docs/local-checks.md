@@ -35,7 +35,9 @@ file's own directory, so an accounts file elsewhere silently runs without creden
    the public `/public/leaderboard` because its whole fill history stays under the
    venue's 10000-fill retention (perp and `PRL/USDC` spot fills from July 2026),
    alongside hourly funding, on-chain deposits and withdrawals, perp/spot transfers and
-   non-zero perp and spot balances.
+   non-zero perp and spot balances. GRVT carries a read-only `GRVT_API_KEY` and its
+   `GRVT_TRADING_ACCOUNT_ID`: an API key without its private key is a `token`
+   ([ADR 0047](adr/0047-grvt-credential-modes.md)).
 2. Each account must reach its venue's `[qualification.market] min_mode` in
    `impl.toml`: `address`, `token` or `private`. The recorded account mode is derived
    from the credentials actually resolved, so a missing variable lowers it and the
@@ -43,7 +45,9 @@ file's own directory, so an accounts file elsewhere silently runs without creden
 3. Testnet accounts use `<venue>_testnet` ids and venues (`<venue>-testnet` for a
    hyphenated slug such as `margin-trade`), so no mainnet slug selects them. Name them explicitly for testnet diagnostics.
 4. Bitget has two mainnet accounts, each with an explicit `uta` mode. Qualify with
-   `--account bitget_classic`, the mode current evidence records.
+   `--account bitget_classic`, the mode current evidence records. GRVT has two: qualify
+   with `--account grvt`, the read-only key; `grvt_trade` holds a trading key on the
+   same sub-account, for mainnet order checks.
 5. Deribit's split qualification pairs `deribit_public` with `deribit_testnet`
    (see below).
 

@@ -100,8 +100,8 @@ Hyperliquid supports trades on spot and perpetual exchanges, and funding payment
 on perpetual exchanges. Each builder DEX is scoped separately. dYdX supports both
 methods across all subaccounts of the configured address, for both `perp` and
 `perp.<N>` exchange objects; selecting one market still includes every subaccount.
-Aster also supports exchange-wide perpetual funding payments. Lighter supports
-exchange-wide trades and perpetual funding payments. Other implementations raise
+Aster also supports exchange-wide perpetual funding payments. Lighter and GRVT
+support exchange-wide trades and perpetual funding payments. Other implementations raise
 `NotImplementedError` where exchange-wide reads are unsupported; consult their
 support declarations for method coverage.
 

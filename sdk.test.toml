@@ -51,6 +51,20 @@ venue = "dydx"
 address = "$DYDX_ADDRESS"
 public = true
 
+# A read-only API key: every account read, no trading.
+[accounts.grvt]
+venue = "grvt"
+api_key = "$GRVT_API_KEY"
+trading_account_id = "$GRVT_TRADING_ACCOUNT_ID"
+
+# The same sub-account with a trading key, for mainnet order checks; qualification uses
+# `grvt` (select it with `--account grvt`).
+[accounts.grvt_trade]
+venue = "grvt"
+api_key = "$GRVY_API_KEY_ADMIN_TRADE"
+private_key = "$GRVT_ADMIN_TRADE_SECRET_PRIVATE_KEY"
+trading_account_id = "$GRVT_TRADING_ACCOUNT_ID"
+
 [accounts.hyperliquid]
 venue = "hyperliquid"
 address = "$HYPERLIQUID_ADDRESS"
@@ -122,6 +136,13 @@ venue = "deribit_testnet"
 venue = "dydx_testnet"
 address = "$DYDX_TESTNET_ADDRESS"
 mnemonic = "$DYDX_TESTNET_MNEMONIC"
+
+# Funded; the API key's private key also places orders.
+[accounts.grvt_testnet]
+venue = "grvt_testnet"
+api_key = "$GRVT_TESTNET_API_KEY"
+private_key = "$GRVT_TESTNET_PRIVATE_KEY"
+trading_account_id = "$GRVT_TESTNET_TRADING_ACCOUNT_ID"
 
 [accounts.hyperliquid_testnet]
 venue = "hyperliquid_testnet"
