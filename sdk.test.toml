@@ -78,6 +78,11 @@ private_key = "$KRAKEN_PRIVATE_KEY"
 [accounts.kucoin]
 venue = "kucoin"
 
+# Read-only API key of a mainnet sub-account: every account read, no orders.
+[accounts.extended]
+venue = "extended"
+api_key = "$EXTENDED_API_KEY"
+
 [accounts.lighter]
 venue = "lighter"
 address = "$LIGHTER_ADDRESS"
@@ -148,6 +153,14 @@ trading_account_id = "$GRVT_TESTNET_TRADING_ACCOUNT_ID"
 venue = "hyperliquid_testnet"
 address = "$HYPERLIQUID_TESTNET_ADDRESS"
 private_key = "$HYPERLIQUID_TESTNET_PRIVATE_KEY"
+
+# Signs orders with the sub-account's Stark key and vault.
+[accounts.extended_testnet]
+venue = "extended_testnet"
+api_key = "$EXTENDED_TESTNET_API_KEY"
+stark_private_key = "$EXTENDED_TESTNET_STARK_PRIVATE_KEY"
+stark_public_key = "$EXTENDED_TESTNET_STARK_PUBLIC_KEY"
+vault = "$EXTENDED_TESTNET_VAULT"
 
 [accounts.lighter_testnet]
 venue = "lighter_testnet"

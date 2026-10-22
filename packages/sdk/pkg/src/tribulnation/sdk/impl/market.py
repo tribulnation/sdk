@@ -17,6 +17,7 @@ from .accounts import (
   Hyperliquid,
   Kraken,
   Kucoin,
+  Extended,
   Grvt,
   Lighter,
   MarginTrade,
@@ -220,6 +221,27 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       raise ImportError('Install tribulnation-deribit to use this venue.') from e
     return DeribitMarket.new(validate=account.validate, account_id=id)
 
+  def extended(self, account: Extended, id: str) -> TradingVenue:
+    """Build Extended's perpetual Market surface on the API key's sub-account: reads and
+    cancels with the key, orders with its Stark key and vault, or public market data."""
+    try:
+      from tribulnation.extended import ExtendedMarket
+    except ImportError as e:
+      raise ImportError(
+        'extended market is not installed. Please install it with `pip install tribulnation-extended`.'
+      ) from e
+    api_key = account.resolved_api_key
+    return ExtendedMarket.new(
+      api_key,
+      account.resolved_stark_private_key,
+      account.resolved_stark_public_key,
+      account.resolved_vault,
+      network='mainnet' if account.venue == 'extended' else 'testnet',
+      public=account.public and api_key is None,
+      validate=account.validate,
+      account_id=id,
+    )
+
   def lighter(self, account: Lighter, id: str) -> TradingVenue:
     """Build Lighter's perpetual and spot Market surface on one account: API key,
     read-only auth token, or public (account reads from `account_index`/`address`)."""
@@ -308,6 +330,8 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
         return self.kucoin(account, id)
       case 'deribit' | 'deribit_testnet':
         return self.deribit(account, id)
+      case 'extended' | 'extended_testnet':
+        return self.extended(account, id)
       case 'lighter' | 'lighter_testnet':
         return self.lighter(account, id)
       case 'margin-trade' | 'margin-trade-testnet':

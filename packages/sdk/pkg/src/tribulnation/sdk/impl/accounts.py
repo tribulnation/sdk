@@ -74,6 +74,8 @@ VenueId = _Literal[
   'deribit_testnet',
   'aster',
   'aster_testnet',
+  'extended',
+  'extended_testnet',
   'lighter',
   'lighter_testnet',
   'margin-trade',
@@ -725,6 +727,71 @@ class Grvt(VenueAccount):
 
 
 @_dataclass(frozen=True)
+class Extended(VenueAccount):
+  """Extended sub-account, isolated by network. An API key belongs to one sub-account:
+  it reads that sub-account and cancels its orders, and the sub-account's Stark private
+  key and vault also place orders. With `public`, market data only."""
+
+  venue: _Literal['extended', 'extended_testnet'] = 'extended'
+  api_key: str | None = None
+  """The sub-account's API key; defaults to the network's `API_KEY` variable."""
+  stark_private_key: str | None = None
+  """The sub-account's Stark private key (hex), for placing orders; defaults to the
+  network's `STARK_PRIVATE_KEY` variable. Optional: without it the account only reads
+  and cancels."""
+  stark_public_key: str | None = None
+  """Its Stark public key (hex), checked against the private key; defaults to the
+  network's `STARK_PUBLIC_KEY` variable. Optional."""
+  vault: int | str | None = None
+  """The sub-account's vault (position id), required with the Stark private key;
+  defaults to the network's `VAULT` variable."""
+  validate: bool = True
+  """Whether to type-validate incoming responses."""
+
+  @property
+  def prefix(self) -> str:
+    """The credential variables' prefix: `EXTENDED` on mainnet, `EXTENDED_TESTNET`."""
+    return 'EXTENDED' if self.venue == 'extended' else 'EXTENDED_TESTNET'
+
+  @property
+  def resolved_api_key(self) -> str | None:
+    """The API key, never mixing networks; required unless `public`."""
+    return resolve_env_var(
+      self.api_key or f'${self.prefix}_API_KEY', require=not self.public
+    )
+
+  @property
+  def resolved_stark_private_key(self) -> str | None:
+    """The Stark private key, never mixing networks; always optional on its own."""
+    return resolve_env_var(
+      self.stark_private_key or f'${self.prefix}_STARK_PRIVATE_KEY', require=False
+    )
+
+  @property
+  def resolved_stark_public_key(self) -> str | None:
+    """The Stark public key, never mixing networks; always optional."""
+    return resolve_env_var(
+      self.stark_public_key or f'${self.prefix}_STARK_PUBLIC_KEY', require=False
+    )
+
+  @property
+  def resolved_vault(self) -> str | None:
+    """The vault, never mixing networks; required with a Stark private key."""
+    if isinstance(self.vault, int):
+      return str(self.vault)
+    return resolve_env_var(
+      self.vault or f'${self.prefix}_VAULT',
+      require=self.resolved_stark_private_key is not None,
+    )
+
+  def verify_env_vars(self):
+    """Fail before constructing clients when a private account has no API key, or a
+    Stark key has no vault."""
+    self.resolved_api_key
+    self.resolved_vault
+
+
+@_dataclass(frozen=True)
 class Evm(BaseAccount):
   Venue = _Literal[
     'ethereum',
@@ -762,6 +829,7 @@ Account = _Annotated[
   | Kucoin
   | Deribit
   | Aster
+  | Extended
   | Lighter
   | MarginTrade
   | Grvt

@@ -34,6 +34,11 @@ CREDENTIAL_OVERRIDES = {
     'api_key': '$GRVT_API_KEY',
     'private_key': '$GRVT_PRIVATE_KEY',
   },
+  'extended': {
+    'api_key': '$EXTENDED_API_KEY',
+    'stark_private_key': '$EXTENDED_STARK_PRIVATE_KEY',
+    'vault': '$EXTENDED_VAULT',
+  },
   'deribit': {
     'client_id': '$DERIBIT_CLIENT_ID',
     'client_secret': '$DERIBIT_CLIENT_SECRET',
@@ -64,6 +69,7 @@ def generate_accounts_toml(*, public: bool = False) -> dict[str, str]:
     Deribit,
     Dydx,
     Evm,
+    Extended,
     Grvt,
     Hyperliquid,
     Kraken,
@@ -89,6 +95,7 @@ def generate_accounts_toml(*, public: bool = False) -> dict[str, str]:
     'lighter': Lighter,
     'margin-trade': MarginTrade,
     'grvt': Grvt,
+    'extended': Extended,
     'deribit': Deribit,
   }
 

@@ -60,6 +60,6 @@ SDK payment rates, and no next-payment time is invented. `funding_rates` and
 
 ---
 
-← [Aster Market](aster.md) · **Next:** [GRVT Market](grvt.md) →
+← [Aster Market](aster.md) · **Next:** [Extended Market](extended.md) →
 
 <!-- /next -->

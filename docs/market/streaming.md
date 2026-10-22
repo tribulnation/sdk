@@ -64,6 +64,7 @@ would raise instead.
 | Lighter | ✅ | ✅ |
 | margin.trade | ✅ | ✅ |
 | GRVT | ✅ | ✅ |
+| Extended | ✅ | ✅ |
 <!-- /streams -->
 
 Per-venue caveats are on the

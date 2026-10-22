@@ -37,7 +37,13 @@ file's own directory, so an accounts file elsewhere silently runs without creden
    alongside hourly funding, on-chain deposits and withdrawals, perp/spot transfers and
    non-zero perp and spot balances. GRVT carries a read-only `GRVT_API_KEY` and its
    `GRVT_TRADING_ACCOUNT_ID`: an API key without its private key is a `token`
-   ([ADR 0047](adr/0047-grvt-credential-modes.md)).
+   ([ADR 0047](adr/0047-grvt-credential-modes.md)). Extended carries
+   `EXTENDED_API_KEY`, a read-only key of one mainnet sub-account with no funds: every
+   account read is private, and an Extended account is one sub-account (the key's).
+   `extended_testnet` signs for the testnet wallet's main sub-account
+   (`EXTENDED_TESTNET_*`); the same wallet's sub-account 1 has its own key and Stark key
+   (`EXTENDED_TESTNET_SUB1_*`), the counterparty and transfer target of testnet trading
+   runs, since testnet order books are usually empty.
 2. Each account must reach its venue's `[qualification.market] min_mode` in
    `impl.toml`: `address`, `token` or `private`. The recorded account mode is derived
    from the credentials actually resolved, so a missing variable lowers it and the
@@ -138,6 +144,13 @@ wrong IDs, invalid books, malformed/negative prices and other checks still block
 See [ADR 0014](adr/0014-bit2me-native-ticker-limitation.md) and
 [ADR 0022](adr/0022-bit2me-one-sided-ticker-limitation.md); this is not a general
 venue exemption or permission to relabel old reports.
+
+Extended `perp` has the same limitation on RFQ markets only: `depth` is the RFQ quotes,
+while ticker bid/ask are the venue's indicative book. A failed comparison records the
+market's RFQ flag (`rules().details['is_rfq']`), and only `rfq: true` checks of the
+same observation shape become `limitation/native_ticker_quotes`; order-book markets
+such as the `BTC-USD` reference must pass. See
+[ADR 0048](adr/0048-extended-rfq-indicative-tickers.md).
 
 This suite does not call personal `fees()` or other account reads, place orders, transfer funds, or claim
 every discovery-only instrument received a depth comparison. The report preserves

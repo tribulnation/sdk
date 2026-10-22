@@ -152,3 +152,12 @@ tier = "development"
 repo = "https://github.com/tribulnation/sdk"
 path = "packages/impl/grvt"
 pypi = "https://pypi.org/project/tribulnation-grvt/"
+
+[[venues]]
+slug = "extended"
+name = "Extended"
+tier = "development"
+repo = "https://github.com/tribulnation/sdk"
+path = "packages/impl/extended"
+pypi = "https://pypi.org/project/tribulnation-extended/"
+icon = "https://catalogue.tribulnation.com/icons/platform/extended.svg"
