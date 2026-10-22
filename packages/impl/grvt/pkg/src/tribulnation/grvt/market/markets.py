@@ -176,8 +176,8 @@ class GrvtPerpMarket(Public, PerpMarket):
     return await account.leverage(self.shared, self.instrument, refetch=refetch)
 
   async def available_notional(self) -> Decimal:
-    """Free cross collateral times `leverage()`, without the venue's position-size cap
-    or risk brackets.
+    """Free cross collateral (`margin_balance` less the cross initial margin) times
+    `leverage()`, without the venue's position-size cap or risk brackets.
 
     The cross pool funds isolated positions too (their margin is moved out of it when
     they open), so an isolated market is sized against it as well.

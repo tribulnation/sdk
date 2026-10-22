@@ -287,44 +287,70 @@ def position(name: str, size: str, margin_type: str = 'CROSS') -> dict[str, Any]
 
 
 def summary(*positions: dict[str, Any]) -> dict[str, Any]:
-  """Testnet's sub-account summary while holding 0.002 BTC cross (2026-10-22)."""
+  """Testnet's flat sub-account summary (2026-10-22), with `positions` listed: in
+  multi-asset mode `margin_balance` is equity at the 99.8% collateral value ratio."""
   return {
-    'total_equity': Decimal('20019.300099'),
-    'total_cross_equity': Decimal('20019.300099'),
-    'initial_margin': Decimal('16.367512'),
-    'maintenance_margin': Decimal('1.636751'),
+    'total_equity': Decimal('20018.031815'),
+    'total_cross_equity': Decimal('20018.031815'),
+    'margin_balance': Decimal('19977.995751'),
+    'initial_margin': Decimal('0.0'),
+    'maintenance_margin': Decimal('0.0'),
     'positions': list(positions),
   }
 
 
 def mixed_summary() -> dict[str, Any]:
-  """Testnet's sub-account summary while holding 0.009 ETH cross and 0.002 BTC isolated
-  at 10x (2026-10-22): the account margins are the cross position's alone."""
+  """Testnet's sub-account summary while holding 0.084 ETH cross and 0.002 BTC isolated
+  at 10x (2026-10-22): the account margins are the cross position's alone. Read with
+  BTC's margin limits: `max_addable_amount` `19941.26479`, `max_removable_amount`
+  `0.00944`."""
   return {
-    'total_equity': Decimal('20018.510663'),
-    'total_cross_equity': Decimal('20002.175121'),
-    'initial_margin': Decimal('2.162061'),
-    'maintenance_margin': Decimal('0.216206'),
+    'total_equity': Decimal('20017.733633'),
+    'total_cross_equity': Decimal('20001.403174'),
+    'margin_balance': Decimal('19961.400456'),
+    'initial_margin': Decimal('20.135665'),
+    'maintenance_margin': Decimal('2.013566'),
     'positions': [
       {
         'instrument': ETH,
-        'size': Decimal('0.009'),
-        'notional': Decimal('21.620618'),
-        'unrealized_pnl': Decimal('-0.023481'),
+        'size': Decimal('0.084'),
+        'notional': Decimal('201.356658'),
+        'unrealized_pnl': Decimal('0.043938'),
         'margin_type': 'CROSS',
       },
       {
         'instrument': BTC,
         'size': Decimal('0.002'),
-        'notional': Decimal('163.361428'),
-        'unrealized_pnl': Decimal('-0.164571'),
+        'notional': Decimal('163.210188'),
+        'unrealized_pnl': Decimal('-0.177811'),
         'margin_type': 'ISOLATED',
-        'isolated_balance': Decimal('16.500113'),
-        'isolated_im': Decimal('16.336142'),
-        'isolated_mm': Decimal('1.633614'),
+        'isolated_balance': Decimal('16.50827'),
+        'isolated_im': Decimal('16.321018'),
+        'isolated_mm': Decimal('1.632101'),
       },
     ],
   }
+
+
+async def mixed(fake: Any) -> list[int]:
+  """Serve `mixed_summary` and the default 10x leverage; returns the leverage call log."""
+  calls: list[int] = []
+
+  async def account_summary() -> dict[str, Any]:
+    """ETH cross, BTC isolated."""
+    return mixed_summary()
+
+  async def all_initial_leverage() -> dict[str, Any]:
+    """Both at the default 10x."""
+    calls.append(1)
+    rows: list[dict[str, Any]] = [
+      {'instrument': m, 'leverage': Decimal('10.0')} for m in (BTC, ETH)
+    ]
+    return {'results': rows}
+
+  fake.trading.account_summary = account_summary
+  fake.trading.all_initial_leverage = all_initial_leverage
+  return calls
 
 
 async def test_perp_position_is_signed(shared: Shared, fake: Any):
@@ -345,36 +371,32 @@ async def test_perp_position_is_signed(shared: Shared, fake: Any):
 
 
 async def test_cross_bucket_and_available_notional(shared: Shared, fake: Any):
-  """Free collateral is equity less initial margin; leverage is cross notional over
-  equity; available notional is free collateral times the account's leverage."""
-
-  async def account_summary() -> dict[str, Any]:
-    """Holding 0.002 BTC cross."""
-    return summary(position(BTC, '0.002'))
-
-  calls: list[int] = []
-
-  async def all_initial_leverage() -> dict[str, Any]:
-    """The default initial leverage, 10."""
-    calls.append(1)
-    return {'results': [{'instrument': BTC, 'leverage': Decimal('10.0')}]}
-
-  fake.trading.account_summary = account_summary
-  fake.trading.all_initial_leverage = all_initial_leverage
-  btc = market(shared)
-  bucket = await btc.perp_collateral()
-  assert bucket.margin_mode == 'cross'
-  assert bucket.free_collateral == Decimal('20002.932587')
-  assert bucket.leverage == Decimal('163.670') / Decimal('20019.300099')
-  assert await btc.available_notional() == Decimal('200029.32587')
-  assert await btc.leverage() == 10 and calls == [1]
-  assert await btc.leverage(refetch=True) == 10 and calls == [1, 1]
-  exchange_bucket = await GrvtPerpExchange(shared=shared).perp_collateral()
-  assert exchange_bucket == bucket
+  """Equity is the cross equity; free collateral is `margin_balance` less the cross
+  initial margin (the venue's `max_addable_amount`, `19941.26479`, in the same read);
+  leverage is cross notional over equity; available notional is free collateral times
+  the account's leverage, for the isolated market too; one leverage read serves
+  every market until refetched."""
+  calls = await mixed(fake)
+  eth = market(shared, ETH)
+  cross = await eth.perp_collateral()
+  assert cross.margin_mode == 'cross'
+  assert cross.equity == Decimal('20001.403174')
+  assert (cross.initial_margin, cross.maintenance_margin) == (
+    Decimal('20.135665'),
+    Decimal('2.013566'),
+  )
+  assert cross.free_collateral == Decimal('19941.264791')
+  assert cross.leverage == Decimal('201.356658') / Decimal('20001.403174')
+  assert await GrvtPerpExchange(shared=shared).perp_collateral() == cross
+  assert await eth.available_notional() == Decimal('199412.64791')
+  assert await market(shared).available_notional() == Decimal('199412.64791')
+  assert await eth.leverage() == 10 and calls == [1]
+  assert await eth.leverage(refetch=True) == 10 and calls == [1, 1]
 
 
-async def test_flat_cross_bucket_has_zero_leverage(shared: Shared, fake: Any):
-  """No cross position: leverage is exactly zero."""
+async def test_flat_cross_bucket(shared: Shared, fake: Any):
+  """No cross position: leverage is exactly zero and free collateral is the whole
+  `margin_balance`."""
 
   async def account_summary() -> dict[str, Any]:
     """Flat."""
@@ -382,57 +404,49 @@ async def test_flat_cross_bucket_has_zero_leverage(shared: Shared, fake: Any):
 
   fake.trading.account_summary = account_summary
   bucket = await market(shared).perp_collateral()
-  assert bucket.leverage == 0 and bucket.initial_margin == Decimal('16.367512')
+  assert bucket.leverage == 0 and bucket.equity == Decimal('20018.031815')
+  assert bucket.free_collateral == Decimal('19977.995751')
+
+
+async def test_cross_free_collateral_floors_at_zero(shared: Shared, fake: Any):
+  """An initial margin above `margin_balance` leaves nothing free, never less."""
+
+  async def account_summary() -> dict[str, Any]:
+    """Margin balance below the initial margin."""
+    return {**summary(), 'margin_balance': Decimal(10), 'initial_margin': Decimal(12)}
+
+  fake.trading.account_summary = account_summary
+  assert (await market(shared).perp_collateral()).free_collateral == 0
 
 
 async def test_isolated_position_has_its_own_bucket(shared: Shared, fake: Any):
   """An isolated position's bucket is its own balance plus unrealized PnL against its
-  own margins; the cross bucket and every other market exclude it."""
-
-  async def account_summary() -> dict[str, Any]:
-    """ETH cross, BTC isolated."""
-    return mixed_summary()
-
-  async def all_initial_leverage() -> dict[str, Any]:
-    """Both at the default 10x."""
-    rows: list[dict[str, Any]] = [
-      {'instrument': m, 'leverage': Decimal('10.0')} for m in (BTC, ETH)
-    ]
-    return {'results': rows}
-
-  fake.trading.account_summary = account_summary
-  fake.trading.all_initial_leverage = all_initial_leverage
-  btc = market(shared)
-  isolated = await btc.perp_collateral()
+  own margins; free is the excess over its initial margin (the venue's
+  `max_removable_amount`, `0.00944`, in the same read)."""
+  await mixed(fake)
+  isolated = await market(shared).perp_collateral()
   assert isolated.margin_mode == 'isolated'
-  assert isolated.equity == Decimal('16.335542')
+  assert isolated.equity == Decimal('16.330459')
   assert (isolated.initial_margin, isolated.maintenance_margin) == (
-    Decimal('16.336142'),
-    Decimal('1.633614'),
+    Decimal('16.321018'),
+    Decimal('1.632101'),
   )
-  assert isolated.free_collateral == 0
-  assert isolated.leverage == Decimal('163.361428') / Decimal('16.335542')
-  cross = await market(shared, ETH).perp_collateral()
-  assert cross.margin_mode == 'cross'
-  assert cross.equity == Decimal('20002.175121')
-  assert cross.free_collateral == Decimal('20000.013060')
-  assert cross.leverage == Decimal('21.620618') / Decimal('20002.175121')
-  assert await GrvtPerpExchange(shared=shared).perp_collateral() == cross
-  assert await btc.available_notional() == Decimal('200000.13060')
+  assert isolated.free_collateral == Decimal('0.009441')
+  assert isolated.leverage == Decimal('163.210188') / Decimal('16.330459')
 
 
 async def test_added_isolated_margin_is_free(shared: Shared, fake: Any):
   """Margin added above the initial margin is free; testnet's `max_removable_amount`
-  after adding 5 USDT was `4.959468`, a micro-unit below (read a moment apart)."""
+  after adding 5 USDT was `5.01478` in the same read."""
   row: dict[str, Any] = {
     'instrument': BTC,
     'size': Decimal('0.002'),
-    'notional': Decimal('163.293325'),
-    'unrealized_pnl': Decimal('-0.158674'),
+    'notional': Decimal('163.216122'),
+    'unrealized_pnl': Decimal('-0.171877'),
     'margin_type': 'ISOLATED',
-    'isolated_balance': Decimal('21.447475'),
-    'isolated_im': Decimal('16.329332'),
-    'isolated_mm': Decimal('1.632933'),
+    'isolated_balance': Decimal('21.50827'),
+    'isolated_im': Decimal('16.321612'),
+    'isolated_mm': Decimal('1.632161'),
   }
 
   async def account_summary() -> dict[str, Any]:
@@ -441,7 +455,7 @@ async def test_added_isolated_margin_is_free(shared: Shared, fake: Any):
 
   fake.trading.account_summary = account_summary
   bucket = await market(shared).perp_collateral()
-  assert bucket.free_collateral == Decimal('4.959469')
+  assert bucket.free_collateral == Decimal('5.014781')
 
 
 async def test_isolated_position_without_its_figures_is_missing_data(

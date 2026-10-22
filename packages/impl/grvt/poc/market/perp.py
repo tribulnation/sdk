@@ -1259,11 +1259,11 @@ async def collateral(market_id: str | None = None, /) -> Collateral:
 #
 # Fetch perpetual collateral.
 #
-# **Cross** (the exchange, and any market without an isolated position): `account_summary`'s `total_cross_equity`, `initial_margin` and `maintenance_margin`, in USDT; free is equity minus the initial margin (GRVT defines `initial_margin` as the equity required to open positions); leverage is the cross positions' notional over equity. With an isolated position open, `total_cross_equity` is `total_equity` less the position's `isolated_balance` and unrealized PnL, and `initial_margin`/`maintenance_margin` are the cross positions' alone (testnet, below), so `total_equity` would count the isolated position twice.
+# **Cross** (the exchange, and any market without an isolated position): `account_summary`'s `total_cross_equity`, `initial_margin` and `maintenance_margin`, in USDT; free is `margin_balance` (the cross equity at each asset's collateral value ratio) minus the initial margin, floored at zero, which equals the venue's `max_addable_amount` (testnet, below); leverage is the cross positions' notional over equity. With an isolated position open, `total_cross_equity` is `total_equity` less the position's `isolated_balance` and unrealized PnL, and `initial_margin`/`maintenance_margin` are the cross positions' alone (testnet, below), so `total_equity` would count the isolated position twice.
 #
-# **Isolated** (a market holding an isolated position): the position's own `isolated_balance` plus its `unrealized_pnl`, against its `isolated_im` and `isolated_mm`; free is equity above `isolated_im`, floored at zero, which matched `position_margin_limits`' `max_removable_amount` (up to the mark's move between the reads). A market without a position reads cross whatever its margin type: an isolated position's margin is moved out of the cross pool when it opens. Verified in the testnet isolated bucket section below.
+# **Isolated** (a market holding an isolated position): the position's own `isolated_balance` plus its `unrealized_pnl`, against its `isolated_im` and `isolated_mm`; free is equity above `isolated_im`, floored at zero, which matched `position_margin_limits`' `max_removable_amount` (up to the mark's move between the reads). Only checked with a negative unrealized PnL: whether GRVT lets an unrealized profit be removed is untested, and if not, this overstates free collateral in profit (Aster and Hyperliquid read it the same way). A market without a position reads cross whatever its margin type: an isolated position's margin is moved out of the cross pool when it opens. Verified in the testnet isolated bucket section below.
 #
-# Both accounts are in multi-asset mode, where `margin_balance` is `total_equity` times the collateral value ratio (99.8% on testnet's USDT and USDC): shown beside the mapping, undecided which one GRVT checks orders against.
+# Both accounts are in multi-asset mode, where `margin_balance` is the cross equity times the collateral value ratio (99.8% on testnet's USDT and USDC). Free collateral is read off it rather than off equity: in every testnet read, flat, with an ETH cross position and with an isolated BTC position beside it, `margin_balance - initial_margin` equalled `max_addable_amount` exactly, while equity minus the initial margin was about 40 USDT more.
 
 
 # %%
@@ -1299,7 +1299,7 @@ async def perp_collateral(
   )
   return PerpCollateral(
     equity=equity,
-    free_collateral=equity - summary['initial_margin'],
+    free_collateral=max(summary['margin_balance'] - summary['initial_margin'], Decimal(0)),
     initial_margin=summary['initial_margin'],
     maintenance_margin=summary['maintenance_margin'],
     leverage=notional / equity if equity > 0 else Decimal(0),
@@ -1611,7 +1611,7 @@ await asyncio.sleep(3)
 # %% [markdown]
 # ## Testnet isolated bucket
 #
-# **Testnet only, user-approved for this verification:** `BTC_USDT_Perp` switched to `ISOLATED` at 10x with `set_position_config`, a minimum-size long opened by `MARKET` order, the bucket read through the SDK implementation (`tribulnation.grvt`, testnet, the API key alone) beside this script's mapping and the venue's own figures, 5 USDT added with `add_position_margin`, read again, then closed and switched back to `CROSS` at 10x. The `finally` closes and switches back whatever failed. The Report snapshot's futures cash is read while the position is open: opening it moves `isolated_balance` out of the USDT spot balance. Run after the funding cells, whose helper cell (`market_order`, `min_qty`) it reuses.
+# **Testnet only, user-approved for this verification:** `BTC_USDT_Perp` switched to `ISOLATED` at 10x with `set_position_config`, a minimum-size long opened by `MARKET` order, the bucket read through the SDK implementation (`tribulnation.grvt`, testnet, the API key alone) beside this script's mapping and the venue's own figures, 5 USDT added with `add_position_margin`, read again, then closed and switched back to `CROSS` at 10x. An ETH cross position of about 200 USDT is held beside it, so the cross free figure (`margin_balance - initial_margin`) is compared with the venue's `max_addable_amount` (the cross margin an isolated position may draw) while cross initial margin is non-zero; summary and limits are read together. The `finally` closes every position and switches BTC back whatever failed. The Report snapshot's futures cash is read while the position is open: opening it moves `isolated_balance` out of the USDT spot balance. Run after the funding cells, whose helper cell (`market_order`, `min_qty`) it reuses.
 
 # %%
 import os
@@ -1620,6 +1620,9 @@ from tribulnation.grvt import GrvtMarket, Report
 
 ISOLATED_ADD = Decimal(5)
 """USDT added to the isolated position."""
+CROSS_NOTIONAL = Decimal(200)
+"""Notional of the ETH cross position held beside it, in USDT: enough initial margin
+(about 20 USDT at 10x) to tell `margin_balance - initial_margin` from `margin_balance`."""
 TESTNET_KEY = os.environ['GRVT_TESTNET_API_KEY']
 TESTNET_ACCOUNT = os.environ.get('GRVT_TESTNET_TRADING_ACCOUNT_ID')
 sdk_venue = await stack.enter_async_context(
@@ -1640,9 +1643,17 @@ async def btc_setting() -> tuple[Decimal, str]:
 
 
 async def isolated_reads() -> dict[str, Any]:
-  """The SDK's buckets beside this mapping, the venue's figures and the snapshot cash."""
-  s = await testnet.trading.account_summary()
+  """The SDK's buckets beside this mapping, the venue's figures and the snapshot cash.
+
+  The summary and BTC's margin limits are read together, so the cross free figure
+  (`margin_balance - initial_margin`) and `max_addable_amount` describe one moment.
+  """
+  s, limits = await asyncio.gather(
+    testnet.trading.account_summary(),
+    testnet.trading.position_margin_limits(instrument=BTC),
+  )
   row = next((p for p in s['positions'] if p['instrument'] == BTC), None)
+  eth_row = next((p for p in s['positions'] if p['instrument'] == ETH), None)
   usdt = next(b['balance'] for b in s['spot_balances'] if b['currency'] == 'USDT')
   snapshot = (await sdk_report.snapshot()).snapshot
   futures = next(
@@ -1652,8 +1663,21 @@ async def isolated_reads() -> dict[str, Any]:
     'sdk BTC bucket': await sdk_btc.perp_collateral(),
     'mapping BTC bucket': await perp_collateral(BTC, on=testnet),
     'sdk cross bucket': await sdk_perp.perp_collateral(),
-    'sdk ETH bucket is cross': (await (await sdk_perp.market(ETH)).perp_collateral())
-    == await sdk_perp.perp_collateral(),
+    'sdk ETH bucket is cross': (
+      await (await sdk_perp.market(ETH)).perp_collateral()
+    ).margin_mode
+    == 'cross',
+    'cross free (margin_balance - initial) vs max_addable': (
+      max(s['margin_balance'] - s['initial_margin'], Decimal(0)),
+      limits['max_addable_amount'],
+    ),
+    'cross ETH (margin_type, size, notional, upnl)': eth_row
+    and (
+      eth_row['margin_type'],
+      eth_row['size'],
+      eth_row['notional'],
+      eth_row['unrealized_pnl'],
+    ),
     'sdk leverage, available_notional': (
       await sdk_btc.leverage(refetch=True),
       await sdk_btc.available_notional(),
@@ -1668,16 +1692,16 @@ async def isolated_reads() -> dict[str, Any]:
       row.get('isolated_im'),
       row.get('isolated_mm'),
     ),
-    'summary (total_equity, total_cross_equity, initial, maintenance)': (
+    'summary (total_equity, total_cross_equity, margin_balance, initial, maintenance)': (
       s['total_equity'],
       s['total_cross_equity'],
+      s['margin_balance'],
       s['initial_margin'],
       s['maintenance_margin'],
     ),
     'limits (addable, removable)': (
-      await testnet.trading.position_margin_limits(instrument=BTC)
-      if row and row['margin_type'] == 'ISOLATED'
-      else None
+      limits['max_addable_amount'],
+      limits['max_removable_amount'],
     ),
     'snapshot USDT vs spot + isolated_balance': (
       futures.balances.get('USDT'),
@@ -1695,14 +1719,22 @@ isolated_ask = (await testnet.market.ticker(BTC)).get('best_ask_price')
 if not isolated_ask:
   raise RuntimeError('No testnet ask on BTC')
 isolated_qty = min_qty(BTC, isolated_ask)
-isolated: dict[str, Any] = {'qty': isolated_qty, 'before': await btc_setting()}
+cross_ask = (await testnet.market.ticker(ETH)).get('best_ask_price')
+if not cross_ask:
+  raise RuntimeError('No testnet ask on ETH')
+cross_qty = min_qty(ETH, cross_ask, CROSS_NOTIONAL)
+isolated: dict[str, Any] = {
+  'qty (BTC isolated, ETH cross)': (isolated_qty, cross_qty),
+  'before': await btc_setting(),
+}
 try:
   isolated['set ISOLATED 10x'] = await testnet.trading.set_position_config(
     instrument=BTC, margin_type='ISOLATED', leverage='10'
   )
   isolated['flat, isolated setting: sdk bucket'] = await sdk_btc.perp_collateral()
-  isolated['open status'] = status_of(
-    await market_order(BTC, isolated_qty, random_client_order_id())
+  isolated['open status (ETH cross, BTC isolated)'] = (
+    status_of(await market_order(ETH, cross_qty, random_client_order_id())),
+    status_of(await market_order(BTC, isolated_qty, random_client_order_id())),
   )
   await asyncio.sleep(3)
   isolated['held'] = await isolated_reads()
@@ -1718,15 +1750,15 @@ try:
   await asyncio.sleep(2)
   isolated['added'] = await isolated_reads()
 finally:
-  held_btc = [
-    p
-    for p in await testnet.trading.positions(kind=['PERPETUAL'])
-    if p['instrument'] == BTC and p['size']
-  ]
-  if held_btc:
-    isolated['close status'] = status_of(
-      await market_order(BTC, -held_btc[0]['size'], random_client_order_id())
+  held_rows = [p for p in await testnet.trading.positions(kind=['PERPETUAL']) if p['size']]
+  isolated['close statuses'] = [
+    (
+      p['instrument'],
+      status_of(await market_order(p['instrument'], -p['size'], random_client_order_id())),
     )
+    for p in held_rows
+  ]
+  if held_rows:
     await asyncio.sleep(3)
   isolated['set CROSS 10x'] = await testnet.trading.set_position_config(
     instrument=BTC, margin_type='CROSS', leverage='10'
@@ -1765,7 +1797,7 @@ isolated
 # | `trades_history` | verified | Testnet fills (mainnet account has none): per market and exchange-wide, venue-applied bounds, cursor pages of 2 equal one walk. Fee in `fee_currency`. |
 # | `trades_stream` | verified | Testnet round trip: both IOC fills streamed with trade id, client order id, signed size, taker role and USDT fee, identical to the history rows; history trails the stream by a few seconds. Mainnet subscribes, no fills. |
 # | `position` | verified | Defers to `perp_position` (testnet positions held, see below). |
-# | `available_notional` | verified | Default: cross free collateral x `leverage` (testnet 20019 x 10; 20002.93 x 10 with 0.002 BTC held). Isolated markets too: the isolated position's margin left the cross pool on opening (testnet: cross equity fell by `isolated_balance` plus the fee), SDK 20002.03 x 10. Venue caps (`max_position_size`, risk brackets) not applied. |
+# | `available_notional` | verified | Default: cross free collateral (`margin_balance - initial_margin`) x `leverage` (testnet flat 19977.996 x 10; mainnet 9.97 x 10). Isolated markets too: the isolated position's margin left the cross pool on opening (testnet: cross equity fell by `isolated_balance` plus the fee), SDK 19941.28 x 10 with ETH cross and BTC isolated held. Venue caps (`max_position_size`, risk brackets) not applied. |
 # | `place_order` | verified | Testnet: POST_ONLY placed (`PENDING`, `0x00` reply, `OPEN` on lookup); MARKET (round trip: IOC, no price, `PENDING` reply, `FILLED` on lookup); off-tick (`2064`) and off-step (`2065`) refused as `BadRequest`. LIMIT branch (GTT without `post_only`) not sent. |
 # | `cancel_order` | verified | Testnet: by client order id; `CANCELLED`/`CLIENT_CANCEL`. The venue acks unknown ids too. |
 # | `cancel_orders` | verified | Testnet: `bulk_orders` by `client_order_i_ds`; both cancelled. |
@@ -1778,7 +1810,7 @@ isolated
 # | `perp_position` | verified | Testnet: +0.002 BTC at 81835.0 while held, flat after the close; +234 BARD at 0.1072 (funding position). Mainnet flat. |
 # | `leverage` | verified | `all_initial_leverage` per instrument (10 default; covers every active market), in either margin type: testnet BTC set `ISOLATED` 10x reads 10, and the isolated position opens at it. |
 # | `collateral` | verified | Defers to `perp_collateral`. |
-# | `perp_collateral` | verified | Cross bucket from `account_summary`'s `total_cross_equity` and margins (testnet equity 20019, mainnet 9.99; with 0.002 BTC held cross: initial 16.37, maintenance 1.64, leverage 0.0082). Isolated bucket (testnet, `set_position_config` ISOLATED 10x, 0.002 BTC): `isolated_balance` + upnl = 16.29, `isolated_im` 16.31, `isolated_mm` 1.63, free 0 (venue `max_removable_amount` 0); after `add_position_margin` 5: equity 21.28, free 4.96 (venue 4.96); SDK and mapping agree. The cross bucket then excludes it (`total_cross_equity` 20002.03 vs `total_equity` 20018.34; account margins 0). A flat isolated-set market reads cross. Multi-asset `margin_balance` vs `total_equity` undecided. |
+# | `perp_collateral` | verified | Cross bucket: equity `total_cross_equity`, the cross margins, free `margin_balance - initial_margin` (testnet flat: equity 20018.03, free 19978.00; mainnet 9.99, free 9.97). With 0.084 ETH cross beside 0.002 BTC isolated: equity 20001.40, initial 20.14, maintenance 2.01, free 19941.264791 against the venue's `max_addable_amount` 19941.26479 in the same read (19936.269936 both after adding margin); `total_cross_equity` excludes the isolated position (`total_equity` 20017.73). Isolated bucket (`set_position_config` ISOLATED 10x): `isolated_balance` + upnl, `isolated_im` 16.32, `isolated_mm` 1.63, free 0.009441 vs venue `max_removable_amount` 0.00944; after `add_position_margin` 5: equity 21.34, free 5.014781 vs 5.01478. SDK and mapping agree. Isolated free checked only with negative upnl. A flat isolated-set market reads cross. |
 
 # %% [markdown]
 # ## Catalogue

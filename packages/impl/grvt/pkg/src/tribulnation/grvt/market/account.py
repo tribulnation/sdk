@@ -50,9 +50,13 @@ def cross_bucket(s: SubAccount) -> PerpCollateral:
 
   Equity is `total_cross_equity`: `total_equity` less every isolated position's own
   balance and unrealized PnL. `initial_margin` and `maintenance_margin` are the cross
-  positions' alone (an isolated position's are its `isolated_im`/`isolated_mm`). Free
-  collateral is equity less `initial_margin` (GRVT's equity required to open
-  positions); leverage is the cross positions' notional over equity.
+  positions' alone (an isolated position's are its `isolated_im`/`isolated_mm`).
+
+  Free collateral is `margin_balance` (the cross equity at each asset's collateral
+  value ratio, 99.8% for USDT in multi-asset mode) less `initial_margin`, floored at
+  zero: on testnet it equalled `position_margin_limits`' `max_addable_amount`, the
+  margin the venue lets a position draw from the pool, with and without cross
+  positions. Leverage is the cross positions' notional over equity.
   """
   equity = s['total_cross_equity']
   notional = sum(
@@ -61,7 +65,7 @@ def cross_bucket(s: SubAccount) -> PerpCollateral:
   )
   return PerpCollateral(
     equity=equity,
-    free_collateral=equity - s['initial_margin'],
+    free_collateral=max(s['margin_balance'] - s['initial_margin'], Decimal(0)),
     initial_margin=s['initial_margin'],
     maintenance_margin=s['maintenance_margin'],
     leverage=notional / equity if notional and equity > 0 else Decimal(0),
