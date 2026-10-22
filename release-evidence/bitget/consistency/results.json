@@ -39,6 +39,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ACNSTOCKUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ACTUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -68,6 +75,20 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"AEROUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AGPUUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AKAMUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -256,6 +277,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BLSHUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BLURUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -271,6 +299,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BNBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BPUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -302,6 +337,13 @@
         "missing_data": null,
         "quotes": [],
         "status": "excluded"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BWETUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
       },
       {
         "code": "ok",
@@ -347,6 +389,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CLSKUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"COMPUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -354,7 +403,21 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CORZUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"COWUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CRMLUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -382,7 +445,35 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CSTOCKUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CVNAUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"CVXUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CYPHUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -564,6 +655,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"FASTRETAILINGUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"FETUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -627,6 +725,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"GNRCUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"GRASSUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -662,7 +767,28 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"HDUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"HUTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"HYPEUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"IBITUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -718,6 +844,27 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"JIOUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"JPMUFGUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"JPSONYUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"JSTUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -753,7 +900,35 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"KAKAOUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"KASUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"KBFGUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"KIAUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"KODUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -775,6 +950,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"LDOUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LGENERGYUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -851,6 +1033,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MDTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"MONUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -866,6 +1055,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"MOVEUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MURATAUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -963,6 +1159,20 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PATHUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PCVXUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PENDLEUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -1054,6 +1264,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"QLDUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"QNTUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -1082,6 +1299,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"RUMUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"RUNEUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -1090,6 +1314,20 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SANDUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SDGRUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SECZUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1124,6 +1362,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SNPSUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SNXUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -1149,6 +1394,20 @@
         "missing_data": null,
         "quotes": [],
         "status": "excluded"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SSBIOLOGICSUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"STONKUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
       },
       {
         "code": "ok",
@@ -1215,6 +1474,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TAIYOYUDENUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"TAOUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -1250,6 +1516,20 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TLTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TOYOTAUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"TRUMPPERP\"]",
         "missing_data": null,
         "quotes": [],
@@ -1278,6 +1558,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TWSTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"UNIPERP\"]",
         "missing_data": null,
         "quotes": [],
@@ -1299,7 +1586,21 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"URNMUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"USDCUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"USDESTOCKUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1328,6 +1629,20 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"VIRTUALUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"VKTXUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"VLOUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1418,6 +1733,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"XPUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"XRPPERP\"]",
         "missing_data": null,
         "quotes": [],
@@ -1440,6 +1762,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"XTZUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ZCSHUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1873,7 +2202,21 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"CTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"DBRUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"DNAUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -2252,6 +2595,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"MANAUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"MHAUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -3104,13 +3454,6 @@
         "status": "pass"
       },
       {
-        "code": "coverage_deferred",
-        "id": "[\"catalogue_coverage\",\"spot\",\"RWBDUSDT\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "deferred"
-      },
-      {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"RWDCUSDT\"]",
         "missing_data": null,
@@ -3637,6 +3980,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ACNSTOCKUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ACTUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -3666,6 +4016,20 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"AEROUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AGPUUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AKAMUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -3854,6 +4218,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BLSHUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BLURUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -3869,6 +4240,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BNBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BPUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -3900,6 +4278,13 @@
         "missing_data": null,
         "quotes": [],
         "status": "excluded"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BWETUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
       },
       {
         "code": "ok",
@@ -3945,6 +4330,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CLSKUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"COMPUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -3952,7 +4344,21 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CORZUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"COWUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CRMLUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -3980,7 +4386,35 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CSTOCKUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CVNAUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"CVXUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CYPHUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -4162,6 +4596,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"FASTRETAILINGUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"FETUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -4225,6 +4666,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"GNRCUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"GRASSUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -4260,7 +4708,28 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"HDUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"HUTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"HYPEUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"IBITUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -4316,6 +4785,27 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"JIOUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"JPMUFGUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"JPSONYUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"JSTUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -4351,7 +4841,35 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"KAKAOUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"KASUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"KBFGUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"KIAUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"KODUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -4373,6 +4891,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"LDOUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LGENERGYUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -4449,6 +4974,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MDTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"MONUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -4464,6 +4996,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"MOVEUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MURATAUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -4561,6 +5100,20 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PATHUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PCVXUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PENDLEUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -4652,6 +5205,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"QLDUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"QNTUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -4680,6 +5240,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"RUMUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"RUNEUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -4688,6 +5255,20 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SANDUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SDGRUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SECZUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -4722,6 +5303,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SNPSUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SNXUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -4747,6 +5335,20 @@
         "missing_data": null,
         "quotes": [],
         "status": "excluded"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SSBIOLOGICSUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"STONKUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
       },
       {
         "code": "ok",
@@ -4813,6 +5415,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TAIYOYUDENUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"TAOUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -4848,6 +5457,20 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TLTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TOYOTAUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"TRUMPPERP\"]",
         "missing_data": null,
         "quotes": [],
@@ -4876,6 +5499,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TWSTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"UNIPERP\"]",
         "missing_data": null,
         "quotes": [],
@@ -4897,7 +5527,21 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"URNMUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"USDCUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"USDESTOCKUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -4926,6 +5570,20 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"VIRTUALUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"VKTXUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"VLOUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -5016,6 +5674,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"XPUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"XRPPERP\"]",
         "missing_data": null,
         "quotes": [],
@@ -5038,6 +5703,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"XTZUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ZCSHUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -5471,7 +6143,21 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"CTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"DBRUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"DNAUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -5850,6 +6536,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"MANAUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"MHAUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -6703,13 +7396,6 @@
       },
       {
         "code": "ok",
-        "id": "[\"catalogue_identity\",\"spot\",\"RWBDUSDT\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "pass"
-      },
-      {
-        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"RWDCUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -7302,14 +7988,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.2254",
-            "after_bid": "0.2253",
-            "ask": "0.2254",
+            "after_ask": "0.2429",
+            "after_bid": "0.2427",
+            "ask": "0.2429",
             "attempt": 1,
-            "before_ask": "0.2254",
-            "before_bid": "0.2253",
-            "bid": "0.2253",
-            "elapsed_seconds": 2.151729837001767,
+            "before_ask": "0.2429",
+            "before_bid": "0.2427",
+            "bid": "0.2427",
+            "elapsed_seconds": 1.1910058539942838,
             "ticker_ids_match": true
           }
         ],
@@ -7321,14 +8007,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.00535",
-            "after_bid": "0.00533",
-            "ask": "0.00534",
+            "after_ask": "0.00537",
+            "after_bid": "0.00535",
+            "ask": "0.00537",
             "attempt": 1,
-            "before_ask": "0.00534",
-            "before_bid": "0.00532",
-            "bid": "0.00532",
-            "elapsed_seconds": 1.022651395003777,
+            "before_ask": "0.00537",
+            "before_bid": "0.00535",
+            "bid": "0.00536",
+            "elapsed_seconds": 1.1910849039559253,
             "ticker_ids_match": true
           }
         ],
@@ -7340,14 +8026,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.09139",
-            "after_bid": "0.09131",
-            "ask": "0.0914",
+            "after_ask": "0.09590",
+            "after_bid": "0.09586",
+            "ask": "0.09589",
             "attempt": 1,
-            "before_ask": "0.09139",
-            "before_bid": "0.09131",
-            "bid": "0.0913",
-            "elapsed_seconds": 0.9884413870167919,
+            "before_ask": "0.09588",
+            "before_bid": "0.09586",
+            "bid": "0.09586",
+            "elapsed_seconds": 1.214633246010635,
             "ticker_ids_match": true
           }
         ],
@@ -7359,14 +8045,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "81508.99",
-            "after_bid": "81508.98",
-            "ask": "81504.91",
+            "after_ask": "84659.42",
+            "after_bid": "84659.41",
+            "ask": "84659.42",
             "attempt": 1,
-            "before_ask": "81508.99",
-            "before_bid": "81508.98",
-            "bid": "81504.9",
-            "elapsed_seconds": 1.0757655029883608,
+            "before_ask": "84659.42",
+            "before_bid": "84659.41",
+            "bid": "84659.41",
+            "elapsed_seconds": 1.0124251350061968,
             "ticker_ids_match": true
           }
         ],
@@ -7378,14 +8064,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.002902",
-            "after_bid": "0.002897",
-            "ask": "0.0029",
+            "after_ask": "0.003196",
+            "after_bid": "0.003188",
+            "ask": "0.003194",
             "attempt": 1,
-            "before_ask": "0.002902",
-            "before_bid": "0.002897",
-            "bid": "0.002897",
-            "elapsed_seconds": 0.7804181390092708,
+            "before_ask": "0.003196",
+            "before_bid": "0.003188",
+            "bid": "0.003189",
+            "elapsed_seconds": 0.7933936910121702,
             "ticker_ids_match": true
           }
         ],
@@ -7397,14 +8083,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "147.8",
-            "after_bid": "147.75",
-            "ask": "147.8",
+            "after_ask": "158.88",
+            "after_bid": "158.69",
+            "ask": "158.88",
             "attempt": 1,
-            "before_ask": "147.8",
-            "before_bid": "147.75",
-            "bid": "147.75",
-            "elapsed_seconds": 0.8585631999885663,
+            "before_ask": "158.88",
+            "before_bid": "158.69",
+            "bid": "158.69",
+            "elapsed_seconds": 0.8081845899578184,
             "ticker_ids_match": true
           }
         ],
@@ -7416,14 +8102,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.2153",
-            "after_bid": "0.2152",
-            "ask": "0.2153",
+            "after_ask": "0.2283",
+            "after_bid": "0.2282",
+            "ask": "0.2283",
             "attempt": 1,
-            "before_ask": "0.2153",
-            "before_bid": "0.2152",
-            "bid": "0.2152",
-            "elapsed_seconds": 0.7821553919930011,
+            "before_ask": "0.2283",
+            "before_bid": "0.2282",
+            "bid": "0.2282",
+            "elapsed_seconds": 0.8049084959784523,
             "ticker_ids_match": true
           }
         ],
@@ -7435,14 +8121,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "81369.3",
-            "after_bid": "81369.2",
-            "ask": "81358",
+            "after_ask": "84533.8",
+            "after_bid": "84533.7",
+            "ask": "84533.8",
             "attempt": 1,
-            "before_ask": "81358.0",
-            "before_bid": "81357.9",
-            "bid": "81357.9",
-            "elapsed_seconds": 0.8043228290043771,
+            "before_ask": "84533.8",
+            "before_bid": "84533.7",
+            "bid": "84533.7",
+            "elapsed_seconds": 0.8239314820384607,
             "ticker_ids_match": true
           }
         ],
@@ -7454,14 +8140,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.2252",
-            "after_bid": "0.2251",
-            "ask": "0.2252",
+            "after_ask": "0.2428",
+            "after_bid": "0.2426",
+            "ask": "0.2428",
             "attempt": 1,
-            "before_ask": "0.2252",
-            "before_bid": "0.2251",
-            "bid": "0.2251",
-            "elapsed_seconds": 1.0452858609787654,
+            "before_ask": "0.2428",
+            "before_bid": "0.2426",
+            "bid": "0.2426",
+            "elapsed_seconds": 0.8567749749636278,
             "ticker_ids_match": true
           }
         ],
@@ -7473,14 +8159,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.1004",
-            "after_bid": "0.1003",
-            "ask": "0.1004",
+            "after_ask": "0.1083",
+            "after_bid": "0.1082",
+            "ask": "0.1083",
             "attempt": 1,
-            "before_ask": "0.1004",
-            "before_bid": "0.1003",
-            "bid": "0.1003",
-            "elapsed_seconds": 0.8345159599848557,
+            "before_ask": "0.1083",
+            "before_bid": "0.1082",
+            "bid": "0.1082",
+            "elapsed_seconds": 0.8796248559956439,
             "ticker_ids_match": true
           }
         ],
@@ -7492,14 +8178,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.00665",
-            "after_bid": "0.00663",
-            "ask": "0.00665",
+            "after_ask": "0.00677",
+            "after_bid": "0.00674",
+            "ask": "0.00677",
             "attempt": 1,
-            "before_ask": "0.00665",
-            "before_bid": "0.00663",
-            "bid": "0.00663",
-            "elapsed_seconds": 0.8506827960081864,
+            "before_ask": "0.00677",
+            "before_bid": "0.00674",
+            "bid": "0.00674",
+            "elapsed_seconds": 0.9540984259801917,
             "ticker_ids_match": true
           }
         ],
@@ -7511,14 +8197,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "81472.2",
-            "after_bid": "81472.1",
-            "ask": "81472.2",
+            "after_ask": "84592.2",
+            "after_bid": "84592.1",
+            "ask": "84612",
             "attempt": 1,
-            "before_ask": "81472.2",
-            "before_bid": "81472.1",
-            "bid": "81472.1",
-            "elapsed_seconds": 0.8246367030078545,
+            "before_ask": "84592.2",
+            "before_bid": "84592.1",
+            "bid": "84611.9",
+            "elapsed_seconds": 0.8888556089950725,
             "ticker_ids_match": true
           }
         ],
@@ -12044,7 +12730,14 @@
           "MDTUSDT",
           "CSTOCKUSDT",
           "BPUSDT",
-          "VLOUSDT"
+          "VLOUSDT",
+          "ELICEUSDT",
+          "AXISUSDT",
+          "EBAYUSDT",
+          "IBKRUSDT",
+          "HLTUSDT",
+          "MSCIUSDT",
+          "ABBVUSDT"
         ]
       },
       {

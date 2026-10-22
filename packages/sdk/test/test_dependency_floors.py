@@ -174,3 +174,16 @@ def test_keep_latest_adapters_require_sdk_2_18():
     )
     assert Version('2.17.0') not in requirement.specifier, venue
     assert Version('2.18.0') in requirement.specifier, venue
+
+
+def test_margin_trade_requires_sdk_2_19():
+  """margin.trade is reached through the `MarginTrade` account and the Market/Report
+  routing that SDK 2.19 introduces, and is released with it."""
+  manifest = ROOT / 'packages/impl/margin-trade/pkg/pyproject.toml'
+  requirement = next(
+    Requirement(value)
+    for value in dependencies(manifest)
+    if Requirement(value).name == 'tribulnation-sdk'
+  )
+  assert Version('2.18.0') not in requirement.specifier
+  assert Version('2.19.0') in requirement.specifier

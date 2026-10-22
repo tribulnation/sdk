@@ -1,6 +1,6 @@
 # Local SDK evidence: binance
 
-Run completed: 2026-10-20T10:40:21.851004+00:00
+Run completed: 2026-10-21T17:47:38.601584+00:00
 
 This records a trusted local run, not cryptographic proof. Release policy must separately validate required check coverage and statuses.
 

@@ -4,6 +4,20 @@
     "checks": [
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"0G\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"2Z\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"AAVE\"]",
         "missing_data": null,
         "quotes": [],
@@ -32,6 +46,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AIXBT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ALGO\"]",
         "missing_data": null,
         "quotes": [],
@@ -39,7 +60,28 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ALT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ANIME\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"APE\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"APEX\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -102,7 +144,42 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AZTEC\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BABY\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BANANA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BCH\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BERA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BIGTIME\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -137,6 +214,20 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BOME\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BRETT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"BSV\"]",
         "missing_data": null,
         "quotes": [],
@@ -158,6 +249,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CASHCAT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"CC\"]",
         "missing_data": null,
         "quotes": [],
@@ -172,6 +270,20 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CFX\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CHIP\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"COMP\"]",
         "missing_data": null,
         "quotes": [],
@@ -180,6 +292,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"CRV\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"DASH\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -277,7 +396,21 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"FOGO\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"GALA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"GAS\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -298,7 +431,28 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"GOAT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"GRAM\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"GRASS\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"GRIFFAIN\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -312,7 +466,28 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"HEMI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"HMSTR\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"HYPE\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"HYPER\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -327,6 +502,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"IMX\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"INIT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -362,6 +544,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"JUP\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"KAITO\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -417,6 +606,62 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MANTA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ME\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MEGA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MELANIA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MEME\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MERL\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MET\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MINA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"MNT\"]",
         "missing_data": null,
         "quotes": [],
@@ -431,7 +676,21 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MOODENG\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"MORPHO\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MOVE\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -460,6 +719,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"NOT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"NXPC\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -508,6 +774,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PEOPLE\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"PNUT\"]",
         "missing_data": null,
         "quotes": [],
@@ -516,6 +789,34 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"POL\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"POLYX\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PONS\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"POPCAT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PROVE\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -550,7 +851,21 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"RESOLV\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"REZ\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"RSR\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -571,6 +886,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SAGA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SAND\"]",
         "missing_data": null,
         "quotes": [],
@@ -579,6 +901,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SEI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SKR\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -606,6 +935,34 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SOPH\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SPX\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"STABLE\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"STBL\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"STRK\"]",
         "missing_data": null,
         "quotes": [],
@@ -621,6 +978,20 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"SUI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SUPER\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SUSHI\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -648,7 +1019,21 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TNSR\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"TON\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TRB\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -669,7 +1054,28 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TURBO\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"UMA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"UNI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"USELESS\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -704,6 +1110,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"WCT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"WIF\"]",
         "missing_data": null,
         "quotes": [],
@@ -719,6 +1132,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"WLFI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"XAI\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -753,7 +1173,21 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"YGG\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ZEC\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ZEN\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -774,7 +1208,70 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ZORA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"ZRO\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"io:ANTH\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"io:EWY\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"io:GPRO\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"io:IONQ\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"io:NBIS\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"io:OAI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"io:PRL\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"io:SNDK\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -795,6 +1292,20 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"kLUNC\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"kNEIRO\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"kPEPE\"]",
         "missing_data": null,
         "quotes": [],
@@ -809,6 +1320,188 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"para:AAOI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"para:AVGO\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"para:COHR\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"para:CRDO\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"para:CRWD\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"para:GLW\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"para:IREN\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"para:LRCX\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"para:MELI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"para:NET\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"para:RDDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"para:SMCI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"para:SMH\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"para:STX\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"para:TER\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"para:TREAD\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"para:TTWO\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"para:UNITREE\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"para:VST\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:AAOI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:ASML\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:BABA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:BB\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:BMNR\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:BOT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:BX\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"xyz:CL\"]",
         "missing_data": null,
         "quotes": [],
@@ -816,7 +1509,336 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:COPPER\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:CXMT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:DELL\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:DKNG\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:EBAY\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:EUR\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:EWJ\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:EWT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:EWZ\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:GLW\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:GME\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:GOLD\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:HIMS\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:HYUNDAI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:KIOXIA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:KORU\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:KSTR\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:LRCX\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:LYTE\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:MINIMAX\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:NET\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:NOK\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:NOW\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:OURA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:PALLADIUM\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:PLATINUM\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:QNT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:RDDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:RIVN\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:RKLB\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:SHEIN\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"xyz:SILVER\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:SMH\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:SNXX\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:STRC\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:UNITREE\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:USAR\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:XLE\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:ZHIPU\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"xyz:ZM\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"AIW3/USDC:711\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ANON/USDC:174\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"AXL/USDH:252\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"AZTEC/USDC:285\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BASED/USDC:305\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"DRV/USDC:700\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"FLOCK/USDC:707\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"FLR/USDC:225\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -844,14 +1866,14 @@
       },
       {
         "code": "ok",
-        "id": "[\"catalogue_coverage\",\"spot\",\"MON/USDC:129\"]",
+        "id": "[\"catalogue_coverage\",\"spot\",\"KITE/USDC:310\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
-        "id": "[\"catalogue_coverage\",\"spot\",\"PEPE/USDC:11\"]",
+        "id": "[\"catalogue_coverage\",\"spot\",\"MAX/USDC:591\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -859,6 +1881,20 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"PURR/USDC:0\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"STABLE/USDC:258\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"TREAD/USDC:719\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -928,6 +1964,20 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"0G\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"2Z\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"AAVE\"]",
         "missing_data": null,
         "quotes": [],
@@ -956,6 +2006,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AIXBT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ALGO\"]",
         "missing_data": null,
         "quotes": [],
@@ -963,7 +2020,28 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ALT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ANIME\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"APE\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"APEX\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1026,7 +2104,42 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AZTEC\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BABY\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BANANA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BCH\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BERA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BIGTIME\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1061,6 +2174,20 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BOME\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BRETT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"BSV\"]",
         "missing_data": null,
         "quotes": [],
@@ -1082,6 +2209,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CASHCAT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"CC\"]",
         "missing_data": null,
         "quotes": [],
@@ -1096,6 +2230,20 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CFX\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CHIP\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"COMP\"]",
         "missing_data": null,
         "quotes": [],
@@ -1104,6 +2252,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"CRV\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"DASH\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1201,7 +2356,21 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"FOGO\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"GALA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"GAS\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1222,7 +2391,28 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"GOAT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"GRAM\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"GRASS\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"GRIFFAIN\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1236,7 +2426,28 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"HEMI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"HMSTR\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"HYPE\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"HYPER\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1251,6 +2462,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"IMX\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"INIT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1286,6 +2504,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"JUP\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"KAITO\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1341,6 +2566,62 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MANTA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ME\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MEGA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MELANIA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MEME\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MERL\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MET\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MINA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"MNT\"]",
         "missing_data": null,
         "quotes": [],
@@ -1355,7 +2636,21 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MOODENG\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"MORPHO\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MOVE\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1384,6 +2679,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"NOT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"NXPC\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1432,6 +2734,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PEOPLE\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"PNUT\"]",
         "missing_data": null,
         "quotes": [],
@@ -1440,6 +2749,34 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"POL\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"POLYX\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PONS\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"POPCAT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PROVE\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1474,7 +2811,21 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"RESOLV\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"REZ\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"RSR\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1495,6 +2846,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SAGA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SAND\"]",
         "missing_data": null,
         "quotes": [],
@@ -1503,6 +2861,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SEI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SKR\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1530,6 +2895,34 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SOPH\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SPX\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"STABLE\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"STBL\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"STRK\"]",
         "missing_data": null,
         "quotes": [],
@@ -1545,6 +2938,20 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"SUI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SUPER\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SUSHI\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1572,7 +2979,21 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TNSR\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"TON\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TRB\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1593,7 +3014,28 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TURBO\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"UMA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"UNI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"USELESS\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1628,6 +3070,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"WCT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"WIF\"]",
         "missing_data": null,
         "quotes": [],
@@ -1643,6 +3092,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"WLFI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"XAI\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1677,7 +3133,21 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"YGG\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ZEC\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ZEN\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1698,7 +3168,70 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ZORA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ZRO\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"io:ANTH\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"io:EWY\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"io:GPRO\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"io:IONQ\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"io:NBIS\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"io:OAI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"io:PRL\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"io:SNDK\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1719,6 +3252,20 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"kLUNC\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"kNEIRO\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"kPEPE\"]",
         "missing_data": null,
         "quotes": [],
@@ -1733,6 +3280,188 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"para:AAOI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"para:AVGO\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"para:COHR\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"para:CRDO\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"para:CRWD\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"para:GLW\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"para:IREN\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"para:LRCX\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"para:MELI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"para:NET\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"para:RDDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"para:SMCI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"para:SMH\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"para:STX\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"para:TER\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"para:TREAD\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"para:TTWO\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"para:UNITREE\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"para:VST\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:AAOI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:ASML\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:BABA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:BB\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:BMNR\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:BOT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:BX\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"xyz:CL\"]",
         "missing_data": null,
         "quotes": [],
@@ -1740,7 +3469,336 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:COPPER\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:CXMT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:DELL\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:DKNG\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:EBAY\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:EUR\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:EWJ\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:EWT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:EWZ\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:GLW\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:GME\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:GOLD\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:HIMS\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:HYUNDAI\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:KIOXIA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:KORU\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:KSTR\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:LRCX\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:LYTE\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:MINIMAX\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:NET\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:NOK\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:NOW\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:OURA\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:PALLADIUM\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:PLATINUM\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:QNT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:RDDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:RIVN\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:RKLB\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:SHEIN\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"xyz:SILVER\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:SMH\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:SNXX\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:STRC\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:UNITREE\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:USAR\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:XLE\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:ZHIPU\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"xyz:ZM\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"AIW3/USDC:711\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ANON/USDC:174\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"AXL/USDH:252\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"AZTEC/USDC:285\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BASED/USDC:305\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"DRV/USDC:700\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"FLOCK/USDC:707\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"FLR/USDC:225\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1768,14 +3826,14 @@
       },
       {
         "code": "ok",
-        "id": "[\"catalogue_identity\",\"spot\",\"MON/USDC:129\"]",
+        "id": "[\"catalogue_identity\",\"spot\",\"KITE/USDC:310\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
       },
       {
         "code": "ok",
-        "id": "[\"catalogue_identity\",\"spot\",\"PEPE/USDC:11\"]",
+        "id": "[\"catalogue_identity\",\"spot\",\"MAX/USDC:591\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1783,6 +3841,20 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"PURR/USDC:0\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"STABLE/USDC:258\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"TREAD/USDC:719\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -2269,14 +4341,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.22524",
-            "after_bid": "0.22509",
-            "ask": "0.22515",
+            "after_ask": "0.24335",
+            "after_bid": "0.24325",
+            "ask": "0.24335",
             "attempt": 1,
-            "before_ask": "0.22515",
-            "before_bid": "0.22507",
-            "bid": "0.22508",
-            "elapsed_seconds": 1.4480398430023342,
+            "before_ask": "0.24335",
+            "before_bid": "0.24325",
+            "bid": "0.24325",
+            "elapsed_seconds": 1.4647194349672645,
             "ticker_ids_match": true
           }
         ],
@@ -2288,14 +4360,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.028983",
-            "after_bid": "0.028981",
-            "ask": "0.028983",
+            "after_ask": "0.031911",
+            "after_bid": "0.031904",
+            "ask": "0.031911",
             "attempt": 1,
-            "before_ask": "0.028985",
-            "before_bid": "0.02898",
-            "bid": "0.028981",
-            "elapsed_seconds": 1.3867963110096753,
+            "before_ask": "0.031911",
+            "before_bid": "0.031906",
+            "bid": "0.031904",
+            "elapsed_seconds": 1.4820597679936327,
             "ticker_ids_match": true
           }
         ],
@@ -2307,14 +4379,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "147.93",
-            "after_bid": "147.92",
-            "ask": "147.93",
+            "after_ask": "159.79",
+            "after_bid": "159.75",
+            "ask": "159.79",
             "attempt": 1,
-            "before_ask": "147.93",
-            "before_bid": "147.92",
-            "bid": "147.92",
-            "elapsed_seconds": 1.5050500969809946,
+            "before_ask": "159.76",
+            "before_bid": "159.73",
+            "bid": "159.75",
+            "elapsed_seconds": 1.5089023199980147,
             "ticker_ids_match": true
           }
         ],
@@ -2326,14 +4398,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "81480.0",
-            "after_bid": "81479.0",
-            "ask": "81480.0",
+            "after_ask": "84686.0",
+            "after_bid": "84685.0",
+            "ask": "84686.0",
             "attempt": 1,
-            "before_ask": "81480.0",
-            "before_bid": "81479.0",
-            "bid": "81479.0",
-            "elapsed_seconds": 1.1611982960021123,
+            "before_ask": "84686.0",
+            "before_bid": "84685.0",
+            "bid": "84685.0",
+            "elapsed_seconds": 1.3993537250207737,
             "ticker_ids_match": true
           }
         ],
@@ -2352,7 +4424,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0093951740127522,
+            "elapsed_seconds": 0.9493365369853564,
             "ticker_ids_match": true
           },
           {
@@ -2363,7 +4435,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.116980030987179,
+            "elapsed_seconds": 1.057817013002932,
             "ticker_ids_match": true
           },
           {
@@ -2374,380 +4446,74 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.95196884899633,
+            "elapsed_seconds": 0.9944687259849161,
             "ticker_ids_match": true
           }
         ],
         "status": "unavailable"
       },
       {
-        "code": "empty_book",
+        "code": "delisted",
         "id": "[\"ticker_depth\",\"cash\",\"cash:AMZN\"]",
         "missing_data": null,
-        "quotes": [
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 1,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9375288749870379,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 2,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9495176950003952,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 3,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9464785190066323,
-            "ticker_ids_match": true
-          }
-        ],
-        "status": "unavailable"
+        "quotes": [],
+        "status": "excluded"
       },
       {
-        "code": "empty_book",
+        "code": "delisted",
         "id": "[\"ticker_depth\",\"cash\",\"cash:BTC\"]",
         "missing_data": null,
-        "quotes": [
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 1,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9795932839915622,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 2,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9731888230016921,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 3,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 1.317855221015634,
-            "ticker_ids_match": true
-          }
-        ],
-        "status": "unavailable"
+        "quotes": [],
+        "status": "excluded"
       },
       {
-        "code": "empty_book",
+        "code": "delisted",
         "id": "[\"ticker_depth\",\"cash\",\"cash:CAR\"]",
         "missing_data": null,
-        "quotes": [
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 1,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 1.0144620210048743,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 2,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9756003060028888,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 3,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9366372330114245,
-            "ticker_ids_match": true
-          }
-        ],
-        "status": "unavailable"
+        "quotes": [],
+        "status": "excluded"
       },
       {
-        "code": "empty_book",
+        "code": "delisted",
         "id": "[\"ticker_depth\",\"flx\",\"flx:BTC\"]",
         "missing_data": null,
-        "quotes": [
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 1,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9996968350023963,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 2,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9481753700238187,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 3,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9857279410061892,
-            "ticker_ids_match": true
-          }
-        ],
-        "status": "unavailable"
+        "quotes": [],
+        "status": "excluded"
       },
       {
-        "code": "empty_book",
+        "code": "delisted",
         "id": "[\"ticker_depth\",\"flx\",\"flx:COIN\"]",
         "missing_data": null,
-        "quotes": [
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 1,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9982683730195276,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 2,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 1.138141813018592,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 3,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 1.2628296799957752,
-            "ticker_ids_match": true
-          }
-        ],
-        "status": "unavailable"
+        "quotes": [],
+        "status": "excluded"
       },
       {
-        "code": "empty_book",
+        "code": "delisted",
         "id": "[\"ticker_depth\",\"flx\",\"flx:COPPER\"]",
         "missing_data": null,
-        "quotes": [
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 1,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 1.0074554869788699,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 2,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.944958243984729,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 3,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 1.3191982519929297,
-            "ticker_ids_match": true
-          }
-        ],
-        "status": "unavailable"
+        "quotes": [],
+        "status": "excluded"
       },
       {
-        "code": "empty_book",
+        "code": "delisted",
         "id": "[\"ticker_depth\",\"hyna\",\"hyna:1000PEPE\"]",
         "missing_data": null,
-        "quotes": [
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 1,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 1.1375165189965628,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 2,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9633842920011375,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 3,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 1.1951651640119962,
-            "ticker_ids_match": true
-          }
-        ],
-        "status": "unavailable"
+        "quotes": [],
+        "status": "excluded"
       },
       {
-        "code": "empty_book",
+        "code": "delisted",
         "id": "[\"ticker_depth\",\"hyna\",\"hyna:ADA\"]",
         "missing_data": null,
-        "quotes": [
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 1,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 1.0088542159937788,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 2,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9937493409961462,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 3,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 1.5999078219756484,
-            "ticker_ids_match": true
-          }
-        ],
-        "status": "unavailable"
+        "quotes": [],
+        "status": "excluded"
       },
       {
-        "code": "empty_book",
+        "code": "delisted",
         "id": "[\"ticker_depth\",\"hyna\",\"hyna:BASED\"]",
         "missing_data": null,
-        "quotes": [
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 1,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 1.0942896360065788,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 2,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9787294260167982,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 3,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9463079419801943,
-            "ticker_ids_match": true
-          }
-        ],
-        "status": "unavailable"
+        "quotes": [],
+        "status": "excluded"
       },
       {
         "code": "ok",
@@ -2755,14 +4521,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "1960.1",
-            "after_bid": "1960.0",
-            "ask": "1960.1",
+            "after_ask": "1958.2",
+            "after_bid": "1957.9",
+            "ask": "1958.2",
             "attempt": 1,
-            "before_ask": "1960.1",
-            "before_bid": "1960.0",
-            "bid": "1960.0",
-            "elapsed_seconds": 1.1511022120248526,
+            "before_ask": "1958.2",
+            "before_bid": "1957.9",
+            "bid": "1957.9",
+            "elapsed_seconds": 1.0653175129555166,
             "ticker_ids_match": true
           }
         ],
@@ -2774,14 +4540,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "46.354",
-            "after_bid": "46.348",
-            "ask": "46.354",
+            "after_ask": "49.244",
+            "after_bid": "49.235",
+            "ask": "49.244",
             "attempt": 1,
-            "before_ask": "46.354",
-            "before_bid": "46.352",
-            "bid": "46.352",
-            "elapsed_seconds": 1.0317374959995504,
+            "before_ask": "49.244",
+            "before_bid": "49.235",
+            "bid": "49.235",
+            "elapsed_seconds": 0.981219554960262,
             "ticker_ids_match": true
           }
         ],
@@ -2793,264 +4559,60 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "151.0",
-            "after_bid": "150.97",
-            "ask": "151.0",
+            "after_ask": "156.82",
+            "after_bid": "156.77",
+            "ask": "156.82",
             "attempt": 1,
-            "before_ask": "151.02",
-            "before_bid": "150.97",
-            "bid": "150.97",
-            "elapsed_seconds": 1.1633057619910687,
+            "before_ask": "156.82",
+            "before_bid": "156.77",
+            "bid": "156.77",
+            "elapsed_seconds": 0.9493200810393319,
             "ticker_ids_match": true
           }
         ],
         "status": "pass"
       },
       {
-        "code": "empty_book",
+        "code": "delisted",
         "id": "[\"ticker_depth\",\"km\",\"km:AAPL\"]",
         "missing_data": null,
-        "quotes": [
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 1,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9466275220038369,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 2,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 1.2460966060170904,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 3,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9748070389905479,
-            "ticker_ids_match": true
-          }
-        ],
-        "status": "unavailable"
+        "quotes": [],
+        "status": "excluded"
       },
       {
-        "code": "empty_book",
+        "code": "delisted",
         "id": "[\"ticker_depth\",\"km\",\"km:BABA\"]",
         "missing_data": null,
-        "quotes": [
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 1,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9388830990064889,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 2,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 1.1056574730027933,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 3,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9985603269888088,
-            "ticker_ids_match": true
-          }
-        ],
-        "status": "unavailable"
+        "quotes": [],
+        "status": "excluded"
       },
       {
-        "code": "empty_book",
+        "code": "delisted",
         "id": "[\"ticker_depth\",\"km\",\"km:BMNR\"]",
         "missing_data": null,
-        "quotes": [
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 1,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 1.0721504680113867,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 2,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 1.3105925810232293,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 3,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.941170542006148,
-            "ticker_ids_match": true
-          }
-        ],
-        "status": "unavailable"
+        "quotes": [],
+        "status": "excluded"
       },
       {
-        "code": "empty_book",
+        "code": "delisted",
         "id": "[\"ticker_depth\",\"mkts\",\"mkts:AAPL\"]",
         "missing_data": null,
-        "quotes": [
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 1,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9426238209998701,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 2,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9710784270137083,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 3,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 1.064036780007882,
-            "ticker_ids_match": true
-          }
-        ],
-        "status": "unavailable"
+        "quotes": [],
+        "status": "excluded"
       },
       {
-        "code": "empty_book",
+        "code": "delisted",
         "id": "[\"ticker_depth\",\"mkts\",\"mkts:BABA\"]",
         "missing_data": null,
-        "quotes": [
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 1,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 1.089936582982773,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 2,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9329107239900623,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 3,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 0.9480293990054633,
-            "ticker_ids_match": true
-          }
-        ],
-        "status": "unavailable"
+        "quotes": [],
+        "status": "excluded"
       },
       {
-        "code": "empty_book",
+        "code": "delisted",
         "id": "[\"ticker_depth\",\"mkts\",\"mkts:BMNR\"]",
         "missing_data": null,
-        "quotes": [
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 1,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 1.0247222449979745,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 2,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 1.2844732519879472,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": null,
-            "after_bid": null,
-            "ask": null,
-            "attempt": 3,
-            "before_ask": null,
-            "before_bid": null,
-            "bid": null,
-            "elapsed_seconds": 1.251268876978429,
-            "ticker_ids_match": true
-          }
-        ],
-        "status": "unavailable"
+        "quotes": [],
+        "status": "excluded"
       },
       {
         "code": "ok",
@@ -3058,14 +4620,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "5.1355",
-            "after_bid": "5.1325",
-            "ask": "5.1355",
+            "after_ask": "5.1188",
+            "after_bid": "5.1148",
+            "ask": "5.1188",
             "attempt": 1,
-            "before_ask": "5.1355",
-            "before_bid": "5.1325",
-            "bid": "5.1325",
-            "elapsed_seconds": 1.003839741984848,
+            "before_ask": "5.1188",
+            "before_bid": "5.1148",
+            "bid": "5.1148",
+            "elapsed_seconds": 1.2411057909484953,
             "ticker_ids_match": true
           }
         ],
@@ -3077,14 +4639,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "4.8026",
-            "after_bid": "4.7988",
-            "ask": "4.8026",
+            "after_ask": "4.8151",
+            "after_bid": "4.8113",
+            "ask": "4.8151",
             "attempt": 1,
-            "before_ask": "4.8026",
-            "before_bid": "4.7988",
-            "bid": "4.7988",
-            "elapsed_seconds": 1.2205688279937021,
+            "before_ask": "4.8151",
+            "before_bid": "4.8113",
+            "bid": "4.8113",
+            "elapsed_seconds": 1.843897299026139,
             "ticker_ids_match": true
           }
         ],
@@ -3096,14 +4658,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "5.4521",
-            "after_bid": "5.4477",
-            "ask": "5.4521",
+            "after_ask": "5.4096",
+            "after_bid": "5.4036",
+            "ask": "5.4096",
             "attempt": 1,
-            "before_ask": "5.4521",
-            "before_bid": "5.4477",
-            "bid": "5.4477",
-            "elapsed_seconds": 1.5001075479958672,
+            "before_ask": "5.4096",
+            "before_bid": "5.4036",
+            "bid": "5.4036",
+            "elapsed_seconds": 1.25001166498987,
             "ticker_ids_match": true
           }
         ],
@@ -3122,7 +4684,7 @@
             "before_ask": "349.51",
             "before_bid": "290.0",
             "bid": "290.0",
-            "elapsed_seconds": 1.4870882700197399,
+            "elapsed_seconds": 1.846493056975305,
             "ticker_ids_match": true
           }
         ],
@@ -3141,7 +4703,7 @@
             "before_ask": null,
             "before_bid": "10.0",
             "bid": "10.0",
-            "elapsed_seconds": 2.0533280709933024,
+            "elapsed_seconds": 1.5858818200067617,
             "ticker_ids_match": true
           }
         ],
@@ -3153,14 +4715,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "148.5",
-            "after_bid": "147.37",
-            "ask": "148.5",
+            "after_ask": "160.1",
+            "after_bid": "158.73",
+            "ask": "160.1",
             "attempt": 1,
-            "before_ask": "148.5",
-            "before_bid": "147.37",
-            "bid": "147.37",
-            "elapsed_seconds": 1.9175194049894344,
+            "before_ask": "160.1",
+            "before_bid": "158.73",
+            "bid": "158.73",
+            "elapsed_seconds": 1.8542730470071547,
             "ticker_ids_match": true
           }
         ],
@@ -3172,14 +4734,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "81406.0",
-            "after_bid": "81405.0",
-            "ask": "81406.0",
+            "after_ask": "84654.0",
+            "after_bid": "84653.0",
+            "ask": "84654.0",
             "attempt": 1,
-            "before_ask": "81406.0",
-            "before_bid": "81405.0",
-            "bid": "81405.0",
-            "elapsed_seconds": 1.856696942995768,
+            "before_ask": "84654.0",
+            "before_bid": "84653.0",
+            "bid": "84653.0",
+            "elapsed_seconds": 1.8401047450024635,
             "ticker_ids_match": true
           }
         ],
@@ -3198,7 +4760,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.4123757850029506,
+            "elapsed_seconds": 1.055547474999912,
             "ticker_ids_match": true
           },
           {
@@ -3209,7 +4771,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0438378959952388,
+            "elapsed_seconds": 0.9827027280116454,
             "ticker_ids_match": true
           },
           {
@@ -3220,7 +4782,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.3140095430135261,
+            "elapsed_seconds": 1.0317264460027218,
             "ticker_ids_match": true
           }
         ],
@@ -3239,7 +4801,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9535535670001991,
+            "elapsed_seconds": 0.9539818679913878,
             "ticker_ids_match": true
           },
           {
@@ -3250,7 +4812,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0063331630080938,
+            "elapsed_seconds": 0.9447781089693308,
             "ticker_ids_match": true
           },
           {
@@ -3261,7 +4823,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.0165641010098625,
+            "elapsed_seconds": 1.2789769300143234,
             "ticker_ids_match": true
           }
         ],
@@ -3280,7 +4842,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9412512050184887,
+            "elapsed_seconds": 0.9699484970187768,
             "ticker_ids_match": true
           },
           {
@@ -3291,7 +4853,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.2697852889832575,
+            "elapsed_seconds": 1.1057900099549443,
             "ticker_ids_match": true
           },
           {
@@ -3302,7 +4864,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9548696179990657,
+            "elapsed_seconds": 0.9907056179945357,
             "ticker_ids_match": true
           }
         ],
@@ -3314,14 +4876,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "74.594",
-            "after_bid": "74.575",
-            "ask": "74.594",
+            "after_ask": "77.463",
+            "after_bid": "77.444",
+            "ask": "77.463",
             "attempt": 1,
-            "before_ask": "74.594",
-            "before_bid": "74.575",
-            "bid": "74.575",
-            "elapsed_seconds": 1.3001886349811684,
+            "before_ask": "77.464",
+            "before_bid": "77.444",
+            "bid": "77.444",
+            "elapsed_seconds": 1.5910151019925252,
             "ticker_ids_match": true
           }
         ],
@@ -3333,14 +4895,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "339.58",
-            "after_bid": "339.55",
-            "ask": "339.58",
+            "after_ask": "344.68",
+            "after_bid": "344.66",
+            "ask": "344.68",
             "attempt": 1,
-            "before_ask": "339.58",
-            "before_bid": "339.55",
-            "bid": "339.55",
-            "elapsed_seconds": 1.5692038699926343,
+            "before_ask": "344.68",
+            "before_bid": "344.66",
+            "bid": "344.66",
+            "elapsed_seconds": 1.4652967570000328,
             "ticker_ids_match": true
           }
         ],
@@ -3359,7 +4921,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.4301375799987,
+            "elapsed_seconds": 1.4437251400086097,
             "ticker_ids_match": true
           },
           {
@@ -3370,7 +4932,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.869895058014663,
+            "elapsed_seconds": 1.1094402829767205,
             "ticker_ids_match": true
           },
           {
@@ -3381,7 +4943,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.398886576993391,
+            "elapsed_seconds": 1.5744152119732462,
             "ticker_ids_match": true
           }
         ],
@@ -3393,14 +4955,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "57.121",
-            "after_bid": "57.12",
-            "ask": "57.129",
+            "after_ask": "57.749",
+            "after_bid": "57.747",
+            "ask": "57.749",
             "attempt": 1,
-            "before_ask": "57.13",
-            "before_bid": "57.129",
-            "bid": "57.126",
-            "elapsed_seconds": 1.4344506560009904,
+            "before_ask": "57.751",
+            "before_bid": "57.748",
+            "bid": "57.747",
+            "elapsed_seconds": 1.464459836948663,
             "ticker_ids_match": true
           }
         ],
@@ -3999,7 +5561,8 @@
           "BYQYS/USDC:1117",
           "PAIR/USDC:1118",
           "EQQQQ/USDC:1119",
-          "EQSPY/USDC:1120"
+          "EQSPY/USDC:1120",
+          "LZCC/USDC:1121"
         ]
       },
       {
@@ -4381,7 +5944,8 @@
           "xyz:CATL",
           "xyz:RELIANCE",
           "xyz:JIO",
-          "xyz:SNAP"
+          "xyz:SNAP",
+          "xyz:TTWO"
         ]
       },
       {

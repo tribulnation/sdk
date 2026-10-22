@@ -361,6 +361,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"CVXUSDT\"]",
         "missing_data": null,
         "quotes": [],
@@ -1530,6 +1537,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ADBEBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"AEROTRY\"]",
         "missing_data": null,
         "quotes": [],
@@ -1545,6 +1559,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"AEROUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"AGPUBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1587,6 +1608,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"ALTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"AMCBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -1944,6 +1972,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"BATUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"BBBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -2433,6 +2468,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"CYPHBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"DASHBTC\"]",
         "missing_data": null,
         "quotes": [],
@@ -2651,6 +2693,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"ENATRY\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ENAUSD1\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -2972,6 +3021,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"FWDIBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"GALATRY\"]",
         "missing_data": null,
         "quotes": [],
@@ -3029,6 +3085,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"GNOUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"GPROBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -3099,6 +3162,34 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"HBARUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"HPEBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"HYPETRY\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"HYPEUSDC\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"HYPEUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -3246,6 +3337,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"JASMYUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"JPMBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -3490,6 +3588,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"LLYBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"LTCBNB\"]",
         "missing_data": null,
         "quotes": [],
@@ -3610,6 +3715,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"MASKUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"MDBBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -3917,6 +4029,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"PDDBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"PENDLEBTC\"]",
         "missing_data": null,
         "quotes": [],
@@ -3939,6 +4058,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"PENDLEUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"PENGBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -4197,6 +4323,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RDDTBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"REDTRY\"]",
         "missing_data": null,
         "quotes": [],
@@ -4302,6 +4435,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"RWUSDUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"SANDTRY\"]",
         "missing_data": null,
         "quotes": [],
@@ -4317,6 +4457,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"SANDUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SECZBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -4359,6 +4506,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"SFPUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"SHAZBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -5135,6 +5289,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"USDEBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"USDEUSDC\"]",
         "missing_data": null,
         "quotes": [],
@@ -5185,6 +5346,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"USUALUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"UVXYBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -5269,6 +5437,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"WBTCUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"WENBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -5716,6 +5891,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_coverage\",\"spot\",\"ZMBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_coverage\",\"spot\",\"ZROFDUSD\"]",
         "missing_data": null,
         "quotes": [],
@@ -6095,6 +6277,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"CRVUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CTUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -7270,6 +7459,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ADBEBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"AEROTRY\"]",
         "missing_data": null,
         "quotes": [],
@@ -7285,6 +7481,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"AEROUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"AGPUBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -7327,6 +7530,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"ALTUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"AMCBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -7684,6 +7894,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"BATUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"BBBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -8173,6 +8390,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"CYPHBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"DASHBTC\"]",
         "missing_data": null,
         "quotes": [],
@@ -8391,6 +8615,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"ENATRY\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ENAUSD1\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -8712,6 +8943,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"FWDIBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"GALATRY\"]",
         "missing_data": null,
         "quotes": [],
@@ -8769,6 +9007,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"GNOUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"GPROBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -8839,6 +9084,34 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"HBARUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"HPEBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"HYPETRY\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"HYPEUSDC\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"HYPEUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -8986,6 +9259,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"JASMYUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"JPMBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -9230,6 +9510,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"LLYBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"LTCBNB\"]",
         "missing_data": null,
         "quotes": [],
@@ -9350,6 +9637,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"MASKUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"MDBBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -9657,6 +9951,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"PDDBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"PENDLEBTC\"]",
         "missing_data": null,
         "quotes": [],
@@ -9679,6 +9980,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"PENDLEUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"PENGBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -9937,6 +10245,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RDDTBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"REDTRY\"]",
         "missing_data": null,
         "quotes": [],
@@ -10042,6 +10357,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"RWUSDUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"SANDTRY\"]",
         "missing_data": null,
         "quotes": [],
@@ -10057,6 +10379,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"SANDUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SECZBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -10099,6 +10428,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"SFPUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"SHAZBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -10875,6 +11211,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"USDEBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"USDEUSDC\"]",
         "missing_data": null,
         "quotes": [],
@@ -10925,6 +11268,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"USUALUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"UVXYBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -11009,6 +11359,13 @@
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"WBTCUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"WENBUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "status": "pass"
@@ -11456,6 +11813,13 @@
       },
       {
         "code": "ok",
+        "id": "[\"catalogue_identity\",\"spot\",\"ZMBUSDT\"]",
+        "missing_data": null,
+        "quotes": [],
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"catalogue_identity\",\"spot\",\"ZROFDUSD\"]",
         "missing_data": null,
         "quotes": [],
@@ -11558,7 +11922,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.3970284989918582,
+            "elapsed_seconds": 1.400090971030295,
             "ticker_ids_match": true
           },
           {
@@ -11569,7 +11933,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9457156260032207,
+            "elapsed_seconds": 1.0334552580025047,
             "ticker_ids_match": true
           },
           {
@@ -11580,7 +11944,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 1.254459941003006,
+            "elapsed_seconds": 0.9469281419878826,
             "ticker_ids_match": true
           }
         ],
@@ -11599,7 +11963,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9314513919816818,
+            "elapsed_seconds": 0.93683444801718,
             "ticker_ids_match": true
           },
           {
@@ -11610,7 +11974,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9414656189910602,
+            "elapsed_seconds": 0.967187809990719,
             "ticker_ids_match": true
           },
           {
@@ -11621,7 +11985,7 @@
             "before_ask": null,
             "before_bid": null,
             "bid": null,
-            "elapsed_seconds": 0.9425489099812694,
+            "elapsed_seconds": 1.3954427760327235,
             "ticker_ids_match": true
           }
         ],
@@ -11633,14 +11997,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "11.15000000",
-            "after_bid": "11.13500000",
-            "ask": "11.15000000",
+            "after_ask": "12.01200000",
+            "after_bid": "11.99700000",
+            "ask": "12.01200000",
             "attempt": 1,
-            "before_ask": "11.15000000",
-            "before_bid": "11.13500000",
-            "bid": "11.13500000",
-            "elapsed_seconds": 0.9970624609850347,
+            "before_ask": "12.01200000",
+            "before_bid": "11.99700000",
+            "bid": "11.99700000",
+            "elapsed_seconds": 1.1502849870012142,
             "ticker_ids_match": true
           }
         ],
@@ -11652,14 +12016,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "81502.82000000",
-            "after_bid": "81502.81000000",
-            "ask": "81502.82000000",
+            "after_ask": "84645.47000000",
+            "after_bid": "84645.46000000",
+            "ask": "84645.47000000",
             "attempt": 1,
-            "before_ask": "81502.82000000",
-            "before_bid": "81502.81000000",
-            "bid": "81502.81000000",
-            "elapsed_seconds": 1.8247414289799053,
+            "before_ask": "84645.47000000",
+            "before_bid": "84645.46000000",
+            "bid": "84645.46000000",
+            "elapsed_seconds": 0.9388061219942756,
             "ticker_ids_match": true
           }
         ],
@@ -11671,14 +12035,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.2252000",
-            "after_bid": "0.2251000",
-            "ask": "0.2252000",
+            "after_ask": "0.2428000",
+            "after_bid": "0.2427000",
+            "ask": "0.2428000",
             "attempt": 1,
-            "before_ask": "0.2252000",
-            "before_bid": "0.2251000",
-            "bid": "0.2251000",
-            "elapsed_seconds": 0.9823781209997833,
+            "before_ask": "0.2428000",
+            "before_bid": "0.2427000",
+            "bid": "0.2427000",
+            "elapsed_seconds": 1.0454363329918124,
             "ticker_ids_match": true
           }
         ],
@@ -11690,14 +12054,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.1004000",
-            "after_bid": "0.1003000",
-            "ask": "0.1004000",
+            "after_ask": "0.1084000",
+            "after_bid": "0.1083000",
+            "ask": "0.1084000",
             "attempt": 1,
-            "before_ask": "0.1004000",
-            "before_bid": "0.1003000",
-            "bid": "0.1003000",
-            "elapsed_seconds": 0.9786682550038677,
+            "before_ask": "0.1084000",
+            "before_bid": "0.1083000",
+            "bid": "0.1083000",
+            "elapsed_seconds": 1.278762089961674,
             "ticker_ids_match": true
           }
         ],
@@ -11709,14 +12073,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.0028970",
-            "after_bid": "0.0028950",
-            "ask": "0.0028970",
+            "after_ask": "0.0031920",
+            "after_bid": "0.0031910",
+            "ask": "0.0031920",
             "attempt": 1,
-            "before_ask": "0.0028970",
-            "before_bid": "0.0028950",
-            "bid": "0.0028960",
-            "elapsed_seconds": 0.9800682769855484,
+            "before_ask": "0.0031920",
+            "before_bid": "0.0031910",
+            "bid": "0.0031910",
+            "elapsed_seconds": 1.0279092900454998,
             "ticker_ids_match": true
           }
         ],
@@ -11728,14 +12092,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "81460.00",
-            "after_bid": "81459.90",
-            "ask": "81472.00",
+            "after_ask": "84602.10",
+            "after_bid": "84602.00",
+            "ask": "84597.60",
             "attempt": 1,
-            "before_ask": "81472.00",
-            "before_bid": "81471.90",
-            "bid": "81471.90",
-            "elapsed_seconds": 0.9796132060000673,
+            "before_ask": "84597.60",
+            "before_bid": "84597.50",
+            "bid": "84597.50",
+            "elapsed_seconds": 0.9884773769881576,
             "ticker_ids_match": true
           }
         ],
@@ -15517,7 +15881,14 @@
           "BBBUSDT",
           "MDBBUSDT",
           "PENGBUSDT",
-          "UVXYBUSDT"
+          "UVXYBUSDT",
+          "BTCTHB",
+          "USDTTHB",
+          "BOTBUSDT",
+          "KSTRBUSDT",
+          "TMFBUSDT",
+          "VSTBUSDT",
+          "BRKBBUSDT"
         ]
       },
       {

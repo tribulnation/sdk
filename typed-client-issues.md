@@ -68,33 +68,6 @@ prices beside them are `Decimal`.
 
 ## typed-margin-trade
 
-### `SocketClient.ping_interval` defaults to 30 s, and the venue drops the socket by then
-
-Every WebSocket subscription dies with `NetworkError('Error receiving message')`
-(`ConnectionClosedError`, no close frame) about 30 s after the client's last ping, on both
-networks: an idle `userFills` subscription at 31.0 s, a busy mainnet `l2Book('BTC')` (99
-pushes) at 61.0 s. The same idle `userFills` subscription built with
-`ping_interval=timedelta(seconds=10)` was still open at 70 s, side by side with a 30 s one
-that died at 31.0 s. `spec/status.md` reads the drops as happening "right around a fill";
-they follow the ping cadence instead.
-
-`core/transport/ws.py:159` (and `SocketClient.new`, `:299`; `MarginTrade.new` exposes no
-override, `core/client.py:76`):
-
-```python
-  ping_interval: timedelta = field(kw_only=True, default=timedelta(seconds=30))
-```
-
-- Kind: transport default (no response shape involved)
-- Observed: drops at 31.0 s (idle, mainnet), 61.0 s (busy, mainnet); testnet user streams
-  dropped the same way during the client's own captures
-- Samples: 30 s ping dies at 31.0 s; 10 s ping alive at 70 s (`userFills`,
-  `HZEB64qX94oiDsKNisSxYSWuEaKdfsD4Rn1ZEToAw68a`, `PRL/USDC`, mainnet, 2026-10-21)
-- Blocks: every `depth_stream`/`trades_stream` subscription in `tribulnation.margin_trade`,
-  which lasts at most about a minute; `poc/market/spot.py` cell 13 (`trades_stream`) holds
-  its subscription on its own socket with a 10 s ping to see a fill at all
-- Suggestion (unverified): a ping interval well under 30 s, or one `MarginTrade.new` exposes
-
 ### `DerivativeContract.next_funding_rate_timestamp` is epoch seconds, parsed as milliseconds
 
 `coingecko.derivatives.contracts` sends the next funding time in seconds; the declared

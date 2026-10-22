@@ -39,8 +39,8 @@ same names prefixed `MARGIN_TRADE_TESTNET_`.
 ## IDs
 
 - Exchanges `perp` and `spot`. Perpetual market ids are coin names (`BTC`, `XAU`,
-  `NVDA`); spot ids are pair names (`PRL/USDC`).
-- Asset ids are token symbols (`USDC`, `PRL`); perpetual fills and rules name their fee
+  `NVDA`); spot ids are pair names (`PEARL/USDC`).
+- Asset ids are token symbols (`USDC`, `PEARL`); perpetual fills and rules name their fee
   asset `USD`.
 
 ## Semantics
@@ -57,8 +57,8 @@ same names prefixed `MARGIN_TRADE_TESTNET_`.
 - Funding settles hourly on the hour; there is no funding-rate history.
 - `perp_collateral` is the perp wallet's cross bucket; a market with an isolated
   position raises `NotImplementedError`.
-- Streams: with `typed-margin-trade` 0.1.0 the venue drops the connection about 30 s
-  after a client ping, so `depth_stream` and `trades_stream` end with `NetworkError`.
+- Streams rely on typed-margin-trade 0.1.1's 10 s ping: the venue drops a connection
+  about 30 s after the client's last ping.
 
 No `settings` are read.
 
