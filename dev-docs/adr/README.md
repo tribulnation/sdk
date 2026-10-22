@@ -69,4 +69,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0044](0044-trades-stream-settings-dydx-node-fills.md) | `trades_stream` settings and dYdX full node fills | Proposed; implemented, not release-verified; amended by 0045 |
 | [0045](0045-dydx-node-feed-refuses-a-node-behind.md) | The dYdX node feed refuses a node behind the chain tip | Proposed; implemented, not release-verified; amends 0044 |
 | [0046](0046-conflated-snapshot-streams.md) | Conflate snapshot streams before decoding, and report skipped books | Proposed; implemented for Binance, Aster and Hyperliquid, not release-verified |
-| [0047](0047-grvt-credential-modes.md) | GRVT credential modes and definitive order refusals | Proposed; implemented, not release-verified |
+| [0047](0047-grvt-credential-modes.md) | GRVT credential modes and definitive order refusals | Accepted; implemented, not release-verified |
