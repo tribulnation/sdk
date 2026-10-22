@@ -118,6 +118,39 @@ async def test_snapshot_layout(fake: Any, shared: Shared):
   }
 
 
+async def test_isolated_balances_are_futures_cash(fake: Any, shared: Shared):
+  """An isolated position's `isolated_balance` left the spot balance when it opened, so
+  it is added back in the settlement currency (testnet, 2026-10-22: 0.002 BTC isolated,
+  USDT spot `19982.202189`, `isolated_balance` `16.500113`)."""
+  isolated: dict[str, Any] = {
+    'instrument': 'BTC_USDT_Perp',
+    'size': Decimal('0.002'),
+    'entry_price': Decimal('81726.0'),
+    'margin_type': 'ISOLATED',
+    'isolated_balance': Decimal('16.500113'),
+  }
+  record = await report(
+    fake,
+    shared,
+    funding=funding(),
+    futures={
+      '111': futures(
+        balance('USDT', '19982.202189'),
+        balance('USDC', '20'),
+        settle_currency='USDT',
+        positions=[isolated],
+      ),
+      '222': futures(),
+    },
+    spot={'111': [], '222': []},
+  ).snapshot()
+  wallet = {s.subaccount: s for s in record.snapshot.subaccounts}['111:futures']
+  assert wallet.balances == {'USDT': Decimal('19998.702302'), 'USDC': Decimal('20')}
+  assert wallet.positions == {
+    'BTC_USDT_Perp': Position(size=Decimal('0.002'), avg_price=Decimal('81726.0'))
+  }
+
+
 @pytest.mark.parametrize(
   'rows',
   [

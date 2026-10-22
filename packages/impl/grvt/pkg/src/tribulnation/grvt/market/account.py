@@ -1,9 +1,13 @@
-"""Account fees, positions, the cross collateral bucket and leverage, of the client's
-trading sub-account."""
+"""Account fees, positions, the cross and isolated collateral buckets and leverage, of
+the client's trading sub-account."""
 
 from decimal import Decimal
 
+from typing_extensions import Literal
+
+from typed_grvt.schemas import Position
 from typed_grvt.trading.account_summary import SubAccount
+from tribulnation.sdk.core import MissingData
 from tribulnation.sdk.market import Fees, PerpCollateral, PerpPosition
 
 from ..core import FEE_UNIT, Shared
@@ -44,17 +48,24 @@ async def summary(shared: Shared) -> SubAccount:
 def cross_bucket(s: SubAccount) -> PerpCollateral:
   """The cross bucket, in the settlement currency (USDT).
 
-  Free collateral is `total_equity` less `initial_margin` (GRVT's equity required to
-  open positions); leverage is the cross positions' notional over equity.
+  Equity is `total_cross_equity`: `total_equity` less every isolated position's own
+  balance and unrealized PnL. `initial_margin` and `maintenance_margin` are the cross
+  positions' alone (an isolated position's are its `isolated_im`/`isolated_mm`).
+
+  Free collateral is `margin_balance` (the cross equity at each asset's collateral
+  value ratio, 99.8% for USDT in multi-asset mode) less `initial_margin`, floored at
+  zero: on testnet it equalled `position_margin_limits`' `max_addable_amount`, the
+  margin the venue lets a position draw from the pool, with and without cross
+  positions. Leverage is the cross positions' notional over equity.
   """
-  equity = s['total_equity']
+  equity = s['total_cross_equity']
   notional = sum(
     (abs(p['notional']) for p in s['positions'] if p['margin_type'] == 'CROSS'),
     Decimal(0),
   )
   return PerpCollateral(
     equity=equity,
-    free_collateral=equity - s['initial_margin'],
+    free_collateral=max(s['margin_balance'] - s['initial_margin'], Decimal(0)),
     initial_margin=s['initial_margin'],
     maintenance_margin=s['maintenance_margin'],
     leverage=notional / equity if notional and equity > 0 else Decimal(0),
@@ -62,20 +73,59 @@ def cross_bucket(s: SubAccount) -> PerpCollateral:
   )
 
 
-def market_bucket(s: SubAccount, instrument: str) -> PerpCollateral:
-  """The bucket backing a market: cross, unless it holds an isolated position.
+def isolated_figure(
+  p: Position, field: Literal['isolated_balance', 'isolated_im', 'isolated_mm']
+) -> Decimal:
+  """One of an isolated position's own figures, which the venue sends only for isolated
+  positions.
 
   Raises:
-    NotImplementedError: The market holds an isolated position, whose bucket is
-      unverified (no position could be made isolated to check it).
+    MissingData: The venue omitted it.
   """
-  if any(
-    p['instrument'] == instrument and p['margin_type'] == 'ISOLATED'
-    for p in s['positions']
-  ):
-    raise NotImplementedError(
-      f'GRVT isolated collateral is not supported: {instrument} holds an isolated position'
+  value = p.get(field)
+  if value is None:
+    raise MissingData(
+      'GRVT omitted an isolated position figure', market_id=p['instrument'], field=field
     )
+  return value
+
+
+def isolated_bucket(p: Position) -> PerpCollateral:
+  """An isolated position's own bucket, in its quote currency (USDT).
+
+  Equity is the position's `isolated_balance` (the wallet balance moved out of the
+  cross pool into it) plus its unrealized PnL; the margins are `isolated_im` and
+  `isolated_mm`. Free collateral is equity above the initial margin, floored at zero,
+  which matched `position_margin_limits`' `max_removable_amount` on testnet. Leverage is
+  the position's notional over equity.
+
+  Raises:
+    MissingData: The venue omitted an isolated figure from an isolated position.
+  """
+  balance = isolated_figure(p, 'isolated_balance')
+  initial = isolated_figure(p, 'isolated_im')
+  maintenance = isolated_figure(p, 'isolated_mm')
+  equity = balance + p['unrealized_pnl']
+  return PerpCollateral(
+    equity=equity,
+    free_collateral=max(equity - initial, Decimal(0)),
+    initial_margin=initial,
+    maintenance_margin=maintenance,
+    leverage=abs(p['notional']) / equity if equity > 0 else Decimal(0),
+    margin_mode='isolated',
+  )
+
+
+def market_bucket(s: SubAccount, instrument: str) -> PerpCollateral:
+  """The bucket backing a market: its isolated position's own, else cross.
+
+  A market without a position draws on the cross pool even when its margin type is
+  set to isolated: an isolated position's margin is moved out of the cross pool when
+  it opens.
+  """
+  for p in s['positions']:
+    if p['instrument'] == instrument and p['margin_type'] == 'ISOLATED':
+      return isolated_bucket(p)
   return cross_bucket(s)
 
 
@@ -83,7 +133,8 @@ async def leverage(
   shared: Shared, instrument: str, *, refetch: bool = False
 ) -> Decimal:
   """The account's initial leverage on the instrument (`all_initial_leverage`, 10 unless
-  changed), cached per instrument.
+  changed), cached per instrument. It is the instrument's setting in either margin type:
+  an isolated position opens with it too.
 
   Raises:
     ValueError: The venue reports no leverage for the instrument.

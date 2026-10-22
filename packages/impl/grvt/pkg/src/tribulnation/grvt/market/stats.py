@@ -119,8 +119,8 @@ async def perp_stats(
 async def next_funding(shared: Shared, instrument: str) -> NextFunding:
   """The indicative rate of the interval ending at `next_funding_time`.
 
-  The ticker's `funding_rate` is in percentage points (not the centibeeps GRVT
-  documents), positive when longs pay. No premium is published.
+  The ticker's `funding_rate` is in percentage points (GRVT's schema docs say
+  centibeeps), positive when longs pay. No premium is published.
 
   Raises:
     MissingData: The ticker or instrument omits the rate, the time or the interval.

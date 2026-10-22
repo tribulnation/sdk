@@ -96,11 +96,23 @@ No `settings` are read.
   not settlements; a walk without `start` still reads through them. Funding payments are
   positive when received.
 - History bounds are inclusive, applied to the venue's nanosecond times.
-- `perp_collateral` is the trading sub-account's cross bucket. A market holding an
-  isolated position raises `NotImplementedError`: that bucket is unverified.
-  `leverage` is the account's initial leverage on the market (10 unless changed).
-  `available_notional` is the free cross collateral times it, without GRVT's
-  position-size cap or risk brackets.
+- `perp_collateral()` is the trading sub-account's cross bucket: its cross equity
+  (isolated positions' own balances and PnL excluded), and the cross positions'
+  margins. Free collateral is GRVT's margin balance (the cross equity valued at each
+  asset's collateral ratio, 99.8% for USDT in multi-asset mode) less the initial
+  margin: the most the venue lets a position draw from the pool, slightly below
+  equity minus initial margin.
+- A market holding an isolated position has its own bucket: the position's isolated
+  balance plus its unrealized PnL, against its own initial and maintenance margin;
+  free collateral is the part above the initial margin, which the venue lets you
+  remove. This was checked only with a negative unrealized PnL: if GRVT does not let
+  an unrealized profit be removed, free collateral overstates it while in profit. A
+  market without a position reads the cross bucket, whatever its margin type, since an
+  isolated position's margin is taken from the cross pool when it opens.
+- `leverage` is the account's initial leverage on the market (10 unless changed), in
+  either margin type. `available_notional` is the cross bucket's free collateral times it, for
+  isolated markets too, without GRVT's position-size cap or risk brackets. The SDK
+  does not set margin types or leverage; set them on the venue.
 - Public and account reads are verified on mainnet; trading on testnet only.
 
 <!-- next -->

@@ -167,8 +167,8 @@ class GrvtPerpMarket(Public, PerpMarket):
     return await account.perp_position(self.shared, self.instrument)
 
   async def perp_collateral(self) -> PerpCollateral:
-    """The cross bucket; a market holding an isolated position raises
-    `NotImplementedError`."""
+    """The isolated position's own bucket where the market holds one, else the cross
+    bucket."""
     return account.market_bucket(await account.summary(self.shared), self.instrument)
 
   async def leverage(self, *, refetch: bool = False) -> Decimal:
@@ -176,8 +176,12 @@ class GrvtPerpMarket(Public, PerpMarket):
     return await account.leverage(self.shared, self.instrument, refetch=refetch)
 
   async def available_notional(self) -> Decimal:
-    """Free cross collateral times `leverage()`, without the venue's position-size cap
-    or risk brackets."""
+    """Free cross collateral (`margin_balance` less the cross initial margin) times
+    `leverage()`, without the venue's position-size cap or risk brackets.
+
+    The cross pool funds isolated positions too (their margin is moved out of it when
+    they open), so an isolated market is sized against it as well.
+    """
     leverage = await self.leverage()
     return (
       account.cross_bucket(await account.summary(self.shared)).free_collateral
