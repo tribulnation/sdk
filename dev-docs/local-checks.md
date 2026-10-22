@@ -141,6 +141,13 @@ See [ADR 0014](adr/0014-bit2me-native-ticker-limitation.md) and
 [ADR 0022](adr/0022-bit2me-one-sided-ticker-limitation.md); this is not a general
 venue exemption or permission to relabel old reports.
 
+Extended `perp` has the same limitation on RFQ markets only: `depth` is the RFQ quotes,
+while ticker bid/ask are the venue's indicative book. A failed comparison records the
+market's RFQ flag (`rules().details['is_rfq']`), and only `rfq: true` checks of the
+same observation shape become `limitation/native_ticker_quotes`; order-book markets
+such as the `BTC-USD` reference must pass. See
+[ADR 0048](adr/0048-extended-rfq-indicative-tickers.md).
+
 This suite does not call personal `fees()` or other account reads, place orders, transfer funds, or claim
 every discovery-only instrument received a depth comparison. The report preserves
 its inventory so that sample coverage is inspectable. Existing `sdk-dev test

@@ -53,6 +53,9 @@ market data only.
 - Most markets are RFQ markets, whose REST book is only indicative: `depth` reads the
   first snapshot of the RFQ quotes stream there, and `depth_stream` maintains the quotes.
   Other markets' `depth` is the whole aggregated REST book, with no timestamp.
+- Tickers carry no best-level sizes. On RFQ markets their bid and ask are the venue's
+  indicative book, so they need not match `depth`; request `depth()` for executable
+  prices ([ADR 0048](https://github.com/tribulnation/sdk/blob/main/dev-docs/adr/0048-extended-rfq-indicative-tickers.md)).
 - `rules().fees` is `None`: no standard schedule is published. `fees()` is the
   sub-account's maker and taker rate; RFQ markets charge the taker rate on every order.
 - `place_order`: `LIMIT` rests good-till-time until the network's longest expiry (90
