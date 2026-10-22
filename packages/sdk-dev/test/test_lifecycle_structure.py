@@ -19,6 +19,7 @@ OWNERS = [
   ('tribulnation.aster.core', 'Shared', 'client'),
   ('tribulnation.lighter.core', 'Shared', 'client'),
   ('tribulnation.margin_trade.core', 'Shared', 'client'),
+  ('tribulnation.grvt.core', 'Shared', 'client'),
   ('tribulnation.binance.core', 'SdkMixin', 'client'),
   ('tribulnation.binance.market.impl.mixin', 'SharedMixin', 'client'),
   ('tribulnation.bit2me.core.mixin', 'Mixin', 'client'),

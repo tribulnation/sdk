@@ -39,7 +39,8 @@ async with market.trades_stream() as my_trades:
 The SDK sends the string unchanged, so an ID of your own must follow the venue's rules:
 most limit its length and characters and reject an ID already in use.
 `random_client_order_id()` follows them by construction: 128 random bits as 32 hex digits on
-most venues, with `0x` in front on Hyperliquid, and a UUID on Coinbase. On markets without
+most venues, with `0x` in front on Hyperliquid, a UUID on Coinbase, and an integer in
+`[2^63, 2^64)` on GRVT. On markets without
 client order IDs it returns `None`, which `place_order` treats like no ID at all, so the code
 above runs unchanged everywhere. Either field is `None` on fills that don't report it:
 
@@ -52,6 +53,7 @@ above runs unchanged everywhere. Either field is `None` on fills that don't repo
 | Bybit | `orderLinkId`, up to 36 characters | History and stream | History and stream |
 | Coinbase | `client_order_id` | History and stream | Stream |
 | dYdX | Ignored | Stream | — |
+| GRVT | `client_order_id`: an integer, also the SDK order id | History and stream | History and stream |
 | Hyperliquid | `cloid`: `0x` and 32 hex digits | History and stream | History and stream |
 | Kraken | No trading | History and stream | Stream |
 | Lighter | Ignored | History and stream | — |

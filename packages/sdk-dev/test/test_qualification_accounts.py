@@ -10,7 +10,7 @@ from sdk_dev.integration.accounts import account_mode
 from sdk_dev.repo import repo_root
 from sdk_dev.support import is_testnet, load_impl_files, mode_rank
 
-EXPLICIT = {'bitget': 'bitget_classic'}
+EXPLICIT = {'bitget': 'bitget_classic', 'grvt': 'grvt'}
 """Venues with several mainnet accounts, and the one qualification uses."""
 
 

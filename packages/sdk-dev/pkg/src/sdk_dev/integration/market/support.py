@@ -90,6 +90,8 @@ CASES: Mapping[str, Sequence[CandleCase]] = {
     CandleCase(market_id='perp:BTC', page=None),
     CandleCase(market_id='spot:PRL/USDC', page=None),
   ],
+  # Instrument names are the same on mainnet and testnet.
+  'grvt': [CandleCase(market_id='perp:BTC_USDT_Perp', page=1000)],
   # Testnet serves thousands of candles per response, so one page cannot straddle two.
   'lighter_testnet': [
     CandleCase(market_id='perp:4096', page=None),

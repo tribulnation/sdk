@@ -78,6 +78,8 @@ VenueId = _Literal[
   'lighter_testnet',
   'margin-trade',
   'margin-trade-testnet',
+  'grvt',
+  'grvt_testnet',
   'mexc',
   'bit2me',
   'bitget',
@@ -671,6 +673,58 @@ class MarginTrade(VenueAccount):
 
 
 @_dataclass(frozen=True)
+class Grvt(VenueAccount):
+  """GRVT account, isolated by environment: an API key (every account read; a read-only
+  key suffices), plus its signer's private key to place orders. With `public` and no API
+  key, market data only."""
+
+  venue: _Literal['grvt', 'grvt_testnet'] = 'grvt'
+  api_key: str | None = None
+  """API key; defaults to the network's `API_KEY` variable (`GRVT_API_KEY`, or
+  `GRVT_TESTNET_API_KEY`)."""
+  private_key: str | None = None
+  """The API key's EIP-712 signer key, needed only to place orders; defaults to the
+  network's `PRIVATE_KEY` variable."""
+  trading_account_id: str | None = None
+  """Trading sub-account; defaults to the network's `TRADING_ACCOUNT_ID` variable, else
+  to the sub-account the API key is scoped to."""
+  validate: bool = True
+  """Whether to type-validate incoming responses."""
+
+  @property
+  def prefix(self) -> str:
+    """The credential variables' prefix: `GRVT` on mainnet, `GRVT_TESTNET`."""
+    return 'GRVT' if self.venue == 'grvt' else 'GRVT_TESTNET'
+
+  @property
+  def resolved_api_key(self) -> str | None:
+    """The API key, never mixing networks; required unless `public`."""
+    return resolve_env_var(
+      self.api_key or f'${self.prefix}_API_KEY', require=not self.public
+    )
+
+  @property
+  def resolved_private_key(self) -> str | None:
+    """The signer key, never mixing networks; always optional."""
+    return resolve_env_var(
+      self.private_key or f'${self.prefix}_PRIVATE_KEY', require=False
+    )
+
+  @property
+  def resolved_trading_account_id(self) -> str | None:
+    """The trading sub-account, never mixing networks; always optional."""
+    return resolve_env_var(
+      self.trading_account_id or f'${self.prefix}_TRADING_ACCOUNT_ID', require=False
+    )
+
+  def verify_env_vars(self):
+    """Fail before constructing clients when a private account has no API key."""
+    self.resolved_api_key
+    self.resolved_private_key
+    self.resolved_trading_account_id
+
+
+@_dataclass(frozen=True)
 class Evm(BaseAccount):
   Venue = _Literal[
     'ethereum',
@@ -710,6 +764,7 @@ Account = _Annotated[
   | Aster
   | Lighter
   | MarginTrade
+  | Grvt
   | Evm,
   _pydantic.Discriminator('venue'),
 ]

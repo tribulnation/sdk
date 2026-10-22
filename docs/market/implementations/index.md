@@ -24,6 +24,7 @@ Per-method differences are on the [Methods](../methods.md) page, under each meth
 - [Kraken](kraken.md) — spot only, read only; altname market ids
 
 - [Deribit](deribit.md) — public spot and linear perpetuals; four intraday candle intervals
+- [GRVT](grvt.md) — perpetuals; instrument-name market ids, a read-only API key for account reads
 - [Lighter](lighter.md) — perpetuals and spot; numeric market ids, unified accounts for spot collateral
 - [margin.trade](margin-trade.md) — perpetuals and spot; Solana keys with agent wallets, per-market fee rates
 
