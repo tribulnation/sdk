@@ -53,6 +53,7 @@ above runs unchanged everywhere. Either field is `None` on fills that don't repo
 | Bybit | `orderLinkId`, up to 36 characters | History and stream | History and stream |
 | Coinbase | `client_order_id` | History and stream | Stream |
 | dYdX | Ignored | Stream | — |
+| Extended | The order's `id` (`externalId`); 32 hex digits generated | History and stream (stream fills not yet observed) | History and stream (stream fills not yet observed) |
 | GRVT | `client_order_id`: an integer, also the SDK order id | History and stream | History and stream |
 | Hyperliquid | `cloid`: `0x` and 32 hex digits | History and stream | History and stream |
 | Kraken | No trading | History and stream | Stream |
