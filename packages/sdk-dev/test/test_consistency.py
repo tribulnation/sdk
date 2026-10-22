@@ -930,3 +930,90 @@ async def test_missing_data_cannot_waive_unrelated_failures(
   result = await collect(mexc_missing_sdk, 'local', 'mexc', catalogue)
   with pytest.raises(ValueError):
     verify_payload(result, catalogue=catalogue, root=root)
+
+
+@pytest.fixture
+async def extended_sdk(
+  root: Path, sdk: MarketSDK, catalogue: Catalogue, monkeypatch: pytest.MonkeyPatch
+) -> MarketSDK:
+  """Exercise Extended's approved exchange, with an RFQ market whose indicative
+  ticker sits inside its wider RFQ quotes."""
+  directory = root / 'packages/impl/extended'
+  directory.mkdir()
+  (directory / 'impl.toml').write_text(
+    (root / 'packages/impl/fixture/impl.toml').read_text()
+  )
+  monkeypatch.setitem(consistency.CASES, 'extended', [])
+  monkeypatch.setattr(sdk.accounts['local'], 'venue', 'extended')
+  owner = await sdk.venue('local')
+  exchange = await owner.exchange('')
+  market = await exchange.market('BTC/USD')
+  for obj in (owner, exchange, market):
+    monkeypatch.setattr(obj, 'venue_id', 'extended')
+  for obj in (exchange, market):
+    monkeypatch.setattr(obj, 'exchange_id', 'perp')
+  cast(AsyncMock, owner.exchanges).return_value = [
+    {'id': 'perp', 'type': 'spot', 'name': 'Extended'}
+  ]
+  catalogue.spot_instruments['extended'] = catalogue.spot_instruments.pop('fixture')
+  catalogue.spot_instruments['extended']['BTC/USD']['exchange'] = 'perp'
+  cast(AsyncMock, market.depth).return_value = Book(
+    bids=[Book.Entry(Decimal(90), Decimal(1))],
+    asks=[Book.Entry(Decimal(110), Decimal(1))],
+  )
+  cast(AsyncMock, market.rules).return_value = SimpleNamespace(details={'is_rfq': True})
+  return sdk
+
+
+async def extended_report(sdk: MarketSDK, catalogue: Catalogue) -> Payload:
+  """Collect the Extended fixture."""
+  return Payload.model_validate(await collect(sdk, 'local', 'extended', catalogue))
+
+
+async def test_extended_rfq_ticker_is_a_visible_limitation(
+  root: Path, extended_sdk: MarketSDK, catalogue: Catalogue
+):
+  """An RFQ market's indicative ticker against its quotes is a limitation, recorded
+  with the RFQ flag the offline verifier requires (ADR 0048)."""
+  report = await extended_report(extended_sdk, catalogue)
+  quote = next(check for check in report.checks if check.quotes)
+  assert (quote.status, quote.code, quote.rfq) == (
+    'limitation',
+    'native_ticker_quotes',
+    True,
+  )
+  assert all(consistency.bracket_result(row) is False for row in quote.quotes)
+  verify_payload(report.model_dump(mode='json'), catalogue=catalogue, root=root)
+  for rfq in (False, None):
+    quote.rfq = rfq
+    with pytest.raises(ValueError):
+      verify_payload(report.model_dump(mode='json'), catalogue=catalogue, root=root)
+
+
+@pytest.mark.parametrize('rules', [{'is_rfq': False}, {}, ApiError('down')])
+async def test_extended_order_book_markets_must_match(
+  rules: object, root: Path, extended_sdk: MarketSDK, catalogue: Catalogue
+):
+  """A mismatch on an order-book market, or one whose RFQ flag cannot be read, fails."""
+  exchange = await (await extended_sdk.venue('local')).exchange('perp')
+  market = await exchange.market('BTC/USD')
+  if isinstance(rules, Exception):
+    cast(AsyncMock, market.rules).side_effect = rules
+  else:
+    cast(AsyncMock, market.rules).return_value = SimpleNamespace(details=rules)
+  report = await extended_report(extended_sdk, catalogue)
+  quote = next(check for check in report.checks if check.quotes)
+  assert (quote.status, quote.code) == ('fail', 'mismatch')
+  with pytest.raises(ValueError):
+    verify_payload(report.model_dump(mode='json'), catalogue=catalogue, root=root)
+
+
+async def test_only_rfq_venues_record_an_rfq_flag(
+  root: Path, sdk: MarketSDK, catalogue: Catalogue
+):
+  """Another venue's check carrying the flag is rejected, not ignored."""
+  report = Payload.model_validate(await payload(sdk, catalogue))
+  quote = next(check for check in report.checks if check.quotes)
+  quote.rfq = True
+  with pytest.raises(ValueError, match='RFQ'):
+    verify_payload(report.model_dump(mode='json'), catalogue=catalogue, root=root)

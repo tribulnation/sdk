@@ -9,7 +9,7 @@ from pathlib import Path
 from time import monotonic
 
 from pydantic import BaseModel, ConfigDict, Field
-from typing_extensions import Literal, TypeVar
+from typing_extensions import Literal, TypeVar, cast
 from tribulnation.catalogue import Catalogue
 from tribulnation.sdk import MissingData
 from tribulnation.sdk.impl.market import MarketSDK
@@ -27,6 +27,13 @@ RETRIES = 3
 T = TypeVar('T')
 Kind = Literal['spot', 'perp']
 Status = Literal['pass', 'fail', 'unavailable', 'excluded', 'deferred', 'limitation']
+
+# Reviewed native ticker quote limitations, by venue and exchange: Bit2Me spot's stale
+# or zero tickers (ADRs 0014/0022) and Extended's indicative RFQ tickers (ADR 0048).
+NATIVE_TICKER_SCOPES = frozenset({('bit2me', 'spot'), ('extended', 'perp')})
+RFQ_VENUES = frozenset({'extended'})
+"""Venues whose native ticker limitation covers RFQ markets only, read from
+`rules().details['is_rfq']` (ADR 0048)."""
 
 # Bitget UTA coin is an explicitly deferred product, and Coinbase INTX perpetuals were
 # dropped ahead of their Advanced Trade retirement (ADR 0031).
@@ -93,6 +100,9 @@ class Check(StrictModel):
   ]
   quotes: list[QuoteObservation] = Field(default_factory=list[QuoteObservation])
   missing_data: MissingDataObservation | None = None
+  rfq: bool | None = None
+  """An `RFQ_VENUES` quote check's market trades by RFQ (`rules().details['is_rfq']`);
+  `None` everywhere else."""
 
 
 class Payload(StrictModel):
@@ -275,6 +285,10 @@ def verify_payload(
   }
   for id, method in expected.items():
     check = actual[id]
+    if check.rfq is not None and (
+      report.venue not in RFQ_VENUES or method != 'depth+tickers'
+    ):
+      raise ValueError("Only RFQ venues' quote checks record an RFQ flag")
     if check.missing_data is not None or check.code == 'missing_index':
       if not enabled(method, supported) or not missing_index_exclusion(report, check):
         raise ValueError('Invalid missing-index exclusion')
@@ -362,20 +376,38 @@ async def request(awaitable: Awaitable[T]) -> T:
   return await asyncio.wait_for(awaitable, timeout=REQUEST_TIMEOUT)
 
 
-def native_ticker_limitation(venue: str, check: Check) -> bool:
-  """Recognize only Bit2Me native quote discrepancies against valid live books.
+async def rfq_market(market: Market | None) -> bool | None:
+  """Whether a market trades by RFQ, from its `rules().details['is_rfq']`; `None`
+  when unreadable, which never qualifies the RFQ limitation (ADR 0048)."""
+  if market is None:
+    return None
+  try:
+    rules = await request(market.rules())
+  except Exception:
+    return None
+  details: object = rules.details
+  if not isinstance(details, dict):
+    return None
+  flag = cast(dict[str, object], details).get('is_rfq')
+  return flag if isinstance(flag, bool) else None
 
-  ADRs 0014/0022 permit stale, zero or missing native ticker sides against
-  stable nonempty book sides, not wrong IDs, failed requests, slow brackets
-  or malformed/negative prices.
+
+def native_ticker_limitation(venue: str, check: Check) -> bool:
+  """Recognize only reviewed native quote discrepancies against valid live books.
+
+  ADRs 0014/0022 permit Bit2Me spot's stale, zero or missing native ticker sides,
+  and ADR 0048 Extended's indicative tickers on RFQ markets (whose book is the RFQ
+  quotes), against stable nonempty book sides: not wrong IDs, failed requests,
+  slow brackets, malformed/negative prices or Extended order-book markets.
   """
   parts: list[object] = json.loads(check.id)
   if (
-    venue != 'bit2me'
-    or not isinstance(parts, list)
+    not isinstance(parts, list)
     or len(parts) != 3
-    or parts[:2] != ['ticker_depth', 'spot']
+    or parts[0] != 'ticker_depth'
+    or (venue, parts[1]) not in NATIVE_TICKER_SCOPES
     or len(check.quotes) != RETRIES
+    or (venue in RFQ_VENUES and check.rfq is not True)
   ):
     return False
   sides = (
@@ -694,6 +726,8 @@ async def collect(
         quotes=observations,
       )
       check = report.checks[-1]
+      if check.status == 'fail' and check.code == 'mismatch' and venue in RFQ_VENUES:
+        check.rfq = await rfq_market(markets.get((item.exchange, market_id)))
       if (
         check.status == 'fail'
         and check.code == 'mismatch'
