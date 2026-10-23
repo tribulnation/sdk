@@ -63,7 +63,11 @@ def selected_accounts(
   *,
   surface: str,
 ) -> list[str]:
-  """Select an exact account id or venue slug before any client is constructed."""
+  """Select an exact account id or venue slug before any client is constructed.
+
+  An account id wins over a venue slug: GRVT's `grvt` account is also the venue of
+  `grvt_trade`, and selecting the account must not select its sibling.
+  """
   selector = cast(str | None, config.getoption('sdk_venue'))
   supported = surface_support(surface)
   if (
@@ -72,11 +76,12 @@ def selected_accounts(
     and not any(selector in (id, account.venue) for id, account in accounts.items())
   ):
     raise pytest.UsageError('Unknown venue or account selector')
+  exact = selector is not None and selector in accounts
   return [
     id
     for id, account in accounts.items()
     if package_of(account.venue) in supported
-    and (selector is None or selector in (id, account.venue))
+    and (selector is None or (selector == id if exact else selector == account.venue))
   ]
 
 

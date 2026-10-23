@@ -7,6 +7,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ASML\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -14,6 +15,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -21,6 +23,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"CBRS\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -28,6 +31,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"CL\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -35,6 +39,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"COHR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -42,6 +47,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"CRCL\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -49,6 +55,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"CRWV\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -56,6 +63,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"DRAM\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -63,6 +71,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ETH\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -70,6 +79,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"GOOGL\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -77,6 +87,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"INTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -84,6 +95,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"LITE\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -91,6 +103,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"LRCX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -98,6 +111,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"MRVL\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -105,6 +119,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"MSFT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -112,6 +127,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"MU\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -119,6 +135,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"NVDA\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -126,20 +143,15 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"PEARL\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
-      },
-      {
-        "code": "coverage_deferred",
-        "id": "[\"catalogue_coverage\",\"perp\",\"PRL\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "deferred"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_coverage\",\"perp\",\"QQQ\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -147,6 +159,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"SKHYNIX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -154,6 +167,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"SNDK\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -161,6 +175,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"SOL\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -168,6 +183,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"SPCX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -175,6 +191,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"SPY\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -182,6 +199,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"TSLA\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -189,6 +207,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"TSM\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -196,6 +215,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"XAG\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -203,6 +223,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"XAU\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -210,6 +231,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"XCU\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -217,20 +239,15 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"PEARL/USDC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
-      },
-      {
-        "code": "coverage_deferred",
-        "id": "[\"catalogue_coverage\",\"spot\",\"PRL/USDC\"]",
-        "missing_data": null,
-        "quotes": [],
-        "status": "deferred"
       },
       {
         "code": "ok",
         "id": "[\"catalogue_identity\",\"perp\",\"ASML\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -238,6 +255,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -245,6 +263,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"CBRS\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -252,6 +271,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"CL\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -259,6 +279,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"COHR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -266,6 +287,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"CRCL\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -273,6 +295,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"CRWV\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -280,6 +303,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"DRAM\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -287,6 +311,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ETH\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -294,6 +319,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"GOOGL\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -301,6 +327,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"INTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -308,6 +335,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"LITE\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -315,6 +343,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"LRCX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -322,6 +351,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"MRVL\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -329,6 +359,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"MSFT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -336,6 +367,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"MU\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -343,6 +375,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"NVDA\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -350,13 +383,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"PEARL\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
-      },
-      {
-        "code": "ok",
-        "id": "[\"catalogue_identity\",\"perp\",\"PRL\"]",
-        "missing_data": null,
-        "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -364,6 +391,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"QQQ\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -371,6 +399,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"SKHYNIX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -378,6 +407,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"SNDK\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -385,6 +415,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"SOL\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -392,6 +423,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"SPCX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -399,6 +431,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"SPY\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -406,6 +439,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"TSLA\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -413,6 +447,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"TSM\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -420,6 +455,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"XAG\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -427,6 +463,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"XAU\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -434,6 +471,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"XCU\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -441,13 +479,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"PEARL/USDC\"]",
         "missing_data": null,
         "quotes": [],
-        "status": "pass"
-      },
-      {
-        "code": "ok",
-        "id": "[\"catalogue_identity\",\"spot\",\"PRL/USDC\"]",
-        "missing_data": null,
-        "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -455,6 +487,7 @@
         "id": "[\"discovery\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -462,6 +495,7 @@
         "id": "[\"exchange_identity\",\"perp\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -469,6 +503,7 @@
         "id": "[\"exchange_identity\",\"spot\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -476,6 +511,7 @@
         "id": "[\"market_identity\",\"perp\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -483,6 +519,7 @@
         "id": "[\"market_identity\",\"spot\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -490,6 +527,7 @@
         "id": "[\"perp_stats\",\"perp\",\"bulk\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -497,6 +535,7 @@
         "id": "[\"perp_stats\",\"perp\",\"empty\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -504,6 +543,7 @@
         "id": "[\"perp_stats\",\"perp\",\"selected\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -511,6 +551,7 @@
         "id": "[\"setup\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -519,17 +560,18 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "1679.6",
-            "after_bid": "1677.6",
-            "ask": "1679.6",
+            "after_ask": "1595.9",
+            "after_bid": "1593",
+            "ask": "1595.81",
             "attempt": 1,
-            "before_ask": "1679.6",
-            "before_bid": "1677.6",
-            "bid": "1677.67",
-            "elapsed_seconds": 0.9563488249550574,
+            "before_ask": "1595.9",
+            "before_bid": "1593",
+            "bid": "1593.03",
+            "elapsed_seconds": 1.001170857984107,
             "ticker_ids_match": true
           }
         ],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -538,17 +580,18 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "84607",
-            "after_bid": "84557",
-            "ask": "84606.9",
+            "after_ask": "81624",
+            "after_bid": "81576",
+            "ask": "81623.8",
             "attempt": 1,
-            "before_ask": "84607",
-            "before_bid": "84557",
-            "bid": "84557.3",
-            "elapsed_seconds": 0.9645112860016525,
+            "before_ask": "81624",
+            "before_bid": "81576",
+            "bid": "81576.4",
+            "elapsed_seconds": 0.9704057640046813,
             "ticker_ids_match": true
           }
         ],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -557,17 +600,18 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "117.76",
-            "after_bid": "117.59",
-            "ask": "117.7574",
+            "after_ask": "109.9",
+            "after_bid": "109.65",
+            "ask": "109.8914",
             "attempt": 1,
-            "before_ask": "117.76",
-            "before_bid": "117.59",
-            "bid": "117.5936",
-            "elapsed_seconds": 0.9839463420212269,
+            "before_ask": "109.9",
+            "before_bid": "109.65",
+            "bid": "109.6535",
+            "elapsed_seconds": 0.9803503809962422,
             "ticker_ids_match": true
           }
         ],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -576,17 +620,18 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "2.69",
-            "after_bid": "2.1537",
-            "ask": "2.69",
+            "after_ask": "2.4862",
+            "after_bid": "2.09",
+            "ask": "2.4862",
             "attempt": 1,
-            "before_ask": "2.69",
-            "before_bid": "2.1537",
-            "bid": "2.1537",
-            "elapsed_seconds": 0.9763176499982364,
+            "before_ask": "2.4862",
+            "before_bid": "2.09",
+            "bid": "2.09",
+            "elapsed_seconds": 0.9743050200049765,
             "ticker_ids_match": true
           }
         ],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -594,6 +639,7 @@
         "id": "[\"tickers\",\"perp\",\"bulk\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -601,6 +647,7 @@
         "id": "[\"tickers\",\"perp\",\"empty\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -608,6 +655,7 @@
         "id": "[\"tickers\",\"perp\",\"selected\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -615,6 +663,7 @@
         "id": "[\"tickers\",\"spot\",\"bulk\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -622,6 +671,7 @@
         "id": "[\"tickers\",\"spot\",\"empty\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -629,6 +679,7 @@
         "id": "[\"tickers\",\"spot\",\"selected\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       }
     ],
