@@ -26,6 +26,9 @@ fresh nonce, so resubmitting an order after an uncertain failure can place it tw
 The SDK never retries order placement; check `open_orders` or `query_order` before
 resending.
 
-Release qualification uses the read-only mainnet API key (`private` mode); the evidence
-is under `release-evidence/extended/`. This adapter release follows SDK 2.20.0
-publication.
+Release qualification on 2026-10-22 used the read-only mainnet API key (`private`
+mode) and passed the read suites and market consistency; three RFQ markets' indicative
+tickers are recorded as the ADR 0048 limitation. Committed evidence under
+`release-evidence/extended/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This
+adapter release follows SDK 2.20.0 publication.
