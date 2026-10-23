@@ -12,6 +12,8 @@ New:
 2. Report: snapshots of the funding wallet and of each trading sub-account's futures and
    spot wallets; the futures cash includes isolated positions' balances.
 
-Release qualification uses the read-only mainnet API key (`token` mode, ADR 0047); the
-evidence is under `release-evidence/grvt/`. This adapter release follows SDK 2.20.0
-publication.
+Release qualification on 2026-10-22 used the read-only mainnet API key (`token` mode,
+ADR 0047) and passed the read suites and market consistency. Committed evidence under
+`release-evidence/grvt/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This
+adapter release follows SDK 2.20.0 publication.
