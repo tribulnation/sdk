@@ -15,7 +15,7 @@
 This page specifies what the [SDK gateway](gateway.md) and its clients exchange, so a
 client in any language can speak it. `ProxySDK` is the reference client and
 `tribulnation.sdk.gateway.codec` the reference codec. The machine-readable form is the
-JSON Schema [gateway-protocol.schema.json](gateway-protocol.schema.json).
+JSON Schema [gateway-protocol.schema.json](https://github.com/tribulnation/sdk/blob/main/docs/gateway-protocol.schema.json).
 
 ## Transport and handshake
 
@@ -186,7 +186,7 @@ A book update on a depth stream:
 
 ## Schema
 
-[gateway-protocol.schema.json](gateway-protocol.schema.json) is JSON Schema 2020-12
+[gateway-protocol.schema.json](https://github.com/tribulnation/sdk/blob/main/docs/gateway-protocol.schema.json) is JSON Schema 2020-12
 generated from the codec: `$defs.ClientMsg` is any frame a client sends and
 `$defs.ServerMsg` any frame the gateway sends. Both are unions discriminated by `tag`.
 A test fails when the file is out of date. Regenerate it with:

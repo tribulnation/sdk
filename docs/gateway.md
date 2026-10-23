@@ -126,7 +126,7 @@ as access to the configured accounts, including their trading operations.
    implementation and selected venue adapters.
 
 The ownership decision and release qualification boundaries are recorded in
-[ADR 0032](../dev-docs/adr/0032-sdk-gateway.md).
+[ADR 0032](https://github.com/tribulnation/sdk/blob/main/dev-docs/adr/0032-sdk-gateway.md).
 
 <!-- next -->
 
