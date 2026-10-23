@@ -201,9 +201,9 @@ def test_snapshots_are_isolated_without_deep_copies():
     bids=[Book.Entry(Decimal('100'), Decimal('1'))],
     asks=[Book.Entry(Decimal('101'), Decimal('2'))],
   )
-  frame_book = books.frozen(book)
+  frame_book = book.frozen()
   book.update(Book(bids=[Book.Entry(Decimal('100'), Decimal('0'))]))
   assert [e.price for e in frame_book.bids] == [Decimal('100')] and book.bids == []
-  mine, theirs = books.detached(frame_book), books.detached(frame_book, 1)
+  mine, theirs = frame_book.copy(), frame_book.limit(1).copy()
   mine.asks[0].qty = Decimal('9')
   assert theirs.asks[0].qty == frame_book.asks[0].qty == Decimal('2')

@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from decimal import Decimal
 
 from tribulnation.sdk.core import OverflowPolicy
-from tribulnation.sdk.market import Book
+from tribulnation.sdk.market import Book, detached_books
 
 from typed_kraken.spot.market_data.depth import OrderBook
 from typed_kraken.streams.market_data.book import BookData, BookMessage
@@ -71,8 +71,8 @@ async def fold_books(messages: AsyncIterable[BookMessage]) -> AsyncIterator[Book
 
   The channel sends one full snapshot on subscribe and then only the changed
   levels, a zero quantity meaning the level was removed -- `Book.update`'s exact
-  contract. Each yielded book is a copy, so a book already handed to a subscriber is
-  never mutated by a later push.
+  contract. Each yielded book is `Book.frozen`, so a later push never mutates it;
+  `depth_stream` gives each subscriber its own copy.
   """
   book = Book()
   async for message in messages:
@@ -82,7 +82,7 @@ async def fold_books(messages: AsyncIterable[BookMessage]) -> AsyncIterator[Book
         book = levels
       else:
         book.update(levels)
-      yield book.copy()
+      yield book.frozen()
 
 
 async def depth(self: 'MarketMixin', *, levels: int | None = None) -> Book:
@@ -113,11 +113,7 @@ async def depth_stream(
   """
   depth = book_depth(levels)
 
-  async def trimmed(books: AsyncIterable[Book]) -> AsyncIterator[Book]:
-    async for book in books:
-      yield book if levels is None else book.limit(levels)
-
   async with self.subscribe_depth(
     depth, queue_size=queue_size, overflow=overflow
   ) as stream:
-    yield trimmed(stream)
+    yield detached_books(stream, levels)

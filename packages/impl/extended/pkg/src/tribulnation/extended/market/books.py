@@ -6,7 +6,7 @@ book is the quotes, which the venue publishes on the `orderbooks/rfq` stream onl
 
 from contextlib import asynccontextmanager
 
-from typing_extensions import Any, AsyncIterable, AsyncIterator, Sequence
+from typing_extensions import Any, AsyncIterator, Sequence
 from typed_core.util import StreamManager
 from typed_extended.info.schemas import OrderbookLevel
 from typed_extended.streams.schemas import OrderbookMessage, StreamOrderbookLevel
@@ -18,7 +18,7 @@ from tribulnation.sdk.core import (
   Subscription,
   exception_wrapper,
 )
-from tribulnation.sdk.market import Book
+from tribulnation.sdk.market import Book, detached_books
 
 from ..core import Shared
 
@@ -59,27 +59,6 @@ def frame_book(frame: OrderbookMessage) -> Book:
     )
   return Book(
     bids=delta_entries(data['b']), asks=delta_entries(data['a']), time=frame['ts']
-  )
-
-
-def frozen(book: Book) -> Book:
-  """This frame's book, unaffected by later frames.
-
-  `Book.update` rebinds new level lists and never mutates an entry, so sharing the
-  entries is safe and costs no copy of a book thousands of levels deep (a deep copy of
-  BTC-USD's ~7000 levels takes longer than the 100 ms between deltas).
-  """
-  return Book(bids=list(book.bids), asks=list(book.asks), time=book.time)
-
-
-def detached(book: Book, levels: int | None = None) -> Book:
-  """A subscriber's own book, trimmed to `levels`, with fresh entries it may mutate."""
-  bids = book.bids if levels is None else book.bids[:levels]
-  asks = book.asks if levels is None else book.asks[:levels]
-  return Book(
-    bids=[Book.Entry(e.price, e.qty) for e in bids],
-    asks=[Book.Entry(e.price, e.qty) for e in asks],
-    time=book.time,
   )
 
 
@@ -154,7 +133,7 @@ def subscription(shared: Shared, market: str, *, rfq: bool) -> Subscription[Book
             book = frame_book(frame)
           else:
             book.update(frame_book(frame))
-          yield frozen(book)
+          yield book.frozen()
 
       return Subscription.Context(books(), exception_wrapper()(stream.unsubscribe))
 
@@ -183,10 +162,5 @@ async def depth_stream(
   rfq = (await shared.perp(market))['isRfq']
   upstream = subscription(shared, market, rfq=rfq)
 
-  async def trimmed(books: AsyncIterable[Book]) -> AsyncIterator[Book]:
-    """Detach before handing out: subscribers share each upstream book."""
-    async for book in books:
-      yield detached(book, levels)
-
   async with upstream.subscribe(queue_size=queue_size, overflow=overflow) as stream:
-    yield trimmed(stream)
+    yield detached_books(stream, levels)
