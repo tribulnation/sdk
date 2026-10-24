@@ -4,6 +4,7 @@ from typing_extensions import (
   Awaitable,
   Iterator,
   Sequence,
+  cast,
 )
 from contextlib import AsyncExitStack, asynccontextmanager
 from datetime import datetime
@@ -38,9 +39,6 @@ from .socket_fills import (
 )
 
 log = logging.getLogger(__name__)
-
-RACE_LOG_INTERVAL = 600.0
-"""Seconds between logs of a `'fastest'` stream's race statistics."""
 
 
 @PaginatedResponse.lift
@@ -248,13 +246,16 @@ async def fastest_stream(
 
   The sources are the indexer, plus the full node and the fill socket when the
   account configures them. Trades carry `details['source']` (`'node'`, `'socket'`, or
-  `'indexer'` with `details['fill']`, the indexer fill). The indexer is the floor: its
-  failure, or this subscriber overflowing, ends the stream with an error. A node or
-  socket source that ends or fails (e.g. a node behind the chain tip as it connects,
-  `NodeFeed`) is dropped with a warning and the others race on. Each later copy of a
-  fill logs (INFO) which source was first and by how many milliseconds; the client's
-  `fill_race` keeps the totals, which the stream logs every `RACE_LOG_INTERVAL`
-  seconds.
+  `'indexer'` with `details['fill']`, the indexer fill). The indexer is the floor, but
+  its channel reconnects on a dropped connection and backfills the gap
+  (`parent_subaccounts_feed`), the other sources racing on meanwhile; only an indexer
+  down for `GIVE_UP_AFTER` seconds, or this subscriber overflowing, ends the stream
+  with an error. A node or socket source that ends or fails (e.g. a node behind the
+  chain tip as it connects, `NodeFeed`) is dropped with a warning and the others race
+  on. Each later copy of a fill logs (INFO) which source was first and by how many
+  milliseconds; the client's `fill_race` keeps the totals and logs them every
+  `RACE_LOG_INTERVAL` seconds. Several streams of one market log each fill once
+  (`FillRace.racing`).
 
   Raises:
     ValueError: On entry, when the account configures neither a full node nor a socket.
@@ -280,10 +281,11 @@ async def fastest_stream(
   async def from_indexer(logs: AsyncIterable[ParentSubaccountNotification]):
     """Admit the indexer's fills."""
     async for notification in logs:
+      late = cast(dict[str, object], notification).get('backfill') is True
       for trade, fill in indexer_trades(
         notification, market=self.market, address=address, parent=parent
       ):
-        if dedup.admit('indexer', indexer_key(fill), at=loop.time()):
+        if dedup.admit('indexer', indexer_key(fill), at=loop.time(), late=late):
           trade.details = {'source': 'indexer', 'fill': fill}
           if not out.push(trade):
             return
@@ -319,7 +321,7 @@ async def fastest_stream(
             return
 
   async def floor(source: Awaitable[None]):
-    """Run the indexer; its end or failure ends the merged stream."""
+    """Run the indexer; its end or lasting failure ends the merged stream."""
     try:
       await source
       out.fail(NetworkError('dYdX indexer fills ended unexpectedly'))
@@ -338,17 +340,12 @@ async def fastest_stream(
     except Exception as e:
       log.warning('dYdX %s fills failed: %r; racing without them', name, e)
 
-  async def report():
-    """Log the race statistics now and then."""
-    while True:
-      await asyncio.sleep(RACE_LOG_INTERVAL)
-      log.info('dYdX fill race: %s', race.stats())
-
   async with AsyncExitStack() as stack:
+    dedup.recording = stack.enter_context(race.racing(clob_pair_id))
     logs = await stack.enter_async_context(
       self.subscribe_parent_subaccount(parent, queue_size=queue_size)
     )
-    tasks: list[Awaitable[None]] = [floor(from_indexer(logs)), report()]
+    tasks: list[Awaitable[None]] = [floor(from_indexer(logs))]
     if shared.full_node is not None:
       fills = await stack.enter_async_context(
         node_fill_subscription(shared).subscribe(queue_size=queue_size)

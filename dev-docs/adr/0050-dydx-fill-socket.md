@@ -6,6 +6,7 @@
    socket. Not release-verified. Amends
    [0044](0044-trades-stream-settings-dydx-node-fills.md) decisions 2 and 7 and
    [0045](0045-dydx-node-feed-refuses-a-node-behind.md) decision 1 for `'fastest'`.
+   Decisions 5 and 6 amended by [0052](0052-dydx-indexer-channels-reconnect.md).
 2. Date: 2026-10-22
 
 ## Context

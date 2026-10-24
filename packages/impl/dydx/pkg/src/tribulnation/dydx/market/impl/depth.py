@@ -1,4 +1,4 @@
-from typing_extensions import AsyncIterable, Awaitable, Callable
+from typing_extensions import Awaitable, Callable
 from decimal import Decimal
 
 from tribulnation.sdk.market import Book
@@ -7,6 +7,8 @@ from tribulnation.dydx.core import wrap_exceptions
 from typed_dydx import Indexer
 from typed_dydx.indexer.schemas import OrderBook
 from typed_dydx.indexer.streams.orders import OrderbookMessageContents as BookUpdate
+
+from .reconnect import Opened, reconnecting
 
 
 def parse_update(update: BookUpdate) -> Book:
@@ -30,16 +32,28 @@ def parse_book(book: OrderBook) -> Book:
   )
 
 
-@wrap_exceptions
-async def depth_stream(
+def depth_stream(
   indexer: Indexer, market: str
-) -> tuple[AsyncIterable[Book], Callable[[], Awaitable[object]]]:
-  stream = await indexer.streams.orders(id=market)
-  book = parse_book(stream.reply)
+) -> Callable[[], Awaitable[Opened[Book]]]:
+  """A `Subscription.of` callback for a market's book that reconnects
+  (`reconnecting`). After a reconnection the new subscription's snapshot comes first,
+  so subscribers never keep a book that missed updates."""
 
-  async def parsed_stream():
-    async for msg in stream:
-      book.update(parse_update(msg))
-      yield book
+  @wrap_exceptions
+  async def open(reopen: bool) -> Opened[Book]:
+    """Subscribe; the book starts from the subscription's snapshot."""
+    stream = await indexer.streams.orders(id=market)
+    book = parse_book(stream.reply)
 
-  return parsed_stream(), stream.unsubscribe
+    @wrap_exceptions
+    async def parsed_stream():
+      """The book after each update, the snapshot first after a reconnection."""
+      if reopen:
+        yield book
+      async for msg in stream:
+        book.update(parse_update(msg))
+        yield book
+
+    return parsed_stream(), stream.unsubscribe
+
+  return reconnecting(f'book {market}', open)
