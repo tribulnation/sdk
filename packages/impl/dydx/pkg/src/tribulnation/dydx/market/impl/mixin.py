@@ -79,7 +79,9 @@ class Settings(TypedDict, total=False):
   """Where `trades_stream` reads fills from. Defaults to the account's `fill_source`,
   else `'indexer'`.
 
-  - `'indexer'`: the indexer's `v4_subaccounts` WebSocket channel.
+  - `'indexer'`: the indexer's `v4_parent_subaccounts` WebSocket channel. It reconnects
+    on a dropped connection and backfills the fills of the gap from REST; only a
+    channel down for a minute ends the stream.
   - `'node'`: the account's full node (`full_node_grpc`/`full_node_rpc` on
     `accounts.Dydx`) only, about 0.4 s ahead of the indexer: its gRPC
     `StreamOrderbookUpdates` stream, finalized updates only. Fills of our orders and
@@ -101,10 +103,12 @@ class Settings(TypedDict, total=False):
   - `'fastest'`: every configured source raced: the indexer, plus the node and the
     socket when the account configures them (at least one is required). Each fill is
     emitted once, by whichever source delivers it first (`details['source']`). Each
-    later copy logs (INFO) which source was first and by how many milliseconds; the
-    client's `fill_race` keeps the totals, which every stream logs every 10 minutes. A
-    node or socket source that fails is dropped with a warning and the stream goes on;
-    the indexer is the floor, and its failure ends the stream.
+    later copy logs (INFO) which source was first and by how many milliseconds, once
+    per market however many streams race it; the client's `fill_race` keeps the totals
+    and logs them every 10 minutes. A node or socket source that fails is dropped with
+    a warning and the stream goes on. The indexer is the floor: its channel reconnects
+    on a dropped connection and backfills the gap from REST, and only an indexer down
+    for a minute ends the stream.
   """
 
 
@@ -245,30 +249,20 @@ class Shared(SDK):
     return self.standard_fee_tier
 
   def parent_account_subscription(self, parent_subaccount: int):
+    """The parent subaccount's channel, shared by its streams; it reconnects and
+    backfills the fills of a gap (`parent_subaccounts_feed`)."""
+    from .parent_feed import parent_subaccounts_feed
+
     if parent_subaccount not in self.parent_subaccount_subscriptions:
-
-      @wrap_exceptions
-      async def subscribe():
-        stream = await self.client.indexer.streams.parent_subaccounts(
-          self.require_address(), subaccount=parent_subaccount
-        )
-
-        @wrap_exceptions
-        async def parsed_stream():
-          async for msg in stream:
-            yield msg
-
-        return parsed_stream(), stream.unsubscribe
-
       self.parent_subaccount_subscriptions[parent_subaccount] = Subscription.of(
-        subscribe
+        parent_subaccounts_feed(self, parent_subaccount)
       )
     return self.parent_subaccount_subscriptions[parent_subaccount]
 
   def depth_subscription(self, market: str):
     if market not in self.depth_subscriptions:
       self.depth_subscriptions[market] = Subscription.of(
-        lambda: depth_stream(self.client.indexer, market)
+        depth_stream(self.client.indexer, market)
       )
     return self.depth_subscriptions[market]
 
