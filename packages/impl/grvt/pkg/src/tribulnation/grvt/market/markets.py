@@ -175,6 +175,11 @@ class GrvtPerpMarket(Public, PerpMarket):
     """The account's initial leverage on this market."""
     return await account.leverage(self.shared, self.instrument, refetch=refetch)
 
+  async def collateral_id(self) -> str:
+    """The trading sub-account's cross pool, `<account_id>:<exchange_id>`: it funds
+    isolated positions too, whose margin moves out of it when they open."""
+    return f'{self.account_id}:{self.exchange_id}'
+
   async def available_notional(self) -> Decimal:
     """Free cross collateral (`margin_balance` less the cross initial margin) times
     `leverage()`, without the venue's position-size cap or risk brackets.

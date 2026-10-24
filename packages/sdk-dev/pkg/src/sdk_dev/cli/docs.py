@@ -13,7 +13,7 @@ import typer
 from typing_extensions import Annotated
 
 from sdk_dev.accounts import generate_accounts_toml
-from sdk_dev.contract import load_contract_file, render_contract_file
+from sdk_dev.contract import kind_universe, load_contract_file, render_contract_file
 from sdk_dev.github import stale_pages, write_pages
 from sdk_dev.nav import check_nav
 from sdk_dev.reference import METHODS_MARKER, render_methods_markdown
@@ -119,8 +119,13 @@ def _build_generated(root: Path) -> Generated:
     if METHODS_MARKER not in page.read_text():
       raise FileNotFoundError(f'{page}: missing the {METHODS_MARKER} marker')
     universes = {
-      name: method_universe(impl_files, surface, name)
-      for name in contract.methods
+      name: kind_universe(
+        method,
+        method_universe(impl_files, surface, name),
+        impl_files=impl_files,
+        surface=surface,
+      )
+      for name, method in contract.methods.items()
     }
     source_methods = {
       name: source.method(method.ref or contract.component.ref, name)

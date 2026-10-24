@@ -25,9 +25,6 @@ methods = [
   "open_orders",
   "trades_history",
   "trades_stream",
-  "position",
-  "collateral",
-  "available_notional",
   "place_order",
   "place_orders",
   "cancel_order",
@@ -35,7 +32,7 @@ methods = [
   "cancel_open_orders",
   "candles",
 ]
-note = "Coinbase is not a default account. Authenticated access is recommended, especially for bulk tickers; public=True is an explicit credential-free fallback, never an automatic fallback on authentication errors. Explicit public=True accounts support spot discovery, rules and tickers without credentials. Public catalogue reads reject incomplete or duplicate responses. Public tickers fetch one book per selected product; authenticated tickers retain batched quotes. Spot serves market data and trading. Account fees() is unsupported until product-specific stablepair pricing is resolved. Public rules().fees remains None. INTX perpetuals are not served: Coinbase retires them on the Advanced Trade API on 2026-10-01 (ADR 0031). Candles use required [start, end) bounds, page 299 opens per window and carry no quote_volume."
+note = "Coinbase is not a default account. Authenticated access is recommended, especially for bulk tickers; public=True is an explicit credential-free fallback, never an automatic fallback on authentication errors. Explicit public=True accounts support spot discovery, rules and tickers without credentials. Public catalogue reads reject incomplete or duplicate responses. Public tickers fetch one book per selected product; authenticated tickers retain batched quotes. Spot serves market data and trading. Account fees() is unsupported until product-specific stablepair pricing is resolved. Public rules().fees remains None. INTX perpetuals are not served: Coinbase retires them on the Advanced Trade API on 2026-10-01 (ADR 0031). Candles use required [start, end) bounds, page 299 opens per window and carry no quote_volume. Spot `position`, `collateral` and `available_notional` were removed in SDK 3.0 with the spot stand-ins (ADR 0051); spot `balances` and collateral IDs are not mapped yet."
 # One exchange: `spot` (Advanced Trade SPOT products). `trades_stream` is best-effort:
 # the `user` channel carries order-level cumulative quantities rather than itemized
 # fills, so it loses per-fill maker/taker and fee. `trades_history` is the reliable

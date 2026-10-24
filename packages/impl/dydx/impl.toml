@@ -24,4 +24,5 @@ min_mode = "address"
 address_methods = [
   "fees", "open_orders", "query_order", "trades_history", "funding_payments", "position",
   "perp_position", "collateral", "perp_collateral", "leverage", "available_notional",
+  "collateral_id",
 ]

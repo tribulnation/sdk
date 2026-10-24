@@ -167,7 +167,12 @@ async with sdk.depth_stream('aster:perp:BTCUSDT', settings={'aster': {'depth_sou
   (`remainingOpenableNotionalValue`). It is the same-direction room; reducing or
   reversing a position is not modelled. Testnet does not serve
   `remainingOpenableNotionalValue` (HTTP 404), so perpetual `available_notional` fails
-  there. Spot `available_notional` is the free quote balance.
+  there.
+- Spot `balances` total each asset's free plus locked amounts, with the free part as
+  `free`; mainnet only, as testnet omits funded balances. Spot and futures wallets are
+  separate, so a spot asset's collateral ID is `<account>:spot:<asset>` (`aster:spot:USDT`)
+  and every perpetual's `collateral_id()` is the futures wallet, `<account>:perp`
+  (ADR 0051).
 - Unsupported, raising `NotImplementedError`: hedge-mode positions and exchange-wide
   perpetual trade history.
 - Public reads and the account reads are verified on mainnet. Order placement and

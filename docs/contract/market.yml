@@ -623,22 +623,17 @@ methods:
     group: Your account data
     public: false
     example:
-      accountVenues: [mexc]
+      accountVenues: [dydx]
       constants:
         aster: {market_id: 'aster:perp:BTCUSDT', size: '0.014'}
-        mexc: {market_id: 'mexc:spot:BTCUSDT', size: '0.014'}
-        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', size: '0.5'}
-        kraken: {market_id: 'kraken:spot:XBTUSD', size: '0.014'}
-        binance: {market_id: 'binance:spot:BTCUSDT', size: '0.014'}
-        bit2me: {market_id: 'bit2me:spot:BTC/EUR', size: '0.014'}
-        bitget: {market_id: 'bitget:spot:BTCUSDT', size: '0.014'}
-        bybit: {market_id: 'bybit:spot:BTCUSDT', size: '0.014'}
-        coinbase: {market_id: 'coinbase:spot:BTC-USD', size: '0.014'}
+        bitget: {market_id: 'bitget:usdt:BTCUSDT', size: '0.014'}
+        bybit: {market_id: 'bybit:perp:BTCUSDT', size: '0.014'}
         dydx: {market_id: 'dydx:perp:BTC-USD', size: '0.014'}
-        lighter: {market_id: 'lighter:perp:1', size: '0.014'}
         extended: {market_id: 'extended:perp:BTC-USD', size: '0.014'}
-        margin-trade: {market_id: 'margin-trade:perp:BTC', size: '0.014'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', size: '0.014'}
+        hyperliquid: {market_id: 'hyperliquid::BTC', size: '0.014'}
+        lighter: {market_id: 'lighter:perp:1', size: '0.014'}
+        margin-trade: {market_id: 'margin-trade:perp:BTC', size: '0.014'}
       callTemplate: |
         pos = await sdk.position('{{ constants[accounts[0]].market_id }}')
       resultTemplate: |
@@ -664,24 +659,20 @@ methods:
     group: Your account data
     public: false
     example:
-      accountVenues: [mexc]
+      accountVenues: [hyperliquid]
       constants:
-        aster: {market_id: 'aster:perp:BTCUSDT', equity: '10240.55', free: '8120.00'}
-        mexc: {market_id: 'mexc:spot:BTCUSDT', equity: '10240.55', free: '8120.00'}
-        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', equity: '9875.20', free: '7640.00'}
-        bit2me: {market_id: 'bit2me:spot:BTC/EUR', equity: '10240.55', free: '8120.00'}
-        binance: {market_id: 'binance:spot:BTCUSDT', equity: '10240.55', free: '8120.00'}
-        bitget: {market_id: 'bitget:spot:BTCUSDT', equity: '10240.55', free: '8120.00'}
-        bybit: {market_id: 'bybit:spot:BTCUSDT', equity: '10240.55', free: '8120.00'}
-        coinbase: {market_id: 'coinbase:spot:BTC-USD', equity: '10240.55', free: '8120.00'}
-        dydx: {market_id: 'dydx:perp:BTC-USD', equity: '10240.55', free: '8120.00'}
-        kraken: {market_id: 'kraken:spot:XBTUSD', equity: '10240.55', free: '8120.00'}
-        lighter: {market_id: 'lighter:perp:1', equity: '10240.55', free: '8120.00'}
-        extended: {market_id: 'extended:perp:BTC-USD', equity: '10240.55', free: '8120.00'}
-        margin-trade: {market_id: 'margin-trade:perp:BTC', equity: '10240.55', free: '8120.00'}
-        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', equity: '10240.55', free: '8120.00'}
+        aster: {collateral_id: 'aster:perp', equity: '10240.55', free: '8120.00'}
+        bitget: {collateral_id: 'bitget:usdt', equity: '10240.55', free: '8120.00'}
+        bybit: {collateral_id: 'bybit:perp', equity: '10240.55', free: '8120.00'}
+        dydx: {collateral_id: 'dydx:perp', equity: '10240.55', free: '8120.00'}
+        extended: {collateral_id: 'extended:perp', equity: '10240.55', free: '8120.00'}
+        grvt: {collateral_id: 'grvt:perp', equity: '10240.55', free: '8120.00'}
+        hyperliquid: {collateral_id: 'hyperliquid:spot:0', equity: '10240.55', free: '8120.00'}
+        lighter: {collateral_id: 'lighter:spot:3', equity: '10240.55', free: '8120.00'}
+        margin-trade: {collateral_id: 'margin-trade:perp', equity: '10240.55', free: '8120.00'}
       callTemplate: |
-        c = await sdk.collateral('{{ constants[accounts[0]].market_id }}')
+        # A collateral ID, as collateral_id() or collateral_ids() return it
+        c = await sdk.collateral('{{ constants[accounts[0]].collateral_id }}')
       resultTemplate: |
         Collateral(equity=Decimal('{{ constants[accounts[0]].equity }}'), free_collateral=Decimal('{{ constants[accounts[0]].free }}'))
     catalogue:
@@ -705,22 +696,17 @@ methods:
     group: Your account data
     public: false
     example:
-      accountVenues: [mexc]
+      accountVenues: [dydx]
       constants:
-        mexc: {market_id: 'mexc:spot:BTCUSDT', notional: '8120.00'}
-        aster: {market_id: 'aster:perp:BTCUSDT', notional: '162400.00'}
-        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', notional: '7640.00'}
-        bitget: {market_id: 'bitget:spot:BTCUSDT', notional: '8120.00'}
-        binance: {market_id: 'binance:spot:BTCUSDT', notional: '8120.00'}
-        bit2me: {market_id: 'bit2me:spot:BTC/EUR', notional: '8120.00'}
-        bybit: {market_id: 'bybit:spot:BTCUSDT', notional: '8120.00'}
-        coinbase: {market_id: 'coinbase:spot:BTC-USD', notional: '8120.00'}
-        dydx: {market_id: 'dydx:perp:BTC-USD', notional: '8120.00'}
-        kraken: {market_id: 'kraken:spot:XBTUSD', notional: '8120.00'}
-        lighter: {market_id: 'lighter:perp:1', notional: '8120.00'}
-        extended: {market_id: 'extended:perp:BTC-USD', notional: '8120.00'}
-        margin-trade: {market_id: 'margin-trade:perp:BTC', notional: '8120.00'}
-        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', notional: '8120.00'}
+        aster: {market_id: 'aster:perp:BTCUSDT', notional: '81200.00'}
+        bitget: {market_id: 'bitget:usdt:BTCUSDT', notional: '81200.00'}
+        bybit: {market_id: 'bybit:perp:BTCUSDT', notional: '81200.00'}
+        dydx: {market_id: 'dydx:perp:BTC-USD', notional: '81200.00'}
+        extended: {market_id: 'extended:perp:BTC-USD', notional: '81200.00'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', notional: '81200.00'}
+        hyperliquid: {market_id: 'hyperliquid::BTC', notional: '81200.00'}
+        lighter: {market_id: 'lighter:perp:1', notional: '81200.00'}
+        margin-trade: {market_id: 'margin-trade:perp:BTC', notional: '81200.00'}
       callTemplate: |
         notional = await sdk.available_notional('{{ constants[accounts[0]].market_id }}')
       resultTemplate: |
@@ -741,6 +727,59 @@ methods:
         mexc   -> BTCUSDT
         okx    -> BTC-USDT
         kraken -> XBTUSDT
+
+  balances:
+    group: Your account data
+    kind: spot
+    public: false
+    example:
+      accountVenues: [hyperliquid]
+      constants:
+        aster: {market_id: 'aster:spot:ASTERUSDT', base_total: '0.5', base_free: '0.4', quote_total: '9875.20', quote_free: '7640.00'}
+        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', base_total: '0.5', base_free: '0.4', quote_total: '9875.20', quote_free: '7640.00'}
+        lighter: {market_id: 'lighter:spot:2048', base_total: '0.5', base_free: '0.4', quote_total: '9875.20', quote_free: '7640.00'}
+        margin-trade: {market_id: 'margin-trade:spot:PEARL/USDC', base_total: '0.5', base_free: '0.4', quote_total: '9875.20', quote_free: '7640.00'}
+      callTemplate: |
+        b = await sdk.balances('{{ constants[accounts[0]].market_id }}')
+        print(b.base.free, b.quote.free)  # what a sell, and a buy, can spend
+      resultTemplate: |
+        {{ constants[accounts[0]].base_free }} {{ constants[accounts[0]].quote_free }}
+
+  collateral_ids:
+    group: Your account data
+    kind: spot
+    public: false
+    example:
+      accountVenues: [hyperliquid]
+      constants:
+        aster: {market_id: 'aster:spot:ASTERUSDT', base: 'ASTER', quote: 'USDT'}
+        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', base: '197', quote: '0'}
+        lighter: {market_id: 'lighter:spot:2048', base: '1', quote: '3'}
+        margin-trade: {market_id: 'margin-trade:spot:PEARL/USDC', base: 'PEARL', quote: 'USDC'}
+      callTemplate: |
+        ids = await sdk.collateral_ids('{{ constants[accounts[0]].market_id }}')
+        quote = await sdk.collateral(ids.quote)  # what a buy reserves on
+      resultTemplate: |
+        SpotCollateralIds(base='{{ accounts[0] }}:spot:{{ constants[accounts[0]].base }}', quote='{{ accounts[0] }}:spot:{{ constants[accounts[0]].quote }}')
+
+  collateral_id:
+    group: Your account data
+    kind: perp
+    public: false
+    example:
+      accountVenues: [hyperliquid]
+      constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', collateral_id: 'aster:perp'}
+        dydx: {market_id: 'dydx:perp:BTC-USD', collateral_id: 'dydx:perp'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', collateral_id: 'grvt:perp'}
+        hyperliquid: {market_id: 'hyperliquid::BTC', collateral_id: 'hyperliquid:spot:0'}
+        lighter: {market_id: 'lighter:perp:1', collateral_id: 'lighter:spot:3'}
+        margin-trade: {market_id: 'margin-trade:perp:BTC', collateral_id: 'margin-trade:perp'}
+      callTemplate: |
+        id = await sdk.collateral_id('{{ constants[accounts[0]].market_id }}')
+        pool = await sdk.collateral(id)  # shared by every market returning this ID
+      resultTemplate: |
+        '{{ constants[accounts[0]].collateral_id }}'
 
   place_order:
     group: Trading
