@@ -1,6 +1,6 @@
 {
   "payload": {
-    "account_mode": "token",
+    "account_mode": "private",
     "account_venue": "grvt",
     "bitget_uta": null,
     "checks": [
