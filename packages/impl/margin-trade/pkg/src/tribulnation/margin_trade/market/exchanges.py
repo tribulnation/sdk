@@ -13,7 +13,7 @@ from typed_margin_trade.coingecko.spot.tickers import SpotTicker
 from typed_margin_trade.schemas import Fill
 from tribulnation.sdk.core import PaginatedResponse, SDK
 from tribulnation.sdk.market import (
-  Exchange,
+  Balance,
   ExchangeFundingPayment,
   ExchangeTrade,
   FundingPayment,
@@ -21,15 +21,16 @@ from tribulnation.sdk.market import (
   PerpExchange as SDKPerpExchange,
   PerpStats,
   Settings,
+  SpotExchange as SDKSpotExchange,
   Ticker,
   Trade,
 )
 from ..core import FUNDING_INTERVAL, Public, parse_trade
-from .collateral import cross_collateral
+from .collateral import cross_collateral, spot_balance
 from .markets import PerpMarket, SpotMarket, next_settlement
 
 
-def is_spot(fill: Fill) -> bool:
+def is_spot_fill(fill: Fill) -> bool:
   """Spot coins are pair names (`PEARL/USDC`); perpetual coins never contain a slash.
 
   Deciding by name, not by the listed markets, keeps delisted markets' fills.
@@ -61,8 +62,8 @@ def quote_ticker(
 
 
 @dataclass(frozen=True, kw_only=True)
-class SpotExchange(Public, Exchange):
-  """margin.trade spot."""
+class SpotExchange(Public, SDKSpotExchange):
+  """margin.trade spot: the spot wallet, separate from the perpetual one."""
 
   @property
   def exchange_id(self) -> str:
@@ -79,6 +80,21 @@ class SpotExchange(Public, Exchange):
     if market_id not in pairs:
       raise ValueError(f'Unknown margin.trade spot pair: {market_id}')
     return SpotMarket(shared=self.shared, meta=pairs[market_id])
+
+  async def balance(self, asset: str, /) -> Balance:
+    """One spot token's balance by symbol (`USDC`, `PEARL`).
+
+    Raises:
+      ValueError: No listed pair trades the token.
+    """
+    pairs = await self.shared.spot_pairs()
+    tokens = {t['name']: t['index'] for p in pairs.values() for t in (p.base, p.quote)}
+    if asset not in tokens:
+      raise ValueError(f'Unknown margin.trade spot token: {asset}')
+    state = await self.shared.call(
+      lambda: self.client.info.spot_clearinghouse_state(self.shared.address)
+    )
+    return spot_balance(state, tokens[asset])
 
   async def tickers(
     self, markets: Collection[str] | None = None, *, settings: Settings = {}
@@ -127,7 +143,7 @@ class SpotExchange(Public, Exchange):
       self.shared.address, start_time=start, end_time=end
     )
     async for page in pages.via(self.shared.call):
-      if rows := [exchange_trade(f) for f in page if is_spot(f)]:
+      if rows := [exchange_trade(f) for f in page if is_spot_fill(f)]:
         yield rows
 
 
@@ -211,7 +227,7 @@ class PerpExchange(Public, SDKPerpExchange):
       self.shared.address, start_time=start, end_time=end
     )
     async for page in pages.via(self.shared.call):
-      if rows := [exchange_trade(f) for f in page if not is_spot(f)]:
+      if rows := [exchange_trade(f) for f in page if not is_spot_fill(f)]:
         yield rows
 
   @overload

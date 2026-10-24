@@ -18,5 +18,5 @@ async def test_retired_intx_exchange_is_rejected():
   async with CoinbaseMarket.new(public=True) as sdk:
     with pytest.raises(ValueError, match='Unknown Coinbase exchange "intx"'):
       await sdk.exchange('intx')
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(ValueError, match='Unknown Coinbase exchange "intx"'):
       await sdk.perp_exchange('intx')

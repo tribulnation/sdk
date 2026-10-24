@@ -24,6 +24,7 @@ from typed_aster.core.urls import SurfaceUrls
 from typed_aster.core.transport.bapi import BapiClient
 from typed_aster.futures.account.schemas import FuturesAccount
 from typed_aster.futures.market.exchange_info import FuturesSymbol
+from typed_aster.schemas import AccountInfo
 from typed_aster.spot.market.exchange_info import SpotSymbol
 from tribulnation.sdk.core import (
   AuthError,
@@ -176,6 +177,19 @@ class Shared(SDK):
           if r['status'] == 'TRADING' and r['contractType'] == 'PERPETUAL'
         )
     return self.perp
+
+  async def spot_account_info(self) -> AccountInfo:
+    """Read the spot account's balances.
+
+    Raises:
+      NotImplementedError: On testnet, whose account information omits funded
+        balances.
+    """
+    if not self.mainnet:
+      raise NotImplementedError(
+        'Aster testnet spot balances are not supported: account information omits them'
+      )
+    return await self.call(self.client.spot.account.info)
 
   async def futures_account(self) -> FuturesAccount:
     """Read the join-margin futures account: totals value every margin asset in USDT.

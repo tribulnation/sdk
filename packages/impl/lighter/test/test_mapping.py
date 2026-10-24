@@ -16,6 +16,7 @@ from tribulnation.lighter.core import ClientIndexes, Shared
 from tribulnation.lighter.market import account, books, history
 from tribulnation.lighter.market.markets import LighterPerpMarket
 from tribulnation.lighter.market.common import parse_trade
+from tribulnation.sdk.market import Balance
 
 ACCOUNT = 476
 TIME = datetime(2026, 9, 25, 13, 0, tzinfo=timezone.utc)
@@ -253,19 +254,46 @@ def usdc(**fields: Any) -> dict[str, Any]:
   return row
 
 
-def test_unified_spot_collateral_is_available_balance_net_of_locks():
+def test_unified_margin_balance_is_available_balance_net_of_locks():
   """Spot locks are not reflected in `available_balance`."""
   acct = detailed(available_balance=Decimal('3987.38'), assets=[usdc()])
-  collateral = account.spot_collateral(acct, 3)
-  assert collateral.equity == Decimal('3987.38')
-  assert collateral.free_collateral == Decimal('3963.38')
+  assert account.spot_balance(acct, 3) == Balance(
+    total=Decimal('3987.38'), free=Decimal('3963.38')
+  )
 
 
-def test_classic_accounts_are_unsupported_for_spot_collateral():
-  """Spot collateral is qualified for unified accounts only: classic accounts are a
+def test_spot_only_assets_are_their_balance_net_of_locks():
+  """An asset outside margin is its own spot balance; one never held is zero."""
+  eth = usdc(asset_id=1, balance=Decimal(2), locked_balance=Decimal('0.5'))
+  eth['margin_mode'] = 'disabled'
+  acct = detailed(assets=[eth])
+  assert account.spot_balance(acct, 1) == Balance(total=Decimal(2), free=Decimal('1.5'))
+  assert account.spot_balance(acct, 9) == Balance(total=Decimal(0), free=Decimal(0))
+
+
+def test_classic_accounts_are_unsupported_for_spot_balances():
+  """Spot balances are qualified for unified accounts only: classic accounts are a
   declared gap, not a venue error."""
   with pytest.raises(NotImplementedError, match='unified accounts only'):
-    account.spot_collateral(detailed(account_trading_mode=0, assets=[usdc()]), 3)
+    account.spot_balance(detailed(account_trading_mode=0, assets=[usdc()]), 3)
+
+
+@pytest.mark.parametrize(
+  ('mode', 'expected'), [(1, 'lt:spot:3'), (0, 'lt:perp')], ids=['unified', 'classic']
+)
+async def test_perp_collateral_id_follows_the_trading_mode(mode: int, expected: str):
+  """Unified accounts margin perps with spot USDC, so they share its ID; classic
+  accounts have a separate pool. The mode is read once (ADR 0051)."""
+  shared = Shared(client=cast(Lighter, SimpleNamespace()), account_id='lt')
+  read = AsyncMock(return_value=detailed(account_trading_mode=mode))
+  object.__setattr__(shared, 'account', read)
+  object.__setattr__(shared, 'account_index', AsyncMock(return_value=7))
+  market = LighterPerpMarket(shared=shared, market_index=1)
+  assert await market.collateral_id() == expected
+  assert await LighterPerpMarket(shared=shared, market_index=0).collateral_id() == (
+    expected
+  )
+  assert read.await_count == 1
 
 
 def test_grid_start_rounds_up_to_the_interval():

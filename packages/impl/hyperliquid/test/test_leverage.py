@@ -9,9 +9,8 @@ from typed_hyperliquid import Hyperliquid
 from typed_hyperliquid.info.active_asset_data import ActiveAssetData
 
 from tribulnation.hyperliquid.market.impl.leverage import parse_leverage
-from tribulnation.hyperliquid.market.impl.mixin import PerpMeta, Shared, SpotMeta
+from tribulnation.hyperliquid.market.impl.mixin import PerpMeta, Shared
 from tribulnation.hyperliquid.market.perps_market import PerpMarket
-from tribulnation.hyperliquid.market.spot_market import SpotMarket
 
 ADDRESS = '0x' + '1' * 40
 
@@ -97,13 +96,3 @@ async def test_available_notional_is_free_unified_balance_times_leverage():
   """`(total - hold) * leverage`, read from the account pool whatever the mode."""
   m, _ = market(leverage=[5])
   assert await m.available_notional() == Decimal(500)
-
-
-async def test_spot_available_notional_is_the_free_quote_balance():
-  """The SDK default: the spot quote bucket's `total - hold`, without leverage."""
-  _, info = market(leverage=[])
-  shared = Shared(
-    client=cast(Hyperliquid, SimpleNamespace(info=info)), maybe_address=ADDRESS
-  )
-  meta = cast(SpotMeta, {'quote_meta': {'index': 0, 'name': 'USDC'}})
-  assert await SpotMarket(shared=shared, meta=meta).available_notional() == 100

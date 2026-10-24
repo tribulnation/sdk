@@ -11,7 +11,6 @@ from tribulnation.sdk.market import (
   Book,
   Candle,
   CandleInterval,
-  Collateral,
   Fees,
   FundingPayment,
   FundingRate,
@@ -23,13 +22,16 @@ from tribulnation.sdk.market import (
   PerpCollateral,
   PerpMarket,
   PerpPosition,
-  Position,
   Rules,
   Settings,
+  SpotBalances,
+  SpotMarket,
+  SpotRules,
   Trade,
 )
 
 from ..core import FEE_TICK, USDC, percent
+from .account import UNIFIED
 from . import account, books, history, orders, stats
 from .common import Public
 
@@ -219,6 +221,22 @@ class LighterPerpMarket(MarketBase, PerpMarket):
     self.shared.leverages[self.market_index] = leverage
     return leverage
 
+  async def collateral_id(self) -> str:
+    """USDC's spot ID `<account_id>:spot:3` on a unified account, where perps margin the
+    spot USDC balance; the perpetual pool `<account_id>:perp` on a classic one.
+
+    Isolated positions are funded from cross collateral, so they return the same ID.
+    The account's mode is read once and cached on `Shared`.
+    """
+    index = await self.shared.account_index()
+    if (mode := self.shared.trading_modes.get(index)) is None:
+      mode = (await self.shared.account())['account_trading_mode']
+      self.shared.trading_modes[index] = mode
+    if mode == UNIFIED:
+      return f'{self.account_id}:spot:{USDC}'
+    else:
+      return f'{self.account_id}:perp'
+
   async def available_notional(self) -> Decimal:
     """Free cross collateral times `leverage()`. Kept over the mode-aware default:
     isolated positions are funded from cross collateral, not their own bucket."""
@@ -258,7 +276,7 @@ class LighterPerpMarket(MarketBase, PerpMarket):
 
 
 @dataclass(frozen=True, kw_only=True)
-class LighterSpotMarket(MarketBase):
+class LighterSpotMarket(MarketBase, SpotMarket):
   """A spot market; fees are charged in the asset each fill delivers."""
 
   base_asset: int
@@ -276,13 +294,15 @@ class LighterSpotMarket(MarketBase):
     """Spot fees: in the base asset on buys, the quote asset on sells."""
     return history.spot_fee(lambda _: self.base_asset, lambda _: self.quote_asset)
 
-  async def rules(self, *, refetch: bool = False) -> Rules:
-    """Signing scales, order floors and the standard account's rates (zero). The fee
-    asset depends on the fill (ADR 0028)."""
+  async def rules(self, *, refetch: bool = False) -> SpotRules:
+    """Signing scales, order floors, the standard account's rates (zero) and the
+    pair's asset ids. The fee asset depends on the fill (ADR 0028)."""
     d = await self.shared.spot(self.market_index, refetch=refetch)
     maker = percent(d['maker_fee']) if d['is_maker_fee_enabled'] else Decimal(0)
     taker = percent(d['taker_fee']) if d['is_taker_fee_enabled'] else Decimal(0)
-    return Rules(
+    return SpotRules(
+      base=str(self.base_asset),
+      quote=str(self.quote_asset),
       fee_asset=None,
       tick_size=Decimal(1).scaleb(-d['supported_price_decimals']),
       step_size=Decimal(1).scaleb(-d['supported_size_decimals']),
@@ -317,10 +337,11 @@ class LighterSpotMarket(MarketBase):
       overflow=overflow,
     )
 
-  async def position(self) -> Position:
-    """The base asset's balance."""
-    return account.spot_position(await self.shared.account(), self.base_asset)
-
-  async def collateral(self) -> Collateral:
-    """The quote asset's collateral; classic accounts raise `NotImplementedError`."""
-    return account.spot_collateral(await self.shared.account(), self.quote_asset)
+  async def balances(self) -> SpotBalances:
+    """The base and quote balances, from one account read; classic accounts raise
+    `NotImplementedError`."""
+    acct = await self.shared.account()
+    return SpotBalances(
+      base=account.spot_balance(acct, self.base_asset),
+      quote=account.spot_balance(acct, self.quote_asset),
+    )

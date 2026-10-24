@@ -1,7 +1,7 @@
 """Positions, collateral buckets and leverage from the account endpoint.
 
-Perpetual figures read the same fields in classic and unified accounts. Spot collateral
-depends on the mode, and only unified accounts are supported, as for Hyperliquid.
+Perpetual figures read the same fields in classic and unified accounts. Spot balances
+depend on the mode, and only unified accounts are supported, as for Hyperliquid.
 """
 
 from decimal import Decimal
@@ -9,7 +9,7 @@ from decimal import Decimal
 from typed_lighter.api.account.get import DetailedAccount
 from typed_lighter.api.markets.order_book_details import PerpsOrderBookDetail
 from typed_lighter.schemas import AccountAsset, AccountPosition
-from tribulnation.sdk.market import Collateral, PerpCollateral, PerpPosition, Position
+from tribulnation.sdk.market import Balance, PerpCollateral, PerpPosition
 
 from ..core import percent
 
@@ -108,18 +108,13 @@ def balance_of(acct: DetailedAccount, asset_id: int) -> AccountAsset | None:
   return next((a for a in acct['assets'] if a['asset_id'] == asset_id), None)
 
 
-def spot_position(acct: DetailedAccount, base_asset_id: int) -> Position:
-  """The base asset's balance, locked part included."""
-  row = balance_of(acct, base_asset_id)
-  return Position(size=row['balance'] if row else Decimal(0))
+def spot_balance(acct: DetailedAccount, asset_id: int) -> Balance:
+  """One asset's spot balance on a unified account, zero when it holds none.
 
-
-def spot_collateral(acct: DetailedAccount, quote_asset_id: int) -> Collateral:
-  """The quote asset's spot collateral on a unified account.
-
-  A margin-enabled quote asset (USDC) lives in `margin_balance`, shared with perps. Resting
-  bids lock `locked_balance`, which `available_balance` does not reflect, so a spot bid can
-  spend `available_balance - locked_balance`. Any other quote asset is its spot balance.
+  A margin-enabled asset (USDC) lives in `margin_balance`, shared with perps. Resting
+  bids lock `locked_balance`, which `available_balance` does not reflect, so a spot order
+  can spend `available_balance - locked_balance`. Any other asset is its spot balance
+  less what resting orders lock.
 
   Raises:
     NotImplementedError: The account is in classic mode, whose separate spot balances
@@ -127,18 +122,15 @@ def spot_collateral(acct: DetailedAccount, quote_asset_id: int) -> Collateral:
   """
   if acct['account_trading_mode'] != UNIFIED:
     raise NotImplementedError(
-      'Lighter spot collateral supports unified accounts only; this account is classic'
+      'Lighter spot balances support unified accounts only; this account is classic'
     )
-  row = balance_of(acct, quote_asset_id)
+  row = balance_of(acct, asset_id)
   if row is None:
-    return Collateral(equity=Decimal(0), free_collateral=Decimal(0))
-  if row['margin_mode'] == 'enabled':
-    return Collateral(
-      equity=row['margin_balance'],
-      free_collateral=max(
-        acct['available_balance'] - row['locked_balance'], Decimal(0)
-      ),
+    return Balance(total=Decimal(0), free=Decimal(0))
+  elif row['margin_mode'] == 'enabled':
+    return Balance(
+      total=row['margin_balance'],
+      free=max(acct['available_balance'] - row['locked_balance'], Decimal(0)),
     )
-  return Collateral(
-    equity=row['balance'], free_collateral=row['balance'] - row['locked_balance']
-  )
+  else:
+    return Balance(total=row['balance'], free=row['balance'] - row['locked_balance'])

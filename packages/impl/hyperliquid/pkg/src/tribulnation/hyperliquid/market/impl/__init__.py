@@ -15,7 +15,6 @@ from .orders import open_orders, place_order, cancel_order, query_order
 from .trades import trades_history, trades_stream
 
 from .spot_rules import rules as spot_rules
-from .spot_position import position as spot_position
 
 from .perps_rules import rules as perps_rules
 from .perps_position import position as perps_position
@@ -27,6 +26,7 @@ from .stats import perp_stats, perp_tickers
 from .collateral import (
   perp_exchange_collateral,
   perp_market_collateral,
-  spot_market_collateral,
+  spot_market_balances,
+  spot_token_balance,
 )
 from .leverage import perp_leverage, perp_available_notional

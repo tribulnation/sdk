@@ -95,6 +95,8 @@ class Shared(SDK):
   client_indexes: ClientIndexes = field(default_factory=ClientIndexes)
   leverages: dict[int, Decimal] = field(default_factory=dict[int, Decimal])
   """The account's leverage per perpetual market, filled by `leverage()`."""
+  trading_modes: dict[int, int] = field(default_factory=dict[int, int])
+  """`account_trading_mode` per account index, filled by `collateral_id()`."""
   public_index: int | None = None
   """Account for public account reads when the client has no credentials."""
   address: str | None = None

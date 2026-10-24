@@ -155,6 +155,18 @@ class Market(MarketMixin, PerpMarket):
 
     return PerpPosition(size=net_size, entry_price=avg_entry)
 
+  async def collateral_id(self) -> str:
+    """The addressed subaccount's pool: `<account_id>:perp` for the parent subaccount,
+    `<account_id>:perp.<N>` for a child (isolated) one.
+
+    Orders are placed from that subaccount and margined by its own free collateral;
+    nothing moves collateral between subaccounts on placement. No request is made.
+    """
+    if self.subaccount == self.shared.parent_subaccount:
+      return f'{self.account_id}:perp'
+    else:
+      return f'{self.account_id}:perp.{self.subaccount}'
+
   async def leverage(self, *, refetch: bool = False) -> Decimal:
     """`1 / effective initial margin fraction`, from the cached market metadata.
 

@@ -8,11 +8,11 @@ from typed_hyperliquid.info.clearinghouse_state import (
   IsolatedLeverage,
 )
 
-from tribulnation.sdk.market import Collateral, PerpCollateral
+from tribulnation.sdk.market import Balance, PerpCollateral, SpotBalances
 from tribulnation.sdk.core import ApiError
 
 from tribulnation.hyperliquid.core import wrap_exceptions
-from .mixin import PerpMixin, PerpMarketMixin, SpotMarketMixin
+from .mixin import PerpMixin, PerpMarketMixin, SpotMixin, SpotMarketMixin
 
 
 def cross_collateral(
@@ -147,17 +147,34 @@ async def perp_market_collateral(self: PerpMarketMixin) -> PerpCollateral:
   return await _unified_cross_collateral(self)
 
 
-@wrap_exceptions
-async def spot_market_collateral(self: SpotMarketMixin) -> Collateral:
-  """Spot bucket = the quote/collateral token balance.
+def spot_balance(spot_state: Any, token_idx: int, /) -> Balance:
+  """One token's spot balance: `total`, and `total - hold` as free (see `spot_collateral`)."""
+  total, free = spot_collateral(spot_state, token_idx)
+  return Balance(total=total, free=free)
 
-  `equity = total` balance of the quote token; `free_collateral = total - hold`
-  (the portion not locked by resting orders).
+
+@wrap_exceptions
+async def spot_market_balances(self: SpotMarketMixin) -> SpotBalances:
+  """The base and quote token balances, from one `spot_clearinghouse_state`.
+
+  `hold` is what resting orders (and, for the collateral token, perp margin) lock, so
+  `free` is what a sell (base) or a buy (quote) can spend.
   """
   state = await self.client.info.spot_clearinghouse_state(user=self.address)
-  for balance in state['balances']:
-    if balance['token'] == self.quote_meta['index']:
-      total = Decimal(balance['total'])
-      hold = Decimal(balance['hold'])
-      return Collateral(equity=total, free_collateral=total - hold)
-  return Collateral(equity=Decimal(0), free_collateral=Decimal(0))
+  return SpotBalances(
+    base=spot_balance(state, self.base_meta['index']),
+    quote=spot_balance(state, self.quote_meta['index']),
+  )
+
+
+@wrap_exceptions
+async def spot_token_balance(self: SpotMixin, asset: str, /) -> Balance:
+  """One token's spot balance by asset ID, the token index as a decimal string.
+
+  Raises:
+    ValueError: `asset` is not a token index.
+  """
+  if not asset.isdigit():
+    raise ValueError(f'Hyperliquid asset IDs are token indices, got {asset!r}')
+  state = await self.client.info.spot_clearinghouse_state(user=self.address)
+  return spot_balance(state, int(asset))

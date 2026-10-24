@@ -98,18 +98,6 @@ class SpotMarket(Public, Market):
     """Private fill streams are outside the public Market surface."""
     raise NotImplementedError('Deribit Market supports public data only')
 
-  async def position(self) -> Position:
-    """Private positions are outside the public Market surface."""
-    raise NotImplementedError('Deribit Market supports public data only')
-
-  async def collateral(self) -> Collateral:
-    """Private collateral is outside the public Market surface."""
-    raise NotImplementedError('Deribit Market supports public data only')
-
-  async def available_notional(self) -> Decimal:
-    """Account buying power is outside the public Market surface."""
-    raise NotImplementedError('Deribit Market supports public data only')
-
   async def place_order(
     self, order: Order, *, settings: Settings = {}
   ) -> OrderResponse:
