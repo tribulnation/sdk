@@ -101,8 +101,9 @@ async with sdk.trades_stream(market_id, settings=settings) as my_trades:
   ...
 ```
 
-Venues without a choice ignore it. dYdX can read fills from your own full node ahead of
-the indexer, or race both: see [dYdX](implementations/dydx.md#fill-sources).
+Venues without a choice ignore it. dYdX can read fills from your own full node or a
+local fill daemon ahead of the indexer, or race them all (and an account can set its
+default with `fill_source`): see [dYdX](implementations/dydx.md#fill-sources).
 
 ## When your consumer falls behind
 
