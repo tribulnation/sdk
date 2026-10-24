@@ -1,4 +1,4 @@
-# ADR 0049: dYdX fills from a local fill socket, and `'fastest'` over every source
+# ADR 0050: dYdX fills from a local fill socket, and `'fastest'` over every source
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
