@@ -4,7 +4,7 @@ from typing_extensions import AsyncGenerator, AsyncIterable, AsyncIterator
 from contextlib import asynccontextmanager
 
 from tribulnation.sdk.core import OverflowPolicy
-from tribulnation.sdk.market import Book, Trade
+from tribulnation.sdk.market import Book, Trade, detached_books
 
 from .mixin import MarketMixin
 from .parse import parse_execution
@@ -25,7 +25,7 @@ async def depth_stream(
   for a sized snapshot.
   """
   async with self.subscribe_depth(queue_size=queue_size, overflow=overflow) as stream:
-    yield stream
+    yield detached_books(stream)
 
 
 @asynccontextmanager

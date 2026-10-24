@@ -1,5 +1,6 @@
 from .types import (
   Book,
+  detached_books,
   Candle,
   CandleInterval,
   candle_width,

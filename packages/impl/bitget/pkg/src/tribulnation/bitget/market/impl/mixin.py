@@ -55,8 +55,9 @@ async def merged_books(pushes: AsyncIterable[OrderBookPush]) -> AsyncIterator[Bo
 
   The channel pushes one full `snapshot` on subscribe (500 levels a side, confirmed
   live) and then `update`s carrying only the changed levels, a zero size meaning the
-  level was removed -- `Book.update`'s exact contract. Each yielded book is a copy, so
-  a book already handed to a subscriber is never mutated by a later push.
+  level was removed -- `Book.update`'s exact contract. Each yielded book is
+  `Book.frozen`, so a later push never mutates it; `depth_stream` gives each
+  subscriber its own copy.
   """
   book = Book()
   async for push in pushes:
@@ -66,7 +67,7 @@ async def merged_books(pushes: AsyncIterable[OrderBookPush]) -> AsyncIterator[Bo
         book = delta
       else:
         book.update(delta)
-      yield book.copy()
+      yield book.frozen()
 
 
 async def flatten(pushes: AsyncIterable[Mapping[str, Any]], key: str):

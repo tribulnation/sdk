@@ -2,10 +2,10 @@
 
 from contextlib import asynccontextmanager
 from decimal import Decimal
-from typing_extensions import AsyncIterable, AsyncIterator
+from typing_extensions import AsyncIterator
 
 from tribulnation.sdk.core import OverflowPolicy, Subscription, exception_wrapper
-from tribulnation.sdk.market import Book
+from tribulnation.sdk.market import Book, detached_books
 from .common import Shared
 
 
@@ -110,10 +110,5 @@ async def depth_stream(
   check_levels(levels, maximum=5)
   source = subscription(shared, exchange, symbol, multiplier)
 
-  async def trimmed(books: AsyncIterable[Book]) -> AsyncIterator[Book]:
-    """Give every subscriber its own book, trimmed to its requested depth."""
-    async for book in books:
-      yield book.copy() if levels is None else book.limit(levels)
-
   async with source.subscribe(queue_size=queue_size, overflow=overflow) as stream:
-    yield trimmed(stream)
+    yield detached_books(stream, levels)

@@ -86,6 +86,12 @@ raises, rather than quietly placing a different order.
   bid, a level the diff sets removes the existing level it crosses; if both come from
   the diff, the larger quantity wins (an equal one keeps the ask). Removals cross
   nothing, and crossings between existing levels are left as they are.
+  `copy` returns an independent book (new level lists and entries). `frozen` copies
+  only the level lists and shares the entries, so a later `update` leaves it intact;
+  it is for venue streams, which hand each subscriber a `copy` of it through
+  `detached_books`. Every book a `depth_stream` delivers is the subscriber's own: later
+  pushes never change it, and mutating it (`buy`, `sell`, editing entries) affects no
+  one else.
 - `Rules`: `fee_asset`, `tick_size`, `step_size`, min and max qty and
   price (fixed and price-relative), optional standard `fees`, and an `api` flag for whether
   the instrument is tradable through the API at all. The helpers round, truncate and

@@ -3,10 +3,10 @@ shared delta stream per instrument maintaining the full book."""
 
 from contextlib import asynccontextmanager
 
-from typing_extensions import AsyncIterable, AsyncIterator, Literal, Sequence
+from typing_extensions import AsyncIterator, Literal, Sequence
 from typed_grvt.schemas import OrderbookLevel, OrderbookLevels
 from tribulnation.sdk.core import OverflowPolicy, Subscription
-from tribulnation.sdk.market import Book
+from tribulnation.sdk.market import Book, detached_books
 
 from ..core import Shared, wrap_exceptions
 
@@ -84,7 +84,7 @@ def subscription(shared: Shared, instrument: str) -> Subscription[Book]:
             book.update(update)
           received += 1
           if received >= snapshots:
-            yield book.copy()
+            yield book.frozen()
 
       return Subscription.Context(books(), wrap_exceptions(stream.unsubscribe))
 
@@ -112,10 +112,5 @@ async def depth_stream(
   """
   upstream = subscription(shared, instrument)
 
-  async def trimmed(books: AsyncIterable[Book]) -> AsyncIterator[Book]:
-    """Copy before handing out: subscribers share each upstream snapshot."""
-    async for book in books:
-      yield book.copy() if levels is None else book.copy().limit(levels)
-
   async with upstream.subscribe(queue_size=queue_size, overflow=overflow) as stream:
-    yield trimmed(stream)
+    yield detached_books(stream, levels)
