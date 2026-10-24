@@ -44,8 +44,10 @@ the indexer.
    replaces 0045's failure of `'fastest'` when the node is behind the tip as it connects:
    the refusal still happens before anything is streamed, so no replayed fill is emitted.
 6. The client keeps a `FillRace`: fills each source delivered first, and per pair of
-   sources the lead in milliseconds (last 1000), exposed as `shared.fill_race.summary()`
-   and logged by each `'fastest'` stream every 10 minutes.
+   sources the lead in milliseconds (last 1000), logged by each `'fastest'` stream
+   every 10 minutes. Each lead
+   is also logged as it happens (INFO, which source was first and by how many
+   milliseconds), so a deployment compares sources from its logs alone.
 
 ## Consequences
 

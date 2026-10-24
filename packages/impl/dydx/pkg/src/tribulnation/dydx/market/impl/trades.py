@@ -251,9 +251,10 @@ async def fastest_stream(
   `'indexer'` with `details['fill']`, the indexer fill). The indexer is the floor: its
   failure, or this subscriber overflowing, ends the stream with an error. A node or
   socket source that ends or fails (e.g. a node behind the chain tip as it connects,
-  `NodeFeed`) is dropped with a warning and the others race on. The client's
-  `fill_race` records which source delivered each fill first and by how much; the
-  stream logs it every `RACE_LOG_INTERVAL` seconds.
+  `NodeFeed`) is dropped with a warning and the others race on. Each later copy of a
+  fill logs (INFO) which source was first and by how many milliseconds; the client's
+  `fill_race` keeps the totals, which the stream logs every `RACE_LOG_INTERVAL`
+  seconds.
 
   Raises:
     ValueError: On entry, when the account configures neither a full node nor a socket.
@@ -341,7 +342,7 @@ async def fastest_stream(
     """Log the race statistics now and then."""
     while True:
       await asyncio.sleep(RACE_LOG_INTERVAL)
-      log.info('dYdX fill race: first %s, leads %s', race.wins, race.summary())
+      log.info('dYdX fill race: %s', race.stats())
 
   async with AsyncExitStack() as stack:
     logs = await stack.enter_async_context(

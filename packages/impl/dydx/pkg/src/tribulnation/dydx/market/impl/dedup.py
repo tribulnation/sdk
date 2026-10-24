@@ -3,9 +3,12 @@
 from typing_extensions import Literal, TypedDict
 from collections import deque
 from dataclasses import dataclass, field
+import logging
 import statistics
 
 from .node_fills import FillKey
+
+log = logging.getLogger(__name__)
 
 Source = Literal['node', 'indexer', 'socket']
 
@@ -24,6 +27,14 @@ class Lead(TypedDict):
   """Fills both delivered, `first` before `second`, among the last `RACE_SAMPLES`."""
   p50_ms: float
   p90_ms: float
+
+
+class RaceStats(TypedDict):
+  """Which source delivered fills first, and by how much."""
+
+  wins: dict[Source, int]
+  """Fills each source delivered first, since the client opened."""
+  leads: list[Lead]
 
 
 @dataclass
@@ -64,6 +75,10 @@ class FillRace:
         }
       )
     return out
+
+  def stats(self) -> RaceStats:
+    """Wins per source and leads per pair of sources."""
+    return {'wins': dict(self.wins), 'leads': self.summary()}
 
 
 @dataclass
@@ -112,7 +127,17 @@ class FillDedup:
     copies.setdefault(source, []).append(at)
     if earlier:
       first_at, first = min(earlier)
-      self.race.lead(first=first, second=source, ms=(at - first_at) * 1000)
+      ms = (at - first_at) * 1000
+      self.race.lead(first=first, second=source, ms=ms)
+      log.info(
+        'dYdX fill %s:%s:%s: %s first, %s +%.0f ms',
+        key.height,
+        key.subject,
+        key.size,
+        first,
+        source,
+        ms,
+      )
       return False
     self.race.won(source)
     return True

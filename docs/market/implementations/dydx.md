@@ -206,9 +206,12 @@ the others are dropped; indexer trades carry their block `time` and
 `time=None`. Keys are kept for 1000 blocks. The indexer is the floor: its failure ends the
 stream as it does with `'indexer'`. A node or socket source that fails or ends (a node
 behind the chain tip as it connects, see above) is dropped with a warning and the others
-race on. The client keeps which source was first and by how many milliseconds
-(`shared.fill_race.summary()`: per pair of sources, the number of fills and the p50/p90
-lead), and each `'fastest'` stream logs it every 10 minutes.
+race on. Each later copy of a fill logs, at INFO on the `tribulnation.dydx` loggers,
+which source was first and by how many milliseconds
+(`dYdX fill <height>:<order>:<size>: socket first, indexer +180 ms`). The client keeps
+the totals (fills each source delivered first, and per pair of sources the number of
+fills and the p50/p90 lead over the last 1000), and each `'fastest'` stream logs them
+every 10 minutes.
 
 ```python
 async with sdk.trades_stream(

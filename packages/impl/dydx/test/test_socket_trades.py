@@ -6,6 +6,7 @@ from pathlib import Path
 from typing_extensions import Any, AsyncIterator, cast
 import asyncio
 import json
+import logging
 
 import pytest
 from websockets.asyncio.server import ServerConnection, unix_serve
@@ -239,8 +240,9 @@ def test_socket_node_and_indexer_keys_agree():
   assert node_key(fill, MARKET, address=ADDRESS) == indexer_key(indexer_fill)
 
 
-def test_race_records_who_was_first_and_by_how_much():
-  """Leads are per (first, second) pair, in milliseconds."""
+def test_race_records_who_was_first_and_by_how_much(caplog: pytest.LogCaptureFixture):
+  """Leads are per (first, second) pair, in milliseconds, and each is logged."""
+  caplog.set_level(logging.INFO, logger='tribulnation.dydx')
   race = FillRace()
   dedup = FillDedup(race=race)
   key = node_key(
@@ -255,6 +257,11 @@ def test_race_records_who_was_first_and_by_how_much():
     ('socket', 'indexer'): pytest.approx(200),
     ('socket', 'node'): pytest.approx(50),
   }
+  leads = [r.getMessage() for r in caplog.records if r.levelno == logging.INFO]
+  assert len(leads) == 2
+  assert leads[0].startswith(f'dYdX fill {key.height}:{key.subject}:')
+  assert leads[0].endswith(': socket first, node +50 ms')
+  assert leads[1].endswith(': socket first, indexer +200 ms')
 
 
 def test_retract_lets_a_real_copy_through():

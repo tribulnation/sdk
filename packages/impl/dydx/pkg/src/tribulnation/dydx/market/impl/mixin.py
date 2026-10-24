@@ -100,8 +100,9 @@ class Settings(TypedDict, total=False):
     feed reconnects forever and replays what it missed (up to 300 blocks).
   - `'fastest'`: every configured source raced: the indexer, plus the node and the
     socket when the account configures them (at least one is required). Each fill is
-    emitted once, by whichever source delivers it first (`details['source']`); the
-    client's `fill_race` keeps which source was first and by how many milliseconds. A
+    emitted once, by whichever source delivers it first (`details['source']`). Each
+    later copy logs (INFO) which source was first and by how many milliseconds; the
+    client's `fill_race` keeps the totals, which every stream logs every 10 minutes. A
     node or socket source that fails is dropped with a warning and the stream goes on;
     the indexer is the floor, and its failure ends the stream.
   """
