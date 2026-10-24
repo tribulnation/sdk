@@ -1,19 +1,13 @@
-# tribulnation-grvt 0.1.0
+# tribulnation-grvt 0.1.1
 
-Requires SDK >=2.20.0 (the release carrying `accounts.Grvt` and the `grvt`
-Market/Report routing), typed-grvt >=0.2.0 and typed-core >=0.13.
+Requires SDK >=2.21.0 (the release adding `Book.frozen` and `detached_books`) and
+typed-grvt >=0.2.0 and typed-core >=0.13. Upgrade the SDK and this adapter together.
 
-New:
+`depth_stream` no longer deep-copies the whole order book on every update: the
+stream yields `Book.frozen()` and each subscriber gets its own copy, through
+`detached_books`, of each book it reads ([ADR 0049](../../../dev-docs/adr/0049-book-streams-copy-on-read.md)).
+On a 500-level-a-side book, the work per update falls from about 16 ms (it copied twice) to about
+0.3 ms, plus about 0.5 ms for each book a subscriber reads. Delivered books keep their
+guarantees: a later push never changes them, and a subscriber may mutate its own.
 
-1. Market: USDT-margined perpetuals; public data, account reads with an API key (a
-   read-only one suffices), and trading with its private key (verified on testnet).
-   `perp_collateral` reads the cross bucket and, for a market holding an isolated
-   position, that position's own bucket (verified on testnet).
-2. Report: snapshots of the funding wallet and of each trading sub-account's futures and
-   spot wallets; the futures cash includes isolated positions' balances.
-
-Release qualification on 2026-10-22 used the read-only mainnet API key (`token` mode,
-ADR 0047) and passed the read suites and market consistency. Committed evidence under
-`release-evidence/grvt/` matches pinned Catalogue
-`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This
-adapter release follows SDK 2.20.0 publication.
+Every other method is unchanged.

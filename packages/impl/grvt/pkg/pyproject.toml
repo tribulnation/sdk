@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tribulnation-grvt"
-version = "0.1.0"
+version = "0.1.1"
 description = "Tribulnation SDK implementation for GRVT perpetual markets."
 license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
 dependencies = [
-  "tribulnation-sdk>=2.20.0",
+  "tribulnation-sdk>=2.21.0",
   "typed-grvt>=0.2.0",
   "typed-core>=0.13",
 ]

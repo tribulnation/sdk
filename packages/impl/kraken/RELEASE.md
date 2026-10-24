@@ -1,13 +1,16 @@
-# tribulnation-kraken 0.7.1
+# tribulnation-kraken 0.7.2
 
-Requires SDK >=2.17.0 and typed-kraken >=0.4.0. `trades_history` filters its window
-on the raw row time instead of the parsed `Trade.time`, which SDK 2.17 makes
-optional. Same value, no behaviour change.
+Requires SDK >=2.21.0 (the release adding `Book.frozen` and `detached_books`) and
+typed-kraken >=0.4.0. Upgrade the SDK and this adapter together.
 
-The SDK floor rises to 2.17.0, whose `Trade.time` is `datetime | None`. Upgrade the
-SDK and this adapter together.
+`depth_stream` no longer deep-copies the whole order book on every update: the
+stream yields `Book.frozen()` and each subscriber gets its own copy, through
+`detached_books`, of each book it reads ([ADR 0049](../../../dev-docs/adr/0049-book-streams-copy-on-read.md)).
+On a 500-level-a-side book, the work per update falls from about 8 ms to about
+0.3 ms, plus about 0.5 ms for each book a subscriber reads. Delivered books keep their
+guarantees: a later push never changes them, and a subscriber may mutate its own.
 
-Release qualification on 2026-10-09 passed the read suites and market
-consistency. Committed evidence under `release-evidence/kraken/` matches pinned
-Catalogue `1851660ac2bed8243dd9ce9c7297fe05c7130973`; offline release
-verification passes. This adapter release follows SDK 2.17.0 publication.
+Subscribers of the same symbol used to share one delivered book object; each now gets
+its own.
+
+Every other method is unchanged.
