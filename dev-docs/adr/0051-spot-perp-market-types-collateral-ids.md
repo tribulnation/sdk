@@ -49,13 +49,14 @@ by `isinstance`, and spot rules do not say which assets a pair trades.
    the base implementation raises `NotImplementedError` rather than guess a pool for
    a venue that may be unified.
 5. **Collateral IDs** are opaque strings led by the account key, like market IDs:
-   a spot asset is `<acct>:<spot exchange>:<venue asset id>` (`hl:spot:USDC`), a perp
-   pool is `<acct>:<perp exchange>` (`mt:perp`, or one per perp exchange where a venue
-   has several, such as Hyperliquid HIP-3 dexes). Markets sharing money return the
+   a spot asset is `<acct>:<spot exchange>:<venue asset id>`, with the asset ID in the
+   venue's `[ids].asset` form (`mt:spot:USDC`; Hyperliquid's are token indices, so USDC
+   is `hl:spot:0`), a perp pool is `<acct>:<perp exchange>` (`mt:perp`, or one per perp
+   exchange where a venue has several, such as Hyperliquid HIP-3 dexes). Markets sharing money return the
    same ID:
    1. Unified accounts: a perpetual's ID is its collateral token's spot ID. On
-      Hyperliquid that is `<acct>:spot:<perp_meta[dex]['collateralToken'] name>`, so
-      spot and perp strategies share one ID.
+      Hyperliquid that is `<acct>:spot:<perp_meta[dex]['collateralToken']>`, so spot
+      and perp strategies share one ID.
    2. Isolated perpetuals return the pool new margin is drawn from; the isolated
       bucket matters only for liquidation, through `collateral()`.
    3. Separate wallets (Margin Trade, Aster, classic Lighter): spot `<acct>:spot:USDC`
