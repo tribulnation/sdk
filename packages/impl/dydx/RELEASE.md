@@ -1,33 +1,37 @@
-# tribulnation-dydx 0.17.0
+# tribulnation-dydx 0.18.0
 
-Requires SDK >=2.17.0, typed-dydx >=3.7.0 and typed-core >=0.11.0, unchanged. Orders
-can carry an absolute expiry, so placing one needs no chain-tip read, and the
-endpoints can be overridden. See "Order expiry" in the dYdX docs.
+Requires SDK >=2.17.0, typed-dydx >=3.7.0 and typed-core >=0.11.0, unchanged. Account
+config `fill_source` and `fill_socket` needs SDK >=2.21.0, which passes them on.
+`trades_stream` can read fills from a local fill daemon, and `'fastest'` races every
+configured source ([ADR 0050](../../../dev-docs/adr/0050-dydx-fill-socket.md),
+amending ADRs 0044 and 0045). See "Fill sources" in the dYdX docs.
 
 New:
 
-1. Two optional `settings['dydx']` keys: `good_til_block` (`int`, short-term orders)
-   and `good_til_block_time` (timezone-aware `datetime`, long-term and conditional
-   orders, whole seconds). When set, `place_order` sends the value as is and neither
-   the SDK nor typed-dydx reads the latest block; the chain validates the window (a
-   height already past, or more than 20 blocks ahead, is refused).
-2. An absolute setting together with its delta counterpart (`short_term_gtb`,
-   `long_term_gtbt`), or on the wrong order kind, raises `ValueError` before anything
-   is sent. Unset, behaviour is unchanged. Cancellations still read the latest block.
-3. Endpoint overrides for other servers (for example local fake exchanges in stress
-   tests): `indexer_rest_url`, `indexer_ws_url`, and `validator_grpc` (plaintext
-   `host:port`) with `validator_rpc` (CometBFT URL), which must be set together and
-   then carry chain queries and order broadcasts. `DydxMarket.new` takes the same
-   keywords, and the SDK `[accounts.<id>]` config accepts them (sdk#240). Unset, the
-   endpoints are unchanged.
+1. `trades_source='socket'` reads fills from a fill daemon on this host: a WebSocket
+   over the unix socket `fill_socket`, subprotocol `tribulnation-dydx-fills.v1`. Fills
+   are built like node fills (synthetic `id`, `time=None`, `fee=None`).
+   `details['level']` says whether a fill arrived when its block committed or earlier,
+   at proposal time. A proposed fill whose proposal does not commit is followed by a
+   reversing trade (`qty` negated, `id` suffixed `:revert`, `details['revert'] = True`).
+   The connection reconnects with backoff and resubscribes from the last complete
+   block; the daemon replays up to 300 blocks.
+2. `DydxMarket.new` (and the SDK `[accounts.<id>]` config, from SDK 2.21.0) take
+   `fill_source`, the account's default `trades_source`, and `fill_socket`. A per-call
+   `trades_source` still overrides `fill_source`.
 
-The dYdX docs' Settings table listed keys `Settings` rejects (`order_flags`,
-`limit_tif`, `market_tif`); it now lists the real keys (`flags`, `tif`, ...).
+Changed:
 
-Every other method is unchanged. The expiry settings are verified by unit fixtures
-only; the read suites place no orders.
+1. `'fastest'` races the indexer against every configured source: the node when
+   `full_node_grpc` and `full_node_rpc` are set, the socket when `fill_socket` is set.
+   At least one is required. The indexer is the floor: a node or socket that fails or
+   ends, including a node behind the chain tip as it connects, is dropped with a warning
+   and the others race on. Before, a node behind the tip failed the whole stream.
+2. Under `'fastest'`, each later copy of a fill logs at INFO which source was first and
+   by how many milliseconds. The client keeps per-source and per-pair totals, which
+   each `'fastest'` stream logs every 10 minutes.
 
-Release qualification on 2026-10-20 passed the read suites and market consistency.
-Committed evidence under `release-evidence/dydx/` matches pinned Catalogue
-`1851660ac2bed8243dd9ce9c7297fe05c7130973`; offline release verification passes.
-This adapter release follows SDK 2.18.0 publication.
+`'indexer'` (the default) and `'node'` are unchanged. The socket source is verified by
+unit fixtures against a fake daemon; the read suites do not open fill streams.
+
+Every other method is unchanged.
