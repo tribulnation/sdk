@@ -4,6 +4,7 @@ from typing_extensions import (
   AsyncIterable,
   AsyncIterator,
   ClassVar,
+  Literal,
   Sequence,
 )
 from abc import abstractmethod
@@ -17,8 +18,9 @@ from .types import (
   Book,
   Candle,
   CandleInterval,
-  Collateral,
   PerpCollateral,
+  SpotBalances,
+  SpotCollateralIds,
   FundingRate,
   NextFunding,
   FundingPayment,
@@ -29,9 +31,13 @@ from .types import (
   PerpPosition,
   Trade,
   Rules,
+  SpotRules,
   Fees,
 )
 from .settings import Settings
+
+MarketKind = Literal['spot', 'perp']
+"""What a market or exchange trades; narrow the static type with `is_spot`/`is_perp`."""
 
 
 def open_trades_stream(
@@ -55,7 +61,20 @@ def open_trades_stream(
 
 
 class Market(SDK):
-  """An abstract market interface."""
+  """An abstract market interface: books, trades, orders, rules and fees.
+
+  Account balances depend on what the market trades: see `SpotMarket` and
+  `MarginMarket`.
+  """
+
+  @property
+  def kind(self) -> MarketKind:
+    """`'spot'` or `'perp'`. It does not narrow the static type; `is_spot`/`is_perp` do.
+
+    Raises `NotImplementedError` on a market that is neither a `SpotMarket` nor a
+    `PerpMarket` yet.
+    """
+    raise NotImplementedError(f'Market kind is not implemented: {self.id}')
 
   CANDLE_INTERVALS: ClassVar[frozenset[CandleInterval]] = frozenset()
   """Candle widths this market serves. Check it before calling `candles`; an interval
@@ -226,30 +245,6 @@ class Market(SDK):
       Each venue reads only its own key and ignores the rest.
     """
 
-  @SDK.method
-  @abstractmethod
-  async def position(self) -> Position:
-    """Fetch your open position in the market."""
-
-  @SDK.method
-  @abstractmethod
-  async def collateral(self) -> Collateral:
-    """Fetch the collateral bucket backing this market."""
-
-  @SDK.method
-  async def available_notional(self) -> Decimal:
-    """Fetch the maximum notional position you can open right now.
-
-    - Spot: the free quote-token balance. The default returns
-      `collateral().free_collateral`, the free part of the quote bucket.
-    - Perpetuals: the free collateral times the account's leverage on the market;
-      see `PerpMarket.available_notional`.
-
-    This is opening capacity, deliberately separate from `collateral()`, which is
-    about liquidation distance. Venues may override it with a more precise figure.
-    """
-    return (await self.collateral()).free_collateral
-
   def random_client_order_id(self) -> str | None:
     """Generate a fresh client order ID in the form this market's `place_order` sends.
 
@@ -334,8 +329,124 @@ class Market(SDK):
     )
 
 
-class PerpMarket(Market):
+class SpotMarket(Market):
+  """An abstract spot market: it trades its base asset against its quote asset."""
+
+  @property
+  def kind(self) -> Literal['spot']:
+    """Always `'spot'`."""
+    return 'spot'
+
+  @SDK.method
+  @abstractmethod
+  async def rules(self, *, refetch: bool = False) -> SpotRules:
+    """Fetch market specifications and standard rates, with the pair's asset IDs.
+
+    - `refetch`: if `True`, fetch the rules even if they are already cached.
+    """
+
+  @SDK.method
+  @abstractmethod
+  async def balances(self) -> SpotBalances:
+    """Fetch your base and quote balances.
+
+    Each `Balance.free` excludes what open orders hold: the base a sell can spend
+    and the quote a buy can spend.
+    """
+
+  @SDK.method
+  async def collateral_ids(self) -> SpotCollateralIds:
+    """The collateral IDs this market's orders reserve on: a buy on `quote`, a sell
+    on `base`.
+
+    Each is `<account_id>:<exchange_id>:<asset>`, with the asset IDs of `rules()`,
+    and resolves through `TradingMarkets.collateral`. On unified accounts a margin
+    market's `collateral_id()` can equal one of them: they are the same money.
+    """
+    rules = await self.rules()
+    prefix = f'{self.account_id}:{self.exchange_id}'
+    return SpotCollateralIds(
+      base=f'{prefix}:{rules.base}', quote=f'{prefix}:{rules.quote}'
+    )
+
+
+class MarginMarket(Market):
+  """An abstract market traded on margin: positions backed by a collateral pool.
+
+  Perpetuals are margin markets; options can be later.
+  """
+
+  @SDK.method
+  @abstractmethod
+  async def position(self) -> Position:
+    """Fetch your open position in the market."""
+
+  @SDK.method
+  @abstractmethod
+  async def collateral(self) -> PerpCollateral:
+    """Fetch the margin bucket backing this market, mode-aware: the cross pool, or
+    an isolated position's own bucket.
+
+    This is about liquidation distance. What funds new orders is `collateral_id()`.
+    """
+
+  @SDK.method
+  async def collateral_id(self) -> str:
+    """The collateral ID of the money that funds new orders on this market.
+
+    A margin pool is `<account_id>:<exchange_id>`. On a unified account it is the
+    collateral token's spot ID, `<account_id>:<spot exchange>:<asset>`, the same ID
+    the spot markets quoted in it return. Isolated positions still return the pool
+    new margin is drawn from. Resolve it with `TradingMarkets.collateral`. Cached after
+    the first call where it needs a request.
+
+    Unsupported implementations raise `NotImplementedError`: a default pool would be
+    wrong on a unified venue.
+    """
+    raise NotImplementedError(f'Collateral ID is not implemented: {self.id}')
+
+  @SDK.method
+  async def leverage(self, *, refetch: bool = False) -> Decimal:
+    """Fetch the leverage this account can open at on this market.
+
+    The multiple of free collateral the account can open as notional here: opening
+    `n` of notional needs `n / leverage` of collateral. It is account-specific (for
+    example a per-market leverage setting, or the venue's default for a market the
+    account never configured), which is why it is neither part of the public
+    `rules()` nor of `collateral()`. It is cached after the first call.
+
+    Margin-only: spot markets trade on their cash balance, so the SDK defines no
+    spot leverage. Unsupported implementations raise `NotImplementedError`.
+
+    Args:
+      refetch: Fetch again even if the leverage is already cached.
+    """
+    raise NotImplementedError(f'Account leverage is not implemented: {self.id}')
+
+  @SDK.method
+  async def available_notional(self) -> Decimal:
+    """Fetch the maximum notional position you can open right now.
+
+    The default is `collateral().free_collateral * leverage()`: the free part of the
+    bucket backing this market (mode-aware) times the account's leverage on it. It
+    raises `NotImplementedError` where either is unsupported. Venues override it
+    when they publish a more precise figure, e.g. where an isolated position is
+    funded from the cross pool rather than from its own bucket.
+
+    This is opening capacity, deliberately separate from `collateral()`, which is
+    about liquidation distance.
+    """
+    leverage = await self.leverage()
+    return (await self.collateral()).free_collateral * leverage
+
+
+class PerpMarket(MarginMarket):
   """An abstract perpetual market interface."""
+
+  @property
+  def kind(self) -> Literal['perp']:
+    """Always `'perp'`."""
+    return 'perp'
 
   @SDK.method
   @abstractmethod
@@ -377,40 +488,9 @@ class PerpMarket(Market):
     """Fetch your open position in the perpetual market."""
 
   @SDK.method
-  async def collateral(self) -> Collateral:
-    """Fetch the collateral bucket backing this market."""
+  async def collateral(self) -> PerpCollateral:
+    """Fetch the margin bucket backing this market (defers to `perp_collateral`)."""
     return await self.perp_collateral()
-
-  @SDK.method
-  async def leverage(self, *, refetch: bool = False) -> Decimal:
-    """Fetch the leverage this account can open at on this market.
-
-    The multiple of free collateral the account can open as notional here: opening
-    `n` of notional needs `n / leverage` of collateral. It is account-specific (for
-    example a per-market leverage setting, or the venue's default for a market the
-    account never configured), which is why it is neither part of the public
-    `rules()` nor of `collateral()`. It is cached after the first call.
-
-    Perpetual-only: spot markets trade on their cash balance, so the SDK defines no
-    spot leverage. Unsupported implementations raise `NotImplementedError`.
-
-    Args:
-      refetch: Fetch again even if the leverage is already cached.
-    """
-    raise NotImplementedError(f'Account leverage is not implemented: {self.id}')
-
-  @SDK.method
-  async def available_notional(self) -> Decimal:
-    """Fetch the maximum notional position you can open right now.
-
-    The default is `collateral().free_collateral * leverage()`: the free part of the
-    bucket backing this market (mode-aware) times the account's leverage on it. It
-    raises `NotImplementedError` where either is unsupported. Venues override it
-    when they publish a more precise figure, e.g. where an isolated position is
-    funded from the cross pool rather than from its own bucket.
-    """
-    leverage = await self.leverage()
-    return (await self.collateral()).free_collateral * leverage
 
   @SDK.method
   @abstractmethod

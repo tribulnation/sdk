@@ -126,6 +126,16 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
   async def perp_collateral(self) -> PerpCollateral:
     return await perp_market_collateral(self)
 
+  async def collateral_id(self) -> str:
+    """The dex collateral token's spot ID, `<account_id>:spot:<token index>`.
+
+    Accounts are unified (see `perp_collateral`): perp margin is the spot balance of
+    `perp_meta[dex]['collateralToken']`, so spot markets quoted in it share the ID.
+    Isolated positions draw new margin from the same balance. Read from the cached
+    market metadata, without a request.
+    """
+    return f'{self.account_id}:spot:{self.collateral_meta["index"]}'
+
   async def leverage(self, *, refetch: bool = False) -> Decimal:
     """The account's `activeAssetData` leverage setting, capped at `maxLeverage`."""
     return await perp_leverage(self, refetch=refetch)

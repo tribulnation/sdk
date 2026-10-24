@@ -43,6 +43,9 @@ from tribulnation.sdk.market import (
   PerpStats,
   Trade,
   Rules,
+  SpotRules,
+  Balance,
+  SpotBalances,
   Settings,
   Order,
   OrderResponse,
@@ -57,12 +60,15 @@ from tribulnation.sdk.market import (
 from tribulnation.sdk.market.venue import ExchangeDescription
 from tribulnation.sdk.impl.accounts import VenueId
 
-PROTOCOL = 'tribulnation-gateway.v1'
+PROTOCOL = 'tribulnation-gateway.v2'
 """WebSocket subprotocol naming this wire format and its version.
 
 Clients offer it in the upgrade and the gateway selects it, so peers on different
-versions fail to connect instead of misreading each other's frames. A peer naming no
-subprotocol predates negotiation (SDK 2.17 and earlier) and speaks the same v1 frames.
+versions fail to connect instead of misreading each other's frames. v2 (SDK 3.0, ADR
+0051) splits spot from margin requests: spot markets answer `balances`, margin
+markets `position`, `collateral`, `available_notional` and `collateral_id`. A peer
+naming no subprotocol predates negotiation (SDK 2.17 and earlier) and speaks v1, so it
+is refused like any other v1 peer.
 """
 
 
@@ -91,6 +97,17 @@ class AnyCollateral(ABC):
 AnyCollateral.register(Collateral)
 
 
+class AnyRules(ABC):
+  """Decode marker for a `SpotRules` or a plain `Rules` payload.
+
+  Untagged like the collateral types: `dec_hook` picks `SpotRules` when the pair's
+  `base` is present.
+  """
+
+
+AnyRules.register(Rules)
+
+
 # Type checkers see the SDK's own types; msgspec, at runtime, sees shapes it can decode
 # without importing optional venue packages (`Settings` names their TypedDicts) or
 # guessing between `Order`'s `str | Decimal | float | int` prices.
@@ -98,11 +115,13 @@ if TYPE_CHECKING:
   WireSettings = Settings
   WireOrder = Order
   WireCollateral = PerpCollateral | Collateral
+  WireRules = SpotRules | Rules
 else:
   WireSettings = dict[str, dict[str, Any]]
   """Venue settings, carried opaquely: each venue's adapter validates its own entry."""
   WireOrder = WireOrderShape
   WireCollateral = AnyCollateral
+  WireRules = AnyRules
 
 
 no_settings = cast(Callable[[], WireSettings], dict)
@@ -256,7 +275,19 @@ class PerpPositionReq(Msg, kw_only=True, tag='perp_position'):
 
 
 class CollateralReq(Msg, kw_only=True, tag='collateral'):
-  """Fetch the collateral bucket backing a market."""
+  """Fetch the margin bucket backing a margin market."""
+
+  market_id: str
+
+
+class BalancesReq(Msg, kw_only=True, tag='balances'):
+  """Fetch a spot market's base and quote balances."""
+
+  market_id: str
+
+
+class CollateralIdReq(Msg, kw_only=True, tag='collateral_id'):
+  """Fetch the collateral ID funding new orders on a margin market."""
 
   market_id: str
 
@@ -391,11 +422,21 @@ class PerpStatsReq(Msg, kw_only=True, tag='perp_stats'):
 
 
 class ExchangeCollateralReq(Msg, kw_only=True, tag='exchange_collateral'):
-  """Fetch a spot or perpetual exchange's collateral bucket."""
+  """Fetch a perpetual exchange's pool, as generic collateral."""
 
   account_id: str
   """Account key addressing the venue, e.g. `\'hl\'`."""
   exchange_id: str
+
+
+class BalanceReq(Msg, kw_only=True, tag='balance'):
+  """Fetch one asset's balance on a spot exchange."""
+
+  account_id: str
+  """Account key addressing the venue, e.g. `\'hl\'`."""
+  exchange_id: str
+  asset: str
+  """Venue-native asset ID."""
 
 
 # ── Message unions ───────────────────────────────────────────────────────────
@@ -409,6 +450,9 @@ CallReq = (
   | TickersReq
   | PerpStatsReq
   | ExchangeCollateralReq
+  | BalanceReq
+  | BalancesReq
+  | CollateralIdReq
   | RulesReq
   | OpenOrdersReq
   | QueryOrderReq
@@ -447,9 +491,9 @@ class DepthResp(Msg, kw_only=True, tag='depth'):
 
 
 class RulesResp(Msg, kw_only=True, tag='rules'):
-  """Market trading rules."""
+  """Market trading rules: a spot market's also name its `base` and `quote`."""
 
-  rules: Rules
+  rules: WireRules
 
 
 class OpenOrdersResp(Msg, kw_only=True, tag='open_orders'):
@@ -540,6 +584,24 @@ class PerpCollateralResp(Msg, kw_only=True, tag='perp_collateral'):
   """Perpetual margin bucket."""
 
   collateral: PerpCollateral
+
+
+class BalanceResp(Msg, kw_only=True, tag='balance'):
+  """One spot asset's balance."""
+
+  balance: Balance
+
+
+class BalancesResp(Msg, kw_only=True, tag='balances'):
+  """A spot market's base and quote balances."""
+
+  balances: SpotBalances
+
+
+class CollateralIdResp(Msg, kw_only=True, tag='collateral_id'):
+  """The collateral ID funding new orders on a margin market."""
+
+  value: str
 
 
 class MarketsResp(Msg, kw_only=True, tag='markets'):
@@ -661,6 +723,9 @@ ServerMsg = (
   | PerpPositionResp
   | CollateralResp
   | PerpCollateralResp
+  | BalanceResp
+  | BalancesResp
+  | CollateralIdResp
   | MarketsResp
   | ExchangesResp
   | VenueResp
@@ -680,6 +745,9 @@ def dec_hook(type: type, obj: Any) -> Any:
   if type is AnyCollateral:
     perp = isinstance(obj, dict) and 'initial_margin' in obj
     return msgspec.convert(obj, PerpCollateral if perp else Collateral)
+  if type is AnyRules:
+    spot = isinstance(obj, dict) and 'base' in obj
+    return msgspec.convert(obj, SpotRules if spot else Rules)
   raise NotImplementedError(f'Unsupported wire type {type}')
 
 
@@ -727,6 +795,8 @@ def schema_hook(type: type) -> dict[str, Any]:
     return {
       'anyOf': [{'$ref': '#/$defs/PerpCollateral'}, {'$ref': '#/$defs/Collateral'}]
     }
+  if type is AnyRules:
+    return {'anyOf': [{'$ref': '#/$defs/SpotRules'}, {'$ref': '#/$defs/Rules'}]}
   raise NotImplementedError(f'Unsupported wire type {type}')
 
 
@@ -737,7 +807,8 @@ def protocol_schema() -> dict[str, Any]:
   gateway sends.
   """
   (client, server, *_), defs = msgspec.json.schema_components(
-    (ClientMsg, ServerMsg, PerpCollateral, Collateral), schema_hook=schema_hook
+    (ClientMsg, ServerMsg, PerpCollateral, Collateral, SpotRules, Rules),
+    schema_hook=schema_hook,
   )
   return {
     '$schema': 'https://json-schema.org/draft/2020-12/schema',

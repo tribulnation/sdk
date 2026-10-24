@@ -3,7 +3,7 @@
 from datetime import datetime, timezone
 from decimal import Decimal
 from unittest.mock import AsyncMock
-from typing_extensions import Callable
+from typing_extensions import Any, Callable
 
 import pytest
 from typed_margin_trade.exchange.cancel import Cancel
@@ -32,7 +32,17 @@ from tribulnation.margin_trade.market.markets import (
   next_settlement,
 )
 from tribulnation.sdk.core import ApiError, OrderRejected
-from tribulnation.sdk.market import Order
+from tribulnation.sdk.market import (
+  Balance,
+  Fees,
+  Order,
+  SpotBalances,
+  SpotCollateralIds,
+)
+from tribulnation.margin_trade.market.exchanges import SpotExchange
+from typed_margin_trade.info.spot_clearinghouse_state import (
+  SpotClearinghouseStateEndpoint,
+)
 
 BTC: PerpUniverseItem = {
   'name': 'BTC',
@@ -255,11 +265,62 @@ async def test_rules_use_the_markets_own_fees(monkeypatch: pytest.MonkeyPatch):
   spot_rules = await s.rules()
   assert spot_rules.fee_asset is None
   assert spot_rules.fees is not None and spot_rules.fees.maker_buy == Decimal('-0.0005')
+  assert (spot_rules.base, spot_rules.quote) == ('PRL', 'USDC')
+
+
+async def test_account_fees_are_the_markets_own_rates():
+  """`fees()` returns `rules().fees`: the rates fills are charged."""
+  m = perp()
+  m.shared.perps['BTC'] = BTC
+  assert await m.fees() == (await m.rules()).fees
+  s = spot()
+  s.shared.pairs['PRL/USDC'] = Pair(PAIR, PRL, USDC)
+  assert await s.fees() == Fees(
+    maker_buy=Decimal('-0.0005'),
+    maker_sell=Decimal('-0.0005'),
+    taker_buy=Decimal('0.0015'),
+    taker_sell=Decimal('0.0015'),
+  )
+
+
+async def test_spot_and_perp_wallets_have_separate_collateral_ids(
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """Spot reserves on its tokens' spot IDs, perps on the separate perp wallet."""
+  s = spot()
+  s.shared.pairs['PRL/USDC'] = Pair(PAIR, PRL, USDC)
+  assert await s.collateral_ids() == SpotCollateralIds(
+    base='margin-trade-testnet:spot:PRL', quote='margin-trade-testnet:spot:USDC'
+  )
+  assert await perp().collateral_id() == 'margin-trade-testnet:perp'
+
+
+async def test_spot_balances_net_holds(monkeypatch: pytest.MonkeyPatch):
+  """Free is what resting orders do not hold; an unheld token is zero."""
+  state: dict[str, Any] = {
+    'balances': [
+      {'coin': 'USDC', 'token': 0, 'total': Decimal(50), 'hold': Decimal(20)},
+    ]
+  }
+  monkeypatch.setattr(
+    SpotClearinghouseStateEndpoint,
+    'spot_clearinghouse_state',
+    AsyncMock(return_value=state),
+  )
+  shared = MarginTradeMarket.new(mainnet=False, address='0x' + '1' * 40).shared
+  s = SpotMarket(shared=shared, meta=Pair(PAIR, PRL, USDC))
+  assert await s.balances() == SpotBalances(
+    base=Balance(total=Decimal(0), free=Decimal(0)),
+    quote=Balance(total=Decimal(50), free=Decimal(30)),
+  )
+  exchange = SpotExchange(shared=s.shared)
+  s.shared.pairs['PRL/USDC'] = Pair(PAIR, PRL, USDC)
+  assert await exchange.balance('USDC') == Balance(total=Decimal(50), free=Decimal(30))
+  with pytest.raises(ValueError, match='Unknown'):
+    await exchange.balance('BTC')
 
 
 async def test_unsupported_methods_raise():
-  """Account fee rates and funding-rate history are not served by the venue."""
-  with pytest.raises(NotImplementedError):
-    await perp().fees()
+  """Funding-rate history is not served by the venue."""
   with pytest.raises(NotImplementedError):
     perp().funding_rates()

@@ -74,6 +74,23 @@ rules, book = await asyncio.gather(
 )
 ```
 
+**Spot or perpetual?** Every `Market` has books, trades, orders, rules and fees. Account
+reads depend on what it trades: a `SpotMarket` has `balances()` and `collateral_ids()`, a
+margin market (`PerpMarket`) `position()`, `collateral()`, `leverage()`,
+`available_notional()` and `collateral_id()`. `is_spot` and `is_perp` narrow the type for
+your type checker; `market.kind` names it:
+
+```python
+from tribulnation.sdk.market import is_spot
+
+market = await sdk.market('hyperliquid:spot:UBTC/USDC:142')
+if is_spot(market):
+  balances = await market.balances()
+```
+
+`sdk.spot_market(id)` and `sdk.perp_market(id)` resolve and check the kind in one call.
+Exchanges split the same way, into `SpotExchange` and `PerpExchange`.
+
 ## Exchange-wide account history
 
 Pass `None` as the market selector to read across a supported exchange:

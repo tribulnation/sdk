@@ -3,6 +3,7 @@ from typing_extensions import (
   AsyncIterable,
   AsyncGenerator,
   Collection,
+  Literal,
   Mapping,
   Sequence,
   overload,
@@ -17,7 +18,9 @@ from tribulnation.sdk.impl.accounts import VenueId
 from .types import (
   Book,
   CandleInterval,
-  Collateral,
+  Balance,
+  SpotBalances,
+  SpotCollateralIds,
   PerpCollateral,
   NextFunding,
   Order,
@@ -32,10 +35,17 @@ from .types import (
   ExchangeFundingPayment,
   FundingPayment,
   Rules,
+  SpotRules,
   Fees,
 )
 from .settings import Settings
-from .market import Market, PerpMarket, open_trades_stream
+from .market import (
+  Market,
+  MarketKind,
+  SpotMarket,
+  PerpMarket,
+  open_trades_stream,
+)
 
 
 def ticker_from_book(book: Book) -> Ticker:
@@ -58,7 +68,13 @@ def ticker_from_book(book: Book) -> Ticker:
 
 
 class Exchange(SDK):
-  """An abstract multi-market exchange interface."""
+  """An abstract multi-market exchange interface; see `SpotExchange` and
+  `PerpExchange` for account balances."""
+
+  @property
+  def kind(self) -> MarketKind:
+    """`'spot'` or `'perp'`, like its markets' `kind`."""
+    raise NotImplementedError(f'Exchange kind is not implemented: {self.id}')
 
   @property
   @abstractmethod
@@ -249,36 +265,6 @@ class Exchange(SDK):
       yield stream
 
   @SDK.method
-  async def position(self, market_id: str, /) -> Position:
-    """Fetch your open position in the market."""
-    market = await self.market(market_id)
-    return await market.position()
-
-  @SDK.method
-  async def collateral(self, market_id: str | None = None, /) -> Collateral:
-    """Fetch collateral.
-
-    - `market_id=None`: this exchange's collateral bucket (the whole pool).
-    - `market_id='<id>'`: delegates to the market's mode-aware collateral.
-    """
-    if market_id is not None:
-      market = await self.market(market_id)
-      return await market.collateral()
-    raise NotImplementedError(
-      f'Collateral is not supported by this exchange [{self.id}].'
-    )
-
-  @SDK.method
-  async def available_notional(self, market_id: str, /):
-    """Fetch the maximum notional position you can open right now.
-
-    - Spot: the free quote-token balance.
-    - Perpetuals: the free collateral times the account's `leverage()` on the market.
-    """
-    market = await self.market(market_id)
-    return await market.available_notional()
-
-  @SDK.method
   async def place_order(
     self, market_id: str, /, order: Order, *, settings: Settings = {}
   ) -> OrderResponse:
@@ -318,8 +304,54 @@ class Exchange(SDK):
     return await market.cancel_open_orders(settings=settings)
 
 
+class SpotExchange(Exchange):
+  """An abstract spot exchange: its markets trade assets held in one spot wallet."""
+
+  @property
+  def kind(self) -> Literal['spot']:
+    """Always `'spot'`."""
+    return 'spot'
+
+  @SDK.method
+  @abstractmethod
+  async def market(self, market_id: str, /) -> SpotMarket:
+    """Fetch a spot market by ID."""
+
+  @SDK.method
+  @abstractmethod
+  async def balance(self, asset: str, /) -> Balance:
+    """Fetch your balance of one asset, zero when you hold none.
+
+    Args:
+      asset: Venue-native asset ID, as `SpotRules.base`/`quote` name it.
+    """
+
+  @SDK.method
+  async def rules(self, market_id: str, /, *, refetch: bool = False) -> SpotRules:
+    """Fetch the market rules, with the pair's asset IDs."""
+    market = await self.market(market_id)
+    return await market.rules(refetch=refetch)
+
+  @SDK.method
+  async def balances(self, market_id: str, /) -> SpotBalances:
+    """Fetch your base and quote balances on a market."""
+    market = await self.market(market_id)
+    return await market.balances()
+
+  @SDK.method
+  async def collateral_ids(self, market_id: str, /) -> SpotCollateralIds:
+    """The collateral IDs a market's orders reserve on; see `SpotMarket.collateral_ids`."""
+    market = await self.market(market_id)
+    return await market.collateral_ids()
+
+
 class PerpExchange(Exchange):
   """An abstract perpetual exchange interface."""
+
+  @property
+  def kind(self) -> Literal['perp']:
+    """Always `'perp'`."""
+    return 'perp'
 
   @SDK.method
   @abstractmethod
@@ -423,8 +455,31 @@ class PerpExchange(Exchange):
     return await market.leverage(refetch=refetch)
 
   @SDK.method
-  async def collateral(self, market_id: str | None = None, /) -> Collateral:
-    """Fetch collateral (defers to `perp_collateral`)."""
+  async def position(self, market_id: str, /) -> Position:
+    """Fetch your open position in the market."""
+    market = await self.market(market_id)
+    return await market.position()
+
+  @SDK.method
+  async def collateral_id(self, market_id: str, /) -> str:
+    """The collateral ID funding new orders on a market; see `MarginMarket.collateral_id`."""
+    market = await self.market(market_id)
+    return await market.collateral_id()
+
+  @SDK.method
+  async def available_notional(self, market_id: str, /) -> Decimal:
+    """Fetch the maximum notional position you can open right now: the free
+    collateral times the account's `leverage()` on the market."""
+    market = await self.market(market_id)
+    return await market.available_notional()
+
+  @SDK.method
+  async def collateral(self, market_id: str | None = None, /) -> PerpCollateral:
+    """Fetch collateral (defers to `perp_collateral`).
+
+    - `market_id=None`: this exchange's pool, which collateral ID `<account_id>:<exchange_id>` names.
+    - `market_id='<id>'`: the market's mode-aware bucket.
+    """
     return await self.perp_collateral(market_id)
 
   @SDK.method

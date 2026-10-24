@@ -20,6 +20,7 @@ from tribulnation.sdk.impl.accounts import (
   Lighter,
 )
 from tribulnation.sdk.market import (
+  Balance,
   Collateral,
   Fees,
   FundingPayment,
@@ -28,6 +29,7 @@ from tribulnation.sdk.market import (
   PerpPosition,
   Position,
   Rules,
+  SpotBalances,
   Trade,
 )
 
@@ -214,9 +216,9 @@ def test_funding_payments_check():
 
 
 def test_position_checks():
-  """Spot balances are non-negative; perpetual sizes agree and carry entry prices."""
-  reads.check_position(Position(size=-SECRET), spot=False)
-  fails(reads.check_position, Position(size=-SECRET), spot=True)
+  """Perpetual sizes are signed, agree and carry entry prices."""
+  reads.check_position(Position(size=-SECRET))
+  fails(reads.check_position, Position(size=Decimal('NaN')))
   perp = PerpPosition(size=-SECRET, entry_price=SECRET)
   reads.check_perp_position(perp, Position(size=-SECRET))
   reads.check_perp_position(PerpPosition(), Position())
@@ -268,6 +270,47 @@ def test_collateral_checks():
   fails(reads.check_perp_collateral, Collateral(equity=SECRET, free_collateral=SECRET))
 
 
+def test_balance_checks():
+  """Spot balances are non-negative, with the free part within the total."""
+  ok = Balance(total=SECRET, free=Decimal(0))
+  reads.check_balances(SpotBalances(base=ok, quote=ok))
+  for bad in (
+    Balance(total=SECRET, free=SECRET + 1),
+    Balance(total=Decimal(0), free=-SECRET),
+    Balance(total=Decimal('NaN'), free=Decimal(0)),
+  ):
+    fails(reads.check_balances, SpotBalances(base=ok, quote=bad))
+  fails(reads.check_balances, ok)
+
+
+def test_collateral_id_checks():
+  """IDs lead with the account key and resolve to collateral; spot never negative."""
+  good = Collateral(equity=SECRET, free_collateral=Decimal(0))
+  debt = Collateral(equity=-SECRET, free_collateral=-SECRET)
+  ids = {'acct:spot:0': good, 'acct:spot:1': good}
+  reads.check_collateral_ids(
+    ids, method='collateral_ids', account_id='acct', count=2, spot=True
+  )
+  reads.check_collateral_ids(
+    {'acct:perp': debt}, method='collateral_id', account_id='acct', count=1, spot=False
+  )
+  for value, count, spot in (
+    ({'other:spot:0': good, 'acct:spot:1': good}, 2, True),
+    ({'acct:spot:0': debt, 'acct:spot:1': good}, 2, True),
+    ({'acct:spot:0': good}, 2, True),
+    ({'acct:perp': 'not collateral'}, 1, False),
+    ('acct:perp', 1, False),
+  ):
+    fails(
+      reads.check_collateral_ids,
+      value,
+      method='collateral_ids',
+      account_id='acct',
+      count=count,
+      spot=spot,
+    )
+
+
 def test_leverage_and_available_notional_checks():
   """Leverage is positive; opening capacity is non-negative and may be capped."""
   reads.check_leverage(Decimal(5))
@@ -279,7 +322,7 @@ def test_leverage_and_available_notional_checks():
 
 def test_trades_check_uses_the_collected_rules():
   """The dispatcher requires a rules read before judging fill fee assets."""
-  result = AccountResults(spot=True, start=START, end=END)
+  result = AccountResults(account_id='acct', spot=True, start=START, end=END)
   result.values['trades_history'] = [trade()]
   fails(reads.check, 'trades_history', result)
   result.values['rules'] = Rules(

@@ -8,7 +8,7 @@ from .fees import Fees
 
 @dataclass(kw_only=True)
 class Rules:
-  """Trading constraints; base and quote identities belong to the Catalogue."""
+  """Trading constraints; canonical asset identities belong to the Catalogue."""
 
   fee_asset: str | None
   """Asset trading fees and funding are paid in, or `None` when it depends on the fill.
@@ -134,3 +134,16 @@ class Rules:
       if self.fixed_max_price is None
       else self.fixed_max_price / m,
     )
+
+
+@dataclass(kw_only=True)
+class SpotRules(Rules):
+  """Spot rules, which also name the pair's assets (ADR 0051).
+
+  Perpetual rules do not: a contract's denomination need not be its collateral.
+  """
+
+  base: str
+  """Venue-native ID of the base asset, the last segment of its collateral ID."""
+  quote: str
+  """Venue-native ID of the quote asset, the last segment of its collateral ID."""

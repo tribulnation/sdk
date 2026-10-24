@@ -46,7 +46,7 @@ same names prefixed `MARGIN_TRADE_TESTNET_`.
 ## Semantics
 
 - `rules().fees` are each market's own `takerFee`/`makerFee`, the rates fills are
-  charged. `fees()` raises `NotImplementedError`: the venue's account rate (`userFees`)
+  charged, and `fees()` returns the same rates: the venue's account rate (`userFees`)
   is not what fills pay.
 - `MARKET` is an `Ioc` limit at the order's `price`; the venue refuses one priced too far
   through the book (`slippage exceeded`, raised as `OrderRejected`).
@@ -57,6 +57,10 @@ same names prefixed `MARGIN_TRADE_TESTNET_`.
 - Funding settles hourly on the hour; there is no funding-rate history.
 - `perp_collateral` is the perp wallet's cross bucket; a market with an isolated
   position raises `NotImplementedError`.
+- Spot and perpetual wallets are separate accounts. Spot `balances` are each token's
+  `total` and `total - hold`; spot tokens are `<account>:spot:<symbol>` collateral IDs
+  (`margin-trade:spot:USDC`), and every perpetual's `collateral_id()` is the perp wallet,
+  `<account>:perp` (ADR 0051).
 - Streams rely on typed-margin-trade 0.1.1's 10 s ping: the venue drops a connection
   about 30 s after the client's last ping.
 

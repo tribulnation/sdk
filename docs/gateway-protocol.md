@@ -24,14 +24,18 @@ JSON Schema [gateway-protocol.schema.json](https://github.com/tribulnation/sdk/b
    concurrent calls and streams.
 2. Every message is one **binary** frame holding one UTF-8 JSON object. Text frames are
    ignored.
-3. The client offers the subprotocol `tribulnation-gateway.v1` in
+3. The client offers the subprotocol `tribulnation-gateway.v2` in
    `Sec-WebSocket-Protocol`, and the gateway selects it.
    1. A client offering subprotocols that do not include the gateway's version is refused
       with HTTP 400 before the upgrade, and the gateway logs the mismatch.
    2. A client that receives a different subprotocol, or a refused upgrade, fails the
       connection (`ProxySDK` raises `GatewayError`).
    3. A peer that names no subprotocol predates negotiation (SDK 2.17 and earlier) and
-      speaks the same v1 frames, so it is served.
+      speaks v1, so it is refused like any other v1 peer.
+   4. v2 (SDK 3.0, ADR 0051) splits spot from margin requests: `position`,
+      `available_notional`, `collateral` and `collateral_id` address margin (perpetual)
+      markets only, spot markets answer `balances`, and spot `rules` replies carry `base`
+      and `quote`.
 4. The version changes only when a frame stops meaning the same thing to a peer of the
    previous version: a removed or renamed field or kind, a changed value encoding, or a
    new required field. Adding an optional field or a reply field is not a version
@@ -79,6 +83,8 @@ defined in the schema. Two of them need care:
 2. A `collateral` reply's `collateral` is a `PerpCollateral` when it carries
    `initial_margin`, `maintenance_margin`, `leverage` and `margin_mode`, and a plain
    `Collateral` (`equity`, `free_collateral`) otherwise.
+3. A `rules` reply's `rules` is a `SpotRules` when it carries `base` and `quote`, and a
+   plain `Rules` otherwise.
 
 ## Requests
 
@@ -96,7 +102,8 @@ requests address a market as `<account_id>:<exchange_id>:<market_id>`, e.g.
 | `markets` | `account_id`, `exchange_id` | List an exchange's market IDs. |
 | `tickers` | `account_id`, `exchange_id`, `markets`?, `settings`? | Fetch bulk tickers. |
 | `perp_stats` | `account_id`, `exchange_id`, `markets`?, `settings`? | Fetch bulk perpetual statistics. |
-| `exchange_collateral` | `account_id`, `exchange_id` | Fetch an exchange's collateral bucket. |
+| `exchange_collateral` | `account_id`, `exchange_id` | Fetch a perpetual exchange's pool as generic collateral. |
+| `balance` | `account_id`, `exchange_id`, `asset` | Fetch one asset's balance on a spot exchange. |
 | `exchange_perp_collateral` | `account_id`, `exchange_id` | Fetch a perpetual exchange's margin bucket. |
 | `depth` | `market_id`, `levels`?, `settings`? | Fetch one order book snapshot. |
 | `rules` | `market_id`, `refetch`? | Fetch trading rules. |
@@ -106,8 +113,10 @@ requests address a market as `<account_id>:<exchange_id>:<market_id>`, e.g.
 | `open_orders` | `market_id` | List the account's open orders. |
 | `query_order` | `market_id`, `order_id` | Look up one order. |
 | `trades_history` | `market_id`, `start`, `end` | Fetch the account's fills in a window. |
-| `position` | `market_id` | Fetch the spot position. |
-| `available_notional` | `market_id` | Fetch the notional the account can still open. |
+| `position` | `market_id` | Fetch a margin market's position. |
+| `available_notional` | `market_id` | Fetch the notional the account can still open on a margin market. |
+| `balances` | `market_id` | Fetch a spot market's base and quote balances. |
+| `collateral_id` | `market_id` | Fetch the collateral ID funding new orders on a margin market. |
 | `place_order` | `market_id`, `order`, `settings`? | Place one order. `order` is `{"type", "qty", "price", "client_order_id"?}`, `type` one of `MARKET`, `LIMIT`, `POST_ONLY`, and a negative `qty` sells. |
 | `cancel_order` | `market_id`, `order_id`, `settings`? | Cancel one order. |
 | `cancel_open_orders` | `market_id`, `settings`? | Cancel every open order on the market. |
@@ -116,7 +125,7 @@ requests address a market as `<account_id>:<exchange_id>:<market_id>`, e.g.
 | `funding_rates` | `market_id`, `start`?, `end`? | Fetch historical funding rates. |
 | `funding_payments` | `market_id`, `start`, `end` | Fetch the account's funding payments. |
 | `perp_position` | `market_id` | Fetch the perpetual position. |
-| `collateral` | `market_id` | Fetch the collateral bucket backing the market. |
+| `collateral` | `market_id` | Fetch the margin bucket backing a margin market. |
 | `perp_collateral` | `market_id` | Fetch the perpetual margin bucket backing the market. |
 | `depth_stream` | `market_id`, `levels`?, `queue_size`?, `overflow`?, `settings`? | Subscribe to order books. |
 | `trades_stream` | `market_id`, `queue_size`?, `overflow`?, `settings`? | Subscribe to the account's fills. |
@@ -137,7 +146,7 @@ the gateway's buffer for the subscription.
 | `tickers` | `tickers`: object of market ID to `Ticker` |
 | `perp_stats` | `stats`: object of market ID to `PerpStats` |
 | `depth` | `book`: `Book` |
-| `rules` | `rules`: `Rules` |
+| `rules` | `rules`: `SpotRules` or `Rules` |
 | `fees` | `fees`: `Fees` |
 | `leverage`, `index`, `available_notional` | `value`: Decimal |
 | `candles` | `candles`: list of `Candle` |
@@ -145,6 +154,9 @@ the gateway's buffer for the subscription.
 | `query_order` | `order`: `OrderState` or `null` |
 | `trades_history` | `trades`: list of `Trade` |
 | `position` | `position`: `Position` |
+| `balance` | `balance`: `Balance` |
+| `balances` | `balances`: `SpotBalances` |
+| `collateral_id` | `value`: collateral ID string |
 | `perp_position` | `position`: `PerpPosition` |
 | `place_order` | `response`: `OrderResponse` |
 | `cancel_order`, `cancel_open_orders` | `result`: venue-specific JSON |

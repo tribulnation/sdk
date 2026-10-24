@@ -22,7 +22,14 @@ from typing_extensions import Any, Awaitable, Callable, Sequence
 from tribulnation.sdk import AuthError, Context, MarketSDK, NetworkError, RateLimited
 from tribulnation.sdk.impl.accounts import Bitget
 from tribulnation.sdk.core import PaginatedResponse
-from tribulnation.sdk.market import Book, Candle, PerpCollateral, Rules, Ticker
+from tribulnation.sdk.market import (
+  Book,
+  Candle,
+  Collateral,
+  PerpCollateral,
+  Rules,
+  Ticker,
+)
 from ..support import describe_exception
 from ..runtime import loop_of
 from ..accounts import selected_accounts, require_credentials
@@ -190,7 +197,10 @@ async def collect(sdk: MarketSDK, account_id: str, public: bool, results: Result
     await results.attempt('spot.open_orders', spot_market.open_orders)
     if public:
       return
-    await results.attempt('spot.collateral.pool', spot.collateral)
+    # Bitget's spot pool is still a venue method: the base `Exchange` dropped it in
+    # SDK 3.0 (ADR 0051), and Bitget has not moved to `SpotExchange.balance` yet.
+    spot_pool: Callable[[], Awaitable[Collateral]] = getattr(spot, 'collateral')
+    await results.attempt('spot.collateral.pool', spot_pool)
     await results.subscribes('spot.trades_stream', spot_market.trades_stream)
     await results.attempt('perp.perp_collateral', perp_market.perp_collateral)
     await results.attempt('perp.perp_collateral.pool', perp.perp_collateral)

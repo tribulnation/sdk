@@ -7,14 +7,13 @@ from tribulnation.sdk.core import PaginatedResponse, OverflowPolicy
 from tribulnation.sdk.market import (
   Candle,
   CandleInterval,
-  Market,
+  SpotMarket as _SpotMarket,
   Book,
-  Collateral,
   Order,
   OrderResponse,
   OrderState,
-  Position,
-  Rules,
+  SpotBalances,
+  SpotRules,
   Fees,
   Settings,
   Trade,
@@ -33,15 +32,14 @@ from .impl import (
   query_order,
   trades_history,
   trades_stream,
-  spot_position,
-  spot_market_collateral,
+  spot_market_balances,
   place_order,
   cancel_order,
 )
 
 
 @dataclass(frozen=True, kw_only=True)
-class SpotMarket(SpotMarketMixin, Market):
+class SpotMarket(SpotMarketMixin, _SpotMarket):
   @property
   def exchange_id(self) -> str:
     return 'spot'
@@ -71,7 +69,7 @@ class SpotMarket(SpotMarketMixin, Market):
       settings=settings,
     )
 
-  async def rules(self, *, refetch: bool = False) -> Rules:
+  async def rules(self, *, refetch: bool = False) -> SpotRules:
     return await spot_rules(self, refetch=refetch)
 
   async def fees(self, *, refetch: bool = False) -> Fees:
@@ -102,11 +100,9 @@ class SpotMarket(SpotMarketMixin, Market):
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
     return trades_stream(self, queue_size=queue_size, overflow=overflow)
 
-  async def position(self) -> Position:
-    return await spot_position(self)
-
-  async def collateral(self) -> Collateral:
-    return await spot_market_collateral(self)
+  async def balances(self) -> SpotBalances:
+    """Base and quote token balances; `free` is `total - hold`."""
+    return await spot_market_balances(self)
 
   def trades_history(self, start: datetime, end: datetime) -> PaginatedResponse[Trade]:
     return PaginatedResponse(trades_history(self, start, end))

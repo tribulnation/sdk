@@ -6,7 +6,7 @@ from datetime import datetime
 from typing_extensions import AsyncIterable, Collection, Mapping, Sequence, overload
 from tribulnation.sdk.core import PaginatedResponse
 from tribulnation.sdk.market import (
-  Exchange,
+  Balance,
   ExchangeFundingPayment,
   ExchangeTrade,
   FundingPayment,
@@ -14,6 +14,7 @@ from tribulnation.sdk.market import (
   PerpExchange,
   PerpStats,
   Settings,
+  SpotExchange,
   Ticker,
   Trade,
 )
@@ -100,7 +101,7 @@ class LighterPerpExchange(Public, PerpExchange):
 
 
 @dataclass(frozen=True, kw_only=True)
-class LighterSpotExchange(Public, Exchange):
+class LighterSpotExchange(Public, SpotExchange):
   """Every spot market."""
 
   @property
@@ -122,6 +123,17 @@ class LighterSpotExchange(Public, Exchange):
       base_asset=detail['base_asset_id'],
       quote_asset=detail['quote_asset_id'],
     )
+
+  async def balance(self, asset: str, /) -> Balance:
+    """One asset's balance by asset id (`'3'` is USDC); classic accounts raise
+    `NotImplementedError`.
+
+    Raises:
+      ValueError: `asset` is not a numeric asset id.
+    """
+    if not asset.isdigit():
+      raise ValueError(f'Lighter asset ids are numeric, got {asset!r}')
+    return account.spot_balance(await self.shared.account(), int(asset))
 
   async def tickers(
     self, markets: Collection[str] | None = None, *, settings: Settings = {}

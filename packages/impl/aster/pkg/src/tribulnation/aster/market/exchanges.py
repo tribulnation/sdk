@@ -18,7 +18,7 @@ import asyncio
 from typed_aster.futures.market.funding_info import FundingInfo
 from typed_aster.futures.market.schemas import FuturesMarkPrice
 from tribulnation.sdk.market import (
-  Exchange,
+  Balance,
   ExchangeFundingPayment,
   ExchangeTrade,
   FundingPayment,
@@ -26,6 +26,7 @@ from tribulnation.sdk.market import (
   PerpExchange as SDKPerpExchange,
   PerpStats,
   Settings,
+  SpotExchange as SDKSpotExchange,
   Ticker,
   Trade,
 )
@@ -37,6 +38,7 @@ from .markets import (
   SpotMarket,
   cross_collateral,
   exchange_trade,
+  spot_balance,
   spot_trade_rows,
   trade_windows,
 )
@@ -131,8 +133,8 @@ def selected(available: Collection[str], markets: Collection[str] | None) -> set
 
 
 @dataclass(frozen=True, kw_only=True)
-class SpotExchange(Public, Exchange):
-  """Aster spot."""
+class SpotExchange(Public, SDKSpotExchange):
+  """Aster spot: the spot wallet, separate from the futures wallet."""
 
   @property
   def exchange_id(self) -> str:
@@ -142,6 +144,11 @@ class SpotExchange(Public, Exchange):
   async def markets(self) -> Sequence[str]:
     """List native symbols currently trading."""
     return list(await self.shared.spot_symbols())
+
+  async def balance(self, asset: str, /) -> Balance:
+    """One asset's balance by symbol (`USDT`): free plus locked, and the free part.
+    Mainnet only: testnet account information omits funded balances."""
+    return spot_balance(await self.shared.spot_account_info(), asset)
 
   async def market(self, market_id: str, /) -> SpotMarket:
     """Resolve a trading symbol."""

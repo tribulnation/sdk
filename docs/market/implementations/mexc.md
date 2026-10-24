@@ -35,7 +35,8 @@ built-in `mexc` account is `accounts.Mexc(public=True)`, read-only.
 
 - Spot only — there is no `PerpMarket`/`PerpExchange`, so `perp_exchange`, `index`,
   `next_funding`, `funding_*`, and `perp_position` are unsupported for this venue.
-- `available_notional` (spot) returns the free quote-token balance.
+- SDK 3.0 removed the spot stand-ins from `Market` (ADR 0051); this venue does not map spot `balances` or collateral IDs yet, so spot `position`, `collateral` and `available_notional` are no longer part of
+  the SDK interface.
 - `collateral` (spot) reports the quote-asset balance: `equity = free + locked`,
   `free_collateral = free`. There is no perp bucket, so only the base `Collateral` type
   applies (no `maintenance_margin`/`leverage`/`margin_mode`).

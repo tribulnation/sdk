@@ -8,10 +8,10 @@ import pytest
 from typing_extensions import Any, cast
 
 from tribulnation.sdk.market import (
-  Collateral,
   Market,
   PerpCollateral,
   PerpMarket,
+  SpotMarket,
   TradingMarkets,
 )
 from tribulnation.sdk.market.exchange import PerpExchange
@@ -52,11 +52,10 @@ async def test_perp_default_fails_before_reading_collateral_without_leverage():
   market.collateral.assert_not_awaited()
 
 
-async def test_spot_default_is_the_free_collateral():
-  """Spot has no leverage: the free part of the quote bucket."""
-  collateral = Collateral(equity=Decimal(50), free_collateral=Decimal(30))
-  market = SimpleNamespace(collateral=AsyncMock(return_value=collateral))
-  assert await Market.available_notional(cast(Any, market)) == Decimal(30)
+def test_spot_markets_have_no_margin_stand_ins():
+  """Spot sizes on `balances()`, not a quote-only notional (ADR 0051)."""
+  for name in ('available_notional', 'collateral', 'position', 'leverage'):
+    assert not hasattr(Market, name) and not hasattr(SpotMarket, name)
 
 
 async def test_leverage_routing_preserves_refetch():

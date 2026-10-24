@@ -5,12 +5,14 @@ from typing_extensions import Literal
 
 @dataclass(kw_only=True)
 class Collateral:
-  """Spot / base collateral of an account bucket."""
+  """The money behind a collateral ID: a spot asset balance or a margin pool."""
 
   equity: Decimal
-  """Total account value in quote units (spot: total quote balance)."""
+  """Total value, in the collateral's own units: the asset for a spot ID, the pool's
+  settlement asset for a margin pool."""
   free_collateral: Decimal
-  """Collateral not backing positions/orders (withdrawable). Opening capacity, NOT risk."""
+  """What new orders can still use: not held by open orders or margin. Opening
+  capacity, NOT risk."""
 
 
 @dataclass(kw_only=True)
@@ -39,3 +41,33 @@ class PerpCollateral(Collateral):
     if self.equity <= 0:
       return Decimal('Infinity')
     return self.maintenance_margin / self.equity
+
+
+@dataclass(kw_only=True)
+class Balance:
+  """One spot asset's balance, in that asset's units."""
+
+  total: Decimal
+  """Everything held, including what open orders hold."""
+  free: Decimal
+  """What new orders can use: `total` less what open orders hold."""
+
+
+@dataclass(kw_only=True)
+class SpotBalances:
+  """The balances of a spot pair's two assets."""
+
+  base: Balance
+  """The base asset: what a sell spends."""
+  quote: Balance
+  """The quote asset: what a buy spends."""
+
+
+@dataclass(frozen=True, kw_only=True)
+class SpotCollateralIds:
+  """The collateral IDs a spot pair's orders reserve on."""
+
+  base: str
+  """`<account_id>:<exchange_id>:<base asset>`: what a sell reserves on."""
+  quote: str
+  """`<account_id>:<exchange_id>:<quote asset>`: what a buy reserves on."""

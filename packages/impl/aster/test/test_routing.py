@@ -94,7 +94,7 @@ async def test_unsupported_methods_raise_instead_of_returning_empty_data():
   venue = AsterMarket.new(public=True, mainnet=False)
   spot = SpotMarket(shared=venue.shared, symbol='ASTERUSDT')
   now = datetime.now(timezone.utc)
-  for method in (spot.position, spot.collateral, spot.available_notional):
+  for method in (spot.balances, lambda: venue.spot.balance('USDT')):
     with pytest.raises(NotImplementedError, match='testnet'):
       await method()
   with pytest.raises(NotImplementedError, match='trade history'):

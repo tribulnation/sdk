@@ -2,7 +2,7 @@
 
 from decimal import Decimal
 
-from tribulnation.sdk.market import Rules
+from tribulnation.sdk.market import SpotRules
 
 from tribulnation.hyperliquid.core import (
   PRICE_MAX_DECIMALS,
@@ -18,8 +18,11 @@ from .fees import standard_spot_fees
 
 
 @wrap_exceptions
-async def rules(self: SpotMarketMixin, *, refetch: bool = False) -> Rules:
-  """Instrument precision and the standard schedule, for supported quote tokens."""
+async def rules(self: SpotMarketMixin, *, refetch: bool = False) -> SpotRules:
+  """Instrument precision and the standard schedule, for supported quote tokens.
+
+  `base` and `quote` are token indices, the venue's asset IDs.
+  """
   tick_decimals = min(
     PRICE_MAX_DECIMALS,
     SPOT_PRICE_MAX_DECIMALS - self.meta['base_meta']['szDecimals'],
@@ -29,7 +32,9 @@ async def rules(self: SpotMarketMixin, *, refetch: bool = False) -> Rules:
   lot_decimals = self.meta['base_meta']['szDecimals']
   lot_size = Decimal(10) ** -lot_decimals
 
-  return Rules(
+  return SpotRules(
+    base=str(self.base_meta['index']),
+    quote=str(self.quote_meta['index']),
     # Fees are paid in the received token: base on buys, quote on sells (ADR 0028).
     # `Trade.fee.asset` names each fill's token.
     fee_asset=None,

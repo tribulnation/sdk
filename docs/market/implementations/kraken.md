@@ -81,10 +81,10 @@ Futures operations are unsupported. Public perpetual support requires
   quote asset, which is where Kraken denominates it.
 - `trades_stream()` is the account-wide `executions` channel filtered to fills
   (`exec_type == 'trade'`) on this market's symbol.
-- `position` is the base asset's balance, held amounts included. `collateral` reports the
-  quote asset's balance: `equity = balance`, `free_collateral = balance - hold_trade`,
-  and `available_notional` is that free balance. Balances are cached for one second
-  across the three, since Kraken meters private calls per account.
+- SDK 3.0 removed the spot stand-ins from `Market` (ADR 0051); this venue does not map spot `balances` or collateral IDs yet, so spot `position`, `collateral` and `available_notional` are no longer part of
+  the SDK interface. The adapter's own spot methods still read the base balance (held
+  amounts included) and the quote balance (`free_collateral = balance - hold_trade`),
+  cached for one second, since Kraken meters private calls per account.
 
 ## Example
 

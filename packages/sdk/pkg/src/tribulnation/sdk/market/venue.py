@@ -21,6 +21,8 @@ from .types import (
   CandleInterval,
   Collateral,
   PerpCollateral,
+  SpotBalances,
+  SpotCollateralIds,
   NextFunding,
   Order,
   OrderResponse,
@@ -33,8 +35,9 @@ from .types import (
   Ticker,
 )
 from .settings import Settings
-from .market import Market, PerpMarket, open_trades_stream
-from .exchange import Exchange, PerpExchange
+from .market import Market, SpotMarket, PerpMarket, open_trades_stream
+from .exchange import Exchange, SpotExchange, PerpExchange
+from .kinds import is_spot, is_perp
 
 
 class ExchangeDescription(TypedDict):
@@ -217,36 +220,6 @@ class TradingVenue(SDK):
       yield stream
 
   @SDK.method
-  async def position(self, market_id: str, /) -> Position:
-    """Fetch your open position in the market."""
-    market = await self.market(market_id)
-    return await market.position()
-
-  @SDK.method
-  async def collateral(self, id: str, /) -> Collateral:
-    """Fetch collateral.
-
-    - 1-segment (`perp`): exchange-level bucket.
-    - 2-segment (`perp:BTC-USD`): market-level (mode-aware).
-    """
-    if ':' in id:
-      exchange_id, market_id = id.split(':', 1)
-      exchange = await self.exchange(exchange_id)
-      return await exchange.collateral(market_id)
-    exchange = await self.exchange(id)
-    return await exchange.collateral()
-
-  @SDK.method
-  async def available_notional(self, market_id: str, /):
-    """Fetch the maximum notional position you can open right now.
-
-    - Spot: the free quote-token balance.
-    - Perpetuals: the free collateral times the account's `leverage()` on the market.
-    """
-    market = await self.market(market_id)
-    return await market.available_notional()
-
-  @SDK.method
   async def place_order(
     self, market_id: str, /, order: Order, *, settings: Settings = {}
   ) -> OrderResponse:
@@ -286,11 +259,67 @@ class TradingVenue(SDK):
     return await market.cancel_open_orders(settings=settings)
 
   @SDK.method
+  async def spot_exchange(self, exchange_id: str, /) -> SpotExchange:
+    """Fetch a spot exchange by ID.
+
+    Raises:
+      ValueError: The exchange is not a spot exchange.
+    """
+    exchange = await self.exchange(exchange_id)
+    if not is_spot(exchange):
+      raise ValueError(f'{self.id}:{exchange_id} is not a spot exchange')
+    return exchange
+
+  @SDK.method
+  async def spot_market(self, exchange_market_id: str, /) -> SpotMarket:
+    """Fetch a spot market by ID.
+
+    - `exchange_market_id`: `<exchange_id>:<market_id>`
+    """
+    exchange_id, market_id = exchange_market_id.split(':', 1)
+    exchange = await self.spot_exchange(exchange_id)
+    return await exchange.market(market_id)
+
+  @SDK.method
+  async def balances(self, market_id: str, /) -> SpotBalances:
+    """Fetch your base and quote balances on a spot market."""
+    market = await self.spot_market(market_id)
+    return await market.balances()
+
+  @SDK.method
+  async def collateral_ids(self, market_id: str, /) -> SpotCollateralIds:
+    """The collateral IDs a spot market's orders reserve on."""
+    market = await self.spot_market(market_id)
+    return await market.collateral_ids()
+
+  @SDK.method
+  async def collateral(self, id: str, /) -> Collateral:
+    """Resolve a collateral ID, without its account key.
+
+    - `<exchange_id>` (`perp`): a perpetual exchange's pool.
+    - `<exchange_id>:<asset>` (`spot:USDC`): one spot asset's balance, with
+      `equity = total` and `free_collateral = free`.
+    """
+    exchange_id, sep, asset = id.partition(':')
+    if sep:
+      spot = await self.spot_exchange(exchange_id)
+      balance = await spot.balance(asset)
+      return Collateral(equity=balance.total, free_collateral=balance.free)
+    else:
+      perp = await self.perp_exchange(exchange_id)
+      return await perp.collateral()
+
+  @SDK.method
   async def perp_exchange(self, exchange_id: str, /) -> PerpExchange:
-    """Fetch a perpetual exchange by ID."""
-    raise NotImplementedError(
-      f'Perp exchanges are not supported by this venue [{self.id}].'
-    )
+    """Fetch a perpetual exchange by ID.
+
+    Raises:
+      ValueError: The exchange is not a perpetual exchange.
+    """
+    exchange = await self.exchange(exchange_id)
+    if not is_perp(exchange):
+      raise ValueError(f'{self.id}:{exchange_id} is not a perpetual exchange')
+    return exchange
 
   @SDK.method
   async def perp_market(self, exchange_market_id: str, /) -> PerpMarket:
@@ -337,6 +366,25 @@ class TradingVenue(SDK):
     market = await self.perp_market(market_id)
     async for page in market.funding_payments(start, end):
       yield page
+
+  @SDK.method
+  async def position(self, market_id: str, /) -> Position:
+    """Fetch your open position in a perpetual market."""
+    market = await self.perp_market(market_id)
+    return await market.position()
+
+  @SDK.method
+  async def collateral_id(self, market_id: str, /) -> str:
+    """The collateral ID funding new orders on a perpetual market."""
+    market = await self.perp_market(market_id)
+    return await market.collateral_id()
+
+  @SDK.method
+  async def available_notional(self, market_id: str, /) -> Decimal:
+    """Fetch the maximum notional position you can open right now on a perpetual
+    market: the free collateral times the account's `leverage()` on it."""
+    market = await self.perp_market(market_id)
+    return await market.available_notional()
 
   @SDK.method
   async def perp_position(self, market_id: str, /) -> PerpPosition:
