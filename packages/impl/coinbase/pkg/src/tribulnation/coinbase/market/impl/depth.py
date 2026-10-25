@@ -1,10 +1,9 @@
 """Order book reads for one Advanced Trade product."""
 
-from typing_extensions import AsyncIterable
 from contextlib import asynccontextmanager
 
 from tribulnation.sdk.core import OverflowPolicy
-from tribulnation.sdk.market import Book
+from tribulnation.sdk.market import Book, detached_books
 
 from tribulnation.coinbase.core import wrap_exceptions
 from .mixin import MarketMixin
@@ -38,9 +37,4 @@ async def depth_stream(
   async with self.subscribe_book(
     self.product_id, queue_size=queue_size, overflow=overflow
   ) as books:
-
-    async def stream() -> AsyncIterable[Book]:
-      async for book in books:
-        yield book if levels is None else book.limit(levels)
-
-    yield stream()
+    yield detached_books(books, levels)

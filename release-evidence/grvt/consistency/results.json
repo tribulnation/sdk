@@ -1,0 +1,3315 @@
+{
+  "payload": {
+    "account_id": "grvt",
+    "checks": [
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AAOI_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AAPL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AAVE_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ADA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AMAT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AMD_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AMZN_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ANTHROPIC_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ARB_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ARM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ASML_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ASTER_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ASTS_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ATOM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AVAX_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AVGO_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AVNT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AXS_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"AXTI_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BABA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BARD_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BASED_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BBX_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BCH_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BERA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BE_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BMNR_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BNB_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BRKB_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BTC_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BX_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"BZ_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CBRS_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CC_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CFX_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"COHR_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"COIN_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"COPPER_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CRCL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CRDO_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CRM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CRV_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CRWD_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CRWV_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"CSCO_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"DELL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"DIS_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"DOGE_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"DOT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"DRAM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"EIGEN_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ENA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ETH_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"EWJ_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"EWT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"EWY_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"EWZ_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"FARTCOIN_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"FIL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"FLNC_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"GIGGLE_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"GLW_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"GOOGL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"GRVT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"GS_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"HANMI_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"HBAR_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"HD_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"HOOD_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"HYPE_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"HYUNDAI_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"H_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"IBM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ICP_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"INTC_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"IREN_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"IWM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"JPM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"JUP_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"KAIA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"KAITO_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"KBONK_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"KODEX200_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"KORU_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"KPEPE_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"KSHIB_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"KSTR_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LDO_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LGELECTRONICS_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LINEA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LINK_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LITE_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LIT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LLY_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"LTC_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MEGA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"META_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MINIMAX_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MON_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MOODENG_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MORPHO_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MRNA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MRVL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MSFT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MSTR_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"MU_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"NATGAS_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"NAVER_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"NBIS_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"NEAR_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"NFLX_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"NOK_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"NOW_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"NVDA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"NVO_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ONDO_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ONDS_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"OPENAI_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"OP_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ORCL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PAXG_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PAYP_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PENDLE_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PENGU_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PLTR_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"POL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"POPCAT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PROVE_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"PUMP_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"QCOM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"QNTX_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"QQQ_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"RIVER_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"RKLB_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SAHARA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SAMSUNGEM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SAMSUNG_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SEI_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SKHYNIX_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SKHY_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SMCI_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SNDK_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SOL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SOXL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SPACEX_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SPY_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SQQQ_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"STRC_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"STRK_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"STXX_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"SUI_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TAO_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TQQQ_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TRUMP_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TSLA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"TSM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"UBER_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"UNI_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"URNM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"USAR_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"UVXY_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"VIRTUAL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"V_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"WDC_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"WIF_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"WLD_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"WLFI_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"WMT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"W_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"XAG_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"XAUT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"XAU_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"XLE_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"XLM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"XMR_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"XPD_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"XPL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"XPT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"XRP_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ZEC_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ZEN_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_coverage\",\"perp\",\"ZK_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AAOI_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AAPL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AAVE_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ADA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AMAT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AMD_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AMZN_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ANTHROPIC_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ARB_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ARM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ASML_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ASTER_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ASTS_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ATOM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AVAX_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AVGO_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AVNT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AXS_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"AXTI_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BABA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BARD_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BASED_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BBX_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BCH_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BERA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BE_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BMNR_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BNB_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BRKB_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BTC_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BX_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"BZ_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CBRS_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CC_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CFX_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"COHR_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"COIN_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"COPPER_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CRCL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CRDO_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CRM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CRV_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CRWD_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CRWV_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"CSCO_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"DELL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"DIS_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"DOGE_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"DOT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"DRAM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"EIGEN_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ENA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ETH_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"EWJ_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"EWT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"EWY_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"EWZ_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"FARTCOIN_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"FIL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"FLNC_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"GIGGLE_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"GLW_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"GOOGL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"GRVT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"GS_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"HANMI_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"HBAR_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"HD_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"HOOD_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"HYPE_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"HYUNDAI_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"H_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"IBM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ICP_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"INTC_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"IREN_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"IWM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"JPM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"JUP_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"KAIA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"KAITO_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"KBONK_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"KODEX200_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"KORU_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"KPEPE_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"KSHIB_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"KSTR_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LDO_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LGELECTRONICS_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LINEA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LINK_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LITE_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LIT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LLY_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"LTC_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MEGA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"META_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MINIMAX_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MON_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MOODENG_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MORPHO_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MRNA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MRVL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MSFT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MSTR_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"MU_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"NATGAS_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"NAVER_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"NBIS_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"NEAR_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"NFLX_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"NOK_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"NOW_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"NVDA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"NVO_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ONDO_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ONDS_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"OPENAI_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"OP_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ORCL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PAXG_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PAYP_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PENDLE_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PENGU_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PLTR_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"POL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"POPCAT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PROVE_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"PUMP_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"QCOM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"QNTX_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"QQQ_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"RIVER_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"RKLB_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SAHARA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SAMSUNGEM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SAMSUNG_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SEI_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SKHYNIX_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SKHY_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SMCI_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SNDK_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SOL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SOXL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SPACEX_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SPY_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SQQQ_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"STRC_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"STRK_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"STXX_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"SUI_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TAO_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TQQQ_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TRUMP_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TSLA_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"TSM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"UBER_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"UNI_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"URNM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"USAR_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"UVXY_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"VIRTUAL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"V_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"WDC_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"WIF_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"WLD_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"WLFI_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"WMT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"W_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"XAG_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"XAUT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"XAU_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"XLE_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"XLM_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"XMR_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"XPD_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"XPL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"XPT_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"XRP_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ZEC_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ZEN_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"catalogue_identity\",\"perp\",\"ZK_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"discovery\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"exchange_identity\",\"perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"perp\",\"bulk\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"perp\",\"empty\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"perp\",\"selected\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"setup\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"perp\",\"AAOI_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": "66.92",
+            "after_bid": "66.89",
+            "ask": "66.92",
+            "attempt": 1,
+            "before_ask": "66.92",
+            "before_bid": "66.89",
+            "bid": "66.89",
+            "elapsed_seconds": 0.7504436270100996,
+            "ticker_ids_match": true
+          }
+        ],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"perp\",\"AAPL_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": "346.87",
+            "after_bid": "346.78",
+            "ask": "346.87",
+            "attempt": 1,
+            "before_ask": "346.87",
+            "before_bid": "346.78",
+            "bid": "346.78",
+            "elapsed_seconds": 0.746908079017885,
+            "ticker_ids_match": true
+          }
+        ],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"perp\",\"AAVE_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": "140.32",
+            "after_bid": "140.3",
+            "ask": "140.32",
+            "attempt": 1,
+            "before_ask": "140.32",
+            "before_bid": "140.3",
+            "bid": "140.3",
+            "elapsed_seconds": 0.7417606810340658,
+            "ticker_ids_match": true
+          }
+        ],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"perp\",\"BTC_USDT_Perp\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": "80567.0",
+            "after_bid": "80566.9",
+            "ask": "80567.0",
+            "attempt": 1,
+            "before_ask": "80567.0",
+            "before_bid": "80566.9",
+            "bid": "80566.9",
+            "elapsed_seconds": 0.7288432630011812,
+            "ticker_ids_match": true
+          }
+        ],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"perp\",\"bulk\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"perp\",\"empty\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"perp\",\"selected\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      }
+    ],
+    "discovery": [
+      {
+        "exchange": "perp",
+        "kind": "perp",
+        "markets": [
+          "AAOI_USDT_Perp",
+          "AAPL_USDT_Perp",
+          "AAVE_USDT_Perp",
+          "ADA_USDT_Perp",
+          "AI16Z_USDT_Perp",
+          "AMAT_USDT_Perp",
+          "AMD_USDT_Perp",
+          "AMZN_USDT_Perp",
+          "ANTHROPIC_USDT_Perp",
+          "ARB_USDT_Perp",
+          "ARM_USDT_Perp",
+          "ASML_USDT_Perp",
+          "ASTER_USDT_Perp",
+          "ASTS_USDT_Perp",
+          "ATOM_USDT_Perp",
+          "AVAX_USDT_Perp",
+          "AVGO_USDT_Perp",
+          "AVNT_USDT_Perp",
+          "AXS_USDT_Perp",
+          "AXTI_USDT_Perp",
+          "BABA_USDT_Perp",
+          "BARD_USDT_Perp",
+          "BASED_USDT_Perp",
+          "BBX_USDT_Perp",
+          "BCH_USDT_Perp",
+          "BERA_USDT_Perp",
+          "BE_USDT_Perp",
+          "BLESS_USDT_Perp",
+          "BMNR_USDT_Perp",
+          "BNB_USDT_Perp",
+          "BRKB_USDT_Perp",
+          "BTC_USDT_Perp",
+          "BX_USDT_Perp",
+          "BZ_USDT_Perp",
+          "CBRS_USDT_Perp",
+          "CC_USDT_Perp",
+          "CFX_USDT_Perp",
+          "CL_USDT_Perp",
+          "COAI_USDT_Perp",
+          "COHR_USDT_Perp",
+          "COIN_USDT_Perp",
+          "COPPER_USDT_Perp",
+          "CRCL_USDT_Perp",
+          "CRDO_USDT_Perp",
+          "CRM_USDT_Perp",
+          "CRV_USDT_Perp",
+          "CRWD_USDT_Perp",
+          "CRWV_USDT_Perp",
+          "CSCO_USDT_Perp",
+          "DELL_USDT_Perp",
+          "DIS_USDT_Perp",
+          "DOGE_USDT_Perp",
+          "DOT_USDT_Perp",
+          "DRAM_USDT_Perp",
+          "EDGE_USDT_Perp",
+          "EIGEN_USDT_Perp",
+          "ENA_USDT_Perp",
+          "ETH_USDT_Perp",
+          "EWJ_USDT_Perp",
+          "EWT_USDT_Perp",
+          "EWY_USDT_Perp",
+          "EWZ_USDT_Perp",
+          "FARTCOIN_USDT_Perp",
+          "FIL_USDT_Perp",
+          "FLNC_USDT_Perp",
+          "GIGGLE_USDT_Perp",
+          "GLW_USDT_Perp",
+          "GOOGL_USDT_Perp",
+          "GRVT_USDT_Perp",
+          "GS_USDT_Perp",
+          "HANMI_USDT_Perp",
+          "HBAR_USDT_Perp",
+          "HD_USDT_Perp",
+          "HOOD_USDT_Perp",
+          "HYPE_USDT_Perp",
+          "HYUNDAI_USDT_Perp",
+          "H_USDT_Perp",
+          "IBM_USDT_Perp",
+          "ICP_USDT_Perp",
+          "INTC_USDT_Perp",
+          "IP_USDT_Perp",
+          "IREN_USDT_Perp",
+          "IWM_USDT_Perp",
+          "JPM_USDT_Perp",
+          "JUP_USDT_Perp",
+          "KAIA_USDT_Perp",
+          "KAITO_USDT_Perp",
+          "KBONK_USDT_Perp",
+          "KODEX200_USDT_Perp",
+          "KORU_USDT_Perp",
+          "KPEPE_USDT_Perp",
+          "KSHIB_USDT_Perp",
+          "KSTR_USDT_Perp",
+          "LA_USDT_Perp",
+          "LDO_USDT_Perp",
+          "LGELECTRONICS_USDT_Perp",
+          "LINEA_USDT_Perp",
+          "LINK_USDT_Perp",
+          "LITE_USDT_Perp",
+          "LIT_USDT_Perp",
+          "LLY_USDT_Perp",
+          "LTC_USDT_Perp",
+          "MEGA_USDT_Perp",
+          "META_USDT_Perp",
+          "MINIMAX_USDT_Perp",
+          "MNT_USDT_Perp",
+          "MON_USDT_Perp",
+          "MOODENG_USDT_Perp",
+          "MORPHO_USDT_Perp",
+          "MRNA_USDT_Perp",
+          "MRVL_USDT_Perp",
+          "MSFT_USDT_Perp",
+          "MSTR_USDT_Perp",
+          "MU_USDT_Perp",
+          "NATGAS_USDT_Perp",
+          "NAVER_USDT_Perp",
+          "NBIS_USDT_Perp",
+          "NEAR_USDT_Perp",
+          "NFLX_USDT_Perp",
+          "NOK_USDT_Perp",
+          "NOW_USDT_Perp",
+          "NVDA_USDT_Perp",
+          "NVO_USDT_Perp",
+          "ONDO_USDT_Perp",
+          "ONDS_USDT_Perp",
+          "OPENAI_USDT_Perp",
+          "OP_USDT_Perp",
+          "ORCL_USDT_Perp",
+          "PAXG_USDT_Perp",
+          "PAYP_USDT_Perp",
+          "PENDLE_USDT_Perp",
+          "PENGU_USDT_Perp",
+          "PLTR_USDT_Perp",
+          "POL_USDT_Perp",
+          "POPCAT_USDT_Perp",
+          "PROVE_USDT_Perp",
+          "PUMP_USDT_Perp",
+          "QCOM_USDT_Perp",
+          "QNTX_USDT_Perp",
+          "QQQ_USDT_Perp",
+          "RESOLV_USDT_Perp",
+          "RIVER_USDT_Perp",
+          "RKLB_USDT_Perp",
+          "SAHARA_USDT_Perp",
+          "SAMSUNGEM_USDT_Perp",
+          "SAMSUNG_USDT_Perp",
+          "SEI_USDT_Perp",
+          "SKHYNIX_USDT_Perp",
+          "SKHY_USDT_Perp",
+          "SMCI_USDT_Perp",
+          "SNDK_USDT_Perp",
+          "SOL_USDT_Perp",
+          "SOXL_USDT_Perp",
+          "SPACEX_USDT_Perp",
+          "SPCX_USDT_Perp",
+          "SPY_USDT_Perp",
+          "SQQQ_USDT_Perp",
+          "STRC_USDT_Perp",
+          "STRK_USDT_Perp",
+          "STXX_USDT_Perp",
+          "SUI_USDT_Perp",
+          "TAO_USDT_Perp",
+          "TON_USDT_Perp",
+          "TQQQ_USDT_Perp",
+          "TRUMP_USDT_Perp",
+          "TSLA_USDT_Perp",
+          "TSM_USDT_Perp",
+          "UBER_USDT_Perp",
+          "UNI_USDT_Perp",
+          "URNM_USDT_Perp",
+          "USAR_USDT_Perp",
+          "UVXY_USDT_Perp",
+          "VINE_USDT_Perp",
+          "VIRTUAL_USDT_Perp",
+          "V_USDT_Perp",
+          "WDC_USDT_Perp",
+          "WIF_USDT_Perp",
+          "WLD_USDT_Perp",
+          "WLFI_USDT_Perp",
+          "WMT_USDT_Perp",
+          "W_USDT_Perp",
+          "XAG_USDT_Perp",
+          "XAUT_USDT_Perp",
+          "XAU_USDT_Perp",
+          "XLE_USDT_Perp",
+          "XLM_USDT_Perp",
+          "XMR_USDT_Perp",
+          "XPD_USDT_Perp",
+          "XPL_USDT_Perp",
+          "XPT_USDT_Perp",
+          "XRP_USDT_Perp",
+          "ZEC_USDT_Perp",
+          "ZEN_USDT_Perp",
+          "ZK_USDT_Perp"
+        ]
+      }
+    ],
+    "venue": "grvt",
+    "version": 6
+  }
+}

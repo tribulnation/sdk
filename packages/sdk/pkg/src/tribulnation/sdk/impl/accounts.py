@@ -58,6 +58,17 @@ class DydxUrls(_TypedDict):
   validator_rpc: str | None
 
 
+class DydxFills(_TypedDict, total=False):
+  """Resolved dYdX fill-source options; only the ones the account sets."""
+
+  fill_source: 'DydxFillSource'
+  fill_socket: str
+
+
+DydxFillSource = _Literal['indexer', 'node', 'socket', 'fastest']
+"""Where a dYdX account's `trades_stream` reads fills from by default."""
+
+
 class RestWsUrls(_TypedDict):
   """Resolved REST and WebSocket overrides; `None` keeps the default."""
 
@@ -74,6 +85,8 @@ VenueId = _Literal[
   'deribit_testnet',
   'aster',
   'aster_testnet',
+  'extended',
+  'extended_testnet',
   'lighter',
   'lighter_testnet',
   'margin-trade',
@@ -137,6 +150,14 @@ class Dydx(VenueAccount):
   """The same node's CometBFT RPC URL, e.g. `'http://20.222.23.181:26657'`; read for
   deleveraging fills (`block_results`). Needed alongside `full_node_grpc`. May be a
   `$ENV_VAR`."""
+  fill_source: DydxFillSource | None = None
+  """Default `trades_source` of this account's `trades_stream`: `'indexer'`, `'node'`
+  (the full node above), `'socket'` (a local fill daemon, see `fill_socket`) or
+  `'fastest'` (every configured source raced, the indexer as the floor). Unset keeps
+  `'indexer'`; a per-call `trades_source` setting overrides it."""
+  fill_socket: str | None = None
+  """Unix socket of a fill daemon on this host, e.g. `'/run/dydx-fills.sock'`, for the
+  `trades_source` settings `'socket'` and `'fastest'`. May be a `$ENV_VAR`."""
   indexer_rest_url: str | None = None
   """Indexer HTTP base URL, e.g. `'http://127.0.0.1:8080'`; unset uses the network's
   (`https://indexer.dydx.trade/`). May be a `$ENV_VAR`."""
@@ -162,6 +183,17 @@ class Dydx(VenueAccount):
   @property
   def resolved_full_node_rpc(self) -> str | None:
     return resolve_env_var(self.full_node_rpc, require=True)
+
+  @property
+  def resolved_fills(self) -> DydxFills:
+    """Fill-source options to pass on: only those set, so a dYdX package that predates
+    them keeps working until an account uses them."""
+    fills: DydxFills = {}
+    if self.fill_source is not None:
+      fills['fill_source'] = self.fill_source
+    if (socket := resolve_env_var(self.fill_socket, require=True)) is not None:
+      fills['fill_socket'] = socket
+    return fills
 
   @property
   def resolved_urls(self) -> DydxUrls:
@@ -190,6 +222,7 @@ class Dydx(VenueAccount):
     self.resolved_creds
     self.resolved_full_node_grpc
     self.resolved_full_node_rpc
+    self.resolved_fills
     self.resolved_urls
 
 
@@ -725,6 +758,71 @@ class Grvt(VenueAccount):
 
 
 @_dataclass(frozen=True)
+class Extended(VenueAccount):
+  """Extended sub-account, isolated by network. An API key belongs to one sub-account:
+  it reads that sub-account and cancels its orders, and the sub-account's Stark private
+  key and vault also place orders. With `public`, market data only."""
+
+  venue: _Literal['extended', 'extended_testnet'] = 'extended'
+  api_key: str | None = None
+  """The sub-account's API key; defaults to the network's `API_KEY` variable."""
+  stark_private_key: str | None = None
+  """The sub-account's Stark private key (hex), for placing orders; defaults to the
+  network's `STARK_PRIVATE_KEY` variable. Optional: without it the account only reads
+  and cancels."""
+  stark_public_key: str | None = None
+  """Its Stark public key (hex), checked against the private key; defaults to the
+  network's `STARK_PUBLIC_KEY` variable. Optional."""
+  vault: int | str | None = None
+  """The sub-account's vault (position id), required with the Stark private key;
+  defaults to the network's `VAULT` variable."""
+  validate: bool = True
+  """Whether to type-validate incoming responses."""
+
+  @property
+  def prefix(self) -> str:
+    """The credential variables' prefix: `EXTENDED` on mainnet, `EXTENDED_TESTNET`."""
+    return 'EXTENDED' if self.venue == 'extended' else 'EXTENDED_TESTNET'
+
+  @property
+  def resolved_api_key(self) -> str | None:
+    """The API key, never mixing networks; required unless `public`."""
+    return resolve_env_var(
+      self.api_key or f'${self.prefix}_API_KEY', require=not self.public
+    )
+
+  @property
+  def resolved_stark_private_key(self) -> str | None:
+    """The Stark private key, never mixing networks; always optional on its own."""
+    return resolve_env_var(
+      self.stark_private_key or f'${self.prefix}_STARK_PRIVATE_KEY', require=False
+    )
+
+  @property
+  def resolved_stark_public_key(self) -> str | None:
+    """The Stark public key, never mixing networks; always optional."""
+    return resolve_env_var(
+      self.stark_public_key or f'${self.prefix}_STARK_PUBLIC_KEY', require=False
+    )
+
+  @property
+  def resolved_vault(self) -> str | None:
+    """The vault, never mixing networks; required with a Stark private key."""
+    if isinstance(self.vault, int):
+      return str(self.vault)
+    return resolve_env_var(
+      self.vault or f'${self.prefix}_VAULT',
+      require=self.resolved_stark_private_key is not None,
+    )
+
+  def verify_env_vars(self):
+    """Fail before constructing clients when a private account has no API key, or a
+    Stark key has no vault."""
+    self.resolved_api_key
+    self.resolved_vault
+
+
+@_dataclass(frozen=True)
 class Evm(BaseAccount):
   Venue = _Literal[
     'ethereum',
@@ -762,6 +860,7 @@ Account = _Annotated[
   | Kucoin
   | Deribit
   | Aster
+  | Extended
   | Lighter
   | MarginTrade
   | Grvt

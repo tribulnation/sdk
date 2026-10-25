@@ -56,7 +56,7 @@ async def book_stream(
           book = update
         else:
           book.update(update)
-        yield book.copy()
+        yield book.frozen()
 
   return books(), stream.unsubscribe
 

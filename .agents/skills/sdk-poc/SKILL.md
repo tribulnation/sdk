@@ -69,7 +69,7 @@ venue doesn't publish. A method is mapped from the venue's own figure or it is n
   written and never run; the scaffold marks them. The lint checks this against the
   paired notebook, so it holds on the machine that ran the PoC; a fresh clone has no
   pair and skips it.
-- **Trading methods are mapped only for venues we trade on.** Otherwise leave
+- **Trading methods are mapped only when asked.** Otherwise leave
   `place_order`/`cancel_*` cells as scaffolded and mark them `not attempted`.
 - **Don't decide what the client's type should be.** Report what the venue sent and
   under what condition; the typed-client maintainer decides between optional, a union,

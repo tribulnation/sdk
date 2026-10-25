@@ -23,3 +23,4 @@ pytest-asyncio
 -e packages/impl/lighter/pkg
 -e packages/impl/margin-trade/pkg
 -e packages/impl/grvt/pkg
+-e packages/impl/extended/pkg

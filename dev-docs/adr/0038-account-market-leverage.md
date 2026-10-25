@@ -3,7 +3,9 @@
 [ADR index](README.md) · [Developer documentation](../README.md)
 
 1. Status: proposed; implemented, not release-verified; amended by
-   [ADR 0041](0041-venue-notional-caps.md)
+   [ADR 0041](0041-venue-notional-caps.md) and, proposed, by
+   [ADR 0051](0051-spot-perp-market-types-collateral-ids.md), which removes the spot
+   `available_notional()` default
 2. Date: 2026-10-08
 
 ## Context

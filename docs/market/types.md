@@ -75,7 +75,9 @@ raises, rather than quietly placing a different order.
   time or a transport header such as HTTP `Date`. Availability: Hyperliquid sets the
   block time on REST and WS; Aster the event/output time `E` (falling back to the
   transaction time `T`) on REST and WS; Lighter the WS `last_updated_at` (REST `depth`
-  is `None`); GRVT the `event_time` on REST and WS; dYdX never sets it. Derived books (`limit`, `with_fees`,
+  is `None`); GRVT the `event_time` on REST and WS; Extended the WS frame `ts` (REST
+  `depth` is `None`, except on RFQ markets, whose `depth` is a quotes-stream snapshot);
+  dYdX never sets it. Derived books (`limit`, `with_fees`,
   `scaled`, `copy`) keep it, `merge` takes the oldest input's, and `update` takes the diff's.
   `update` replaces, adds and removes (zero quantity) levels, then uncrosses the book:
   some venues' diff streams can cross (dYdX's Indexer does by design, see
@@ -84,6 +86,12 @@ raises, rather than quietly placing a different order.
   bid, a level the diff sets removes the existing level it crosses; if both come from
   the diff, the larger quantity wins (an equal one keeps the ask). Removals cross
   nothing, and crossings between existing levels are left as they are.
+  `copy` returns an independent book (new level lists and entries). `frozen` copies
+  only the level lists and shares the entries, so a later `update` leaves it intact;
+  it is for venue streams, which hand each subscriber a `copy` of it through
+  `detached_books`. Every book a `depth_stream` delivers is the subscriber's own: later
+  pushes never change it, and mutating it (`buy`, `sell`, editing entries) affects no
+  one else.
 - `Rules`: `fee_asset`, `tick_size`, `step_size`, min and max qty and
   price (fixed and price-relative), optional standard `fees`, and an `api` flag for whether
   the instrument is tradable through the API at all. The helpers round, truncate and

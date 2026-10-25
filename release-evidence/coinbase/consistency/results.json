@@ -7,6 +7,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"1000BONK-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -14,6 +15,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"1000PEPE-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -21,6 +23,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"1000SHIB-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -28,6 +31,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"AAPL-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -35,6 +39,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"AAVE-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -42,6 +47,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ADA-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -49,6 +55,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"AERO-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -56,6 +63,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ALGO-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -63,6 +71,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ALT-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -70,6 +79,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"AMZN-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -77,6 +87,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"APE-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -84,6 +95,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"APT-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -91,6 +103,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ARB-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -98,6 +111,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ASTER-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -105,6 +119,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ATOM-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -112,6 +127,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"AVAX-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -119,6 +135,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"AVNT-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -126,6 +143,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"BCH-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -133,6 +151,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"BERA-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -140,6 +159,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"BNB-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -147,6 +167,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"BTC-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -154,6 +175,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"CFX-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -161,6 +183,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"COMP-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -168,6 +191,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"CRV-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -175,6 +199,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"DASH-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -182,6 +207,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"DOGE-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -189,6 +215,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"DOT-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -196,6 +223,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"DYDX-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -203,6 +231,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"EIGEN-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -210,6 +239,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ENA-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -217,6 +247,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ETC-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -224,6 +255,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ETH-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -231,6 +263,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ETHFI-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -238,6 +271,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"EURC-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -245,6 +279,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"FARTCOIN-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -252,6 +287,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"FET-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -259,6 +295,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"FIL-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -266,6 +303,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"GOLD-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -273,6 +311,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"GOOGL-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -280,6 +319,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"HBAR-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -287,6 +327,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"HYPE-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -294,6 +335,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ICP-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -301,6 +343,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"INJ-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -308,6 +351,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"JASMY-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -315,6 +359,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"JTO-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -322,6 +367,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"JUP-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -329,6 +375,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"LDO-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -336,6 +383,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"LINK-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -343,6 +391,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"LIT-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -350,6 +399,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"LTC-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -357,6 +407,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"META-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -364,6 +415,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"MON-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -371,6 +423,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"MORPHO-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -378,6 +431,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"MSFT-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -385,6 +439,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"MSTR-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -392,6 +447,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"NEAR-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -399,6 +455,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"NVDA-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -406,6 +463,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ONDO-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -413,6 +471,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"OP-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -420,6 +479,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"PAXG-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -427,6 +487,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"PENDLE-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -434,6 +495,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"PENGU-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -441,6 +503,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"PNUT-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -448,6 +511,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"POL-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -455,6 +519,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"PUMP-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -462,6 +527,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"PYTH-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -469,6 +535,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"RENDER-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -476,6 +543,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"RUNE-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -483,6 +551,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"S-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -490,6 +559,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"SEI-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -497,6 +567,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"SILVER-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -504,6 +575,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"SOL-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -511,6 +583,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"STRK-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -518,6 +591,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"SUI-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -525,6 +599,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"TAO-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -532,6 +607,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"TIA-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -539,6 +615,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"TRUMP-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -546,6 +623,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"TSLA-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -553,6 +631,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"UNI-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -560,6 +639,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"VIRTUAL-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -567,6 +647,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"VVV-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -574,6 +655,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"W-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -581,6 +663,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"WIF-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -588,6 +671,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"WLD-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -595,6 +679,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"WLFI-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -602,6 +687,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"XLM-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -609,6 +695,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"XPL-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -616,6 +703,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"XRP-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -623,6 +711,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ZEC-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -630,6 +719,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"1INCH-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -637,6 +727,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"1INCH-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -644,6 +735,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"1INCH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -651,6 +743,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"2Z-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -658,6 +751,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"AAVE-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -665,6 +759,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"AAVE-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -672,6 +767,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"AAVE-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -679,6 +775,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"AAVE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -686,6 +783,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ADA-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -693,6 +791,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ADA-ETH\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -700,6 +799,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ADA-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -707,6 +807,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ADA-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -714,6 +815,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ADA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -721,6 +823,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ADA-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -728,6 +831,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"AERO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -735,6 +839,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"AKT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -742,6 +847,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ALEPH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -749,6 +855,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ALGO-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -756,6 +863,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ALGO-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -763,6 +871,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ALGO-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -770,6 +879,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ALGO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -777,6 +887,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ALT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -784,6 +895,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ANKR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -791,6 +903,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"APE-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -798,6 +911,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"APE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -805,6 +919,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"APE-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -812,6 +927,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"APT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -819,6 +935,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ARB-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -826,6 +943,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ARKM-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -833,6 +951,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ASTER-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -840,6 +959,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ATH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -847,6 +967,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ATOM-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -854,6 +975,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ATOM-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -861,6 +983,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ATOM-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -868,6 +991,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ATOM-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -875,6 +999,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ATOM-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -882,6 +1007,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"AVAX-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -889,6 +1015,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"AVAX-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -896,6 +1023,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"AVAX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -903,6 +1031,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"AVAX-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -910,6 +1039,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"AVNT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -917,6 +1047,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"AXL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -924,6 +1055,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"AXS-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -931,6 +1063,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"BAL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -938,6 +1071,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"BAT-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -945,6 +1079,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"BAT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -952,6 +1087,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"BCH-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -959,6 +1095,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"BCH-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -966,6 +1103,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"BCH-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -973,6 +1111,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"BCH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -980,6 +1119,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"BERA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -987,6 +1127,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"BIO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -994,6 +1135,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"BLAST-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "deferred"
       },
       {
@@ -1001,6 +1143,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"BLUR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1008,6 +1151,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"BNB-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1015,6 +1159,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"BONK-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1022,6 +1167,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"BTC-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1029,6 +1175,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"BTC-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1036,6 +1183,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"BTC-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1043,6 +1191,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"BTC-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1050,6 +1199,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"CAKE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1057,6 +1207,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"CGLD-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1064,6 +1215,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"CHZ-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1071,6 +1223,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"CHZ-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1078,6 +1231,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"CHZ-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1085,6 +1239,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"COMP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1092,6 +1247,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"COW-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1099,6 +1255,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"CRO-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1106,6 +1263,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"CRO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1113,6 +1271,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"CRV-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1120,6 +1279,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"CRV-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1127,6 +1287,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"CRV-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1134,6 +1295,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"CRV-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1141,6 +1303,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"CVX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1148,6 +1311,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"DASH-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1155,6 +1319,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"DASH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1162,6 +1327,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"DBR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1169,6 +1335,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"DOGE-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1176,6 +1343,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"DOGE-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1183,6 +1351,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"DOGE-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1190,6 +1359,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"DOGE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1197,6 +1367,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"DOGE-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1204,6 +1375,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"DOT-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1211,6 +1383,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"DOT-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1218,6 +1391,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"DOT-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1225,6 +1399,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"DOT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1232,6 +1407,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"DOT-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1239,6 +1415,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"EIGEN-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1246,6 +1423,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ENA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1253,6 +1431,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ENS-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1260,6 +1439,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ENS-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1267,6 +1447,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ETC-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1274,6 +1455,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ETC-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1281,6 +1463,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ETC-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1288,6 +1471,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ETC-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1295,6 +1479,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ETH-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1302,6 +1487,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ETH-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1309,6 +1495,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ETH-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1316,6 +1503,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ETH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1323,6 +1511,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ETH-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1330,6 +1519,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ETHFI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1337,6 +1527,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"EURC-USDC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1344,6 +1535,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"FARTCOIN-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1351,6 +1543,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"FET-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1358,6 +1551,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"FET-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1365,6 +1559,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"FIL-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1372,6 +1567,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"FIL-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1379,6 +1575,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"FIL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1386,6 +1583,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"FLOKI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1393,6 +1591,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"FLR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1400,6 +1599,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"G-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1407,6 +1607,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"GLM-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1414,6 +1615,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"GMT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1421,6 +1623,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"GNO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1428,6 +1631,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"GRASS-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1435,6 +1639,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"GRT-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1442,6 +1647,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"GRT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1449,6 +1655,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"HBAR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1456,6 +1663,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"HBAR-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1463,6 +1671,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"HYPE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1470,6 +1679,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ICP-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1477,6 +1687,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ICP-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1484,6 +1695,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ICP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1491,6 +1703,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"IMX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1498,6 +1711,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"IMX-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1505,6 +1719,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"INJ-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1512,6 +1727,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"IO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1519,6 +1735,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"JASMY-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1526,6 +1743,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"JTO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1533,6 +1751,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"JUPITER-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1540,6 +1759,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"KAITO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1547,6 +1767,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"KSM-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1554,6 +1775,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"LAYER-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1561,6 +1783,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"LDO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1568,6 +1791,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"LIGHTER-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1575,6 +1799,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"LINEA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1582,6 +1807,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"LINK-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1589,6 +1815,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"LINK-ETH\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1596,6 +1823,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"LINK-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1603,6 +1831,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"LINK-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1610,6 +1839,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"LINK-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1617,6 +1847,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"LINK-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1624,6 +1855,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"LTC-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1631,6 +1863,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"LTC-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1638,6 +1871,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"LTC-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1645,6 +1879,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"LTC-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1652,6 +1887,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"MANA-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1659,6 +1895,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"MANA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1666,6 +1903,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"MANTLE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1673,6 +1911,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"MASK-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1680,6 +1919,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ME-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1687,6 +1927,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"META-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1694,6 +1935,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"MON-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1701,6 +1943,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"MORPHO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1708,6 +1951,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"NEAR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1715,6 +1959,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"NEAR-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1722,6 +1967,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ONDO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1729,6 +1975,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"OP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1736,6 +1983,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"OP-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1743,6 +1991,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ORCA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1750,6 +1999,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"OSMO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1757,6 +2007,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"PAXG-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1764,6 +2015,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"PENDLE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1771,6 +2023,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"PENGU-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1778,6 +2031,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"PEPE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1785,6 +2039,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"PNUT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1792,6 +2047,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"POL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1799,6 +2055,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"PUMP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1806,6 +2063,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"PYTH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1813,6 +2071,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"QNT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1820,6 +2079,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"QNT-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1827,6 +2087,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"RAY-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1834,6 +2095,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"RED-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1841,6 +2103,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"RENDER-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1848,6 +2111,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"REQ-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1855,6 +2119,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"REZ-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1862,6 +2127,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"S-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1869,6 +2135,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"SAND-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1876,6 +2143,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"SEI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1883,6 +2151,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"SHIB-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1890,6 +2159,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"SHIB-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1897,6 +2167,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"SHIB-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1904,6 +2175,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"SHIB-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1911,6 +2183,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"SKY-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1918,6 +2191,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"SNX-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1925,6 +2199,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"SNX-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1932,6 +2207,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"SNX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1939,6 +2215,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"SOL-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1946,6 +2223,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"SOL-ETH\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1953,6 +2231,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"SOL-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1960,6 +2239,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"SOL-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1967,6 +2247,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"SOL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1974,6 +2255,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"SOL-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1981,6 +2263,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"SPX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1988,6 +2271,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"STRK-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1995,6 +2279,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"STX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2002,6 +2287,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"STX-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2009,6 +2295,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"SUI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2016,6 +2303,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"SUSHI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2023,6 +2311,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"SYRUP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2030,6 +2319,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"T-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2037,6 +2327,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"TAO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2044,6 +2335,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"TIA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2051,6 +2343,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"TON-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2058,6 +2351,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"TRAC-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2065,6 +2359,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"TRB-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2072,6 +2367,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"TRUMP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2079,6 +2375,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"UMA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2086,6 +2383,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"UNI-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2093,6 +2391,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"UNI-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2100,6 +2399,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"UNI-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2107,6 +2407,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"UNI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2114,6 +2415,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"USD1-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2121,6 +2423,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"USDC-AUD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2128,6 +2431,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"USDC-CAD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2135,6 +2439,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"USDC-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2142,6 +2447,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"USDC-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2149,6 +2455,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"USDS-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2156,6 +2463,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"USDT-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2163,6 +2471,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"USDT-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2170,6 +2479,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"USDT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2177,6 +2487,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"USDT-USDC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2184,6 +2495,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"USELESS-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2191,6 +2503,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"VELO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2198,6 +2511,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"VET-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2205,6 +2519,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"VIRTUAL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2212,6 +2527,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"VVV-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2219,6 +2535,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"W-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2226,6 +2543,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"WIF-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2233,6 +2551,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"WLD-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2240,6 +2559,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"WLFI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2247,6 +2567,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"XCN-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2254,6 +2575,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"XLM-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2261,6 +2583,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"XLM-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2268,6 +2591,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"XLM-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2275,6 +2599,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"XLM-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2282,6 +2607,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"XPL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2289,6 +2615,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"XRP-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2296,6 +2623,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"XRP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2303,6 +2631,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"XRP-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2310,6 +2639,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"XTZ-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2317,6 +2647,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"XTZ-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2324,6 +2655,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"XTZ-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2331,6 +2663,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"XTZ-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2338,6 +2671,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"YFI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2345,6 +2679,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ZEC-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2352,6 +2687,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ZEN-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2359,6 +2695,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ZK-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2366,6 +2703,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ZORA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2373,6 +2711,7 @@
         "id": "[\"catalogue_coverage\",\"spot\",\"ZRO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -2380,6 +2719,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"1000BONK-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2387,6 +2727,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"1000PEPE-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2394,6 +2735,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"1000SHIB-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2401,6 +2743,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"AAPL-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2408,6 +2751,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"AAVE-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2415,6 +2759,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ADA-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2422,6 +2767,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"AERO-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2429,6 +2775,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ALGO-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2436,6 +2783,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ALT-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2443,6 +2791,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"AMZN-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2450,6 +2799,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"APE-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2457,6 +2807,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"APT-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2464,6 +2815,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ARB-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2471,6 +2823,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ASTER-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2478,6 +2831,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ATOM-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2485,6 +2839,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"AVAX-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2492,6 +2847,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"AVNT-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2499,6 +2855,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"BCH-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2506,6 +2863,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"BERA-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2513,6 +2871,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"BNB-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2520,6 +2879,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"BTC-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2527,6 +2887,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"CFX-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2534,6 +2895,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"COMP-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2541,6 +2903,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"CRV-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2548,6 +2911,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"DASH-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2555,6 +2919,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"DOGE-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2562,6 +2927,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"DOT-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2569,6 +2935,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"DYDX-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2576,6 +2943,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"EIGEN-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2583,6 +2951,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ENA-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2590,6 +2959,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ETC-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2597,6 +2967,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ETH-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2604,6 +2975,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ETHFI-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2611,6 +2983,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"EURC-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2618,6 +2991,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"FARTCOIN-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2625,6 +2999,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"FET-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2632,6 +3007,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"FIL-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2639,6 +3015,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"GOLD-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2646,6 +3023,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"GOOGL-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2653,6 +3031,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"HBAR-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2660,6 +3039,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"HYPE-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2667,6 +3047,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ICP-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2674,6 +3055,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"INJ-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2681,6 +3063,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"JASMY-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2688,6 +3071,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"JTO-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2695,6 +3079,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"JUP-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2702,6 +3087,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"LDO-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2709,6 +3095,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"LINK-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2716,6 +3103,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"LIT-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2723,6 +3111,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"LTC-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2730,6 +3119,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"META-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2737,6 +3127,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"MON-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2744,6 +3135,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"MORPHO-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2751,6 +3143,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"MSFT-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2758,6 +3151,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"MSTR-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2765,6 +3159,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"NEAR-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2772,6 +3167,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"NVDA-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2779,6 +3175,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ONDO-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2786,6 +3183,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"OP-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2793,6 +3191,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"PAXG-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2800,6 +3199,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"PENDLE-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2807,6 +3207,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"PENGU-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2814,6 +3215,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"PNUT-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2821,6 +3223,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"POL-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2828,6 +3231,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"PUMP-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2835,6 +3239,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"PYTH-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2842,6 +3247,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"RENDER-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2849,6 +3255,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"RUNE-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2856,6 +3263,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"S-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2863,6 +3271,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"SEI-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2870,6 +3279,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"SILVER-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2877,6 +3287,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"SOL-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2884,6 +3295,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"STRK-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2891,6 +3303,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"SUI-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2898,6 +3311,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"TAO-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2905,6 +3319,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"TIA-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2912,6 +3327,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"TRUMP-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2919,6 +3335,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"TSLA-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2926,6 +3343,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"UNI-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2933,6 +3351,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"VIRTUAL-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2940,6 +3359,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"VVV-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2947,6 +3367,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"W-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2954,6 +3375,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"WIF-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2961,6 +3383,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"WLD-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2968,6 +3391,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"WLFI-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2975,6 +3399,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"XLM-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2982,6 +3407,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"XPL-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2989,6 +3415,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"XRP-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -2996,6 +3423,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ZEC-PERP-INTX\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "excluded"
       },
       {
@@ -3003,6 +3431,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"1INCH-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3010,6 +3439,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"1INCH-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3017,6 +3447,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"1INCH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3024,6 +3455,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"2Z-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3031,6 +3463,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"AAVE-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3038,6 +3471,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"AAVE-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3045,6 +3479,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"AAVE-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3052,6 +3487,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"AAVE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3059,6 +3495,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ADA-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3066,6 +3503,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ADA-ETH\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3073,6 +3511,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ADA-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3080,6 +3519,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ADA-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3087,6 +3527,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ADA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3094,6 +3535,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ADA-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3101,6 +3543,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"AERO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3108,6 +3551,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"AKT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3115,6 +3559,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ALEPH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3122,6 +3567,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ALGO-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3129,6 +3575,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ALGO-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3136,6 +3583,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ALGO-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3143,6 +3591,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ALGO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3150,6 +3599,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ALT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3157,6 +3607,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ANKR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3164,6 +3615,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"APE-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3171,6 +3623,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"APE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3178,6 +3631,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"APE-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3185,6 +3639,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"APT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3192,6 +3647,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ARB-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3199,6 +3655,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ARKM-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3206,6 +3663,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ASTER-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3213,6 +3671,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ATH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3220,6 +3679,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ATOM-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3227,6 +3687,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ATOM-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3234,6 +3695,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ATOM-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3241,6 +3703,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ATOM-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3248,6 +3711,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ATOM-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3255,6 +3719,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"AVAX-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3262,6 +3727,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"AVAX-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3269,6 +3735,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"AVAX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3276,6 +3743,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"AVAX-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3283,6 +3751,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"AVNT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3290,6 +3759,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"AXL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3297,6 +3767,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"AXS-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3304,6 +3775,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"BAL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3311,6 +3783,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"BAT-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3318,6 +3791,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"BAT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3325,6 +3799,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"BCH-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3332,6 +3807,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"BCH-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3339,6 +3815,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"BCH-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3346,6 +3823,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"BCH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3353,6 +3831,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"BERA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3360,6 +3839,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"BIO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3367,6 +3847,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"BLAST-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3374,6 +3855,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"BLUR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3381,6 +3863,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"BNB-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3388,6 +3871,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"BONK-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3395,6 +3879,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"BTC-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3402,6 +3887,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"BTC-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3409,6 +3895,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"BTC-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3416,6 +3903,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"BTC-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3423,6 +3911,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"CAKE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3430,6 +3919,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"CGLD-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3437,6 +3927,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"CHZ-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3444,6 +3935,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"CHZ-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3451,6 +3943,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"CHZ-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3458,6 +3951,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"COMP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3465,6 +3959,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"COW-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3472,6 +3967,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"CRO-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3479,6 +3975,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"CRO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3486,6 +3983,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"CRV-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3493,6 +3991,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"CRV-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3500,6 +3999,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"CRV-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3507,6 +4007,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"CRV-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3514,6 +4015,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"CVX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3521,6 +4023,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"DASH-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3528,6 +4031,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"DASH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3535,6 +4039,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"DBR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3542,6 +4047,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"DOGE-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3549,6 +4055,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"DOGE-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3556,6 +4063,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"DOGE-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3563,6 +4071,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"DOGE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3570,6 +4079,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"DOGE-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3577,6 +4087,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"DOT-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3584,6 +4095,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"DOT-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3591,6 +4103,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"DOT-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3598,6 +4111,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"DOT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3605,6 +4119,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"DOT-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3612,6 +4127,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"EIGEN-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3619,6 +4135,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ENA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3626,6 +4143,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ENS-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3633,6 +4151,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ENS-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3640,6 +4159,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ETC-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3647,6 +4167,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ETC-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3654,6 +4175,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ETC-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3661,6 +4183,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ETC-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3668,6 +4191,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ETH-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3675,6 +4199,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ETH-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3682,6 +4207,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ETH-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3689,6 +4215,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ETH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3696,6 +4223,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ETH-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3703,6 +4231,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ETHFI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3710,6 +4239,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"EURC-USDC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3717,6 +4247,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"FARTCOIN-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3724,6 +4255,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"FET-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3731,6 +4263,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"FET-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3738,6 +4271,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"FIL-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3745,6 +4279,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"FIL-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3752,6 +4287,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"FIL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3759,6 +4295,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"FLOKI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3766,6 +4303,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"FLR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3773,6 +4311,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"G-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3780,6 +4319,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"GLM-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3787,6 +4327,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"GMT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3794,6 +4335,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"GNO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3801,6 +4343,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"GRASS-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3808,6 +4351,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"GRT-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3815,6 +4359,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"GRT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3822,6 +4367,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"HBAR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3829,6 +4375,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"HBAR-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3836,6 +4383,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"HYPE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3843,6 +4391,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ICP-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3850,6 +4399,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ICP-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3857,6 +4407,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ICP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3864,6 +4415,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"IMX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3871,6 +4423,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"IMX-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3878,6 +4431,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"INJ-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3885,6 +4439,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"IO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3892,6 +4447,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"JASMY-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3899,6 +4455,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"JTO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3906,6 +4463,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"JUPITER-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3913,6 +4471,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"KAITO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3920,6 +4479,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"KSM-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3927,6 +4487,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"LAYER-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3934,6 +4495,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"LDO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3941,6 +4503,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"LIGHTER-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3948,6 +4511,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"LINEA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3955,6 +4519,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"LINK-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3962,6 +4527,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"LINK-ETH\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3969,6 +4535,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"LINK-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3976,6 +4543,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"LINK-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3983,6 +4551,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"LINK-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3990,6 +4559,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"LINK-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -3997,6 +4567,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"LTC-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4004,6 +4575,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"LTC-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4011,6 +4583,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"LTC-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4018,6 +4591,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"LTC-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4025,6 +4599,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"MANA-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4032,6 +4607,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"MANA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4039,6 +4615,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"MANTLE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4046,6 +4623,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"MASK-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4053,6 +4631,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ME-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4060,6 +4639,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"META-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4067,6 +4647,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"MON-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4074,6 +4655,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"MORPHO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4081,6 +4663,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"NEAR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4088,6 +4671,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"NEAR-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4095,6 +4679,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ONDO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4102,6 +4687,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"OP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4109,6 +4695,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"OP-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4116,6 +4703,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ORCA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4123,6 +4711,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"OSMO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4130,6 +4719,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"PAXG-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4137,6 +4727,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"PENDLE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4144,6 +4735,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"PENGU-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4151,6 +4743,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"PEPE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4158,6 +4751,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"PNUT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4165,6 +4759,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"POL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4172,6 +4767,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"PUMP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4179,6 +4775,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"PYTH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4186,6 +4783,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"QNT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4193,6 +4791,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"QNT-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4200,6 +4799,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"RAY-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4207,6 +4807,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"RED-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4214,6 +4815,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"RENDER-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4221,6 +4823,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"REQ-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4228,6 +4831,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"REZ-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4235,6 +4839,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"S-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4242,6 +4847,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"SAND-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4249,6 +4855,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"SEI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4256,6 +4863,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"SHIB-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4263,6 +4871,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"SHIB-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4270,6 +4879,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"SHIB-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4277,6 +4887,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"SHIB-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4284,6 +4895,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"SKY-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4291,6 +4903,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"SNX-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4298,6 +4911,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"SNX-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4305,6 +4919,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"SNX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4312,6 +4927,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"SOL-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4319,6 +4935,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"SOL-ETH\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4326,6 +4943,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"SOL-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4333,6 +4951,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"SOL-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4340,6 +4959,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"SOL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4347,6 +4967,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"SOL-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4354,6 +4975,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"SPX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4361,6 +4983,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"STRK-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4368,6 +4991,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"STX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4375,6 +4999,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"STX-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4382,6 +5007,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"SUI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4389,6 +5015,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"SUSHI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4396,6 +5023,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"SYRUP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4403,6 +5031,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"T-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4410,6 +5039,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"TAO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4417,6 +5047,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"TIA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4424,6 +5055,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"TON-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4431,6 +5063,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"TRAC-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4438,6 +5071,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"TRB-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4445,6 +5079,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"TRUMP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4452,6 +5087,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"UMA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4459,6 +5095,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"UNI-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4466,6 +5103,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"UNI-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4473,6 +5111,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"UNI-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4480,6 +5119,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"UNI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4487,6 +5127,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"USD1-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4494,6 +5135,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"USDC-AUD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4501,6 +5143,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"USDC-CAD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4508,6 +5151,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"USDC-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4515,6 +5159,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"USDC-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4522,6 +5167,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"USDS-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4529,6 +5175,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"USDT-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4536,6 +5183,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"USDT-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4543,6 +5191,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"USDT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4550,6 +5199,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"USDT-USDC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4557,6 +5207,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"USELESS-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4564,6 +5215,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"VELO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4571,6 +5223,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"VET-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4578,6 +5231,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"VIRTUAL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4585,6 +5239,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"VVV-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4592,6 +5247,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"W-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4599,6 +5255,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"WIF-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4606,6 +5263,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"WLD-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4613,6 +5271,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"WLFI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4620,6 +5279,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"XCN-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4627,6 +5287,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"XLM-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4634,6 +5295,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"XLM-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4641,6 +5303,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"XLM-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4648,6 +5311,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"XLM-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4655,6 +5319,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"XPL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4662,6 +5327,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"XRP-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4669,6 +5335,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"XRP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4676,6 +5343,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"XRP-USDT\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4683,6 +5351,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"XTZ-BTC\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4690,6 +5359,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"XTZ-EUR\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4697,6 +5367,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"XTZ-GBP\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4704,6 +5375,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"XTZ-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4711,6 +5383,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"YFI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4718,6 +5391,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ZEC-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4725,6 +5399,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ZEN-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4732,6 +5407,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ZK-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4739,6 +5415,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ZORA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4746,6 +5423,7 @@
         "id": "[\"catalogue_identity\",\"spot\",\"ZRO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4753,6 +5431,7 @@
         "id": "[\"discovery\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4760,6 +5439,7 @@
         "id": "[\"exchange_identity\",\"spot\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4767,6 +5447,7 @@
         "id": "[\"market_identity\",\"spot\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4774,6 +5455,7 @@
         "id": "[\"setup\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4782,17 +5464,18 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.010315",
-            "after_bid": "0.01010736",
-            "ask": "0.010315",
+            "after_ask": "0.00965",
+            "after_bid": "0.009602",
+            "ask": "0.00965",
             "attempt": 1,
-            "before_ask": "0.010315",
-            "before_bid": "0.01010736",
-            "bid": "0.01010736",
-            "elapsed_seconds": 0.7290050789597444,
+            "before_ask": "0.00965",
+            "before_bid": "0.009602",
+            "bid": "0.009602",
+            "elapsed_seconds": 0.7337041300488636,
             "ticker_ids_match": true
           }
         ],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4801,17 +5484,18 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.010315",
-            "after_bid": "0.01010736",
-            "ask": "0.010315",
+            "after_ask": "0.00965",
+            "after_bid": "0.009602",
+            "ask": "0.00965",
             "attempt": 1,
-            "before_ask": "0.010315",
-            "before_bid": "0.01010736",
-            "bid": "0.01010736",
-            "elapsed_seconds": 1.3383030150434934,
+            "before_ask": "0.00965",
+            "before_bid": "0.009602",
+            "bid": "0.009602",
+            "elapsed_seconds": 1.3866726930136792,
             "ticker_ids_match": true
           }
         ],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4820,17 +5504,18 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.08531",
-            "after_bid": "0.08521",
-            "ask": "0.08531",
+            "after_ask": "0.08014",
+            "after_bid": "0.08005",
+            "ask": "0.08014",
             "attempt": 1,
-            "before_ask": "0.08531",
-            "before_bid": "0.08521",
-            "bid": "0.08522",
-            "elapsed_seconds": 0.9476928460062481,
+            "before_ask": "0.08014",
+            "before_bid": "0.08005",
+            "bid": "0.08005",
+            "elapsed_seconds": 0.6248836869490333,
             "ticker_ids_match": true
           }
         ],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4839,17 +5524,18 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "84596.35",
-            "after_bid": "84596.34",
-            "ask": "84596.35",
+            "after_ask": "80488.44",
+            "after_bid": "80486.48",
+            "ask": "80488.44",
             "attempt": 1,
-            "before_ask": "84596.35",
-            "before_bid": "84596.34",
-            "bid": "84596.34",
-            "elapsed_seconds": 0.9652370300027542,
+            "before_ask": "80488.44",
+            "before_bid": "80486.48",
+            "bid": "80486.05",
+            "elapsed_seconds": 0.5204365300014615,
             "ticker_ids_match": true
           }
         ],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4857,6 +5543,7 @@
         "id": "[\"tickers\",\"spot\",\"bulk\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4864,6 +5551,7 @@
         "id": "[\"tickers\",\"spot\",\"empty\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -4871,6 +5559,7 @@
         "id": "[\"tickers\",\"spot\",\"selected\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       }
     ],
@@ -4887,915 +5576,915 @@
           "ZEC-USDC",
           "XRP-USD",
           "XRP-USDC",
-          "NEAR-USD",
-          "NEAR-USDC",
           "SOL-USD",
           "SOL-USDC",
+          "NEAR-USD",
+          "NEAR-USDC",
           "USDT-USD",
+          "IRYS-USD",
+          "IRYS-USDC",
           "USDC-EUR",
+          "BIRB-USD",
+          "BIRB-USDC",
           "HYPE-USD",
           "HYPE-USDC",
-          "BTC-EUR",
-          "UNI-USD",
-          "UNI-USDC",
           "SUI-USD",
           "SUI-USDC",
-          "PUMP-USD",
-          "PUMP-USDC",
+          "USDC-INR",
+          "BTC-EUR",
+          "USDC-BRL",
           "QNT-USD",
           "QNT-USDC",
+          "PEPE-USD",
+          "PEPE-USDC",
+          "AERO-USD",
+          "AERO-USDC",
+          "USDT-USDC",
+          "EURC-USDC",
           "ENA-USD",
           "ENA-USDC",
           "ADA-USD",
           "ADA-USDC",
-          "VVV-USD",
-          "VVV-USDC",
           "LTC-USD",
           "LTC-USDC",
-          "USDC-INR",
-          "AVAX-USD",
-          "AVAX-USDC",
-          "USDC-BRL",
-          "USDT-EUR",
-          "LINK-USD",
-          "LINK-USDC",
-          "BTC-GBP",
-          "STRK-USD",
-          "STRK-USDC",
           "DOGE-USD",
           "DOGE-USDC",
           "HBAR-USD",
           "HBAR-USDC",
-          "WLD-USD",
-          "WLD-USDC",
-          "TAO-USD",
-          "TAO-USDC",
+          "LINK-USD",
+          "LINK-USDC",
+          "PUMP-USD",
+          "PUMP-USDC",
           "XLM-USD",
           "XLM-USDC",
-          "AERO-USD",
-          "AERO-USDC",
-          "DOOD-USD",
-          "DOOD-USDC",
-          "INJ-USD",
-          "INJ-USDC",
-          "PEPE-USD",
-          "PEPE-USDC",
+          "VVV-USD",
+          "VVV-USDC",
+          "WLD-USD",
+          "WLD-USDC",
+          "UNI-USD",
+          "UNI-USDC",
+          "TAO-USD",
+          "TAO-USDC",
+          "USDT-EUR",
           "ONDO-USD",
           "ONDO-USDC",
-          "FIL-USD",
-          "FIL-USDC",
-          "EURC-USDC",
-          "ZRO-USD",
-          "ZRO-USDC",
-          "USELESS-USD",
-          "USELESS-USDC",
-          "TIA-USD",
-          "TIA-USDC",
-          "SOL-INR",
-          "AAVE-USD",
-          "AAVE-USDC",
-          "ETH-USDT",
-          "ETH-EUR",
-          "BCH-USD",
-          "BCH-USDC",
-          "GTC-USD",
-          "GTC-USDC",
-          "CRV-USD",
-          "CRV-USDC",
-          "BTC-USDT",
-          "LIGHTER-USD",
-          "LIGHTER-USDC",
-          "PENGU-USD",
-          "PENGU-USDC",
-          "ICP-USD",
-          "ICP-USDC",
-          "USDC-GBP",
-          "CVX-USD",
-          "CVX-USDC",
-          "ARB-USD",
-          "ARB-USDC",
-          "USDT-USDC",
-          "TRUMP-USD",
-          "TRUMP-USDC",
-          "FET-USD",
-          "FET-USDC",
-          "DASH-USD",
-          "DASH-USDC",
-          "ETH-GBP",
-          "DOT-USD",
-          "DOT-USDC",
-          "XRP-EUR",
-          "IRYS-USD",
-          "IRYS-USDC",
-          "SOL-EUR",
-          "ICNT-USD",
-          "ICNT-USDC",
-          "DATA-USD",
-          "DATA-USDC",
-          "USDT-GBP",
-          "FARTCOIN-USD",
-          "FARTCOIN-USDC",
-          "PAXG-USD",
-          "PAXG-USDC",
-          "TOSHI-USD",
-          "TOSHI-USDC",
-          "CTR-USD",
-          "CTR-USDC",
-          "GRASS-USD",
-          "GRASS-USDC",
-          "MORPHO-USD",
-          "MORPHO-USDC",
-          "BNB-USD",
-          "BNB-USDC",
-          "MON-USD",
-          "MON-USDC",
-          "COMP-USD",
-          "COMP-USDC",
-          "JASMY-USD",
-          "JASMY-USDC",
-          "AXIS-USD",
-          "AXIS-USDC",
-          "BAT-USD",
-          "BAT-USDC",
-          "BONK-USD",
-          "BONK-USDC",
-          "APT-USD",
-          "APT-USDC",
-          "RENDER-USD",
-          "RENDER-USDC",
-          "DRV-USD",
-          "DRV-USDC",
-          "USD1-USD",
-          "USD1-USDC",
-          "BIRB-USD",
-          "BIRB-USDC",
-          "OP-USD",
-          "OP-USDC",
-          "CT-USD",
-          "CT-USDC",
-          "MOODENG-USD",
-          "MOODENG-USDC",
-          "RAY-USD",
-          "RAY-USDC",
-          "B3-USD",
-          "B3-USDC",
-          "TON-USD",
-          "TON-USDC",
-          "SYRUP-USD",
-          "SYRUP-USDC",
-          "SOL-GBP",
-          "SUPER-USD",
-          "SUPER-USDC",
-          "MPLX-USD",
-          "MPLX-USDC",
-          "AMP-USD",
-          "AMP-USDC",
-          "ATH-USD",
-          "ATH-USDC",
-          "ATOM-USD",
-          "ATOM-USDC",
-          "XPL-USD",
-          "XPL-USDC",
-          "PYTH-USD",
-          "PYTH-USDC",
-          "STX-USD",
-          "STX-USDC",
-          "NEON-USD",
-          "NEON-USDC",
-          "ALT-USD",
-          "ALT-USDC",
-          "W-USD",
-          "W-USDC",
-          "SEI-USD",
-          "SEI-USDC",
-          "POL-USD",
-          "POL-USDC",
-          "ORCA-USD",
-          "ORCA-USDC",
-          "VTHO-USD",
-          "VTHO-USDC",
-          "GRVT-USD",
-          "GRVT-USDC",
-          "AKT-USD",
-          "AKT-USDC",
-          "ALEO-USD",
-          "ALEO-USDC",
-          "ZK-USD",
-          "ZK-USDC",
-          "ALGO-USD",
-          "ALGO-USDC",
-          "NMR-USD",
-          "NMR-USDC",
-          "BERA-USD",
-          "BERA-USDC",
-          "BILL-USD",
-          "BILL-USDC",
-          "APR-USD",
-          "APR-USDC",
-          "LMTS-USD",
-          "LMTS-USDC",
-          "WLFI-USD",
-          "WLFI-USDC",
-          "HNT-USD",
-          "HNT-USDC",
-          "ASTER-USD",
-          "ASTER-USDC",
-          "SPX-USD",
-          "SPX-USDC",
-          "MET-USD",
-          "MET-USDC",
-          "LDO-USD",
-          "LDO-USDC",
-          "WHUF-USD",
-          "WHUF-USDC",
-          "GRT-USD",
-          "GRT-USDC",
-          "MEGA-USD",
-          "MEGA-USDC",
-          "STG-USD",
-          "STG-USDC",
-          "PONS-USD",
-          "PONS-USDC",
-          "PENDLE-USD",
-          "PENDLE-USDC",
-          "FLR-USD",
-          "FLR-USDC",
-          "BTC-INR",
-          "PLUME-USD",
-          "PLUME-USDC",
-          "OSMO-USD",
-          "OSMO-USDC",
-          "FORT-USD",
-          "FORT-USDC",
-          "COTI-USD",
-          "COTI-USDC",
-          "CHIP-USD",
-          "CHIP-USDC",
-          "EIGEN-USD",
-          "EIGEN-USDC",
-          "JUPITER-USD",
-          "JUPITER-USDC",
-          "VET-USD",
-          "VET-USDC",
-          "ETHFI-USD",
-          "ETHFI-USDC",
-          "XCN-USD",
-          "XCN-USDC",
-          "BNKR-USD",
-          "BNKR-USDC",
-          "ETC-USD",
-          "ETC-USDC",
-          "MAMO-USD",
-          "MAMO-USDC",
-          "CRO-USD",
-          "CRO-USDC",
-          "S-USD",
-          "S-USDC",
-          "AXS-USD",
-          "AXS-USDC",
-          "ERA-USD",
-          "ERA-USDC",
-          "XRP-USDT",
-          "SAND-USD",
-          "SAND-USDC",
-          "FAI-USD",
-          "FAI-USDC",
-          "WAL-USD",
-          "WAL-USDC",
-          "MAGIC-USD",
-          "MAGIC-USDC",
-          "SYND-USD",
-          "SYND-USDC",
-          "RLC-USD",
-          "RLC-USDC",
-          "AXL-USD",
-          "AXL-USDC",
-          "CAP-USD",
-          "CAP-USDC",
-          "SHIB-USD",
-          "SHIB-USDC",
-          "RLS-USD",
-          "RLS-USDC",
-          "JTO-USD",
-          "JTO-USDC",
-          "WIF-USD",
-          "WIF-USDC",
-          "SENT-USD",
-          "SENT-USDC",
-          "AVNT-USD",
-          "AVNT-USDC",
-          "REZ-USD",
-          "REZ-USDC",
-          "IO-USD",
-          "IO-USDC",
-          "BASECAT-USD",
-          "BASECAT-USDC",
-          "BCH-EUR",
-          "BAT-EUR",
-          "CBETH-USD",
-          "CBETH-USDC",
-          "AIOZ-USD",
-          "AIOZ-USDC",
-          "ADA-EUR",
-          "METIS-USD",
-          "METIS-USDC",
-          "BICO-USD",
-          "BICO-USDC",
-          "ZAMA-USD",
-          "ZAMA-USDC",
-          "VELO-USD",
-          "VELO-USDC",
-          "TRAC-USD",
-          "TRAC-USDC",
-          "AERGO-USD",
-          "AERGO-USDC",
-          "ENS-USD",
-          "ENS-USDC",
-          "ZEN-USD",
-          "ZEN-USDC",
-          "PYR-USD",
-          "PYR-USDC",
-          "USDC-SGD",
-          "ICP-EUR",
-          "SKR-USD",
-          "SKR-USDC",
-          "ZORA-USD",
-          "ZORA-USDC",
-          "ALGO-EUR",
-          "VIRTUAL-USD",
-          "VIRTUAL-USDC",
-          "TROLL-USD",
-          "TROLL-USDC",
-          "PRL-USD",
-          "PRL-USDC",
-          "SKY-USD",
-          "SKY-USDC",
-          "WELL-USD",
-          "WELL-USDC",
-          "HIGH-USD",
-          "HIGH-USDC",
-          "MANTLE-USD",
-          "MANTLE-USDC",
-          "GEOD-USD",
-          "GEOD-USDC",
-          "APE-USD",
-          "APE-USDC",
-          "DRB-USD",
-          "DRB-USDC",
-          "2Z-USD",
-          "2Z-USDC",
-          "REQ-USD",
-          "REQ-USDC",
-          "AVT-USD",
-          "AVT-USDC",
-          "CFG-USD",
-          "CFG-USDC",
-          "SOL-USDT",
-          "RSR-USD",
-          "RSR-USDC",
-          "LCX-USD",
-          "LCX-USDC",
-          "LTC-EUR",
-          "XAN-USD",
-          "XAN-USDC",
-          "KAIO-USD",
-          "KAIO-USDC",
-          "KMNO-USD",
-          "KMNO-USDC",
-          "PRO-USD",
-          "PRO-USDC",
-          "USDC-AUD",
-          "BLUECHIP-USD",
-          "BLUECHIP-USDC",
-          "BASED1-USD",
-          "BASED1-USDC",
-          "LINK-EUR",
-          "HBAR-USDT",
-          "SKL-USD",
-          "SKL-USDC",
-          "GWEI-USD",
-          "GWEI-USDC",
-          "AURORA-USD",
-          "AURORA-USDC",
-          "NEAR-USDT",
-          "MINA-USD",
-          "MINA-USDC",
-          "ALIGN-USD",
-          "ALIGN-USDC",
-          "DRIFT-USD",
-          "DRIFT-USDC",
-          "YFI-USD",
-          "YFI-USDC",
-          "ROSE-USD",
-          "ROSE-USDC",
-          "KAT-USD",
-          "KAT-USDC",
-          "LA-USD",
-          "LA-USDC",
-          "DOT-EUR",
-          "EDGE-USD",
-          "EDGE-USDC",
-          "XTZ-USD",
-          "XTZ-USDC",
-          "UNI-EUR",
-          "GST-USD",
-          "GST-USDC",
-          "FLOKI-USD",
-          "FLOKI-USDC",
-          "DIMO-USD",
-          "DIMO-USDC",
-          "IMX-USD",
-          "IMX-USDC",
-          "LTC-GBP",
-          "DEGEN-USD",
-          "DEGEN-USDC",
-          "KITE-USD",
-          "KITE-USDC",
-          "POPCAT-USD",
-          "POPCAT-USDC",
-          "KTA-USD",
-          "KTA-USDC",
-          "BEAM-USD",
-          "BEAM-USDC",
-          "TRB-USD",
-          "TRB-USDC",
-          "ZETA-USD",
-          "ZETA-USDC",
-          "MANA-USD",
-          "MANA-USDC",
-          "USDC-CAD",
-          "CLANKER-USD",
-          "CLANKER-USDC",
-          "ETH-INR",
-          "INDEX-USD",
-          "INDEX-USDC",
-          "FIL-EUR",
-          "HFT-USD",
-          "HFT-USDC",
-          "DOT-GBP",
-          "HONEY-USD",
-          "HONEY-USDC",
-          "API3-USD",
-          "API3-USDC",
-          "RAVE-USD",
-          "RAVE-USDC",
-          "DOGE-EUR",
-          "ALLO-USD",
-          "ALLO-USDC",
-          "FET-USDT",
-          "ME-USD",
-          "ME-USDC",
-          "CAKE-USD",
-          "CAKE-USDC",
-          "SPK-USD",
-          "SPK-USDC",
-          "FLUID-USD",
-          "FLUID-USDC",
-          "RSC-USD",
-          "RSC-USDC",
-          "SQD-USD",
-          "SQD-USDC",
-          "DOGINME-USD",
-          "DOGINME-USDC",
-          "AVAX-EUR",
-          "PROVE-USD",
-          "PROVE-USDC",
-          "RED-USD",
-          "RED-USDC",
-          "OGN-USD",
-          "OGN-USDC",
-          "ZRX-USD",
-          "ZRX-USDC",
-          "GIGA-USD",
-          "GIGA-USDC",
-          "PROS-USD",
-          "PROS-USDC",
-          "ELSA-USD",
-          "ELSA-USDC",
-          "XLM-EUR",
-          "IMU-USD",
-          "IMU-USDC",
-          "PNG-USD",
-          "PNG-USDC",
-          "ARKM-USD",
-          "ARKM-USDC",
-          "SXT-USD",
-          "SXT-USDC",
-          "AZTEC-USD",
-          "AZTEC-USDC",
-          "CORECHAIN-USD",
-          "CORECHAIN-USDC",
-          "CHZ-USD",
-          "CHZ-USDC",
-          "DEEP-USD",
-          "DEEP-USDC",
-          "NCT-USD",
-          "NCT-USDC",
-          "KSM-USD",
-          "KSM-USDC",
-          "OP-USDT",
-          "SNX-USD",
-          "SNX-USDC",
-          "KERNEL-USD",
-          "KERNEL-USDC",
-          "LINK-GBP",
-          "BLUR-USD",
-          "BLUR-USDC",
-          "DIEM-USD",
-          "DIEM-USDC",
-          "TURBO-USD",
-          "TURBO-USDC",
-          "ZKP-USD",
-          "ZKP-USDC",
-          "GRT-EUR",
-          "AUDD-USDC",
-          "G-USD",
-          "G-USDC",
-          "SUSHI-USD",
-          "SUSHI-USDC",
-          "ANKR-USD",
-          "ANKR-USDC",
-          "KEYCAT-USD",
-          "KEYCAT-USDC",
-          "SD-USD",
-          "SD-USDC",
-          "LRDS-USD",
-          "LRDS-USDC",
-          "TGBP-USDC",
-          "PRIME-USD",
-          "PRIME-USDC",
-          "GROVE-USD",
-          "GROVE-USDC",
-          "MASK-USD",
-          "MASK-USDC",
-          "RARE-USD",
-          "RARE-USDC",
-          "SWELL-USD",
-          "SWELL-USDC",
-          "EUL-USD",
-          "EUL-USDC",
-          "CRV-EUR",
-          "O-USD",
-          "O-USDC",
-          "PNUT-USD",
-          "PNUT-USDC",
           "UP-USD",
           "UP-USDC",
+          "ZRO-USD",
+          "ZRO-USDC",
+          "NCT-USD",
+          "NCT-USDC",
+          "DOT-USD",
+          "DOT-USDC",
+          "AVAX-USD",
+          "AVAX-USDC",
+          "FET-USD",
+          "FET-USDC",
+          "STRK-USD",
+          "STRK-USDC",
+          "BONK-USD",
+          "BONK-USDC",
+          "BCH-USD",
+          "BCH-USDC",
+          "BTC-GBP",
+          "USELESS-USD",
+          "USELESS-USDC",
+          "STX-USD",
+          "STX-USDC",
+          "USDC-GBP",
+          "INJ-USD",
+          "INJ-USDC",
+          "LIGHTER-USD",
+          "LIGHTER-USDC",
+          "PAXG-USD",
+          "PAXG-USDC",
+          "GTC-USD",
+          "GTC-USDC",
+          "ETH-EUR",
+          "PENGU-USD",
+          "PENGU-USDC",
+          "AXIS-USD",
+          "AXIS-USDC",
+          "TIA-USD",
+          "TIA-USDC",
+          "DATA-USD",
+          "DATA-USDC",
+          "AAVE-USD",
+          "AAVE-USDC",
+          "BTC-USDT",
+          "ZORA-USD",
+          "ZORA-USDC",
+          "SOL-EUR",
+          "DASH-USD",
+          "DASH-USDC",
+          "ETH-USDT",
+          "ERA-USD",
+          "ERA-USDC",
+          "ICP-USD",
+          "ICP-USDC",
+          "TRAC-USD",
+          "TRAC-USDC",
+          "CRV-USD",
+          "CRV-USDC",
           "TREE-USD",
           "TREE-USDC",
-          "ACH-USD",
-          "ACH-USDC",
-          "LPT-USD",
-          "LPT-USDC",
-          "AI-USD",
-          "AI-USDC",
-          "ADA-GBP",
-          "SHDW-USD",
-          "SHDW-USDC",
-          "QI-USD",
-          "QI-USDC",
-          "KAITO-USD",
-          "KAITO-USDC",
-          "BOBBOB-USD",
-          "BOBBOB-USDC",
-          "POND-USD",
-          "POND-USDC",
-          "DNT-USD",
-          "DNT-USDC",
-          "TRUST-USD",
-          "TRUST-USDC",
-          "ADA-USDT",
-          "SAFE-USD",
-          "SAFE-USDC",
-          "AAVE-GBP",
-          "FIL-GBP",
-          "ZKC-USD",
-          "ZKC-USDC",
-          "KARRAT-USD",
-          "KARRAT-USDC",
-          "BIO-USD",
-          "BIO-USDC",
-          "RECALL-USD",
-          "RECALL-USDC",
-          "CRV-GBP",
-          "ESP-USD",
-          "ESP-USDC",
-          "FLOCK-USD",
-          "FLOCK-USDC",
-          "PROMPT-USD",
-          "PROMPT-USDC",
-          "SAPIEN-USD",
-          "SAPIEN-USDC",
+          "KAT-USD",
+          "KAT-USDC",
+          "RENDER-USD",
+          "RENDER-USDC",
+          "ETH-GBP",
+          "FARTCOIN-USD",
+          "FARTCOIN-USDC",
+          "DOOD-USD",
+          "DOOD-USDC",
+          "USDT-GBP",
+          "ARB-USD",
+          "ARB-USDC",
+          "DRV-USD",
+          "DRV-USDC",
+          "MON-USD",
+          "MON-USDC",
           "STX-USDT",
-          "MDT-USD",
-          "MDT-USDC",
-          "BLZ-USD",
-          "BLZ-USDC",
-          "CP-USD",
-          "CP-USDC",
-          "ABT-USD",
-          "ABT-USDC",
-          "LINEA-USD",
-          "LINEA-USDC",
-          "SWFTC-USD",
-          "SWFTC-USDC",
-          "AST-USD",
-          "AST-USDC",
-          "L3-USD",
-          "L3-USDC",
-          "AWE-USD",
-          "AWE-USDC",
-          "RARI-USD",
-          "RARI-USDC",
-          "DOT-USDT",
-          "VARA-USD",
-          "VARA-USDC",
-          "OXT-USD",
-          "OXT-USDC",
-          "ARX-USD",
-          "ARX-USDC",
-          "GFI-USD",
-          "GFI-USDC",
-          "LQTY-USD",
-          "LQTY-USDC",
-          "PERP-USD",
-          "PERP-USDC",
-          "BCH-GBP",
-          "YB-USD",
-          "YB-USDC",
-          "FUN1-USD",
-          "FUN1-USDC",
-          "AUDIO-USD",
-          "AUDIO-USDC",
-          "ASM-USD",
-          "ASM-USDC",
-          "ALCX-USD",
-          "ALCX-USDC",
-          "EGLD-USD",
-          "EGLD-USDC",
-          "NOM-USD",
-          "NOM-USDC",
-          "ACS-USD",
-          "ACS-USDC",
-          "WCT-USD",
-          "WCT-USDC",
-          "RE-USD",
-          "RE-USDC",
-          "FOX-USD",
-          "FOX-USDC",
-          "DBR-USD",
-          "DBR-USDC",
-          "VOXEL-USD",
-          "VOXEL-USDC",
-          "RNBW-USD",
-          "RNBW-USDC",
-          "RPL-USD",
-          "RPL-USDC",
-          "DIA-USD",
-          "DIA-USDC",
-          "TRIA-USD",
-          "TRIA-USDC",
-          "ALEPH-USD",
-          "ALEPH-USDC",
-          "ILV-USD",
-          "ILV-USDC",
-          "NOICE-USD",
-          "NOICE-USDC",
-          "HOPR-USD",
-          "HOPR-USDC",
-          "BARD-USD",
-          "BARD-USDC",
-          "EDGEX-USD",
-          "EDGEX-USDC",
-          "BTRST-USD",
-          "BTRST-USDC",
-          "CRO-EUR",
-          "DOGE-USDT",
-          "HOME-USD",
-          "HOME-USDC",
-          "MLN-USD",
-          "MLN-USDC",
-          "DOGE-GBP",
-          "CTSI-USD",
-          "CTSI-USDC",
-          "GHST-USD",
-          "GHST-USDC",
-          "ATOM-GBP",
-          "UNI-GBP",
-          "USDS-USD",
-          "USDS-USDC",
-          "XYO-USD",
-          "XYO-USDC",
-          "ATOM-EUR",
-          "OCEAN-USD",
-          "OCEAN-USDC",
-          "DOLO-USD",
-          "DOLO-USDC",
-          "JITOSOL-USD",
-          "JITOSOL-USDC",
-          "FIGHT-USD",
-          "FIGHT-USDC",
-          "BOBA-USD",
-          "BOBA-USDC",
-          "NKN-USD",
-          "NKN-USDC",
-          "AAVE-EUR",
-          "OPG-USD",
-          "OPG-USDC",
-          "GLM-USD",
-          "GLM-USDC",
+          "SYRUP-USD",
+          "SYRUP-USDC",
+          "IMX-USD",
+          "IMX-USDC",
+          "TRUMP-USD",
+          "TRUMP-USDC",
+          "XRP-EUR",
+          "FIL-USD",
+          "FIL-USDC",
+          "BNB-USD",
+          "BNB-USDC",
+          "GRASS-USD",
+          "GRASS-USDC",
+          "USDC-SGD",
+          "ATOM-USD",
+          "ATOM-USDC",
+          "LA-USD",
+          "LA-USDC",
+          "BTC-INR",
+          "ZK-USD",
+          "ZK-USDC",
+          "SOL-GBP",
+          "JASMY-USD",
+          "JASMY-USDC",
+          "SEI-USD",
+          "SEI-USDC",
+          "ICNT-USD",
+          "ICNT-USDC",
+          "TON-USD",
+          "TON-USDC",
+          "MEZO-USD",
+          "MEZO-USDC",
           "BLEND-USD",
           "BLEND-USDC",
-          "GODS-USD",
-          "GODS-USDC",
+          "APT-USD",
+          "APT-USDC",
+          "FET-USDT",
+          "FORT-USD",
+          "FORT-USDC",
+          "AMP-USD",
+          "AMP-USDC",
+          "AKT-USD",
+          "AKT-USDC",
+          "PONS-USD",
+          "PONS-USDC",
+          "B3-USD",
+          "B3-USDC",
+          "PYTH-USD",
+          "PYTH-USDC",
+          "WET-USD",
+          "WET-USDC",
+          "SENT-USD",
+          "SENT-USDC",
+          "BAT-USD",
+          "BAT-USDC",
+          "REZ-USD",
+          "REZ-USDC",
+          "AVNT-USD",
+          "AVNT-USDC",
+          "AIOZ-USD",
+          "AIOZ-USDC",
+          "OP-USD",
+          "OP-USDC",
+          "TRUST-USD",
+          "TRUST-USDC",
+          "JTO-USD",
+          "JTO-USDC",
+          "ETH-INR",
+          "BILL-USD",
+          "BILL-USDC",
+          "QNT-USDT",
+          "APR-USD",
+          "APR-USDC",
+          "CTR-USD",
+          "CTR-USDC",
+          "RECALL-USD",
+          "RECALL-USDC",
+          "ZKC-USD",
+          "ZKC-USDC",
+          "BEAM-USD",
+          "BEAM-USDC",
+          "ALEO-USD",
+          "ALEO-USDC",
+          "RAY-USD",
+          "RAY-USDC",
+          "WLFI-USD",
+          "WLFI-USDC",
+          "PYR-USD",
+          "PYR-USDC",
+          "MEGA-USD",
+          "MEGA-USDC",
+          "PLUME-USD",
+          "PLUME-USDC",
+          "ALGO-USD",
+          "ALGO-USDC",
+          "FLR-USD",
+          "FLR-USDC",
+          "MORPHO-USD",
+          "MORPHO-USDC",
+          "SHIB-USD",
+          "SHIB-USDC",
+          "CFG-USD",
+          "CFG-USDC",
+          "CT-USD",
+          "CT-USDC",
+          "XPL-USD",
+          "XPL-USDC",
+          "ZAMA-USD",
+          "ZAMA-USDC",
+          "PROS-USD",
+          "PROS-USDC",
+          "TOSHI-USD",
+          "TOSHI-USDC",
+          "PENDLE-USD",
+          "PENDLE-USDC",
+          "KMNO-USD",
+          "KMNO-USDC",
+          "IMX-USDT",
+          "WIF-USD",
+          "WIF-USDC",
+          "SKR-USD",
+          "SKR-USDC",
+          "NEON-USD",
+          "NEON-USDC",
+          "RLC-USD",
+          "RLC-USDC",
+          "ETC-USD",
+          "ETC-USDC",
+          "CVX-USD",
+          "CVX-USDC",
+          "CHIP-USD",
+          "CHIP-USDC",
+          "DOT-USDT",
+          "BERA-USD",
+          "BERA-USDC",
+          "IO-USD",
+          "IO-USDC",
+          "COTI-USD",
+          "COTI-USDC",
+          "POL-USD",
+          "POL-USDC",
+          "XCN-USD",
+          "XCN-USDC",
+          "MAMO-USD",
+          "MAMO-USDC",
+          "VIRTUAL-USD",
+          "VIRTUAL-USDC",
+          "ATH-USD",
+          "ATH-USDC",
+          "NMR-USD",
+          "NMR-USDC",
+          "S-USD",
+          "S-USDC",
+          "EDGE-USD",
+          "EDGE-USDC",
+          "W-USD",
+          "W-USDC",
+          "MOODENG-USD",
+          "MOODENG-USDC",
           "POWR-USD",
           "POWR-USDC",
-          "SUP-USD",
-          "SUP-USDC",
+          "YFI-USD",
+          "YFI-USDC",
+          "ORCA-USD",
+          "ORCA-USDC",
+          "CRO-USD",
+          "CRO-USDC",
+          "ELSA-USD",
+          "ELSA-USDC",
+          "SPK-USD",
+          "SPK-USDC",
+          "WCT-USD",
+          "WCT-USDC",
+          "KITE-USD",
+          "KITE-USDC",
+          "JUPITER-USD",
+          "JUPITER-USDC",
+          "AXL-USD",
+          "AXL-USDC",
+          "LMTS-USD",
+          "LMTS-USDC",
+          "ALT-USD",
+          "ALT-USDC",
+          "DOT-EUR",
+          "GRT-USD",
+          "GRT-USDC",
+          "CAP-USD",
+          "CAP-USDC",
+          "SPX-USD",
+          "SPX-USDC",
+          "VET-USD",
+          "VET-USDC",
+          "XAN-USD",
+          "XAN-USDC",
+          "SOL-USDT",
+          "BAT-EUR",
+          "ZEN-USD",
+          "ZEN-USDC",
+          "ARKM-USD",
+          "ARKM-USDC",
+          "AURORA-USD",
+          "AURORA-USDC",
+          "DEEP-USD",
+          "DEEP-USDC",
+          "SAND-USD",
+          "SAND-USDC",
+          "APE-USD",
+          "APE-USDC",
+          "CP-USD",
+          "CP-USDC",
+          "COMP-USD",
+          "COMP-USDC",
+          "PROVE-USD",
+          "PROVE-USDC",
+          "FLOKI-USD",
+          "FLOKI-USDC",
+          "MASK-USD",
+          "MASK-USDC",
+          "SOL-INR",
+          "EIGEN-USD",
+          "EIGEN-USDC",
+          "SAFE-USD",
+          "SAFE-USDC",
+          "USDC-CAD",
+          "KAIO-USD",
+          "KAIO-USDC",
+          "TRIA-USD",
+          "TRIA-USDC",
+          "MPLX-USD",
+          "MPLX-USDC",
+          "SYND-USD",
+          "SYND-USDC",
+          "DRB-USD",
+          "DRB-USDC",
+          "LTC-GBP",
+          "GEOD-USD",
+          "GEOD-USDC",
+          "HNT-USD",
+          "HNT-USDC",
+          "BASECAT-USD",
+          "BASECAT-USDC",
+          "GIGA-USD",
+          "GIGA-USDC",
+          "ASTER-USD",
+          "ASTER-USDC",
+          "LDO-USD",
+          "LDO-USDC",
+          "CBETH-USD",
+          "CBETH-USDC",
+          "SAPIEN-USD",
+          "SAPIEN-USDC",
+          "VELO-USD",
+          "VELO-USDC",
+          "RED-USD",
+          "RED-USDC",
+          "OSMO-USD",
+          "OSMO-USDC",
+          "FAI-USD",
+          "FAI-USDC",
+          "ETHFI-USD",
+          "ETHFI-USDC",
+          "ME-USD",
+          "ME-USDC",
+          "BLUECHIP-USD",
+          "BLUECHIP-USDC",
+          "2Z-USD",
+          "2Z-USDC",
+          "BNKR-USD",
+          "BNKR-USDC",
+          "LCX-USD",
+          "LCX-USDC",
+          "TRB-USD",
+          "TRB-USDC",
+          "DOT-GBP",
+          "DRIFT-USD",
+          "DRIFT-USDC",
+          "METIS-USD",
+          "METIS-USDC",
+          "SUPER-USD",
+          "SUPER-USDC",
+          "AI-USD",
+          "AI-USDC",
+          "GWEI-USD",
+          "GWEI-USDC",
+          "PRL-USD",
+          "PRL-USDC",
+          "NEAR-USDT",
+          "RE-USD",
+          "RE-USDC",
+          "MANTLE-USD",
+          "MANTLE-USDC",
+          "ATOM-USDT",
+          "ESP-USD",
+          "ESP-USDC",
+          "RAVE-USD",
+          "RAVE-USDC",
+          "AXS-USD",
+          "AXS-USDC",
+          "SNX-USD",
+          "SNX-USDC",
+          "PRO-USD",
+          "PRO-USDC",
+          "ADA-EUR",
+          "LTC-EUR",
+          "CLANKER-USD",
+          "CLANKER-USDC",
+          "BCH-EUR",
+          "OGN-USD",
+          "OGN-USDC",
+          "TROLL-USD",
+          "TROLL-USDC",
+          "POPCAT-USD",
+          "POPCAT-USDC",
+          "ENS-USD",
+          "ENS-USDC",
+          "KTA-USD",
+          "KTA-USDC",
+          "LPT-USD",
+          "LPT-USDC",
+          "XLM-EUR",
+          "FLUID-USD",
+          "FLUID-USDC",
+          "SKL-USD",
+          "SKL-USDC",
+          "SUSHI-USD",
+          "SUSHI-USDC",
+          "ADA-GBP",
+          "ZKP-USD",
+          "ZKP-USDC",
+          "KERNEL-USD",
+          "KERNEL-USDC",
+          "GRVT-USD",
+          "GRVT-USDC",
+          "PROMPT-USD",
+          "PROMPT-USDC",
+          "SXT-USD",
+          "SXT-USDC",
+          "VTHO-USD",
+          "VTHO-USDC",
+          "AERGO-USD",
+          "AERGO-USDC",
+          "WHUF-USD",
+          "WHUF-USDC",
+          "SKY-USD",
+          "SKY-USDC",
+          "BARD-USD",
+          "BARD-USDC",
+          "SQD-USD",
+          "SQD-USDC",
+          "ALIGN-USD",
+          "ALIGN-USDC",
+          "CORECHAIN-USD",
+          "CORECHAIN-USDC",
+          "MET-USD",
+          "MET-USDC",
+          "HONEY-USD",
+          "HONEY-USDC",
+          "HFT-USD",
+          "HFT-USDC",
+          "ALGO-EUR",
+          "MINA-USD",
+          "MINA-USDC",
+          "DOGE-EUR",
+          "BASED1-USD",
+          "BASED1-USDC",
+          "AVT-USD",
+          "AVT-USDC",
+          "LINK-EUR",
+          "RSR-USD",
+          "RSR-USDC",
+          "DOGINME-USD",
+          "DOGINME-USDC",
+          "MAGIC-USD",
+          "MAGIC-USDC",
+          "ADA-USDT",
+          "PNUT-USD",
+          "PNUT-USDC",
+          "GROVE-USD",
+          "GROVE-USDC",
+          "FLOCK-USD",
+          "FLOCK-USDC",
+          "API3-USD",
+          "API3-USDC",
+          "DIMO-USD",
+          "DIMO-USDC",
+          "QI-USD",
+          "QI-USDC",
+          "AZTEC-USD",
+          "AZTEC-USDC",
+          "RARE-USD",
+          "RARE-USDC",
+          "XTZ-USD",
+          "XTZ-USDC",
+          "DOGE-GBP",
+          "BREV-USD",
+          "BREV-USDC",
+          "CAKE-USD",
+          "CAKE-USDC",
+          "UNI-EUR",
+          "STG-USD",
+          "STG-USDC",
+          "WAL-USD",
+          "WAL-USDC",
+          "INX-USD",
+          "INX-USDC",
+          "SWFTC-USD",
+          "SWFTC-USDC",
+          "USDC-AUD",
+          "PNG-USD",
+          "PNG-USDC",
+          "EDGEX-USD",
+          "EDGEX-USDC",
+          "EUL-USD",
+          "EUL-USDC",
+          "ZRX-USD",
+          "ZRX-USDC",
+          "NOM-USD",
+          "NOM-USDC",
+          "ROSE-USD",
+          "ROSE-USDC",
+          "BLUR-USD",
+          "BLUR-USDC",
+          "CVC-USD",
+          "CVC-USDC",
+          "GST-USD",
+          "GST-USDC",
+          "HOME-USD",
+          "HOME-USDC",
+          "RLS-USD",
+          "RLS-USDC",
+          "CELR-USD",
+          "CELR-USDC",
+          "ABT-USD",
+          "ABT-USDC",
+          "BICO-USD",
+          "BICO-USDC",
+          "ACH-USD",
+          "ACH-USDC",
+          "RSC-USD",
+          "RSC-USDC",
+          "CHZ-USD",
+          "CHZ-USDC",
+          "BIO-USD",
+          "BIO-USDC",
+          "ILV-USD",
+          "ILV-USDC",
+          "CRV-GBP",
+          "LINEA-USD",
+          "LINEA-USDC",
+          "XYO-USD",
+          "XYO-USDC",
+          "FORTH-USD",
+          "FORTH-USDC",
+          "INDEX-USD",
+          "INDEX-USDC",
+          "DEGEN-USD",
+          "DEGEN-USDC",
+          "LINK-GBP",
+          "EGLD-USD",
+          "EGLD-USDC",
+          "WELL-USD",
+          "WELL-USDC",
+          "AVAX-EUR",
+          "TURBO-USD",
+          "TURBO-USDC",
+          "LAYER-USD",
+          "LAYER-USDC",
+          "L3-USD",
+          "L3-USDC",
+          "SD-USD",
+          "SD-USDC",
+          "KNC-USD",
+          "KNC-USDC",
+          "AAVE-EUR",
+          "ARX-USD",
+          "ARX-USDC",
+          "KAITO-USD",
+          "KAITO-USDC",
+          "MDT-USD",
+          "MDT-USDC",
+          "COW-USD",
+          "COW-USDC",
+          "NEWT-USD",
+          "NEWT-USDC",
+          "XSGD-USDC",
+          "OXT-USD",
+          "OXT-USDC",
+          "DIA-USD",
+          "DIA-USDC",
+          "TOWNS-USD",
+          "TOWNS-USDC",
+          "ALLO-USD",
+          "ALLO-USDC",
+          "CTSI-USD",
+          "CTSI-USDC",
+          "FLOW-USD",
+          "FLOW-USDC",
+          "PUNDIX-USD",
+          "PUNDIX-USDC",
+          "XLM-USDT",
+          "ANKR-USD",
+          "ANKR-USDC",
+          "ATOM-EUR",
+          "ICP-EUR",
+          "OP-USDT",
+          "PRIME-USD",
+          "PRIME-USDC",
           "DEXT-USD",
           "DEXT-USDC",
-          "SHPING-USD",
-          "SHPING-USDC",
-          "1INCH-USD",
-          "1INCH-USDC",
+          "CRV-EUR",
+          "BLZ-USD",
+          "BLZ-USDC",
+          "XRP-USDT",
+          "GFI-USD",
+          "GFI-USDC",
+          "UMA-USD",
+          "UMA-USDC",
+          "WMTX-USD",
+          "WMTX-USDC",
+          "LRDS-USD",
+          "LRDS-USDC",
+          "DIEM-USD",
+          "DIEM-USDC",
+          "CTX-USD",
+          "CTX-USDC",
+          "DOGE-USDT",
+          "FIL-GBP",
+          "POND-USD",
+          "POND-USDC",
+          "RPL-USD",
+          "RPL-USDC",
           "PRCL-USD",
           "PRCL-USDC",
+          "SHIB-GBP",
+          "MLN-USD",
+          "MLN-USDC",
+          "HIGH-USD",
+          "HIGH-USDC",
+          "GHST-USD",
+          "GHST-USDC",
+          "SHDW-USD",
+          "SHDW-USDC",
+          "OPG-USD",
+          "OPG-USDC",
+          "FIL-EUR",
+          "SIGN-USD",
+          "SIGN-USDC",
+          "BIGTIME-USD",
+          "BIGTIME-USDC",
+          "MANA-USD",
+          "MANA-USDC",
+          "KSM-USD",
+          "KSM-USDC",
+          "AUDIO-USD",
+          "AUDIO-USDC",
+          "SPELL-USD",
+          "SPELL-USDC",
+          "ALCX-USD",
+          "ALCX-USDC",
+          "AST-USD",
+          "AST-USDC",
+          "O-USD",
+          "O-USDC",
+          "HYPER-USD",
+          "HYPER-USDC",
+          "JITOSOL-USD",
+          "JITOSOL-USDC",
+          "ALEPH-USD",
+          "ALEPH-USDC",
+          "1INCH-USD",
+          "1INCH-USDC",
+          "KARRAT-USD",
+          "KARRAT-USDC",
+          "DNT-USD",
+          "DNT-USDC",
+          "FUN1-USD",
+          "FUN1-USDC",
+          "GRT-EUR",
+          "RAD-USD",
+          "RAD-USDC",
+          "ROBO-USD",
+          "ROBO-USDC",
+          "ATOM-GBP",
+          "AGLD-USD",
+          "AGLD-USDC",
+          "SWELL-USD",
+          "SWELL-USDC",
+          "KAVA-USD",
+          "KAVA-USDC",
+          "MNDE-USD",
+          "MNDE-USDC",
+          "HBAR-USDT",
+          "KEYCAT-USD",
+          "KEYCAT-USDC",
+          "CHECK-USD",
+          "CHECK-USDC",
+          "SHPING-USD",
+          "SHPING-USDC",
+          "VARA-USD",
+          "VARA-USDC",
+          "CGLD-USD",
+          "CGLD-USDC",
+          "SHIB-EUR",
+          "YB-USD",
+          "YB-USDC",
+          "T-USD",
+          "T-USDC",
+          "VOXEL-USD",
+          "VOXEL-USDC",
+          "MOG-USD",
+          "MOG-USDC",
+          "NOICE-USD",
+          "NOICE-USDC",
+          "AUCTION-USD",
+          "AUCTION-USDC",
+          "BOBBOB-USD",
+          "BOBBOB-USDC",
+          "AWE-USD",
+          "AWE-USDC",
+          "XTZ-EUR",
+          "DBR-USD",
+          "DBR-USDC",
+          "OCEAN-USD",
+          "OCEAN-USDC",
+          "CRO-EUR",
+          "ZETA-USD",
+          "ZETA-USDC",
+          "SHIB-USDT",
+          "ACS-USD",
+          "ACS-USDC",
+          "SPA-USD",
+          "SPA-USDC",
+          "FARM-USD",
+          "FARM-USDC",
+          "META-USD",
+          "META-USDC",
+          "AVAX-USDT",
+          "UNI-GBP",
+          "IMU-USD",
+          "IMU-USDC",
+          "SUP-USD",
+          "SUP-USDC",
+          "BNT-USD",
+          "BNT-USDC",
+          "NKN-USD",
+          "NKN-USDC",
+          "ELA-USD",
+          "ELA-USDC",
+          "REQ-USD",
+          "REQ-USDC",
+          "WAXL-USD",
+          "WAXL-USDC",
+          "TNSR-USD",
+          "TNSR-USDC",
+          "MATH-USD",
+          "MATH-USDC",
+          "BAL-USD",
+          "BAL-USDC",
+          "LQTY-USD",
+          "LQTY-USDC",
+          "RNBW-USD",
+          "RNBW-USDC",
+          "POLS-USD",
+          "POLS-USDC",
+          "PERP-USD",
+          "PERP-USDC",
+          "AAVE-GBP",
+          "ALICE-USD",
+          "ALICE-USDC",
           "COOKIE-USD",
           "COOKIE-USDC",
           "C98-USD",
           "C98-USDC",
-          "LAYER-USD",
-          "LAYER-USDC",
-          "MEZO-USD",
-          "MEZO-USDC",
-          "MNDE-USD",
-          "MNDE-USDC",
-          "FORTH-USD",
-          "FORTH-USDC",
-          "SUKU-USD",
-          "SUKU-USDC",
-          "MATH-USD",
-          "MATH-USDC",
-          "INX-USD",
-          "INX-USDC",
-          "CVC-USD",
-          "CVC-USDC",
-          "SIGN-USD",
-          "SIGN-USDC",
-          "CGLD-USD",
-          "CGLD-USDC",
-          "00-USD",
-          "00-USDC",
-          "KNC-USD",
-          "KNC-USDC",
-          "ATOM-USDT",
-          "LINK-USDT",
-          "COW-USD",
-          "COW-USDC",
-          "AGLD-USD",
-          "AGLD-USDC",
-          "THQ-USD",
-          "THQ-USDC",
-          "KAVA-USD",
-          "KAVA-USDC",
-          "FLOW-USD",
-          "FLOW-USDC",
-          "ROBO-USD",
-          "ROBO-USDC",
-          "BNT-USD",
-          "BNT-USDC",
-          "SPELL-USD",
-          "SPELL-USDC",
-          "FARM-USD",
-          "FARM-USDC",
-          "SHIB-GBP",
-          "BAL-USD",
-          "BAL-USDC",
-          "TOWNS-USD",
-          "TOWNS-USDC",
-          "A8-USD",
-          "A8-USDC",
-          "MOG-USD",
-          "MOG-USDC",
-          "MANA-EUR",
-          "OPN-USD",
-          "OPN-USDC",
-          "ELA-USD",
-          "ELA-USDC",
-          "CTX-USD",
-          "CTX-USDC",
-          "QNT-USDT",
-          "SHIB-EUR",
-          "AVAX-USDT",
-          "TNSR-USD",
-          "TNSR-USDC",
-          "AUCTION-USD",
-          "AUCTION-USDC",
-          "UMA-USD",
-          "UMA-USDC",
-          "XTZ-EUR",
-          "GNO-USD",
-          "GNO-USDC",
-          "XLM-USDT",
-          "PUNDIX-USD",
-          "PUNDIX-USDC",
-          "ALGO-GBP",
-          "IMX-USDT",
-          "GMT-USD",
-          "GMT-USDC",
-          "LSETH-USD",
-          "LSETH-USDC",
-          "INV-USD",
-          "INV-USDC",
-          "APE-USDT",
-          "ALICE-USD",
-          "ALICE-USDC",
-          "ZETACHAIN-USD",
-          "ZETACHAIN-USDC",
-          "WET-USD",
-          "WET-USDC",
-          "APE-EUR",
+          "RARI-USD",
+          "RARI-USDC",
+          "GLM-USD",
+          "GLM-USDC",
+          "GODS-USD",
+          "GODS-USDC",
           "SNX-EUR",
           "WRON-USD",
           "WRON-USDC",
-          "RAD-USD",
-          "RAD-USDC",
-          "WMTX-USD",
-          "WMTX-USDC",
-          "CELR-USD",
-          "CELR-USDC",
-          "T-USD",
-          "T-USDC",
-          "SPA-USD",
-          "SPA-USDC",
-          "CHECK-USD",
-          "CHECK-USDC",
-          "HYPER-USD",
-          "HYPER-USDC",
-          "PLU-USD",
-          "PLU-USDC",
-          "NEX-USD",
-          "NEX-USDC",
-          "ARPA-USD",
-          "ARPA-USDC",
-          "POLS-USD",
-          "POLS-USDC",
-          "CHZ-EUR",
-          "META-USD",
-          "META-USDC",
-          "KRL-USD",
-          "KRL-USDC",
-          "BREV-USD",
-          "BREV-USDC",
-          "FIDA-USD",
-          "FIDA-USDC",
-          "1INCH-EUR",
-          "BIGTIME-USD",
-          "BIGTIME-USDC",
-          "SNX-GBP",
-          "SHIB-USDT",
-          "XTZ-GBP",
           "COSMOSDYDX-USD",
           "COSMOSDYDX-USDC",
+          "APE-USDT",
+          "OPN-USD",
+          "OPN-USDC",
+          "LSETH-USD",
+          "LSETH-USDC",
+          "PLU-USD",
+          "PLU-USDC",
+          "GNO-USD",
+          "GNO-USDC",
+          "FOX-USD",
+          "FOX-USDC",
+          "INV-USD",
+          "INV-USDC",
+          "ALGO-GBP",
+          "ZETACHAIN-USD",
+          "ZETACHAIN-USDC",
+          "FIDA-USD",
+          "FIDA-USDC",
+          "FIGHT-USD",
+          "FIGHT-USDC",
           "BAND-USD",
           "BAND-USDC",
-          "XSGD-USDC",
-          "WAXL-USD",
-          "WAXL-USDC",
+          "GMT-USD",
+          "GMT-USDC",
+          "USDS-USD",
+          "USDS-USDC",
+          "NEX-USD",
+          "NEX-USDC",
+          "ASM-USD",
+          "ASM-USDC",
+          "ETC-EUR",
+          "THQ-USD",
+          "THQ-USDC",
+          "MANA-EUR",
+          "DOLO-USD",
+          "DOLO-USDC",
+          "LINK-USDT",
+          "APE-EUR",
+          "SUKU-USD",
+          "SUKU-USDC",
+          "A8-USD",
+          "A8-USDC",
+          "00-USD",
+          "00-USDC",
+          "ARPA-USD",
+          "ARPA-USDC",
+          "HOPR-USD",
+          "HOPR-USDC",
+          "CHZ-EUR",
+          "SNX-GBP",
+          "1INCH-EUR",
+          "G-USD",
+          "G-USDC",
+          "BOBA-USD",
+          "BOBA-USDC",
+          "KRL-USD",
+          "KRL-USDC",
+          "BCH-GBP",
           "PAX-USD",
           "PAX-USDC",
-          "ETC-EUR",
-          "NEWT-USD",
-          "NEWT-USDC",
+          "1INCH-GBP",
+          "AUDD-USDC",
+          "BTRST-USD",
+          "BTRST-USDC",
+          "USD1-USD",
+          "USD1-USDC",
+          "XTZ-GBP",
           "ENS-EUR",
+          "TGBP-USDC",
           "MSOL-USD",
           "MSOL-USDC",
           "CHZ-GBP",
-          "1INCH-GBP",
           "ETC-GBP",
-          "ETH-BTC",
-          "ADA-ETH",
           "LINK-ETH",
+          "ADA-ETH",
+          "ETH-BTC",
           "LINK-BTC",
-          "SOL-ETH",
-          "SOL-BTC",
-          "LTC-BTC",
-          "CBETH-ETH",
-          "CRV-BTC",
-          "UNI-BTC",
-          "ICP-BTC",
-          "BCH-BTC",
-          "ALGO-BTC",
-          "AVAX-BTC",
-          "AAVE-BTC",
-          "DOT-BTC",
-          "DOGE-BTC",
-          "ATOM-BTC",
-          "DASH-BTC",
           "XLM-BTC",
-          "XTZ-BTC",
+          "SOL-ETH",
+          "AAVE-BTC",
+          "SOL-BTC",
+          "DOT-BTC",
+          "BCH-BTC",
+          "LTC-BTC",
+          "ATOM-BTC",
+          "ALGO-BTC",
+          "DOGE-BTC",
           "ADA-BTC",
+          "CRV-BTC",
+          "ICP-BTC",
           "ETC-BTC",
+          "AVAX-BTC",
+          "DASH-BTC",
+          "XTZ-BTC",
+          "UNI-BTC",
+          "CBETH-ETH",
           "DAI-USD",
           "DAI-USDC",
           "EOS-USD",

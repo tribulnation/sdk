@@ -89,7 +89,7 @@ async def test_a_new_snapshot_replaces_the_book_instead_of_merging():
 
 
 async def test_a_delivered_book_is_never_mutated_by_a_later_push():
-  """Each yielded book is a copy, so a subscriber's snapshot stays what it saw."""
+  """Each yielded book is frozen, so a subscriber's snapshot stays what it saw."""
   books = [
     book
     async for book in merged_books(

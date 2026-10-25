@@ -1,22 +1,18 @@
-# tribulnation-lighter 0.11.0
+# tribulnation-lighter 0.11.1
 
-Requires SDK >=2.17.0 and typed-lighter >=0.3.0. The endpoints can be overridden.
+Requires SDK >=2.21.0 (the release adding `Book.frozen` and `detached_books`) and
+typed-lighter >=0.3.0. Upgrade the SDK and this adapter together.
 
-New:
-
-1. Endpoint overrides for other servers (for example local fake exchanges in stress
-   tests): `rest_url` and `ws_url`; the chain id still follows the venue (mainnet or
-   testnet). `LighterMarket.new` takes the same keywords, and the SDK
-   `[accounts.<id>]` config accepts them (sdk#240). Unset, the endpoints are
-   unchanged.
+`depth_stream` no longer deep-copies the whole order book on every update: the
+stream yields `Book.frozen()` and each subscriber gets its own copy, through
+`detached_books`, of each book it reads ([ADR 0049](../../../dev-docs/adr/0049-book-streams-copy-on-read.md)).
+On a 500-level-a-side book, the work per update falls from about 16 ms (it copied twice) to about
+0.3 ms, plus about 0.5 ms for each book a subscriber reads. Delivered books keep their
+guarantees: a later push never changes them, and a subscriber may mutate its own.
 
 Every other method is unchanged.
 
-The typed-lighter floor rises to 0.3.0, which adds the endpoint overrides. The SDK
-floor is unchanged; SDK 2.18.0 requires this version so that its account config can
-pass the new keywords.
-
-Release qualification on 2026-10-20 passed the read suites and market consistency.
+Release qualification on 2026-10-24 passed the read suites and market consistency.
 Committed evidence under `release-evidence/lighter/` matches pinned Catalogue
-`1851660ac2bed8243dd9ce9c7297fe05c7130973`; offline release verification passes.
-This adapter release follows SDK 2.18.0 publication.
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
+release follows SDK 2.21.0 publication.

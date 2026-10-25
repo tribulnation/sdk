@@ -63,7 +63,7 @@ dropped).
   public one. Account-scoped reads on `spot` and `usdt` dispatch on the account's mode;
   `usdc` account reads are not implemented.
 - **Trading is not implemented.** `place_order`, `cancel_order`, `cancel_orders` and
-  `cancel_open_orders` raise `NotImplementedError`: Bitget is not a venue we trade on.
+  `cancel_open_orders` raise `NotImplementedError`.
 - **`rules`** come from the public symbol and contract catalogues, cached after the first
   call. Bitget publishes decimal-place counts rather than tick sizes, so `tick_size` and
   `step_size` are derived from them (`priceEndStep * 10 ** -pricePlace` on perps). The fee

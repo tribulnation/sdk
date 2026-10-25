@@ -3,6 +3,7 @@
 [ADR index](README.md) · [Developer documentation](../README.md)
 
 1. Status: accepted; amended by [ADR 0022](0022-bit2me-one-sided-ticker-limitation.md)
+   and [ADR 0048](0048-extended-rfq-indicative-tickers.md)
 2. Date: 2026-09-12
 3. Amends: [ADR 0003](0003-local-consistency-release-evidence.md) and
    [ADR 0011](0011-liquidity-independent-consistency.md).

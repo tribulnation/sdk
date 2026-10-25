@@ -34,6 +34,11 @@ point at a full node you run: its plaintext gRPC streaming endpoint (`host:port`
 `'20.222.23.181:9090'`) and its CometBFT RPC URL (e.g. `'http://20.222.23.181:26657'`).
 They are only read by the [node fill sources](#fill-sources), which need both.
 
+`fill_socket` (optional, `$ENV_VAR` allowed) is the unix socket of a fill daemon on the
+same host (e.g. `'/run/dydx-fills.sock'`), read by the socket fill sources. `fill_source` (`'indexer' | 'node' | 'socket' | 'fastest'`, optional) is the
+account's default `trades_source`; unset keeps `'indexer'`, and a per-call
+`trades_source` overrides it. Both are only passed to the dYdX package when set.
+
 `indexer_rest_url` and `indexer_ws_url` (optional, `$ENV_VAR` allowed) override the
 indexer's HTTP and WebSocket URLs. `validator_grpc` (plaintext `host:port`) and
 `validator_rpc` (CometBFT RPC URL), set together, replace the default chain provider for
@@ -93,7 +98,7 @@ by the dYdX `Settings` TypedDict (`market/impl/mixin.py`). All keys are optional
 | `reduce_only` | `bool` | `False` | Place as reduce-only. |
 | `tickers_fetch_depth` | `bool` | `True` | Whether bulk tickers fetch order books for best bid and ask. |
 | `tickers_depth_concurrent` | `int` | `20` | Maximum concurrent order-book requests used to enrich bulk tickers. |
-| `trades_source` | `'indexer' \| 'node' \| 'fastest'` | `'indexer'` | Where `trades_stream` reads fills from; see [Fill sources](#fill-sources). |
+| `trades_source` | `'indexer' \| 'node' \| 'socket' \| 'fastest'` | the account's `fill_source`, else `'indexer'` | Where `trades_stream` reads fills from; see [Fill sources](#fill-sources). |
 
 Unknown keys are rejected.
 
@@ -121,20 +126,41 @@ the latest block, so a cancel's good-til-block covers any short-term order still
 
 ## Fill sources
 
-`trades_stream` covers the parent subaccount and all its children. `trades_source` picks
-where it reads your fills from:
+`trades_stream` covers the parent subaccount and all its children. `trades_source` (or,
+when the call doesn't set it, the account's `fill_source`) picks where it reads your
+fills from:
 
 | `trades_source` | Source | Notes |
 | --- | --- | --- |
-| `'indexer'` (default) | The indexer's `v4_subaccounts` WebSocket channel | Unchanged behaviour: indexer fill ids, block `time`. |
+| `'indexer'` (default) | The indexer's `v4_parent_subaccounts` WebSocket channel | Indexer fill ids, block `time`. A dropped indexer connection ends the stream with `NetworkError`. |
 | `'node'` | Your full node only | About 0.4 s ahead of the indexer. No fallback. `time` is `None`. |
-| `'fastest'` | Both, raced | Each fill once, from whichever source delivers it first. |
+| `'socket'` | A local fill daemon only | No fallback. `time` is `None`. |
+| `'fastest'` | The indexer plus every configured node or socket, raced | Each fill once, from whichever source delivers it first; the indexer is the floor, but it may reconnect for up to `indexer_reconnect_window` seconds (default 3). |
 
 `'node'` and `'fastest'` need both `full_node_grpc` and `full_node_rpc` on the account;
 without them, entering the stream raises `ValueError`. The node must run with
 `--grpc-streaming-enabled`, and with the fix for
 [v4-chain#3414](https://github.com/dydxprotocol/v4-chain/issues/3414): the SDK sets
 `filter_orders_by_subaccount_id`, which crashes an unpatched v9.7.1 node on a liquidation.
+
+How indexer fills are read:
+
+- Every indexer channel of a client (your parent subaccount's, and each book of
+  `depth_stream`) shares one WebSocket, which the indexer drops now and then, usually
+  for about 1.5 s. A dropped channel is reopened with backoff (0.5 s, doubling to 8 s)
+  while any stream still follows it; a channel down for 60 s gives up with
+  `NetworkError`.
+- An `'indexer'` trades stream ends with `NetworkError` as the connection drops, so a
+  strategy reading it stops rather than trade on without its fills. The fills of the
+  gap are not read; a stream opened again starts from its new subscription.
+- A `'fastest'` trades stream races on through a drop (see below). After the
+  reconnection the fills between the last block the channel reached and the new
+  subscription's block are read from REST (`/v4/fills/parentSubaccountNumber`) and
+  delivered before the live ones, with their order ids, so the drop skips no fill. Fills
+  are remembered by id for 100 blocks, so none is delivered twice. A backfill that fails
+  counts as a failed reconnection and is retried.
+- A book stream rides through a drop: it restarts from the new subscription's snapshot,
+  delivered at once, and only a book down for 60 s ends it.
 
 How node fills are read:
 
@@ -164,19 +190,52 @@ How node fills are read:
   unreachable are missed: reconcile with `trades_history`.
 - Before every connection, the first and each reconnection, the feed reads the node's
   CometBFT `/status`. If the node is catching up, or its latest block is more than 10 s
-  old, the stream fails with `NetworkError` (with `'fastest'` too) instead of connecting:
+  old, the stream fails with `NetworkError` (with `'fastest'`, the node is dropped instead) rather than connecting:
   a node replaying old blocks streams them as finalized updates, so their fills would
   read as new. Use `'indexer'` until the node is synced. A node that falls behind while
   connected is not detected.
 
-With `'fastest'`, a fill is identified on both sources by its block height, order (the
-indexer's order id is derived from the protocol order id) and size; orderless fills by
-height, subaccount, market, side and size. Identical fills in one block are counted, not
-merged. The first copy wins and the other is dropped; indexer trades carry their block
-`time` and `details={'source': 'indexer', 'fill': <indexer fill>}`, node trades
-`time=None`. Keys are kept for 1000 blocks; the indexer keeps delivering while the node is
-unreachable, a node that is behind fails the stream (see above), and an indexer failure
-ends the stream as it does with `'indexer'`.
+How socket fills are read:
+
+- The fill daemon (one per host, shared by every process, not part of the SDK)
+  publishes every fill of every block on its unix socket, as a WebSocket with
+  subprotocol `tribulnation-dydx-fills.v1`.
+- Whether fills arrive when their block commits or earlier, at proposal time, is the
+  daemon's setting, not the SDK's. `details['level']` says which (`'committed'` or
+  `'proposed'`). When a proposed fill's proposal does not commit, the stream emits a
+  reversing trade: the same trade with opposite `qty`, `id` suffixed `:revert` and
+  `details['revert'] = True`.
+- Fills are built like node fills: the same synthetic `id`, `order_id`, maker price,
+  `time=None` and `fee=None`; `details` is
+  `{'source': 'socket', 'height', 'round', 'level', 'kind', 'subaccount'}`. A fill whose
+  stateful maker order the daemon could not price is skipped with a warning (with
+  `'fastest'` another source delivers it).
+- One connection per client, reconnecting with backoff forever. Each connection
+  resubscribes from the last complete block, and the daemon replays up to 300 blocks, so
+  a short disconnection loses nothing; the daemon never replays old blocks as new ones.
+
+With `'fastest'`, the indexer races every source the account configures: the node when
+both `full_node_grpc` and `full_node_rpc` are set, the socket when `fill_socket` is set
+(at least one is required; entering the stream raises `ValueError` otherwise). A fill is
+identified on every source by its block height, order (the indexer's order id is derived
+from the protocol order id) and size; orderless fills by height, subaccount, market, side
+and size. Identical fills in one block are counted, not merged. The first copy wins and
+the others are dropped; indexer trades carry their block `time` and
+`details={'source': 'indexer', 'fill': <indexer fill>}`, node and socket trades
+`time=None`. Keys are kept for 1000 blocks. The indexer is the floor: while its channel
+reconnects the other sources race on and its backfilled fills are deduplicated like any
+copy (and not counted as leads), but an indexer down for over
+`indexer_reconnect_window` seconds (a dYdX setting; default 3, `0` for at once) ends the
+stream with `NetworkError`, so a strategy stops rather than trade on unhealthy. A
+node or socket source that fails or ends (a node behind the chain tip as it connects,
+see above) is dropped with a warning and the others race on. Each later copy of a fill logs, at INFO on the `tribulnation.dydx` loggers,
+which source was first and by how many milliseconds
+(`dYdX fill <height>:<order>:<size>: socket first, indexer +180 ms`). The client keeps
+the totals (fills each source delivered first, and per pair of sources the number of
+fills and the p50/p90 lead over the last 1000) and logs them every 10 minutes
+(`dYdX fill race: ...`) while any `'fastest'` stream is open. When several `'fastest'`
+streams follow one market, only the oldest records and logs its fills, so each fill is
+logged and counted once.
 
 ```python
 async with sdk.trades_stream(

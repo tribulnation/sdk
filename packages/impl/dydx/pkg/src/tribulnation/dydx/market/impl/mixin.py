@@ -1,7 +1,9 @@
 from functools import cached_property
 from typing_extensions import (
   TYPE_CHECKING,
+  Annotated,
   AsyncContextManager,
+  AsyncIterator,
   Literal,
   Iterable,
   TypedDict,
@@ -9,6 +11,7 @@ from typing_extensions import (
   Awaitable,
   TypeVar,
 )
+from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 import asyncio
 import pydantic
@@ -33,19 +36,30 @@ from tribulnation.sdk.core import (
   Subscription,
   OverflowPolicy,
   AuthError,
+  NetworkError,
 )
 from tribulnation.dydx.core import wrap_exceptions
 from .depth import depth_stream, Book
+from .reconnect import Dropped, Reconnected
 from .rules import parse_rules, Rules
 from .fees import combined_fees, market_charge, market_discount_params, PPM
 from tribulnation.sdk.market import Fees
 
 if TYPE_CHECKING:
+  from .dedup import FillRace
   from .node_fills import NodeFill
+  from .socket_fills import SocketItem
 
 T = TypeVar('T')
 
-TradesSource = Literal['indexer', 'node', 'fastest']
+TradesSource = Literal['indexer', 'node', 'socket', 'fastest']
+
+INDEXER_RECONNECT_WINDOW = 3.0
+"""Default `Settings.indexer_reconnect_window`, in seconds: an indexer reconnection
+usually takes about 1.5 s."""
+
+ParentFeedItem = ParentSubaccountNotification | Dropped | Reconnected
+"""An item of the shared parent subaccounts feed (`parent_subaccounts_feed`)."""
 """Where `trades_stream` reads fills from. See `Settings.trades_source`."""
 
 
@@ -74,25 +88,45 @@ class Settings(TypedDict, total=False):
   `SHORT_TERM` orders."""
   reduce_only: bool
   trades_source: TradesSource
-  """Where `trades_stream` reads fills from. Defaults to `'indexer'`.
+  """Where `trades_stream` reads fills from. Defaults to the account's `fill_source`,
+  else `'indexer'`.
 
-  - `'indexer'`: the indexer's `v4_subaccounts` WebSocket channel.
+  - `'indexer'`: the indexer's `v4_parent_subaccounts` WebSocket channel. A dropped
+    connection ends the stream with `NetworkError`; the fills of the gap are not read.
   - `'node'`: the account's full node (`full_node_grpc`/`full_node_rpc` on
     `accounts.Dydx`) only, about 0.4 s ahead of the indexer: its gRPC
     `StreamOrderbookUpdates` stream, finalized updates only. Fills of our orders and
     fills liquidating us come from the stream; deleveraging fills also read the block's
-    `match` events (`block_results`) for side and price. `time` is the local receive
-    time (the stream has no block time), `id` is synthetic
+    `match` events (`block_results`) for side and price. `time` is `None`
+    (the stream has no block time; `details['height']` has the block), `id` is synthetic
     (`<height>:<order id or subaccount:kind:perpetual>:<n>`) and `fee` is `None`. There
     is no fallback: fills finalized while the node is unreachable are missed, so the
     caller's reconciliation (e.g. `trades_history`) must cover them. The stream fails
     with `NetworkError` when the node is catching up or its latest block is old as it
     connects, since it would stream old blocks as new fills.
-  - `'fastest'`: `'node'` and `'indexer'` raced. Each fill is emitted once, by whichever
-    source delivers it first (`details['source']`), so the indexer covers node outages;
-    a node that is not at the chain tip as it connects fails the stream, as with
-    `'node'`.
+  - `'socket'`: a local fill daemon's unix socket (`fill_socket` on `accounts.Dydx`)
+    only.
+    Fills are built like node fills (synthetic `id`, `time` `None`, `fee` `None`) with
+    `details['source'] == 'socket'`, `details['level']` (`'committed'` or `'proposed'`,
+    the daemon's setting) and `details['round']`. When a proposed fill's proposal does
+    not commit, a reversing trade follows (opposite `qty`, `details['revert']`). The
+    feed reconnects forever and replays what it missed (up to 300 blocks).
+  - `'fastest'`: every configured source raced: the indexer, plus the node and the
+    socket when the account configures them (at least one is required). Each fill is
+    emitted once, by whichever source delivers it first (`details['source']`). Each
+    later copy logs (INFO) which source was first and by how many milliseconds, once
+    per market however many streams race it; the client's `fill_race` keeps the totals
+    and logs them every 10 minutes. A node or socket source that fails is dropped with
+    a warning and the stream goes on. The indexer is the floor: while its channel
+    reconnects after a dropped connection the other sources race on, and the fills of
+    the gap are then read from REST; an indexer down for over
+    `indexer_reconnect_window` seconds ends the stream with `NetworkError`.
   """
+  indexer_reconnect_window: Annotated[float, pydantic.Field(ge=0)]
+  """Seconds a `'fastest'` stream races on while the indexer's channel reconnects
+  before it fails with `NetworkError`. Defaults to 3 (`INDEXER_RECONNECT_WINDOW`); `0`
+  fails at once. The channel gives up by itself after a minute (`GIVE_UP_AFTER`), so a
+  longer window acts as a minute."""
 
 
 settings_adapter = pydantic.TypeAdapter(Settings)
@@ -111,9 +145,9 @@ class Shared(SDK):
   fee_tier: feetiers_proto.PerpetualFeeTier | None = None
   standard_fee_tier: feetiers_proto.PerpetualFeeTier | None = None
   market_discounts: dict[int, feetiers_proto.PerMarketFeeDiscountParams] | None = None
-  parent_subaccount_subscriptions: dict[
-    int, Subscription[ParentSubaccountNotification]
-  ] = field(default_factory=dict[int, Subscription[ParentSubaccountNotification]])
+  parent_subaccount_subscriptions: dict[int, Subscription[ParentFeedItem]] = field(
+    default_factory=dict[int, Subscription[ParentFeedItem]]
+  )
   depth_subscriptions: dict[str, Subscription[Book]] = field(
     default_factory=dict[str, Subscription[Book]]
   )
@@ -123,6 +157,16 @@ class Shared(SDK):
   deleveraging fills. Separate from `client.chain`, the public endpoints."""
   node_subscription: 'Subscription[NodeFill] | None' = None
   """The full node fill feed, created by the first node-sourced `trades_stream`."""
+  fill_source: TradesSource | None = None
+  """The account's default `trades_source`; a per-call setting overrides it."""
+  fill_socket: str | None = None
+  """Path of a local fill daemon's unix socket, for the `'socket'` and `'fastest'`
+  trades sources."""
+  socket_subscription: 'Subscription[SocketItem] | None' = None
+  """The socket fill feed, created by the first socket-sourced `trades_stream`."""
+  fill_race: 'FillRace | None' = None
+  """Which source delivered each fill first, across this client's `'fastest'` streams;
+  created by the first one."""
 
   def require_address(self) -> str:
     """Require an account only when an account-scoped operation uses it."""
@@ -222,30 +266,21 @@ class Shared(SDK):
     return self.standard_fee_tier
 
   def parent_account_subscription(self, parent_subaccount: int):
+    """The parent subaccount's channel, shared by its streams; it reconnects, signals
+    the drop and the reconnection, and backfills the fills of a gap
+    (`parent_subaccounts_feed`)."""
+    from .parent_feed import parent_subaccounts_feed
+
     if parent_subaccount not in self.parent_subaccount_subscriptions:
-
-      @wrap_exceptions
-      async def subscribe():
-        stream = await self.client.indexer.streams.parent_subaccounts(
-          self.require_address(), subaccount=parent_subaccount
-        )
-
-        @wrap_exceptions
-        async def parsed_stream():
-          async for msg in stream:
-            yield msg
-
-        return parsed_stream(), stream.unsubscribe
-
       self.parent_subaccount_subscriptions[parent_subaccount] = Subscription.of(
-        subscribe
+        parent_subaccounts_feed(self, parent_subaccount)
       )
     return self.parent_subaccount_subscriptions[parent_subaccount]
 
   def depth_subscription(self, market: str):
     if market not in self.depth_subscriptions:
       self.depth_subscriptions[market] = Subscription.of(
-        lambda: depth_stream(self.client.indexer, market)
+        depth_stream(self.client.indexer, market)
       )
     return self.depth_subscriptions[market]
 
@@ -317,6 +352,8 @@ class ExchangeMixin(SDK):
     account_id: str | None = None,
     full_node_grpc: str | None = None,
     full_node_rpc: str | None = None,
+    fill_source: TradesSource | None = None,
+    fill_socket: str | None = None,
     indexer_rest_url: str | None = None,
     indexer_ws_url: str | None = None,
     validator_grpc: str | None = None,
@@ -337,6 +374,9 @@ class ExchangeMixin(SDK):
       full_node_grpc: `host:port` of a full node's gRPC streaming endpoint, for the
         `'node'` and `'fastest'` trades sources (with `full_node_rpc`).
       full_node_rpc: The same node's CometBFT RPC URL, read for deleveraging fills.
+      fill_source: Default `trades_source` of `trades_stream` (see `Settings`).
+      fill_socket: Path of a local fill daemon's unix socket, for the `'socket'` and
+        `'fastest'` trades sources.
       indexer_rest_url: Indexer HTTP base URL (e.g. `https://indexer.dydx.trade/`);
         overrides `mainnet`'s.
       indexer_ws_url: Indexer WebSocket URL (e.g. `wss://indexer.dydx.trade/v4/ws`);
@@ -410,6 +450,8 @@ class ExchangeMixin(SDK):
           if full_node_grpc is not None and full_node_rpc is not None
           else None
         ),
+        fill_source=fill_source,
+        fill_socket=fill_socket,
       )
     )
 
@@ -444,7 +486,24 @@ class ExchangeMixin(SDK):
     *,
     queue_size: int = 1000,
     overflow: OverflowPolicy = 'fail',
-  ):
+  ) -> AsyncContextManager[AsyncIterator[ParentSubaccountNotification]]:
+    """The parent subaccount's notifications, ending with `NetworkError` when the
+    connection drops, while the shared channel reconnects for `subscribe_parent_feed`."""
+    return ended_by_drops(
+      self.subscribe_parent_feed(
+        parent_subaccount, queue_size=queue_size, overflow=overflow
+      )
+    )
+
+  def subscribe_parent_feed(
+    self,
+    parent_subaccount: int,
+    *,
+    queue_size: int = 1000,
+    overflow: OverflowPolicy = 'fail',
+  ) -> AsyncContextManager[AsyncIterator[ParentFeedItem]]:
+    """The parent subaccount's shared feed, across reconnections: `Dropped` and
+    `Reconnected` mark a gap, whose fills follow as a `backfill` notification."""
     return self.shared.parent_account_subscription(parent_subaccount).subscribe(
       queue_size=queue_size, overflow=overflow
     )
@@ -455,6 +514,28 @@ class ExchangeMixin(SDK):
     return self.shared.depth_subscription(market).subscribe(
       queue_size=queue_size, overflow=overflow
     )
+
+
+@asynccontextmanager
+async def ended_by_drops(
+  feed: AsyncContextManager[AsyncIterator[ParentFeedItem]],
+):
+  """`feed`'s notifications until its connection drops, which raises `NetworkError`.
+
+  A backfill (of a gap this subscriber joined during) is skipped as well: it would
+  only bring fills from before the subscription.
+  """
+  async with feed as items:
+
+    async def notifications() -> AsyncIterator[ParentSubaccountNotification]:
+      async for item in items:
+        if isinstance(item, Dropped):
+          raise NetworkError(*item.error.args) from item.error
+        if isinstance(item, Reconnected) or item.get('backfill'):
+          continue
+        yield item
+
+    yield notifications()
 
 
 @dataclass(kw_only=True, frozen=True)

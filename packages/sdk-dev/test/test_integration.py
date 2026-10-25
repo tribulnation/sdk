@@ -87,6 +87,30 @@ def test_account_selection_matches_venue_not_alias_substrings(
   )
 
 
+@pytest.mark.parametrize(
+  ('selector', 'expected'),
+  [('mexc', ['mexc']), ('mexc_trade', ['mexc_trade']), ('kraken', ['a', 'b'])],
+)
+def test_account_id_selector_excludes_same_venue_siblings(
+  selector: str,
+  expected: list[str],
+  monkeypatch: pytest.MonkeyPatch,
+  pytestconfig: pytest.Config,
+):
+  """An account named by its venue slug selects itself, not every account of that
+  venue (GRVT's `grvt` and `grvt_trade`); a bare venue slug still selects them all."""
+  monkeypatch.setattr(pytestconfig.option, 'sdk_venue', selector, raising=False)
+  configured: dict[str, Account] = {
+    'mexc': Mexc(),
+    'mexc_trade': Mexc(),
+    'a': Kraken(),
+    'b': Kraken(),
+  }
+  assert (
+    accounts.selected_accounts(pytestconfig, configured, surface='wallet') == expected
+  )
+
+
 def test_unknown_selector_is_an_error(
   monkeypatch: pytest.MonkeyPatch, pytestconfig: pytest.Config
 ):

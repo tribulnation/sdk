@@ -7,6 +7,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"1INCH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -14,6 +15,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"2Z-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -21,6 +23,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"AAVE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -28,6 +31,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ADA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -35,6 +39,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ALGO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -42,6 +47,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"APE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -49,6 +55,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"APT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -56,6 +63,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ARB-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -63,6 +71,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ARKM-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -70,6 +79,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ASTER-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -77,6 +87,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ATH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -84,6 +95,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ATOM-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -91,6 +103,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"AVAX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -98,6 +111,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"AXL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -105,6 +119,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"BCH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -112,6 +127,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"BLAST-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -119,6 +135,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"BLUR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -126,6 +143,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"BNB-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -133,6 +151,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"BONK-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -140,6 +159,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"BTC-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -147,6 +167,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"CHZ-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -154,6 +175,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"COMP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -161,6 +183,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"CRO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -168,6 +191,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"CRV-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -175,6 +199,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"DOGE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -182,6 +207,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"DOT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -189,6 +215,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"DYDX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -196,6 +223,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"DYM-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -203,6 +231,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"EIGEN-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -210,6 +239,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ENA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -217,6 +247,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ETC-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -224,6 +255,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ETH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -231,6 +263,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ETHFI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -238,6 +271,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"EUR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -245,6 +279,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"FIL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -252,6 +287,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"GRT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -259,6 +295,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"HBAR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -266,6 +303,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"HYPE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -273,6 +311,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ICP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -280,6 +319,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"IMX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -287,6 +327,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"INJ-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -294,6 +335,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"IO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -301,6 +343,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"JTO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -308,6 +351,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"JUP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -315,6 +359,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"LDO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -322,6 +367,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"LINK-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -329,6 +375,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"LIT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -336,6 +383,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"LTC-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -343,6 +391,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"MANA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -350,6 +399,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"MNT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -357,6 +407,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"MON-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -364,6 +415,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"MORPHO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -371,6 +423,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"MOVE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -378,6 +431,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"NEAR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -385,6 +439,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ONDO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -392,6 +447,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"OP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -399,6 +455,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ORDI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -406,6 +463,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"PAXG-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -413,6 +471,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"PENDLE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -420,6 +479,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"PENGU-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -427,6 +487,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"PEPE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -434,6 +495,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"PI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -441,6 +503,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"POL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -448,6 +511,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"PUMP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -455,6 +519,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"PYTH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -462,6 +527,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"RENDER-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -469,6 +535,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"RUNE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -476,6 +543,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"SEI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -483,6 +551,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"SHIB-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -490,6 +559,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"SNX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -497,6 +567,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"SOL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -504,6 +575,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"SPX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -511,6 +583,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"STRK-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -518,6 +591,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"STX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -525,6 +599,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"SUI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -532,6 +607,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"TAO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -539,6 +615,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"TIA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -546,6 +623,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"TRUMP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -553,6 +631,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"TRX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -560,6 +639,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"TSLAX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -567,6 +647,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"UNI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -574,6 +655,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"USUAL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -581,6 +663,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"VVV-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -588,6 +671,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"W-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -595,6 +679,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"WIF-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -602,6 +687,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"WLD-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -609,6 +695,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"WLFI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -616,6 +703,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"WOO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -623,6 +711,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"WTI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -630,6 +719,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"XAG-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -637,6 +727,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"XLM-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -644,6 +735,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"XMR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -651,6 +743,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"XPL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -658,6 +751,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"XRP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -665,6 +759,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ZEC-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -672,6 +767,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ZEN-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -679,6 +775,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ZK-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -686,6 +783,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ZORA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -693,6 +791,7 @@
         "id": "[\"catalogue_coverage\",\"perp\",\"ZRO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -700,6 +799,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"1INCH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -707,6 +807,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"2Z-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -714,6 +815,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"AAVE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -721,6 +823,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ADA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -728,6 +831,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ALGO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -735,6 +839,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"APE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -742,6 +847,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"APT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -749,6 +855,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ARB-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -756,6 +863,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ARKM-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -763,6 +871,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ASTER-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -770,6 +879,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ATH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -777,6 +887,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ATOM-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -784,6 +895,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"AVAX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -791,6 +903,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"AXL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -798,6 +911,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"BCH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -805,6 +919,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"BLAST-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -812,6 +927,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"BLUR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -819,6 +935,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"BNB-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -826,6 +943,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"BONK-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -833,6 +951,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"BTC-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -840,6 +959,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"CHZ-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -847,6 +967,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"COMP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -854,6 +975,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"CRO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -861,6 +983,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"CRV-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -868,6 +991,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"DOGE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -875,6 +999,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"DOT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -882,6 +1007,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"DYDX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -889,6 +1015,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"DYM-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -896,6 +1023,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"EIGEN-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -903,6 +1031,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ENA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -910,6 +1039,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ETC-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -917,6 +1047,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ETH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -924,6 +1055,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ETHFI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -931,6 +1063,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"EUR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -938,6 +1071,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"FIL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -945,6 +1079,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"GRT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -952,6 +1087,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"HBAR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -959,6 +1095,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"HYPE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -966,6 +1103,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ICP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -973,6 +1111,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"IMX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -980,6 +1119,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"INJ-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -987,6 +1127,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"IO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -994,6 +1135,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"JTO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1001,6 +1143,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"JUP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1008,6 +1151,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"LDO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1015,6 +1159,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"LINK-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1022,6 +1167,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"LIT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1029,6 +1175,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"LTC-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1036,6 +1183,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"MANA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1043,6 +1191,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"MNT-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1050,6 +1199,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"MON-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1057,6 +1207,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"MORPHO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1064,6 +1215,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"MOVE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1071,6 +1223,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"NEAR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1078,6 +1231,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ONDO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1085,6 +1239,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"OP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1092,6 +1247,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ORDI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1099,6 +1255,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"PAXG-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1106,6 +1263,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"PENDLE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1113,6 +1271,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"PENGU-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1120,6 +1279,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"PEPE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1127,6 +1287,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"PI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1134,6 +1295,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"POL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1141,6 +1303,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"PUMP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1148,6 +1311,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"PYTH-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1155,6 +1319,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"RENDER-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1162,6 +1327,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"RUNE-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1169,6 +1335,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"SEI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1176,6 +1343,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"SHIB-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1183,6 +1351,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"SNX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1190,6 +1359,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"SOL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1197,6 +1367,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"SPX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1204,6 +1375,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"STRK-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1211,6 +1383,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"STX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1218,6 +1391,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"SUI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1225,6 +1399,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"TAO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1232,6 +1407,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"TIA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1239,6 +1415,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"TRUMP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1246,6 +1423,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"TRX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1253,6 +1431,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"TSLAX-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1260,6 +1439,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"UNI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1267,6 +1447,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"USUAL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1274,6 +1455,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"VVV-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1281,6 +1463,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"W-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1288,6 +1471,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"WIF-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1295,6 +1479,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"WLD-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1302,6 +1487,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"WLFI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1309,6 +1495,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"WOO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1316,6 +1503,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"WTI-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1323,6 +1511,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"XAG-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1330,6 +1519,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"XLM-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1337,6 +1527,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"XMR-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1344,6 +1535,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"XPL-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1351,6 +1543,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"XRP-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1358,6 +1551,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ZEC-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1365,6 +1559,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ZEN-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1372,6 +1567,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ZK-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1379,6 +1575,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ZORA-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1386,6 +1583,7 @@
         "id": "[\"catalogue_identity\",\"perp\",\"ZRO-USD\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1393,6 +1591,7 @@
         "id": "[\"discovery\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1400,6 +1599,7 @@
         "id": "[\"exchange_identity\",\"perp\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1407,6 +1607,7 @@
         "id": "[\"market_identity\",\"perp\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1414,6 +1615,7 @@
         "id": "[\"perp_stats\",\"perp\",\"bulk\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1421,6 +1623,7 @@
         "id": "[\"perp_stats\",\"perp\",\"empty\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1428,6 +1631,7 @@
         "id": "[\"perp_stats\",\"perp\",\"selected\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1435,6 +1639,7 @@
         "id": "[\"setup\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1443,17 +1648,18 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.0962",
-            "after_bid": "0.09594",
-            "ask": "0.0962",
+            "after_ask": "0.08991",
+            "after_bid": "0.08964",
+            "ask": "0.08991",
             "attempt": 1,
-            "before_ask": "0.0962",
-            "before_bid": "0.09594",
-            "bid": "0.09594",
-            "elapsed_seconds": 0.10787939000874758,
+            "before_ask": "0.08991",
+            "before_bid": "0.08964",
+            "bid": "0.08964",
+            "elapsed_seconds": 0.07639286096673459,
             "ticker_ids_match": true
           }
         ],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1469,10 +1675,11 @@
             "before_ask": "0.05824",
             "before_bid": "0.05164",
             "bid": "0.05164",
-            "elapsed_seconds": 0.5987976689939387,
+            "elapsed_seconds": 0.31216511299135163,
             "ticker_ids_match": true
           }
         ],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1481,17 +1688,18 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "159.96",
-            "after_bid": "157.25",
-            "ask": "159.96",
+            "after_ask": "141.05",
+            "after_bid": "140.02",
+            "ask": "141.05",
             "attempt": 1,
-            "before_ask": "159.96",
-            "before_bid": "157.25",
-            "bid": "157.25",
-            "elapsed_seconds": 0.18114129902096465,
+            "before_ask": "141.05",
+            "before_bid": "140.02",
+            "bid": "140.02",
+            "elapsed_seconds": 0.06328327103983611,
             "ticker_ids_match": true
           }
         ],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1500,28 +1708,18 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "84632",
-            "after_bid": "84620",
-            "ask": "84632",
+            "after_ask": "80492",
+            "after_bid": "80481",
+            "ask": "80492",
             "attempt": 1,
-            "before_ask": "84653",
-            "before_bid": "84644",
-            "bid": "84620",
-            "elapsed_seconds": 15.746331007045228,
-            "ticker_ids_match": true
-          },
-          {
-            "after_ask": "84632",
-            "after_bid": "84620",
-            "ask": "84632",
-            "attempt": 2,
-            "before_ask": "84632",
-            "before_bid": "84620",
-            "bid": "84620",
-            "elapsed_seconds": 0.21977374400012195,
+            "before_ask": "80492",
+            "before_bid": "80481",
+            "bid": "80481",
+            "elapsed_seconds": 0.06329363101394847,
             "ticker_ids_match": true
           }
         ],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1529,6 +1727,7 @@
         "id": "[\"tickers\",\"perp\",\"bulk\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1536,6 +1735,7 @@
         "id": "[\"tickers\",\"perp\",\"empty\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       },
       {
@@ -1543,6 +1743,7 @@
         "id": "[\"tickers\",\"perp\",\"selected\"]",
         "missing_data": null,
         "quotes": [],
+        "rfq": null,
         "status": "pass"
       }
     ],

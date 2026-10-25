@@ -1,13 +1,21 @@
-# tribulnation-coinbase 0.5.0
+# tribulnation-coinbase 0.5.1
 
-Requires SDK >=2.16.0 and typed-coinbase >=0.4.0. `trades_stream` accepts the new
-keyword-only `settings` argument of SDK 2.16 (ADR 0044) and ignores it: Coinbase
-has no trades-stream options. Fills and every other method are unchanged.
+Requires SDK >=2.21.0 (the release adding `Book.frozen` and `detached_books`) and
+typed-coinbase >=0.4.0. Upgrade the SDK and this adapter together.
 
-The SDK floor rises to 2.16.0, whose `Market.trades_stream` declares `settings`.
-Upgrade the SDK and this adapter together.
+`depth_stream` no longer deep-copies the whole order book on every update: the
+stream yields `Book.frozen()` and each subscriber gets its own copy, through
+`detached_books`, of each book it reads ([ADR 0049](../../../dev-docs/adr/0049-book-streams-copy-on-read.md)).
+On a 500-level-a-side book, the work per update falls from about 8 ms to about
+0.3 ms, plus about 0.5 ms for each book a subscriber reads. Delivered books keep their
+guarantees: a later push never changes them, and a subscriber may mutate its own.
 
-Release qualification on 2026-10-09 passed the read suites and market
-consistency. Committed evidence under `release-evidence/coinbase/` matches pinned
-Catalogue `1851660ac2bed8243dd9ce9c7297fe05c7130973`; offline release
-verification passes. This adapter release follows SDK 2.16.0 publication.
+Subscribers of the same symbol used to share one delivered book object; each now gets
+its own.
+
+Every other method is unchanged.
+
+Release qualification on 2026-10-24 passed the read suites and market consistency.
+Committed evidence under `release-evidence/coinbase/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
+release follows SDK 2.21.0 publication.

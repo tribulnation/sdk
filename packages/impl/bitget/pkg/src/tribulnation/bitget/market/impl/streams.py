@@ -4,7 +4,7 @@ from typing_extensions import AsyncGenerator, AsyncIterable, AsyncIterator
 from contextlib import asynccontextmanager
 
 from tribulnation.sdk.core import OverflowPolicy
-from tribulnation.sdk.market import Book, Trade
+from tribulnation.sdk.market import Book, Trade, detached_books
 
 from .mixin import MarketMixin
 from .parse import parse_classic_stream_fill, parse_uta_stream_fill
@@ -24,15 +24,7 @@ async def depth_stream(
   `levels` trims each delivered book rather than resizing the upstream.
   """
   async with self.subscribe_depth(queue_size=queue_size, overflow=overflow) as stream:
-    if levels is None:
-      yield stream
-    else:
-
-      async def limited() -> AsyncIterator[Book]:
-        async for book in stream:
-          yield book.limit(levels)
-
-      yield limited()
+    yield detached_books(stream, levels)
 
 
 @asynccontextmanager

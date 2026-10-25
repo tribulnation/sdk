@@ -4,7 +4,7 @@ from decimal import Decimal
 import asyncio
 from contextlib import asynccontextmanager, suppress
 
-from tribulnation.sdk.market import Book
+from tribulnation.sdk.market import Book, detached_books
 from tribulnation.sdk.core import NetworkError, OverflowPolicy
 from tribulnation.mexc.core.exc import wrap_exceptions
 from typed_mexc import MEXC
@@ -150,7 +150,7 @@ async def reconstruct_books(
       version, book = await synchronized_book(
         client, symbol, queue, collector, levels=levels
       )
-      yield book.copy()
+      yield book.frozen()
 
       while True:
         update = await receive_update(queue, collector)
@@ -160,7 +160,7 @@ async def reconstruct_books(
           break
         book.update(update.book)
         version = update.to_version
-        yield book.copy()
+        yield book.frozen()
   finally:
     collector.cancel()
     with suppress(asyncio.CancelledError):
@@ -179,4 +179,4 @@ async def depth_stream(
   # `levels` is accepted for API compatibility but does not size the shared
   # streaming book (mirrors dYdX); use `depth(levels=...)` for a sized snapshot.
   async with self.subscribe_depth(queue_size=queue_size, overflow=overflow) as stream:
-    yield stream
+    yield detached_books(stream)

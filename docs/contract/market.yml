@@ -73,6 +73,7 @@ methods:
         dydx: {market_id: 'dydx:perp:BTC-USD', bid: '60123.00', ask: '60124.10'}
         kraken: {market_id: 'kraken:spot:XBTUSD', bid: '60123.00', ask: '60124.10'}
         lighter: {market_id: 'lighter:perp:1', bid: '60123.00', ask: '60124.10'}
+        extended: {market_id: 'extended:perp:BTC-USD', bid: '60123', ask: '60124'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', bid: '60123.00', ask: '60124.10'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', bid: '60123.00', ask: '60124.10'}
       callTemplate: |
@@ -129,6 +130,7 @@ methods:
         dydx: {market_id: 'dydx:perp:BTC-USD', ticks: [{bid: '60123.40', ask: '60124.00'}, {bid: '60123.50', ask: '60124.00'}, {bid: '60122.90', ask: '60123.60'}, {bid: '60123.10', ask: '60123.90'}]}
         kraken: {market_id: 'kraken:spot:XBTUSD', ticks: [{bid: '60123.40', ask: '60124.00'}, {bid: '60123.50', ask: '60124.00'}, {bid: '60122.90', ask: '60123.60'}, {bid: '60123.10', ask: '60123.90'}]}
         lighter: {market_id: 'lighter:perp:1', ticks: [{bid: '60123.40', ask: '60124.00'}, {bid: '60123.50', ask: '60124.00'}, {bid: '60122.90', ask: '60123.60'}, {bid: '60123.10', ask: '60123.90'}]}
+        extended: {market_id: 'extended:perp:BTC-USD', ticks: [{bid: '60123', ask: '60124'}, {bid: '60124', ask: '60125'}, {bid: '60122', ask: '60123'}, {bid: '60123', ask: '60124'}]}
         margin-trade: {market_id: 'margin-trade:perp:BTC', ticks: [{bid: '60123.40', ask: '60124.00'}, {bid: '60123.50', ask: '60124.00'}, {bid: '60122.90', ask: '60123.60'}, {bid: '60123.10', ask: '60123.90'}]}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', ticks: [{bid: '60123.40', ask: '60124.00'}, {bid: '60123.50', ask: '60124.00'}, {bid: '60122.90', ask: '60123.60'}, {bid: '60123.10', ask: '60123.90'}]}
       callTemplate: |
@@ -187,6 +189,7 @@ methods:
         coinbase: {market_id: 'coinbase:spot:BTC-USD', instrument_id: 'BTC-USD', fee_asset: 'USD', tick_size: '0.10', step_size: '0.00001'}
         dydx: {market_id: 'dydx:perp:BTC-USD', instrument_id: 'BTC-USD', fee_asset: 'USDC', tick_size: '0.10', step_size: '0.00001'}
         lighter: {market_id: 'lighter:perp:1', instrument_id: '1', fee_asset: '3', tick_size: '0.1', step_size: '0.00001'}
+        extended: {market_id: 'extended:perp:BTC-USD', instrument_id: 'BTC-USD', fee_asset: 'USD', tick_size: '1', step_size: '0.00001'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', instrument_id: 'BTC', fee_asset: 'USD', tick_size: '0.1', step_size: '0.00001'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', instrument_id: 'BTC_USDT_Perp', fee_asset: 'USDT', tick_size: '0.1', step_size: '0.001'}
       callTemplate: |
@@ -240,6 +243,7 @@ methods:
         dydx: {market_id: 'dydx:perp:BTC-USD'}
         mexc: {market_id: 'mexc:spot:BTCUSDT'}
         lighter: {market_id: 'lighter:perp:1'}
+        extended: {market_id: 'extended:perp:BTC-USD'}
         margin-trade: {market_id: 'margin-trade:perp:BTC'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp'}
       callTemplate: |
@@ -278,6 +282,7 @@ methods:
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', open1: '60123.40', close1: '60150.00', open2: '60150.00', close2: '60098.20'}
         kraken: {market_id: 'kraken:spot:XBTUSD', open1: '60123.40', close1: '60150.00', open2: '60150.00', close2: '60098.20'}
         lighter: {market_id: 'lighter:perp:1', open1: '60124.10', close1: '60151.30', open2: '60151.30', close2: '60099.00'}
+        extended: {market_id: 'extended:perp:BTC-USD', open1: '60124', close1: '60151', open2: '60151', close2: '60099'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', open1: '60124.10', close1: '60151.30', open2: '60151.30', close2: '60099.00'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', open1: '60124.10', close1: '60151.30', open2: '60151.30', close2: '60099.00'}
       callTemplate: |
@@ -334,6 +339,7 @@ methods:
         dydx: {exchange_id: 'dydx:perp', markets: [{key: 'BTC-USD', last: '60123.40', bid: '60123.00', ask: '60124.10'}]}
         kraken: {exchange_id: 'kraken:spot', markets: [{key: 'XBTUSD', last: '60123.40', bid: '60123.00', ask: '60124.10'}]}
         lighter: {exchange_id: 'lighter:perp', markets: [{key: '1', last: '60123.40', bid: '60123.00', ask: '60124.10'}]}
+        extended: {exchange_id: 'extended:perp', markets: [{key: 'BTC-USD', last: '60123', bid: '60123', ask: '60124'}]}
         margin-trade: {exchange_id: 'margin-trade:perp', markets: [{key: 'BTC', last: '60123.40', bid: '60123.00', ask: '60124.10'}]}
         grvt: {exchange_id: 'grvt:perp', markets: [{key: 'BTC_USDT_Perp', last: '60123.40', bid: '60123.00', ask: '60124.10'}]}
       callTemplate: |
@@ -400,6 +406,7 @@ methods:
         bybit: {exchange_id: 'bybit:perp', key: 'BTCUSDT', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: '812.4'}
         mexc: {exchange_id: 'mexc:perp', key: 'BTC_USDT', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: '812.4'}
         lighter: {exchange_id: 'lighter:perp', key: '1', index: '60120.00', mark: '60125.50', funding: '0.000012', open_interest: '812.4'}
+        extended: {exchange_id: 'extended:perp', key: 'BTC-USD', index: '60120', mark: '60125', funding: '0.000013', open_interest: '812.4'}
         margin-trade: {exchange_id: 'margin-trade:perp', key: 'BTC', index: '60120.00', mark: '60125.50', funding: '0.000012', open_interest: '812.4'}
         grvt: {exchange_id: 'grvt:perp', key: 'BTC_USDT_Perp', index: '60120.00', mark: '60125.50', funding: '0.000012', open_interest: '812.4'}
         aster: {exchange_id: 'aster:perp', key: 'BTCUSDT', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: '812.4'}
@@ -444,6 +451,7 @@ methods:
         dydx: {market_id: 'dydx:perp:BTC-USD', order_id: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAQAAABhA', price: '59500', qty: '0.01'}
         kraken: {market_id: 'kraken:spot:XBTUSD', order_id: 'OABC12-DE345-FGHI61', price: '59500', qty: '0.01'}
         lighter: {market_id: 'lighter:perp:1', order_id: '101492020762855', price: '59500', qty: '0.01'}
+        extended: {market_id: 'extended:perp:BTC-USD', order_id: '2112522693715927040', price: '59500', qty: '0.01'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', order_id: '38549392126', price: '59500', qty: '0.01'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id: '13835058055282163712', price: '59500', qty: '0.01'}
       callTemplate: |
@@ -485,6 +493,7 @@ methods:
         dydx: {market_id: 'dydx:perp:BTC-USD', order_id: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAQAAABhA', price: '59500', qty: '0.01'}
         kraken: {market_id: 'kraken:spot:XBTUSD', order_id: 'OABC12-DE345-FGHI61', price: '59500', qty: '0.01'}
         lighter: {market_id: 'lighter:perp:1', order_id: '101492020762855', price: '59500', qty: '0.01'}
+        extended: {market_id: 'extended:perp:BTC-USD', order_id: '2112522693715927040', price: '59500', qty: '0.01'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', order_id: '38549392126', price: '59500', qty: '0.01'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id: '13835058055282163712', price: '59500', qty: '0.01'}
       callTemplate: |
@@ -528,6 +537,7 @@ methods:
         dydx: {market_id: 'dydx:perp:BTC-USD', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'USDC'}
         kraken: {market_id: 'kraken:spot:XBTUSD', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'ZUSD'}
         lighter: {market_id: 'lighter:perp:1', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: '3'}
+        extended: {market_id: 'extended:perp:BTC-USD', price1: '60123', qty1: '0.01', price2: '60050', qty2: '-0.02', fee_asset: 'USD'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'USD'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'USDT'}
       callTemplate: |
@@ -580,6 +590,7 @@ methods:
         dydx: {market_id: 'dydx:perp:BTC-USD', ticks: [{price: '60123.40', qty: '0.01'}, {price: '60124.00', qty: '-0.02'}, {price: '60125.10', qty: '0.05'}]}
         kraken: {market_id: 'kraken:spot:XBTUSD', ticks: [{price: '60123.40', qty: '0.01'}, {price: '60124.00', qty: '-0.02'}, {price: '60125.10', qty: '0.05'}]}
         lighter: {market_id: 'lighter:perp:1', ticks: [{price: '60123.40', qty: '0.01'}, {price: '60124.00', qty: '-0.02'}, {price: '60125.10', qty: '0.05'}]}
+        extended: {market_id: 'extended:perp:BTC-USD', ticks: [{price: '60123', qty: '0.01'}, {price: '60124', qty: '-0.02'}, {price: '60125', qty: '0.05'}]}
         margin-trade: {market_id: 'margin-trade:perp:BTC', ticks: [{price: '60123.40', qty: '0.01'}, {price: '60124.00', qty: '-0.02'}, {price: '60125.10', qty: '0.05'}]}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', ticks: [{price: '60123.40', qty: '0.01'}, {price: '60124.00', qty: '-0.02'}, {price: '60125.10', qty: '0.05'}]}
       callTemplate: |
@@ -625,6 +636,7 @@ methods:
         coinbase: {market_id: 'coinbase:spot:BTC-USD', size: '0.014'}
         dydx: {market_id: 'dydx:perp:BTC-USD', size: '0.014'}
         lighter: {market_id: 'lighter:perp:1', size: '0.014'}
+        extended: {market_id: 'extended:perp:BTC-USD', size: '0.014'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', size: '0.014'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', size: '0.014'}
       callTemplate: |
@@ -665,6 +677,7 @@ methods:
         dydx: {market_id: 'dydx:perp:BTC-USD', equity: '10240.55', free: '8120.00'}
         kraken: {market_id: 'kraken:spot:XBTUSD', equity: '10240.55', free: '8120.00'}
         lighter: {market_id: 'lighter:perp:1', equity: '10240.55', free: '8120.00'}
+        extended: {market_id: 'extended:perp:BTC-USD', equity: '10240.55', free: '8120.00'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', equity: '10240.55', free: '8120.00'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', equity: '10240.55', free: '8120.00'}
       callTemplate: |
@@ -705,6 +718,7 @@ methods:
         dydx: {market_id: 'dydx:perp:BTC-USD', notional: '8120.00'}
         kraken: {market_id: 'kraken:spot:XBTUSD', notional: '8120.00'}
         lighter: {market_id: 'lighter:perp:1', notional: '8120.00'}
+        extended: {market_id: 'extended:perp:BTC-USD', notional: '8120.00'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', notional: '8120.00'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', notional: '8120.00'}
       callTemplate: |
@@ -742,6 +756,7 @@ methods:
         bit2me: {market_id: 'bit2me:spot:BTC/EUR', order_id: '00000000-0000-4000-8000-000000000001'}
         dydx: {market_id: 'dydx:perp:BTC-USD', order_id: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAQAAABhA'}
         lighter: {market_id: 'lighter:perp:1', order_id: '101492020762855'}
+        extended: {market_id: 'extended:perp:BTC-USD', order_id: '2112522693715927040'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', order_id: '38549392126'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id: '13835058055282163712'}
       callTemplate: |
@@ -779,6 +794,7 @@ methods:
         bit2me: {market_id: 'bit2me:spot:BTC/EUR', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
         dydx: {market_id: 'dydx:perp:BTC-USD', order_id1: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAQAAABhA', order_id2: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAgAAABhA'}
         lighter: {market_id: 'lighter:perp:1', order_id1: '101492020762855', order_id2: '101492020762856'}
+        extended: {market_id: 'extended:perp:BTC-USD', order_id1: '2112522693715927040', order_id2: '2112522693715927104'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', order_id1: '38549392126', order_id2: '38549396356'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id1: '13835058055282163712', order_id2: '13835058055282163713'}
       callTemplate: |
@@ -820,6 +836,7 @@ methods:
         bit2me: {market_id: 'bit2me:spot:BTC/EUR', order_id: '00000000-0000-4000-8000-000000000001'}
         dydx: {market_id: 'dydx:perp:BTC-USD', order_id: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAQAAABhA'}
         lighter: {market_id: 'lighter:perp:1', order_id: '101492020762855'}
+        extended: {market_id: 'extended:perp:BTC-USD', order_id: '2112522693715927040'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', order_id: '38549392126'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id: '13835058055282163712'}
       callTemplate: |
@@ -858,6 +875,7 @@ methods:
         bit2me: {market_id: 'bit2me:spot:BTC/EUR', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
         dydx: {market_id: 'dydx:perp:BTC-USD', order_id1: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAQAAABhA', order_id2: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAgAAABhA'}
         lighter: {market_id: 'lighter:perp:1', order_id1: '101492020762855', order_id2: '101492020762856'}
+        extended: {market_id: 'extended:perp:BTC-USD', order_id1: '2112522693715927040', order_id2: '2112522693715927104'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', order_id1: '38549392126', order_id2: '38549396356'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id1: '13835058055282163712', order_id2: '13835058055282163713'}
       callTemplate: |
@@ -896,6 +914,7 @@ methods:
         bit2me: {market_id: 'bit2me:spot:BTC/EUR'}
         dydx: {market_id: 'dydx:perp:BTC-USD'}
         lighter: {market_id: 'lighter:perp:1'}
+        extended: {market_id: 'extended:perp:BTC-USD'}
         margin-trade: {market_id: 'margin-trade:perp:BTC'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp'}
       callTemplate: |
@@ -936,6 +955,7 @@ methods:
         binance: {market_id: 'binance:usdm:BTCUSDT', index: '60120.00'}
         bitget: {market_id: 'bitget:usdt:BTCUSDT', index: '60120.00'}
         lighter: {market_id: 'lighter:perp:1', index: '60120.00'}
+        extended: {market_id: 'extended:perp:BTC-USD', index: '60120'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', index: '60120.00'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', index: '60120.00'}
       callTemplate: |
@@ -973,6 +993,7 @@ methods:
         bybit: {market_id: 'bybit:perp:BTCUSDT', rate: '0.0001', annualized: '0.1095'}
         mexc: {market_id: 'mexc:perp:BTC_USDT', rate: '0.0001', annualized: '0.1095'}
         lighter: {market_id: 'lighter:perp:1', rate: '0.0001', annualized: '0.876'}
+        extended: {market_id: 'extended:perp:BTC-USD', rate: '0.000013', annualized: '0.11388'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', rate: '0.0001', annualized: '0.876'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', rate: '0.0001', annualized: '0.1095'}
       callTemplate: |
@@ -1014,6 +1035,7 @@ methods:
         binance: {market_id: 'binance:usdm:BTCUSDT', rate1: '0.0001', rate2: '0.00012'}
         bitget: {market_id: 'bitget:usdt:BTCUSDT', rate1: '0.0001', rate2: '0.00012'}
         lighter: {market_id: 'lighter:perp:1', rate1: '0.0001', rate2: '0.00012'}
+        extended: {market_id: 'extended:perp:BTC-USD', rate1: '0.000013', rate2: '-0.000004'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', rate1: '0.0001', rate2: '0.00012'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', rate1: '0.0001', rate2: '0.00012'}
       callTemplate: |
@@ -1051,6 +1073,7 @@ methods:
         hyperliquid: {market_id: 'hyperliquid::BTC', amount1: '-1.05', amount2: '0.74'}
         bybit: {market_id: 'bybit:perp:BTCUSDT', amount1: '-1.24', amount2: '0.86'}
         lighter: {market_id: 'lighter:perp:1', amount1: '-1.24', amount2: '0.86'}
+        extended: {market_id: 'extended:perp:BTC-USD', amount1: '-1.24', amount2: '0.86'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', amount1: '-1.24', amount2: '0.86'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', amount1: '-1.24', amount2: '0.86'}
       callTemplate: |
@@ -1089,6 +1112,7 @@ methods:
         bitget: {market_id: 'bitget:usdt:BTCUSDT', size: '0.5', entry_price: '58230.10'}
         bybit: {market_id: 'bybit:perp:BTCUSDT', size: '0.5', entry_price: '58230.10'}
         lighter: {market_id: 'lighter:perp:1', size: '0.5', entry_price: '58230.10'}
+        extended: {market_id: 'extended:perp:BTC-USD', size: '0.5', entry_price: '58230'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', size: '0.5', entry_price: '58230.10'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', size: '0.5', entry_price: '58230.10'}
       callTemplate: |
@@ -1123,6 +1147,7 @@ methods:
         bitget: {market_id: 'bitget:usdt:BTCUSDT', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
         bybit: {market_id: 'bybit:perp:BTCUSDT', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
         lighter: {market_id: 'lighter:perp:1', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
+        extended: {market_id: 'extended:perp:BTC-USD', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
         aster: {market_id: 'aster:perp:BTCUSDT', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
@@ -1159,6 +1184,7 @@ methods:
         aster: {market_id: 'aster:perp:BTCUSDT', leverage: '20', free: '8120.00', notional: '162400.00'}
         dydx: {market_id: 'dydx:perp:BTC-USD', leverage: '20', free: '8120.00', notional: '162400.00'}
         lighter: {market_id: 'lighter:perp:1', leverage: '20', free: '8120.00', notional: '162400.00'}
+        extended: {market_id: 'extended:perp:BTC-USD', leverage: '10', free: '8120.00', notional: '81200.00'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', leverage: '20', free: '8120.00', notional: '162400.00'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', leverage: '20', free: '8120.00', notional: '162400.00'}
       callTemplate: |

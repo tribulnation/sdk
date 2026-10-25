@@ -881,22 +881,35 @@ async def test_feed_retries_an_unreachable_status_like_any_transport_error(
   assert fill.height == 10 and len(requests) == 1 and comet.status_calls == 2
 
 
-@pytest.mark.parametrize('source', ['node', 'fastest'])
-async def test_a_node_behind_the_tip_fails_the_trades_stream(source: str):
-  """The node feed's refusal reaches the caller with either source that reads it."""
+async def refused() -> AsyncIterator[NodeFill]:
+  """A node feed refusing its node."""
+  raise NetworkError('dYdX full node is catching up')
+  yield
+
+
+async def test_a_node_behind_the_tip_fails_the_node_stream():
+  """With `'node'`, the node feed's refusal reaches the caller."""
   gate = Gate()
-  gate.events['indexer'].set()
-
-  async def refused() -> AsyncIterator[NodeFill]:
-    """A node feed refusing its node."""
-    raise NetworkError('dYdX full node is catching up')
-    yield
-
   market = market_with(node=refused(), indexer=gate.stream('indexer', []))
-  settings: Any = {'dydx': {'trades_source': source}}
+  settings: Any = {'dydx': {'trades_source': 'node'}}
   async with trades_stream(market, settings=settings) as stream:
     with pytest.raises(NetworkError, match='catching up'):
       await asyncio.wait_for(anext(aiter(stream)), 2)
+
+
+async def test_fastest_drops_a_node_behind_the_tip(caplog: pytest.LogCaptureFixture):
+  """With `'fastest'`, a refused node is dropped with a warning and the indexer's fills
+  keep coming: the indexer is the floor."""
+  gate = Gate()
+  gate.events['indexer'].set()
+  market = market_with(
+    node=refused(), indexer=gate.stream('indexer', [indexer_message(10)])
+  )
+  settings: Any = {'dydx': {'trades_source': 'fastest'}}
+  async with trades_stream(market, settings=settings) as stream:
+    [trade] = await take(aiter(stream), 1)
+  assert trade.id == 'indexer-10-1'
+  assert 'catching up' in caplog.text and 'racing without them' in caplog.text
 
 
 async def test_feed_reconnects_and_resolves_deleveraging(

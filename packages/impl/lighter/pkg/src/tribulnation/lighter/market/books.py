@@ -4,7 +4,7 @@
 from contextlib import asynccontextmanager
 from decimal import Decimal
 
-from typing_extensions import AsyncIterable, AsyncIterator, Mapping, Sequence
+from typing_extensions import AsyncIterator, Mapping, Sequence
 from typed_lighter.core import timestamp_micros
 from typed_lighter.schemas import PriceLevel, SimpleOrder
 from typed_lighter.streams.ticker import TickerUpdate
@@ -14,7 +14,7 @@ from tribulnation.sdk.core import (
   Subscription,
   exception_wrapper,
 )
-from tribulnation.sdk.market import Book, Settings
+from tribulnation.sdk.market import Book, Settings, detached_books
 from tribulnation.sdk.util import epoch_time
 
 from ..core import DepthSource, Shared
@@ -173,7 +173,7 @@ def order_book_subscription(shared: Shared, market_id: int) -> Subscription[Book
           else:
             book.update(delta)
           nonce = state['nonce']
-          yield book.copy()
+          yield book.frozen()
 
       return Subscription.Context(books(), exception_wrapper()(stream.unsubscribe))
 
@@ -218,10 +218,5 @@ async def depth_stream(
   """
   upstream = subscription(shared, market_id, source)
 
-  async def trimmed(books: AsyncIterable[Book]) -> AsyncIterator[Book]:
-    """Copy before handing out: subscribers share each upstream snapshot."""
-    async for book in books:
-      yield book.copy() if levels is None else book.copy().limit(levels)
-
   async with upstream.subscribe(queue_size=queue_size, overflow=overflow) as stream:
-    yield trimmed(stream)
+    yield detached_books(stream, levels)

@@ -140,15 +140,26 @@ icon = "https://catalogue.tribulnation.com/icons/asset/lighter.svg"
 [[venues]]
 slug = "margin-trade"
 name = "margin.trade"
-tier = "development"
+tier = "beta"
 repo = "https://github.com/tribulnation/sdk"
 path = "packages/impl/margin-trade"
 pypi = "https://pypi.org/project/tribulnation-margin-trade/"
+icon = "https://catalogue.tribulnation.com/icons/platform/margin-trade.svg"
 
 [[venues]]
 slug = "grvt"
 name = "GRVT"
-tier = "development"
+tier = "beta"
 repo = "https://github.com/tribulnation/sdk"
 path = "packages/impl/grvt"
 pypi = "https://pypi.org/project/tribulnation-grvt/"
+icon = "https://catalogue.tribulnation.com/icons/asset/grvt.svg"
+
+[[venues]]
+slug = "extended"
+name = "Extended"
+tier = "beta"
+repo = "https://github.com/tribulnation/sdk"
+path = "packages/impl/extended"
+pypi = "https://pypi.org/project/tribulnation-extended/"
+icon = "https://catalogue.tribulnation.com/icons/platform/extended.svg"

@@ -1,7 +1,8 @@
-from typing_extensions import Sequence, overload
+from typing_extensions import AsyncIterable, AsyncIterator, Sequence, overload
 from dataclasses import dataclass, field
 from datetime import datetime
 from decimal import Decimal
+from tribulnation.sdk.core.stream import Skipping, SkippingView
 from .fees import Fees
 
 
@@ -184,9 +185,27 @@ class Book:
     return fmt_book(self, fmt)
 
   def copy(self) -> 'Book':
-    import copy
+    """An independent copy: new level lists and new entries, in the same order.
 
-    return copy.deepcopy(self)
+    Mutating either book, its lists or its entries leaves the other intact. Prices,
+    quantities and `time` are immutable values and are shared.
+    """
+    return presorted(
+      bids=[Book.Entry(e.price, e.qty) for e in self.bids],
+      asks=[Book.Entry(e.price, e.qty) for e in self.asks],
+      time=self.time,
+    )
+
+  def frozen(self) -> 'Book':
+    """This book's current levels, unaffected by later `update`s of it.
+
+    Copies the two level lists but shares the entries: `update` binds new lists and
+    never mutates an entry, so a stream maintaining a book can take one per update for
+    two list copies instead of a `copy` of every entry. The entries stay shared with
+    this book, so the result must not be mutated nor handed to a consumer that may;
+    give consumers `copy()` (see `detached_books`).
+    """
+    return presorted(bids=list(self.bids), asks=list(self.asks), time=self.time)
 
   def update(self, updates: 'Book'):
     """Update the local book with an incoming update.
@@ -246,6 +265,42 @@ class Book:
     self.asks = sorted_asks[j:]
     if updates.time is not None:
       self.time = updates.time
+
+
+def presorted(
+  *, bids: list[Book.Entry], asks: list[Book.Entry], time: datetime | None
+) -> Book:
+  """A book from levels already in book order, skipping the constructor's sort."""
+  book = object.__new__(Book)
+  book.bids = bids
+  book.asks = asks
+  book.time = time
+  return book
+
+
+def detached_books(
+  books: AsyncIterable[Book], levels: int | None = None
+) -> AsyncIterable[Book]:
+  """Give one subscriber its own copy of each shared book it reads, trimmed to `levels`.
+
+  Copy on read: a book replaced in the subscriber's inbox before being read is never
+  copied, so a slow subscriber costs nothing for the books it skips. Each delivered
+  book is the subscriber's to mutate (`buy`, `sell`, ...), never seen by the stream nor
+  by other subscribers. Keeps the source's `skipped` count when it has one.
+
+  Args:
+    books: A subscriber's stream of shared books, e.g. `Book.frozen` ones.
+    levels: Keep at most this many levels per side.
+  """
+
+  async def copies() -> AsyncIterator[Book]:
+    async for book in books:
+      yield book.copy() if levels is None else book.limit(levels).copy()
+
+  if isinstance(books, Skipping):
+    return SkippingView(copies(), books)
+  else:
+    return copies()
 
 
 def avg_price(entries: Sequence['Book.Entry']) -> Decimal:

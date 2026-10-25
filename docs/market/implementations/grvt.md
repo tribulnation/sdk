@@ -119,6 +119,6 @@ No `settings` are read.
 
 ---
 
-← [Deribit Market](deribit.md) · **Next:** [Lighter Market](lighter.md) →
+← [Extended Market](extended.md) · **Next:** [Lighter Market](lighter.md) →
 
 <!-- /next -->

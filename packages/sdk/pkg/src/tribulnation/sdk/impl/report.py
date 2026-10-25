@@ -19,6 +19,7 @@ from .accounts import (
   Deribit,
   Mexc,
   Hyperliquid,
+  Extended,
   Lighter,
   MarginTrade,
   Grvt,
@@ -227,6 +228,25 @@ class ReportSDK:
       validate=account.validate,
     )
 
+  def extended(self, account: Extended, id: str) -> Report:
+    """Build Extended's snapshots and history of the API key's sub-account; a read-only
+    key is enough."""
+    try:
+      from tribulnation.extended import Report as ExtendedReport
+    except ImportError as e:
+      raise ImportError(
+        'extended sdk is not installed. Please install it with `pip install tribulnation-extended`.'
+      ) from e
+    api_key = account.resolved_api_key
+    if api_key is None:
+      raise ValueError(f'Account {id} has no API key.')
+    return ExtendedReport.new(
+      api_key,
+      network='mainnet' if account.venue == 'extended' else 'testnet',
+      validate=account.validate,
+      account_id=id,
+    )
+
   def lighter(self, account: Lighter, id: str) -> Report:
     """Build Lighter's credential-free snapshots of every account of the L1 address,
     given directly or resolved from the account index."""
@@ -318,6 +338,8 @@ class ReportSDK:
         return self.kucoin(account, id)
       case 'deribit' | 'deribit_testnet':
         return self.deribit(account, id)
+      case 'extended' | 'extended_testnet':
+        return self.extended(account, id)
       case 'lighter' | 'lighter_testnet':
         return self.lighter(account, id)
       case 'aster' | 'aster_testnet':

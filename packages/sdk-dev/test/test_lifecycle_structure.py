@@ -18,6 +18,7 @@ from tribulnation.sdk.core import Context, ManagedResource, NetworkError
 OWNERS = [
   ('tribulnation.aster.core', 'Shared', 'client'),
   ('tribulnation.lighter.core', 'Shared', 'client'),
+  ('tribulnation.extended.core', 'Shared', 'client'),
   ('tribulnation.margin_trade.core', 'Shared', 'client'),
   ('tribulnation.grvt.core', 'Shared', 'client'),
   ('tribulnation.binance.core', 'SdkMixin', 'client'),

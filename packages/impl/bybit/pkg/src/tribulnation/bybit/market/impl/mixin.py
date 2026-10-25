@@ -71,8 +71,8 @@ async def merged_books(
   merges in; a push arriving without one falls back to Bybit's documented `u == 1`
   marker.
 
-  Each yielded book is a copy, so a book already handed to a subscriber is never
-  mutated by a later push.
+  Each yielded book is `Book.frozen`, so a later push never mutates it; `depth_stream`
+  gives each subscriber its own copy.
   """
   book = Book()
   async for update in updates:
@@ -83,7 +83,7 @@ async def merged_books(
       book = delta
     else:
       book.update(delta)
-    yield book.copy()
+    yield book.frozen()
 
 
 async def flatten_executions(

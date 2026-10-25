@@ -22,6 +22,7 @@ methods:
       kucoin: Classic main/trade and Earn only; futures and legacy margin compartments excluded.
       deribit: Accessible subaccounts; cash balances and signed base-unit positions, not equity-as-cash.
       ethereum: Requires an address and configured data providers; provider settings can be supplied in Python.
+      extended: The API key's sub-account only, labelled by its account id; another sub-account needs its own key.
       lighter: Every account of the L1 address (or of the account index's owner), credential-free; pool shares as pro-rata pool holdings.
       margin-trade: The perp wallet (USDC without unrealized PnL, positions) and the spot wallet, read by address.
       grvt: The funding wallet and each readable trading sub-account's futures (cash, isolated positions' balances included, without unrealized PnL; positions) and spot wallets, with an API key.
@@ -36,6 +37,7 @@ methods:
         deribit: {subaccounts: 1, balances: 2}
         dydx: {subaccounts: 1, balances: 2}
         ethereum: {subaccounts: 1, balances: 2}
+        extended: {subaccounts: 1, balances: 2}
         hyperliquid: {subaccounts: 1, balances: 2}
         kraken: {subaccounts: 1, balances: 2}
         kucoin: {subaccounts: 1, balances: 2}
@@ -60,6 +62,7 @@ methods:
       dydx: Full older chain history requires an archive provider, not a shorter fallback window.
       ethereum: Requires configured data providers; chain history and interpretation depend on provider/configuration.
       deribit: Transaction-log rows include unknown observations for unsupported trade/settlement interpretations.
+      extended: Asset operations, fills (the 10000 most recent) and closed positions; raises NotImplementedError when the window holds a funding or interest payment.
       margin-trade: Fills (the 10000 most recent), funding and transfers; system and liquidation transfers are unclassified.
     example:
       accountVenues: [hyperliquid]
@@ -71,6 +74,7 @@ methods:
         deribit: {count: 2}
         dydx: {count: 2}
         ethereum: {count: 2}
+        extended: {count: 2}
         hyperliquid: {count: 2}
         kraken: {count: 2}
         kucoin: {count: 2}

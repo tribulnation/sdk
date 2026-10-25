@@ -265,6 +265,8 @@ TRADING_ACCOUNTS: list[accounts.Account] = [
   accounts.Hyperliquid(venue='hyperliquid_testnet', public=True),
   accounts.Aster(public=True),
   accounts.Aster(venue='aster_testnet', public=True),
+  accounts.Extended(public=True),
+  accounts.Extended(venue='extended_testnet', public=True),
   accounts.Lighter(public=True),
   accounts.Lighter(venue='lighter_testnet', public=True),
   accounts.MarginTrade(public=True),

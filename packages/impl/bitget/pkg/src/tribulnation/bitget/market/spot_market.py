@@ -129,9 +129,9 @@ class SpotMarket(MarketMixin, Market):
   async def place_order(
     self, order: Order, *, settings: Settings = {}
   ) -> OrderResponse:
-    """Not implemented: Bitget is not a venue we trade on."""
+    """Not implemented: trading is not supported for Bitget."""
     raise NotImplementedError('Trading is not implemented for Bitget.')
 
   async def cancel_order(self, id: str, *, settings: Settings = {}) -> Any:
-    """Not implemented: Bitget is not a venue we trade on."""
+    """Not implemented: trading is not supported for Bitget."""
     raise NotImplementedError('Trading is not implemented for Bitget.')

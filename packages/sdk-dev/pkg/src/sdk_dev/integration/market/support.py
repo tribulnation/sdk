@@ -80,6 +80,8 @@ CASES: Mapping[str, Sequence[CandleCase]] = {
     CandleCase(market_id='spot:XBTUSD', page=None),
     CandleCase(market_id='perp:PF_XBTUSD', page=2000),
   ],
+  # A walk asks for at most 1000 opens per request (the venue serves up to 2800).
+  'extended': [CandleCase(market_id='perp:BTC-USD', page=1000)],
   # Numeric market ids differ by network: BTC and ETH/USDC are 1 and 2048 on mainnet.
   'lighter': [
     CandleCase(market_id='perp:1', page=500),

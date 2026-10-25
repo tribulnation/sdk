@@ -1,33 +1,31 @@
-# tribulnation-sdk 2.19.0
+# tribulnation-sdk 2.21.0
 
-Adds margin.trade: accounts, Market and Report routing, and the `margin-trade` extra.
+Book streams stop deep-copying the whole order book on every update, and dYdX accounts
+can pick their default fill source.
 
 New:
 
-1. `accounts.MarginTrade` (`venue = "margin-trade"` or `"margin-trade-testnet"`): the
-   master `address` (base58) and the master's or an approved agent's `private_key`,
-   defaulting to `$MARGIN_TRADE_ADDRESS`/`$MARGIN_TRADE_PRIVATE_KEY` (or the
-   `MARGIN_TRADE_TESTNET_` variables on testnet). With `public = true` the address
-   alone serves account reads; a private account requires the key. The variables of
-   one network are never used for the other.
-2. `MarketSDK` and `ReportSDK` route `margin-trade` and `margin-trade-testnet`
-   accounts to `tribulnation-margin-trade` (spot and USDC-margined perpetuals;
-   snapshots and history by address). The gateway's account schema accepts both venue
-   IDs.
-3. The `margin-trade` extra installs `tribulnation-margin-trade>=0.1.0`.
+1. `Book.frozen()`: the book's current levels, unaffected by later `update`s. It copies
+   the two level lists and shares the entries, for venue streams that hand out one book
+   per update.
+2. `detached_books(stream, levels=None)` (`tribulnation.sdk.market`): gives one
+   subscriber its own copy of each shared book it reads, trimmed to `levels`. A book
+   replaced unread in a `'latest'` inbox is never copied, and the stream keeps its
+   `skipped` count ([ADR 0049](../../dev-docs/adr/0049-book-streams-copy-on-read.md)).
+3. `accounts.Dydx` gains `fill_source` (`'indexer' | 'node' | 'socket' | 'fastest'`,
+   the account's default `trades_source`) and `fill_socket` (a local fill daemon's unix
+   socket, `$ENV_VAR` allowed). `MarketSDK` passes them to the dYdX package only when
+   set; using either needs tribulnation-dydx 0.18.0
+   ([ADR 0050](../../dev-docs/adr/0050-dydx-fill-socket.md)).
 
-Qualification tooling accepts hyphenated testnet venue IDs (`margin-trade-testnet`),
-mapping them onto the mainnet slug.
+Changed:
 
-This release goes with tribulnation-margin-trade 0.1.0, which requires SDK >=2.19.0
-and typed-margin-trade >=0.1.1. Other adapters are unaffected.
+1. `Book.copy()` builds new level lists and entries directly instead of calling
+   `deepcopy`. The result is the same: an independent book, in the same order, sharing
+   only the immutable prices, quantities and time. On a 500-level-a-side book it takes
+   about 0.5 ms instead of 8 ms.
 
-Qualification on 2026-10-21, against the Catalogue pin
-`70d93fa09c351f5a24c915b348e8f38f31c7b6a6` (Catalogue main with the margin.trade
-platform; the pin moves from `1851660a`): all 15 venues have passing, verified
-read-suite evidence, and every market venue passing consistency evidence. Waived account
-reads (ADR 0042), skipped as expected: Binance `usdm` `fees` (`credential_scope`) and
-MEXC `spot` `fees` (`account_setting`). The venue renamed margin.trade's `PRL` token
-to `PEARL`, so its spot reference case is now `spot:PEARL/USDC`.
-
-All 2,149 repository unit tests pass.
+This release goes with tribulnation-bitget 0.11.1, -bybit 0.7.1, -coinbase 0.5.1,
+-extended 0.1.1, -grvt 0.1.1, -kraken 0.7.2, -kucoin 0.6.1, -lighter 0.11.1 and
+-mexc 2.4.1, which require SDK >=2.21.0, and tribulnation-dydx 0.18.0. Other adapters
+are unaffected.
