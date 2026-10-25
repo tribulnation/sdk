@@ -69,7 +69,7 @@ not a changelog or a substitute for API documentation and tests.
 | [0044](0044-trades-stream-settings-dydx-node-fills.md) | `trades_stream` settings and dYdX full node fills | Proposed; implemented, not release-verified; amended by 0045 and 0050 |
 | [0045](0045-dydx-node-feed-refuses-a-node-behind.md) | The dYdX node feed refuses a node behind the chain tip | Proposed; implemented, not release-verified; amends 0044; amended by 0050 |
 | [0046](0046-conflated-snapshot-streams.md) | Conflate snapshot streams before decoding, and report skipped books | Proposed; implemented for Binance, Aster and Hyperliquid, not release-verified |
-| [0047](0047-grvt-credential-modes.md) | GRVT credential modes and definitive order refusals | Proposed; implemented, not release-verified |
+| [0047](0047-grvt-credential-modes.md) | GRVT credential modes and definitive order refusals | Accepted; implemented, not release-verified |
 | [0048](0048-extended-rfq-indicative-tickers.md) | Extended RFQ depth from quotes, with indicative tickers as a visible limitation | Accepted; implemented, not release-verified; amends 0014 and 0022 |
 | [0049](0049-book-streams-copy-on-read.md) | Book streams share a frozen book and copy it on read | Proposed; implemented, not release-verified |
 | [0050](0050-dydx-fill-socket.md) | dYdX fills from a local fill socket, and `'fastest'` over every source | Proposed; implemented, not release-verified; amends 0044 and 0045; amended by 0052 |

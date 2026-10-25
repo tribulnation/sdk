@@ -2,7 +2,7 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: proposed; implemented, not release-verified
+1. Status: accepted; implemented, not release-verified
 2. Date: 2026-10-22
 
 ## Context
