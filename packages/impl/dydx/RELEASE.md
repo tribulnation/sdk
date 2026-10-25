@@ -1,42 +1,39 @@
-# tribulnation-dydx 0.18.0
+# tribulnation-dydx 0.19.0
 
 Requires SDK >=2.17.0, typed-dydx >=3.7.0 and typed-core >=0.11.0, unchanged. Account
-config `fill_source` and `fill_socket` needs SDK >=2.21.0, which passes them on.
-`trades_stream` can read fills from a local fill daemon, and `'fastest'` races every
-configured source ([ADR 0050](../../../dev-docs/adr/0050-dydx-fill-socket.md),
-amending ADRs 0044 and 0045). See "Fill sources" in the dYdX docs.
+config `fill_source` and `fill_socket` still needs SDK >=2.21.0, which passes them on.
+The indexer's WebSocket channels reconnect after a dropped connection, and `'fastest'`
+rides a short indexer drop
+([ADR 0052](../../../dev-docs/adr/0052-dydx-indexer-channels-reconnect.md), amending
+ADR 0050). See "How indexer fills are read" in the dYdX docs.
 
 New:
 
-1. `trades_source='socket'` reads fills from a fill daemon on this host: a WebSocket
-   over the unix socket `fill_socket`, subprotocol `tribulnation-dydx-fills.v1`. Fills
-   are built like node fills (synthetic `id`, `time=None`, `fee=None`).
-   `details['level']` says whether a fill arrived when its block committed or earlier,
-   at proposal time. A proposed fill whose proposal does not commit is followed by a
-   reversing trade (`qty` negated, `id` suffixed `:revert`, `details['revert'] = True`).
-   The connection reconnects with backoff and resubscribes from the last complete
-   block; the daemon replays up to 300 blocks.
-2. `DydxMarket.new` (and the SDK `[accounts.<id>]` config, from SDK 2.21.0) take
-   `fill_source`, the account's default `trades_source`, and `fill_socket`. A per-call
-   `trades_source` still overrides `fill_source`.
+1. Settings field `indexer_reconnect_window` (seconds, default 3, `0` for at once): how
+   long a `'fastest'` trades stream races on while the indexer's channel reconnects
+   before it fails with `NetworkError`.
 
 Changed:
 
-1. `'fastest'` races the indexer against every configured source: the node when
-   `full_node_grpc` and `full_node_rpc` are set, the socket when `fill_socket` is set.
-   At least one is required. The indexer is the floor: a node or socket that fails or
-   ends, including a node behind the chain tip as it connects, is dropped with a warning
-   and the others race on. Before, a node behind the tip failed the whole stream.
-2. Under `'fastest'`, each later copy of a fill logs at INFO which source was first and
-   by how many milliseconds. The client keeps per-source and per-pair totals, which
-   each `'fastest'` stream logs every 10 minutes.
+1. `'fastest'` no longer ends when the indexer's WebSocket drops. The node and socket
+   race on while the indexer reconnects (0.5 s backoff doubling to 8 s; usually about
+   1.5 s), and the fills of the gap are then read from REST
+   (`/v4/fills/parentSubaccountNumber`, with their orders) and deduplicated, so the drop
+   skips no fill. Backfilled copies are not counted as leads. An indexer down for over
+   `indexer_reconnect_window` seconds ends the stream with `NetworkError`. Before, any
+   drop ended it.
+2. Book streams (`depth_stream`) ride a drop: after the reconnection the new
+   subscription's snapshot is delivered at once. Only a book channel down for 60 s ends
+   them. Before, any drop ended every book stream with `NetworkError`.
+3. Under `'fastest'`, each fill is recorded and logged once per client. When several
+   `'fastest'` streams follow one market (e.g. a strategy's hedger and position
+   tracker), only the oldest records and logs the race, and the next takes over when it
+   leaves. The `dYdX fill race:` totals come from one client-wide task every 10 minutes.
+   Before, each stream logged each fill and its own totals, so fills were logged and
+   counted once per stream.
 
-`'indexer'` (the default) and `'node'` are unchanged. The socket source is verified by
-unit fixtures against a fake daemon; the read suites do not open fill streams.
+`'indexer'` (the default) is unchanged: a dropped connection ends the stream with
+`NetworkError`, and the fills of the gap are not read. So is `subscribe_parent_subaccount`.
+`'node'` and `'socket'` are unchanged.
 
 Every other method is unchanged.
-
-Release qualification on 2026-10-24 passed the read suites and market consistency.
-Committed evidence under `release-evidence/dydx/` matches pinned Catalogue
-`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
-release follows SDK 2.21.0 publication.
