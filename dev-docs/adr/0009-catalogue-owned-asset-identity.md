@@ -2,7 +2,8 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: accepted
+1. Status: accepted; amended by [ADR 0051](0051-spot-perp-market-types-collateral-ids.md)
+   (proposed), which gives spot rules venue-native `base` and `quote`
 2. Date: 2026-09-10
 3. Amends: ADRs 0003, 0006 and 0007; supersedes the remaining base/quote fields from ADR 0001.
 

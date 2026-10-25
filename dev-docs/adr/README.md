@@ -31,7 +31,7 @@ not a changelog or a substitute for API documentation and tests.
 | [0006](0006-release-evidence-scope.md) | Separate exact coverage and add non-market release evidence | Accepted; amended by 0009 |
 | [0007](0007-dydx-quote-asset.md) | dYdX quote and fee assets are USDC | Accepted; quote field removed by 0009 |
 | [0008](0008-bitget-classic-and-uta-coin.md) | Coexisting Classic and UTA Bitget coin perpetuals | Accepted; UTA support deferred by 0010; Classic retired by 0018 |
-| [0009](0009-catalogue-owned-asset-identity.md) | Catalogue-owned instrument asset identity | Accepted |
+| [0009](0009-catalogue-owned-asset-identity.md) | Catalogue-owned instrument asset identity | Accepted; amended by 0051 (proposed) |
 | [0010](0010-defer-bitget-uta-coin.md) | Defer Bitget UTA coin support | Accepted; amended by 0018 |
 | [0011](0011-liquidity-independent-consistency.md) | Compare available quote sides without guaranteeing liquidity | Accepted |
 | [0012](0012-deribit-public-mainnet-private-testnet.md) | Deribit mainnet public metadata and testnet private Report evidence | Accepted |
@@ -60,7 +60,7 @@ not a changelog or a substitute for API documentation and tests.
 | [0035](0035-funding-cash-flow-sign.md) | Funding payments use received-positive account cash flows | Accepted; supersedes the sign decision in 0024 |
 | [0036](0036-no-implicit-accounts.md) | SDK roots have no implicit accounts | Accepted |
 | [0037](0037-account-scoped-ids.md) | Account-scoped market and exchange IDs | Proposed; implemented, not release-verified |
-| [0038](0038-account-market-leverage.md) | Account-scoped perpetual market leverage and the default available notional | Proposed; implemented, not release-verified; amended by 0041 |
+| [0038](0038-account-market-leverage.md) | Account-scoped perpetual market leverage and the default available notional | Proposed; implemented, not release-verified; amended by 0041 and 0051 (proposed) |
 | [0039](0039-hyperliquid-hip3-spot-fees.md) | Hyperliquid HIP-3 and spot fees via the official formula | Accepted; implemented, not release-verified; amended by 0042 |
 | [0040](0040-lighter-credential-modes.md) | Lighter credential modes: read-only tokens and public account reads | Proposed; implemented, not release-verified |
 | [0041](0041-venue-notional-caps.md) | Venue notional caps in available notional | Proposed; implemented for Aster, not release-verified; amended by 0042 |
@@ -73,4 +73,5 @@ not a changelog or a substitute for API documentation and tests.
 | [0048](0048-extended-rfq-indicative-tickers.md) | Extended RFQ depth from quotes, with indicative tickers as a visible limitation | Accepted; implemented, not release-verified; amends 0014 and 0022 |
 | [0049](0049-book-streams-copy-on-read.md) | Book streams share a frozen book and copy it on read | Proposed; implemented, not release-verified |
 | [0050](0050-dydx-fill-socket.md) | dYdX fills from a local fill socket, and `'fastest'` over every source | Proposed; implemented, not release-verified; amends 0044 and 0045; amended by 0052 |
+| [0051](0051-spot-perp-market-types-collateral-ids.md) | Spot and margin market types, and collateral IDs | Proposed; amends 0009 and 0038 |
 | [0052](0052-dydx-indexer-channels-reconnect.md) | dYdX indexer channels reconnect; `'fastest'` rides short drops, `'indexer'` ends | Proposed; implemented, not release-verified; amends 0050 |
