@@ -4,6 +4,7 @@ from typing_extensions import (
   Awaitable,
   Iterator,
   Sequence,
+  cast,
 )
 from contextlib import AsyncExitStack, asynccontextmanager
 from datetime import datetime
@@ -24,10 +25,17 @@ from tribulnation.sdk.core import (
 from tribulnation.dydx.core import wrap_exceptions
 from tribulnation.dydx.core.exceptions import VenueError, translate
 from .dedup import FillDedup, FillRace
-from .mixin import MarketMixin, ParentSubaccountNotification, settings_adapter
+from .mixin import (
+  INDEXER_RECONNECT_WINDOW,
+  MarketMixin,
+  ParentFeedItem,
+  ParentSubaccountNotification,
+  settings_adapter,
+)
 from .node_fills import FillKey, NodeFill, node_key, node_trade
 from .node_stream import node_fill_subscription
 from .orders import stream_order_ids
+from .reconnect import Dropped, Reconnected
 from .socket_fills import (
   ProposedTrades,
   SocketItem,
@@ -38,9 +46,6 @@ from .socket_fills import (
 )
 
 log = logging.getLogger(__name__)
-
-RACE_LOG_INTERVAL = 600.0
-"""Seconds between logs of a `'fastest'` stream's race statistics."""
 
 
 @PaginatedResponse.lift
@@ -154,9 +159,8 @@ def trades_stream(
     ValueError: On entry, for `'node'` without the account's full node endpoints,
       `'socket'` without its `fill_socket`, or `'fastest'` with neither.
   """
-  source = settings_adapter.validate_python(settings.get('dydx', {})).get(
-    'trades_source', self.shared.fill_source or 'indexer'
-  )
+  dydx = settings_adapter.validate_python(settings.get('dydx', {}))
+  source = dydx.get('trades_source', self.shared.fill_source or 'indexer')
   match source:
     case 'indexer':
       return indexer_stream(self, queue_size=queue_size, overflow=overflow)
@@ -165,14 +169,20 @@ def trades_stream(
     case 'socket':
       return socket_stream(self, queue_size=queue_size, overflow=overflow)
     case 'fastest':
-      return fastest_stream(self, queue_size=queue_size, overflow=overflow)
+      return fastest_stream(
+        self,
+        queue_size=queue_size,
+        overflow=overflow,
+        reconnect_window=dydx.get('indexer_reconnect_window', INDEXER_RECONNECT_WINDOW),
+      )
 
 
 @asynccontextmanager
 async def indexer_stream(
   self: MarketMixin, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'
 ):
-  """The market's fills from the indexer's parent subaccounts channel.
+  """The market's fills from the indexer's parent subaccounts channel; a dropped
+  connection ends them with `NetworkError`.
 
   Not wrapped in `wrap_exceptions` itself: wrapping a context manager's generator
   re-yields from an inner generator that the context's exit never reaches, so its
@@ -241,20 +251,27 @@ async def socket_stream(
 
 @asynccontextmanager
 async def fastest_stream(
-  self: MarketMixin, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail'
+  self: MarketMixin,
+  *,
+  queue_size: int = 1000,
+  overflow: OverflowPolicy = 'fail',
+  reconnect_window: float = INDEXER_RECONNECT_WINDOW,
 ):
   """The market's fills from every configured source, each emitted once, by the first
   source to deliver it (`FillDedup`).
 
   The sources are the indexer, plus the full node and the fill socket when the
   account configures them. Trades carry `details['source']` (`'node'`, `'socket'`, or
-  `'indexer'` with `details['fill']`, the indexer fill). The indexer is the floor: its
-  failure, or this subscriber overflowing, ends the stream with an error. A node or
-  socket source that ends or fails (e.g. a node behind the chain tip as it connects,
-  `NodeFeed`) is dropped with a warning and the others race on. Each later copy of a
-  fill logs (INFO) which source was first and by how many milliseconds; the client's
-  `fill_race` keeps the totals, which the stream logs every `RACE_LOG_INTERVAL`
-  seconds.
+  `'indexer'` with `details['fill']`, the indexer fill). The indexer is the floor, but
+  its channel reconnects on a dropped connection and backfills the gap
+  (`parent_subaccounts_feed`), the other sources racing on meanwhile; an indexer down
+  for over `reconnect_window` seconds (`0`: at once), or this subscriber overflowing,
+  ends the stream with an error. A node or socket source that ends or fails (e.g. a node behind the
+  chain tip as it connects, `NodeFeed`) is dropped with a warning and the others race
+  on. Each later copy of a fill logs (INFO) which source was first and by how many
+  milliseconds; the client's `fill_race` keeps the totals and logs them every
+  `RACE_LOG_INTERVAL` seconds. Several streams of one market log each fill once
+  (`FillRace.racing`).
 
   Raises:
     ValueError: On entry, when the account configures neither a full node nor a socket.
@@ -277,13 +294,34 @@ async def fastest_stream(
   dedup = FillDedup(race=race)
   loop = asyncio.get_running_loop()
 
-  async def from_indexer(logs: AsyncIterable[ParentSubaccountNotification]):
-    """Admit the indexer's fills."""
-    async for notification in logs:
+  async def from_indexer(feed: AsyncIterable[ParentFeedItem]):
+    """Admit the indexer's fills; fail once its channel is down for over
+    `reconnect_window` seconds."""
+    items = aiter(feed)
+    deadline: float | None = None
+    while True:
+      timeout = None if deadline is None else max(deadline - loop.time(), 0)
+      try:
+        notification = await asyncio.wait_for(anext(items), timeout)
+      except StopAsyncIteration:
+        return
+      except asyncio.TimeoutError:
+        raise NetworkError(
+          f'dYdX indexer down for over {reconnect_window:g}s (indexer_reconnect_window)'
+        ) from None
+      if isinstance(notification, Dropped):
+        if reconnect_window <= 0:
+          raise NetworkError(*notification.error.args) from notification.error
+        deadline = loop.time() + reconnect_window
+        continue
+      if isinstance(notification, Reconnected):
+        deadline = None
+        continue
+      late = cast(dict[str, object], notification).get('backfill') is True
       for trade, fill in indexer_trades(
         notification, market=self.market, address=address, parent=parent
       ):
-        if dedup.admit('indexer', indexer_key(fill), at=loop.time()):
+        if dedup.admit('indexer', indexer_key(fill), at=loop.time(), late=late):
           trade.details = {'source': 'indexer', 'fill': fill}
           if not out.push(trade):
             return
@@ -319,7 +357,7 @@ async def fastest_stream(
             return
 
   async def floor(source: Awaitable[None]):
-    """Run the indexer; its end or failure ends the merged stream."""
+    """Run the indexer; its end or lasting failure ends the merged stream."""
     try:
       await source
       out.fail(NetworkError('dYdX indexer fills ended unexpectedly'))
@@ -338,17 +376,12 @@ async def fastest_stream(
     except Exception as e:
       log.warning('dYdX %s fills failed: %r; racing without them', name, e)
 
-  async def report():
-    """Log the race statistics now and then."""
-    while True:
-      await asyncio.sleep(RACE_LOG_INTERVAL)
-      log.info('dYdX fill race: %s', race.stats())
-
   async with AsyncExitStack() as stack:
+    dedup.recording = stack.enter_context(race.racing(clob_pair_id))
     logs = await stack.enter_async_context(
-      self.subscribe_parent_subaccount(parent, queue_size=queue_size)
+      self.subscribe_parent_feed(parent, queue_size=queue_size)
     )
-    tasks: list[Awaitable[None]] = [floor(from_indexer(logs)), report()]
+    tasks: list[Awaitable[None]] = [floor(from_indexer(logs))]
     if shared.full_node is not None:
       fills = await stack.enter_async_context(
         node_fill_subscription(shared).subscribe(queue_size=queue_size)

@@ -72,5 +72,6 @@ not a changelog or a substitute for API documentation and tests.
 | [0047](0047-grvt-credential-modes.md) | GRVT credential modes and definitive order refusals | Proposed; implemented, not release-verified |
 | [0048](0048-extended-rfq-indicative-tickers.md) | Extended RFQ depth from quotes, with indicative tickers as a visible limitation | Accepted; implemented, not release-verified; amends 0014 and 0022 |
 | [0049](0049-book-streams-copy-on-read.md) | Book streams share a frozen book and copy it on read | Proposed; implemented, not release-verified |
-| [0050](0050-dydx-fill-socket.md) | dYdX fills from a local fill socket, and `'fastest'` over every source | Proposed; implemented, not release-verified; amends 0044 and 0045 |
+| [0050](0050-dydx-fill-socket.md) | dYdX fills from a local fill socket, and `'fastest'` over every source | Proposed; implemented, not release-verified; amends 0044 and 0045; amended by 0052 |
 | [0051](0051-spot-perp-market-types-collateral-ids.md) | Spot and margin market types, and collateral IDs | Proposed; amends 0009 and 0038 |
+| [0052](0052-dydx-indexer-channels-reconnect.md) | dYdX indexer channels reconnect; `'fastest'` rides short drops, `'indexer'` ends | Proposed; implemented, not release-verified; amends 0050 |
