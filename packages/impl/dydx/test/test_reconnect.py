@@ -4,8 +4,11 @@ from datetime import datetime, timezone
 from decimal import Decimal
 from typing_extensions import Any, AsyncIterator, cast
 import asyncio
+import contextlib
 import logging
+import time
 
+import pydantic
 import pytest
 from typed_core.exceptions import NetworkError as TypedNetworkError
 from typed_dydx.indexer.schemas import Fill, PerpetualMarket
@@ -14,13 +17,13 @@ from typed_dydx.protos.dydxprotocol import clob, subaccounts
 from tribulnation.dydx.market.exchange import Exchange
 from tribulnation.dydx.market.impl import dedup, parent_feed, reconnect
 from tribulnation.dydx.market.impl.dedup import FillDedup, FillRace
-from tribulnation.dydx.market.impl.mixin import MarketMixin, Shared
+from tribulnation.dydx.market.impl.mixin import MarketMixin, Shared, ended_by_drops
 from tribulnation.dydx.market.impl.orders import (
   indexer_order_id,
   indexer_subaccount_id,
-  serialize_id,
 )
 from tribulnation.dydx.market.impl.parent_feed import ParentFills
+from tribulnation.dydx.market.impl.reconnect import Dropped, Reconnected
 from tribulnation.dydx.market.impl.socket_fills import (
   FrameParser,
   SocketItem,
@@ -188,10 +191,11 @@ async def take(stream: AsyncIterator[Any], n: int) -> list[Any]:
 # ── reconnecting ────────────────────────────────────────────────────────────
 
 
-async def test_a_dropped_channel_reopens_and_subscribers_see_no_end(
+async def test_a_dropped_channel_reopens_and_signals_the_gap(
   caplog: pytest.LogCaptureFixture,
 ):
-  """After a drop the channel is released, reopened, and items go on."""
+  """After a drop the channel is released and reopened; subscribers see `Dropped`,
+  `Reconnected`, and the items go on."""
   calls: list[bool] = []
   streams = [FakeStream(None, [1, 2], drop=True), FakeStream(None, [3], drop=False)]
 
@@ -212,7 +216,10 @@ async def test_a_dropped_channel_reopens_and_subscribers_see_no_end(
 
   subscription = Subscription[Any].of(reconnect.reconnecting('test', open))
   async with subscription.subscribe() as inbox:
-    assert await take(aiter(inbox), 3) == [1, 2, 3]
+    one, two, dropped, reconnected, three = await take(aiter(inbox), 5)
+  assert (one, two, three) == (1, 2, 3)
+  assert isinstance(dropped, Dropped) and 'Error receiving' in str(dropped.error)
+  assert isinstance(reconnected, Reconnected) and reconnected.after >= 0
   assert calls == [False, True]
   assert streams[0].unsubscribed and streams[1].unsubscribed
   assert 'dYdX indexer test dropped' in caplog.text
@@ -242,6 +249,7 @@ async def test_a_channel_down_too_long_ends_its_subscribers():
 
   subscription = Subscription[Any].of(reconnect.reconnecting('test', open))
   async with subscription.subscribe() as inbox:
+    assert isinstance((await take(aiter(inbox), 1))[0], Dropped)
     with pytest.raises(NetworkError, match='indexer unreachable'):
       await asyncio.wait_for(anext(aiter(inbox)), 3)
   assert attempts > 2
@@ -296,6 +304,7 @@ async def test_a_rejected_reopen_is_not_retried():
 
   subscription = Subscription[Any].of(reconnect.reconnecting('test', open))
   async with subscription.subscribe() as inbox:
+    assert isinstance((await take(aiter(inbox), 1))[0], Dropped)
     with pytest.raises(BadRequest):
       await asyncio.wait_for(anext(aiter(inbox)), 2)
   assert calls == 2
@@ -323,7 +332,8 @@ async def test_parent_feed_backfills_the_gap_from_rest(
   caplog: pytest.LogCaptureFixture,
 ):
   """On reconnection the fills between the last height seen and the new subscription's
-  height come from REST, marked `backfill`, then live fills go on, without repeats."""
+  height come from REST, marked `backfill` after `Reconnected`, then live fills go on,
+  without repeats."""
   indexer = FakeIndexer(
     [
       FakeStream(
@@ -345,8 +355,9 @@ async def test_parent_feed_backfills_the_gap_from_rest(
   )
   shared = shared_with(indexer)
   async with shared.parent_account_subscription(0).subscribe() as inbox:
-    first, gap, live = await take(aiter(inbox), 3)
+    first, dropped, reconnected, gap, live = await take(aiter(inbox), 5)
   assert [f['id'] for f in first['fills']] == ['a']
+  assert isinstance(dropped, Dropped) and isinstance(reconnected, Reconnected)
   assert gap['backfill'] is True
   assert [f['id'] for f in gap['fills']] == ['b', 'd']
   assert gap['fills'][0]['subaccountId'] == indexer_subaccount_id(ADDRESS, 0)
@@ -380,13 +391,14 @@ async def test_a_failed_backfill_retries_the_reconnection():
   shared = shared_with(indexer)
   cast(Any, shared.client.indexer.data).get_parent_fills = flaky
   async with shared.parent_account_subscription(0).subscribe() as inbox:
-    _, gap = await take(aiter(inbox), 2)
+    *_, gap = await take(aiter(inbox), 4)
   assert [f['id'] for f in gap['fills']] == ['b']
   assert indexer.opened[1].unsubscribed  # released when its backfill failed
 
 
-async def test_indexer_trades_stream_survives_a_drop():
-  """An `'indexer'` trades stream sees the gap's fills, with order ids, and no end."""
+async def test_indexer_trades_stream_ends_on_a_drop():
+  """An `'indexer'` trades stream ends with `NetworkError` when the connection drops,
+  without reading the gap: the strategy reading it stops."""
   indexer = FakeIndexer(
     [
       FakeStream(
@@ -396,11 +408,40 @@ async def test_indexer_trades_stream_survives_a_drop():
     ],
     fills=[rest_fill('b', 12)],
   )
-  market = MarketMixin(shared=shared_with(indexer), perpetual_market=MARKET)
+  shared = shared_with(indexer)
+  market = MarketMixin(shared=shared, perpetual_market=MARKET)
   async with trades_stream(market) as stream:
-    a, b = await take(aiter(stream), 2)
-  assert (a.id, b.id) == ('a', 'b')
-  assert b.order_id == serialize_id(proto_id(1))
+    it = aiter(stream)
+    [a] = await take(it, 1)
+    with pytest.raises(NetworkError, match='Error receiving message'):
+      await asyncio.wait_for(anext(it), 2)
+  assert a.id == 'a'
+  assert shared.parent_subaccount_subscriptions[0].pump is None  # nobody left
+
+
+async def test_a_subscriber_joining_during_a_gap_skips_its_backfill():
+  """`subscribe_parent_subaccount` (`ended_by_drops`) passes notifications only: a
+  subscriber that joined while the channel was down skips `Reconnected` and the gap's
+  fills, which are older than its subscription."""
+  items: list[Any] = [
+    Reconnected(1.0),
+    {'blockHeight': 12, 'fills': [pushed('b', 12)], 'backfill': True},
+    {'blockHeight': 13, 'fills': [pushed('c', 13)]},
+  ]
+
+  async def feed() -> AsyncIterator[Any]:
+    """A feed joined during its gap."""
+    for item in items:
+      yield item
+
+  @contextlib.asynccontextmanager
+  async def subscribed():
+    """The joined feed."""
+    yield feed()
+
+  async with ended_by_drops(subscribed()) as notifications:
+    [only] = [n async for n in notifications]
+  assert [f['id'] for f in only.get('fills') or []] == ['c']
 
 
 async def test_depth_reopens_with_the_new_snapshot():
@@ -523,6 +564,75 @@ async def test_fastest_races_on_while_the_indexer_reconnects():
   assert indexer.fill_requests  # the gap was backfilled
   race = shared.fill_race
   assert race is not None and race.wins == {'socket': 1} and race.summary() == []
+
+
+def down_after_one_drop(indexer: FakeIndexer, shared: Shared):
+  """Make the indexer drop its first subscription and refuse every reopen."""
+  subscribe = indexer.subscribe
+
+  async def refused(*args: Any, **kwargs: Any):
+    """The first subscription, then the indexer unreachable."""
+    if indexer.opened:
+      raise NetworkError('indexer unreachable')
+    return await subscribe(*args, **kwargs)
+
+  cast(Any, shared.client.indexer.streams).parent_subaccounts = refused
+
+
+async def test_fastest_raises_once_the_indexer_is_down_for_the_window(
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """An indexer down for over `indexer_reconnect_window` seconds ends `'fastest'`,
+  before the channel's own `GIVE_UP_AFTER`, though the socket is healthy."""
+  monkeypatch.setattr(reconnect, 'GIVE_UP_AFTER', 5)
+  indexer = FakeIndexer([FakeStream({'blockHeight': 9}, [], drop=True)])
+  shared = shared_with(indexer, fill_socket='/unused.sock')
+  down_after_one_drop(indexer, shared)
+
+  async def socket_items() -> AsyncIterator[SocketItem]:
+    """A healthy socket with nothing to deliver."""
+    await asyncio.Event().wait()
+    yield socket_fill(11)
+
+  socket_source(shared, socket_items())
+  market = MarketMixin(shared=shared, perpetual_market=MARKET)
+  settings: Any = {
+    'dydx': {'trades_source': 'fastest', 'indexer_reconnect_window': 0.2}
+  }
+  start = time.monotonic()
+  async with trades_stream(market, settings=settings) as stream:
+    with pytest.raises(NetworkError, match=r'down for over 0\.2s'):
+      await asyncio.wait_for(anext(aiter(stream)), 3)
+  assert 0.2 <= time.monotonic() - start < 1
+
+
+async def test_fastest_with_a_zero_window_raises_on_the_drop():
+  """`indexer_reconnect_window: 0` ends `'fastest'` as the indexer drops."""
+  indexer = FakeIndexer(
+    [FakeStream({'blockHeight': 9}, [], drop=True), FakeStream({}, [], drop=False)]
+  )
+  shared = shared_with(indexer, fill_socket='/unused.sock')
+
+  async def socket_items() -> AsyncIterator[SocketItem]:
+    """A healthy socket with nothing to deliver."""
+    await asyncio.Event().wait()
+    yield socket_fill(11)
+
+  socket_source(shared, socket_items())
+  market = MarketMixin(shared=shared, perpetual_market=MARKET)
+  settings: Any = {'dydx': {'trades_source': 'fastest', 'indexer_reconnect_window': 0}}
+  async with trades_stream(market, settings=settings) as stream:
+    with pytest.raises(NetworkError, match='Error receiving message'):
+      await asyncio.wait_for(anext(aiter(stream)), 2)
+
+
+def test_a_negative_window_is_refused():
+  """The window is validated with the other dYdX settings."""
+  market = MarketMixin(shared=shared_with(FakeIndexer([])), perpetual_market=MARKET)
+  with pytest.raises(pydantic.ValidationError):
+    trades_stream(
+      market, settings=cast(Any, {'dydx': {'indexer_reconnect_window': -1}})
+    )
 
 
 async def test_two_streams_of_a_market_log_each_fill_once(

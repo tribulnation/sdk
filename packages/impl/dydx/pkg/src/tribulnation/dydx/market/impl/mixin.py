@@ -1,7 +1,9 @@
 from functools import cached_property
 from typing_extensions import (
   TYPE_CHECKING,
+  Annotated,
   AsyncContextManager,
+  AsyncIterator,
   Literal,
   Iterable,
   TypedDict,
@@ -9,6 +11,7 @@ from typing_extensions import (
   Awaitable,
   TypeVar,
 )
+from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 import asyncio
 import pydantic
@@ -33,9 +36,11 @@ from tribulnation.sdk.core import (
   Subscription,
   OverflowPolicy,
   AuthError,
+  NetworkError,
 )
 from tribulnation.dydx.core import wrap_exceptions
 from .depth import depth_stream, Book
+from .reconnect import Dropped, Reconnected
 from .rules import parse_rules, Rules
 from .fees import combined_fees, market_charge, market_discount_params, PPM
 from tribulnation.sdk.market import Fees
@@ -48,6 +53,13 @@ if TYPE_CHECKING:
 T = TypeVar('T')
 
 TradesSource = Literal['indexer', 'node', 'socket', 'fastest']
+
+INDEXER_RECONNECT_WINDOW = 3.0
+"""Default `Settings.indexer_reconnect_window`, in seconds: an indexer reconnection
+usually takes about 1.5 s."""
+
+ParentFeedItem = ParentSubaccountNotification | Dropped | Reconnected
+"""An item of the shared parent subaccounts feed (`parent_subaccounts_feed`)."""
 """Where `trades_stream` reads fills from. See `Settings.trades_source`."""
 
 
@@ -79,9 +91,8 @@ class Settings(TypedDict, total=False):
   """Where `trades_stream` reads fills from. Defaults to the account's `fill_source`,
   else `'indexer'`.
 
-  - `'indexer'`: the indexer's `v4_parent_subaccounts` WebSocket channel. It reconnects
-    on a dropped connection and backfills the fills of the gap from REST; only a
-    channel down for a minute ends the stream.
+  - `'indexer'`: the indexer's `v4_parent_subaccounts` WebSocket channel. A dropped
+    connection ends the stream with `NetworkError`; the fills of the gap are not read.
   - `'node'`: the account's full node (`full_node_grpc`/`full_node_rpc` on
     `accounts.Dydx`) only, about 0.4 s ahead of the indexer: its gRPC
     `StreamOrderbookUpdates` stream, finalized updates only. Fills of our orders and
@@ -106,10 +117,16 @@ class Settings(TypedDict, total=False):
     later copy logs (INFO) which source was first and by how many milliseconds, once
     per market however many streams race it; the client's `fill_race` keeps the totals
     and logs them every 10 minutes. A node or socket source that fails is dropped with
-    a warning and the stream goes on. The indexer is the floor: its channel reconnects
-    on a dropped connection and backfills the gap from REST, and only an indexer down
-    for a minute ends the stream.
+    a warning and the stream goes on. The indexer is the floor: while its channel
+    reconnects after a dropped connection the other sources race on, and the fills of
+    the gap are then read from REST; an indexer down for over
+    `indexer_reconnect_window` seconds ends the stream with `NetworkError`.
   """
+  indexer_reconnect_window: Annotated[float, pydantic.Field(ge=0)]
+  """Seconds a `'fastest'` stream races on while the indexer's channel reconnects
+  before it fails with `NetworkError`. Defaults to 3 (`INDEXER_RECONNECT_WINDOW`); `0`
+  fails at once. The channel gives up by itself after a minute (`GIVE_UP_AFTER`), so a
+  longer window acts as a minute."""
 
 
 settings_adapter = pydantic.TypeAdapter(Settings)
@@ -128,9 +145,9 @@ class Shared(SDK):
   fee_tier: feetiers_proto.PerpetualFeeTier | None = None
   standard_fee_tier: feetiers_proto.PerpetualFeeTier | None = None
   market_discounts: dict[int, feetiers_proto.PerMarketFeeDiscountParams] | None = None
-  parent_subaccount_subscriptions: dict[
-    int, Subscription[ParentSubaccountNotification]
-  ] = field(default_factory=dict[int, Subscription[ParentSubaccountNotification]])
+  parent_subaccount_subscriptions: dict[int, Subscription[ParentFeedItem]] = field(
+    default_factory=dict[int, Subscription[ParentFeedItem]]
+  )
   depth_subscriptions: dict[str, Subscription[Book]] = field(
     default_factory=dict[str, Subscription[Book]]
   )
@@ -249,8 +266,9 @@ class Shared(SDK):
     return self.standard_fee_tier
 
   def parent_account_subscription(self, parent_subaccount: int):
-    """The parent subaccount's channel, shared by its streams; it reconnects and
-    backfills the fills of a gap (`parent_subaccounts_feed`)."""
+    """The parent subaccount's channel, shared by its streams; it reconnects, signals
+    the drop and the reconnection, and backfills the fills of a gap
+    (`parent_subaccounts_feed`)."""
     from .parent_feed import parent_subaccounts_feed
 
     if parent_subaccount not in self.parent_subaccount_subscriptions:
@@ -468,7 +486,24 @@ class ExchangeMixin(SDK):
     *,
     queue_size: int = 1000,
     overflow: OverflowPolicy = 'fail',
-  ):
+  ) -> AsyncContextManager[AsyncIterator[ParentSubaccountNotification]]:
+    """The parent subaccount's notifications, ending with `NetworkError` when the
+    connection drops, while the shared channel reconnects for `subscribe_parent_feed`."""
+    return ended_by_drops(
+      self.subscribe_parent_feed(
+        parent_subaccount, queue_size=queue_size, overflow=overflow
+      )
+    )
+
+  def subscribe_parent_feed(
+    self,
+    parent_subaccount: int,
+    *,
+    queue_size: int = 1000,
+    overflow: OverflowPolicy = 'fail',
+  ) -> AsyncContextManager[AsyncIterator[ParentFeedItem]]:
+    """The parent subaccount's shared feed, across reconnections: `Dropped` and
+    `Reconnected` mark a gap, whose fills follow as a `backfill` notification."""
     return self.shared.parent_account_subscription(parent_subaccount).subscribe(
       queue_size=queue_size, overflow=overflow
     )
@@ -479,6 +514,28 @@ class ExchangeMixin(SDK):
     return self.shared.depth_subscription(market).subscribe(
       queue_size=queue_size, overflow=overflow
     )
+
+
+@asynccontextmanager
+async def ended_by_drops(
+  feed: AsyncContextManager[AsyncIterator[ParentFeedItem]],
+):
+  """`feed`'s notifications until its connection drops, which raises `NetworkError`.
+
+  A backfill (of a gap this subscriber joined during) is skipped as well: it would
+  only bring fills from before the subscription.
+  """
+  async with feed as items:
+
+    async def notifications() -> AsyncIterator[ParentSubaccountNotification]:
+      async for item in items:
+        if isinstance(item, Dropped):
+          raise NetworkError(str(item.error)) from item.error
+        if isinstance(item, Reconnected) or item.get('backfill'):
+          continue
+        yield item
+
+    yield notifications()
 
 
 @dataclass(kw_only=True, frozen=True)

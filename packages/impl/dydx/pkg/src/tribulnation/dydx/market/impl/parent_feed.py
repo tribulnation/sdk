@@ -1,5 +1,5 @@
 """The parent subaccounts channel, reconnecting and backfilling the fills of each gap
-from REST, so no fill of the account is skipped by a dropped connection."""
+from REST, so a stream that races on through a dropped connection skips no fill."""
 
 from typing_extensions import TYPE_CHECKING, AsyncIterator, Awaitable, Callable, cast
 from contextlib import suppress
@@ -16,7 +16,7 @@ from typed_dydx.indexer.schemas import (
 
 from tribulnation.dydx.core import wrap_exceptions
 from .orders import indexer_subaccount_id
-from .reconnect import Opened, reconnecting
+from .reconnect import Dropped, Opened, Reconnected, reconnecting
 
 if TYPE_CHECKING:
   from .mixin import Shared
@@ -159,12 +159,14 @@ async def order_of(shared: 'Shared', order_id: str) -> OrderSubaccountMessage:
 
 def parent_subaccounts_feed(
   shared: 'Shared', parent: int
-) -> Callable[[], Awaitable[Opened[SubaccountsNotification]]]:
+) -> Callable[[], Awaitable[Opened[SubaccountsNotification | Dropped | Reconnected]]]:
   """A `Subscription.of` callback for the parent subaccounts channel that reconnects
-  (`reconnecting`) and, on each reconnection, emits the fills of the gap first.
+  (`reconnecting`) and, on each reconnection, emits the fills of the gap after
+  `Reconnected`.
 
   A backfilled notification carries `backfill: True`: its fills are late, which a fill
-  race must not count as leads.
+  race must not count as leads, and a subscriber that ends on `Dropped` never sees them
+  unless it joined during the gap.
   """
   position = ParentFills()
 

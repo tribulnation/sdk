@@ -8,7 +8,7 @@ from typed_dydx import Indexer
 from typed_dydx.indexer.schemas import OrderBook
 from typed_dydx.indexer.streams.orders import OrderbookMessageContents as BookUpdate
 
-from .reconnect import Opened, reconnecting
+from .reconnect import Opened, reconnecting, without_signals
 
 
 def parse_update(update: BookUpdate) -> Book:
@@ -36,8 +36,9 @@ def depth_stream(
   indexer: Indexer, market: str
 ) -> Callable[[], Awaitable[Opened[Book]]]:
   """A `Subscription.of` callback for a market's book that reconnects
-  (`reconnecting`). After a reconnection the new subscription's snapshot comes first,
-  so subscribers never keep a book that missed updates."""
+  (`reconnecting`), its subscribers seeing a gap. After a reconnection the new
+  subscription's snapshot comes first, so subscribers never keep a book that missed
+  updates."""
 
   @wrap_exceptions
   async def open(reopen: bool) -> Opened[Book]:
@@ -56,4 +57,4 @@ def depth_stream(
 
     return parsed_stream(), stream.unsubscribe
 
-  return reconnecting(f'book {market}', open)
+  return without_signals(reconnecting(f'book {market}', open))
