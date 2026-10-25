@@ -25,6 +25,10 @@ for repository setup, development commands and implementation guidance.
 8. [Aster Market qualification](aster-market.md): mappings, credential handling,
    unsupported methods and testnet observations.
 
+9. [Docs diagrams](diagrams/collateral.py): the source of the SVGs in
+   `docs/market/media/`. Edit it and rerun
+   `.venv/bin/python dev-docs/diagrams/collateral.py`; never hand-edit the SVGs.
+
 ## Documentation boundaries
 
 1. [User documentation](../docs/index.md) explains installation, configuration,

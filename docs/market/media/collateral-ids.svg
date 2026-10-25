@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="690" viewBox="0 0 480 690" role="img" aria-label="Collateral IDs: which money each market’s orders spend">
+<title>Collateral IDs: which money each market’s orders spend</title>
+<style>
+text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 14px; fill: #1f2328; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13.5px; }
+.title { font-size: 16px; font-weight: 600; }
+.small { font-size: 13px; }
+.muted { fill: #59636e; }
+.bg { fill: #ffffff; stroke: #d0d7de; }
+.market { fill: #f6f8fa; stroke: #8c959f; }
+.spot { fill: #dafbe1; stroke: #1a7f37; }
+.margin { fill: #fbefff; stroke: #8250df; }
+.money { fill: #fff8c5; stroke: #9a6700; }
+.shared { fill: #fff8c5; stroke: #9a6700; stroke-width: 2.5; }
+.warn { fill: #fff1e5; stroke: #bc4c00; stroke-dasharray: 5 4; }
+.link { stroke: #59636e; stroke-width: 1.5; fill: none; }
+.head { fill: #59636e; }
+.rule { stroke: #d0d7de; }
+@media (prefers-color-scheme: dark) {
+  text { fill: #f0f6fc; }
+  .muted { fill: #9198a1; }
+  .bg { fill: #0d1117; stroke: #3d444d; }
+  .market { fill: #151b23; stroke: #656c76; }
+  .spot { fill: #10261a; stroke: #3fb950; }
+  .margin { fill: #221a33; stroke: #a371f7; }
+  .money, .shared { fill: #2a2312; stroke: #d29922; }
+  .warn { fill: #2b1a0f; stroke: #f0883e; }
+  .link { stroke: #9198a1; }
+  .head { fill: #9198a1; }
+  .rule { stroke: #3d444d; }
+}
+</style>
+<defs><marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="head"/></marker></defs>
+<rect x="0.5" y="0.5" width="479" height="689" rx="12" class="bg"/>
+<text x="16" y="28" class="small muted" text-anchor="start">Arrows: collateral_ids() on spot, collateral_id() on perps</text>
+<text x="16" y="60.0" class="title" text-anchor="start">Separate wallets</text>
+<text x="16" y="79.0" class="small muted" text-anchor="start">Aster, Margin Trade, classic Lighter (account mt)</text>
+<rect x="16" y="92.0" width="186" height="70" rx="7" class="spot"/>
+<text x="28" y="132.0" class="mono" text-anchor="start">spot ETH/USDC</text>
+<rect x="16" y="172.0" width="186" height="30" rx="7" class="margin"/>
+<text x="28" y="192.0" class="mono" text-anchor="start">perp ETH</text>
+<rect x="278" y="92.0" width="186" height="30" rx="7" class="money"/>
+<text x="290" y="112.0" class="mono" text-anchor="start">mt:spot:ETH</text>
+<rect x="278" y="132.0" width="186" height="30" rx="7" class="money"/>
+<text x="290" y="152.0" class="mono" text-anchor="start">mt:spot:USDC</text>
+<rect x="278" y="172.0" width="186" height="30" rx="7" class="money"/>
+<text x="290" y="192.0" class="mono" text-anchor="start">mt:perp</text>
+<polyline points="202,107.0 276,107.0" class="link" marker-end="url(#head)"/>
+<text x="236" y="102.0" class="small muted" text-anchor="middle">base</text>
+<polyline points="202,147.0 276,147.0" class="link" marker-end="url(#head)"/>
+<text x="236" y="142.0" class="small muted" text-anchor="middle">quote</text>
+<polyline points="202,187.0 276,187.0" class="link" marker-end="url(#head)"/>
+<text x="16" y="220.0" class="small" text-anchor="start">Two USDC balances, two IDs: spot never spends perp margin.</text>
+<line x1="16" y1="236.0" x2="464" y2="236.0" class="rule"/>
+<text x="16" y="264.0" class="title" text-anchor="start">Unified account</text>
+<text x="16" y="283.0" class="small muted" text-anchor="start">Hyperliquid, unified Lighter (account hl, USDC is token 0)</text>
+<rect x="16" y="296.0" width="186" height="70" rx="7" class="spot"/>
+<text x="28" y="336.0" class="mono" text-anchor="start">spot UBTC/USDC</text>
+<rect x="16" y="376.0" width="186" height="30" rx="7" class="margin"/>
+<text x="28" y="396.0" class="mono" text-anchor="start">perp BTC</text>
+<rect x="16" y="416.0" width="186" height="30" rx="7" class="margin"/>
+<text x="28" y="436.0" class="mono" text-anchor="start">perp xyz:SILVER</text>
+<rect x="278" y="296.0" width="186" height="30" rx="7" class="money"/>
+<text x="290" y="316.0" class="mono" text-anchor="start">hl:spot:197</text>
+<rect x="278" y="336.0" width="186" height="110" rx="7" class="shared"/>
+<text x="290" y="396.0" class="mono" text-anchor="start">hl:spot:0</text>
+<polyline points="202,311.0 276,311.0" class="link" marker-end="url(#head)"/>
+<text x="236" y="306.0" class="small muted" text-anchor="middle">base</text>
+<polyline points="202,351.0 276,351.0" class="link" marker-end="url(#head)"/>
+<text x="236" y="346.0" class="small muted" text-anchor="middle">quote</text>
+<polyline points="202,391.0 276,391.0" class="link" marker-end="url(#head)"/>
+<polyline points="202,431.0 276,431.0" class="link" marker-end="url(#head)"/>
+<text x="16" y="464.0" class="small" text-anchor="start">One USDC balance, one ID: spot and perps share a ledger.</text>
+<line x1="16" y1="480.0" x2="464" y2="480.0" class="rule"/>
+<text x="16" y="508.0" class="title" text-anchor="start">Subaccount pools</text>
+<text x="16" y="527.0" class="small muted" text-anchor="start">dYdX: each subaccount is its own pool (account dydx)</text>
+<rect x="16" y="540.0" width="186" height="30" rx="7" class="margin"/>
+<text x="28" y="560.0" class="mono" text-anchor="start">perp BTC-USD</text>
+<rect x="16" y="580.0" width="186" height="30" rx="7" class="margin"/>
+<text x="28" y="600.0" class="mono" text-anchor="start">perp ETH-USD</text>
+<rect x="16" y="620.0" width="186" height="30" rx="7" class="margin"/>
+<text x="28" y="640.0" class="mono" text-anchor="start">perp.1 BTC-USD</text>
+<rect x="278" y="540.0" width="186" height="70" rx="7" class="shared"/>
+<text x="290" y="580.0" class="mono" text-anchor="start">dydx:perp</text>
+<rect x="278" y="620.0" width="186" height="30" rx="7" class="money"/>
+<text x="290" y="640.0" class="mono" text-anchor="start">dydx:perp.1</text>
+<polyline points="202,555.0 276,555.0" class="link" marker-end="url(#head)"/>
+<polyline points="202,595.0 276,595.0" class="link" marker-end="url(#head)"/>
+<polyline points="202,635.0 276,635.0" class="link" marker-end="url(#head)"/>
+<text x="16" y="668.0" class="small" text-anchor="start">Each market draws on its own subaccount’s pool.</text>
+</svg>

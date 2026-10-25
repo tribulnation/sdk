@@ -32,6 +32,24 @@ Spot markets have no margin and no liquidation: they have [balances](#spot-balan
 every market names the money its orders spend with a [collateral ID](#collateral-ids), so
 strategies on one account never reserve the same balance twice.
 
+## At a glance
+
+Account reads depend on what a market trades. Books, trades, orders, rules and fees live on
+every `Market`; balances on spot, and position, margin and sizing on margin markets:
+
+![Market splits into SpotMarket, with balances() and collateral_ids(), and MarginMarket, with position(), collateral(), leverage(), available_notional() and collateral_id(); PerpMarket derives from MarginMarket and adds funding and index. market.position() is not on Market: narrow with is_perp() or fetch with sdk.perp_market().](media/market-types.svg)
+
+Every order spends money named by a [collateral ID](#collateral-ids). Markets that spend the
+same money share an ID; markets with separate wallets don't:
+
+![Three venue styles. Separate wallets (Aster, Margin Trade, classic Lighter): spot ETH/USDC spends mt:spot:ETH and mt:spot:USDC, perp ETH spends mt:perp. Unified account (Hyperliquid, unified Lighter): spot UBTC/USDC's quote and every perp spend hl:spot:0. Subaccount pools (dYdX): parent perps spend dydx:perp, subaccount 1 spends dydx:perp.1.](media/collateral-ids.svg)
+
+A perpetual answers two different questions. `collateral_id()` names the money that funds its
+new orders; `collateral()` (or `sdk.perp_collateral(id)`) is the bucket that gets liquidated.
+On a cross-margin market they're the same pool; on an isolated one they differ:
+
+![An isolated BTC perpetual on Hyperliquid. collateral_id() is hl:spot:0, the cross USDC, read with sdk.collateral(id) for free_collateral times leverage(), used for sizing and reservations. collateral() is BTC's isolated bucket, a PerpCollateral whose maintenance_ratio liquidates at 1.0.](media/perp-collateral.svg)
+
 ## The two ratios
 
 `PerpCollateral` gives you two, and they answer different questions:
