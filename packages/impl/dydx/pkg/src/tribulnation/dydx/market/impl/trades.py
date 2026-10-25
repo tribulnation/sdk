@@ -311,7 +311,7 @@ async def fastest_stream(
         ) from None
       if isinstance(notification, Dropped):
         if reconnect_window <= 0:
-          raise NetworkError(str(notification.error)) from notification.error
+          raise NetworkError(*notification.error.args) from notification.error
         deadline = loop.time() + reconnect_window
         continue
       if isinstance(notification, Reconnected):

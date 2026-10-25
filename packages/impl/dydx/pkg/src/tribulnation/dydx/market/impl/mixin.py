@@ -530,7 +530,7 @@ async def ended_by_drops(
     async def notifications() -> AsyncIterator[ParentSubaccountNotification]:
       async for item in items:
         if isinstance(item, Dropped):
-          raise NetworkError(str(item.error)) from item.error
+          raise NetworkError(*item.error.args) from item.error
         if isinstance(item, Reconnected) or item.get('backfill'):
           continue
         yield item
