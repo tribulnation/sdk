@@ -37,3 +37,8 @@ Changed:
 `'node'` and `'socket'` are unchanged.
 
 Every other method is unchanged.
+
+Release qualification on 2026-10-25 passed the read suites and market consistency.
+Committed evidence under `release-evidence/dydx/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. No SDK
+release is needed: this adapter runs on the published SDK 2.x (>=2.17.0).
