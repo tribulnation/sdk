@@ -75,3 +75,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0050](0050-dydx-fill-socket.md) | dYdX fills from a local fill socket, and `'fastest'` over every source | Proposed; implemented, not release-verified; amends 0044 and 0045; amended by 0052 |
 | [0051](0051-spot-perp-market-types-collateral-ids.md) | Spot and margin market types, and collateral IDs | Proposed; amends 0009 and 0038 |
 | [0052](0052-dydx-indexer-channels-reconnect.md) | dYdX indexer channels reconnect; `'fastest'` rides short drops, `'indexer'` ends | Proposed; implemented, not release-verified; amends 0050 |
+| [0053](0053-shared-account-reads-aster-max-leverage.md) | Shared account reads, and Aster orders at the symbol's maximum leverage | Proposed; implemented, not release-verified |

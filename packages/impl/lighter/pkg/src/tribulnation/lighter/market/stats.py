@@ -10,6 +10,15 @@ from tribulnation.sdk.market import NextFunding, PerpStats, Ticker
 
 from ..core import FUNDING_INTERVAL, Shared, percent
 
+STATS_TTL = 5.0
+"""Seconds one `*market_stats` snapshot serves every reader of the same selector.
+
+Each read subscribes to the channel for its first frame, and a connection refuses a
+second subscription to a channel already open ("Already subscribed"), so concurrent
+readers (every maker's 24 h volume, a selection's stats) share one subscription. Five
+seconds also keeps a burst from resubscribing; volumes and funding move slower.
+"""
+
 
 def price_or_none(value: Decimal | Literal['']) -> Decimal | None:
   """A stats price, or `None` where the venue sends `""` (no such side)."""
@@ -43,13 +52,21 @@ async def read_spot_snapshot(shared: Shared) -> dict[int, SpotMarketStats]:
 async def perp_snapshot(
   shared: Shared, selector: MarketSelector
 ) -> dict[int, MarketStats]:
-  """The perp snapshot, as one retried request."""
-  return await shared.call(lambda: read_perp_snapshot(shared, selector))
+  """The perp snapshot, as one retried request shared by concurrent readers (`STATS_TTL`)."""
+  return await shared.reads.read(
+    ('market_stats', selector),
+    lambda: shared.call(lambda: read_perp_snapshot(shared, selector)),
+    ttl=STATS_TTL,
+  )
 
 
 async def spot_snapshot(shared: Shared) -> dict[int, SpotMarketStats]:
-  """The spot snapshot, as one retried request."""
-  return await shared.call(lambda: read_spot_snapshot(shared))
+  """The spot snapshot, as one retried request shared by concurrent readers (`STATS_TTL`)."""
+  return await shared.reads.read(
+    ('spot_market_stats', 'all'),
+    lambda: shared.call(lambda: read_spot_snapshot(shared)),
+    ttl=STATS_TTL,
+  )
 
 
 def selected(markets: Collection[str] | None, available: Collection[int]) -> list[int]:
