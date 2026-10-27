@@ -83,16 +83,15 @@ New:
 Behaviour changes in the adapters released with this version (see each package's
 notes):
 
-1. Aster perpetual orders run at the symbol's highest allowed leverage: before a
-   symbol's first order, `place_order` sets the leverage to bracket 1's
-   `initialLeverage` if it differs, and on a `-2027` refusal sets it again and resends
-   the order once (ADR 0053).
+1. Aster lowers a symbol's leverage setting to the maximum it now allows only when an
+   order is refused for being above it (`-2027`), and resends that order once; it never
+   raises a setting ([ADR 0055](../../dev-docs/adr/0055-aster-lower-leverage-on-refusal.md),
+   amending ADR 0053).
 2. Binance, Bit2Me, Bitget, Bybit, Coinbase, Kraken and MEXC spot markets no longer
    serve `position`, `collateral` and `available_notional` through the SDK interface,
    and do not map `balances` yet. Aster, Hyperliquid, Lighter and margin.trade spot
-   markets serve `balances` and collateral IDs; dYdX, GRVT and the perpetuals of Aster,
-   Hyperliquid, Lighter and margin.trade serve `collateral_id()`. Extended does not map
-   collateral IDs yet.
+   markets serve `balances` and collateral IDs; dYdX, Extended, GRVT and the perpetuals of
+   Aster, Hyperliquid, Lighter and margin.trade serve `collateral_id()`.
 
 This release goes with tribulnation-aster 0.13.0, -binance 0.9.0, -bit2me 0.10.0,
 -bitget 0.12.0, -bybit 0.8.0, -coinbase 0.6.0, -deribit 0.7.0, -dydx 0.20.0,

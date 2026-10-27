@@ -11,6 +11,8 @@ from typed_core import PaginatedResponse
 from tribulnation.extended import ExtendedMarket
 from tribulnation.extended.market import ExtendedPerpExchange
 from tribulnation.extended.market.account import bucket
+from tribulnation.sdk import MarketSDK
+from tribulnation.sdk.impl import accounts
 from tribulnation.sdk.market import ExchangeFundingPayment
 
 NEXT = datetime(2026, 10, 22, 13, tzinfo=timezone.utc)
@@ -262,3 +264,37 @@ async def test_venue_ids_follow_the_network():
     assert [e['id'] for e in await venue.exchanges()] == ['perp']
     with pytest.raises(ValueError):
       await venue.exchange('spot')
+
+
+async def test_every_market_spends_the_one_cross_pool():
+  """`collateral_id()` is `<account>:perp` on every market, and `MarketSDK` resolves it
+  to the cross bucket; there is no spot exchange to name a `spot:USD` balance."""
+  async with MarketSDK({'ext': accounts.Extended(public=True)}) as sdk:
+    venue = await sdk.venue('ext')
+    assert isinstance(venue, ExtendedMarket)
+
+    async def markets(names: list[str] | None = None) -> list[Any]:
+      """Every fixture market, or the named ones."""
+      return [m for m in MARKETS if names is None or m['name'] in names]
+
+    async def balance() -> Any:
+      """A funded balance."""
+      return {
+        'equity': Decimal('1000'),
+        'availableForTrade': Decimal('800'),
+        'initialMargin': Decimal('200'),
+        'marginRatio': Decimal('0.05'),
+        'leverage': Decimal('2'),
+      }
+
+    venue.shared.client.info.markets = markets  # type: ignore[method-assign]
+    venue.shared.client.account.balance = balance  # type: ignore[method-assign]
+    ids = {await sdk.collateral_id(f'ext:perp:{m}') for m in ('BTC-USD', 'MKR-USD')}
+    assert ids == {'ext:perp'}
+    collateral = await sdk.collateral('ext:perp')
+    assert (collateral.equity, collateral.free_collateral) == (
+      Decimal('1000'),
+      Decimal('800'),
+    )
+    with pytest.raises(ValueError):
+      await sdk.collateral('ext:spot:USD')

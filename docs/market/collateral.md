@@ -192,6 +192,8 @@ IDs are opaque strings led by the account key, like market IDs:
 - On a **unified** account, perpetual margin *is* a spot balance, so a perpetual returns that
   asset's spot ID. Every Hyperliquid perpetual returns its dex collateral token's spot ID
   (`hyperliquid:spot:0` for USDC), the same ID USDC-quoted spot pairs return.
+  Extended is unified too, but its orders spend the cross pool's `availableForTrade`,
+  not a spot balance, so its perpetuals return the pool, `extended:perp`.
 - An **isolated** position still returns the pool its new margin is drawn from; its own
   bucket only matters for liquidation, through `perp_collateral()`.
 - Venues with separate spot and perpetual wallets (Margin Trade, Aster) return distinct IDs:

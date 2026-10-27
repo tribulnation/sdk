@@ -78,7 +78,11 @@ market data only.
   order's included. Cancellation is asynchronous.
 - Trade history reads the 10,000 most recent fills; the exchange-wide form leaves out
   spot fills and keeps delisted perpetuals.
-- Collateral is the sub-account's one cross bucket, whatever the market; the maintenance
+- Collateral is the sub-account's one cross bucket, whatever the market, and every
+  market's `collateral_id()` is that pool, `<account>:perp` (ADR 0051). The account is
+  unified: spot holdings add to equity and spot buy orders reserve collateral too, but
+  orders spend the pool's `availableForTrade`, not the `USD` spot balance, so the ID names
+  the pool; a spot exchange added later must give its `USD` quote the same ID. The maintenance
   requirement is `marginRatio x equity`. `marginRatio` is a fraction rounded up to four
   decimals, so the figure can overstate the requirement by up to `0.0001 x equity`.
   `available_notional` is free collateral times the account's leverage, without the
