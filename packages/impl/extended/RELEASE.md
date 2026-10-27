@@ -1,15 +1,9 @@
-# tribulnation-extended 0.1.1
+# tribulnation-extended 0.2.0
 
-Requires SDK >=2.21.0 (the release adding `Book.frozen` and `detached_books`) and
-typed-extended >=0.2.0. Upgrade the SDK and this adapter together.
+Requires SDK >=3.0.0 (spot and margin market types, collateral IDs and read `ttl`) and typed-extended >=0.2.0. Upgrade the SDK and this adapter together: SDK 3.0 changes the base classes this adapter subclasses, so older adapters do not work with it, and this one does not work with SDK 2.
 
-`depth_stream` uses the SDK's `Book.frozen` and `detached_books`
-([ADR 0049](../../../dev-docs/adr/0049-book-streams-copy-on-read.md)). Extended already worked this way;
-its local helpers are replaced by the SDK's, with no behaviour change.
+`leverage(refetch=...)` becomes `leverage(ttl=...)` ([ADR 0054](../../../dev-docs/adr/0054-caller-chosen-read-staleness.md)). Leverage is no longer cached per market: without a `ttl` each call asks the venue; with one, concurrent and recent callers share one answer. Other account reads accept `ttl` and ignore it.
+
+`collateral_id()` is not mapped yet and raises `NotImplementedError` ([ADR 0051](../../../dev-docs/adr/0051-spot-perp-market-types-collateral-ids.md)).
 
 Every other method is unchanged.
-
-Release qualification on 2026-10-24 passed the read suites and market consistency.
-Committed evidence under `release-evidence/extended/` matches pinned Catalogue
-`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
-release follows SDK 2.21.0 publication.

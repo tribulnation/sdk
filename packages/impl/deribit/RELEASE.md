@@ -1,13 +1,7 @@
-# tribulnation-deribit 0.6.0
+# tribulnation-deribit 0.7.0
 
-Requires SDK >=2.16.0 and typed-deribit >=0.3.0. `trades_stream` accepts the new
-keyword-only `settings` argument of SDK 2.16 (ADR 0044) and ignores it: Deribit
-has no trades-stream options. Fills and every other method are unchanged.
+Requires SDK >=3.0.0 (spot and margin market types, collateral IDs and read `ttl`) and typed-deribit >=0.3.0. Upgrade the SDK and this adapter together: SDK 3.0 changes the base classes this adapter subclasses, so older adapters do not work with it, and this one does not work with SDK 2.
 
-The SDK floor rises to 2.16.0, whose `Market.trades_stream` declares `settings`.
-Upgrade the SDK and this adapter together.
+Markets drop the `position`, `collateral` and `available_notional` stubs SDK 3.0 removes from spot ([ADR 0051](../../../dev-docs/adr/0051-spot-perp-market-types-collateral-ids.md)); they raised `NotImplementedError` before. Perpetuals keep raising it from `perp_position` and `perp_collateral`. The reads SDK 3.0 gives a `ttl` accept it and ignore it: every read asks the venue ([ADR 0054](../../../dev-docs/adr/0054-caller-chosen-read-staleness.md)).
 
-Release qualification on 2026-10-09 passed the read suites and market
-consistency. Committed evidence under `release-evidence/deribit/` matches pinned
-Catalogue `1851660ac2bed8243dd9ce9c7297fe05c7130973`; offline release
-verification passes. This adapter release follows SDK 2.16.0 publication.
+Every other method is unchanged.

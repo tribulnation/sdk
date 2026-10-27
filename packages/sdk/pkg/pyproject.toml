@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tribulnation-sdk"
-version = "2.21.0"
+version = "3.0.0"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
@@ -33,23 +33,23 @@ gateway = "tribulnation.sdk.gateway.cli:app"
 
 [project.optional-dependencies]
 gateway = ["aiohttp>=3.12,<4", "msgspec>=0.19,<1", "python-dotenv>=1,<2"]
-aster = ["tribulnation-aster>=0.12.0"]
-extended = ["tribulnation-extended>=0.1.0"]
-lighter = ["tribulnation-lighter>=0.11.0"]
-margin-trade = ["tribulnation-margin-trade>=0.1.0"]
-grvt = ["tribulnation-grvt>=0.1.0"]
-mexc = ["tribulnation-mexc>=2.4.0"]
-dydx = ["tribulnation-dydx>=0.17.0"]
-hyperliquid = ["tribulnation-hyperliquid>=0.18.0"]
-binance = ["tribulnation-binance>=0.8.0"]
-bitget = ["tribulnation-bitget>=0.11.0"]
-bit2me = ["tribulnation-bit2me>=0.9.0"]
+aster = ["tribulnation-aster>=0.13.0"]
+extended = ["tribulnation-extended>=0.2.0"]
+lighter = ["tribulnation-lighter>=0.12.0"]
+margin-trade = ["tribulnation-margin-trade>=0.2.0"]
+grvt = ["tribulnation-grvt>=0.2.0"]
+mexc = ["tribulnation-mexc>=3.0.0"]
+dydx = ["tribulnation-dydx>=0.20.0"]
+hyperliquid = ["tribulnation-hyperliquid>=0.19.0"]
+binance = ["tribulnation-binance>=0.9.0"]
+bitget = ["tribulnation-bitget>=0.12.0"]
+bit2me = ["tribulnation-bit2me>=0.10.0"]
 ethereum = ["tribulnation-ethereum>=0.6.0"]
-bybit = ["tribulnation-bybit>=0.7.0"]
-coinbase = ["tribulnation-coinbase>=0.5.0"]
-kraken = ["tribulnation-kraken>=0.7.1"]
-kucoin = ["tribulnation-kucoin>=0.6.0"]
-deribit = ["tribulnation-deribit>=0.6.0"]
+bybit = ["tribulnation-bybit>=0.8.0"]
+coinbase = ["tribulnation-coinbase>=0.6.0"]
+kraken = ["tribulnation-kraken>=0.8.0"]
+kucoin = ["tribulnation-kucoin>=0.7.0"]
+deribit = ["tribulnation-deribit>=0.7.0"]
 
 [project.urls]
 Github = "https://github.com/tribulnation/sdk.git"

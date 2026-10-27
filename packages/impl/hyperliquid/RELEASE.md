@@ -1,34 +1,12 @@
-# tribulnation-hyperliquid 0.18.0
+# tribulnation-hyperliquid 0.19.0
 
-Requires SDK >=2.18.0 and typed-hyperliquid >=2.6.0. Depth streams skip stale
-snapshots before validating them and report how many they skipped, and the endpoints
-can be overridden. See ADR 0046.
+Requires SDK >=3.0.0 (spot and margin market types, collateral IDs and read `ttl`) and typed-hyperliquid >=2.6.0. Upgrade the SDK and this adapter together: SDK 3.0 changes the base classes this adapter subclasses, so older adapters do not work with it, and this one does not work with SDK 2.
 
-New:
+Breaking and behaviour changes:
 
-1. Endpoint overrides for other servers (for example local fake exchanges in stress
-   tests): `rest_url` (the `/info` and `/exchange` root) and
-   `ws_url`. `HyperliquidMarket.new` takes the same keywords, and the SDK
-   `[accounts.<id>]` config accepts them (sdk#240). Unset, the endpoints are
-   unchanged.
-
-Behaviour changes:
-
-1. While every consumer of a coin and depth source keeps only the newest book (the
-   default `queue_size=1, overflow='latest'`), `depth_stream` subscribes `l2Book` (and
-   the fast `l2Book`) and `bbo` with typed `keep_latest`: a stale frame is decoded to
-   route it but never validated nor converted. A consumer asking for more (for example
-   `overflow='fail'`) reopens the shared feed unconflated, as before.
-2. The yielded stream reports `skipped`, read with `tribulnation.sdk.core.skipped`:
-   the books this consumer never saw, skipped upstream or in its own inbox.
+1. Spot markets are SDK `SpotMarket`s ([ADR 0051](../../../dev-docs/adr/0051-spot-perp-market-types-collateral-ids.md)): `balances()` reads `spotClearinghouseState` (`total`, and `total - hold` free), and `rules()` returns `SpotRules` naming the pair by token index (`base='197'`, `quote='0'` for UBTC/USDC). Spot `position`, `collateral` and `available_notional` are gone.
+2. Collateral IDs use token indices: spot assets are `<account>:spot:<index>`. Every perpetual's `collateral_id()` is its dex collateral token's spot ID (`<account>:spot:0` for USDC), read from cached metadata: perpetuals and USDC-quoted spot pairs share one ID and one balance. Isolated positions return the same ID. `sdk.collateral('<account>:spot:<index>')` reads the token; token names raise `ValueError`.
+3. `clearinghouseState` per dex and `spotClearinghouseState` are shared between markets and concurrent callers ([ADR 0053](../../../dev-docs/adr/0053-shared-account-reads-aster-max-leverage.md)); reads take `ttl` ([ADR 0054](../../../dev-docs/adr/0054-caller-chosen-read-staleness.md)), `None` (the default) asking afresh. `userAbstraction` (account mode) is reused for a minute.
+4. `leverage(refetch=...)` becomes `leverage(ttl=...)`, and leverage is no longer cached per coin; `maxLeverage` still comes from the cached dex universe, which `rules(refetch=True)` reloads.
 
 Every other method is unchanged.
-
-The SDK floor rises to 2.18.0, which adds `SkippingView` and `Subscription`'s
-latest-only connector, and the typed-hyperliquid floor to 2.6.0 (typed-core 0.12
-`keep_latest`). Upgrade the SDK and this adapter together.
-
-Release qualification on 2026-10-20 passed the read suites and market consistency.
-Committed evidence under `release-evidence/hyperliquid/` matches pinned Catalogue
-`1851660ac2bed8243dd9ce9c7297fe05c7130973`; offline release verification passes.
-This adapter release follows SDK 2.18.0 publication.
