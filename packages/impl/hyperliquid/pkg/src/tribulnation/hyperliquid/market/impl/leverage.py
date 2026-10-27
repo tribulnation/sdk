@@ -57,6 +57,6 @@ async def perp_available_notional(self: PerpMarketMixin) -> Decimal:
   own bucket, so this reads the account pool whatever the market's margin mode.
   """
   leverage = await perp_leverage(self)
-  state = await self.client.info.spot_clearinghouse_state(user=self.address)
+  state = await self.shared.spot_clearinghouse_state()
   _, free = spot_collateral(state, self.collateral_meta['index'])
   return free * leverage

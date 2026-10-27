@@ -215,7 +215,8 @@ class LighterPerpMarket(MarketBase, PerpMarket):
     if cached is not None and not refetch:
       return cached
     acct, detail = await asyncio.gather(
-      self.shared.account(), self.shared.perp(self.market_index, refetch=refetch)
+      self.shared.account(fresh=refetch),
+      self.shared.perp(self.market_index, refetch=refetch),
     )
     leverage = account.perp_leverage(acct, self.market_index, detail)
     self.shared.leverages[self.market_index] = leverage

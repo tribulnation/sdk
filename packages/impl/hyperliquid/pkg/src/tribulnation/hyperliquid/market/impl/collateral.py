@@ -101,17 +101,18 @@ def spot_collateral(spot_state: Any, token_idx: int, /) -> tuple[Decimal, Decima
 
 async def _unified_cross_collateral(self: PerpMixin) -> PerpCollateral:
   """Fetch the unified cross collateral, asserting unified account mode."""
-  mode = await self.client.info.user_abstraction(user=self.address)
+  mode = await self.shared.user_abstraction()
   if mode != 'unifiedAccount':
     raise ApiError(f'Only unified accounts are supported, got mode={mode!r}')
 
   dex_name = self.dex_name
-  perp_meta, _ = await self.client.info.perp_meta_and_asset_ctxs(dex=dex_name)
+  # The collateral token never changes: the cached meta serves.
+  _, perp_meta, _ = await self.shared.load_perp_meta_for_dex(dex_name)
   collateral_token_idx = perp_meta['collateralToken']
 
   state, spot_state = await asyncio.gather(
-    self.client.info.clearinghouse_state(user=self.address, dex=dex_name),
-    self.client.info.spot_clearinghouse_state(user=self.address),
+    self.shared.clearinghouse_state(dex_name),
+    self.shared.spot_clearinghouse_state(),
   )
 
   spot_equity, free_collateral = spot_collateral(spot_state, collateral_token_idx)
@@ -133,10 +134,7 @@ async def perp_market_collateral(self: PerpMarketMixin) -> PerpCollateral:
   Cross positions (and no position) share the account cross pool; isolated
   positions get their own bucket.
   """
-  state = await self.client.info.clearinghouse_state(
-    user=self.address,
-    dex=self.dex_name,
-  )
+  state = await self.shared.clearinghouse_state(self.dex_name)
   for entry in state['assetPositions']:
     pos = entry['position']
     if pos['coin'] == self.asset_name:
@@ -160,7 +158,7 @@ async def spot_market_balances(self: SpotMarketMixin) -> SpotBalances:
   `hold` is what resting orders (and, for the collateral token, perp margin) lock, so
   `free` is what a sell (base) or a buy (quote) can spend.
   """
-  state = await self.client.info.spot_clearinghouse_state(user=self.address)
+  state = await self.shared.spot_clearinghouse_state()
   return SpotBalances(
     base=spot_balance(state, self.base_meta['index']),
     quote=spot_balance(state, self.quote_meta['index']),
@@ -176,5 +174,5 @@ async def spot_token_balance(self: SpotMixin, asset: str, /) -> Balance:
   """
   if not asset.isdigit():
     raise ValueError(f'Hyperliquid asset IDs are token indices, got {asset!r}')
-  state = await self.client.info.spot_clearinghouse_state(user=self.address)
+  state = await self.shared.spot_clearinghouse_state()
   return spot_balance(state, int(asset))

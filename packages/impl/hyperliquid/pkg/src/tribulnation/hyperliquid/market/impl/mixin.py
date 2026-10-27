@@ -18,7 +18,13 @@ from decimal import Decimal
 import asyncio
 import os
 
-from tribulnation.sdk.core import ManagedResource, SDK, Subscription, OverflowPolicy
+from tribulnation.sdk.core import (
+  ManagedResource,
+  SDK,
+  SharedReads,
+  Subscription,
+  OverflowPolicy,
+)
 
 from typed_hyperliquid import Hyperliquid, Wallet
 from typed_hyperliquid.core.ws import SocketClient
@@ -29,6 +35,9 @@ from typed_hyperliquid.info.spot_meta import (
   SpotToken,
 )
 from typed_hyperliquid.info.user_fees import FeeSchedule, UserFeesResponse
+from typed_hyperliquid.info.clearinghouse_state import ClearinghouseState
+from typed_hyperliquid.info.spot_clearinghouse_state import SpotClearinghouseState
+from typed_hyperliquid.info.user_abstraction import Response as UserAbstraction
 from typed_hyperliquid.info.perp_meta_and_asset_ctxs import (
   PerpDexMeta,
   PerpAssetContext,
@@ -44,6 +53,21 @@ from typed_core.validation import validator
 from tribulnation.hyperliquid.core import DepthSource, Settings, wrap_exceptions
 
 T = TypeVar('T')
+
+ACCOUNT_TTL = 1.0
+"""Seconds one `clearinghouseState` or `spotClearinghouseState` answer serves every
+market's position and collateral reads.
+
+Each of those reads the whole account state, and one gateway serves every task's reads
+from one client, so a burst of them (collateral managers, rebalancers, makers, a
+selection round) used to send as many identical requests against the per-IP weight
+budget: on 2026-10-26 they were answered 429. A second collapses such a burst into one
+request, while an answer is at most that second (plus its latency) old: short next to
+how often any one reader polls.
+"""
+ABSTRACTION_TTL = 60.0
+"""Seconds one `userAbstraction` answer (the account mode) is reused: it changes only
+by hand, and every collateral read checks it."""
 
 
 class BboUpdate(TypedDict):
@@ -202,6 +226,8 @@ class Shared(SDK):
     default_factory=asyncio.Lock, init=False, repr=False
   )
   _fees_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
+  reads: SharedReads = field(default_factory=SharedReads, init=False, repr=False)
+  """Account-wide reads shared between markets and concurrent callers."""
 
   @cached_property
   def client_resource(self) -> ManagedResource[object]:
@@ -235,6 +261,33 @@ class Shared(SDK):
       )
       self.fast_streams = Streams.new(socket, validate=self.client.validate)
     return self.fast_streams
+
+  async def clearinghouse_state(self, dex: str | None) -> ClearinghouseState:
+    """The account's perpetual state on `dex` (None or `''`: the default one), one request per `ACCOUNT_TTL` for every caller."""
+    address, dex = self.address, dex or None
+    return await self.reads.read(
+      ('clearinghouseState', address, dex),
+      lambda: self.client.info.clearinghouse_state(user=address, dex=dex),
+      ttl=ACCOUNT_TTL,
+    )
+
+  async def spot_clearinghouse_state(self) -> SpotClearinghouseState:
+    """The account's spot balances, one request per `ACCOUNT_TTL` for every caller."""
+    address = self.address
+    return await self.reads.read(
+      ('spotClearinghouseState', address),
+      lambda: self.client.info.spot_clearinghouse_state(user=address),
+      ttl=ACCOUNT_TTL,
+    )
+
+  async def user_abstraction(self) -> UserAbstraction:
+    """The account's mode, one request per `ABSTRACTION_TTL` for every caller."""
+    address = self.address
+    return await self.reads.read(
+      ('userAbstraction', address),
+      lambda: self.client.info.user_abstraction(user=address),
+      ttl=ABSTRACTION_TTL,
+    )
 
   @wrap_exceptions
   async def load_spot_meta(self, *, refetch: bool = False) -> SpotMetaResponse:
