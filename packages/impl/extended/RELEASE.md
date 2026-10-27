@@ -12,3 +12,8 @@ orders spend the pool's `availableForTrade`, not the `USD` spot balance, so the 
 the pool. The adapter serves no spot exchange.
 
 Every other method is unchanged.
+
+Release qualification on 2026-10-27 passed the read suites and market consistency.
+Committed evidence under `release-evidence/extended/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
+release follows SDK 3.0.0 publication.
