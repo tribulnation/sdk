@@ -104,7 +104,7 @@ class PerpMarket(ExchangeMixin, BasePerpMarket):
       raise ValueError('MEXC index response is missing data')
     return Decimal(str(data['indexPrice']))
 
-  async def next_funding(self) -> NextFunding:
+  async def next_funding(self, *, ttl: timedelta | None = None) -> NextFunding:
     """Read the actual per-contract settlement time and cycle, never a fixed schedule."""
     response = await self.call_mexc(
       lambda: self.client.futures.http.market.funding_rate(
@@ -272,7 +272,7 @@ class PerpMarket(ExchangeMixin, BasePerpMarket):
     """Private perpetual streams are not implemented."""
     raise unsupported('trades_stream')
 
-  async def available_notional(self) -> Decimal:
+  async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     """Private perpetual balances are not implemented."""
     raise unsupported('available_notional')
 
@@ -292,10 +292,10 @@ class PerpMarket(ExchangeMixin, BasePerpMarket):
     """Private perpetual settlements are not implemented on Market."""
     raise unsupported('funding_payments')
 
-  async def perp_position(self) -> PerpPosition:
+  async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
     """Private perpetual positions are not implemented on Market."""
     raise unsupported('perp_position')
 
-  async def perp_collateral(self) -> PerpCollateral:
+  async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """Private perpetual balances are not implemented on Market."""
     raise unsupported('perp_collateral')

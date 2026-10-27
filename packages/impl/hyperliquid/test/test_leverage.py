@@ -1,5 +1,6 @@
-"""Account leverage from `activeAssetData`, its cache, and the available notional."""
+"""Account leverage from `activeAssetData`, its shared reads, and the available notional."""
 
+from datetime import timedelta
 from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import AsyncMock
@@ -72,14 +73,15 @@ def market(
   ), info
 
 
-async def test_leverage_is_cached_per_coin_until_refetch():
-  """One read per coin; `refetch=True` reads the setting (and the universe) again."""
+async def test_leverage_is_shared_per_coin_for_its_ttl():
+  """A `ttl` reuses one read per coin; `None` reads the setting again."""
   m, info = market(leverage=[3, 2])
-  assert await m.leverage() == 3
-  assert await m.leverage() == 3
+  minute = timedelta(minutes=1)
+  assert await m.leverage(ttl=minute) == 3
+  assert await m.leverage(ttl=minute) == 3
   assert info.active_asset_data.await_count == 1
-  assert await m.leverage(refetch=True) == 2
   assert await m.leverage() == 2
+  assert await m.leverage(ttl=minute) == 2
   assert info.active_asset_data.await_count == 2
   info.active_asset_data.assert_awaited_with(user=ADDRESS, coin='ETC')
 

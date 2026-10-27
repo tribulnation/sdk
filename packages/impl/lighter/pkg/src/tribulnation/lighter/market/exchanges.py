@@ -1,7 +1,7 @@
 """Perpetual and spot exchanges: discovery, bulk snapshots and exchange-wide history."""
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from typing_extensions import AsyncIterable, Collection, Mapping, Sequence, overload
 from tribulnation.sdk.core import PaginatedResponse
@@ -46,16 +46,24 @@ class LighterPerpExchange(Public, PerpExchange):
     return LighterPerpMarket(shared=self.shared, market_index=detail['market_id'])
 
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Last price, best bid/ask and 24h volumes from one `market_stats:all` snapshot."""
-    return await stats.perp_tickers(self.shared, markets)
+    return await stats.perp_tickers(self.shared, markets, ttl=ttl)
 
   async def perp_stats(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, PerpStats]:
     """Index, mark, predicted funding and base-unit open interest."""
-    return await stats.perp_stats(self.shared, markets)
+    return await stats.perp_stats(self.shared, markets, ttl=ttl)
 
   @overload
   def trades_history(
@@ -93,11 +101,13 @@ class LighterPerpExchange(Public, PerpExchange):
     async for page in history.funding_payments(self.shared, index, start, end):
       yield page
 
-  async def perp_collateral(self, market_id: str | None = None, /) -> PerpCollateral:
+  async def perp_collateral(
+    self, market_id: str | None = None, /, *, ttl: timedelta | None = None
+  ) -> PerpCollateral:
     """The cross bucket, or the bucket backing a market."""
     if market_id is not None:
-      return await (await self.market(market_id)).perp_collateral()
-    return account.cross_bucket(await self.shared.account())
+      return await (await self.market(market_id)).perp_collateral(ttl=ttl)
+    return account.cross_bucket(await self.shared.account(ttl=ttl))
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -124,7 +134,7 @@ class LighterSpotExchange(Public, SpotExchange):
       quote_asset=detail['quote_asset_id'],
     )
 
-  async def balance(self, asset: str, /) -> Balance:
+  async def balance(self, asset: str, /, *, ttl: timedelta | None = None) -> Balance:
     """One asset's balance by asset id (`'3'` is USDC); classic accounts raise
     `NotImplementedError`.
 
@@ -133,13 +143,17 @@ class LighterSpotExchange(Public, SpotExchange):
     """
     if not asset.isdigit():
       raise ValueError(f'Lighter asset ids are numeric, got {asset!r}')
-    return account.spot_balance(await self.shared.account(), int(asset))
+    return account.spot_balance(await self.shared.account(ttl=ttl), int(asset))
 
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Last price, best bid/ask and 24h volumes from one `spot_market_stats:all` snapshot."""
-    return await stats.spot_tickers(self.shared, markets)
+    return await stats.spot_tickers(self.shared, markets, ttl=ttl)
 
   @overload
   def trades_history(

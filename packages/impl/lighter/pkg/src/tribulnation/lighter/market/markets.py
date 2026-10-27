@@ -1,7 +1,7 @@
 """Perpetual and spot Market objects; market ids are the venue's numeric `market_id`."""
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 import asyncio
 
@@ -197,30 +197,25 @@ class LighterPerpMarket(MarketBase, PerpMarket):
       )
     )
 
-  async def perp_position(self) -> PerpPosition:
+  async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
     """The signed position and average entry."""
-    return account.perp_position(await self.shared.account(), self.market_index)
+    return account.perp_position(await self.shared.account(ttl=ttl), self.market_index)
 
-  async def perp_collateral(self) -> PerpCollateral:
+  async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """This market's isolated bucket when its position is isolated, else cross."""
     acct, detail = await asyncio.gather(
-      self.shared.account(), self.shared.perp(self.market_index)
+      self.shared.account(ttl=ttl), self.shared.perp(self.market_index)
     )
     return account.market_bucket(acct, self.market_index, detail)
 
-  async def leverage(self, *, refetch: bool = False) -> Decimal:
+  async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
     """`1 / initial margin fraction`: the account's configured fraction for this
-    market, else the market default. Cached per market on `Shared`."""
-    cached = self.shared.leverages.get(self.market_index)
-    if cached is not None and not refetch:
-      return cached
+    market, else the market default (from the cached market details), read from the
+    `/account` answer that positions and collateral share."""
     acct, detail = await asyncio.gather(
-      self.shared.account(fresh=refetch),
-      self.shared.perp(self.market_index, refetch=refetch),
+      self.shared.account(ttl=ttl), self.shared.perp(self.market_index)
     )
-    leverage = account.perp_leverage(acct, self.market_index, detail)
-    self.shared.leverages[self.market_index] = leverage
-    return leverage
+    return account.perp_leverage(acct, self.market_index, detail)
 
   async def collateral_id(self) -> str:
     """USDC's spot ID `<account_id>:spot:3` on a unified account, where perps margin the
@@ -231,18 +226,22 @@ class LighterPerpMarket(MarketBase, PerpMarket):
     """
     index = await self.shared.account_index()
     if (mode := self.shared.trading_modes.get(index)) is None:
-      mode = (await self.shared.account())['account_trading_mode']
+      mode = (await self.shared.account(ttl=None))['account_trading_mode']
       self.shared.trading_modes[index] = mode
     if mode == UNIFIED:
       return f'{self.account_id}:spot:{USDC}'
     else:
       return f'{self.account_id}:perp'
 
-  async def available_notional(self) -> Decimal:
+  async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     """Free cross collateral times `leverage()`. Kept over the mode-aware default:
-    isolated positions are funded from cross collateral, not their own bucket."""
-    leverage = await self.leverage()
-    return account.cross_free(await self.shared.account()) * leverage
+    isolated positions are funded from cross collateral, not their own bucket. Both
+    come from one `/account` answer."""
+    acct, detail = await asyncio.gather(
+      self.shared.account(ttl=ttl), self.shared.perp(self.market_index)
+    )
+    leverage = account.perp_leverage(acct, self.market_index, detail)
+    return account.cross_free(acct) * leverage
 
   async def index(self, *, settings: Settings = {}) -> Decimal:
     """The market's index price, fresh from `orderBookDetails`."""
@@ -255,9 +254,9 @@ class LighterPerpMarket(MarketBase, PerpMarket):
       raise ApiError(f'Lighter returned no details for market {market_index}')
     return rows[0]['index_price']
 
-  async def next_funding(self) -> NextFunding:
+  async def next_funding(self, *, ttl: timedelta | None = None) -> NextFunding:
     """The predicted rate of the next hourly settlement."""
-    return await stats.next_funding(self.shared, self.market_index)
+    return await stats.next_funding(self.shared, self.market_index, ttl=ttl)
 
   def funding_rates(
     self, start: datetime | None = None, end: datetime | None = None
@@ -338,10 +337,10 @@ class LighterSpotMarket(MarketBase, SpotMarket):
       overflow=overflow,
     )
 
-  async def balances(self) -> SpotBalances:
+  async def balances(self, *, ttl: timedelta | None = None) -> SpotBalances:
     """The base and quote balances, from one account read; classic accounts raise
     `NotImplementedError`."""
-    acct = await self.shared.account()
+    acct = await self.shared.account(ttl=ttl)
     return SpotBalances(
       base=account.spot_balance(acct, self.base_asset),
       quote=account.spot_balance(acct, self.quote_asset),

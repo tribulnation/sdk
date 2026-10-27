@@ -1,7 +1,7 @@
 """The perpetual Market object; market ids are the venue's market names (`BTC-USD`)."""
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
@@ -188,37 +188,36 @@ class ExtendedPerpMarket(Public, PerpMarket):
       self.shared, self.name, queue_size=queue_size, overflow=overflow
     )
 
-  async def perp_position(self) -> PerpPosition:
+  async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
     """The signed position and entry price."""
     rows = await self.shared.call(
       lambda: self.shared.client.account.positions([self.name])
     )
     return account.perp_position(rows, self.name)
 
-  async def perp_collateral(self) -> PerpCollateral:
+  async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """The sub-account's one cross bucket, whatever the market."""
     return account.bucket(await self.shared.call(self.shared.client.account.balance))
 
-  async def leverage(self, *, refetch: bool = False) -> Decimal:
+  async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
     """The sub-account's leverage setting on the market (the venue default until
-    changed). Cached per market."""
-    cached = self.shared.leverages.get(self.name)
-    if cached is not None and not refetch:
-      return cached
-    rows = await self.shared.call(
-      lambda: self.shared.client.account.leverage([self.name])
+    changed), read per market and shared for the caller's `ttl`."""
+    name = self.name
+    rows = await self.shared.reads.read(
+      ('leverage', name),
+      lambda: self.shared.call(lambda: self.shared.client.account.leverage([name])),
+      ttl=ttl,
     )
     for row in rows:
-      if row['market'] == self.name:
-        self.shared.leverages[self.name] = row['leverage']
+      if row['market'] == name:
         return row['leverage']
-    raise ValueError(f'Extended returned no leverage for {self.name}')
+    raise ValueError(f'Extended returned no leverage for {name}')
 
   async def index(self, *, settings: Settings = {}) -> Decimal:
     """The market's index price, fresh from `info.markets`."""
     return (await self.shared.fresh(self.name))['marketStats']['indexPrice']
 
-  async def next_funding(self) -> NextFunding:
+  async def next_funding(self, *, ttl: timedelta | None = None) -> NextFunding:
     """The venue's one-minute estimate of the next hourly rate (a fraction, positive
     when longs pay) and its payment time. No premium is reported."""
     stats = (await self.shared.fresh(self.name))['marketStats']

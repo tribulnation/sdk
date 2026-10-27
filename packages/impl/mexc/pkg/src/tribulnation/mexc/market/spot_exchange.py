@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing_extensions import Collection, Mapping, Sequence
 from dataclasses import dataclass
 
@@ -28,6 +29,7 @@ class SpotExchange(ExchangeMixin, Exchange):
     markets: Collection[str] | None = None,
     *,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Fetch quotes and native 24-hour volumes for every spot symbol in one call.
 

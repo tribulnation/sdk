@@ -1679,7 +1679,7 @@ async def isolated_reads() -> dict[str, Any]:
       eth_row['unrealized_pnl'],
     ),
     'sdk leverage, available_notional': (
-      await sdk_btc.leverage(refetch=True),
+      await sdk_btc.leverage(),
       await sdk_btc.available_notional(),
     ),
     'setting (leverage, margin type)': await btc_setting(),

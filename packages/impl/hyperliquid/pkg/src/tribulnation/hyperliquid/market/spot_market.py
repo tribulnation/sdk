@@ -1,6 +1,6 @@
 from typing_extensions import AsyncContextManager, AsyncIterable, Sequence
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 import secrets
 
 from tribulnation.sdk.core import PaginatedResponse, OverflowPolicy
@@ -100,9 +100,9 @@ class SpotMarket(SpotMarketMixin, _SpotMarket):
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
     return trades_stream(self, queue_size=queue_size, overflow=overflow)
 
-  async def balances(self) -> SpotBalances:
+  async def balances(self, *, ttl: timedelta | None = None) -> SpotBalances:
     """Base and quote token balances; `free` is `total - hold`."""
-    return await spot_market_balances(self)
+    return await spot_market_balances(self, ttl=ttl)
 
   def trades_history(self, start: datetime, end: datetime) -> PaginatedResponse[Trade]:
     return PaginatedResponse(trades_history(self, start, end))

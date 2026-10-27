@@ -3,7 +3,7 @@ import logging
 
 from typing_extensions import Collection, Mapping, Sequence, overload
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from tribulnation.sdk import SDK
@@ -84,6 +84,7 @@ class SpotExchange(SpotMixin, _SpotExchange):
     markets: Collection[str] | None = None,
     *,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Fetch spot tickers, optionally enriched with per-market order books.
 
@@ -137,9 +138,9 @@ class SpotExchange(SpotMixin, _SpotExchange):
     await asyncio.gather(*(_enrich(c, m) for c, m in coin_to_market.items()))
     return result
 
-  async def balance(self, asset: str, /) -> Balance:
+  async def balance(self, asset: str, /, *, ttl: timedelta | None = None) -> Balance:
     """One token's balance by token index (`'0'` is USDC); `free` is `total - hold`."""
-    return await spot_token_balance(self, asset)
+    return await spot_token_balance(self, asset, ttl=ttl)
 
   async def market(self, market_id: str, /) -> SpotMarket:
     base, quote, spot_index = parse_market_id(market_id)

@@ -772,7 +772,7 @@ class SpotMarket(NativeMarket, SDKSpotMarket):
         if page := [parse_trade(r) for r in rows if start <= r['time'] <= end]:
           yield page
 
-  async def balances(self) -> SpotBalances:
+  async def balances(self, *, ttl: timedelta | None = None) -> SpotBalances:
     """The base and quote balances: free plus locked in open orders, and the free part.
 
     Raises:
@@ -894,7 +894,7 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
       'Aster premium index omits the symbol', market_id=self.symbol, field='indexPrice'
     )
 
-  async def next_funding(self) -> NextFunding:
+  async def next_funding(self, *, ttl: timedelta | None = None) -> NextFunding:
     """Read the predicted rate, settlement time and the symbol's own interval."""
     rows = await self.shared.call(lambda: self.api.market.premium_index(self.symbol))
     premium = next(
@@ -979,37 +979,32 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     async for page in pages.via(self.shared.call):
       yield [FundingPayment(amount=r['income'], time=r['time']) for r in page]
 
-  async def one_way_position(self):
+  async def one_way_position(self, *, ttl: timedelta | None):
     """Read the symbol's single one-way (`BOTH`) position row."""
-    rows = await self.shared.position_risk(self.symbol)
+    rows = await self.shared.position_risk(self.symbol, ttl=ttl)
     if len(rows) != 1 or rows[0]['positionSide'] != 'BOTH':
       raise NotImplementedError('Aster hedge-mode positions are not supported')
     return rows[0]
 
-  async def perp_position(self) -> PerpPosition:
+  async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
     """Read the signed one-way size and entry price."""
-    row = await self.one_way_position()
+    row = await self.one_way_position(ttl=ttl)
     return PerpPosition(size=row['positionAmt'], entry_price=row['entryPrice'])
 
-  async def leverage(self, *, refetch: bool = False) -> Decimal:
-    """The symbol's configured initial leverage (`positionRisk`), cached per symbol.
+  async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
+    """The symbol's configured initial leverage, from the shared `positionRisk` read.
 
     The setting applies to cross and isolated margin alike.
     """
-    cached = self.shared.leverages.get(self.symbol)
-    if cached is not None and not refetch:
-      return cached
-    rows = await self.shared.position_risk(self.symbol, fresh=refetch)
-    leverage = position_leverage(rows, self.symbol)
-    self.shared.leverages[self.symbol] = leverage
-    return leverage
+    rows = await self.shared.position_risk(self.symbol, ttl=ttl)
+    return position_leverage(rows, self.symbol)
 
   async def collateral_id(self) -> str:
     """The futures wallet, `<account_id>:perp`: separate from the spot wallet, and the
     source of new margin in either margin mode (see `available_notional`)."""
     return f'{self.account_id}:perp'
 
-  async def perp_collateral(self) -> PerpCollateral:
+  async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """The bucket backing this one-way position: cross, or its own isolated margin.
 
     Both come from the join-margin account view; see `cross_collateral` and
@@ -1018,11 +1013,11 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     Raises:
       NotImplementedError: The symbol is in hedge mode.
     """
-    account = await self.shared.futures_account()
+    account = await self.shared.futures_account(ttl=ttl)
     row = one_way_row(account['positions'], self.symbol)
     return isolated_collateral(row) if row['isolated'] else cross_collateral(account)
 
-  async def available_notional(self) -> Decimal:
+  async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     """The free cross balance times `leverage()`, capped by the venue's notional caps.
 
     New margin comes from the account's `availableBalance` in either margin mode, so
@@ -1033,8 +1028,8 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     reversing a position is not modelled: the result is the same-direction room
     (ADR 0041).
     """
-    leverage = await self.leverage()
-    account = await self.shared.futures_account()
+    leverage = await self.leverage(ttl=ttl)
+    account = await self.shared.futures_account(ttl=ttl)
     row = one_way_row(account['positions'], self.symbol)
     remaining = await self.shared.call(
       lambda: self.api.market.remaining_openable_notional_value(
@@ -1089,14 +1084,11 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
       ):
         return
       self.shared.maxed[self.symbol] = loop.time()
-      top, current = await asyncio.gather(
-        self.max_leverage(), self.leverage(refetch=True)
-      )
+      top, current = await asyncio.gather(self.max_leverage(), self.leverage(ttl=None))
       if current != top:
         change = await self.shared.call(
           lambda: self.api.account.set_leverage(self.symbol, leverage=top)
         )
-        self.shared.leverages[self.symbol] = Decimal(change['leverage'])
         self.shared.reads.forget(POSITION_RISK)
         log.info(
           'Aster %s leverage set from %s to %s, the highest allowed',

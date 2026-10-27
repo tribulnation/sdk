@@ -1,6 +1,6 @@
 """Venue-row mappings, checked against figures observed on testnet."""
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import AsyncMock
@@ -216,21 +216,24 @@ def perp_market(*accounts: DetailedAccount) -> tuple[LighterPerpMarket, AsyncMoc
   return LighterPerpMarket(shared=shared, market_index=4095), get
 
 
-async def test_market_leverage_is_cached_until_refetch():
-  """One account read; `refetch=True` sees a changed setting (10% to 4%: 25x)."""
+async def test_market_leverage_reuses_the_account_read_for_its_ttl():
+  """A `ttl` reuses one account read; `None` reads again and sees a changed setting
+  (10% to 4%: 25x)."""
   changed = detailed(positions=[position(initial_margin_fraction=Decimal('4.00'))])
   market, get = perp_market(detailed(), changed)
-  assert await market.leverage() == 10
-  assert await market.leverage() == 10
+  assert await market.leverage(ttl=timedelta(minutes=1)) == 10
+  assert await market.leverage(ttl=timedelta(minutes=1)) == 10
   assert get.await_count == 1
-  assert await market.leverage(refetch=True) == 25
+  assert await market.leverage() == 25
   assert get.await_count == 2
 
 
 async def test_available_notional_is_free_cross_collateral_times_leverage():
-  """Kept over the SDK default: an isolated market still opens from cross collateral."""
-  market, _ = perp_market(detailed(), detailed(), detailed())
+  """Kept over the SDK default: an isolated market still opens from cross collateral.
+  Collateral and leverage come from one account read, even a fresh one."""
+  market, get = perp_market(detailed(), detailed())
   assert await market.available_notional() == Decimal('39570.86742')
+  assert get.await_count == 1
   assert (await market.perp_collateral()).margin_mode == 'isolated'
 
 

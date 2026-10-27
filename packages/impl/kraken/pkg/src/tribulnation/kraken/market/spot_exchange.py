@@ -1,5 +1,6 @@
 """Kraken's Spot exchange: the whole pair catalogue."""
 
+from datetime import timedelta
 from typing_extensions import Collection, Mapping, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
@@ -54,6 +55,7 @@ class SpotExchange(ExchangeMixin, Exchange):
     markets: Collection[str] | None = None,
     *,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Fetch last price, best bid and best ask for every market in one call.
 

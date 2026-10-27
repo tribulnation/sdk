@@ -1,6 +1,8 @@
 """Account leverage on perpetual markets and the opening capacity it implies."""
 
+from datetime import timedelta
 from decimal import Decimal
+import asyncio
 
 from typed_hyperliquid.info.active_asset_data import ActiveAssetData
 
@@ -29,34 +31,32 @@ def parse_leverage(data: ActiveAssetData, *, max_leverage: int) -> Decimal:
 
 
 @wrap_exceptions
-async def perp_leverage(self: PerpMarketMixin, *, refetch: bool = False) -> Decimal:
-  """The account's leverage on this market, cached per coin on `Shared`.
+async def perp_leverage(
+  self: PerpMarketMixin, *, ttl: timedelta | None = None
+) -> Decimal:
+  """The account's leverage on this market, from a shared `activeAssetData` read.
 
-  `refetch` also reloads the dex universe, so a changed `maxLeverage` is seen.
+  `maxLeverage` comes from the cached dex universe, which `rules(refetch=True)` reloads.
   """
   coin = self.asset_name
-  cached = self.shared.leverages.get(coin)
-  if cached is not None and not refetch:
-    return cached
-  _, perp_meta, _ = await self.shared.load_perp_meta_for_dex(
-    self.dex_name, refetch=refetch
-  )
+  _, perp_meta, _ = await self.shared.load_perp_meta_for_dex(self.dex_name)
   asset = perp_meta['universe'][find_asset_idx(coin, perp_meta)]
-  data = await self.client.info.active_asset_data(user=self.address, coin=coin)
-  leverage = parse_leverage(data, max_leverage=asset['maxLeverage'])
-  self.shared.leverages[coin] = leverage
-  return leverage
+  data = await self.shared.active_asset_data(coin, ttl=ttl)
+  return parse_leverage(data, max_leverage=asset['maxLeverage'])
 
 
 @wrap_exceptions
-async def perp_available_notional(self: PerpMarketMixin) -> Decimal:
+async def perp_available_notional(
+  self: PerpMarketMixin, *, ttl: timedelta | None = None
+) -> Decimal:
   """Free unified collateral times the account's leverage on this market.
 
   Both cross and isolated positions are opened from the collateral token's free spot
   balance (`total - hold`, see `spot_collateral`), not from an isolated position's
   own bucket, so this reads the account pool whatever the market's margin mode.
   """
-  leverage = await perp_leverage(self)
-  state = await self.shared.spot_clearinghouse_state()
+  leverage, state = await asyncio.gather(
+    perp_leverage(self, ttl=ttl), self.shared.spot_clearinghouse_state(ttl=ttl)
+  )
   _, free = spot_collateral(state, self.collateral_meta['index'])
   return free * leverage

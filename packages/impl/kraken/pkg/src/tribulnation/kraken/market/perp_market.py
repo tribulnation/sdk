@@ -87,7 +87,7 @@ class PerpMarket(SharedMixin, BasePerpMarket):
       raise ValueError('Kraken returned an index ticker instead of a contract ticker')
     return Decimal(str(row['indexPrice']))
 
-  async def next_funding(self) -> NextFunding:
+  async def next_funding(self, *, ttl: timedelta | None = None) -> NextFunding:
     """The current native ticker lacks a qualified relative rate and settlement time."""
     raise NotImplementedError(
       'Kraken Futures next funding has no qualified native rate/time mapping'
@@ -145,7 +145,7 @@ class PerpMarket(SharedMixin, BasePerpMarket):
     """Private Futures streams are outside this public implementation."""
     raise NotImplementedError('Kraken Futures supports public market data only')
 
-  async def available_notional(self) -> Decimal:
+  async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     """Private Futures buying power is outside this public implementation."""
     raise NotImplementedError('Kraken Futures supports public market data only')
 
@@ -165,10 +165,10 @@ class PerpMarket(SharedMixin, BasePerpMarket):
     """Private funding payments are outside this public implementation."""
     raise NotImplementedError('Kraken Futures supports public market data only')
 
-  async def perp_position(self) -> PerpPosition:
+  async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
     """Private Futures positions are outside this public implementation."""
     raise NotImplementedError('Kraken Futures supports public market data only')
 
-  async def perp_collateral(self) -> PerpCollateral:
+  async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """Private Futures collateral is outside this public implementation."""
     raise NotImplementedError('Kraken Futures supports public market data only')

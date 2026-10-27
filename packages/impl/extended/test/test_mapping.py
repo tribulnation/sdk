@@ -1,6 +1,6 @@
 """Venue rows mapped onto SDK markets, rules, stats, collateral and positions."""
 
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from decimal import Decimal
 
 from typing_extensions import Any
@@ -143,7 +143,7 @@ async def test_rules_carry_the_side_specific_band(exchange: ExtendedPerpExchange
 
 
 async def test_account_reads(exchange: ExtendedPerpExchange):
-  """Fees, leverage (cached), the signed position and the one cross bucket."""
+  """Fees, leverage (shared for a `ttl`), the signed position and the one cross bucket."""
   account = exchange.shared.client.account
   calls: list[str] = []
 
@@ -190,9 +190,11 @@ async def test_account_reads(exchange: ExtendedPerpExchange):
   account.balance = balance  # type: ignore[method-assign]
   rates = await exchange.fees('BTC-USD')
   assert (rates.maker_buy, rates.taker_sell) == (Decimal('0'), Decimal('0.00025'))
-  assert await exchange.leverage('BTC-USD') == Decimal('10')
-  assert await exchange.leverage('BTC-USD') == Decimal('10')
+  assert await exchange.leverage('BTC-USD', ttl=timedelta(minutes=1)) == Decimal('10')
+  assert await exchange.leverage('BTC-USD', ttl=timedelta(minutes=1)) == Decimal('10')
   assert calls == ['leverage']
+  assert await exchange.leverage('BTC-USD') == Decimal('10')
+  assert calls == ['leverage', 'leverage']
   position = await exchange.perp_position('BTC-USD')
   assert (position.size, position.entry_price) == (Decimal('-0.5'), Decimal('80000'))
   collateral = await exchange.perp_collateral()

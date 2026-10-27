@@ -1,6 +1,6 @@
 from typing_extensions import AsyncIterable, Collection, Mapping, Sequence, overload
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 import asyncio
 
@@ -51,6 +51,7 @@ class Exchange(ExchangeMixin, PerpExchange):
     markets: Collection[str] | None = None,
     *,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, PerpStats]:
     """Fetch pricing and funding stats for every perp market in one call.
 
@@ -69,6 +70,7 @@ class Exchange(ExchangeMixin, PerpExchange):
     markets: Collection[str] | None = None,
     *,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     return await tickers(self, markets, settings=settings)
 
@@ -196,7 +198,9 @@ class Exchange(ExchangeMixin, PerpExchange):
           break
 
   @wrap_exceptions
-  async def perp_collateral(self, market_id: str | None = None, /) -> PerpCollateral:
+  async def perp_collateral(
+    self, market_id: str | None = None, /, *, ttl: timedelta | None = None
+  ) -> PerpCollateral:
     """Fetch the perpetual collateral bucket for this exchange's subaccount.
 
     dYdX has one collateral pool per subaccount, so this exchange (margin bucket)
@@ -205,7 +209,7 @@ class Exchange(ExchangeMixin, PerpExchange):
     """
     if market_id is not None:
       m = await self.market(market_id)
-      return await m.perp_collateral()
+      return await m.perp_collateral(ttl=ttl)
     address = self.address
     sub, markets = await asyncio.gather(
       self.indexer.data.get_subaccount(address=address, subaccount=self.subaccount),

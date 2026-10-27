@@ -1,5 +1,6 @@
 """Public native discovery, product-scoped summaries and linear perpetual statistics."""
 
+from datetime import timedelta
 from dataclasses import dataclass
 from decimal import Decimal
 from typing_extensions import Collection, Literal, Mapping, Sequence
@@ -36,7 +37,11 @@ class SpotExchange(Public, Exchange):
     return cls(shared=self.shared, symbol=market_id)
 
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Read product-specific summaries; never pull unrelated option records."""
     if markets is not None and not markets:
@@ -91,7 +96,11 @@ class LinearPerpExchange(SpotExchange, PerpExchange):
     return LinearPerpMarket(shared=self.shared, symbol=market_id)
 
   async def perp_stats(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, PerpStats]:
     """Read native index, mark and base open interest with shared request pacing."""
     if markets is not None and not markets:

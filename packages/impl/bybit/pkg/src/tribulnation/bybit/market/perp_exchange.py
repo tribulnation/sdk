@@ -60,6 +60,7 @@ class PerpExchange(VenueMixin, _PerpExchange):
     markets: Collection[str] | None = None,
     *,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Fetch best bid/ask and last price for every perpetual in one call.
 
@@ -92,6 +93,7 @@ class PerpExchange(VenueMixin, _PerpExchange):
     markets: Collection[str] | None = None,
     *,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, PerpStats]:
     """Fetch pricing and funding stats for every perpetual in one call.
 
@@ -122,7 +124,9 @@ class PerpExchange(VenueMixin, _PerpExchange):
       )
     return stats
 
-  async def perp_collateral(self, market_id: str | None = None, /) -> PerpCollateral:
+  async def perp_collateral(
+    self, market_id: str | None = None, /, *, ttl: timedelta | None = None
+  ) -> PerpCollateral:
     """Fetch the Unified Trading Account's margin pool.
 
     Bybit runs one margin pool per unified account rather than one per contract, so

@@ -5,7 +5,7 @@ Per-market methods use the SDK's default delegation to `market(market_id)`.
 """
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from decimal import Decimal
 from typing_extensions import AsyncIterable, Collection, Mapping, Sequence, overload
 from typed_margin_trade.coingecko.derivatives.contracts import DerivativeContract
@@ -81,7 +81,7 @@ class SpotExchange(Public, SDKSpotExchange):
       raise ValueError(f'Unknown margin.trade spot pair: {market_id}')
     return SpotMarket(shared=self.shared, meta=pairs[market_id])
 
-  async def balance(self, asset: str, /) -> Balance:
+  async def balance(self, asset: str, /, *, ttl: timedelta | None = None) -> Balance:
     """One spot token's balance by symbol (`USDC`, `PEARL`).
 
     Raises:
@@ -97,7 +97,11 @@ class SpotExchange(Public, SDKSpotExchange):
     return spot_balance(state, tokens[asset])
 
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """24h volumes from the spot contexts; last and best bid/ask from CoinGecko."""
     pairs = await self.shared.spot_pairs()
@@ -169,7 +173,11 @@ class PerpExchange(Public, SDKPerpExchange):
     return PerpMarket(shared=self.shared, meta=universe[market_id])
 
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """24h volumes from the asset contexts; last and best bid/ask from CoinGecko,
     which omits some markets (`SPY`, `QQQ`): theirs stay `None`."""
@@ -186,7 +194,11 @@ class PerpExchange(Public, SDKPerpExchange):
     }
 
   async def perp_stats(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, PerpStats]:
     """Oracle index, mark, funding and open interest from one `metaAndAssetCtxs`."""
     next_time = next_settlement(datetime.now(timezone.utc))
@@ -263,10 +275,12 @@ class PerpExchange(Public, SDKPerpExchange):
         for r in rows
       ]
 
-  async def perp_collateral(self, market_id: str | None = None, /) -> PerpCollateral:
+  async def perp_collateral(
+    self, market_id: str | None = None, /, *, ttl: timedelta | None = None
+  ) -> PerpCollateral:
     """The cross bucket, or a market's own bucket."""
     if market_id is not None:
-      return await (await self.market(market_id)).perp_collateral()
+      return await (await self.market(market_id)).perp_collateral(ttl=ttl)
     state = await self.shared.call(
       lambda: self.client.info.clearinghouse_state(user=self.shared.address)
     )
