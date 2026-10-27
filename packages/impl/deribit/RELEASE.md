@@ -5,3 +5,8 @@ Requires SDK >=3.0.0 (spot and margin market types, collateral IDs and read `ttl
 Markets drop the `position`, `collateral` and `available_notional` stubs SDK 3.0 removes from spot ([ADR 0051](../../../dev-docs/adr/0051-spot-perp-market-types-collateral-ids.md)); they raised `NotImplementedError` before. Perpetuals keep raising it from `perp_position` and `perp_collateral`. The reads SDK 3.0 gives a `ttl` accept it and ignore it: every read asks the venue ([ADR 0054](../../../dev-docs/adr/0054-caller-chosen-read-staleness.md)).
 
 Every other method is unchanged.
+
+Release qualification on 2026-10-27 passed the read suites and market consistency.
+Committed evidence under `release-evidence/deribit/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
+release follows SDK 3.0.0 publication.
