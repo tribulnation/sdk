@@ -96,8 +96,8 @@ NO_OPEN_INTEREST_CAP = Decimal(-1)
 LEVERAGE_ABOVE_MAX = -2027
 """Aster refusing an order because the symbol's leverage exceeds the maximum it now allows."""
 LEVERAGE_RECHECK = 10.0
-"""Seconds after a symbol's leverage was set to its maximum before a `-2027` sets it
-again: concurrent orders refused together share one fix."""
+"""Seconds a symbol's leverage check after a `-2027` stands: concurrent orders refused
+together share one check and its outcome."""
 
 
 class ErrorBody(TypedDict):
@@ -1068,64 +1068,68 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
         field='brackets',
       )
 
-  async def use_max_leverage(self, *, again: bool = False):
-    """Set the symbol's leverage to the highest Aster allows: once per `Shared`, or once more with `again` (unless just done).
+  async def lower_to_max_leverage(self) -> bool:
+    """After a `-2027` refusal, lower the symbol's leverage to the highest Aster now allows.
 
     Aster may lower a symbol's maximum while the account keeps its old setting, and then
-    refuses every order on it (`-2027`). A failed attempt counts as one, so failing
-    reads (e.g. while rate limited) aren't repeated on every order.
+    refuses every order on it (`-2027`). The setting is only ever lowered, never raised:
+    when it is not above the maximum nothing changes. One check per symbol stands for
+    `LEVERAGE_RECHECK` seconds, so concurrent refusals share it and its outcome; a
+    failed check counts as one that lowered nothing.
+
+    Returns:
+      Whether the setting is now at the maximum after being above it, i.e. whether
+      resending the order can succeed.
     """
     lock = self.shared.leverage_locks.setdefault(self.symbol, asyncio.Lock())
     async with lock:
       loop = asyncio.get_running_loop()
-      checked = self.shared.maxed.get(self.symbol)
-      if checked is not None and (
-        not again or loop.time() - checked < LEVERAGE_RECHECK
-      ):
-        return
-      self.shared.maxed[self.symbol] = loop.time()
+      checked = self.shared.leverage_checks.get(self.symbol)
+      if checked is not None and loop.time() - checked[0] < LEVERAGE_RECHECK:
+        return checked[1]
+      self.shared.leverage_checks[self.symbol] = (loop.time(), False)
       top, current = await asyncio.gather(self.max_leverage(), self.leverage(ttl=None))
-      if current != top:
+      if current > top:
         change = await self.shared.call(
           lambda: self.api.account.set_leverage(self.symbol, leverage=top)
         )
         self.shared.reads.forget(POSITION_RISK)
+        self.shared.leverage_checks[self.symbol] = (loop.time(), True)
         log.info(
-          'Aster %s leverage set from %s to %s, the highest allowed',
+          'Aster %s leverage lowered from %s to %s, the highest now allowed',
           self.symbol,
           current,
           change['leverage'],
         )
+        return True
+      else:
+        return False
 
   async def place_order(
     self, order: Order, *, settings: Settings = {}
   ) -> OrderResponse:
-    """Place the order at the symbol's highest allowed leverage (see `NativeMarket.place_order`).
+    """Place the order (see `NativeMarket.place_order`), lowering the leverage once if Aster lowered the symbol's maximum.
 
-    Before the symbol's first order in this `Shared`'s lifetime its leverage is set to
-    the maximum (`use_max_leverage`); if that fails, the order goes anyway. An order
-    refused for a leverage above the maximum (`-2027`) sets it again and is sent once
-    more.
+    The leverage setting is left alone, never raised. An order refused because the
+    setting is above the symbol's current maximum (`-2027`) lowers it to that maximum
+    (`lower_to_max_leverage`) and is sent once more.
 
     Raises:
-      OrderRejected: As `NativeMarket.place_order`, also when the leverage could not
-        be set after a `-2027`.
+      OrderRejected: As `NativeMarket.place_order`; after a `-2027`, the original
+        refusal when the setting was not above the maximum or could not be lowered.
     """
-    if self.symbol not in self.shared.maxed:
-      try:
-        await self.use_max_leverage()
-      except Error as e:
-        log.warning('Aster %s: could not check the leverage: %r', self.symbol, e)
     try:
       return await super().place_order(order, settings=settings)
     except OrderRejected as e:
       if not leverage_above_max(e):
         raise
       try:
-        await self.use_max_leverage(again=True)
+        lowered = await self.lower_to_max_leverage()
       except Error as fix:
-        log.warning('Aster %s: could not set the leverage: %r', self.symbol, fix)
+        log.warning('Aster %s: could not lower the leverage: %r', self.symbol, fix)
         raise e from fix
+      if not lowered:
+        raise
     return await super().place_order(order, settings=settings)
 
   def fetch_order(self, order_id: int):

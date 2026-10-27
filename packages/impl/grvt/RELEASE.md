@@ -1,18 +1,9 @@
-# tribulnation-grvt 0.1.1
+# tribulnation-grvt 0.2.0
 
-Requires SDK >=2.21.0 (the release adding `Book.frozen` and `detached_books`) and
-typed-grvt >=0.2.0 and typed-core >=0.13. Upgrade the SDK and this adapter together.
+Requires SDK >=3.0.0 (spot and margin market types, collateral IDs and read `ttl`). Upgrade the SDK and this adapter together: SDK 3.0 changes the base classes this adapter subclasses, so older adapters do not work with it, and this one does not work with SDK 2.
 
-`depth_stream` no longer deep-copies the whole order book on every update: the
-stream yields `Book.frozen()` and each subscriber gets its own copy, through
-`detached_books`, of each book it reads ([ADR 0049](../../../dev-docs/adr/0049-book-streams-copy-on-read.md)).
-On a 500-level-a-side book, the work per update falls from about 16 ms (it copied twice) to about
-0.3 ms, plus about 0.5 ms for each book a subscriber reads. Delivered books keep their
-guarantees: a later push never changes them, and a subscriber may mutate its own.
+`collateral_id()` is the trading sub-account's cross pool, `<account>:<exchange>` ([ADR 0051](../../../dev-docs/adr/0051-spot-perp-market-types-collateral-ids.md)); it funds isolated positions too.
+
+`leverage(refetch=...)` becomes `leverage(ttl=...)` ([ADR 0054](../../../dev-docs/adr/0054-caller-chosen-read-staleness.md)). Leverage is no longer cached per instrument: one account-wide `all_initial_leverage` answer serves every instrument, asked afresh without a `ttl` and shared with one. Other account reads accept `ttl` and ignore it.
 
 Every other method is unchanged.
-
-Release qualification on 2026-10-24 passed the read suites and market consistency.
-Committed evidence under `release-evidence/grvt/` matches pinned Catalogue
-`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
-release follows SDK 2.21.0 publication.

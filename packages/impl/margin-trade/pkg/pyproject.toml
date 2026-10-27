@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tribulnation-margin-trade"
-version = "0.1.0"
+version = "0.2.0"
 description = "Tribulnation SDK implementation for margin.trade spot and perpetual markets."
 license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
-dependencies = ["tribulnation-sdk>=2.19.0", "typed-margin-trade>=0.1.1"]
+dependencies = ["tribulnation-sdk>=3.0.0", "typed-margin-trade>=0.1.1"]
 readme = {file = "README.md", content-type = "text/markdown"}
 
 [project.urls]

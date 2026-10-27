@@ -1,6 +1,6 @@
 # Local SDK evidence: extended
 
-Run completed: 2026-10-24T11:27:34.306942+00:00
+Run completed: 2026-10-27T12:30:58.938600+00:00
 
 This records a trusted local run, not cryptographic proof. Release policy must separately validate required check coverage and statuses.
 

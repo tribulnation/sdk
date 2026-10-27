@@ -1,4 +1,4 @@
-"""The highest allowed leverage, set automatically, and account reads shared between symbols."""
+"""Leverage lowered to a lowered maximum on refusal, and account reads shared between symbols."""
 
 from datetime import timedelta
 from decimal import Decimal
@@ -15,7 +15,7 @@ from typed_aster.futures.position.risk import Risk
 from typed_aster.futures.trade.place_order import PlaceOrder
 from tribulnation.aster import AsterMarket
 from tribulnation.aster.core import Shared
-from tribulnation.aster.market.markets import PerpMarket
+from tribulnation.aster.market.markets import PerpMarket, leverage_above_max
 from tribulnation.sdk.core import NetworkError, OrderRejected
 from tribulnation.sdk.market import Order
 
@@ -87,76 +87,83 @@ def venue(monkeypatch: pytest.MonkeyPatch) -> dict[str, AsyncMock]:
   return mocks
 
 
-async def test_first_orders_set_the_maximum_once(venue: dict[str, AsyncMock]):
-  """Concurrent first orders set the leverage once; later orders don't check again."""
-  s = shared()
-  m = perp(s)
+async def test_orders_never_touch_the_leverage(venue: dict[str, AsyncMock]):
+  """Orders that are accepted read and set nothing, even at a setting below the maximum."""
+  venue['risk'].return_value = [risk(leverage=3)]
+  m = perp(shared())
   await asyncio.gather(m.place_order(ORDER), m.place_order(ORDER))
-  await m.place_order(ORDER)
-  call = venue['set'].await_args
-  assert venue['set'].await_count == 1 and call is not None
-  assert (call.args, call.kwargs) == ((SYMBOL,), {'leverage': 10})
-  assert venue['brackets'].await_count == 1
-  assert venue['place'].await_count == 3
-  venue['risk'].return_value = [risk(leverage=10)]
-  assert await m.leverage(ttl=MINUTE) == 10
-
-
-async def test_leverage_at_the_maximum_is_left_alone(venue: dict[str, AsyncMock]):
-  """No change is sent when the setting already is the maximum."""
-  venue['risk'].return_value = [risk(leverage=10)]
-  await perp(shared()).place_order(ORDER)
+  assert venue['place'].await_count == 2
+  assert venue['brackets'].await_count == 0
+  assert venue['risk'].await_count == 0
   assert venue['set'].await_count == 0
 
 
-async def test_a_failed_check_does_not_block_orders(venue: dict[str, AsyncMock]):
-  """The order goes anyway, and the failed check isn't repeated on every order."""
-  venue['brackets'].side_effect = NetworkError('down')
+async def test_a_refusal_lowers_the_leverage_and_resends(venue: dict[str, AsyncMock]):
+  """A `-2027` at 20x under a 10x maximum lowers the setting to 10x and resends once."""
+  s = shared()
+  venue['place'].side_effect = [ABOVE_MAX, placed(2)]
+  response = await perp(s).place_order(ORDER)
+  call = venue['set'].await_args
+  assert response.id == '2' and venue['place'].await_count == 2
+  assert call is not None and (call.args, call.kwargs) == ((SYMBOL,), {'leverage': 10})
+  venue['risk'].return_value = [risk(leverage=10)]
+  assert await perp(s).leverage(ttl=MINUTE) == 10
+
+
+async def test_a_refusal_never_raises_the_leverage(venue: dict[str, AsyncMock]):
+  """At or below the maximum nothing is set, and the original refusal stands."""
+  venue['risk'].return_value = [risk(leverage=5)]
+  venue['place'].side_effect = [ABOVE_MAX]
+  with pytest.raises(OrderRejected) as refused:
+    await perp(shared()).place_order(ORDER)
+  assert leverage_above_max(refused.value)
+  assert venue['set'].await_count == 0
+  assert venue['place'].await_count == 1
+
+
+async def test_concurrent_refusals_share_one_fix(venue: dict[str, AsyncMock]):
+  """Orders refused together lower the leverage once and are each resent."""
+  venue['place'].side_effect = [ABOVE_MAX, ABOVE_MAX, placed(2), placed(3)]
   m = perp(shared())
-  await m.place_order(ORDER)
-  await m.place_order(ORDER)
+  responses = await asyncio.gather(m.place_order(ORDER), m.place_order(ORDER))
+  assert sorted(r.id for r in responses) == ['2', '3']
+  assert venue['set'].await_count == 1
   assert venue['brackets'].await_count == 1
-  assert venue['place'].await_count == 2
+  assert venue['place'].await_count == 4
 
 
-async def test_a_lowered_maximum_is_set_again_and_the_order_resent(
+async def test_a_later_refusal_checks_again(
   venue: dict[str, AsyncMock], monkeypatch: pytest.MonkeyPatch
 ):
-  """A `-2027` sets the new maximum and sends the order once more."""
+  """After `LEVERAGE_RECHECK`, a new `-2027` (a maximum lowered again) checks afresh."""
   s = shared()
   m = perp(s)
-  venue['risk'].return_value = [risk(leverage=10)]
+  venue['place'].side_effect = [ABOVE_MAX, placed(2)]
   await m.place_order(ORDER)
   loop = asyncio.get_running_loop()
   later = loop.time() + 60
   monkeypatch.setattr(loop, 'time', lambda: later)
+  venue['risk'].return_value = [risk(leverage=10)]
   venue['brackets'].return_value = brackets(5)
   venue['set'].return_value = {'symbol': SYMBOL, 'leverage': 5}
-  venue['place'].side_effect = [ABOVE_MAX, placed(2)]
-  response = await m.place_order(ORDER)
+  venue['place'].side_effect = [ABOVE_MAX, placed(3)]
+  assert (await m.place_order(ORDER)).id == '3'
   call = venue['set'].await_args
-  assert response.id == '2'
+  assert venue['set'].await_count == 2
   assert call is not None and call.kwargs == {'leverage': 5}
-  venue['risk'].return_value = [risk(leverage=5)]
-  assert await perp(s).leverage(ttl=MINUTE) == 5
 
 
-async def test_the_rejection_stands_when_the_leverage_cannot_be_set(
-  venue: dict[str, AsyncMock], monkeypatch: pytest.MonkeyPatch
+async def test_the_refusal_stands_when_the_leverage_cannot_be_lowered(
+  venue: dict[str, AsyncMock],
 ):
-  """If the maximum can't be set after a `-2027`, the order is refused, not resent."""
-  m = perp(shared())
-  venue['risk'].return_value = [risk(leverage=10)]
-  await m.place_order(ORDER)
-  loop = asyncio.get_running_loop()
-  later = loop.time() + 60
-  monkeypatch.setattr(loop, 'time', lambda: later)
-  venue['brackets'].return_value = brackets(5)
+  """If the leverage can't be lowered after a `-2027`, the original refusal is raised
+  from the failure, and the order is not resent."""
   venue['set'].side_effect = NetworkError('down')
   venue['place'].side_effect = [ABOVE_MAX]
-  with pytest.raises(OrderRejected):
-    await m.place_order(ORDER)
-  assert venue['place'].await_count == 2
+  with pytest.raises(OrderRejected) as refused:
+    await perp(shared()).place_order(ORDER)
+  assert isinstance(refused.value.__cause__, NetworkError)
+  assert venue['place'].await_count == 1
 
 
 async def test_symbols_share_one_position_risk_read(venue: dict[str, AsyncMock]):

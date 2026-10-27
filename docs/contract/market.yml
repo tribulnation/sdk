@@ -771,6 +771,7 @@ methods:
       constants:
         aster: {market_id: 'aster:perp:BTCUSDT', collateral_id: 'aster:perp'}
         dydx: {market_id: 'dydx:perp:BTC-USD', collateral_id: 'dydx:perp'}
+        extended: {market_id: 'extended:perp:BTC-USD', collateral_id: 'extended:perp'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', collateral_id: 'grvt:perp'}
         hyperliquid: {market_id: 'hyperliquid::BTC', collateral_id: 'hyperliquid:spot:0'}
         lighter: {market_id: 'lighter:perp:1', collateral_id: 'lighter:spot:3'}

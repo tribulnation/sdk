@@ -1,21 +1,11 @@
-# tribulnation-mexc 2.4.1
+# tribulnation-mexc 3.0.0
 
-Requires SDK >=2.21.0 (the release adding `Book.frozen` and `detached_books`) and
-typed-mexc >=2.2.1. Upgrade the SDK and this adapter together.
+Requires SDK >=3.0.0 (spot and margin market types, collateral IDs and read `ttl`) and typed-mexc >=2.2.1. Upgrade the SDK and this adapter together: SDK 3.0 changes the base classes this adapter subclasses, so older adapters do not work with it, and this one does not work with SDK 2.
 
-`depth_stream` no longer deep-copies the whole order book on every update: the
-stream yields `Book.frozen()` and each subscriber gets its own copy, through
-`detached_books`, of each book it reads ([ADR 0049](../../../dev-docs/adr/0049-book-streams-copy-on-read.md)).
-On a 500-level-a-side book, the work per update falls from about 8 ms to about
-0.3 ms, plus about 0.5 ms for each book a subscriber reads. Delivered books keep their
-guarantees: a later push never changes them, and a subscriber may mutate its own.
+Spot markets no longer serve `position`, `collateral` and `available_notional` through the SDK interface: SDK 3.0 removes them from spot markets ([ADR 0051](../../../dev-docs/adr/0051-spot-perp-market-types-collateral-ids.md)). Spot `balances` and collateral IDs are not mapped yet.
 
-Subscribers of the same symbol used to share one delivered book object; each now gets
-its own.
+The reads SDK 3.0 gives a `ttl` accept it and ignore it: every read asks the venue ([ADR 0054](../../../dev-docs/adr/0054-caller-chosen-read-staleness.md)).
+
+The major version follows the SDK's, as 2.0.0 did.
 
 Every other method is unchanged.
-
-Release qualification on 2026-10-24 passed the read suites and market consistency.
-Committed evidence under `release-evidence/mexc/` matches pinned Catalogue
-`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
-release follows SDK 2.21.0 publication.

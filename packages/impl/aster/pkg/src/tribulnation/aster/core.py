@@ -134,12 +134,15 @@ class Shared(SDK):
   trades: dict[Scope, Subscription[tuple[str, Trade]]] = field(
     default_factory=dict[Scope, Subscription[tuple[str, Trade]]]
   )
-  maxed: dict[str, float] = field(default_factory=dict[str, float])
-  """Loop time each perpetual symbol's leverage was last checked against its maximum (and set to it), successfully or not."""
+  leverage_checks: dict[str, tuple[float, bool]] = field(
+    default_factory=dict[str, tuple[float, bool]]
+  )
+  """Per perpetual symbol, the loop time its leverage was last checked after a `-2027`
+  refusal, and whether that check lowered it to the maximum (`False` also when it failed)."""
   leverage_locks: dict[str, asyncio.Lock] = field(
     default_factory=dict[str, asyncio.Lock]
   )
-  """One lock per perpetual symbol, so concurrent orders set its leverage once."""
+  """One lock per perpetual symbol, so concurrent refusals lower its leverage once."""
   reads: SharedReads = field(default_factory=SharedReads)
   """Account-wide reads shared between symbols and concurrent callers."""
 

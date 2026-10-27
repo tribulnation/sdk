@@ -199,6 +199,22 @@ class ExtendedPerpMarket(Public, PerpMarket):
     """The sub-account's one cross bucket, whatever the market."""
     return account.bucket(await self.shared.call(self.shared.client.account.balance))
 
+  async def collateral_id(self) -> str:
+    """The sub-account's one cross pool, `<account_id>:perp`, for every market.
+
+    The account is unified: spot holdings back perpetual margin, and spot buy orders
+    reserve the same collateral (typed-extended `Balance`: `equity` adds `spotEquity`,
+    the haircut `equityContribution` of each spot balance, and
+    `collateralReservedForSpotOrders` is held out of `availableForTrade`). But what new
+    orders spend is the pool's `availableForTrade`, not the `USD` row of
+    `/user/spot/balances`, which leaves out unrealised PnL, spot equity and margin.
+    So the ID names the pool, which `TradingMarkets.collateral` resolves to
+    `perp_collateral()`, rather than a `spot:USD` balance; this adapter serves no spot
+    exchange to resolve one either. A spot exchange added later must give its `USD`
+    quote this same ID (ADR 0051).
+    """
+    return f'{self.account_id}:{self.exchange_id}'
+
   async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
     """The sub-account's leverage setting on the market (the venue default until
     changed), read per market and shared for the caller's `ttl`."""

@@ -231,6 +231,30 @@
       {
         "exclusion": null,
         "failed": 0,
+        "id": "market.test_account_read[\"perp:1\", \"collateral_id\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "spot_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:1\", \"balances\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "spot_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:1\", \"collateral_ids\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
         "id": "market.test_candle_values_are_decimals_and_ordered[\"spot:2048\", null]",
         "network": "mainnet",
         "passed": 1,
@@ -381,11 +405,11 @@
         "skipped": 0
       },
       {
-        "exclusion": null,
+        "exclusion": "perp_only",
         "failed": 0,
         "id": "market.test_account_read[\"spot:2048\", \"position\"]",
         "network": "mainnet",
-        "passed": 1,
+        "passed": 0,
         "skipped": 0
       },
       {
@@ -397,11 +421,11 @@
         "skipped": 0
       },
       {
-        "exclusion": null,
+        "exclusion": "perp_only",
         "failed": 0,
         "id": "market.test_account_read[\"spot:2048\", \"collateral\"]",
         "network": "mainnet",
-        "passed": 1,
+        "passed": 0,
         "skipped": 0
       },
       {
@@ -421,9 +445,33 @@
         "skipped": 0
       },
       {
-        "exclusion": null,
+        "exclusion": "perp_only",
         "failed": 0,
         "id": "market.test_account_read[\"spot:2048\", \"available_notional\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:2048\", \"collateral_id\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:2048\", \"balances\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:2048\", \"collateral_ids\"]",
         "network": "mainnet",
         "passed": 1,
         "skipped": 0

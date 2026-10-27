@@ -160,6 +160,9 @@ async with sdk.depth_stream('aster:perp:BTCUSDT', settings={'aster': {'depth_sou
   differ). Aster lists flat symbols too, so a missing row raises `MissingData` rather than
   falling back. The setting applies to cross and isolated margin. It comes from the
   all-symbol `positionRisk` answer that positions share for a `ttl`.
+  `place_order` never changes it, except when Aster refuses an order because the setting
+  is above the symbol's current maximum (`-2027`, after Aster lowers a maximum): it then
+  lowers the setting to bracket 1's `initialLeverage` and resends the order once (ADR 0055).
 - Perpetual `available_notional` is the account's `availableBalance` times
   `leverage()`, in either margin mode (new margin comes from the available balance),
   capped by the room left in the leverage bracket at that leverage (`maxNotional` less

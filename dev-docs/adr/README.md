@@ -75,5 +75,6 @@ not a changelog or a substitute for API documentation and tests.
 | [0050](0050-dydx-fill-socket.md) | dYdX fills from a local fill socket, and `'fastest'` over every source | Proposed; implemented, not release-verified; amends 0044 and 0045; amended by 0052 |
 | [0051](0051-spot-perp-market-types-collateral-ids.md) | Spot and margin market types, and collateral IDs | Proposed; amends 0009 and 0038 |
 | [0052](0052-dydx-indexer-channels-reconnect.md) | dYdX indexer channels reconnect; `'fastest'` rides short drops, `'indexer'` ends | Proposed; implemented, not release-verified; amends 0050 |
-| [0053](0053-shared-account-reads-aster-max-leverage.md) | Shared account reads, and Aster orders at the symbol's maximum leverage | Proposed; implemented, not release-verified; decision 2 amended by 0054 |
+| [0053](0053-shared-account-reads-aster-max-leverage.md) | Shared account reads, and Aster orders at the symbol's maximum leverage | Proposed; implemented, not release-verified; decision 2 amended by 0054, decision 3 by 0055 |
 | [0054](0054-caller-chosen-read-staleness.md) | Caller-chosen read staleness | Proposed; amends 0053; implemented, not release-verified |
+| [0055](0055-aster-lower-leverage-on-refusal.md) | Aster lowers leverage only when an order is refused for it | Proposed; amends 0053; implemented, not release-verified |
