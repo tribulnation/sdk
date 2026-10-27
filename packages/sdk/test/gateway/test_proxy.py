@@ -64,6 +64,10 @@ class MockState:
   """The `settings` every `trades_stream` call received, in call order."""
   trades_stream_items: list[Trade] = field(default_factory=list[Trade])
   """What every `trades_stream` yields."""
+  ttls: list[tuple[str, timedelta | None]] = field(
+    default_factory=list[tuple[str, timedelta | None]]
+  )
+  """The `ttl` every account or snapshot read received, with the method, in call order."""
 
 
 def book(price: str = '100') -> Book:
@@ -154,9 +158,10 @@ class MockMarket(PerpMarket):
       taker_sell=Decimal('0.004'),
     )
 
-  async def leverage(self, *, refetch: bool = False) -> Decimal:
-    """Report a refetched setting distinct from the cached one."""
-    return Decimal('4') if refetch else Decimal('5')
+  async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
+    """Report a fresh setting distinct from a shared one."""
+    self.state.ttls.append(('leverage', ttl))
+    return Decimal('4') if ttl is None else Decimal('5')
 
   def candles(self, interval, start, end):
     """Provide an empty fixture candle window."""
@@ -167,8 +172,9 @@ class MockMarket(PerpMarket):
 
     return PaginatedResponse(pages())
 
-  async def perp_collateral(self) -> PerpCollateral:
+  async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """Provide a cross-margin collateral fixture."""
+    self.state.ttls.append(('perp_collateral', ttl))
     return PerpCollateral(
       equity=Decimal(100),
       free_collateral=Decimal(80),
@@ -204,10 +210,12 @@ class MockMarket(PerpMarket):
 
     yield gen()
 
-  async def position(self) -> Position:
+  async def position(self, *, ttl: timedelta | None = None) -> Position:
+    self.state.ttls.append(('position', ttl))
     return Position()
 
-  async def available_notional(self) -> Decimal:
+  async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
+    self.state.ttls.append(('available_notional', ttl))
     return Decimal('1000')
 
   async def place_order(
@@ -223,7 +231,8 @@ class MockMarket(PerpMarket):
   async def index(self, *, settings: Settings = {}) -> Decimal:
     return Decimal('100')
 
-  async def next_funding(self) -> NextFunding:
+  async def next_funding(self, *, ttl: timedelta | None = None) -> NextFunding:
+    self.state.ttls.append(('next_funding', ttl))
     return NextFunding(
       rate=Decimal('0.001'),
       time=datetime.now(timezone.utc),
@@ -246,7 +255,8 @@ class MockMarket(PerpMarket):
 
     return PaginatedResponse(gen())
 
-  async def perp_position(self) -> PerpPosition:
+  async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
+    self.state.ttls.append(('perp_position', ttl))
     return PerpPosition()
 
 
@@ -254,17 +264,23 @@ class MockMarket(PerpMarket):
 class MockExchange(PerpExchange):
   state: MockState
 
-  async def tickers(self, markets=None, *, settings={}):
+  async def tickers(self, markets=None, *, settings={}, ttl: timedelta | None = None):
     """Provide an empty bulk ticker snapshot."""
+    self.state.ttls.append(('tickers', ttl))
     return {}
 
-  async def perp_stats(self, markets=None, *, settings={}):
+  async def perp_stats(
+    self, markets=None, *, settings={}, ttl: timedelta | None = None
+  ):
     """Provide an empty bulk statistics snapshot."""
+    self.state.ttls.append(('perp_stats', ttl))
     return {}
 
-  async def perp_collateral(self, market_id=None):
+  async def perp_collateral(
+    self, market_id: str | None = None, *, ttl: timedelta | None = None
+  ):
     """Provide the exchange bucket used by the mock market."""
-    return await MockMarket(self.state).perp_collateral()
+    return await MockMarket(self.state).perp_collateral(ttl=ttl)
 
   @property
   def venue_id(self) -> VenueId:
@@ -805,26 +821,65 @@ async def test_sdk2_account_fees_and_funding_interval(sdk: ProxySDK):
 
 
 @pytest.mark.asyncio
-async def test_leverage_forwards_refetch_through_gateway(sdk: ProxySDK) -> None:
-  """The gateway-side market owns the cache; `refetch` crosses the wire."""
+async def test_leverage_forwards_ttl_through_gateway(sdk: ProxySDK) -> None:
+  """The gateway-side market keeps the shared answers; `ttl` crosses the wire."""
   sent = record_calls(sdk)
-  assert await sdk.leverage(MARKET_ID) == Decimal('5')
-  assert await sdk.leverage(MARKET_ID, refetch=True) == Decimal('4')
+  assert await sdk.leverage(MARKET_ID) == Decimal('4')
+  assert await sdk.leverage(MARKET_ID, ttl=timedelta(seconds=30)) == Decimal('5')
   requests = [req for req in sent if isinstance(req, codec.LeverageReq)]
-  assert [req.refetch for req in requests] == [False, True]
+  assert [req.ttl for req in requests] == [None, timedelta(seconds=30)]
   assert all(req.market_id == MARKET_ID for req in requests)
+
+
+@pytest.mark.asyncio
+async def test_account_and_snapshot_reads_forward_ttl_through_gateway(
+  mock_state: MockState, sdk: ProxySDK
+) -> None:
+  """Every read taking `ttl` hands the caller's value to the gateway-side SDK."""
+  ttl = timedelta(milliseconds=1500)
+  await sdk.position(MARKET_ID, ttl=ttl)
+  await sdk.perp_position(MARKET_ID, ttl=ttl)
+  await sdk.perp_collateral(MARKET_ID, ttl=ttl)
+  await sdk.perp_collateral('mock:perp', ttl=ttl)
+  await sdk.collateral('mock:perp', ttl=ttl)
+  await sdk.available_notional(MARKET_ID, ttl=ttl)
+  await sdk.next_funding(MARKET_ID, ttl=ttl)
+  await sdk.tickers('mock:perp', ttl=ttl)
+  await sdk.perp_stats('mock:perp', ttl=ttl)
+  await sdk.position(MARKET_ID)
+  assert mock_state.ttls == [
+    ('position', ttl),
+    ('perp_position', ttl),
+    ('perp_collateral', ttl),
+    ('perp_collateral', ttl),
+    ('perp_collateral', ttl),
+    ('available_notional', ttl),
+    ('next_funding', ttl),
+    ('tickers', ttl),
+    ('perp_stats', ttl),
+    ('position', None),
+  ]
 
 
 @pytest.mark.parametrize(
   'msg',
   [
     codec.LeverageReq(id='l', market_id=MARKET_ID),
-    codec.LeverageReq(id='l', market_id=MARKET_ID, refetch=True),
+    codec.LeverageReq(id='l', market_id=MARKET_ID, ttl=timedelta(0)),
+    codec.LeverageReq(id='l', market_id=MARKET_ID, ttl=timedelta(seconds=1.5)),
   ],
 )
 def test_leverage_request_roundtrips(msg: codec.LeverageReq) -> None:
-  """The leverage request keeps its market and refetch flag on the wire."""
+  """The leverage request keeps its market and `ttl` on the wire, zero included."""
   assert codec.decode_client(codec.encode_client(msg)) == msg
+
+
+def test_ttl_crosses_the_wire_as_an_iso_duration() -> None:
+  """`ttl` is an ISO 8601 duration; a frame without it decodes as a fresh read."""
+  msg = codec.PositionReq(id='p', market_id=MARKET_ID, ttl=timedelta(seconds=1))
+  assert b'"ttl":"PT1S"' in codec.encode_client(msg)
+  frame = b'{"tag":"position","id":"p","market_id":"mock:perp:BTC-USD"}'
+  assert codec.decode_client(frame) == codec.PositionReq(id='p', market_id=MARKET_ID)
 
 
 def test_leverage_response_keeps_decimal_value() -> None:

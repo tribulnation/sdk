@@ -1,5 +1,6 @@
 """Spot and margin market types, collateral IDs and their resolver (ADR 0051)."""
 
+from datetime import timedelta
 from dataclasses import dataclass
 from decimal import Decimal
 from types import SimpleNamespace
@@ -57,11 +58,15 @@ class FakeSpotExchange(Ids, SpotExchange):
     return []
 
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     return {}
 
-  async def balance(self, asset: str, /) -> Balance:
+  async def balance(self, asset: str, /, *, ttl: timedelta | None = None) -> Balance:
     return Balance(total=Decimal(10), free=Decimal(6))
 
 
@@ -80,12 +85,20 @@ class FakePerpExchange(Ids, PerpExchange):
     return []
 
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     return {}
 
   async def perp_stats(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, PerpStats]:
     return {}
 
@@ -166,7 +179,7 @@ async def test_root_resolver_routes_by_account_key():
   root = SimpleNamespace(venue=AsyncMock(return_value=venue))
   assert await TradingMarkets.collateral(cast(Any, root), 'hl:spot:0') == collateral
   root.venue.assert_awaited_once_with('hl')
-  venue.collateral.assert_awaited_once_with('spot:0')
+  venue.collateral.assert_awaited_once_with('spot:0', ttl=None)
 
 
 async def test_root_routes_spot_and_margin_reads_by_kind():

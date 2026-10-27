@@ -4,7 +4,7 @@ from typing_extensions import Any, AsyncIterable, Sequence, Collection, Mapping
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from decimal import Decimal
-from datetime import datetime
+from datetime import datetime, timedelta
 import asyncio
 import logging
 from uuid import uuid4
@@ -491,10 +491,10 @@ class ProxySpotMarket(ProxyMarket, SpotMarket):
       raise ValueError(f'market {self.id} answered rules without base and quote')
     return rules
 
-  async def balances(self) -> SpotBalances:
+  async def balances(self, *, ttl: timedelta | None = None) -> SpotBalances:
     """Forward spot balances through the gateway."""
     resp: codec.BalancesResp = await self._conn.call(
-      codec.BalancesReq(id=self._mid(), market_id=self.id)
+      codec.BalancesReq(id=self._mid(), market_id=self.id, ttl=ttl)
     )
     return resp.balances
 
@@ -506,17 +506,17 @@ class ProxyPerpMarket(ProxyMarket, PerpMarket):
   _collateral_id: str | None = field(default=None, init=False, repr=False)
   """Cached `collateral_id()`."""
 
-  async def position(self) -> Position:
+  async def position(self, *, ttl: timedelta | None = None) -> Position:
     """Forward position through the gateway."""
     resp: codec.PositionResp = await self._conn.call(
-      codec.PositionReq(id=self._mid(), market_id=self.id)
+      codec.PositionReq(id=self._mid(), market_id=self.id, ttl=ttl)
     )
     return resp.position
 
-  async def available_notional(self) -> Decimal:
+  async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     """Forward available notional through the gateway."""
     resp: codec.AvailableNotionalResp = await self._conn.call(
-      codec.AvailableNotionalReq(id=self._mid(), market_id=self.id)
+      codec.AvailableNotionalReq(id=self._mid(), market_id=self.id, ttl=ttl)
     )
     return resp.value
 
@@ -536,10 +536,10 @@ class ProxyPerpMarket(ProxyMarket, PerpMarket):
     )
     return resp.value
 
-  async def next_funding(self) -> NextFunding:
+  async def next_funding(self, *, ttl: timedelta | None = None) -> NextFunding:
     """Forward next funding through the gateway."""
     resp: codec.NextFundingResp = await self._conn.call(
-      codec.NextFundingReq(id=self._mid(), market_id=self.id)
+      codec.NextFundingReq(id=self._mid(), market_id=self.id, ttl=ttl)
     )
     return resp.rate
 
@@ -573,28 +573,28 @@ class ProxyPerpMarket(ProxyMarket, PerpMarket):
 
     return PaginatedResponse(gen())
 
-  async def perp_position(self) -> PerpPosition:
+  async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
     """Forward perp position through the gateway."""
     resp: codec.PerpPositionResp = await self._conn.call(
-      codec.PerpPositionReq(id=self._mid(), market_id=self.id)
+      codec.PerpPositionReq(id=self._mid(), market_id=self.id, ttl=ttl)
     )
     return resp.position
 
-  async def leverage(self, *, refetch: bool = False) -> Decimal:
-    """Forward account leverage through the gateway, which owns its cache."""
+  async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
+    """Forward account leverage through the gateway, which keeps the shared answers."""
     resp: codec.LeverageResp = await self._conn.call(
-      codec.LeverageReq(id=self._mid(), market_id=self.id, refetch=refetch)
+      codec.LeverageReq(id=self._mid(), market_id=self.id, ttl=ttl)
     )
     return resp.value
 
-  async def collateral(self) -> PerpCollateral:
+  async def collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """Forward collateral through the gateway."""
-    return await self.perp_collateral()
+    return await self.perp_collateral(ttl=ttl)
 
-  async def perp_collateral(self) -> PerpCollateral:
+  async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """Forward perp collateral through the gateway."""
     resp: codec.PerpCollateralResp = await self._conn.call(
-      codec.PerpCollateralReq(id=self._mid(), market_id=self.id)
+      codec.PerpCollateralReq(id=self._mid(), market_id=self.id, ttl=ttl)
     )
     return resp.collateral
 
@@ -643,7 +643,11 @@ class ProxyExchange(Exchange):
     return resp.markets
 
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Fetch native bulk tickers, including both volume fields."""
     resp: codec.TickersResp = await self._conn.call(
@@ -653,6 +657,7 @@ class ProxyExchange(Exchange):
         exchange_id=self._exchange_id,
         markets=list(markets) if markets is not None else None,
         settings=settings,
+        ttl=ttl,
       )
     )
     return resp.tickers
@@ -668,7 +673,7 @@ class ProxySpotExchange(ProxyExchange, SpotExchange):
       self._conn, self._account_id, self._exchange_id, market_id, self._venue_id
     )
 
-  async def balance(self, asset: str, /) -> Balance:
+  async def balance(self, asset: str, /, *, ttl: timedelta | None = None) -> Balance:
     """Forward one asset's balance through the gateway."""
     resp: codec.BalanceResp = await self._conn.call(
       codec.BalanceReq(
@@ -676,6 +681,7 @@ class ProxySpotExchange(ProxyExchange, SpotExchange):
         account_id=self._account_id,
         exchange_id=self._exchange_id,
         asset=asset,
+        ttl=ttl,
       )
     )
     return resp.balance
@@ -692,7 +698,11 @@ class ProxyPerpExchange(ProxyExchange, PerpExchange):
     )
 
   async def perp_stats(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, PerpStats]:
     """Fetch native bulk funding and pricing statistics."""
     resp: codec.PerpStatsResp = await self._conn.call(
@@ -702,22 +712,30 @@ class ProxyPerpExchange(ProxyExchange, PerpExchange):
         exchange_id=self._exchange_id,
         markets=list(markets) if markets is not None else None,
         settings=settings,
+        ttl=ttl,
       )
     )
     return resp.stats
 
-  async def collateral(self, market_id: str | None = None, /) -> PerpCollateral:
+  async def collateral(
+    self, market_id: str | None = None, /, *, ttl: timedelta | None = None
+  ) -> PerpCollateral:
     """Preserve perpetual margin fields for generic collateral callers."""
-    return await self.perp_collateral(market_id)
+    return await self.perp_collateral(market_id, ttl=ttl)
 
-  async def perp_collateral(self, market_id: str | None = None, /) -> PerpCollateral:
+  async def perp_collateral(
+    self, market_id: str | None = None, /, *, ttl: timedelta | None = None
+  ) -> PerpCollateral:
     """Forward perp collateral through the gateway."""
     if market_id is not None:
       market = await self.market(market_id)
-      return await market.perp_collateral()
+      return await market.perp_collateral(ttl=ttl)
     resp: codec.PerpCollateralResp = await self._conn.call(
       codec.ExchangePerpCollateralReq(
-        id=str(uuid4()), account_id=self._account_id, exchange_id=self._exchange_id
+        id=str(uuid4()),
+        account_id=self._account_id,
+        exchange_id=self._exchange_id,
+        ttl=ttl,
       )
     )
     return resp.collateral

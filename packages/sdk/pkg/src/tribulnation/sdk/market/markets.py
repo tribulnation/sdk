@@ -8,7 +8,7 @@ from typing_extensions import (
 )
 from abc import abstractmethod
 from contextlib import asynccontextmanager
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from tribulnation.sdk.core import SDK, PaginatedResponse, OverflowPolicy
@@ -173,6 +173,7 @@ class TradingMarkets(SDK):
     *,
     markets: Collection[str] | None = None,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Fetch a top-of-book snapshot for many markets at once.
 
@@ -190,12 +191,13 @@ class TradingMarkets(SDK):
       exchange: `<account_id>:<exchange_id>`.
       markets: Market IDs to fetch. `None` fetches every market of the exchange.
       settings: Venue-specific ticker settings.
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
 
     Returns:
       A mapping of market ID to its `Ticker`.
     """
     sdk = await self.exchange(exchange)
-    return await sdk.tickers(markets=markets, settings=settings)
+    return await sdk.tickers(markets=markets, settings=settings, ttl=ttl)
 
   @SDK.method
   async def perp_stats(
@@ -204,6 +206,7 @@ class TradingMarkets(SDK):
     *,
     markets: Collection[str] | None = None,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, PerpStats]:
     """Fetch a pricing and funding snapshot for many perpetual markets at once.
 
@@ -216,12 +219,13 @@ class TradingMarkets(SDK):
       exchange: `<account_id>:<exchange_id>`.
       markets: Market IDs to fetch. `None` fetches every market of the exchange.
       settings: Venue-specific settings.
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
 
     Returns:
       A mapping of market ID to its `PerpStats`.
     """
     sdk = await self.perp_exchange(exchange)
-    return await sdk.perp_stats(markets=markets, settings=settings)
+    return await sdk.perp_stats(markets=markets, settings=settings, ttl=ttl)
 
   @SDK.method
   async def rules(self, market_id: str, /, *, refetch: bool = False) -> Rules:
@@ -340,7 +344,7 @@ class TradingMarkets(SDK):
       yield stream
 
   @SDK.method
-  async def collateral(self, id: str, /) -> Collateral:
+  async def collateral(self, id: str, /, *, ttl: timedelta | None = None) -> Collateral:
     """Resolve a collateral ID: the money that funds new orders, as `equity` and
     `free_collateral`.
 
@@ -360,20 +364,28 @@ class TradingMarkets(SDK):
     Raises:
       ValueError: The ID names a spot exchange without an asset, or a perpetual
         exchange with one.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
     """
     account_id, rest = id.split(':', 1)
     venue = await self.venue(account_id)
-    return await venue.collateral(rest)
+    return await venue.collateral(rest, ttl=ttl)
 
   @SDK.method
-  async def balances(self, market_id: str, /) -> SpotBalances:
+  async def balances(
+    self, market_id: str, /, *, ttl: timedelta | None = None
+  ) -> SpotBalances:
     """Fetch your base and quote balances on a spot market.
 
     Each is a `Balance(total, free)`: `free` excludes what open orders hold, so it is
     the base a sell can spend and the quote a buy can spend.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
     """
     market = await self.spot_market(market_id)
-    return await market.balances()
+    return await market.balances(ttl=ttl)
 
   @SDK.method
   async def collateral_ids(self, market_id: str, /) -> SpotCollateralIds:
@@ -466,14 +478,19 @@ class TradingMarkets(SDK):
     return await market.cancel_open_orders(settings=settings)
 
   @SDK.method
-  async def position(self, market_id: str, /) -> Position:
+  async def position(
+    self, market_id: str, /, *, ttl: timedelta | None = None
+  ) -> Position:
     """Fetch your open position in a perpetual market, as a signed size in base units.
 
     The same data as `perp_position()`, typed as the base `Position`. Spot markets have
     balances instead: see `balances()`.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
     """
     market = await self.perp_market(market_id)
-    return await market.position()
+    return await market.position(ttl=ttl)
 
   @SDK.method
   async def collateral_id(self, market_id: str, /) -> str:
@@ -488,7 +505,9 @@ class TradingMarkets(SDK):
     return await market.collateral_id()
 
   @SDK.method
-  async def available_notional(self, market_id: str, /) -> Decimal:
+  async def available_notional(
+    self, market_id: str, /, *, ttl: timedelta | None = None
+  ) -> Decimal:
     """Fetch the maximum notional position you could open right now on a perpetual
     market.
 
@@ -496,33 +515,46 @@ class TradingMarkets(SDK):
     `leverage()` on it, unless the venue publishes a more precise figure. This is
     opening capacity, deliberately separate from `perp_collateral()`, which is about
     liquidation distance. Spot capacity is `balances()`.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
     """
     market = await self.perp_market(market_id)
-    return await market.available_notional()
+    return await market.available_notional(ttl=ttl)
 
   @SDK.method
-  async def perp_position(self, market_id: str, /) -> PerpPosition:
-    """Fetch your open perpetual position: signed `size` plus average `entry_price`."""
+  async def perp_position(
+    self, market_id: str, /, *, ttl: timedelta | None = None
+  ) -> PerpPosition:
+    """Fetch your open perpetual position: signed `size` plus average `entry_price`.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """
     market = await self.perp_market(market_id)
-    return await market.perp_position()
+    return await market.perp_position(ttl=ttl)
 
   @SDK.method
-  async def leverage(self, market_id: str, /, *, refetch: bool = False) -> Decimal:
+  async def leverage(
+    self, market_id: str, /, *, ttl: timedelta | None = None
+  ) -> Decimal:
     """Fetch the leverage this account can open at on a perpetual market.
 
     The multiple of free collateral the account can open as notional: opening `n` of
     notional needs `n / leverage` of collateral. Account-specific (e.g. a per-market
-    leverage setting), so it is not part of `rules()`. Cached after the first call.
+    leverage setting), so it is not part of `rules()`.
     Spot markets have no leverage; unsupported venues raise `NotImplementedError`.
 
     Args:
-      refetch: Fetch again even if the leverage is already cached.
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
     """
     market = await self.perp_market(market_id)
-    return await market.leverage(refetch=refetch)
+    return await market.leverage(ttl=ttl)
 
   @SDK.method
-  async def perp_collateral(self, id: str, /) -> PerpCollateral:
+  async def perp_collateral(
+    self, id: str, /, *, ttl: timedelta | None = None
+  ) -> PerpCollateral:
     """Fetch the perpetual collateral bucket, with maintenance-margin risk fields.
 
     Same bucket model and routing as `collateral()`, plus `initial_margin`,
@@ -533,17 +565,18 @@ class TradingMarkets(SDK):
     Args:
       id: `<account_id>:<exchange_id>` for the exchange bucket, or
         `<account_id>:<exchange_id>:<market_id>` for the bucket backing that market.
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
     """
     parts = id.split(':', 2)
     if len(parts) == 3:
       account_id, exchange_id, market_id = parts
       venue = await self.venue(account_id)
       exchange = await venue.perp_exchange(exchange_id)
-      return await exchange.perp_collateral(market_id)
+      return await exchange.perp_collateral(market_id, ttl=ttl)
     account_id, exchange_id = parts
     venue = await self.venue(account_id)
     exchange = await venue.perp_exchange(exchange_id)
-    return await exchange.perp_collateral()
+    return await exchange.perp_collateral(ttl=ttl)
 
   @SDK.method
   async def index(self, market_id: str, /) -> Decimal:
@@ -552,13 +585,18 @@ class TradingMarkets(SDK):
     return await market.index()
 
   @SDK.method
-  async def next_funding(self, market_id: str, /) -> NextFunding:
+  async def next_funding(
+    self, market_id: str, /, *, ttl: timedelta | None = None
+  ) -> NextFunding:
     """Fetch the upcoming funding `rate`, `time` and `interval`.
 
     `.annualized` extrapolates the rate to a yearly figure.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
     """
     market = await self.perp_market(market_id)
-    return await market.next_funding()
+    return await market.next_funding(ttl=ttl)
 
   @SDK.method
   @PaginatedResponse.lift

@@ -266,9 +266,7 @@ class Gateway:
       case codec.LeverageReq():
         return codec.LeverageResp(
           id=msg.id,
-          value=await (await self._perp_market(msg.market_id)).leverage(
-            refetch=msg.refetch
-          ),
+          value=await (await self._perp_market(msg.market_id)).leverage(ttl=msg.ttl),
         )
       case codec.CandlesReq():
         return codec.CandlesResp(
@@ -292,7 +290,9 @@ class Gateway:
         )
         return codec.TickersResp(
           id=msg.id,
-          tickers=dict(await exchange.tickers(msg.markets, settings=msg.settings)),
+          tickers=dict(
+            await exchange.tickers(msg.markets, settings=msg.settings, ttl=msg.ttl)
+          ),
         )
       case codec.PerpStatsReq():
         perp_exchange = await (await self._sdk.venue(msg.account_id)).perp_exchange(
@@ -301,23 +301,29 @@ class Gateway:
         return codec.PerpStatsResp(
           id=msg.id,
           stats=dict(
-            await perp_exchange.perp_stats(msg.markets, settings=msg.settings)
+            await perp_exchange.perp_stats(
+              msg.markets, settings=msg.settings, ttl=msg.ttl
+            )
           ),
         )
       case codec.ExchangeCollateralReq():
         exchange = await (await self._sdk.venue(msg.account_id)).perp_exchange(
           msg.exchange_id
         )
-        return codec.CollateralResp(id=msg.id, collateral=await exchange.collateral())
+        return codec.CollateralResp(
+          id=msg.id, collateral=await exchange.collateral(ttl=msg.ttl)
+        )
       case codec.BalanceReq():
         spot = await (await self._sdk.venue(msg.account_id)).spot_exchange(
           msg.exchange_id
         )
-        return codec.BalanceResp(id=msg.id, balance=await spot.balance(msg.asset))
+        return codec.BalanceResp(
+          id=msg.id, balance=await spot.balance(msg.asset, ttl=msg.ttl)
+        )
       case codec.BalancesReq():
         return codec.BalancesResp(
           id=msg.id,
-          balances=await (await self._spot_market(msg.market_id)).balances(),
+          balances=await (await self._spot_market(msg.market_id)).balances(ttl=msg.ttl),
         )
       case codec.CollateralIdReq():
         return codec.CollateralIdResp(
@@ -349,12 +355,16 @@ class Gateway:
       case codec.PositionReq():
         return codec.PositionResp(
           id=msg.id,
-          position=await (await self._margin_market(msg.market_id)).position(),
+          position=await (await self._margin_market(msg.market_id)).position(
+            ttl=msg.ttl
+          ),
         )
       case codec.AvailableNotionalReq():
         return codec.AvailableNotionalResp(
           id=msg.id,
-          value=await (await self._margin_market(msg.market_id)).available_notional(),
+          value=await (await self._margin_market(msg.market_id)).available_notional(
+            ttl=msg.ttl
+          ),
         )
       case codec.PlaceOrderReq():
         return codec.PlaceOrderResp(
@@ -387,7 +397,7 @@ class Gateway:
       case codec.NextFundingReq():
         return codec.NextFundingResp(
           id=msg.id,
-          rate=await (await self._perp_market(msg.market_id)).next_funding(),
+          rate=await (await self._perp_market(msg.market_id)).next_funding(ttl=msg.ttl),
         )
       case codec.FundingRatesReq():
         return codec.FundingRatesResp(
@@ -406,24 +416,30 @@ class Gateway:
       case codec.PerpPositionReq():
         return codec.PerpPositionResp(
           id=msg.id,
-          position=await (await self._perp_market(msg.market_id)).perp_position(),
+          position=await (await self._perp_market(msg.market_id)).perp_position(
+            ttl=msg.ttl
+          ),
         )
       case codec.CollateralReq():
         return codec.CollateralResp(
           id=msg.id,
-          collateral=await (await self._margin_market(msg.market_id)).collateral(),
+          collateral=await (await self._margin_market(msg.market_id)).collateral(
+            ttl=msg.ttl
+          ),
         )
       case codec.PerpCollateralReq():
         return codec.PerpCollateralResp(
           id=msg.id,
-          collateral=await (await self._perp_market(msg.market_id)).perp_collateral(),
+          collateral=await (await self._perp_market(msg.market_id)).perp_collateral(
+            ttl=msg.ttl
+          ),
         )
       case codec.ExchangePerpCollateralReq():
         venue = await self._sdk.venue(msg.account_id)
         exchange = await venue.perp_exchange(msg.exchange_id)
         return codec.PerpCollateralResp(
           id=msg.id,
-          collateral=await exchange.perp_collateral(),
+          collateral=await exchange.perp_collateral(ttl=msg.ttl),
         )
       case codec.MarketsReq():
         exc = await (await self._sdk.venue(msg.account_id)).exchange(msg.exchange_id)

@@ -16,7 +16,7 @@ from typing_extensions import (
   cast,
 )
 from abc import ABC
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 import msgspec
@@ -205,15 +205,19 @@ class TradesHistoryReq(Msg, kw_only=True, tag='trades_history'):
 
 
 class PositionReq(Msg, kw_only=True, tag='position'):
-  """Fetch the account's spot position on a market."""
+  """Fetch the account's position on a margin market."""
 
   market_id: str
+  ttl: timedelta | None = None
+  """How old a shared answer may be (ISO 8601 duration); null asks the venue afresh."""
 
 
 class AvailableNotionalReq(Msg, kw_only=True, tag='available_notional'):
   """Fetch the notional the account can still open on a market."""
 
   market_id: str
+  ttl: timedelta | None = None
+  """How old a shared answer may be (ISO 8601 duration); null asks the venue afresh."""
 
 
 class PlaceOrderReq(Msg, kw_only=True, tag='place_order'):
@@ -250,6 +254,8 @@ class NextFundingReq(Msg, kw_only=True, tag='next_funding'):
   """Fetch a perpetual market's upcoming funding rate."""
 
   market_id: str
+  ttl: timedelta | None = None
+  """How old a shared answer may be (ISO 8601 duration); null asks the venue afresh."""
 
 
 class FundingRatesReq(Msg, kw_only=True, tag='funding_rates'):
@@ -272,18 +278,24 @@ class PerpPositionReq(Msg, kw_only=True, tag='perp_position'):
   """Fetch the account's perpetual position on a market."""
 
   market_id: str
+  ttl: timedelta | None = None
+  """How old a shared answer may be (ISO 8601 duration); null asks the venue afresh."""
 
 
 class CollateralReq(Msg, kw_only=True, tag='collateral'):
   """Fetch the margin bucket backing a margin market."""
 
   market_id: str
+  ttl: timedelta | None = None
+  """How old a shared answer may be (ISO 8601 duration); null asks the venue afresh."""
 
 
 class BalancesReq(Msg, kw_only=True, tag='balances'):
   """Fetch a spot market's base and quote balances."""
 
   market_id: str
+  ttl: timedelta | None = None
+  """How old a shared answer may be (ISO 8601 duration); null asks the venue afresh."""
 
 
 class CollateralIdReq(Msg, kw_only=True, tag='collateral_id'):
@@ -296,6 +308,8 @@ class PerpCollateralReq(Msg, kw_only=True, tag='perp_collateral'):
   """Fetch the perpetual margin bucket backing a market."""
 
   market_id: str
+  ttl: timedelta | None = None
+  """How old a shared answer may be (ISO 8601 duration); null asks the venue afresh."""
 
 
 # ── Exchange-level call requests ─────────────────────────────────────────────
@@ -307,6 +321,8 @@ class ExchangePerpCollateralReq(Msg, kw_only=True, tag='exchange_perp_collateral
   account_id: str
   """Account key addressing the venue, e.g. `\'hl\'`."""
   exchange_id: str
+  ttl: timedelta | None = None
+  """How old a shared answer may be (ISO 8601 duration); null asks the venue afresh."""
 
 
 class MarketsReq(Msg, kw_only=True, tag='markets'):
@@ -381,7 +397,8 @@ class LeverageReq(Msg, kw_only=True, tag='leverage'):
   """Fetch the leverage the account can open at on a perpetual market."""
 
   market_id: str
-  refetch: bool = False
+  ttl: timedelta | None = None
+  """How old a shared answer may be (ISO 8601 duration); null asks the venue afresh."""
 
 
 class CandlesReq(Msg, kw_only=True, tag='candles'):
@@ -409,6 +426,8 @@ class TickersReq(Msg, kw_only=True, tag='tickers'):
   exchange_id: str
   markets: list[str] | None = None
   settings: WireSettings = msgspec.field(default_factory=no_settings)
+  ttl: timedelta | None = None
+  """How old a shared answer may be (ISO 8601 duration); null asks the venue afresh."""
 
 
 class PerpStatsReq(Msg, kw_only=True, tag='perp_stats'):
@@ -419,6 +438,8 @@ class PerpStatsReq(Msg, kw_only=True, tag='perp_stats'):
   exchange_id: str
   markets: list[str] | None = None
   settings: WireSettings = msgspec.field(default_factory=no_settings)
+  ttl: timedelta | None = None
+  """How old a shared answer may be (ISO 8601 duration); null asks the venue afresh."""
 
 
 class ExchangeCollateralReq(Msg, kw_only=True, tag='exchange_collateral'):
@@ -427,6 +448,8 @@ class ExchangeCollateralReq(Msg, kw_only=True, tag='exchange_collateral'):
   account_id: str
   """Account key addressing the venue, e.g. `\'hl\'`."""
   exchange_id: str
+  ttl: timedelta | None = None
+  """How old a shared answer may be (ISO 8601 duration); null asks the venue afresh."""
 
 
 class BalanceReq(Msg, kw_only=True, tag='balance'):
@@ -437,6 +460,8 @@ class BalanceReq(Msg, kw_only=True, tag='balance'):
   exchange_id: str
   asset: str
   """Venue-native asset ID."""
+  ttl: timedelta | None = None
+  """How old a shared answer may be (ISO 8601 duration); null asks the venue afresh."""
 
 
 # ── Message unions ───────────────────────────────────────────────────────────

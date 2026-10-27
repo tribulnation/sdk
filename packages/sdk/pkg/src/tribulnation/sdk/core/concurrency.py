@@ -3,6 +3,7 @@
 from collections.abc import AsyncGenerator, Awaitable, Callable, Hashable, Iterable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
+from datetime import timedelta
 import asyncio
 from typing_extensions import Any, TypeVar, cast
 
@@ -26,12 +27,22 @@ async def managed_tasks(
 
 @dataclass
 class SharedReads:
-  """Reads that concurrent callers share, each answer reused for a short while.
+  """Reads that concurrent callers share, each answer reused as long as its caller allows.
 
-  One request per key is in flight at a time: callers arriving meanwhile await the same
-  answer (single-flight). A successful answer is then reused for `ttl` seconds counted
-  from when its request started, so it is never older than `ttl` plus that request's
-  own latency. Failures are not kept: the next caller asks again. A caller's
+  Each read states its `ttl`, how old an answer it accepts (ADR 0054):
+
+  - A `timedelta` (`timedelta(0)` included) shares: an answer whose request started less
+    than `ttl` ago is returned as is; otherwise the caller joins a request already in
+    flight (single-flight), or starts one.
+  - `None` asks afresh: it always starts a request, after the call, and neither returns
+    a stored answer nor joins a request in flight, which may predate something the
+    caller just saw (e.g. its own fill). Its answer is still stored and, while it is in
+    flight, joined by later sharing callers.
+
+  An answer is never older than its `ttl` plus its request's own latency. Callers with
+  different `ttl`s share one key: each read judges the stored answer by its own. Only
+  the latest request started for a key stores its answer, so a stored answer never
+  goes back in time. Failures are not kept: the next caller asks again. A caller's
   cancellation never cancels the shared request, which still stores its answer.
 
   Meant for one client's account-wide reads (positions, balances, bulk snapshots) that
@@ -45,26 +56,32 @@ class SharedReads:
   inflight: dict[Hashable, asyncio.Future[Any]] = field(
     default_factory=dict[Hashable, asyncio.Future[Any]]
   )
-  """Each key's request in flight."""
+  """Each key's latest request in flight."""
 
   async def read(
-    self, key: Hashable, fetch: Callable[[], Awaitable[T]], *, ttl: float
+    self, key: Hashable, fetch: Callable[[], Awaitable[T]], *, ttl: timedelta | None
   ) -> T:
-    """`fetch()`'s answer for `key`, shared with concurrent callers and reused for `ttl` seconds.
+    """`fetch()`'s answer for `key`, no older than `ttl` allows.
 
     Args:
       key: What is read; callers reading the same thing must use equal keys.
-      fetch: The request, called only when no fresh answer or request in flight exists.
-      ttl: Seconds an answer stays reusable; 0 never reuses a stored answer, but still
-        joins a request already in flight.
+      fetch: The request, called only when no stored answer or request in flight serves
+        the read.
+      ttl: How long ago the request of a reusable answer may have started; `timedelta(0)`
+        reuses none, but joins a request in flight. `None` neither reuses nor joins:
+        it always starts a request.
     """
     loop = asyncio.get_running_loop()
     now = loop.time()
-    answer = self.answers.get(key)
-    if answer is not None and now - answer[0] < ttl:
-      return cast(T, answer[1])
-    future = self.inflight.get(key)
-    if future is None or future.get_loop() is not loop:
+    future = None
+    if ttl is not None:
+      answer = self.answers.get(key)
+      if answer is not None and now - answer[0] < ttl.total_seconds():
+        return cast(T, answer[1])
+      inflight = self.inflight.get(key)
+      if inflight is not None and inflight.get_loop() is loop:
+        future = inflight
+    if future is None:
       future = asyncio.ensure_future(self.request(key, fetch, started=now))
       future.add_done_callback(retrieve)
       self.inflight[key] = future
@@ -82,7 +99,11 @@ class SharedReads:
   async def request(
     self, key: Hashable, fetch: Callable[[], Awaitable[T]], *, started: float
   ) -> T:
-    """Run `fetch()` for `key`, storing its answer unless `forget` dropped the request meanwhile."""
+    """Run `fetch()` for `key`, storing its answer if it is still the key's latest request.
+
+    A request stops being the latest when `forget` drops it or a fresh read (`ttl=None`)
+    starts another.
+    """
     try:
       value = await fetch()
       if self.inflight.get(key) is asyncio.current_task():

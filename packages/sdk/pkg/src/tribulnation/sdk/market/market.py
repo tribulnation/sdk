@@ -8,7 +8,7 @@ from typing_extensions import (
   Sequence,
 )
 from abc import abstractmethod
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 import asyncio
 
@@ -65,6 +65,22 @@ class Market(SDK):
 
   Account balances depend on what the market trades: see `SpotMarket` and
   `MarginMarket`.
+
+  Read staleness (ADR 0054): reads of changing account and snapshot data (balances,
+  positions, collateral, leverage, available notional, tickers, perpetual stats and
+  next funding) take `ttl: timedelta | None`, how old an answer the caller accepts.
+
+  - `None` (the default) asks afresh: the answer comes from a request started after
+    the call. Nothing stored is reused and no request already in flight is joined,
+    since it may predate e.g. a fill the caller just saw.
+  - A `timedelta`, `timedelta(0)` included, shares: an answer whose request started
+    less than `ttl` ago is reused, else a request in flight is joined, else one starts.
+    Where the venue answers many markets of one account with one account-wide request,
+    a burst of readers sends one request; this is what keeps a gateway serving many
+    tasks under the venue's rate limits.
+
+  An answer is at most `ttl` plus its request's latency old. Venues without shared
+  reads accept `ttl` and ignore it: every read asks the venue.
   """
 
   @property
@@ -347,11 +363,14 @@ class SpotMarket(Market):
 
   @SDK.method
   @abstractmethod
-  async def balances(self) -> SpotBalances:
+  async def balances(self, *, ttl: timedelta | None = None) -> SpotBalances:
     """Fetch your base and quote balances.
 
     Each `Balance.free` excludes what open orders hold: the base a sell can spend
     and the quote a buy can spend.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
     """
 
   @SDK.method
@@ -378,16 +397,23 @@ class MarginMarket(Market):
 
   @SDK.method
   @abstractmethod
-  async def position(self) -> Position:
-    """Fetch your open position in the market."""
+  async def position(self, *, ttl: timedelta | None = None) -> Position:
+    """Fetch your open position in the market.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """
 
   @SDK.method
   @abstractmethod
-  async def collateral(self) -> PerpCollateral:
+  async def collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """Fetch the margin bucket backing this market, mode-aware: the cross pool, or
     an isolated position's own bucket.
 
     This is about liquidation distance. What funds new orders is `collateral_id()`.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
     """
 
   @SDK.method
@@ -406,25 +432,26 @@ class MarginMarket(Market):
     raise NotImplementedError(f'Collateral ID is not implemented: {self.id}')
 
   @SDK.method
-  async def leverage(self, *, refetch: bool = False) -> Decimal:
+  async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
     """Fetch the leverage this account can open at on this market.
 
     The multiple of free collateral the account can open as notional here: opening
     `n` of notional needs `n / leverage` of collateral. It is account-specific (for
     example a per-market leverage setting, or the venue's default for a market the
     account never configured), which is why it is neither part of the public
-    `rules()` nor of `collateral()`. It is cached after the first call.
+    `rules()` nor of `collateral()`. A `ttl` reuses an answer read for this market,
+    or one the venue's account-wide read shares with `position()` and `collateral()`.
 
     Margin-only: spot markets trade on their cash balance, so the SDK defines no
     spot leverage. Unsupported implementations raise `NotImplementedError`.
 
     Args:
-      refetch: Fetch again even if the leverage is already cached.
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
     """
     raise NotImplementedError(f'Account leverage is not implemented: {self.id}')
 
   @SDK.method
-  async def available_notional(self) -> Decimal:
+  async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     """Fetch the maximum notional position you can open right now.
 
     The default is `collateral().free_collateral * leverage()`: the free part of the
@@ -435,9 +462,12 @@ class MarginMarket(Market):
 
     This is opening capacity, deliberately separate from `collateral()`, which is
     about liquidation distance.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
     """
-    leverage = await self.leverage()
-    return (await self.collateral()).free_collateral * leverage
+    leverage = await self.leverage(ttl=ttl)
+    return (await self.collateral(ttl=ttl)).free_collateral * leverage
 
 
 class PerpMarket(MarginMarket):
@@ -455,8 +485,12 @@ class PerpMarket(MarginMarket):
 
   @SDK.method
   @abstractmethod
-  async def next_funding(self) -> NextFunding:
-    """Fetch the next funding rate and time."""
+  async def next_funding(self, *, ttl: timedelta | None = None) -> NextFunding:
+    """Fetch the next funding rate and time.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """
 
   @SDK.method
   @abstractmethod
@@ -478,21 +512,37 @@ class PerpMarket(MarginMarket):
     """Fetch your funding payments history."""
 
   @SDK.method
-  async def position(self) -> Position:
-    """Fetch your open position in the market."""
-    return await self.perp_position()
+  async def position(self, *, ttl: timedelta | None = None) -> Position:
+    """Fetch your open position in the market.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """
+    return await self.perp_position(ttl=ttl)
 
   @SDK.method
   @abstractmethod
-  async def perp_position(self) -> PerpPosition:
-    """Fetch your open position in the perpetual market."""
+  async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
+    """Fetch your open position in the perpetual market.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """
 
   @SDK.method
-  async def collateral(self) -> PerpCollateral:
-    """Fetch the margin bucket backing this market (defers to `perp_collateral`)."""
-    return await self.perp_collateral()
+  async def collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
+    """Fetch the margin bucket backing this market (defers to `perp_collateral`).
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """
+    return await self.perp_collateral(ttl=ttl)
 
   @SDK.method
   @abstractmethod
-  async def perp_collateral(self) -> PerpCollateral:
-    """Fetch the perpetual collateral bucket backing this market."""
+  async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
+    """Fetch the perpetual collateral bucket backing this market.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """

@@ -11,7 +11,7 @@ from typing_extensions import (
 )
 from abc import abstractmethod
 from contextlib import asynccontextmanager
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from tribulnation.sdk.core import SDK, PaginatedResponse, OverflowPolicy
@@ -132,18 +132,20 @@ class TradingVenue(SDK):
     *,
     markets: Collection[str] | None = None,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Fetch a ticker snapshot for many markets at once.
 
     Args:
       markets: Market IDs to fetch. `None` fetches every market of the exchange.
       settings: Venue-specific ticker settings.
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
 
     Returns:
       A mapping of market ID to its `Ticker`.
     """
     sdk = await self.exchange(exchange)
-    return await sdk.tickers(markets=markets, settings=settings)
+    return await sdk.tickers(markets=markets, settings=settings, ttl=ttl)
 
   @SDK.method
   async def rules(self, market_id: str, /, *, refetch: bool = False) -> Rules:
@@ -281,10 +283,16 @@ class TradingVenue(SDK):
     return await exchange.market(market_id)
 
   @SDK.method
-  async def balances(self, market_id: str, /) -> SpotBalances:
-    """Fetch your base and quote balances on a spot market."""
+  async def balances(
+    self, market_id: str, /, *, ttl: timedelta | None = None
+  ) -> SpotBalances:
+    """Fetch your base and quote balances on a spot market.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """
     market = await self.spot_market(market_id)
-    return await market.balances()
+    return await market.balances(ttl=ttl)
 
   @SDK.method
   async def collateral_ids(self, market_id: str, /) -> SpotCollateralIds:
@@ -293,21 +301,24 @@ class TradingVenue(SDK):
     return await market.collateral_ids()
 
   @SDK.method
-  async def collateral(self, id: str, /) -> Collateral:
+  async def collateral(self, id: str, /, *, ttl: timedelta | None = None) -> Collateral:
     """Resolve a collateral ID, without its account key.
 
     - `<exchange_id>` (`perp`): a perpetual exchange's pool.
     - `<exchange_id>:<asset>` (`spot:USDC`): one spot asset's balance, with
       `equity = total` and `free_collateral = free`.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
     """
     exchange_id, sep, asset = id.partition(':')
     if sep:
       spot = await self.spot_exchange(exchange_id)
-      balance = await spot.balance(asset)
+      balance = await spot.balance(asset, ttl=ttl)
       return Collateral(equity=balance.total, free_collateral=balance.free)
     else:
       perp = await self.perp_exchange(exchange_id)
-      return await perp.collateral()
+      return await perp.collateral(ttl=ttl)
 
   @SDK.method
   async def perp_exchange(self, exchange_id: str, /) -> PerpExchange:
@@ -338,10 +349,16 @@ class TradingVenue(SDK):
     return await market.index()
 
   @SDK.method
-  async def next_funding(self, market_id: str, /) -> NextFunding:
-    """Fetch the next funding rate and time."""
+  async def next_funding(
+    self, market_id: str, /, *, ttl: timedelta | None = None
+  ) -> NextFunding:
+    """Fetch the next funding rate and time.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """
     market = await self.perp_market(market_id)
-    return await market.next_funding()
+    return await market.next_funding(ttl=ttl)
 
   @SDK.method
   @PaginatedResponse.lift
@@ -368,10 +385,16 @@ class TradingVenue(SDK):
       yield page
 
   @SDK.method
-  async def position(self, market_id: str, /) -> Position:
-    """Fetch your open position in a perpetual market."""
+  async def position(
+    self, market_id: str, /, *, ttl: timedelta | None = None
+  ) -> Position:
+    """Fetch your open position in a perpetual market.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """
     market = await self.perp_market(market_id)
-    return await market.position()
+    return await market.position(ttl=ttl)
 
   @SDK.method
   async def collateral_id(self, market_id: str, /) -> str:
@@ -380,39 +403,61 @@ class TradingVenue(SDK):
     return await market.collateral_id()
 
   @SDK.method
-  async def available_notional(self, market_id: str, /) -> Decimal:
+  async def available_notional(
+    self, market_id: str, /, *, ttl: timedelta | None = None
+  ) -> Decimal:
     """Fetch the maximum notional position you can open right now on a perpetual
-    market: the free collateral times the account's `leverage()` on it."""
+    market: the free collateral times the account's `leverage()` on it.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """
     market = await self.perp_market(market_id)
-    return await market.available_notional()
+    return await market.available_notional(ttl=ttl)
 
   @SDK.method
-  async def perp_position(self, market_id: str, /) -> PerpPosition:
-    """Fetch your open position in the perpetual market."""
+  async def perp_position(
+    self, market_id: str, /, *, ttl: timedelta | None = None
+  ) -> PerpPosition:
+    """Fetch your open position in the perpetual market.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """
     market = await self.perp_market(market_id)
-    return await market.perp_position()
+    return await market.perp_position(ttl=ttl)
 
   @SDK.method
-  async def leverage(self, market_id: str, /, *, refetch: bool = False) -> Decimal:
+  async def leverage(
+    self, market_id: str, /, *, ttl: timedelta | None = None
+  ) -> Decimal:
     """Fetch the leverage this account can open at on the selected market.
 
     - `market_id`: `<exchange_id>:<market_id>`.
 
-    See `PerpMarket.leverage`; cached after the first call.
+    See `MarginMarket.leverage`.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
     """
     market = await self.perp_market(market_id)
-    return await market.leverage(refetch=refetch)
+    return await market.leverage(ttl=ttl)
 
   @SDK.method
-  async def perp_collateral(self, id: str, /) -> PerpCollateral:
+  async def perp_collateral(
+    self, id: str, /, *, ttl: timedelta | None = None
+  ) -> PerpCollateral:
     """Fetch perpetual collateral.
 
     - 1-segment (`perp`): exchange-level bucket.
     - 2-segment (`perp:BTC-USD`): market-level (mode-aware).
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
     """
     if ':' in id:
       exchange_id, market_id = id.split(':', 1)
       exchange = await self.perp_exchange(exchange_id)
-      return await exchange.perp_collateral(market_id)
+      return await exchange.perp_collateral(market_id, ttl=ttl)
     exchange = await self.perp_exchange(id)
-    return await exchange.perp_collateral()
+    return await exchange.perp_collateral(ttl=ttl)

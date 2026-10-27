@@ -42,7 +42,9 @@ def test_changed_poc_does_not_create_an_install_job(repository: Path):
 
 def test_scaffold_manifest_does_not_create_a_release_job(repository: Path):
   """A hidden scaffold is not a distributable implementation."""
-  assert select_packages(repository, ['packages/impl/.template/pkg/pyproject.toml']) == []
+  assert (
+    select_packages(repository, ['packages/impl/.template/pkg/pyproject.toml']) == []
+  )
 
 
 def test_venue_change_selects_only_that_package(repository: Path):
