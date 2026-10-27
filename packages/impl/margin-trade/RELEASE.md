@@ -10,3 +10,8 @@ Breaking and behaviour changes:
 4. `leverage(refetch=...)` becomes `leverage(ttl=...)` ([ADR 0054](../../../dev-docs/adr/0054-caller-chosen-read-staleness.md)) and is no longer cached forever. Other account reads accept `ttl`.
 
 Every other method is unchanged.
+
+Release qualification on 2026-10-27 passed the read suites and market consistency.
+Committed evidence under `release-evidence/margin-trade/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
+release follows SDK 3.0.0 publication.
