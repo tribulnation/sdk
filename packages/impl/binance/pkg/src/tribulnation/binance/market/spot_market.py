@@ -300,7 +300,7 @@ class SpotMarket(SharedMixin, Market):
     return trades_only(self.client.spot.ws.user_data.events().map(parse))
 
   @wrap_exceptions
-  async def position(self) -> Position:
+  async def position(self, *, ttl: timedelta | None = None) -> Position:
     symbols = await self.shared.load_spot_symbols()
     base = symbols[self.symbol]['baseAsset']
     account = await self.client.spot.http.account.info()
@@ -309,7 +309,7 @@ class SpotMarket(SharedMixin, Market):
     return Position(size=size)
 
   @wrap_exceptions
-  async def collateral(self) -> Collateral:
+  async def collateral(self, *, ttl: timedelta | None = None) -> Collateral:
     symbols = await self.shared.load_spot_symbols()
     quote = symbols[self.symbol]['quoteAsset']
     account = await self.client.spot.http.account.info()
@@ -319,7 +319,7 @@ class SpotMarket(SharedMixin, Market):
     return Collateral(equity=free + locked, free_collateral=free)
 
   @wrap_exceptions
-  async def available_notional(self) -> Decimal:
+  async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     collateral = await self.collateral()
     return collateral.free_collateral
 

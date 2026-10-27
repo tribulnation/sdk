@@ -2,7 +2,7 @@
 
 from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
@@ -123,13 +123,13 @@ class SpotMarket(MarketMixin, Market):
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
     return trades_stream(self, queue_size=queue_size, overflow=overflow)
 
-  async def position(self) -> Position:
+  async def position(self, *, ttl: timedelta | None = None) -> Position:
     return await position(self)
 
-  async def collateral(self) -> Collateral:
+  async def collateral(self, *, ttl: timedelta | None = None) -> Collateral:
     return await collateral(self)
 
-  async def available_notional(self) -> Decimal:
+  async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     return await available_notional(self)
 
   async def place_order(

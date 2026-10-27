@@ -1,7 +1,7 @@
 """The perpetual exchange: discovery, bulk snapshots and exchange-wide fills."""
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from typing_extensions import AsyncIterable, Collection, Mapping, Sequence, overload
 from typed_extended.info.markets import Market as MarketRow
@@ -81,7 +81,11 @@ class ExtendedPerpExchange(Public, PerpExchange):
     return ExtendedPerpMarket(shared=self.shared, name=row['name'])
 
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Tickers of the listed perpetuals, from one `info.markets` read."""
     if markets is not None and not markets:
@@ -90,7 +94,11 @@ class ExtendedPerpExchange(Public, PerpExchange):
     return {m: ticker(rows[m]) for m in selected(markets, rows)}
 
   async def perp_stats(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, PerpStats]:
     """Pricing and funding snapshots of the listed perpetuals, from one `info.markets`
     read."""
@@ -134,7 +142,9 @@ class ExtendedPerpExchange(Public, PerpExchange):
     async for page in history.funding_payments(self.shared, market_id, start, end):
       yield page
 
-  async def perp_collateral(self, market_id: str | None = None, /) -> PerpCollateral:
+  async def perp_collateral(
+    self, market_id: str | None = None, /, *, ttl: timedelta | None = None
+  ) -> PerpCollateral:
     """The sub-account's one cross bucket, whatever the market."""
     if market_id is not None:
       await self.shared.perp(market_id)

@@ -1,6 +1,6 @@
 """Tickers, perpetual stats and predicted funding, from the `*market_stats` snapshots."""
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from typing_extensions import Collection, Literal, Mapping
@@ -40,16 +40,50 @@ async def read_spot_snapshot(shared: Shared) -> dict[int, SpotMarketStats]:
   raise ApiError('Lighter spot_market_stats stream closed before its snapshot')
 
 
+def single_flight(ttl: timedelta | None) -> timedelta:
+  """The `ttl` a snapshot read shares with: `None` (no stored answer) still joins a
+  subscription in flight.
+
+  Each snapshot subscribes to its channel for the first frame, and a connection refuses
+  a second subscription to a channel already open ("Already subscribed"), so readers of
+  one selector must never subscribe concurrently, whatever their `ttl`.
+  """
+  return timedelta(0) if ttl is None else ttl
+
+
 async def perp_snapshot(
-  shared: Shared, selector: MarketSelector
+  shared: Shared, selector: MarketSelector, *, ttl: timedelta | None
 ) -> dict[int, MarketStats]:
-  """The perp snapshot, as one retried request."""
-  return await shared.call(lambda: read_perp_snapshot(shared, selector))
+  """The perp snapshot, as one retried subscription that concurrent readers share.
+
+  Args:
+    shared: The client's shared state.
+    selector: `'all'` or one market id.
+    ttl: How old a stored snapshot may be; `None` reuses none, but still joins a
+      subscription in flight (see `single_flight`).
+  """
+  return await shared.reads.read(
+    ('market_stats', selector),
+    lambda: shared.call(lambda: read_perp_snapshot(shared, selector)),
+    ttl=single_flight(ttl),
+  )
 
 
-async def spot_snapshot(shared: Shared) -> dict[int, SpotMarketStats]:
-  """The spot snapshot, as one retried request."""
-  return await shared.call(lambda: read_spot_snapshot(shared))
+async def spot_snapshot(
+  shared: Shared, *, ttl: timedelta | None
+) -> dict[int, SpotMarketStats]:
+  """The spot snapshot, as one retried subscription that concurrent readers share.
+
+  Args:
+    shared: The client's shared state.
+    ttl: How old a stored snapshot may be; `None` reuses none, but still joins a
+      subscription in flight (see `single_flight`).
+  """
+  return await shared.reads.read(
+    ('spot_market_stats', 'all'),
+    lambda: shared.call(lambda: read_spot_snapshot(shared)),
+    ttl=single_flight(ttl),
+  )
 
 
 def selected(markets: Collection[str] | None, available: Collection[int]) -> list[int]:
@@ -72,22 +106,22 @@ def ticker(s: MarketStats | SpotMarketStats) -> Ticker:
 
 
 async def perp_tickers(
-  shared: Shared, markets: Collection[str] | None
+  shared: Shared, markets: Collection[str] | None, *, ttl: timedelta | None
 ) -> Mapping[str, Ticker]:
   """Tickers of the requested perpetuals."""
   if markets is not None and not markets:
     return {}
-  stats = await perp_snapshot(shared, 'all')
+  stats = await perp_snapshot(shared, 'all', ttl=ttl)
   return {str(m): ticker(stats[m]) for m in selected(markets, stats)}
 
 
 async def spot_tickers(
-  shared: Shared, markets: Collection[str] | None
+  shared: Shared, markets: Collection[str] | None, *, ttl: timedelta | None
 ) -> Mapping[str, Ticker]:
   """Tickers of the requested spot markets."""
   if markets is not None and not markets:
     return {}
-  stats = await spot_snapshot(shared)
+  stats = await spot_snapshot(shared, ttl=ttl)
   return {str(m): ticker(stats[m]) for m in selected(markets, stats)}
 
 
@@ -97,13 +131,13 @@ def next_settlement(last: datetime) -> datetime:
 
 
 async def perp_stats(
-  shared: Shared, markets: Collection[str] | None
+  shared: Shared, markets: Collection[str] | None, *, ttl: timedelta | None
 ) -> Mapping[str, PerpStats]:
   """Index, mark and predicted funding from `market_stats`; base-unit open interest from
   `orderBookDetails` (`market_stats` reports it in USDC)."""
   if markets is not None and not markets:
     return {}
-  stats = await perp_snapshot(shared, 'all')
+  stats = await perp_snapshot(shared, 'all', ttl=ttl)
   await shared.load_details(refetch=True)
   return {
     str(m): PerpStats(
@@ -120,10 +154,12 @@ async def perp_stats(
   }
 
 
-async def next_funding(shared: Shared, market_id: int) -> NextFunding:
+async def next_funding(
+  shared: Shared, market_id: int, *, ttl: timedelta | None
+) -> NextFunding:
   """The venue's estimate of the next hourly settlement's rate (percent, positive when
   longs pay), with the premium it is computed from."""
-  stats = (await perp_snapshot(shared, market_id))[market_id]
+  stats = (await perp_snapshot(shared, market_id, ttl=ttl))[market_id]
   return NextFunding(
     rate=percent(stats['current_funding_rate']),
     time=next_settlement(stats['funding_timestamp']),

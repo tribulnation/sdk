@@ -30,6 +30,7 @@ from typed_margin_trade.schemas import (
 )
 from typed_margin_trade.info.frontend_open_orders import FrontendOpenOrder
 from tribulnation.sdk.core import (
+  SharedReads,
   AuthError,
   ManagedResource,
   OverflowPolicy,
@@ -163,8 +164,8 @@ class Shared(SDK):
     default_factory=dict[str, PerpUniverseItem]
   )
   pairs: dict[str, Pair] = field(default_factory=dict[str, Pair])
-  leverages: dict[str, Decimal] = field(default_factory=dict[str, Decimal])
-  """The account's leverage per perpetual, filled by `leverage()`."""
+  reads: SharedReads = field(default_factory=SharedReads)
+  """Account reads shared between concurrent callers (`leverage()`)."""
   lock: asyncio.Lock = field(default_factory=asyncio.Lock)
   books: dict[str, Subscription[Book]] = field(
     default_factory=dict[str, Subscription[Book]]

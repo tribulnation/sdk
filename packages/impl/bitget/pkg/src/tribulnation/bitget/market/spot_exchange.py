@@ -1,5 +1,6 @@
 """Bitget's spot exchange: every spot pair."""
 
+from datetime import timedelta
 from typing_extensions import Collection, Mapping, Sequence
 from dataclasses import dataclass
 
@@ -33,6 +34,7 @@ class SpotExchange(VenueMixin, Exchange):
     markets: Collection[str] | None = None,
     *,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Fetch best bid/ask and last price for every spot pair in one call.
 
@@ -51,7 +53,9 @@ class SpotExchange(VenueMixin, Exchange):
       if wanted is None or t['symbol'] in wanted
     }
 
-  async def collateral(self, market_id: str | None = None, /) -> Collateral:
+  async def collateral(
+    self, market_id: str | None = None, /, *, ttl: timedelta | None = None
+  ) -> Collateral:
     """Fetch collateral.
 
     Args:

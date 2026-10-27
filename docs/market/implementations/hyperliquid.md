@@ -111,7 +111,8 @@ async with sdk.depth_stream('hl::ETH', settings={'hyperliquid': {'depth_source':
   setting it falls back to `maxLeverage`. Hyperliquid reports its default setting for an
   asset the account never configured, so the fallback is defensive. Cross and isolated
   settings mean the same multiple. HIP-3 (builder-dex) markets query their `dex:`-prefixed
-  coin. Cached per coin; `refetch=True` re-reads the setting and the dex universe.
+  coin. Reads with a `ttl` share one answer per coin; `maxLeverage` comes from the
+  cached dex universe, which `rules(refetch=True)` reloads.
 - **`available_notional`** (perp) is the collateral token's free spot balance
   (`total - hold`, the same figure as the cross bucket's `free_collateral`) times
   `leverage()`. It overrides the SDK default (`collateral().free_collateral × leverage()`)

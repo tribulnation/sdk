@@ -107,6 +107,9 @@ Hold a `Market` reference in hot loops; use the scoped one-shot calls otherwise.
   - `available_notional() -> Decimal`: max. notional you could open now
   - `collateral_id() -> str`: the money funding new orders, shared with spot on unified accounts
 - `sdk.collateral(id) -> Collateral`: resolves any collateral ID (ADR 0051)
+- Balance, position, collateral, leverage, available-notional, ticker, perpetual-stats and
+  next-funding reads take `ttl: timedelta | None`: `None` (default) asks the venue afresh,
+  a `timedelta` accepts a shared answer that recent (ADR 0054)
 
 Full reference: [docs/market/index.md](docs/market/index.md), with per-venue notes for [dYdX](docs/market/impl/dydx.md), [Hyperliquid](docs/market/impl/hyperliquid.md), and [MEXC](docs/market/impl/mexc.md).
 

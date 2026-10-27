@@ -1,7 +1,7 @@
 """Public Deribit spot and linear perpetual Market objects."""
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 from typing_extensions import AsyncContextManager, AsyncIterable, Never, Sequence
 from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
@@ -137,7 +137,7 @@ class LinearPerpMarket(NativeSpotMarket, PerpMarket):
     row = await self.shared.ticker(self.symbol)
     return Decimal(str(row['index_price']))
 
-  async def next_funding(self) -> NextFunding:
+  async def next_funding(self, *, ttl: timedelta | None = None) -> NextFunding:
     """Continuous accrual does not provide a qualified next-payment forecast."""
     raise NotImplementedError(
       'Deribit funding accrues continuously; no native next-payment forecast'
@@ -157,10 +157,10 @@ class LinearPerpMarket(NativeSpotMarket, PerpMarket):
     """Private funding payments are outside the public Market surface."""
     raise NotImplementedError('Deribit Market supports public data only')
 
-  async def perp_position(self) -> PerpPosition:
+  async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
     """Private positions are outside the public Market surface."""
     raise NotImplementedError('Deribit Market supports public data only')
 
-  async def perp_collateral(self) -> PerpCollateral:
+  async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """Private collateral is outside the public Market surface."""
     raise NotImplementedError('Deribit Market supports public data only')

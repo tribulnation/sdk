@@ -19,6 +19,7 @@ from typed_grvt import Grvt
 from typed_grvt.schemas import InstrumentDisplay
 from tribulnation.sdk import SDK
 from tribulnation.sdk.core import (
+  SharedReads,
   AuthError,
   ManagedResource,
   Subscription,
@@ -70,7 +71,7 @@ def percent(value: Decimal) -> Decimal:
 
 @dataclass(frozen=True, kw_only=True)
 class Shared(SDK):
-  """Own one client; cache the perpetuals, leverages and shared stream fan-outs."""
+  """Own one client; cache the perpetuals; share reads and stream fan-outs."""
 
   client: Grvt
   venue_id: VenueId = 'grvt'
@@ -90,8 +91,8 @@ class Shared(SDK):
     default_factory=dict[str, Subscription[Trade]]
   )
   """One shared fills upstream per instrument."""
-  leverages: dict[str, Decimal] = field(default_factory=dict[str, Decimal])
-  """The account's initial leverage per instrument, filled by `leverage()`."""
+  reads: SharedReads = field(default_factory=SharedReads)
+  """Account reads shared between instruments and concurrent callers (`leverage()`)."""
 
   @classmethod
   def new(

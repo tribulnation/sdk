@@ -100,39 +100,44 @@ requests address a market as `<account_id>:<exchange_id>:<market_id>`, e.g.
 | `exchanges` | `account_id` | List a venue's exchanges. |
 | `exchange` | `account_id`, `exchange_id` | Resolve an exchange's product type and venue. |
 | `markets` | `account_id`, `exchange_id` | List an exchange's market IDs. |
-| `tickers` | `account_id`, `exchange_id`, `markets`?, `settings`? | Fetch bulk tickers. |
-| `perp_stats` | `account_id`, `exchange_id`, `markets`?, `settings`? | Fetch bulk perpetual statistics. |
-| `exchange_collateral` | `account_id`, `exchange_id` | Fetch a perpetual exchange's pool as generic collateral. |
-| `balance` | `account_id`, `exchange_id`, `asset` | Fetch one asset's balance on a spot exchange. |
-| `exchange_perp_collateral` | `account_id`, `exchange_id` | Fetch a perpetual exchange's margin bucket. |
+| `tickers` | `account_id`, `exchange_id`, `markets`?, `settings`?, `ttl`? | Fetch bulk tickers. |
+| `perp_stats` | `account_id`, `exchange_id`, `markets`?, `settings`?, `ttl`? | Fetch bulk perpetual statistics. |
+| `exchange_collateral` | `account_id`, `exchange_id`, `ttl`? | Fetch a perpetual exchange's pool as generic collateral. |
+| `balance` | `account_id`, `exchange_id`, `asset`, `ttl`? | Fetch one asset's balance on a spot exchange. |
+| `exchange_perp_collateral` | `account_id`, `exchange_id`, `ttl`? | Fetch a perpetual exchange's margin bucket. |
 | `depth` | `market_id`, `levels`?, `settings`? | Fetch one order book snapshot. |
 | `rules` | `market_id`, `refetch`? | Fetch trading rules. |
 | `fees` | `market_id`, `refetch`? | Fetch account-specific trading fees. |
-| `leverage` | `market_id`, `refetch`? | Fetch the account's leverage on a perpetual market. |
+| `leverage` | `market_id`, `ttl`? | Fetch the account's leverage on a perpetual market. |
 | `candles` | `market_id`, `interval`, `start`, `end` | Fetch candles in a half-open window. |
 | `open_orders` | `market_id` | List the account's open orders. |
 | `query_order` | `market_id`, `order_id` | Look up one order. |
 | `trades_history` | `market_id`, `start`, `end` | Fetch the account's fills in a window. |
-| `position` | `market_id` | Fetch a margin market's position. |
-| `available_notional` | `market_id` | Fetch the notional the account can still open on a margin market. |
-| `balances` | `market_id` | Fetch a spot market's base and quote balances. |
+| `position` | `market_id`, `ttl`? | Fetch a margin market's position. |
+| `available_notional` | `market_id`, `ttl`? | Fetch the notional the account can still open on a margin market. |
+| `balances` | `market_id`, `ttl`? | Fetch a spot market's base and quote balances. |
 | `collateral_id` | `market_id` | Fetch the collateral ID funding new orders on a margin market. |
 | `place_order` | `market_id`, `order`, `settings`? | Place one order. `order` is `{"type", "qty", "price", "client_order_id"?}`, `type` one of `MARKET`, `LIMIT`, `POST_ONLY`, and a negative `qty` sells. |
 | `cancel_order` | `market_id`, `order_id`, `settings`? | Cancel one order. |
 | `cancel_open_orders` | `market_id`, `settings`? | Cancel every open order on the market. |
 | `index` | `market_id`, `settings`? | Fetch the index price. |
-| `next_funding` | `market_id` | Fetch the upcoming funding rate. |
+| `next_funding` | `market_id`, `ttl`? | Fetch the upcoming funding rate. |
 | `funding_rates` | `market_id`, `start`?, `end`? | Fetch historical funding rates. |
 | `funding_payments` | `market_id`, `start`, `end` | Fetch the account's funding payments. |
-| `perp_position` | `market_id` | Fetch the perpetual position. |
-| `collateral` | `market_id` | Fetch the margin bucket backing a margin market. |
-| `perp_collateral` | `market_id` | Fetch the perpetual margin bucket backing the market. |
+| `perp_position` | `market_id`, `ttl`? | Fetch the perpetual position. |
+| `collateral` | `market_id`, `ttl`? | Fetch the margin bucket backing a margin market. |
+| `perp_collateral` | `market_id`, `ttl`? | Fetch the perpetual margin bucket backing the market. |
 | `depth_stream` | `market_id`, `levels`?, `queue_size`?, `overflow`?, `settings`? | Subscribe to order books. |
 | `trades_stream` | `market_id`, `queue_size`?, `overflow`?, `settings`? | Subscribe to the account's fills. |
 | `unsub` | none | Stop the stream whose `id` this carries. |
 
 `?` marks an optional field. `queue_size` and `overflow` (`"fail"` or `"latest"`) size
 the gateway's buffer for the subscription.
+
+`ttl` is how old an answer the caller accepts, as an ISO 8601 duration (`"PT1S"`). The
+gateway keeps the answers it shares, so every task reading through one gateway shares
+them: an answer whose request started less than `ttl` ago is reused, else a request in
+flight is joined. Null or absent asks the venue afresh (ADR 0054).
 
 ## Replies and stream messages
 

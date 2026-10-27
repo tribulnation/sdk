@@ -145,7 +145,7 @@ class SpotExchange(Public, SDKSpotExchange):
     """List native symbols currently trading."""
     return list(await self.shared.spot_symbols())
 
-  async def balance(self, asset: str, /) -> Balance:
+  async def balance(self, asset: str, /, *, ttl: timedelta | None = None) -> Balance:
     """One asset's balance by symbol (`USDT`): free plus locked, and the free part.
     Mainnet only: testnet account information omits funded balances."""
     return spot_balance(await self.shared.spot_account_info(), asset)
@@ -157,7 +157,11 @@ class SpotExchange(Public, SDKSpotExchange):
     return SpotMarket(shared=self.shared, symbol=market_id)
 
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Read 24h statistics and best bid/ask for all or the selected symbols."""
     if markets is not None and not markets:
@@ -261,7 +265,11 @@ class PerpExchange(Public, SDKPerpExchange):
       ]
 
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Read 24h statistics and best bid/ask for all or the selected contracts."""
     if markets is not None and not markets:
@@ -277,7 +285,11 @@ class PerpExchange(Public, SDKPerpExchange):
     )
 
   async def perp_stats(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, PerpStats]:
     """Read pricing and funding for all or the selected contracts in two bulk calls.
 
@@ -313,8 +325,10 @@ class PerpExchange(Public, SDKPerpExchange):
     async with managed_tasks(read(symbol) for symbol in symbols) as tasks:
       return dict(await asyncio.gather(*tasks))
 
-  async def perp_collateral(self, market_id: str | None = None, /) -> PerpCollateral:
+  async def perp_collateral(
+    self, market_id: str | None = None, /, *, ttl: timedelta | None = None
+  ) -> PerpCollateral:
     """Read the cross-margin bucket, or a market's own (cross or isolated) bucket."""
     if market_id is not None:
-      return await (await self.market(market_id)).perp_collateral()
-    return cross_collateral(await self.shared.futures_account())
+      return await (await self.market(market_id)).perp_collateral(ttl=ttl)
+    return cross_collateral(await self.shared.futures_account(ttl=ttl))

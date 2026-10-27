@@ -2,6 +2,7 @@
 
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
+from datetime import timedelta
 from decimal import Decimal
 from functools import cached_property
 import asyncio
@@ -25,12 +26,14 @@ from typed_aster.core.transport.bapi import BapiClient
 from typed_aster.futures.account.schemas import FuturesAccount
 from typed_aster.futures.market.exchange_info import FuturesSymbol
 from typed_aster.schemas import AccountInfo
+from typed_aster.futures.position.risk import PositionRisk
 from typed_aster.spot.market.exchange_info import SpotSymbol
 from tribulnation.sdk.core import (
   AuthError,
   ManagedResource,
   OverflowPolicy,
   SDK,
+  SharedReads,
   SkippingView,
   Subscription,
   exception_wrapper,
@@ -44,6 +47,8 @@ Scope = Literal['spot', 'perp']
 DepthSource = Literal['depth', 'fast', 'bbo']
 """Which Aster WebSocket feed backs `depth_stream`; see `market.settings.Settings`."""
 wrap_exceptions = exception_wrapper()
+POSITION_RISK = 'positionRisk'
+"""`SharedReads` key of the all-symbol `positionRisk` answer."""
 
 
 @wrap_exceptions
@@ -129,8 +134,14 @@ class Shared(SDK):
   trades: dict[Scope, Subscription[tuple[str, Trade]]] = field(
     default_factory=dict[Scope, Subscription[tuple[str, Trade]]]
   )
-  leverages: dict[str, Decimal] = field(default_factory=dict[str, Decimal])
-  """The account's initial leverage per perpetual symbol, filled by `leverage()`."""
+  maxed: dict[str, float] = field(default_factory=dict[str, float])
+  """Loop time each perpetual symbol's leverage was last checked against its maximum (and set to it), successfully or not."""
+  leverage_locks: dict[str, asyncio.Lock] = field(
+    default_factory=dict[str, asyncio.Lock]
+  )
+  """One lock per perpetual symbol, so concurrent orders set its leverage once."""
+  reads: SharedReads = field(default_factory=SharedReads)
+  """Account-wide reads shared between symbols and concurrent callers."""
 
   @property
   def venue_id(self) -> Literal['aster', 'aster_testnet']:
@@ -191,13 +202,47 @@ class Shared(SDK):
       )
     return await self.call(self.client.spot.account.info)
 
-  async def futures_account(self) -> FuturesAccount:
-    """Read the join-margin futures account: totals value every margin asset in USDT.
+  async def futures_account(self, *, ttl: timedelta | None) -> FuturesAccount:
+    """Read the join-margin futures account, which every symbol's collateral reads share.
 
-    The plain `account.info` totals count USDT alone, which misstates Multi-Assets
-    accounts margined in other assets.
+    Its totals value every margin asset in USDT; the plain `account.info` totals count
+    USDT alone, which misstates Multi-Assets accounts margined in other assets.
+
+    Positions, leverage and collateral of every symbol come from this and `positionRisk`,
+    so callers passing a `ttl` share them (ADR 0054): a burst of reads sends one request
+    rather than one per symbol and caller, which Aster answered 429 on 2026-10-26 before
+    banning the IP.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh (see `SharedReads`).
     """
-    return await self.call(self.client.futures.account.info_with_join_margin)
+    return await self.reads.read(
+      ('futures_account',),
+      lambda: self.call(self.client.futures.account.info_with_join_margin),
+      ttl=ttl,
+    )
+
+  async def position_risk(
+    self, symbol: str, *, ttl: timedelta | None
+  ) -> list[PositionRisk]:
+    """A perpetual symbol's `positionRisk` rows, from one all-symbol request shared like `futures_account`.
+
+    The all-symbol answer lists flat symbols too; one missing the symbol (e.g. a
+    listing newer than it) is answered by a request for that symbol alone.
+
+    Args:
+      symbol: The perpetual symbol.
+      ttl: How old a shared answer may be; `None` asks afresh (see `SharedReads`).
+    """
+    rows = await self.reads.read(
+      POSITION_RISK,
+      lambda: self.call(self.client.futures.position.risk),
+      ttl=ttl,
+    )
+    if mine := [r for r in rows if r['symbol'] == symbol]:
+      return mine
+    else:
+      return await self.call(lambda: self.client.futures.position.risk(symbol))
 
   @asynccontextmanager
   async def stream(

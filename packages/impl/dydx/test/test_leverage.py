@@ -50,13 +50,15 @@ def market(*markets: PerpetualMarket) -> tuple[Market, SimpleNamespace]:
 
 
 async def test_leverage_is_the_inverse_effective_imf_and_cached():
-  """10% IMF is 10x; the cached market list is reused until `refetch=True`."""
+  """10% IMF is 10x; the cached market list is reused, whatever the `ttl`, until
+  it is reloaded (`rules(refetch=True)`, tickers and perpetual stats do)."""
   # Open notional 7500 sits halfway between the caps: IMF 0.1 + 0.5 * 0.9 = 0.55.
   m, data = market(perpetual(), perpetual(openInterest=Decimal(750)))
   assert await m.leverage() == 10
-  assert await m.leverage() == 10
+  assert await m.leverage(ttl=None) == 10
   assert data.get_markets.await_count == 1
-  assert await m.leverage(refetch=True) == Decimal(1) / Decimal('0.55')
+  await m.shared.load_markets(refetch=True)
+  assert await m.leverage() == Decimal(1) / Decimal('0.55')
   assert data.get_markets.await_count == 2
 
 

@@ -130,8 +130,9 @@ Decimal('10')
   market: opening `n` of notional takes `n / leverage` of collateral. It is account-specific,
   e.g. Hyperliquid's per-asset leverage setting, which is why it lives on the market and not
   in the public `rules()`, nor in `collateral()` (a bucket shared by many markets has no
-  single leverage). It's cached after the first call; pass `refetch=True` after changing the
-  setting elsewhere.
+  single leverage). Like the other account reads it takes `ttl` (see
+  [Read staleness](#read-staleness)): the default asks the venue each time, and a `ttl`
+  reuses a recent answer, so a setting changed elsewhere shows once it is older than that.
 - `available_notional()` is `free_collateral × leverage()`, using the collateral backing that
   market. A venue may override it with a more precise figure, e.g. when an isolated position
   is funded from the cross pool rather than its own bucket; each
@@ -143,6 +144,34 @@ Both exist on margin (perpetual) markets only. On spot, size from `balances()`: 
 Venues without account leverage raise `NotImplementedError` from `leverage()` and keep
 their own venue-specific `available_notional()`. Neither figure subtracts fees, nor checks a venue's
 notional caps or margin tiers beyond what its leverage already reflects.
+
+## Read staleness
+
+`balances`, `balance`, `position`, `perp_position`, `collateral`, `perp_collateral`,
+`leverage`, `available_notional`, `next_funding`, `tickers` and `perp_stats` take
+`ttl: timedelta | None`, how old an answer you accept:
+
+- `ttl=None` (the default) asks the venue afresh: the answer comes from a request started
+  after your call. Use it right after a fill or an order, when an earlier answer could
+  predate what you just saw.
+- `ttl=timedelta(seconds=1)` (any `timedelta`, `0` included) shares: an answer whose request
+  started less than `ttl` ago is reused, else a request already in flight is joined. On
+  venues that answer every market of an account with one request (Lighter's `/account`,
+  Hyperliquid's `clearinghouseState`, Aster's `positionRisk` and futures account), a burst
+  of readers sends one request.
+
+```python
+from datetime import timedelta
+
+# A collateral manager polling every market: one account read per second, at most.
+for market_id in markets:
+  c = await sdk.collateral(await sdk.collateral_id(market_id), ttl=timedelta(seconds=1))
+```
+
+Through a [gateway](../gateway.md) the shared answers live in the gateway process, so
+every task reading through it shares them. Many tasks reading account state without a
+`ttl` send one request each, which is what venue rate limits (and Lighter's WAF) refuse.
+Venues without shared reads accept `ttl` and ignore it.
 
 ## Collateral IDs
 

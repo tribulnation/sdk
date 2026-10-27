@@ -180,7 +180,7 @@ class LinearPerpMarket(SpotMarket, PerpMarket):
     row = await self.shared.call(lambda: self.shared.client.futures.symbol(self.symbol))
     return Decimal(str(row['indexPrice']))
 
-  async def next_funding(self) -> NextFunding:
+  async def next_funding(self, *, ttl: timedelta | None = None) -> NextFunding:
     """Use the dedicated funding endpoint's rate, settlement time and interval."""
     row = await self.shared.call(
       lambda: self.shared.client.futures.funding_fees.current_funding_rate(self.symbol)
@@ -224,10 +224,10 @@ class LinearPerpMarket(SpotMarket, PerpMarket):
     """Account funding payments are outside the public Market surface."""
     raise NotImplementedError('KuCoin Market supports public data only')
 
-  async def perp_position(self) -> PerpPosition:
+  async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
     """Private futures positions are outside the public Market surface."""
     raise NotImplementedError('KuCoin Market supports public data only')
 
-  async def perp_collateral(self) -> PerpCollateral:
+  async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """Private futures collateral is outside the public Market surface."""
     raise NotImplementedError('KuCoin Market supports public data only')

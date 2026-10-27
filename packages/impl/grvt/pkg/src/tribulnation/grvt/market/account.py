@@ -1,6 +1,7 @@
 """Account fees, positions, the cross and isolated collateral buckets and leverage, of
 the client's trading sub-account."""
 
+from datetime import timedelta
 from decimal import Decimal
 
 from typing_extensions import Literal
@@ -130,20 +131,23 @@ def market_bucket(s: SubAccount, instrument: str) -> PerpCollateral:
 
 
 async def leverage(
-  shared: Shared, instrument: str, *, refetch: bool = False
+  shared: Shared, instrument: str, *, ttl: timedelta | None = None
 ) -> Decimal:
   """The account's initial leverage on the instrument (`all_initial_leverage`, 10 unless
-  changed), cached per instrument. It is the instrument's setting in either margin type:
-  an isolated position opens with it too.
+  changed). It is the instrument's setting in either margin type: an isolated position
+  opens with it too. One account-wide answer serves every instrument, shared for the
+  caller's `ttl`.
 
   Raises:
     ValueError: The venue reports no leverage for the instrument.
   """
-  if not refetch and (cached := shared.leverages.get(instrument)) is not None:
-    return cached
   shared.require_session()
-  response = await shared.call(shared.client.trading.all_initial_leverage)
-  shared.leverages.update((r['instrument'], r['leverage']) for r in response['results'])
-  if instrument not in shared.leverages:
-    raise ValueError(f'GRVT reports no leverage for {instrument}')
-  return shared.leverages[instrument]
+  response = await shared.reads.read(
+    ('all_initial_leverage',),
+    lambda: shared.call(shared.client.trading.all_initial_leverage),
+    ttl=ttl,
+  )
+  for row in response['results']:
+    if row['instrument'] == instrument:
+      return row['leverage']
+  raise ValueError(f'GRVT reports no leverage for {instrument}')

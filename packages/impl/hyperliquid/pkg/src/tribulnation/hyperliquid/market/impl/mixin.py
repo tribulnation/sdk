@@ -14,11 +14,17 @@ from typing_extensions import (
 )
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
-from decimal import Decimal
+from datetime import timedelta
 import asyncio
 import os
 
-from tribulnation.sdk.core import ManagedResource, SDK, Subscription, OverflowPolicy
+from tribulnation.sdk.core import (
+  ManagedResource,
+  SDK,
+  SharedReads,
+  Subscription,
+  OverflowPolicy,
+)
 
 from typed_hyperliquid import Hyperliquid, Wallet
 from typed_hyperliquid.core.ws import SocketClient
@@ -29,6 +35,10 @@ from typed_hyperliquid.info.spot_meta import (
   SpotToken,
 )
 from typed_hyperliquid.info.user_fees import FeeSchedule, UserFeesResponse
+from typed_hyperliquid.info.clearinghouse_state import ClearinghouseState
+from typed_hyperliquid.info.spot_clearinghouse_state import SpotClearinghouseState
+from typed_hyperliquid.info.user_abstraction import Response as UserAbstraction
+from typed_hyperliquid.info.active_asset_data import ActiveAssetData
 from typed_hyperliquid.info.perp_meta_and_asset_ctxs import (
   PerpDexMeta,
   PerpAssetContext,
@@ -44,6 +54,11 @@ from typed_core.validation import validator
 from tribulnation.hyperliquid.core import DepthSource, Settings, wrap_exceptions
 
 T = TypeVar('T')
+
+ABSTRACTION_TTL = timedelta(minutes=1)
+"""How long one `userAbstraction` answer (the account mode) is reused: it changes only
+by hand, and every collateral read checks it. Internal, unlike the account state reads,
+whose staleness the caller chooses (ADR 0054)."""
 
 
 class BboUpdate(TypedDict):
@@ -181,8 +196,6 @@ class Shared(SDK):
     default_factory=dict[int | None, list[PerpAssetContext]]
   )
   user_fees: UserFeesResponse | None = None
-  leverages: dict[str, Decimal] = field(default_factory=dict[str, Decimal])
-  """The account's leverage per perpetual coin (`dex:`-prefixed off the default dex)."""
   standard_fee_schedule: FeeSchedule | None = None
 
   # Stream subscriptions.
@@ -202,6 +215,8 @@ class Shared(SDK):
     default_factory=asyncio.Lock, init=False, repr=False
   )
   _fees_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
+  reads: SharedReads = field(default_factory=SharedReads, init=False, repr=False)
+  """Account-wide reads shared between markets and concurrent callers."""
 
   @cached_property
   def client_resource(self) -> ManagedResource[object]:
@@ -235,6 +250,66 @@ class Shared(SDK):
       )
       self.fast_streams = Streams.new(socket, validate=self.client.validate)
     return self.fast_streams
+
+  async def clearinghouse_state(
+    self, dex: str | None, *, ttl: timedelta | None
+  ) -> ClearinghouseState:
+    """The account's perpetual state on `dex` (None or `''`: the default one).
+
+    One answer serves every market of the dex: callers passing a `ttl` share it
+    (ADR 0054), so a burst of position and collateral reads sends one request rather
+    than the many Hyperliquid answered 429 on 2026-10-26.
+
+    Args:
+      dex: The perpetual dex, None or `''` for the default one.
+      ttl: How old a shared answer may be; `None` asks afresh (see `SharedReads`).
+    """
+    address, dex = self.address, dex or None
+    return await self.reads.read(
+      ('clearinghouseState', address, dex),
+      lambda: self.client.info.clearinghouse_state(user=address, dex=dex),
+      ttl=ttl,
+    )
+
+  async def spot_clearinghouse_state(
+    self, *, ttl: timedelta | None
+  ) -> SpotClearinghouseState:
+    """The account's spot balances, shared like `clearinghouse_state`.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh (see `SharedReads`).
+    """
+    address = self.address
+    return await self.reads.read(
+      ('spotClearinghouseState', address),
+      lambda: self.client.info.spot_clearinghouse_state(user=address),
+      ttl=ttl,
+    )
+
+  async def active_asset_data(
+    self, coin: str, *, ttl: timedelta | None
+  ) -> ActiveAssetData:
+    """The account's leverage setting on `coin`, shared like `clearinghouse_state`.
+
+    Args:
+      coin: The perpetual coin, `dex:`-prefixed off the default dex.
+      ttl: How old a shared answer may be; `None` asks afresh (see `SharedReads`).
+    """
+    address = self.address
+    return await self.reads.read(
+      ('activeAssetData', address, coin),
+      lambda: self.client.info.active_asset_data(user=address, coin=coin),
+      ttl=ttl,
+    )
+
+  async def user_abstraction(self) -> UserAbstraction:
+    """The account's mode, one request per `ABSTRACTION_TTL` for every caller."""
+    address = self.address
+    return await self.reads.read(
+      ('userAbstraction', address),
+      lambda: self.client.info.user_abstraction(user=address),
+      ttl=ABSTRACTION_TTL,
+    )
 
   @wrap_exceptions
   async def load_spot_meta(self, *, refetch: bool = False) -> SpotMetaResponse:

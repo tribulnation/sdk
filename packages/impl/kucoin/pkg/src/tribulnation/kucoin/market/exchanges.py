@@ -1,5 +1,6 @@
 """Native discovery, ticker selection and public perpetual statistics."""
 
+from datetime import timedelta
 from dataclasses import dataclass
 from decimal import Decimal
 from typing_extensions import Collection, Mapping, Sequence
@@ -40,6 +41,7 @@ class SpotExchange(Public, Exchange):
     markets: Collection[str] | None = None,
     *,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Return native bid/ask prices and sizes for the requested active universe."""
     if markets is not None and not markets:
@@ -92,6 +94,7 @@ class LinearPerpExchange(Public, PerpExchange):
     markets: Collection[str] | None = None,
     *,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Normalize top-of-book lots; the contract's 24h volume is already base units."""
     if markets is not None and not markets:
@@ -124,6 +127,7 @@ class LinearPerpExchange(Public, PerpExchange):
     markets: Collection[str] | None = None,
     *,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, PerpStats]:
     """Return published index, mark and base-unit open interest; use next_funding for funding."""
     if markets is not None and not markets:

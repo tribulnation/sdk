@@ -126,6 +126,10 @@ async with sdk.depth_stream('lighter:perp:1', settings={'lighter': {'depth_sourc
   full book, shared per market, and fail on a sequence gap; `depth_source='bbo'`
   streams the best bid/offer instead (see [Depth sources](#depth-sources)).
 - Tickers carry no best-level sizes.
+- Tickers, perpetual stats and `next_funding` read the `market_stats` snapshot of a
+  WebSocket subscription. The connection refuses a second subscription to an open channel,
+  so concurrent readers of one snapshot always share one subscription, `ttl=None`
+  included; `None` only skips a stored snapshot.
 - `place_order` raises `OrderRejected` when the API refuses the transaction with a
   business code before the sequencer sees it. Code `21104` (invalid nonce), a code-less
   HTTP status and any `5XX` stay `BadRequest`/`ApiError`. An accepted transaction can
@@ -151,8 +155,9 @@ async with sdk.depth_stream('lighter:perp:1', settings={'lighter': {'depth_sourc
 - Perpetual `leverage` is `1 / initial margin fraction`: the account's configured fraction
   for the market (the account's position entry, `initial_margin_fraction`, in percent), or
   the market's `default_initial_margin_fraction` for a market the account never
-  configured. The fraction applies to cross and isolated positions alike. Cached per
-  market; `refetch=True` re-reads the account. Perpetual `available_notional` is the free
+  configured. The fraction applies to cross and isolated positions alike. It is read
+  from the same `/account` answer as positions and collateral, which reads with a `ttl`
+  share. Perpetual `available_notional` is the free
   cross collateral times it, kept over the SDK default because isolated positions are
   funded from cross collateral rather than their own bucket.
 - Spot `balances` support unified accounts only; classic accounts raise

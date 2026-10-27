@@ -1,3 +1,4 @@
+from datetime import timedelta
 from decimal import Decimal
 
 from tribulnation.sdk.market import PerpPosition
@@ -7,11 +8,11 @@ from .mixin import PerpMarketMixin
 
 
 @wrap_exceptions
-async def position(self: PerpMarketMixin) -> PerpPosition:
-  state = await self.client.info.clearinghouse_state(
-    user=self.address,
-    dex=self.dex_name,
-  )
+async def position(
+  self: PerpMarketMixin, *, ttl: timedelta | None = None
+) -> PerpPosition:
+  """The position on this coin, from the dex's shared `clearinghouseState`."""
+  state = await self.shared.clearinghouse_state(self.dex_name, ttl=ttl)
   for entry in state['assetPositions']:
     pos = entry['position']
     if pos['coin'] == self.asset_name:

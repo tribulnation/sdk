@@ -158,8 +158,8 @@ async with sdk.depth_stream('aster:perp:BTCUSDT', settings={'aster': {'depth_sou
 - Perpetual `leverage` is the symbol's configured initial leverage, the `leverage` field
   of its `positionRisk` rows (one per side in hedge mode; the lowest is used should they
   differ). Aster lists flat symbols too, so a missing row raises `MissingData` rather than
-  falling back. The setting applies to cross and isolated margin. Cached per symbol;
-  `refetch=True` reads it again.
+  falling back. The setting applies to cross and isolated margin. It comes from the
+  all-symbol `positionRisk` answer that positions share for a `ttl`.
 - Perpetual `available_notional` is the account's `availableBalance` times
   `leverage()`, in either margin mode (new margin comes from the available balance),
   capped by the room left in the leverage bracket at that leverage (`maxNotional` less

@@ -52,7 +52,11 @@ class PerpExchange(SharedMixin, _PerpExchange):
 
   @wrap_exceptions
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Join bulk trade and book snapshots, excluding dated/inactive contracts.
 
@@ -92,7 +96,11 @@ class PerpExchange(SharedMixin, _PerpExchange):
 
   @wrap_exceptions
   async def perp_stats(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, PerpStats]:
     """Read public pricing/funding plus bounded per-symbol open interest.
 

@@ -2,7 +2,7 @@
 cross collateral bucket."""
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from typing_extensions import AsyncIterable, Collection, Mapping, Sequence, overload
 from tribulnation.sdk.core import PaginatedResponse
@@ -43,14 +43,22 @@ class GrvtPerpExchange(Public, PerpExchange):
     return GrvtPerpMarket(shared=self.shared, instrument=detail['instrument'])
 
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """One `ticker` per perpetual, concurrently: last price, best bid/ask with sizes
     and 24h volumes (taker buys plus sells)."""
     return await stats.tickers(self.shared, markets)
 
   async def perp_stats(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, PerpStats]:
     """Index, mark, indicative funding and base-unit open interest, one `ticker` per
     perpetual."""
@@ -88,8 +96,10 @@ class GrvtPerpExchange(Public, PerpExchange):
     async for page in history.funding_payments(self.shared, market_id, start, end):
       yield page
 
-  async def perp_collateral(self, market_id: str | None = None, /) -> PerpCollateral:
+  async def perp_collateral(
+    self, market_id: str | None = None, /, *, ttl: timedelta | None = None
+  ) -> PerpCollateral:
     """The cross bucket, or the bucket backing a market."""
     if market_id is not None:
-      return await (await self.market(market_id)).perp_collateral()
+      return await (await self.market(market_id)).perp_collateral(ttl=ttl)
     return account.cross_bucket(await account.summary(self.shared))

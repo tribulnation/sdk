@@ -1,5 +1,6 @@
-"""Account leverage from `positionRisk`, its cache, and the default available notional."""
+"""Account leverage from `positionRisk`, its shared reads, and the default available notional."""
 
+from datetime import timedelta
 from decimal import Decimal
 from unittest.mock import AsyncMock
 from typing_extensions import Any, cast
@@ -52,16 +53,17 @@ def test_missing_symbol_is_missing_data():
     position_leverage([risk(symbol='BTCUSDT')], SYMBOL)
 
 
-async def test_leverage_is_cached_until_refetch(monkeypatch: pytest.MonkeyPatch):
-  """One request per symbol; `refetch=True` reads the setting again."""
+async def test_leverage_is_shared_for_its_ttl(monkeypatch: pytest.MonkeyPatch):
+  """A `ttl` reuses one `positionRisk` read; `None` reads the setting again."""
   endpoint = AsyncMock(side_effect=[[risk(leverage=5)], [risk(leverage=3)]])
   monkeypatch.setattr(Risk, 'risk', endpoint)
   m = market()
-  assert await m.leverage() == 5
-  assert await m.leverage() == 5
+  minute = timedelta(minutes=1)
+  assert await m.leverage(ttl=minute) == 5
+  assert await m.leverage(ttl=minute) == 5
   assert endpoint.await_count == 1
-  assert await m.leverage(refetch=True) == 3
   assert await m.leverage() == 3
+  assert await m.leverage(ttl=minute) == 3
   assert endpoint.await_count == 2
 
 

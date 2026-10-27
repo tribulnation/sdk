@@ -389,9 +389,17 @@
         "market_id": {
           "type": "string"
         },
-        "refetch": {
-          "type": "boolean",
-          "default": false
+        "ttl": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "duration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
@@ -508,6 +516,18 @@
             "type": "object"
           },
           "default": {}
+        },
+        "ttl": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "duration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
@@ -556,6 +576,18 @@
             "type": "object"
           },
           "default": {}
+        },
+        "ttl": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "duration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
@@ -583,6 +615,18 @@
         },
         "exchange_id": {
           "type": "string"
+        },
+        "ttl": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "duration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
@@ -613,6 +657,18 @@
         },
         "asset": {
           "type": "string"
+        },
+        "ttl": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "duration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
@@ -638,6 +694,18 @@
         },
         "market_id": {
           "type": "string"
+        },
+        "ttl": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "duration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
@@ -779,7 +847,7 @@
     },
     "PositionReq": {
       "title": "PositionReq",
-      "description": "Fetch the account's spot position on a market.",
+      "description": "Fetch the account's position on a margin market.",
       "type": "object",
       "properties": {
         "tag": {
@@ -792,6 +860,18 @@
         },
         "market_id": {
           "type": "string"
+        },
+        "ttl": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "duration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
@@ -815,6 +895,18 @@
         },
         "market_id": {
           "type": "string"
+        },
+        "ttl": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "duration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
@@ -1003,6 +1095,18 @@
         },
         "market_id": {
           "type": "string"
+        },
+        "ttl": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "duration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
@@ -1102,6 +1206,18 @@
         },
         "market_id": {
           "type": "string"
+        },
+        "ttl": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "duration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
@@ -1125,6 +1241,18 @@
         },
         "market_id": {
           "type": "string"
+        },
+        "ttl": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "duration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
@@ -1148,6 +1276,18 @@
         },
         "market_id": {
           "type": "string"
+        },
+        "ttl": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "duration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
@@ -1174,6 +1314,18 @@
         },
         "exchange_id": {
           "type": "string"
+        },
+        "ttl": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "duration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [

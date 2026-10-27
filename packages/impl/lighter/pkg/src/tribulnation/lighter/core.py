@@ -28,6 +28,7 @@ from tribulnation.sdk import SDK
 from tribulnation.sdk.core import (
   AuthError,
   ManagedResource,
+  SharedReads,
   Subscription,
   exception_wrapper,
 )
@@ -93,8 +94,6 @@ class Shared(SDK):
     default_factory=dict[int, Subscription[Trade]]
   )
   client_indexes: ClientIndexes = field(default_factory=ClientIndexes)
-  leverages: dict[int, Decimal] = field(default_factory=dict[int, Decimal])
-  """The account's leverage per perpetual market, filled by `leverage()`."""
   trading_modes: dict[int, int] = field(default_factory=dict[int, int])
   """`account_trading_mode` per account index, filled by `collateral_id()`."""
   public_index: int | None = None
@@ -104,6 +103,8 @@ class Shared(SDK):
   credentials nor `public_index` name an account."""
   masters: dict[str, int] = field(default_factory=dict[str, int])
   """Master account index per resolved L1 address."""
+  reads: SharedReads = field(default_factory=SharedReads)
+  """Account-wide reads shared between markets and concurrent callers."""
 
   @classmethod
   def new(
@@ -271,11 +272,24 @@ class Shared(SDK):
       self.scalers[market_id] = Scaler.from_details(detail)
     return self.scalers[market_id]
 
-  async def account(self) -> DetailedAccount:
-    """The configured account's positions, balances and margin figures."""
+  async def account(self, *, ttl: timedelta | None) -> DetailedAccount:
+    """The configured account's positions, balances and margin figures.
+
+    One `/account` answers every market's position, collateral, balance and leverage
+    reads, so callers passing a `ttl` share it (ADR 0054): a burst of them sends one
+    request instead of the hundreds Lighter's WAF answered with 405 "Human
+    Verification" on 2026-10-26.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh (see `SharedReads`).
+    """
     index = await self.account_index()
-    accounts = await self.call(
-      lambda: self.client.api.account.get({'by': 'index', 'value': index})
+    accounts = await self.reads.read(
+      ('account', index),
+      lambda: self.call(
+        lambda: self.client.api.account.get({'by': 'index', 'value': index})
+      ),
+      ttl=ttl,
     )
     return accounts['accounts'][0]
 

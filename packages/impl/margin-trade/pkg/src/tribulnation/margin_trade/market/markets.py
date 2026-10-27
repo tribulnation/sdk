@@ -358,7 +358,7 @@ class SpotMarket(NativeMarket, SDKSpotMarket):
       details=pair,
     )
 
-  async def balances(self) -> SpotBalances:
+  async def balances(self, *, ttl: timedelta | None = None) -> SpotBalances:
     """The base and quote spot balances, from one `spotClearinghouseState`; free is
     what resting orders do not hold."""
     state = await self.shared.call(
@@ -423,7 +423,7 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     _, ctx = (await self.shared.contexts())[self.coin]
     return ctx['oraclePx']
 
-  async def next_funding(self) -> NextFunding:
+  async def next_funding(self, *, ttl: timedelta | None = None) -> NextFunding:
     """The current funding rate and premium, settled at the next full hour."""
     _, ctx = (await self.shared.contexts())[self.coin]
     return NextFunding(
@@ -458,7 +458,7 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     ]:
       yield page
 
-  async def perp_position(self) -> PerpPosition:
+  async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
     """The one-way position, flat when absent."""
     state = await self.shared.call(
       lambda: self.client.info.clearinghouse_state(user=self.shared.address)
@@ -473,18 +473,20 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     the spot wallet, and funds cross and isolated positions alike."""
     return f'{self.account_id}:perp'
 
-  async def leverage(self, *, refetch: bool = False) -> Decimal:
-    """The account's `activeAssetData` leverage on this market, cached per coin."""
-    if refetch or self.coin not in self.shared.leverages:
-      data = await self.shared.call(
-        lambda: self.client.info.active_asset_data(
-          user=self.shared.address, coin=self.coin
-        )
-      )
-      self.shared.leverages[self.coin] = Decimal(data['leverage']['value'])
-    return self.shared.leverages[self.coin]
+  async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
+    """The account's `activeAssetData` leverage on this market, read per coin and
+    shared for the caller's `ttl`."""
+    address, coin = self.shared.address, self.coin
+    data = await self.shared.reads.read(
+      ('activeAssetData', coin),
+      lambda: self.shared.call(
+        lambda: self.client.info.active_asset_data(user=address, coin=coin)
+      ),
+      ttl=ttl,
+    )
+    return Decimal(data['leverage']['value'])
 
-  async def perp_collateral(self) -> PerpCollateral:
+  async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """The cross bucket; an isolated position's own bucket is not supported."""
     state = await self.shared.call(
       lambda: self.client.info.clearinghouse_state(user=self.shared.address)
