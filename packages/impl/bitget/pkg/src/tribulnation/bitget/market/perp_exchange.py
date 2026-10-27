@@ -1,5 +1,6 @@
 """Bitget's perpetual exchanges, with separate discovery for each product line."""
 
+from datetime import timedelta
 from typing_extensions import Collection, Mapping, Sequence
 from dataclasses import dataclass
 import asyncio
@@ -55,6 +56,7 @@ class PerpExchange(VenueMixin, _PerpExchange):
     markets: Collection[str] | None = None,
     *,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Fetch best bid/ask and last price for every perpetual in one call.
 
@@ -81,6 +83,7 @@ class PerpExchange(VenueMixin, _PerpExchange):
     markets: Collection[str] | None = None,
     *,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, PerpStats]:
     """Fetch pricing and funding stats for every perpetual in two calls.
 
@@ -117,7 +120,9 @@ class PerpExchange(VenueMixin, _PerpExchange):
       if t['symbol'] in wanted
     }
 
-  async def perp_collateral(self, market_id: str | None = None, /) -> PerpCollateral:
+  async def perp_collateral(
+    self, market_id: str | None = None, /, *, ttl: timedelta | None = None
+  ) -> PerpCollateral:
     """Fetch perpetual collateral.
 
     A UTA account has one margin pool across every product line: `market_id` selects
@@ -131,7 +136,7 @@ class PerpExchange(VenueMixin, _PerpExchange):
       )
     if market_id is not None:
       market = await self.market(market_id)
-      return await market.perp_collateral()
+      return await market.perp_collateral(ttl=ttl)
     if await self.is_uta():
       return await uta_perp_collateral(self)
     raise not_supported_classic_collateral()

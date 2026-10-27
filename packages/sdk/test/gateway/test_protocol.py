@@ -34,6 +34,9 @@ from tribulnation.sdk.market import (
   PerpStats,
   Position,
   Rules,
+  Balance,
+  SpotBalances,
+  SpotRules,
   Settings,
   Ticker,
   Trade,
@@ -112,8 +115,8 @@ CLIENT_MESSAGES: list[codec.ClientMsg] = [
   codec.OpenOrdersReq(**MARKET),
   codec.QueryOrderReq(**MARKET, order_id='o1'),
   codec.TradesHistoryReq(**MARKET, start=T, end=T_OFFSET),
-  codec.PositionReq(**MARKET),
-  codec.AvailableNotionalReq(**MARKET),
+  codec.PositionReq(**MARKET, ttl=timedelta(seconds=1)),
+  codec.AvailableNotionalReq(**MARKET, ttl=timedelta(0)),
   codec.PlaceOrderReq(
     **MARKET,
     order={
@@ -127,13 +130,13 @@ CLIENT_MESSAGES: list[codec.ClientMsg] = [
   codec.CancelOrderReq(**MARKET, order_id='o1', settings=SETTINGS),
   codec.CancelOpenOrdersReq(**MARKET),
   codec.IndexReq(**MARKET),
-  codec.NextFundingReq(**MARKET),
+  codec.NextFundingReq(**MARKET, ttl=timedelta(seconds=5)),
   codec.FundingRatesReq(**MARKET, start=T),
   codec.FundingPaymentsReq(**MARKET, start=T, end=T_OFFSET),
-  codec.PerpPositionReq(**MARKET),
+  codec.PerpPositionReq(**MARKET, ttl=timedelta(milliseconds=250)),
   codec.CollateralReq(**MARKET),
   codec.PerpCollateralReq(**MARKET),
-  codec.ExchangePerpCollateralReq(**EXCHANGE),
+  codec.ExchangePerpCollateralReq(**EXCHANGE, ttl=timedelta(seconds=1)),
   codec.MarketsReq(**EXCHANGE),
   codec.ExchangesReq(id='r', account_id='hl'),
   codec.VenueReq(id='r', account_id='hl'),
@@ -142,12 +145,17 @@ CLIENT_MESSAGES: list[codec.ClientMsg] = [
   codec.TradesStreamReq(**MARKET, queue_size=10, overflow='latest'),
   codec.UnsubMsg(id='r'),
   codec.FeesReq(**MARKET, refetch=True),
-  codec.LeverageReq(**MARKET),
+  codec.LeverageReq(**MARKET, ttl=timedelta(minutes=1)),
   codec.CandlesReq(**MARKET, interval='1h', start=T, end=T_OFFSET),
   codec.ExchangeReq(**EXCHANGE),
   codec.TickersReq(**EXCHANGE, markets=['BTC', 'ETH'], settings=SETTINGS),
-  codec.PerpStatsReq(**EXCHANGE),
+  codec.PerpStatsReq(**EXCHANGE, ttl=timedelta(seconds=5)),
   codec.ExchangeCollateralReq(**EXCHANGE),
+  codec.BalanceReq(
+    id='r', account_id='hl', exchange_id='spot', asset='0', ttl=timedelta(seconds=1)
+  ),
+  codec.BalancesReq(id='r', market_id='hl:spot:UBTC/USDC:142'),
+  codec.CollateralIdReq(**MARKET),
 ]
 
 SERVER_MESSAGES: list[codec.ServerMsg] = [
@@ -164,6 +172,26 @@ SERVER_MESSAGES: list[codec.ServerMsg] = [
       details={'k': 'v'},
     ),
   ),
+  codec.RulesResp(
+    id='r',
+    rules=SpotRules(
+      base='197',
+      quote='0',
+      fee_asset=None,
+      tick_size=D('0.5'),
+      step_size=D('0.001'),
+      api=True,
+    ),
+  ),
+  codec.BalanceResp(id='r', balance=Balance(total=D('10'), free=D('6'))),
+  codec.BalancesResp(
+    id='r',
+    balances=SpotBalances(
+      base=Balance(total=D('2'), free=D('1.5')),
+      quote=Balance(total=D('120'), free=D('100')),
+    ),
+  ),
+  codec.CollateralIdResp(id='r', value='hl:spot:0'),
   codec.OpenOrdersResp(id='r', orders=[ORDER_STATE]),
   codec.QueryOrderResp(id='r', order=None),
   codec.QueryOrderResp(id='r', order=ORDER_STATE),
@@ -446,19 +474,18 @@ async def test_gateway_refuses_another_protocol(gateway_socket: Path):
   async with aiohttp.ClientSession(connector=connector) as session:
     with pytest.raises(aiohttp.WSServerHandshakeError) as raised:
       await session.ws_connect(
-        'http://localhost/', protocols=('tribulnation-gateway.v2',)
+        'http://localhost/', protocols=('tribulnation-gateway.v1',)
       )
   assert raised.value.status == 400
 
 
-async def test_gateway_serves_clients_predating_negotiation(gateway_socket: Path):
-  """A client offering no subprotocol (SDK 2.17 and earlier) speaks v1 and is served."""
+async def test_gateway_refuses_clients_predating_negotiation(gateway_socket: Path):
+  """A client offering no subprotocol (SDK 2.17 and earlier) speaks v1: refused."""
   connector = aiohttp.UnixConnector(path=str(gateway_socket))
   async with aiohttp.ClientSession(connector=connector) as session:
-    async with session.ws_connect('http://localhost/') as ws:
-      await ws.send_bytes(b'{"id":"r","tag":"venues"}')
-      reply = await ws.receive_bytes()
-  assert codec.decode_server(reply) == codec.VenuesResp(id='r', venues=['hl'])
+    with pytest.raises(aiohttp.WSServerHandshakeError) as raised:
+      await session.ws_connect('http://localhost/')
+  assert raised.value.status == 400
 
 
 async def test_proxy_fails_loudly_when_the_gateway_refuses(tmp_path: Path):
@@ -467,14 +494,14 @@ async def test_proxy_fails_loudly_when_the_gateway_refuses(tmp_path: Path):
 
   async def refuse(request: web.Request) -> web.Response:
     """Refuse every upgrade, like a gateway on another protocol version."""
-    return web.Response(status=400, text='gateway speaks tribulnation-gateway.v2')
+    return web.Response(status=400, text='gateway speaks tribulnation-gateway.v1')
 
   app = web.Application()
   app.router.add_get('/', refuse)
   runner = await serve(app, path)
   try:
     with pytest.raises(
-      GatewayError, match='refused the tribulnation-gateway.v1 handshake'
+      GatewayError, match='refused the tribulnation-gateway.v2 handshake'
     ):
       async with ProxySDK.at(f'unix://{path}') as sdk:
         await sdk.venues()
@@ -482,26 +509,24 @@ async def test_proxy_fails_loudly_when_the_gateway_refuses(tmp_path: Path):
     await runner.cleanup()
 
 
-async def test_proxy_talks_to_gateways_predating_negotiation(tmp_path: Path):
+async def test_proxy_refuses_gateways_predating_negotiation(tmp_path: Path):
   """A gateway answering without a subprotocol (SDK 2.17 and earlier) speaks v1."""
   path = tmp_path / 'legacy.sock'
 
   async def legacy(request: web.Request) -> web.WebSocketResponse:
-    """Answer one venues call the way the pydantic gateway did."""
+    """Upgrade without a subprotocol, the way the pydantic gateway did."""
     ws = web.WebSocketResponse()
     await ws.prepare(request)
-    async for msg in ws:
-      request_id = json.loads(msg.data)['id']
-      await ws.send_bytes(
-        json.dumps({'id': request_id, 'venues': ['hl'], 'tag': 'venues'}).encode()
-      )
+    async for _ in ws:
+      pass
     return ws
 
   app = web.Application()
   app.router.add_get('/', legacy)
   runner = await serve(app, path)
   try:
-    async with ProxySDK.at(f'unix://{path}') as sdk:
-      assert await sdk.venues() == ['hl']
+    with pytest.raises(GatewayError, match='none \\(v1\\)'):
+      async with ProxySDK.at(f'unix://{path}') as sdk:
+        await sdk.venues()
   finally:
     await runner.cleanup()

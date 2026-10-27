@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="338" viewBox="0 0 480 338" role="img" aria-label="collateral_id() versus collateral() on one perpetual">
+<title>collateral_id() versus collateral() on one perpetual</title>
+<style>
+text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 14px; fill: #1f2328; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13.5px; }
+.title { font-size: 16px; font-weight: 600; }
+.small { font-size: 13px; }
+.muted { fill: #59636e; }
+.bg { fill: #ffffff; stroke: #d0d7de; }
+.market { fill: #f6f8fa; stroke: #8c959f; }
+.spot { fill: #dafbe1; stroke: #1a7f37; }
+.margin { fill: #fbefff; stroke: #8250df; }
+.money { fill: #fff8c5; stroke: #9a6700; }
+.shared { fill: #fff8c5; stroke: #9a6700; stroke-width: 2.5; }
+.warn { fill: #fff1e5; stroke: #bc4c00; stroke-dasharray: 5 4; }
+.link { stroke: #59636e; stroke-width: 1.5; fill: none; }
+.head { fill: #59636e; }
+.rule { stroke: #d0d7de; }
+@media (prefers-color-scheme: dark) {
+  text { fill: #f0f6fc; }
+  .muted { fill: #9198a1; }
+  .bg { fill: #0d1117; stroke: #3d444d; }
+  .market { fill: #151b23; stroke: #656c76; }
+  .spot { fill: #10261a; stroke: #3fb950; }
+  .margin { fill: #221a33; stroke: #a371f7; }
+  .money, .shared { fill: #2a2312; stroke: #d29922; }
+  .warn { fill: #2b1a0f; stroke: #f0883e; }
+  .link { stroke: #9198a1; }
+  .head { fill: #9198a1; }
+  .rule { stroke: #3d444d; }
+}
+</style>
+<defs><marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="head"/></marker></defs>
+<rect x="0.5" y="0.5" width="479" height="337" rx="12" class="bg"/>
+<rect x="90" y="16" width="300" height="54" rx="7" class="margin"/>
+<text x="240" y="39" class="mono" text-anchor="middle">hl::BTC, isolated 10x</text>
+<text x="240" y="59" class="small muted" text-anchor="middle">one perpetual, two questions</text>
+<polyline points="240,70 240,84" class="link"/>
+<polyline points="123,84 357,84" class="link"/>
+<polyline points="123,84 123,98" class="link" marker-end="url(#head)"/>
+<text x="16" y="118" class="mono title" text-anchor="start">collateral_id()</text>
+<text x="16" y="137" class="small muted" text-anchor="start">What funds new orders?</text>
+<rect x="16" y="150" width="214" height="36" rx="7" class="money"/>
+<text x="28" y="173" class="mono" text-anchor="start">hl:spot:0 (cross USDC)</text>
+<polyline points="123,186 123,206" class="link" marker-end="url(#head)"/>
+<rect x="16" y="208" width="214" height="76" rx="7" class="market"/>
+<text x="28" y="230" class="mono" text-anchor="start">sdk.collateral(id)</text>
+<text x="28" y="251" class="mono" text-anchor="start">.free_collateral</text>
+<text x="28" y="272" class="mono" text-anchor="start">× leverage()</text>
+<text x="16" y="304" class="small muted" text-anchor="start">sizing and reservations</text>
+<polyline points="357,84 357,98" class="link" marker-end="url(#head)"/>
+<text x="250" y="118" class="mono title" text-anchor="start">collateral()</text>
+<text x="250" y="137" class="small muted" text-anchor="start">How close to liquidation?</text>
+<rect x="250" y="150" width="214" height="36" rx="7" class="margin"/>
+<text x="262" y="173" class="small" text-anchor="start">BTC’s isolated bucket</text>
+<polyline points="357,186 357,206" class="link" marker-end="url(#head)"/>
+<rect x="250" y="208" width="214" height="76" rx="7" class="market"/>
+<text x="262" y="230" class="mono" text-anchor="start">PerpCollateral</text>
+<text x="262" y="251" class="mono" text-anchor="start">.maintenance_ratio</text>
+<text x="262" y="272" class="mono" text-anchor="start">.initial_ratio</text>
+<text x="250" y="304" class="small muted" text-anchor="start">also sdk.perp_collateral(id)</text>
+<text x="16" y="326" class="small" text-anchor="start">Cross margin: both name the same pool. Isolated: they differ.</text>
+</svg>

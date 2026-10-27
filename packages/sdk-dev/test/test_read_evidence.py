@@ -405,6 +405,8 @@ def test_account_inventory_follows_support_modes_and_exchanges():
   assert hl[':BTC fees'] is None and hl['xyz:xyz:SILVER leverage'] is None
   assert hl['spot:UBTC/USDC:142 fees'] is None
   assert hl['spot:UBTC/USDC:142 perp_position'] == 'perp_only'
+  assert hl['spot:UBTC/USDC:142 collateral'] == 'perp_only'
+  assert hl[':BTC balances'] == 'spot_only'
   assert all(
     code == 'order_lifecycle' for key, code in hl.items() if 'query_order' in key
   )
@@ -421,13 +423,14 @@ def test_account_inventory_follows_support_modes_and_exchanges():
   bitget = account_cases('bitget')
   assert bitget['usdt:BTCUSDT perp_collateral'] == 'bitget_classic'
   assert bitget['usdt:BTCUSDT collateral'] == 'bitget_classic'
-  assert bitget['spot:BTCUSDT collateral'] is None
+  assert bitget['spot:BTCUSDT collateral'] == 'perp_only'
+  assert bitget['usdt:BTCUSDT balances'] == 'spot_only'
   assert bitget['usdc:BTCPERP fees'] == 'unsupported'
   uta = evidence.inventory(repo_root(), 'bitget', mode='private', bitget_uta=True)
   assert all(case.exclusion != 'bitget_classic' for case in uta.values())
   for venue in ('deribit', 'kucoin'):
     codes = set(account_cases(venue).values())
-    assert codes == {'unsupported', 'order_lifecycle', 'perp_only'}
+    assert codes == {'unsupported', 'order_lifecycle', 'perp_only', 'spot_only'}
 
 
 def test_qualification_tables_name_real_account_reads():
@@ -568,6 +571,8 @@ def with_waiver(venue: str, **fields: str) -> ImplFile:
     {'exchange': 'coin', 'method': 'fees'},
     {'exchange': 'spot', 'method': 'place_order'},
     {'exchange': 'spot', 'method': 'leverage'},
+    {'exchange': 'spot', 'method': 'position'},
+    {'exchange': 'perp', 'method': 'balances'},
     {'exchange': 'spot', 'method': 'query_order'},
     {'exchange': 'perp', 'method': 'open_orders'},
     {'exchange': 'spot', 'method': 'fees'},
@@ -578,7 +583,7 @@ def test_waivers_must_name_a_required_read(fields: dict[str, str]):
   with pytest.raises(ValueError):
     check_waivers(with_waiver('mexc', **fields), {'spot', 'perp'})
   check_waivers(
-    with_waiver('mexc', exchange='spot', method='position'), {'spot', 'perp'}
+    with_waiver('mexc', exchange='spot', method='trades_history'), {'spot', 'perp'}
   )
 
 

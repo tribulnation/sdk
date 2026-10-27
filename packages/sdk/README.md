@@ -87,8 +87,10 @@ Hold a `Market` reference in hot loops; use the scoped one-shot calls otherwise.
   - `open_orders() -> Sequence[OrderState]`
   - `trades_history(start, end) -> AsyncIterable[Sequence[Trade]]`
   - `trades_stream() -> AsyncContextManager[AsyncIterable[Trade]]`
-  - `position() -> Position`
-  - `available_notional() -> Decimal`: max. notional you could open now
+- Spot markets (`is_spot(market)`):
+  - `rules() -> SpotRules`: also names the pair's `base` and `quote` asset IDs
+  - `balances() -> SpotBalances`: base and quote `total` and `free` (without order holds)
+  - `collateral_ids() -> SpotCollateralIds`: what a buy (`quote`) and a sell (`base`) reserve on
 - Trading:
   - `place_order(order) -> OrderResponse`
   - `place_orders(orders) -> Sequence[OrderResponse]`
@@ -101,6 +103,13 @@ Hold a `Market` reference in hot loops; use the scoped one-shot calls otherwise.
   - `funding_rates(start, end=None) -> AsyncIterable[Sequence[FundingRate]]`: market-wide rate history
   - `funding_payments(start, end) -> AsyncIterable[Sequence[FundingPayment]]`: your own settled cashflows
   - `perp_position() -> PerpPosition`: includes entry price
+  - `position() -> Position`, `collateral() -> PerpCollateral`, `leverage() -> Decimal`
+  - `available_notional() -> Decimal`: max. notional you could open now
+  - `collateral_id() -> str`: the money funding new orders, shared with spot on unified accounts
+- `sdk.collateral(id) -> Collateral`: resolves any collateral ID (ADR 0051)
+- Balance, position, collateral, leverage, available-notional, ticker, perpetual-stats and
+  next-funding reads take `ttl: timedelta | None`: `None` (default) asks the venue afresh,
+  a `timedelta` accepts a shared answer that recent (ADR 0054)
 
 Full reference: [docs/market/index.md](docs/market/index.md), with per-venue notes for [dYdX](docs/market/impl/dydx.md), [Hyperliquid](docs/market/impl/hyperliquid.md), and [MEXC](docs/market/impl/mexc.md).
 

@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing_extensions import Collection, Mapping, Sequence, cast
 from dataclasses import dataclass
 from decimal import Decimal
@@ -31,7 +32,11 @@ class SpotExchange(SharedMixin, Exchange):
 
   @wrap_exceptions
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Read spot tickers using bulk public data and cached market discovery.
 

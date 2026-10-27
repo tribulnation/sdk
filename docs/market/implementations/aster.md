@@ -158,8 +158,8 @@ async with sdk.depth_stream('aster:perp:BTCUSDT', settings={'aster': {'depth_sou
 - Perpetual `leverage` is the symbol's configured initial leverage, the `leverage` field
   of its `positionRisk` rows (one per side in hedge mode; the lowest is used should they
   differ). Aster lists flat symbols too, so a missing row raises `MissingData` rather than
-  falling back. The setting applies to cross and isolated margin. Cached per symbol;
-  `refetch=True` reads it again.
+  falling back. The setting applies to cross and isolated margin. It comes from the
+  all-symbol `positionRisk` answer that positions share for a `ttl`.
 - Perpetual `available_notional` is the account's `availableBalance` times
   `leverage()`, in either margin mode (new margin comes from the available balance),
   capped by the room left in the leverage bracket at that leverage (`maxNotional` less
@@ -167,7 +167,12 @@ async with sdk.depth_stream('aster:perp:BTCUSDT', settings={'aster': {'depth_sou
   (`remainingOpenableNotionalValue`). It is the same-direction room; reducing or
   reversing a position is not modelled. Testnet does not serve
   `remainingOpenableNotionalValue` (HTTP 404), so perpetual `available_notional` fails
-  there. Spot `available_notional` is the free quote balance.
+  there.
+- Spot `balances` total each asset's free plus locked amounts, with the free part as
+  `free`; mainnet only, as testnet omits funded balances. Spot and futures wallets are
+  separate, so a spot asset's collateral ID is `<account>:spot:<asset>` (`aster:spot:USDT`)
+  and every perpetual's `collateral_id()` is the futures wallet, `<account>:perp`
+  (ADR 0051).
 - Unsupported, raising `NotImplementedError`: hedge-mode positions and exchange-wide
   perpetual trade history.
 - Public reads and the account reads are verified on mainnet. Order placement and

@@ -1,6 +1,7 @@
 """Public linear perpetual snapshots, preserving MEXC contract identifiers."""
 
 from collections.abc import Collection, Mapping, Sequence
+from datetime import timedelta
 from dataclasses import dataclass
 from decimal import Decimal
 
@@ -85,6 +86,7 @@ class PerpExchange(ExchangeMixin, BasePerpExchange):
     markets: Collection[str] | None = None,
     *,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Fetch all linear tickers in one call and convert contract volume to base units."""
     if markets is not None and not markets:
@@ -107,6 +109,7 @@ class PerpExchange(ExchangeMixin, BasePerpExchange):
     markets: Collection[str] | None = None,
     *,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, PerpStats]:
     """Fetch bulk funding/prices/OI; use next_funding for per-contract settlement state.
 

@@ -3,14 +3,15 @@ import logging
 
 from typing_extensions import Collection, Mapping, Sequence, overload
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from tribulnation.sdk import SDK
 from tribulnation.sdk.core import PaginatedResponse
 from tribulnation.sdk.market import (
+  Balance,
   Book,
-  Exchange as _Exchange,
+  SpotExchange as _SpotExchange,
   Settings,
   Ticker,
   Trade,
@@ -19,7 +20,7 @@ from tribulnation.sdk.market import (
 from tribulnation.sdk.market.exchange import ticker_from_book
 
 from tribulnation.hyperliquid.core import wrap_exceptions
-from .impl import SpotMixin
+from .impl import SpotMixin, spot_token_balance
 from .impl.depth import parse_book
 from .spot_market import SpotMarket
 from .impl.exchange_history import exchange_trades_history
@@ -44,7 +45,7 @@ async def fetch_l2_book(self: SpotMixin, coin: str) -> Book:
 
 
 @dataclass(frozen=True, kw_only=True)
-class SpotExchange(SpotMixin, _Exchange):
+class SpotExchange(SpotMixin, _SpotExchange):
   @property
   def exchange_id(self) -> str:
     return 'spot'
@@ -83,6 +84,7 @@ class SpotExchange(SpotMixin, _Exchange):
     markets: Collection[str] | None = None,
     *,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Fetch spot tickers, optionally enriched with per-market order books.
 
@@ -136,7 +138,11 @@ class SpotExchange(SpotMixin, _Exchange):
     await asyncio.gather(*(_enrich(c, m) for c, m in coin_to_market.items()))
     return result
 
-  async def market(self, market_id: str, /):
+  async def balance(self, asset: str, /, *, ttl: timedelta | None = None) -> Balance:
+    """One token's balance by token index (`'0'` is USDC); `free` is `total - hold`."""
+    return await spot_token_balance(self, asset, ttl=ttl)
+
+  async def market(self, market_id: str, /) -> SpotMarket:
     base, quote, spot_index = parse_market_id(market_id)
     meta = await self.shared.spot_meta_of(spot_index)
     if meta['base_meta']['name'] != base or meta['quote_meta']['name'] != quote:

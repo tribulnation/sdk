@@ -1,5 +1,6 @@
 """Bit2Me's Trading Spot exchange: the whole market catalogue."""
 
+from datetime import timedelta
 from typing_extensions import Collection, Mapping, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
@@ -53,6 +54,7 @@ class SpotExchange(ExchangeMixin, Exchange):
     markets: Collection[str] | None = None,
     *,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Fetch bulk tickers, or use symbol-specific reads for an explicit selection.
 

@@ -2,7 +2,7 @@
 
 from typing_extensions import AsyncContextManager, AsyncIterable, Any, Sequence
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 import uuid
 
@@ -82,13 +82,13 @@ class SpotMarket(impl.MarketMixin, Market):
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
     return impl.trades_stream(self, queue_size=queue_size, overflow=overflow)
 
-  async def position(self) -> Position:
+  async def position(self, *, ttl: timedelta | None = None) -> Position:
     return await impl.position(self)
 
-  async def collateral(self) -> Collateral:
+  async def collateral(self, *, ttl: timedelta | None = None) -> Collateral:
     return await impl.collateral(self)
 
-  async def available_notional(self) -> Decimal:
+  async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     return (await impl.collateral(self)).free_collateral
 
   def random_client_order_id(self) -> str:

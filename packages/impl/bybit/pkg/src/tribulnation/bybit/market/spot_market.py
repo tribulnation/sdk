@@ -2,7 +2,7 @@
 
 from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 import secrets
 
@@ -138,13 +138,13 @@ class SpotMarket(MarketMixin, Market):
     """Subscribe to your real-time trades."""
     return trades_stream(self, queue_size=queue_size, overflow=overflow)
 
-  async def position(self) -> Position:
+  async def position(self, *, ttl: timedelta | None = None) -> Position:
     """Fetch your base-asset balance in the market."""
     instruments = await self.spot_instruments()
     balance = await self.coin_balance(instruments[self.symbol]['baseCoin'])
     return Position(size=num(balance['walletBalance']) if balance else Decimal(0))
 
-  async def collateral(self) -> Collateral:
+  async def collateral(self, *, ttl: timedelta | None = None) -> Collateral:
     """Fetch the quote-asset balance backing this market."""
     instruments = await self.spot_instruments()
     balance = await self.coin_balance(instruments[self.symbol]['quoteCoin'])
@@ -154,7 +154,7 @@ class SpotMarket(MarketMixin, Market):
     locked = num(balance.get('locked'))
     return Collateral(equity=equity, free_collateral=equity - locked)
 
-  async def available_notional(self) -> Decimal:
+  async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     """Fetch the free quote-asset balance."""
     return (await self.collateral()).free_collateral
 

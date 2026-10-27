@@ -1,5 +1,6 @@
-"""Account leverage from `activeAssetData`, its cache, and the available notional."""
+"""Account leverage from `activeAssetData`, its shared reads, and the available notional."""
 
+from datetime import timedelta
 from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import AsyncMock
@@ -9,9 +10,8 @@ from typed_hyperliquid import Hyperliquid
 from typed_hyperliquid.info.active_asset_data import ActiveAssetData
 
 from tribulnation.hyperliquid.market.impl.leverage import parse_leverage
-from tribulnation.hyperliquid.market.impl.mixin import PerpMeta, Shared, SpotMeta
+from tribulnation.hyperliquid.market.impl.mixin import PerpMeta, Shared
 from tribulnation.hyperliquid.market.perps_market import PerpMarket
-from tribulnation.hyperliquid.market.spot_market import SpotMarket
 
 ADDRESS = '0x' + '1' * 40
 
@@ -73,14 +73,15 @@ def market(
   ), info
 
 
-async def test_leverage_is_cached_per_coin_until_refetch():
-  """One read per coin; `refetch=True` reads the setting (and the universe) again."""
+async def test_leverage_is_shared_per_coin_for_its_ttl():
+  """A `ttl` reuses one read per coin; `None` reads the setting again."""
   m, info = market(leverage=[3, 2])
-  assert await m.leverage() == 3
-  assert await m.leverage() == 3
+  minute = timedelta(minutes=1)
+  assert await m.leverage(ttl=minute) == 3
+  assert await m.leverage(ttl=minute) == 3
   assert info.active_asset_data.await_count == 1
-  assert await m.leverage(refetch=True) == 2
   assert await m.leverage() == 2
+  assert await m.leverage(ttl=minute) == 2
   assert info.active_asset_data.await_count == 2
   info.active_asset_data.assert_awaited_with(user=ADDRESS, coin='ETC')
 
@@ -97,13 +98,3 @@ async def test_available_notional_is_free_unified_balance_times_leverage():
   """`(total - hold) * leverage`, read from the account pool whatever the mode."""
   m, _ = market(leverage=[5])
   assert await m.available_notional() == Decimal(500)
-
-
-async def test_spot_available_notional_is_the_free_quote_balance():
-  """The SDK default: the spot quote bucket's `total - hold`, without leverage."""
-  _, info = market(leverage=[])
-  shared = Shared(
-    client=cast(Hyperliquid, SimpleNamespace(info=info)), maybe_address=ADDRESS
-  )
-  meta = cast(SpotMeta, {'quote_meta': {'index': 0, 'name': 'USDC'}})
-  assert await SpotMarket(shared=shared, meta=meta).available_notional() == 100

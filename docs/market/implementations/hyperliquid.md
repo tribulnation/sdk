@@ -98,7 +98,8 @@ async with sdk.depth_stream('hl::ETH', settings={'hyperliquid': {'depth_source':
 ## Venue-specific semantics
 
 - Spot and perp markets are separate objects (`SpotMarket` / `PerpMarket`) with their own
-  rules and position logic. Only `PerpMarket` exposes funding and `index()`.
+  rules and account reads. Only `PerpMarket` exposes funding, `index()` and margin reads;
+  only `SpotMarket` exposes `balances()`.
 - `candles` raises `NotImplementedError` on both, and `CANDLE_INTERVALS` is empty:
   `info.candle_snapshot` answers at most 5000 candles per call and the typed client
   declares no paged walk for it yet, so the series cannot be swept through the client.
@@ -110,14 +111,25 @@ async with sdk.depth_stream('hl::ETH', settings={'hyperliquid': {'depth_source':
   setting it falls back to `maxLeverage`. Hyperliquid reports its default setting for an
   asset the account never configured, so the fallback is defensive. Cross and isolated
   settings mean the same multiple. HIP-3 (builder-dex) markets query their `dex:`-prefixed
-  coin. Cached per coin; `refetch=True` re-reads the setting and the dex universe.
+  coin. Reads with a `ttl` share one answer per coin; `maxLeverage` comes from the
+  cached dex universe, which `rules(refetch=True)` reloads.
 - **`available_notional`** (perp) is the collateral token's free spot balance
   (`total - hold`, the same figure as the cross bucket's `free_collateral`) times
   `leverage()`. It overrides the SDK default (`collateral().free_collateral × leverage()`)
   because an isolated position is opened from that account pool, not from its own
   bucket, and because it needs one request instead of the mode-aware collateral's four.
-  Like the old figure, it does not check the account abstraction mode. Spot
-  `available_notional` is the SDK default: the quote bucket's `total - hold`.
+  Like the old figure, it does not check the account abstraction mode.
+- **Spot `balances`** are the base and quote tokens' `total` and `total - hold` from one
+  `spot_clearinghouse_state` read. Spot rules name the pair by token index (`base='197'`,
+  `quote='0'` for UBTC/USDC), Hyperliquid's asset IDs.
+- **Collateral IDs** use token indices: `<account>:spot:<index>`. Accounts are unified, so
+  every perpetual's `collateral_id()` is its dex collateral token's spot ID
+  (`perp_meta[dex]['collateralToken']`, `<account>:spot:0` for USDC): perpetuals and the
+  spot pairs quoted in USDC share one ID, and one balance (ADR 0051). Isolated positions
+  return the same ID, since their margin comes from that balance. It is read from cached
+  metadata, without a request. `sdk.collateral('<account>:spot:<index>')` reads the
+  token's `total` and `total - hold`; token names are not asset IDs and raise
+  `ValueError`.
 - **`perp_collateral`** at the exchange level returns the account **cross** pool in **unified
   account** mode. The implementation asserts `user_abstraction == "unifiedAccount"` and raises
   on other modes. In unified mode, the real equity backing perps is the **spot collateral token

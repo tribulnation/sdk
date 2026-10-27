@@ -1,7 +1,7 @@
 """The perpetual Market object; market ids are GRVT instrument names (`BTC_USDT_Perp`)."""
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
@@ -162,27 +162,32 @@ class GrvtPerpMarket(Public, PerpMarket):
       self.shared, self.instrument, queue_size=queue_size, overflow=overflow
     )
 
-  async def perp_position(self) -> PerpPosition:
+  async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
     """The signed position and average entry."""
     return await account.perp_position(self.shared, self.instrument)
 
-  async def perp_collateral(self) -> PerpCollateral:
+  async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """The isolated position's own bucket where the market holds one, else the cross
     bucket."""
     return account.market_bucket(await account.summary(self.shared), self.instrument)
 
-  async def leverage(self, *, refetch: bool = False) -> Decimal:
+  async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
     """The account's initial leverage on this market."""
-    return await account.leverage(self.shared, self.instrument, refetch=refetch)
+    return await account.leverage(self.shared, self.instrument, ttl=ttl)
 
-  async def available_notional(self) -> Decimal:
+  async def collateral_id(self) -> str:
+    """The trading sub-account's cross pool, `<account_id>:<exchange_id>`: it funds
+    isolated positions too, whose margin moves out of it when they open."""
+    return f'{self.account_id}:{self.exchange_id}'
+
+  async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     """Free cross collateral (`margin_balance` less the cross initial margin) times
     `leverage()`, without the venue's position-size cap or risk brackets.
 
     The cross pool funds isolated positions too (their margin is moved out of it when
     they open), so an isolated market is sized against it as well.
     """
-    leverage = await self.leverage()
+    leverage = await self.leverage(ttl=ttl)
     return (
       account.cross_bucket(await account.summary(self.shared)).free_collateral
       * leverage
@@ -192,7 +197,7 @@ class GrvtPerpMarket(Public, PerpMarket):
     """The index price."""
     return await stats.index(self.shared, self.instrument)
 
-  async def next_funding(self) -> NextFunding:
+  async def next_funding(self, *, ttl: timedelta | None = None) -> NextFunding:
     """The indicative rate of the current interval, positive when longs pay."""
     return await stats.next_funding(self.shared, self.instrument)
 

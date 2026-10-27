@@ -153,7 +153,7 @@ class PerpMarket(SharedMixin, _PerpMarket):
     return one_mark_price(raw)['indexPrice']
 
   @wrap_exceptions
-  async def next_funding(self) -> NextFunding:
+  async def next_funding(self, *, ttl: timedelta | None = None) -> NextFunding:
     raw = await self.client.usdm_futures.http.market.premium_index(symbol=self.symbol)
     premium = one_mark_price(raw)
     info = await self.client.usdm_futures.http.market.funding_info()
@@ -300,7 +300,7 @@ class PerpMarket(SharedMixin, _PerpMarket):
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
     raise futures_permission_error('trades_stream', self.id)
 
-  async def available_notional(self) -> Decimal:
+  async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     raise futures_permission_error('available_notional', self.id)
 
   async def place_order(
@@ -316,8 +316,8 @@ class PerpMarket(SharedMixin, _PerpMarket):
   ) -> PaginatedResponse[FundingPayment]:
     raise futures_permission_error('funding_payments', self.id)
 
-  async def perp_position(self) -> PerpPosition:
+  async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
     raise futures_permission_error('perp_position', self.id)
 
-  async def perp_collateral(self) -> PerpCollateral:
+  async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     raise futures_permission_error('perp_collateral', self.id)

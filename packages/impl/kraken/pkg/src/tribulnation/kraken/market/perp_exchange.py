@@ -1,5 +1,6 @@
 """Kraken public USD linear perpetual discovery, tickers and statistics."""
 
+from datetime import timedelta
 from dataclasses import dataclass
 from typing_extensions import Collection, Mapping, Sequence
 
@@ -54,7 +55,11 @@ class PerpExchange(SharedMixin, BasePerpExchange):
     }
 
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Preserve native base-unit prices, sizes and 24-hour volume."""
     return {
@@ -63,7 +68,11 @@ class PerpExchange(SharedMixin, BasePerpExchange):
     }
 
   async def perp_stats(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, PerpStats]:
     """Expose published index, mark and open interest without derived funding estimates."""
     return {

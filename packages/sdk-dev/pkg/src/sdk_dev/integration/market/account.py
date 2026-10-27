@@ -18,16 +18,20 @@ from typing_extensions import TypeVar, cast
 from tribulnation.sdk import AuthError, Context, MarketSDK, NetworkError, RateLimited
 from tribulnation.sdk.core import PaginatedResponse
 from tribulnation.sdk.market import (
+  Balance,
   Collateral,
   Fees,
   FundingPayment,
   OrderState,
   PerpCollateral,
-  PerpMarket,
   PerpPosition,
   Position,
   Rules,
+  SpotBalances,
   Trade,
+  is_margin,
+  is_perp,
+  is_spot,
 )
 from sdk_dev.repo import IMPL_DIR, repo_root
 from sdk_dev.support import (
@@ -55,13 +59,28 @@ ACCOUNT_READS = (
   'perp_collateral',
   'leverage',
   'available_notional',
+  'collateral_id',
+  'balances',
+  'collateral_ids',
 )
 """Account-scoped Market reads, one case each per reference market."""
 
 PERP_ONLY = frozenset(
-  {'funding_payments', 'perp_position', 'perp_collateral', 'leverage'}
+  {
+    'funding_payments',
+    'position',
+    'perp_position',
+    'collateral',
+    'perp_collateral',
+    'leverage',
+    'available_notional',
+    'collateral_id',
+  }
 )
-"""Reads the SDK defines on perpetual markets only."""
+"""Reads the SDK defines on margin (perpetual) markets only (ADR 0051)."""
+
+SPOT_ONLY = frozenset({'balances', 'collateral_ids'})
+"""Reads the SDK defines on spot markets only (ADR 0051)."""
 
 STATIC_EXCLUSIONS = {'query_order': 'order_lifecycle'}
 """Reads a read-only suite cannot exercise: an order ID to query needs an order
@@ -124,6 +143,8 @@ def account_exclusion(
     return STATIC_EXCLUSIONS[method]
   if exchange_id == 'spot' and method in PERP_ONLY:
     return 'perp_only'
+  if exchange_id != 'spot' and method in SPOT_ONLY:
+    return 'spot_only'
   support = impl.support.get('market')
   qualification = impl.qualification.market
   declared = (
@@ -237,6 +258,8 @@ def plan_of(sdk: MarketSDK, id: str) -> AccountPlan:
 class AccountResults:
   """Independent read outcomes for one account and market, with the history window."""
 
+  account_id: str
+  """Key of the account read, which every collateral ID must lead with."""
   spot: bool
   start: datetime
   end: datetime
@@ -282,7 +305,12 @@ async def collect_account(
   """Acquire one managed venue and call only the selected read-only account methods."""
   account_id, exchange_id, symbol = id.split(':', 2)
   end = datetime.now(timezone.utc)
-  result = AccountResults(spot=exchange_id == 'spot', start=end - HISTORY, end=end)
+  result = AccountResults(
+    account_id=account_id,
+    spot=exchange_id == 'spot',
+    start=end - HISTORY,
+    end=end,
+  )
   try:
     async with sdk:
       venue = await sdk.venue(account_id)
@@ -295,19 +323,42 @@ async def collect_account(
         'trades_history': lambda: first_pages(
           lambda: market.trades_history(result.start, result.end)
         ),
-        'position': market.position,
-        'collateral': market.collateral,
-        'available_notional': market.available_notional,
       }
-      if isinstance(market, PerpMarket):
+      if is_spot(market):
+        spot = market
+
+        async def collateral_ids() -> dict[str, Collateral]:
+          """Resolve both of the pair's collateral IDs through the root SDK."""
+          ids = await spot.collateral_ids()
+          return {id: await sdk.collateral(id) for id in (ids.base, ids.quote)}
+
+        calls.update({'balances': spot.balances, 'collateral_ids': collateral_ids})
+      if is_margin(market):
+        margin = market
+
+        async def collateral_id() -> dict[str, Collateral]:
+          """Resolve the market's collateral ID through the root SDK."""
+          id = await margin.collateral_id()
+          return {id: await sdk.collateral(id)}
+
+        calls.update(
+          {
+            'position': margin.position,
+            'collateral': margin.collateral,
+            'available_notional': margin.available_notional,
+            'leverage': margin.leverage,
+            'collateral_id': collateral_id,
+          }
+        )
+      if is_perp(market):
+        perp = market
         calls.update(
           {
             'funding_payments': lambda: first_pages(
-              lambda: market.funding_payments(result.start, result.end)
+              lambda: perp.funding_payments(result.start, result.end)
             ),
-            'perp_position': market.perp_position,
-            'perp_collateral': market.perp_collateral,
-            'leverage': market.leverage,
+            'perp_position': perp.perp_position,
+            'perp_collateral': perp.perp_collateral,
           }
         )
       wanted = list(methods)
@@ -319,7 +370,7 @@ async def collect_account(
         if name in calls:
           await result.attempt(name, calls[name])
         else:
-          result.failures[name] = 'Perpetual read on a non-perpetual market'
+          result.failures[name] = 'Read not defined on this kind of market'
   except Exception as exception:
     failure = describe_exception(exception)
     for name in methods:
@@ -413,12 +464,10 @@ def check_funding_payments(value: object, *, start: datetime, end: datetime):
     )
 
 
-def check_position(value: object, *, spot: bool):
-  """A finite size, never negative on spot, where it is a balance."""
+def check_position(value: object):
+  """A finite, signed size."""
   require(isinstance(value, Position), 'position: not a Position')
-  size = cast(Position, value).size
-  require(finite(size), 'position: non-finite size')
-  require(not spot or size >= 0, 'position: negative spot balance')
+  require(finite(cast(Position, value).size), 'position: non-finite size')
 
 
 def check_perp_position(value: object, position: object):
@@ -441,8 +490,9 @@ def check_perp_position(value: object, position: object):
   )
 
 
-def check_collateral(value: object, *, spot: bool):
-  """Finite equity and free collateral, free never above equity."""
+def check_collateral(value: object, *, spot: bool = False):
+  """Finite equity and free collateral, free never above equity; never negative for a
+  spot asset, which is a balance."""
   require(isinstance(value, Collateral), 'collateral: not a Collateral')
   collateral = cast(Collateral, value)
   require(
@@ -484,6 +534,45 @@ def check_perp_collateral(value: object):
   )
 
 
+def check_balance(value: object, name: str):
+  """A finite, non-negative balance whose free part is within its total."""
+  require(isinstance(value, Balance), f'balances: {name} is not a Balance')
+  balance = cast(Balance, value)
+  require(
+    finite(balance.total) and finite(balance.free),
+    f'balances: non-finite {name} balance',
+  )
+  require(
+    0 <= balance.free <= balance.total, f'balances: {name} free outside its total'
+  )
+
+
+def check_balances(value: object):
+  """Base and quote balances."""
+  require(isinstance(value, SpotBalances), 'balances: not SpotBalances')
+  balances = cast(SpotBalances, value)
+  check_balance(balances.base, 'base')
+  check_balance(balances.quote, 'quote')
+
+
+def check_collateral_ids(
+  value: object, *, method: str, account_id: str, count: int, spot: bool
+):
+  """Collateral IDs led by the account key, each resolving to valid collateral."""
+  require(isinstance(value, dict), f'{method}: IDs were not resolved')
+  resolved = cast(dict[object, object], value)
+  require(len(resolved) == count, f'{method}: unexpected number of IDs')
+  for id, collateral in resolved.items():
+    require(
+      isinstance(id, str) and id.startswith(f'{account_id}:'),
+      f'{method}: ID is not led by the account key',
+    )
+    try:
+      check_collateral(collateral, spot=spot)
+    except AccountCheckError as error:
+      raise AccountCheckError(f'{method}: resolved {error}') from None
+
+
 def check_leverage(value: object):
   """A finite, positive leverage."""
   require(finite(value) and cast(Decimal, value) > 0, 'leverage: not positive')
@@ -513,17 +602,29 @@ def check(method: str, result: AccountResults):
   elif method == 'funding_payments':
     check_funding_payments(value, start=result.start, end=result.end)
   elif method == 'position':
-    check_position(value, spot=result.spot)
+    check_position(value)
   elif method == 'perp_position':
     check_perp_position(value, result.values.get('position'))
   elif method == 'collateral':
-    check_collateral(value, spot=result.spot)
+    check_collateral(value)
   elif method == 'perp_collateral':
     check_perp_collateral(value)
   elif method == 'leverage':
     check_leverage(value)
   elif method == 'available_notional':
     check_available_notional(value)
+  elif method == 'balances':
+    check_balances(value)
+  elif method == 'collateral_ids':
+    # A pair's base and quote are distinct assets, so they resolve as two spot IDs.
+    check_collateral_ids(
+      value, method=method, account_id=result.account_id, count=2, spot=True
+    )
+  elif method == 'collateral_id':
+    # A unified venue's ID is a spot asset, a pool's may be in margin debt: no sign.
+    check_collateral_ids(
+      value, method=method, account_id=result.account_id, count=1, spot=False
+    )
   else:
     raise AccountCheckError(f'{method}: no check defined')
 

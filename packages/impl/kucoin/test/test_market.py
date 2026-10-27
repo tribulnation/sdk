@@ -125,7 +125,7 @@ async def test_rules_are_public_and_quantities_use_base_units():
   with pytest.raises(NotImplementedError):
     await perp.fees()
   with pytest.raises(NotImplementedError):
-    await spot.position()
+    await perp.position()
   with pytest.raises(NotImplementedError):
     await perp.perp_position()
   with pytest.raises(NotImplementedError):

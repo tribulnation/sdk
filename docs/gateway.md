@@ -95,9 +95,9 @@ as access to the configured accounts, including their trading operations.
 
 1. The frames are specified in [Gateway wire protocol](gateway-protocol.md), with a
    JSON Schema, for clients in other languages. The upgrade negotiates the
-   `tribulnation-gateway.v1` subprotocol; peers from SDK 2.17 and earlier name none and
-   still interoperate: only durations are now written in seconds (`PT28800S` rather
-   than `PT8H`), which both codecs read. The codec uses msgspec
+   `tribulnation-gateway.v2` subprotocol (SDK 3.0, ADR 0051, which split spot from
+   margin requests); v1 peers, including those from SDK 2.17 and earlier that name no
+   subprotocol, are refused. The codec uses msgspec
    instead of pydantic, so the `gateway` extra installs `msgspec`.
 2. Binary JSON WebSocket frames, request tags and correlation IDs are unchanged,
    except for the added `venue` request, the `venue_id` on `exchange` replies, and

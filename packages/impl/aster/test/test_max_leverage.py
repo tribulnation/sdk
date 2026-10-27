@@ -1,5 +1,6 @@
 """The highest allowed leverage, set automatically, and account reads shared between symbols."""
 
+from datetime import timedelta
 from decimal import Decimal
 from unittest.mock import AsyncMock
 import asyncio
@@ -19,6 +20,8 @@ from tribulnation.sdk.core import NetworkError, OrderRejected
 from tribulnation.sdk.market import Order
 
 SYMBOL = 'OPUSDT'
+SECOND = timedelta(seconds=1)
+MINUTE = timedelta(minutes=1)
 ORDER: Order = {'type': 'POST_ONLY', 'qty': Decimal('1'), 'price': Decimal('0.75')}
 ABOVE_MAX = ClientBadRequest(
   400,
@@ -95,7 +98,8 @@ async def test_first_orders_set_the_maximum_once(venue: dict[str, AsyncMock]):
   assert (call.args, call.kwargs) == ((SYMBOL,), {'leverage': 10})
   assert venue['brackets'].await_count == 1
   assert venue['place'].await_count == 3
-  assert await m.leverage() == 10
+  venue['risk'].return_value = [risk(leverage=10)]
+  assert await m.leverage(ttl=MINUTE) == 10
 
 
 async def test_leverage_at_the_maximum_is_left_alone(venue: dict[str, AsyncMock]):
@@ -133,7 +137,8 @@ async def test_a_lowered_maximum_is_set_again_and_the_order_resent(
   call = venue['set'].await_args
   assert response.id == '2'
   assert call is not None and call.kwargs == {'leverage': 5}
-  assert s.leverages[SYMBOL] == 5
+  venue['risk'].return_value = [risk(leverage=5)]
+  assert await perp(s).leverage(ttl=MINUTE) == 5
 
 
 async def test_the_rejection_stands_when_the_leverage_cannot_be_set(
@@ -159,12 +164,24 @@ async def test_symbols_share_one_position_risk_read(venue: dict[str, AsyncMock])
   venue['risk'].return_value = [risk(), risk('BTCUSDT', leverage=5)]
   s = shared()
   leverage, btc, position = await asyncio.gather(
-    perp(s).leverage(), perp(s, 'BTCUSDT').leverage(), perp(s).perp_position()
+    perp(s).leverage(ttl=SECOND),
+    perp(s, 'BTCUSDT').leverage(ttl=timedelta(0)),
+    perp(s).perp_position(ttl=SECOND),
   )
   assert (leverage, btc, position.size) == (20, 5, 0)
   call = venue['risk'].await_args
   assert venue['risk'].await_count == 1
   assert call is not None and call.args == ()
+
+
+async def test_fresh_position_reads_are_not_shared(venue: dict[str, AsyncMock]):
+  """`ttl=None` reads each send a request; a later shared read reuses the newest."""
+  venue['risk'].return_value = [risk(), risk('BTCUSDT')]
+  s = shared()
+  await asyncio.gather(perp(s).perp_position(), perp(s, 'BTCUSDT').perp_position())
+  assert venue['risk'].await_count == 2
+  await perp(s).leverage(ttl=MINUTE)
+  assert venue['risk'].await_count == 2
 
 
 async def test_a_symbol_missing_from_the_shared_read_is_read_alone(
@@ -182,5 +199,7 @@ async def test_symbols_share_one_account_read(monkeypatch: pytest.MonkeyPatch):
   view = AsyncMock(return_value={'positions': []})
   monkeypatch.setattr(InfoWithJoinMargin, 'info_with_join_margin', view)
   s = shared()
-  await asyncio.gather(s.futures_account(), s.futures_account())
+  await asyncio.gather(s.futures_account(ttl=SECOND), s.futures_account(ttl=SECOND))
   assert view.await_count == 1
+  await s.futures_account(ttl=None)
+  assert view.await_count == 2

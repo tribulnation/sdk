@@ -375,7 +375,7 @@ async def test_cross_bucket_and_available_notional(shared: Shared, fake: Any):
   initial margin (the venue's `max_addable_amount`, `19941.26479`, in the same read);
   leverage is cross notional over equity; available notional is free collateral times
   the account's leverage, for the isolated market too; one leverage read serves
-  every market until refetched."""
+  every market for the caller's `ttl`."""
   calls = await mixed(fake)
   eth = market(shared, ETH)
   cross = await eth.perp_collateral()
@@ -388,10 +388,11 @@ async def test_cross_bucket_and_available_notional(shared: Shared, fake: Any):
   assert cross.free_collateral == Decimal('19941.264791')
   assert cross.leverage == Decimal('201.356658') / Decimal('20001.403174')
   assert await GrvtPerpExchange(shared=shared).perp_collateral() == cross
-  assert await eth.available_notional() == Decimal('199412.64791')
-  assert await market(shared).available_notional() == Decimal('199412.64791')
-  assert await eth.leverage() == 10 and calls == [1]
-  assert await eth.leverage(refetch=True) == 10 and calls == [1, 1]
+  minute = timedelta(minutes=1)
+  assert await eth.available_notional(ttl=minute) == Decimal('199412.64791')
+  assert await market(shared).available_notional(ttl=minute) == Decimal('199412.64791')
+  assert await eth.leverage(ttl=minute) == 10 and calls == [1]
+  assert await eth.leverage() == 10 and calls == [1, 1]
 
 
 async def test_flat_cross_bucket(shared: Shared, fake: Any):

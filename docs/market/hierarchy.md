@@ -74,6 +74,27 @@ rules, book = await asyncio.gather(
 )
 ```
 
+**Spot or perpetual?** Every `Market` has books, trades, orders, rules and fees. Account
+reads depend on what it trades: a `SpotMarket` has `balances()` and `collateral_ids()`, a
+margin market (`PerpMarket`) `position()`, `collateral()`, `leverage()`,
+`available_notional()` and `collateral_id()`. So `market.position()` on a plain `Market`
+fails type checking, and on a spot market at runtime. `is_spot` and `is_perp` narrow the
+type for your type checker; `market.kind` names it:
+
+![Market splits into SpotMarket, with balances() and collateral_ids(), and MarginMarket, with position(), collateral(), leverage(), available_notional() and collateral_id(); PerpMarket derives from MarginMarket and adds funding and index.](media/market-types.svg)
+
+```python
+from tribulnation.sdk.market import is_spot
+
+market = await sdk.market('hyperliquid:spot:UBTC/USDC:142')
+if is_spot(market):
+  balances = await market.balances()
+```
+
+`sdk.spot_market(id)` and `sdk.perp_market(id)` resolve and check the kind in one call.
+Exchanges split the same way, into `SpotExchange` and `PerpExchange`. For how markets map to
+the money they spend, see [Collateral & Risk](collateral.md#at-a-glance).
+
 ## Exchange-wide account history
 
 Pass `None` as the market selector to read across a supported exchange:
@@ -117,22 +138,22 @@ Perpetual markets are scope similarly, just use different methods:
 **Top/Venue level**:
 
 ```python
-await sdk.next_funding('mexc:perp:BTCUSDT') # raises NotImplementedError if the market isn't a perpetual
+await sdk.next_funding('mexc:perp:BTCUSDT') # raises if the market isn't a perpetual
 venue = await sdk.venue('mexc')
-await venue.next_funding('perp:BTCUSDT') # raises NotImplementedError if the market isn't a perpetual
+await venue.next_funding('perp:BTCUSDT') # raises if the market isn't a perpetual
 ```
 
 **Exchange**:
 
 ```python
-exchange = await sdk.perp_exchange('mexc:perp') # raises NotImplementedError if you pass a non-perpetual exchange ID
+exchange = await sdk.perp_exchange('mexc:perp') # raises ValueError if you pass a non-perpetual exchange ID
 await exchange.next_funding('BTCUSDT')
 ```
 
 **Market**:
 
 ```python
-market = await sdk.perp_market('mexc:perp:BTCUSDT') # raises NotImplementedError if you pass a non-perpetual market ID
+market = await sdk.perp_market('mexc:perp:BTCUSDT') # raises ValueError if you pass a non-perpetual market ID
 await market.next_funding()
 ```
 

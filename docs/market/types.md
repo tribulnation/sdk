@@ -100,7 +100,8 @@ raises, rather than quietly placing a different order.
   `scaled(m)` converts the rules the same way as `Book.scaled`: `tick_size` and the fixed
   price bounds are divided by `m`; `step_size`, `fixed_min_qty` and `max_qty` multiplied;
   `min_value`, the relative price bounds, fees and `details` (raw, in venue units) unchanged.
-  Base/quote identities come from the Catalogue instrument, not `Rules`.
+  Canonical base/quote identities come from the Catalogue instrument. Spot markets return
+  `SpotRules`, which also name the pair's `base` and `quote` in the venue's own asset IDs.
 - `Ticker`: `last`, `bid`, `ask`, `bid_qty`, `ask_qty` and `base_volume_24h`, all optional.
 - `Trade`: `id`, `price`, signed `qty`, `time`, a `maker` flag, and an optional `fee`
   (`amount` plus `asset`). `order_id` is the filled order's `OrderResponse.id`, and
@@ -147,13 +148,17 @@ fee-token conversion or rounding.
 > Only trade candles are served; mark- and index-price series are a different thing and
 > would be a separate method, not a flag.
 
-## Positions and collateral
+## Positions, balances and collateral
 
-- `Position`: `size`, in signed base units. `PerpPosition` adds `entry_price`.
-- `Collateral`: `equity` and `free_collateral`. `PerpCollateral` adds `initial_margin`,
-  `maintenance_margin`, `leverage`, `margin_mode`, and the `initial_ratio` and
-  `maintenance_ratio` properties. See [Collateral & Risk](collateral.md) for what they mean
-  and which pool they describe.
+- `Position`: `size`, in signed base units, on margin markets. `PerpPosition` adds
+  `entry_price`.
+- `Balance`: one spot asset's `total` and `free`, where `free` excludes what open orders
+  hold. `SpotBalances` holds a pair's `base` and `quote`; `SpotCollateralIds` their
+  collateral IDs.
+- `Collateral`: `equity` and `free_collateral`, the money behind a collateral ID.
+  `PerpCollateral` adds `initial_margin`, `maintenance_margin`, `leverage`, `margin_mode`,
+  and the `initial_ratio` and `maintenance_ratio` properties. See
+  [Collateral & Risk](collateral.md) for what they mean and which pool they describe.
 
 ## Perpetuals
 

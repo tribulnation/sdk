@@ -18,6 +18,7 @@ from typed_margin_trade.info.candle_snapshot import CandleRange
 from typed_margin_trade.schemas import OrderSpec, PerpUniverseItem
 from tribulnation.sdk.core import (
   ApiError,
+  MissingData,
   OrderRejected,
   OverflowPolicy,
   PaginatedResponse,
@@ -26,7 +27,7 @@ from tribulnation.sdk.market import (
   Book,
   Candle,
   CandleInterval,
-  Collateral,
+  Balance,
   Fees,
   FundingPayment,
   FundingRate,
@@ -38,9 +39,11 @@ from tribulnation.sdk.market import (
   PerpCollateral,
   PerpMarket as SDKPerpMarket,
   PerpPosition,
-  Position,
   Rules,
   Settings,
+  SpotBalances,
+  SpotMarket as SDKSpotMarket,
+  SpotRules,
   Trade,
 )
 from ..core import (
@@ -57,7 +60,7 @@ from ..core import (
   round_price,
   tick_size,
 )
-from .collateral import cross_collateral
+from .collateral import cross_collateral, spot_balance
 
 CANDLE_WIDTHS: dict[CandleInterval, timedelta] = {
   '1m': timedelta(minutes=1),
@@ -136,11 +139,18 @@ class NativeMarket(Public, Market):
     )
 
   async def fees(self, *, refetch: bool = False) -> Fees:
-    """Not supported: `userFees` reports one account-wide rate, while fills are charged
-    the market's own rate (see `rules().fees`)."""
-    raise NotImplementedError(
-      f'margin.trade publishes no per-account rate per market [{self.id}]'
-    )
+    """The market's own `takerFee`/`makerFee` from `rules().fees`: the rates fills are
+    charged. `userFees` reports one account-wide rate that fills do not use.
+
+    Raises:
+      MissingData: The market publishes no rates.
+    """
+    fees = (await self.rules(refetch=refetch)).fees
+    if fees is None:
+      raise MissingData(
+        'margin.trade market publishes no fee rates', market_id=self.coin, field='fees'
+      )
+    return fees
 
   def candles(
     self, interval: CandleInterval, start: datetime, end: datetime
@@ -296,8 +306,8 @@ class NativeMarket(Public, Market):
 
 
 @dataclass(frozen=True, kw_only=True)
-class SpotMarket(NativeMarket):
-  """A spot pair, named `<base>/<quote>`."""
+class SpotMarket(NativeMarket, SDKSpotMarket):
+  """A spot pair, named `<base>/<quote>`, in the spot wallet (separate from perps)."""
 
   meta: Pair
 
@@ -326,13 +336,15 @@ class SpotMarket(NativeMarket):
     """Spot prices take up to `8 - szDecimals` decimals."""
     return SPOT_PRICE_DECIMALS
 
-  async def rules(self, *, refetch: bool = False) -> Rules:
-    """The pair's own fees and precision. Minimums are side-specific
-    (`spotMinBuyQuoteAmount`, `spotMinSellBaseQuantity`) and stay in `details`; fills
-    name their fee asset."""
+  async def rules(self, *, refetch: bool = False) -> SpotRules:
+    """The pair's own fees and precision, and its token symbols. Minimums are
+    side-specific (`spotMinBuyQuoteAmount`, `spotMinSellBaseQuantity`) and stay in
+    `details`; fills name their fee asset."""
     meta = (await self.shared.spot_pairs(refetch=refetch))[self.coin]
     pair = meta.pair
-    return Rules(
+    return SpotRules(
+      base=meta.base['name'],
+      quote=meta.quote['name'],
       fee_asset=None,
       tick_size=tick_size(meta.base['szDecimals'], max_decimals=SPOT_PRICE_DECIMALS),
       step_size=Decimal(10) ** -meta.base['szDecimals'],
@@ -346,25 +358,16 @@ class SpotMarket(NativeMarket):
       details=pair,
     )
 
-  async def balance(self, token: int) -> tuple[Decimal, Decimal]:
-    """`(total, hold)` of one spot token, zero when the account holds none."""
+  async def balances(self, *, ttl: timedelta | None = None) -> SpotBalances:
+    """The base and quote spot balances, from one `spotClearinghouseState`; free is
+    what resting orders do not hold."""
     state = await self.shared.call(
       lambda: self.client.info.spot_clearinghouse_state(self.shared.address)
     )
-    for row in state['balances']:
-      if row['token'] == token:
-        return row['total'], row['hold']
-    return Decimal(0), Decimal(0)
-
-  async def position(self) -> Position:
-    """The base token's spot total, resting sells included."""
-    total, _ = await self.balance(self.meta.base['index'])
-    return Position(size=total)
-
-  async def collateral(self) -> Collateral:
-    """The quote token's spot balance; free is what resting buys do not hold."""
-    total, hold = await self.balance(self.meta.quote['index'])
-    return Collateral(equity=total, free_collateral=total - hold)
+    return SpotBalances(
+      base=spot_balance(state, self.meta.base['index']),
+      quote=spot_balance(state, self.meta.quote['index']),
+    )
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -420,7 +423,7 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     _, ctx = (await self.shared.contexts())[self.coin]
     return ctx['oraclePx']
 
-  async def next_funding(self) -> NextFunding:
+  async def next_funding(self, *, ttl: timedelta | None = None) -> NextFunding:
     """The current funding rate and premium, settled at the next full hour."""
     _, ctx = (await self.shared.contexts())[self.coin]
     return NextFunding(
@@ -455,7 +458,7 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     ]:
       yield page
 
-  async def perp_position(self) -> PerpPosition:
+  async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
     """The one-way position, flat when absent."""
     state = await self.shared.call(
       lambda: self.client.info.clearinghouse_state(user=self.shared.address)
@@ -465,18 +468,25 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
         return PerpPosition(size=pos['szi'], entry_price=pos['entryPx'])
     return PerpPosition(size=Decimal(0), entry_price=Decimal(0))
 
-  async def leverage(self, *, refetch: bool = False) -> Decimal:
-    """The account's `activeAssetData` leverage on this market, cached per coin."""
-    if refetch or self.coin not in self.shared.leverages:
-      data = await self.shared.call(
-        lambda: self.client.info.active_asset_data(
-          user=self.shared.address, coin=self.coin
-        )
-      )
-      self.shared.leverages[self.coin] = Decimal(data['leverage']['value'])
-    return self.shared.leverages[self.coin]
+  async def collateral_id(self) -> str:
+    """The perpetual wallet, `<account_id>:perp`: it is its own account, separate from
+    the spot wallet, and funds cross and isolated positions alike."""
+    return f'{self.account_id}:perp'
 
-  async def perp_collateral(self) -> PerpCollateral:
+  async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
+    """The account's `activeAssetData` leverage on this market, read per coin and
+    shared for the caller's `ttl`."""
+    address, coin = self.shared.address, self.coin
+    data = await self.shared.reads.read(
+      ('activeAssetData', coin),
+      lambda: self.shared.call(
+        lambda: self.client.info.active_asset_data(user=address, coin=coin)
+      ),
+      ttl=ttl,
+    )
+    return Decimal(data['leverage']['value'])
+
+  async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """The cross bucket; an isolated position's own bucket is not supported."""
     state = await self.shared.call(
       lambda: self.client.info.clearinghouse_state(user=self.shared.address)

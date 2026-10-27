@@ -1,6 +1,6 @@
 from typing_extensions import AsyncContextManager, AsyncIterable, Sequence
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 import secrets
 
@@ -120,19 +120,29 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
     return trades_stream(self, queue_size=queue_size, overflow=overflow)
 
-  async def perp_position(self) -> PerpPosition:
-    return await perps_position(self)
+  async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
+    return await perps_position(self, ttl=ttl)
 
-  async def perp_collateral(self) -> PerpCollateral:
-    return await perp_market_collateral(self)
+  async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
+    return await perp_market_collateral(self, ttl=ttl)
 
-  async def leverage(self, *, refetch: bool = False) -> Decimal:
+  async def collateral_id(self) -> str:
+    """The dex collateral token's spot ID, `<account_id>:spot:<token index>`.
+
+    Accounts are unified (see `perp_collateral`): perp margin is the spot balance of
+    `perp_meta[dex]['collateralToken']`, so spot markets quoted in it share the ID.
+    Isolated positions draw new margin from the same balance. Read from the cached
+    market metadata, without a request.
+    """
+    return f'{self.account_id}:spot:{self.collateral_meta["index"]}'
+
+  async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
     """The account's `activeAssetData` leverage setting, capped at `maxLeverage`."""
-    return await perp_leverage(self, refetch=refetch)
+    return await perp_leverage(self, ttl=ttl)
 
-  async def available_notional(self) -> Decimal:
+  async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     """Free unified collateral times `leverage()`, for cross and isolated alike."""
-    return await perp_available_notional(self)
+    return await perp_available_notional(self, ttl=ttl)
 
   def random_client_order_id(self) -> str:
     """Generate a `cloid`: `0x` and 128 random bits as 32 hex digits."""
@@ -152,7 +162,7 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
   async def index(self, *, settings: Settings = {}) -> Decimal:
     return await index(self, settings=settings)
 
-  async def next_funding(self) -> NextFunding:
+  async def next_funding(self, *, ttl: timedelta | None = None) -> NextFunding:
     return await next_funding(self)
 
   def funding_rates(

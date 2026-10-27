@@ -13,7 +13,15 @@ from aiohttp.client_exceptions import ClientConnectionResetError
 
 from tribulnation.sdk.gateway.diagnostics import memory_snapshot
 from tribulnation.sdk import TradingMarkets, Market, PerpMarket
-from tribulnation.sdk.market import Book, Trade, PerpExchange
+from tribulnation.sdk.market import (
+  Book,
+  Trade,
+  SpotMarket,
+  MarginMarket,
+  is_spot,
+  is_perp,
+  is_margin,
+)
 from tribulnation.sdk.market.market import open_trades_stream
 
 from . import codec
@@ -42,21 +50,35 @@ class Gateway:
   async def _perp_market(self, market_id: str) -> PerpMarket:
     """Require a perpetual market for this request."""
     mkt = await self._market(market_id)
-    if not isinstance(mkt, PerpMarket):
+    if not is_perp(mkt):
       raise ValueError(f'market {market_id} is not a perpetual market')
+    return mkt
+
+  async def _spot_market(self, market_id: str) -> SpotMarket:
+    """Require a spot market for this request."""
+    mkt = await self._market(market_id)
+    if not is_spot(mkt):
+      raise ValueError(f'market {market_id} is not a spot market')
+    return mkt
+
+  async def _margin_market(self, market_id: str) -> MarginMarket:
+    """Require a margin (perpetual) market for this request."""
+    mkt = await self._market(market_id)
+    if not is_margin(mkt):
+      raise ValueError(f'market {market_id} is not a margin market')
     return mkt
 
   async def handler(self, request: web.Request) -> web.StreamResponse:
     """Serve multiplexed requests and streams on one WebSocket.
 
-    A client offering WebSocket subprotocols must offer `codec.PROTOCOL`, or the
-    upgrade is refused with 400. One offering none predates protocol negotiation
-    and speaks the same v1 frames.
+    A client must offer `codec.PROTOCOL`, or the upgrade is refused with 400. One
+    offering none predates protocol negotiation and speaks v1.
     """
     offered = codec.offered_protocols(request.headers.get('Sec-WebSocket-Protocol'))
-    if offered and codec.PROTOCOL not in offered:
+    if codec.PROTOCOL not in offered:
       reason = (
-        f'gateway speaks {codec.PROTOCOL}, client offered {", ".join(offered)}; '
+        f'gateway speaks {codec.PROTOCOL}, '
+        f'client offered {", ".join(offered) or "none (v1)"}; '
         'upgrade the gateway and its clients together'
       )
       log.error('refused %s: %s', request.remote, reason)
@@ -244,9 +266,7 @@ class Gateway:
       case codec.LeverageReq():
         return codec.LeverageResp(
           id=msg.id,
-          value=await (await self._perp_market(msg.market_id)).leverage(
-            refetch=msg.refetch
-          ),
+          value=await (await self._perp_market(msg.market_id)).leverage(ttl=msg.ttl),
         )
       case codec.CandlesReq():
         return codec.CandlesResp(
@@ -261,7 +281,7 @@ class Gateway:
         )
         return codec.ExchangeResp(
           id=msg.id,
-          type='perp' if isinstance(exchange, PerpExchange) else 'spot',
+          type='perp' if is_perp(exchange) else 'spot',
           venue_id=exchange.venue_id,
         )
       case codec.TickersReq():
@@ -270,7 +290,9 @@ class Gateway:
         )
         return codec.TickersResp(
           id=msg.id,
-          tickers=dict(await exchange.tickers(msg.markets, settings=msg.settings)),
+          tickers=dict(
+            await exchange.tickers(msg.markets, settings=msg.settings, ttl=msg.ttl)
+          ),
         )
       case codec.PerpStatsReq():
         perp_exchange = await (await self._sdk.venue(msg.account_id)).perp_exchange(
@@ -279,14 +301,35 @@ class Gateway:
         return codec.PerpStatsResp(
           id=msg.id,
           stats=dict(
-            await perp_exchange.perp_stats(msg.markets, settings=msg.settings)
+            await perp_exchange.perp_stats(
+              msg.markets, settings=msg.settings, ttl=msg.ttl
+            )
           ),
         )
       case codec.ExchangeCollateralReq():
-        exchange = await (await self._sdk.venue(msg.account_id)).exchange(
+        exchange = await (await self._sdk.venue(msg.account_id)).perp_exchange(
           msg.exchange_id
         )
-        return codec.CollateralResp(id=msg.id, collateral=await exchange.collateral())
+        return codec.CollateralResp(
+          id=msg.id, collateral=await exchange.collateral(ttl=msg.ttl)
+        )
+      case codec.BalanceReq():
+        spot = await (await self._sdk.venue(msg.account_id)).spot_exchange(
+          msg.exchange_id
+        )
+        return codec.BalanceResp(
+          id=msg.id, balance=await spot.balance(msg.asset, ttl=msg.ttl)
+        )
+      case codec.BalancesReq():
+        return codec.BalancesResp(
+          id=msg.id,
+          balances=await (await self._spot_market(msg.market_id)).balances(ttl=msg.ttl),
+        )
+      case codec.CollateralIdReq():
+        return codec.CollateralIdResp(
+          id=msg.id,
+          value=await (await self._margin_market(msg.market_id)).collateral_id(),
+        )
       case codec.RulesReq():
         return codec.RulesResp(
           id=msg.id,
@@ -311,12 +354,17 @@ class Gateway:
         )
       case codec.PositionReq():
         return codec.PositionResp(
-          id=msg.id, position=await (await self._market(msg.market_id)).position()
+          id=msg.id,
+          position=await (await self._margin_market(msg.market_id)).position(
+            ttl=msg.ttl
+          ),
         )
       case codec.AvailableNotionalReq():
         return codec.AvailableNotionalResp(
           id=msg.id,
-          value=await (await self._market(msg.market_id)).available_notional(),
+          value=await (await self._margin_market(msg.market_id)).available_notional(
+            ttl=msg.ttl
+          ),
         )
       case codec.PlaceOrderReq():
         return codec.PlaceOrderResp(
@@ -349,7 +397,7 @@ class Gateway:
       case codec.NextFundingReq():
         return codec.NextFundingResp(
           id=msg.id,
-          rate=await (await self._perp_market(msg.market_id)).next_funding(),
+          rate=await (await self._perp_market(msg.market_id)).next_funding(ttl=msg.ttl),
         )
       case codec.FundingRatesReq():
         return codec.FundingRatesResp(
@@ -368,24 +416,30 @@ class Gateway:
       case codec.PerpPositionReq():
         return codec.PerpPositionResp(
           id=msg.id,
-          position=await (await self._perp_market(msg.market_id)).perp_position(),
+          position=await (await self._perp_market(msg.market_id)).perp_position(
+            ttl=msg.ttl
+          ),
         )
       case codec.CollateralReq():
         return codec.CollateralResp(
           id=msg.id,
-          collateral=await (await self._market(msg.market_id)).collateral(),
+          collateral=await (await self._margin_market(msg.market_id)).collateral(
+            ttl=msg.ttl
+          ),
         )
       case codec.PerpCollateralReq():
         return codec.PerpCollateralResp(
           id=msg.id,
-          collateral=await (await self._perp_market(msg.market_id)).perp_collateral(),
+          collateral=await (await self._perp_market(msg.market_id)).perp_collateral(
+            ttl=msg.ttl
+          ),
         )
       case codec.ExchangePerpCollateralReq():
         venue = await self._sdk.venue(msg.account_id)
         exchange = await venue.perp_exchange(msg.exchange_id)
         return codec.PerpCollateralResp(
           id=msg.id,
-          collateral=await exchange.perp_collateral(),
+          collateral=await exchange.perp_collateral(ttl=msg.ttl),
         )
       case codec.MarketsReq():
         exc = await (await self._sdk.venue(msg.account_id)).exchange(msg.exchange_id)

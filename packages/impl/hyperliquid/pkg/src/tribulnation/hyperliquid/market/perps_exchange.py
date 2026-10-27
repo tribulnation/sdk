@@ -1,6 +1,6 @@
 from typing_extensions import Collection, Mapping, Sequence, overload
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from tribulnation.sdk.core import PaginatedResponse
 
@@ -63,17 +63,20 @@ class PerpExchange(PerpMixin, _PerpExchange):
       return super().funding_payments(market_id, start, end)
     return PaginatedResponse(exchange_funding_payments(self, start=start, end=end))
 
-  async def perp_collateral(self, market_id: str | None = None, /) -> PerpCollateral:
+  async def perp_collateral(
+    self, market_id: str | None = None, /, *, ttl: timedelta | None = None
+  ) -> PerpCollateral:
     if market_id is not None:
       m = await self.market(market_id)
-      return await m.perp_collateral()
-    return await perp_exchange_collateral(self)
+      return await m.perp_collateral(ttl=ttl)
+    return await perp_exchange_collateral(self, ttl=ttl)
 
   async def perp_stats(
     self,
     markets: Collection[str] | None = None,
     *,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, PerpStats]:
     """Fetch pricing and funding stats for the whole perp universe in one call.
 
@@ -91,6 +94,7 @@ class PerpExchange(PerpMixin, _PerpExchange):
     markets: Collection[str] | None = None,
     *,
     settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     return await perp_tickers(self, markets, settings=settings)
 

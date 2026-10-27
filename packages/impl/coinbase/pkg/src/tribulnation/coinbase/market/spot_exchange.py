@@ -1,5 +1,6 @@
 """Coinbase Advanced Trade's spot exchange."""
 
+from datetime import timedelta
 from typing_extensions import Collection, Mapping, Sequence
 from dataclasses import dataclass
 
@@ -25,7 +26,11 @@ class SpotExchange(impl.ExchangeMixin, _Exchange):
     return SpotMarket(shared=self.shared, product_id=market_id)
 
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Combine catalogue trade statistics with batched bid/ask prices and sizes."""
     products = await impl.list_products(self, product_type='SPOT')

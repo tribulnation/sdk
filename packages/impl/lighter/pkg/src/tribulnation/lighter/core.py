@@ -49,16 +49,6 @@ MASTER = 0
 """`account_type` of an L1 address's master account (sub-accounts are `1`, pools `2`-`4`)."""
 DepthSource = Literal['order_book', 'bbo']
 """Which Lighter WebSocket channel backs `depth_stream`; see `market.common.Settings`."""
-ACCOUNT_TTL = 1.0
-"""Seconds one `/account` answer serves every market's position and collateral reads.
-
-Each of those reads the whole account, and one gateway serves every task's reads from
-one client, so a burst of them (collateral managers, rebalancers, makers, a selection
-round) used to send as many identical requests: on 2026-10-26 Lighter's WAF answered
-hundreds of them with 405 "Human Verification". A second collapses such a burst into one
-request, while an answer is at most that second (plus its latency) old: short next to
-how often any one reader polls.
-"""
 
 
 @dataclass
@@ -104,8 +94,8 @@ class Shared(SDK):
     default_factory=dict[int, Subscription[Trade]]
   )
   client_indexes: ClientIndexes = field(default_factory=ClientIndexes)
-  leverages: dict[int, Decimal] = field(default_factory=dict[int, Decimal])
-  """The account's leverage per perpetual market, filled by `leverage()`."""
+  trading_modes: dict[int, int] = field(default_factory=dict[int, int])
+  """`account_trading_mode` per account index, filled by `collateral_id()`."""
   public_index: int | None = None
   """Account for public account reads when the client has no credentials."""
   address: str | None = None
@@ -282,11 +272,16 @@ class Shared(SDK):
       self.scalers[market_id] = Scaler.from_details(detail)
     return self.scalers[market_id]
 
-  async def account(self, *, fresh: bool = False) -> DetailedAccount:
-    """The configured account's positions, balances and margin figures, one request per `ACCOUNT_TTL` for every caller.
+  async def account(self, *, ttl: timedelta | None) -> DetailedAccount:
+    """The configured account's positions, balances and margin figures.
+
+    One `/account` answers every market's position, collateral, balance and leverage
+    reads, so callers passing a `ttl` share it (ADR 0054): a burst of them sends one
+    request instead of the hundreds Lighter's WAF answered with 405 "Human
+    Verification" on 2026-10-26.
 
     Args:
-      fresh: Don't reuse a stored answer (a request already in flight is still joined).
+      ttl: How old a shared answer may be; `None` asks afresh (see `SharedReads`).
     """
     index = await self.account_index()
     accounts = await self.reads.read(
@@ -294,7 +289,7 @@ class Shared(SDK):
       lambda: self.call(
         lambda: self.client.api.account.get({'by': 'index', 'value': index})
       ),
-      ttl=0 if fresh else ACCOUNT_TTL,
+      ttl=ttl,
     )
     return accounts['accounts'][0]
 

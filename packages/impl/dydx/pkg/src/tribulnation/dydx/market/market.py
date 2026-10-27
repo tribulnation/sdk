@@ -7,7 +7,7 @@ from typing_extensions import (
 )
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from tribulnation.sdk.core import PaginatedResponse, ApiError, OverflowPolicy
@@ -117,7 +117,7 @@ class Market(MarketMixin, PerpMarket):
     )
 
   @wrap_exceptions
-  async def perp_position(self) -> PerpPosition:
+  async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
     positions = await self.indexer.data.list_parent_positions(
       self.address,
       parent_subaccount=self.shared.parent_subaccount,
@@ -155,15 +155,28 @@ class Market(MarketMixin, PerpMarket):
 
     return PerpPosition(size=net_size, entry_price=avg_entry)
 
-  async def leverage(self, *, refetch: bool = False) -> Decimal:
+  async def collateral_id(self) -> str:
+    """The addressed subaccount's pool: `<account_id>:perp` for the parent subaccount,
+    `<account_id>:perp.<N>` for a child (isolated) one.
+
+    Orders are placed from that subaccount and margined by its own free collateral;
+    nothing moves collateral between subaccounts on placement. No request is made.
+    """
+    if self.subaccount == self.shared.parent_subaccount:
+      return f'{self.account_id}:perp'
+    else:
+      return f'{self.account_id}:perp.{self.subaccount}'
+
+  async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
     """`1 / effective initial margin fraction`, from the cached market metadata.
 
     dYdX has no per-account leverage setting: every subaccount, cross or isolated,
     opens at the market's initial margin fraction, scaled up by open interest (see
     `effective_imf`). The open interest and oracle price are those of the cached
-    market list (shared with `rules()`); `refetch` reloads it.
+    market list (shared with `rules()`), which `rules(refetch=True)`, tickers and
+    perpetual stats reload; `ttl` is accepted and ignored, like on every dYdX read.
     """
-    markets = await self.shared.load_markets(refetch=refetch)
+    markets = await self.shared.load_markets()
     market = markets.get(self.market)
     if market is None:
       raise ApiError(f'dYdX market not found: {self.market}')
@@ -191,7 +204,7 @@ class Market(MarketMixin, PerpMarket):
       raise ApiError('Oracle price unavailable')
     return Decimal(price)
 
-  async def perp_collateral(self) -> PerpCollateral:
+  async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     # dYdX has no per-market margin mode: a market's collateral bucket is exactly its
     # exchange's subaccount pool, which the market inherits. Delegate to the exchange.
     from .exchange import Exchange
@@ -199,7 +212,7 @@ class Market(MarketMixin, PerpMarket):
     exchange = Exchange(shared=self.shared, subaccount=self.subaccount)
     return await exchange.perp_collateral()
 
-  async def next_funding(self) -> NextFunding:
+  async def next_funding(self, *, ttl: timedelta | None = None) -> NextFunding:
     return await next_funding(self)
 
   def funding_rates(

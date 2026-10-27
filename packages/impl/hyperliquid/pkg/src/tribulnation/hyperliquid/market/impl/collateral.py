@@ -1,4 +1,5 @@
 from typing_extensions import Any
+from datetime import timedelta
 from decimal import Decimal
 import asyncio
 
@@ -8,11 +9,11 @@ from typed_hyperliquid.info.clearinghouse_state import (
   IsolatedLeverage,
 )
 
-from tribulnation.sdk.market import Collateral, PerpCollateral
+from tribulnation.sdk.market import Balance, PerpCollateral, SpotBalances
 from tribulnation.sdk.core import ApiError
 
 from tribulnation.hyperliquid.core import wrap_exceptions
-from .mixin import PerpMixin, PerpMarketMixin, SpotMarketMixin
+from .mixin import PerpMixin, PerpMarketMixin, SpotMixin, SpotMarketMixin
 
 
 def cross_collateral(
@@ -99,7 +100,9 @@ def spot_collateral(spot_state: Any, token_idx: int, /) -> tuple[Decimal, Decima
   return Decimal(0), Decimal(0)
 
 
-async def _unified_cross_collateral(self: PerpMixin) -> PerpCollateral:
+async def _unified_cross_collateral(
+  self: PerpMixin, *, ttl: timedelta | None
+) -> PerpCollateral:
   """Fetch the unified cross collateral, asserting unified account mode."""
   mode = await self.shared.user_abstraction()
   if mode != 'unifiedAccount':
@@ -111,8 +114,8 @@ async def _unified_cross_collateral(self: PerpMixin) -> PerpCollateral:
   collateral_token_idx = perp_meta['collateralToken']
 
   state, spot_state = await asyncio.gather(
-    self.shared.clearinghouse_state(dex_name),
-    self.shared.spot_clearinghouse_state(),
+    self.shared.clearinghouse_state(dex_name, ttl=ttl),
+    self.shared.spot_clearinghouse_state(ttl=ttl),
   )
 
   spot_equity, free_collateral = spot_collateral(spot_state, collateral_token_idx)
@@ -122,19 +125,23 @@ async def _unified_cross_collateral(self: PerpMixin) -> PerpCollateral:
 
 
 @wrap_exceptions
-async def perp_exchange_collateral(self: PerpMixin) -> PerpCollateral:
+async def perp_exchange_collateral(
+  self: PerpMixin, *, ttl: timedelta | None = None
+) -> PerpCollateral:
   """Exchange-level bucket = the unified account CROSS pool."""
-  return await _unified_cross_collateral(self)
+  return await _unified_cross_collateral(self, ttl=ttl)
 
 
 @wrap_exceptions
-async def perp_market_collateral(self: PerpMarketMixin) -> PerpCollateral:
+async def perp_market_collateral(
+  self: PerpMarketMixin, *, ttl: timedelta | None = None
+) -> PerpCollateral:
   """Mode-aware bucket for a single perp market.
 
   Cross positions (and no position) share the account cross pool; isolated
   positions get their own bucket.
   """
-  state = await self.shared.clearinghouse_state(self.dex_name)
+  state = await self.shared.clearinghouse_state(self.dex_name, ttl=ttl)
   for entry in state['assetPositions']:
     pos = entry['position']
     if pos['coin'] == self.asset_name:
@@ -142,20 +149,41 @@ async def perp_market_collateral(self: PerpMarketMixin) -> PerpCollateral:
       if leverage['type'] == 'isolated':
         return isolated_collateral(pos, leverage)
       break  # cross position → fall through to the cross pool
-  return await _unified_cross_collateral(self)
+  return await _unified_cross_collateral(self, ttl=ttl)
+
+
+def spot_balance(spot_state: Any, token_idx: int, /) -> Balance:
+  """One token's spot balance: `total`, and `total - hold` as free (see `spot_collateral`)."""
+  total, free = spot_collateral(spot_state, token_idx)
+  return Balance(total=total, free=free)
 
 
 @wrap_exceptions
-async def spot_market_collateral(self: SpotMarketMixin) -> Collateral:
-  """Spot bucket = the quote/collateral token balance.
+async def spot_market_balances(
+  self: SpotMarketMixin, *, ttl: timedelta | None = None
+) -> SpotBalances:
+  """The base and quote token balances, from one `spot_clearinghouse_state`.
 
-  `equity = total` balance of the quote token; `free_collateral = total - hold`
-  (the portion not locked by resting orders).
+  `hold` is what resting orders (and, for the collateral token, perp margin) lock, so
+  `free` is what a sell (base) or a buy (quote) can spend.
   """
-  state = await self.shared.spot_clearinghouse_state()
-  for balance in state['balances']:
-    if balance['token'] == self.quote_meta['index']:
-      total = Decimal(balance['total'])
-      hold = Decimal(balance['hold'])
-      return Collateral(equity=total, free_collateral=total - hold)
-  return Collateral(equity=Decimal(0), free_collateral=Decimal(0))
+  state = await self.shared.spot_clearinghouse_state(ttl=ttl)
+  return SpotBalances(
+    base=spot_balance(state, self.base_meta['index']),
+    quote=spot_balance(state, self.quote_meta['index']),
+  )
+
+
+@wrap_exceptions
+async def spot_token_balance(
+  self: SpotMixin, asset: str, /, *, ttl: timedelta | None = None
+) -> Balance:
+  """One token's spot balance by asset ID, the token index as a decimal string.
+
+  Raises:
+    ValueError: `asset` is not a token index.
+  """
+  if not asset.isdigit():
+    raise ValueError(f'Hyperliquid asset IDs are token indices, got {asset!r}')
+  state = await self.shared.spot_clearinghouse_state(ttl=ttl)
+  return spot_balance(state, int(asset))

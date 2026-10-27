@@ -146,7 +146,7 @@ class PerpMarket(MarketMixin, _PerpMarket):
     """Subscribe to your real-time trades."""
     return trades_stream(self, queue_size=queue_size, overflow=overflow)
 
-  async def perp_position(self) -> PerpPosition:
+  async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
     """Fetch your open position in the market."""
     positions = await self.call_bybit(
       lambda: self.client.position.list(
@@ -165,7 +165,7 @@ class PerpMarket(MarketMixin, _PerpMarket):
       entry_price=num(row['avgPrice']),
     )
 
-  async def perp_collateral(self) -> PerpCollateral:
+  async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """Fetch the collateral bucket backing this market.
 
     Bybit's unified account has one margin pool shared by every derivative position,
@@ -178,7 +178,7 @@ class PerpMarket(MarketMixin, _PerpMarket):
     )
     return await exchange.perp_collateral()
 
-  async def available_notional(self) -> Decimal:
+  async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     """Fetch the max. notional position you can open: free collateral times leverage."""
     instruments = await self.perp_instruments()
     collateral = await self.perp_collateral()
@@ -197,7 +197,7 @@ class PerpMarket(MarketMixin, _PerpMarket):
     assert tickers['category'] == 'linear'
     return tickers['list'][0]['indexPrice']
 
-  async def next_funding(self) -> NextFunding:
+  async def next_funding(self, *, ttl: timedelta | None = None) -> NextFunding:
     """Fetch the next funding rate and time."""
     tickers = await self.call_bybit(
       lambda: self.client.market.tickers(

@@ -18,7 +18,7 @@ import asyncio
 from typed_aster.futures.market.funding_info import FundingInfo
 from typed_aster.futures.market.schemas import FuturesMarkPrice
 from tribulnation.sdk.market import (
-  Exchange,
+  Balance,
   ExchangeFundingPayment,
   ExchangeTrade,
   FundingPayment,
@@ -26,6 +26,7 @@ from tribulnation.sdk.market import (
   PerpExchange as SDKPerpExchange,
   PerpStats,
   Settings,
+  SpotExchange as SDKSpotExchange,
   Ticker,
   Trade,
 )
@@ -37,6 +38,7 @@ from .markets import (
   SpotMarket,
   cross_collateral,
   exchange_trade,
+  spot_balance,
   spot_trade_rows,
   trade_windows,
 )
@@ -131,8 +133,8 @@ def selected(available: Collection[str], markets: Collection[str] | None) -> set
 
 
 @dataclass(frozen=True, kw_only=True)
-class SpotExchange(Public, Exchange):
-  """Aster spot."""
+class SpotExchange(Public, SDKSpotExchange):
+  """Aster spot: the spot wallet, separate from the futures wallet."""
 
   @property
   def exchange_id(self) -> str:
@@ -143,6 +145,11 @@ class SpotExchange(Public, Exchange):
     """List native symbols currently trading."""
     return list(await self.shared.spot_symbols())
 
+  async def balance(self, asset: str, /, *, ttl: timedelta | None = None) -> Balance:
+    """One asset's balance by symbol (`USDT`): free plus locked, and the free part.
+    Mainnet only: testnet account information omits funded balances."""
+    return spot_balance(await self.shared.spot_account_info(), asset)
+
   async def market(self, market_id: str, /) -> SpotMarket:
     """Resolve a trading symbol."""
     if market_id not in await self.shared.spot_symbols():
@@ -150,7 +157,11 @@ class SpotExchange(Public, Exchange):
     return SpotMarket(shared=self.shared, symbol=market_id)
 
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Read 24h statistics and best bid/ask for all or the selected symbols."""
     if markets is not None and not markets:
@@ -254,7 +265,11 @@ class PerpExchange(Public, SDKPerpExchange):
       ]
 
   async def tickers(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, Ticker]:
     """Read 24h statistics and best bid/ask for all or the selected contracts."""
     if markets is not None and not markets:
@@ -270,7 +285,11 @@ class PerpExchange(Public, SDKPerpExchange):
     )
 
   async def perp_stats(
-    self, markets: Collection[str] | None = None, *, settings: Settings = {}
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
   ) -> Mapping[str, PerpStats]:
     """Read pricing and funding for all or the selected contracts in two bulk calls.
 
@@ -306,8 +325,10 @@ class PerpExchange(Public, SDKPerpExchange):
     async with managed_tasks(read(symbol) for symbol in symbols) as tasks:
       return dict(await asyncio.gather(*tasks))
 
-  async def perp_collateral(self, market_id: str | None = None, /) -> PerpCollateral:
+  async def perp_collateral(
+    self, market_id: str | None = None, /, *, ttl: timedelta | None = None
+  ) -> PerpCollateral:
     """Read the cross-margin bucket, or a market's own (cross or isolated) bucket."""
     if market_id is not None:
-      return await (await self.market(market_id)).perp_collateral()
-    return cross_collateral(await self.shared.futures_account())
+      return await (await self.market(market_id)).perp_collateral(ttl=ttl)
+    return cross_collateral(await self.shared.futures_account(ttl=ttl))

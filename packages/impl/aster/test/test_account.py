@@ -22,6 +22,7 @@ from typed_aster.spot.account.info import Info as SpotInfo
 from typed_aster.spot.market.exchange_info import ExchangeInfo as SpotExchangeInfo
 from tribulnation.aster import AsterMarket
 from tribulnation.aster.market import exchanges
+from tribulnation.aster.market.exchanges import SpotExchange
 from tribulnation.aster.market.markets import (
   PerpMarket,
   SpotMarket,
@@ -29,7 +30,12 @@ from tribulnation.aster.market.markets import (
   isolated_collateral,
 )
 from tribulnation.sdk.core import MissingData
-from tribulnation.sdk.market import Collateral, PerpCollateral, Position
+from tribulnation.sdk.market import (
+  Balance,
+  PerpCollateral,
+  SpotBalances,
+  SpotCollateralIds,
+)
 
 TIME = datetime(2026, 10, 8, tzinfo=timezone.utc)
 
@@ -84,25 +90,24 @@ def spot_info(*balances: tuple[str, str, str]) -> dict[str, Any]:
 
 
 async def test_spot_balances_are_free_plus_locked(monkeypatch: pytest.MonkeyPatch):
-  """Base is the position; the quote is the collateral, free when not in orders."""
+  """Each balance totals free plus locked in orders; free is the free part."""
   market = spot_market(monkeypatch)
   info = spot_info(('ASTER', '10', '2.5'), ('USDT', '100', '40'), ('USDC', '7', '0'))
   monkeypatch.setattr(SpotInfo, 'info', AsyncMock(return_value=info))
-  assert await market.position() == Position(size=Decimal('12.5'))
-  assert await market.collateral() == Collateral(
-    equity=Decimal(140), free_collateral=Decimal(100)
+  assert await market.balances() == SpotBalances(
+    base=Balance(total=Decimal('12.5'), free=Decimal(10)),
+    quote=Balance(total=Decimal(140), free=Decimal(100)),
   )
-  assert await market.available_notional() == Decimal(100)
+  exchange = SpotExchange(shared=market.shared)
+  assert await exchange.balance('USDC') == Balance(total=Decimal(7), free=Decimal(7))
 
 
 async def test_unlisted_spot_assets_hold_zero(monkeypatch: pytest.MonkeyPatch):
   """The venue lists only assets with a balance."""
   market = spot_market(monkeypatch)
   monkeypatch.setattr(SpotInfo, 'info', AsyncMock(return_value=spot_info()))
-  assert await market.position() == Position(size=Decimal(0))
-  assert await market.collateral() == Collateral(
-    equity=Decimal(0), free_collateral=Decimal(0)
-  )
+  zero = Balance(total=Decimal(0), free=Decimal(0))
+  assert await market.balances() == SpotBalances(base=zero, quote=zero)
 
 
 async def test_testnet_spot_balances_raise(monkeypatch: pytest.MonkeyPatch):
@@ -110,10 +115,24 @@ async def test_testnet_spot_balances_raise(monkeypatch: pytest.MonkeyPatch):
   market = spot_market(monkeypatch, mainnet=False)
   info = AsyncMock(return_value=spot_info())
   monkeypatch.setattr(SpotInfo, 'info', info)
-  for method in (market.position, market.collateral, market.available_notional):
+  exchange = SpotExchange(shared=market.shared)
+  for method in (market.balances, lambda: exchange.balance('USDT')):
     with pytest.raises(NotImplementedError, match='testnet'):
       await method()
   assert info.await_count == 0
+
+
+async def test_spot_and_futures_wallets_have_separate_collateral_ids(
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """Spot reserves on its assets' IDs, perpetuals on the futures wallet (ADR 0051)."""
+  market = spot_market(monkeypatch)
+  rules = await market.rules()
+  assert (rules.base, rules.quote) == ('ASTER', 'USDT')
+  assert await market.collateral_ids() == SpotCollateralIds(
+    base='aster:spot:ASTER', quote='aster:spot:USDT'
+  )
+  assert await perp().collateral_id() == 'aster:perp'
 
 
 async def test_spot_fee_asset_depends_on_the_fill(monkeypatch: pytest.MonkeyPatch):

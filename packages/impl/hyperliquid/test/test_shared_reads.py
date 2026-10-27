@@ -1,6 +1,7 @@
 """Account-state reads shared between markets and concurrent callers."""
 
 from dataclasses import dataclass, field
+from datetime import timedelta
 import asyncio
 
 from typing_extensions import Any, cast
@@ -9,6 +10,7 @@ from typed_hyperliquid import Hyperliquid
 from tribulnation.hyperliquid.market.impl.mixin import Shared
 
 ADDRESS = '0xabc'
+SECOND = timedelta(seconds=1)
 
 
 @dataclass
@@ -38,16 +40,17 @@ class Client:
 
 
 async def test_markets_share_one_state_read_per_dex():
-  """Concurrent reads of one dex (None and `''` alike) send one request; another dex its own."""
+  """Concurrent shared reads of one dex (None and `''` alike) send one request; another
+  dex its own."""
   client = Client()
   shared = Shared(client=cast(Hyperliquid, client), maybe_address=ADDRESS)
   states = await asyncio.gather(
-    shared.clearinghouse_state(None),
-    shared.clearinghouse_state(''),
-    shared.clearinghouse_state(None),
-    shared.clearinghouse_state('xyz'),
-    shared.spot_clearinghouse_state(),
-    shared.spot_clearinghouse_state(),
+    shared.clearinghouse_state(None, ttl=SECOND),
+    shared.clearinghouse_state('', ttl=SECOND),
+    shared.clearinghouse_state(None, ttl=timedelta(0)),
+    shared.clearinghouse_state('xyz', ttl=SECOND),
+    shared.spot_clearinghouse_state(ttl=SECOND),
+    shared.spot_clearinghouse_state(ttl=SECOND),
   )
   assert [s.get('dex') for s in states[:4]] == [None, None, None, 'xyz']
   assert sorted(client.info.calls, key=str) == [
@@ -55,5 +58,19 @@ async def test_markets_share_one_state_read_per_dex():
     ('clearinghouseState', None),
     ('spotClearinghouseState', None),
   ]
-  await shared.clearinghouse_state(None)
+  await shared.clearinghouse_state(None, ttl=SECOND)
+  assert len(client.info.calls) == 3
+
+
+async def test_fresh_state_reads_send_their_own_request():
+  """`ttl=None` reads neither reuse a stored state nor join one in flight."""
+  client = Client()
+  shared = Shared(client=cast(Hyperliquid, client), maybe_address=ADDRESS)
+  await shared.spot_clearinghouse_state(ttl=SECOND)
+  await asyncio.gather(
+    shared.spot_clearinghouse_state(ttl=None),
+    shared.spot_clearinghouse_state(ttl=None),
+  )
+  assert len(client.info.calls) == 3
+  await shared.spot_clearinghouse_state(ttl=SECOND)
   assert len(client.info.calls) == 3

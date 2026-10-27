@@ -38,11 +38,8 @@ methods = [
   "open_orders",
   "trades_history",
   "trades_stream",
-  "position",
-  "collateral",
-  "available_notional",
 ]
-note = "Spot retains its existing public/private reads; perp adds public non-tradfi USD linear perpetuals with unit contract size, including tokenized assets classified that way by Kraken. Perp supports discovery, depth, tickers, rules, index, perp_stats, funding_rates and all six candle intervals. Futures streams, next_funding, account fees and all private/trading methods remain unsupported. Spot candles retain the recent API window (documented 720; 721 observed including forming). Perp candles use trade Charts in bounded 2000-open windows, preserve missing intervals, and filter aware half-open bounds. Funding history uses native relativeFundingRate, with settlement time = native period start + 1 hour and inclusive/open bounds. Perp standard fees and maximum order size remain unknown; USD fee currency resolves through Assets to ZUSD."
+note = "Spot retains its existing public/private reads; perp adds public non-tradfi USD linear perpetuals with unit contract size, including tokenized assets classified that way by Kraken. Perp supports discovery, depth, tickers, rules, index, perp_stats, funding_rates and all six candle intervals. Futures streams, next_funding, account fees and all private/trading methods remain unsupported. Spot candles retain the recent API window (documented 720; 721 observed including forming). Perp candles use trade Charts in bounded 2000-open windows, preserve missing intervals, and filter aware half-open bounds. Funding history uses native relativeFundingRate, with settlement time = native period start + 1 hour and inclusive/open bounds. Perp standard fees and maximum order size remain unknown; USD fee currency resolves through Assets to ZUSD. Spot `position`, `collateral` and `available_notional` were removed in SDK 3.0 with the spot stand-ins (ADR 0051); spot `balances` and collateral IDs are not mapped yet."
 # Spot depth_stream is supported; perpetual streams are explicitly unsupported.
 # Public reads use the credential-free Kraken DEFAULT_ACCOUNTS entry.
 
@@ -56,4 +53,4 @@ note = "Kraken's internal asset id (`XXBT`, `XETH`, `ZUSD`, `USDC`, `SOL`): what
 min_mode = "private"
 
 [qualification.market.unsupported]
-perp = ["fees", "open_orders", "trades_history", "position", "collateral", "available_notional"]
+perp = ["fees", "open_orders", "trades_history"]

@@ -2,7 +2,6 @@
 
 from dataclasses import dataclass, field
 from datetime import timedelta
-from decimal import Decimal
 from functools import cached_property
 import asyncio
 
@@ -20,6 +19,7 @@ from typed_extended.core.networks import Network
 from typed_extended.info.markets import Market as MarketRow
 from tribulnation.sdk import SDK
 from tribulnation.sdk.core import (
+  SharedReads,
   AuthError,
   ManagedResource,
   Subscription,
@@ -55,7 +55,7 @@ def network_venue_id(network: Network) -> VenueId:
 
 @dataclass(frozen=True, kw_only=True)
 class Shared(SDK):
-  """Own one client for one sub-account; cache markets, leverages and shared streams."""
+  """Own one client for one sub-account; cache markets and share reads and streams."""
 
   client: Extended
   venue_id: VenueId = 'extended'
@@ -73,8 +73,8 @@ class Shared(SDK):
     default_factory=dict[str, Subscription[Trade]]
   )
   """One shared account stream per market, filtered to its fills."""
-  leverages: dict[str, Decimal] = field(default_factory=dict[str, Decimal])
-  """The account's leverage per market, filled by `leverage()`."""
+  reads: SharedReads = field(default_factory=SharedReads)
+  """Account reads shared between concurrent callers (`leverage()`)."""
 
   @classmethod
   def new(

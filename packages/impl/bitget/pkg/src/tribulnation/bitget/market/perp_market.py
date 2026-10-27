@@ -130,12 +130,12 @@ class PerpMarket(MarketMixin, _PerpMarket):
     """Subscribe to your real-time trades."""
     return trades_stream(self, queue_size=queue_size, overflow=overflow)
 
-  async def perp_position(self) -> PerpPosition:
+  async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
     """Fetch your open position in the market."""
     self.require_account_surface()
     return await perp_position(self, self.symbol)
 
-  async def perp_collateral(self) -> PerpCollateral:
+  async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """Fetch the collateral bucket backing this market.
 
     A UTA account has one margin pool across every product line, reported with the
@@ -147,7 +147,7 @@ class PerpMarket(MarketMixin, _PerpMarket):
       return await uta_perp_collateral(self, self.symbol)
     raise not_supported_classic_collateral()
 
-  async def available_notional(self) -> Decimal:
+  async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     """Fetch the max. notional position you can open: free margin times max leverage.
 
     Classic reads the futures wallet's `available`; UTA the unified pool's effective
@@ -171,7 +171,7 @@ class PerpMarket(MarketMixin, _PerpMarket):
     )
     return prices[0]['indexPrice']
 
-  async def next_funding(self) -> NextFunding:
+  async def next_funding(self, *, ttl: timedelta | None = None) -> NextFunding:
     """Fetch the next funding rate, settlement time and interval.
 
     Read from the UTA v3 public funding-rate endpoint, which serves every account
