@@ -10,3 +10,8 @@ Breaking and behaviour changes:
 4. The `market_stats` snapshots (`tickers`, `perp_stats`, `next_funding`) stay single-flight whatever the `ttl`, since a connection refuses a second subscription to an open channel; `None` only skips a stored snapshot.
 
 Every other method is unchanged.
+
+Release qualification on 2026-10-27 passed the read suites and market consistency.
+Committed evidence under `release-evidence/lighter/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
+release follows SDK 3.0.0 publication.
