@@ -10,3 +10,8 @@ Breaking and behaviour changes:
 4. `leverage(refetch=...)` becomes `leverage(ttl=...)`, and leverage is no longer cached per coin; `maxLeverage` still comes from the cached dex universe, which `rules(refetch=True)` reloads.
 
 Every other method is unchanged.
+
+Release qualification on 2026-10-27 passed the read suites and market consistency.
+Committed evidence under `release-evidence/hyperliquid/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
+release follows SDK 3.0.0 publication.
