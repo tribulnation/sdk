@@ -2,7 +2,8 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: proposed; implemented, not release-verified
+1. Status: proposed; implemented, not release-verified; decision 2's hard-coded TTLs
+   amended by [0054](0054-caller-chosen-read-staleness.md)
 2. Date: 2026-10-26
 
 ## Context
