@@ -8,23 +8,23 @@ from typing_extensions import cast
 
 ROOT = Path(__file__).resolve().parents[3]
 COMPATIBLE_IMPLEMENTATIONS = {
-  'aster': '0.12.0',
-  'binance': '0.8.0',
-  'bit2me': '0.9.0',
-  'bitget': '0.11.0',
-  'bybit': '0.7.0',
-  'coinbase': '0.5.0',
-  'deribit': '0.6.0',
-  'dydx': '0.17.0',
+  'aster': '0.13.0',
+  'binance': '0.9.0',
+  'bit2me': '0.10.0',
+  'bitget': '0.12.0',
+  'bybit': '0.8.0',
+  'coinbase': '0.6.0',
+  'deribit': '0.7.0',
+  'dydx': '0.20.0',
   'ethereum': '0.6.0',
-  'extended': '0.1.0',
-  'grvt': '0.1.0',
-  'hyperliquid': '0.18.0',
-  'kraken': '0.7.1',
-  'kucoin': '0.6.0',
-  'lighter': '0.11.0',
-  'margin-trade': '0.1.0',
-  'mexc': '2.4.0',
+  'extended': '0.2.0',
+  'grvt': '0.2.0',
+  'hyperliquid': '0.19.0',
+  'kraken': '0.8.0',
+  'kucoin': '0.7.0',
+  'lighter': '0.12.0',
+  'margin-trade': '0.2.0',
+  'mexc': '3.0.0',
 }
 
 
@@ -175,7 +175,6 @@ def test_keep_latest_adapters_require_sdk_2_18():
       if Requirement(value).name == 'tribulnation-sdk'
     )
     assert Version('2.17.0') not in requirement.specifier, venue
-    assert Version('2.18.0') in requirement.specifier, venue
 
 
 def test_margin_trade_requires_sdk_2_19():
@@ -188,4 +187,19 @@ def test_margin_trade_requires_sdk_2_19():
     if Requirement(value).name == 'tribulnation-sdk'
   )
   assert Version('2.18.0') not in requirement.specifier
-  assert Version('2.19.0') in requirement.specifier
+
+
+def test_market_adapters_require_sdk_3():
+  """Market adapters subclass SDK 3.0's spot and margin types and take `ttl` (ADR 0051,
+  ADR 0054), so none may resolve against SDK 2."""
+  for manifest in sorted((ROOT / 'packages/impl').glob('*/pkg/pyproject.toml')):
+    venue = manifest.parents[1].name
+    if venue.startswith('.') or venue == 'ethereum':
+      continue
+    requirement = next(
+      Requirement(value)
+      for value in dependencies(manifest)
+      if Requirement(value).name == 'tribulnation-sdk'
+    )
+    assert Version('2.99.0') not in requirement.specifier, venue
+    assert Version('3.0.0') in requirement.specifier, venue
