@@ -231,6 +231,30 @@
       {
         "exclusion": null,
         "failed": 0,
+        "id": "market.test_account_read[\":BTC\", \"collateral_id\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "spot_only",
+        "failed": 0,
+        "id": "market.test_account_read[\":BTC\", \"balances\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "spot_only",
+        "failed": 0,
+        "id": "market.test_account_read[\":BTC\", \"collateral_ids\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
         "id": "market.test_candle_values_are_decimals_and_ordered[\"xyz:xyz:SILVER\", null]",
         "network": "mainnet",
         "passed": 1,
@@ -431,6 +455,30 @@
       {
         "exclusion": null,
         "failed": 0,
+        "id": "market.test_account_read[\"xyz:xyz:SILVER\", \"collateral_id\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "spot_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"xyz:xyz:SILVER\", \"balances\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "spot_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"xyz:xyz:SILVER\", \"collateral_ids\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
         "id": "market.test_candle_values_are_decimals_and_ordered[\"spot:UBTC/USDC:142\", null]",
         "network": "mainnet",
         "passed": 1,
@@ -581,11 +629,11 @@
         "skipped": 0
       },
       {
-        "exclusion": null,
+        "exclusion": "perp_only",
         "failed": 0,
         "id": "market.test_account_read[\"spot:UBTC/USDC:142\", \"position\"]",
         "network": "mainnet",
-        "passed": 1,
+        "passed": 0,
         "skipped": 0
       },
       {
@@ -597,11 +645,11 @@
         "skipped": 0
       },
       {
-        "exclusion": null,
+        "exclusion": "perp_only",
         "failed": 0,
         "id": "market.test_account_read[\"spot:UBTC/USDC:142\", \"collateral\"]",
         "network": "mainnet",
-        "passed": 1,
+        "passed": 0,
         "skipped": 0
       },
       {
@@ -621,9 +669,33 @@
         "skipped": 0
       },
       {
-        "exclusion": null,
+        "exclusion": "perp_only",
         "failed": 0,
         "id": "market.test_account_read[\"spot:UBTC/USDC:142\", \"available_notional\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:UBTC/USDC:142\", \"collateral_id\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:UBTC/USDC:142\", \"balances\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:UBTC/USDC:142\", \"collateral_ids\"]",
         "network": "mainnet",
         "passed": 1,
         "skipped": 0

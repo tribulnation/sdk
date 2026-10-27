@@ -197,11 +197,11 @@
         "skipped": 0
       },
       {
-        "exclusion": null,
+        "exclusion": "perp_only",
         "failed": 0,
         "id": "market.test_account_read[\"spot:BTC-USD\", \"position\"]",
         "network": "mainnet",
-        "passed": 1,
+        "passed": 0,
         "skipped": 0
       },
       {
@@ -213,11 +213,11 @@
         "skipped": 0
       },
       {
-        "exclusion": null,
+        "exclusion": "perp_only",
         "failed": 0,
         "id": "market.test_account_read[\"spot:BTC-USD\", \"collateral\"]",
         "network": "mainnet",
-        "passed": 1,
+        "passed": 0,
         "skipped": 0
       },
       {
@@ -237,11 +237,35 @@
         "skipped": 0
       },
       {
-        "exclusion": null,
+        "exclusion": "perp_only",
         "failed": 0,
         "id": "market.test_account_read[\"spot:BTC-USD\", \"available_notional\"]",
         "network": "mainnet",
-        "passed": 1,
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTC-USD\", \"collateral_id\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTC-USD\", \"balances\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTC-USD\", \"collateral_ids\"]",
+        "network": "mainnet",
+        "passed": 0,
         "skipped": 0
       }
     ],

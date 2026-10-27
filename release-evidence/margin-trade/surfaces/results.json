@@ -141,11 +141,11 @@
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": null,
         "failed": 0,
         "id": "market.test_account_read[\"perp:BTC\", \"fees\"]",
         "network": "mainnet",
-        "passed": 0,
+        "passed": 1,
         "skipped": 0
       },
       {
@@ -226,6 +226,30 @@
         "id": "market.test_account_read[\"perp:BTC\", \"available_notional\"]",
         "network": "mainnet",
         "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTC\", \"collateral_id\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "spot_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTC\", \"balances\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "spot_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTC\", \"collateral_ids\"]",
+        "network": "mainnet",
+        "passed": 0,
         "skipped": 0
       },
       {
@@ -341,11 +365,11 @@
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": null,
         "failed": 0,
         "id": "market.test_account_read[\"spot:PEARL/USDC\", \"fees\"]",
         "network": "mainnet",
-        "passed": 0,
+        "passed": 1,
         "skipped": 0
       },
       {
@@ -381,11 +405,11 @@
         "skipped": 0
       },
       {
-        "exclusion": null,
+        "exclusion": "perp_only",
         "failed": 0,
         "id": "market.test_account_read[\"spot:PEARL/USDC\", \"position\"]",
         "network": "mainnet",
-        "passed": 1,
+        "passed": 0,
         "skipped": 0
       },
       {
@@ -397,11 +421,11 @@
         "skipped": 0
       },
       {
-        "exclusion": null,
+        "exclusion": "perp_only",
         "failed": 0,
         "id": "market.test_account_read[\"spot:PEARL/USDC\", \"collateral\"]",
         "network": "mainnet",
-        "passed": 1,
+        "passed": 0,
         "skipped": 0
       },
       {
@@ -421,9 +445,33 @@
         "skipped": 0
       },
       {
-        "exclusion": null,
+        "exclusion": "perp_only",
         "failed": 0,
         "id": "market.test_account_read[\"spot:PEARL/USDC\", \"available_notional\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:PEARL/USDC\", \"collateral_id\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:PEARL/USDC\", \"balances\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:PEARL/USDC\", \"collateral_ids\"]",
         "network": "mainnet",
         "passed": 1,
         "skipped": 0

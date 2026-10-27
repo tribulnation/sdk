@@ -229,7 +229,7 @@
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": "perp_only",
         "failed": 0,
         "id": "market.test_account_read[\"spot:BTC-USDT\", \"position\"]",
         "network": "mainnet",
@@ -245,7 +245,7 @@
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": "perp_only",
         "failed": 0,
         "id": "market.test_account_read[\"spot:BTC-USDT\", \"collateral\"]",
         "network": "mainnet",
@@ -269,9 +269,33 @@
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": "perp_only",
         "failed": 0,
         "id": "market.test_account_read[\"spot:BTC-USDT\", \"available_notional\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTC-USDT\", \"collateral_id\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTC-USDT\", \"balances\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:BTC-USDT\", \"collateral_ids\"]",
         "network": "mainnet",
         "passed": 0,
         "skipped": 0
@@ -472,6 +496,30 @@
         "exclusion": "unsupported",
         "failed": 0,
         "id": "market.test_account_read[\"perp:XBTUSDTM\", \"available_notional\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:XBTUSDTM\", \"collateral_id\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "spot_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:XBTUSDTM\", \"balances\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "spot_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:XBTUSDTM\", \"collateral_ids\"]",
         "network": "mainnet",
         "passed": 0,
         "skipped": 0
