@@ -7,3 +7,8 @@ Perpetual markets are SDK 3.0 `MarginMarket`s ([ADR 0051](../../../dev-docs/adr/
 Account reads accept `ttl` and ignore it: every read asks the indexer ([ADR 0054](../../../dev-docs/adr/0054-caller-chosen-read-staleness.md)). `leverage(refetch=...)` becomes `leverage(ttl=...)`; leverage still derives from the cached market list.
 
 Every other method is unchanged.
+
+Release qualification on 2026-10-27 passed the read suites and market consistency.
+Committed evidence under `release-evidence/dydx/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
+release follows SDK 3.0.0 publication.
