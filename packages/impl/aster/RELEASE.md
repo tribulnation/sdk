@@ -11,3 +11,8 @@ Breaking and behaviour changes:
 5. An order refused because the symbol's leverage setting is above the maximum Aster now allows (`-2027`, seen when Aster lowers a symbol's maximum) lowers the setting to that maximum (bracket 1's `initialLeverage`) and is resent once [ADR 0055](../../../dev-docs/adr/0055-aster-lower-leverage-on-refusal.md). Concurrent refusals share one fix, which stands for 10 s. The adapter never raises a leverage setting and reads nothing before an order; if the setting is not above the maximum, or cannot be lowered, the original `OrderRejected` is raised.
 
 Every other method is unchanged.
+
+Release qualification on 2026-10-27 passed the read suites and market consistency.
+Committed evidence under `release-evidence/aster/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
+release follows SDK 3.0.0 publication.
