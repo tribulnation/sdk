@@ -7,3 +7,8 @@ Requires SDK >=3.0.0 (spot and margin market types, collateral IDs and read `ttl
 `leverage(refetch=...)` becomes `leverage(ttl=...)` ([ADR 0054](../../../dev-docs/adr/0054-caller-chosen-read-staleness.md)). Leverage is no longer cached per instrument: one account-wide `all_initial_leverage` answer serves every instrument, asked afresh without a `ttl` and shared with one. Other account reads accept `ttl` and ignore it.
 
 Every other method is unchanged.
+
+Release qualification on 2026-10-27 passed the read suites and market consistency.
+Committed evidence under `release-evidence/grvt/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
+release follows SDK 3.0.0 publication.
