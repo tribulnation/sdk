@@ -24,12 +24,14 @@ from typed_aster.core.urls import SurfaceUrls
 from typed_aster.core.transport.bapi import BapiClient
 from typed_aster.futures.account.schemas import FuturesAccount
 from typed_aster.futures.market.exchange_info import FuturesSymbol
+from typed_aster.futures.position.risk import PositionRisk
 from typed_aster.spot.market.exchange_info import SpotSymbol
 from tribulnation.sdk.core import (
   AuthError,
   ManagedResource,
   OverflowPolicy,
   SDK,
+  SharedReads,
   SkippingView,
   Subscription,
   exception_wrapper,
@@ -43,6 +45,18 @@ Scope = Literal['spot', 'perp']
 DepthSource = Literal['depth', 'fast', 'bbo']
 """Which Aster WebSocket feed backs `depth_stream`; see `market.settings.Settings`."""
 wrap_exceptions = exception_wrapper()
+ACCOUNT_TTL = 1.0
+"""Seconds one futures account or `positionRisk` answer serves every symbol's reads.
+
+Positions, leverage and collateral of every symbol come from these two account-wide
+requests, and one gateway serves every task's reads from one client, so a burst of them
+(collateral managers, rebalancers, makers, a selection round) used to send one request
+per symbol and caller against the per-IP limit: on 2026-10-26 Aster answered 429, then
+banned the IP. A second collapses such a burst into one request, while an answer is at
+most that second (plus its latency) old: short next to how often any one reader polls.
+"""
+POSITION_RISK = 'positionRisk'
+"""`SharedReads` key of the all-symbol `positionRisk` answer."""
 
 
 @wrap_exceptions
@@ -130,6 +144,14 @@ class Shared(SDK):
   )
   leverages: dict[str, Decimal] = field(default_factory=dict[str, Decimal])
   """The account's initial leverage per perpetual symbol, filled by `leverage()`."""
+  maxed: dict[str, float] = field(default_factory=dict[str, float])
+  """Loop time each perpetual symbol's leverage was last checked against its maximum (and set to it), successfully or not."""
+  leverage_locks: dict[str, asyncio.Lock] = field(
+    default_factory=dict[str, asyncio.Lock]
+  )
+  """One lock per perpetual symbol, so concurrent orders set its leverage once."""
+  reads: SharedReads = field(default_factory=SharedReads)
+  """Account-wide reads shared between symbols and concurrent callers."""
 
   @property
   def venue_id(self) -> Literal['aster', 'aster_testnet']:
@@ -178,12 +200,38 @@ class Shared(SDK):
     return self.perp
 
   async def futures_account(self) -> FuturesAccount:
-    """Read the join-margin futures account: totals value every margin asset in USDT.
+    """Read the join-margin futures account, one request per `ACCOUNT_TTL` for every caller.
 
-    The plain `account.info` totals count USDT alone, which misstates Multi-Assets
-    accounts margined in other assets.
+    Its totals value every margin asset in USDT; the plain `account.info` totals count
+    USDT alone, which misstates Multi-Assets accounts margined in other assets.
     """
-    return await self.call(self.client.futures.account.info_with_join_margin)
+    return await self.reads.read(
+      ('futures_account',),
+      lambda: self.call(self.client.futures.account.info_with_join_margin),
+      ttl=ACCOUNT_TTL,
+    )
+
+  async def position_risk(
+    self, symbol: str, *, fresh: bool = False
+  ) -> list[PositionRisk]:
+    """A perpetual symbol's `positionRisk` rows, from one all-symbol request per `ACCOUNT_TTL` for every caller.
+
+    The all-symbol answer lists flat symbols too; one missing the symbol (e.g. a
+    listing newer than it) is answered by a request for that symbol alone.
+
+    Args:
+      symbol: The perpetual symbol.
+      fresh: Don't reuse a stored answer (a request already in flight is still joined).
+    """
+    rows = await self.reads.read(
+      POSITION_RISK,
+      lambda: self.call(self.client.futures.position.risk),
+      ttl=0 if fresh else ACCOUNT_TTL,
+    )
+    if mine := [r for r in rows if r['symbol'] == symbol]:
+      return mine
+    else:
+      return await self.call(lambda: self.client.futures.position.risk(symbol))
 
   @asynccontextmanager
   async def stream(

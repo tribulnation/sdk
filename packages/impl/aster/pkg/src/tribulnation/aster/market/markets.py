@@ -4,6 +4,8 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
+import asyncio
+import logging
 import secrets
 from typing_extensions import (
   Any,
@@ -32,6 +34,7 @@ from typed_aster.spot.trade.schemas import SpotOrder
 from tribulnation.sdk.core import (
   ApiError,
   BadRequest,
+  Error,
   MissingData,
   OrderRejected,
   OverflowPolicy,
@@ -60,7 +63,7 @@ from tribulnation.sdk.market import (
   Trade,
 )
 from tribulnation.sdk.market.types.candles import candle_windows
-from ..core import Public, Scope, Shared
+from ..core import POSITION_RISK, Public, Scope, Shared
 from .settings import Settings as AsterSettings
 from .streams import (
   SOURCE_LEVELS,
@@ -69,6 +72,8 @@ from .streams import (
   connect_trades,
   depth_source,
 )
+
+log = logging.getLogger(__name__)
 
 DepthLimit = Literal[5, 10, 20, 50, 100, 500, 1000]
 DEPTH_LIMITS: tuple[DepthLimit, ...] = (5, 10, 20, 50, 100, 500, 1000)
@@ -86,6 +91,11 @@ DEAD_STATUSES = frozenset({'EXPIRED', 'REJECTED'})
 """Final statuses of an order that will never rest."""
 NO_OPEN_INTEREST_CAP = Decimal(-1)
 """`remainingOpenableNotionalValue` when the symbol has no open-interest cap."""
+LEVERAGE_ABOVE_MAX = -2027
+"""Aster refusing an order because the symbol's leverage exceeds the maximum it now allows."""
+LEVERAGE_RECHECK = 10.0
+"""Seconds after a symbol's leverage was set to its maximum before a `-2027` sets it
+again: concurrent orders refused together share one fix."""
 
 
 class ErrorBody(TypedDict):
@@ -119,6 +129,12 @@ def rejected(exc: BadRequest) -> bool:
     and bool(exc.args)
     and exc.args[0] != 408
   )
+
+
+def leverage_above_max(exc: OrderRejected) -> bool:
+  """Whether Aster refused an order because the symbol's leverage is above its maximum (`-2027`)."""
+  cause = exc.__cause__
+  return isinstance(cause, BadRequest) and error_code(cause) == LEVERAGE_ABOVE_MAX
 
 
 def dead_on_arrival(row: SpotOrder | FuturesOrder) -> bool:
@@ -973,7 +989,7 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
 
   async def one_way_position(self):
     """Read the symbol's single one-way (`BOTH`) position row."""
-    rows = await self.shared.call(lambda: self.api.position.risk(self.symbol))
+    rows = await self.shared.position_risk(self.symbol)
     if len(rows) != 1 or rows[0]['positionSide'] != 'BOTH':
       raise NotImplementedError('Aster hedge-mode positions are not supported')
     return rows[0]
@@ -991,7 +1007,7 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     cached = self.shared.leverages.get(self.symbol)
     if cached is not None and not refetch:
       return cached
-    rows = await self.shared.call(lambda: self.api.position.risk(self.symbol))
+    rows = await self.shared.position_risk(self.symbol, fresh=refetch)
     leverage = position_leverage(rows, self.symbol)
     self.shared.leverages[self.symbol] = leverage
     return leverage
@@ -1035,6 +1051,93 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     if (cap := remaining['remainingOpenableNotionalValue']) != NO_OPEN_INTEREST_CAP:
       caps.append(cap)
     return max(min(caps), Decimal(0))
+
+  async def max_leverage(self) -> int:
+    """The highest initial leverage Aster allows on the symbol: its lowest notional bracket's.
+
+    Raises:
+      MissingData: The brackets omit the symbol.
+    """
+    rows = await self.shared.call(
+      lambda: self.api.account.leverage_brackets(self.symbol)
+    )
+    levels = [
+      b['initialLeverage']
+      for r in rows
+      if r['symbol'] == self.symbol
+      for b in r['brackets']
+    ]
+    if levels:
+      return max(levels)
+    else:
+      raise MissingData(
+        'Aster leverage brackets omit the symbol',
+        market_id=self.symbol,
+        field='brackets',
+      )
+
+  async def use_max_leverage(self, *, again: bool = False):
+    """Set the symbol's leverage to the highest Aster allows: once per `Shared`, or once more with `again` (unless just done).
+
+    Aster may lower a symbol's maximum while the account keeps its old setting, and then
+    refuses every order on it (`-2027`). A failed attempt counts as one, so failing
+    reads (e.g. while rate limited) aren't repeated on every order.
+    """
+    lock = self.shared.leverage_locks.setdefault(self.symbol, asyncio.Lock())
+    async with lock:
+      loop = asyncio.get_running_loop()
+      checked = self.shared.maxed.get(self.symbol)
+      if checked is not None and (
+        not again or loop.time() - checked < LEVERAGE_RECHECK
+      ):
+        return
+      self.shared.maxed[self.symbol] = loop.time()
+      top, current = await asyncio.gather(
+        self.max_leverage(), self.leverage(refetch=True)
+      )
+      if current != top:
+        change = await self.shared.call(
+          lambda: self.api.account.set_leverage(self.symbol, leverage=top)
+        )
+        self.shared.leverages[self.symbol] = Decimal(change['leverage'])
+        self.shared.reads.forget(POSITION_RISK)
+        log.info(
+          'Aster %s leverage set from %s to %s, the highest allowed',
+          self.symbol,
+          current,
+          change['leverage'],
+        )
+
+  async def place_order(
+    self, order: Order, *, settings: Settings = {}
+  ) -> OrderResponse:
+    """Place the order at the symbol's highest allowed leverage (see `NativeMarket.place_order`).
+
+    Before the symbol's first order in this `Shared`'s lifetime its leverage is set to
+    the maximum (`use_max_leverage`); if that fails, the order goes anyway. An order
+    refused for a leverage above the maximum (`-2027`) sets it again and is sent once
+    more.
+
+    Raises:
+      OrderRejected: As `NativeMarket.place_order`, also when the leverage could not
+        be set after a `-2027`.
+    """
+    if self.symbol not in self.shared.maxed:
+      try:
+        await self.use_max_leverage()
+      except Error as e:
+        log.warning('Aster %s: could not check the leverage: %r', self.symbol, e)
+    try:
+      return await super().place_order(order, settings=settings)
+    except OrderRejected as e:
+      if not leverage_above_max(e):
+        raise
+      try:
+        await self.use_max_leverage(again=True)
+      except Error as fix:
+        log.warning('Aster %s: could not set the leverage: %r', self.symbol, fix)
+        raise e from fix
+    return await super().place_order(order, settings=settings)
 
   def fetch_order(self, order_id: int):
     """Query one perpetual order."""
