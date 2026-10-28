@@ -15,6 +15,7 @@ from typed_extended.info.markets import Market as MarketRow
 
 from tribulnation.extended.core import Shared
 from tribulnation.extended.market import orders
+from tribulnation.extended.market.markets import ExtendedPerpMarket
 from tribulnation.sdk.core import ApiError, AuthError, BadRequest, OrderRejected
 from tribulnation.sdk.market import Order
 
@@ -216,6 +217,57 @@ async def test_rfq_markets_route_through_create_rfq(type: Any):
   assert endpoint == 'create_rfq'
   assert 'postOnly' not in request
   assert request['timeInForce'] == ('GTT' if type == 'LIMIT' else 'IOC')
+
+
+@pytest.mark.parametrize(
+  ('name', 'rfq', 'endpoint'), [(ETH, False, 'create'), (RFQ, True, 'create_rfq')]
+)
+async def test_ioc_limit_carries_the_default_expiry(
+  name: str, rfq: bool, endpoint: str
+):
+  """With `time_in_force: 'IOC'`, a `LIMIT` is sent IOC without an explicit expiry, as a
+  `MARKET` order is, on order-book and RFQ markets alike."""
+  client = Client()
+  order: Order = {'qty': '-3', 'price': '0.1', 'type': 'LIMIT'}
+  await orders.place_order(
+    shared(client), market(name, rfq=rfq), order, {'time_in_force': 'IOC'}
+  )
+  ((sent_to, request),) = client.orders.calls
+  expected: dict[str, Any] = {
+    'type': 'LIMIT',
+    'market': name,
+    'side': 'SELL',
+    'qty': Decimal('3'),
+    'price': Decimal('0.1'),
+    'timeInForce': 'IOC',
+    'selfTradeProtectionLevel': 'ACCOUNT',
+  }
+  assert sent_to == endpoint
+  assert request == (expected if rfq else {**expected, 'postOnly': False})
+
+
+async def test_market_reads_its_own_settings_key():
+  """`place_order` reads `settings['extended']`; other venues' keys are ignored."""
+  client = Client()
+  m = ExtendedPerpMarket(shared=shared(client), name=ETH)
+  order: Order = {'qty': '1', 'price': '2400', 'type': 'LIMIT'}
+  await m.place_order(order, settings={'aster': {'time_in_force': 'IOC'}})
+  await m.place_order(order, settings={'extended': {'time_in_force': 'IOC'}})
+  (_, plain), (_, ioc) = client.orders.calls
+  assert plain['timeInForce'] == 'GTT' and 'expiryEpochMillis' in plain
+  assert ioc['timeInForce'] == 'IOC' and 'expiryEpochMillis' not in ioc
+
+
+@pytest.mark.parametrize('type', ['MARKET', 'POST_ONLY'])
+async def test_time_in_force_is_for_limit_orders_only(type: Any):
+  """`time_in_force` on a `MARKET` or `POST_ONLY` order raises before signing."""
+  client = Client()
+  order: Order = {'qty': '1', 'price': '2400', 'type': type}
+  with pytest.raises(ValueError, match='LIMIT orders only'):
+    await orders.place_order(
+      shared(client), market(ETH), order, {'time_in_force': 'IOC'}
+    )
+  assert client.orders.calls == []
 
 
 @pytest.mark.parametrize(

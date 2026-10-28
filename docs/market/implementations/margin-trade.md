@@ -48,8 +48,9 @@ same names prefixed `MARGIN_TRADE_TESTNET_`.
 - `rules().fees` are each market's own `takerFee`/`makerFee`, the rates fills are
   charged, and `fees()` returns the same rates: the venue's account rate (`userFees`)
   is not what fills pay.
-- `MARKET` is an `Ioc` limit at the order's `price`; the venue refuses one priced too far
-  through the book (`slippage exceeded`, raised as `OrderRejected`).
+- `LIMIT` is `Gtc` (see Settings) and `POST_ONLY` `Alo`. `MARKET` is an `Ioc` limit at
+  the order's `price`; the venue refuses one priced too far through the book
+  (`slippage exceeded`, raised as `OrderRejected`).
 - `query_order` trails placement and cancellation by about a second; `open_orders` is
   current.
 - Tickers carry no best-level sizes; markets missing from the venue's CoinGecko feed
@@ -64,7 +65,14 @@ same names prefixed `MARGIN_TRADE_TESTNET_`.
 - Streams rely on typed-margin-trade 0.1.1's 10 s ping: the venue drops a connection
   about 30 s after the client's last ping.
 
-No `settings` are read.
+## Settings
+
+`place_order` reads `settings['margin-trade']`, as Hyperliquid reads
+`settings['hyperliquid']`; other venues' keys are ignored.
+
+| Key | Type | Applies to | Meaning |
+| --- | --- | --- | --- |
+| `limit_tif` | `'Gtc' \| 'Ioc' \| 'Alo'` | `place_order` (`LIMIT`) | Time in force of a `LIMIT` order; defaults to `'Gtc'`. `MARKET` and `POST_ONLY` ignore it. |
 
 <!-- next -->
 

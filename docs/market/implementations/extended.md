@@ -61,7 +61,10 @@ market data only.
 - `place_order`: `LIMIT` rests good-till-time until the network's longest expiry (90
   days on mainnet, 28 on testnet, less a minute), `POST_ONLY` adds the post-only flag
   (RFQ markets refuse it, before signing), and `MARKET` is the venue's IOC market order
-  bounded by `price`. RFQ markets' orders go through the RFQ endpoint. Off-grid prices
+  bounded by `price`. `settings={'extended': {'time_in_force': 'IOC'}}` sends a `LIMIT`
+  immediate-or-cancel instead (with the client's default one-hour expiry, as `MARKET`
+  carries), on order-book and RFQ markets; set on `MARKET` or `POST_ONLY` it raises
+  `ValueError`. RFQ markets' orders go through the RFQ endpoint. Off-grid prices
   and sizes raise `ValueError` before signing. `client_order_id` is the order's client
   id (`externalId`), 32 hex digits from `random_client_order_id()`. The venue does not
   keep client ids unique: reusing one places a second order.
@@ -96,7 +99,13 @@ market data only.
   Streams are verified on mainnet only: the testnet stream host refuses connections
   (`503`).
 
-No `settings` are read.
+## Settings
+
+`place_order` reads `settings['extended']`; other venues' keys are ignored.
+
+| Key | Type | Applies to | Meaning |
+| --- | --- | --- | --- |
+| `time_in_force` | `'IOC'` | `place_order` (`LIMIT`) | Send the order immediate-or-cancel instead of good-till-time. |
 
 <!-- next -->
 

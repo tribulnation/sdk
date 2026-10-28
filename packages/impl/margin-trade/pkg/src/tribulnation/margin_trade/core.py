@@ -16,6 +16,7 @@ from typing_extensions import (
   Iterable,
   Literal,
   NamedTuple,
+  TypedDict,
   TypeVar,
 )
 from typed_margin_trade import MarginTrade, Wallet
@@ -61,6 +62,15 @@ PERP_ASSET = 'USDC'
 """The perpetual wallet's collateral, as transfer history and `perpBalance` name it."""
 PERP_FEE_ASSET = 'USD'
 """The `feeToken` perpetual fills are charged in."""
+
+
+class Settings(TypedDict, total=False):
+  """margin.trade settings, under `settings['margin-trade']`."""
+
+  limit_tif: Literal['Gtc', 'Ioc', 'Alo']
+  """Time in force of a `LIMIT` order, as Hyperliquid's `limit_tif`. Defaults to
+  `'Gtc'`; `'Ioc'` fills what it can at the limit price or better and cancels the rest,
+  `'Alo'` only rests. `MARKET` and `POST_ONLY` orders ignore it."""
 
 
 def round_price(price: Decimal, *, max_decimals: int) -> Decimal:

@@ -32,7 +32,7 @@ reads = MarginTradeMarket.new(address='6dm8…')
 3. Account and trading: order queries, open orders, trade history (per market or
    exchange-wide) and per-coin fill streams, positions, cross collateral, leverage,
    available notional, perpetual funding payments, and `MARKET` (an `Ioc` limit),
-   `LIMIT` (`Gtc`) and `POST_ONLY` (`Alo`) orders with every cancellation method. Order
+   `LIMIT` (`Gtc`, or `settings={'margin-trade': {'limit_tif': 'Ioc'}}`) and `POST_ONLY` (`Alo`) orders with every cancellation method. Order
    placement is verified on testnet only. `fees` is unsupported: the venue's account
    rate is not what fills are charged.
 4. Report: a `perp` subaccount (USDC without unrealized PnL, positions) and a `spot`
