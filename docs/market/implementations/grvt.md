@@ -124,12 +124,14 @@ No `settings` are read.
   account tier's spot rates.
 - Spot `balances()` and `balance()` read the trading sub-account's spot wallet
   (`spot_account_summary`): `total` is its `balance`, `free` its
-  `available_to_transfer`, and a currency it does not list is zero. Whether
-  `available_to_transfer` excludes what open spot orders hold is not yet verified.
+  `available_to_transfer`, which excludes what open spot orders hold, and a currency
+  it does not list is zero.
 - Spot orders, cancellations and fills use the perpetual paths above, scoped to the
   `SPOT_SWAP` kind (a spot instrument can share its base and quote with a perpetual).
-- Public and account reads are verified on mainnet, spot reads against an empty spot
-  wallet; perpetual trading on testnet only. Spot order placement is unverified.
+- Public and account reads are verified on mainnet; perpetual and spot trading on
+  testnet only. A filled `MARKET` order's `query_order` price is `0`: the venue's order
+  has no limit price. A fill reaches the fills stream at once, but trade history a few
+  seconds later.
 
 <!-- next -->
 

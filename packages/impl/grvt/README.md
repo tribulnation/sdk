@@ -37,7 +37,7 @@ trading = GrvtMarket.new(api_key='…', private_key='0x…', env='testnet')
    isolated collateral buckets, leverage, available notional, funding payments, the
    spot wallet's balances, and `MARKET`, `LIMIT` and `POST_ONLY` orders with every
    cancellation method. Order ids are client order ids. Perpetual trading is verified
-   on testnet only; spot order placement is unverified.
+   on testnet only, spot trading too.
 4. Margin types and leverage are read, not set: set them on the venue.
 
 `Report` snapshots the funding wallet and every trading sub-account the API key can
