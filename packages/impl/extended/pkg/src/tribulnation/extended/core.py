@@ -12,6 +12,7 @@ from typing_extensions import (
   Iterable,
   Literal,
   Mapping,
+  TypedDict,
   TypeVar,
 )
 from typed_extended import Extended
@@ -40,6 +41,17 @@ ORDER_LIFETIME: Mapping[Network, timedelta] = {
 EXPIRY_MARGIN = timedelta(minutes=1)
 """Kept off the longest expiry, so a client clock slightly ahead of the venue's does not
 push an order past the network's limit."""
+
+
+class Settings(TypedDict, total=False):
+  """Extended settings, under `settings['extended']`."""
+
+  time_in_force: Literal['IOC']
+  """Send a `LIMIT` order immediate-or-cancel instead of good-till-time: it fills what it
+  can at the limit price or better and cancels the rest. `POST_ONLY` and `MARKET` orders
+  raise `ValueError` when it is set."""
+
+
 COLLATERAL = 'USD'
 """The deployment's one collateral asset: margin, PnL, trading fees and funding settle in
 it, and every market names it as `collateralAssetName`."""
