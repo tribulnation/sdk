@@ -1,4 +1,4 @@
-"""The GRVT trading venue: one `perp` exchange."""
+"""The GRVT trading venue: a `perp` and a `spot` exchange."""
 
 from dataclasses import dataclass
 
@@ -6,15 +6,16 @@ from tribulnation.sdk.market import TradingVenue
 
 from ..core import Environment, Shared
 from .common import Public
-from .exchanges import GrvtPerpExchange
+from .exchanges import GrvtPerpExchange, GrvtSpotExchange
 
 
 @dataclass(frozen=True, kw_only=True)
 class GrvtMarket(Public, TradingVenue):
-  """GRVT's USDT-margined perpetuals, on one trading sub-account.
+  """GRVT's USDT-margined perpetuals and its spot instruments, on one trading
+  sub-account (its futures and its spot wallet).
 
-  Market ids are instrument names (`BTC_USDT_Perp`), the same on mainnet and testnet;
-  asset ids are currency codes (`USDT`).
+  Market ids are instrument names (`BTC_USDT_Perp`, `GRVT_USDT_SpotSwap`), the same on
+  mainnet and testnet; asset ids are currency codes (`USDT`).
   """
 
   @classmethod
@@ -58,12 +59,18 @@ class GrvtMarket(Public, TradingVenue):
     )
 
   async def exchanges(self) -> list[TradingVenue.ExchangeDescription]:
-    """The perpetual exchange."""
-    return [{'id': 'perp', 'type': 'perp', 'name': 'Perpetuals'}]
+    """The perpetual and spot exchanges."""
+    return [
+      {'id': 'perp', 'type': 'perp', 'name': 'Perpetuals'},
+      {'id': 'spot', 'type': 'spot', 'name': 'Spot'},
+    ]
 
-  async def exchange(self, exchange_id: str, /) -> GrvtPerpExchange:
+  async def exchange(self, exchange_id: str, /) -> GrvtPerpExchange | GrvtSpotExchange:
     """An exchange by id."""
-    return await self.perp_exchange(exchange_id)
+    if exchange_id == 'spot':
+      return GrvtSpotExchange(shared=self.shared)
+    else:
+      return await self.perp_exchange(exchange_id)
 
   async def perp_exchange(self, exchange_id: str, /) -> GrvtPerpExchange:
     """The perpetual exchange.

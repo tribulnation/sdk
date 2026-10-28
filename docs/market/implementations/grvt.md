@@ -12,7 +12,7 @@
 
 # GRVT Market
 
-> USDT-margined perpetuals. `tribulnation-grvt`, venue names `grvt` and `grvt_testnet`.
+> USDT-margined perpetuals and spot. `tribulnation-grvt`, venue names `grvt` and `grvt_testnet`.
 
 See the [generic market interface](../index.md) for the shared method surface. This page
 covers only what is GRVT-specific.
@@ -24,7 +24,7 @@ Three credential modes, by what the account configures:
 | Method | Public | API key | API key and private key |
 | --- | --- | --- | --- |
 | Market data | yes | yes | yes |
-| `fees`, `query_order`, `open_orders`, `trades_history`, `trades_stream`, `position`, `collateral`, `perp_position`, `perp_collateral`, `leverage`, `available_notional`, `funding_payments` | no | yes | yes |
+| `fees`, `query_order`, `open_orders`, `trades_history`, `trades_stream`, `position`, `collateral`, `balances`, `perp_position`, `perp_collateral`, `leverage`, `available_notional`, `funding_payments` | no | yes | yes |
 | `cancel_order`, `cancel_orders`, `cancel_open_orders` | no | yes (unsigned; the venue checks the key's permissions) | yes |
 | `place_order`, `place_orders` | no | no | yes |
 
@@ -52,10 +52,15 @@ toggles response validation.
 
 ## Exchange & ID conventions
 
-- One exchange, `perp`. Market ids are instrument names, the same on mainnet and
-  testnet: `grvt:perp:BTC_USDT_Perp`. Delisted instruments stay listed; `rules().api`
-  says whether one trades.
-- Asset ids are currency codes (`USDT`, `USDC`). Fees, margin and funding are in USDT.
+- Two exchanges, `perp` and `spot`. Market ids are instrument names, the same on
+  mainnet and testnet: `grvt:perp:BTC_USDT_Perp`, `grvt:spot:GRVT_USDT_SpotSwap`.
+  Delisted instruments stay listed; `rules().api` says whether one trades.
+- Asset ids are currency codes (`USDT`, `USDC`). Perpetual fees, margin and funding
+  are in USDT.
+- `spot` is GRVT's `SPOT_SWAP` instruments: ordinary order books, traded with the same
+  orders as perpetuals, settled in the trading sub-account's spot wallet (separate from
+  its futures wallet). Spot collateral IDs are `<account>:spot:<asset>`, the wallet's
+  balance of one currency: `grvt:spot:USDT`. The perpetual pool stays `<account>:perp`.
 
 No `settings` are read.
 
@@ -113,7 +118,18 @@ No `settings` are read.
   either margin type. `available_notional` is the cross bucket's free collateral times it, for
   isolated markets too, without GRVT's position-size cap or risk brackets. The SDK
   does not set margin types or leverage; set them on the venue.
-- Public and account reads are verified on mainnet; trading on testnet only.
+- Spot `rules()` name the pair (`base`, `quote`); `fee_asset` is `None`, since the fee
+  is charged in the asset a fill delivers (base on a buy, quote on a sell), and
+  `rules().fees` is `None`: GRVT publishes no standard spot schedule. `fees()` reads the
+  account tier's spot rates.
+- Spot `balances()` and `balance()` read the trading sub-account's spot wallet
+  (`spot_account_summary`): `total` is its `balance`, `free` its
+  `available_to_transfer`, and a currency it does not list is zero. Whether
+  `available_to_transfer` excludes what open spot orders hold is not yet verified.
+- Spot orders, cancellations and fills use the perpetual paths above, scoped to the
+  `SPOT_SWAP` kind (a spot instrument can share its base and quote with a perpetual).
+- Public and account reads are verified on mainnet, spot reads against an empty spot
+  wallet; perpetual trading on testnet only. Spot order placement is unverified.
 
 <!-- next -->
 

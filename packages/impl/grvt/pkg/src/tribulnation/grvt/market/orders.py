@@ -134,13 +134,11 @@ async def cancel_orders(shared: Shared, ids: Sequence[str]) -> list[Any]:
 
 
 async def cancel_open_orders(shared: Shared, instrument: str) -> Any:
-  """The venue's cancel-all, scoped to the perpetual by kind, base and quote."""
+  """The venue's cancel-all, scoped to the instrument by kind, base and quote."""
   shared.require_session()
-  base, quote = scope(await shared.instrument(instrument))
+  kind, base, quote = scope(await shared.instrument(instrument))
   return await shared.call(
-    lambda: shared.client.trading.cancel_all_orders(
-      kind=['PERPETUAL'], base=base, quote=quote
-    )
+    lambda: shared.client.trading.cancel_all_orders(kind=kind, base=base, quote=quote)
   )
 
 
@@ -164,12 +162,10 @@ async def query_order(shared: Shared, instrument: str, id: str) -> OrderState | 
 
 
 async def open_orders(shared: Shared, instrument: str) -> Sequence[OrderState]:
-  """The perpetual's open orders."""
+  """The instrument's open orders."""
   shared.require_session()
-  base, quote = scope(await shared.instrument(instrument))
+  kind, base, quote = scope(await shared.instrument(instrument))
   rows = await shared.call(
-    lambda: shared.client.trading.open_orders(
-      kind=['PERPETUAL'], base=base, quote=quote
-    )
+    lambda: shared.client.trading.open_orders(kind=kind, base=base, quote=quote)
   )
   return [parse_order(o) for o in rows if o['legs'][0]['instrument'] == instrument]

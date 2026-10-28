@@ -1,15 +1,15 @@
-"""Account fees, positions, the cross and isolated collateral buckets and leverage, of
-the client's trading sub-account."""
+"""Account fees, positions, the cross and isolated collateral buckets, leverage and the
+spot wallet, of the client's trading sub-account."""
 
 from datetime import timedelta
 from decimal import Decimal
 
 from typing_extensions import Literal
 
-from typed_grvt.schemas import Position
+from typed_grvt.schemas import ClientTier, Position, SpotBalance
 from typed_grvt.trading.account_summary import SubAccount
 from tribulnation.sdk.core import MissingData
-from tribulnation.sdk.market import Fees, PerpCollateral, PerpPosition
+from tribulnation.sdk.market import Balance, Fees, PerpCollateral, PerpPosition
 
 from ..core import FEE_UNIT, Shared
 from .common import scope
@@ -18,21 +18,68 @@ from .common import scope
 async def fees(shared: Shared) -> Fees:
   """The account tier's futures maker and taker rates, the same for every perpetual and
   both sides (`ClientTier`, in millionths of notional)."""
-  shared.require_session()
-  summary = await shared.call(shared.client.trading.funding_account_summary)
-  tier = summary['tier']
+  tier = await client_tier(shared)
   return Fees.symmetric(
     maker=tier['futures_maker_fee'] * FEE_UNIT,
     taker=tier['futures_taker_fee'] * FEE_UNIT,
   )
 
 
+async def spot_fees(shared: Shared) -> Fees:
+  """The account tier's spot maker and taker rates, the same for every spot instrument
+  and both sides (`ClientTier`, in millionths of notional like the futures rates)."""
+  tier = await client_tier(shared)
+  return Fees.symmetric(
+    maker=tier['spot_maker_fee'] * FEE_UNIT, taker=tier['spot_taker_fee'] * FEE_UNIT
+  )
+
+
+async def client_tier(shared: Shared) -> ClientTier:
+  """The account's fee tier, from the funding account summary."""
+  shared.require_session()
+  summary = await shared.call(shared.client.trading.funding_account_summary)
+  return summary['tier']
+
+
+async def spot_wallet(
+  shared: Shared, *, ttl: timedelta | None = None
+) -> list[SpotBalance]:
+  """The trading sub-account's spot wallet: one row per currency it has held.
+
+  This is `spot_account_summary`, not `account_summary`'s `spot_balances` (the
+  futures wallet's cash). Spot fills settle here: GRVT's exchange contract moves a
+  spot trade's base and quote in the sub-account's spot wallet and refuses one that
+  would leave either negative, so it holds no borrow. One answer serves every market,
+  shared for the caller's `ttl`.
+  """
+  shared.require_session()
+  summary = await shared.reads.read(
+    ('spot_account_summary',),
+    lambda: shared.call(shared.client.trading.spot_account_summary),
+    ttl=ttl,
+  )
+  return summary['spot_balances']
+
+
+def spot_balance(rows: list[SpotBalance], asset: str) -> Balance:
+  """One currency's spot balance, zero when the wallet lists none.
+
+  `total` is the venue's `balance`; `free` its `available_to_transfer`, what can
+  leave the wallet. Whether that excludes what open spot orders hold is unverified:
+  no account read had an open spot order.
+  """
+  for b in rows:
+    if b['currency'] == asset:
+      return Balance(total=b['balance'], free=b['available_to_transfer'])
+  return Balance(total=Decimal(0), free=Decimal(0))
+
+
 async def perp_position(shared: Shared, instrument: str) -> PerpPosition:
   """The signed position and average entry; flat when the venue lists none."""
   shared.require_session()
-  base, quote = scope(await shared.instrument(instrument))
+  kind, base, quote = scope(await shared.instrument(instrument))
   rows = await shared.call(
-    lambda: shared.client.trading.positions(kind=['PERPETUAL'], base=base, quote=quote)
+    lambda: shared.client.trading.positions(kind=kind, base=base, quote=quote)
   )
   for p in rows:
     if p['instrument'] == instrument:

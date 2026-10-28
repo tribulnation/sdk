@@ -736,6 +736,7 @@ methods:
       accountVenues: [hyperliquid]
       constants:
         aster: {market_id: 'aster:spot:ASTERUSDT', base_total: '0.5', base_free: '0.4', quote_total: '9875.20', quote_free: '7640.00'}
+        grvt: {market_id: 'grvt:spot:GRVT_USDT_SpotSwap', base_total: '1200.0', base_free: '1000.0', quote_total: '9875.20', quote_free: '7640.00'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', base_total: '0.5', base_free: '0.4', quote_total: '9875.20', quote_free: '7640.00'}
         lighter: {market_id: 'lighter:spot:2048', base_total: '0.5', base_free: '0.4', quote_total: '9875.20', quote_free: '7640.00'}
         margin-trade: {market_id: 'margin-trade:spot:PEARL/USDC', base_total: '0.5', base_free: '0.4', quote_total: '9875.20', quote_free: '7640.00'}
@@ -753,6 +754,7 @@ methods:
       accountVenues: [hyperliquid]
       constants:
         aster: {market_id: 'aster:spot:ASTERUSDT', base: 'ASTER', quote: 'USDT'}
+        grvt: {market_id: 'grvt:spot:GRVT_USDT_SpotSwap', base: 'GRVT', quote: 'USDT'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', base: '197', quote: '0'}
         lighter: {market_id: 'lighter:spot:2048', base: '1', quote: '3'}
         margin-trade: {market_id: 'margin-trade:spot:PEARL/USDC', base: 'PEARL', quote: 'USDC'}

@@ -13,7 +13,7 @@ from typed_grvt.schemas import InstrumentDisplay, Ticker as GrvtTicker
 from tribulnation.sdk.core import MissingData
 from tribulnation.sdk.market import NextFunding, PerpStats, Ticker
 
-from ..core import Shared, percent
+from ..core import InstrumentKind, Shared, percent
 
 
 def price_or_none(value: Decimal | None) -> Decimal | None:
@@ -59,23 +59,22 @@ async def ticker(
 
 
 async def venue_tickers(
-  shared: Shared, markets: Collection[str] | None
+  shared: Shared, markets: Collection[str] | None, *, kind: InstrumentKind
 ) -> dict[str, GrvtTicker]:
-  """The venue tickers of the requested perpetuals (every one when `None`), fetched
-  concurrently; names GRVT does not list are left out."""
-  instruments = await shared.load_instruments()
-  names = (
-    list(instruments) if markets is None else [m for m in markets if m in instruments]
-  )
+  """The venue tickers of the requested instruments of one kind (every one when
+  `None`), fetched concurrently; names GRVT does not list as that kind are left out."""
+  listed = await shared.listed(kind)
+  names = listed if markets is None else [m for m in markets if m in listed]
   rows = await asyncio.gather(*(ticker(shared, name, transport='ws') for name in names))
   return dict(zip(names, rows))
 
 
 async def tickers(
-  shared: Shared, markets: Collection[str] | None
+  shared: Shared, markets: Collection[str] | None, *, kind: InstrumentKind
 ) -> Mapping[str, Ticker]:
-  """Tickers of the requested perpetuals."""
-  return {m: parse_ticker(t) for m, t in (await venue_tickers(shared, markets)).items()}
+  """Tickers of the requested instruments of one kind."""
+  rows = await venue_tickers(shared, markets, kind=kind)
+  return {m: parse_ticker(t) for m, t in rows.items()}
 
 
 def missing_index(instrument: str) -> MissingData:
@@ -96,7 +95,7 @@ async def perp_stats(
   Raises:
     MissingData: A named market's ticker has no index price.
   """
-  rows = await venue_tickers(shared, markets)
+  rows = await venue_tickers(shared, markets, kind='PERPETUAL')
   stats: dict[str, PerpStats] = {}
   for name, t in rows.items():
     index = t.get('index_price')

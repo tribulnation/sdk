@@ -8,6 +8,7 @@ from typed_grvt.schemas import (
   Candlestick,
   Fill,
   InstrumentDisplay,
+  Kind,
   Order as GrvtOrder,
 )
 from tribulnation.sdk import SDK
@@ -40,10 +41,12 @@ class Public(SDK):
     yield self.shared
 
 
-def scope(instrument: InstrumentDisplay) -> tuple[list[str], list[str]]:
-  """The base and quote filters naming one perpetual: GRVT lists one perpetual per
-  base and quote, and filters orders, fills and positions by them, never by name."""
-  return [instrument['base']], [instrument['quote']]
+def scope(instrument: InstrumentDisplay) -> tuple[list[Kind], list[str], list[str]]:
+  """The kind, base and quote filters naming one instrument: GRVT filters orders,
+  fills and positions by them, never by name. It lists one instrument per kind, base
+  and quote, but a spot instrument can share its base and quote with a perpetual
+  (`GRVT_USDT_SpotSwap`, `GRVT_USDT_Perp`), so the kind is part of the filter."""
+  return [instrument['kind']], [instrument['base']], [instrument['quote']]
 
 
 def parse_order(o: GrvtOrder) -> OrderState:
@@ -67,6 +70,9 @@ def parse_order(o: GrvtOrder) -> OrderState:
 
 def parse_fill(f: Fill) -> Trade:
   """The account's fill, signed by side.
+
+  The fee is in `fee_currency`: the quote on a perpetual; on spot, the base on a buy
+  and the quote on a sell (GRVT's exchange contract, `_executeSpotOrder`).
 
   `order_id` and `client_order_id` are both the order's client order id, the SDK order
   id. The fee is the venue's `fee` in `fee_currency` (negative for a maker rebate); a
