@@ -3,7 +3,7 @@ twine
 ipykernel
 pyright
 python-dotenv
-pytest
+pytest==9.1.1
 pytest-asyncio
 -e packages/sdk/pkg[gateway]
 -e packages/sdk-dev/pkg
