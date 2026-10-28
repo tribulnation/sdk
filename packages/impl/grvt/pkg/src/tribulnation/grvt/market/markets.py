@@ -1,4 +1,5 @@
-"""The perpetual Market object; market ids are GRVT instrument names (`BTC_USDT_Perp`)."""
+"""The perpetual and spot Market objects; market ids are GRVT instrument names
+(`BTC_USDT_Perp`, `GRVT_USDT_SpotSwap`)."""
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -13,6 +14,7 @@ from tribulnation.sdk.market import (
   Fees,
   FundingPayment,
   FundingRate,
+  Market,
   NextFunding,
   Order,
   OrderResponse,
@@ -22,6 +24,9 @@ from tribulnation.sdk.market import (
   PerpPosition,
   Rules,
   Settings,
+  SpotBalances,
+  SpotMarket,
+  SpotRules,
   Trade,
 )
 
@@ -36,8 +41,9 @@ as tier 1 (`-1`/`450` millionths). Account tiers are `fees()`."""
 
 
 @dataclass(frozen=True, kw_only=True)
-class GrvtPerpMarket(Public, PerpMarket):
-  """A USDT-margined perpetual."""
+class OrderBookMarket(Public, Market):
+  """An instrument on GRVT's order book: books, candles, orders and fills are the same
+  endpoints for perpetuals and spot."""
 
   instrument: str
   """The instrument name, the market id."""
@@ -47,11 +53,6 @@ class GrvtPerpMarket(Public, PerpMarket):
   def market_id(self) -> str:
     """The instrument name."""
     return self.instrument
-
-  @property
-  def exchange_id(self) -> str:
-    """The perpetual exchange."""
-    return 'perp'
 
   async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
     """The aggregated book at the smallest venue depth (10, 50, 100 or 500 levels per
@@ -75,26 +76,6 @@ class GrvtPerpMarket(Public, PerpMarket):
       queue_size=queue_size,
       overflow=overflow,
     )
-
-  async def rules(self, *, refetch: bool = False) -> Rules:
-    """The instrument's tick, size step (`min_size`, also the minimum) and minimum
-    notional, with the published tier-1 rates; fees are charged in the quote (USDT).
-    `max_position_size` caps a position, not an order, and stays in `details`."""
-    i = await self.shared.instrument(self.instrument, refetch=refetch)
-    return Rules(
-      fee_asset=i['quote'],
-      tick_size=i['tick_size'],
-      step_size=i['min_size'],
-      fixed_min_qty=i['min_size'],
-      min_value=i['min_notional'],
-      fees=STANDARD_FEES,
-      api=i.get('status') == 'ACTIVE',
-      details=i,
-    )
-
-  async def fees(self, *, refetch: bool = False) -> Fees:
-    """The account tier's futures rates, the same for every perpetual and both sides."""
-    return await account.fees(self.shared)
 
   def candles(
     self, interval: CandleInterval, start: datetime, end: datetime
@@ -128,7 +109,7 @@ class GrvtPerpMarket(Public, PerpMarket):
     Raises:
       AuthError: The client has no private key to sign with.
       OrderRejected: The venue refused the order before accepting it (off-tick price,
-        size off the step, below the minimum notional, margin, ...).
+        size off the step, below the minimum notional, margin or balance, ...).
     """
     return await orders.place_order(self.shared, self.instrument, order)
 
@@ -144,12 +125,6 @@ class GrvtPerpMarket(Public, PerpMarket):
     """The venue's cancel-all, scoped to this market."""
     return await orders.cancel_open_orders(self.shared, self.instrument)
 
-  def trades_history(self, start: datetime, end: datetime) -> PaginatedResponse[Trade]:
-    """Personal fills, with fees in USDT."""
-    return PaginatedResponse(
-      history.trades_history(self.shared, self.instrument, start, end)
-    )
-
   def trades_stream(
     self,
     *,
@@ -160,6 +135,42 @@ class GrvtPerpMarket(Public, PerpMarket):
     """The account's new fills on this market."""
     return history.trades_stream(
       self.shared, self.instrument, queue_size=queue_size, overflow=overflow
+    )
+
+
+@dataclass(frozen=True, kw_only=True)
+class GrvtPerpMarket(OrderBookMarket, PerpMarket):
+  """A USDT-margined perpetual."""
+
+  @property
+  def exchange_id(self) -> str:
+    """The perpetual exchange."""
+    return 'perp'
+
+  async def rules(self, *, refetch: bool = False) -> Rules:
+    """The instrument's tick, size step (`min_size`, also the minimum) and minimum
+    notional, with the published tier-1 rates; fees are charged in the quote (USDT).
+    `max_position_size` caps a position, not an order, and stays in `details`."""
+    i = await self.shared.instrument(self.instrument, kind='PERPETUAL', refetch=refetch)
+    return Rules(
+      fee_asset=i['quote'],
+      tick_size=i['tick_size'],
+      step_size=i['min_size'],
+      fixed_min_qty=i['min_size'],
+      min_value=i['min_notional'],
+      fees=STANDARD_FEES,
+      api=i.get('status') == 'ACTIVE',
+      details=i,
+    )
+
+  async def fees(self, *, refetch: bool = False) -> Fees:
+    """The account tier's futures rates, the same for every perpetual and both sides."""
+    return await account.fees(self.shared)
+
+  def trades_history(self, start: datetime, end: datetime) -> PaginatedResponse[Trade]:
+    """Personal fills, with fees in USDT."""
+    return PaginatedResponse(
+      history.trades_history(self.shared, self.instrument, start, end, kind='PERPETUAL')
     )
 
   async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
@@ -215,4 +226,60 @@ class GrvtPerpMarket(Public, PerpMarket):
     """Personal funding payments, received-positive."""
     return PaginatedResponse(
       history.funding_payments(self.shared, self.instrument, start, end)
+    )
+
+
+@dataclass(frozen=True, kw_only=True)
+class GrvtSpotMarket(OrderBookMarket, SpotMarket):
+  """A spot instrument (`SPOT_SWAP`), settled in the trading sub-account's spot wallet."""
+
+  @property
+  def exchange_id(self) -> str:
+    """The spot exchange."""
+    return 'spot'
+
+  async def rules(self, *, refetch: bool = False) -> SpotRules:
+    """The instrument's tick, size step (`min_size`, also the minimum), minimum
+    notional and currencies.
+
+    The fee is charged in the asset a fill delivers (base on a buy, quote on a sell),
+    so `fee_asset` is `None`; GRVT publishes no standard spot schedule, so `fees` is
+    `None` too (account rates are `fees()`).
+    """
+    i = await self.shared.instrument(self.instrument, kind='SPOT_SWAP', refetch=refetch)
+    return SpotRules(
+      base=i['base'],
+      quote=i['quote'],
+      fee_asset=None,
+      tick_size=i['tick_size'],
+      step_size=i['min_size'],
+      fixed_min_qty=i['min_size'],
+      min_value=i['min_notional'],
+      fees=None,
+      api=i.get('status') == 'ACTIVE',
+      details=i,
+    )
+
+  async def fees(self, *, refetch: bool = False) -> Fees:
+    """The account tier's spot rates, the same for every spot instrument and both
+    sides."""
+    return await account.spot_fees(self.shared)
+
+  def trades_history(self, start: datetime, end: datetime) -> PaginatedResponse[Trade]:
+    """Personal fills, each with its fee in the asset it delivered."""
+    return PaginatedResponse(
+      history.trades_history(self.shared, self.instrument, start, end, kind='SPOT_SWAP')
+    )
+
+  async def balances(self, *, ttl: timedelta | None = None) -> SpotBalances:
+    """The base and quote spot-wallet balances, from one `spot_account_summary`.
+
+    `free` is the venue's `available_to_transfer`; whether it excludes what open spot
+    orders hold is unverified.
+    """
+    i = await self.shared.instrument(self.instrument, kind='SPOT_SWAP')
+    rows = await account.spot_wallet(self.shared, ttl=ttl)
+    return SpotBalances(
+      base=account.spot_balance(rows, i['base']),
+      quote=account.spot_balance(rows, i['quote']),
     )

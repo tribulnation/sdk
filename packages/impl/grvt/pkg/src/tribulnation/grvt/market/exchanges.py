@@ -1,5 +1,5 @@
-"""The perpetual exchange: discovery, bulk snapshots, exchange-wide history and the
-cross collateral bucket."""
+"""The perpetual and spot exchanges: discovery, bulk snapshots, exchange-wide history,
+the cross collateral bucket and spot balances."""
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from typing_extensions import AsyncIterable, Collection, Mapping, Sequence, overload
 from tribulnation.sdk.core import PaginatedResponse
 from tribulnation.sdk.market import (
+  Balance,
   ExchangeFundingPayment,
   ExchangeTrade,
   FundingPayment,
@@ -14,13 +15,68 @@ from tribulnation.sdk.market import (
   PerpExchange,
   PerpStats,
   Settings,
+  SpotExchange,
   Ticker,
   Trade,
 )
 
 from . import account, history, stats
 from .common import Public
-from .markets import GrvtPerpMarket
+from .markets import GrvtPerpMarket, GrvtSpotMarket
+
+
+@dataclass(frozen=True, kw_only=True)
+class GrvtSpotExchange(Public, SpotExchange):
+  """Every spot instrument (`SPOT_SWAP`), trading the trading sub-account's spot
+  wallet."""
+
+  @property
+  def exchange_id(self) -> str:
+    """The spot exchange."""
+    return 'spot'
+
+  async def markets(self) -> Sequence[str]:
+    """Every spot instrument's name, delisted ones included (`rules().api` says
+    whether it trades)."""
+    return await self.shared.listed('SPOT_SWAP')
+
+  async def market(self, market_id: str, /) -> GrvtSpotMarket:
+    """A spot instrument by name."""
+    detail = await self.shared.instrument(market_id, kind='SPOT_SWAP')
+    return GrvtSpotMarket(shared=self.shared, instrument=detail['instrument'])
+
+  async def balance(self, asset: str, /, *, ttl: timedelta | None = None) -> Balance:
+    """One currency's spot-wallet balance by code (`USDT`), zero when not held."""
+    return account.spot_balance(await account.spot_wallet(self.shared, ttl=ttl), asset)
+
+  async def tickers(
+    self,
+    markets: Collection[str] | None = None,
+    *,
+    settings: Settings = {},
+    ttl: timedelta | None = None,
+  ) -> Mapping[str, Ticker]:
+    """One `ticker` per spot instrument, concurrently: last price, best bid/ask with
+    sizes and 24h volumes (taker buys plus sells)."""
+    return await stats.tickers(self.shared, markets, kind='SPOT_SWAP')
+
+  @overload
+  def trades_history(
+    self, market_id: None, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[ExchangeTrade]: ...
+  @overload
+  def trades_history(
+    self, market_id: str, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[Trade]: ...
+  @PaginatedResponse.lift
+  async def trades_history(
+    self, market_id: str | None, /, start: datetime, end: datetime
+  ) -> AsyncIterable[Sequence[Trade]]:
+    """Personal spot fills, of one market or every market (delisted included)."""
+    async for page in history.trades_history(
+      self.shared, market_id, start, end, kind='SPOT_SWAP'
+    ):
+      yield page
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -35,11 +91,11 @@ class GrvtPerpExchange(Public, PerpExchange):
   async def markets(self) -> Sequence[str]:
     """Every perpetual's instrument name, delisted ones included (`rules().api` says
     whether it trades)."""
-    return list(await self.shared.load_instruments())
+    return await self.shared.listed('PERPETUAL')
 
   async def market(self, market_id: str, /) -> GrvtPerpMarket:
     """A perpetual by instrument name."""
-    detail = await self.shared.instrument(market_id)
+    detail = await self.shared.instrument(market_id, kind='PERPETUAL')
     return GrvtPerpMarket(shared=self.shared, instrument=detail['instrument'])
 
   async def tickers(
@@ -51,7 +107,7 @@ class GrvtPerpExchange(Public, PerpExchange):
   ) -> Mapping[str, Ticker]:
     """One `ticker` per perpetual, concurrently: last price, best bid/ask with sizes
     and 24h volumes (taker buys plus sells)."""
-    return await stats.tickers(self.shared, markets)
+    return await stats.tickers(self.shared, markets, kind='PERPETUAL')
 
   async def perp_stats(
     self,
@@ -77,7 +133,9 @@ class GrvtPerpExchange(Public, PerpExchange):
     self, market_id: str | None, /, start: datetime, end: datetime
   ) -> AsyncIterable[Sequence[Trade]]:
     """Personal perpetual fills, of one market or every market (delisted included)."""
-    async for page in history.trades_history(self.shared, market_id, start, end):
+    async for page in history.trades_history(
+      self.shared, market_id, start, end, kind='PERPETUAL'
+    ):
       yield page
 
   @overload

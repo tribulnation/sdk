@@ -1,6 +1,6 @@
 # GRVT SDK
 
-USDT-margined perpetual Market support, and Report snapshots, for
+USDT-margined perpetual and spot Market support, and Report snapshots, for
 [GRVT](https://grvt.io/), built on `typed-grvt`. Install with
 `pip install tribulnation-grvt`.
 
@@ -22,18 +22,22 @@ reads = GrvtMarket.new(api_key='…')
 trading = GrvtMarket.new(api_key='…', private_key='0x…', env='testnet')
 ```
 
-1. One exchange, `perp`. Market ids are instrument names (`BTC_USDT_Perp`), the same on
-   mainnet and testnet; asset ids are currency codes (`USDT`).
+1. Two exchanges, `perp` and `spot`. Market ids are instrument names (`BTC_USDT_Perp`,
+   `GRVT_USDT_SpotSwap`), the same on mainnet and testnet; asset ids are currency codes
+   (`USDT`). Spot instruments (GRVT's `SPOT_SWAP`) are order books settled in the
+   trading sub-account's spot wallet; their collateral IDs are `<account>:spot:<asset>`.
 2. Public data: discovery, tickers and `perp_stats` (one `ticker` request per market,
-   sent concurrently), rules with GRVT's published tier-1 rates, REST depth and a shared
+   sent concurrently), rules (perpetuals with GRVT's published tier-1 rates; spot
+   publishes none), REST depth and a shared
    delta depth stream, candles in the six SDK intervals, index, next funding and
    funding-rate history (4- or 8-hour settlements).
 3. Account and trading, on the trading sub-account (`trading_account_id`, else the one
    the API key is scoped to): the account's fee tier, order queries, open orders, trade
    history (per market or exchange-wide) and fill streams, positions, the cross and
-   isolated collateral buckets, leverage, available notional, funding payments, and
-   `MARKET`, `LIMIT` and `POST_ONLY` orders with every cancellation method. Order ids
-   are client order ids. Trading is verified on testnet only.
+   isolated collateral buckets, leverage, available notional, funding payments, the
+   spot wallet's balances, and `MARKET`, `LIMIT` and `POST_ONLY` orders with every
+   cancellation method. Order ids are client order ids. Perpetual trading is verified
+   on testnet only, spot trading too.
 4. Margin types and leverage are read, not set: set them on the venue.
 
 `Report` snapshots the funding wallet and every trading sub-account the API key can

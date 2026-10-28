@@ -159,7 +159,11 @@ async def test_fill_bounds_are_inclusive_at_microseconds(shared: Shared, fake: A
     fill(start - MICRO),
   ]
   fake.trading.fill_history_paged = recorder([rows], requests, [])
-  trades = [t async for p in history.trades_history(shared, BTC, start, END) for t in p]
+  trades = [
+    t
+    async for p in history.trades_history(shared, BTC, start, END, kind='PERPETUAL')
+    for t in p
+  ]
   assert [t.time for t in trades] == [END, start + 30 * timedelta(minutes=1), start]
   assert requests == [
     {
@@ -188,7 +192,11 @@ async def test_exchange_fills_carry_their_market(shared: Shared, fake: Any):
   rows = [fill(END), fill(END - HOUR, instrument='ETH_USDT_Perp')]
   fake.trading.fill_history_paged = recorder([rows], requests, [])
   trades = [
-    t async for p in history.trades_history(shared, None, END - HOUR, END) for t in p
+    t
+    async for p in history.trades_history(
+      shared, None, END - HOUR, END, kind='PERPETUAL'
+    )
+    for t in p
   ]
   assert [getattr(t, 'market_id') for t in trades] == [BTC, 'ETH_USDT_Perp']
   assert all(isinstance(t, ExchangeTrade) for t in trades)
@@ -203,7 +211,9 @@ async def test_fill_pages_retry_without_duplicates(shared: Shared, fake: Any):
   with Context().retried(NetworkError, max_retries=1, base_delay=0).use():
     trades = [
       t
-      async for p in history.trades_history(shared, BTC, END - 5 * HOUR, END)
+      async for p in history.trades_history(
+        shared, BTC, END - 5 * HOUR, END, kind='PERPETUAL'
+      )
       for t in p
     ]
   assert calls == [0, 1, 1, 2]
@@ -310,6 +320,10 @@ async def test_account_history_needs_an_api_key(
 ):
   """A public client raises `AuthError` before any request."""
   shared = make_shared(make_fake(api_key=False))
-  walk = getattr(history, read)(shared, BTC, END - HOUR, END)
+  walk = (
+    history.trades_history(shared, BTC, END - HOUR, END, kind='PERPETUAL')
+    if read == 'trades_history'
+    else history.funding_payments(shared, BTC, END - HOUR, END)
+  )
   with pytest.raises(AuthError):
     await anext(aiter(walk))

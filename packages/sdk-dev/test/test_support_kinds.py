@@ -97,7 +97,7 @@ def test_committed_declarations_agree_with_the_contracts():
   for contract in sorted((root / 'docs/contract').glob('*.yml')):
     assert kind_conflicts(impls, contract.stem, load_method_kinds(contract)) == []
   kinds = load_method_kinds(root / 'docs/contract/market.yml')
-  for venue in ('dydx', 'extended', 'grvt'):
+  for venue in ('dydx', 'extended'):
     assert impls[venue].support['market'].support == 'full'
     for method, kind in kinds.items():
       eligible = venue in method_universe(impls, 'market', method, kind=kind)

@@ -92,8 +92,12 @@ CASES: Mapping[str, Sequence[CandleCase]] = {
     CandleCase(market_id='perp:BTC', page=None),
     CandleCase(market_id='spot:PEARL/USDC', page=None),
   ],
-  # Instrument names are the same on mainnet and testnet.
-  'grvt': [CandleCase(market_id='perp:BTC_USDT_Perp', page=1000)],
+  # Instrument names are the same on mainnet and testnet. The spot instrument was listed
+  # on 2026-09-30, so fewer opens exist than one page plus the straddle extra.
+  'grvt': [
+    CandleCase(market_id='perp:BTC_USDT_Perp', page=1000),
+    CandleCase(market_id='spot:GRVT_USDT_SpotSwap', page=None),
+  ],
   # Testnet serves thousands of candles per response, so one page cannot straddle two.
   'lighter_testnet': [
     CandleCase(market_id='perp:4096', page=None),

@@ -21,7 +21,7 @@ from tribulnation.sdk.market import (
   Trade,
 )
 
-from ..core import Shared, percent, upper_bound, wrap_exceptions
+from ..core import InstrumentKind, Shared, percent, upper_bound, wrap_exceptions
 from .common import parse_candle, parse_fill, scope
 
 PAGE = 1000
@@ -96,22 +96,27 @@ async def funding_rates(
 
 
 async def trades_history(
-  shared: Shared, instrument: str | None, start: datetime, end: datetime
+  shared: Shared,
+  instrument: str | None,
+  start: datetime,
+  end: datetime,
+  *,
+  kind: InstrumentKind,
 ) -> AsyncIterable[Sequence[Trade]]:
-  """Personal perpetual fills with `start <= time <= end`, newest first.
+  """Personal fills of one kind with `start <= time <= end`, newest first.
 
-  One market is filtered by its base and quote; exchange-wide rows (`instrument=None`)
-  are `ExchangeTrade`s.
+  One market is filtered by its kind, base and quote; exchange-wide rows
+  (`instrument=None`) are the kind's `ExchangeTrade`s.
   """
   shared.require_session()
   if instrument is None:
     pages = shared.client.trading.fill_history_paged(
-      kind=['PERPETUAL'], start_time=start, end_time=upper_bound(end), limit=PAGE
+      kind=[kind], start_time=start, end_time=upper_bound(end), limit=PAGE
     )
   else:
-    base, quote = scope(await shared.instrument(instrument))
+    kinds, base, quote = scope(await shared.instrument(instrument, kind=kind))
     pages = shared.client.trading.fill_history_paged(
-      kind=['PERPETUAL'],
+      kind=kinds,
       base=base,
       quote=quote,
       start_time=start,
@@ -199,7 +204,7 @@ async def trades_stream(
   queue_size: int = 1000,
   overflow: OverflowPolicy = 'fail',
 ):
-  """Fan out the account's fills on one perpetual.
+  """Fan out the account's fills on one instrument.
 
   Args:
     shared: The owner of the client and its fan-outs.

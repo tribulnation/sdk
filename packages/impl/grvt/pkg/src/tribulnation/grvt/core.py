@@ -30,6 +30,14 @@ from tribulnation.sdk.market import Book, Trade
 T = TypeVar('T')
 VenueId = Literal['grvt', 'grvt_testnet']
 """GRVT's venue IDs: mainnet, and testnet as a separate venue."""
+InstrumentKind = Literal['PERPETUAL', 'SPOT_SWAP']
+"""The instrument kinds the SDK trades: perpetuals, and spot (`SPOT_SWAP`, an order book
+settled in the trading sub-account's spot wallet)."""
+KIND_NAMES: dict[InstrumentKind, str] = {
+  'PERPETUAL': 'perpetual',
+  'SPOT_SWAP': 'spot instrument',
+}
+"""How errors name each kind."""
 Environment = Literal['prod', 'testnet']
 """The GRVT deployments the SDK connects to."""
 wrap_exceptions = exception_wrapper()
@@ -71,7 +79,7 @@ def percent(value: Decimal) -> Decimal:
 
 @dataclass(frozen=True, kw_only=True)
 class Shared(SDK):
-  """Own one client; cache the perpetuals; share reads and stream fan-outs."""
+  """Own one client; cache the instruments; share reads and stream fan-outs."""
 
   client: Grvt
   venue_id: VenueId = 'grvt'
@@ -81,7 +89,7 @@ class Shared(SDK):
   instruments: dict[str, InstrumentDisplay] = field(
     default_factory=dict[str, InstrumentDisplay]
   )
-  """Every perpetual by instrument name, delisted ones included."""
+  """Every perpetual and spot instrument by name, delisted ones included."""
   lock: asyncio.Lock = field(default_factory=asyncio.Lock)
   books: dict[str, Subscription[Book]] = field(
     default_factory=dict[str, Subscription[Book]]
@@ -182,23 +190,34 @@ class Shared(SDK):
   async def load_instruments(
     self, *, refetch: bool = False
   ) -> dict[str, InstrumentDisplay]:
-    """Cache every perpetual, delisted ones included, from one request."""
+    """Cache every perpetual and spot instrument, delisted ones included, from one
+    request."""
     async with self.lock:
       if refetch or not self.instruments:
         rows = await self.call(
-          lambda: self.client.market.all_instruments(kinds=['PERPETUAL'])
+          lambda: self.client.market.all_instruments(kinds=['PERPETUAL', 'SPOT_SWAP'])
         )
         self.instruments.clear()
         self.instruments.update((i['instrument'], i) for i in rows)
     return self.instruments
 
-  async def instrument(self, name: str, *, refetch: bool = False) -> InstrumentDisplay:
-    """One perpetual's instrument.
+  async def listed(self, kind: InstrumentKind) -> list[str]:
+    """The names of every instrument of one kind, delisted ones included."""
+    instruments = await self.load_instruments()
+    return [name for name, i in instruments.items() if i['kind'] == kind]
+
+  async def instrument(
+    self, name: str, *, kind: InstrumentKind | None = None, refetch: bool = False
+  ) -> InstrumentDisplay:
+    """One instrument, of `kind` when given.
 
     Raises:
-      ValueError: GRVT lists no perpetual of that name.
+      ValueError: GRVT lists no instrument of that name (and kind).
     """
     instruments = await self.load_instruments(refetch=refetch)
-    if name not in instruments:
-      raise ValueError(f'Unknown GRVT perpetual: {name!r}')
-    return instruments[name]
+    i = instruments.get(name)
+    if i is not None and kind in (None, i['kind']):
+      return i
+    else:
+      label = 'instrument' if kind is None else KIND_NAMES[kind]
+      raise ValueError(f'Unknown GRVT {label}: {name!r}')
