@@ -17,7 +17,7 @@ from typed_extended.orders.schemas import PlacedOrder
 from tribulnation.sdk.core import BadRequest, OrderRejected
 from tribulnation.sdk.market import Order, OrderResponse, OrderState
 
-from ..core import EXPIRY_MARGIN, ORDER_LIFETIME, Shared
+from ..core import EXPIRY_MARGIN, ORDER_LIFETIME, Settings, Shared
 from .common import parse_order
 
 DUPLICATE_ORDER = 1134
@@ -92,12 +92,16 @@ def check_order(row: MarketRow, qty: Decimal, price: Decimal):
     )
 
 
-async def place_order(shared: Shared, row: MarketRow, order: Order) -> OrderResponse:
+async def place_order(
+  shared: Shared, row: MarketRow, order: Order, settings: Settings = {}
+) -> OrderResponse:
   """Sign and send one order; an RFQ market's go through `create_rfq`.
 
   `LIMIT` rests good-till-time until the network's longest expiry (90 days on mainnet,
   28 on testnet, less a minute); `POST_ONLY` adds `postOnly`, and an RFQ market refuses
   it; `MARKET` is the venue's market order (immediate-or-cancel) bounded by `price`.
+  With the `time_in_force: 'IOC'` setting a `LIMIT` is immediate-or-cancel instead, with
+  the client's default expiry (an hour), as a `MARKET` order carries.
   Self-trade protection is `ACCOUNT`. The fee cap is the account's maker rate for
   post-only orders and its taker rate otherwise, and `client_order_id` is sent as the
   order's `id` (its `externalId`; the order hash when omitted). The venue does not keep
@@ -108,14 +112,19 @@ async def place_order(shared: Shared, row: MarketRow, order: Order) -> OrderResp
 
   Raises:
     AuthError: The client cannot sign (no Stark private key).
-    ValueError: Zero size, non-positive or off-grid price or size, or `POST_ONLY` on an
-      RFQ market.
+    ValueError: Zero size, non-positive or off-grid price or size, `POST_ONLY` on an
+      RFQ market, or `time_in_force` set on an order other than `LIMIT`.
     OrderRejected: The venue refused the order with an error code (other than `1134`
       DuplicateOrder and `1006` UnhandledError): nothing rests. Observed: `1140`, the
       order's cost exceeds the available balance, and `1120`, a size below the
       minimum.
   """
   market, rfq = row['name'], row['isRfq']
+  time_in_force = settings.get('time_in_force')
+  if time_in_force is not None and order['type'] != 'LIMIT':
+    raise ValueError(
+      f'Extended time_in_force applies to LIMIT orders only, not {order["type"]}'
+    )
   qty = Decimal(order['qty'])
   price = Decimal(order['price'])
   check_order(row, qty, price)
@@ -153,10 +162,11 @@ async def place_order(shared: Shared, row: MarketRow, order: Order) -> OrderResp
         'side': side,
         'qty': abs(qty),
         'price': price,
-        'timeInForce': 'GTT',
+        'timeInForce': time_in_force or 'GTT',
         'selfTradeProtectionLevel': 'ACCOUNT',
-        'expiryEpochMillis': expiry,
       }
+      if time_in_force is None:
+        rfq_limit['expiryEpochMillis'] = expiry
       if client_id is not None:
         rfq_limit['id'] = client_id
       placed = await submit(shared, lambda: orders.create_rfq(rfq_limit))
@@ -167,11 +177,12 @@ async def place_order(shared: Shared, row: MarketRow, order: Order) -> OrderResp
         'side': side,
         'qty': abs(qty),
         'price': price,
-        'timeInForce': 'GTT',
+        'timeInForce': time_in_force or 'GTT',
         'selfTradeProtectionLevel': 'ACCOUNT',
-        'expiryEpochMillis': expiry,
         'postOnly': order['type'] == 'POST_ONLY',
       }
+      if time_in_force is None:
+        limit['expiryEpochMillis'] = expiry
       if client_id is not None:
         limit['id'] = client_id
       placed = await submit(shared, lambda: orders.create(limit))

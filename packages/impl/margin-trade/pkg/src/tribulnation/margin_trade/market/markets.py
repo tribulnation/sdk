@@ -54,6 +54,7 @@ from ..core import (
   SPOT_PRICE_DECIMALS,
   Pair,
   Public,
+  Settings as MarginTradeSettings,
   order_state,
   parse_book,
   parse_trade,
@@ -77,6 +78,16 @@ TIME_IN_FORCE: dict[str, Literal['Gtc', 'Alo', 'Ioc']] = {
 }
 """`MARKET` is an IOC limit at the SDK's protection price: the venue has no market order
 type, and refuses an IOC priced too far through the book with `slippage exceeded`."""
+
+
+def time_in_force(
+  order: Order, settings: MarginTradeSettings
+) -> Literal['Gtc', 'Alo', 'Ioc']:
+  """The order's `tif`: a `LIMIT` order's `limit_tif` setting, or its type's default."""
+  if order['type'] == 'LIMIT':
+    return settings.get('limit_tif', TIME_IN_FORCE['LIMIT'])
+  else:
+    return TIME_IN_FORCE[order['type']]
 
 
 def next_settlement(now: datetime) -> datetime:
@@ -247,6 +258,9 @@ class NativeMarket(Public, Market):
     """
     Place a LIMIT (`Gtc`), POST_ONLY (`Alo`) or MARKET (`Ioc` at `price`) order.
 
+    `settings={'margin-trade': {'limit_tif': 'Ioc'}}` sends a LIMIT order with that time
+    in force instead (`'Gtc'`, `'Ioc'` or `'Alo'`); other order types ignore it.
+
     The price is rounded to the venue's precision. `filled_qty` is reported for orders
     that fill on placement; a resting order reports none.
 
@@ -262,7 +276,7 @@ class NativeMarket(Public, Market):
       ),
       's': abs(qty),
       'r': False,
-      't': {'limit': {'tif': TIME_IN_FORCE[order['type']]}},
+      't': {'limit': {'tif': time_in_force(order, settings.get('margin-trade', {}))}},
     }
     if (cloid := order.get('client_order_id')) is not None:
       spec['c'] = cloid

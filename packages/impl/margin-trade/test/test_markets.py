@@ -36,6 +36,7 @@ from tribulnation.sdk.market import (
   Balance,
   Fees,
   Order,
+  Settings,
   SpotBalances,
   SpotCollateralIds,
 )
@@ -216,6 +217,45 @@ async def test_place_order_spec(
   ]
   assert kwargs == {'grouping': 'na'}
   assert response.id == '5' and response.filled_qty is None
+
+
+@pytest.mark.parametrize('market', [perp, spot])
+@pytest.mark.parametrize(
+  ('settings', 'tif'),
+  [
+    ({}, 'Gtc'),
+    ({'hyperliquid': {'limit_tif': 'Ioc'}}, 'Gtc'),
+    ({'margin-trade': {'limit_tif': 'Ioc'}}, 'Ioc'),
+    ({'margin-trade': {'limit_tif': 'Alo'}}, 'Alo'),
+  ],
+)
+async def test_limit_tif_setting(
+  market: Callable[[], PerpMarket | SpotMarket],
+  settings: Settings,
+  tif: str,
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """A LIMIT order is `Gtc` unless `settings['margin-trade']['limit_tif']` says
+  otherwise; other venues' keys are ignored."""
+  endpoint = AsyncMock(return_value={'statuses': [{'resting': {'oid': 5}}]})
+  monkeypatch.setattr(OrderEndpoint, 'order', endpoint)
+  order: Order = {'type': 'LIMIT', 'qty': Decimal('1'), 'price': Decimal('2')}
+  await market().place_order(order, settings=settings)
+  ((spec,),) = endpoint.call_args.args
+  assert spec['t'] == {'limit': {'tif': tif}}
+
+
+@pytest.mark.parametrize(('type', 'tif'), [('MARKET', 'Ioc'), ('POST_ONLY', 'Alo')])
+async def test_limit_tif_leaves_other_types_alone(
+  type: Any, tif: str, monkeypatch: pytest.MonkeyPatch
+):
+  """`limit_tif` applies to LIMIT orders only."""
+  endpoint = AsyncMock(return_value={'statuses': [{'resting': {'oid': 5}}]})
+  monkeypatch.setattr(OrderEndpoint, 'order', endpoint)
+  order: Order = {'type': type, 'qty': Decimal('1'), 'price': Decimal('2')}
+  await perp().place_order(order, settings={'margin-trade': {'limit_tif': 'Gtc'}})
+  ((spec,),) = endpoint.call_args.args
+  assert spec['t'] == {'limit': {'tif': tif}}
 
 
 async def test_filled_order_reports_its_size(monkeypatch: pytest.MonkeyPatch):

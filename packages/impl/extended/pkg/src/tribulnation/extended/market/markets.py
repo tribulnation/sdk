@@ -150,15 +150,19 @@ class ExtendedPerpMarket(Public, PerpMarket):
     """Sign and send an order; RFQ markets go through the RFQ endpoint.
 
     See `orders.place_order` for the mapping.
+    `settings={'extended': {'time_in_force': 'IOC'}}` sends a LIMIT order
+    immediate-or-cancel.
 
     Raises:
       AuthError: The client cannot sign (no Stark private key).
-      ValueError: Zero size, non-positive or off-grid price or size, or `POST_ONLY` on
-        an RFQ market.
+      ValueError: Zero size, non-positive or off-grid price or size, `POST_ONLY` on an
+        RFQ market, or `time_in_force` set on a MARKET or POST_ONLY order.
       OrderRejected: The venue refused the order with an error code: nothing rests.
     """
     row = await self.shared.perp(self.name)
-    return await orders.place_order(self.shared, row, order)
+    return await orders.place_order(
+      self.shared, row, order, settings.get('extended', {})
+    )
 
   async def cancel_order(self, id: str, *, settings: Settings = {}) -> Any:
     """Cancel by Extended id; cancellation is asynchronous."""

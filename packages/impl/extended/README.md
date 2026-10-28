@@ -29,7 +29,8 @@ With no arguments, the client reads `EXTENDED_API_KEY`, `EXTENDED_STARK_PRIVATE_
    six SDK intervals, index, `perp_stats`, next funding and hourly funding-rate history.
    RFQ markets' books are their quotes, from the RFQ quotes stream.
 3. Account and trading: fees, order queries, open orders, trade history and the fills
-   stream, positions, collateral, leverage, available notional, `MARKET`, `LIMIT` and
+   stream, positions, collateral, leverage, available notional, `MARKET`, `LIMIT` (or
+   immediate-or-cancel with `settings={'extended': {'time_in_force': 'IOC'}}`) and
    `POST_ONLY` orders (RFQ markets through the RFQ endpoint), and every cancellation
    method. Order ids are Extended's numeric order ids; `client_order_id` is the order's
    `externalId`.
