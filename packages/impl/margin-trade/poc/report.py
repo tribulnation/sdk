@@ -55,13 +55,7 @@ ADDRESS[:6]
 # %%
 from sdk_dev.surface import surface
 
-print(
-  surface(
-    'typed_margin_trade',
-    'MarginTrade',
-    grep=r'clearinghouse|fill|funding|transfer|deposit|withdraw|web_data',
-  )
-)
+print(surface('typed_margin_trade', 'MarginTrade', grep=r'clearinghouse|fill|funding|transfer|deposit|withdraw|web_data'))
 
 
 # %% [markdown]
@@ -74,49 +68,24 @@ PERP_ASSET = 'USDC'
 """The perp wallet's only asset: `getTransferHistory` and `webData3.perpBalance` name it `USDC`."""
 
 
-async def snapshot(
-  assets: Collection[str] | None = None, user: str = ADDRESS, via: MarginTrade = testnet
-) -> SnapshotRecord:
-  state, spot = await asyncio.gather(
-    via.info.clearinghouse_state(user=user), via.info.spot_clearinghouse_state(user)
-  )
-  unrealized = sum(
-    (p['position']['unrealizedPnl'] for p in state['assetPositions']), Decimal(0)
-  )
+async def snapshot(assets: Collection[str] | None = None, user: str = ADDRESS, via: MarginTrade = testnet) -> SnapshotRecord:
+  state, spot = await asyncio.gather(via.info.clearinghouse_state(user=user), via.info.spot_clearinghouse_state(user))
+  unrealized = sum((p['position']['unrealizedPnl'] for p in state['assetPositions']), Decimal(0))
   balance = state['marginSummary']['accountValue'] - unrealized
   snap = Snapshot(
     subaccounts=[
       SubaccountSnapshot(
         subaccount='perp',
         balances={PERP_ASSET: balance} if balance else {},
-        positions={
-          p['position']['coin']: Position(
-            size=p['position']['szi'], avg_price=p['position']['entryPx']
-          )
-          for p in state['assetPositions']
-        },
+        positions={p['position']['coin']: Position(size=p['position']['szi'], avg_price=p['position']['entryPx']) for p in state['assetPositions']},
       ),
-      SubaccountSnapshot(
-        subaccount='spot',
-        balances={b['coin']: b['total'] for b in spot['balances'] if b['total']},
-      ),
+      SubaccountSnapshot(subaccount='spot', balances={b['coin']: b['total'] for b in spot['balances'] if b['total']}),
     ]
   )
-  return SnapshotRecord(
-    snapshot=snap,
-    provenance={
-      'source': 'api',
-      'service': 'margin-trade-testnet',
-      'id': snap.time.isoformat(),
-    },
-  )
+  return SnapshotRecord(snapshot=snap, provenance={'source': 'api', 'service': 'margin-trade-testnet', 'id': snap.time.isoformat()})
 
 
-(
-  await snapshot(),
-  await snapshot(user=SPOT_TRADER, via=mainnet),
-  await snapshot(user=PERP_TRADER, via=mainnet),
-)
+await snapshot(), await snapshot(user=SPOT_TRADER, via=mainnet), await snapshot(user=PERP_TRADER, via=mainnet)
 
 
 # %% [markdown]
@@ -128,117 +97,49 @@ async def snapshot(
 # 2. Funding (`userFunding`): `Funding`, signed received-positive.
 # 3. Transfers (`getTransferHistory`, the whole history in one response): on-chain deposits and withdrawals, perp/spot transfers (one row per transfer, `venue` naming the credited wallet), faucet credits (testnet `deposit` rows whose `txHash` is `faucet:...`) as `Bonus`; `system` and `liquidation` rows unclassified.
 
-
 # %%
 def fill_record(fill: Fill, perps: set[str], service: str) -> HistoryRecord:
   side = 1 if fill['side'] == 'B' else -1
   fee = Fee(amount=fill['fee'], asset=fill['feeToken'])
-  common: dict[str, Any] = {
-    'id': f'fill:{fill["tid"]}',
-    'time': fill['time'],
-    'order_id': str(fill['oid']),
-    'fee': fee,
-    'price': fill['px'],
-    'size': side * fill['sz'],
-  }
+  common: dict[str, Any] = {'id': f'fill:{fill["tid"]}', 'time': fill['time'], 'order_id': str(fill['oid']), 'fee': fee, 'price': fill['px'], 'size': side * fill['sz']}
   if fill['coin'] in perps:
-    obs: Observation = FutureTrade(
-      **common,
-      subaccount='perp',
-      instrument=fill['coin'],
-      settle=PERP_ASSET,
-      realized_pnl=fill['closedPnl'] + fill['fee'],
-    )
+    obs: Observation = FutureTrade(**common, subaccount='perp', instrument=fill['coin'], settle=PERP_ASSET, realized_pnl=fill['closedPnl'] + fill['fee'])
   else:
     base, quote = fill['coin'].split('/')
-    obs = SpotTrade(
-      **common, subaccount='spot', pair=fill['coin'], base=base, quote=quote
-    )
-  return HistoryRecord(
-    observations=[obs],
-    provenance={
-      'source': 'api',
-      'service': service,
-      'id': f'fill:{fill["tid"]}',
-      'details': fill,
-    },
-  )
+    obs = SpotTrade(**common, subaccount='spot', pair=fill['coin'], base=base, quote=quote)
+  return HistoryRecord(observations=[obs], provenance={'source': 'api', 'service': service, 'id': f'fill:{fill["tid"]}', 'details': fill})
 
 
 def funding_record(row: UserFundingRecord, service: str) -> HistoryRecord:
   delta = row['delta']
-  obs = Funding(
-    id=f'funding:{row["hash"]}',
-    time=row['time'],
-    subaccount='perp',
-    asset=PERP_ASSET,
-    amount=delta['usdc'],
-    instrument=delta['coin'],
-  )
-  return HistoryRecord(
-    observations=[obs],
-    provenance={
-      'source': 'api',
-      'service': service,
-      'id': f'funding:{row["hash"]}',
-      'details': row,
-    },
-  )
+  obs = Funding(id=f'funding:{row["hash"]}', time=row['time'], subaccount='perp', asset=PERP_ASSET, amount=delta['usdc'], instrument=delta['coin'])
+  return HistoryRecord(observations=[obs], provenance={'source': 'api', 'service': service, 'id': f'funding:{row["hash"]}', 'details': row})
 
 
 def transfer_observation(row: TransferHistoryItem, id: str) -> Observation:
-  common: dict[str, Any] = {
-    'id': id,
-    'time': row['createdTime'],
-    'subaccount': row['venue'],
-    'asset': row['asset'],
-  }
+  common: dict[str, Any] = {'id': id, 'time': row['createdTime'], 'subaccount': row['venue'], 'asset': row['asset']}
   tx = row.get('txHash')
   match row['type']:
     case 'deposit' if tx is not None and tx.startswith('faucet:'):
       return Bonus(**common, amount=row['amountChange'], category='faucet')
     case 'deposit':
-      return CryptoDeposit(
-        **common,
-        amount=row['amountChange'],
-        network=row.get('chain'),
-        tx_id=tx,
-        src_address=row['from'] or None,
-        dst_address=row['to'] or None,
-      )
+      return CryptoDeposit(**common, amount=row['amountChange'], network=row.get('chain'), tx_id=tx, src_address=row['from'] or None, dst_address=row['to'] or None)
     case 'withdrawal':
       fee = Fee(amount=row['fee'], asset=row['asset']) if row['fee'] else None
-      return CryptoWithdrawal(
-        **common,
-        amount=row['amountChange'],
-        network=row.get('chain'),
-        tx_id=tx,
-        src_address=row['from'] or None,
-        dst_address=row['to'] or None,
-        fee=fee,
-      )
+      return CryptoWithdrawal(**common, amount=row['amountChange'], network=row.get('chain'), tx_id=tx, src_address=row['from'] or None, dst_address=row['to'] or None, fee=fee)
     case 'transfer':
       other = 'spot' if row['venue'] == 'perp' else 'perp'
-      return InternalTransfer(
-        **common, amount=row['amount'], src_account=other, dst_account=row['venue']
-      )
+      return InternalTransfer(**common, amount=row['amount'], src_account=other, dst_account=row['venue'])
     case _:
       return UnknownObservation(**common, amount=row['amountChange'])
 
 
-async def history(
-  start: datetime | None = None,
-  end: datetime | None = None,
-  user: str = ADDRESS,
-  via: MarginTrade = testnet,
-) -> AsyncIterator[HistoryRecord]:
+async def history(start: datetime | None = None, end: datetime | None = None, user: str = ADDRESS, via: MarginTrade = testnet) -> AsyncIterator[HistoryRecord]:
   service = 'margin-trade-testnet' if via is testnet else 'margin-trade'
   upper = end or datetime.now(timezone.utc)
   lower = start or datetime(2025, 1, 1, tzinfo=timezone.utc)
   perps = {item['name'] for item in (await via.info.meta())['universe']}
-  async for page in via.info.user_fills_by_time_paged(
-    user, start_time=lower, end_time=upper
-  ):
+  async for page in via.info.user_fills_by_time_paged(user, start_time=lower, end_time=upper):
     for fill in page:
       yield fill_record(fill, perps, service)
   for row in await via.info.user_funding(user, start_time=lower, end_time=upper):
@@ -246,48 +147,27 @@ async def history(
   for row in (await via.user.get_transfer_history(user))['items']:
     if lower <= row['createdTime'] <= upper:
       id = f'transfer:{row["type"]}:{row["venue"]}:{int(row["createdTime"].timestamp() * 1000)}'
-      yield HistoryRecord(
-        observations=[transfer_observation(row, id)],
-        provenance={'source': 'api', 'service': service, 'id': id, 'details': row},
-      )
+      yield HistoryRecord(observations=[transfer_observation(row, id)], provenance={'source': 'api', 'service': service, 'id': id, 'details': row})
 
 
 records = [r async for r in history()]
 kinds: dict[str, int] = {}
 for r in records:
   kinds[r.observations[0].type] = kinds.get(r.observations[0].type, 0) + 1
-transfers = [
-  r.observations[0]
-  for r in records
-  if r.observations[0].type not in ('future_trade', 'funding')
-]
+transfers = [r.observations[0] for r in records if r.observations[0].type not in ('future_trade', 'funding')]
 kinds, transfers, len({r.provenance['id'] for r in records}) == len(records)
 
 # %% [markdown]
 # Mainnet accounts: spot fills, funding and on-chain deposits/withdrawals with networks.
 
 # %%
-spot_records = [
-  r async for r in history(end - timedelta(days=2), end, SPOT_TRADER, mainnet)
-]
-perp_records = [
-  r async for r in history(end - timedelta(days=2), end, PERP_TRADER, mainnet)
-]
-chains = [
-  r.observations[0]
-  for r in [r async for r in history(None, None, SPOT_TRADER, mainnet)]
-  + [r async for r in history(None, None, PERP_TRADER, mainnet)]
-  if r.observations[0].type
-  in ('crypto_deposit', 'crypto_withdrawal', 'unknown', 'internal_transfer')
-]
+spot_records = [r async for r in history(end - timedelta(days=2), end, SPOT_TRADER, mainnet)]
+perp_records = [r async for r in history(end - timedelta(days=2), end, PERP_TRADER, mainnet)]
+chains = [r.observations[0] for r in [r async for r in history(None, None, SPOT_TRADER, mainnet)] + [r async for r in history(None, None, PERP_TRADER, mainnet)] if r.observations[0].type in ('crypto_deposit', 'crypto_withdrawal', 'unknown', 'internal_transfer')]
 {
   'spot kinds': {r.observations[0].type for r in spot_records},
-  'spot fill': next(
-    r.observations[0] for r in spot_records if r.observations[0].type == 'spot_trade'
-  ),
-  'perp funding': next(
-    r.observations[0] for r in perp_records if r.observations[0].type == 'funding'
-  ),
+  'spot fill': next(r.observations[0] for r in spot_records if r.observations[0].type == 'spot_trade'),
+  'perp funding': next(r.observations[0] for r in perp_records if r.observations[0].type == 'funding'),
   'transfer rows': chains[:6],
   'networks': {getattr(o, 'network', None) for o in chains},
   'assets': {getattr(o, 'asset', None) for o in chains},
@@ -295,7 +175,6 @@ chains = [
 
 # %% [markdown]
 # Realized PnL check: fold the testnet account's complete fill history per coin from flat (the venue's `startPosition` is `0` on every fill, closing ones included, so it cannot seed the fold) and compare each fill's price PnL with `closedPnl + fee`.
-
 
 # %%
 def fold_check(fills: list[Fill]) -> tuple[int, int, list[Any]]:
@@ -325,9 +204,7 @@ def fold_check(fills: list[Fill]) -> tuple[int, int, list[Any]]:
   return len(perp), matching, bad[:5]
 
 
-mine = await testnet.info.user_fills_by_time(
-  ADDRESS, start_time=datetime(2025, 1, 1, tzinfo=timezone.utc)
-)
+mine = await testnet.info.user_fills_by_time(ADDRESS, start_time=datetime(2025, 1, 1, tzinfo=timezone.utc))
 fold_check(mine), {f['startPosition'] for f in mine}, {f['dir'] for f in mine}
 
 # %% [markdown]
@@ -336,24 +213,10 @@ fold_check(mine), {f['startPosition'] for f in mine}, {f['dir'] for f in mine}
 # With a 0.001 BTC testnet position open, the snapshot's perp balance (`accountValue - unrealizedPnl`) must equal the venue's own `webData3.perpBalance.total`; the position is then closed.
 
 # %%
-agent = await MarginTrade.new(
-  env['MARGIN_TRADE_TESTNET_AGENT_PRIVATE_KEY'], vault=ADDRESS, mainnet=False
-).__aenter__()
+agent = await MarginTrade.new(env['MARGIN_TRADE_TESTNET_AGENT_PRIVATE_KEY'], vault=ADDRESS, mainnet=False).__aenter__()
 mid = (await agent.info.all_mids())['BTC']
 log: dict[str, Any] = {}
-await agent.exchange.order(
-  [
-    {
-      'a': 0,
-      'b': True,
-      'p': Decimal(int(mid * Decimal('1.01'))),
-      's': Decimal('0.001'),
-      'r': False,
-      't': {'limit': {'tif': 'Ioc'}},
-    }
-  ],
-  grouping='na',
-)
+await agent.exchange.order([{'a': 0, 'b': True, 'p': Decimal(int(mid * Decimal('1.01'))), 's': Decimal('0.001'), 'r': False, 't': {'limit': {'tif': 'Ioc'}}}], grouping='na')
 try:
   await asyncio.sleep(1)
   stream = await agent.streams.web_data3(ADDRESS)
@@ -363,24 +226,9 @@ try:
   log['snapshot perp'] = record.snapshot.subaccounts[0]
   state = push['perpDexStates'][0]['clearinghouseState']
   log['webData3 perpBalance'] = state.get('perpBalance')
-  log['webData3 accountValue, uPnL'] = (
-    state['marginSummary']['accountValue'],
-    [p['position']['unrealizedPnl'] for p in state['assetPositions']],
-  )
+  log['webData3 accountValue, uPnL'] = (state['marginSummary']['accountValue'], [p['position']['unrealizedPnl'] for p in state['assetPositions']])
 finally:
-  await agent.exchange.order(
-    [
-      {
-        'a': 0,
-        'b': False,
-        'p': Decimal(int(mid * Decimal('0.99'))),
-        's': Decimal('0.001'),
-        'r': True,
-        't': {'limit': {'tif': 'Ioc'}},
-      }
-    ],
-    grouping='na',
-  )
+  await agent.exchange.order([{'a': 0, 'b': False, 'p': Decimal(int(mid * Decimal('0.99'))), 's': Decimal('0.001'), 'r': True, 't': {'limit': {'tif': 'Ioc'}}}], grouping='na')
 await asyncio.sleep(1)
 log['flat'] = (await snapshot()).snapshot.subaccounts[0]
 log
@@ -404,11 +252,7 @@ log
 from sdk_dev.catalogue import Ids, gap, load_catalogue
 
 found = Ids()
-for rec in [
-  await snapshot(),
-  await snapshot(user=SPOT_TRADER, via=mainnet),
-  await snapshot(user=PERP_TRADER, via=mainnet),
-]:
+for rec in [await snapshot(), await snapshot(user=SPOT_TRADER, via=mainnet), await snapshot(user=PERP_TRADER, via=mainnet)]:
   for sub in rec.snapshot.subaccounts:
     found.assets |= set(sub.balances)
     found.positions |= {f'perp:{p}' for p in sub.positions}

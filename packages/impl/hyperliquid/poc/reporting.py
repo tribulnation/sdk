@@ -45,7 +45,6 @@ ADDRESS
 # %% [markdown]
 # ## `History`
 
-
 # %%
 async def spot_trades(start: datetime, end: datetime) -> list[SpotTrade]:
   fills = await client.info.user_fills_by_time(
@@ -207,7 +206,6 @@ await ledger_observations(start, end)
 # %% [markdown]
 # ### `history(start=None, end=None)`
 
-
 # %%
 async def history(start: datetime | None = None, end: datetime | None = None):
   end = end or datetime.now(timezone.utc)
@@ -249,7 +247,6 @@ len(records), records[:3]
 
 # %% [markdown]
 # ## `Snapshots`
-
 
 # %%
 async def snapshot(assets: list[str] | None = None) -> SnapshotRecord:

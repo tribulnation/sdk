@@ -36,7 +36,6 @@ SPOT_MARKETS = ['BTC/EUR', 'ETH/EUR', 'USDT/EUR']
 # between earn and pockets), so they're not fungible views of one balance -- each becomes
 # its own `SubaccountSnapshot`.
 
-
 # %%
 async def spot_balances(*, assets: list[str] | None = None) -> dict[str, Decimal]:
   out: dict[str, Decimal] = {}
@@ -129,7 +128,6 @@ await snapshot(assets=['BTC', 'ETH'])
 #   client-side.
 # - **Earn rewards**: `v1.earn.wallets.list_movements`, one call per Earn wallet (there's no
 #   cross-wallet movements endpoint), filtered to `type == 'reward'`.
-
 
 # %%
 async def spot_trades(start: datetime, end: datetime) -> list[SpotTrade]:

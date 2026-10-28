@@ -37,18 +37,8 @@ client = await Bitget.new(
 
 Category = Literal['SPOT', 'MARGIN', 'USDT-FUTURES', 'COIN-FUTURES', 'USDC-FUTURES']
 FuturesCategory = Literal['USDT-FUTURES', 'COIN-FUTURES', 'USDC-FUTURES']
-CATEGORIES: list[Category] = [
-  'SPOT',
-  'MARGIN',
-  'USDT-FUTURES',
-  'COIN-FUTURES',
-  'USDC-FUTURES',
-]
-FUTURES_CATEGORIES: list[FuturesCategory] = [
-  'USDT-FUTURES',
-  'COIN-FUTURES',
-  'USDC-FUTURES',
-]
+CATEGORIES: list[Category] = ['SPOT', 'MARGIN', 'USDT-FUTURES', 'COIN-FUTURES', 'USDC-FUTURES']
+FUTURES_CATEGORIES: list[FuturesCategory] = ['USDT-FUTURES', 'COIN-FUTURES', 'USDC-FUTURES']
 
 instrument_cache: dict[str, Instrument | dict[str, str]] = {}
 
@@ -74,14 +64,9 @@ async def base_quote(symbol: str, category: Category) -> tuple[str | None, str |
 # field is an open-ended business-type string, same caveat as Classic's `tax` records), and
 # `transfers.deposit`/`withdraw.records` to `CryptoDeposit`/`CryptoWithdrawal`.
 
-
 # %%
-async def trades(
-  category: Category, start: datetime, end: datetime
-) -> list[Observation]:
-  raw = await client.uta.trade.order.fills(
-    category=category, start_time=start, end_time=end
-  )
+async def trades(category: Category, start: datetime, end: datetime) -> list[Observation]:
+  raw = await client.uta.trade.order.fills(category=category, start_time=start, end_time=end)
   fills = raw['list'] or []
   out: list[Observation] = []
   for f in fills:
@@ -95,37 +80,19 @@ async def trades(
         fee = Fee(amount=fee_amount, asset=f['feeDetail'][0]['feeCoin'])
     if category in ('SPOT', 'MARGIN'):
       base, quote = await base_quote(f['symbol'], category)
-      out.append(
-        SpotTrade(
-          id=f['execId'],
-          time=f['createdTime'],
-          base=base,
-          quote=quote,
-          pair=f['symbol'],
-          size=size,
-          price=price,
-          order_id=f['orderId'],
-          fee=fee,
-          subaccount='margin' if category == 'MARGIN' else 'spot',
-        )
-      )
+      out.append(SpotTrade(
+        id=f['execId'], time=f['createdTime'], base=base, quote=quote, pair=f['symbol'],
+        size=size, price=price, order_id=f['orderId'], fee=fee,
+        subaccount='margin' if category == 'MARGIN' else 'spot',
+      ))
     else:
       exec_pnl = f.get('execPnl')
-      out.append(
-        FutureTrade(
-          id=f['execId'],
-          time=f['createdTime'],
-          instrument=f['symbol'],
-          size=size,
-          price=price,
-          realized_pnl=Decimal(exec_pnl) if exec_pnl else None,
-          order_id=f['orderId'],
-          fee=fee,
-          subaccount='futures',
-        )
-      )
+      out.append(FutureTrade(
+        id=f['execId'], time=f['createdTime'], instrument=f['symbol'], size=size, price=price,
+        realized_pnl=Decimal(exec_pnl) if exec_pnl else None,
+        order_id=f['orderId'], fee=fee, subaccount='futures',
+      ))
   return out
-
 
 end = datetime.now(timezone.utc)
 start = end - timedelta(hours=24)
@@ -133,39 +100,21 @@ start = end - timedelta(hours=24)
 
 
 # %%
-async def flows(
-  category: Category, start: datetime, end: datetime
-) -> list[Observation]:
-  raw = await client.uta.account.financial_records(
-    category=category, start_time=start, end_time=end
-  )
+async def flows(category: Category, start: datetime, end: datetime) -> list[Observation]:
+  raw = await client.uta.account.financial_records(category=category, start_time=start, end_time=end)
   records = raw['list'] or []
   out: list[Observation] = []
   subaccount = 'futures' if category.endswith('FUTURES') else category.lower()
   for r in records:
-    out.append(
-      UnknownObservation(
-        id=r['id'],
-        asset=r['coin'],
-        amount=Decimal(r['amount']),
-        time=r['ts'],
-        subaccount=subaccount,
-      )
-    )
+    out.append(UnknownObservation(
+      id=r['id'], asset=r['coin'], amount=Decimal(r['amount']), time=r['ts'], subaccount=subaccount,
+    ))
     if (fee := abs(Decimal(r['fee'] or '0'))) > 0:
-      out.append(
-        FeeLeg(
-          id=f'{r["id"]}:fee',
-          asset=r['coin'],
-          amount=-fee,
-          time=r['ts'],
-          event_type='unknown',
-          event_id=r['id'],
-          subaccount=subaccount,
-        )
-      )
+      out.append(FeeLeg(
+        id=f'{r["id"]}:fee', asset=r['coin'], amount=-fee, time=r['ts'],
+        event_type='unknown', event_id=r['id'], subaccount=subaccount,
+      ))
   return out
-
 
 {category: await flows(category, start, end) for category in CATEGORIES}
 
@@ -175,19 +124,13 @@ async def crypto_deposits(start: datetime, end: datetime) -> list[CryptoDeposit]
   raw = await client.uta.transfers.deposit.records(start_time=start, end_time=end)
   return [
     CryptoDeposit(
-      id=d['orderId'],
-      time=d['createdTime'],
-      asset=d['coin'],
-      amount=d['size'],
-      network=d['chain'],
-      tx_id=d['recordId'],
-      src_address=d.get('fromAddress'),
+      id=d['orderId'], time=d['createdTime'], asset=d['coin'], amount=d['size'],
+      network=d['chain'], tx_id=d['recordId'], src_address=d.get('fromAddress'),
       dst_address=d.get('toAddress'),
     )
     for d in raw
     if d['dest'] == 'on_chain' and d['status'] == 'success'
   ]
-
 
 deposits_end = datetime.now(timezone.utc)
 deposits_start = deposits_end - timedelta(days=30)
@@ -199,13 +142,8 @@ async def crypto_withdrawals(start: datetime, end: datetime) -> list[CryptoWithd
   raw = await client.uta.transfers.withdraw.records(start_time=start, end_time=end)
   return [
     CryptoWithdrawal(
-      id=w['orderId'],
-      time=w['createdTime'],
-      asset=w['coin'],
-      amount=-w['size'],
-      network=w['chain'],
-      tx_id=w['recordId'],
-      dst_address=w.get('toAddress'),
+      id=w['orderId'], time=w['createdTime'], asset=w['coin'], amount=-w['size'],
+      network=w['chain'], tx_id=w['recordId'], dst_address=w.get('toAddress'),
       # `fee` arrives signed negative (confirmed live: `-0.00000236` on a BTC
       # withdrawal), while `Fee.amount` is a magnitude.
       fee=Fee(amount=abs(w['fee']), asset=w['coin']) if w.get('fee') else None,
@@ -214,13 +152,11 @@ async def crypto_withdrawals(start: datetime, end: datetime) -> list[CryptoWithd
     if w['dest'] == 'on_chain' and w['status'] == 'success'
   ]
 
-
 await crypto_withdrawals(deposits_start, deposits_end)
 
 
 # %% [markdown]
 # ### `history(start=None, end=None)`
-
 
 # %%
 async def history(start: datetime | None = None, end: datetime | None = None):
@@ -238,7 +174,6 @@ async def history(start: datetime | None = None, end: datetime | None = None):
         observations=[observation],
         provenance={'source': 'api', 'service': 'bitget', 'id': source_id('bitget')},
       )
-
 
 hist_end = datetime.now(timezone.utc)
 hist_start = hist_end - timedelta(hours=24)
@@ -286,12 +221,10 @@ hist_start = hist_end - timedelta(hours=24)
 # Classic's many separate balance compartments -- so this notebook's `Snapshot` has far
 # fewer `SubaccountSnapshot`s than `reporting/classic.ipynb`'s.
 
-
 # %%
 async def account_balances() -> dict[str, Decimal]:
   raw = await client.uta.account.assets()
   return {a['coin']: a['balance'] for a in raw['assets']}
-
 
 await account_balances()
 
@@ -307,7 +240,6 @@ async def futures_positions() -> dict[str, Position]:
       out[p['symbol']] = Position(size=size, avg_price=Decimal(p['avgPrice']))
   return out
 
-
 await futures_positions()
 
 
@@ -316,11 +248,8 @@ async def earn_balances() -> dict[str, Decimal]:
   raw = await client.uta.earn.elite.assets()
   out: dict[str, Decimal] = {}
   for a in raw['resultList']:
-    out[a['productCoin']] = out.get(a['productCoin'], Decimal(0)) + Decimal(
-      a['holdingAmount']
-    )
+    out[a['productCoin']] = out.get(a['productCoin'], Decimal(0)) + Decimal(a['holdingAmount'])
   return out
-
 
 await earn_balances()
 
@@ -328,26 +257,18 @@ await earn_balances()
 # %% [markdown]
 # ### `snapshot(assets=None)`
 
-
 # %%
 async def snapshot(assets: list[str] | None = None) -> SnapshotRecord:
   balances, positions, earn = await asyncio.gather(
-    account_balances(),
-    futures_positions(),
-    earn_balances(),
+    account_balances(), futures_positions(), earn_balances(),
   )
   return SnapshotRecord(
-    snapshot=Snapshot(
-      subaccounts=[
-        SubaccountSnapshot(
-          subaccount='account', balances=balances, positions=positions
-        ),
-        SubaccountSnapshot(subaccount='earn', balances=earn),
-      ]
-    ),
+    snapshot=Snapshot(subaccounts=[
+      SubaccountSnapshot(subaccount='account', balances=balances, positions=positions),
+      SubaccountSnapshot(subaccount='earn', balances=earn),
+    ]),
     provenance={'source': 'api', 'service': 'bitget', 'id': source_id('bitget')},
   )
-
 
 await snapshot()
 

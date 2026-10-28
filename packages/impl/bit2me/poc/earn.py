@@ -19,7 +19,6 @@ ASSETS = ['BTC', 'ETH', 'USDT', 'B2M']
 #
 # Bit2Me's Earn surface is two public endpoints, combined client-side: `v2.earn.assets()` lists every Earn-eligible asset with its allowed reward currencies (`currenciesRewardAllowed`, each with a reward `type` -- `daily`/`weekly`/`monthly`) and lock periods, while `v2.earn.apy()` gives the base annual yield per currency, broken down by that same `daily`/`weekly`/`monthly` key. Neither call needs credentials.
 
-
 # %%
 async def instruments(
   *,
@@ -83,7 +82,6 @@ len(all_instruments), all_instruments[:5]
 # read-only), but is the natural next step a real integration would need: one endpoint,
 # discriminated by `type: 'deposit' | 'withdrawal'`, for both subscribing to and redeeming
 # from an Earn position. Included here only to show the mapping -- **never executed**.
-
 
 # %%
 async def subscribe(instrument: Instrument, *, amount: Decimal) -> str:

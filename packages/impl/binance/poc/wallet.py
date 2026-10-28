@@ -23,7 +23,6 @@ ASSETS = ['BTC', 'ETH', 'USDT', 'BNB', 'SOL']
 # and fee data `DepositMethod`/`WithdrawalMethod` need. Deposits are free on Binance (only
 # withdrawals carry a network fee), so `fee` is always `None` here.
 
-
 # %%
 async def deposit_methods(*, assets: list[str] | None = None) -> list[DepositMethod]:
   coins = await client.spot.http.wallet.capital.config.get_all()
@@ -55,7 +54,6 @@ len(await deposit_methods()), await deposit_methods(assets=ASSETS)
 # Same `capital.config.get_all` call; `withdrawFee` becomes the `Fee`, and `networks` is an
 # extra client-side filter on `network` (there's no per-network request parameter -- only
 # per-account, all-coins-all-networks).
-
 
 # %%
 async def withdrawal_methods(
@@ -113,7 +111,6 @@ await withdrawal_methods(assets=['USDT', 'ETH'], networks=['ETH'])
 # part of `WithdrawalMethods`/`DepositMethods` (the abstract interface is read-only), but
 # are the natural next step a real integration would need. Included here only to show how
 # they'd map -- **never executed**.
-
 
 # %%
 async def withdraw(

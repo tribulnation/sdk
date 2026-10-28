@@ -34,7 +34,6 @@ ASSETS = ['BTC', 'ETH', 'USDT']
 # though the response carries no account-specific state -- credentials are required to call it, but the
 # data itself is public reference data.
 
-
 # %%
 async def deposit_methods(*, assets: list[str] | None = None) -> list[DepositMethod]:
   currencies = await client.spot.http.wallet.currency_info()
@@ -64,7 +63,6 @@ await deposit_methods(assets=ASSETS)
 
 # %% [markdown]
 # ## `WithdrawalMethods`
-
 
 # %%
 async def withdrawal_methods(
@@ -131,7 +129,6 @@ await withdrawal_methods(assets=ASSETS, networks=['BSC'])
 # unlike `currency_info` above, this needs real account state, and (unlike `currency_info`)
 # MEXC's own permission scoping treats it as account-sensitive.
 
-
 # %%
 async def deposit_addresses(coin: str) -> list[DepositAddressItem]:
   return await client.spot.http.wallet.deposit_address(coin=coin)
@@ -155,7 +152,6 @@ addresses
 # `spot.http.wallet.withdraw` isn't part of `WithdrawalMethods` (the abstract interface is
 # read-only), but is the natural next step a real integration would need. Included only to
 # show the mapping -- **never executed**.
-
 
 # %%
 async def withdraw(*, asset: str, network: str, address: str, amount: Decimal) -> str:

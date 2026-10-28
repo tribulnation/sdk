@@ -19,7 +19,6 @@ ASSETS = ['XBT', 'ETH', 'USDT']
 #
 # Kraken's `spot.funding.deposit_methods` requires a single `asset` per call -- there is no "list every deposit method for every asset" mode, so `assets=None` ("give me everything") can't be honored directly; see coverage notes.
 
-
 # %%
 async def deposit_methods(*, assets: list[str] | None = None) -> list[DepositMethod]:
   # Kraken has no asset-less "all deposit methods" call; None falls back to a curated
@@ -51,7 +50,6 @@ await deposit_methods(assets=ASSETS)
 # ## `WithdrawalMethods`
 #
 # Unlike deposits, `spot.funding.withdraw_methods` accepts an *optional* `asset`, so "every withdrawal method" is a real, single request here.
-
 
 # %%
 async def withdrawal_methods(

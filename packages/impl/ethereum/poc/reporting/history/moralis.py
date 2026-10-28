@@ -58,7 +58,6 @@ address = os.environ['EVM_ADDRESS']
 # > cleanly, in one paged call, is `CryptoTransaction`. Both mappings are written below,
 # > the second with the gap in its own signature.
 
-
 # %%
 async def credentials_check() -> object:
   """Call the history endpoint and report what comes back."""
@@ -73,7 +72,6 @@ await credentials_check()
 
 # %% [markdown]
 # ## Reading the feed
-
 
 # %%
 async def wallet_history(
@@ -150,7 +148,6 @@ def signed(
 #
 # One paged call covers it: `CryptoTransaction` needs a hash, a fee and a list of
 # `{asset, change, counterparty}`, and every one of those is on the history row.
-
 
 # %%
 def parse_fee(row: WalletHistoryTransaction) -> Fee | None:
@@ -240,7 +237,6 @@ async def history(
 # `nft_transfers` is a second, smaller gap: the endpoint's own docstring says the response
 # includes NFT transfers, but `WalletHistoryTransaction` declares no such field, so
 # `EvmTx.NftTransfer` has nothing to read here.
-
 
 # %%
 async def transaction_detail(hash: str) -> dict[str, Any]:

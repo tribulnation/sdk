@@ -16,9 +16,7 @@ from tribulnation.sdk.wallet.deposit_methods import DepositMethod
 from tribulnation.sdk.wallet.withdrawal_methods import WithdrawalMethod
 
 env = dotenv_values(repo_root() / '.env')
-client = await MarginTrade.new(
-  env['MARGIN_TRADE_TESTNET_PRIVATE_KEY'], mainnet=False
-).__aenter__()
+client = await MarginTrade.new(env['MARGIN_TRADE_TESTNET_PRIVATE_KEY'], mainnet=False).__aenter__()
 public = await MarginTrade.new(public=True).__aenter__()
 SPOT_TRADER = 'HZEB64qX94oiDsKNisSxYSWuEaKdfsD4Rn1ZEToAw68a'
 
@@ -30,13 +28,7 @@ SPOT_TRADER = 'HZEB64qX94oiDsKNisSxYSWuEaKdfsD4Rn1ZEToAw68a'
 # %%
 from sdk_dev.surface import surface
 
-print(
-  surface(
-    'typed_margin_trade',
-    'MarginTrade',
-    grep=r'deposit|withdraw|coin|currenc|network|chain|onchain',
-  )
-)
+print(surface('typed_margin_trade', 'MarginTrade', grep=r'deposit|withdraw|coin|currenc|network|chain|onchain'))
 
 
 # %% [markdown]
@@ -44,24 +36,15 @@ print(
 #
 # Fetch the ways to deposit: one entry per asset and network. Not supported: no endpoint enumerates the (asset, chain) pairs. `getDepositAddress` answers for a pair the caller already names (the docs' USDC on `solana`, PRL on `pearl`), and `spotMeta` lists tokens without chains, so listing methods would mean hard-coding the docs' table.
 
-
 # %%
-async def deposit_methods(
-  *, assets: Collection[str] | None = None
-) -> Sequence[DepositMethod]:
-  raise NotImplementedError(
-    'margin.trade has no endpoint listing deposit assets and networks'
-  )
+async def deposit_methods(*, assets: Collection[str] | None = None) -> Sequence[DepositMethod]:
+  raise NotImplementedError('margin.trade has no endpoint listing deposit assets and networks')
 
 
 usdc = await client.user.get_deposit_address(asset='USDC', chain='solana')
 prl = await client.user.get_deposit_address(asset='PRL', chain='pearl')
 tokens = [t['name'] for t in (await client.info.spot_meta())['tokens']]
-{
-  'USDC': (usdc['asset'], usdc['chain'], len(usdc['depositAddress'])),
-  'PRL': (prl['asset'], prl['chain'], prl['depositAddress'][:5]),
-  'spotMeta tokens': tokens,
-}
+{'USDC': (usdc['asset'], usdc['chain'], len(usdc['depositAddress'])), 'PRL': (prl['asset'], prl['chain'], prl['depositAddress'][:5]), 'spotMeta tokens': tokens}
 
 
 # %% [markdown]
@@ -69,14 +52,9 @@ tokens = [t['name'] for t in (await client.info.spot_meta())['tokens']]
 #
 # Fetch the ways to withdraw, with fees. Not supported: no endpoint lists withdrawal assets, networks or fees; the fee is known only after the fact, per withdrawal (`withdrawalHistory.withdraw_fee`: 1 USDC on testnet, 0.1 PRL on a mainnet account).
 
-
 # %%
-async def withdrawal_methods(
-  *, assets: Collection[str] | None = None, networks: Collection[str] | None = None
-) -> Sequence[WithdrawalMethod]:
-  raise NotImplementedError(
-    'margin.trade has no endpoint listing withdrawal methods or fees'
-  )
+async def withdrawal_methods(*, assets: Collection[str] | None = None, networks: Collection[str] | None = None) -> Sequence[WithdrawalMethod]:
+  raise NotImplementedError('margin.trade has no endpoint listing withdrawal methods or fees')
 
 
 mine = (await client.info.withdrawal_history(client.account or ''))['withdrawals']

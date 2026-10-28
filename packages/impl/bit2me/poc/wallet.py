@@ -54,7 +54,6 @@ ASSETS = ['BTC', 'ETH', 'USDT', 'SOL']
 # per-network `hasTag` does say whether an address on that chain needs a memo (true for TON,
 # XRP, XLM and Cosmos), but `DepositMethod` has no field to put it in.
 
-
 # %%
 async def coin_networks(coin: str) -> list[CurrencyNetwork]:
   """Every network Bit2Me supports for one asset, or `[]` when it has none (fiat 404s)."""
@@ -259,7 +258,6 @@ await withdrawal_methods(assets=ASSETS, networks=['polygon', 'tron'])
 # address-fetching method at all), but because it's the natural next read after
 # `deposit_methods()`.
 
-
 # %%
 async def deposit_address(asset: str, *, network: str):
   pockets = await client.v1.wallet.pockets.get()
@@ -279,7 +277,6 @@ await deposit_address('ETH', network='ethereum')
 # the abstract `Wallet` interface is read-only. `v1.wallet.transactions.execute()` (paired
 # with the `preview()` proforma used for the fee quotes above) is the natural next step a
 # real integration would need. Included only to show the mapping -- **never executed**.
-
 
 # %%
 async def withdraw(*, asset: str, network: str, address: str, amount: Decimal) -> str:

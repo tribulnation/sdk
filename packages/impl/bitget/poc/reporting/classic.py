@@ -5,12 +5,7 @@ from decimal import Decimal
 from datetime import datetime, timedelta, timezone
 
 from typing_extensions import (
-  Awaitable,
-  Callable,
-  Literal,
-  ParamSpec,
-  Sequence,
-  TypeVar,
+  Awaitable, Callable, Literal, ParamSpec, Sequence, TypeVar,
 )
 
 from typed_bitget import Bitget
@@ -42,9 +37,7 @@ client = await Bitget.new(
 
 SPOT_MARKETS = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT']
 PRODUCT_TYPES: list[Literal['USDT-FUTURES', 'COIN-FUTURES', 'USDC-FUTURES']] = [
-  'USDT-FUTURES',
-  'COIN-FUTURES',
-  'USDC-FUTURES',
+  'USDT-FUTURES', 'COIN-FUTURES', 'USDC-FUTURES',
 ]
 
 
@@ -54,9 +47,7 @@ RETRY_ATTEMPTS = 4
 
 
 async def retry(
-  coro_fn: Callable[P, Awaitable[T]],
-  *args: P.args,
-  **kwargs: P.kwargs,
+  coro_fn: Callable[P, Awaitable[T]], *args: P.args, **kwargs: P.kwargs,
 ) -> T:
   """Retry a Bitget call a few times with backoff on rate-limit (429) errors.
 
@@ -90,34 +81,26 @@ async def retry(
 # `tribulnation.bitget.reporting.history` gives them, independently re-derived here against
 # `typed_bitget` directly rather than imported from that code.
 
-
 # %%
 async def spot_trades(start: datetime, end: datetime) -> list[SpotTrade]:
   out: list[SpotTrade] = []
   for symbol in SPOT_MARKETS:
-    fills = await client.classic.spot.order.fills(
-      symbol=symbol, start_time=start, end_time=end
-    )
+    fills = await client.classic.spot.order.fills(symbol=symbol, start_time=start, end_time=end)
     for f in fills:
       size = Decimal(f['size'])
       fee_detail = f['feeDetail']
       fee_amount = abs(Decimal(fee_detail['totalFee']))
-      out.append(
-        SpotTrade(
-          id=f['tradeId'],
-          time=f['cTime'],
-          pair=symbol,
-          size=size if f['side'] == 'buy' else -size,
-          price=Decimal(f['priceAvg']),
-          order_id=f['orderId'],
-          fee=Fee(amount=fee_amount, asset=fee_detail['feeCoin'])
-          if fee_amount
-          else None,
-          subaccount='spot',
-        )
-      )
+      out.append(SpotTrade(
+        id=f['tradeId'],
+        time=f['cTime'],
+        pair=symbol,
+        size=size if f['side'] == 'buy' else -size,
+        price=Decimal(f['priceAvg']),
+        order_id=f['orderId'],
+        fee=Fee(amount=fee_amount, asset=fee_detail['feeCoin']) if fee_amount else None,
+        subaccount='spot',
+      ))
   return out
-
 
 end = datetime.now(timezone.utc)
 start = end - timedelta(hours=24)
@@ -131,10 +114,7 @@ async def futures_trades(start: datetime, end: datetime) -> list[SpotTrade]:
   out: list[SpotTrade] = []
   for symbol in SPOT_MARKETS:
     r = await client.classic.mix.order.fills(
-      product_type='USDT-FUTURES',
-      symbol=symbol,
-      start_time=start,
-      end_time=end,
+      product_type='USDT-FUTURES', symbol=symbol, start_time=start, end_time=end,
     )
     for f in r['fillList'] or []:
       fee_amount = Decimal(0)
@@ -143,31 +123,24 @@ async def futures_trades(start: datetime, end: datetime) -> list[SpotTrade]:
         fee_amount += abs(Decimal(detail['totalFee']))
         fee_asset = detail['feeCoin']
       size = Decimal(f['baseVolume'])
-      out.append(
-        SpotTrade(
-          id=f['tradeId'],
-          time=f['cTime'],
-          pair=symbol,
-          size=size if f['side'] == 'buy' else -size,
-          price=Decimal(f['price']),
-          order_id=f['orderId'],
-          fee=Fee(amount=fee_amount, asset=fee_asset)
-          if fee_amount and fee_asset
-          else None,
-          subaccount='futures',
-        )
-      )
+      out.append(SpotTrade(
+        id=f['tradeId'],
+        time=f['cTime'],
+        pair=symbol,
+        size=size if f['side'] == 'buy' else -size,
+        price=Decimal(f['price']),
+        order_id=f['orderId'],
+        fee=Fee(amount=fee_amount, asset=fee_asset) if fee_amount and fee_asset else None,
+        subaccount='futures',
+      ))
   return out
-
 
 await futures_trades(start, end)
 
 
 # %%
 async def margin_trades(
-  margin_type: str,
-  start: datetime,
-  end: datetime,
+  margin_type: str, start: datetime, end: datetime,
 ) -> list[SpotTrade]:
   subaccount = f'{margin_type}_margin'
   fn = (
@@ -192,20 +165,17 @@ async def margin_trades(
         if fee_amount and fee_coin:
           fee = Fee(amount=fee_amount, asset=fee_coin)
       raw_price = f.get('priceAvg')
-      out.append(
-        SpotTrade(
-          id=f.get('tradeId'),
-          time=f.get('cTime'),
-          pair=symbol,
-          size=(size if side == 'buy' else -size) if size is not None else None,
-          price=Decimal(raw_price) if raw_price is not None else None,
-          order_id=f.get('orderId'),
-          fee=fee,
-          subaccount=subaccount,
-        )
-      )
+      out.append(SpotTrade(
+        id=f.get('tradeId'),
+        time=f.get('cTime'),
+        pair=symbol,
+        size=(size if side == 'buy' else -size) if size is not None else None,
+        price=Decimal(raw_price) if raw_price is not None else None,
+        order_id=f.get('orderId'),
+        fee=fee,
+        subaccount=subaccount,
+      ))
   return out
-
 
 await margin_trades('crossed', start, end)
 
@@ -217,21 +187,18 @@ async def crypto_deposits(start: datetime, end: datetime) -> list[CryptoDeposit]
   for d in raw:
     if d['dest'] != 'on_chain' or d['status'] != 'success':
       continue
-    out.append(
-      CryptoDeposit(
-        id=d['orderId'],
-        time=d['cTime'],
-        asset=d['coin'],
-        amount=d['size'],
-        network=d['chain'],
-        tx_id=d['tradeId'],
-        src_address=d.get('fromAddress'),
-        dst_address=d['toAddress'],
-        subaccount='spot',
-      )
-    )
+    out.append(CryptoDeposit(
+      id=d['orderId'],
+      time=d['cTime'],
+      asset=d['coin'],
+      amount=d['size'],
+      network=d['chain'],
+      tx_id=d['tradeId'],
+      src_address=d.get('fromAddress'),
+      dst_address=d['toAddress'],
+      subaccount='spot',
+    ))
   return out
-
 
 deposits_end = datetime.now(timezone.utc)
 deposits_start = deposits_end - timedelta(days=30)
@@ -248,21 +215,18 @@ async def crypto_withdrawals(start: datetime, end: datetime) -> list[CryptoWithd
     # `fee` arrives signed negative (confirmed live: `-0.0064` on an AVAX withdrawal),
     # while `Fee.amount` is a magnitude.
     fee_amount = abs(w['fee'])
-    out.append(
-      CryptoWithdrawal(
-        id=w['orderId'],
-        time=w['cTime'],
-        asset=w['coin'],
-        amount=-w['size'],
-        network=w['chain'],
-        tx_id=w['tradeId'],
-        dst_address=w['toAddress'],
-        fee=Fee(amount=fee_amount, asset=w['coin']) if fee_amount else None,
-        subaccount='spot',
-      )
-    )
+    out.append(CryptoWithdrawal(
+      id=w['orderId'],
+      time=w['cTime'],
+      asset=w['coin'],
+      amount=-w['size'],
+      network=w['chain'],
+      tx_id=w['tradeId'],
+      dst_address=w['toAddress'],
+      fee=Fee(amount=fee_amount, asset=w['coin']) if fee_amount else None,
+      subaccount='spot',
+    ))
   return out
-
 
 await crypto_withdrawals(deposits_start, deposits_end)
 
@@ -281,96 +245,49 @@ await crypto_withdrawals(deposits_start, deposits_end)
 # out of scope for this demo; a real integration would pick one source per event type, not
 # both.
 
-
 # %%
 async def flows(start: datetime, end: datetime) -> list[Observation]:
   out: list[Observation] = []
   spot = await retry(client.classic.tax.spot_records, start_time=start, end_time=end)
-  futures = await retry(
-    client.classic.tax.futures_records, start_time=start, end_time=end
-  )
+  futures = await retry(client.classic.tax.futures_records, start_time=start, end_time=end)
   crossed = await retry(
-    client.classic.tax.margin_records,
-    margin_type='crossed',
-    start_time=start,
-    end_time=end,
+    client.classic.tax.margin_records, margin_type='crossed', start_time=start, end_time=end,
   )
   isolated = await retry(
-    client.classic.tax.margin_records,
-    margin_type='isolated',
-    start_time=start,
-    end_time=end,
+    client.classic.tax.margin_records, margin_type='isolated', start_time=start, end_time=end,
   )
   for tx in spot:
-    out.append(
-      UnknownObservation(
-        id=tx['id'],
-        asset=tx['coin'],
-        amount=tx['amount'],
-        time=tx['ts'],
-        subaccount='spot',
-      )
-    )
+    out.append(UnknownObservation(
+      id=tx['id'], asset=tx['coin'], amount=tx['amount'], time=tx['ts'], subaccount='spot',
+    ))
     if (fee := abs(tx['fee'])) > 0:
-      out.append(
-        FeeLeg(
-          id=f'{tx["id"]}:fee',
-          asset=tx['coin'],
-          amount=-fee,
-          time=tx['ts'],
-          event_type='unknown',
-          event_id=tx['id'],
-          subaccount='spot',
-        )
-      )
+      out.append(FeeLeg(
+        id=f'{tx["id"]}:fee', asset=tx['coin'], amount=-fee, time=tx['ts'],
+        event_type='unknown', event_id=tx['id'], subaccount='spot',
+      ))
   for tx in futures:
-    out.append(
-      UnknownObservation(
-        id=tx['id'],
-        asset=tx['marginCoin'],
-        amount=Decimal(tx['amount']),
-        time=tx['ts'],
-        subaccount='futures',
-      )
-    )
+    out.append(UnknownObservation(
+      id=tx['id'], asset=tx['marginCoin'], amount=Decimal(tx['amount']), time=tx['ts'],
+      subaccount='futures',
+    ))
     if (fee := abs(Decimal(tx['fee']))) > 0:
-      out.append(
-        FeeLeg(
-          id=f'{tx["id"]}:fee',
-          asset=tx['marginCoin'],
-          amount=-fee,
-          time=tx['ts'],
-          event_type='unknown',
-          event_id=tx['id'],
-          subaccount='futures',
-        )
-      )
+      out.append(FeeLeg(
+        id=f'{tx["id"]}:fee', asset=tx['marginCoin'], amount=-fee, time=tx['ts'],
+        event_type='unknown', event_id=tx['id'], subaccount='futures',
+      ))
   for margin_type, records in (('crossed', crossed), ('isolated', isolated)):
     subaccount = f'{margin_type}_margin'
     for tx in records:
-      out.append(
-        UnknownObservation(
-          id=tx['id'],
-          asset=tx['coin'],
-          amount=tx['amount'],
-          time=tx['ts'],
-          subaccount=subaccount,
-        )
-      )
+      out.append(UnknownObservation(
+        id=tx['id'], asset=tx['coin'], amount=tx['amount'], time=tx['ts'],
+        subaccount=subaccount,
+      ))
       if (fee := abs(tx['fee'])) > 0:
-        out.append(
-          FeeLeg(
-            id=f'{tx["id"]}:fee',
-            asset=tx['coin'],
-            amount=-fee,
-            time=tx['ts'],
-            event_type='unknown',
-            event_id=tx['id'],
-            subaccount=subaccount,
-          )
-        )
+        out.append(FeeLeg(
+          id=f'{tx["id"]}:fee', asset=tx['coin'], amount=-fee, time=tx['ts'],
+          event_type='unknown', event_id=tx['id'], subaccount=subaccount,
+        ))
   return out
-
 
 # Tax endpoints cap the window at 30 days -- reusing the same 30-day range as deposits/withdrawals above.
 await flows(deposits_start, deposits_end)
@@ -378,7 +295,6 @@ await flows(deposits_start, deposits_end)
 
 # %% [markdown]
 # ### `history(start=None, end=None)`
-
 
 # %%
 async def history(start: datetime | None = None, end: datetime | None = None):
@@ -403,11 +319,8 @@ async def history(start: datetime | None = None, end: datetime | None = None):
         provenance={'source': 'api', 'service': 'bitget', 'id': source_id('bitget')},
       )
 
-
 hist_end = datetime.now(timezone.utc)
-hist_start = hist_end - timedelta(
-  hours=24
-)  # tightest window among the sources above (spot/futures/margin fills)
+hist_start = hist_end - timedelta(hours=24)  # tightest window among the sources above (spot/futures/margin fills)
 [record async for record in history(hist_start, hist_end)]
 
 
@@ -443,17 +356,13 @@ hist_start = hist_end - timedelta(
 # %% [markdown]
 # ## `Snapshots`
 
-
 # %%
 async def spot_balances() -> dict[str, Decimal]:
   raw = await client.classic.spot.account.assets()
   out: dict[str, Decimal] = {}
   for b in raw:
-    out[b['coin']] = (
-      out.get(b['coin'], Decimal(0)) + b['available'] + b['frozen'] + b['locked']
-    )
+    out[b['coin']] = out.get(b['coin'], Decimal(0)) + b['available'] + b['frozen'] + b['locked']
   return out
-
 
 await spot_balances()
 
@@ -464,11 +373,8 @@ async def futures_balances() -> dict[str, Decimal]:
   for product_type in PRODUCT_TYPES:
     accounts = await client.classic.mix.account.list(product_type=product_type)
     for a in accounts:
-      out[a['marginCoin']] = out.get(a['marginCoin'], Decimal(0)) + Decimal(
-        a['available']
-      )
+      out[a['marginCoin']] = out.get(a['marginCoin'], Decimal(0)) + Decimal(a['available'])
   return {k: v for k, v in out.items() if v != 0}
-
 
 await futures_balances()
 
@@ -482,7 +388,6 @@ async def futures_positions() -> dict[str, Position]:
       size = p['total'] if p['holdSide'] == 'long' else -p['total']
       out[p['symbol']] = Position(size=size, avg_price=p['openPriceAvg'])
   return out
-
 
 await futures_positions()
 
@@ -500,7 +405,6 @@ async def margin_balances(margin_type: str) -> dict[str, Decimal]:
     out[b['coin']] = out.get(b['coin'], Decimal(0)) + b['net']
   return out
 
-
 await margin_balances('crossed')
 
 
@@ -509,7 +413,6 @@ async def earn_balances() -> dict[str, Decimal]:
   raw = await client.classic.earn.account_assets()
   return {b['coin']: Decimal(b['amount']) for b in raw}
 
-
 await earn_balances()
 
 
@@ -517,7 +420,6 @@ await earn_balances()
 async def funding_balances() -> dict[str, Decimal]:
   raw = await client.classic.common.funding_assets()
   return {b['coin']: b['available'] + b['frozen'] for b in raw}
-
 
 await funding_balances()
 
@@ -532,13 +434,11 @@ async def bot_balances(account_type: Literal['futures', 'spot']) -> dict[str, De
     out[b['coin']] = out.get(b['coin'], Decimal(0)) + total
   return out
 
-
 await bot_balances('spot')
 
 
 # %% [markdown]
 # ### `snapshot(assets=None)`
-
 
 # %%
 async def snapshot(assets: list[str] | None = None) -> SnapshotRecord:
@@ -548,19 +448,9 @@ async def snapshot(assets: list[str] | None = None) -> SnapshotRecord:
   # return type, which defeats the tuple-unpacking below. Both inner `gather` calls still
   # schedule all of their coroutines immediately, so this keeps all 9 calls concurrent.
   (
-    (
-      spot,
-      futures,
-      positions,
-      crossed_margin,
-      isolated_margin,
-    ),
-    (
-      earn,
-      funding,
-      spot_bot,
-      futures_bot,
-    ),
+    spot, futures, positions, crossed_margin, isolated_margin,
+  ), (
+    earn, funding, spot_bot, futures_bot,
   ) = await asyncio.gather(
     asyncio.gather(
       spot_balances(),
@@ -577,21 +467,18 @@ async def snapshot(assets: list[str] | None = None) -> SnapshotRecord:
     ),
   )
   return SnapshotRecord(
-    snapshot=Snapshot(
-      subaccounts=[
-        SubaccountSnapshot(subaccount='spot', balances=spot),
-        SubaccountSnapshot(subaccount='futures', balances=futures, positions=positions),
-        SubaccountSnapshot(subaccount='crossed_margin', balances=crossed_margin),
-        SubaccountSnapshot(subaccount='isolated_margin', balances=isolated_margin),
-        SubaccountSnapshot(subaccount='earn', balances=earn),
-        SubaccountSnapshot(subaccount='funding', balances=funding),
-        SubaccountSnapshot(subaccount='spot_bot', balances=spot_bot),
-        SubaccountSnapshot(subaccount='futures_bot', balances=futures_bot),
-      ]
-    ),
+    snapshot=Snapshot(subaccounts=[
+      SubaccountSnapshot(subaccount='spot', balances=spot),
+      SubaccountSnapshot(subaccount='futures', balances=futures, positions=positions),
+      SubaccountSnapshot(subaccount='crossed_margin', balances=crossed_margin),
+      SubaccountSnapshot(subaccount='isolated_margin', balances=isolated_margin),
+      SubaccountSnapshot(subaccount='earn', balances=earn),
+      SubaccountSnapshot(subaccount='funding', balances=funding),
+      SubaccountSnapshot(subaccount='spot_bot', balances=spot_bot),
+      SubaccountSnapshot(subaccount='futures_bot', balances=futures_bot),
+    ]),
     provenance={'source': 'api', 'service': 'bitget', 'id': source_id('bitget')},
   )
-
 
 await snapshot()
 

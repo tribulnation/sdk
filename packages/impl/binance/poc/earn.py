@@ -30,7 +30,6 @@ BINANCE_EARN_URL = 'https://www.binance.com/earn'
 # not rate-bearing instruments).
 #
 
-
 # %%
 async def flexible_instruments(*, asset: str | None = None) -> list[Instrument]:
   rows = await client.spot.http.simple_earn.flexible.list_paged(asset=asset, size=100)
@@ -93,7 +92,6 @@ len(results), results[:5]
 # ### Soft Staking
 #
 
-
 # %%
 async def soft_staking_instruments(*, asset: str | None = None) -> list[Instrument]:
   rows = await client.spot.http.staking.soft.list_paged(asset=asset)
@@ -117,7 +115,6 @@ len(results), results[:5]
 # %% [markdown]
 # ### On-chain Yields (locked)
 #
-
 
 # %%
 async def on_chain_yields_instruments(*, asset: str | None = None) -> list[Instrument]:
@@ -152,7 +149,6 @@ len(results), results[:5]
 # ### BFUSD
 #
 
-
 # %%
 async def bfusd_instrument() -> Instrument | None:
   page = await client.spot.http.bfusd.history.rate_history()
@@ -176,7 +172,6 @@ await bfusd_instrument()
 # %% [markdown]
 # ### RWUSD
 #
-
 
 # %%
 async def rwusd_instruments() -> list[Instrument]:
@@ -205,7 +200,6 @@ await rwusd_instruments()
 # %% [markdown]
 # ### `instruments(*, tags=None, assets=None)`
 #
-
 
 # %%
 async def instruments(
@@ -284,7 +278,6 @@ eth_quota, sol_quota
 # whole number of days, `id` is a string), so it's demonstrated live below for one
 # concrete pair, but left out of `instruments()` for both reasons: no filter-free
 # listing, and no fixed settlement asset.
-
 
 # %%
 async def dual_investment_products(
@@ -392,7 +385,6 @@ len(usdt), len(usdc), usdc[:5]
 # merged into `instruments()`). Included here only to show how they'd map --
 # **never executed**.
 #
-
 
 # %%
 async def subscribe(instrument: Instrument, *, amount: Decimal) -> str:

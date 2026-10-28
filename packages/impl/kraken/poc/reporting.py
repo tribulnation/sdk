@@ -68,7 +68,6 @@ LedgerObservation = (
 #
 # Kraken has no single "unified history" endpoint -- `spot.account.ledgers` is the closest fit: every balance-affecting event (trades, deposits, withdrawals, staking rewards, transfers, ...) shows up there as one row per asset leg, which lines up well with the SDK's per-observation model.
 
-
 # %%
 def map_ledger_entry(ledger_id: str, entry: LedgerEntry) -> Sequence[LedgerObservation]:
   asset = entry.get('asset', '')
@@ -162,7 +161,6 @@ start = end - timedelta(days=365)
 # ## `Snapshots`
 #
 # `spot.account.balance` is a direct fit for a point-in-time balance snapshot.
-
 
 # %%
 async def snapshot(assets: list[str] | None = None) -> SnapshotRecord:

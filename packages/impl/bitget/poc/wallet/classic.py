@@ -31,7 +31,6 @@ ASSETS = ['BTC', 'ETH', 'USDT', 'SOL']
 # `extraWithdrawFee` but no deposit-fee field of any kind, so `fee` is always `None` here,
 # same as KuCoin's `poc/wallet.ipynb`.
 
-
 # %%
 async def deposit_methods(*, assets: list[str] | None = None) -> list[DepositMethod]:
   raw = await client.classic.spot.coins()
@@ -42,17 +41,14 @@ async def deposit_methods(*, assets: list[str] | None = None) -> list[DepositMet
     for ch in c['chains']:
       if not ch['rechargeable']:
         continue
-      out.append(
-        DepositMethod(
-          asset=c['coin'],
-          network=ch['chain'],
-          fee=None,
-          contract_address=ch['contractAddress'],
-          min_confirmations=ch['depositConfirm'],
-        )
-      )
+      out.append(DepositMethod(
+        asset=c['coin'],
+        network=ch['chain'],
+        fee=None,
+        contract_address=ch['contractAddress'],
+        min_confirmations=ch['depositConfirm'],
+      ))
   return out
-
 
 await deposit_methods(assets=ASSETS)
 
@@ -63,7 +59,6 @@ await deposit_methods(assets=ASSETS)
 # Same `spot.coins()` call; `withdrawFee` becomes the `Fee` (already a `Decimal`, no
 # string-parsing needed), and `networks` is a client-side filter on `chain` (Bitget doesn't
 # take it as a request parameter -- there's no per-network lookup, only per-coin).
-
 
 # %%
 async def withdrawal_methods(
@@ -81,16 +76,13 @@ async def withdrawal_methods(
         continue
       if networks is not None and ch['chain'] not in networks:
         continue
-      out.append(
-        WithdrawalMethod(
-          asset=c['coin'],
-          network=ch['chain'],
-          fee=WithdrawalMethod.Fee(asset=c['coin'], amount=ch['withdrawFee']),
-          contract_address=ch['contractAddress'],
-        )
-      )
+      out.append(WithdrawalMethod(
+        asset=c['coin'],
+        network=ch['chain'],
+        fee=WithdrawalMethod.Fee(asset=c['coin'], amount=ch['withdrawFee']),
+        contract_address=ch['contractAddress'],
+      ))
   return out
-
 
 await withdrawal_methods(assets=ASSETS)
 
@@ -116,11 +108,9 @@ await withdrawal_methods(assets=['USDT', 'BTC'], networks=['ERC20'])
 # parameter is documented in `typed_bitget` only as "reserved for future use", so it's
 # passed as `'0'`.
 
-
 # %%
 async def deposit_address(coin: str, chain: str | None = None):
   return await client.classic.spot.deposit.address(coin=coin, chain=chain, size='0')
-
 
 await deposit_address('USDT', 'TRC20')
 
@@ -131,7 +121,6 @@ await deposit_address('USDT', 'TRC20')
 # `spot.withdrawal.create` isn't part of `WithdrawalMethods` (the abstract interface is
 # read-only), but is the natural next step. Included only to show the mapping --
 # **never executed**.
-
 
 # %%
 async def withdraw(*, asset: str, network: str, address: str, amount: Decimal) -> str:
@@ -144,8 +133,5 @@ async def withdraw(*, asset: str, network: str, address: str, amount: Decimal) -
   )
   return result['orderId']
 
-
 # Not executed here -- would send a real on-chain withdrawal from the account.
-await withdraw(
-  asset='USDT', network='TRC20', address='<destination-address>', amount=Decimal('10')
-)
+await withdraw(asset='USDT', network='TRC20', address='<destination-address>', amount=Decimal('10'))

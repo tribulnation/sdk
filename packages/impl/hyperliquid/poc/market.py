@@ -55,7 +55,6 @@ ADDRESS
 # %% [markdown]
 # ## Exchanges (spot / perp dexs)
 
-
 # %%
 async def exchanges() -> list[dict[str, str]]:
   """List every exchange on the venue: the one spot exchange, the main perp dex (''), and
@@ -77,7 +76,6 @@ len(result), result[:5]
 # ## `Market` (spot)
 #
 # Hyperliquid's `l2Book`, fills, and order-status endpoints are already `coin`-generic across spot and perp -- `depth`/`depth_stream`/`open_orders`/`query_order`/`trades_history`/`trades_stream` below are defined once and reused as-is for the perp section further down.
-
 
 # %%
 async def depth(coin: str, *, levels: int | None = None) -> Book:
@@ -312,7 +310,6 @@ await available_notional(SPOT_MARKET)
 # %% [markdown]
 # ### Mutating (written, never executed)
 
-
 # %%
 async def place_order(
   coin: str, order: Order, *, settings: Settings = {}
@@ -539,7 +536,6 @@ await funding_payments(PERP_MARKET, start, end)
 
 # %% [markdown]
 # ### Mutating (written, never executed)
-
 
 # %%
 async def perp_place_order(

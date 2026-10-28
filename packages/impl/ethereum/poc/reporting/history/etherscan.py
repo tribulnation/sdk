@@ -61,7 +61,6 @@ address = os.environ['EVM_ADDRESS']
 # %% [markdown]
 # ## Resolving a time window to a block range
 
-
 # %%
 async def block_at(time: datetime, closest: Literal['before', 'after']) -> int:
   """Resolve a timestamp to the closest block number.
@@ -92,7 +91,6 @@ await block_at(now - timedelta(days=30), 'after'), await latest_block()
 # `tokentx` and `tokennfttx`, and omitting it returns every token transfer of the address,
 # which is what a history feed needs: it cannot know the contract set up front.
 #
-
 
 # %%
 async def native_transactions(
@@ -159,12 +157,12 @@ async def nft_transfers(start_block: int, end_block: int) -> list[Erc721Transfer
   return rows
 
 
+
 # %% [markdown]
 # Each row comes back typed: `timeStamp` is a `datetime`, and `value`, `tokenDecimal`,
 # `tokenID`, the gas fields and the block numbers are exact `int`s, so the grouping below
 # reads them straight off the row.
 #
-
 
 # %%
 class TxGroup(TypedDict):
@@ -189,7 +187,9 @@ async def group_transactions(start_block: int, end_block: int) -> dict[str, TxGr
 
   def group(hash: str, time: datetime) -> TxGroup:
     if hash not in groups:
-      groups[hash] = TxGroup(time=time, native=[], internal=[], erc20=[], erc721=[])
+      groups[hash] = TxGroup(
+        time=time, native=[], internal=[], erc20=[], erc721=[]
+      )
     return groups[hash]
 
   for native_row in native:
@@ -318,7 +318,6 @@ async def is_eoa(contract: str) -> bool:
 # %% [markdown]
 # ## Mapping onto `EvmTx`
 
-
 # %%
 def parse_fee(receipt: dict[str, Any]) -> Fee | None:
   """Map a receipt onto `Fee`, but only when this address is the one that paid it.
@@ -405,6 +404,7 @@ def parse_erc721_transfer(row: Erc721Transfer) -> EvmTx.NftTransfer | None:
   )
 
 
+
 # %%
 async def parse_execution(hash: str) -> EvmTx.Execution:
   """Map a transaction and its receipt onto `EvmTx.Execution`."""
@@ -467,13 +467,13 @@ async def parse_tx(hash: str, group: TxGroup) -> EvmTx:
   )
 
 
+
 # %% [markdown]
 # ### The branch-triggering transactions
 #
 # One real transaction per branch, taken from the full-history survey above rather than
 # chosen by hand -- so each of these is the population's own evidence that the branch
 # fires.
-
 
 # %%
 async def parse_one(hash: str) -> EvmTx:
@@ -507,7 +507,6 @@ inbound.fee, inbound.transfers
 
 # %% [markdown]
 # ## `History`
-
 
 # %%
 async def history(

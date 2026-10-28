@@ -27,7 +27,6 @@ client = await MEXC.new(public=True).__aenter__()
 # below lists all four namespaces' groups, confirming there's nothing earn-shaped to
 # hand-map.
 
-
 # %%
 def groups(namespace: object) -> list[str]:
   """Endpoint groups a `typed_mexc` namespace exposes, as its `cached_property` names."""
