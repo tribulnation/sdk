@@ -1076,7 +1076,6 @@ methods:
         bitget: {market_id: 'bitget:usdt:BTCUSDT', rate1: '0.0001', rate2: '0.00012'}
         lighter: {market_id: 'lighter:perp:1', rate1: '0.0001', rate2: '0.00012'}
         extended: {market_id: 'extended:perp:BTC-USD', rate1: '0.000013', rate2: '-0.000004'}
-        margin-trade: {market_id: 'margin-trade:perp:BTC', rate1: '0.0001', rate2: '0.00012'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', rate1: '0.0001', rate2: '0.00012'}
       callTemplate: |
         async for page in sdk.funding_rates('{{ constants[accounts[0]].market_id }}', start, end):
