@@ -68,8 +68,10 @@ jobs:
       - if: matrix.package != 'sdk' && matrix.package != 'sdk-dev'
         run: pip install -e ${{ steps.package.outputs.path }}
       # Shared Market.Settings references every optional venue settings type.
-      - if: matrix.package == 'aster' || matrix.package == 'dydx' || matrix.package == 'hyperliquid' || matrix.package == 'lighter'
-        run: pip install -e packages/impl/aster/pkg -e packages/impl/dydx/pkg -e packages/impl/hyperliquid/pkg -e packages/impl/lighter/pkg
+      # The SDK `Settings` TypedDict types each venue's key with that venue's own settings,
+      # so a venue reading its key resolves them all.
+      - if: matrix.package == 'aster' || matrix.package == 'dydx' || matrix.package == 'extended' || matrix.package == 'hyperliquid' || matrix.package == 'lighter' || matrix.package == 'margin-trade'
+        run: pip install -e packages/impl/aster/pkg -e packages/impl/dydx/pkg -e packages/impl/extended/pkg -e packages/impl/hyperliquid/pkg -e packages/impl/lighter/pkg -e packages/impl/margin-trade/pkg
       - run: pip install ruff pyright build
       - run: ruff check --config ruff.toml ${{ steps.package.outputs.path }}/src
       - run: pyright ${{ steps.package.outputs.path }}

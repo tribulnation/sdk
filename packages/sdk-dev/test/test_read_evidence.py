@@ -12,7 +12,7 @@ from typing_extensions import Literal
 
 from sdk_dev import read_evidence as evidence
 from sdk_dev.cli import results
-from sdk_dev.integration.market.account import WAIVED, check_waivers, runs
+from sdk_dev.integration.market.account import WAIVED, check_waivers, market_kinds, runs
 from sdk_dev.repo import repo_root
 from sdk_dev.support import AccountMode, ImplFile, Waiver, load_impl_files
 
@@ -446,9 +446,10 @@ def test_qualification_tables_name_real_account_reads():
         assert all(code is not None for code in account_cases(venue).values())
       continue
     assert support is not None
-    declared = (
-      set(ACCOUNT_READS) if support.support == 'full' else set(support.methods or ())
-    )
+    kinds = market_kinds(repo_root())
+    declared = {
+      method for method in ACCOUNT_READS if support.declares(method, kinds.get(method))
+    }
     assert set(market.address_methods) | set(market.token_methods) <= declared
     assert not set(market.address_methods) & set(market.token_methods)
     exchanges = {case.market_id.split(':', 1)[0] for case in CASES[venue]}
@@ -580,10 +581,13 @@ def with_waiver(venue: str, **fields: str) -> ImplFile:
 )
 def test_waivers_must_name_a_required_read(fields: dict[str, str]):
   """Unknown exchanges or methods, excluded reads and duplicates are rejected."""
+  kinds = market_kinds(repo_root())
   with pytest.raises(ValueError):
-    check_waivers(with_waiver('mexc', **fields), {'spot', 'perp'})
+    check_waivers(with_waiver('mexc', **fields), {'spot', 'perp'}, kinds=kinds)
   check_waivers(
-    with_waiver('mexc', exchange='spot', method='trades_history'), {'spot', 'perp'}
+    with_waiver('mexc', exchange='spot', method='trades_history'),
+    {'spot', 'perp'},
+    kinds=kinds,
   )
 
 

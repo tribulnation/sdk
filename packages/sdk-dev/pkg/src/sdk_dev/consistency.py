@@ -16,8 +16,8 @@ from tribulnation.sdk.impl.market import MarketSDK
 from tribulnation.sdk.market import Exchange, Market, PerpExchange
 
 from .integration.market.support import CASES
-from .repo import repo_root
-from .support import is_testnet, load_impl_files
+from .repo import CONTRACT_DIR, repo_root
+from .support import is_testnet, load_impl_files, load_method_kinds
 
 VERSION = 6
 REQUEST_TIMEOUT = 120
@@ -126,11 +126,9 @@ def methods(root: Path, venue: str) -> set[str]:
   support = entry.support.get('market') if entry is not None else None
   if support is None or support.support == 'none' or is_testnet(venue):
     raise ValueError('Venue has no mainnet market consistency scope')
-  return (
-    {'rules', 'depth', 'tickers', 'perp_stats'}
-    if support.support == 'full'
-    else set(support.methods or [])
-  )
+  kinds = load_method_kinds(root / CONTRACT_DIR / 'market.yml')
+  reads = {'rules', 'depth', 'tickers', 'perp_stats', *(support.methods or ())}
+  return {method for method in reads if support.declares(method, kinds.get(method))}
 
 
 def catalogue_rows(catalogue: Catalogue, venue: str):

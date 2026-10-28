@@ -16,6 +16,7 @@
 [support.market]
 support = "partial"
 auth = true
+kinds = ["spot"]
 methods = [
   "depth",
   "depth_stream",

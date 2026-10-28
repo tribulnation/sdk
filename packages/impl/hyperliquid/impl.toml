@@ -4,6 +4,7 @@
 [support.market]
 support = "partial"
 auth = false
+kinds = ["spot", "perp"]
 methods = [
   "candles",
   "depth",

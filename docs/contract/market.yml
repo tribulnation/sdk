@@ -24,6 +24,11 @@
 # `group`: optional display grouping (Market is the only component with more than a
 # handful of methods). Display order follows first-appearance order in this file.
 #
+# `kind`: the kind of market a method exists on (`spot`: SpotMarket; `perp`: margin and
+# perpetual markets), absent when every market has it (ADR 0051). A venue is eligible
+# only if its impl.toml `[support.market] kinds` include it, so a perpetuals-only `full`
+# venue needs no spot examples (ADR 0056).
+#
 # `catalogue`: an optional second call/result pair showing how the `tribulnation-catalogue`
 # package resolves this method's raw venue-native strings into canonical cross-venue ids.
 # Most methods below show a venue-independent comparison (which raw id does BTC/USDT use
@@ -367,6 +372,7 @@ methods:
 
   perp_stats:
     group: Bulk market data
+    kind: perp
     venues:
       kraken: "Public linear perpetual index, mark and base-unit open interest; optional funding fields remain unset."
       deribit: "Linear perpetual native index, mark and base open interest; continuous funding is not mapped to a scheduled payment forecast."
@@ -621,6 +627,7 @@ methods:
 
   position:
     group: Your account data
+    kind: perp
     public: false
     example:
       accountVenues: [dydx]
@@ -657,6 +664,7 @@ methods:
 
   collateral:
     group: Your account data
+    kind: perp
     public: false
     example:
       accountVenues: [hyperliquid]
@@ -694,6 +702,7 @@ methods:
 
   available_notional:
     group: Your account data
+    kind: perp
     public: false
     example:
       accountVenues: [dydx]
@@ -983,6 +992,7 @@ methods:
 
   index:
     group: Perpetual-only
+    kind: perp
     example:
       accountVenues: [dydx]
       constants:
@@ -1023,6 +1033,7 @@ methods:
 
   next_funding:
     group: Perpetual-only
+    kind: perp
     example:
       accountVenues: [dydx]
       constants:
@@ -1062,6 +1073,7 @@ methods:
 
   funding_rates:
     group: Perpetual-only
+    kind: perp
     venues:
       kraken: "Native historical relative rates; SDK settlement time is period start plus one hour. Inclusive bounds apply to settlement time; an omitted start includes all retained rows."
     example:
@@ -1105,6 +1117,7 @@ methods:
 
   funding_payments:
     group: Perpetual-only
+    kind: perp
     public: false
     example:
       accountVenues: [dydx]
@@ -1143,6 +1156,7 @@ methods:
 
   perp_position:
     group: Perpetual-only
+    kind: perp
     public: false
     example:
       accountVenues: [dydx]
@@ -1179,6 +1193,7 @@ methods:
 
   perp_collateral:
     group: Perpetual-only
+    kind: perp
     public: false
     example:
       accountVenues: [dydx]
@@ -1217,6 +1232,7 @@ methods:
 
   leverage:
     group: Perpetual-only
+    kind: perp
     public: false
     example:
       accountVenues: [hyperliquid]

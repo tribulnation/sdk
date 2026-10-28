@@ -19,7 +19,7 @@ eligible (from `sdk_dev.support`'s `impl.toml` data) and passes that in as `univ
 """
 
 from pathlib import Path
-from typing_extensions import Any, Literal, Mapping, NotRequired, TypedDict
+from typing_extensions import Any, Mapping, NotRequired, TypedDict
 import re
 
 import jinja2
@@ -27,7 +27,7 @@ import pydantic
 import yaml
 
 from sdk_dev.source import SourceMethod
-from sdk_dev.support import ImplFile
+from sdk_dev.support import MarketKind
 
 JINJA_ENV = jinja2.Environment(
   trim_blocks=True, lstrip_blocks=True, undefined=jinja2.StrictUndefined
@@ -62,9 +62,9 @@ class ContractMethod(pydantic.BaseModel):
   model_config = pydantic.ConfigDict(extra='forbid')
 
   group: str | None = None
-  kind: Literal['spot', 'perp'] | None = None
-  """The kind of market the method exists on (ADR 0051): a `full`-support venue
-  without such markets is left out of its universe instead of needing constants."""
+  kind: MarketKind | None = None
+  """The kind of market the method exists on (ADR 0051); `None` means every kind. A
+  venue whose impl.toml `kinds` leaves it out is not eligible (ADR 0056)."""
   ref: str | None = None
   """`module.path:ClassName` overriding the component's `ref` for this one method."""
   public: bool | None = None
@@ -119,6 +119,7 @@ class RenderedMethodFlags(TypedDict, total=False):
 
   group: str
   public: bool
+  kind: MarketKind
 
 
 class RenderedMethod(RenderedMethodFlags):
@@ -178,37 +179,6 @@ def _render_lines(template: jinja2.Template, ctx: Mapping[str, Any]) -> list[str
   rendered = template.render(ctx).strip('\n')
   return [
     chunk.strip('\n') for chunk in re.split(r'\n[ \t]*\n', rendered) if chunk.strip()
-  ]
-
-
-def kind_universe(
-  method: ContractMethod,
-  universe: list[str],
-  *,
-  impl_files: Mapping[str, ImplFile],
-  surface: str,
-) -> list[str]:
-  """
-  Narrow a method's universe by its `kind`.
-
-  `support = "full"` declares every method, so a perpetual-only `full` venue is
-  eligible for spot-only methods by declaration alone. A `kind`-scoped method keeps
-  such a venue only when the contract gives it constants; a `partial` venue listing the
-  method must still provide them.
-
-  Args:
-    method: The contract method.
-    universe: Its eligible venues from `sdk_dev.support.method_universe`.
-    impl_files: `load_impl_files()`'s output.
-    surface: The contract's surface, e.g. `market`.
-  """
-  if method.kind is None:
-    return universe
-  return [
-    venue
-    for venue in universe
-    if venue in method.example.constants
-    or impl_files[venue].support[surface].support != 'full'
   ]
 
 
@@ -311,6 +281,8 @@ def render_contract_file(
       flags['group'] = method.group
     if method.public is not None:
       flags['public'] = method.public
+    if method.kind is not None:
+      flags['kind'] = method.kind
     try:
       examples = render_method(
         method,

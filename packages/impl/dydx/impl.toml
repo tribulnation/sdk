@@ -2,16 +2,9 @@
 # auth = true means every call always needs a real accounts.Dydx() entry.
 
 [support.market]
-support = "partial"
+support = "full"
 auth = false
-methods = [
-  "depth", "depth_stream", "tickers", "rules", "fees", "candles",
-  "query_order", "open_orders", "trades_history", "trades_stream",
-  "position", "collateral", "available_notional",
-  "place_order", "place_orders", "cancel_order", "cancel_orders", "cancel_open_orders",
-  "index", "next_funding", "perp_stats", "funding_rates", "funding_payments", "perp_position",
-  "leverage", "perp_collateral", "collateral_id",
-]
+kinds = ["perp"]
 note = "`candles` serves every contract interval in the indexer's native newest-first pages, filtered to the required `[start, end)` range. Public rules include active market fee holidays; personal fees also include referral tier overrides and staking discounts, with protocol PPM rounding. Fee holiday reads use Typed's generated public gRPC method until a convenience wrapper is available. Exchange-wide trades and funding history enumerate all subaccounts of the configured address and use native all-market indexer pages, including historical market tickers. Selected-market history likewise includes all address subaccounts. Funding payments preserve native received-positive amounts for both market and exchange history; negative amounts are paid."
 # MarketSDK.DEFAULT_ACCOUNTS includes 'dydx' (Dydx(public=True)) — but that only covers
 # purely public market-data methods; account-scoped/trading methods still need real
