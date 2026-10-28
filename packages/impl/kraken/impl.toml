@@ -24,6 +24,7 @@ note = "`deposit_methods` raises `NotImplementedError`: Kraken's `DepositMethods
 [support.market]
 support = "partial"
 auth = false
+kinds = ["spot", "perp"]
 methods = [
   "depth",
   "depth_stream",

@@ -52,6 +52,7 @@ PERP_CATEGORY = 'USDT-FUTURES'
 # %% [markdown]
 # ## `Market` (UTA, category `SPOT`)
 
+
 # %%
 async def depth(symbol: str, *, levels: int | None = None) -> Book:
   raw = await client.uta.market.orderbook(category='SPOT', symbol=symbol, limit=levels)
@@ -59,6 +60,7 @@ async def depth(symbol: str, *, levels: int | None = None) -> Book:
     bids=[Book.Entry(Decimal(str(p)), Decimal(str(q))) for p, q in raw['b']],
     asks=[Book.Entry(Decimal(str(p)), Decimal(str(q))) for p, q in raw['a']],
   )
+
 
 {symbol: await depth(symbol, levels=5) for symbol in SPOT_MARKETS}
 
@@ -71,6 +73,7 @@ async def depth(symbol: str, *, levels: int | None = None) -> Book:
 # `minOrderQty`/`minOrderAmount`/`status` and no `makerFeeRate`/`takerFeeRate`, while the
 # same call for `USDT-FUTURES` returns both. No alternative UTA spot-fee-rate endpoint was
 # found in scope.
+
 
 # %%
 async def rules(symbol: str, *, refetch: bool = False) -> Rules:
@@ -89,6 +92,7 @@ async def rules(symbol: str, *, refetch: bool = False) -> Rules:
     details=s,
   )
 
+
 {symbol: await rules(symbol) for symbol in SPOT_MARKETS}
 
 
@@ -100,15 +104,18 @@ async def open_orders(symbol: str) -> list[OrderState]:
     qty = Decimal(o['qty'])
     filled = Decimal(o['cumExecQty'])
     sign = 1 if o['side'] == 'buy' else -1
-    out.append(OrderState(
-      id=o['orderId'],
-      price=Decimal(o['price']),
-      qty=sign * qty,
-      filled_qty=sign * filled,
-      active=True,  # this endpoint only lists currently-unfilled orders
-      details=o,
-    ))
+    out.append(
+      OrderState(
+        id=o['orderId'],
+        price=Decimal(o['price']),
+        qty=sign * qty,
+        filled_qty=sign * filled,
+        active=True,  # this endpoint only lists currently-unfilled orders
+        details=o,
+      )
+    )
   return out
+
 
 {symbol: await open_orders(symbol) for symbol in SPOT_MARKETS}
 
@@ -116,7 +123,9 @@ async def open_orders(symbol: str) -> list[OrderState]:
 # %%
 async def trades_history(symbol: str, start: datetime, end: datetime) -> list[Trade]:
   raw = await client.uta.trade.order.fills(
-    category='SPOT', start_time=start, end_time=end,
+    category='SPOT',
+    start_time=start,
+    end_time=end,
   )
   out: list[Trade] = []
   for f in raw['list'] or []:
@@ -128,16 +137,19 @@ async def trades_history(symbol: str, start: datetime, end: datetime) -> list[Tr
       fee_amount = sum(abs(Decimal(d['fee'])) for d in f['feeDetail'])
       if fee_amount:
         fee = Trade.Fee(amount=fee_amount, asset=f['feeDetail'][0]['feeCoin'])
-    out.append(Trade(
-      id=f['execId'],
-      price=Decimal(f['execPrice']),
-      qty=qty if f['side'] == 'buy' else -qty,
-      time=f['createdTime'],
-      maker=f['tradeScope'].lower() == 'maker',
-      fee=fee,
-      details=f,
-    ))
+    out.append(
+      Trade(
+        id=f['execId'],
+        price=Decimal(f['execPrice']),
+        qty=qty if f['side'] == 'buy' else -qty,
+        time=f['createdTime'],
+        maker=f['tradeScope'].lower() == 'maker',
+        fee=fee,
+        details=f,
+      )
+    )
   return out
+
 
 end = datetime.now(timezone.utc)
 start = end - timedelta(hours=24)
@@ -150,6 +162,7 @@ start = end - timedelta(hours=24)
 # there's no separate "spot balance" endpoint the way Classic has `spot.account.assets`,
 # because UTA doesn't partition spot balances from the rest of the unified account.
 
+
 # %%
 async def coin_balance(coin: str) -> Decimal:
   raw = await client.uta.account.assets()
@@ -161,6 +174,7 @@ async def position(symbol: str) -> Position:
   base = symbol.removesuffix('USDT')  # SPOT_MARKETS are all *USDT pairs here
   return Position(size=await coin_balance(base))
 
+
 {symbol: await position(symbol) for symbol in SPOT_MARKETS}
 
 
@@ -168,34 +182,52 @@ async def position(symbol: str) -> Position:
 async def available_notional(symbol: str) -> Decimal:
   return await coin_balance('USDT')
 
+
 {symbol: await available_notional(symbol) for symbol in SPOT_MARKETS}
 
 
 # %%
-async def place_order(symbol: str, order: Order, *, settings: Settings = {}) -> OrderResponse:
+async def place_order(
+  symbol: str, order: Order, *, settings: Settings = {}
+) -> OrderResponse:
   qty_signed = Decimal(str(order['qty']))
   side = 'buy' if qty_signed > 0 else 'sell'
   qty = abs(qty_signed)
   price = Decimal(str(order['price']))
   body: LimitOrderRequest | MarketOrderRequest
   if order['type'] == 'MARKET':
-    body = {'category': 'SPOT', 'symbol': symbol, 'side': side, 'qty': qty, 'orderType': 'market'}
+    body = {
+      'category': 'SPOT',
+      'symbol': symbol,
+      'side': side,
+      'qty': qty,
+      'orderType': 'market',
+    }
   else:
     time_in_force = 'post_only' if order['type'] == 'POST_ONLY' else 'gtc'
     body = {
-      'category': 'SPOT', 'symbol': symbol, 'side': side, 'qty': qty,
-      'orderType': 'limit', 'price': price, 'timeInForce': time_in_force,
+      'category': 'SPOT',
+      'symbol': symbol,
+      'side': side,
+      'qty': qty,
+      'orderType': 'limit',
+      'price': price,
+      'timeInForce': time_in_force,
     }
   raw = await client.uta.trade.order.place(body)
   return OrderResponse(id=raw['orderId'], details=raw)
 
+
 # Not executed here -- would place a real order on the account.
-await place_order('BTCUSDT', {'qty': Decimal('0.0001'), 'price': Decimal('20000'), 'type': 'LIMIT'})
+await place_order(
+  'BTCUSDT', {'qty': Decimal('0.0001'), 'price': Decimal('20000'), 'type': 'LIMIT'}
+)
 
 
 # %%
 async def cancel_order(symbol: str, id: str, *, settings: Settings = {}):
   return await client.uta.trade.order.cancel(order_id=id, category='SPOT')
+
 
 # Not executed here -- would cancel a real order on the account.
 await cancel_order('BTCUSDT', '123456')
@@ -215,13 +247,17 @@ await cancel_order('BTCUSDT', '123456')
 # %% [markdown]
 # ## `PerpMarket` (UTA, category `USDT-FUTURES`)
 
+
 # %%
 async def perp_depth(symbol: str, *, levels: int | None = None) -> Book:
-  raw = await client.uta.market.orderbook(category=PERP_CATEGORY, symbol=symbol, limit=levels)
+  raw = await client.uta.market.orderbook(
+    category=PERP_CATEGORY, symbol=symbol, limit=levels
+  )
   return Book(
     bids=[Book.Entry(Decimal(str(p)), Decimal(str(q))) for p, q in raw['b']],
     asks=[Book.Entry(Decimal(str(p)), Decimal(str(q))) for p, q in raw['a']],
   )
+
 
 {symbol: await perp_depth(symbol, levels=5) for symbol in PERP_MARKETS}
 
@@ -243,6 +279,7 @@ async def perp_rules(symbol: str, *, refetch: bool = False) -> Rules:
     details=s,
   )
 
+
 {symbol: await perp_rules(symbol) for symbol in PERP_MARKETS}
 
 
@@ -254,23 +291,30 @@ async def perp_open_orders(symbol: str) -> list[OrderState]:
     qty = Decimal(o['qty'])
     filled = Decimal(o['cumExecQty'])
     sign = 1 if o['side'] == 'buy' else -1
-    out.append(OrderState(
-      id=o['orderId'],
-      price=Decimal(o['price']),
-      qty=sign * qty,
-      filled_qty=sign * filled,
-      active=True,
-      details=o,
-    ))
+    out.append(
+      OrderState(
+        id=o['orderId'],
+        price=Decimal(o['price']),
+        qty=sign * qty,
+        filled_qty=sign * filled,
+        active=True,
+        details=o,
+      )
+    )
   return out
+
 
 {symbol: await perp_open_orders(symbol) for symbol in PERP_MARKETS}
 
 
 # %%
-async def perp_trades_history(symbol: str, start: datetime, end: datetime) -> list[Trade]:
+async def perp_trades_history(
+  symbol: str, start: datetime, end: datetime
+) -> list[Trade]:
   raw = await client.uta.trade.order.fills(
-    category=PERP_CATEGORY, start_time=start, end_time=end,
+    category=PERP_CATEGORY,
+    start_time=start,
+    end_time=end,
   )
   out: list[Trade] = []
   for f in raw['list'] or []:
@@ -282,16 +326,19 @@ async def perp_trades_history(symbol: str, start: datetime, end: datetime) -> li
       fee_amount = sum(abs(Decimal(d['fee'])) for d in f['feeDetail'])
       if fee_amount:
         fee = Trade.Fee(amount=fee_amount, asset=f['feeDetail'][0]['feeCoin'])
-    out.append(Trade(
-      id=f['execId'],
-      price=Decimal(f['execPrice']),
-      qty=qty if f['side'] == 'buy' else -qty,
-      time=f['createdTime'],
-      maker=f['tradeScope'].lower() == 'maker',
-      fee=fee,
-      details=f,
-    ))
+    out.append(
+      Trade(
+        id=f['execId'],
+        price=Decimal(f['execPrice']),
+        qty=qty if f['side'] == 'buy' else -qty,
+        time=f['createdTime'],
+        maker=f['tradeScope'].lower() == 'maker',
+        fee=fee,
+        details=f,
+      )
+    )
   return out
+
 
 {symbol: await perp_trades_history(symbol, start, end) for symbol in PERP_MARKETS}
 
@@ -301,15 +348,20 @@ async def index(symbol: str, *, settings: Settings = {}) -> Decimal:
   raw = await client.uta.market.tickers(category=PERP_CATEGORY, symbol=symbol)
   price = raw[0].get('indexPrice')
   if price is None:
-    raise NotImplementedError(f'{symbol}: `tickers` carries no `indexPrice` for {PERP_CATEGORY}')
+    raise NotImplementedError(
+      f'{symbol}: `tickers` carries no `indexPrice` for {PERP_CATEGORY}'
+    )
   return price
+
 
 {symbol: await index(symbol) for symbol in PERP_MARKETS}
 
 
 # %%
 async def next_funding(symbol: str) -> NextFunding:
-  raw = await client.uta.market.funding_rate.current(category=PERP_CATEGORY, symbol=symbol)
+  raw = await client.uta.market.funding_rate.current(
+    category=PERP_CATEGORY, symbol=symbol
+  )
   r = raw[0]
   return NextFunding(
     rate=Decimal(r['fundingRate']),
@@ -317,26 +369,38 @@ async def next_funding(symbol: str) -> NextFunding:
     interval=timedelta(hours=int(r['fundingRateInterval'])),
   )
 
+
 {symbol: await next_funding(symbol) for symbol in PERP_MARKETS}
 
 
 # %%
 async def funding_rates(
-  symbol: str, start: datetime | None = None, end: datetime | None = None,
+  symbol: str,
+  start: datetime | None = None,
+  end: datetime | None = None,
 ) -> list[FundingRate]:
   # `funding_rate.history`'s `cursor` behaves as a page number, not a date range -- one
   # page is fetched and filtered client-side, same caveat as `market/classic.ipynb`.
-  raw = await client.uta.market.funding_rate.history(category=PERP_CATEGORY, symbol=symbol, limit=50)
-  out = [FundingRate(rate=r['fundingRate'], time=r['fundingRateTimestamp']) for r in raw['resultList']]
+  raw = await client.uta.market.funding_rate.history(
+    category=PERP_CATEGORY, symbol=symbol, limit=50
+  )
+  out = [
+    FundingRate(rate=r['fundingRate'], time=r['fundingRateTimestamp'])
+    for r in raw['resultList']
+  ]
   if start is not None:
     out = [r for r in out if r.time >= start]
   if end is not None:
     out = [r for r in out if r.time <= end]
   return out
 
+
 funding_end = datetime.now(timezone.utc)
 funding_start = funding_end - timedelta(days=7)
-{symbol: await funding_rates(symbol, funding_start, funding_end) for symbol in PERP_MARKETS}
+{
+  symbol: await funding_rates(symbol, funding_start, funding_end)
+  for symbol in PERP_MARKETS
+}
 
 
 # %% [markdown]
@@ -350,21 +414,30 @@ funding_start = funding_end - timedelta(days=7)
 # `ORDER_DEALT_IN`, `ORDER_DEALT_FROZEN_OUT`, `BUY_DEAL`, `SELL_DEAL` -- none of them a
 # funding settlement. Rather than guess a substring filter, the method raises.
 
+
 # %%
-async def funding_payments(symbol: str, start: datetime, end: datetime) -> list[FundingPayment]:
+async def funding_payments(
+  symbol: str, start: datetime, end: datetime
+) -> list[FundingPayment]:
   raise NotImplementedError(
     'not supported: `uta.account.financial_records` filters on a free-text `type` the '
     'venue documents as open-ended without listing its values, so there is no documented '
     'funding-fee value to filter on'
   )
 
+
 # not executed: not supported, see the note above
-{symbol: await funding_payments(symbol, funding_start, funding_end) for symbol in PERP_MARKETS}
+{
+  symbol: await funding_payments(symbol, funding_start, funding_end)
+  for symbol in PERP_MARKETS
+}
 
 
 # %%
 async def perp_position(symbol: str) -> PerpPosition:
-  raw = await client.uta.position.current_positions(category=PERP_CATEGORY, symbol=symbol)
+  raw = await client.uta.position.current_positions(
+    category=PERP_CATEGORY, symbol=symbol
+  )
   rows = raw['list'] or []
   row = rows[0] if rows else None
   if row is None:
@@ -372,6 +445,7 @@ async def perp_position(symbol: str) -> PerpPosition:
   total = Decimal(row['total'])
   size = total if row['posSide'] == 'long' else -total
   return PerpPosition(size=size, entry_price=Decimal(row['avgPrice']))
+
 
 {symbol: await perp_position(symbol) for symbol in PERP_MARKETS}
 
@@ -388,10 +462,12 @@ async def perp_position(symbol: str) -> PerpPosition:
 # translates Bitget's `'crossed'`/`'isolated'` spelling to the abstract
 # `Literal['cross', 'isolated']`.
 
+
 # %%
 async def perp_collateral(symbol: str) -> PerpCollateral:
   assets, settings = await asyncio.gather(
-    client.uta.account.assets(), client.uta.account.settings(),
+    client.uta.account.assets(),
+    client.uta.account.settings(),
   )
   cfg = next((c for c in settings['symbolConfigList'] if c['symbol'] == symbol), None)
   margin_mode = 'isolated' if cfg and cfg['marginMode'] == 'isolated' else 'cross'
@@ -404,6 +480,7 @@ async def perp_collateral(symbol: str) -> PerpCollateral:
     margin_mode=margin_mode,
   )
 
+
 {symbol: await perp_collateral(symbol) for symbol in PERP_MARKETS}
 
 
@@ -413,34 +490,52 @@ async def perp_available_notional(symbol: str) -> Decimal:
   max_leverage = rules.details.get('maxLeverage') or Decimal(1)
   return collateral.free_collateral * max_leverage
 
+
 {symbol: await perp_available_notional(symbol) for symbol in PERP_MARKETS}
 
 
 # %%
-async def perp_place_order(symbol: str, order: Order, *, settings: Settings = {}) -> OrderResponse:
+async def perp_place_order(
+  symbol: str, order: Order, *, settings: Settings = {}
+) -> OrderResponse:
   qty_signed = Decimal(str(order['qty']))
   side = 'buy' if qty_signed > 0 else 'sell'
   qty = abs(qty_signed)
   price = Decimal(str(order['price']))
   body: LimitOrderRequest | MarketOrderRequest
   if order['type'] == 'MARKET':
-    body = {'category': PERP_CATEGORY, 'symbol': symbol, 'side': side, 'qty': qty, 'orderType': 'market'}
+    body = {
+      'category': PERP_CATEGORY,
+      'symbol': symbol,
+      'side': side,
+      'qty': qty,
+      'orderType': 'market',
+    }
   else:
     time_in_force = 'post_only' if order['type'] == 'POST_ONLY' else 'gtc'
     body = {
-      'category': PERP_CATEGORY, 'symbol': symbol, 'side': side, 'qty': qty,
-      'orderType': 'limit', 'price': price, 'timeInForce': time_in_force,
+      'category': PERP_CATEGORY,
+      'symbol': symbol,
+      'side': side,
+      'qty': qty,
+      'orderType': 'limit',
+      'price': price,
+      'timeInForce': time_in_force,
     }
   raw = await client.uta.trade.order.place(body)
   return OrderResponse(id=raw['orderId'], details=raw)
 
+
 # Not executed here -- would place a real order on the account.
-await perp_place_order('BTCUSDT', {'qty': Decimal('0.001'), 'price': Decimal('20000'), 'type': 'LIMIT'})
+await perp_place_order(
+  'BTCUSDT', {'qty': Decimal('0.001'), 'price': Decimal('20000'), 'type': 'LIMIT'}
+)
 
 
 # %%
 async def perp_cancel_order(symbol: str, id: str, *, settings: Settings = {}):
   return await client.uta.trade.order.cancel(order_id=id, category=PERP_CATEGORY)
+
 
 # Not executed here -- would cancel a real order on the account.
 await perp_cancel_order('BTCUSDT', '123456')

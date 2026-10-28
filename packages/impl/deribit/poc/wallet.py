@@ -26,6 +26,7 @@ ASSETS = ['BTC', 'ETH', 'USDC', 'SOL']
 # %% [markdown]
 # `public/get_currencies` gives, per currency, its native chain (`coin_type`) plus any additional Coinbase-routed networks (`coinbase_networks`) Deribit accepts deposits from -- e.g. `USDC` accepts deposits from 7 different chains. `min_confirmations` is currency-level (not broken out per network). Deribit does not charge deposit fees, and does not expose a per-token contract address via this endpoint, so `DepositMethod.fee`/`contract_address` are `None`.
 
+
 # %%
 async def deposit_methods(*, assets: list[str] | None = None) -> list[DepositMethod]:
   """Map Deribit's supported currencies/networks onto `DepositMethod`."""
@@ -36,13 +37,16 @@ async def deposit_methods(*, assets: list[str] | None = None) -> list[DepositMet
       continue
     networks = c.get('coinbase_networks') or [{'display_name': c['coin_type']}]
     for net in networks:
-      out.append(DepositMethod(
-        asset=c['currency'],
-        network=net.get('display_name', c['coin_type']),
-        fee=None,  # Deribit does not charge deposit fees
-        min_confirmations=c['min_confirmations'],
-      ))
+      out.append(
+        DepositMethod(
+          asset=c['currency'],
+          network=net.get('display_name', c['coin_type']),
+          fee=None,  # Deribit does not charge deposit fees
+          min_confirmations=c['min_confirmations'],
+        )
+      )
   return out
+
 
 await deposit_methods(assets=ASSETS)
 
@@ -53,9 +57,12 @@ await deposit_methods(assets=ASSETS)
 # %% [markdown]
 # Withdrawal fees are also currency-level (`withdrawal_fee`, in the currency's own units) rather than per-network, so every network row for a given currency below carries the same fee -- Deribit does not expose a fee breakdown per `coinbase_networks` entry. `contract_address` is `None` for the same reason as deposits.
 
+
 # %%
 async def withdrawal_methods(
-  *, assets: list[str] | None = None, networks: list[str] | None = None,
+  *,
+  assets: list[str] | None = None,
+  networks: list[str] | None = None,
 ) -> list[WithdrawalMethod]:
   """Map Deribit's supported currencies/networks/fees onto `WithdrawalMethod`."""
   currencies = await public_client.market_data.get_currencies()
@@ -68,12 +75,17 @@ async def withdrawal_methods(
       network = net.get('display_name', c['coin_type'])
       if networks is not None and network not in networks:
         continue
-      out.append(WithdrawalMethod(
-        asset=c['currency'],
-        network=network,
-        fee=WithdrawalMethod.Fee(asset=c['currency'], amount=Decimal(str(c['withdrawal_fee']))),
-      ))
+      out.append(
+        WithdrawalMethod(
+          asset=c['currency'],
+          network=network,
+          fee=WithdrawalMethod.Fee(
+            asset=c['currency'], amount=Decimal(str(c['withdrawal_fee']))
+          ),
+        )
+      )
   return out
+
 
 await withdrawal_methods(assets=ASSETS)
 

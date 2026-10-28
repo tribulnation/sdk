@@ -40,6 +40,7 @@ PERP_MARKETS = ['XBTUSDTM', 'ETHUSDTM', 'KCSUSDTM']
 # withdrawals, funding) directly to its matching `Observation`, and covers the gap in the
 # coverage note below.
 
+
 # %%
 async def spot_trades(start: datetime, end: datetime) -> list[SpotTrade]:
   out: list[SpotTrade] = []
@@ -192,6 +193,7 @@ await funding(start, end)
 # %% [markdown]
 # ### `history(start=None, end=None)`
 
+
 # %%
 async def history(start: datetime | None = None, end: datetime | None = None):
   end = end or datetime.now(timezone.utc)
@@ -255,6 +257,7 @@ start = end - timedelta(
 
 # %% [markdown]
 # ## `Snapshots`
+
 
 # %%
 async def snapshot(assets: list[str] | None = None) -> SnapshotRecord:

@@ -43,6 +43,7 @@ ASSETS = ['BTC', 'ETH', 'USDT', 'SOL']
 # `tribulnation.bitget`'s blanket `NotImplementedError` for UTA mode wallet methods looks
 # overly conservative in light of this -- the underlying data isn't account-mode-scoped.
 
+
 # %%
 async def deposit_methods(*, assets: list[str] | None = None) -> list[DepositMethod]:
   raw = await client.classic.spot.coins()
@@ -53,14 +54,17 @@ async def deposit_methods(*, assets: list[str] | None = None) -> list[DepositMet
     for ch in c['chains']:
       if not ch['rechargeable']:
         continue
-      out.append(DepositMethod(
-        asset=c['coin'],
-        network=ch['chain'],
-        fee=None,
-        contract_address=ch['contractAddress'],
-        min_confirmations=ch['depositConfirm'],
-      ))
+      out.append(
+        DepositMethod(
+          asset=c['coin'],
+          network=ch['chain'],
+          fee=None,
+          contract_address=ch['contractAddress'],
+          min_confirmations=ch['depositConfirm'],
+        )
+      )
   return out
+
 
 await deposit_methods(assets=ASSETS)
 
@@ -81,13 +85,16 @@ async def withdrawal_methods(
         continue
       if networks is not None and ch['chain'] not in networks:
         continue
-      out.append(WithdrawalMethod(
-        asset=c['coin'],
-        network=ch['chain'],
-        fee=WithdrawalMethod.Fee(asset=c['coin'], amount=ch['withdrawFee']),
-        contract_address=ch['contractAddress'],
-      ))
+      out.append(
+        WithdrawalMethod(
+          asset=c['coin'],
+          network=ch['chain'],
+          fee=WithdrawalMethod.Fee(asset=c['coin'], amount=ch['withdrawFee']),
+          contract_address=ch['contractAddress'],
+        )
+      )
   return out
+
 
 await withdrawal_methods(assets=['USDT', 'BTC'], networks=['TRC20'])
 
@@ -106,9 +113,11 @@ await withdrawal_methods(assets=['USDT', 'BTC'], networks=['TRC20'])
 # Unlike the coin/network listing, `uta.transfers.deposit.address` genuinely is
 # UTA-specific and authenticated -- it returns an address scoped to *this* unified account.
 
+
 # %%
 async def deposit_address(coin: str, chain: str | None = None):
   return await client.uta.transfers.deposit.address(coin=coin, chain=chain)
+
 
 await deposit_address('USDT', 'TRC20')
 
@@ -119,6 +128,7 @@ await deposit_address('USDT', 'TRC20')
 # `uta.transfers.withdraw.submit` isn't part of `WithdrawalMethods` (the abstract interface
 # is read-only), but is the natural next step. Included only to show the mapping --
 # **never executed**.
+
 
 # %%
 async def withdraw(*, asset: str, network: str, address: str, amount: Decimal) -> str:
@@ -131,5 +141,8 @@ async def withdraw(*, asset: str, network: str, address: str, amount: Decimal) -
   )
   return result['orderId']
 
+
 # Not executed here -- would send a real on-chain withdrawal from the account.
-await withdraw(asset='USDT', network='trx', address='<destination-address>', amount=Decimal('10'))
+await withdraw(
+  asset='USDT', network='trx', address='<destination-address>', amount=Decimal('10')
+)

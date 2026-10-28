@@ -54,6 +54,7 @@ MARKETS = {
 # %% [markdown]
 # ## `Market` (spot)
 
+
 # %%
 async def depth(symbol: str, *, levels: int | None = None) -> Book:
   raw = await client.spot.http.market.depth(symbol=symbol, limit=levels)
@@ -115,6 +116,7 @@ async def rules(symbol: str) -> Rules:
 # `open_orders`/`trades_history` fail live with the same MEXC error -- this API key
 # doesn't have the scope for these account-sensitive spot endpoints, confirmed by the
 # response code, not a code issue:
+
 
 # %%
 async def open_orders(symbol: str) -> list[OrderState]:
@@ -182,6 +184,7 @@ trades_history_result
 # (`spot@private.deals.v3.api.pb`) carries no symbol field (unlike the order-update push,
 # which has `market`), so unlike other venues this can't be filtered by symbol at all --
 # it's account-wide by construction:
+
 
 # %%
 def trades_stream():
@@ -253,6 +256,7 @@ async def available_notional(symbol: str) -> Decimal:
 # %% [markdown]
 # ### Mutating (written, never executed)
 
+
 # %%
 async def place_order(symbol: str, order: Order) -> OrderResponse:
   qty = Decimal(order['qty'])
@@ -322,6 +326,7 @@ await cancel_order('BTCUSDT', '123456')
 # %% [markdown]
 # ## `PerpMarket` (USDT-M futures)
 
+
 # %%
 async def perp_depth(symbol: str, *, levels: int | None = None) -> Book:
   raw = await client.futures.http.market.depth(symbol=symbol, limit=levels)
@@ -384,6 +389,7 @@ async def perp_rules(symbol: str) -> Rules:
 # `open_orders`/`trades_history`/`position`/`collateral`/`available_notional` all fail
 # live with the same MEXC futures error -- this API key isn't enabled for futures account
 # read access, confirmed by the response code, not a code issue:
+
 
 # %%
 async def perp_open_orders(symbol: str) -> list[OrderState]:
@@ -466,6 +472,7 @@ perp_trades_history_result
 # `perp_trades_stream` (the account's own fill feed, `personal.order.deal`) authenticates
 # at the WebSocket layer independently of the REST futures-read scope above, so unlike the
 # REST calls it connects live and simply observes no fills in the window:
+
 
 # %%
 def perp_trades_stream(symbol: str):
@@ -656,6 +663,7 @@ start = end - timedelta(days=7)
 # `funding_payments` fails live with the same futures-read-access error as the other
 # account-scoped futures endpoints above:
 
+
 # %%
 async def funding_payments(
   symbol: str, start: datetime, end: datetime
@@ -671,6 +679,7 @@ async def funding_payments(
 # MEXC futures orders need a margin mode (`openType`) and, for isolated margin, a
 # `leverage` -- neither is part of the abstract `Order`/`Settings` shape yet, so this
 # demonstration hardcodes 1x isolated margin as an illustrative simplification.
+
 
 # %%
 async def perp_place_order(symbol: str, order: Order) -> OrderResponse:

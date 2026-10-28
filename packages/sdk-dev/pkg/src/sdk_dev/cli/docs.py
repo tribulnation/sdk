@@ -13,14 +13,14 @@ import typer
 from typing_extensions import Annotated
 
 from sdk_dev.accounts import generate_accounts_toml
-from sdk_dev.contract import kind_universe, load_contract_file, render_contract_file
+from sdk_dev.contract import load_contract_file, render_contract_file
 from sdk_dev.github import stale_pages, write_pages
 from sdk_dev.nav import check_nav
 from sdk_dev.reference import METHODS_MARKER, render_methods_markdown
 from sdk_dev.schema import generate_schema
 from sdk_dev.registry import load_registry
 from sdk_dev.source import Source, SourceLookupError
-from sdk_dev.streams import render_streams_markdown
+from sdk_dev.streams import STREAMS_SURFACE, render_streams_markdown
 from sdk_dev.repo import (
   CONTRACT_DIR,
   DOCS_DIR,
@@ -29,7 +29,14 @@ from sdk_dev.repo import (
   NotACheckout,
   repo_root,
 )
-from sdk_dev.support import load_impl_files, load_support_matrix, method_universe
+from sdk_dev.support import (
+  MarketKind,
+  kind_conflicts,
+  load_impl_files,
+  load_method_kinds,
+  load_support_matrix,
+  method_universe,
+)
 
 DEFAULT_LANDING_PATH = 'refs/landing'
 LANDING_DOCS_DEST = 'content/docs/sdk'
@@ -93,7 +100,11 @@ def _build_generated(root: Path) -> Generated:
   check_nav(root / DOCS_DIR)
   registry = load_registry(str(root / REGISTRY_PATH))
   venue_names = {slug: entry['name'] for slug, entry in registry.items()}
-  streams = render_streams_markdown(impl_files, venue_names=venue_names)
+  streams = render_streams_markdown(
+    impl_files,
+    kinds=load_method_kinds(root / CONTRACT_DIR / f'{STREAMS_SURFACE}.yml'),
+    venue_names=venue_names,
+  )
   stale = stale_pages(root / DOCS_DIR, streams=streams)
   if stale:
     listed = ', '.join(str(path) for path in stale)
@@ -118,13 +129,14 @@ def _build_generated(root: Path) -> Generated:
       raise FileNotFoundError(f'{src_file.name}: no methods page at {page}')
     if METHODS_MARKER not in page.read_text():
       raise FileNotFoundError(f'{page}: missing the {METHODS_MARKER} marker')
+    kinds: dict[str, MarketKind | None] = {
+      name: method.kind for name, method in contract.methods.items()
+    }
+    conflicts = kind_conflicts(impl_files, surface, kinds)
+    if conflicts:
+      raise ValueError(f'{src_file.name}: ' + '; '.join(conflicts))
     universes = {
-      name: kind_universe(
-        method,
-        method_universe(impl_files, surface, name),
-        impl_files=impl_files,
-        surface=surface,
-      )
+      name: method_universe(impl_files, surface, name, kind=method.kind)
       for name, method in contract.methods.items()
     }
     source_methods = {
@@ -173,7 +185,9 @@ def check(
     impl_files = load_impl_files(root / IMPL_DIR)
     registry = load_registry(str(root / REGISTRY_PATH))
     streams = render_streams_markdown(
-      impl_files, venue_names={slug: e['name'] for slug, e in registry.items()}
+      impl_files,
+      kinds=load_method_kinds(root / CONTRACT_DIR / f'{STREAMS_SURFACE}.yml'),
+      venue_names={slug: e['name'] for slug, e in registry.items()},
     )
     for path in write_pages(root / DOCS_DIR, streams=streams):
       typer.echo(f'rewrote {DOCS_DIR}/{path}')

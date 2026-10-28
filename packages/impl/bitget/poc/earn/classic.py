@@ -29,6 +29,7 @@ ASSETS = ['USDT', 'BTC', 'ETH']
 # lending, not itself a yield instrument) are omitted here to keep the demo tractable; see
 # the coverage note below.
 
+
 # %%
 async def savings_instruments(*, asset: str | None = None) -> list[Instrument]:
   raw = await client.classic.earn.savings.products(coin=asset)
@@ -42,22 +43,26 @@ async def savings_instruments(*, asset: str | None = None) -> list[Instrument]:
       else None
     )
     for tier in prod['apyList']:
-      out.append(Instrument(
-        tags=[prod['periodType']],
-        asset=prod['coin'],
-        apr=tier['currentApy'] / 100,
-        min_qty=tier['minStepVal'],
-        max_qty=tier['maxStepVal'],
-        duration=duration,
-        id=prod['productId'],
-      ))
+      out.append(
+        Instrument(
+          tags=[prod['periodType']],
+          asset=prod['coin'],
+          apr=tier['currentApy'] / 100,
+          min_qty=tier['minStepVal'],
+          max_qty=tier['maxStepVal'],
+          duration=duration,
+          id=prod['productId'],
+        )
+      )
   return out
+
 
 {asset: await savings_instruments(asset=asset) for asset in ASSETS}
 
 
 # %% [markdown]
 # ### `instruments(*, tags=None, assets=None)`
+
 
 # %%
 async def instruments(
@@ -71,6 +76,7 @@ async def instruments(
   if tags is not None:
     out = [ins for ins in out if set(ins.tags) & set(tags)]
   return out
+
 
 await instruments(assets=['USDT', 'BTC'], tags=['flexible'])
 
@@ -109,6 +115,7 @@ await instruments(assets=['USDT', 'BTC'], tags=['flexible'])
 # read-only), but are the natural next step. Included only to show the mapping --
 # **never executed**.
 
+
 # %%
 async def subscribe(instrument: Instrument, *, amount: Decimal) -> str:
   assert instrument.id is not None, 'instrument has no id to subscribe to'
@@ -119,10 +126,13 @@ async def subscribe(instrument: Instrument, *, amount: Decimal) -> str:
   )
   return result['orderId']
 
+
 # Not executed here -- would subscribe real funds to a real Earn product.
 products = await client.classic.earn.savings.products(coin='USDT')
 await subscribe(
-  Instrument(tags=['flexible'], asset='USDT', apr=Decimal('0'), id=products[0]['productId']),
+  Instrument(
+    tags=['flexible'], asset='USDT', apr=Decimal('0'), id=products[0]['productId']
+  ),
   amount=Decimal('1'),
 )
 
@@ -136,6 +146,7 @@ async def redeem(instrument: Instrument, *, amount: Decimal) -> str:
     amount=amount,
   )
   return result['orderId']
+
 
 # Not executed here -- would redeem a real holding on the account.
 await redeem(

@@ -52,6 +52,7 @@ MARKETS = {
 # %% [markdown]
 # ## `Market` (spot)
 
+
 # %%
 async def depth(symbol: str, *, levels: int | None = None) -> Book:
   raw = await client.market.orderbook(category='spot', symbol=symbol, limit=levels)
@@ -331,6 +332,7 @@ await cancel_order('BTCUSDT', '123456')
 
 # %% [markdown]
 # ## `PerpMarket` (linear)
+
 
 # %%
 async def depth(symbol: str, *, levels: int | None = None) -> Book:

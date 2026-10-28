@@ -6,10 +6,11 @@ Failures use fixed messages, so balances, identifiers and raw errors never reach
 output or the recorded evidence.
 """
 
-from collections.abc import Awaitable, Callable, Collection, Sequence
+from collections.abc import Awaitable, Callable, Collection, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
+from pathlib import Path
 import asyncio
 
 import pytest
@@ -33,12 +34,14 @@ from tribulnation.sdk.market import (
   is_perp,
   is_spot,
 )
-from sdk_dev.repo import IMPL_DIR, repo_root
+from sdk_dev.repo import CONTRACT_DIR, IMPL_DIR, repo_root
 from sdk_dev.support import (
   AccountMode,
   ImplFile,
+  MarketKind,
   MarketQualification,
   load_impl_files,
+  load_method_kinds,
   mode_rank,
 )
 from ..accounts import account_mode, package_of, selected_accounts
@@ -64,23 +67,6 @@ ACCOUNT_READS = (
   'collateral_ids',
 )
 """Account-scoped Market reads, one case each per reference market."""
-
-PERP_ONLY = frozenset(
-  {
-    'funding_payments',
-    'position',
-    'perp_position',
-    'collateral',
-    'perp_collateral',
-    'leverage',
-    'available_notional',
-    'collateral_id',
-  }
-)
-"""Reads the SDK defines on margin (perpetual) markets only (ADR 0051)."""
-
-SPOT_ONLY = frozenset({'balances', 'collateral_ids'})
-"""Reads the SDK defines on spot markets only (ADR 0051)."""
 
 STATIC_EXCLUSIONS = {'query_order': 'order_lifecycle'}
 """Reads a read-only suite cannot exercise: an order ID to query needs an order
@@ -120,9 +106,20 @@ def required_mode(qualification: MarketQualification, method: str) -> AccountMod
   return 'private'
 
 
+def market_kinds(root: Path) -> dict[str, MarketKind | None]:
+  """Each Market method's `kind`, from the committed `docs/contract/market.yml`."""
+  return load_method_kinds(root / CONTRACT_DIR / 'market.yml')
+
+
+def exchange_kind(exchange_id: str) -> MarketKind:
+  """The kind of market an exchange ID lists: `spot`, else margin (`perp`)."""
+  return 'spot' if exchange_id == 'spot' else 'perp'
+
+
 def account_exclusion(
   impl: ImplFile,
   *,
+  kinds: Mapping[str, MarketKind | None],
   venue: str,
   exchange_id: str,
   method: str,
@@ -136,22 +133,28 @@ def account_exclusion(
   offline verifier reaches the same answer as the live run. A `waived:<reason>` code
   still runs the read: only the waiver's expected error becomes a visible skip.
 
+  Args:
+    impl: The venue's impl.toml.
+    kinds: `market_kinds()`: a read whose contract `kind` differs from the market's is
+      `perp_only` or `spot_only` there, before any support declaration.
+    venue: The venue slug.
+    exchange_id: The reference market's exchange ID.
+    method: The account read.
+    mode: The account's credential mode.
+    bitget_uta: Whether a Bitget account is unified, when known.
+    apply_waivers: Return a matching waiver's code rather than `None`.
+
   Raises:
     ValueError: Account methods are declared without a `[qualification.market]` table.
   """
   if method in STATIC_EXCLUSIONS:
     return STATIC_EXCLUSIONS[method]
-  if exchange_id == 'spot' and method in PERP_ONLY:
-    return 'perp_only'
-  if exchange_id != 'spot' and method in SPOT_ONLY:
-    return 'spot_only'
+  kind = kinds.get(method)
+  if kind is not None and kind != exchange_kind(exchange_id):
+    return f'{kind}_only'
   support = impl.support.get('market')
   qualification = impl.qualification.market
-  declared = (
-    support is not None
-    and support.support != 'none'
-    and (support.support == 'full' or method in (support.methods or ()))
-  )
+  declared = support is not None and support.declares(method, kind)
   if not declared or (
     qualification is not None
     and method in qualification.unsupported.get(exchange_id, ())
@@ -185,7 +188,12 @@ WAIVED_ERRORS: dict[str, type[Exception]] = {
 """The only failure each waiver reason turns into a skip; anything else still fails."""
 
 
-def check_waivers(impl: ImplFile, exchanges: Collection[str]):
+def check_waivers(
+  impl: ImplFile,
+  exchanges: Collection[str],
+  *,
+  kinds: Mapping[str, MarketKind | None],
+):
   """Reject waivers naming an unknown exchange or a read that is not otherwise required.
 
   Checked against the reference markets' exchanges and the declarations alone, in the
@@ -207,6 +215,7 @@ def check_waivers(impl: ImplFile, exchanges: Collection[str]):
       raise ValueError('Waiver names an unknown exchange or account read')
     code = account_exclusion(
       impl,
+      kinds=kinds,
       venue='',
       exchange_id=waiver.exchange,
       method=waiver.method,
@@ -233,12 +242,15 @@ def plan_of(sdk: MarketSDK, id: str) -> AccountPlan:
   account_id, exchange_id, _ = id.split(':', 2)
   account = sdk.accounts[account_id]
   venue = package_of(account.venue)
-  impl = load_impl_files(repo_root() / IMPL_DIR)[venue]
+  root = repo_root()
+  impl = load_impl_files(root / IMPL_DIR)[venue]
+  kinds = market_kinds(root)
   mode = account_mode(account)
   uta = getattr(account, 'uta', None)
   exclusions = {
     method: account_exclusion(
       impl,
+      kinds=kinds,
       venue=venue,
       exchange_id=exchange_id,
       method=method,

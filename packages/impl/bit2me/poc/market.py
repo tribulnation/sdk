@@ -39,6 +39,7 @@ MARKETS = ['BTC/EUR', 'ETH/EUR', 'SOL/EUR']
 # endpoints), so only the abstract `Market` interface applies here; there's no
 # `PerpMarket` notebook section.
 
+
 # %%
 async def depth(symbol: str, *, levels: int | None = None) -> Book:
   raw = await client.v2.trading.order_book(symbol=symbol)
@@ -137,7 +138,10 @@ async def tickers(markets: list[str] | None = None) -> dict[str, Ticker]:
     if not symbol or (wanted is not None and symbol not in wanted):
       continue
     last, bid, ask, volume = (
-      entry.get('close'), entry.get('bid'), entry.get('ask'), entry.get('baseVolume')
+      entry.get('close'),
+      entry.get('bid'),
+      entry.get('ask'),
+      entry.get('baseVolume'),
     )
     out[symbol] = Ticker(
       last=Decimal(str(last)) if last is not None else None,

@@ -27,6 +27,7 @@ client = await Bybit.new().__aenter__()
 # %% [markdown]
 # ## `Snapshots.snapshot`
 
+
 # %%
 async def snapshot(assets: list[str] | None = None) -> SnapshotRecord:
   wallet = (await client.account.wallet_balance(account_type='UNIFIED'))['list']
@@ -74,6 +75,7 @@ await snapshot()
 # `History.history` is a plain `def` returning an async-iterable directly (not
 # `async def`), so it's implemented the same way here: `history()` just returns the
 # async generator `_history_records()` produces, without itself being a coroutine.
+
 
 # %%
 async def _history_records(start: datetime | None, end: datetime | None):

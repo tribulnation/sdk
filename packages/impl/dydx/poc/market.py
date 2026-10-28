@@ -54,6 +54,7 @@ address = os.environ['DYDX_TESTNET_ADDRESS']
 #
 # dYdX exposes a single exchange kind: the account's perpetual margin bucket.
 
+
 # %%
 async def exchanges() -> list[dict[str, str]]:
   """dYdX's only exchange kind is the perpetual margin bucket addressed by
@@ -71,6 +72,7 @@ await exchanges()
 # The parent subaccount (`0`) is addressed as `perp`; a child subaccount `N` would be
 # `perp.N` (`N % 128 == 0`) -- not exercised here since this testnet account only uses the
 # parent subaccount.
+
 
 # %%
 async def markets() -> list[str]:

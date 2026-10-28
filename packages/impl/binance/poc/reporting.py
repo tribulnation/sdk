@@ -115,7 +115,6 @@ async def future_trades(start: datetime, end: datetime) -> list[FutureTrade]:
   return out
 
 
-
 # %%
 # not executed: signed USD-M futures calls 401 on this key (`enableFutures` is false, see `api_restrictions()` in reporting.ipynb, and the account is geo-blocked from enabling it)
 await future_trades(
@@ -242,7 +241,6 @@ async def futures_income(start: datetime, end: datetime) -> list[Observation]:
           )
         )
   return out
-
 
 
 # %%
@@ -518,6 +516,7 @@ await snapshot()
 # that reads it -- account-wide, no pagination -- so it folds in as a fourth subaccount
 # without touching any of the five sources above.
 #
+
 
 # %%
 async def funding_balances(assets: list[str] | None = None) -> dict[str, Decimal]:

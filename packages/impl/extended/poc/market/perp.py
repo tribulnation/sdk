@@ -122,9 +122,7 @@ details = await market_table()
   'typed-extended': version('typed-extended'),
   'markets': len(details),
   'listed perps': len(listed_perps(details)),
-  'rfq perps': sum(
-    1 for n in listed_perps(details) if details[n]['isRfq']
-  ),
+  'rfq perps': sum(1 for n in listed_perps(details) if details[n]['isRfq']),
   'testnet markets': len(await market_table(testnet)),
 }
 
@@ -175,6 +173,7 @@ assert set(MARKETS) | {RFQ} <= set(listed)
 # Fetch the market order book.
 #
 # Order-book markets: `info.orderbook`, the whole aggregated book (thousands of levels on BTC), with no timestamp, so `time` is `None`; an inactive or unknown market has no book (`None`), which raises. RFQ markets: the REST book is the venue's *indicative* book (empty on `OP-USD`); the real book is the quotes, which the venue publishes only on the `orderbooks/rfq` stream, so `depth` takes that stream's first snapshot, stamped with its `ts`.
+
 
 # %%
 def book_entries(rows: Sequence[OrderbookLevel]) -> list[Book.Entry]:
@@ -430,7 +429,9 @@ async def rules(market_id: str, /, *, refetch: bool = False) -> Rules:
 
 
 # %%
-async def fees(market_id: str, /, *, refetch: bool = False, on: Extended = client) -> Fees:
+async def fees(
+  market_id: str, /, *, refetch: bool = False, on: Extended = client
+) -> Fees:
   """The account's maker/taker rates on the market."""
   row = (await on.account.fees([market_id]))[0]
   return Fees.symmetric(maker=row['makerFeeRate'], taker=row['takerFeeRate'])
@@ -450,7 +451,9 @@ async def fees(market_id: str, /, *, refetch: bool = False, on: Extended = clien
 # `info.candles_paged` with `candleType='trades'`, newest first, stamped with the open time; `endTime` is exclusive. A request covers the `limit` intervals before `endTime` (at most 2800), and the client's walk moves `endTime` back to each page's oldest open. The walk starts at `end` with `limit` the number of grid opens in `[start, end)`, at most 1000, and stops once a page reaches `start`; older rows are dropped. Volume is `v` (base); there is no quote volume or trade count. Daily candles are `P1D`, aligned to UTC midnight.
 
 # %%
-INTERVALS: dict[CandleInterval, Literal['PT1M', 'PT5M', 'PT15M', 'PT1H', 'PT4H', 'P1D']] = {
+INTERVALS: dict[
+  CandleInterval, Literal['PT1M', 'PT5M', 'PT15M', 'PT1H', 'PT4H', 'P1D']
+] = {
   '1m': 'PT1M',
   '5m': 'PT5M',
   '15m': 'PT15M',
@@ -503,7 +506,9 @@ candle_end = datetime.now(timezone.utc).replace(second=0, microsecond=0)
 candle_probe = {}
 for interval in INTERVALS:
   window_start = candle_end - candle_width(interval) * 5
-  rows = [c async for page in candles(ETH, interval, window_start, candle_end) for c in page]
+  rows = [
+    c async for page in candles(ETH, interval, window_start, candle_end) for c in page
+  ]
   candle_probe[interval] = (len(rows), rows[0] if rows else None)
 candle_probe
 
@@ -561,7 +566,9 @@ def parse_order(o: ExtendedOrder) -> OrderState:
   )
 
 
-async def query_order(market_id: str, /, id: str, *, on: Extended = client) -> OrderState | None:
+async def query_order(
+  market_id: str, /, id: str, *, on: Extended = client
+) -> OrderState | None:
   """Look the order up by its Extended id."""
   o = await on.account.order(int(id))
   return parse_order(o) if o is not None and o['market'] == market_id else None
@@ -594,7 +601,9 @@ closed_state = await query_order(closed['market'], str(closed['id']), on=testnet
 
 
 # %%
-async def open_orders(market_id: str, /, *, on: Extended = client) -> Sequence[OrderState]:
+async def open_orders(
+  market_id: str, /, *, on: Extended = client
+) -> Sequence[OrderState]:
   """The market's open limit orders."""
   rows = await on.account.open_orders([market_id], type='LIMIT')
   return [parse_order(o) for o in rows]
@@ -870,7 +879,11 @@ bid = (await depth(ETH, levels=1, on=trader)).best_bid.price
 tick = (await rules(ETH)).tick_size
 resting = await place_order(
   ETH,
-  {'type': 'POST_ONLY', 'qty': Decimal('0.01'), 'price': (bid * Decimal('0.9')).quantize(tick)},
+  {
+    'type': 'POST_ONLY',
+    'qty': Decimal('0.01'),
+    'price': (bid * Decimal('0.9')).quantize(tick),
+  },
 )
 await asyncio.sleep(2)
 {
@@ -886,6 +899,7 @@ await asyncio.sleep(2)
 # Cancel an order in the market.
 #
 # `orders.cancel` by Extended id. Cancellation is asynchronous: the call only acknowledges the request.
+
 
 # %%
 # not executed: state-changing; verified on testnet in qualification
@@ -905,6 +919,7 @@ await query_order(ETH, resting.id, on=trader)
 # Cancel multiple orders in the market.
 #
 # One `orders.mass_cancel` request with the Extended ids.
+
 
 # %%
 # not executed: state-changing; verified on testnet in qualification
@@ -932,6 +947,7 @@ await asyncio.sleep(2)
 # Cancel all open orders in the market.
 #
 # `orders.mass_cancel(markets=[market])`, the venue's cancel-all scoped to the market. It also cancels conditional and TP/SL orders, which `open_orders` leaves out (see the design questions).
+
 
 # %%
 # not executed: state-changing; verified on testnet in qualification
@@ -1055,7 +1071,9 @@ rates = {
 }
 bounded_lower = rates[ETH][5].time
 bounded = [
-  r async for page in funding_rates(ETH, bounded_lower, rates[ETH][3].time) for r in page
+  r
+  async for page in funding_rates(ETH, bounded_lower, rates[ETH][3].time)
+  for r in page
 ]
 full = [page async for page in funding_rates('BTC-USD')]
 {
@@ -1063,7 +1081,8 @@ full = [page async for page in funding_rates('BTC-USD')]
   'latest': {m: rs[0] for m, rs in rates.items()},
   'inclusive_bounds': [r.time for r in bounded],
   'all_history_pages': [len(p) for p in full],
-  'all_history_unique': len({r.time for p in full for r in p}) == sum(len(p) for p in full),
+  'all_history_unique': len({r.time for p in full for r in p})
+  == sum(len(p) for p in full),
   'negative rates (BTC)': sum(1 for p in full for r in p if r.rate < 0),
 }
 
@@ -1110,11 +1129,15 @@ async def funding_payments(
 {
   name: {
     'per market': {
-      m: [p async for page in funding_payments(m, history_start, end, on=on) for p in page]
+      m: [
+        p async for page in funding_payments(m, history_start, end, on=on) for p in page
+      ]
       for m in MARKETS
     },
     'exchange-wide': [
-      p async for page in funding_payments(None, history_start, end, on=on) for p in page
+      p
+      async for page in funding_payments(None, history_start, end, on=on)
+      for p in page
     ],
   }
   for name, on in (('mainnet', client), ('testnet', testnet))
@@ -1153,7 +1176,9 @@ async def perp_position(market_id: str, /, *, on: Extended = client) -> PerpPosi
 
 
 # %%
-async def leverage(market_id: str, /, *, refetch: bool = False, on: Extended = client) -> Decimal:
+async def leverage(
+  market_id: str, /, *, refetch: bool = False, on: Extended = client
+) -> Decimal:
   """The account's leverage setting on the market."""
   return await account_leverage(market_id, on)
 
@@ -1171,7 +1196,9 @@ async def leverage(market_id: str, /, *, refetch: bool = False, on: Extended = c
 
 
 # %%
-async def collateral(market_id: str | None = None, /, *, on: Extended = client) -> Collateral:
+async def collateral(
+  market_id: str | None = None, /, *, on: Extended = client
+) -> Collateral:
   """Defers to `perp_collateral`."""
   return await perp_collateral(market_id, on=on)
 

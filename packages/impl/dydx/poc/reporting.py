@@ -228,6 +228,7 @@ await snapshot()
 # and historical trading rewards (`Yield`). Each is mapped separately below, then merged in
 # `history()`.
 
+
 # %%
 def fill_sign(side: str) -> int:
   return 1 if side == 'BUY' else -1
@@ -325,6 +326,7 @@ await funding_history(start, end)
 # `'bank'` and `perp.<N>`) and only uses `Transfer` (crossing the account scope entirely)
 # when a `TRANSFER_IN`/`TRANSFER_OUT` leg's counterparty address differs from ours.
 
+
 # %%
 def account_label(account: Account, *, our_address: str) -> str:
   """Label one transfer leg as a compartment inside our account, or an external
@@ -397,6 +399,7 @@ await transfers_history(start, end)
 # assumes `asset='DYDX'` rather than reading it from the payload (not independently
 # confirmed against a non-empty live response, since this testnet account's rewards *are*
 # all-zero, as seen below -- flagged in the coverage notes).
+
 
 # %%
 async def rewards_history(start: datetime, end: datetime) -> list[Yield]:

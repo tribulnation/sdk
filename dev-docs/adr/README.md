@@ -78,3 +78,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0053](0053-shared-account-reads-aster-max-leverage.md) | Shared account reads, and Aster orders at the symbol's maximum leverage | Proposed; implemented, not release-verified; decision 2 amended by 0054, decision 3 by 0055 |
 | [0054](0054-caller-chosen-read-staleness.md) | Caller-chosen read staleness | Proposed; amends 0053; implemented, not release-verified |
 | [0055](0055-aster-lower-leverage-on-refusal.md) | Aster lowers leverage only when an order is refused for it | Proposed; amends 0053; implemented, not release-verified |
+| [0056](0056-market-kind-aware-support.md) | Market-kind-aware support declarations | Proposed; builds on 0051; implemented, not release-verified |

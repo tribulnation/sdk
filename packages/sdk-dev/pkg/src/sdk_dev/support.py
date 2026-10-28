@@ -8,11 +8,17 @@ alone (a venue can be wired into an *SDK's router ahead of being ready to announ
 any impl.toml's own comments for real examples of that gate in use).
 """
 
+from collections.abc import Mapping
 from pathlib import Path
 import tomllib
 
 import pydantic
+import yaml
 from typing_extensions import Literal, NotRequired, TypedDict
+
+MarketKind = Literal['spot', 'perp']
+"""A kind of market (ADR 0051). A contract method with a `kind` exists only on markets
+of that kind; a venue's `kinds` says which of them it serves (ADR 0056)."""
 
 
 class ImplSurfaceSupport(pydantic.BaseModel):
@@ -22,12 +28,44 @@ class ImplSurfaceSupport(pydantic.BaseModel):
 
   support: Literal['full', 'partial', 'none']
   """`none` announces a deliberate gap: the venue is excluded from the surface exactly as
-  if the table were absent, but its `note` still reaches the support matrix."""
+  if the table were absent, but its `note` still reaches the support matrix. `full`
+  means every contract method applicable to `kinds`."""
   auth: bool
+  kinds: list[MarketKind] | None = pydantic.Field(default=None, min_length=1)
+  """Market kinds the venue serves (ADR 0056). A method whose contract `kind` is not
+  among them does not apply to the venue. Absent means every kind; only surfaces with
+  kind-scoped methods (Market) may set it."""
   methods: list[str] | None = None
   note: str | None = None
   """One user-facing sentence rendered as a footnote under the support matrix — a caveat
   the data alone can't express (a module that exists but isn't wired, a naming quirk)."""
+
+  @pydantic.field_validator('kinds')
+  @classmethod
+  def unique_kinds(cls, kinds: list[MarketKind] | None) -> list[MarketKind] | None:
+    """Reject a kind listed twice."""
+    if kinds is not None and len(set(kinds)) != len(kinds):
+      raise ValueError('kinds must not repeat')
+    return kinds
+
+  def applies(self, kind: MarketKind | None) -> bool:
+    """Whether a method of contract `kind` (`None`: any kind) applies to the venue."""
+    return kind is None or self.kinds is None or kind in self.kinds
+
+  def declares(self, method: str, kind: MarketKind | None) -> bool:
+    """
+    Whether this table declares `method`: it applies to the venue's kinds, and the
+    support is `full` or a `partial` list naming it.
+
+    Args:
+      method: The method name.
+      kind: The method's `kind` in its `docs/contract/<surface>.yml`.
+    """
+    return (
+      self.support != 'none'
+      and self.applies(kind)
+      and (self.support == 'full' or method in (self.methods or ()))
+    )
 
 
 class VenueSupport(TypedDict):
@@ -35,6 +73,9 @@ class VenueSupport(TypedDict):
 
   support: Literal['full', 'partial', 'none']
   auth: bool
+  kinds: NotRequired[list[MarketKind]]
+  """Market kinds the venue serves; absent means every kind. A method whose contract
+  `kind` is not among them does not apply, even under `full` support (ADR 0056)."""
   methods: NotRequired[list[str]]
   """Which methods a `partial` surface implements; absent when it implements all of
   them, or when the package hasn't enumerated them."""
@@ -188,8 +229,67 @@ def load_impl_files(impl_dir: Path) -> dict[str, ImplFile]:
   return files
 
 
+def load_method_kinds(contract: Path) -> dict[str, MarketKind | None]:
+  """
+  Read each method's `kind` from one `docs/contract/<surface>.yml`.
+
+  Only `methods.<name>.kind` is read, so callers that never render examples (the
+  qualification and evidence code) need not validate the whole contract.
+
+  Args:
+    contract: Path to the contract file.
+
+  Returns:
+    `{method: kind}`, `None` for a method that applies to every kind.
+  """
+  with open(contract) as f:
+    raw = yaml.safe_load(f)
+  kinds = pydantic.TypeAdapter(dict[str, MarketKind | None])
+  return kinds.validate_python(
+    {name: method.get('kind') for name, method in raw['methods'].items()}
+  )
+
+
+def kind_conflicts(
+  impl_files: Mapping[str, ImplFile],
+  surface: str,
+  kinds: Mapping[str, MarketKind | None],
+) -> list[str]:
+  """
+  Declarations of one surface that contradict its contract's method kinds.
+
+  Args:
+    impl_files: `load_impl_files()`'s output.
+    surface: The contract's surface, e.g. `market`.
+    kinds: `load_method_kinds()` of that surface's contract.
+
+  Returns:
+    One message per `partial` list naming a method outside the venue's `kinds`, and
+    per `kinds` declared on a surface without kind-scoped methods.
+  """
+  scoped = any(kind is not None for kind in kinds.values())
+  conflicts: list[str] = []
+  for slug, data in impl_files.items():
+    entry = data.support.get(surface)
+    if entry is None or entry.kinds is None:
+      continue
+    if not scoped:
+      conflicts.append(f'{slug}: {surface} has no kind-scoped methods to declare kinds')
+    for method in entry.methods or ():
+      if not entry.applies(kinds.get(method)):
+        conflicts.append(
+          f'{slug}: {surface}.{method} is {kinds.get(method)}-only, '
+          f'outside kinds {entry.kinds}'
+        )
+  return conflicts
+
+
 def method_universe(
-  impl_files: dict[str, ImplFile], surface: str, method: str
+  impl_files: Mapping[str, ImplFile],
+  surface: str,
+  method: str,
+  *,
+  kind: MarketKind | None,
 ) -> list[str]:
   """
   Every venue genuinely eligible to serve one method of one surface, per every
@@ -200,21 +300,20 @@ def method_universe(
     surface: A surface name — by convention, a `docs/contract/<surface>.yml`'s own
       filename stem, never hardcoded by any caller.
     method: The method name (a `docs/contract/<surface>.yml`'s `methods.<method>` key).
+    kind: The method's `kind` in that contract file (`None`: every kind).
 
   Returns:
     Slugs (impl_files' own iteration order — alphabetical) of every venue whose
-    impl.toml declares this surface with `support: full`, or `support: partial` with
-    this method in its `methods` list. This is the outer bound on which venues a
-    method's `.yml` template can be rendered for — see `sdk_dev.contract.render_method`.
+    impl.toml declares the method (`ImplSurfaceSupport.declares`): the method applies
+    to the venue's `kinds`, and the support is `full`, or `partial` with this method in
+    its `methods` list. This is the outer bound on which venues a method's `.yml`
+    template can be rendered for — see `sdk_dev.contract.render_method`.
   """
-  eligible: list[str] = []
-  for slug, data in impl_files.items():
-    entry = data.support.get(surface)
-    if entry is None or entry.support == 'none':
-      continue
-    if entry.support == 'full' or (entry.methods and method in entry.methods):
-      eligible.append(slug)
-  return eligible
+  return [
+    slug
+    for slug, data in impl_files.items()
+    if (entry := data.support.get(surface)) is not None and entry.declares(method, kind)
+  ]
 
 
 def load_support_matrix(impl_dir: Path) -> dict[str, SurfaceSupport]:
@@ -242,6 +341,8 @@ def load_support_matrix(impl_dir: Path) -> dict[str, SurfaceSupport]:
         surface, {'supportedVenues': [], 'defaultVenues': [], 'venues': {}}
       )
       venue: VenueSupport = {'support': entry.support, 'auth': entry.auth}
+      if entry.kinds is not None:
+        venue['kinds'] = entry.kinds
       if entry.methods:
         venue['methods'] = entry.methods
       if entry.note:

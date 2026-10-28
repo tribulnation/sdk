@@ -39,6 +39,7 @@ MARKETS = {
 # %% [markdown]
 # ## `Market` (spot)
 
+
 # %%
 async def depth(symbol: str, *, levels: int | None = None) -> Book:
   raw = await client.spot.http.market.order_book(symbol=symbol, limit=levels)
@@ -285,6 +286,7 @@ await cancel_order('BTCUSDT', '123456')
 # `reporting.ipynb`) and the account is geo-blocked from enabling it, so those cells
 # are written but left unexecuted (`not attempted`): the mapping is unverified.
 #
+
 
 # %%
 async def depth(

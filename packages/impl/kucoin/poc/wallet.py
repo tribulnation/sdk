@@ -24,6 +24,7 @@ ASSETS = ['BTC', 'ETH', 'USDT', 'KCS', 'SOL']
 # Deposits are free on KuCoin (only withdrawals carry a fee), so `fee` is always `None`
 # here.
 
+
 # %%
 async def deposit_methods(*, assets: list[str] | None = None) -> list[DepositMethod]:
   currencies = await client.spot.all_currencies()
@@ -55,6 +56,7 @@ await deposit_methods(assets=ASSETS)
 # Same `all_currencies()` call; `withdrawalMinFee` becomes the `Fee`, and `networks` is an
 # extra client-side filter on `chainId` (KuCoin doesn't take it as a request parameter --
 # there's no per-network lookup, only per-currency).
+
 
 # %%
 async def withdrawal_methods(
@@ -112,6 +114,7 @@ await withdrawal_methods(assets=['USDT', 'BTC'], networks=['trx'])
 # addresses only), unlike the public per-network data above -- included here as a
 # real-data supplement, not because the SDK interface asks for it.
 
+
 # %%
 async def deposit_addresses(currency: str) -> list[DepositAddressV3Row]:
   return await client.account.deposit.address(currency=currency)
@@ -126,6 +129,7 @@ await deposit_addresses('USDT')
 # `account.withdrawals.withdraw` isn't part of `WithdrawalMethods` (the abstract interface
 # is read-only), but is the natural next step. Included only to show the mapping --
 # **never executed**.
+
 
 # %%
 async def withdraw(*, asset: str, network: str, address: str, amount: Decimal) -> str:

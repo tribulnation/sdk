@@ -61,7 +61,10 @@ async def test_unknown_account_event_does_not_end_fills(
     keys, 'start', AsyncMock(return_value={'listenKey': 'test-lease'})
   )
   monkeypatch.setattr(keys, 'close', AsyncMock())
-  unknown: dict[str, Any] = {'e': 'FUND_CHANGE_WS', 'fundChangeEventInfo': {'asset': 'USDT'}}
+  unknown: dict[str, Any] = {
+    'e': 'FUND_CHANGE_WS',
+    'fundChangeEventInfo': {'asset': 'USDT'},
+  }
 
   @asynccontextmanager
   async def stream(*args: Any):

@@ -24,8 +24,14 @@ from datetime import datetime, timedelta, timezone
 from typing_extensions import Literal
 
 from typed_bitget import Bitget
-from typed_bitget.classic.spot.order.place import SpotLimitOrderRequest, SpotMarketOrderRequest
-from typed_bitget.classic.mix.order.place import MixLimitOrderRequest, MixMarketOrderRequest
+from typed_bitget.classic.spot.order.place import (
+  SpotLimitOrderRequest,
+  SpotMarketOrderRequest,
+)
+from typed_bitget.classic.mix.order.place import (
+  MixLimitOrderRequest,
+  MixMarketOrderRequest,
+)
 from dotenv import load_dotenv
 
 from tribulnation.sdk.market import (
@@ -61,6 +67,7 @@ PRODUCT_TYPE = 'USDT-FUTURES'
 # %% [markdown]
 # ## `Market` (spot)
 
+
 # %%
 async def depth(symbol: str, *, levels: int | None = None) -> Book:
   raw = await client.classic.spot.orderbook(symbol=symbol, limit=levels)
@@ -68,6 +75,7 @@ async def depth(symbol: str, *, levels: int | None = None) -> Book:
     bids=[Book.Entry(price, qty) for price, qty in raw['bids']],
     asks=[Book.Entry(price, qty) for price, qty in raw['asks']],
   )
+
 
 {symbol: await depth(symbol, levels=5) for symbol in SPOT_MARKETS}
 
@@ -89,6 +97,7 @@ async def rules(symbol: str, *, refetch: bool = False) -> Rules:
     details=sym,
   )
 
+
 {symbol: await rules(symbol) for symbol in SPOT_MARKETS}
 
 
@@ -100,37 +109,47 @@ async def open_orders(symbol: str) -> list[OrderState]:
     size = Decimal(o['size'])
     filled = Decimal(o['baseVolume'])
     sign = 1 if o['side'] == 'buy' else -1
-    out.append(OrderState(
-      id=o['orderId'],
-      price=Decimal(o['basePrice']),
-      qty=sign * size,
-      filled_qty=sign * filled,
-      active=True,  # this endpoint only lists currently-open orders
-      details=o,
-    ))
+    out.append(
+      OrderState(
+        id=o['orderId'],
+        price=Decimal(o['basePrice']),
+        qty=sign * size,
+        filled_qty=sign * filled,
+        active=True,  # this endpoint only lists currently-open orders
+        details=o,
+      )
+    )
   return out
+
 
 {symbol: await open_orders(symbol) for symbol in SPOT_MARKETS}
 
 
 # %%
 async def trades_history(symbol: str, start: datetime, end: datetime) -> list[Trade]:
-  raw = await client.classic.spot.order.fills(symbol=symbol, start_time=start, end_time=end)
+  raw = await client.classic.spot.order.fills(
+    symbol=symbol, start_time=start, end_time=end
+  )
   out: list[Trade] = []
   for f in raw:
     size = Decimal(f['size'])
     fee_detail = f['feeDetail']
     fee_amount = abs(Decimal(fee_detail['totalFee']))
-    out.append(Trade(
-      id=f['tradeId'],
-      price=Decimal(f['priceAvg']),
-      qty=size if f['side'] == 'buy' else -size,
-      time=f['cTime'],
-      maker=f['tradeScope'] == 'maker',
-      fee=Trade.Fee(amount=fee_amount, asset=fee_detail['feeCoin']) if fee_amount else None,
-      details=f,
-    ))
+    out.append(
+      Trade(
+        id=f['tradeId'],
+        price=Decimal(f['priceAvg']),
+        qty=size if f['side'] == 'buy' else -size,
+        time=f['cTime'],
+        maker=f['tradeScope'] == 'maker',
+        fee=Trade.Fee(amount=fee_amount, asset=fee_detail['feeCoin'])
+        if fee_amount
+        else None,
+        details=f,
+      )
+    )
   return out
+
 
 end = datetime.now(timezone.utc)
 start = end - timedelta(hours=24)
@@ -147,10 +166,14 @@ async def position(symbol: str) -> Position:
   base = symbol.removesuffix('USDT')  # SPOT_MARKETS are all *USDT pairs here
   balance = await spot_asset(base)
   size = (
-    Decimal(balance['available']) + Decimal(balance['frozen']) + Decimal(balance['locked'])
-    if balance else Decimal(0)
+    Decimal(balance['available'])
+    + Decimal(balance['frozen'])
+    + Decimal(balance['locked'])
+    if balance
+    else Decimal(0)
   )
   return Position(size=size)
+
 
 {symbol: await position(symbol) for symbol in SPOT_MARKETS}
 
@@ -160,32 +183,59 @@ async def available_notional(symbol: str) -> Decimal:
   balance = await spot_asset('USDT')
   return Decimal(balance['available']) if balance else Decimal(0)
 
+
 {symbol: await available_notional(symbol) for symbol in SPOT_MARKETS}
 
 
 # %%
-async def place_order(symbol: str, order: Order, *, settings: Settings = {}) -> OrderResponse:
+async def place_order(
+  symbol: str, order: Order, *, settings: Settings = {}
+) -> OrderResponse:
   qty = Decimal(str(order['qty']))
   side = 'buy' if qty > 0 else 'sell'
   size = abs(qty)
   price = Decimal(str(order['price']))
   body: SpotLimitOrderRequest | SpotMarketOrderRequest
   if order['type'] == 'MARKET':
-    body = {'symbol': symbol, 'side': side, 'orderType': 'market', 'force': 'gtc', 'size': size}
+    body = {
+      'symbol': symbol,
+      'side': side,
+      'orderType': 'market',
+      'force': 'gtc',
+      'size': size,
+    }
   elif order['type'] == 'POST_ONLY':
-    body = {'symbol': symbol, 'side': side, 'orderType': 'limit', 'force': 'post_only', 'price': price, 'size': size}
+    body = {
+      'symbol': symbol,
+      'side': side,
+      'orderType': 'limit',
+      'force': 'post_only',
+      'price': price,
+      'size': size,
+    }
   else:
-    body = {'symbol': symbol, 'side': side, 'orderType': 'limit', 'force': 'gtc', 'price': price, 'size': size}
+    body = {
+      'symbol': symbol,
+      'side': side,
+      'orderType': 'limit',
+      'force': 'gtc',
+      'price': price,
+      'size': size,
+    }
   raw = await client.classic.spot.order.place(body)
   return OrderResponse(id=raw['orderId'], details=raw)
 
+
 # Not executed here -- would place a real order on the account.
-await place_order('BTCUSDT', {'qty': Decimal('0.0001'), 'price': Decimal('20000'), 'type': 'LIMIT'})
+await place_order(
+  'BTCUSDT', {'qty': Decimal('0.0001'), 'price': Decimal('20000'), 'type': 'LIMIT'}
+)
 
 
 # %%
 async def cancel_order(symbol: str, id: str, *, settings: Settings = {}):
   return await client.classic.spot.order.cancel(symbol=symbol, order_id=id)
+
 
 # Not executed here -- would cancel a real order on the account.
 await cancel_order('BTCUSDT', '123456')
@@ -215,12 +265,20 @@ await cancel_order('BTCUSDT', '123456')
 # `classic.mix.market.orderbook`'s `limit` is a fixed enum (`'1' | '5' | '15' | '50' | 'max'`),
 # unlike `classic.spot.orderbook`'s arbitrary `int` -- `levels` is restricted to the four
 # numeric members and mapped here.
-_DEPTH_LEVELS: dict[int, Literal['1', '5', '15', '50']] = {1: '1', 5: '5', 15: '15', 50: '50'}
+_DEPTH_LEVELS: dict[int, Literal['1', '5', '15', '50']] = {
+  1: '1',
+  5: '5',
+  15: '15',
+  50: '50',
+}
 
 
-async def perp_depth(symbol: str, *, levels: Literal[1, 5, 15, 50] | None = None) -> Book:
+async def perp_depth(
+  symbol: str, *, levels: Literal[1, 5, 15, 50] | None = None
+) -> Book:
   raw = await client.classic.mix.market.orderbook(
-    symbol=symbol, product_type=PRODUCT_TYPE,
+    symbol=symbol,
+    product_type=PRODUCT_TYPE,
     limit=_DEPTH_LEVELS[levels] if levels is not None else None,
   )
   return Book(
@@ -228,12 +286,15 @@ async def perp_depth(symbol: str, *, levels: Literal[1, 5, 15, 50] | None = None
     asks=[Book.Entry(Decimal(str(p)), Decimal(str(q))) for p, q in raw['asks']],
   )
 
+
 {symbol: await perp_depth(symbol, levels=5) for symbol in PERP_MARKETS}
 
 
 # %%
 async def perp_rules(symbol: str, *, refetch: bool = False) -> Rules:
-  raw = await client.classic.mix.market.contracts(product_type=PRODUCT_TYPE, symbol=symbol)
+  raw = await client.classic.mix.market.contracts(
+    product_type=PRODUCT_TYPE, symbol=symbol
+  )
   c = raw[0]
   return Rules(
     fee_asset=c['quoteCoin'],
@@ -248,6 +309,7 @@ async def perp_rules(symbol: str, *, refetch: bool = False) -> Rules:
     details=c,
   )
 
+
 {symbol: await perp_rules(symbol) for symbol in PERP_MARKETS}
 
 
@@ -259,39 +321,52 @@ async def perp_open_orders(symbol: str) -> list[OrderState]:
     size = Decimal(o['size'])
     filled = Decimal(o['baseVolume'])
     sign = 1 if o['side'] == 'buy' else -1
-    out.append(OrderState(
-      id=o['orderId'],
-      price=Decimal(o['price']),
-      qty=sign * size,
-      filled_qty=sign * filled,
-      active=o['status'] in ('live', 'partially_filled'),
-      details=o,
-    ))
+    out.append(
+      OrderState(
+        id=o['orderId'],
+        price=Decimal(o['price']),
+        qty=sign * size,
+        filled_qty=sign * filled,
+        active=o['status'] in ('live', 'partially_filled'),
+        details=o,
+      )
+    )
   return out
+
 
 {symbol: await perp_open_orders(symbol) for symbol in PERP_MARKETS}
 
 
 # %%
-async def perp_trades_history(symbol: str, start: datetime, end: datetime) -> list[Trade]:
+async def perp_trades_history(
+  symbol: str, start: datetime, end: datetime
+) -> list[Trade]:
   raw = await client.classic.mix.order.fills(
-    product_type=PRODUCT_TYPE, symbol=symbol, start_time=start, end_time=end,
+    product_type=PRODUCT_TYPE,
+    symbol=symbol,
+    start_time=start,
+    end_time=end,
   )
   out: list[Trade] = []
   for f in raw['fillList'] or []:
     fee_amount = sum((abs(Decimal(d['totalFee'])) for d in f['feeDetail']), Decimal(0))
     fee_asset = f['feeDetail'][0]['feeCoin'] if f['feeDetail'] else None
     size = Decimal(f['baseVolume'])
-    out.append(Trade(
-      id=f['tradeId'],
-      price=Decimal(f['price']),
-      qty=size if f['side'] == 'buy' else -size,
-      time=f['cTime'],
-      maker=f['tradeScope'] == 'maker',
-      fee=Trade.Fee(amount=fee_amount, asset=fee_asset) if fee_amount and fee_asset else None,
-      details=f,
-    ))
+    out.append(
+      Trade(
+        id=f['tradeId'],
+        price=Decimal(f['price']),
+        qty=size if f['side'] == 'buy' else -size,
+        time=f['cTime'],
+        maker=f['tradeScope'] == 'maker',
+        fee=Trade.Fee(amount=fee_amount, asset=fee_asset)
+        if fee_amount and fee_asset
+        else None,
+        details=f,
+      )
+    )
   return out
+
 
 {symbol: await perp_trades_history(symbol, start, end) for symbol in PERP_MARKETS}
 
@@ -301,13 +376,16 @@ async def index(symbol: str, *, settings: Settings = {}) -> Decimal:
   raw = await client.classic.mix.market.symbol_price(symbol, product_type=PRODUCT_TYPE)
   return raw[0]['indexPrice']
 
+
 {symbol: await index(symbol) for symbol in PERP_MARKETS}
 
 
 # %%
 async def next_funding(symbol: str) -> NextFunding:
   rate, time_info = await asyncio.gather(
-    client.classic.mix.market.funding.current_rate(symbol=symbol, product_type=PRODUCT_TYPE),
+    client.classic.mix.market.funding.current_rate(
+      symbol=symbol, product_type=PRODUCT_TYPE
+    ),
     client.classic.mix.market.funding.time(symbol=symbol, product_type=PRODUCT_TYPE),
   )
   return NextFunding(
@@ -316,16 +394,21 @@ async def next_funding(symbol: str) -> NextFunding:
     interval=timedelta(hours=int(rate[0]['fundingRateInterval'])),
   )
 
+
 {symbol: await next_funding(symbol) for symbol in PERP_MARKETS}
 
 
 # %%
 async def funding_rates(
-  symbol: str, start: datetime | None = None, end: datetime | None = None,
+  symbol: str,
+  start: datetime | None = None,
+  end: datetime | None = None,
 ) -> list[FundingRate]:
   # `rate_history` paginates by page number, not a date range -- filtered client-side.
   raw = await client.classic.mix.market.funding.rate_history(
-    symbol=symbol, product_type=PRODUCT_TYPE, page_size=50,
+    symbol=symbol,
+    product_type=PRODUCT_TYPE,
+    page_size=50,
   )
   out = [FundingRate(rate=r['fundingRate'], time=r['fundingTime']) for r in raw]
   if start is not None:
@@ -334,9 +417,13 @@ async def funding_rates(
     out = [r for r in out if r.time <= end]
   return out
 
+
 funding_end = datetime.now(timezone.utc)
 funding_start = funding_end - timedelta(days=7)
-{symbol: await funding_rates(symbol, funding_start, funding_end) for symbol in PERP_MARKETS}
+{
+  symbol: await funding_rates(symbol, funding_start, funding_end)
+  for symbol in PERP_MARKETS
+}
 
 
 # %% [markdown]
@@ -354,26 +441,36 @@ funding_start = funding_end - timedelta(days=7)
 # account has never held a position across a settlement to observe one. Rather than guess a
 # substring filter, the method raises.
 
+
 # %%
-async def funding_payments(symbol: str, start: datetime, end: datetime) -> list[FundingPayment]:
+async def funding_payments(
+  symbol: str, start: datetime, end: datetime
+) -> list[FundingPayment]:
   raise NotImplementedError(
     'not supported: Bitget publishes no closed set of futures ledger types '
     '(`classic.mix.account.bills` `businessType`, `classic.tax.futures_records` '
     '`futureTaxType`), so there is no documented funding-fee value to filter on'
   )
 
+
 # not executed: not supported, see the note above
-{symbol: await funding_payments(symbol, funding_start, funding_end) for symbol in PERP_MARKETS}
+{
+  symbol: await funding_payments(symbol, funding_start, funding_end)
+  for symbol in PERP_MARKETS
+}
 
 
 # %%
 async def perp_position(symbol: str) -> PerpPosition:
-  raw = await client.classic.mix.position.get(product_type=PRODUCT_TYPE, symbol=symbol, margin_coin='USDT')
+  raw = await client.classic.mix.position.get(
+    product_type=PRODUCT_TYPE, symbol=symbol, margin_coin='USDT'
+  )
   row = raw[0] if raw else None
   if row is None:
     return PerpPosition()
   size = row['total'] if row['holdSide'] == 'long' else -row['total']
   return PerpPosition(size=size, entry_price=row['openPriceAvg'])
+
 
 {symbol: await perp_position(symbol) for symbol in PERP_MARKETS}
 
@@ -386,6 +483,7 @@ async def perp_collateral(symbol: str) -> PerpCollateral:
     'requires both'
   )
 
+
 # not executed: not supported, see the coverage note below
 {symbol: await perp_collateral(symbol) for symbol in PERP_MARKETS}
 
@@ -393,7 +491,9 @@ async def perp_collateral(symbol: str) -> PerpCollateral:
 # %%
 async def perp_account(symbol: str):
   return await client.classic.mix.account.get(
-    symbol=symbol, product_type=PRODUCT_TYPE, margin_coin='USDT',
+    symbol=symbol,
+    product_type=PRODUCT_TYPE,
+    margin_coin='USDT',
   )
 
 
@@ -401,11 +501,14 @@ async def perp_available_notional(symbol: str) -> Decimal:
   account, rules = await asyncio.gather(perp_account(symbol), perp_rules(symbol))
   return account['available'] * rules.details['maxLever']
 
+
 {symbol: await perp_available_notional(symbol) for symbol in PERP_MARKETS}
 
 
 # %%
-async def perp_place_order(symbol: str, order: Order, *, settings: Settings = {}) -> OrderResponse:
+async def perp_place_order(
+  symbol: str, order: Order, *, settings: Settings = {}
+) -> OrderResponse:
   qty = Decimal(str(order['qty']))
   side = 'buy' if qty > 0 else 'sell'
   size = abs(qty)
@@ -413,25 +516,43 @@ async def perp_place_order(symbol: str, order: Order, *, settings: Settings = {}
   body: MixLimitOrderRequest | MixMarketOrderRequest
   if order['type'] == 'MARKET':
     body = {
-      'symbol': symbol, 'productType': PRODUCT_TYPE, 'marginMode': 'crossed', 'marginCoin': 'USDT',
-      'side': side, 'orderType': 'market', 'size': size,
+      'symbol': symbol,
+      'productType': PRODUCT_TYPE,
+      'marginMode': 'crossed',
+      'marginCoin': 'USDT',
+      'side': side,
+      'orderType': 'market',
+      'size': size,
     }
   else:
     force = 'post_only' if order['type'] == 'POST_ONLY' else 'gtc'
     body = {
-      'symbol': symbol, 'productType': PRODUCT_TYPE, 'marginMode': 'crossed', 'marginCoin': 'USDT',
-      'side': side, 'orderType': 'limit', 'force': force, 'price': price, 'size': size,
+      'symbol': symbol,
+      'productType': PRODUCT_TYPE,
+      'marginMode': 'crossed',
+      'marginCoin': 'USDT',
+      'side': side,
+      'orderType': 'limit',
+      'force': force,
+      'price': price,
+      'size': size,
     }
   raw = await client.classic.mix.order.place(body)
   return OrderResponse(id=raw['orderId'], details=raw)
 
+
 # Not executed here -- would place a real order on the account.
-await perp_place_order('BTCUSDT', {'qty': Decimal('0.001'), 'price': Decimal('20000'), 'type': 'LIMIT'})
+await perp_place_order(
+  'BTCUSDT', {'qty': Decimal('0.001'), 'price': Decimal('20000'), 'type': 'LIMIT'}
+)
 
 
 # %%
 async def perp_cancel_order(symbol: str, id: str, *, settings: Settings = {}):
-  return await client.classic.mix.order.cancel(symbol=symbol, product_type=PRODUCT_TYPE, order_id=id)
+  return await client.classic.mix.order.cancel(
+    symbol=symbol, product_type=PRODUCT_TYPE, order_id=id
+  )
+
 
 # Not executed here -- would cancel a real order on the account.
 await perp_cancel_order('BTCUSDT', '123456')

@@ -143,6 +143,7 @@ await staking_http.aclose()
 # credentials, the Staking API cannot back `instruments()`: not a permissions gap, an
 # architecture gap. The best-effort `rewards.apy` inference below remains the only signal.
 
+
 # %%
 async def instruments(
   *,
@@ -162,9 +163,7 @@ async def instruments(
     if not rewards or code in seen:
       continue
     seen.add(code)
-    out.append(
-      Instrument(tags=['staking', 'flexible'], asset=code, apr=rewards['apy'])
-    )
+    out.append(Instrument(tags=['staking', 'flexible'], asset=code, apr=rewards['apy']))
 
   # `GET /wrapped-assets` omits the per-asset detail the single-asset route carries, so
   # `apy` is read from `get(id)` -- both unauthenticated. The catalogue names only the

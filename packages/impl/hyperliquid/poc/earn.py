@@ -26,6 +26,7 @@ ADDRESS
 # %% [markdown]
 # ## `Earn` (`Instruments`)
 
+
 # %%
 async def lending_instruments(*, assets: list[str] | None = None) -> list[Instrument]:
   spot_meta, _ = await client.info.spot_meta_and_asset_ctxs()
@@ -84,6 +85,7 @@ await vault_instruments()
 # %% [markdown]
 # ### `instruments(*, tags=None, assets=None)`
 
+
 # %%
 async def instruments(
   *,
@@ -129,6 +131,7 @@ await client.info.borrow_lend_user_state(user=ADDRESS)
 
 # %% [markdown]
 # ## Deposit / delegate / redeem (state-mutating -- written, never executed)
+
 
 # %%
 async def stake(amount_wei: int, *, chain_id: str = '0xa4b1'):

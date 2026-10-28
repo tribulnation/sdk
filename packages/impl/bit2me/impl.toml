@@ -27,6 +27,7 @@ note = "Deposit and withdrawal methods come from the per-asset chain list (`v1/w
 [support.market]
 support = "partial"
 auth = false
+kinds = ["spot"]
 methods = [
   "candles",
   "depth",

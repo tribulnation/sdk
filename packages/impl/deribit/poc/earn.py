@@ -23,9 +23,12 @@ from tribulnation.sdk.earn.instruments import Instrument, InstrumentTag
 # %% [markdown]
 # Deribit has no Binance-style "Simple Earn" product family: no flexible/locked savings instruments with subscribe/redeem actions, min/max quantities, or fixed durations. The closest adjacent concept is Deribit's [yield reward-bearing coins](https://support.deribit.com/hc/en-us/articles/31424939199261-Yield-reward-bearing-coins) (`USDE`, `STETH`, `USDC`, `BUIDL`): holding a balance of one of these currencies earns a continuously-accruing reward, surfaced per-account via `private/get_reward_eligibility` (also mirrored, venue-wide, in `public/get_currencies`'s `apr` field). There is no action to "subscribe" -- the yield applies automatically to any held balance -- so the mapping below is approximate: `id`, `min_qty`/`max_qty`, `duration`, and `url` are all `None`, and every eligible currency is tagged `'flexible'` since there is no lock-up.
 
+
 # %%
 async def instruments(
-  *, tags: list[InstrumentTag] | None = None, assets: list[str] | None = None,
+  *,
+  tags: list[InstrumentTag] | None = None,
+  assets: list[str] | None = None,
 ) -> list[Instrument]:
   """Map Deribit's (account-scoped) yield-bearing-token reward APRs onto `Instrument`."""
   eligibility = await client.wallet.rewards.get_reward_eligibility()
@@ -41,12 +44,15 @@ async def instruments(
       continue
     if assets is not None and asset not in assets:
       continue
-    out.append(Instrument(
-      tags=['flexible'],
-      asset=asset,
-      apr=Decimal(str(info['apr_sma7'])) / 100,
-    ))
+    out.append(
+      Instrument(
+        tags=['flexible'],
+        asset=asset,
+        apr=Decimal(str(info['apr_sma7'])) / 100,
+      )
+    )
   return out
+
 
 await instruments()
 
@@ -60,12 +66,17 @@ await instruments()
 from typing_extensions import Literal
 
 APR_CURRENCIES: dict[str, Literal['usde', 'steth', 'usdc', 'buidl']] = {
-  'USDE': 'usde', 'STETH': 'steth', 'USDC': 'usdc', 'BUIDL': 'buidl',
+  'USDE': 'usde',
+  'STETH': 'steth',
+  'USDC': 'usdc',
+  'BUIDL': 'buidl',
 }
 
 
 async def public_instruments(
-  *, tags: list[InstrumentTag] | None = None, assets: list[str] | None = None,
+  *,
+  tags: list[InstrumentTag] | None = None,
+  assets: list[str] | None = None,
 ) -> list[Instrument]:
   """Map Deribit's public, venue-wide yield APRs onto `Instrument`, without credentials."""
   if tags is not None and 'flexible' not in tags:
@@ -78,12 +89,15 @@ async def public_instruments(
     day = history['data'][0] if history['data'] else None
     if day is None or 'apr' not in day:
       continue
-    out.append(Instrument(
-      tags=['flexible'],
-      asset=asset,
-      apr=Decimal(str(day['apr'])) / 100,
-    ))
+    out.append(
+      Instrument(
+        tags=['flexible'],
+        asset=asset,
+        apr=Decimal(str(day['apr'])) / 100,
+      )
+    )
   return out
+
 
 await public_instruments()
 

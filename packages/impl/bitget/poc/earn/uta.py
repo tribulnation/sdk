@@ -30,6 +30,7 @@ ASSETS = ['USDT', 'BTC', 'ETH']
 # exchange rate. This notebook yields one `Instrument` per (product, subscription coin)
 # pair.
 
+
 # %%
 async def elite_instruments(*, assets: list[str] | None = None) -> list[Instrument]:
   raw = await client.uta.earn.elite.products()
@@ -42,26 +43,30 @@ async def elite_instruments(*, assets: list[str] | None = None) -> list[Instrume
       if assets is not None and asset not in assets:
         continue
       min_amount = sub.get('minAmount')
-      out.append(Instrument(
-        tags=['fixed'],
-        asset=asset,
-        # `minApr` is used as a conservative estimate -- see coverage note below for why
-        # this is declared as a range. Values are percentages (confirmed live: the three
-        # products listed today report '3.00' (BGUSD), '4.45' (BGSOL) and '1.85' (BGBTC),
-        # not '0.03'/'0.0445'/'0.0185'), so divide by 100 to match `Instrument.apr`'s
-        # fraction-of-1.
-        apr=prod['minApr'] / 100,
-        yield_asset=prod['coin'] if prod['coin'] != asset else None,
-        min_qty=Decimal(min_amount) if min_amount else None,
-        id=prod['productId'],
-      ))
+      out.append(
+        Instrument(
+          tags=['fixed'],
+          asset=asset,
+          # `minApr` is used as a conservative estimate -- see coverage note below for why
+          # this is declared as a range. Values are percentages (confirmed live: the three
+          # products listed today report '3.00' (BGUSD), '4.45' (BGSOL) and '1.85' (BGBTC),
+          # not '0.03'/'0.0445'/'0.0185'), so divide by 100 to match `Instrument.apr`'s
+          # fraction-of-1.
+          apr=prod['minApr'] / 100,
+          yield_asset=prod['coin'] if prod['coin'] != asset else None,
+          min_qty=Decimal(min_amount) if min_amount else None,
+          id=prod['productId'],
+        )
+      )
   return out
+
 
 await elite_instruments(assets=ASSETS)
 
 
 # %% [markdown]
 # ### `instruments(*, tags=None, assets=None)`
+
 
 # %%
 async def instruments(
@@ -73,6 +78,7 @@ async def instruments(
   if tags is not None:
     out = [ins for ins in out if set(ins.tags) & set(tags)]
   return out
+
 
 await instruments(tags=['fixed'])
 
@@ -106,6 +112,7 @@ await instruments(tags=['fixed'])
 # (it's read-only), but are the natural next step. Included only to show the mapping --
 # **never executed**.
 
+
 # %%
 async def subscribe(instrument: Instrument, *, amount: Decimal) -> str:
   assert instrument.id is not None, 'instrument has no id to subscribe to'
@@ -117,11 +124,16 @@ async def subscribe(instrument: Instrument, *, amount: Decimal) -> str:
   )
   return result['orderId']
 
+
 # Not executed here -- would subscribe real funds to a real Earn product.
 products = await client.uta.earn.elite.products()
 await subscribe(
-  Instrument(tags=['fixed'], asset=products[0]['subscriptionCoinList'][0]['subscriptionCoin'],
-             apr=products[0]['minApr'], id=products[0]['productId']),
+  Instrument(
+    tags=['fixed'],
+    asset=products[0]['subscriptionCoinList'][0]['subscriptionCoin'],
+    apr=products[0]['minApr'],
+    id=products[0]['productId'],
+  ),
   amount=Decimal('1'),
 )
 
@@ -138,6 +150,7 @@ async def redeem(instrument: Instrument, *, amount: Decimal) -> str:
     coin=instrument.asset,
   )
   return result['orderId']
+
 
 # Not executed here -- would redeem a real holding on the account.
 await redeem(

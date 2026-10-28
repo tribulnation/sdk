@@ -18,7 +18,12 @@ from typed_bitget.classic.tax.margin_records import MarginRecords
 from tribulnation.bitget.reporting.history.futures import FuturesHistory
 from tribulnation.bitget.reporting.history.margin import MarginHistory
 from tribulnation.bitget.reporting.history.spot import SpotHistory
-from tribulnation.bitget.reporting.history.util import TimezoneMixin, id_pages, windows, require_range
+from tribulnation.bitget.reporting.history.util import (
+  TimezoneMixin,
+  id_pages,
+  windows,
+  require_range,
+)
 from tribulnation.sdk.reporting import CryptoDeposit, CryptoWithdrawal, SpotTrade
 
 START = datetime(2026, 1, 1, tzinfo=timezone.utc)

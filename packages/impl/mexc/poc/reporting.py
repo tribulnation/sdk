@@ -45,6 +45,7 @@ ASSETS = ['BTC', 'ETH', 'USDT']
 # (`meta={'signed': True}`), needing the same spot/futures account scopes `market.ipynb`/`wallet.ipynb` already found blocked on
 # this API key -- shown live below (the failures are real, not fabricated).
 
+
 # %%
 async def spot_trades(start: datetime, end: datetime) -> list[SpotTrade]:
   out: list[SpotTrade] = []
@@ -220,6 +221,7 @@ funding_result
 # %% [markdown]
 # ### `history(start=None, end=None)`
 
+
 # %%
 async def history(start: datetime | None = None, end: datetime | None = None):
   end = end or datetime.now(timezone.utc)
@@ -284,6 +286,7 @@ history_result
 # Split into three supplementary reads (not part of the abstract interface, matching the
 # legacy `mexc/poc/reporting.ipynb`'s pattern) so it's clear which piece of `snapshot()` is
 # live and which is blocked by this API key's permissions, before composing them.
+
 
 # %%
 async def spot_balances(assets: list[str] | None = None) -> dict[str, Decimal]:

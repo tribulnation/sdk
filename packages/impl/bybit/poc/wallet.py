@@ -19,6 +19,7 @@ ASSETS = ['BTC', 'ETH', 'USDT', 'USDC']
 # %% [markdown]
 # ## `DepositMethods.deposit_methods`
 
+
 # %%
 async def deposit_methods(*, assets: list[str] | None = None) -> list[DepositMethod]:
   raw = await client.asset.coin_info()
@@ -54,6 +55,7 @@ await client.asset.deposit.master_address(coin='USDT')
 
 # %% [markdown]
 # ## `WithdrawalMethods.withdrawal_methods`
+
 
 # %%
 async def withdrawal_methods(
@@ -99,6 +101,7 @@ await withdrawal_methods(assets=ASSETS)
 
 # %% [markdown]
 # ### `withdraw.create` — written, not executed
+
 
 # %%
 async def withdraw(

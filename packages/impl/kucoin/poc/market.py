@@ -55,6 +55,7 @@ MARKETS = {
 # %% [markdown]
 # ## `Market` (spot)
 
+
 # %%
 async def depth(symbol: str, *, levels: int | None = None) -> Book:
   size = '100' if levels and levels > 20 else '20'
@@ -287,6 +288,7 @@ await cancel_order('BTC-USDT', '123456')
 # (`futures.symbol`), and is negative/inverted for inverse contracts. This notebook passes
 # the raw lot count through as `qty`/`size` (documented in the coverage note below) rather
 # than silently mis-converting.
+
 
 # %%
 async def depth(symbol: str, *, levels: int | None = None) -> Book:

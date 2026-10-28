@@ -43,6 +43,7 @@ MARKETS = {
 # %% [markdown]
 # ## `Market` (spot)
 
+
 # %%
 async def depth(product_id: str, *, levels: int | None = None) -> Book:
   raw = await client.app.advanced_trade.http.products.public.book(
@@ -356,6 +357,7 @@ await cancel_order('BTC-USD', '00000000-0000-0000-0000-000000000000')
 # in this client for INTX perpetuals (`futures.balance_summary.funding_pnl` is CFM
 # dated-futures funding, not swap funding), so `funding_rates`/`funding_payments` raise
 # `NotImplementedError`, matching the SDK's own convention for unsupported methods.
+
 
 # %%
 async def depth(product_id: str, *, levels: int | None = None) -> Book:

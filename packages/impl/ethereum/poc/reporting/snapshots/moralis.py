@@ -45,6 +45,7 @@ address = os.environ['EVM_ADDRESS']
 # > `EVM_ADDRESS` holds 17 non-zero balances there against 9 on Ethereum mainnet, including
 # > the 0-decimal tokens that make the decimals branch worth testing.
 
+
 # %%
 async def credentials_check() -> object:
   """Call the cheapest Deep Index endpoint and report what comes back."""

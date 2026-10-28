@@ -59,7 +59,9 @@ async def test_absolute_good_til_block_is_sent_without_reading_the_tip():
 
 
 @pytest.mark.parametrize('flags', ['LONG_TERM', 'CONDITIONAL'])
-async def test_absolute_good_til_block_time_is_sent_without_reading_the_tip(flags: Flags):
+async def test_absolute_good_til_block_time_is_sent_without_reading_the_tip(
+  flags: Flags,
+):
   expiry = datetime(2026, 10, 17, 12, 5, 30, 900_000, tzinfo=timezone.utc)
 
   order, latest = await placed({'flags': flags, 'good_til_block_time': expiry})

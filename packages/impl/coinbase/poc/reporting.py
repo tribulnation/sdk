@@ -64,6 +64,7 @@ LOOKBACK = timedelta(days=180)
 # `Transaction.type` covers every row kind this account produces, `staking_reward` included, so
 # every wallet's page validates as-is.
 
+
 # %%
 def transaction_to_observations(tx: Transaction, time: datetime) -> list[Observation]:
   """Map one `app.accounts.transactions` row to an `Observation`, for row kinds not
@@ -215,6 +216,7 @@ async def history(
 # (empty on this account -- no CFM futures wallet). INTX perpetuals positions are not
 # reachable at all on this key (`PERMISSION_DENIED`, see `market.ipynb`) and are omitted
 # rather than guessed.
+
 
 # %%
 async def snapshot(assets: list[str] | None = None) -> SnapshotRecord:

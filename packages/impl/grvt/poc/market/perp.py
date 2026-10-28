@@ -150,7 +150,9 @@ listed = await markets()
     Counter(INSTRUMENTS[m]['quote'] for m in listed),
   ),
   'testnet only': sorted(set(await markets(testnet)) - set(listed)),
-  'one perpetual per base/quote': len({(i['base'], i['quote']) for i in INSTRUMENTS.values()})
+  'one perpetual per base/quote': len(
+    {(i['base'], i['quote']) for i in INSTRUMENTS.values()}
+  )
   == len(INSTRUMENTS),
 }
 
@@ -960,7 +962,9 @@ btc_orders = [await place_order(BTC, far_buy(BTC, btc_bid)) for _ in range(2)]
 eth_order = await place_order(ETH, far_buy(ETH, await testnet_bid(ETH)))
 mine.update([*(o.id for o in btc_orders), eth_order.id])
 await asyncio.sleep(2)
-everyone = [o['metadata']['client_order_id'] for o in await testnet.trading.open_orders()]
+everyone = [
+  o['metadata']['client_order_id'] for o in await testnet.trading.open_orders()
+]
 if not set(everyone) <= mine:
   raise RuntimeError('The testnet account has open orders this PoC did not place')
 before = {m: [o.id for o in await open_orders(m, on=testnet)] for m in (BTC, ETH)}
@@ -1097,7 +1101,8 @@ async def funding_rates(
   )
   async for page in pages:
     yield [
-      FundingRate(rate=r['funding_rate'] / PERCENT, time=r['funding_time']) for r in page
+      FundingRate(rate=r['funding_rate'] / PERCENT, time=r['funding_time'])
+      for r in page
     ]
 
 
@@ -1115,7 +1120,9 @@ exact = [r async for page in funding_rates(BTC, settled, settled) for r in page]
   'open bounds': [
     r
     async for page in funding_rates(
-      BTC, settled + timedelta(microseconds=1), settled + timedelta(hours=8, microseconds=-1)
+      BTC,
+      settled + timedelta(microseconds=1),
+      settled + timedelta(hours=8, microseconds=-1),
     )
     for r in page
   ],
@@ -1171,11 +1178,15 @@ payments_start = end - timedelta(days=30)
 {
   env: {
     'per market': {
-      m: [p async for page in funding_payments(m, payments_start, end, on=c) for p in page]
+      m: [
+        p async for page in funding_payments(m, payments_start, end, on=c) for p in page
+      ]
       for m in (BTC, ETH)
     },
     'exchange': [
-      p async for page in funding_payments(None, payments_start, end, on=c) for p in page
+      p
+      async for page in funding_payments(None, payments_start, end, on=c)
+      for p in page
     ],
   }
   for env, c in (('mainnet', client), ('testnet', testnet))
@@ -1217,7 +1228,9 @@ async def perp_position(market_id: str, /, *, on: Grvt = client) -> PerpPosition
 
 
 # %%
-async def leverage(market_id: str, /, *, refetch: bool = False, on: Grvt = client) -> Decimal:
+async def leverage(
+  market_id: str, /, *, refetch: bool = False, on: Grvt = client
+) -> Decimal:
   """The account's initial leverage on the market."""
   for row in (await on.trading.all_initial_leverage())['results']:
     if row['instrument'] == market_id:
@@ -1232,7 +1245,11 @@ settings_rows = {
   'mainnet': {m: await leverage(m) for m in MARKETS},
   'testnet': {m: await leverage(m, on=testnet) for m in (BTC, ETH)},
   'ranges': {
-    m: (settings_rows[m]['min_leverage'], settings_rows[m]['max_leverage'], settings_rows[m]['margin_type'])
+    m: (
+      settings_rows[m]['min_leverage'],
+      settings_rows[m]['max_leverage'],
+      settings_rows[m]['margin_type'],
+    )
     for m in MARKETS
   },
   'covers every active market': {
@@ -1299,7 +1316,9 @@ async def perp_collateral(
   )
   return PerpCollateral(
     equity=equity,
-    free_collateral=max(summary['margin_balance'] - summary['initial_margin'], Decimal(0)),
+    free_collateral=max(
+      summary['margin_balance'] - summary['initial_margin'], Decimal(0)
+    ),
     initial_margin=summary['initial_margin'],
     maintenance_margin=summary['maintenance_margin'],
     leverage=notional / equity if equity > 0 else Decimal(0),
@@ -1383,7 +1402,9 @@ def status_of(o: GrvtOrder | None) -> str | None:
 
 
 if (await perp_position(BTC, on=testnet)).size:
-  raise RuntimeError('The testnet account already holds BTC; the round trip needs it flat')
+  raise RuntimeError(
+    'The testnet account already holds BTC; the round trip needs it flat'
+  )
 btc_ask = (await testnet.market.ticker(BTC)).get('best_ask_price')
 if not btc_ask:
   raise RuntimeError('No testnet ask on BTC')
@@ -1416,7 +1437,11 @@ round_end = datetime.now(timezone.utc)
 {
   'qty': round_qty,
   'replies (own id, order_id, status)': [
-    (o['metadata']['client_order_id'] in (open_id, close_id), o.get('order_id'), status_of(o))
+    (
+      o['metadata']['client_order_id'] in (open_id, close_id),
+      o.get('order_id'),
+      status_of(o),
+    )
     for o in (opened, closed)
     if o is not None
   ],
@@ -1445,7 +1470,9 @@ round_states = [
 round_taker = (await fees(BTC, on=testnet)).taker_buy
 {
   'history': [brief(t) for t in round_fills],
-  'order_id == client_order_id': all(t.order_id == t.client_order_id for t in round_fills),
+  'order_id == client_order_id': all(
+    t.order_id == t.client_order_id for t in round_fills
+  ),
   'query (qty, filled, active, status)': [
     (s.qty, s.filled_qty, s.active, s.details['state']['status'])
     for s in round_states
@@ -1512,12 +1539,16 @@ def tight(t: GrvtTicker) -> bool:
 four_hour = [
   n
   for n, i in TESTNET_INSTRUMENTS.items()
-  if i.get('funding_interval_hours') == 4 and i.get('status') == 'ACTIVE' and n in INSTRUMENTS
+  if i.get('funding_interval_hours') == 4
+  and i.get('status') == 'ACTIVE'
+  and n in INSTRUMENTS
 ]
 quotes = dict(
   zip(
     four_hour,
-    await asyncio.gather(*(testnet.market.ticker(n, transport='ws') for n in four_hour)),
+    await asyncio.gather(
+      *(testnet.market.ticker(n, transport='ws') for n in four_hour)
+    ),
   )
 )
 funding_market = max(
@@ -1531,9 +1562,13 @@ entry = funding_quote.get('best_ask_price' if side > 0 else 'best_bid_price')
 if not entry:
   raise RuntimeError(f'No testnet quote on {funding_market}')
 if any(p['size'] for p in await testnet.trading.positions(kind=['PERPETUAL'])):
-  raise RuntimeError('The testnet account holds a position; the funding check needs it flat')
+  raise RuntimeError(
+    'The testnet account holds a position; the funding check needs it flat'
+  )
 funding_qty = side * min_qty(funding_market, entry, FUNDING_NOTIONAL)
-funding_opened = await market_order(funding_market, funding_qty, random_client_order_id())
+funding_opened = await market_order(
+  funding_market, funding_qty, random_client_order_id()
+)
 await asyncio.sleep(3)
 {
   'market': funding_market,
@@ -1548,7 +1583,9 @@ await asyncio.sleep(3)
 # %%
 # After the settlement: the payment by market and exchange-wide, beside the venue's rows and
 # the settled rate, then the position is closed. Self-contained: it finds the open position.
-held_rows = [p for p in await testnet.trading.positions(kind=['PERPETUAL']) if p['size']]
+held_rows = [
+  p for p in await testnet.trading.positions(kind=['PERPETUAL']) if p['size']
+]
 if len(held_rows) != 1:
   raise RuntimeError('Expected exactly the funding position open on testnet')
 held_row = held_rows[0]
@@ -1556,7 +1593,9 @@ held_market = held_row['instrument']
 since = datetime.now(timezone.utc) - timedelta(hours=5)
 now = datetime.now(timezone.utc)
 settlements = (
-  await testnet.market.funding_rate(instrument=held_market, start_time=since, end_time=now)
+  await testnet.market.funding_rate(
+    instrument=held_market, start_time=since, end_time=now
+  )
 )['result']
 venue_rows = (
   await testnet.trading.funding_payment_history(
@@ -1564,7 +1603,9 @@ venue_rows = (
   )
 )['result']
 by_market = [
-  p async for page in funding_payments(held_market, since, now, on=testnet) for p in page
+  p
+  async for page in funding_payments(held_market, since, now, on=testnet)
+  for p in page
 ]
 exchange_wide = [
   p async for page in funding_payments(None, since, now, on=testnet) for p in page
@@ -1578,7 +1619,11 @@ close_order: NewOrder = {
   'signature': {'expiration': datetime.now(timezone.utc) + timedelta(days=29)},
   'metadata': {'client_order_id': random_client_order_id()},
   'legs': [
-    {'instrument': held_market, 'size': abs(held_size), 'is_buying_asset': held_size < 0}
+    {
+      'instrument': held_market,
+      'size': abs(held_size),
+      'is_buying_asset': held_size < 0,
+    }
   ],
 }
 require_testnet(testnet)
@@ -1587,11 +1632,15 @@ await asyncio.sleep(3)
 {
   'market': held_market,
   'size, entry': (held_size, held_entry),
-  'settled (time, rate %)': [(r['funding_time'], r['funding_rate']) for r in settlements],
+  'settled (time, rate %)': [
+    (r['funding_time'], r['funding_rate']) for r in settlements
+  ],
   'venue rows (time, amount, currency)': [
     (r['event_time'], r['amount'], r['currency']) for r in venue_rows
   ],
-  'cumulative_realized_funding_payment': held_row['cumulative_realized_funding_payment'],
+  'cumulative_realized_funding_payment': held_row[
+    'cumulative_realized_funding_payment'
+  ],
   'payments': by_market,
   'exchange-wide': exchange_wide,
   'expected received (time, -size x mark x rate)': [
@@ -1602,9 +1651,11 @@ await asyncio.sleep(3)
     status_of(funding_closed),
     funding_closed['signature']['expiration'],
   ),
-  'close state': (await testnet.trading.order(
-    {'client_order_id': funding_closed['metadata']['client_order_id']}
-  )).get('state'),
+  'close state': (
+    await testnet.trading.order(
+      {'client_order_id': funding_closed['metadata']['client_order_id']}
+    )
+  ).get('state'),
   'flat after': await perp_position(held_market, on=testnet),
 }
 
@@ -1712,9 +1763,13 @@ async def isolated_reads() -> dict[str, Any]:
 
 require_testnet(testnet)
 if any(p['size'] for p in await testnet.trading.positions(kind=['PERPETUAL'])):
-  raise RuntimeError('The testnet account holds a position; the isolated check needs it flat')
+  raise RuntimeError(
+    'The testnet account holds a position; the isolated check needs it flat'
+  )
 if await testnet.trading.open_orders():
-  raise RuntimeError('The testnet account has open orders; the isolated check needs none')
+  raise RuntimeError(
+    'The testnet account has open orders; the isolated check needs none'
+  )
 isolated_ask = (await testnet.market.ticker(BTC)).get('best_ask_price')
 if not isolated_ask:
   raise RuntimeError('No testnet ask on BTC')
@@ -1750,11 +1805,15 @@ try:
   await asyncio.sleep(2)
   isolated['added'] = await isolated_reads()
 finally:
-  held_rows = [p for p in await testnet.trading.positions(kind=['PERPETUAL']) if p['size']]
+  held_rows = [
+    p for p in await testnet.trading.positions(kind=['PERPETUAL']) if p['size']
+  ]
   isolated['close statuses'] = [
     (
       p['instrument'],
-      status_of(await market_order(p['instrument'], -p['size'], random_client_order_id())),
+      status_of(
+        await market_order(p['instrument'], -p['size'], random_client_order_id())
+      ),
     )
     for p in held_rows
   ]
@@ -1766,7 +1825,9 @@ finally:
 isolated['after'] = {
   'setting': await btc_setting(),
   'positions': [
-    p['instrument'] for p in await testnet.trading.positions(kind=['PERPETUAL']) if p['size']
+    p['instrument']
+    for p in await testnet.trading.positions(kind=['PERPETUAL'])
+    if p['size']
   ],
   'open orders': len(await testnet.trading.open_orders()),
   'non-default settings': [

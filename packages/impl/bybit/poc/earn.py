@@ -19,6 +19,7 @@ client = await Bybit.new().__aenter__()
 # %% [markdown]
 # ## `Instruments.instruments` — fixed-term saving products
 
+
 # %%
 def _parse_duration(raw: str) -> timedelta | None:
   """Parse Bybit's `duration` strings, e.g. "7d", "8h". The client also documents a
@@ -148,6 +149,7 @@ async def easy_onchain_instruments(
 # `'new-users'` for a restricted promotional product, `'fixed'` otherwise -- both were
 # observed live in the same response.
 
+
 # %%
 async def instruments(
   *,
@@ -178,6 +180,7 @@ await client.finance.hold_to_earn.product()
 
 # %% [markdown]
 # ### `place_order` / `redeem` — written, not executed
+
 
 # %%
 async def subscribe(

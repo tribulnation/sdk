@@ -10,7 +10,15 @@ import asyncio
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
 from decimal import ROUND_HALF_UP, Decimal
-from typing_extensions import Any, AsyncIterator, AsyncIterable, Collection, Literal, Mapping, Sequence
+from typing_extensions import (
+  Any,
+  AsyncIterator,
+  AsyncIterable,
+  Collection,
+  Literal,
+  Mapping,
+  Sequence,
+)
 
 from dotenv import dotenv_values
 from sdk_dev.repo import repo_root
@@ -18,12 +26,33 @@ from typed_margin_trade import MarginTrade
 from typed_margin_trade.schemas import L2Book, OrderSpec, PerpAssetCtx, PerpUniverseItem
 from typed_margin_trade.schemas import Fill
 
-from tribulnation.sdk.market import Book, Candle, CandleInterval, Collateral, Fees, FundingPayment, NextFunding, Order, OrderResponse, OrderState, PerpCollateral, PerpPosition, PerpStats, Position, Rules, Settings, Ticker, Trade
+from tribulnation.sdk.market import (
+  Book,
+  Candle,
+  CandleInterval,
+  Collateral,
+  Fees,
+  FundingPayment,
+  NextFunding,
+  Order,
+  OrderResponse,
+  OrderState,
+  PerpCollateral,
+  PerpPosition,
+  PerpStats,
+  Position,
+  Rules,
+  Settings,
+  Ticker,
+  Trade,
+)
 from tribulnation.sdk.market.exchange import OverflowPolicy
 
 env = dotenv_values(repo_root() / '.env')
 ADDRESS = env['MARGIN_TRADE_TESTNET_ADDRESS'] or ''
-client = await MarginTrade.new(env['MARGIN_TRADE_TESTNET_AGENT_PRIVATE_KEY'], vault=ADDRESS, mainnet=False).__aenter__()
+client = await MarginTrade.new(
+  env['MARGIN_TRADE_TESTNET_AGENT_PRIVATE_KEY'], vault=ADDRESS, mainnet=False
+).__aenter__()
 public = await MarginTrade.new(public=True).__aenter__()
 
 MARKETS = ['BTC', 'PRL']
@@ -93,7 +122,13 @@ ADDRESS[:6]
 # %%
 from sdk_dev.surface import surface
 
-print(surface('typed_margin_trade', 'MarginTrade', grep=r'meta|book|mids|candle|order|fill|funding|position|clearinghouse|active_asset|fees|contracts|cancel'))
+print(
+  surface(
+    'typed_margin_trade',
+    'MarginTrade',
+    grep=r'meta|book|mids|candle|order|fill|funding|position|clearinghouse|active_asset|fees|contracts|cancel',
+  )
+)
 
 
 # %% [markdown]
@@ -101,9 +136,12 @@ print(surface('typed_margin_trade', 'MarginTrade', grep=r'meta|book|mids|candle|
 #
 # List available markets.
 
+
 # %%
 async def markets() -> Sequence[str]:
-  return [name for name, item in (await universe()).items() if not item.get('isDelisted')]
+  return [
+    name for name, item in (await universe()).items() if not item.get('isDelisted')
+  ]
 
 
 await markets()
@@ -114,8 +152,11 @@ await markets()
 #
 # Fetch the market order book.
 
+
 # %%
-async def depth(market_id: str, /, *, levels: int | None = None, settings: Settings = {}) -> Book:
+async def depth(
+  market_id: str, /, *, levels: int | None = None, settings: Settings = {}
+) -> Book:
   return parse_book(await client.info.l2_book(market_id), levels)
 
 
@@ -127,9 +168,18 @@ async def depth(market_id: str, /, *, levels: int | None = None, settings: Setti
 #
 # Subscribe to the market order book. Each `l2Book` push is a full snapshot.
 
+
 # %%
 @asynccontextmanager
-async def depth_stream(market_id: str, /, *, levels: int | None = None, queue_size: int = 1, overflow: OverflowPolicy = 'latest', settings: Settings = {}) -> AsyncIterator[AsyncIterable[Book]]:
+async def depth_stream(
+  market_id: str,
+  /,
+  *,
+  levels: int | None = None,
+  queue_size: int = 1,
+  overflow: OverflowPolicy = 'latest',
+  settings: Settings = {},
+) -> AsyncIterator[AsyncIterable[Book]]:
   stream = await client.streams.l2_book(market_id)
 
   async def books() -> AsyncIterator[Book]:
@@ -156,9 +206,14 @@ pushes
 #
 # Fetch a ticker snapshot for many markets at once: 24h volumes from the asset contexts (every market), last trade and best bid/ask from the CoinGecko contracts feed, which publishes no bid/ask sizes and omits `SPY` and `QQQ` (their tickers keep only volumes).
 
+
 # %%
-async def tickers(markets: Collection[str] | None = None, *, settings: Settings = {}) -> Mapping[str, Ticker]:
-  quotes = {row['base_currency']: row for row in await client.coingecko.derivatives.contracts()}
+async def tickers(
+  markets: Collection[str] | None = None, *, settings: Settings = {}
+) -> Mapping[str, Ticker]:
+  quotes = {
+    row['base_currency']: row for row in await client.coingecko.derivatives.contracts()
+  }
   out: dict[str, Ticker] = {}
   for name, (_, ctx) in (await contexts()).items():
     if markets is None or name in markets:
@@ -174,13 +229,18 @@ async def tickers(markets: Collection[str] | None = None, *, settings: Settings 
 
 
 everything = await tickers()
-{k: v for k, v in everything.items() if k in MARKETS + ['SPY']}, len(everything), await tickers([])
+(
+  {k: v for k, v in everything.items() if k in MARKETS + ['SPY']},
+  len(everything),
+  await tickers([]),
+)
 
 
 # %% [markdown]
 # ## `rules`
 #
 # Fetch the market rules. Fees are the market's own `takerFee`/`makerFee` from `meta`, the rates fills are charged at (checked in the `fees` cell).
+
 
 # %%
 async def rules(market_id: str, /, *, refetch: bool = False) -> Rules:
@@ -190,7 +250,12 @@ async def rules(market_id: str, /, *, refetch: bool = False) -> Rules:
     fee_asset='USD',
     tick_size=Decimal(10) ** -min(MAX_SIG_FIGS, PERP_MAX_DECIMALS - sz),
     step_size=Decimal(10) ** -sz,
-    fees=Fees(maker_buy=item['makerFee'], maker_sell=item['makerFee'], taker_buy=item['takerFee'], taker_sell=item['takerFee']),
+    fees=Fees(
+      maker_buy=item['makerFee'],
+      maker_sell=item['makerFee'],
+      taker_buy=item['takerFee'],
+      taker_sell=item['takerFee'],
+    ),
     api=not item.get('isDelisted', False),
     details=item,
   )
@@ -203,6 +268,7 @@ async def rules(market_id: str, /, *, refetch: bool = False) -> Rules:
 # ## `fees`
 #
 # Fetch the selected market's account rates without a standard-rate fallback. `userFees` answers one account-wide rate (`userCrossRate` 0.0005, `userAddRate` 0.0001 on testnet), but the account's BTC fills were charged the market's own `meta` rate (testnet BTC `takerFee` 0.0001): the venue publishes no per-account, per-market rate, so this is not supported.
+
 
 # %%
 async def fees(market_id: str, /, *, refetch: bool = False) -> Fees:
@@ -218,8 +284,16 @@ except NotImplementedError as e:
 account = await client.info.user_fees(ADDRESS)
 btc = (await universe())['BTC']
 fills = await client.info.user_fills(ADDRESS)
-charged = {f['tid']: f['fee'] / (f['px'] * f['sz']) for f in fills if f['coin'] == 'BTC' and f['isTaker']}
-{'userCrossRate': account['userCrossRate'], 'meta takerFee': btc['takerFee'], 'charged taker rates': set(charged.values())}
+charged = {
+  f['tid']: f['fee'] / (f['px'] * f['sz'])
+  for f in fills
+  if f['coin'] == 'BTC' and f['isTaker']
+}
+{
+  'userCrossRate': account['userCrossRate'],
+  'meta takerFee': btc['takerFee'],
+  'charged taker rates': set(charged.values()),
+}
 
 
 # %% [markdown]
@@ -228,14 +302,42 @@ charged = {f['tid']: f['fee'] / (f['px'] * f['sz']) for f in fills if f['coin'] 
 # Fetch the market's historical trade candles. The venue answers at most 5000 candles per request, oldest first; the walk advances past the last opening time.
 
 # %%
-INTERVALS: dict[CandleInterval, timedelta] = {'1m': timedelta(minutes=1), '5m': timedelta(minutes=5), '15m': timedelta(minutes=15), '1h': timedelta(hours=1), '4h': timedelta(hours=4), '1d': timedelta(days=1)}
+INTERVALS: dict[CandleInterval, timedelta] = {
+  '1m': timedelta(minutes=1),
+  '5m': timedelta(minutes=5),
+  '15m': timedelta(minutes=15),
+  '1h': timedelta(hours=1),
+  '4h': timedelta(hours=4),
+  '1d': timedelta(days=1),
+}
 
 
-async def candles(market_id: str, /, interval: CandleInterval, start: datetime, end: datetime) -> AsyncIterator[Sequence[Candle]]:
+async def candles(
+  market_id: str, /, interval: CandleInterval, start: datetime, end: datetime
+) -> AsyncIterator[Sequence[Candle]]:
   cursor = start
   while cursor < end:
-    rows = await client.info.candle_snapshot({'coin': market_id, 'interval': interval, 'startTime': cursor, 'endTime': end - timedelta(milliseconds=1)})
-    page = [Candle(time=r['t'], open=r['o'], high=r['h'], low=r['l'], close=r['c'], volume=r['v'], trades=r['n']) for r in rows if start <= r['t'] < end]
+    rows = await client.info.candle_snapshot(
+      {
+        'coin': market_id,
+        'interval': interval,
+        'startTime': cursor,
+        'endTime': end - timedelta(milliseconds=1),
+      }
+    )
+    page = [
+      Candle(
+        time=r['t'],
+        open=r['o'],
+        high=r['h'],
+        low=r['l'],
+        close=r['c'],
+        volume=r['v'],
+        trades=r['n'],
+      )
+      for r in rows
+      if start <= r['t'] < end
+    ]
     if page:
       yield page
     if not rows:
@@ -250,7 +352,10 @@ times = [c.time for page in pages for c in page]
   'unique': len(set(times)) == len(times),
   'first': times[0],
   'last': times[-1],
-  'per interval': {i: len([c async for p in candles('BTC', i, end - 6 * w, end) for c in p]) for i, w in INTERVALS.items()},
+  'per interval': {
+    i: len([c async for p in candles('BTC', i, end - 6 * w, end) for c in p])
+    for i, w in INTERVALS.items()
+  },
 }
 
 
@@ -258,6 +363,7 @@ times = [c.time for page in pages for c in page]
 # ## `query_order`
 #
 # Fetch the state of the order with the given ID. `orderStatus` answers `{status: 'order', order: {order, status}}` or `{status: 'unknownOid'}`.
+
 
 # %%
 def order_state(order: Any, status: str) -> OrderState:
@@ -283,13 +389,18 @@ async def query_order(market_id: str, /, id: str) -> OrderState | None:
 
 
 last_fill = (await client.info.user_fills(ADDRESS))[0]
-await query_order('BTC', str(last_fill['oid'])), await query_order('BTC', '1'), await client.info.order_status(user=ADDRESS, oid=1)
+(
+  await query_order('BTC', str(last_fill['oid'])),
+  await query_order('BTC', '1'),
+  await client.info.order_status(user=ADDRESS, oid=1),
+)
 
 
 # %% [markdown]
 # ## `open_orders`
 #
 # Fetch your currently open orders. `frontendOpenOrders` carries the original size, so the filled part is `origSz - sz`.
+
 
 # %%
 async def open_orders(market_id: str, /) -> Sequence[OrderState]:
@@ -305,18 +416,29 @@ async def open_orders(market_id: str, /) -> Sequence[OrderState]:
 #
 # Fetch personal fills for one market or the whole exchange: `userFillsByTime` pages backwards from `end`.
 
+
 # %%
-async def trades_history(market_id: str | None, /, start: datetime, end: datetime) -> AsyncIterator[Sequence[Trade]]:
+async def trades_history(
+  market_id: str | None, /, start: datetime, end: datetime
+) -> AsyncIterator[Sequence[Trade]]:
   pages = client.info.user_fills_by_time_paged(ADDRESS, start_time=start, end_time=end)
   async for page in pages:
-    rows = [parse_trade(f) for f in page if f['coin'] in perps and (market_id is None or f['coin'] == market_id)]
+    rows = [
+      parse_trade(f)
+      for f in page
+      if f['coin'] in perps and (market_id is None or f['coin'] == market_id)
+    ]
     if rows:
       yield rows
 
 
 perps = set(await markets())
 history = [t async for page in trades_history('BTC', start, end) for t in page]
-len(history), history[:2], len([t async for page in trades_history(None, start, end) for t in page])
+(
+  len(history),
+  history[:2],
+  len([t async for page in trades_history(None, start, end) for t in page]),
+)
 
 
 # %% [markdown]
@@ -324,9 +446,17 @@ len(history), history[:2], len([t async for page in trades_history(None, start, 
 #
 # Subscribe to your real-time trades. `userFills` pushes only when subscribed with a `coin` (the client requires it), so each market holds its own subscription. Exercised with real fills in the lifecycle cell.
 
+
 # %%
 @asynccontextmanager
-async def trades_stream(market_id: str, /, *, queue_size: int = 1000, overflow: OverflowPolicy = 'fail', settings: Settings = {}) -> AsyncIterator[AsyncIterable[Trade]]:
+async def trades_stream(
+  market_id: str,
+  /,
+  *,
+  queue_size: int = 1000,
+  overflow: OverflowPolicy = 'fail',
+  settings: Settings = {},
+) -> AsyncIterator[AsyncIterable[Trade]]:
   stream = await client.streams.user_fills(user=ADDRESS, coin=market_id)
 
   async def trades() -> AsyncIterator[Trade]:
@@ -355,10 +485,16 @@ async with trades_stream('BTC') as stream:
 # Place an order in the market. `LIMIT` sends `Gtc`, `POST_ONLY` `Alo`, `MARKET` an `Ioc` limit at the SDK's protection price. Exercised in the lifecycle cell.
 
 # %%
-TIF: dict[str, Literal['Gtc', 'Alo', 'Ioc']] = {'LIMIT': 'Gtc', 'POST_ONLY': 'Alo', 'MARKET': 'Ioc'}
+TIF: dict[str, Literal['Gtc', 'Alo', 'Ioc']] = {
+  'LIMIT': 'Gtc',
+  'POST_ONLY': 'Alo',
+  'MARKET': 'Ioc',
+}
 
 
-async def place_order(market_id: str, /, order: Order, *, settings: Settings = {}) -> OrderResponse:
+async def place_order(
+  market_id: str, /, order: Order, *, settings: Settings = {}
+) -> OrderResponse:
   item = (await universe())[market_id]
   qty = Decimal(order['qty'])
   spec: OrderSpec = {
@@ -378,7 +514,9 @@ async def place_order(market_id: str, /, order: Order, *, settings: Settings = {
   if 'resting' in status:
     return OrderResponse(id=str(status['resting']['oid']), details=status)
   filled = status['filled']
-  return OrderResponse(id=str(filled['oid']), details=status, filled_qty=filled['totalSz'])
+  return OrderResponse(
+    id=str(filled['oid']), details=status, filled_qty=filled['totalSz']
+  )
 
 
 place_order  # changes the account: exercised by the lifecycle cell below
@@ -388,6 +526,7 @@ place_order  # changes the account: exercised by the lifecycle cell below
 # ## `cancel_order`
 #
 # Cancel an order in the market. A failed cancel comes back as its own status (`order not found`), not raised. Exercised in the lifecycle cell.
+
 
 # %%
 async def cancel_order(market_id: str, /, id: str, *, settings: Settings = {}) -> Any:
@@ -407,12 +546,17 @@ cancel_order  # changes the account: exercised by the lifecycle cell below
 #
 # Cancel multiple orders in the market, in one `cancel` action. Exercised in the lifecycle cell.
 
+
 # %%
-async def cancel_orders(market_id: str, /, ids: Sequence[str], *, settings: Settings = {}) -> Any:
+async def cancel_orders(
+  market_id: str, /, ids: Sequence[str], *, settings: Settings = {}
+) -> Any:
   if not ids:
     return []
   item = (await universe())[market_id]
-  result = await client.exchange.cancel([{'a': item['index'], 'o': int(id)} for id in ids])
+  result = await client.exchange.cancel(
+    [{'a': item['index'], 'o': int(id)} for id in ids]
+  )
   return result['statuses']
 
 
@@ -423,6 +567,7 @@ cancel_orders  # changes the account: exercised by the lifecycle cell below
 # ## `cancel_open_orders`
 #
 # Cancel all open orders in the market. Exercised in the lifecycle cell.
+
 
 # %%
 async def cancel_open_orders(market_id: str, /, *, settings: Settings = {}) -> Any:
@@ -436,6 +581,7 @@ cancel_open_orders  # changes the account: exercised by the lifecycle cell below
 # ## `index`
 #
 # Fetch the market index price: the asset context's `oraclePx`.
+
 
 # %%
 async def index(market_id: str, /, *, settings: Settings = {}) -> Decimal:
@@ -458,11 +604,22 @@ FUNDING_INTERVAL = timedelta(hours=1)
 async def next_funding(market_id: str, /) -> NextFunding:
   _, ctx = (await contexts())[market_id]
   now = datetime.now(timezone.utc)
-  return NextFunding(rate=ctx['funding'], time=now.replace(minute=0, second=0, microsecond=0) + FUNDING_INTERVAL, interval=FUNDING_INTERVAL, premium=ctx['premium'])
+  return NextFunding(
+    rate=ctx['funding'],
+    time=now.replace(minute=0, second=0, microsecond=0) + FUNDING_INTERVAL,
+    interval=FUNDING_INTERVAL,
+    premium=ctx['premium'],
+  )
 
 
-gecko = {r['base_currency']: r['next_funding_rate_timestamp'] for r in await client.coingecko.derivatives.contracts()}
-{market_id: await next_funding(market_id) for market_id in MARKETS}, {m: gecko[m] for m in MARKETS}
+gecko = {
+  r['base_currency']: r['next_funding_rate_timestamp']
+  for r in await client.coingecko.derivatives.contracts()
+}
+(
+  {market_id: await next_funding(market_id) for market_id in MARKETS},
+  {m: gecko[m] for m in MARKETS},
+)
 
 
 # %% [markdown]
@@ -470,12 +627,22 @@ gecko = {r['base_currency']: r['next_funding_rate_timestamp'] for r in await cli
 #
 # Fetch a pricing and funding snapshot for many markets at once, from one `metaAndAssetCtxs` call.
 
+
 # %%
-async def perp_stats(markets: Collection[str] | None = None, *, settings: Settings = {}) -> Mapping[str, PerpStats]:
+async def perp_stats(
+  markets: Collection[str] | None = None, *, settings: Settings = {}
+) -> Mapping[str, PerpStats]:
   now = datetime.now(timezone.utc)
   nxt = now.replace(minute=0, second=0, microsecond=0) + FUNDING_INTERVAL
   return {
-    name: PerpStats(index=ctx['oraclePx'], mark=ctx['markPx'], funding=ctx['funding'], next_funding_time=nxt, funding_interval=FUNDING_INTERVAL, open_interest=ctx['openInterest'])
+    name: PerpStats(
+      index=ctx['oraclePx'],
+      mark=ctx['markPx'],
+      funding=ctx['funding'],
+      next_funding_time=nxt,
+      funding_interval=FUNDING_INTERVAL,
+      open_interest=ctx['openInterest'],
+    )
     for name, (_, ctx) in (await contexts()).items()
     if markets is None or name in markets
   }
@@ -489,8 +656,11 @@ await perp_stats(MARKETS), len(await perp_stats())
 #
 # Fetch the market's historical funding rates. Not supported: `fundingHistory` answers placeholder data only (documented "not yet populated", `[]` on both networks), so `typed_margin_trade` excludes it.
 
+
 # %%
-async def funding_rates(market_id: str, /, start: datetime | None = None, end: datetime | None = None) -> AsyncIterator[Sequence[Any]]:
+async def funding_rates(
+  market_id: str, /, start: datetime | None = None, end: datetime | None = None
+) -> AsyncIterator[Sequence[Any]]:
   raise NotImplementedError('margin.trade serves no funding-rate history')
   yield []
 
@@ -506,22 +676,50 @@ except NotImplementedError as e:
 #
 # Fetch personal funding payments for one market or the whole exchange. `delta.usdc` is signed from the account's side: a long paying a positive rate is negative (mainnet sample below), matching the SDK's received-positive convention. The venue sends newest first and states no row cap; the mainnet account below returned every settlement of a three-day window in one response.
 
+
 # %%
-async def funding_payments(market_id: str | None, /, start: datetime, end: datetime, user: str = ADDRESS, via: MarginTrade = client) -> AsyncIterator[Sequence[FundingPayment]]:
+async def funding_payments(
+  market_id: str | None,
+  /,
+  start: datetime,
+  end: datetime,
+  user: str = ADDRESS,
+  via: MarginTrade = client,
+) -> AsyncIterator[Sequence[FundingPayment]]:
   rows = await via.info.user_funding(user, start_time=start, end_time=end)
-  page = [FundingPayment(amount=r['delta']['usdc'], time=r['time']) for r in rows if market_id is None or r['delta']['coin'] == market_id]
+  page = [
+    FundingPayment(amount=r['delta']['usdc'], time=r['time'])
+    for r in rows
+    if market_id is None or r['delta']['coin'] == market_id
+  ]
   if page:
     yield page
 
 
 MAINNET_TRADER = '9Tdb5DUfoUVnUAGwvfKhsLr8xx3nTzd4VwAw3wDdgaks'  # top of the public mainnet leaderboard
-raw = await public.info.user_funding(MAINNET_TRADER, start_time=end - timedelta(days=3), end_time=end)
-signs = {(r['delta']['szi'] > 0, r['delta']['fundingRate'] > 0, r['delta']['usdc'] > 0) for r in raw if r['delta']['usdc'] and r['delta']['fundingRate']}
+raw = await public.info.user_funding(
+  MAINNET_TRADER, start_time=end - timedelta(days=3), end_time=end
+)
+signs = {
+  (r['delta']['szi'] > 0, r['delta']['fundingRate'] > 0, r['delta']['usdc'] > 0)
+  for r in raw
+  if r['delta']['usdc'] and r['delta']['fundingRate']
+}
 {
-  'testnet': [p async for page in funding_payments('BTC', end - timedelta(days=30), end) for p in page],
+  'testnet': [
+    p
+    async for page in funding_payments('BTC', end - timedelta(days=30), end)
+    for p in page
+  ],
   'mainnet rows (3 days)': len(raw),
   '(long, rate>0, received) combinations': signs,
-  'mainnet XAU': [p async for page in funding_payments('XAU', end - timedelta(days=1), end, MAINNET_TRADER, public) for p in page][:3],
+  'mainnet XAU': [
+    p
+    async for page in funding_payments(
+      'XAU', end - timedelta(days=1), end, MAINNET_TRADER, public
+    )
+    for p in page
+  ][:3],
 }
 
 
@@ -530,12 +728,15 @@ signs = {(r['delta']['szi'] > 0, r['delta']['fundingRate'] > 0, r['delta']['usdc
 #
 # Fetch your open position in the perpetual market. Exercised with a real position in the lifecycle cell.
 
+
 # %%
 async def perp_position(market_id: str, /) -> PerpPosition:
   state = await client.info.clearinghouse_state(user=ADDRESS)
   for entry in state['assetPositions']:
     if entry['position']['coin'] == market_id:
-      return PerpPosition(size=entry['position']['szi'], entry_price=entry['position']['entryPx'])
+      return PerpPosition(
+        size=entry['position']['szi'], entry_price=entry['position']['entryPx']
+      )
   return PerpPosition(size=Decimal(0), entry_price=Decimal(0))
 
 
@@ -546,6 +747,7 @@ async def perp_position(market_id: str, /) -> PerpPosition:
 # ## `leverage`
 #
 # Fetch the leverage this account can open at on the selected market: `activeAssetData.leverage.value`.
+
 
 # %%
 async def leverage(market_id: str, /, *, refetch: bool = False) -> Decimal:
@@ -561,12 +763,17 @@ async def leverage(market_id: str, /, *, refetch: bool = False) -> Decimal:
 #
 # Fetch perpetual collateral. The perp wallet is its own account (spot is separate): the cross bucket is `crossMarginSummary` (equity `accountValue`, initial margin `totalMarginUsed`, leverage `totalNtlPos / accountValue`), maintenance `crossMaintenanceMarginUsed`, and free collateral the venue's `withdrawable`. An isolated position reports its own bucket from `leverage.rawUsd`, verified in the lifecycle cell.
 
+
 # %%
 async def perp_collateral(market_id: str | None = None, /) -> PerpCollateral:
   state = await client.info.clearinghouse_state(user=ADDRESS)
   for entry in state['assetPositions']:
     pos = entry['position']
-    if market_id is not None and pos['coin'] == market_id and pos['leverage']['type'] == 'isolated':
+    if (
+      market_id is not None
+      and pos['coin'] == market_id
+      and pos['leverage']['type'] == 'isolated'
+    ):
       raise NotImplementedError('isolated buckets are not mapped')
   summary = state['crossMarginSummary']
   equity = summary['accountValue']
@@ -588,6 +795,7 @@ await perp_collateral(), await perp_collateral('BTC')
 #
 # Fetch your open position in the market (defers to `perp_position`).
 
+
 # %%
 async def position(market_id: str, /) -> Position:
   return await perp_position(market_id)
@@ -601,6 +809,7 @@ async def position(market_id: str, /) -> Position:
 #
 # Fetch the maximum notional position you can open right now: the SDK default, the free collateral of the market's bucket times `leverage`.
 
+
 # %%
 async def available_notional(market_id: str, /) -> Decimal:
   return (await perp_collateral(market_id)).free_collateral * await leverage(market_id)
@@ -613,6 +822,7 @@ async def available_notional(market_id: str, /) -> Decimal:
 # ## `collateral`
 #
 # Fetch collateral (defers to `perp_collateral`).
+
 
 # %%
 async def collateral(market_id: str | None = None, /) -> Collateral:
@@ -632,14 +842,21 @@ log: dict[str, Any] = {}
 mid = (await client.info.all_mids())['BTC']
 low = mid * Decimal('0.9')
 
-resting = await place_order('BTC', {'type': 'POST_ONLY', 'qty': Decimal('0.001'), 'price': low})
+resting = await place_order(
+  'BTC', {'type': 'POST_ONLY', 'qty': Decimal('0.001'), 'price': low}
+)
 log['post_only'] = resting
 log['query resting'] = await query_order('BTC', resting.id)
 log['open'] = [o.id for o in await open_orders('BTC')]
 log['cancel_order'] = await cancel_order('BTC', resting.id)
 log['query cancelled'] = await query_order('BTC', resting.id)
 
-pair = [await place_order('BTC', {'type': 'LIMIT', 'qty': Decimal('0.001'), 'price': low * Decimal(k)}) for k in ('0.99', '0.98')]
+pair = [
+  await place_order(
+    'BTC', {'type': 'LIMIT', 'qty': Decimal('0.001'), 'price': low * Decimal(k)}
+  )
+  for k in ('0.99', '0.98')
+]
 log['cancel_orders'] = await cancel_orders('BTC', [o.id for o in pair])
 await place_order('BTC', {'type': 'LIMIT', 'qty': Decimal('0.001'), 'price': low})
 log['cancel_open_orders'] = await cancel_open_orders('BTC')
@@ -647,22 +864,38 @@ log['open after'] = await open_orders('BTC')
 
 async with trades_stream('BTC') as stream:
   it = aiter(stream)
-  bought = await place_order('BTC', {'type': 'MARKET', 'qty': Decimal('0.001'), 'price': mid * Decimal('1.01')})
+  bought = await place_order(
+    'BTC', {'type': 'MARKET', 'qty': Decimal('0.001'), 'price': mid * Decimal('1.01')}
+  )
   log['market buy'] = bought
   log['streamed'] = await asyncio.wait_for(anext(it), timeout=20)
   log['perp_position'] = await perp_position('BTC')
   log['perp_collateral'] = await perp_collateral('BTC')
   log['available_notional'] = await available_notional('BTC')
   state = await client.info.clearinghouse_state(user=ADDRESS)
-  log['summary with position'] = (state['crossMarginSummary'], state['withdrawable'], [p['position']['unrealizedPnl'] for p in state['assetPositions']])
-  sold = await place_order('BTC', {'type': 'MARKET', 'qty': Decimal('-0.001'), 'price': mid * Decimal('0.99')})
+  log['summary with position'] = (
+    state['crossMarginSummary'],
+    state['withdrawable'],
+    [p['position']['unrealizedPnl'] for p in state['assetPositions']],
+  )
+  sold = await place_order(
+    'BTC', {'type': 'MARKET', 'qty': Decimal('-0.001'), 'price': mid * Decimal('0.99')}
+  )
   log['market sell'] = sold
   log['streamed close'] = await asyncio.wait_for(anext(it), timeout=20)
 
 await asyncio.sleep(2)
-recent = [t async for page in trades_history('BTC', end - timedelta(minutes=1), datetime.now(timezone.utc) + timedelta(minutes=1)) for t in page]
+recent = [
+  t
+  async for page in trades_history(
+    'BTC', end - timedelta(minutes=1), datetime.now(timezone.utc) + timedelta(minutes=1)
+  )
+  for t in page
+]
 log['history ids'] = [t.id for t in recent[:2]]
-log['stream matches history'] = {log['streamed'].id, log['streamed close'].id} <= {t.id for t in recent}
+log['stream matches history'] = {log['streamed'].id, log['streamed close'].id} <= {
+  t.id for t in recent
+}
 log['flat after'] = await perp_position('BTC')
 log['filled query'] = await query_order('BTC', bought.id)
 log

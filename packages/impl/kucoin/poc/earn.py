@@ -24,6 +24,7 @@ ASSETS = ['USDT', 'BTC', 'ETH', 'KCS']
 # that each return their own item shape. `Instruments.instruments()` needs to flatten all
 # of these into one `Sequence[Instrument]`.
 
+
 # %%
 async def savings_instruments(*, currency: str | None = None) -> list[Instrument]:
   raw = await client.earn.savings_products(currency=currency)
@@ -167,6 +168,7 @@ len(results), results[:5]
 # Combine every product family behind the one SDK method, then apply the `tags`/`assets`
 # filters client-side (KuCoin has no single endpoint spanning all families).
 
+
 # %%
 async def instruments(
   *,
@@ -222,6 +224,7 @@ len(results), results[:10]
 # `earn.purchase` and `earn.redeem` aren't part of the `Instruments` abstract interface
 # (it's read-only), but are the natural next step a real integration would need. Included
 # here only to show how they'd map -- **never executed**.
+
 
 # %%
 async def purchase(instrument: Instrument, *, amount: Decimal) -> str:
