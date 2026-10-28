@@ -2,26 +2,33 @@
 
 Which venues stream natively is a real differentiator, and every
 `packages/impl/*/impl.toml` already declares it: `support = "full"` covers both stream
-methods, `partial` names whichever ones it implements. Generating the table from that is
+methods (unless the contract scopes one to a kind of market the venue does not serve),
+`partial` names whichever ones it implements. Generating the table from that is
 what keeps it from drifting the way a hand-written list would.
 """
 
-from sdk_dev.support import ImplFile, method_universe
+from typing_extensions import Mapping
+
+from sdk_dev.support import ImplFile, MarketKind, method_universe
 
 STREAMS_START = '<!-- streams -->'
 STREAMS_END = '<!-- /streams -->'
 STREAM_METHODS = ('depth_stream', 'trades_stream')
-SURFACE = 'market'
+STREAMS_SURFACE = 'market'
 
 
 def render_streams_markdown(
-  impl_files: dict[str, ImplFile], *, venue_names: dict[str, str]
+  impl_files: dict[str, ImplFile],
+  *,
+  kinds: Mapping[str, MarketKind | None],
+  venue_names: dict[str, str],
 ) -> str:
   """
   Render the venue x stream-method table.
 
   Args:
     impl_files: `load_impl_files()`'s output.
+    kinds: `load_method_kinds()` of the Market contract.
     venue_names: `{slug: display name}`, from registry.toml, whose order the rows follow.
 
   Returns:
@@ -30,7 +37,9 @@ def render_streams_markdown(
     Market, and a venue with no Market at all is the support matrix's business.
   """
   serving = {
-    method: set(method_universe(impl_files, SURFACE, method))
+    method: set(
+      method_universe(impl_files, STREAMS_SURFACE, method, kind=kinds[method])
+    )
     for method in STREAM_METHODS
   }
   header = ' | '.join(f'`{method}`' for method in STREAM_METHODS)
@@ -38,7 +47,7 @@ def render_streams_markdown(
   rows = [f'| Venue | {header} |', f'| {divider} |']
   for slug, name in venue_names.items():
     entry = impl_files.get(slug)
-    market = entry.support.get(SURFACE) if entry else None
+    market = entry.support.get(STREAMS_SURFACE) if entry else None
     if market is None or market.support == 'none':
       continue
     cells = ' | '.join(

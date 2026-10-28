@@ -32,8 +32,9 @@ def support():
       if entry is None:
         continue
       auth = 'auth' if entry.auth else 'no auth'
+      kinds = f' [{", ".join(entry.kinds)}]' if entry.kinds else ''
       methods = f' ({", ".join(entry.methods)})' if entry.methods else ''
-      typer.echo(f'  {slug:<12} {entry.support}{methods}, {auth}')
+      typer.echo(f'  {slug:<12} {entry.support}{kinds}{methods}, {auth}')
       if entry.note:
         typer.echo(f'  {"":<12} {entry.note}')
     typer.echo()

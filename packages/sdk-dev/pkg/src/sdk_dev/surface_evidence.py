@@ -13,8 +13,8 @@ import pytest
 from typing_extensions import Literal
 
 from .consistency import StrictModel
-from .repo import repo_root
-from .support import is_testnet, load_impl_files
+from .repo import CONTRACT_DIR, repo_root
+from .support import is_testnet, load_impl_files, load_method_kinds
 
 Group = Literal['all', 'public_mainnet', 'report_testnet']
 
@@ -76,7 +76,10 @@ def inventory(root: Path, venue: str) -> dict[str, Path]:
     support = impl.support.get(surface)
     if support is None or support.support == 'none':
       continue
-    enabled = set(methods) if support.support == 'full' else set(support.methods or ())
+    kinds = load_method_kinds(root / CONTRACT_DIR / f'{surface}.yml')
+    enabled = {
+      method for method in methods if support.declares(method, kinds.get(method))
+    }
     for method, tests in methods.items():
       if method in enabled:
         for test in tests:

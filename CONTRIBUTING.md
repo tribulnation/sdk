@@ -208,9 +208,16 @@ for implementation guidance, regression expectations and the venue audit.
 Copy the shape of an existing `packages/impl/<venue>/`: a `pkg/` package named
 `tribulnation-<venue>`, `test/`, a `README.md` and `LICENSE`. Then declare it in two
 places: `impl.toml` says what the package actually supports (`[support.<surface>]` with
-`support`, `auth`, optional `methods` and `note`), and the root `registry.toml` lists the
-venue for the site. Both feed the published support matrix — nothing there is inferred
-from the code.
+`support`, `auth`, optional `kinds`, `methods` and `note`), and the root `registry.toml`
+lists the venue for the site. Both feed the published support matrix — nothing there is
+inferred from the code.
+
+For Market, declare `kinds = ["spot"]`, `["perp"]` or `["spot", "perp"]`: the kinds of
+market the venue serves. A contract method with a `kind` (`docs/contract/market.yml`)
+applies only to venues serving that kind, so `support = "full"` means every applicable
+method and a perpetuals-only venue is not counted for spot methods. Omitting `kinds`
+means every kind; a `partial` list must not name a method outside them
+([ADR 0056](dev-docs/adr/0056-market-kind-aware-support.md)).
 
 ## Releasing
 

@@ -2,6 +2,7 @@
 
 from decimal import Decimal
 from pathlib import Path
+import shutil
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock
 
@@ -14,6 +15,7 @@ from tribulnation.sdk.market import Book, PerpExchange, PerpStats, Ticker
 
 from sdk_dev import consistency
 from sdk_dev.consistency import Payload, check_id, collect, verify_payload
+from sdk_dev.repo import CONTRACT_DIR, repo_root
 
 
 @pytest.fixture
@@ -41,6 +43,9 @@ def catalogue() -> Catalogue:
 @pytest.fixture
 def root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
   """An explicit venue policy excludes only undeclared methods."""
+  contracts = tmp_path / CONTRACT_DIR
+  contracts.mkdir(parents=True)
+  shutil.copy(repo_root() / CONTRACT_DIR / 'market.yml', contracts)
   directory = tmp_path / 'packages' / 'impl' / 'fixture'
   directory.mkdir(parents=True)
   (directory / 'impl.toml').write_text(

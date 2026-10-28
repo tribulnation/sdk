@@ -1,6 +1,7 @@
 [support.market]
 support = "partial"
 auth = false
+kinds = ["spot", "perp"]
 methods = [
   "depth", "depth_stream", "tickers", "rules", "fees", "candles",
   "query_order", "open_orders", "trades_history", "trades_stream",

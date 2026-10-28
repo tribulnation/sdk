@@ -331,12 +331,42 @@ def test_trades_check_uses_the_collected_rules():
   reads.check('trades_history', result)
 
 
+def test_contract_kinds_keep_the_recorded_exclusions():
+  """The contract's kinds scope exactly the reads recorded evidence excludes by kind."""
+  from sdk_dev.repo import repo_root
+
+  kinds = reads.market_kinds(repo_root())
+  assert {m for m in reads.ACCOUNT_READS if kinds[m] == 'spot'} == {
+    'balances',
+    'collateral_ids',
+  }
+  assert {m for m in reads.ACCOUNT_READS if kinds[m] == 'perp'} == {
+    'funding_payments',
+    'position',
+    'perp_position',
+    'collateral',
+    'perp_collateral',
+    'leverage',
+    'available_notional',
+    'collateral_id',
+  }
+  from sdk_dev.integration.market.public import READS
+
+  assert {m for m in READS if kinds.get(m) == 'perp'} == {
+    'index',
+    'next_funding',
+    'funding_rates',
+    'perp_stats',
+  }
+
+
 def test_exclusion_policy_order():
   """Static, perpetual-only, support, mode and Bitget Classic exclusions apply in order."""
   from sdk_dev.repo import repo_root
   from sdk_dev.support import load_impl_files
 
   impls = load_impl_files(repo_root() / 'packages/impl')
+  kinds = reads.market_kinds(repo_root())
 
   def code(
     venue: str,
@@ -348,6 +378,7 @@ def test_exclusion_policy_order():
     """The exclusion for one read."""
     return reads.account_exclusion(
       impls[venue],
+      kinds=kinds,
       venue=venue,
       exchange_id=exchange,
       method=method,
@@ -357,6 +388,9 @@ def test_exclusion_policy_order():
 
   assert code('lighter', 'perp', 'query_order') == 'order_lifecycle'
   assert code('lighter', 'spot', 'leverage') == 'perp_only'
+  assert code('lighter', 'perp', 'balances') == 'spot_only'
+  assert code('dydx', 'perp', 'balances') == 'spot_only'
+  assert code('dydx', 'perp', 'collateral_id', 'address') is None
   assert code('bit2me', 'spot', 'fees') == 'unsupported'
   assert code('mexc', 'perp', 'open_orders') == 'unsupported'
   assert code('lighter', 'perp', 'open_orders', 'address') == 'credential_mode'

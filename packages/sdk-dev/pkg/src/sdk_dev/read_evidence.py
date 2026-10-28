@@ -19,12 +19,19 @@ from .integration.market.account import (
   ACCOUNT_READS,
   account_exclusion,
   check_waivers,
+  market_kinds,
   runs,
 )
 from .integration.market.public import READS
 from .integration.market.support import CASES
-from .repo import repo_root
-from .support import AccountMode, is_testnet, load_impl_files, mode_rank
+from .repo import CONTRACT_DIR, repo_root
+from .support import (
+  AccountMode,
+  is_testnet,
+  load_impl_files,
+  load_method_kinds,
+  mode_rank,
+)
 from .surface_evidence import Group, TESTS
 
 SUSPENSIONS: dict[tuple[str, str], date] = {
@@ -114,7 +121,10 @@ def inventory(
     mapped = {test for tests in methods.values() for test in tests}
     if test_names(path) != mapped:
       raise ValueError(f'Unmapped live tests in {surface}')
-    enabled = set(methods) if support.support == 'full' else set(support.methods or ())
+    kinds = load_method_kinds(root / CONTRACT_DIR / f'{surface}.yml')
+    enabled = {
+      method for method in methods if support.declares(method, kinds.get(method))
+    }
     for method, tests in methods.items():
       for test in tests:
         exclusion = None
@@ -135,12 +145,15 @@ def inventory(
     references = CASES.get(venue, ())
     if not references:
       raise ValueError('Supported market implementation has no reference cases')
-    check_waivers(impl, {case.market_id.split(':', 1)[0] for case in references})
-    enabled = (
-      set(READS) | {'candles'}
-      if support.support == 'full'
-      else set(support.methods or ())
+    kinds = market_kinds(root)
+    check_waivers(
+      impl, {case.market_id.split(':', 1)[0] for case in references}, kinds=kinds
     )
+    enabled = {
+      method
+      for method in (*READS, 'candles')
+      if support.declares(method, kinds.get(method))
+    }
     candle_path = base / 'market/suite.py'
     public_path = base / 'market/public.py'
     account_path = base / 'market/account.py'
@@ -169,12 +182,8 @@ def inventory(
         )
       for method in READS:
         exclusion = None
-        if reference.market_id.startswith('spot:') and method in {
-          'index',
-          'next_funding',
-          'funding_rates',
-          'perp_stats',
-        }:
+        if reference.market_id.startswith('spot:') and kinds.get(method) == 'perp':
+          # A perpetual read on a spot reference; the code predates kinds.
           exclusion = 'spot_only'
         elif method not in {'exchanges', 'markets'} and method not in enabled:
           exclusion = 'unsupported'
@@ -205,6 +214,7 @@ def inventory(
             method=method,
             exclusion=account_exclusion(
               impl,
+              kinds=kinds,
               venue=venue,
               exchange_id=exchange_id,
               method=method,
