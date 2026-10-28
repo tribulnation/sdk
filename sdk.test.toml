@@ -61,7 +61,7 @@ trading_account_id = "$GRVT_TRADING_ACCOUNT_ID"
 # `grvt` (select it with `--account grvt`).
 [accounts.grvt_trade]
 venue = "grvt"
-api_key = "$GRVY_API_KEY_ADMIN_TRADE"
+api_key = "$GRVT_API_KEY_ADMIN_TRADE"
 private_key = "$GRVT_ADMIN_TRADE_SECRET_PRIVATE_KEY"
 trading_account_id = "$GRVT_TRADING_ACCOUNT_ID"
 
