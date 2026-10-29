@@ -148,6 +148,11 @@ async with sdk.depth_stream('lighter:perp:1', settings={'lighter': {'depth_sourc
   still accepted; it ends with a `canceled-*` status. `settings={'lighter': {'replaces':
   id}}` moves the resting order `id` to the order's price and size with one modify
   transaction instead of a cancel and a placement; the response keeps `id`.
+- Creates, modifies and single-order cancels sent while another order transaction is in
+  flight, or together in one event-loop turn, wait for it and go as one `sendTxBatch` of up
+  to 15. A lone one goes alone, as before. A batch Lighter refuses raises `ApiError` for
+  each of its transactions, never `OrderRejected`: the refusal names no transaction
+  ([ADR 0057](https://github.com/tribulnation/sdk/blob/main/dev-docs/adr/0057-lighter-batched-order-transactions.md)).
 - Order ids are client order indexes. `query_order` finds inactive orders for 24 hours,
   and misses a just-cancelled order for a few seconds while the venue indexes it.
 - Spot `cancel_open_orders` cancels order by order: the venue's market-scoped cancel-all
