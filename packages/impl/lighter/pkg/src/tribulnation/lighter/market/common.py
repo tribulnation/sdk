@@ -24,6 +24,13 @@ class Settings(TypedDict, total=False):
   """Send a `LIMIT` order immediate-or-cancel instead of good-till-time: it fills what
   it can at the limit price or better and cancels the rest, with no expiry. `POST_ONLY`
   and `MARKET` orders raise `ValueError` when it is set."""
+  replaces: str
+  """Id of a resting order of the market to move to this order's price and size with one
+  `L2ModifyOrder`, instead of placing a new order: one transaction where cancelling and
+  placing again takes two. The order keeps its id, side, time-in-force and reduce-only
+  flag, so `MARKET` orders, `time_in_force` and `reduce_only` raise `ValueError` beside
+  it. Lighter doesn't document whether a partly filled order's new size counts from its
+  original size or from what's left: modify unfilled orders only."""
   depth_source: DepthSource
   """Which channel `depth_stream`/`depth` read. Defaults to `'order_book'`.
 

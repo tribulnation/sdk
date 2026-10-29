@@ -39,6 +39,10 @@ class Tx:
     """Raise the configured error."""
     raise self.error
 
+  async def modify_order(self, **request: Any) -> dict[str, Any]:
+    """Raise the configured error."""
+    raise self.error
+
 
 @dataclass
 class Client:
@@ -99,3 +103,13 @@ async def test_rate_limit_keeps_its_class():
   """Throttling stays `RateLimited`, the class callers retry on."""
   with pytest.raises(RateLimited):
     await orders.place_order(shared(coded(21506)), MARKET, ORDER)
+
+
+async def test_refused_modify_is_a_bad_request_not_a_rejection():
+  """A refused modify leaves the order resting, so it is no `OrderRejected`."""
+  with pytest.raises(BadRequest) as raised:
+    await orders.place_order(
+      shared(coded(21701)), MARKET, ORDER, settings={'lighter': {'replaces': '42'}}
+    )
+
+  assert not isinstance(raised.value, OrderRejected)

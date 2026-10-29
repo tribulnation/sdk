@@ -74,12 +74,13 @@ and the WebSocket stream URL, e.g. to run against a local test server. Unset, th
 ## Settings
 
 `depth` and `depth_stream` accept `settings={'lighter': {'depth_source': ...}}`, typed
-by the `Settings` TypedDict (`market/common.py`) alongside the order setting
-`reduce_only`:
+by the `Settings` TypedDict (`market/common.py`) alongside the order settings
+`reduce_only` and `replaces`:
 
 | Key | Type | Applies to | Meaning |
 | --- | --- | --- | --- |
 | `reduce_only` | `bool` | `place_order` | Place as reduce-only. |
+| `replaces` | `str` | `place_order` | Modify this resting order to the order's price and size with one `L2ModifyOrder` instead of placing a new one. It keeps its id, side, time-in-force and reduce-only flag, so `MARKET`, `time_in_force` and `reduce_only` raise `ValueError` beside it. Unfilled orders only: Lighter doesn't document how a partly filled order's new size counts. A refusal is `BadRequest`, since the order still rests. |
 | `depth_source` | `'order_book' \| 'bbo'` | `depth_stream`, `depth` | Which order-book channel to read; defaults to `'order_book'`. |
 
 ### Depth sources
@@ -144,7 +145,9 @@ async with sdk.depth_stream('lighter:perp:1', settings={'lighter': {'depth_sourc
   True}}` places reduce-only orders, and `settings={'lighter': {'time_in_force':
   'immediate-or-cancel'}}` sends a `LIMIT` order immediate-or-cancel with no expiry
   (set on `MARKET` or `POST_ONLY`, it raises `ValueError`). An IOC that fills nothing is
-  still accepted; it ends with a `canceled-*` status.
+  still accepted; it ends with a `canceled-*` status. `settings={'lighter': {'replaces':
+  id}}` moves the resting order `id` to the order's price and size with one modify
+  transaction instead of a cancel and a placement; the response keeps `id`.
 - Order ids are client order indexes. `query_order` finds inactive orders for 24 hours,
   and misses a just-cancelled order for a few seconds while the venue indexes it.
 - Spot `cancel_open_orders` cancels order by order: the venue's market-scoped cancel-all
