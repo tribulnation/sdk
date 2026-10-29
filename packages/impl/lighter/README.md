@@ -35,8 +35,9 @@ history; fees, orders and funding payments need a token or an API key.
    perpetual index, `perp_stats`, next funding and hourly funding-rate history.
 3. Account and trading: fees (the account's fee ticks, in parts per million), order
    queries, open orders, trade history and streams with fees, positions, collateral,
-   available notional, funding payments, `MARKET`, `LIMIT` and `POST_ONLY` orders, and
-   every cancellation method. Order ids are client order indexes.
+   available notional, funding payments, `MARKET`, `LIMIT` and `POST_ONLY` orders,
+   modifying a resting order in one transaction (`settings={'lighter': {'replaces':
+   id}}`), and every cancellation method. Order ids are client order indexes.
 4. Perpetual fees, margin and funding are in USDC. Spot fees are charged in the asset a
    fill delivers, so spot `rules().fee_asset` is `None` and each `Trade.fee` names it.
 5. Perpetual collateral covers cross and isolated positions. Spot collateral supports

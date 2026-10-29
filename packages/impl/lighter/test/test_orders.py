@@ -1,4 +1,4 @@
-"""Create-order requests built from SDK orders."""
+"""Create- and modify-order requests built from SDK orders."""
 
 from dataclasses import dataclass, field
 from typing_extensions import Any, cast
@@ -9,6 +9,7 @@ from typed_lighter.scaling import Scaler
 
 from tribulnation.lighter.core import ClientIndexes, Shared
 from tribulnation.lighter.market import orders
+from tribulnation.lighter.market.common import Settings
 from tribulnation.sdk.market import Order
 
 MARKET = 4095
@@ -27,11 +28,17 @@ class Tx:
   """Record create-order requests instead of signing them."""
 
   requests: list[dict[str, Any]] = field(default_factory=list[dict[str, Any]])
+  modifies: list[dict[str, Any]] = field(default_factory=list[dict[str, Any]])
 
   async def create_order(self, request: dict[str, Any]) -> dict[str, Any]:
     """Record the request."""
     self.requests.append(request)
     return {'code': 200, 'tx_hash': 'ab'}
+
+  async def modify_order(self, **request: Any) -> dict[str, Any]:
+    """Record the modify request."""
+    self.modifies.append(request)
+    return {'code': 200, 'tx_hash': 'cd'}
 
 
 @dataclass
@@ -125,3 +132,47 @@ async def test_ioc_setting_rejects_other_order_types(type: Any):
       settings={'lighter': {'time_in_force': 'immediate-or-cancel'}},
     )
   assert client.tx.requests == []
+
+
+async def test_replaces_setting_modifies_the_resting_order():
+  """`replaces` sends one modify of that order, which keeps its id, and no create."""
+  client = Client()
+  order: Order = {'qty': '0.01', 'price': '2500.5', 'type': 'POST_ONLY'}
+  response = await orders.place_order(
+    ioc_shared(client), MARKET, order, settings={'lighter': {'replaces': '42'}}
+  )
+  assert response.id == '42'
+  assert client.tx.requests == []
+  assert client.tx.modifies == [
+    {'market_index': MARKET, 'order_index': 42, 'base_amount': 100, 'price': 250050}
+  ]
+
+
+async def test_replaces_setting_rejects_market_orders():
+  """A market order has nothing resting to modify; nothing is sent."""
+  client = Client()
+  order: Order = {'qty': '0.01', 'price': '2500.5', 'type': 'MARKET'}
+  with pytest.raises(ValueError, match='resting LIMIT or POST_ONLY'):
+    await orders.place_order(
+      ioc_shared(client), MARKET, order, settings={'lighter': {'replaces': '42'}}
+    )
+  assert client.tx.requests == client.tx.modifies == []
+
+
+@pytest.mark.parametrize(
+  'lighter',
+  [
+    {'replaces': '42', 'time_in_force': 'immediate-or-cancel'},
+    {'replaces': '42', 'reduce_only': True},
+  ],
+  ids=['time-in-force', 'reduce-only'],
+)
+async def test_replaces_setting_rejects_flags_a_modify_keeps(lighter: Settings):
+  """A modify can't change the order's time-in-force or reduce-only flag: asking raises."""
+  client = Client()
+  order: Order = {'qty': '0.01', 'price': '2500.5', 'type': 'LIMIT'}
+  with pytest.raises(ValueError, match='drop time_in_force and reduce_only'):
+    await orders.place_order(
+      ioc_shared(client), MARKET, order, settings={'lighter': lighter}
+    )
+  assert client.tx.requests == client.tx.modifies == []

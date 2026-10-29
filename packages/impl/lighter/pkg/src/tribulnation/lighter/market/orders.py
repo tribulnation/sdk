@@ -1,4 +1,4 @@
-"""Order placement, cancellation and lookup, shared by perp and spot markets.
+"""Order placement, modification, cancellation and lookup, shared by perp and spot markets.
 
 The SDK order id is the `client_order_index` assigned at placement: a create-order
 transaction only returns its hash (the venue assigns `order_index` on execution), and
@@ -53,6 +53,9 @@ async def place_order(
   Off-grid prices and sizes raise before signing. Acceptance is not execution: a
   sequencer rejection, or an IOC cancelled unfilled, shows as a `canceled-*` status.
 
+  With `settings={'lighter': {'replaces': id}}` it modifies that resting order instead
+  (`modify_order`).
+
   Raises:
     ValueError: `time_in_force` is set on a `MARKET` or `POST_ONLY` order.
     OrderRejected: The API refused the transaction with a business code before the
@@ -64,6 +67,13 @@ async def place_order(
     raise ValueError(
       f'Lighter time_in_force applies to LIMIT orders only, not {order["type"]}'
     )
+  if (replaces := lighter.get('replaces')) is not None:
+    if time_in_force is not None or lighter.get('reduce_only'):
+      raise ValueError(
+        "A Lighter modify keeps the order's time-in-force and reduce-only flag: "
+        'drop time_in_force and reduce_only beside replaces'
+      )
+    return await modify_order(shared, market_id, replaces, order)
   shared.require_api_key()
   scaler = await shared.scaler(market_id)
   qty = Decimal(order['qty'])
@@ -121,6 +131,42 @@ async def place_order(
       ),
     )
   return OrderResponse(id=str(client_index), details=response)
+
+
+async def modify_order(
+  shared: Shared, market_id: int, id: str, order: Order
+) -> OrderResponse:
+  """Move a resting order to `order`'s price and size with one `L2ModifyOrder`.
+
+  One transaction, where cancelling and placing again takes two. The order keeps its id
+  (the response's), side, time-in-force and reduce-only flag: a post-only order stays
+  post-only, and neither `order`'s type (other than `MARKET`) nor the sign of its `qty`
+  is checked against it. Acceptance is not execution: if the order is gone by then, the
+  sequencer drops the modify, and the response says nothing of it.
+
+  Args:
+    shared: The owner of the client.
+    market_id: The venue's market id.
+    id: The resting order's SDK id (its client order index).
+    order: The order's new price and size.
+
+  Raises:
+    ValueError: `order` is a `MARKET` order, or `id` is not a client order index.
+    BadRequest: The API refused the transaction; the order rests unchanged.
+  """
+  if order['type'] == 'MARKET':
+    raise ValueError('Lighter can only modify a resting LIMIT or POST_ONLY order')
+  shared.require_api_key()
+  index = client_index(id)
+  scaler = await shared.scaler(market_id)
+  base_amount = scaler.size(abs(Decimal(order['qty'])))
+  price = scaler.price(Decimal(order['price']))
+  response = await shared.call(
+    lambda: shared.client.tx.modify_order(
+      market_index=market_id, order_index=index, base_amount=base_amount, price=price
+    )
+  )
+  return OrderResponse(id=id, details=response)
 
 
 def client_index(id: str) -> int:
