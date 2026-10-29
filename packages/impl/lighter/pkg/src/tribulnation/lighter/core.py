@@ -34,6 +34,8 @@ from tribulnation.sdk.core import (
 )
 from tribulnation.sdk.market import Book, Trade
 
+from .batching import TxBatcher
+
 T = TypeVar('T')
 
 FEE_TICK = Decimal('1e-6')
@@ -170,9 +172,19 @@ class Shared(SDK):
       wrap_exit=exception_wrapper(),
     )
 
+  @cached_property
+  def batcher(self) -> TxBatcher:
+    """Send the client's order transactions one request at a time, batching what waits."""
+    return TxBatcher(self.client)
+
   def resources(self) -> Iterable[AsyncContextManager[object]]:
-    """The client root owns every transport."""
+    """The client root owns every transport; the batcher stops sending first on exit."""
     yield self.client_resource
+    yield ManagedResource(
+      resource=self.batcher.closing(),
+      wrap_enter=exception_wrapper(),
+      wrap_exit=exception_wrapper(),
+    )
 
   @SDK.method
   @exception_wrapper()

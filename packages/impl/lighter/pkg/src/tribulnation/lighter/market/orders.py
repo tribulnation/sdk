@@ -7,12 +7,15 @@ the venue accepts the client index wherever it takes an `order_index`.
 
 from decimal import Decimal
 
-from typing_extensions import Any, Awaitable, Callable, Sequence
+from typing_extensions import Any, Sequence
 from typed_lighter.core.envelope import INVALID_NONCE, error_code
 from typed_lighter.core.exc import BadRequest as ClientBadRequest
+from typed_lighter.schemas import SendTxResponse
+from typed_lighter.tx.create_order import IocLimitOrder, LimitOrder, MarketOrder
 from tribulnation.sdk.core import BadRequest, OrderRejected
 from tribulnation.sdk.market import Order, OrderResponse, OrderState, Settings
 
+from ..batching import OrderTx
 from ..core import Shared
 from .common import parse_order
 
@@ -31,10 +34,15 @@ def refused(exc: BadRequest) -> bool:
   return code is not None and code != INVALID_NONCE
 
 
-async def submit(shared: Shared, send: Callable[[], Awaitable[Any]]) -> Any:
+async def send(shared: Shared, tx: OrderTx) -> SendTxResponse:
+  """Send an order transaction through the client's batcher (`batching.TxBatcher`)."""
+  return await shared.call(lambda: shared.batcher.submit(tx))
+
+
+async def submit(shared: Shared, tx: OrderTx) -> SendTxResponse:
   """Send a create-order transaction, raising `OrderRejected` for a certain refusal."""
   try:
-    return await shared.call(send)
+    return await send(shared, tx)
   except BadRequest as exc:
     if refused(exc):
       raise OrderRejected(*exc.args) from exc
@@ -54,12 +62,15 @@ async def place_order(
   sequencer rejection, or an IOC cancelled unfilled, shows as a `canceled-*` status.
 
   With `settings={'lighter': {'replaces': id}}` it modifies that resting order instead
-  (`modify_order`).
+  (`modify_order`). Order transactions sent while another is in flight go together in
+  one `sendTxBatch` (`batching.TxBatcher`).
 
   Raises:
     ValueError: `time_in_force` is set on a `MARKET` or `POST_ONLY` order.
     OrderRejected: The API refused the transaction with a business code before the
       sequencer saw it (other than `21104` invalid nonce).
+    ApiError: The transaction went in a batch that Lighter refused: whether it was
+      placed is unknown (`batching.batch_error`).
   """
   lighter = settings.get('lighter', {})
   time_in_force = lighter.get('time_in_force')
@@ -81,55 +92,51 @@ async def place_order(
   base_amount = scaler.size(abs(qty))
   price = scaler.price(Decimal(order['price']))
   reduce_only = lighter.get('reduce_only', False)
+  is_ask = qty < 0
+  request: LimitOrder | IocLimitOrder | MarketOrder
   if order['type'] == 'MARKET':
-    response = await submit(
-      shared,
-      lambda: shared.client.tx.create_order(
-        {
-          'order_type': 'market',
-          'market_index': market_id,
-          'client_order_index': client_index,
-          'base_amount': base_amount,
-          'is_ask': qty < 0,
-          'price': price,
-          'reduce_only': reduce_only,
-        }
-      ),
-    )
+    request = {
+      'order_type': 'market',
+      'market_index': market_id,
+      'client_order_index': client_index,
+      'base_amount': base_amount,
+      'is_ask': is_ask,
+      'price': price,
+      'reduce_only': reduce_only,
+    }
   elif time_in_force == 'immediate-or-cancel':
-    response = await submit(
-      shared,
-      lambda: shared.client.tx.create_order(
-        {
-          'order_type': 'limit',
-          'market_index': market_id,
-          'client_order_index': client_index,
-          'base_amount': base_amount,
-          'is_ask': qty < 0,
-          'price': price,
-          'time_in_force': 'immediate-or-cancel',
-          'reduce_only': reduce_only,
-        }
-      ),
-    )
+    request = {
+      'order_type': 'limit',
+      'market_index': market_id,
+      'client_order_index': client_index,
+      'base_amount': base_amount,
+      'is_ask': is_ask,
+      'price': price,
+      'time_in_force': 'immediate-or-cancel',
+      'reduce_only': reduce_only,
+    }
   else:
-    response = await submit(
-      shared,
-      lambda: shared.client.tx.create_order(
-        {
-          'order_type': 'limit',
-          'market_index': market_id,
-          'client_order_index': client_index,
-          'base_amount': base_amount,
-          'is_ask': qty < 0,
-          'price': price,
-          'time_in_force': 'post-only'
-          if order['type'] == 'POST_ONLY'
-          else 'good-till-time',
-          'reduce_only': reduce_only,
-        }
+    request = {
+      'order_type': 'limit',
+      'market_index': market_id,
+      'client_order_index': client_index,
+      'base_amount': base_amount,
+      'is_ask': is_ask,
+      'price': price,
+      'time_in_force': 'post-only'
+      if order['type'] == 'POST_ONLY'
+      else 'good-till-time',
+      'reduce_only': reduce_only,
+    }
+  response = await submit(
+    shared,
+    OrderTx(
+      send=lambda: shared.client.tx.create_order(request),
+      sign=lambda key, nonce: shared.client.signer.create_order(
+        request, api_key_index=key, nonce=nonce
       ),
-    )
+    ),
+  )
   return OrderResponse(id=str(client_index), details=response)
 
 
@@ -153,6 +160,7 @@ async def modify_order(
   Raises:
     ValueError: `order` is a `MARKET` order, or `id` is not a client order index.
     BadRequest: The API refused the transaction; the order rests unchanged.
+    ApiError: The modify went in a batch that Lighter refused.
   """
   if order['type'] == 'MARKET':
     raise ValueError('Lighter can only modify a resting LIMIT or POST_ONLY order')
@@ -161,10 +169,21 @@ async def modify_order(
   scaler = await shared.scaler(market_id)
   base_amount = scaler.size(abs(Decimal(order['qty'])))
   price = scaler.price(Decimal(order['price']))
-  response = await shared.call(
-    lambda: shared.client.tx.modify_order(
-      market_index=market_id, order_index=index, base_amount=base_amount, price=price
-    )
+  response = await send(
+    shared,
+    OrderTx(
+      send=lambda: shared.client.tx.modify_order(
+        market_index=market_id, order_index=index, base_amount=base_amount, price=price
+      ),
+      sign=lambda key, nonce: shared.client.signer.modify_order(
+        market_index=market_id,
+        order_index=index,
+        base_amount=base_amount,
+        price=price,
+        api_key_index=key,
+        nonce=nonce,
+      ),
+    ),
   )
   return OrderResponse(id=id, details=response)
 
@@ -177,12 +196,20 @@ def client_index(id: str) -> int:
     raise ValueError(f'Lighter order ids are client order indexes: {id!r}') from None
 
 
-async def cancel_order(shared: Shared, market_id: int, id: str) -> Any:
-  """Cancel by client order index."""
+async def cancel_order(shared: Shared, market_id: int, id: str) -> SendTxResponse:
+  """Cancel by client order index, alone or batched with other order transactions."""
   shared.require_api_key()
   index = client_index(id)
-  return await shared.call(
-    lambda: shared.client.tx.cancel_order(market_index=market_id, order_index=index)
+  return await send(
+    shared,
+    OrderTx(
+      send=lambda: shared.client.tx.cancel_order(
+        market_index=market_id, order_index=index
+      ),
+      sign=lambda key, nonce: shared.client.signer.cancel_order(
+        market_index=market_id, order_index=index, api_key_index=key, nonce=nonce
+      ),
+    ),
   )
 
 
