@@ -35,6 +35,8 @@ from .impl import (
   spot_market_balances,
   place_order,
   cancel_order,
+  replace_order,
+  replace_orders,
 )
 
 
@@ -124,3 +126,13 @@ class SpotMarket(SpotMarketMixin, _SpotMarket):
   @wrap_exceptions
   async def cancel_order(self, id: str, *, settings: Settings = {}):
     return await cancel_order(self, id, settings=settings)
+
+  async def replace_order(
+    self, id: str, order: Order, *, settings: Settings = {}
+  ) -> OrderResponse:
+    return await replace_order(self, id, order, settings=settings)
+
+  async def replace_orders(
+    self, orders: Sequence[tuple[str, Order]], *, settings: Settings = {}
+  ) -> Sequence[OrderResponse | Exception]:
+    return await replace_orders(self, orders, settings=settings)

@@ -11,7 +11,14 @@ from .mixin import (
 )
 
 from .depth import depth, depth_stream
-from .orders import open_orders, place_order, cancel_order, query_order
+from .orders import (
+  open_orders,
+  place_order,
+  cancel_order,
+  query_order,
+  replace_order,
+  replace_orders,
+)
 from .trades import trades_history, trades_stream
 
 from .spot_rules import rules as spot_rules

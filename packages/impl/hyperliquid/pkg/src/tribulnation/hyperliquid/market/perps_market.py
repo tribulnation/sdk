@@ -44,6 +44,8 @@ from .impl import (
   open_orders,
   place_order,
   cancel_order,
+  replace_order,
+  replace_orders,
   query_order,
   trades_history,
   trades_stream,
@@ -158,6 +160,16 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
 
   async def cancel_order(self, id: str, *, settings: Settings = {}):
     return await cancel_order(self, id, settings=settings)
+
+  async def replace_order(
+    self, id: str, order: Order, *, settings: Settings = {}
+  ) -> OrderResponse:
+    return await replace_order(self, id, order, settings=settings)
+
+  async def replace_orders(
+    self, orders: Sequence[tuple[str, Order]], *, settings: Settings = {}
+  ) -> Sequence[OrderResponse | Exception]:
+    return await replace_orders(self, orders, settings=settings)
 
   async def index(self, *, settings: Settings = {}) -> Decimal:
     return await index(self, settings=settings)
