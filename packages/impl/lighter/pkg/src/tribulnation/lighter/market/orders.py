@@ -197,7 +197,11 @@ def client_index(id: str) -> int:
 
 
 async def cancel_order(shared: Shared, market_id: int, id: str) -> SendTxResponse:
-  """Cancel by client order index, alone or batched with other order transactions."""
+  """Cancel by client order index, alone or batched with other order transactions.
+
+  An order already gone is dropped by the sequencer, unreported: this never raises
+  `OrderNotFound`.
+  """
   shared.require_api_key()
   index = client_index(id)
   return await send(
