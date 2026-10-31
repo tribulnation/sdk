@@ -27,6 +27,7 @@ from typed_margin_trade.schemas import (
 from tribulnation.sdk.core import (
   ApiError,
   MissingData,
+  OrderNotFound,
   OrderRejected,
   OverflowPolicy,
   PaginatedResponse,
@@ -380,24 +381,33 @@ class NativeMarket(Public, Market):
       raise result
     return result
 
-  async def cancel_orders(self, ids: Sequence[str], *, settings: Settings = {}) -> Any:
-    """Cancel in one action; each order reports its own status."""
+  async def cancel_orders(
+    self, ids: Sequence[str], *, settings: Settings = {}
+  ) -> Sequence[str | Exception]:
+    """Cancel in one action: per order, `'success'` or its error.
+
+    `order not found` is an `OrderNotFound`; any other status an `ApiError`.
+    """
     if not ids:
       return []
     cancels: list[CancelSpec] = [{'a': self.asset, 'o': int(id)} for id in ids]
     result = await self.shared.call(lambda: self.client.exchange.cancel(cancels))
-    return result['statuses']
+    statuses = result['statuses']
+    if len(statuses) != len(ids):
+      raise ApiError('margin.trade answered a status per cancel', result)
+    return [cancelled(id, status) for id, status in zip(ids, statuses)]
 
   async def cancel_order(self, id: str, *, settings: Settings = {}) -> Any:
     """Cancel one order.
 
     Raises:
-      ApiError: The venue refused it (e.g. `order not found`).
+      OrderNotFound: The order no longer rests (`order not found`).
+      ApiError: The venue refused it otherwise.
     """
-    statuses = await self.cancel_orders([id])
-    if not statuses or statuses[0] != 'success':
-      raise ApiError(f'margin.trade did not cancel order {id}', statuses)
-    return statuses[0]
+    (status,) = await self.cancel_orders([id])
+    if isinstance(status, Exception):
+      raise status
+    return status
 
   async def cancel_open_orders(self, *, settings: Settings = {}) -> Any:
     """Cancel every resting order of this coin in one action."""
@@ -610,3 +620,13 @@ def placed(status: RestingStatus | FilledStatus) -> OrderResponse:
     return OrderResponse(
       id=str(filled['oid']), details=status, filled_qty=filled['totalSz']
     )
+
+
+def cancelled(id: str, status: str) -> str | Exception:
+  """One cancel's outcome: `'success'`, or its status as an error."""
+  if status == 'success':
+    return status
+  elif NOT_FOUND in status:
+    return OrderNotFound(f'margin.trade order {id}: {status}')
+  else:
+    return ApiError(f'margin.trade did not cancel order {id}: {status}')

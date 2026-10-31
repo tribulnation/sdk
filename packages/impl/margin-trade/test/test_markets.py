@@ -31,7 +31,7 @@ from tribulnation.margin_trade.market.markets import (
   SpotMarket,
   next_settlement,
 )
-from tribulnation.sdk.core import ApiError, OrderRejected
+from tribulnation.sdk.core import ApiError, OrderNotFound, OrderRejected
 from tribulnation.sdk.market import (
   Balance,
   Fees,
@@ -294,13 +294,33 @@ async def test_error_status_is_rejected(monkeypatch: pytest.MonkeyPatch):
     await perp().place_order(order)
 
 
-async def test_failed_cancel_raises(monkeypatch: pytest.MonkeyPatch):
-  """A cancel answered with anything but `success` raises."""
+async def test_cancel_of_a_gone_order_is_not_found(monkeypatch: pytest.MonkeyPatch):
+  """`order not found` raises `OrderNotFound`."""
   monkeypatch.setattr(
     Cancel, 'cancel', AsyncMock(return_value={'statuses': ['order not found']})
   )
-  with pytest.raises(ApiError):
+  with pytest.raises(OrderNotFound):
     await perp().cancel_order('1')
+
+
+async def test_failed_cancel_raises(monkeypatch: pytest.MonkeyPatch):
+  """Any other status but `success` is an ambiguous `ApiError`."""
+  monkeypatch.setattr(
+    Cancel, 'cancel', AsyncMock(return_value={'statuses': ['rate limited']})
+  )
+  with pytest.raises(ApiError) as raised:
+    await perp().cancel_order('1')
+  assert not isinstance(raised.value, OrderNotFound)
+
+
+async def test_cancel_orders_reports_each_order(monkeypatch: pytest.MonkeyPatch):
+  """One action, one outcome per order: `success` or its error."""
+  statuses = ['success', 'order not found', 'busy']
+  monkeypatch.setattr(Cancel, 'cancel', AsyncMock(return_value={'statuses': statuses}))
+  results = await perp().cancel_orders(['1', '2', '3'])
+  assert results[0] == 'success'
+  assert isinstance(results[1], OrderNotFound)
+  assert type(results[2]) is ApiError
 
 
 async def test_replace_orders_is_one_batch_modify(monkeypatch: pytest.MonkeyPatch):

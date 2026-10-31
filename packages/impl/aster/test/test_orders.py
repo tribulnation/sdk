@@ -18,9 +18,10 @@ from typed_aster.spot.trade.place_order import (
 from typed_aster.futures.trade.order import Order as PerpQuery
 from typed_aster.spot.trade.order import Order as SpotQuery
 from typed_aster.futures.trade.cancel_batch_orders import CancelBatchOrders
+from typed_aster.futures.trade.cancel_order import CancelOrder
 from tribulnation.aster import AsterMarket
 from tribulnation.aster.market.markets import PerpMarket, SpotMarket
-from tribulnation.sdk import AuthError, BadRequest
+from tribulnation.sdk import AuthError, BadRequest, OrderNotFound
 from tribulnation.sdk.market import Order
 from typing_extensions import Literal
 
@@ -146,20 +147,50 @@ async def test_only_documented_not_found_is_none(
 
 
 async def test_batch_boundary_retains_partial_errors(monkeypatch: pytest.MonkeyPatch):
-  """The eleven-order path makes two requests and does not hide batch errors."""
+  """The eleven-order path makes two requests and reports each order's error."""
   results = [{'orderId': n} for n in range(10)] + [
     {'code': -2011, 'msg': 'Unknown order'}
   ]
   endpoint = AsyncMock(side_effect=[results[:10], results[10:]])
   monkeypatch.setattr(CancelBatchOrders, 'cancel_batch_orders', endpoint)
   target = market('perp')
-  assert await target.cancel_orders([str(n) for n in range(11)]) == results
+  *acks, gone = await target.cancel_orders([str(n) for n in range(11)])
+  assert acks == results[:10]
+  assert isinstance(gone, OrderNotFound)
   assert [c.args[0]['orderIdList'] for c in endpoint.await_args_list] == [
     list(range(10)),
     [10],
   ]
   assert await target.cancel_orders([]) == []
   assert endpoint.await_count == 2
+
+
+async def test_batch_cancel_errors_are_exceptions(monkeypatch: pytest.MonkeyPatch):
+  """A gone order is `OrderNotFound`; another per-order error a plain `BadRequest`."""
+  rows: list[dict[str, object]] = [
+    {'code': -2013, 'msg': 'Order does not exist'},
+    {'code': -1100, 'msg': 'x'},
+  ]
+  monkeypatch.setattr(
+    CancelBatchOrders, 'cancel_batch_orders', AsyncMock(return_value=rows)
+  )
+  gone, refused = await market('perp').cancel_orders(['1', '2'])
+  assert isinstance(gone, OrderNotFound)
+  assert type(refused) is BadRequest
+
+
+@pytest.mark.parametrize(
+  ('code', 'error'), [(-2011, OrderNotFound), (-1100, BadRequest)]
+)
+async def test_cancel_of_a_gone_order_is_not_found(
+  code: int, error: type[Exception], monkeypatch: pytest.MonkeyPatch
+):
+  """Only the gone-order codes raise `OrderNotFound`."""
+  endpoint = AsyncMock(side_effect=ClientBadRequest(400, {'code': code, 'msg': 'no'}))
+  monkeypatch.setattr(CancelOrder, 'cancel_order', endpoint)
+  with pytest.raises(error) as raised:
+    await market('perp').cancel_order('1')
+  assert type(raised.value) is error
 
 
 @pytest.mark.parametrize('scope', ['spot', 'perp'])

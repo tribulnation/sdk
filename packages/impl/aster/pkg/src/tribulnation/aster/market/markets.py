@@ -36,6 +36,7 @@ from tribulnation.sdk.core import (
   BadRequest,
   Error,
   MissingData,
+  OrderNotFound,
   OrderRejected,
   OverflowPolicy,
   PaginatedResponse,
@@ -83,6 +84,10 @@ CANDLE_PAGE = 500
 BATCH_SIZE = 10
 """Native maximum orders per batch cancellation."""
 ORDER_NOT_FOUND = -2013
+"""`Order does not exist`, answered by order queries and modifies."""
+GONE_CODES = frozenset({-2011, ORDER_NOT_FOUND})
+"""Codes for an order that no longer rests: `Unknown order sent` (cancels) and
+`Order does not exist`."""
 TRADES_WINDOW = timedelta(days=7)
 """Widest `userTrades` time window; a wider one is refused with `-4165`."""
 TRADES_PAGE = 1000
@@ -115,6 +120,18 @@ def error_code(exc: BadRequest) -> int | None:
     return error_body.validate_python(exc.args[1])['code']
   except (IndexError, ValidationError):
     return None
+
+
+def cancelled(
+  row: SpotBatchCancelledOrder | FuturesOrder | BatchError,
+) -> SpotBatchCancelledOrder | FuturesOrder | Exception:
+  """One batch cancel's acknowledgement, or its error as an exception."""
+  if 'code' not in row:
+    return row
+  elif row['code'] in GONE_CODES:
+    return OrderNotFound(row['msg'], row)
+  else:
+    return BadRequest(row['msg'], row)
 
 
 def rejected(exc: BadRequest) -> bool:
@@ -659,18 +676,33 @@ class NativeMarket(Public, Market):
     )
 
   async def cancel_order(self, id: str, *, settings: Settings = {}) -> Any:
-    """Cancel one order and return the native acknowledgement."""
-    reject_settings(settings)
-    return await self.shared.call(lambda: self.cancel(int(id)))
+    """Cancel one order and return the native acknowledgement.
 
-  async def cancel_orders(self, ids: Sequence[str], *, settings: Settings = {}) -> Any:
-    """Cancel in native batches of ten, keeping every per-order result or error."""
+    Raises:
+      OrderNotFound: Aster answered a code in `GONE_CODES`.
+    """
+    reject_settings(settings)
+    try:
+      return await self.shared.call(lambda: self.cancel(int(id)))
+    except BadRequest as exc:
+      if error_code(exc) in GONE_CODES:
+        raise OrderNotFound(*exc.args) from exc
+      raise
+
+  async def cancel_orders(
+    self, ids: Sequence[str], *, settings: Settings = {}
+  ) -> Sequence[SpotBatchCancelledOrder | FuturesOrder | Exception]:
+    """Cancel in native batches of ten: per order, its acknowledgement or its error.
+
+    An error with a code in `GONE_CODES` is an `OrderNotFound`; any other a `BadRequest`.
+    """
     reject_settings(settings)
     order_ids = [int(id) for id in ids]
-    results: list[SpotBatchCancelledOrder | FuturesOrder | BatchError] = []
+    results: list[SpotBatchCancelledOrder | FuturesOrder | Exception] = []
     for offset in range(0, len(order_ids), BATCH_SIZE):
       batch = order_ids[offset : offset + BATCH_SIZE]
-      results.extend(await self.shared.call(lambda: self.cancel_batch(batch)))
+      rows = await self.shared.call(lambda: self.cancel_batch(batch))
+      results.extend(cancelled(row) for row in rows)
     return results
 
   async def cancel_open_orders(self, *, settings: Settings = {}) -> Any:
