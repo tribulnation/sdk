@@ -15,6 +15,7 @@ from typing_extensions import (
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from datetime import timedelta
+from decimal import Decimal
 import asyncio
 import os
 
@@ -51,7 +52,14 @@ from typed_hyperliquid.streams.bbo import BboLevel0, BboLevel1
 from typed_hyperliquid.core import TimestampMillis
 from typed_core.validation import validator
 
-from tribulnation.hyperliquid.core import DepthSource, Settings, wrap_exceptions
+from tribulnation.hyperliquid.core import (
+  FUTURES_PRICE_MAX_DECIMALS,
+  SPOT_PRICE_MAX_DECIMALS,
+  DepthSource,
+  Settings,
+  tick_size,
+  wrap_exceptions,
+)
 
 T = TypeVar('T')
 
@@ -693,6 +701,11 @@ class SpotMarketMixin(SpotMixin):
   def asset_id(self) -> int:
     return 10000 + self.asset_idx
 
+  @property
+  def tick_size(self) -> Decimal:
+    """The finest price step of the pair."""
+    return tick_size(self.base_meta['szDecimals'], max_decimals=SPOT_PRICE_MAX_DECIMALS)
+
 
 @dataclass(kw_only=True, frozen=True)
 class PerpMixin(SharedMixin):
@@ -729,6 +742,13 @@ class PerpMarketMixin(PerpMixin):
   @property
   def asset_meta(self) -> PerpUniverseAsset:
     return self.meta['asset_meta']
+
+  @property
+  def tick_size(self) -> Decimal:
+    """The finest price step of the contract."""
+    return tick_size(
+      self.asset_meta['szDecimals'], max_decimals=FUTURES_PRICE_MAX_DECIMALS
+    )
 
   @property
   def asset_name(self) -> str:

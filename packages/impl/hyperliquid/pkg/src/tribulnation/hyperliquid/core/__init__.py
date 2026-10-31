@@ -1,6 +1,5 @@
 from .exc import wrap_exceptions
 from .constants import (
-  PRICE_MAX_DECIMALS,
   SPOT_PRICE_MAX_DECIMALS,
   FUTURES_PRICE_MAX_DECIMALS,
   MAX_SIGNIFICANT_FIGURES,
@@ -9,5 +8,6 @@ from .constants import (
   MAX_RELATIVE_PRICE,
   plain_decimal,
   round_price,
+  tick_size,
 )
 from .settings import Settings, DepthSource

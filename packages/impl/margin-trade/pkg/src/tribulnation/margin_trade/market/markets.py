@@ -48,6 +48,7 @@ from tribulnation.sdk.market import (
 )
 from ..core import (
   FUNDING_INTERVAL,
+  MAX_SIGNIFICANT_FIGURES,
   PERP_FEE_ASSET,
   PERP_PRICE_DECIMALS,
   SPOT_ASSET_OFFSET,
@@ -361,6 +362,7 @@ class SpotMarket(NativeMarket, SDKSpotMarket):
       quote=meta.quote['name'],
       fee_asset=None,
       tick_size=tick_size(meta.base['szDecimals'], max_decimals=SPOT_PRICE_DECIMALS),
+      sig_figs=MAX_SIGNIFICANT_FIGURES,
       step_size=Decimal(10) ** -meta.base['szDecimals'],
       fees=Fees(
         maker_buy=pair['makerFee'],
@@ -421,6 +423,7 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     return Rules(
       fee_asset=PERP_FEE_ASSET,
       tick_size=tick_size(item['szDecimals'], max_decimals=PERP_PRICE_DECIMALS),
+      sig_figs=MAX_SIGNIFICANT_FIGURES,
       step_size=Decimal(10) ** -item['szDecimals'],
       fees=Fees(
         maker_buy=item['makerFee'],

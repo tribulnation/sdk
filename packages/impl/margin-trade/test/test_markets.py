@@ -109,9 +109,9 @@ def test_round_price(price: Decimal, decimals: int, expected: Decimal):
 
 
 def test_tick_size():
-  """`10^-min(5, max - szDecimals)`, as observed on BTC and PRL/USDC."""
+  """`10^-(max - szDecimals)`, the finest step; significant figures coarsen it."""
   assert tick_size(5, max_decimals=6) == Decimal('0.1')
-  assert tick_size(2, max_decimals=8) == Decimal('0.00001')
+  assert tick_size(2, max_decimals=8) == Decimal('0.000001')
 
 
 def test_empty_book():

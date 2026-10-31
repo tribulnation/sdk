@@ -2,8 +2,6 @@
 
 from decimal import Decimal, ROUND_HALF_UP
 
-PRICE_MAX_DECIMALS = 5
-"""See https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/tick-and-lot-size"""
 SPOT_PRICE_MAX_DECIMALS = 8
 """See https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/tick-and-lot-size"""
 FUTURES_PRICE_MAX_DECIMALS = 6
@@ -58,3 +56,15 @@ def round_price(price: Decimal, max_sig_figs: int = MAX_SIGNIFICANT_FIGURES) -> 
   if rounded == rounded.to_integral_value():
     return rounded.to_integral_value()
   return rounded.normalize()
+
+
+def tick_size(sz_decimals: int, *, max_decimals: int) -> Decimal:
+  """The finest price step: `max_decimals - szDecimals` decimal places.
+
+  Coarser prices also need at most `MAX_SIGNIFICANT_FIGURES` significant figures,
+  integers excepted (`Rules.sig_figs`).
+
+  References:
+    - https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/tick-and-lot-size
+  """
+  return Decimal(10) ** -(max_decimals - sz_decimals)

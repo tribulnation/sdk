@@ -37,6 +37,7 @@ def spot_market(quote: dict[str, object]) -> SpotMarketMixin:
       base_meta=base,
       quote_meta=quote,
       meta={'base_meta': base, 'quote_meta': quote, 'asset_meta': {}},
+      tick_size=Decimal('0.001'),
     ),
   )
 
@@ -46,6 +47,7 @@ async def test_spot_rules_do_not_fetch_user_fees():
   target = spot_market({'index': 0, 'name': 'USDC'})
   rules = await spot_rules(target)
   assert rules.fee_asset is None
+  assert (rules.tick_size, rules.sig_figs) == (Decimal('0.001'), 5)
   assert rules.fees is not None
   assert rules.fees.maker_buy == Decimal('0.0004')
   assert rules.fees.taker_sell == Decimal('0.0007')
@@ -76,6 +78,7 @@ def perp_market(collateral: dict[str, object]) -> PerpMarketMixin:
       asset_name='xyz:XYZ',
       dex={'name': 'xyz', 'idx': 1},
       collateral_meta=collateral,
+      tick_size=Decimal('0.001'),
     ),
   )
 
@@ -85,6 +88,7 @@ async def test_perp_rules_do_not_fetch_user_fees():
   target = perp_market({'index': 0, 'name': 'USDC'})
   rules = await perp_rules(target)
   assert rules.fee_asset == '0'
+  assert (rules.tick_size, rules.sig_figs) == (Decimal('0.001'), 5)
   assert rules.fees is not None
   assert rules.fees.maker_buy == Decimal('0.00003')
   assert rules.fees.taker_buy == Decimal('0.00009')

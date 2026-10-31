@@ -89,8 +89,10 @@ def round_price(price: Decimal, *, max_decimals: int) -> Decimal:
 
 
 def tick_size(sz_decimals: int, *, max_decimals: int) -> Decimal:
-  """The finest price step: `10^-min(5, max_decimals - szDecimals)`."""
-  return Decimal(10) ** -min(MAX_SIGNIFICANT_FIGURES, max_decimals - sz_decimals)
+  """The finest price step, `10^-(max_decimals - szDecimals)`; coarser prices also need
+  at most `MAX_SIGNIFICANT_FIGURES` significant figures, integers excepted
+  (`Rules.sig_figs`)."""
+  return Decimal(10) ** -(max_decimals - sz_decimals)
 
 
 def parse_book(raw: L2Book, levels: int | None = None) -> Book:
