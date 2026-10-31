@@ -3,7 +3,7 @@
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from datetime import timedelta
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import Decimal
 from functools import cached_property
 import asyncio
 from typing_extensions import (
@@ -71,21 +71,6 @@ class Settings(TypedDict, total=False):
   """Time in force of a `LIMIT` order, as Hyperliquid's `limit_tif`. Defaults to
   `'Gtc'`; `'Ioc'` fills what it can at the limit price or better and cancels the rest,
   `'Alo'` only rests. `MARKET` and `POST_ONLY` orders ignore it."""
-
-
-def round_price(price: Decimal, *, max_decimals: int) -> Decimal:
-  """
-  Round a price to the venue's precision, in positional form.
-
-  Args:
-    price: The requested price.
-    max_decimals: `6 - szDecimals` on perpetuals, `8 - szDecimals` on spot.
-  """
-  if price == price.to_integral_value():
-    return Decimal(f'{price.to_integral_value():f}')
-  places = min(MAX_SIGNIFICANT_FIGURES - 1 - price.adjusted(), max_decimals)
-  rounded = price.quantize(Decimal(1).scaleb(-places), rounding=ROUND_HALF_UP)
-  return Decimal(f'{rounded.normalize():f}')
 
 
 def tick_size(sz_decimals: int, *, max_decimals: int) -> Decimal:

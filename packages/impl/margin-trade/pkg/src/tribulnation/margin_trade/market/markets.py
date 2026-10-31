@@ -23,6 +23,7 @@ from tribulnation.sdk.core import (
   OverflowPolicy,
   PaginatedResponse,
 )
+from tribulnation.sdk.market.types.rules import valid_price
 from tribulnation.sdk.market import (
   Book,
   Candle,
@@ -59,7 +60,6 @@ from ..core import (
   order_state,
   parse_book,
   parse_trade,
-  round_price,
   tick_size,
 )
 from .collateral import cross_collateral, spot_balance
@@ -253,6 +253,33 @@ class NativeMarket(Public, Market):
     """A `cloid`: `0x` and 128 random bits as 32 hex digits."""
     return f'0x{secrets.token_hex(16)}'
 
+  def order_spec(self, order: Order, settings: Settings) -> OrderSpec:
+    """The venue order for `order`.
+
+    Raises:
+      ValueError: The price is off the venue's grid (`Rules.valid_price`).
+    """
+    qty = Decimal(order['qty'])
+    price = Decimal(order['price'])
+    tick = tick_size(self.sz_decimals, max_decimals=self.price_decimals)
+    if not valid_price(price, tick_size=tick, sig_figs=MAX_SIGNIFICANT_FIGURES):
+      raise ValueError(
+        f'Price {price} is off the margin.trade grid (at most '
+        f'{MAX_SIGNIFICANT_FIGURES} significant figures and the tick size, or an '
+        'integer): round it with Rules'
+      )
+    spec: OrderSpec = {
+      'a': self.asset,
+      'b': qty > 0,
+      'p': Decimal(f'{price.normalize():f}'),
+      's': abs(qty),
+      'r': False,
+      't': {'limit': {'tif': time_in_force(order, settings.get('margin-trade', {}))}},
+    }
+    if (cloid := order.get('client_order_id')) is not None:
+      spec['c'] = cloid
+    return spec
+
   async def place_order(
     self, order: Order, *, settings: Settings = {}
   ) -> OrderResponse:
@@ -262,25 +289,14 @@ class NativeMarket(Public, Market):
     `settings={'margin-trade': {'limit_tif': 'Ioc'}}` sends a LIMIT order with that time
     in force instead (`'Gtc'`, `'Ioc'` or `'Alo'`); other order types ignore it.
 
-    The price is rounded to the venue's precision. `filled_qty` is reported for orders
-    that fill on placement; a resting order reports none.
+    `filled_qty` is reported for orders that fill on placement; a resting order reports
+    none.
 
     Raises:
+      ValueError: The price is off the venue's grid; round it with the market's `Rules`.
       OrderRejected: The order's own status is an error (nothing rests or filled).
     """
-    qty = Decimal(order['qty'])
-    spec: OrderSpec = {
-      'a': self.asset,
-      'b': qty > 0,
-      'p': round_price(
-        Decimal(order['price']), max_decimals=self.price_decimals - self.sz_decimals
-      ),
-      's': abs(qty),
-      'r': False,
-      't': {'limit': {'tif': time_in_force(order, settings.get('margin-trade', {}))}},
-    }
-    if (cloid := order.get('client_order_id')) is not None:
-      spec['c'] = cloid
+    spec = self.order_spec(order, settings)
     result = await self.shared.call(
       lambda: self.client.exchange.order([spec], grouping='na')
     )

@@ -72,7 +72,9 @@ async def test_place_order_cloid(client_order_id: str | None):
   market = cast(
     PerpMarketMixin,
     SimpleNamespace(
-      asset_id=3, client=SimpleNamespace(exchange=SimpleNamespace(order=order_endpoint))
+      asset_id=3,
+      tick_size=Decimal('0.0001'),
+      client=SimpleNamespace(exchange=SimpleNamespace(order=order_endpoint)),
     ),
   )
   order: Order = {'qty': Decimal('-2'), 'price': Decimal('10'), 'type': 'POST_ONLY'}

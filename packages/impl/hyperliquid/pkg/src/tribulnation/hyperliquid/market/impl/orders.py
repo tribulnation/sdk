@@ -2,6 +2,7 @@ from typing_extensions import Any, Sequence
 from decimal import Decimal
 
 from tribulnation.sdk.core import ApiError, OrderRejected
+from tribulnation.sdk.market.types.rules import valid_price
 from tribulnation.sdk.market import (
   Order,
   OrderResponse,
@@ -15,8 +16,8 @@ from typed_hyperliquid.info.order_status import OrderFound, OrderNotFound
 
 from tribulnation.hyperliquid.core import (
   Settings,
+  MAX_SIGNIFICANT_FIGURES,
   plain_decimal,
-  round_price,
   wrap_exceptions,
 )
 from .mixin import SpotMarketMixin, PerpMarketMixin
@@ -42,11 +43,16 @@ def _export_order(
     raise ValueError(f'Unknown order type: {o["type"]}')
 
   qty = Decimal(o['qty'])
-  price = round_price(Decimal(o['price']))
+  price = Decimal(o['price'])
+  if not valid_price(price, tick_size=self.tick_size, sig_figs=MAX_SIGNIFICANT_FIGURES):
+    raise ValueError(
+      f'Price {price} is off the Hyperliquid grid (at most {MAX_SIGNIFICANT_FIGURES} '
+      'significant figures and the tick size, or an integer): round it with Rules'
+    )
   wire: HyperliquidOrder = {
     'a': self.asset_id,
     'b': qty >= 0,
-    'p': price,
+    'p': plain_decimal(price),
     's': plain_decimal(abs(qty)),
     'r': settings.get('reduce_only', False),
     't': {'limit': {'tif': tif}},
@@ -98,6 +104,8 @@ async def place_order(
   `filled_qty` is `None`.
 
   Raises:
+    ValueError: The price is off the venue's grid (`Rules.valid_price`); round it with
+      the market's `Rules`.
     OrderRejected: The action was refused as a whole (`status == 'err'`), or the
       order's own status carries an `error` (e.g. an IOC that could not match).
     ApiError: The response carried no order status, so the outcome is unknown.

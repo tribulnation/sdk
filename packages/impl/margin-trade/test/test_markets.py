@@ -22,7 +22,6 @@ from tribulnation.margin_trade.core import (
   Pair,
   order_state,
   parse_book,
-  round_price,
   tick_size,
 )
 from tribulnation.margin_trade.market.collateral import cross_collateral
@@ -90,22 +89,34 @@ def spot() -> SpotMarket:
 
 
 @pytest.mark.parametrize(
-  ('price', 'decimals', 'expected'),
+  'price',
+  [Decimal('84512.37'), Decimal('76041.5'), Decimal('1.23456'), Decimal('0.1234567')],
+)
+def test_off_grid_price_raises(price: Decimal):
+  """More than five significant figures, integers aside, or decimals than the tick:
+  refused before signing rather than rounded."""
+  order: Order = {'type': 'LIMIT', 'qty': Decimal('1'), 'price': price}
+  with pytest.raises(ValueError, match='off the margin.trade grid'):
+    perp().order_spec(order, {})
+
+
+@pytest.mark.parametrize(
+  ('market', 'price', 'wire'),
   [
-    (Decimal('84512.37'), 1, Decimal('84512')),
-    (Decimal('76041.5'), 1, Decimal('76042')),
-    (Decimal('1.23456'), 6, Decimal('1.2346')),
-    (Decimal('2.3714'), 4, Decimal('2.3714')),
-    (Decimal('0.000123456'), 6, Decimal('0.000123')),
-    (Decimal('40'), 1, Decimal('40')),
-    (Decimal('4E+1'), 1, Decimal('40')),
+    (perp, Decimal('84512'), Decimal('84512')),
+    (perp, Decimal('123456'), Decimal('123456')),
+    (perp, Decimal('4E+1'), Decimal('40')),
+    (spot, Decimal('2.3714'), Decimal('2.3714')),
+    (spot, Decimal('0.000123'), Decimal('0.000123')),
   ],
 )
-def test_round_price(price: Decimal, decimals: int, expected: Decimal):
-  """Five significant figures, the decimal cap, integers kept, positional form."""
-  rounded = round_price(price, max_decimals=decimals)
-  assert rounded == expected
-  assert 'E' not in str(rounded)
+def test_on_grid_price_is_sent_positionally(
+  market: Callable[[], PerpMarket | SpotMarket], price: Decimal, wire: Decimal
+):
+  """Valid prices, integers of any size included, go out unchanged and positional."""
+  order: Order = {'type': 'LIMIT', 'qty': Decimal('1'), 'price': price}
+  sent = market().order_spec(order, {})['p']
+  assert sent == wire and 'E' not in str(sent)
 
 
 def test_tick_size():
@@ -191,15 +202,14 @@ async def test_place_order_spec(
   price: Decimal,
   monkeypatch: pytest.MonkeyPatch,
 ):
-  """Asset index, side, rounded price, size, tif and `cloid` go on the wire."""
+  """Asset index, side, price, size, tif and `cloid` go on the wire."""
   endpoint = AsyncMock(return_value={'statuses': [{'resting': {'oid': 5}}]})
   monkeypatch.setattr(OrderEndpoint, 'order', endpoint)
   m = market()
-  requested = Decimal('76041.5') if asset == 0 else Decimal('1.23456')
   order: Order = {
     'type': 'POST_ONLY',
     'qty': Decimal('-0.001'),
-    'price': requested,
+    'price': price,
     'client_order_id': '0x' + '1f' * 16,
   }
   response = await m.place_order(order)

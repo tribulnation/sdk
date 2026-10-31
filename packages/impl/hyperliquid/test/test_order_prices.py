@@ -1,4 +1,4 @@
-"""Price rounding and serialization regressions for Hyperliquid orders."""
+"""Price grid checks and serialization regressions for Hyperliquid orders."""
 
 from decimal import Decimal
 from types import SimpleNamespace
@@ -8,40 +8,34 @@ from typed_hyperliquid.core.wire import dump_request
 from typed_hyperliquid.exchange.order import Request
 from typing_extensions import cast
 
-from tribulnation.hyperliquid.core import round_price
 from tribulnation.hyperliquid.market.impl.mixin import PerpMarketMixin
 from tribulnation.hyperliquid.market.impl.orders import _export_order
 
 
+def market() -> PerpMarketMixin:
+  """A perpetual with `szDecimals` 0: prices take up to 6 decimals."""
+  return cast(
+    PerpMarketMixin, SimpleNamespace(asset_id=0, tick_size=Decimal('0.000001'))
+  )
+
+
 @pytest.mark.parametrize(
-  ('price', 'expected'),
-  [
-    ('0.1302', '0.1302'),
-    ('0.130200', '0.1302'),
-    ('0.130205', '0.13021'),
-    ('0.130199', '0.1302'),
-    ('0.0001234', '0.0001234'),
-    ('1234.56', '1234.6'),
-    ('1', '1'),
-    ('10.00', '10'),
-    ('100', '100'),
-    ('9999.99', '10000'),
-    ('123456', '123456'),
-    ('1.2E+5', '120000'),
-    ('0.0000', '0'),
-  ],
+  'price', ['0.130205', '1234.56', '9999.99', '0.0000001', '10000.5']
 )
-def test_round_price_representation(price: str, expected: str):
-  """Keep venue precision and remove fractional padding, including after a carry."""
-  assert str(round_price(Decimal(price))) == expected
+def test_off_grid_price_raises(price: str):
+  """More than 5 significant figures (integers aside) or decimals than the tick: the
+  order is refused before signing rather than rounded."""
+  with pytest.raises(ValueError, match='off the Hyperliquid grid'):
+    _export_order(
+      market(), {'type': 'LIMIT', 'price': Decimal(price), 'qty': Decimal('1')}, {}
+    )
 
 
-@pytest.mark.parametrize('price', ['0.1302', '10', '10000'])
+@pytest.mark.parametrize('price', ['0.1302', '10', '10000', '123456', '0.000123'])
 def test_exported_order_price_serialization(price: str):
   """The typed client's pre-signing payload must contain an unpadded price."""
-  market = cast(PerpMarketMixin, SimpleNamespace(asset_id=0))
   order = _export_order(
-    market,
+    market(),
     {'type': 'LIMIT', 'price': Decimal(price), 'qty': Decimal('100')},
     {},
   )
@@ -63,9 +57,8 @@ def test_exported_order_price_serialization(price: str):
 )
 def test_exported_order_size_serialization(qty: str, expected: str):
   """Sizes rounded by the SDK rules arrive normalized (`40` is `4E+1`); the venue only parses positional decimals."""
-  market = cast(PerpMarketMixin, SimpleNamespace(asset_id=0))
   order = _export_order(
-    market,
+    market(),
     {'type': 'LIMIT', 'price': Decimal('4.9557'), 'qty': Decimal(qty)},
     {},
   )
@@ -76,9 +69,8 @@ def test_exported_order_size_serialization(qty: str, expected: str):
 
 def test_exported_order_price_serialization_from_normalized_integer():
   """A tick-rounded price above 10000 arrives as `1.2E+5` and must still be sent positionally."""
-  market = cast(PerpMarketMixin, SimpleNamespace(asset_id=0))
   order = _export_order(
-    market,
+    market(),
     {'type': 'LIMIT', 'price': Decimal('1.2E+5'), 'qty': Decimal('0.01')},
     {},
   )

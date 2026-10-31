@@ -25,7 +25,9 @@ def market(status: dict[str, Any]) -> PerpMarketMixin:
   return cast(
     PerpMarketMixin,
     SimpleNamespace(
-      asset_id=3, client=SimpleNamespace(exchange=SimpleNamespace(order=order))
+      asset_id=3,
+      tick_size=Decimal('0.0001'),
+      client=SimpleNamespace(exchange=SimpleNamespace(order=order)),
     ),
   )
 

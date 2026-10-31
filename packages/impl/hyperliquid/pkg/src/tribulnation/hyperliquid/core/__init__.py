@@ -7,7 +7,6 @@ from .constants import (
   MIN_RELATIVE_PRICE,
   MAX_RELATIVE_PRICE,
   plain_decimal,
-  round_price,
   tick_size,
 )
 from .settings import Settings, DepthSource
