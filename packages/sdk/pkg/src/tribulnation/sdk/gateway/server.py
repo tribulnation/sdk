@@ -15,6 +15,7 @@ from tribulnation.sdk.gateway.diagnostics import memory_snapshot
 from tribulnation.sdk import TradingMarkets, Market, PerpMarket
 from tribulnation.sdk.market import (
   Book,
+  OrderResponse,
   Trade,
   SpotMarket,
   MarginMarket,
@@ -380,6 +381,20 @@ class Gateway:
             msg.order_id, settings=msg.settings
           ),
         )
+      case codec.ReplaceOrderReq():
+        return codec.ReplaceOrderResp(
+          id=msg.id,
+          response=await (await self._market(msg.market_id)).replace_order(
+            msg.order_id, msg.order, settings=msg.settings
+          ),
+        )
+      case codec.ReplaceOrdersReq():
+        results = await (await self._market(msg.market_id)).replace_orders(
+          [(e.order_id, e.order) for e in msg.orders], settings=msg.settings
+        )
+        return codec.ReplaceOrdersResp(
+          id=msg.id, results=[_replace_result(r) for r in results]
+        )
       case codec.CancelOpenOrdersReq():
         return codec.CancelOpenOrdersResp(
           id=msg.id,
@@ -467,6 +482,16 @@ def _error_message(exc: Exception) -> str:
   if exc.args:
     return ', '.join(str(arg) for arg in exc.args if arg is not None)
   return str(exc)
+
+
+def _replace_result(result: OrderResponse | Exception) -> codec.ReplaceResult:
+  """Carry one `replace_orders` entry's response or error over the wire."""
+  if isinstance(result, Exception):
+    return codec.ReplaceResult(
+      error=_error_message(result), exc=codec.encode_exception(result)
+    )
+  else:
+    return codec.ReplaceResult(response=result)
 
 
 def gateway_app(sdk: TradingMarkets) -> web.Application:

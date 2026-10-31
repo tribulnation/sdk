@@ -31,6 +31,7 @@ from tribulnation.sdk import (
   AuthError,
   RateLimited,
   OrderRejected,
+  OrderNotFound,
   LogicError,
 )
 from tribulnation.sdk.market import (
@@ -151,6 +152,7 @@ EXCEPTIONS: dict[str, type[Exception]] = {
   'AuthError': AuthError,
   'RateLimited': RateLimited,
   'OrderRejected': OrderRejected,
+  'OrderNotFound': OrderNotFound,
   'LogicError': LogicError,
 }
 
@@ -233,6 +235,30 @@ class CancelOrderReq(Msg, kw_only=True, tag='cancel_order'):
 
   market_id: str
   order_id: str
+  settings: WireSettings = msgspec.field(default_factory=no_settings)
+
+
+class ReplaceOrderReq(Msg, kw_only=True, tag='replace_order'):
+  """Replace one resting order (`Market.replace_order`)."""
+
+  market_id: str
+  order_id: str
+  order: WireOrder
+  settings: WireSettings = msgspec.field(default_factory=no_settings)
+
+
+class ReplaceEntry(msgspec.Struct, kw_only=True, gc=False):
+  """One `(id, order)` pair of a `replace_orders` request."""
+
+  order_id: str
+  order: WireOrder
+
+
+class ReplaceOrdersReq(Msg, kw_only=True, tag='replace_orders'):
+  """Replace several resting orders in one venue call (`Market.replace_orders`)."""
+
+  market_id: str
+  orders: Sequence[ReplaceEntry]
   settings: WireSettings = msgspec.field(default_factory=no_settings)
 
 
@@ -486,6 +512,8 @@ CallReq = (
   | AvailableNotionalReq
   | PlaceOrderReq
   | CancelOrderReq
+  | ReplaceOrderReq
+  | ReplaceOrdersReq
   | CancelOpenOrdersReq
   | IndexReq
   | NextFundingReq
@@ -561,6 +589,28 @@ class CancelOrderResp(Msg, kw_only=True, tag='cancel_order'):
   """Venue-specific cancellation result."""
 
   result: Any
+
+
+class ReplaceOrderResp(Msg, kw_only=True, tag='replace_order'):
+  """The order now resting."""
+
+  response: OrderResponse
+
+
+class ReplaceResult(msgspec.Struct, kw_only=True, gc=False):
+  """One entry's outcome: the order now resting, or the error it raised."""
+
+  response: OrderResponse | None = None
+  error: str | None = None
+  """The entry's error message; set exactly when `response` is null."""
+  exc: str | None = None
+  """The SDK exception class of `error`, when known."""
+
+
+class ReplaceOrdersResp(Msg, kw_only=True, tag='replace_orders'):
+  """One outcome per requested entry, in request order."""
+
+  results: Sequence[ReplaceResult]
 
 
 class CancelOpenOrdersResp(Msg, kw_only=True, tag='cancel_open_orders'):
@@ -740,6 +790,8 @@ ServerMsg = (
   | AvailableNotionalResp
   | PlaceOrderResp
   | CancelOrderResp
+  | ReplaceOrderResp
+  | ReplaceOrdersResp
   | CancelOpenOrdersResp
   | IndexResp
   | NextFundingResp

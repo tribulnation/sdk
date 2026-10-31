@@ -18,7 +18,7 @@ from tribulnation.sdk.gateway import codec
 from tribulnation.sdk.impl.accounts import VenueId
 from tribulnation.sdk.gateway.proxy import ProxySDK
 from tribulnation.sdk.gateway.server import Gateway
-from tribulnation.sdk import ApiError, NetworkError, OrderRejected
+from tribulnation.sdk import ApiError, NetworkError, OrderNotFound, OrderRejected
 from tribulnation.sdk.core import PaginatedResponse, OverflowPolicy
 from tribulnation.sdk.market import (
   Book,
@@ -56,6 +56,8 @@ ALIAS_MARKET_ID = f'{ALIAS}:perp:BTC-USD'
 class MockState:
   depth_error: Exception | None = None
   place_order_error: Exception | None = None
+  cancel_errors: dict[str, Exception] = field(default_factory=dict[str, Exception])
+  """What `cancel_order` raises, per order ID."""
   depth_stream_items: list[Book | Exception] = field(default_factory=list)
   depth_stream_wait: bool = False
   depth_stream_started: asyncio.Event = field(default_factory=asyncio.Event)
@@ -231,6 +233,8 @@ class MockMarket(PerpMarket):
     return OrderResponse(id='order-1', filled_qty=Decimal('0.5'))
 
   async def cancel_order(self, id: str, *, settings: Settings = {}) -> Any:
+    if (error := self.state.cancel_errors.get(id)) is not None:
+      raise error
     return {'cancelled': id}
 
   async def index(self, *, settings: Settings = {}) -> Decimal:
@@ -775,6 +779,43 @@ def test_place_order_response_roundtrips(filled_qty: Decimal | None) -> None:
     id='p', response=OrderResponse(id='o', filled_qty=filled_qty)
   )
   assert codec.decode_server(codec.encode_server(msg)) == msg
+
+
+@pytest.mark.asyncio
+async def test_replace_order_through_gateway(sdk: ProxySDK) -> None:
+  """A single replace crosses the gateway and returns the order now resting."""
+  market = await sdk.perp_market(MARKET_ID)
+  order: Order = {'type': 'LIMIT', 'qty': Decimal('1'), 'price': Decimal('100')}
+
+  response = await market.replace_order('old', order)
+
+  assert response.id == 'order-1'
+
+
+@pytest.mark.asyncio
+async def test_replace_orders_keeps_per_entry_errors_through_gateway(
+  sdk: ProxySDK, mock_state: MockState
+) -> None:
+  """Each entry comes back as its response or its error, as the SDK exception class."""
+  mock_state.cancel_errors = {
+    'gone': OrderNotFound('gone'),
+    'unknown': ApiError('timeout'),
+  }
+  market = await sdk.perp_market(MARKET_ID)
+  order: Order = {'type': 'LIMIT', 'qty': Decimal('1'), 'price': Decimal('100')}
+
+  results = await market.replace_orders(
+    [('live', order), ('gone', order), ('unknown', order)]
+  )
+
+  assert [type(r) for r in results] == [OrderResponse, OrderResponse, ApiError]
+  assert str(results[2]) == 'ApiError(timeout)'
+
+
+def test_order_not_found_codec_roundtrip() -> None:
+  exc_cls = codec.decode_exception(codec.encode_exception(OrderNotFound('gone')))
+
+  assert exc_cls is OrderNotFound
 
 
 def test_error_messages_share_exception_field_shape() -> None:

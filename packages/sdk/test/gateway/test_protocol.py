@@ -128,6 +128,21 @@ CLIENT_MESSAGES: list[codec.ClientMsg] = [
     settings=SETTINGS,
   ),
   codec.CancelOrderReq(**MARKET, order_id='o1', settings=SETTINGS),
+  codec.ReplaceOrderReq(
+    **MARKET,
+    order_id='o1',
+    order={'type': 'LIMIT', 'qty': D('-0.015'), 'price': D('64120.5')},
+    settings=SETTINGS,
+  ),
+  codec.ReplaceOrdersReq(
+    **MARKET,
+    orders=[
+      codec.ReplaceEntry(
+        order_id='o1',
+        order={'type': 'POST_ONLY', 'qty': D('0.015'), 'price': D('64000')},
+      )
+    ],
+  ),
   codec.CancelOpenOrdersReq(**MARKET),
   codec.IndexReq(**MARKET),
   codec.NextFundingReq(**MARKET, ttl=timedelta(seconds=5)),
@@ -203,6 +218,14 @@ SERVER_MESSAGES: list[codec.ServerMsg] = [
     response=OrderResponse(id='o1', details={'tx': {'height': 1}}, filled_qty=D('0.5')),
   ),
   codec.CancelOrderResp(id='r', result={'tx_response': {'code': 0}}),
+  codec.ReplaceOrderResp(id='r', response=OrderResponse(id='o2')),
+  codec.ReplaceOrdersResp(
+    id='r',
+    results=[
+      codec.ReplaceResult(response=OrderResponse(id='o2', filled_qty=D('0.1'))),
+      codec.ReplaceResult(error='gone', exc='OrderNotFound'),
+    ],
+  ),
   codec.CancelOpenOrdersResp(id='r', result=None),
   codec.IndexResp(id='r', value=D('64000.1')),
   codec.NextFundingResp(

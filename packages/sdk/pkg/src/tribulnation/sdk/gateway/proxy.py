@@ -470,6 +470,31 @@ class ProxyMarket(Market):
       *[self.cancel_order(id, settings=settings) for id in ids]
     )
 
+  async def replace_order(
+    self, id: str, order: Order, *, settings: Settings = {}
+  ) -> OrderResponse:
+    """Forward replace order through the gateway."""
+    resp: codec.ReplaceOrderResp = await self._conn.call(
+      codec.ReplaceOrderReq(
+        id=self._mid(), market_id=self.id, order_id=id, order=order, settings=settings
+      )
+    )
+    return resp.response
+
+  async def replace_orders(
+    self, orders: Sequence[tuple[str, Order]], *, settings: Settings = {}
+  ) -> Sequence[OrderResponse | Exception]:
+    """Forward replace orders through the gateway as one call, keeping the venue's bulk modify."""
+    resp: codec.ReplaceOrdersResp = await self._conn.call(
+      codec.ReplaceOrdersReq(
+        id=self._mid(),
+        market_id=self.id,
+        orders=[codec.ReplaceEntry(order_id=id, order=o) for id, o in orders],
+        settings=settings,
+      )
+    )
+    return [replace_outcome(r) for r in resp.results]
+
   async def cancel_open_orders(self, *, settings: Settings = {}) -> Any:
     """Forward cancel open orders through the gateway."""
     resp: codec.CancelOpenOrdersResp = await self._conn.call(
@@ -942,3 +967,11 @@ class ProxySDK(TradingMarkets):
       )
     )
     return await exchange.market(qualified.market_id)
+
+
+def replace_outcome(result: codec.ReplaceResult) -> OrderResponse | Exception:
+  """Rebuild one `replace_orders` entry: its response, or its error as the SDK exception class."""
+  if result.response is not None:
+    return result.response
+  else:
+    return codec.decode_exception(result.exc or '')(result.error)

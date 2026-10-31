@@ -119,6 +119,8 @@ requests address a market as `<account_id>:<exchange_id>:<market_id>`, e.g.
 | `collateral_id` | `market_id` | Fetch the collateral ID funding new orders on a margin market. |
 | `place_order` | `market_id`, `order`, `settings`? | Place one order. `order` is `{"type", "qty", "price", "client_order_id"?}`, `type` one of `MARKET`, `LIMIT`, `POST_ONLY`, and a negative `qty` sells. |
 | `cancel_order` | `market_id`, `order_id`, `settings`? | Cancel one order. |
+| `replace_order` | `market_id`, `order_id`, `order`, `settings`? | Replace one resting order with `order`, shaped as for `place_order`. |
+| `replace_orders` | `market_id`, `orders`, `settings`? | Replace several resting orders in one venue call; `orders` is a list of `{"order_id", "order"}`. |
 | `cancel_open_orders` | `market_id`, `settings`? | Cancel every open order on the market. |
 | `index` | `market_id`, `settings`? | Fetch the index price. |
 | `next_funding` | `market_id`, `ttl`? | Fetch the upcoming funding rate. |
@@ -164,6 +166,8 @@ flight is joined. Null or absent asks the venue afresh (ADR 0054).
 | `collateral_id` | `value`: collateral ID string |
 | `perp_position` | `position`: `PerpPosition` |
 | `place_order` | `response`: `OrderResponse` |
+| `replace_order` | `response`: `OrderResponse` |
+| `replace_orders` | `results`: list of `{"response"?, "error"?, "exc"?}`, one per entry in request order: the order now resting, or the entry's error and exception class |
 | `cancel_order`, `cancel_open_orders` | `result`: venue-specific JSON |
 | `next_funding` | `rate`: `NextFunding` |
 | `funding_rates` | `rates`: list of `FundingRate` |
@@ -177,7 +181,7 @@ flight is joined. Null or absent asks the venue afresh (ADR 0054).
 
 `exc` names the SDK exception the gateway caught: `Error`, `NetworkError`,
 `ValidationError`, `ApiError`, `BadRequest`, `AuthError`, `RateLimited`,
-`OrderRejected`, `LogicError`, `ValueError` or `NotImplementedError`. Clients map any
+`OrderRejected`, `OrderNotFound`, `LogicError`, `ValueError` or `NotImplementedError`. Clients map any
 other name to a generic error. An `end` without `error` is a clean end of the stream.
 
 ## Examples

@@ -71,6 +71,12 @@
           "$ref": "#/$defs/CancelOrderReq"
         },
         {
+          "$ref": "#/$defs/ReplaceOrderReq"
+        },
+        {
+          "$ref": "#/$defs/ReplaceOrdersReq"
+        },
+        {
           "$ref": "#/$defs/CancelOpenOrdersReq"
         },
         {
@@ -141,6 +147,8 @@
           "available_notional": "#/$defs/AvailableNotionalReq",
           "place_order": "#/$defs/PlaceOrderReq",
           "cancel_order": "#/$defs/CancelOrderReq",
+          "replace_order": "#/$defs/ReplaceOrderReq",
+          "replace_orders": "#/$defs/ReplaceOrdersReq",
           "cancel_open_orders": "#/$defs/CancelOpenOrdersReq",
           "index": "#/$defs/IndexReq",
           "next_funding": "#/$defs/NextFundingReq",
@@ -206,6 +214,12 @@
         },
         {
           "$ref": "#/$defs/CancelOrderResp"
+        },
+        {
+          "$ref": "#/$defs/ReplaceOrderResp"
+        },
+        {
+          "$ref": "#/$defs/ReplaceOrdersResp"
         },
         {
           "$ref": "#/$defs/CancelOpenOrdersResp"
@@ -283,6 +297,8 @@
           "available_notional": "#/$defs/AvailableNotionalResp",
           "place_order": "#/$defs/PlaceOrderResp",
           "cancel_order": "#/$defs/CancelOrderResp",
+          "replace_order": "#/$defs/ReplaceOrderResp",
+          "replace_orders": "#/$defs/ReplaceOrdersResp",
           "cancel_open_orders": "#/$defs/CancelOpenOrdersResp",
           "index": "#/$defs/IndexResp",
           "next_funding": "#/$defs/NextFundingResp",
@@ -1018,6 +1034,98 @@
         "id",
         "market_id",
         "order_id"
+      ]
+    },
+    "ReplaceOrderReq": {
+      "title": "ReplaceOrderReq",
+      "description": "Replace one resting order (`Market.replace_order`).",
+      "type": "object",
+      "properties": {
+        "tag": {
+          "enum": [
+            "replace_order"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "market_id": {
+          "type": "string"
+        },
+        "order_id": {
+          "type": "string"
+        },
+        "order": {
+          "$ref": "#/$defs/WireOrderShape"
+        },
+        "settings": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "default": {}
+        }
+      },
+      "required": [
+        "tag",
+        "id",
+        "market_id",
+        "order_id",
+        "order"
+      ]
+    },
+    "ReplaceOrdersReq": {
+      "title": "ReplaceOrdersReq",
+      "description": "Replace several resting orders in one venue call (`Market.replace_orders`).",
+      "type": "object",
+      "properties": {
+        "tag": {
+          "enum": [
+            "replace_orders"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "market_id": {
+          "type": "string"
+        },
+        "orders": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ReplaceEntry"
+          }
+        },
+        "settings": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "default": {}
+        }
+      },
+      "required": [
+        "tag",
+        "id",
+        "market_id",
+        "orders"
+      ]
+    },
+    "ReplaceEntry": {
+      "title": "ReplaceEntry",
+      "description": "One `(id, order)` pair of a `replace_orders` request.",
+      "type": "object",
+      "properties": {
+        "order_id": {
+          "type": "string"
+        },
+        "order": {
+          "$ref": "#/$defs/WireOrderShape"
+        }
+      },
+      "required": [
+        "order_id",
+        "order"
       ]
     },
     "CancelOpenOrdersReq": {
@@ -2425,6 +2533,96 @@
         "id",
         "result"
       ]
+    },
+    "ReplaceOrderResp": {
+      "title": "ReplaceOrderResp",
+      "description": "The order now resting.",
+      "type": "object",
+      "properties": {
+        "tag": {
+          "enum": [
+            "replace_order"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "response": {
+          "$ref": "#/$defs/OrderResponse"
+        }
+      },
+      "required": [
+        "tag",
+        "id",
+        "response"
+      ]
+    },
+    "ReplaceOrdersResp": {
+      "title": "ReplaceOrdersResp",
+      "description": "One outcome per requested entry, in request order.",
+      "type": "object",
+      "properties": {
+        "tag": {
+          "enum": [
+            "replace_orders"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ReplaceResult"
+          }
+        }
+      },
+      "required": [
+        "tag",
+        "id",
+        "results"
+      ]
+    },
+    "ReplaceResult": {
+      "title": "ReplaceResult",
+      "description": "One entry's outcome: the order now resting, or the error it raised.",
+      "type": "object",
+      "properties": {
+        "response": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OrderResponse"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "exc": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": []
     },
     "CancelOpenOrdersResp": {
       "title": "CancelOpenOrdersResp",
