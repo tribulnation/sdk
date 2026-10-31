@@ -39,6 +39,7 @@ from .settings import Settings
 from .market import Market, SpotMarket, PerpMarket, open_trades_stream
 from .exchange import Exchange, SpotExchange, PerpExchange
 from .venue import TradingVenue
+from .ids import QualifiedExchangeId, QualifiedMarketId
 
 
 class TradingMarkets(SDK):
@@ -60,9 +61,9 @@ class TradingMarkets(SDK):
 
     - `id`: `<account_id>:<exchange_id>`
     """
-    account_id, exchange_id = id.split(':', 1)
-    venue = await self.venue(account_id)
-    return await venue.exchange(exchange_id)
+    qualified = QualifiedExchangeId.parse(id)
+    venue = await self.venue(qualified.account_id)
+    return await venue.exchange(qualified.exchange_id)
 
   @SDK.method
   async def spot_exchange(self, id: str, /) -> SpotExchange:
@@ -70,9 +71,9 @@ class TradingMarkets(SDK):
 
     - `id`: `<account_id>:<exchange_id>`
     """
-    account_id, exchange_id = id.split(':', 1)
-    venue = await self.venue(account_id)
-    return await venue.spot_exchange(exchange_id)
+    qualified = QualifiedExchangeId.parse(id)
+    venue = await self.venue(qualified.account_id)
+    return await venue.spot_exchange(qualified.exchange_id)
 
   @SDK.method
   async def perp_exchange(self, id: str, /) -> PerpExchange:
@@ -80,9 +81,9 @@ class TradingMarkets(SDK):
 
     - `id`: `<account_id>:<exchange_id>`
     """
-    account_id, exchange_id = id.split(':', 1)
-    venue = await self.venue(account_id)
-    return await venue.perp_exchange(exchange_id)
+    qualified = QualifiedExchangeId.parse(id)
+    venue = await self.venue(qualified.account_id)
+    return await venue.perp_exchange(qualified.exchange_id)
 
   @SDK.method
   async def market(self, id: str, /) -> Market:
@@ -90,10 +91,10 @@ class TradingMarkets(SDK):
 
     - `id`: `<account_id>:<exchange_id>:<market_id>`
     """
-    account_id, exchange_id, market_id = id.split(':', 2)
-    venue = await self.venue(account_id)
-    exchange = await venue.exchange(exchange_id)
-    return await exchange.market(market_id)
+    qualified = QualifiedMarketId.parse(id)
+    venue = await self.venue(qualified.account_id)
+    exchange = await venue.exchange(qualified.exchange_id)
+    return await exchange.market(qualified.market_id)
 
   @SDK.method
   async def spot_market(self, id: str, /) -> SpotMarket:
@@ -101,10 +102,10 @@ class TradingMarkets(SDK):
 
     - `id`: `<account_id>:<exchange_id>:<market_id>`
     """
-    account_id, exchange_id, market_id = id.split(':', 2)
-    venue = await self.venue(account_id)
-    exchange = await venue.spot_exchange(exchange_id)
-    return await exchange.market(market_id)
+    qualified = QualifiedMarketId.parse(id)
+    venue = await self.venue(qualified.account_id)
+    exchange = await venue.spot_exchange(qualified.exchange_id)
+    return await exchange.market(qualified.market_id)
 
   @SDK.method
   async def perp_market(self, id: str, /) -> PerpMarket:
@@ -112,10 +113,10 @@ class TradingMarkets(SDK):
 
     - `id`: `<account_id>:<exchange_id>:<market_id>`
     """
-    account_id, exchange_id, market_id = id.split(':', 2)
-    venue = await self.venue(account_id)
-    exchange = await venue.perp_exchange(exchange_id)
-    return await exchange.market(market_id)
+    qualified = QualifiedMarketId.parse(id)
+    venue = await self.venue(qualified.account_id)
+    exchange = await venue.perp_exchange(qualified.exchange_id)
+    return await exchange.market(qualified.market_id)
 
   @SDK.method
   async def depth(

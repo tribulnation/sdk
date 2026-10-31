@@ -24,6 +24,8 @@ from tribulnation.sdk.market import (
   PerpMarket,
   is_spot,
   is_perp,
+  QualifiedExchangeId,
+  QualifiedMarketId,
 )
 from tribulnation.sdk.market.venue import TradingVenue, ExchangeDescription
 from tribulnation.sdk.market.exchange import Exchange, SpotExchange, PerpExchange
@@ -872,53 +874,71 @@ class ProxySDK(TradingMarkets):
 
   async def exchange(self, id: str, /) -> Exchange:
     """Resolve an exchange in one round trip, skipping venue resolution."""
-    account_id, exchange_id = id.split(':', 1)
+    qualified = QualifiedExchangeId.parse(id)
     return await resolve_exchange(
-      self._conn, self._exchanges, account_id=account_id, exchange_id=exchange_id
+      self._conn,
+      self._exchanges,
+      account_id=qualified.account_id,
+      exchange_id=qualified.exchange_id,
     )
 
   async def perp_exchange(self, id: str, /) -> PerpExchange:
     """Resolve an exchange and require a perpetual product."""
-    account_id, exchange_id = id.split(':', 1)
+    qualified = QualifiedExchangeId.parse(id)
     return require_perp(
       await resolve_exchange(
-        self._conn, self._exchanges, account_id=account_id, exchange_id=exchange_id
+        self._conn,
+        self._exchanges,
+        account_id=qualified.account_id,
+        exchange_id=qualified.exchange_id,
       )
     )
 
   async def spot_exchange(self, id: str, /) -> SpotExchange:
     """Resolve an exchange and require a spot product."""
-    account_id, exchange_id = id.split(':', 1)
+    qualified = QualifiedExchangeId.parse(id)
     return require_spot(
       await resolve_exchange(
-        self._conn, self._exchanges, account_id=account_id, exchange_id=exchange_id
+        self._conn,
+        self._exchanges,
+        account_id=qualified.account_id,
+        exchange_id=qualified.exchange_id,
       )
     )
 
   async def spot_market(self, id: str, /) -> SpotMarket:
     """Resolve a spot market through its exchange: one round trip, then cached."""
-    account_id, exchange_id, market_id = id.split(':', 2)
+    qualified = QualifiedMarketId.parse(id)
     exchange = require_spot(
       await resolve_exchange(
-        self._conn, self._exchanges, account_id=account_id, exchange_id=exchange_id
+        self._conn,
+        self._exchanges,
+        account_id=qualified.account_id,
+        exchange_id=qualified.exchange_id,
       )
     )
-    return await exchange.market(market_id)
+    return await exchange.market(qualified.market_id)
 
   async def market(self, id: str, /) -> Market:
     """Resolve a market through its exchange: one round trip, then cached."""
-    account_id, exchange_id, market_id = id.split(':', 2)
+    qualified = QualifiedMarketId.parse(id)
     exchange = await resolve_exchange(
-      self._conn, self._exchanges, account_id=account_id, exchange_id=exchange_id
+      self._conn,
+      self._exchanges,
+      account_id=qualified.account_id,
+      exchange_id=qualified.exchange_id,
     )
-    return await exchange.market(market_id)
+    return await exchange.market(qualified.market_id)
 
   async def perp_market(self, id: str, /) -> PerpMarket:
     """Resolve a perpetual market through its exchange: one round trip, then cached."""
-    account_id, exchange_id, market_id = id.split(':', 2)
+    qualified = QualifiedMarketId.parse(id)
     exchange = require_perp(
       await resolve_exchange(
-        self._conn, self._exchanges, account_id=account_id, exchange_id=exchange_id
+        self._conn,
+        self._exchanges,
+        account_id=qualified.account_id,
+        exchange_id=qualified.exchange_id,
       )
     )
-    return await exchange.market(market_id)
+    return await exchange.market(qualified.market_id)

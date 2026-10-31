@@ -31,5 +31,6 @@ from .settings import Settings
 from .market import Market, MarketKind, SpotMarket, MarginMarket, PerpMarket
 from .exchange import Exchange, SpotExchange, PerpExchange
 from .kinds import is_spot, is_perp, is_margin
+from .ids import QualifiedExchangeId, QualifiedMarketId
 from .venue import TradingVenue, ExchangeDescription
 from .markets import TradingMarkets
