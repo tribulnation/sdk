@@ -221,7 +221,11 @@ class NativeMarket(Public, Market):
 
   async def query_order(self, id: str) -> OrderState | None:
     """`orderStatus` by exchange order ID. It trails placement and cancellation by
-    about a second: a just-placed order reads `None`, a just-cancelled one active."""
+    about a second: a just-placed order reads `None`, a just-cancelled one active.
+
+    The venue ignores `user`: it finds any account's order by ID, so a hit does not
+    prove the order is this account's.
+    """
     found = await self.shared.call(
       lambda: self.client.info.order_status(user=self.shared.address, oid=int(id))
     )

@@ -13,8 +13,10 @@ async with MarginTradeMarket.new() as venue:
 ```
 
 Accounts are Solana Ed25519 keys; the account is the master key's base58 address. Trading
-needs the master's key or an approved agent's (API wallet), with `address` set to the
-master. Account reads are by address and need no key:
+needs the master's key or an approved agent's (API wallet). Entering a signed venue asks
+the venue for the key's master account: `address`, when set, must be it (else
+`AuthError`), and when omitted the master is used. Account reads are by address and need
+no key:
 
 ```python
 venue = MarginTradeMarket.new(address='6dm8…', private_key='<agent key>', mainnet=False)

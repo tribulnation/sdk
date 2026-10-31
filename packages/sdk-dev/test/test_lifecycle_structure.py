@@ -78,6 +78,10 @@ def owner_for(module: str, name: str, attribute: str, client: AsyncMock) -> SDK:
   if module == 'tribulnation.dydx.market.impl.mixin':
     other = 'client' if attribute == 'full_node' else 'full_node'
     object.__setattr__(owner, other, AsyncMock() if other == 'client' else None)
+  # margin.trade's `Shared` checks a signed client's account on entry; a public one owns
+  # only its client.
+  if module == 'tribulnation.margin_trade.core':
+    client.credentials = None
   object.__setattr__(owner, 'streams', {})
   object.__setattr__(owner, 'ws_stack', None)
   return owner

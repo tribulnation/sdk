@@ -147,6 +147,13 @@ def new_client(
   return MarginTrade.new(wallet, vault=vault, mainnet=mainnet, validate=validate)
 
 
+@dataclass
+class MasterAccount:
+  """The account a signed client acts for, as `getUser` names it on entry."""
+
+  address: str | None = None
+
+
 @dataclass(frozen=True, kw_only=True)
 class Shared(SDK):
   """Own one client, its market metadata and the account's shared streams."""
@@ -154,7 +161,9 @@ class Shared(SDK):
   client: MarginTrade
   mainnet: bool
   maybe_address: str | None = None
-  """The account read and traded: the master address."""
+  """The configured account address: the master's."""
+  master: MasterAccount = field(default_factory=MasterAccount)
+  """The signing key's master account, settled on entry (`checked_master`)."""
   account_id: str | None = None
   """Root SDK account key; `None` when built directly, reporting `venue_id` instead."""
   perps: dict[str, PerpUniverseItem] = field(
@@ -180,10 +189,12 @@ class Shared(SDK):
 
   @property
   def address(self) -> str:
-    """The account address, required by every account read."""
-    if self.maybe_address is None:
+    """The account address, required by every account read: the configured one, else
+    the signing key's master account (settled on entry), else the key's own address."""
+    address = self.maybe_address or self.master.address or self.client.account
+    if address is None:
       raise AuthError('margin.trade account reads need an `address` or a private key')
-    return self.maybe_address
+    return address
 
   @cached_property
   def client_resource(self) -> ManagedResource[object]:
@@ -193,8 +204,34 @@ class Shared(SDK):
     )
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:
-    """The client root owns both transports."""
+    """The client root owns both transports; a signed client also checks its account."""
     yield self.client_resource
+    if self.client.credentials is not None:
+      yield ManagedResource(
+        resource=self.checked_master(),
+        wrap_enter=wrap_exceptions,
+        wrap_exit=wrap_exceptions,
+      )
+
+  @asynccontextmanager
+  async def checked_master(self) -> AsyncIterator[None]:
+    """Settle the account the signing key acts for: `getUser`'s master account.
+
+    An agent's orders land on its master whatever `address` says, so a mismatch would
+    read one account and trade another.
+
+    Raises:
+      AuthError: `address` is set and is not the key's master account.
+    """
+    user = await self.call(self.client.user.get_user)
+    master = user['masterAccount']
+    if self.maybe_address is not None and self.maybe_address != master:
+      raise AuthError(
+        f'margin.trade key acts for account {master}, not the configured address '
+        f'{self.maybe_address}: set `address` to the master account'
+      )
+    self.master.address = master
+    yield
 
   @SDK.method
   @wrap_exceptions
@@ -316,10 +353,11 @@ class Public(SDK):
     Create a surface over a new client.
 
     Args:
-      address: Master account address (base58). Alone, it serves the account's reads;
-        derived from `private_key` when omitted.
-      private_key: The master's key, or an approved agent's (with `address` set to the
-        master); any format `typed_margin_trade.Wallet.parse` accepts. Needed for trading.
+      address: Master account address (base58). Alone, it serves the account's reads.
+        With `private_key`, entering checks it is the key's master account (`getUser`)
+        and raises `AuthError` otherwise; omitted, the master account is used.
+      private_key: The master's key, or an approved agent's; any format
+        `typed_margin_trade.Wallet.parse` accepts. Needed for trading.
       mainnet: Use mainnet when true, testnet when false.
       validate: Validate responses against the typed client's schemas.
       account_id: Root SDK account key, the first segment of every market ID;
@@ -332,7 +370,7 @@ class Public(SDK):
       shared=Shared(
         client=client,
         mainnet=mainnet,
-        maybe_address=address or client.account,
+        maybe_address=address,
         account_id=account_id,
       )
     )
