@@ -6,6 +6,22 @@ from tribulnation.sdk.util import ceil2tick, trunc2tick, round2tick
 from .fees import Fees
 
 
+def price_step(price: Decimal, *, tick_size: Decimal, sig_figs: int | None) -> Decimal:
+  """The valid price step around `price`: `tick_size`, or with `sig_figs` the coarser of
+  `tick_size` and the last significant figure's, never coarser than 1 (integers are
+  always valid)."""
+  if sig_figs is None or price.is_zero():
+    return tick_size
+  else:
+    step = Decimal(1).scaleb(price.adjusted() - sig_figs + 1)
+    return max(tick_size, min(step, Decimal(1)))
+
+
+def valid_price(price: Decimal, *, tick_size: Decimal, sig_figs: int | None) -> bool:
+  """Whether `price` is a multiple of its `price_step`."""
+  return price % price_step(price, tick_size=tick_size, sig_figs=sig_figs) == 0
+
+
 @dataclass(kw_only=True)
 class Rules:
   """Trading constraints; canonical asset identities belong to the Catalogue."""
@@ -17,7 +33,7 @@ class Rules:
   buy, quote on a sell); `Trade.fee.asset` then names it per fill.
   """
   tick_size: Decimal
-  """Tick size of the price (in quote units)."""
+  """Tick size of the price (in quote units); with `sig_figs`, the finest one."""
   step_size: Decimal
   """Step size of the quantity (in base units)."""
   fixed_min_qty: Decimal | None = None
@@ -42,8 +58,19 @@ class Rules:
   """
   api: bool
   """Whether the instrument can be traded via API."""
+  sig_figs: int | None = None
+  """Most significant figures in a price, on venues whose price step grows with the price
+  (Hyperliquid's 5); integer prices are exempt. `None` for a fixed `tick_size`."""
   details: Any = None
   """Raw details of the rules."""
+
+  def price_step(self, price: Decimal, /) -> Decimal:
+    """The valid price step around `price` (see `price_step`)."""
+    return price_step(price, tick_size=self.tick_size, sig_figs=self.sig_figs)
+
+  def valid_price(self, price: Decimal, /) -> bool:
+    """Whether `price` is on the price grid."""
+    return valid_price(price, tick_size=self.tick_size, sig_figs=self.sig_figs)
 
   def min_price(self, mark_price: Decimal, /) -> Decimal | None:
     """Minimum price of the order (in quote units), accounting for the minimum value and fixed minimum price."""
@@ -83,16 +110,16 @@ class Rules:
       return qty
 
   def round_price(self, price: Decimal) -> Decimal:
-    """Round the price to the nearest tick size."""
-    return round2tick(price, self.tick_size)
+    """Round the price to the nearest valid price (`price_step`)."""
+    return round2tick(price, self.price_step(price))
 
   def trunc_price(self, price: Decimal) -> Decimal:
-    """Truncate the price to the nearest tick size."""
-    return trunc2tick(price, self.tick_size)
+    """Truncate the price to the valid price below it (`price_step`)."""
+    return trunc2tick(price, self.price_step(price))
 
   def ceil_price(self, price: Decimal) -> Decimal:
-    """Ceil the price to the nearest tick size."""
-    return ceil2tick(price, self.tick_size)
+    """Ceil the price to the valid price above it (`price_step`)."""
+    return ceil2tick(price, self.price_step(price))
 
   def notional2qty(self, notional: Decimal, *, price: Decimal) -> Decimal | None:
     """Convert a notional value (in quote units) to a base quantity, truncating to the nearest step size. Returns `None` if the quantity is too small."""

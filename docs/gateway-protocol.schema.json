@@ -3483,6 +3483,17 @@
           ],
           "default": null
         },
+        "sig_figs": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "details": {
           "default": null
         }
@@ -3610,6 +3621,17 @@
           "anyOf": [
             {
               "$ref": "#/$defs/Fees"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "sig_figs": {
+          "anyOf": [
+            {
+              "type": "integer"
             },
             {
               "type": "null"
