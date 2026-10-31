@@ -79,6 +79,18 @@ class OrderRejected(ApiError):
     return super().__str__()
 
 
+class OrderNotFound(ApiError):
+  """
+  The venue answered that the order doesn't exist: it filled, was cancelled, or never rested.
+
+  Raised by cancels only where the venue says so plainly; a venue that can't tell
+  returns as if the cancel succeeded. Ambiguous failures are never `OrderNotFound`.
+  """
+
+  def __str__(self):
+    return super().__str__()
+
+
 class LogicError(Error):
   """Logic error: invalid assumptions, logic, or other bugs on the SDK side."""
 

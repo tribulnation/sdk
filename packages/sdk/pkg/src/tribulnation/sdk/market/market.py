@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 import asyncio
 
-from tribulnation.sdk.core import SDK, PaginatedResponse, OverflowPolicy
+from tribulnation.sdk.core import SDK, OrderNotFound, PaginatedResponse, OverflowPolicy
 from tribulnation.sdk.impl.accounts import VenueId
 from .types import (
   Book,
@@ -365,7 +365,12 @@ class Market(SDK):
   @SDK.method
   @abstractmethod
   async def cancel_order(self, id: str, *, settings: Settings = {}) -> Any:
-    """Cancel an order in the market."""
+    """Cancel an order in the market.
+
+    Raises:
+      OrderNotFound: The venue says the order doesn't exist (filled, cancelled or
+        never rested). Venues that can't tell return instead.
+    """
 
   @SDK.method
   async def cancel_orders(self, ids: Sequence[str], *, settings: Settings = {}) -> Any:
@@ -373,6 +378,44 @@ class Market(SDK):
     return await asyncio.gather(
       *[self.cancel_order(id, settings=settings) for id in ids]
     )
+
+  @SDK.method
+  async def replace_order(
+    self, id: str, order: Order, *, settings: Settings = {}
+  ) -> OrderResponse:
+    """Replace resting order `id` with `order`; returns the order now resting, whose ID may differ.
+
+    ``order["qty"]`` is the size to rest from now on, regardless of what `id`
+    filled. The default cancels `id`, then places `order`, so the order loses its
+    queue priority; venues with a native modify or replace override it.
+
+    Raises:
+      OrderRejected: The venue refused `order`; `id` is gone.
+      ApiError: Any other venue error; `id` may still rest, and `order` may rest.
+      NetworkError: The venue could not be reached; either order may rest.
+    """
+    try:
+      await self.cancel_order(id, settings=settings)
+    except OrderNotFound:
+      pass
+    return await self.place_order(order, settings=settings)
+
+  @SDK.method
+  async def replace_orders(
+    self, orders: Sequence[tuple[str, Order]], *, settings: Settings = {}
+  ) -> Sequence[OrderResponse | Exception]:
+    """Replace several resting orders, each as `replace_order` does: one result per `(id, order)`, the response or its error.
+
+    The default replaces them in parallel; venues with a bulk modify override it.
+    """
+
+    async def one(id: str, order: Order) -> OrderResponse | Exception:
+      try:
+        return await self.replace_order(id, order, settings=settings)
+      except Exception as e:
+        return e
+
+    return await asyncio.gather(*[one(id, order) for id, order in orders])
 
   @SDK.method
   async def cancel_open_orders(self, *, settings: Settings = {}) -> Any:

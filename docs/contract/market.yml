@@ -951,6 +951,85 @@ methods:
         okx    -> BTC-USDT
         kraken -> XBTUSDT
 
+  replace_order:
+    group: Trading
+    public: false
+    example:
+      accountVenues: [hyperliquid]
+      constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', order_id1: '12345678', order_id2: '12345679'}
+        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id1: '184920371', order_id2: '184920372'}
+        bybit: {market_id: 'bybit:spot:BTCUSDT', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
+        coinbase: {market_id: 'coinbase:spot:BTC-USD', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
+        bit2me: {market_id: 'bit2me:spot:BTC/EUR', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
+        dydx: {market_id: 'dydx:perp:BTC-USD', order_id1: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAQAAABhA', order_id2: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAgAAABhA'}
+        lighter: {market_id: 'lighter:perp:1', order_id1: '101492020762855', order_id2: '101492020762856'}
+        extended: {market_id: 'extended:perp:BTC-USD', order_id1: '2112522693715927040', order_id2: '2112522693715927104'}
+        margin-trade: {market_id: 'margin-trade:perp:BTC', order_id1: '38549392126', order_id2: '38549396356'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id1: '13835058055282163712', order_id2: '13835058055282163713'}
+      callTemplate: |
+        order = {'type': 'POST_ONLY', 'qty': 0.01, 'price': 60_100}
+        response = await sdk.replace_order('{{ constants[accounts[0]].market_id }}', '{{ constants[accounts[0]].order_id1 }}', order)
+      resultTemplate: |
+        OrderResponse(id='{{ constants[accounts[0]].order_id2 }}', details={...})
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['mexc', 'okx', 'kraken']:
+          for raw_id, info in catalogue.spot_instruments[venue].items():
+            if info['base'] == 'bitcoin' and info['quote'] == 'tether':
+              print(venue, '->', raw_id)
+              break
+      resultTemplate: |
+        mexc   -> BTCUSDT
+        okx    -> BTC-USDT
+        kraken -> XBTUSDT
+
+  replace_orders:
+    group: Trading
+    public: false
+    example:
+      accountVenues: [hyperliquid]
+      constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', order_id1: '12345678', order_id2: '12345679'}
+        hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id1: '184920371', order_id2: '184920372'}
+        bybit: {market_id: 'bybit:spot:BTCUSDT', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
+        coinbase: {market_id: 'coinbase:spot:BTC-USD', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
+        bit2me: {market_id: 'bit2me:spot:BTC/EUR', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
+        dydx: {market_id: 'dydx:perp:BTC-USD', order_id1: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAQAAABhA', order_id2: 'Ci0KK2R5ZHgxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXE2NndtODIVAgAAABhA'}
+        lighter: {market_id: 'lighter:perp:1', order_id1: '101492020762855', order_id2: '101492020762856'}
+        extended: {market_id: 'extended:perp:BTC-USD', order_id1: '2112522693715927040', order_id2: '2112522693715927104'}
+        margin-trade: {market_id: 'margin-trade:perp:BTC', order_id1: '38549392126', order_id2: '38549396356'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id1: '13835058055282163712', order_id2: '13835058055282163713'}
+      callTemplate: |
+        orders = [
+          ('{{ constants[accounts[0]].order_id1 }}', {'type': 'POST_ONLY', 'qty': 0.01, 'price': 60_100}),
+          ('{{ constants[accounts[0]].order_id2 }}', {'type': 'POST_ONLY', 'qty': -0.01, 'price': 60_400}),
+        ]
+        results = await sdk.replace_orders('{{ constants[accounts[0]].market_id }}', orders)
+      resultTemplate: |
+        [OrderResponse(id=..., details={...}), OrderNotFound(...)]
+    catalogue:
+      callTemplate: |
+        # pip install tribulnation-catalogue
+
+        from tribulnation.catalogue import Catalogue
+
+        catalogue = Catalogue.load()  # cached locally, no credentials needed
+        for venue in ['mexc', 'okx', 'kraken']:
+          for raw_id, info in catalogue.spot_instruments[venue].items():
+            if info['base'] == 'bitcoin' and info['quote'] == 'tether':
+              print(venue, '->', raw_id)
+              break
+      resultTemplate: |
+        mexc   -> BTCUSDT
+        okx    -> BTC-USDT
+        kraken -> XBTUSDT
+
   cancel_open_orders:
     group: Trading
     public: false

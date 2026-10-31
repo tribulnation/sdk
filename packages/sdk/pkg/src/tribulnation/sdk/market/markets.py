@@ -467,6 +467,51 @@ class TradingMarkets(SDK):
     return await market.cancel_orders(ids, settings=settings)
 
   @SDK.method
+  async def replace_order(
+    self, market_id: str, /, id: str, order: Order, *, settings: Settings = {}
+  ) -> OrderResponse:
+    """Replace a resting order with `order`; returns the order now resting.
+
+    The new order's ID may differ from `id`. Unless the venue modifies in place, the
+    default cancels `id`, then places `order`; a cancel finding `id` already gone
+    still places, and any other cancel failure raises without placing.
+
+    Args:
+      id: The resting order's ID, as returned by `place_order`.
+      order: The order to rest instead, as for `place_order`; `qty` is the size to
+        rest from now on, whatever `id` already filled.
+      settings: Venue-specific options keyed by venue name.
+
+    Raises:
+      OrderRejected: The venue refused `order`; `id` is gone.
+      ApiError: Any other venue error; `id` may still rest, and `order` may rest.
+      NetworkError: The venue could not be reached; either order may rest.
+    """
+    market = await self.market(market_id)
+    return await market.replace_order(id, order, settings=settings)
+
+  @SDK.method
+  async def replace_orders(
+    self,
+    market_id: str,
+    /,
+    orders: Sequence[tuple[str, Order]],
+    *,
+    settings: Settings = {},
+  ) -> Sequence[OrderResponse | Exception]:
+    """Replace several resting orders: one result per entry, in input order.
+
+    Each result is the response, or the error that entry raised, as for
+    `replace_order`. Venues with a bulk modify send one request.
+
+    Args:
+      orders: `(id, order)` pairs, each as for `replace_order`.
+      settings: Venue-specific options, applied to every entry.
+    """
+    market = await self.market(market_id)
+    return await market.replace_orders(orders, settings=settings)
+
+  @SDK.method
   async def cancel_open_orders(
     self, market_id: str, /, *, settings: Settings = {}
   ) -> Any:

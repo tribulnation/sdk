@@ -6,7 +6,8 @@ methods = [
   "depth", "depth_stream", "tickers", "rules", "fees", "candles",
   "query_order", "open_orders", "trades_history", "trades_stream",
   "position", "collateral", "balances", "collateral_ids", "collateral_id",
-  "place_order", "place_orders", "cancel_order", "cancel_orders", "cancel_open_orders",
+  "place_order", "place_orders", "cancel_order", "cancel_orders", "replace_order", "replace_orders",
+  "cancel_open_orders",
   "index", "next_funding", "funding_rates", "perp_stats", "perp_position",
   "perp_collateral", "funding_payments", "leverage", "available_notional",
 ]

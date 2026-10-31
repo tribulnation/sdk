@@ -11,6 +11,7 @@ from .core import (
   AuthError,
   RateLimited,
   OrderRejected,
+  OrderNotFound,
   LogicError,
 )
 from .earn import Earn
@@ -39,6 +40,7 @@ __all__ = [
   'AuthError',
   'RateLimited',
   'OrderRejected',
+  'OrderNotFound',
   'LogicError',
   'Earn',
   'Wallet',

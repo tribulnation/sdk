@@ -81,3 +81,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0056](0056-market-kind-aware-support.md) | Market-kind-aware support declarations | Proposed; builds on 0051; implemented, not release-verified |
 | [0057](0057-lighter-batched-order-transactions.md) | Lighter sends waiting order transactions as one `sendTxBatch` | Proposed; implemented, not release-verified |
 | [0058](0058-market-delta-and-hold.md) | Default `delta()` and `hold()` on spot and margin markets | Proposed; builds on 0051; implemented, not release-verified |
+| [0059](0059-replace-orders-and-order-not-found.md) | `replace_order(s)` and `OrderNotFound` | Proposed |

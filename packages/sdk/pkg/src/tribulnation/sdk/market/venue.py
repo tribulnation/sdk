@@ -253,6 +253,27 @@ class TradingVenue(SDK):
     return await market.cancel_orders(ids, settings=settings)
 
   @SDK.method
+  async def replace_order(
+    self, market_id: str, /, id: str, order: Order, *, settings: Settings = {}
+  ) -> OrderResponse:
+    """Replace a resting order; see ``Market.replace_order``."""
+    market = await self.market(market_id)
+    return await market.replace_order(id, order, settings=settings)
+
+  @SDK.method
+  async def replace_orders(
+    self,
+    market_id: str,
+    /,
+    orders: Sequence[tuple[str, Order]],
+    *,
+    settings: Settings = {},
+  ) -> Sequence[OrderResponse | Exception]:
+    """Replace several resting orders; see ``Market.replace_orders``."""
+    market = await self.market(market_id)
+    return await market.replace_orders(orders, settings=settings)
+
+  @SDK.method
   async def cancel_open_orders(
     self, market_id: str, /, *, settings: Settings = {}
   ) -> Any:
