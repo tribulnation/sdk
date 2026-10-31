@@ -4,6 +4,7 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
+import asyncio
 import secrets
 from typing_extensions import (
   Any,
@@ -15,7 +16,14 @@ from typing_extensions import (
 )
 from typed_margin_trade.exchange.cancel import CancelSpec
 from typed_margin_trade.info.candle_snapshot import CandleRange
-from typed_margin_trade.schemas import OrderSpec, PerpUniverseItem
+from typed_margin_trade.schemas import (
+  ErrorStatus,
+  FilledStatus,
+  ModifySpec,
+  OrderSpec,
+  PerpUniverseItem,
+  RestingStatus,
+)
 from tribulnation.sdk.core import (
   ApiError,
   MissingData,
@@ -79,6 +87,13 @@ TIME_IN_FORCE: dict[str, Literal['Gtc', 'Alo', 'Ioc']] = {
 }
 """`MARKET` is an IOC limit at the SDK's protection price: the venue has no market order
 type, and refuses an IOC priced too far through the book with `slippage exceeded`."""
+NOT_FOUND = 'order not found'
+"""Part of the venue's answer for an order that no longer rests: the cancel status
+`order not found`, or a modify's `cancel failed: order not found` (testnet, 2026-10-31,
+for cancelled and filled orders alike)."""
+POST_ONLY_REFUSED = 'Canceled due to post only'
+"""A modify's answer when its post-only replacement would have crossed: the old order is
+cancelled and nothing rests (testnet, 2026-10-31)."""
 
 
 def time_in_force(
@@ -305,12 +320,65 @@ class NativeMarket(Public, Market):
     status = result['statuses'][0]
     if 'error' in status:
       raise OrderRejected(status['error'], result)
-    if 'resting' in status:
-      return OrderResponse(id=str(status['resting']['oid']), details=status)
-    filled = status['filled']
-    return OrderResponse(
-      id=str(filled['oid']), details=status, filled_qty=filled['totalSz']
+    return placed(status)
+
+  async def replace_orders(
+    self, orders: Sequence[tuple[str, Order]], *, settings: Settings = {}
+  ) -> Sequence[OrderResponse | Exception]:
+    """Replace in one `batchModify`; each replacement gets a new order ID.
+
+    The venue cancels, then places each entry, and places nothing when the old order
+    is gone (`cancel failed: order not found`): such an entry is placed afresh. A
+    post-only replacement that would have crossed (`POST_ONLY_REFUSED`) is an
+    `OrderRejected`, the old order cancelled. Any other entry error is an `ApiError`,
+    since the old order may still rest. A failed request fails every entry with its
+    error.
+    """
+    if not orders:
+      return []
+    modifies: list[ModifySpec] = [
+      {'oid': int(id), 'order': self.order_spec(order, settings)}
+      for id, order in orders
+    ]
+    try:
+      result = await self.shared.call(
+        lambda: self.client.exchange.batch_modify(modifies)
+      )
+    except Exception as e:
+      return [e] * len(orders)
+    statuses = result['statuses']
+    if len(statuses) != len(orders):
+      error = ApiError('margin.trade answered a status per order', result)
+      return [error] * len(orders)
+
+    async def outcome(
+      status: RestingStatus | FilledStatus | ErrorStatus, order: Order
+    ) -> OrderResponse | Exception:
+      """The entry's response, placing it afresh when its old order was gone."""
+      try:
+        if 'error' not in status:
+          return placed(status)
+        elif NOT_FOUND in status['error']:
+          return await self.place_order(order, settings=settings)
+        elif POST_ONLY_REFUSED in status['error']:
+          return OrderRejected(status['error'], status)
+        else:
+          return ApiError(status['error'], status)
+      except Exception as e:
+        return e
+
+    return await asyncio.gather(
+      *[outcome(status, order) for status, (_, order) in zip(statuses, orders)]
     )
+
+  async def replace_order(
+    self, id: str, order: Order, *, settings: Settings = {}
+  ) -> OrderResponse:
+    """Replace one order through `replace_orders`, raising its error."""
+    (result,) = await self.replace_orders([(id, order)], settings=settings)
+    if isinstance(result, Exception):
+      raise result
+    return result
 
   async def cancel_orders(self, ids: Sequence[str], *, settings: Settings = {}) -> Any:
     """Cancel in one action; each order reports its own status."""
@@ -531,3 +599,14 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
           f'margin.trade isolated collateral is not supported [{self.id}]'
         )
     return cross_collateral(state)
+
+
+def placed(status: RestingStatus | FilledStatus) -> OrderResponse:
+  """The response for an order resting or filled on placement."""
+  if 'resting' in status:
+    return OrderResponse(id=str(status['resting']['oid']), details=status)
+  else:
+    filled = status['filled']
+    return OrderResponse(
+      id=str(filled['oid']), details=status, filled_qty=filled['totalSz']
+    )

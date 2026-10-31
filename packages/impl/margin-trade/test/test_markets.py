@@ -6,6 +6,7 @@ from unittest.mock import AsyncMock
 from typing_extensions import Any, Callable
 
 import pytest
+from typed_margin_trade.exchange.batch_modify import BatchModify
 from typed_margin_trade.exchange.cancel import Cancel
 from typed_margin_trade.exchange.order import Order as OrderEndpoint
 from typed_margin_trade.schemas import (
@@ -300,6 +301,78 @@ async def test_failed_cancel_raises(monkeypatch: pytest.MonkeyPatch):
   )
   with pytest.raises(ApiError):
     await perp().cancel_order('1')
+
+
+async def test_replace_orders_is_one_batch_modify(monkeypatch: pytest.MonkeyPatch):
+  """Every entry goes in one `batchModify`, as the old oid and the full new order."""
+  filled: FilledOrder = {
+    'oid': 8,
+    'totalSz': Decimal('0.001'),
+    'origSz': Decimal('0.002'),
+    'avgPx': Decimal('76000'),
+  }
+  modify = AsyncMock(
+    return_value={'statuses': [{'resting': {'oid': 7}}, {'filled': filled}]}
+  )
+  monkeypatch.setattr(BatchModify, 'batch_modify', modify)
+  buy: Order = {'type': 'POST_ONLY', 'qty': Decimal('0.002'), 'price': Decimal('76000')}
+  sell: Order = {'type': 'LIMIT', 'qty': Decimal('-0.002'), 'price': Decimal('76100')}
+
+  results = await perp().replace_orders([('1', buy), ('2', sell)])
+
+  (modifies,) = modify.call_args.args
+  assert [(m['oid'], m['order']['b'], m['order']['s']) for m in modifies] == [
+    (1, True, Decimal('0.002')),
+    (2, False, Decimal('0.002')),
+  ]
+  assert [r.id for r in results if not isinstance(r, Exception)] == ['7', '8']
+
+
+async def test_replace_of_a_gone_order_places_it(monkeypatch: pytest.MonkeyPatch):
+  """The venue places nothing when the old order is gone, so the entry is placed afresh;
+  any other entry error is ambiguous."""
+  statuses = [
+    {'error': 'cancel failed: order not found'},
+    {'error': 'insufficient margin'},
+  ]
+  monkeypatch.setattr(
+    BatchModify, 'batch_modify', AsyncMock(return_value={'statuses': statuses})
+  )
+  place = AsyncMock(return_value={'statuses': [{'resting': {'oid': 9}}]})
+  monkeypatch.setattr(OrderEndpoint, 'order', place)
+  order: Order = {'type': 'POST_ONLY', 'qty': Decimal('1'), 'price': Decimal('2')}
+
+  gone, refused = await perp().replace_orders([('1', order), ('2', order)])
+
+  assert place.await_count == 1
+  assert not isinstance(gone, Exception) and gone.id == '9'
+  assert type(refused) is ApiError
+
+
+async def test_crossing_post_only_replace_is_rejected(monkeypatch: pytest.MonkeyPatch):
+  """The venue cancelled the old order and refused the crossing post-only one."""
+  statuses = [{'error': 'Canceled due to post only'}]
+  monkeypatch.setattr(
+    BatchModify, 'batch_modify', AsyncMock(return_value={'statuses': statuses})
+  )
+  place = AsyncMock()
+  monkeypatch.setattr(OrderEndpoint, 'order', place)
+  order: Order = {'type': 'POST_ONLY', 'qty': Decimal('1'), 'price': Decimal('2')}
+
+  (result,) = await perp().replace_orders([('1', order)])
+
+  assert isinstance(result, OrderRejected)
+  place.assert_not_awaited()
+
+
+async def test_replace_order_raises_its_error(monkeypatch: pytest.MonkeyPatch):
+  """A single replace raises what its entry failed with, a failed request included."""
+  monkeypatch.setattr(
+    BatchModify, 'batch_modify', AsyncMock(side_effect=ApiError('timeout'))
+  )
+  order: Order = {'type': 'POST_ONLY', 'qty': Decimal('1'), 'price': Decimal('2')}
+  with pytest.raises(ApiError, match='timeout'):
+    await perp().replace_order('1', order)
 
 
 async def test_rules_use_the_markets_own_fees(monkeypatch: pytest.MonkeyPatch):
