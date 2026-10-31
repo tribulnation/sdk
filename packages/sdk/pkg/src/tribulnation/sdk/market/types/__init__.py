@@ -6,6 +6,7 @@ from .collateral import (
   Balance,
   SpotBalances,
   SpotCollateralIds,
+  Hold,
 )
 from .funding import FundingRate, NextFunding, FundingPayment, ExchangeFundingPayment
 from .orders import Order, OrderResponse, OrderState

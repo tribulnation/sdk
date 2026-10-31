@@ -80,3 +80,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0055](0055-aster-lower-leverage-on-refusal.md) | Aster lowers leverage only when an order is refused for it | Proposed; amends 0053; implemented, not release-verified |
 | [0056](0056-market-kind-aware-support.md) | Market-kind-aware support declarations | Proposed; builds on 0051; implemented, not release-verified |
 | [0057](0057-lighter-batched-order-transactions.md) | Lighter sends waiting order transactions as one `sendTxBatch` | Proposed; implemented, not release-verified |
+| [0058](0058-market-delta-and-hold.md) | Default `delta()` and `hold()` on spot and margin markets | Proposed; builds on 0051; implemented, not release-verified |

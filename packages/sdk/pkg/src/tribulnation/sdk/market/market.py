@@ -21,6 +21,7 @@ from .types import (
   PerpCollateral,
   SpotBalances,
   SpotCollateralIds,
+  Hold,
   FundingRate,
   NextFunding,
   FundingPayment,
@@ -64,7 +65,7 @@ class Market(SDK):
   """An abstract market interface: books, trades, orders, rules and fees.
 
   Account balances depend on what the market trades: see `SpotMarket` and
-  `MarginMarket`.
+  `MarginMarket`. `delta()` and `hold()` answer the same two questions of either kind.
 
   Read staleness (ADR 0054): reads of changing account and snapshot data (balances,
   positions, collateral, leverage, available notional, tickers, perpetual stats and
@@ -183,6 +184,43 @@ class Market(SDK):
     failures and missing account rates propagate instead of returning zero.
     """
     raise NotImplementedError(f'Account trading fees are not implemented: {self.id}')
+
+  @SDK.method
+  async def delta(self, *, ttl: timedelta | None = None) -> Decimal:
+    """Fetch your exposure to the base asset, in base units.
+
+    Signed: what you own or are long is positive. `SpotMarket` answers its total base
+    balance, `MarginMarket` its position size.
+
+    Markets of venues not yet migrated to `SpotMarket`/`MarginMarket` raise
+    `NotImplementedError`. Not abstract, so venue packages released before it keep
+    instantiating (ADR 0058).
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """
+    raise NotImplementedError(f'Delta is not implemented: {self.id}')
+
+  @SDK.method
+  async def hold(
+    self, *, qty: Decimal, price: Decimal, ttl: timedelta | None = None
+  ) -> Hold:
+    """What an order of signed `qty` at `price` holds while it rests.
+
+    An amount of one collateral, in that collateral's units, on an ID resolved by
+    `TradingMarkets.collateral`. Fees are not included. See `SpotMarket.hold` and
+    `MarginMarket.hold` for what each kind holds.
+
+    Markets of venues not yet migrated to `SpotMarket`/`MarginMarket` raise
+    `NotImplementedError`, as with `delta`.
+
+    Args:
+      qty: Signed order size in base units: positive buys, negative sells.
+      price: Order price, in quote units per base unit.
+      ttl: How old the shared answers it reads may be; `None` asks afresh. See
+        `Market`.
+    """
+    raise NotImplementedError(f'Order holds are not implemented: {self.id}')
 
   @SDK.method
   async def query_order(self, id: str) -> OrderState | None:
@@ -388,6 +426,39 @@ class SpotMarket(Market):
       base=f'{prefix}:{rules.base}', quote=f'{prefix}:{rules.quote}'
     )
 
+  @SDK.method
+  async def delta(self, *, ttl: timedelta | None = None) -> Decimal:
+    """Fetch your exposure to the base asset, in base units.
+
+    The total base balance, `balances().base.total`: what open orders hold included,
+    since a resting sell still owns its base until it fills.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """
+    return (await self.balances(ttl=ttl)).base.total
+
+  @SDK.method
+  async def hold(
+    self, *, qty: Decimal, price: Decimal, ttl: timedelta | None = None
+  ) -> Hold:
+    """What an order of signed `qty` at `price` holds while it rests.
+
+    A buy holds `qty * price` of the quote collateral, a sell `|qty|` of the base
+    collateral, on the IDs of `collateral_ids()`. Fees are not included.
+
+    Args:
+      qty: Signed order size in base units: positive buys, negative sells.
+      price: Order price, in quote units per base unit.
+      ttl: Accepted for symmetry with `MarginMarket.hold`; a spot hold reads no
+        account state.
+    """
+    ids = await self.collateral_ids()
+    if qty > 0:
+      return Hold(collateral_id=ids.quote, amount=qty * price)
+    else:
+      return Hold(collateral_id=ids.base, amount=abs(qty))
+
 
 class MarginMarket(Market):
   """An abstract market traded on margin: positions backed by a collateral pool.
@@ -468,6 +539,42 @@ class MarginMarket(Market):
     """
     leverage = await self.leverage(ttl=ttl)
     return (await self.collateral(ttl=ttl)).free_collateral * leverage
+
+  @SDK.method
+  async def delta(self, *, ttl: timedelta | None = None) -> Decimal:
+    """Fetch your exposure to the base asset, in base units: `position().size`.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """
+    return (await self.position(ttl=ttl)).size
+
+  @SDK.method
+  async def hold(
+    self, *, qty: Decimal, price: Decimal, ttl: timedelta | None = None
+  ) -> Hold:
+    """What an order of signed `qty` at `price` holds while it rests.
+
+    Only the opening part holds collateral: whatever of `|qty|` exceeds what the
+    order closes of `position().size`. It holds `opening * price / leverage()` of
+    `collateral_id()`. A closing order holds nothing, and reads no leverage. Fees
+    are not included.
+
+    Args:
+      qty: Signed order size in base units: positive buys, negative sells.
+      price: Order price, in quote units per base unit.
+      ttl: How old shared position and leverage answers may be; `None` asks
+        afresh. See `Market`.
+    """
+    collateral_id = await self.collateral_id()
+    size = (await self.position(ttl=ttl)).size
+    closing = abs(size) if size * qty < 0 else Decimal(0)
+    opening = max(abs(qty) - closing, Decimal(0))
+    if opening > 0:
+      leverage = await self.leverage(ttl=ttl)
+      return Hold(collateral_id=collateral_id, amount=opening * price / leverage)
+    else:
+      return Hold(collateral_id=collateral_id, amount=Decimal(0))
 
 
 class PerpMarket(MarginMarket):

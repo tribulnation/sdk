@@ -26,6 +26,7 @@ from .types import (
   Balance,
   SpotBalances,
   SpotCollateralIds,
+  Hold,
 )
 from .settings import Settings
 from .market import Market, MarketKind, SpotMarket, MarginMarket, PerpMarket

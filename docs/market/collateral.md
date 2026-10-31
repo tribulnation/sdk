@@ -216,6 +216,34 @@ pool ID to the exchange's `PerpCollateral`. `free_collateral` already excludes r
 orders, so a reservation ledger only subtracts what it has sent but the venue hasn't
 counted yet.
 
+### Delta and holds
+
+Every spot and margin market answers the two questions a hedging strategy asks of it,
+from the reads above. Both are declared on `Market`, so a market need not be narrowed
+first; a venue not yet split into spot and margin markets raises `NotImplementedError`.
+
+```python
+market = await sdk.perp_market('hyperliquid::ETH')
+exposure = await market.delta()  # signed, in base units
+hold = await market.hold(qty=Decimal('-0.5'), price=Decimal('3200'))
+```
+
+```
+Decimal('1.2')
+Hold(collateral_id='hyperliquid:spot:0', amount=Decimal('0'))
+```
+
+- `delta()` is the exposure to the base asset: `balances().base.total` on spot (what
+  open orders hold included), `position().size` on a margin market.
+- `hold(qty=..., price=...)` is what an order of signed `qty` at `price` holds while it rests,
+  as an amount of one collateral ID, in that collateral's units. A spot buy holds
+  `qty × price` of the quote, a spot sell `|qty|` of the base. A margin order holds
+  `opening × price / leverage()` of `collateral_id()`, where `opening` is the part of
+  `|qty|` that grows the position; the part that closes it holds nothing (above, selling
+  0.5 of a 1.2 long). Fees are not included.
+
+Both take `ttl` and pass it to the position, balance and leverage reads they make.
+
 ## Which bucket backs a perpetual?
 
 Liquidation is per **bucket**: a set of markets sharing one collateral pool and one

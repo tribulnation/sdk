@@ -27,6 +27,8 @@ from tribulnation.sdk.market import (
   PerpCollateral,
   FundingPayment,
   FundingRate,
+  Hold,
+  Market,
   Order,
   OrderResponse,
   OrderState,
@@ -217,6 +219,9 @@ class MockMarket(PerpMarket):
   async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     self.state.ttls.append(('available_notional', ttl))
     return Decimal('1000')
+
+  async def collateral_id(self) -> str:
+    return 'mock:perp'
 
   async def place_order(
     self, order: Order, *, settings: Settings = {}
@@ -829,6 +834,42 @@ async def test_leverage_forwards_ttl_through_gateway(sdk: ProxySDK) -> None:
   requests = [req for req in sent if isinstance(req, codec.LeverageReq)]
   assert [req.ttl for req in requests] == [None, timedelta(seconds=30)]
   assert all(req.market_id == MARKET_ID for req in requests)
+
+
+@pytest.mark.asyncio
+async def test_delta_and_hold_compose_proxied_reads(
+  mock_state: MockState, sdk: ProxySDK
+) -> None:
+  """The defaults need no RPC of their own: position, leverage and collateral ID
+  cross the wire, with the caller's `ttl`."""
+  market = await sdk.perp_market(MARKET_ID)
+  ttl = timedelta(seconds=30)
+  assert await market.delta(ttl=ttl) == Decimal(0)
+  assert await market.hold(qty=Decimal(2), price=Decimal(100), ttl=ttl) == Hold(
+    collateral_id='mock:perp', amount=Decimal(40)
+  )
+  assert mock_state.ttls == [('position', ttl), ('position', ttl), ('leverage', ttl)]
+
+
+@pytest.mark.asyncio
+async def test_unnarrowed_proxy_market_answers_delta_and_hold(
+  mock_state: MockState, sdk: ProxySDK
+) -> None:
+  """`sdk.market` returns a plain `Market`; delta and hold need no narrowing, and only
+  the composed reads cross the wire."""
+  sent = record_calls(sdk)
+  market: Market = await sdk.market(MARKET_ID)
+  assert await market.delta() == Decimal(0)
+  assert await market.hold(qty=Decimal(-1), price=Decimal(100)) == Hold(
+    collateral_id='mock:perp', amount=Decimal(25)
+  )
+  assert mock_state.ttls == [('position', None), ('position', None), ('leverage', None)]
+  assert {type(req) for req in sent} <= {
+    codec.ExchangeReq,
+    codec.PositionReq,
+    codec.LeverageReq,
+    codec.CollateralIdReq,
+  }
 
 
 @pytest.mark.asyncio

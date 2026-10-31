@@ -71,3 +71,13 @@ class SpotCollateralIds:
   """`<account_id>:<exchange_id>:<base asset>`: what a sell reserves on."""
   quote: str
   """`<account_id>:<exchange_id>:<quote asset>`: what a buy reserves on."""
+
+
+@dataclass(frozen=True, kw_only=True)
+class Hold:
+  """What an order holds while it rests: an amount of one collateral."""
+
+  collateral_id: str
+  """The collateral the order holds, resolved by `TradingMarkets.collateral`."""
+  amount: Decimal
+  """In the collateral's own units. Fees are not included."""
