@@ -1,18 +1,11 @@
-# tribulnation-aster 0.13.0
+# tribulnation-aster 0.14.0
 
-Requires SDK >=3.0.0 (spot and margin market types, collateral IDs and read `ttl`) and typed-aster >=0.7.0. Upgrade the SDK and this adapter together: SDK 3.0 changes the base classes this adapter subclasses, so older adapters do not work with it, and this one does not work with SDK 2.
+Requires SDK >=4.0.0 (`place_orders` results per order, `replace_order(s)` and `OrderNotFound`, [ADR 0059](../../../dev-docs/adr/0059-replace-orders-and-order-not-found.md)) and typed-aster >=0.7.0, unchanged. Upgrade the SDK and this adapter together: this adapter does not work with SDK 3.
 
 Breaking and behaviour changes:
 
-1. Spot markets are SDK `SpotMarket`s ([ADR 0051](../../../dev-docs/adr/0051-spot-perp-market-types-collateral-ids.md)): `balances()` (`free` and `locked` of the spot wallet), `rules()` returns `SpotRules` with the pair's asset symbols, and `collateral_ids()` returns `<account>:spot:<asset>`. `SpotExchange.balance(asset)` reads one asset. Spot `position`, `collateral` and `available_notional` are gone. Spot balances are mainnet only.
-2. Every perpetual's `collateral_id()` is the futures wallet, `<account>:perp`: spot and futures wallets are separate.
-3. Perpetual positions, collateral and leverage come from one all-symbol `positionRisk` request and the futures account, shared between symbols and concurrent callers ([ADR 0053](../../../dev-docs/adr/0053-shared-account-reads-aster-max-leverage.md)). Reads take `ttl` ([ADR 0054](../../../dev-docs/adr/0054-caller-chosen-read-staleness.md)): `None` (the default) asks afresh, a `timedelta` reuses an answer that recent. A symbol missing from the all-symbol answer is read alone.
-4. `leverage(refetch=...)` becomes `leverage(ttl=...)`, and leverage is no longer cached per symbol: without a `ttl` each call reads `positionRisk`.
-5. An order refused because the symbol's leverage setting is above the maximum Aster now allows (`-2027`, seen when Aster lowers a symbol's maximum) lowers the setting to that maximum (bracket 1's `initialLeverage`) and is resent once [ADR 0055](../../../dev-docs/adr/0055-aster-lower-leverage-on-refusal.md). Concurrent refusals share one fix, which stands for 10 s. The adapter never raises a leverage setting and reads nothing before an order; if the setting is not above the maximum, or cannot be lowered, the original `OrderRejected` is raised.
+1. `cancel_orders` returns, per order, the acknowledgement or its error: `OrderNotFound` for a gone order (`-2011`, `-2013`), else an `ApiError` subclass. It used to return the raw venue entries.
+2. `cancel_order` of a gone order raises `OrderNotFound`. It used to raise `BadRequest`, which `OrderNotFound` is not.
+3. `replace_order(s)` use the SDK default: cancel, then place.
 
 Every other method is unchanged.
-
-Release qualification on 2026-10-27 passed the read suites and market consistency.
-Committed evidence under `release-evidence/aster/` matches pinned Catalogue
-`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
-release follows SDK 3.0.0 publication.
