@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tribulnation-sdk"
-version = "3.0.0"
+version = "4.0.0"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
@@ -33,14 +33,14 @@ gateway = "tribulnation.sdk.gateway.cli:app"
 
 [project.optional-dependencies]
 gateway = ["aiohttp>=3.12,<4", "msgspec>=0.19,<1", "python-dotenv>=1,<2"]
-aster = ["tribulnation-aster>=0.13.0"]
+aster = ["tribulnation-aster>=0.14.0"]
 extended = ["tribulnation-extended>=0.2.0"]
-lighter = ["tribulnation-lighter>=0.12.0"]
-margin-trade = ["tribulnation-margin-trade>=0.2.0"]
+lighter = ["tribulnation-lighter>=0.13.0"]
+margin-trade = ["tribulnation-margin-trade>=0.3.0"]
 grvt = ["tribulnation-grvt>=0.2.0"]
 mexc = ["tribulnation-mexc>=3.0.0"]
-dydx = ["tribulnation-dydx>=0.20.0"]
-hyperliquid = ["tribulnation-hyperliquid>=0.19.0"]
+dydx = ["tribulnation-dydx>=0.21.0"]
+hyperliquid = ["tribulnation-hyperliquid>=0.20.0"]
 binance = ["tribulnation-binance>=0.9.0"]
 bitget = ["tribulnation-bitget>=0.12.0"]
 bit2me = ["tribulnation-bit2me>=0.10.0"]
