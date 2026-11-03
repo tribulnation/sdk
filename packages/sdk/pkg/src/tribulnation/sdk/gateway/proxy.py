@@ -449,11 +449,16 @@ class ProxyMarket(Market):
 
   async def place_orders(
     self, orders: Sequence[Order], *, settings: Settings = {}
-  ) -> Sequence[OrderResponse]:
-    """Forward place orders through the gateway."""
-    return list(
-      await asyncio.gather(*[self.place_order(o, settings=settings) for o in orders])
-    )
+  ) -> Sequence[OrderResponse | Exception]:
+    """Forward place orders through the gateway: one result per order, the response or its error."""
+
+    async def one(order: Order) -> OrderResponse | Exception:
+      try:
+        return await self.place_order(order, settings=settings)
+      except Exception as e:
+        return e
+
+    return list(await asyncio.gather(*[one(o) for o in orders]))
 
   async def cancel_order(self, id: str, *, settings: Settings = {}) -> Any:
     """Forward cancel order through the gateway."""

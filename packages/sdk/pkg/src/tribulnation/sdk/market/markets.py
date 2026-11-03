@@ -430,8 +430,11 @@ class TradingMarkets(SDK):
   @SDK.method
   async def place_orders(
     self, market_id: str, /, orders: Sequence[Order], *, settings: Settings = {}
-  ) -> Sequence[OrderResponse]:
-    """Place several orders concurrently: one response per order, in input order.
+  ) -> Sequence[OrderResponse | Exception]:
+    """Place several orders concurrently: one result per order, in input order.
+
+    Each result is the response, or the error that order raised, as for
+    `place_order`.
 
     Args:
       orders: The orders to place, each as for `place_order`.

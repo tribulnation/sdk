@@ -56,6 +56,10 @@ ALIAS_MARKET_ID = f'{ALIAS}:perp:BTC-USD'
 class MockState:
   depth_error: Exception | None = None
   place_order_error: Exception | None = None
+  place_errors: dict[Decimal, Exception] = field(
+    default_factory=dict[Decimal, Exception]
+  )
+  """What `place_order` raises, per order price."""
   cancel_errors: dict[str, Exception] = field(default_factory=dict[str, Exception])
   """What `cancel_order` raises, per order ID."""
   depth_stream_items: list[Book | Exception] = field(default_factory=list)
@@ -230,6 +234,8 @@ class MockMarket(PerpMarket):
   ) -> OrderResponse:
     if self.state.place_order_error is not None:
       raise self.state.place_order_error
+    if (error := self.state.place_errors.get(Decimal(order['price']))) is not None:
+      raise error
     return OrderResponse(id='order-1', filled_qty=Decimal('0.5'))
 
   async def cancel_order(self, id: str, *, settings: Settings = {}) -> Any:
@@ -790,6 +796,21 @@ async def test_replace_order_through_gateway(sdk: ProxySDK) -> None:
   response = await market.replace_order('old', order)
 
   assert response.id == 'order-1'
+
+
+@pytest.mark.asyncio
+async def test_place_orders_keeps_per_order_errors_through_gateway(
+  sdk: ProxySDK, mock_state: MockState
+) -> None:
+  """A refused order comes back as its error; the others still report their response."""
+  mock_state.place_errors = {Decimal('99'): OrderRejected('would cross')}
+  market = await sdk.perp_market(MARKET_ID)
+  buy: Order = {'type': 'POST_ONLY', 'qty': Decimal('1'), 'price': Decimal('99')}
+  sell: Order = {'type': 'POST_ONLY', 'qty': Decimal('-1'), 'price': Decimal('101')}
+
+  results = await market.place_orders([buy, sell])
+
+  assert [type(r) for r in results] == [OrderRejected, OrderResponse]
 
 
 @pytest.mark.asyncio

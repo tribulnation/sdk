@@ -356,11 +356,19 @@ class Market(SDK):
   @SDK.method
   async def place_orders(
     self, orders: Sequence[Order], *, settings: Settings = {}
-  ) -> Sequence[OrderResponse]:
-    """Place multiple orders in the market."""
-    return await asyncio.gather(
-      *[self.place_order(order, settings=settings) for order in orders]
-    )
+  ) -> Sequence[OrderResponse | Exception]:
+    """Place several orders, each as `place_order` does: one result per order, the response or its error.
+
+    The default places them in parallel; venues with a bulk placement may override it.
+    """
+
+    async def one(order: Order) -> OrderResponse | Exception:
+      try:
+        return await self.place_order(order, settings=settings)
+      except Exception as e:
+        return e
+
+    return await asyncio.gather(*[one(order) for order in orders])
 
   @SDK.method
   @abstractmethod
