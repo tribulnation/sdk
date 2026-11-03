@@ -52,8 +52,9 @@ return, and rejects the new order asynchronously when the old one is gone.
    up with two orders.
 4. `Market.replace_orders(orders: Sequence[tuple[str, Order]], *, settings={})
    -> Sequence[OrderResponse | Exception]` returns one result or error per entry, in
-   order. The default runs `replace_order` per entry concurrently. `place_orders` and
-   `cancel_orders` keep raising their first error.
+   order. The default runs `replace_order` per entry concurrently. `place_orders` returns
+   the same: one `OrderResponse` or error per order, so a refused order does not hide
+   the response of one that rests. `cancel_orders` keeps the venue's shape.
 5. Venue overrides:
    1. Hyperliquid and margin.trade: one `batchModify` per call, without Hyperliquid's
       always-place flag; an entry failing because the old order is gone falls back to a
@@ -97,8 +98,10 @@ return, and rejects the new order asynchronously when the old one is gone.
    reason, which can leave two orders.
 5. Extended's `cancelId` replace: needs the client id, and a gone order rejects the new
    one asynchronously instead of placing it.
-6. Making `place_orders` and `cancel_orders` return per-entry errors too: a breaking
-   change to existing callers, outside this decision.
+6. `place_orders` raising its first error: a maker placing both sides, one refused
+   for crossing, loses the other's id while it rests, and only finds it again as a
+   stray. Seen on the margin.trade testnet (2026-11-02). Callers that relied on the
+   raise must now check each result.
 7. A `Rules` subclass for significant-figure venues: the gateway decodes rules as
    `SpotRules | Rules`, so a subclass would arrive as plain `Rules` and round on the
    wrong grid. Hyperliquid spot rules would also need a second subclass of `SpotRules`.

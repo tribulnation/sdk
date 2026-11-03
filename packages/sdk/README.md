@@ -93,7 +93,7 @@ Hold a `Market` reference in hot loops; use the scoped one-shot calls otherwise.
   - `collateral_ids() -> SpotCollateralIds`: what a buy (`quote`) and a sell (`base`) reserve on
 - Trading:
   - `place_order(order) -> OrderResponse`
-  - `place_orders(orders) -> Sequence[OrderResponse]`
+  - `place_orders(orders) -> Sequence[OrderResponse | Exception]`: one result per order
   - `cancel_order(id)`
   - `cancel_orders(ids)`
   - `cancel_open_orders()`
