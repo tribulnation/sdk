@@ -11,3 +11,8 @@ Breaking and behaviour changes:
 5. New setting `settings['margin-trade'] = {'limit_tif': 'Gtc' | 'Ioc' | 'Alo'}` sets a `LIMIT` order's time in force (default `Gtc`); `MARKET` and `POST_ONLY` ignore it.
 
 Every other method is unchanged.
+
+Release qualification on 2026-11-03 passed the read suites and market consistency.
+Committed evidence under `release-evidence/margin-trade/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
+release follows SDK 4.0.0 publication.
