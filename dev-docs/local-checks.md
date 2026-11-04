@@ -50,8 +50,9 @@ file's own directory, so an accounts file elsewhere silently runs without creden
    verifier rejects the report ([ADR 0042](adr/0042-read-only-account-method-qualification.md)).
 3. Testnet accounts use `<venue>_testnet` ids and venues (`<venue>-testnet` for a
    hyphenated slug such as `margin-trade`), so no mainnet slug selects them. Name them explicitly for testnet diagnostics.
-4. Bitget has two mainnet accounts, each with an explicit `uta` mode. Qualify with
-   `--account bitget_classic`, the mode current evidence records. GRVT has two: qualify
+4. Bitget has one mainnet account, `bitget_uta`, with an explicit `uta = true`: the
+   former Classic account was upgraded to UTA. Qualify with `--account bitget_uta`
+   ([ADR 0060](adr/0060-bitget-qualifies-uta.md)). GRVT has two: qualify
    with `--account grvt`, the read-only key; `grvt_trade` holds a trading key on the
    same sub-account, for mainnet order checks.
 5. Deribit's split qualification pairs `deribit_public` with `deribit_testnet`
@@ -247,7 +248,8 @@ methods and single-page retention cases are excluded, not passed. Account cases
 carry their own codes: `order_lifecycle` (`query_order`), `perp_only`,
 `unsupported` (undeclared, or listed per exchange in `impl.toml`),
 `credential_mode` (the recorded account mode cannot serve the method) and
-`bitget_classic`. A declared read raising `NotImplementedError` or `AuthError`
+`bitget_classic` (perpetual collateral reads on a Classic account; the tracked UTA
+account never records it). A declared read raising `NotImplementedError` or `AuthError`
 fails, unless `impl.toml` waives it (`waived:credential_scope` for `AuthError`,
 `waived:account_setting` for `NotImplementedError`). A waived read still runs: its
 expected error is a visible, non-blocking skip, a pass is recorded as a pass (the

@@ -30,8 +30,8 @@ def minimum(venue: str) -> AccountMode:
 
 
 def uta_of(venue: str) -> bool | None:
-  """Bitget qualifies its tracked Classic account; other venues have no mode flag."""
-  return False if venue == 'bitget' else None
+  """Bitget qualifies its tracked UTA account; other venues have no mode flag."""
+  return True if venue == 'bitget' else None
 
 
 def cases_of(venue: str, mode: AccountMode | None = None) -> dict[str, evidence.Case]:
@@ -421,13 +421,17 @@ def test_account_inventory_follows_support_modes_and_exchanges():
   assert lighter['perp:1 funding_payments'] == 'credential_mode'
   assert account_cases('lighter')['perp:1 fees'] is None
   bitget = account_cases('bitget')
-  assert bitget['usdt:BTCUSDT perp_collateral'] == 'bitget_classic'
-  assert bitget['usdt:BTCUSDT collateral'] == 'bitget_classic'
+  assert bitget['usdt:BTCUSDT perp_collateral'] is None
+  assert bitget['usdt:BTCUSDT collateral'] is None
   assert bitget['spot:BTCUSDT collateral'] == 'perp_only'
   assert bitget['usdt:BTCUSDT balances'] == 'spot_only'
   assert bitget['usdc:BTCPERP fees'] == 'unsupported'
-  uta = evidence.inventory(repo_root(), 'bitget', mode='private', bitget_uta=True)
-  assert all(case.exclusion != 'bitget_classic' for case in uta.values())
+  classic = evidence.inventory(repo_root(), 'bitget', mode='private', bitget_uta=False)
+  assert {
+    f'{case.market} {case.method}'
+    for case in classic.values()
+    if case.exclusion == 'bitget_classic'
+  } == {'usdt:BTCUSDT collateral', 'usdt:BTCUSDT perp_collateral'}
   for venue in ('deribit', 'kucoin'):
     codes = set(account_cases(venue).values())
     assert codes == {'unsupported', 'order_lifecycle', 'perp_only', 'spot_only'}

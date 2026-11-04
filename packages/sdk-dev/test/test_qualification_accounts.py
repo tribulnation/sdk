@@ -10,7 +10,7 @@ from sdk_dev.integration.accounts import account_mode
 from sdk_dev.repo import repo_root
 from sdk_dev.support import is_testnet, load_impl_files, mode_rank
 
-EXPLICIT = {'bitget': 'bitget_classic', 'grvt': 'grvt'}
+EXPLICIT = {'bitget': 'bitget_uta', 'grvt': 'grvt'}
 """Venues with several mainnet accounts, and the one qualification uses."""
 
 
@@ -35,7 +35,7 @@ def test_bitget_accounts_declare_their_mode():
   sdk = tracked_sdk()
   bitget = [a for a in sdk.accounts.values() if a.venue == 'bitget']
   assert bitget and all(isinstance(getattr(a, 'uta', None), bool) for a in bitget)
-  assert getattr(sdk.accounts[EXPLICIT['bitget']], 'uta') is False
+  assert getattr(sdk.accounts[EXPLICIT['bitget']], 'uta') is True
 
 
 @pytest.mark.parametrize('venue', required_venues(repo_root(), 'sdk'))
