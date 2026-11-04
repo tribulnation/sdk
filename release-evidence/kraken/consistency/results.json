@@ -24160,14 +24160,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.08722",
-            "after_bid": "0.08699",
-            "ask": "0.08722",
+            "after_ask": "0.08493",
+            "after_bid": "0.08411",
+            "ask": "0.08493",
             "attempt": 1,
-            "before_ask": "0.08722",
-            "before_bid": "0.08699",
-            "bid": "0.08699",
-            "elapsed_seconds": 0.1207114930730313,
+            "before_ask": "0.08493",
+            "before_bid": "0.08411",
+            "bid": "0.08411",
+            "elapsed_seconds": 0.12550759792793542,
             "ticker_ids_match": true
           }
         ],
@@ -24180,14 +24180,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "342.34",
-            "after_bid": "342.33",
-            "ask": "342.34",
+            "after_ask": "353.21",
+            "after_bid": "352.73",
+            "ask": "353.21",
             "attempt": 1,
-            "before_ask": "342.34",
-            "before_bid": "342.33",
-            "bid": "342.33",
-            "elapsed_seconds": 0.12016980291809887,
+            "before_ask": "353.21",
+            "before_bid": "352.73",
+            "bid": "352.73",
+            "elapsed_seconds": 0.16581957996822894,
             "ticker_ids_match": true
           }
         ],
@@ -24200,14 +24200,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "131.25",
-            "after_bid": "131.12",
-            "ask": "131.25",
+            "after_ask": "136.45",
+            "after_bid": "136.21",
+            "ask": "136.45",
             "attempt": 1,
-            "before_ask": "131.25",
-            "before_bid": "131.12",
-            "bid": "131.12",
-            "elapsed_seconds": 0.14556287101004273,
+            "before_ask": "136.45",
+            "before_bid": "136.22",
+            "bid": "136.22",
+            "elapsed_seconds": 0.15431222901679575,
             "ticker_ids_match": true
           }
         ],
@@ -24220,14 +24220,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "79727.0",
-            "after_bid": "79726.0",
-            "ask": "79727.0",
+            "after_ask": "80022.0",
+            "after_bid": "80017.0",
+            "ask": "80022.0",
             "attempt": 1,
-            "before_ask": "79727.0",
-            "before_bid": "79726.0",
-            "bid": "79726.0",
-            "elapsed_seconds": 0.15749211597722024,
+            "before_ask": "80047.0",
+            "before_bid": "80000.0",
+            "bid": "80011.0",
+            "elapsed_seconds": 0.1867023049853742,
             "ticker_ids_match": true
           }
         ],
@@ -24240,14 +24240,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.1760000",
-            "after_bid": "0.1750000",
-            "ask": "0.1760000",
+            "after_ask": "0.1450000",
+            "after_bid": "0.1430000",
+            "ask": "0.1450000",
             "attempt": 1,
-            "before_ask": "0.1760000",
-            "before_bid": "0.1750000",
-            "bid": "0.1750000",
-            "elapsed_seconds": 0.13508841791190207,
+            "before_ask": "0.1450000",
+            "before_bid": "0.1430000",
+            "bid": "0.1430000",
+            "elapsed_seconds": 0.10605571395717561,
             "ticker_ids_match": true
           }
         ],
@@ -24260,14 +24260,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.1960000",
-            "after_bid": "0.1950000",
-            "ask": "0.1960000",
+            "after_ask": "0.1620000",
+            "after_bid": "0.1610000",
+            "ask": "0.1620000",
             "attempt": 1,
-            "before_ask": "0.1960000",
-            "before_bid": "0.1950000",
-            "bid": "0.1950000",
-            "elapsed_seconds": 0.12996605597436428,
+            "before_ask": "0.1620000",
+            "before_bid": "0.1610000",
+            "bid": "0.1610000",
+            "elapsed_seconds": 0.1461350698955357,
             "ticker_ids_match": true
           }
         ],
@@ -24280,14 +24280,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.07820",
-            "after_bid": "0.07810",
-            "ask": "0.07820",
+            "after_ask": "0.07520",
+            "after_bid": "0.07510",
+            "ask": "0.07520",
             "attempt": 1,
-            "before_ask": "0.07820",
-            "before_bid": "0.07810",
-            "bid": "0.07810",
-            "elapsed_seconds": 0.1957190689863637,
+            "before_ask": "0.07520",
+            "before_bid": "0.07510",
+            "bid": "0.07500",
+            "elapsed_seconds": 0.11571819905657321,
             "ticker_ids_match": true
           }
         ],
@@ -24300,14 +24300,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "79729.60000",
-            "after_bid": "79729.50000",
-            "ask": "79729.60000",
+            "after_ask": "79959.50000",
+            "after_bid": "79959.40000",
+            "ask": "79968.00000",
             "attempt": 1,
-            "before_ask": "79729.60000",
-            "before_bid": "79729.50000",
-            "bid": "79729.50000",
-            "elapsed_seconds": 0.13277369702700526,
+            "before_ask": "79959.50000",
+            "before_bid": "79959.40000",
+            "bid": "79937.70000",
+            "elapsed_seconds": 0.10650143306702375,
             "ticker_ids_match": true
           }
         ],
@@ -24784,6 +24784,7 @@
           "ETHCHF",
           "ETHDAI",
           "ETHEURC",
+          "ETHEURCV",
           "ETHEUROP",
           "ETHFIDD",
           "ETHFIEUR",
@@ -24801,6 +24802,9 @@
           "EURCHF",
           "EURCUSD",
           "EURCUSDC",
+          "EURCVEUR",
+          "EURCVUSD",
+          "EURCVUSDC",
           "EURGBP",
           "EURJPY",
           "EUROPEUR",
@@ -25002,6 +25006,7 @@
           "KNTQUSD",
           "KOBANEUR",
           "KOBANUSD",
+          "KORUSD",
           "KP3REUR",
           "KP3RUSD",
           "KSMEUR",
@@ -25701,6 +25706,7 @@
           "XBTCHF",
           "XBTDAI",
           "XBTEURC",
+          "XBTEURCV",
           "XBTFIDD",
           "XBTPYUSD",
           "XBTSOFID",
