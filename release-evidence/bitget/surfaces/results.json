@@ -2,7 +2,7 @@
   "payload": {
     "account_mode": "private",
     "account_venue": "bitget",
-    "bitget_uta": false,
+    "bitget_uta": true,
     "checks": [
       {
         "exclusion": null,
@@ -445,19 +445,19 @@
         "skipped": 0
       },
       {
-        "exclusion": "bitget_classic",
+        "exclusion": null,
         "failed": 0,
         "id": "market.test_account_read[\"usdt:BTCUSDT\", \"collateral\"]",
         "network": "mainnet",
-        "passed": 0,
+        "passed": 1,
         "skipped": 0
       },
       {
-        "exclusion": "bitget_classic",
+        "exclusion": null,
         "failed": 0,
         "id": "market.test_account_read[\"usdt:BTCUSDT\", \"perp_collateral\"]",
         "network": "mainnet",
-        "passed": 0,
+        "passed": 1,
         "skipped": 0
       },
       {
