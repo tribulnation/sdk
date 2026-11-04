@@ -2964,7 +2964,23 @@
       },
       {
         "code": "ok",
+        "id": "[\"exchange_identity\",\"spot\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
         "id": "[\"market_identity\",\"perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"spot\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
@@ -3008,14 +3024,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "73.77",
-            "after_bid": "73.74",
-            "ask": "73.77",
+            "after_ask": "63.59",
+            "after_bid": "63.56",
+            "ask": "63.59",
             "attempt": 1,
-            "before_ask": "73.77",
-            "before_bid": "73.74",
-            "bid": "73.74",
-            "elapsed_seconds": 0.705052662990056,
+            "before_ask": "63.59",
+            "before_bid": "63.56",
+            "bid": "63.56",
+            "elapsed_seconds": 1.0449929839232937,
             "ticker_ids_match": true
           }
         ],
@@ -3028,14 +3044,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "343.02",
-            "after_bid": "342.93",
-            "ask": "343.02",
+            "after_ask": "332.58",
+            "after_bid": "332.35",
+            "ask": "332.45",
             "attempt": 1,
-            "before_ask": "343.02",
-            "before_bid": "342.93",
-            "bid": "342.93",
-            "elapsed_seconds": 0.7119266969384626,
+            "before_ask": "332.45",
+            "before_bid": "332.37",
+            "bid": "332.37",
+            "elapsed_seconds": 0.7592861639568582,
             "ticker_ids_match": true
           }
         ],
@@ -3048,14 +3064,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "131.41",
-            "after_bid": "131.39",
-            "ask": "131.41",
+            "after_ask": "126.75",
+            "after_bid": "126.72",
+            "ask": "126.75",
             "attempt": 1,
-            "before_ask": "131.41",
-            "before_bid": "131.39",
-            "bid": "131.39",
-            "elapsed_seconds": 0.7071192859439179,
+            "before_ask": "126.75",
+            "before_bid": "126.72",
+            "bid": "126.72",
+            "elapsed_seconds": 1.010242438991554,
             "ticker_ids_match": true
           }
         ],
@@ -3068,14 +3084,54 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "79909.2",
-            "after_bid": "79909.1",
-            "ask": "79909.2",
+            "after_ask": "77695.7",
+            "after_bid": "77695.6",
+            "ask": "77695.7",
             "attempt": 1,
-            "before_ask": "79909.2",
-            "before_bid": "79909.1",
-            "bid": "79909.1",
-            "elapsed_seconds": 0.7076265449868515,
+            "before_ask": "77695.7",
+            "before_bid": "77695.6",
+            "bid": "77695.6",
+            "elapsed_seconds": 0.7543529099784791,
+            "ticker_ids_match": true
+          }
+        ],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"spot\",\"GRVT_USDT_SpotSwap\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": "0.223",
+            "after_bid": "0.2223",
+            "ask": "0.223",
+            "attempt": 1,
+            "before_ask": "0.223",
+            "before_bid": "0.2223",
+            "bid": "0.2223",
+            "elapsed_seconds": 0.7544758579460904,
+            "ticker_ids_match": true
+          }
+        ],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"spot\",\"USDC_USDT_SpotSwap\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": "1.00102",
+            "after_bid": "1.0",
+            "ask": "1.00102",
+            "attempt": 1,
+            "before_ask": "1.00102",
+            "before_bid": "1.0",
+            "bid": "1.0",
+            "elapsed_seconds": 0.7867728719720617,
             "ticker_ids_match": true
           }
         ],
@@ -3101,6 +3157,30 @@
       {
         "code": "ok",
         "id": "[\"tickers\",\"perp\",\"selected\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"spot\",\"bulk\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"spot\",\"empty\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"spot\",\"selected\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
@@ -3306,6 +3386,14 @@
           "ZEC_USDT_Perp",
           "ZEN_USDT_Perp",
           "ZK_USDT_Perp"
+        ]
+      },
+      {
+        "exchange": "spot",
+        "kind": "spot",
+        "markets": [
+          "GRVT_USDT_SpotSwap",
+          "USDC_USDT_SpotSwap"
         ]
       }
     ],

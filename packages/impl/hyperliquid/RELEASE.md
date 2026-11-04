@@ -1,17 +1,12 @@
-# tribulnation-hyperliquid 0.19.0
+# tribulnation-hyperliquid 0.20.0
 
-Requires SDK >=3.0.0 (spot and margin market types, collateral IDs and read `ttl`) and typed-hyperliquid >=2.6.0. Upgrade the SDK and this adapter together: SDK 3.0 changes the base classes this adapter subclasses, so older adapters do not work with it, and this one does not work with SDK 2.
+Requires SDK >=4.0.0 (`place_orders` results per order, `replace_order(s)` and `OrderNotFound`, [ADR 0059](../../../dev-docs/adr/0059-replace-orders-and-order-not-found.md)) and typed-hyperliquid >=2.6.0, unchanged. Upgrade the SDK and this adapter together: this adapter does not work with SDK 3.
 
 Breaking and behaviour changes:
 
-1. Spot markets are SDK `SpotMarket`s ([ADR 0051](../../../dev-docs/adr/0051-spot-perp-market-types-collateral-ids.md)): `balances()` reads `spotClearinghouseState` (`total`, and `total - hold` free), and `rules()` returns `SpotRules` naming the pair by token index (`base='197'`, `quote='0'` for UBTC/USDC). Spot `position`, `collateral` and `available_notional` are gone.
-2. Collateral IDs use token indices: spot assets are `<account>:spot:<index>`. Every perpetual's `collateral_id()` is its dex collateral token's spot ID (`<account>:spot:0` for USDC), read from cached metadata: perpetuals and USDC-quoted spot pairs share one ID and one balance. Isolated positions return the same ID. `sdk.collateral('<account>:spot:<index>')` reads the token; token names raise `ValueError`.
-3. `clearinghouseState` per dex and `spotClearinghouseState` are shared between markets and concurrent callers ([ADR 0053](../../../dev-docs/adr/0053-shared-account-reads-aster-max-leverage.md)); reads take `ttl` ([ADR 0054](../../../dev-docs/adr/0054-caller-chosen-read-staleness.md)), `None` (the default) asking afresh. `userAbstraction` (account mode) is reused for a minute.
-4. `leverage(refetch=...)` becomes `leverage(ttl=...)`, and leverage is no longer cached per coin; `maxLeverage` still comes from the cached dex universe, which `rules(refetch=True)` reloads.
+1. `Rules` carry the venue's 5-significant-figure grid (`sig_figs=5`), and `tick_size` is the documented finest step, `10^-(max decimals - szDecimals)`, without the old cap at 5 decimals: finer for prices below 0.1.
+2. An order price off the grid (`Rules.valid_price`) raises `ValueError` before signing. It used to be rounded half-up silently; round with the market's `Rules`.
+3. `replace_orders` sends `POST_ONLY` entries in one `batchModify`; other entries cancel, then place. An entry whose old order is gone is placed afresh; one refused after the cancel (`Error placing new order during modify:`) is `OrderRejected`; any other entry error is `ApiError`.
+4. A cancel of a gone order raises `OrderNotFound`.
 
 Every other method is unchanged.
-
-Release qualification on 2026-10-27 passed the read suites and market consistency.
-Committed evidence under `release-evidence/hyperliquid/` matches pinned Catalogue
-`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
-release follows SDK 3.0.0 publication.

@@ -64,7 +64,7 @@ not a changelog or a substitute for API documentation and tests.
 | [0039](0039-hyperliquid-hip3-spot-fees.md) | Hyperliquid HIP-3 and spot fees via the official formula | Accepted; implemented, not release-verified; amended by 0042 |
 | [0040](0040-lighter-credential-modes.md) | Lighter credential modes: read-only tokens and public account reads | Proposed; implemented, not release-verified |
 | [0041](0041-venue-notional-caps.md) | Venue notional caps in available notional | Proposed; implemented for Aster, not release-verified; amended by 0042 |
-| [0042](0042-read-only-account-method-qualification.md) | Read-only account-method qualification | Accepted; implemented, not release-verified; amends 0013, 0039 and 0041 |
+| [0042](0042-read-only-account-method-qualification.md) | Read-only account-method qualification | Accepted; implemented, not release-verified; amends 0013, 0039 and 0041; amended by 0060 |
 | [0043](0043-order-rejected.md) | Definitive order rejections as `OrderRejected` | Accepted; implemented for Hyperliquid, Aster, Lighter and Extended, not release-verified |
 | [0044](0044-trades-stream-settings-dydx-node-fills.md) | `trades_stream` settings and dYdX full node fills | Proposed; implemented, not release-verified; amended by 0045 and 0050 |
 | [0045](0045-dydx-node-feed-refuses-a-node-behind.md) | The dYdX node feed refuses a node behind the chain tip | Proposed; implemented, not release-verified; amends 0044; amended by 0050 |
@@ -82,3 +82,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0057](0057-lighter-batched-order-transactions.md) | Lighter sends waiting order transactions as one `sendTxBatch` | Proposed; implemented, not release-verified |
 | [0058](0058-market-delta-and-hold.md) | Default `delta()` and `hold()` on spot and margin markets | Proposed; builds on 0051; implemented, not release-verified |
 | [0059](0059-replace-orders-and-order-not-found.md) | `replace_order(s)` and `OrderNotFound` | Proposed |
+| [0060](0060-bitget-qualifies-uta.md) | Bitget qualifies with its UTA account | Accepted; amends 0042 |

@@ -200,14 +200,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.0783",
-            "after_bid": "0.0782",
-            "ask": "0.0783",
+            "after_ask": "0.0729",
+            "after_bid": "0.0728",
+            "ask": "0.0728",
             "attempt": 1,
-            "before_ask": "0.0783",
-            "before_bid": "0.0782",
-            "bid": "0.0782",
-            "elapsed_seconds": 0.11473414802458137,
+            "before_ask": "0.0729",
+            "before_bid": "0.0728",
+            "bid": "0.0727",
+            "elapsed_seconds": 0.2669797820271924,
             "ticker_ids_match": true
           }
         ],
@@ -220,36 +220,36 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.0001513",
-            "after_bid": "0.0001401",
+            "after_ask": "0.0001313",
+            "after_bid": "0.0001296",
             "ask": "0.0",
             "attempt": 1,
-            "before_ask": "0.0001513",
-            "before_bid": "0.0001401",
+            "before_ask": "0.0001313",
+            "before_bid": "0.0001296",
             "bid": "0.0",
-            "elapsed_seconds": 0.1663682630751282,
+            "elapsed_seconds": 0.16506922792177647,
             "ticker_ids_match": true
           },
           {
-            "after_ask": "0.0001513",
-            "after_bid": "0.0001401",
+            "after_ask": "0.0001313",
+            "after_bid": "0.0001296",
             "ask": "0.0",
             "attempt": 2,
-            "before_ask": "0.0001513",
-            "before_bid": "0.0001401",
+            "before_ask": "0.0001313",
+            "before_bid": "0.0001296",
             "bid": "0.0",
-            "elapsed_seconds": 0.11629504803568125,
+            "elapsed_seconds": 0.15759147598873824,
             "ticker_ids_match": true
           },
           {
-            "after_ask": "0.0001513",
-            "after_bid": "0.0001401",
+            "after_ask": "0.0001313",
+            "after_bid": "0.0001296",
             "ask": "0.0",
             "attempt": 3,
-            "before_ask": "0.0001513",
-            "before_bid": "0.0001401",
+            "before_ask": "0.0001313",
+            "before_bid": "0.0001296",
             "bid": "0.0",
-            "elapsed_seconds": 0.11067726905457675,
+            "elapsed_seconds": 0.1501798330573365,
             "ticker_ids_match": true
           }
         ],
@@ -262,14 +262,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "117.98",
-            "after_bid": "117.92",
-            "ask": "118.07",
+            "after_ask": "113.04",
+            "after_bid": "112.98",
+            "ask": "113.05",
             "attempt": 1,
-            "before_ask": "117.98",
-            "before_bid": "117.92",
-            "bid": "118.02",
-            "elapsed_seconds": 0.1341186020290479,
+            "before_ask": "113.04",
+            "before_bid": "112.98",
+            "bid": "112.99",
+            "elapsed_seconds": 0.12833514902740717,
             "ticker_ids_match": true
           }
         ],
@@ -282,14 +282,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "71565.9",
-            "after_bid": "71565.8",
-            "ask": "71565.9",
+            "after_ask": "69333.5",
+            "after_bid": "69333.4",
+            "ask": "69332.6",
             "attempt": 1,
-            "before_ask": "71565.9",
-            "before_bid": "71565.8",
-            "bid": "71565.8",
-            "elapsed_seconds": 0.12413752602878958,
+            "before_ask": "69333.5",
+            "before_bid": "69333.4",
+            "bid": "69331.5",
+            "elapsed_seconds": 0.15565075597260147,
             "ticker_ids_match": true
           }
         ],
@@ -414,7 +414,6 @@
           "DYM/EUR",
           "EGLD/EUR",
           "EIGEN/EUR",
-          "ELIZAOS/EUR",
           "ENA/EUR",
           "ENJ/EUR",
           "ENS/EUR",
@@ -585,7 +584,6 @@
           "USDCV/EURCV",
           "USDR/USDC",
           "USUAL/EUR",
-          "VELODROME/EUR",
           "VELO/EUR",
           "VET/USDC",
           "VIRTUAL/EUR",

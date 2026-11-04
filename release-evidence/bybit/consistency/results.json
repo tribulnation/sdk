@@ -4259,12 +4259,12 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"BTCTRY\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -4835,12 +4835,12 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"ETHTRY\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -5171,12 +5171,12 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"HFTUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -6963,12 +6963,12 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"USDTTRY\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -14896,14 +14896,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.1962",
-            "after_bid": "0.1961",
-            "ask": "0.1962",
+            "after_ask": "0.1625",
+            "after_bid": "0.1624",
+            "ask": "0.1625",
             "attempt": 1,
-            "before_ask": "0.1962",
-            "before_bid": "0.1961",
-            "bid": "0.1961",
-            "elapsed_seconds": 1.1676660160301253,
+            "before_ask": "0.1625",
+            "before_bid": "0.1624",
+            "bid": "0.1624",
+            "elapsed_seconds": 0.5419988069916144,
             "ticker_ids_match": true
           }
         ],
@@ -14916,14 +14916,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.0003440",
-            "after_bid": "0.0003437",
-            "ask": "0.0003440",
+            "after_ask": "0.0003263",
+            "after_bid": "0.0003261",
+            "ask": "0.0003263",
             "attempt": 1,
-            "before_ask": "0.0003440",
-            "before_bid": "0.0003437",
-            "bid": "0.0003437",
-            "elapsed_seconds": 0.8796548240352422,
+            "before_ask": "0.0003263",
+            "before_bid": "0.0003261",
+            "bid": "0.0003261",
+            "elapsed_seconds": 0.6955856790300459,
             "ticker_ids_match": true
           }
         ],
@@ -14936,14 +14936,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.09910",
-            "after_bid": "0.09890",
-            "ask": "0.09910",
+            "after_ask": "0.10000",
+            "after_bid": "0.09990",
+            "ask": "0.10000",
             "attempt": 1,
-            "before_ask": "0.09910",
-            "before_bid": "0.09890",
-            "bid": "0.09890",
-            "elapsed_seconds": 0.857909430982545,
+            "before_ask": "0.10000",
+            "before_bid": "0.09990",
+            "bid": "0.09990",
+            "elapsed_seconds": 1.7726904490264133,
             "ticker_ids_match": true
           }
         ],
@@ -14956,14 +14956,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "79888.10",
-            "after_bid": "79888.00",
-            "ask": "79888.10",
+            "after_ask": "80487.40",
+            "after_bid": "80487.30",
+            "ask": "80481.00",
             "attempt": 1,
-            "before_ask": "79888.10",
-            "before_bid": "79888.00",
-            "bid": "79888.00",
-            "elapsed_seconds": 0.8480989939998835,
+            "before_ask": "80475.10",
+            "before_bid": "80475.00",
+            "bid": "80480.90",
+            "elapsed_seconds": 1.9529589059529826,
             "ticker_ids_match": true
           }
         ],
@@ -14976,14 +14976,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.1964",
-            "after_bid": "0.1962",
-            "ask": "0.1964",
+            "after_ask": "0.1625",
+            "after_bid": "0.1624",
+            "ask": "0.1625",
             "attempt": 1,
-            "before_ask": "0.1964",
-            "before_bid": "0.1962",
-            "bid": "0.1962",
-            "elapsed_seconds": 0.5141937910811976,
+            "before_ask": "0.1625",
+            "before_bid": "0.1623",
+            "bid": "0.1623",
+            "elapsed_seconds": 0.5189551390940323,
             "ticker_ids_match": true
           }
         ],
@@ -14996,14 +14996,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.08737",
-            "after_bid": "0.08729",
-            "ask": "0.08737",
+            "after_ask": "0.0843",
+            "after_bid": "0.08424",
+            "ask": "0.0843",
             "attempt": 1,
-            "before_ask": "0.08737",
-            "before_bid": "0.08729",
-            "bid": "0.08729",
-            "elapsed_seconds": 0.5151007210370153,
+            "before_ask": "0.0843",
+            "before_bid": "0.08424",
+            "bid": "0.08424",
+            "elapsed_seconds": 0.5252190470928326,
             "ticker_ids_match": true
           }
         ],
@@ -15016,14 +15016,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.02739",
-            "after_bid": "0.02736",
-            "ask": "0.02739",
+            "after_ask": "0.02442",
+            "after_bid": "0.02426",
+            "ask": "0.02442",
             "attempt": 1,
-            "before_ask": "0.02739",
-            "before_bid": "0.02736",
-            "bid": "0.02736",
-            "elapsed_seconds": 0.6589896919904277,
+            "before_ask": "0.02442",
+            "before_bid": "0.02426",
+            "bid": "0.02426",
+            "elapsed_seconds": 0.5072294360725209,
             "ticker_ids_match": true
           }
         ],
@@ -15036,14 +15036,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "79912.1",
-            "after_bid": "79912",
-            "ask": "79911.3",
+            "after_ask": "80435.9",
+            "after_bid": "80435.8",
+            "ask": "80424.7",
             "attempt": 1,
-            "before_ask": "79911.3",
-            "before_bid": "79911.2",
-            "bid": "79911.2",
-            "elapsed_seconds": 0.5092770039336756,
+            "before_ask": "80419.3",
+            "before_bid": "80419.2",
+            "bid": "80424.6",
+            "elapsed_seconds": 0.5332993599586189,
             "ticker_ids_match": true
           }
         ],
@@ -15248,7 +15248,6 @@
           "USDTEUR",
           "MCRTUSDT",
           "MASKUSDT",
-          "HFTUSDT",
           "PEOPLEUSDT",
           "TWTUSDT",
           "MAGICUSDT",
@@ -15362,9 +15361,6 @@
           "POPCATUSDT",
           "ZROUSDC",
           "ZROUSDT",
-          "BTCBRL",
-          "ETHBRL",
-          "SOLBRL",
           "USDTBRL",
           "USDCBRL",
           "SHIBEUR",
@@ -15396,9 +15392,6 @@
           "BCHUSDC",
           "NEARUSDC",
           "ORDERUSDT",
-          "ETHTRY",
-          "BTCTRY",
-          "USDTTRY",
           "MEWUSDC",
           "KASUSDC",
           "ONDOUSDC",
@@ -15630,7 +15623,8 @@
           "DATAUSDT",
           "GRVTUSDT",
           "KIIUSDT",
-          "PONSUSDT"
+          "PONSUSDT",
+          "KORUSDT"
         ]
       },
       {
@@ -15687,6 +15681,7 @@
           "AIOUSDT",
           "AIOZUSDT",
           "AIXBTUSDT",
+          "AKAMUSDT",
           "AKEUSDT",
           "AKTUSDT",
           "ALABUSDT",
@@ -15777,6 +15772,7 @@
           "BIOUSDT",
           "BIRBUSDT",
           "BITOUSDT",
+          "BKNGUSDT",
           "BLENDUSDT",
           "BLESSUSDT",
           "BLUAIUSDT",
@@ -15818,6 +15814,7 @@
           "CATSTOCKUSDT",
           "CBRSUSDT",
           "CCUSDT",
+          "CEGUSDT",
           "CELOUSDT",
           "CETUSUSDT",
           "CFGUSDT",
@@ -15912,7 +15909,6 @@
           "ENJUSDT",
           "ENSOUSDT",
           "ENSUSDT",
-          "EPICUSDT",
           "EQTUSDT",
           "ERAUSDT",
           "ESPORTSUSDT",
@@ -15930,6 +15926,7 @@
           "EWJUSDT",
           "EWTUSDT",
           "EWYUSDT",
+          "EWZSUSDT",
           "EWZUSDT",
           "FARTCOINPERP",
           "FARTCOINUSDT",
@@ -16123,7 +16120,6 @@
           "MINAUSDT",
           "MINIMAXUSDT",
           "MIRAUSDT",
-          "MITOUSDT",
           "MMTUSDT",
           "MNSTUSDT",
           "MNTPERP",
@@ -16201,6 +16197,7 @@
           "ORDIUSDT",
           "OUSDT",
           "OUSTUSDT",
+          "OXYUSDT",
           "PANWUSDT",
           "PARTIUSDT",
           "PATHUSDT",
@@ -16216,6 +16213,7 @@
           "PENGUUSDT",
           "PEOPLEUSDT",
           "PEPUSDT",
+          "PFEUSDT",
           "PGUSDT",
           "PHAROSUSDT",
           "PHAUSDT",
@@ -16240,7 +16238,6 @@
           "POWRUSDT",
           "PRLUSDT",
           "PROVEUSDT",
-          "PTBUSDT",
           "PUFFERUSDT",
           "PUMPFUNPERP",
           "PUMPFUNUSDT",
@@ -16317,6 +16314,7 @@
           "SMCIUSDT",
           "SMHUSDT",
           "SMICUSDT",
+          "SMRUSDT",
           "SNDKUSDT",
           "SNOWUSDT",
           "SNPSUSDT",
@@ -16385,7 +16383,6 @@
           "TLMUSDT",
           "TLTUSDT",
           "TMFUSDT",
-          "TMXUSDT",
           "TNSRUSDT",
           "TOWNSUSDT",
           "TQQQUSDT",
@@ -16424,6 +16421,7 @@
           "URNMUSDT",
           "USARUSDT",
           "USD1USDT",
+          "USDBRLUSDT",
           "USDCUSDT",
           "USDEUSDT",
           "USDEXUSDT",
@@ -16475,6 +16473,7 @@
           "XIAOMIUSDT",
           "XLEUSDT",
           "XLFUSDT",
+          "XLIUSDT",
           "XLKUSDT",
           "XLMPERP",
           "XLMUSDT",
@@ -16488,6 +16487,7 @@
           "XPINUSDT",
           "XPLPERP",
           "XPLUSDT",
+          "XPUSDT",
           "XRPPERP",
           "XRPUSDT",
           "XTZUSDT",

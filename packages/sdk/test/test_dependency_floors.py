@@ -8,22 +8,22 @@ from typing_extensions import cast
 
 ROOT = Path(__file__).resolve().parents[3]
 COMPATIBLE_IMPLEMENTATIONS = {
-  'aster': '0.13.0',
+  'aster': '0.14.0',
   'binance': '0.9.0',
   'bit2me': '0.10.0',
   'bitget': '0.12.0',
   'bybit': '0.8.0',
   'coinbase': '0.6.0',
   'deribit': '0.7.0',
-  'dydx': '0.20.0',
+  'dydx': '0.21.0',
   'ethereum': '0.6.0',
   'extended': '0.2.0',
   'grvt': '0.2.0',
-  'hyperliquid': '0.19.0',
+  'hyperliquid': '0.20.0',
   'kraken': '0.8.0',
   'kucoin': '0.7.0',
-  'lighter': '0.12.0',
-  'margin-trade': '0.2.0',
+  'lighter': '0.13.0',
+  'margin-trade': '0.3.0',
   'mexc': '3.0.0',
 }
 
@@ -202,4 +202,17 @@ def test_market_adapters_require_sdk_3():
       if Requirement(value).name == 'tribulnation-sdk'
     )
     assert Version('2.99.0') not in requirement.specifier, venue
-    assert Version('3.0.0') in requirement.specifier, venue
+
+
+def test_trading_adapters_require_sdk_4():
+  """Adapters released with SDK 4.0 implement `replace_order(s)`, raise `OrderNotFound` and
+  follow its per-order `place_orders` results (ADR 0059), so none may resolve against SDK 3."""
+  for venue in ('aster', 'dydx', 'hyperliquid', 'lighter', 'margin-trade'):
+    manifest = ROOT / f'packages/impl/{venue}/pkg/pyproject.toml'
+    requirement = next(
+      Requirement(value)
+      for value in dependencies(manifest)
+      if Requirement(value).name == 'tribulnation-sdk'
+    )
+    assert Version('3.99.0') not in requirement.specifier, venue
+    assert Version('4.0.0') in requirement.specifier, venue
