@@ -30,5 +30,10 @@ cannot record evidence.
    (ADR 0042 consequence 2). Classic accounts remain supported by the adapter but are
    unobserved by release evidence.
 2. Bitget needs fresh surfaces and consistency reports recorded with `bitget_uta`.
+   The adapter's UTA wallet and earn reads, which raised `NotImplementedError`, are
+   implemented for it (tribulnation-bitget 0.13.0): deposit and withdrawal methods read
+   the public coin list, which serves both modes, and earn instruments list the on-chain
+   Elite products, the only earn products the UTA API lists. Nothing is declared
+   unsupported.
 3. The Classic proof-of-concept scripts (`packages/impl/bitget/poc/*/classic.py`) are
    removed with the account; their `uta.py` counterparts remain.

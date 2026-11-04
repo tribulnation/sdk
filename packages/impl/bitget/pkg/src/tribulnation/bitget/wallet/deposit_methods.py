@@ -58,8 +58,6 @@ class DepositMethods(SdkMixin, _DepositMethods):
     *,
     assets: Collection[str] | None = None,
   ) -> Sequence[DepositMethod]:
-    if await self.is_uta():
-      raise NotImplementedError('Deposit methods are not supported in UTA mode.')
-    else:
-      r = await self.client.classic.spot.coins()
-      return _parse_coins_response_deposits(r, assets=assets)
+    """Deposit networks from the public coin list, which serves Classic and UTA alike."""
+    r = await self.client.classic.spot.coins()
+    return _parse_coins_response_deposits(r, assets=assets)

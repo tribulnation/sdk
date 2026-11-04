@@ -4,6 +4,7 @@ from decimal import Decimal
 
 from tribulnation.sdk.earn.instruments import Instrument, Instruments as _Instruments
 from typed_bitget.classic.earn.savings.products import SavingsProduct
+from typed_bitget.uta.earn.elite.products import EliteProduct
 from tribulnation.bitget.core import SdkMixin, wrap_exceptions
 
 BITGET_SAVINGS_URL = 'https://www.bitget.com/earning/savings'
@@ -36,6 +37,38 @@ def parse_product(prod: SavingsProduct) -> Iterable[Instrument]:
     )
 
 
+def parse_elite_product(prod: EliteProduct) -> Iterable[Instrument]:
+  """One instrument per subscription coin of an Elite product that is not sold out.
+
+  `apr` is the product's minimum APR (the venue quotes a range, in percent).
+  """
+  if prod['sellOut'] == 'YES':
+    return
+  for item in prod['subscriptionCoinList']:
+    asset = item['subscriptionCoin']
+    yield Instrument(
+      tags=['staking'],
+      asset=asset,
+      yield_asset=prod['coin'] if prod['coin'] != asset else None,
+      apr=Decimal(prod['minApr']) / 100,
+      min_qty=Decimal(min_amount) if (min_amount := item.get('minAmount')) else None,
+      max_qty=Decimal(quota) if (quota := item.get('remainQuota')) else None,
+      id=prod['productId'],
+    )
+
+
+def selected(
+  inst: Instrument,
+  *,
+  tags: Collection[Instrument.Tag] | None,
+  assets: Collection[str] | None,
+) -> bool:
+  """Whether an instrument passes the asset and tag filters."""
+  return (assets is None or inst.asset in assets) and (
+    tags is None or set(inst.tags).issubset(tags)
+  )
+
+
 class Instruments(SdkMixin, _Instruments):
   @wrap_exceptions
   async def instruments(
@@ -44,17 +77,14 @@ class Instruments(SdkMixin, _Instruments):
     tags: Collection[Instrument.Tag] | None = None,
     assets: Collection[str] | None = None,
   ) -> Sequence[Instrument]:
+    """Savings products on a Classic account; on-chain Elite products on a UTA account.
+
+    The Classic savings API refuses UTA accounts, whose earn API lists only Elite products.
+    """
     if await self.is_uta():
-      raise NotImplementedError(
-        'The UTA API does not support listing earn instruments.'
-      )
+      products = await self.client.uta.earn.elite.products()
+      parsed = [inst for prod in products for inst in parse_elite_product(prod)]
     else:
-      out: list[Instrument] = []
-      r = await self.client.classic.earn.savings.products()
-      for prod in r:
-        for inst in parse_product(prod):
-          if (assets is None or inst.asset in assets) and (
-            tags is None or set(inst.tags).issubset(tags)
-          ):
-            out.append(inst)
-      return out
+      savings = await self.client.classic.earn.savings.products()
+      parsed = [inst for prod in savings for inst in parse_product(prod)]
+    return [inst for inst in parsed if selected(inst, tags=tags, assets=assets)]

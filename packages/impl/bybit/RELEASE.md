@@ -1,14 +1,9 @@
-# tribulnation-bybit 0.8.0
+# tribulnation-bybit 0.9.0
 
-Requires SDK >=3.0.0 (spot and margin market types, collateral IDs and read `ttl`) and typed-bybit >=0.3.1. Upgrade the SDK and this adapter together: SDK 3.0 changes the base classes this adapter subclasses, so older adapters do not work with it, and this one does not work with SDK 2.
+Requires SDK >=4.0.0 and typed-bybit >=0.3.1, unchanged. It is released with SDK 4.0 ([ADR 0059](../../../dev-docs/adr/0059-replace-orders-and-order-not-found.md)) and its evidence.
 
-Spot markets no longer serve `position`, `collateral` and `available_notional` through the SDK interface: SDK 3.0 removes them from spot markets ([ADR 0051](../../../dev-docs/adr/0051-spot-perp-market-types-collateral-ids.md)). Spot `balances` and collateral IDs are not mapped yet.
+Changed:
 
-The reads SDK 3.0 gives a `ttl` accept it and ignore it: every read asks the venue ([ADR 0054](../../../dev-docs/adr/0054-caller-chosen-read-staleness.md)).
+1. Spot `tickers()` returns only pairs that `instruments-info` lists, the same set `markets()` returns. Bybit's tickers endpoint also served an unlisted pair (`SOLBRL`, with no bid or ask, on 2026-11-04), which used to come back too.
 
 Every other method is unchanged.
-
-Release qualification on 2026-10-27 passed the read suites and market consistency.
-Committed evidence under `release-evidence/bybit/` matches pinned Catalogue
-`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
-release follows SDK 3.0.0 publication.

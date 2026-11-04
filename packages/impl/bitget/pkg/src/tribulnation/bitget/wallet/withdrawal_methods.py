@@ -50,15 +50,13 @@ class WithdrawalMethods(SdkMixin, _WithdrawalMethods):
     assets: Collection[str] | None = None,
     networks: Collection[str] | None = None,
   ) -> Sequence[WithdrawalMethod]:
-    if await self.is_uta():
-      raise NotImplementedError('Withdrawal methods are not supported in UTA mode.')
-    else:
-      r = await self.client.classic.spot.coins()
-      parsed = _parse_coins_response(r)
-      if assets is not None:
-        assets_set = set(assets)
-        parsed = [p for p in parsed if p.asset in assets_set]
-      if networks is not None:
-        networks_set = set(networks)
-        parsed = [p for p in parsed if p.network in networks_set]
-      return parsed
+    """Withdrawal networks from the public coin list, which serves Classic and UTA alike."""
+    r = await self.client.classic.spot.coins()
+    parsed = _parse_coins_response(r)
+    if assets is not None:
+      assets_set = set(assets)
+      parsed = [p for p in parsed if p.asset in assets_set]
+    if networks is not None:
+      networks_set = set(networks)
+      parsed = [p for p in parsed if p.network in networks_set]
+    return parsed

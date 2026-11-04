@@ -45,8 +45,12 @@ class SpotExchange(VenueMixin, Exchange):
   ) -> Mapping[str, Ticker]:
     """Fetch best bid/ask and last price for every spot pair in one call.
 
+    Only pairs listed by `instruments-info` (`markets()`) are returned: the tickers
+    endpoint also serves unlisted symbols (e.g. `SOLBRL`, without bid or ask, on
+    2026-11-04).
+
     Args:
-      markets: Symbols to keep. `None` keeps every symbol.
+      markets: Symbols to keep. `None` keeps every listed symbol.
       settings: Accepted for interface compatibility and ignored -- Bybit serves the
         whole book of tickers in one request either way.
     """
@@ -56,6 +60,7 @@ class SpotExchange(VenueMixin, Exchange):
     # `tickers()` reveals a 3-way union whatever the `category` argument was; narrow
     # it on the discriminant the three shapes share.
     assert tickers['category'] == 'spot'
+    listed = await self.spot_instruments()
     wanted = None if markets is None else set(markets)
     return {
       t['symbol']: Ticker(
@@ -72,7 +77,7 @@ class SpotExchange(VenueMixin, Exchange):
         quote_volume_24h=t['turnover24h'],
       )
       for t in tickers['list']
-      if wanted is None or t['symbol'] in wanted
+      if t['symbol'] in listed and (wanted is None or t['symbol'] in wanted)
     }
 
   async def collateral(

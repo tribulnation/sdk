@@ -56,6 +56,10 @@ notes):
    ([ADR 0057](../../dev-docs/adr/0057-lighter-batched-order-transactions.md)) and can
    modify a resting order with the `replaces` setting.
 
-This release goes with tribulnation-aster 0.14.0, -dydx 0.21.0, -hyperliquid 0.20.0,
--lighter 0.13.0 and -margin-trade 0.3.0, which require SDK >=4.0.0. The other adapters
-keep their current releases and SDK 3 floors.
+5. Bitget serves deposit and withdrawal methods and earn instruments (on-chain Elite
+   products) on Unified Trading Accounts, and Bybit's spot `tickers()` returns only
+   listed pairs.
+
+This release goes with tribulnation-aster 0.14.0, -bitget 0.13.0, -bybit 0.9.0,
+-dydx 0.21.0, -hyperliquid 0.20.0, -lighter 0.13.0 and -margin-trade 0.3.0, which
+require SDK >=4.0.0. The other adapters keep their current releases and SDK 3 floors.

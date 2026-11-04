@@ -1,14 +1,12 @@
-# tribulnation-bitget 0.12.0
+# tribulnation-bitget 0.13.0
 
-Requires SDK >=3.0.0 (spot and margin market types, collateral IDs and read `ttl`) and typed-bitget >=0.4.1. Upgrade the SDK and this adapter together: SDK 3.0 changes the base classes this adapter subclasses, so older adapters do not work with it, and this one does not work with SDK 2.
+Requires SDK >=4.0.0 and typed-bitget >=0.4.1, unchanged. This adapter is read-only, so the SDK 4.0 order changes ([ADR 0059](../../../dev-docs/adr/0059-replace-orders-and-order-not-found.md)) do not change its behaviour; it is released with SDK 4.0 and its evidence.
 
-Spot markets no longer serve `position`, `collateral` and `available_notional` through the SDK interface: SDK 3.0 removes them from spot markets ([ADR 0051](../../../dev-docs/adr/0051-spot-perp-market-types-collateral-ids.md)). Spot `balances` and collateral IDs are not mapped yet. The adapter's own methods stay on its concrete `SpotMarket`.
+New on Unified Trading Accounts (UTA), which used to raise `NotImplementedError`:
 
-The reads SDK 3.0 gives a `ttl` accept it and ignore it: every read asks the venue ([ADR 0054](../../../dev-docs/adr/0054-caller-chosen-read-staleness.md)).
+1. `deposit_methods()` and `withdrawal_methods()` read the public coin list (`/api/v2/spot/public/coins`), as on a Classic account: the endpoint serves both modes.
+2. `instruments()` lists the open on-chain Elite products (`/api/v3/earn/elite-product`), the only earn products the UTA API lists: one `staking` instrument per subscription coin, with `yield_asset` the product's coin, `apr` its minimum APR (Bitget quotes a range), `min_qty` the coin's minimum subscription, `max_qty` its remaining quota and `id` the product ID. Sold-out products are left out. Classic accounts keep reading savings products.
+
+Release evidence is now recorded with the UTA account ([ADR 0060](../../../dev-docs/adr/0060-bitget-qualifies-uta.md)).
 
 Every other method is unchanged.
-
-Release qualification on 2026-10-27 passed the read suites and market consistency.
-Committed evidence under `release-evidence/bitget/` matches pinned Catalogue
-`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
-release follows SDK 3.0.0 publication.
