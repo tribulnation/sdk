@@ -191,11 +191,13 @@ class LighterPerpMarket(MarketBase, PerpMarket):
     """The venue's cancel-all, scoped to this market."""
     self.shared.require_api_key()
     market_index = self.market_index
-    return await self.shared.call(
+    response = await self.shared.call(
       lambda: self.shared.client.tx.cancel_all_orders(
         {'mode': 'immediate', 'market_index': market_index}
       )
     )
+    self.shared.batcher.quota.record(response)
+    return response
 
   async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
     """The signed position and average entry."""

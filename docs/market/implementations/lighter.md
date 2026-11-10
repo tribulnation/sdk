@@ -153,6 +153,12 @@ async with sdk.depth_stream('lighter:perp:1', settings={'lighter': {'depth_sourc
   to 15. A lone one goes alone, as before. A batch Lighter refuses raises `ApiError` for
   each of its transactions, never `OrderRejected`: the refusal names no transaction
   ([ADR 0057](https://github.com/tribulnation/sdk/blob/main/dev-docs/adr/0057-lighter-batched-order-transactions.md)).
+- Each order transaction's reply carries a Premium account's remaining volume quota, which
+  the `tribulnation.lighter` loggers log as `Lighter volume quota remaining: <n> (<account>)`:
+  at INFO the first time, then every 10 minutes or once it moved by 500; below 2,000, at
+  WARNING (`..., below 2000)`) as soon as it drops there, then at most once a minute.
+  `tribulnation.lighter.quota` holds these defaults; `Shared.batcher.quota` holds a client's
+  quota and its throttles.
 - Order ids are client order indexes. `query_order` finds inactive orders for 24 hours,
   and misses a just-cancelled order for a few seconds while the venue indexes it.
 - Spot `cancel_open_orders` cancels order by order: the venue's market-scoped cancel-all
