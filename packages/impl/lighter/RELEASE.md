@@ -1,16 +1,13 @@
-# tribulnation-lighter 0.13.0
+# tribulnation-lighter 0.13.1
 
-Requires SDK >=4.0.0 (`place_orders` results per order, `replace_order(s)` and `OrderNotFound`, [ADR 0059](../../../dev-docs/adr/0059-replace-orders-and-order-not-found.md)) and typed-lighter >=0.3.0, unchanged. Upgrade the SDK and this adapter together: this adapter does not work with SDK 3.
+Requires SDK >=4.0.0 and typed-lighter >=0.3.0, unchanged.
 
-New and behaviour changes:
+New:
 
-1. Creates, modifies and single-order cancels go through one batcher per client ([ADR 0057](../../../dev-docs/adr/0057-lighter-batched-order-transactions.md)). A lone transaction goes through `sendTx` as before; those submitted while one is in flight, or in the same event-loop turn, leave together in one `sendTxBatch` (at most 15). A refused batch raises `ApiError` for each of its transactions, never `OrderRejected`.
-2. `place_order(order, settings={'lighter': {'replaces': id}})` moves resting order `id` to the order's price and size with one `L2ModifyOrder`. `MARKET` orders, `time_in_force` and `reduce_only` raise `ValueError` beside it; a refused modify is `BadRequest`.
-3. A cancel of an order already gone is dropped by the sequencer unreported, so Lighter never raises `OrderNotFound`. `replace_order(s)` use the SDK default.
+1. The remaining volume quota of a Premium account, which every `sendTx` and `sendTxBatch` reply reports (`volume_quota_remaining`), is logged on the `tribulnation.lighter.quota` logger as `Lighter volume quota remaining: <n> (<account>)`. It logs at INFO the first time, then every 10 minutes or once it moved by 500. Below 2,000 it logs at WARNING (`..., below 2000)`) as soon as it drops there, then at most once a minute. Replies without a quota (the free transaction every 15 seconds) are ignored. Order replies through the batcher and the perpetual `cancel_open_orders` count. `tribulnation.lighter.quota` holds the defaults.
 
-Every other method is unchanged.
+Every method is unchanged.
 
-Release qualification on 2026-11-03 passed the read suites and market consistency.
+Release qualification on 2026-11-10 passed the read suites and market consistency.
 Committed evidence under `release-evidence/lighter/` matches pinned Catalogue
-`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
-release follows SDK 4.0.0 publication.
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes.
