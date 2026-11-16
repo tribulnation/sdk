@@ -195,13 +195,22 @@ async def cancel_order(self: MarketMixin, id: str) -> Any:
 
 
 async def cancel_open_orders(self: MarketMixin) -> Any:
-  """Cancel every open order on this symbol in one request."""
+  """Cancel every open order on this symbol in one request.
+
+  With nothing open, Bitget answers `25204` (order does not exist; confirmed live,
+  2026-11-16): that is nothing to cancel, so an empty result is returned.
+  """
   await require_trading(self)
-  return await self.call(
-    lambda: self.client.uta.trade.order.cancel_symbol(
-      PERP, symbol=self.symbol, validate=self.validate
+  try:
+    return await self.call(
+      lambda: self.client.uta.trade.order.cancel_symbol(
+        PERP, symbol=self.symbol, validate=self.validate
+      )
     )
-  )
+  except ApiError as e:
+    if error_code(e) in NOT_FOUND_CODES:
+      return {'list': []}
+    raise
 
 
 async def replace_order(

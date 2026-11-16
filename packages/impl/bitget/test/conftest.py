@@ -154,6 +154,8 @@ class FakeBitget:
           for o in list(self.orders.values())
           if o.status in ('new', 'partially_filled')
         ]
+        if not rows:
+          return self.error('25204', 'Order does not exist')
         return self.answer({'list': rows})
       case 'trade/modify-order':
         return self.modify(params)

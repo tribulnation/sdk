@@ -160,6 +160,14 @@ async def test_cancel_open_orders_cancels_the_symbol_in_one_request(
   assert await market.open_orders() == []
 
 
+async def test_cancel_open_orders_with_nothing_open_is_a_no_op(
+  fake: 'FakeBitget', market: PerpMarket
+):
+  """Bitget answers `25204` when nothing rests (seen live): nothing to cancel, not an
+  error, so a shutdown or flatten carries on."""
+  assert await market.cancel_open_orders() == {'list': []}
+
+
 async def test_a_definitive_refusal_is_order_rejected(
   fake: 'FakeBitget', market: PerpMarket
 ):
