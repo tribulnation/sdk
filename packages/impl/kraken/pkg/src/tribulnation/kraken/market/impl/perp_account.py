@@ -235,8 +235,9 @@ def leverage_of(
 
   A market with a leverage preference trades isolated at that leverage. Otherwise it
   trades cross, at the inverse of its first-tier retail initial margin: of the
-  `marginSchedules` platform `schedule` when given, else the instrument's
-  `retailMarginLevels`.
+  `marginSchedules` platform `schedule` when the instrument has one for it, else the
+  instrument's `retailMarginLevels` (many instruments, e.g. `PF_IOTXUSD`, publish no
+  schedule for every platform).
 
   Raises:
     ValueError: The instrument publishes no margin levels.
@@ -244,10 +245,9 @@ def leverage_of(
   for row in preferences:
     if row['symbol'].upper() == instrument['symbol'].upper():
       return row['maxLeverage']
-  levels: list[FuturesMarginLevel] = []
-  if schedule is not None:
-    if (margin := instrument.get('marginSchedules', {}).get(schedule)) is not None:
-      levels = margin['retail']
+  margin = instrument.get('marginSchedules', {}).get(schedule or '')
+  if margin is not None and margin['retail']:
+    levels = margin['retail']
   else:
     levels = instrument.get('retailMarginLevels') or instrument.get('marginLevels', [])
   if levels:

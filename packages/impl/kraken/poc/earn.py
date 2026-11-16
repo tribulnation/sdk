@@ -21,6 +21,7 @@ ASSETS = ['BTC', 'ETH', 'ADA']
 #
 # Kraken has a dedicated `spot.earn` namespace (`strategies`, `allocations`, `allocate`, `allocate_status`, `deallocate`, `deallocate_status`) that maps closely onto the abstract `Instruments` interface -- `spot.earn.strategies` is the discovery endpoint behind `instruments()`.
 
+
 # %%
 def to_tags(strategy: EarnStrategy) -> list[InstrumentTag]:
   tags: list[InstrumentTag] = []
