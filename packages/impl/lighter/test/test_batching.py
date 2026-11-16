@@ -59,7 +59,9 @@ class Tx:
       await self.hold.wait()
     return {'code': 200, 'tx_hash': f'single-{len(self.singles)}'}
 
-  async def create_order(self, request: dict[str, Any]) -> dict[str, Any]:
+  async def create_order(
+    self, request: dict[str, Any], *, price_protection: bool | None = None
+  ) -> dict[str, Any]:
     """`client.tx.create_order`."""
     return await self.single('create', request)
 
@@ -222,7 +224,9 @@ async def test_a_lone_refusal_stays_a_rejection():
   """Sent alone, a coded refusal of a create is still `OrderRejected`."""
 
   class Refusing(Tx):
-    async def create_order(self, request: dict[str, Any]) -> dict[str, Any]:
+    async def create_order(
+      self, request: dict[str, Any], *, price_protection: bool | None = None
+    ) -> dict[str, Any]:
       raise coded(21701)
 
   with pytest.raises(OrderRejected):
