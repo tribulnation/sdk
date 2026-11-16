@@ -4,6 +4,7 @@ from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
+from uuid import uuid4
 
 from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
@@ -41,13 +42,18 @@ from .impl import (
   trades_stream,
   uta_perp_collateral,
 )
+from .impl import trading
 from .impl.account import not_supported_classic_collateral
 from .impl.parse import PerpProduct, perp_exchange_id
 
 
 @dataclass(kw_only=True, frozen=True)
 class PerpMarket(MarketMixin, _PerpMarket):
-  """One Bitget perpetual contract; USDC and coin products are public-data only."""
+  """One Bitget perpetual contract; USDC and coin products are public-data only.
+
+  Trading needs a Unified Trading Account (UTA): `USDT-FUTURES` orders go on cross
+  margin, in the account's one-way position mode (see `impl.trading`).
+  """
 
   perp_product: PerpProduct = PERP
 
@@ -214,12 +220,44 @@ class PerpMarket(MarketMixin, _PerpMarket):
       'documented funding-fee value to filter on'
     )
 
+  def random_client_order_id(self) -> str:
+    """A fresh 32-character client order ID, Bitget's maximum."""
+    return uuid4().hex
+
   async def place_order(
     self, order: Order, *, settings: Settings = {}
   ) -> OrderResponse:
-    """Not implemented: trading is not supported for Bitget."""
-    raise NotImplementedError('Trading is not implemented for Bitget.')
+    """Place an order; see `impl.trading.place_order`."""
+    return await trading.place_order(self, order, settings=settings)
 
   async def cancel_order(self, id: str, *, settings: Settings = {}) -> Any:
-    """Not implemented: trading is not supported for Bitget."""
-    raise NotImplementedError('Trading is not implemented for Bitget.')
+    """Cancel an order; see `impl.trading.cancel_order`."""
+    return await trading.cancel_order(self, id)
+
+  async def cancel_open_orders(self, *, settings: Settings = {}) -> Any:
+    """Cancel every open order on this symbol in one request."""
+    return await trading.cancel_open_orders(self)
+
+  async def replace_order(
+    self, id: str, order: Order, *, settings: Settings = {}
+  ) -> OrderResponse:
+    """Replace a resting order; see `impl.trading.replace_order`."""
+    return await trading.replace_order(self, id, order, settings=settings)
+
+  async def query_order(self, id: str) -> OrderState | None:
+    """The state of an order, resting or done; see `impl.trading.query_order`."""
+    return await trading.query_order(self, id)
+
+  async def collateral_id(self) -> str:
+    """The unified pool, `<account_id>:usdt`, which funds every product line.
+
+    A UTA account margins every position with its one multi-asset pool, valued in
+    USD; what new orders spend is that pool's free margin, not the `USDT` row of the
+    spot balances. So the ID names the pool, which `TradingMarkets.collateral`
+    resolves to `perp_collateral()`. No request is made.
+    """
+    return f'{self.account_id}:{self.exchange_id}'
+
+  async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
+    """The cross leverage set for this symbol; see `impl.trading.cross_leverage`."""
+    return await trading.cross_leverage(self)
