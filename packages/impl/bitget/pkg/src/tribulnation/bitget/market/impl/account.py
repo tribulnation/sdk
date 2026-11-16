@@ -133,8 +133,12 @@ async def uta_perp_collateral(
 
   UTA runs one pool across every product line, so the figures are the same whatever
   the symbol; only `margin_mode` is symbol-specific. `account.settings` holds one row
-  per (symbol, margin mode) rather than one per symbol -- the first row matching the
-  symbol wins, and a symbol with no row is `cross`, the venue's default.
+  per (symbol, margin mode) rather than one per symbol (confirmed live: `BTCUSDT`
+  listed both `crossed` and `isolated`); orders default to cross, so the symbol is
+  `cross` unless it has only `isolated` rows.
+
+  Free collateral is the effective (haircut) equity less the initial margin of open
+  positions, never negative: `effEquity` alone counts margin already in use as free.
   """
   if symbol is None:
     assets = await uta_assets(self)
@@ -144,13 +148,13 @@ async def uta_perp_collateral(
       uta_assets(self),
       self.call(lambda: self.client.uta.account.settings(validate=self.validate)),
     )
-    config = next(
-      (c for c in settings['symbolConfigList'] if c['symbol'] == symbol), None
-    )
-    mode = 'isolated' if config and config['marginMode'] == 'isolated' else 'cross'
+    modes = {
+      c['marginMode'] for c in settings['symbolConfigList'] if c['symbol'] == symbol
+    }
+    mode = 'isolated' if modes == {'isolated'} else 'cross'
   return PerpCollateral(
     equity=assets['accountEquity'],
-    free_collateral=assets['effEquity'],
+    free_collateral=max(assets['effEquity'] - assets['imr'], Decimal(0)),
     initial_margin=assets['imr'],
     maintenance_margin=assets['mmr'],
     leverage=assets['leverage'],

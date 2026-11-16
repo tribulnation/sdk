@@ -20,7 +20,7 @@ from typing_extensions import (
 from dataclasses import dataclass, field
 import asyncio
 
-from tribulnation.sdk.core import SDK, OverflowPolicy, Subscription
+from tribulnation.sdk.core import SDK, NetworkError, OverflowPolicy, Subscription
 from tribulnation.sdk.market import Book, Fees
 from typed_bitget import Bitget
 from typed_bitget.classic.mix.market.contracts import MixContract
@@ -58,15 +58,32 @@ async def merged_books(pushes: AsyncIterable[OrderBookPush]) -> AsyncIterator[Bo
   level was removed -- `Book.update`'s exact contract. Each yielded book is
   `Book.frozen`, so a later push never mutates it; `depth_stream` gives each
   subscriber its own copy.
+
+  Futures updates chain: each one's `pseq` is the previous push's `seq` (confirmed
+  live, 2026-11-16, unbroken over every update observed; the futures `books` channel
+  carries no `checksum`). A broken chain means a lost update, so the stream fails with
+  `NetworkError` and subscribers reconnect from a fresh snapshot instead of keeping a
+  wrong book. Spot pushes carry no `pseq` and are not checked.
+
+  Raises:
+    NetworkError: A futures update did not follow the previous push.
   """
   book = Book()
+  seq: int | None = None
   async for push in pushes:
     for levels in push['data']:
       delta = parse_book(levels['bids'], levels['asks'])
+      pseq = levels.get('pseq')
       if push['action'] == 'snapshot':
         book = delta
+      elif pseq and seq is not None and pseq != seq:
+        raise NetworkError(
+          f'Bitget book {push["arg"]["instId"]} out of sequence: '
+          f'update follows {pseq}, last seen {seq}'
+        )
       else:
         book.update(delta)
+      seq = levels['seq']
       yield book.frozen()
 
 
@@ -75,6 +92,17 @@ async def flatten(pushes: AsyncIterable[Mapping[str, Any]], key: str):
   async for push in pushes:
     for row in push[key]:
       yield row
+
+
+@wrap_exceptions
+async def wrapped(stream: AsyncIterable[T]) -> AsyncIterator[T]:
+  """`stream`, its errors raised as `tribulnation.sdk.core` errors.
+
+  The subscribe call alone being wrapped is not enough: a socket that drops mid-stream
+  raises from the `async for`, and subscribers expect an SDK `NetworkError` then.
+  """
+  async for item in stream:
+    yield item
 
 
 @dataclass
@@ -247,7 +275,7 @@ class VenueMixin(SDK):
         )
         # Fold to whole books once here, not per consumer: subscribers then buffer
         # snapshots rather than a growing backlog of deltas they'd have to replay.
-        return merged_books(stream.stream), stream.unsubscribe
+        return wrapped(merged_books(stream.stream)), stream.unsubscribe
 
       subscription = open_subscription(subscribe)
       self.cache.depth[key] = subscription
@@ -270,7 +298,7 @@ class VenueMixin(SDK):
         stream = await self.client.classic_streams.fill(
           product, inst_id=symbol, validate=self.validate
         )
-        return flatten(stream.stream, 'data'), stream.unsubscribe
+        return wrapped(flatten(stream.stream, 'data')), stream.unsubscribe
 
       subscription = open_subscription(subscribe)
       self.cache.classic_fills[key] = subscription
@@ -287,7 +315,7 @@ class VenueMixin(SDK):
       @wrap_exceptions
       async def subscribe():
         stream = await self.client.uta_streams.fill('UTA', validate=self.validate)
-        return flatten(stream.stream, 'data'), stream.unsubscribe
+        return wrapped(flatten(stream.stream, 'data')), stream.unsubscribe
 
       self.cache.uta_fills = open_subscription(subscribe)
     return self.cache.uta_fills

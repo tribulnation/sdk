@@ -2,6 +2,7 @@ from typing_extensions import TYPE_CHECKING, TypedDict
 
 if TYPE_CHECKING:
   from tribulnation.aster.market.settings import Settings as AsterSettings
+  from tribulnation.bitget.market.impl.trading import BitgetSettings
   from tribulnation.dydx.market.impl.mixin import Settings as DydxSettings
   from tribulnation.extended.core import Settings as ExtendedSettings
   from tribulnation.hyperliquid.core.settings import Settings as HyperliquidSettings
@@ -13,6 +14,7 @@ Settings = TypedDict(
   'Settings',
   {
     'aster': 'AsterSettings',
+    'bitget': 'BitgetSettings',
     'dydx': 'DydxSettings',
     'extended': 'ExtendedSettings',
     'hyperliquid': 'HyperliquidSettings',
