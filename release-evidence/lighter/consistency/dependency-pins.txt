@@ -65,7 +65,7 @@ tornado==6.6
 traitlets==5.16.1
 tribulnation-catalogue==0.4.2
 typed-core==0.13.0
-typed-lighter==0.3.0
+typed-lighter==0.3.2
 typer==0.27.3
 typing-extensions==4.16.0
 typing-inspection==0.4.4
