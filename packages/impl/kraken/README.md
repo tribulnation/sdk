@@ -25,11 +25,23 @@ async with KrakenMarket.new(public=True) as kraken:
   print(book.best_bid, book.best_ask)
 ```
 
-Spot and public linear perpetuals are available through `spot` and `perp` exchanges.
+Spot and linear perpetuals are available through `spot` and `perp` exchanges.
 For example, `await kraken.depth('perp:PF_XBTUSD', levels=5)` reads the Futures book.
-Perpetuals support discovery, tickers, rules, depth, index, statistics, historical
-funding and all six trade-candle intervals. Private Futures methods, trading,
-next-funding estimates and Futures streams remain unsupported.
+Perpetuals serve public data without a key; with a Futures API key (separate from Spot
+keys: `futures_api_key`/`futures_private_key`, or `KRAKEN_FUTURES_API_KEY`/
+`KRAKEN_FUTURES_PRIVATE_KEY`) they also trade: orders (`lmt`, `post`, `ioc`, batches,
+in-place edits), positions, the multi-collateral pool, leverage, fees, own fills and
+funding payments, and the WebSocket book and fills feeds.
+
+```python
+async with KrakenMarket.new(futures_api_key=..., futures_private_key=...) as kraken:
+  market = await kraken.perp_market('perp:PF_POPCATUSD')
+  order = await market.place_order(
+    {'type': 'POST_ONLY', 'qty': -1000, 'price': '0.0280'}
+  )
+```
+
+The `kraken_testnet` venue is the Futures demo environment (perpetuals only).
 
 ## Identifiers
 
@@ -56,7 +68,10 @@ inclusive; an omitted start reads all retained rows. The latest period may settl
 - Perpetual candles use bounded requests of 2000 possible opens, preserving aware
   half-open bounds and missing periods. Older availability depends on the market;
   the API is not a complete archive guarantee. Standard fees and maximum order size
-  remain unknown. `next_funding` and Futures streams are unsupported.
+  remain unknown.
+- Perpetual `trades_history` reads REST `fills`, which carry no fee; `trades_stream`
+  fills carry theirs. Isolated-margin buckets (`perp_collateral` of a market with a
+  leverage preference) are not supported.
 - `Wallet.deposit_methods`: `DepositMethods` answers a method name per asset and no
   network field, so there is no network to report.
 - `Earn`: `apr` is the midpoint of Kraken's `low`/`high` estimate and `min_qty` is never

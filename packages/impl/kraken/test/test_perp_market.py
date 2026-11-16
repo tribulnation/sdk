@@ -15,7 +15,7 @@ from typed_kraken.futures.instruments import FuturesInstrument, Instruments
 from typed_kraken.futures.historical_funding_rates import HistoricalFundingRates
 from typed_kraken.schemas import FuturesMarketTicker
 
-from tribulnation.sdk import Context, MarketSDK, NetworkError, accounts
+from tribulnation.sdk import AuthError, Context, MarketSDK, NetworkError, accounts
 from tribulnation.kraken import KrakenMarket
 from tribulnation.kraken.market import SpotExchange
 from tribulnation.kraken.market.impl.mixin import Shared
@@ -75,6 +75,11 @@ def ticker(symbol: str = 'PF_XBTUSD') -> FuturesMarketTicker:
     'fundingRate': 0.15,
     'fundingRatePrediction': 0.16,
   }
+
+
+def funded_ticker(symbol: str = 'PF_XBTUSD') -> FuturesMarketTicker:
+  """A snapshot with the relative (fraction per hour) funding rate too."""
+  return {**ticker(symbol), 'relativeFundingRate': -0.000164465904166667}
 
 
 def response(indices: list[int], *, more: bool = False) -> ChartCandlesResult:
@@ -282,16 +287,12 @@ async def test_unexpected_truncation_is_visible(
     await market.candles('1m', START, START + MINUTE)
 
 
-async def test_unqualified_methods_remain_explicit(market: PerpMarket):
-  """Private APIs, streams and synthesized next funding are not enabled by REST support."""
-  with pytest.raises(NotImplementedError):
-    await market.next_funding()
-  with pytest.raises(NotImplementedError):
-    market.depth_stream()
-  with pytest.raises(NotImplementedError):
-    await market.fees()
-  with pytest.raises(NotImplementedError):
+async def test_private_methods_need_futures_keys(market: PerpMarket):
+  """Without a Futures key pair, account reads fail with `AuthError` before any request."""
+  with pytest.raises(AuthError):
     await market.perp_position()
+  with pytest.raises(AuthError):
+    await market.open_orders()
 
 
 async def test_funding_settlement_conversion_and_inclusive_bounds(
@@ -413,19 +414,14 @@ async def test_root_public_perpetual_helpers(public_futures: AsyncMock):
     public_futures.assert_awaited_once()
 
 
-async def test_venue_perpetual_helpers_preserve_unsupported_methods(
-  public_futures: AsyncMock,
-):
-  """Typed routing reaches the existing method-level public Futures limitations."""
+async def test_venue_perpetual_helpers_route_to_futures(public_futures: AsyncMock):
+  """Typed routing reaches next funding (relative rate) and the keyless private reads."""
   async with KrakenMarket.new(public=True) as venue:
     market_id = 'perp:PF_XBTUSD'
-    with pytest.raises(NotImplementedError, match='no qualified native rate/time'):
+    with pytest.raises(ValueError, match='no relative funding rate'):
       await venue.next_funding(market_id)
-    with pytest.raises(NotImplementedError, match='public market data only'):
-      await venue.funding_payments(market_id, START, START + MINUTE)
-    with pytest.raises(NotImplementedError, match='public market data only'):
-      await venue.perp_position(market_id)
     for id in ('perp', market_id):
-      with pytest.raises(NotImplementedError):
+      with pytest.raises(AuthError):
         await venue.perp_collateral(id)
-    public_futures.assert_awaited_once()
+    with pytest.raises(AuthError):
+      await venue.perp_position(market_id)
