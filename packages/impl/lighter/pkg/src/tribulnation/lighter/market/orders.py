@@ -63,10 +63,13 @@ async def place_order(
 
   With `settings={'lighter': {'replaces': id}}` it modifies that resting order instead
   (`modify_order`). Order transactions sent while another is in flight go together in
-  one `sendTxBatch` (`batching.TxBatcher`).
+  one `sendTxBatch` (`batching.TxBatcher`). `settings={'lighter': {'price_protection':
+  False}}` skips the API's fat-finger check (`21733`) on an order sent alone; a batched
+  one is never checked.
 
   Raises:
-    ValueError: `time_in_force` is set on a `MARKET` or `POST_ONLY` order.
+    ValueError: `time_in_force` is set on a `MARKET` or `POST_ONLY` order, or
+      `price_protection` beside `replaces`.
     OrderRejected: The API refused the transaction with a business code before the
       sequencer saw it (other than `21104` invalid nonce).
     ApiError: The transaction went in a batch that Lighter refused: whether it was
@@ -78,11 +81,16 @@ async def place_order(
     raise ValueError(
       f'Lighter time_in_force applies to LIMIT orders only, not {order["type"]}'
     )
+  price_protection = lighter.get('price_protection')
   if (replaces := lighter.get('replaces')) is not None:
     if time_in_force is not None or lighter.get('reduce_only'):
       raise ValueError(
         "A Lighter modify keeps the order's time-in-force and reduce-only flag: "
         'drop time_in_force and reduce_only beside replaces'
+      )
+    if price_protection is not None:
+      raise ValueError(
+        'price_protection applies to new Lighter orders: drop it beside replaces'
       )
     return await modify_order(shared, market_id, replaces, order)
   shared.require_api_key()
@@ -131,7 +139,9 @@ async def place_order(
   response = await submit(
     shared,
     OrderTx(
-      send=lambda: shared.client.tx.create_order(request),
+      send=lambda: shared.client.tx.create_order(
+        request, price_protection=price_protection
+      ),
       sign=lambda key, nonce: shared.client.signer.create_order(
         request, api_key_index=key, nonce=nonce
       ),

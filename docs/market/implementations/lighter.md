@@ -75,12 +75,13 @@ and the WebSocket stream URL, e.g. to run against a local test server. Unset, th
 
 `depth` and `depth_stream` accept `settings={'lighter': {'depth_source': ...}}`, typed
 by the `Settings` TypedDict (`market/common.py`) alongside the order settings
-`reduce_only` and `replaces`:
+`reduce_only`, `replaces` and `price_protection`:
 
 | Key | Type | Applies to | Meaning |
 | --- | --- | --- | --- |
 | `reduce_only` | `bool` | `place_order` | Place as reduce-only. |
 | `replaces` | `str` | `place_order` | Modify this resting order to the order's price and size with one `L2ModifyOrder` instead of placing a new one. It keeps its id, side, time-in-force and reduce-only flag, so `MARKET`, `time_in_force` and `reduce_only` raise `ValueError` beside it. Unfilled orders only: Lighter doesn't document how a partly filled order's new size counts. A refusal is `BadRequest`, since the order still rests. |
+| `price_protection` | `bool` | `place_order` | `False` skips Lighter's fat-finger check on a new perpetual order (`21733`, "order price flagged as an accidental price"): an ask below `max(mark, best bid) x 0.95`, or a bid above `min(mark, best ask) x 1.05`, is otherwise refused even when the book trades there. The mark-price filter (`21734`) still applies. A batched order (`sendTxBatch`) is never checked. Not with `replaces`. |
 | `depth_source` | `'order_book' \| 'bbo'` | `depth_stream`, `depth` | Which order-book channel to read; defaults to `'order_book'`. |
 
 ### Depth sources

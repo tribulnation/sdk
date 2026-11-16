@@ -35,7 +35,9 @@ class Tx:
 
   error: Exception
 
-  async def create_order(self, request: dict[str, Any]) -> dict[str, Any]:
+  async def create_order(
+    self, request: dict[str, Any], *, price_protection: bool | None = None
+  ) -> dict[str, Any]:
     """Raise the configured error."""
     raise self.error
 
