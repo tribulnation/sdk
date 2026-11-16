@@ -30,6 +30,7 @@ from .types import (
   OrderState,
   Position,
   PerpPosition,
+  PositionHeadroom,
   Trade,
   Rules,
   SpotRules,
@@ -590,6 +591,26 @@ class MarginMarket(Market):
     """
     leverage = await self.leverage(ttl=ttl)
     return (await self.collateral(ttl=ttl)).free_collateral * leverage
+
+  @SDK.method
+  async def position_headroom(
+    self, *, ttl: timedelta | None = None
+  ) -> PositionHeadroom:
+    """Fetch how much more position the venue lets this account open here, per direction.
+
+    Venue limits on the position itself, which free collateral does not lift: e.g.
+    a leverage bracket's notional cap, a margin tier limit, or the market's
+    open-interest cap. An order growing the position past them is refused with
+    `PositionLimitExceeded` (`OpenInterestCapped` for the market-wide cap). Size
+    openings at the smaller of this and `available_notional()`.
+
+    The default reports no limits (`None` both ways): unknown, treated as unlimited.
+    Venues override it where they publish limits.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """
+    return PositionHeadroom()
 
   @SDK.method
   async def delta(self, *, ttl: timedelta | None = None) -> Decimal:

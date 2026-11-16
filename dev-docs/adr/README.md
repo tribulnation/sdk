@@ -82,3 +82,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0057](0057-lighter-batched-order-transactions.md) | Lighter sends waiting order transactions as one `sendTxBatch` | Proposed; implemented, not release-verified |
 | [0058](0058-market-delta-and-hold.md) | Default `delta()` and `hold()` on spot and margin markets | Proposed; builds on 0051; implemented, not release-verified |
 | [0059](0059-replace-orders-and-order-not-found.md) | `replace_order(s)` and `OrderNotFound` | Proposed |
+| [0060](0060-position-headroom-and-limit-refusals.md) | Position headroom, and position-limit refusals as typed errors | Proposed; implemented for Aster and Hyperliquid, not release-verified |

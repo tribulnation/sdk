@@ -367,6 +367,13 @@ class Gateway:
             ttl=msg.ttl
           ),
         )
+      case codec.PositionHeadroomReq():
+        return codec.PositionHeadroomResp(
+          id=msg.id,
+          headroom=await (await self._margin_market(msg.market_id)).position_headroom(
+            ttl=msg.ttl
+          ),
+        )
       case codec.PlaceOrderReq():
         return codec.PlaceOrderResp(
           id=msg.id,

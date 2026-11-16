@@ -31,6 +31,8 @@ from tribulnation.sdk import (
   AuthError,
   RateLimited,
   OrderRejected,
+  PositionLimitExceeded,
+  OpenInterestCapped,
   OrderNotFound,
   LogicError,
 )
@@ -53,6 +55,7 @@ from tribulnation.sdk.market import (
   OrderState,
   Position,
   PerpPosition,
+  PositionHeadroom,
   Collateral,
   PerpCollateral,
   FundingRate,
@@ -152,6 +155,8 @@ EXCEPTIONS: dict[str, type[Exception]] = {
   'AuthError': AuthError,
   'RateLimited': RateLimited,
   'OrderRejected': OrderRejected,
+  'PositionLimitExceeded': PositionLimitExceeded,
+  'OpenInterestCapped': OpenInterestCapped,
   'OrderNotFound': OrderNotFound,
   'LogicError': LogicError,
 }
@@ -216,6 +221,14 @@ class PositionReq(Msg, kw_only=True, tag='position'):
 
 class AvailableNotionalReq(Msg, kw_only=True, tag='available_notional'):
   """Fetch the notional the account can still open on a market."""
+
+  market_id: str
+  ttl: timedelta | None = None
+  """How old a shared answer may be (ISO 8601 duration); null asks the venue afresh."""
+
+
+class PositionHeadroomReq(Msg, kw_only=True, tag='position_headroom'):
+  """Fetch how much more position the venue lets the account open on a margin market."""
 
   market_id: str
   ttl: timedelta | None = None
@@ -510,6 +523,7 @@ CallReq = (
   | TradesHistoryReq
   | PositionReq
   | AvailableNotionalReq
+  | PositionHeadroomReq
   | PlaceOrderReq
   | CancelOrderReq
   | ReplaceOrderReq
@@ -577,6 +591,12 @@ class AvailableNotionalResp(Msg, kw_only=True, tag='available_notional'):
   """Notional the account can still open."""
 
   value: Decimal
+
+
+class PositionHeadroomResp(Msg, kw_only=True, tag='position_headroom'):
+  """Position headroom per direction; null where no limit is known."""
+
+  headroom: PositionHeadroom
 
 
 class PlaceOrderResp(Msg, kw_only=True, tag='place_order'):
@@ -788,6 +808,7 @@ ServerMsg = (
   | TradesHistoryResp
   | PositionResp
   | AvailableNotionalResp
+  | PositionHeadroomResp
   | PlaceOrderResp
   | CancelOrderResp
   | ReplaceOrderResp

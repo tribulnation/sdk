@@ -16,6 +16,7 @@ from .types import (
   OrderState,
   Position,
   PerpPosition,
+  PositionHeadroom,
   PerpStats,
   Ticker,
   Trade,
