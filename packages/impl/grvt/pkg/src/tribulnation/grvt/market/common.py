@@ -1,9 +1,9 @@
-"""Shared base object and the venue-row parsers the market objects share."""
+"""Shared base object, venue settings and the venue-row parsers the market objects share."""
 
 from dataclasses import dataclass
 from decimal import Decimal
 
-from typing_extensions import AsyncContextManager, Iterable
+from typing_extensions import AsyncContextManager, Iterable, Literal, TypedDict
 from typed_grvt.schemas import (
   Candlestick,
   Fill,
@@ -15,6 +15,17 @@ from tribulnation.sdk import SDK
 from tribulnation.sdk.market import Candle, OrderState, Trade
 
 from ..core import Shared, VenueId
+
+
+class Settings(TypedDict, total=False):
+  """GRVT order settings, under `settings['grvt']`."""
+
+  time_in_force: Literal['IMMEDIATE_OR_CANCEL']
+  """Send a `LIMIT` order immediate-or-cancel instead of good-till-time: it fills what
+  it can at the limit price or better and the venue cancels the rest. One that found
+  nothing ends `REJECTED`, reason `IOC_CANCEL` (mainnet, 2026-11-16). `POST_ONLY` and
+  `MARKET` orders raise `ValueError` when it is set."""
+
 
 ACTIVE_STATUSES = frozenset({'PENDING', 'OPEN'})
 """Statuses of an order still live: accepted but not yet processed, or resting."""
