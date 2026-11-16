@@ -190,16 +190,23 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
     )
 
   def kraken(self, account: Kraken, id: str) -> TradingVenue:
+    """Build Kraken's Spot and perpetual Market surface: Spot with the Spot keys, the
+    perpetuals with the Futures keys (public data without them)."""
     try:
       from tribulnation.kraken import KrakenMarket
     except ImportError as e:
       raise ImportError(
         'kraken market is not installed. Please install it with `pip install tribulnation-kraken`.'
       ) from e
+    api_key, private_key = account.resolved_api_key, account.resolved_private_key
     return KrakenMarket.new(
-      account.resolved_api_key,
-      account.resolved_private_key,
-      public=account.public,
+      api_key,
+      private_key,
+      futures_api_key=account.resolved_futures_api_key,
+      futures_private_key=account.resolved_futures_private_key,
+      venue=account.venue,
+      margin_schedule=account.margin_schedule,
+      public=account.public or api_key is None or private_key is None,
       validate=account.validate,
       account_id=id,
     )
@@ -325,7 +332,7 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
         return self.bit2me(account, id)
       case 'bitget':
         return self.bitget(account, id)
-      case 'kraken':
+      case 'kraken' | 'kraken_testnet':
         return self.kraken(account, id)
       case 'kucoin':
         return self.kucoin(account, id)

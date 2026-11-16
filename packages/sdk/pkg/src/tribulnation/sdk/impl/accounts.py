@@ -100,6 +100,7 @@ VenueId = _Literal[
   'bybit',
   'coinbase',
   'kraken',
+  'kraken_testnet',
   'kucoin',
 ]
 """A trading venue, testnets included: the `venue` of a trading account and the
@@ -431,25 +432,69 @@ class Coinbase(VenueAccount):
 
 @_dataclass(frozen=True)
 class Kraken(VenueAccount):
-  venue: _Literal['kraken'] = 'kraken'
+  """Kraken account: Spot keys for Spot, and the separate Futures keys for the
+  perpetuals. `kraken_testnet` is the Futures demo environment (perpetuals only, with
+  its own Futures keys)."""
+
+  venue: _Literal['kraken', 'kraken_testnet'] = 'kraken'
   api_key: str = '$KRAKEN_API_KEY'
   """Kraken API key"""
   private_key: str = '$KRAKEN_PRIVATE_KEY'
   """Kraken private key (the API secret; the client reads `KRAKEN_PRIVATE_KEY`)"""
+  futures_api_key: str | None = None
+  """Futures API key; defaults to the network's `KRAKEN_FUTURES_API_KEY` (or
+  `KRAKEN_FUTURES_TESTNET_API_KEY`) variable. Without one, perpetuals are public only."""
+  futures_private_key: str | None = None
+  """Futures API secret; defaults to the network's `..._PRIVATE_KEY` variable."""
+  margin_schedule: str | None = None
+  """`marginSchedules` platform (e.g. `europa`) whose retail margin sets cross leverage;
+  `None` reads the instrument's `retailMarginLevels`."""
   validate: bool = True
   """Whether to type-validate incoming responses."""
 
   @property
+  def futures_prefix(self) -> str:
+    """The Futures credential variables' prefix, never mixing networks."""
+    return 'KRAKEN_FUTURES' if self.venue == 'kraken' else 'KRAKEN_FUTURES_TESTNET'
+
+  @property
+  def resolved_futures_api_key(self) -> str | None:
+    """The Futures API key; optional."""
+    return resolve_env_var(
+      self.futures_api_key or f'${self.futures_prefix}_API_KEY', require=False
+    )
+
+  @property
+  def resolved_futures_private_key(self) -> str | None:
+    """The Futures API secret; optional."""
+    return resolve_env_var(
+      self.futures_private_key or f'${self.futures_prefix}_PRIVATE_KEY', require=False
+    )
+
+  @property
+  def spot_required(self) -> bool:
+    """Whether Spot keys are required: on the live venue, unless public or the account
+    has Futures keys (a Futures-only account)."""
+    futures = self.resolved_futures_api_key and self.resolved_futures_private_key
+    return self.venue == 'kraken' and not self.public and not futures
+
+  @property
   def resolved_api_key(self) -> str | None:
-    return resolve_env_var(self.api_key, require=not self.public)
+    """The Spot credential; the demo venue has no Spot."""
+    if self.venue == 'kraken':
+      return resolve_env_var(self.api_key, require=self.spot_required)
 
   @property
   def resolved_private_key(self) -> str | None:
-    return resolve_env_var(self.private_key, require=not self.public)
+    """The Spot credential; the demo venue has no Spot."""
+    if self.venue == 'kraken':
+      return resolve_env_var(self.private_key, require=self.spot_required)
 
   def verify_env_vars(self):
     self.resolved_api_key
     self.resolved_private_key
+    self.resolved_futures_api_key
+    self.resolved_futures_private_key
 
 
 @_dataclass(frozen=True)

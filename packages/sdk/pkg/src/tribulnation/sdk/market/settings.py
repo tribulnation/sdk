@@ -5,6 +5,7 @@ if TYPE_CHECKING:
   from tribulnation.dydx.market.impl.mixin import Settings as DydxSettings
   from tribulnation.extended.core import Settings as ExtendedSettings
   from tribulnation.hyperliquid.core.settings import Settings as HyperliquidSettings
+  from tribulnation.kraken.market.impl.perp_account import KrakenSettings
   from tribulnation.lighter.market.common import Settings as LighterSettings
   from tribulnation.margin_trade.core import Settings as MarginTradeSettings
 
@@ -15,6 +16,7 @@ Settings = TypedDict(
     'dydx': 'DydxSettings',
     'extended': 'ExtendedSettings',
     'hyperliquid': 'HyperliquidSettings',
+    'kraken': 'KrakenSettings',
     'lighter': 'LighterSettings',
     'margin-trade': 'MarginTradeSettings',
   },
