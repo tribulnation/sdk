@@ -171,6 +171,11 @@ async with sdk.depth_stream('aster:perp:BTCUSDT', settings={'aster': {'depth_sou
   reversing a position is not modelled. Testnet does not serve
   `remainingOpenableNotionalValue` (HTTP 404), so perpetual `available_notional` fails
   there.
+- Perpetual `position_headroom` is the bracket's room per direction: `maxNotional` less
+  the notional the position holds in that direction, bounded by
+  `remainingOpenableNotionalValue`; free balance is left out (ADR 0060). An order refused
+  for the bracket's cap (`-5018`) raises `PositionLimitExceeded`. It fails on testnet,
+  which does not serve `remainingOpenableNotionalValue`.
 - Spot `balances` total each asset's free plus locked amounts, with the free part as
   `free`; mainnet only, as testnet omits funded balances. Spot and futures wallets are
   separate, so a spot asset's collateral ID is `<account>:spot:<asset>` (`aster:spot:USDT`)

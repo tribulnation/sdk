@@ -18,7 +18,14 @@ from tribulnation.sdk.gateway import codec
 from tribulnation.sdk.impl.accounts import VenueId
 from tribulnation.sdk.gateway.proxy import ProxySDK
 from tribulnation.sdk.gateway.server import Gateway
-from tribulnation.sdk import ApiError, NetworkError, OrderNotFound, OrderRejected
+from tribulnation.sdk import (
+  ApiError,
+  NetworkError,
+  OpenInterestCapped,
+  OrderNotFound,
+  OrderRejected,
+  PositionLimitExceeded,
+)
 from tribulnation.sdk.core import PaginatedResponse, OverflowPolicy
 from tribulnation.sdk.market import (
   Book,
@@ -35,6 +42,7 @@ from tribulnation.sdk.market import (
   PerpMarket,
   PerpPosition,
   Position,
+  PositionHeadroom,
   Rules,
   Settings,
   Trade,
@@ -225,6 +233,12 @@ class MockMarket(PerpMarket):
   async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     self.state.ttls.append(('available_notional', ttl))
     return Decimal('1000')
+
+  async def position_headroom(
+    self, *, ttl: timedelta | None = None
+  ) -> PositionHeadroom:
+    self.state.ttls.append(('position_headroom', ttl))
+    return PositionHeadroom(long=Decimal('250'), short=None)
 
   async def collateral_id(self) -> str:
     return 'mock:perp'
@@ -750,6 +764,36 @@ async def test_order_rejected_survives_gateway(
 
   with pytest.raises(OrderRejected, match='could not immediately match'):
     await market.place_order(order)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize('error', [PositionLimitExceeded, OpenInterestCapped])
+async def test_position_limit_refusals_survive_gateway(
+  sdk: ProxySDK, mock_state: MockState, error: type[OrderRejected]
+) -> None:
+  """A limit refusal keeps its class through the gateway, and is still an `OrderRejected`."""
+  mock_state.place_order_error = error('limit')
+  market = await sdk.perp_market(MARKET_ID)
+  order: Order = {'type': 'MARKET', 'qty': Decimal('1'), 'price': Decimal('100')}
+
+  with pytest.raises(error) as raised:
+    await market.place_order(order)
+
+  assert type(raised.value) is error and isinstance(raised.value, OrderRejected)
+
+
+@pytest.mark.asyncio
+async def test_position_headroom_through_gateway(
+  sdk: ProxySDK, mock_state: MockState
+) -> None:
+  """Headroom crosses the gateway with its unknown direction kept as `None`."""
+  market = await sdk.perp_market(MARKET_ID)
+  ttl = timedelta(seconds=1)
+
+  assert await market.position_headroom(ttl=ttl) == PositionHeadroom(
+    long=Decimal('250'), short=None
+  )
+  assert mock_state.ttls[-1] == ('position_headroom', ttl)
 
 
 @pytest.mark.asyncio

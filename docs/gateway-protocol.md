@@ -115,6 +115,7 @@ requests address a market as `<account_id>:<exchange_id>:<market_id>`, e.g.
 | `trades_history` | `market_id`, `start`, `end` | Fetch the account's fills in a window. |
 | `position` | `market_id`, `ttl`? | Fetch a margin market's position. |
 | `available_notional` | `market_id`, `ttl`? | Fetch the notional the account can still open on a margin market. |
+| `position_headroom` | `market_id`, `ttl`? | Fetch how much more position the venue lets the account open on a margin market, per direction. |
 | `balances` | `market_id`, `ttl`? | Fetch a spot market's base and quote balances. |
 | `collateral_id` | `market_id` | Fetch the collateral ID funding new orders on a margin market. |
 | `place_order` | `market_id`, `order`, `settings`? | Place one order. `order` is `{"type", "qty", "price", "client_order_id"?}`, `type` one of `MARKET`, `LIMIT`, `POST_ONLY`, and a negative `qty` sells. |
@@ -165,6 +166,7 @@ flight is joined. Null or absent asks the venue afresh (ADR 0054).
 | `balances` | `balances`: `SpotBalances` |
 | `collateral_id` | `value`: collateral ID string |
 | `perp_position` | `position`: `PerpPosition` |
+| `position_headroom` | `headroom`: `PositionHeadroom`, `{"long", "short"}`, each a Decimal or `null` when no limit is known |
 | `place_order` | `response`: `OrderResponse` |
 | `replace_order` | `response`: `OrderResponse` |
 | `replace_orders` | `results`: list of `{"response"?, "error"?, "exc"?}`, one per entry in request order: the order now resting, or the entry's error and exception class |
@@ -181,7 +183,7 @@ flight is joined. Null or absent asks the venue afresh (ADR 0054).
 
 `exc` names the SDK exception the gateway caught: `Error`, `NetworkError`,
 `ValidationError`, `ApiError`, `BadRequest`, `AuthError`, `RateLimited`,
-`OrderRejected`, `OrderNotFound`, `LogicError`, `ValueError` or `NotImplementedError`. Clients map any
+`OrderRejected`, `PositionLimitExceeded`, `OpenInterestCapped`, `OrderNotFound`, `LogicError`, `ValueError` or `NotImplementedError`. Clients map any
 other name to a generic error. An `end` without `error` is a clean end of the stream.
 
 ## Examples
