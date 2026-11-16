@@ -10,6 +10,7 @@ import pytest
 
 from tribulnation.sdk import NetworkError, OrderNotFound, OrderRejected
 from tribulnation.sdk.market import Fees, Trade
+from tribulnation.kraken.market.impl.perp_account import leverage_of
 from tribulnation.kraken.market.impl.perp_streams import fold_futures_books
 from tribulnation.kraken.market.perp_exchange import PerpExchange
 from tribulnation.kraken.market.perp_market import PerpMarket, next_hour
@@ -199,3 +200,18 @@ def test_next_hour():
 
   now = datetime(2026, 11, 16, 10, 59, 59, tzinfo=timezone.utc)
   assert next_hour(now) == datetime(2026, 11, 16, 11, tzinfo=timezone.utc)
+
+
+def test_schedule_falls_back_to_retail_levels():
+  """A platform schedule the instrument doesn't publish falls back to its retail levels."""
+  instrument = {
+    'symbol': 'PF_IOTXUSD',
+    'retailMarginLevels': [
+      {'numNonContractUnits': 0, 'initialMargin': 0.1, 'maintenanceMargin': 0.05}
+    ],
+    'marginSchedules': {
+      'dlt': {'retail': [{'initialMargin': 0.5}], 'professional': []}
+    },
+  }
+  assert leverage_of(instrument, [], schedule='europa') == 10  # type: ignore[arg-type]
+  assert leverage_of(instrument, [], schedule='dlt') == 2  # type: ignore[arg-type]
