@@ -121,7 +121,7 @@ class FakeFutures:
       case 'cancelorder':
         return self.answer({'cancelStatus': self.cancel(params['order_id'])})
       case 'batchorder':
-        batch = json.loads(body.removeprefix('json='))['batchOrder']
+        batch = json.loads(dict(parse_qsl(body))['json'])['batchOrder']
         return self.answer({'batchStatus': [self.instruction(i) for i in batch]})
       case 'openorders':
         return self.answer(
