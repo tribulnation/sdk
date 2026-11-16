@@ -7,7 +7,7 @@ auth = false
 kinds = ["spot", "perp"]
 methods = [
   "depth", "depth_stream", "tickers", "rules", "fees", "candles", "perp_stats", "query_order", "open_orders",
-  "trades_history", "trades_stream", "position", "collateral", "available_notional",
+  "trades_history", "trades_stream", "position", "collateral", "available_notional", "remaining_position_limit",
   "index", "next_funding", "funding_rates", "perp_position", "perp_collateral",
 ]
 note = "`spot` and `usdt` support read-only account data; `usdc` exposes public market data only. Classic `coin-classic` futures retired on 2026-09-17; requesting that exchange raises NotImplementedError. UTA `coin` markets are deferred; requesting that exchange raises NotImplementedError (SDK issue #32). The former USDT exchange ID `perp` is now `usdt`, without an alias. Read-only: `place_order`/`cancel_*` raise `NotImplementedError`. `funding_payments` is unsupported on either account mode, since Bitget publishes no closed set of futures ledger types to filter a settlement on. On a Classic account `perp_collateral` and the exchange-level spot `collateral` are unsupported too (the futures wallet reports no margin requirement, the spot wallet no pool). `candles` serves every contract interval on all three exchanges with required aware bounds and half-open opening timestamps. Native response order is preserved, without an ordering guarantee across windows. Perp windows cover 198 opens back to the contract's listing; spot windows cover 999 opens but only reach the venue's recent horizon (about two months of hourly candles), since the spot history endpoint has no paged walk in the typed client yet."
@@ -46,5 +46,5 @@ min_mode = "private"
 [qualification.market.unsupported]
 usdc = [
   "fees", "open_orders", "trades_history", "position", "perp_position", "collateral",
-  "perp_collateral", "available_notional",
+  "perp_collateral", "available_notional", "remaining_position_limit",
 ]

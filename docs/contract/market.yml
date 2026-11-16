@@ -765,6 +765,30 @@ methods:
         okx    -> BTC-USDT
         kraken -> XBTUSDT
 
+  remaining_position_limit:
+    group: Your account data
+    kind: perp
+    public: false
+    example:
+      accountVenues: [hyperliquid]
+      constants:
+        aster: {market_id: 'aster:perp:BTCUSDT', long: "Decimal('4986000.00')", short: "Decimal('5000000.00')"}
+        bitget: {market_id: 'bitget:usdt:BTCUSDT', long: "None", short: "None"}
+        bybit: {market_id: 'bybit:perp:BTCUSDT', long: "None", short: "None"}
+        dydx: {market_id: 'dydx:perp:BTC-USD', long: "None", short: "None"}
+        extended: {market_id: 'extended:perp:BTC-USD', long: "None", short: "None"}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', long: "None", short: "None"}
+        nado: {market_id: 'nado:perp:BTC-PERP', long: "None", short: "None"}
+        risex: {market_id: 'risex:perp:1', long: "None", short: "None"}
+        hyperliquid: {market_id: 'hyperliquid::BTC', long: "Decimal('148600.00')", short: "Decimal('150000.00')"}
+        lighter: {market_id: 'lighter:perp:1', long: "None", short: "None"}
+        margin-trade: {market_id: 'margin-trade:perp:BTC', long: "None", short: "None"}
+      callTemplate: |
+        limit = await sdk.remaining_position_limit('{{ constants[accounts[0]].market_id }}')
+        # Size an opening at the smaller of this and available_notional()
+      resultTemplate: |
+        RemainingPositionLimit(long={{ constants[accounts[0]].long }}, short={{ constants[accounts[0]].short }})
+
   balances:
     group: Your account data
     kind: spot

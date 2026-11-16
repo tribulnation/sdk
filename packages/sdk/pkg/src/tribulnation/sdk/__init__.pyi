@@ -11,6 +11,8 @@ from .core import (
   AuthError,
   RateLimited,
   OrderRejected,
+  PositionLimitExceeded,
+  OpenInterestCapped,
   OrderNotFound,
   LogicError,
 )
@@ -40,6 +42,8 @@ __all__ = [
   'AuthError',
   'RateLimited',
   'OrderRejected',
+  'PositionLimitExceeded',
+  'OpenInterestCapped',
   'OrderNotFound',
   'LogicError',
   'Earn',

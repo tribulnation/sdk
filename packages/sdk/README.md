@@ -105,6 +105,7 @@ Hold a `Market` reference in hot loops; use the scoped one-shot calls otherwise.
   - `perp_position() -> PerpPosition`: includes entry price
   - `position() -> Position`, `collateral() -> PerpCollateral`, `leverage() -> Decimal`
   - `available_notional() -> Decimal`: max. notional you could open now
+  - `remaining_position_limit() -> RemainingPositionLimit`: per direction, how much more the venue's position limits let the position grow (ADR 0062)
   - `collateral_id() -> str`: the money funding new orders, shared with spot on unified accounts
 - `sdk.collateral(id) -> Collateral`: resolves any collateral ID (ADR 0051)
 - Balance, position, collateral, leverage, available-notional, ticker, perpetual-stats and

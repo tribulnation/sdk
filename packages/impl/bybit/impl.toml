@@ -8,11 +8,11 @@ kinds = ["spot", "perp"]
 methods = [
   "depth", "depth_stream", "rules", "fees", "candles", "tickers", "perp_stats",
   "query_order", "open_orders", "trades_history", "trades_stream", "position",
-  "collateral", "available_notional", "place_order", "place_orders", "cancel_order",
+  "collateral", "available_notional", "remaining_position_limit", "place_order", "place_orders", "cancel_order",
   "cancel_orders", "cancel_open_orders", "index", "next_funding", "funding_rates",
   "funding_payments", "perp_position", "perp_collateral",
 ]
-note = "`candles` serves every contract interval on spot and perp, in Bybit's native newest-first pages, filtered to the required `[start, end)` range. Account `leverage` is not implemented."
+note = "`candles` serves every contract interval on spot and perp, in Bybit's native newest-first pages, filtered to the required `[start, end)` range. Account `leverage` is not implemented. `remaining_position_limit` reads no limits and returns None both ways (the SDK default); Bybit's risk limits are not read."
 # Bybit v5 is one API discriminated by `category`, so both exchanges
 # run off one client. `perp` lists linear perpetuals only — the 40 dated `LinearFutures`
 # contracts the same category carries pay no funding and settle on a delivery date, so

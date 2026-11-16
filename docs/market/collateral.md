@@ -145,6 +145,13 @@ Venues without account leverage raise `NotImplementedError` from `leverage()` an
 their own venue-specific `available_notional()`. Neither figure subtracts fees, nor checks a venue's
 notional caps or margin tiers beyond what its leverage already reflects.
 
+Limits on the position itself, which free collateral does not lift (a leverage bracket's
+notional cap, a margin tier, a market's open-interest cap), are `remaining_position_limit()`: per
+direction, the notional a long or short position may still grow by, `None` where the venue
+publishes no limit the SDK reads. Size an opening at the smaller of it and
+`available_notional()`. An order past such a limit raises `PositionLimitExceeded`
+(`OpenInterestCapped` for a market-wide cap), both `OrderRejected` (ADR 0062).
+
 ## Read staleness
 
 `balances`, `balance`, `position`, `perp_position`, `collateral`, `perp_collateral`,

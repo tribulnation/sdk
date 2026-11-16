@@ -114,6 +114,7 @@ dropped).
   On Classic it is unsupported: the futures wallet reports no initial or maintenance
   margin. **`available_notional`** on `usdt` is the free margin times the contract's
   maximum leverage (`available` of the futures wallet on Classic, `effEquity` on UTA).
+  **`remaining_position_limit`** reads no limits and returns `None` both ways (the SDK default, ADR 0062); Bitget's position tiers are not read.
 - **Fees** on trades are reported the SDK's way, positive when charged: Classic signs a
   fee charged negative and is flipped, UTA already agrees. A fill charged in several
   coins reports the first coin only.

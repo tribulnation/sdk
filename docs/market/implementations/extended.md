@@ -89,7 +89,7 @@ market data only.
   requirement is `marginRatio x equity`. `marginRatio` is a fraction rounded up to four
   decimals, so the figure can overstate the requirement by up to `0.0001 x equity`.
   `available_notional` is free collateral times the account's leverage, without the
-  margin schedule's position-value cap.
+  margin schedule's position-value cap. `remaining_position_limit` reads no limits and returns `None` both ways (the SDK default, ADR 0062).
 - Funding settles hourly, on the hour, and the payment is stamped shortly after (45 s
   on testnet). Funding-rate history is positive when longs pay; `funding_payments`, per
   market or exchange-wide, are positive when received, as the venue signs them.

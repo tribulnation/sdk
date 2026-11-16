@@ -310,6 +310,25 @@ class Shared(SDK):
       ttl=ttl,
     )
 
+  async def perps_at_open_interest_cap(
+    self, dex: str | None, *, ttl: timedelta | None
+  ) -> frozenset[str]:
+    """The coins of `dex` at their open-interest cap, shared like `clearinghouse_state`.
+
+    Public and market-wide: no order increasing a position in them is accepted.
+
+    Args:
+      dex: The perpetual dex, None or `''` for the default one.
+      ttl: How old a shared answer may be; `None` asks afresh (see `SharedReads`).
+    """
+    dex = dex or None
+
+    async def read() -> frozenset[str]:
+      """The capped coins as a set."""
+      return frozenset(await self.client.info.perps_at_open_interest_cap(dex))
+
+    return await self.reads.read(('perpsAtOpenInterestCap', dex), read, ttl=ttl)
+
   async def user_abstraction(self) -> UserAbstraction:
     """The account's mode, one request per `ABSTRACTION_TTL` for every caller."""
     address = self.address

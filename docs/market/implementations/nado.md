@@ -25,7 +25,7 @@ signature. Three credential modes, by what the account configures:
 | Method | Public | Address | Private key |
 | --- | --- | --- | --- |
 | Market data | yes | yes | yes |
-| `fees`, `query_order`, `open_orders`, `trades_history`, `trades_stream`, `position`, `collateral`, `balances`, `perp_position`, `perp_collateral`, `leverage`, `available_notional`, `funding_payments` | no | yes | yes |
+| `fees`, `query_order`, `open_orders`, `trades_history`, `trades_stream`, `position`, `collateral`, `balances`, `perp_position`, `perp_collateral`, `leverage`, `available_notional`, `remaining_position_limit`, `funding_payments` | no | yes | yes |
 | `place_order`, `place_orders`, `replace_order`, `cancel_order`, `cancel_orders`, `cancel_open_orders` | no | no | yes |
 
 ```toml
@@ -91,7 +91,8 @@ orders never borrow, and one that would is refused (`2017`).
   the initial health. `leverage` is what the product's initial risk weights allow (cross
   margin has no per-account leverage setting), and `available_notional` free collateral
   times it, which matched the venue's own `max_order_size`. A market holding an isolated
-  position raises `NotImplementedError` from its account reads.
+  position raises `NotImplementedError` from its account reads. `remaining_position_limit`
+  reads no limits and returns `None` both ways (the SDK default, ADR 0062).
 - `rules().fees` are the products' default rates; `fees()` reads the subaccount's
   per-product rates. Nado's fixed sequencer fee is not a rate and is not included.
 - REST `depth` returns at most 100 levels per side. Depth streams apply the `book_depth`

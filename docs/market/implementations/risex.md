@@ -57,6 +57,7 @@ trading is invite-only.
 - Tickers carry only the last price and the 24h quote volume: the venue publishes no
   best bid/ask in its market data, nor a base volume. `perp_stats` open interest is in
   base units.
+- `remaining_position_limit` reads no limits and returns `None` both ways (the SDK default, ADR 0062).
 - `rules().fees` is `None`: the fee schedule is served to logged-in accounts only.
   `fees()` is the account's tier rates, one maker and one taker rate for every market;
   a negative maker rate is a rebate.

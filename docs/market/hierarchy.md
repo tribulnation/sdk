@@ -77,7 +77,7 @@ rules, book = await asyncio.gather(
 **Spot or perpetual?** Every `Market` has books, trades, orders, rules and fees. Account
 reads depend on what it trades: a `SpotMarket` has `balances()` and `collateral_ids()`, a
 margin market (`PerpMarket`) `position()`, `collateral()`, `leverage()`,
-`available_notional()` and `collateral_id()`. So `market.position()` on a plain `Market`
+`available_notional()`, `remaining_position_limit()` and `collateral_id()`. So `market.position()` on a plain `Market`
 fails type checking, and on a spot market at runtime. `is_spot` and `is_perp` narrow the
 type for your type checker; `market.kind` names it:
 
