@@ -31,6 +31,13 @@ class Settings(TypedDict, total=False):
   flag, so `MARKET` orders, `time_in_force` and `reduce_only` raise `ValueError` beside
   it. Lighter doesn't document whether a partly filled order's new size counts from its
   original size or from what's left: modify unfilled orders only."""
+  price_protection: bool
+  """`False` skips Lighter's fat-finger check on a new perpetual order (`21733`, `order
+  price flagged as an accidental price`), which refuses an ask below `max(mark, best bid)
+  x 0.95` and a bid above `min(mark, best ask) x 1.05`, even when the book really trades
+  there. The mark-price filter (`21734`) still applies. Unset or `True` keeps the venue's
+  default for an order sent alone; an order batched with others (`sendTxBatch`) is never
+  checked. Not with `replaces`: a modify takes no such field."""
   depth_source: DepthSource
   """Which channel `depth_stream`/`depth` read. Defaults to `'order_book'`.
 

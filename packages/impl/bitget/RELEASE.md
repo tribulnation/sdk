@@ -10,3 +10,8 @@ New on Unified Trading Accounts (UTA), which used to raise `NotImplementedError`
 Release evidence is now recorded with the UTA account ([ADR 0060](../../../dev-docs/adr/0060-bitget-qualifies-uta.md)).
 
 Every other method is unchanged.
+
+Release qualification on 2026-11-04 passed the read suites and market consistency.
+Committed evidence under `release-evidence/bitget/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
+release follows SDK 4.0.0 publication.

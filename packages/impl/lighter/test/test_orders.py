@@ -29,10 +29,15 @@ class Tx:
 
   requests: list[dict[str, Any]] = field(default_factory=list[dict[str, Any]])
   modifies: list[dict[str, Any]] = field(default_factory=list[dict[str, Any]])
+  protections: list[bool | None] = field(default_factory=list[bool | None])
+  """Each create's `price_protection` argument."""
 
-  async def create_order(self, request: dict[str, Any]) -> dict[str, Any]:
+  async def create_order(
+    self, request: dict[str, Any], *, price_protection: bool | None = None
+  ) -> dict[str, Any]:
     """Record the request."""
     self.requests.append(request)
+    self.protections.append(price_protection)
     return {'code': 200, 'tx_hash': 'ab'}
 
   async def modify_order(self, **request: Any) -> dict[str, Any]:
@@ -174,5 +179,35 @@ async def test_replaces_setting_rejects_flags_a_modify_keeps(lighter: Settings):
   with pytest.raises(ValueError, match='drop time_in_force and reduce_only'):
     await orders.place_order(
       ioc_shared(client), MARKET, order, settings={'lighter': lighter}
+    )
+  assert client.tx.requests == client.tx.modifies == []
+
+
+async def test_price_protection_setting_reaches_send_tx():
+  """`price_protection` goes to `create_order` beside the request, never inside it; unset,
+  the venue's default applies."""
+  client = Client()
+  shared = ioc_shared(client)
+  order: Order = {'qty': '-0.01', 'price': '2400', 'type': 'LIMIT'}
+  ioc: Settings = {'time_in_force': 'immediate-or-cancel'}
+  await orders.place_order(
+    shared, MARKET, order, settings={'lighter': {**ioc, 'price_protection': False}}
+  )
+  await orders.place_order(shared, MARKET, order, settings={'lighter': ioc})
+  unprotected, default = client.tx.requests
+  assert unprotected == default and 'price_protection' not in unprotected
+  assert client.tx.protections == [False, None]
+
+
+async def test_price_protection_setting_rejects_replaces():
+  """A modify takes no `price_protection`: asking raises before anything is sent."""
+  client = Client()
+  order: Order = {'qty': '0.01', 'price': '2500.5', 'type': 'LIMIT'}
+  with pytest.raises(ValueError, match='new Lighter orders'):
+    await orders.place_order(
+      ioc_shared(client),
+      MARKET,
+      order,
+      settings={'lighter': {'replaces': '42', 'price_protection': False}},
     )
   assert client.tx.requests == client.tx.modifies == []

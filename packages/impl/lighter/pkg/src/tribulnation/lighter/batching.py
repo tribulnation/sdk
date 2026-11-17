@@ -11,6 +11,8 @@ from typed_lighter.core.signer.txs.base import SignedTx
 from typed_lighter.schemas import SendTxResponse
 from typed_lighter.tx.batch import SendTxBatchResponse
 
+from .quota import VolumeQuota
+
 BATCH_LIMIT = 15
 """Most transactions per `sendTxBatch`. Lighter takes 50 over HTTP, but advises 15 or
 fewer to stay within its CDN's request size."""
@@ -76,10 +78,12 @@ class TxBatcher:
 
   A batch is signed with consecutive nonces of one key (`tx.reserve_nonces`). Its
   acceptance settles each transaction with its own hash; its failure fails them all
-  (`batch_error`).
+  (`batch_error`). Each acceptance's remaining volume quota goes to `quota`.
   """
 
   client: Lighter
+  quota: VolumeQuota = field(default_factory=VolumeQuota)
+  """The account's remaining volume quota, logged as replies report it."""
   queue: list[Queued] = field(default_factory=list[Queued])
   """Transactions waiting to be sent, oldest first."""
   worker: asyncio.Task[None] | None = None
@@ -125,6 +129,8 @@ class TxBatcher:
     except Exception as e:
       settle_errors(batch, e if len(batch) == 1 else batch_error(e))
     else:
+      if responses:
+        self.quota.record(responses[-1])
       for q, response in zip(batch, responses):
         if not q.result.done():
           q.result.set_result(response)

@@ -1,19 +1,13 @@
-# tribulnation-extended 0.2.0
+# tribulnation-extended 0.3.0
 
-Requires SDK >=3.0.0 (spot and margin market types, collateral IDs and read `ttl`) and typed-extended >=0.2.0. Upgrade the SDK and this adapter together: SDK 3.0 changes the base classes this adapter subclasses, so older adapters do not work with it, and this one does not work with SDK 2.
+Requires SDK >=4.0.0 (`place_orders` results per order, `replace_order(s)` and `OrderNotFound`, [ADR 0059](../../../dev-docs/adr/0059-replace-orders-and-order-not-found.md)) and typed-extended >=0.2.0, unchanged. `replace_order(s)` use the SDK default (cancel, then place); Extended cancels asynchronously, so a cancel of a gone order is not reported as `OrderNotFound`.
 
-`leverage(refetch=...)` becomes `leverage(ttl=...)` ([ADR 0054](../../../dev-docs/adr/0054-caller-chosen-read-staleness.md)). Leverage is no longer cached per market: without a `ttl` each call asks the venue; with one, concurrent and recent callers share one answer. Other account reads accept `ttl` and ignore it.
+New:
 
-`collateral_id()` is the sub-account's one cross pool, `<account>:perp`, on every market
-([ADR 0051](../../../dev-docs/adr/0051-spot-perp-market-types-collateral-ids.md)), and
-`sdk.collateral('<account>:perp')` resolves it to that bucket. The account is unified
-(spot holdings add to equity; spot buy orders reserve from `availableForTrade`), but
-orders spend the pool's `availableForTrade`, not the `USD` spot balance, so the ID names
-the pool. The adapter serves no spot exchange.
+1. Setting `settings['extended'] = {'time_in_force': 'IOC'}`: a `LIMIT` order is sent with `timeInForce` `IOC` (immediate-or-cancel), on order-book and RFQ markets, without an explicit expiry. Set on a `MARKET` or `POST_ONLY` order it raises `ValueError` before signing. Without it, `LIMIT` orders are unchanged.
 
 Every other method is unchanged.
 
-Release qualification on 2026-10-27 passed the read suites and market consistency.
+Release qualification on 2026-11-04 passed the read suites and market consistency.
 Committed evidence under `release-evidence/extended/` matches pinned Catalogue
-`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
-release follows SDK 3.0.0 publication.
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes.

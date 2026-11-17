@@ -35,6 +35,7 @@ from tribulnation.sdk.core import (
 from tribulnation.sdk.market import Book, Trade
 
 from .batching import TxBatcher
+from .quota import VolumeQuota
 
 T = TypeVar('T')
 
@@ -175,7 +176,9 @@ class Shared(SDK):
   @cached_property
   def batcher(self) -> TxBatcher:
     """Send the client's order transactions one request at a time, batching what waits."""
-    return TxBatcher(self.client)
+    return TxBatcher(
+      self.client, quota=VolumeQuota(account=self.account_id or self.venue_id)
+    )
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     """The client root owns every transport; the batcher stops sending first on exit."""

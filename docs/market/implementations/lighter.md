@@ -75,12 +75,13 @@ and the WebSocket stream URL, e.g. to run against a local test server. Unset, th
 
 `depth` and `depth_stream` accept `settings={'lighter': {'depth_source': ...}}`, typed
 by the `Settings` TypedDict (`market/common.py`) alongside the order settings
-`reduce_only` and `replaces`:
+`reduce_only`, `replaces` and `price_protection`:
 
 | Key | Type | Applies to | Meaning |
 | --- | --- | --- | --- |
 | `reduce_only` | `bool` | `place_order` | Place as reduce-only. |
 | `replaces` | `str` | `place_order` | Modify this resting order to the order's price and size with one `L2ModifyOrder` instead of placing a new one. It keeps its id, side, time-in-force and reduce-only flag, so `MARKET`, `time_in_force` and `reduce_only` raise `ValueError` beside it. Unfilled orders only: Lighter doesn't document how a partly filled order's new size counts. A refusal is `BadRequest`, since the order still rests. |
+| `price_protection` | `bool` | `place_order` | `False` skips Lighter's fat-finger check on a new perpetual order (`21733`, "order price flagged as an accidental price"): an ask below `max(mark, best bid) x 0.95`, or a bid above `min(mark, best ask) x 1.05`, is otherwise refused even when the book trades there. The mark-price filter (`21734`) still applies. A batched order (`sendTxBatch`) is never checked. Not with `replaces`. |
 | `depth_source` | `'order_book' \| 'bbo'` | `depth_stream`, `depth` | Which order-book channel to read; defaults to `'order_book'`. |
 
 ### Depth sources
@@ -131,6 +132,13 @@ async with sdk.depth_stream('lighter:perp:1', settings={'lighter': {'depth_sourc
   WebSocket subscription. The connection refuses a second subscription to an open channel,
   so concurrent readers of one snapshot always share one subscription, `ttl=None`
   included; `None` only skips a stored snapshot.
+- Stream subscriptions (`depth_stream`, `trades_stream` and the `market_stats` snapshots)
+  are released when their last consumer leaves, even when that consumer is cancelled
+  mid-release. A subscription the connection still holds without a local reader (a
+  subscribe cancelled or timed out after it was sent, an unsubscribe lost) would make
+  Lighter refuse every later subscribe to the channel with `30003` ("Already
+  Subscribed") until the connection drops; a subscribe refused that way unsubscribes
+  the orphan and subscribes again, starting from a fresh snapshot.
 - `place_order` raises `OrderRejected` when the API refuses the transaction with a
   business code before the sequencer sees it. Code `21104` (invalid nonce), a code-less
   HTTP status and any `5XX` stay `BadRequest`/`ApiError`. An accepted transaction can
@@ -153,6 +161,12 @@ async with sdk.depth_stream('lighter:perp:1', settings={'lighter': {'depth_sourc
   to 15. A lone one goes alone, as before. A batch Lighter refuses raises `ApiError` for
   each of its transactions, never `OrderRejected`: the refusal names no transaction
   ([ADR 0057](https://github.com/tribulnation/sdk/blob/main/dev-docs/adr/0057-lighter-batched-order-transactions.md)).
+- Each order transaction's reply carries a Premium account's remaining volume quota, which
+  the `tribulnation.lighter` loggers log as `Lighter volume quota remaining: <n> (<account>)`:
+  at INFO the first time, then every 10 minutes or once it moved by 500; below 2,000, at
+  WARNING (`..., below 2000)`) as soon as it drops there, then at most once a minute.
+  `tribulnation.lighter.quota` holds these defaults; `Shared.batcher.quota` holds a client's
+  quota and its throttles.
 - Order ids are client order indexes. `query_order` finds inactive orders for 24 hours,
   and misses a just-cancelled order for a few seconds while the venue indexes it.
 - Spot `cancel_open_orders` cancels order by order: the venue's market-scoped cancel-all
