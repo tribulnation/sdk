@@ -25,3 +25,4 @@ pytest-asyncio
 -e packages/impl/grvt/pkg
 -e packages/impl/extended/pkg
 -e packages/impl/nado/pkg
+-e packages/impl/risex/pkg

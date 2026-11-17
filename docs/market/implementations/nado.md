@@ -113,6 +113,6 @@ orders never borrow, and one that would is refused (`2017`).
 
 ---
 
-← [margin.trade Market](margin-trade.md) · **Next:** [Earn](../../earn/index.md) →
+← [margin.trade Market](margin-trade.md) · **Next:** [RISEx Market](risex.md) →
 
 <!-- /next -->

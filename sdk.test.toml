@@ -86,6 +86,12 @@ venue = "margin-trade"
 address = "$MARGIN_TRADE_ADDRESS"
 public = true
 
+# RISEx account reads are public: an address alone serves them (no mainnet key exists).
+[accounts.risex]
+venue = "risex"
+address = "$RISEX_ADDRESS"
+public = true
+
 [accounts.mexc]
 venue = "mexc"
 api_key = "$MEXC_ACCESS_KEY"
@@ -168,3 +174,10 @@ venue = "lighter_testnet"
 venue = "margin-trade-testnet"
 address = "$MARGIN_TRADE_TESTNET_ADDRESS"
 private_key = "$MARGIN_TRADE_TESTNET_AGENT_PRIVATE_KEY"
+
+# RISEx testnet: a faucet-funded account with a registered signer.
+[accounts.risex_testnet]
+venue = "risex_testnet"
+address = "$RISEX_TESTNET_ADDRESS"
+account_key = "$RISEX_TESTNET_ACCOUNT_KEY"
+signer_key = "$RISEX_TESTNET_SIGNER_KEY"

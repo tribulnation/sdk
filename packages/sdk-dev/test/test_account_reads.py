@@ -18,6 +18,7 @@ from tribulnation.sdk.impl.accounts import (
   Hyperliquid,
   Kucoin,
   Lighter,
+  Risex,
 )
 from tribulnation.sdk.market import (
   Balance,
@@ -56,6 +57,9 @@ def clean_env(monkeypatch: pytest.MonkeyPatch):
     'BINANCE_SECRET_KEY',
     'GRVT_API_KEY',
     'GRVT_PRIVATE_KEY',
+    'RISEX_ADDRESS',
+    'RISEX_ACCOUNT_KEY',
+    'RISEX_SIGNER_KEY',
   ):
     monkeypatch.delenv(name, raising=False)
   return monkeypatch
@@ -76,6 +80,21 @@ def test_declared_modes_ignore_the_environment(clean_env: pytest.MonkeyPatch):
   assert account_mode(Lighter(address='$A', public=True), resolve=False) == 'address'
   assert account_mode(Aster(), resolve=False) == 'private'
   assert account_mode(Aster(public=True), resolve=False) == 'public'
+
+
+def test_risex_address_reads_and_keys_trade(clean_env: pytest.MonkeyPatch):
+  """A RISEx address alone serves the public account reads; a key adds logins and
+  signing."""
+  assert account_mode(Risex(address='$A', public=True), resolve=False) == 'address'
+  assert account_mode(Risex(address='0xA'), resolve=False) == 'address'
+  assert account_mode(Risex(), resolve=False) == 'private'
+  assert account_mode(Risex(signer_key='$K', address='$A'), resolve=False) == 'private'
+  assert account_mode(Risex(public=True), resolve=False) == 'public'
+  assert account_mode(Risex(public=True)) == 'public'
+  clean_env.setenv('RISEX_ADDRESS', '0x33de260b080a60217127795f33bFBa7296D5c53c')
+  assert account_mode(Risex(public=True)) == 'address'
+  clean_env.setenv('RISEX_SIGNER_KEY', '0x' + '1' * 64)
+  assert account_mode(Risex()) == 'private'
 
 
 def test_grvt_api_key_reads_as_a_token(clean_env: pytest.MonkeyPatch):

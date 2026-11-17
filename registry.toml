@@ -172,3 +172,12 @@ repo = "https://github.com/tribulnation/sdk"
 path = "packages/impl/nado"
 pypi = "https://pypi.org/project/tribulnation-nado/"
 icon = "https://catalogue.tribulnation.com/icons/platform/nado.svg"
+
+[[venues]]
+slug = "risex"
+name = "RISEx"
+tier = "development"
+repo = "https://github.com/tribulnation/sdk"
+path = "packages/impl/risex"
+pypi = "https://pypi.org/project/tribulnation-risex/"
+icon = "https://catalogue.tribulnation.com/icons/platform/risex.svg"

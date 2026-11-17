@@ -96,6 +96,8 @@ VenueId = _Literal[
   'mexc',
   'nado',
   'nado_testnet',
+  'risex',
+  'risex_testnet',
   'bit2me',
   'bitget',
   'binance',
@@ -879,6 +881,62 @@ class Nado(VenueAccount):
 
 
 @_dataclass(frozen=True)
+class Risex(VenueAccount):
+  """RISEx account, isolated by network. RISEx has no API keys: every account read is
+  public, so the account's `address` alone serves them; a registered `signer_key`
+  also places and cancels orders, and either key logs in for the fee tier. With
+  `public` and none of them, market data only."""
+
+  venue: _Literal['risex', 'risex_testnet'] = 'risex'
+  address: str | None = None
+  """The account's address; defaults to the network's `ADDRESS` variable
+  (`RISEX_ADDRESS`, or `RISEX_TESTNET_ADDRESS`). Optional with an account key, whose
+  address it is."""
+  account_key: str | None = None
+  """The account wallet's private key; defaults to the network's `ACCOUNT_KEY`
+  variable. Optional: it only logs in (fees) and is never used to trade."""
+  signer_key: str | None = None
+  """A registered signer's private key, for orders, cancels and the fills stream;
+  defaults to the network's `SIGNER_KEY` variable. Optional: without it the account
+  only reads."""
+  validate: bool = True
+  """Whether to type-validate incoming responses."""
+
+  @property
+  def prefix(self) -> str:
+    """The credential variables' prefix: `RISEX` on mainnet, `RISEX_TESTNET`."""
+    return 'RISEX' if self.venue == 'risex' else 'RISEX_TESTNET'
+
+  @property
+  def resolved_account_key(self) -> str | None:
+    """The account key, never mixing networks; always optional on its own."""
+    return resolve_env_var(
+      self.account_key or f'${self.prefix}_ACCOUNT_KEY', require=False
+    )
+
+  @property
+  def resolved_signer_key(self) -> str | None:
+    """The signer key, never mixing networks; always optional on its own."""
+    return resolve_env_var(
+      self.signer_key or f'${self.prefix}_SIGNER_KEY', require=False
+    )
+
+  @property
+  def resolved_address(self) -> str | None:
+    """The account's address, never mixing networks; required unless `public` or an
+    account key is configured."""
+    return resolve_env_var(
+      self.address or f'${self.prefix}_ADDRESS',
+      require=not self.public and self.resolved_account_key is None,
+    )
+
+  def verify_env_vars(self):
+    """Fail before constructing clients when a private account has neither an address
+    nor an account key."""
+    self.resolved_address
+
+
+@_dataclass(frozen=True)
 class Evm(BaseAccount):
   Venue = _Literal[
     'ethereum',
@@ -921,6 +979,7 @@ Account = _Annotated[
   | MarginTrade
   | Grvt
   | Nado
+  | Risex
   | Evm,
   _pydantic.Discriminator('venue'),
 ]

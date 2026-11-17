@@ -23,6 +23,7 @@ from .accounts import (
   MarginTrade,
   Mexc,
   Nado,
+  Risex,
   load_accounts,
 )
 
@@ -324,6 +325,24 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       account_id=id,
     )
 
+  def risex(self, account: Risex, id: str) -> TradingVenue:
+    """Build RISEx's perpetual Market surface on one account: an address reads it, a
+    registered signer key also trades, and neither (public) serves market data only."""
+    try:
+      from tribulnation.risex import RisexMarket
+    except ImportError as e:
+      raise ImportError(
+        'risex market is not installed. Please install it with `pip install tribulnation-risex`.'
+      ) from e
+    return RisexMarket.new(
+      network='mainnet' if account.venue == 'risex' else 'testnet',
+      account_key=account.resolved_account_key,
+      signer_key=account.resolved_signer_key,
+      address=account.resolved_address,
+      validate=account.validate,
+      account_id=id,
+    )
+
   def _venue(self, id: str, /) -> TradingVenue:
     if (account := self.accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
@@ -362,6 +381,8 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
         return self.grvt(account, id)
       case 'nado' | 'nado_testnet':
         return self.nado(account, id)
+      case 'risex' | 'risex_testnet':
+        return self.risex(account, id)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 
