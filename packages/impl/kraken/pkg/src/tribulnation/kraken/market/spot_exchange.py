@@ -5,11 +5,16 @@ from typing_extensions import Collection, Mapping, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 
-from tribulnation.sdk.market import Exchange, Settings, Ticker
+from tribulnation.sdk.market import (
+  Balance,
+  Settings,
+  SpotExchange as BaseSpotExchange,
+  Ticker,
+)
 
 from typed_kraken.spot.market_data.ticker import AssetTicker
 
-from .impl import ExchangeMixin
+from .impl import ExchangeMixin, asset_balance
 from .spot_market import SpotMarket
 
 
@@ -35,8 +40,10 @@ def parse_ticker(entry: AssetTicker) -> Ticker:
 
 
 @dataclass(frozen=True, kw_only=True)
-class SpotExchange(ExchangeMixin, Exchange):
-  """Kraken implementation of `Exchange`."""
+class SpotExchange(ExchangeMixin, BaseSpotExchange):
+  """Kraken implementation of `SpotExchange`: every pair trades out of one Spot
+  wallet, whose assets are collateral IDs `<account>:spot:<internal asset id>`
+  (`kraken:spot:ZUSD`, `kraken:spot:KAVA`)."""
 
   @property
   def exchange_id(self) -> str:
@@ -49,6 +56,14 @@ class SpotExchange(ExchangeMixin, Exchange):
   async def market(self, market_id: str, /) -> SpotMarket:
     pairs = await self.shared.load_pairs()
     return SpotMarket(shared=self.shared, meta={'pair': pairs[market_id]})
+
+  async def balance(self, asset: str, /, *, ttl: timedelta | None = None) -> Balance:
+    """One Spot asset's balance by internal id (`ZUSD`, `XXBT`, `KAVA`), from `BalanceEx`.
+
+    Raises:
+      ValueError: No listed pair trades the asset.
+    """
+    return await asset_balance(self.shared, asset, ttl=ttl)
 
   async def tickers(
     self,
