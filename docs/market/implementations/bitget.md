@@ -99,6 +99,11 @@ dropped).
   no symbol filter, so it is narrowed client-side.
 - **`trades_stream`** subscribes to the private `fill` channel: per product line and symbol
   on Classic, one account-wide channel narrowed to the market on UTA.
+  Private channels need a login on their own connection. When Bitget announces a reset
+  (`30033`, "Service upgrade in progress") or answers a private subscribe with `30004`
+  ("User not logged in"), typed-bitget 0.6.1+ closes the private connection, so running
+  private streams raise `NetworkError`, and the next subscribe opens a fresh connection
+  and logs in there (a `30004` subscribe is retried that way, with backoff).
 - SDK 3.0 removed the spot stand-ins from `Market` (ADR 0051); this venue does not map spot `balances` or collateral IDs yet, so the spot `position`, `collateral` and `available_notional` below are the
   adapter's own methods, reachable on its concrete `SpotMarket`/`SpotExchange` only.
 - **`position`** on `spot` is the base-coin balance (available, frozen and locked on
