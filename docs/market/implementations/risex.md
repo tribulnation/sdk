@@ -88,8 +88,7 @@ trading is invite-only.
   set.
 - Funding settles hourly. `next_funding` and the funding in `perp_stats` are the venue's
   estimate of the next rate, positive when longs pay. `funding_payments` are positive
-  when received, unsettled accruals of an open position included; on an account with an
-  open position they currently fail validation (`typed-risex` 0.1.0).
+  when received, unsettled accruals of an open position included.
 - Market data and account reads are verified on mainnet; orders, cancels, fills and the
   fills stream on testnet only.
 
