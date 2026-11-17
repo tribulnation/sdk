@@ -132,6 +132,13 @@ async with sdk.depth_stream('lighter:perp:1', settings={'lighter': {'depth_sourc
   WebSocket subscription. The connection refuses a second subscription to an open channel,
   so concurrent readers of one snapshot always share one subscription, `ttl=None`
   included; `None` only skips a stored snapshot.
+- Stream subscriptions (`depth_stream`, `trades_stream` and the `market_stats` snapshots)
+  are released when their last consumer leaves, even when that consumer is cancelled
+  mid-release. A subscription the connection still holds without a local reader (a
+  subscribe cancelled or timed out after it was sent, an unsubscribe lost) would make
+  Lighter refuse every later subscribe to the channel with `30003` ("Already
+  Subscribed") until the connection drops; a subscribe refused that way unsubscribes
+  the orphan and subscribes again, starting from a fresh snapshot.
 - `place_order` raises `OrderRejected` when the API refuses the transaction with a
   business code before the sequencer sees it. Code `21104` (invalid nonce), a code-less
   HTTP status and any `5XX` stay `BadRequest`/`ApiError`. An accepted transaction can
