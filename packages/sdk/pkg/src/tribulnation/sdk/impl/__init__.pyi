@@ -13,6 +13,7 @@ from .accounts import (
   Lighter,
   MarginTrade,
   Grvt,
+  Nado,
   Evm,
 )
 from .market import MarketSDK
@@ -35,6 +36,7 @@ __all__ = [
   'Lighter',
   'MarginTrade',
   'Grvt',
+  'Nado',
   'Evm',
   'MarketSDK',
   'EarnSDK',

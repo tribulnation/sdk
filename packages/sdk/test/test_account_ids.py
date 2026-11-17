@@ -273,6 +273,8 @@ TRADING_ACCOUNTS: list[accounts.Account] = [
   accounts.MarginTrade(venue='margin-trade-testnet', public=True),
   accounts.Grvt(public=True),
   accounts.Grvt(venue='grvt_testnet', public=True),
+  accounts.Nado(public=True),
+  accounts.Nado(venue='nado_testnet', public=True),
   accounts.Deribit(public=True),
   accounts.Mexc(public=True),
   accounts.Bit2Me(public=True),

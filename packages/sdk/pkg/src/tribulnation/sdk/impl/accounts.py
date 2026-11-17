@@ -94,6 +94,8 @@ VenueId = _Literal[
   'grvt',
   'grvt_testnet',
   'mexc',
+  'nado',
+  'nado_testnet',
   'bit2me',
   'bitget',
   'binance',
@@ -823,6 +825,60 @@ class Extended(VenueAccount):
 
 
 @_dataclass(frozen=True)
+class Nado(VenueAccount):
+  """Nado subaccount, isolated by network. Nado has no API keys: every account read is
+  public, so the owner wallet's `address` alone serves them, and the EIP-712
+  `private_key` (the owner's, or its linked signer's) also places and cancels orders.
+  With `public` and neither, market data only."""
+
+  venue: _Literal['nado', 'nado_testnet'] = 'nado'
+  address: str | None = None
+  """Owner wallet of the subaccount; defaults to the network's `ADDRESS` variable
+  (`NADO_ADDRESS`, or `NADO_TESTNET_ADDRESS`), else to the private key's own address."""
+  private_key: str | None = None
+  """Signing key, for orders; defaults to the network's `PRIVATE_KEY` variable.
+  Optional: without it the account only reads."""
+  subaccount: str | None = None
+  """Subaccount name; defaults to the network's `SUBACCOUNT` variable, else `default`."""
+  validate: bool = True
+  """Whether to type-validate incoming responses."""
+
+  @property
+  def prefix(self) -> str:
+    """The credential variables' prefix: `NADO` on mainnet, `NADO_TESTNET`."""
+    return 'NADO' if self.venue == 'nado' else 'NADO_TESTNET'
+
+  @property
+  def resolved_private_key(self) -> str | None:
+    """The signing key, never mixing networks; always optional on its own."""
+    return resolve_env_var(
+      self.private_key or f'${self.prefix}_PRIVATE_KEY', require=False
+    )
+
+  @property
+  def resolved_address(self) -> str | None:
+    """The owner wallet, never mixing networks; required unless `public` or a private
+    key is configured."""
+    return resolve_env_var(
+      self.address or f'${self.prefix}_ADDRESS',
+      require=not self.public and self.resolved_private_key is None,
+    )
+
+  @property
+  def resolved_subaccount(self) -> str | None:
+    """The subaccount name, never mixing networks; always optional."""
+    return resolve_env_var(
+      self.subaccount or f'${self.prefix}_SUBACCOUNT', require=False
+    )
+
+  def verify_env_vars(self):
+    """Fail before constructing clients when a private account has neither an address
+    nor a private key."""
+    self.resolved_address
+    self.resolved_subaccount
+
+
+@_dataclass(frozen=True)
 class Evm(BaseAccount):
   Venue = _Literal[
     'ethereum',
@@ -864,6 +920,7 @@ Account = _Annotated[
   | Lighter
   | MarginTrade
   | Grvt
+  | Nado
   | Evm,
   _pydantic.Discriminator('venue'),
 ]
