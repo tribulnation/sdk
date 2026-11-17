@@ -15,6 +15,7 @@ from tribulnation.sdk.market import (
   OrderState,
   PerpCollateral,
   PerpPosition,
+  PositionHeadroom,
   Rules,
   Fees,
   Settings,
@@ -41,6 +42,7 @@ from .impl import (
   perp_market_collateral,
   perp_leverage,
   perp_available_notional,
+  perp_position_headroom,
   open_orders,
   place_order,
   cancel_order,
@@ -145,6 +147,12 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
   async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     """Free unified collateral times `leverage()`, for cross and isolated alike."""
     return await perp_available_notional(self, ttl=ttl)
+
+  async def position_headroom(
+    self, *, ttl: timedelta | None = None
+  ) -> PositionHeadroom:
+    """Nothing at the coin's open-interest cap, else the margin tier limit's room (`perp_position_headroom`)."""
+    return await perp_position_headroom(self, ttl=ttl)
 
   def random_client_order_id(self) -> str:
     """Generate a `cloid`: `0x` and 128 random bits as 32 hex digits."""

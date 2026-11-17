@@ -65,6 +65,9 @@
           "$ref": "#/$defs/AvailableNotionalReq"
         },
         {
+          "$ref": "#/$defs/PositionHeadroomReq"
+        },
+        {
           "$ref": "#/$defs/PlaceOrderReq"
         },
         {
@@ -145,6 +148,7 @@
           "trades_history": "#/$defs/TradesHistoryReq",
           "position": "#/$defs/PositionReq",
           "available_notional": "#/$defs/AvailableNotionalReq",
+          "position_headroom": "#/$defs/PositionHeadroomReq",
           "place_order": "#/$defs/PlaceOrderReq",
           "cancel_order": "#/$defs/CancelOrderReq",
           "replace_order": "#/$defs/ReplaceOrderReq",
@@ -208,6 +212,9 @@
         },
         {
           "$ref": "#/$defs/AvailableNotionalResp"
+        },
+        {
+          "$ref": "#/$defs/PositionHeadroomResp"
         },
         {
           "$ref": "#/$defs/PlaceOrderResp"
@@ -295,6 +302,7 @@
           "trades_history": "#/$defs/TradesHistoryResp",
           "position": "#/$defs/PositionResp",
           "available_notional": "#/$defs/AvailableNotionalResp",
+          "position_headroom": "#/$defs/PositionHeadroomResp",
           "place_order": "#/$defs/PlaceOrderResp",
           "cancel_order": "#/$defs/CancelOrderResp",
           "replace_order": "#/$defs/ReplaceOrderResp",
@@ -904,6 +912,41 @@
         "tag": {
           "enum": [
             "available_notional"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "market_id": {
+          "type": "string"
+        },
+        "ttl": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "duration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "tag",
+        "id",
+        "market_id"
+      ]
+    },
+    "PositionHeadroomReq": {
+      "title": "PositionHeadroomReq",
+      "description": "Fetch how much more position the venue lets the account open on a margin market.",
+      "type": "object",
+      "properties": {
+        "tag": {
+          "enum": [
+            "position_headroom"
           ]
         },
         "id": {
@@ -2462,6 +2505,61 @@
         "id",
         "value"
       ]
+    },
+    "PositionHeadroomResp": {
+      "title": "PositionHeadroomResp",
+      "description": "Position headroom per direction; null where no limit is known.",
+      "type": "object",
+      "properties": {
+        "tag": {
+          "enum": [
+            "position_headroom"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "headroom": {
+          "$ref": "#/$defs/PositionHeadroom"
+        }
+      },
+      "required": [
+        "tag",
+        "id",
+        "headroom"
+      ]
+    },
+    "PositionHeadroom": {
+      "title": "PositionHeadroom",
+      "description": "How much more position the venue lets the account open on a market, per direction.\n\n  Notional in quote units, at the venue's mark price: how far a long (or short)\n  position may still grow, beyond closing whatever is open in the other direction.\n  Closing is never limited. `None` means the venue publishes no limit the SDK reads:\n  unknown, treated as unlimited. Free collateral is a separate bound\n  (`available_notional`, `Collateral.free_collateral`).",
+      "type": "object",
+      "properties": {
+        "long": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "short": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": []
     },
     "PlaceOrderResp": {
       "title": "PlaceOrderResp",
