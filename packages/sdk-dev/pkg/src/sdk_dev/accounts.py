@@ -34,6 +34,15 @@ CREDENTIAL_OVERRIDES = {
     'api_key': '$GRVT_API_KEY',
     'private_key': '$GRVT_PRIVATE_KEY',
   },
+  'nado': {
+    'address': '$NADO_ADDRESS',
+    'private_key': '$NADO_PRIVATE_KEY',
+  },
+  'risex': {
+    'address': '$RISEX_ADDRESS',
+    'account_key': '$RISEX_ACCOUNT_KEY',
+    'signer_key': '$RISEX_SIGNER_KEY',
+  },
   'extended': {
     'api_key': '$EXTENDED_API_KEY',
     'stark_private_key': '$EXTENDED_STARK_PRIVATE_KEY',
@@ -77,6 +86,8 @@ def generate_accounts_toml(*, public: bool = False) -> dict[str, str]:
     Lighter,
     MarginTrade,
     Mexc,
+    Nado,
+    Risex,
   )
 
   classes: dict[str, type[BaseAccount]] = {
@@ -95,6 +106,8 @@ def generate_accounts_toml(*, public: bool = False) -> dict[str, str]:
     'lighter': Lighter,
     'margin-trade': MarginTrade,
     'grvt': Grvt,
+    'nado': Nado,
+    'risex': Risex,
     'extended': Extended,
     'deribit': Deribit,
   }

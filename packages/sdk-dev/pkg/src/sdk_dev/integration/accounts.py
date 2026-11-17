@@ -17,6 +17,8 @@ from tribulnation.sdk.impl.accounts import (
   Hyperliquid,
   Lighter,
   MarginTrade,
+  Nado,
+  Risex,
 )
 from sdk_dev.repo import IMPL_DIR, repo_root
 from sdk_dev.support import AccountMode, ImplSurfaceSupport, load_impl_files, mainnet_of
@@ -143,6 +145,28 @@ def account_mode(account: Account, *, resolve: bool = True) -> AccountMode:
     if not keyed:
       return 'public'
     return 'private' if configured(account, 'private_key', resolve=resolve) else 'token'
+  if isinstance(account, Nado):
+    # Nado's reads are public: an address alone serves every account read (ADR 0042's
+    # address mode), and the private key, whose address is the default, adds trading.
+    if not account.public and not resolve:
+      return 'private' if account.private_key or not account.address else 'address'
+    if configured(account, 'private_key', resolve=resolve):
+      return 'private'
+    if configured(account, 'address', resolve=resolve):
+      return 'address'
+    return 'public'
+  if isinstance(account, Risex):
+    # RISEx's account reads are public: an address alone serves them (ADR 0042's
+    # address mode). A key adds the JWT reads (`fees`), the signer key trading.
+    keys = ('account_key', 'signer_key')
+    if not account.public and not resolve:
+      keyed = any(getattr(account, k) for k in keys) or not account.address
+      return 'private' if keyed else 'address'
+    if any(configured(account, k, resolve=resolve) for k in keys):
+      return 'private'
+    if configured(account, 'address', resolve=resolve):
+      return 'address'
+    return 'public'
   if isinstance(account, Aster):
     if not account.public and not resolve:
       return 'private'
@@ -187,6 +211,14 @@ def require_report_credentials(account: Account):
       owner = None
     if owner is None:
       pytest.skip('Report checks require a configured address or account index')
+    return
+  if isinstance(account, Risex):
+    try:
+      owner = account.resolved_address or account.resolved_account_key
+    except ValueError:
+      owner = None
+    if owner is None:
+      pytest.skip('Report checks require a configured address or account key')
     return
   if isinstance(account, MarginTrade):
     try:

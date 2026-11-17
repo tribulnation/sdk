@@ -33,6 +33,10 @@ class CandleCase:
   page: int | None
   """Candles per page the implementation yields, so the long window can be sized to
   straddle two of them."""
+  unordered_ohlc: bool = False
+  """The venue's own candles may put `open` or `close` outside `[low, high]`, an
+  accepted upstream limitation passed through unmodified (ADR 0061, RISEx only). Every
+  other candle value check still applies, `low <= high` included."""
 
 
 CASES: Mapping[str, Sequence[CandleCase]] = {
@@ -98,6 +102,17 @@ CASES: Mapping[str, Sequence[CandleCase]] = {
     CandleCase(market_id='perp:BTC_USDT_Perp', page=1000),
     CandleCase(market_id='spot:GRVT_USDT_SpotSwap', page=None),
   ],
+  # Product symbols are the same on mainnet and testnet; a walk asks for 500 per page.
+  # KBTC trades too rarely for 500 hourly candles to fit the window: hours without a
+  # trade have no candle, so one page reaches back months.
+  'nado': [
+    CandleCase(market_id='perp:BTC-PERP', page=500),
+    CandleCase(market_id='spot:KBTC', page=None),
+  ],
+  # Market ids are the same on mainnet and testnet. One request serves up to 10,000
+  # opens, so the hourly window fits one page. Some native candles break OHLC ordering
+  # (ADR 0061).
+  'risex': [CandleCase(market_id='perp:1', page=None, unordered_ohlc=True)],
   # Testnet serves thousands of candles per response, so one page cannot straddle two.
   'lighter_testnet': [
     CandleCase(market_id='perp:4096', page=None),

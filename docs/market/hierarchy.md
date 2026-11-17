@@ -123,7 +123,8 @@ methods across all subaccounts of the configured address, for both `perp` and
 `perp.<N>` exchange objects; selecting one market still includes every subaccount.
 Aster also supports exchange-wide perpetual funding payments. Lighter, GRVT and
 Extended support exchange-wide trades and perpetual funding payments; GRVT's trades
-are exchange-wide on its spot exchange too. Other implementations raise `NotImplementedError` where exchange-wide reads are
+are exchange-wide on its spot exchange too. Nado supports exchange-wide trades on both
+exchanges and perpetual funding payments. Other implementations raise `NotImplementedError` where exchange-wide reads are
 unsupported; consult their support declarations for method coverage.
 
 These reads use native account feeds, with their retention and pagination limits.

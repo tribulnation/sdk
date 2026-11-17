@@ -40,6 +40,6 @@ for account, sdk in earn.all.items():
 
 ---
 
-← [margin.trade Market](../market/implementations/margin-trade.md) · **Next:** [Methods](methods.md) →
+← [RISEx Market](../market/implementations/risex.md) · **Next:** [Methods](methods.md) →
 
 <!-- /next -->

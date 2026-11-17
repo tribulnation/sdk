@@ -1932,7 +1932,11 @@
             "lighter_testnet",
             "margin-trade",
             "margin-trade-testnet",
-            "mexc"
+            "mexc",
+            "nado",
+            "nado_testnet",
+            "risex",
+            "risex_testnet"
           ]
         }
       },
@@ -3180,7 +3184,11 @@
             "lighter_testnet",
             "margin-trade",
             "margin-trade-testnet",
-            "mexc"
+            "mexc",
+            "nado",
+            "nado_testnet",
+            "risex",
+            "risex_testnet"
           ]
         }
       },
