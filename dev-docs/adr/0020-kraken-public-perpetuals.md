@@ -2,7 +2,9 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: accepted; implementation and release qualification are separate.
+1. Status: accepted; implementation and release qualification are separate. Decision 3's
+   unsupported private Futures methods and trading, and decision 6, amended by
+   [0065](0065-kraken-futures-and-spot-trading.md) (proposed).
 2. Date: 2026-09-19
 
 ## Context

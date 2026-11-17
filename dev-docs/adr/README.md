@@ -42,7 +42,7 @@ not a changelog or a substitute for API documentation and tests.
 | [0017](0017-venue-resource-policies.md) | Venue-owned resource policies without whole-lifecycle middleware | Accepted |
 | [0018](0018-retire-bitget-classic-coin.md) | Retire confirmed Bitget Classic coin markets while preserving historical IDs | Accepted; amends 0008 and 0010 |
 | [0019](0019-kucoin-public-market.md) | KuCoin public spot and linear perpetual data with native identities and base units | Accepted |
-| [0020](0020-kraken-public-perpetuals.md) | Kraken public linear perpetual data with native identities and hourly funding settlement conversion | Accepted |
+| [0020](0020-kraken-public-perpetuals.md) | Kraken public linear perpetual data with native identities and hourly funding settlement conversion | Accepted; amended by 0065 (proposed) |
 | [0021](0021-deribit-public-market.md) | Deribit public spot and linear perpetuals with explicit candle and funding limits | Accepted |
 | [0022](0022-bit2me-one-sided-ticker-limitation.md) | Extend the Bit2Me native ticker limitation to stable one-sided books | Accepted; amends 0014; amended by 0048 |
 | [0023](0023-ticker-quote-volume.md) | Native 24-hour quote volume in tickers | Accepted |
@@ -86,3 +86,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0061](0061-risex-unordered-native-candles.md) | RISEx native candles pass through unordered, as an accepted venue limitation | Accepted; implemented, not release-verified |
 | [0062](0062-remaining-position-limit-and-limit-refusals.md) | Remaining position limit, and position-limit refusals as typed errors | Proposed; implemented for Aster, Hyperliquid, Extended, GRVT, RISEx, Lighter and Nado, not release-verified |
 | [0064](0064-bitget-uta-perpetual-trading.md) | Bitget trades USDT-margined perpetuals on a Unified Trading Account | Proposed; builds on 0043 and 0060; implemented, not release-verified |
+| [0065](0065-kraken-futures-and-spot-trading.md) | Kraken Futures and Spot trading | Proposed; implemented, not release-verified; amends 0020 |
