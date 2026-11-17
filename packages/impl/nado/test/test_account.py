@@ -250,3 +250,24 @@ async def test_report_moves_unsettled_perp_cash_into_usdt0(fake: Any):
     Decimal('0.01'),
     Decimal(60000),
   )
+
+
+async def test_report_counts_a_closed_positions_unsettled_quote(fake: Any):
+  """A flat perpetual whose `v_quote_balance` is not yet settled is USDT0 cash."""
+  from .conftest import shared_of
+
+  shared = shared_of(fake)
+  serve(
+    fake,
+    info(initial='1', maintenance='1', unweighted='1', usdt0='10', v_quote='-0.08'),
+  )
+
+  async def subaccounts(*, address: str) -> Any:
+    rows: list[Any] = [
+      {'subaccount': SENDER, 'subaccount_name': 'default', 'isolated': False}
+    ]
+    return {'subaccounts': rows}
+
+  fake.archive.subaccounts = subaccounts
+  [sub] = (await Report(shared=shared).snapshot()).snapshot.subaccounts
+  assert sub.balances == {'USDT0': Decimal('9.92')} and sub.positions == {}

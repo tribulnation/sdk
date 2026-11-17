@@ -56,9 +56,10 @@ def client_id(order: Order) -> int | None:
   return value
 
 
-def nado_order(order: Order) -> NadoOrder:
+def nado_order(order: Order, settings: Settings = {}) -> NadoOrder:
   """The signed order struct for an SDK order: a limit at `price`, expiring with
-  `GTC_EXPIRATION`, with the appendix of its type.
+  `GTC_EXPIRATION`, with the appendix of its type (reduce-only under
+  `{'nado': {'reduce_only': True}}`).
 
   Raises:
     ValueError: The quantity is zero or not finite, or the price is not positive.
@@ -73,7 +74,10 @@ def nado_order(order: Order) -> NadoOrder:
     'priceX18': to_x18(price),
     'amount': to_x18(qty),
     'expiration': GTC_EXPIRATION,
-    'appendix': order_appendix(ORDER_TYPES[order['type']]),
+    'appendix': order_appendix(
+      ORDER_TYPES[order['type']],
+      reduce_only=settings.get('nado', {}).get('reduce_only', False),
+    ),
   }
 
 
@@ -83,7 +87,7 @@ def place_request(
   """One `place_orders`/`cancel_and_place` entry for an SDK order."""
   request: PlaceOrderRequest = {
     'product_id': symbol['product_id'],
-    'order': nado_order(order),
+    'order': nado_order(order, settings),
   }
   if (borrow := spot_leverage(symbol, settings)) is not None:
     request['spot_leverage'] = borrow

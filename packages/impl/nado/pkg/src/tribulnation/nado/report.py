@@ -103,7 +103,9 @@ class Report(SDKReport):
     A position's value is `amount * price + v_quote_balance`; of it,
     `amount * (price - entry)` is the position's unrealized PnL, so the rest,
     `v_quote_balance + amount * entry` (funding and realized PnL not yet settled into
-    USDT0), is added to the USDT0 balance.
+    USDT0), is added to the USDT0 balance. A position just closed keeps its
+    `v_quote_balance` until the venue settles it (seconds, after a mainnet round trip on
+    2026-11-17), and it is added the same way.
 
     Raises:
       NotImplementedError: A position has no open window in the archive to read its
@@ -124,6 +126,10 @@ class Report(SDKReport):
       for b in info['perp_balances']
       if int(b['balance']['amount'])
     }
+    for b in info['perp_balances']:
+      if not int(b['balance']['amount']) and int(b['balance']['v_quote_balance']):
+        settling = x18(b['balance']['v_quote_balance'])
+        balances[QUOTE_ASSET] = balances.get(QUOTE_ASSET, Decimal(0)) + settling
     positions: dict[str, Position] = {}
     if open_perps:
       entries = await self.entry_prices(sender, list(open_perps))

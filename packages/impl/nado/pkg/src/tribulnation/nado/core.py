@@ -45,6 +45,9 @@ class Settings(TypedDict, total=False):
   spot_leverage: bool
   """Let a spot order borrow against the account's margin (the venue's
   `spot_leverage`). Spot orders never borrow without it; perpetual orders ignore it."""
+  reduce_only: bool
+  """Only ever reduce the position (the appendix's reduce-only bit): an order that would
+  open or grow one is refused, or cut to what closes it."""
 
 
 X18 = Decimal(10) ** 18

@@ -247,3 +247,12 @@ async def test_query_order_falls_back_to_the_archive(shared: Shared, fake: Any):
   assert o is not None and not o.active and o.filled_qty == Decimal('0.00315')
   archived.clear()
   assert await btc(shared).query_order(DIGEST) is None
+
+
+def test_reduce_only_sets_the_appendix_bit():
+  """`{'nado': {'reduce_only': True}}` sets bit 11 of the appendix."""
+  o = nado_order(
+    {'type': 'MARKET', 'qty': '-0.00155', 'price': '60000'},
+    {'nado': {'reduce_only': True}},
+  )
+  assert o['appendix'] == 1 | 1 << 9 | 1 << 11

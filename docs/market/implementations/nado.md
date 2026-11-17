@@ -63,6 +63,7 @@ mode raise `AuthError` naming what is missing. `validate` toggles response valid
 
 `settings={'nado': {'spot_leverage': True}}` lets a spot order borrow; without it spot
 orders never borrow, and one that would is refused (`2017`).
+`settings={'nado': {'reduce_only': True}}` makes an order reduce-only.
 
 ## Venue-specific semantics
 
@@ -101,8 +102,12 @@ orders never borrow, and one that would is refused (`2017`).
 - Funding settles hourly. Nado quotes funding as a 24-hour rate; `next_funding`,
   `perp_stats` funding and `funding_rates` are per hourly settlement, positive when
   longs pay. Funding payments are positive when received.
-- Public and account reads, and the order lifecycle with post-only orders that could not
-  fill, are verified on mainnet. No order has filled through the SDK yet.
+- A closed position's PnL reaches the USDT0 balance a few seconds later, when Nado
+  settles it; until then USDT0's `free` (capped at the initial health) already reflects
+  it, and `Report` counts it.
+- Public and account reads, the order lifecycle with post-only orders that could not
+  fill, and one taker round trip on BTC-PERP (a `MARKET` buy and a reduce-only `MARKET`
+  sell, costing exactly the two taker fees and the spread) are verified on mainnet.
 
 <!-- next -->
 

@@ -459,11 +459,11 @@ await signer.gateway.place_order(
 # | `rules` | verified | |
 # | `fees` | verified | |
 # | `candles` | verified | no quote volume or trade count |
-# | `query_order` | verified | resting order through the implementation; the archive path is empty (no fill yet) |
+# | `query_order` | verified | resting order from the book; both filled round-trip orders from the archive (through the implementation) |
 # | `open_orders` | verified | through the implementation, with a resting post-only order |
-# | `trades_history` | empty | the account has never filled; the price formula checked against recorded BTC-PERP fills |
-# | `trades_stream` | empty | subscribed through the implementation; no fill |
-# | `perp_position` | empty | flat account; entry price from the archive's open position window |
+# | `trades_history` | verified | the round trip's two fills, prices 64207 and 64202 from the formula, fees in USDT0 |
+# | `trades_stream` | verified | the round trip's buy fill arrived at once, through the implementation |
+# | `perp_position` | verified | 0.00165 at 64207 while open, flat after (through the implementation) |
 # | `perp_collateral` | verified | |
 # | `leverage` | verified | BTC-PERP 50x; `available_notional` equals the venue's `max_order_size` notional for a buy below the oracle (above it, the venue also charges the immediate loss) |
 # | `available_notional` | verified | |
@@ -472,8 +472,8 @@ await signer.gateway.place_order(
 # | `next_funding` | verified | |
 # | `perp_stats` | verified | |
 # | `funding_rates` | verified | |
-# | `funding_payments` | empty | no position has ever been held |
-# | `place_order` | verified | POST_ONLY and LIMIT rested and were cancelled (mainnet, through the implementation); MARKET's refusal path (`2056`); a fill not attempted: needs Alex's OK for a taker round trip |
+# | `funding_payments` | empty | the round trip held its position for 5 seconds, crossing no settlement |
+# | `place_order` | verified | POST_ONLY and LIMIT rested and were cancelled (mainnet, through the implementation); MARKET's refusal path (`2056`); one taker round trip (MARKET buy, reduce-only MARKET sell) cost 0.082419 USDT0, the two fees and the spread |
 # | `place_orders` | verified | a valid batch rested; a batch with one invalid order was refused whole |
 # | `cancel_order` | verified | a second cancel raises `OrderNotFound` |
 # | `cancel_orders` | verified | |
