@@ -13,7 +13,7 @@ from tribulnation.sdk.core import BadRequest, OrderRejected
 from tribulnation.sdk.market import Order, OrderResponse, OrderState
 
 from ..core import Shared, random_client_order_id
-from .common import parse_order, scope
+from .common import Settings, parse_order, scope
 
 NOT_FOUND = 1004
 """`Data Not Found`: an order lookup by an unknown client order id."""
@@ -44,16 +44,25 @@ def refused(exc: BadRequest) -> bool:
   )
 
 
-def new_order(instrument: str, order: Order, client_order_id: str) -> NewOrder:
+def new_order(
+  instrument: str, order: Order, client_order_id: str, settings: Settings = {}
+) -> NewOrder:
   """The venue order for an SDK order.
 
   `MARKET` is the venue's market order, immediate-or-cancel: the venue refuses a market
   order with a limit price (`2020`), so the SDK `price` is not sent. `LIMIT` and
-  `POST_ONLY` rest good-till-time, expiring with their signature (`core.ORDER_TTL`).
+  `POST_ONLY` rest good-till-time, expiring with their signature (`core.ORDER_TTL`);
+  `settings['time_in_force']` sends a `LIMIT` immediate-or-cancel instead.
 
   Raises:
-    ValueError: The quantity is zero or not finite, or a limit price is not positive.
+    ValueError: The quantity is zero or not finite, a limit price is not positive, or
+      `time_in_force` is set on a `MARKET` or `POST_ONLY` order.
   """
+  time_in_force = settings.get('time_in_force')
+  if time_in_force is not None and order['type'] != 'LIMIT':
+    raise ValueError(
+      f'GRVT time_in_force applies to LIMIT orders only, not {order["type"]}'
+    )
   qty = Decimal(str(order['qty']))
   if not qty.is_finite() or not qty:
     raise ValueError('Order quantity must be finite and nonzero')
@@ -71,7 +80,7 @@ def new_order(instrument: str, order: Order, client_order_id: str) -> NewOrder:
   if not price.is_finite() or price <= 0:
     raise ValueError('Limit price must be finite and positive')
   limit: LimitOrder = {
-    'time_in_force': 'GOOD_TILL_TIME',
+    'time_in_force': time_in_force or 'GOOD_TILL_TIME',
     'post_only': order['type'] == 'POST_ONLY',
     'metadata': {'client_order_id': client_order_id},
     'legs': [
@@ -86,22 +95,26 @@ def new_order(instrument: str, order: Order, client_order_id: str) -> NewOrder:
   return limit
 
 
-async def place_order(shared: Shared, instrument: str, order: Order) -> OrderResponse:
+async def place_order(
+  shared: Shared, instrument: str, order: Order, settings: Settings = {}
+) -> OrderResponse:
   """Sign and send a single-leg order; its client order id is the SDK id.
 
   The caller's `client_order_id` is sent unchanged (GRVT takes integers, and reserves
   `[2^63, 2^64)` for API clients), else a fresh one in that range is used. The reply is
   the order as accepted (`PENDING`, nothing filled yet): a refusal after acceptance,
   such as a post-only order that would cross or a margin check, only shows as a
-  `REJECTED` state.
+  `REJECTED` state, as does an immediate-or-cancel `LIMIT` that found nothing at its
+  price (reason `IOC_CANCEL`).
 
   Raises:
     AuthError: The client has no private key to sign with.
+    ValueError: `time_in_force` is set on a `MARKET` or `POST_ONLY` order.
     OrderRejected: The venue refused the order before accepting it.
   """
   shared.require_signer()
   client_order_id = order.get('client_order_id') or random_client_order_id()
-  new = new_order(instrument, order, client_order_id)
+  new = new_order(instrument, order, client_order_id, settings)
   try:
     reply = await shared.call(lambda: shared.client.trading.create_order(new))
   except BadRequest as exc:

@@ -86,6 +86,60 @@ def test_limit_orders_rest_good_till_time(kind: Any, post_only: bool):
   }
 
 
+def test_limit_orders_can_be_immediate_or_cancel():
+  """`time_in_force` sends a `LIMIT` immediate-or-cancel, with its limit price."""
+  new = new_order(
+    BTC,
+    {'type': 'LIMIT', 'qty': '-0.002', 'price': '49100.0'},
+    ID,
+    {'time_in_force': 'IMMEDIATE_OR_CANCEL'},
+  )
+  assert new == {
+    'time_in_force': 'IMMEDIATE_OR_CANCEL',
+    'post_only': False,
+    'metadata': {'client_order_id': ID},
+    'legs': [
+      {
+        'instrument': BTC,
+        'size': Decimal('0.002'),
+        'limit_price': Decimal('49100.0'),
+        'is_buying_asset': False,
+      }
+    ],
+  }
+
+
+@pytest.mark.parametrize('kind', ['MARKET', 'POST_ONLY'])
+def test_time_in_force_is_for_limit_orders_only(kind: Any):
+  """A market order is already immediate-or-cancel, and a post-only one must rest."""
+  with pytest.raises(ValueError):
+    new_order(
+      BTC,
+      {'type': kind, 'qty': 1, 'price': 2},
+      ID,
+      {'time_in_force': 'IMMEDIATE_OR_CANCEL'},
+    )
+
+
+async def test_place_order_reads_its_venue_settings(shared: Shared, fake: Any):
+  """`place_order` reads `settings['grvt']` and ignores other venues' keys."""
+  sent: list[Any] = []
+
+  async def create_order(new: Any) -> Any:
+    """Accept, pending."""
+    sent.append(new)
+    return {**order('PENDING'), 'order_id': '0x00'}
+
+  fake.trading.create_order = create_order
+  btc = market(shared)
+  limit: Any = {'type': 'LIMIT', 'qty': 1, 'price': 2}
+  await btc.place_order(
+    limit, settings={'grvt': {'time_in_force': 'IMMEDIATE_OR_CANCEL'}}
+  )
+  await btc.place_order(limit, settings={'aster': {'time_in_force': 'IOC'}})
+  assert [s['time_in_force'] for s in sent] == ['IMMEDIATE_OR_CANCEL', 'GOOD_TILL_TIME']
+
+
 @pytest.mark.parametrize(
   'bad', [{'qty': 0, 'price': 1}, {'qty': 'NaN', 'price': 1}, {'qty': 1, 'price': 0}]
 )

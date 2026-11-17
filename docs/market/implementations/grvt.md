@@ -62,7 +62,14 @@ toggles response validation.
   its futures wallet). Spot collateral IDs are `<account>:spot:<asset>`, the wallet's
   balance of one currency: `grvt:spot:USDT`. The perpetual pool stays `<account>:perp`.
 
-No `settings` are read.
+## Settings
+
+`place_order` reads `settings['grvt']`, typed by the `Settings` TypedDict
+(`market/common.py`); other venues' keys are ignored.
+
+| Key | Type | Applies to | Meaning |
+| --- | --- | --- | --- |
+| `time_in_force` | `'IMMEDIATE_OR_CANCEL'` | `place_order` (`LIMIT`) | Send the order immediate-or-cancel instead of good-till-time. |
 
 ## Venue-specific semantics
 
@@ -84,7 +91,11 @@ No `settings` are read.
 - Orders: `MARKET` is the venue's immediate-or-cancel market order, which takes no limit
   price, so `price` is not sent. `LIMIT` rests good-till-time and `POST_ONLY` is a
   post-only good-till-time order; both expire 29 days after signing, since GRVT caps a
-  signature at 30 days.
+  signature at 30 days. `settings={'grvt': {'time_in_force': 'IMMEDIATE_OR_CANCEL'}}`
+  sends a `LIMIT` immediate-or-cancel instead: it fills what it can at its price or
+  better, and the venue cancels the rest. On mainnet (2026-11-16) one that found nothing
+  ended `REJECTED` with reason `IOC_CANCEL`, nothing filled or resting. Set on `MARKET`
+  or `POST_ONLY` it raises `ValueError` before signing.
 - `place_order` raises `OrderRejected` when the venue refuses the order before accepting
   it: an off-tick price (`2064`), a size off the step (`2065`), a notional below the
   minimum (`2066`), a margin or reduce-only check. A client order id already in use

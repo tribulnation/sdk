@@ -105,13 +105,18 @@ class OrderBookMarket(Public, Market):
     """Place a `MARKET` (the venue's immediate-or-cancel market order, `price` not
     sent), `LIMIT` or `POST_ONLY` order (good-till-time, expiring 29 days after
     signing); the id is its client order id.
+    `settings={'grvt': {'time_in_force': 'IMMEDIATE_OR_CANCEL'}}` sends a `LIMIT`
+    order immediate-or-cancel.
 
     Raises:
       AuthError: The client has no private key to sign with.
+      ValueError: `time_in_force` is set on a `MARKET` or `POST_ONLY` order.
       OrderRejected: The venue refused the order before accepting it (off-tick price,
         size off the step, below the minimum notional, margin or balance, ...).
     """
-    return await orders.place_order(self.shared, self.instrument, order)
+    return await orders.place_order(
+      self.shared, self.instrument, order, settings.get('grvt', {})
+    )
 
   async def cancel_order(self, id: str, *, settings: Settings = {}) -> Any:
     """Cancel by client order id."""

@@ -35,8 +35,9 @@ trading = GrvtMarket.new(api_key='…', private_key='0x…', env='testnet')
    the API key is scoped to): the account's fee tier, order queries, open orders, trade
    history (per market or exchange-wide) and fill streams, positions, the cross and
    isolated collateral buckets, leverage, available notional, funding payments, the
-   spot wallet's balances, and `MARKET`, `LIMIT` and `POST_ONLY` orders with every
-   cancellation method. Order ids are client order ids. Perpetual trading is verified
+   spot wallet's balances, and `MARKET`, `LIMIT` (or immediate-or-cancel with
+   `settings={'grvt': {'time_in_force': 'IMMEDIATE_OR_CANCEL'}}`) and `POST_ONLY` orders
+   with every cancellation method. Order ids are client order ids. Perpetual trading is verified
    on testnet only, spot trading too.
 4. Margin types and leverage are read, not set: set them on the venue.
 
