@@ -86,11 +86,12 @@ venue = "margin-trade"
 address = "$MARGIN_TRADE_ADDRESS"
 public = true
 
-# RISEx account reads are public: an address alone serves them (no mainnet key exists).
+# RISEx account reads are public: an address alone serves them. The account key adds
+# the logged-in `fees` read.
 [accounts.risex]
 venue = "risex"
 address = "$RISEX_ADDRESS"
-public = true
+account_key = "$RISEX_ACCOUNT_KEY"
 
 [accounts.mexc]
 venue = "mexc"
