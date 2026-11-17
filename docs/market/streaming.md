@@ -66,6 +66,7 @@ would raise instead.
 | GRVT | ✅ | ✅ |
 | Extended | ✅ | ✅ |
 | Nado | ✅ | ✅ |
+| RISEx | ✅ | ✅ |
 <!-- /streams -->
 
 Per-venue caveats are on the

@@ -40,6 +40,6 @@ for account, sdk in earn.all.items():
 
 ---
 
-← [Nado Market](../market/implementations/nado.md) · **Next:** [Methods](methods.md) →
+← [RISEx Market](../market/implementations/risex.md) · **Next:** [Methods](methods.md) →
 
 <!-- /next -->

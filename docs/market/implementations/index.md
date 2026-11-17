@@ -29,6 +29,7 @@ Per-method differences are on the [Methods](../methods.md) page, under each meth
 - [Lighter](lighter.md) — perpetuals and spot; numeric market ids, unified accounts for spot collateral
 - [margin.trade](margin-trade.md) — perpetuals and spot; Solana keys with agent wallets, per-market fee rates
 - [Nado](nado.md) — perpetuals and spot on one unified account; symbol market ids, an address for account reads
+- [RISEx](risex.md) — perpetuals; numeric market ids, address-only account reads, signer-key trading
 
 <!-- next -->
 
