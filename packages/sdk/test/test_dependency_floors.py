@@ -26,6 +26,7 @@ COMPATIBLE_IMPLEMENTATIONS = {
   'margin-trade': '0.3.0',
   'mexc': '3.0.0',
   'nado': '0.1.0',
+  'risex': '0.1.0',
 }
 
 

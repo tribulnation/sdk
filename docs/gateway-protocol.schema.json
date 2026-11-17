@@ -1934,7 +1934,9 @@
             "margin-trade-testnet",
             "mexc",
             "nado",
-            "nado_testnet"
+            "nado_testnet",
+            "risex",
+            "risex_testnet"
           ]
         }
       },
@@ -3184,7 +3186,9 @@
             "margin-trade-testnet",
             "mexc",
             "nado",
-            "nado_testnet"
+            "nado_testnet",
+            "risex",
+            "risex_testnet"
           ]
         }
       },

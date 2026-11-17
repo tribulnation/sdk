@@ -105,6 +105,9 @@ CASES: Mapping[str, Sequence[CandleCase]] = {
     CandleCase(market_id='perp:BTC-PERP', page=500),
     CandleCase(market_id='spot:KBTC', page=None),
   ],
+  # Market ids are the same on mainnet and testnet. One request serves up to 10,000
+  # opens, so the hourly window fits one page.
+  'risex': [CandleCase(market_id='perp:1', page=None)],
   # Testnet serves thousands of candles per response, so one page cannot straddle two.
   'lighter_testnet': [
     CandleCase(market_id='perp:4096', page=None),
