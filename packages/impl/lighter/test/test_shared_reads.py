@@ -1,12 +1,12 @@
 """Account reads and `market_stats` snapshots shared between markets and concurrent callers."""
 
-from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from datetime import timedelta
 from decimal import Decimal
 import asyncio
 
 from typing_extensions import Any, AsyncIterator, cast
+from typed_core.util import Stream, StreamManager
 from typed_lighter import Lighter
 
 from tribulnation.lighter.core import Shared
@@ -36,24 +36,29 @@ class Streams:
   open: set[str] = field(default_factory=set[str])
   subscriptions: int = 0
 
-  @asynccontextmanager
-  async def market_stats(self, selector: Any) -> AsyncIterator[AsyncIterator[Any]]:
+  def market_stats(self, selector: Any) -> StreamManager[Any, Any, Any]:
     """Subscribe, yield the snapshot frame after a pause, then unsubscribe."""
     channel = f'market_stats/{selector}'
-    if channel in self.open:
-      raise RuntimeError(f'Already subscribed to channel "{channel}"')
-    self.open.add(channel)
-    self.subscriptions += 1
 
-    async def frames() -> AsyncIterator[Any]:
-      """The subscribe snapshot."""
-      await asyncio.sleep(0.01)
-      yield {'market_stats': {'33': market_stats(33), '53': market_stats(53)}}
+    async def connect() -> Stream[Any, Any, Any]:
+      """Open the channel, refusing a second subscription."""
+      if channel in self.open:
+        raise RuntimeError(f'Already subscribed to channel "{channel}"')
+      self.open.add(channel)
+      self.subscriptions += 1
 
-    try:
-      yield frames()
-    finally:
-      self.open.discard(channel)
+      async def frames() -> AsyncIterator[Any]:
+        """The subscribe snapshot."""
+        await asyncio.sleep(0.01)
+        yield {'market_stats': {'33': market_stats(33), '53': market_stats(53)}}
+
+      async def unsubscribe():
+        """Close the channel."""
+        self.open.discard(channel)
+
+      return Stream(None, frames(), unsubscribe)
+
+    return StreamManager(connect)
 
 
 @dataclass

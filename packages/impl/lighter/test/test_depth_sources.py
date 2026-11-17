@@ -6,6 +6,7 @@ from decimal import Decimal
 from types import SimpleNamespace
 
 import pytest
+from typed_core.util import Stream, StreamManager
 from typed_core.validation import validator
 from typed_lighter.streams.order_book import OrderBookUpdate
 from typed_lighter.streams.ticker import TickerUpdate
@@ -97,7 +98,7 @@ class Channels:
     self.subscribed: list[str] = []
     self.unsubscribed: list[str] = []
 
-  def stream(self, channel: str, row: Any) -> Any:
+  def stream(self, channel: str, row: Any) -> Stream[Any, Any, Any]:
     """A stream pushing one frame, then idling until unsubscribed."""
     self.subscribed.append(channel)
 
@@ -110,30 +111,27 @@ class Channels:
       """Record the release."""
       self.unsubscribed.append(channel)
 
-    return Frames(rows(), unsubscribe)
+    return Stream(None, rows(), unsubscribe)
 
-  async def order_book(self, market_id: int) -> Any:
+  def order_book(self, market_id: int) -> StreamManager[Any, Any, Any]:
     """Open the fake `order_book` channel."""
     row = validator(OrderBookUpdate).python(order_book_wire())
-    return self.stream(f'order_book/{market_id}', row)
 
-  async def ticker(self, market_id: int) -> Any:
+    async def connect() -> Stream[Any, Any, Any]:
+      """Subscribe."""
+      return self.stream(f'order_book/{market_id}', row)
+
+    return StreamManager(connect)
+
+  def ticker(self, market_id: int) -> StreamManager[Any, Any, Any]:
     """Open the fake `ticker` channel."""
-    return self.stream(
-      f'ticker/{market_id}', validator(TickerUpdate).python(ticker_wire())
-    )
+    row = validator(TickerUpdate).python(ticker_wire())
 
+    async def connect() -> Stream[Any, Any, Any]:
+      """Subscribe."""
+      return self.stream(f'ticker/{market_id}', row)
 
-class Frames:
-  """An async-iterable native stream with an `unsubscribe` coroutine."""
-
-  def __init__(self, rows: AsyncIterator[Any], unsubscribe: Any):
-    self.rows = rows
-    self.unsubscribe = unsubscribe
-
-  def __aiter__(self):
-    """Iterate the frames."""
-    return self.rows
+    return StreamManager(connect)
 
 
 def fake_shared(channels: Channels) -> Shared:

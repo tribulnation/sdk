@@ -26,6 +26,7 @@ from tribulnation.sdk.market import (
 )
 from tribulnation.sdk.market.types.candles import EPOCH
 
+from .. import streams
 from ..core import FUNDING_INTERVAL, USDC, Shared, percent
 from .common import parse_candle, parse_trade, role
 
@@ -123,8 +124,12 @@ def fills_subscription(shared: Shared, market_id: int, fee: Fee) -> Subscription
     @exception_wrapper()
     async def connect() -> Subscription.Context[Trade]:
       """Subscribe; the snapshot frame replays existing state and is skipped."""
-      stream = await shared.client.streams.account_market(
-        market_id=market_id, account_index=account
+      stream = await streams.channel(
+        shared.client,
+        f'account_market/{market_id}/{account}',
+        shared.client.streams.account_market(
+          market_id=market_id, account_index=account
+        ),
       )
 
       @exception_wrapper()

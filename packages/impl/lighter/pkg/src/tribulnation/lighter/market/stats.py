@@ -8,6 +8,7 @@ from typed_lighter.schemas import MarketSelector, MarketStats, SpotMarketStats
 from tribulnation.sdk.core import ApiError
 from tribulnation.sdk.market import NextFunding, PerpStats, Ticker
 
+from .. import streams
 from ..core import FUNDING_INTERVAL, Shared, percent
 
 
@@ -20,7 +21,10 @@ async def read_perp_snapshot(
   shared: Shared, selector: MarketSelector
 ) -> dict[int, MarketStats]:
   """The `market_stats` subscribe snapshot: every perp's live stats, or one market's."""
-  async with shared.client.streams.market_stats(selector) as stream:
+  manager = shared.client.streams.market_stats(selector)
+  async with streams.channel(
+    shared.client, f'market_stats/{selector}', manager
+  ) as stream:
     async for frame in stream:
       stats = frame['market_stats']
       # One market's frame is its stats; `all`'s maps market ids to stats.
@@ -31,7 +35,8 @@ async def read_perp_snapshot(
 
 async def read_spot_snapshot(shared: Shared) -> dict[int, SpotMarketStats]:
   """The `spot_market_stats:all` subscribe snapshot."""
-  async with shared.client.streams.spot_market_stats('all') as stream:
+  manager = shared.client.streams.spot_market_stats('all')
+  async with streams.channel(shared.client, 'spot_market_stats/all', manager) as stream:
     async for frame in stream:
       stats = frame['spot_market_stats']
       # One market's frame is its stats; `all`'s maps market ids to stats.
