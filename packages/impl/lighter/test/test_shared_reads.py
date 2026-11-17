@@ -12,6 +12,7 @@ from typed_lighter import Lighter
 from tribulnation.lighter.core import Shared
 from tribulnation.lighter.market import stats
 from tribulnation.lighter.market.markets import LighterPerpMarket
+from tribulnation.sdk.market import RemainingPositionLimit
 
 ACCOUNT = 7
 SECOND = timedelta(seconds=1)
@@ -152,3 +153,42 @@ async def test_fresh_account_reads_are_not_shared(monkeypatch: Any):
   assert client.api.account.requests == 3
   await market.perp_position(ttl=timedelta(minutes=1))
   assert client.api.account.requests == 3
+
+
+async def test_remaining_position_limit_reads_the_market_snapshot():
+  """The market's `market_stats` row gives the open-interest room both ways: the raw
+  6-decimal limit less one side's open interest in USDC (mainnet SPY, 2026-11-17)."""
+  s, client = shared()
+
+  @asynccontextmanager
+  async def one(selector: Any) -> AsyncIterator[AsyncIterator[Any]]:
+    """SPY's snapshot."""
+
+    async def frames() -> AsyncIterator[Any]:
+      """The subscribe snapshot of one market."""
+      yield {
+        'market_stats': {
+          'market_id': 128,
+          'open_interest': Decimal('11873351.69062'),
+          'open_interest_limit': Decimal('100000000000000'),
+        }
+      }
+
+    yield frames()
+
+  client.streams.market_stats = one  # type: ignore[method-assign]
+  market = LighterPerpMarket(shared=s, market_index=128)
+  room = Decimal('88126648.30938')
+  assert await market.remaining_position_limit() == RemainingPositionLimit(
+    long=room, short=room
+  )
+
+
+def test_open_interest_room_caps_and_floors():
+  """The uncapped sentinel is no known limit; past the cap is zero both ways."""
+  row: Any = {'open_interest': Decimal(10), 'open_interest_limit': Decimal(2**56)}
+  assert stats.open_interest_room(row) == RemainingPositionLimit()
+  row = {'open_interest': Decimal(10), 'open_interest_limit': Decimal(5_000_000)}
+  assert stats.open_interest_room(row) == RemainingPositionLimit(
+    long=Decimal(0), short=Decimal(0)
+  )

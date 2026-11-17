@@ -5,7 +5,8 @@
 1. Status: proposed; builds on [0041](0041-venue-notional-caps.md),
    [0042](0042-read-only-account-method-qualification.md),
    [0043](0043-order-rejected.md) and [0056](0056-market-kind-aware-support.md);
-   implemented for Aster and Hyperliquid, not release-verified
+   implemented for Aster, Hyperliquid, Extended, GRVT, RISEx, Lighter and Nado, not
+   release-verified
 2. Date: 2026-11-16; amended 2026-11-17 (renamed from "position headroom", added to the
    contract and to account-read qualification)
 
@@ -59,7 +60,24 @@ include free margin, which callers already bound through `available_notional()`.
       (prefixed or not on a HIP-3 dex); otherwise the margin table's bound at the
       account's leverage (the `lowerBound` of the first tier whose `maxLeverage` is below
       it) less the position in each direction; `None` when no tier binds.
-   3. Venue-computed maxima that include free margin (see Context) are not used.
+   3. Extended: the margin schedule's cap at the account's leverage (the highest
+      `upperBound` of a bracket open to users whose `riskFactor` allows the leverage, at
+      most `maxPositionValue`) less the position value held in each direction, bounded
+      by `openInterestLimit` less `openInterest` (USD). Resting and triggered orders,
+      which Extended also counts, are not subtracted.
+   4. GRVT: `max_position_size` (base) less the position held in each direction, at the
+      ticker's mark. Its risk brackets are not read.
+   5. RISEx: `max_position_size` less the position held in each direction, bounded by
+      `open_interest_limit` less `open_interest`, all base amounts, at the mark.
+   6. Lighter: `market_stats`' `open_interest_limit` (a raw 6-decimal USDC amount;
+      `2^56` uncapped) less `open_interest` (one side, USDC).
+   7. Nado: `max_open_interest_x18` (notional) less the gateway's open interest at the
+      mark. That figure counts both sides and Nado does not document which it
+      compares, so the room may be half the venue's, never more.
+   8. A market-wide open-interest room bounds both directions: a new position on
+      either side may meet a counterparty that opens too, raising open interest, and
+      venues at the cap refuse increases either way (Hyperliquid, Extended).
+   9. Venue-computed maxima that include free margin (see Context) are not used.
 3. `PositionLimitExceeded(OrderRejected)`: the venue refused the order because it would
    take the position past a limit. `OpenInterestCapped(PositionLimitExceeded)`: that
    limit is the market's open-interest cap. Both are `OrderRejected`, so existing
@@ -107,15 +125,17 @@ include free margin, which callers already bound through `available_notional()`.
 
 1. Aster's figure costs the shared `positionRisk` and futures-account reads plus one
    public request; Hyperliquid's the shared `clearinghouseState` and `activeAssetData`
-   reads plus one shared, public `perpsAtOpenInterestCap` read per dex.
+   reads plus one shared, public `perpsAtOpenInterestCap` read per dex. Extended reads
+   the market's live row, the positions and the shared leverage; GRVT the positions
+   and one ticker (the instrument is cached); RISEx the market's live row and the
+   shared positions; Lighter the shared `market_stats` snapshot of the market; Nado
+   `all_products` and one archive price (the symbol is cached).
 2. Other venues answer `None` until they adopt it; a `None` direction is not evidence
-   that no limit exists. What they publish (2026-11-17): Lighter a market-wide
-   `open_interest_limit` beside `open_interest`; dYdX `openInterestLowerCap`/`UpperCap`
-   (margin scaling, not a hard cap); Bitget position tiers and an open-interest limit
-   endpoint; Kraken Futures `maxPositionSize` per instrument; Extended
-   `maxPositionValue` and `openInterestLimit`; GRVT `max_position_size`; RISEx
-   `max_position_size` and `open_interest_limit`; Nado `max_open_interest_x18`;
-   margin.trade nothing found.
+   that no limit exists. What they publish (2026-11-17): dYdX
+   `openInterestLowerCap`/`UpperCap` (margin scaling, not a hard cap); Bitget position
+   tiers and an open-interest limit endpoint; Bybit risk limits; Kraken Futures
+   `maxPositionSize` per instrument (left until its trading support lands); GRVT
+   risk brackets; margin.trade nothing found.
 3. A new qualification read changes live qualification, so every venue in a release's
    scope needs fresh read evidence (ADR 0033); the shared SDK change requires it anyway.
 4. A gateway older than its client does not decode `remaining_position_limit` and logs

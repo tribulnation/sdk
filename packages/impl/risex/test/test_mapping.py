@@ -19,7 +19,9 @@ from tribulnation.risex.core import Shared
 from tribulnation.risex.market import account, history
 from tribulnation.risex.market.books import frame_book
 from tribulnation.risex.market.common import funding_received, parse_trade
+from tribulnation.risex.market.markets import RisexPerpMarket
 from tribulnation.risex.report import Report
+from tribulnation.sdk.market import RemainingPositionLimit
 
 T0 = datetime(2026, 11, 17, 10, tzinfo=timezone.utc)
 
@@ -277,3 +279,50 @@ async def test_unsettled_funding_rows_validate_and_count():
     p async for p in history.funding_payments(shared, 1, T0 - timedelta(hours=1), T0)
   ]
   assert payment.amount == Decimal('-19.468611333931637682')
+
+
+def market_row(*, max_size: str = '100000000', open_interest: str = '247.6') -> Any:
+  """Mainnet BTC's row (2026-11-17), at a round mark of 60000."""
+  return {
+    'market_id': 1,
+    'mark_price': Decimal('60000'),
+    'max_position_size': Decimal(max_size),
+    'open_interest': Decimal(open_interest),
+    'config': {'open_interest_limit': Decimal('750')},
+  }
+
+
+@pytest.mark.parametrize(
+  'max_size,open_interest,size,expected',
+  [
+    # The open-interest room, 502.4 BTC, binds both ways.
+    ('100000000', '247.6', '0', (Decimal('30144000'), Decimal('30144000'))),
+    # A 2 BTC cap less the 0.5 held long; the short side keeps the whole cap.
+    ('2', '247.6', '0.5', (Decimal('90000'), Decimal('120000'))),
+    ('2', '247.6', '-0.5', (Decimal('120000'), Decimal('90000'))),
+    # At the open-interest limit nothing grows.
+    ('100000000', '750', '0.5', (Decimal(0), Decimal(0))),
+  ],
+)
+def test_remaining_position_limit(
+  max_size: str, open_interest: str, size: str, expected: tuple[Decimal, Decimal]
+):
+  """Base-unit caps as notional at the mark: the account's cap less what each
+  direction holds, bounded by the market's open-interest room."""
+  limit = account.remaining_position_limit(
+    market_row(max_size=max_size, open_interest=open_interest), size=Decimal(size)
+  )
+  assert (limit.long, limit.short) == expected
+
+
+async def test_market_reads_its_live_row_and_position(monkeypatch: pytest.MonkeyPatch):
+  """The market method combines the fresh market row and the account's position."""
+  shared = fake_shared(account=SimpleNamespace(positions_paged=walk(positions())))
+
+  async def fresh(self: Shared, market_id: int) -> Any:
+    """BTC's live row, with a 1 BTC cap."""
+    return market_row(max_size='1')
+
+  monkeypatch.setattr(Shared, 'fresh', fresh)
+  limit = await RisexPerpMarket(shared=shared, index_id=1).remaining_position_limit()
+  assert limit == RemainingPositionLimit(long=Decimal(60000), short=Decimal('59994'))

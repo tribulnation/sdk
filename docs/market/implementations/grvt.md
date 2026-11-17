@@ -128,8 +128,12 @@ toggles response validation.
 - `leverage` is the account's initial leverage on the market (10 unless changed), in
   either margin type. `available_notional` is the cross bucket's free collateral times it, for
   isolated markets too, without GRVT's position-size cap or risk brackets. The SDK
-  does not set margin types or leverage; set them on the venue. `remaining_position_limit`
-  reads no limits and returns `None` both ways (the SDK default, ADR 0062).
+  does not set margin types or leverage; set them on the venue.
+- `remaining_position_limit` (ADR 0062) is the instrument's `max_position_size` (base
+  units, 1000 on BTC) less the position held in each direction, at the ticker's mark
+  price. The risk brackets (`margin_rules`) are not read: whether GRVT refuses an order
+  past a bracket at the account's leverage is unverified. GRVT publishes no
+  open-interest cap.
 - Spot `rules()` name the pair (`base`, `quote`); `fee_asset` is `None`, since the fee
   is charged in the asset a fill delivers (base on a buy, quote on a sell), and
   `rules().fees` is `None`: GRVT publishes no standard spot schedule. `fees()` reads the

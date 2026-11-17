@@ -181,8 +181,12 @@ async with sdk.depth_stream('lighter:perp:1', settings={'lighter': {'depth_sourc
   from the same `/account` answer as positions and collateral, which reads with a `ttl`
   share. Perpetual `available_notional` is the free
   cross collateral times it, kept over the SDK default because isolated positions are
-  funded from cross collateral rather than their own bucket. Perpetual
-  `remaining_position_limit` reads no limits and returns `None` both ways (the SDK default, ADR 0062).
+  funded from cross collateral rather than their own bucket.
+- Perpetual `remaining_position_limit` (ADR 0062) is the room left under the market's
+  open-interest cap, for both directions, from its `market_stats` snapshot:
+  `open_interest_limit` (a raw 6-decimal USDC amount, `2^56` when uncapped, then `None`
+  both ways) less `open_interest` (one side's notional in USDC). Lighter publishes no
+  per-account cap. Near the cap the figure is racy: other accounts take the same room.
 - Spot `balances` support unified accounts only; classic accounts raise
   `NotImplementedError`. A margin-enabled asset (USDC) totals its `margin_balance`, shared
   with perpetuals, and frees `available_balance - locked_balance`; any other asset is its
