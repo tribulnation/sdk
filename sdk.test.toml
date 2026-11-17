@@ -91,7 +91,7 @@ public = true
 [accounts.risex]
 venue = "risex"
 address = "$RISEX_ADDRESS"
-account_key = "$RISEX_ACCOUNT_KEY"
+signer_key = "$RISEX_SIGNER_KEY"
 
 [accounts.mexc]
 venue = "mexc"
