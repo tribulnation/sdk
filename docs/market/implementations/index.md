@@ -28,6 +28,7 @@ Per-method differences are on the [Methods](../methods.md) page, under each meth
 - [GRVT](grvt.md) — perpetuals and spot; instrument-name market ids, a read-only API key for account reads
 - [Lighter](lighter.md) — perpetuals and spot; numeric market ids, unified accounts for spot collateral
 - [margin.trade](margin-trade.md) — perpetuals and spot; Solana keys with agent wallets, per-market fee rates
+- [Nado](nado.md) — perpetuals and spot on one unified account; symbol market ids, an address for account reads
 
 <!-- next -->
 

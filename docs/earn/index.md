@@ -40,6 +40,6 @@ for account, sdk in earn.all.items():
 
 ---
 
-← [margin.trade Market](../market/implementations/margin-trade.md) · **Next:** [Methods](methods.md) →
+← [Nado Market](../market/implementations/nado.md) · **Next:** [Methods](methods.md) →
 
 <!-- /next -->

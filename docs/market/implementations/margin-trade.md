@@ -78,6 +78,6 @@ same names prefixed `MARGIN_TRADE_TESTNET_`.
 
 ---
 
-← [Lighter Market](lighter.md) · **Next:** [Earn](../../earn/index.md) →
+← [Lighter Market](lighter.md) · **Next:** [Nado Market](nado.md) →
 
 <!-- /next -->
