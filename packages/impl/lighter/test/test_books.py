@@ -5,6 +5,7 @@ from decimal import Decimal
 from types import SimpleNamespace
 
 import pytest
+from typed_core.util import Stream, StreamManager
 from typed_core.validation import validator
 from typed_lighter.streams.order_book import OrderBookUpdate
 from typing_extensions import Any, cast
@@ -76,7 +77,7 @@ def unvalidated(row: dict[str, Any]) -> dict[str, Any]:
   }
 
 
-class Stream:
+class Frames:
   """A native `order_book` stream replaying fixture frames."""
 
   def __init__(self, rows: list[Any]):
@@ -103,10 +104,16 @@ async def test_stream_time_advances(validate: bool):
     for f in frames()
   ]
 
-  async def order_book(market_id: int):
+  def order_book(market_id: int) -> StreamManager[Any, Any, Any]:
     """Open the fixture stream."""
     assert market_id == MARKET
-    return Stream(rows)
+
+    async def connect() -> Stream[Any, Any, Any]:
+      """The typed stream over the fixture frames."""
+      fixture = Frames(rows)
+      return Stream(None, fixture, fixture.unsubscribe)
+
+    return StreamManager(connect)
 
   shared = SimpleNamespace(
     books={}, client=SimpleNamespace(streams=SimpleNamespace(order_book=order_book))

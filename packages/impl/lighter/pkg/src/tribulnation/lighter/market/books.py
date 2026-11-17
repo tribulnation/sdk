@@ -17,6 +17,7 @@ from tribulnation.sdk.core import (
 from tribulnation.sdk.market import Book, Settings, detached_books
 from tribulnation.sdk.util import epoch_time
 
+from .. import streams
 from ..core import DepthSource, Shared
 
 BOOK_ORDERS_LIMIT = 250
@@ -127,7 +128,9 @@ def ticker_subscription(shared: Shared, market_id: int) -> Subscription[Book]:
     @exception_wrapper()
     async def connect() -> Subscription.Context[Book]:
       """Subscribe; each frame replaces the previous one."""
-      stream = await shared.client.streams.ticker(market_id)
+      stream = await streams.channel(
+        shared.client, f'ticker/{market_id}', shared.client.streams.ticker(market_id)
+      )
 
       @exception_wrapper()
       async def books() -> AsyncIterator[Book]:
@@ -149,7 +152,11 @@ def order_book_subscription(shared: Shared, market_id: int) -> Subscription[Book
     @exception_wrapper()
     async def connect() -> Subscription.Context[Book]:
       """Subscribe; the first frame is the full book, later ones changed levels."""
-      stream = await shared.client.streams.order_book(market_id)
+      stream = await streams.channel(
+        shared.client,
+        f'order_book/{market_id}',
+        shared.client.streams.order_book(market_id),
+      )
 
       @exception_wrapper()
       async def books() -> AsyncIterator[Book]:
