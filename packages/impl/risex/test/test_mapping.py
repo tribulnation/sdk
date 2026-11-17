@@ -256,7 +256,7 @@ async def test_funding_payments_filter_and_sign():
 async def test_unsettled_funding_rows_validate_and_count():
   """An unsettled accrual sends `''` rates (typed-risex 0.1.1 accepts them): it still
   validates and is funding all the same, its amount the negated `funding_payment`."""
-  wire = {
+  wire: dict[str, object] = {
     'market_id': 1,
     'funding_payment': '19.468611333931637682',
     'position_size': '0.5',
