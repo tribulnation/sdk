@@ -2,8 +2,9 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: accepted; implemented for Hyperliquid, Aster, Lighter and Extended, which unit
-   fixtures verify; dYdX deliberately unchanged. Not release-verified; Extended's mapping
+1. Status: accepted; implemented for Hyperliquid, Aster, Lighter, Extended and Bitget
+   ([ADR 0064](0064-bitget-uta-perpetual-trading.md)), which unit fixtures verify; dYdX
+   deliberately unchanged. Not release-verified; Extended's mapping
    was exercised by a live testnet run (2026-10-22).
 2. Date: 2026-10-08
 
