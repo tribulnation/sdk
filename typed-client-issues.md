@@ -168,3 +168,30 @@ fill's time, and the adapter walks `matches` by hand with `idx` instead.
 - Observed: `Matches = {matches, txs}`; `PaginatedResponse[Match, ...]`
 - Blocks: `pkg/src/tribulnation/nado/market/history.py` (`matches`, a hand walk)
 - Suggestion (unverified): page `(Match, Tx)` pairs, or attach the timestamp to each row
+
+## typed-risex
+
+### `FundingPayment.funding_rate_8h` is `''` on unsettled rows
+
+`account.funding_payments` sends `funding_rate_8h: ''` on every row with `is_settled:
+false` (an hourly accrual on a position still open, with `trade_side` `''` too), which the
+required `Decimal` rejects, failing the whole page. The field's own docstring already says
+it is "only set for settled rows".
+
+`account/funding_payments.py:30`:
+
+```python
+  funding_rate_8h: Decimal
+```
+
+- Kind: absent-under-condition
+- Observed: `''`; settled rows send a decimal string (`'0.000074535876248434'`)
+- Condition: `is_settled == False` (unsettled accruals of an open position)
+- Samples: mainnet, a leaderboard trader's BTC (`market_id=1`) history (2026-11-17): 165
+  settled rows carry a decimal, the 2 unsettled ones (`is_settled: false`, long,
+  `funding_payment` `19.468611333931637682` and `14.547508249548556305`) carry `''`;
+  testnet, a flat account's settled rows validate
+- Blocks: `poc/market/perp.py` cell 24 (`funding_payments`) on any account with an open
+  position, and so the adapter's `funding_payments` there
+- Suggestion (unverified): `Decimal | Literal['']`, as `Position` already does for its
+  empty fields; `trade_side` (declared `str`) is `''` on the same rows and validates
