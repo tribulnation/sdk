@@ -11,8 +11,9 @@ from decimal import Decimal
 import asyncio
 
 from typing_extensions import Collection, Mapping
-from typed_nado.archive_v2.tickers import Ticker as NadoTicker
-from typed_nado.schemas import FundingRate as NadoFundingRate, MarketPrice
+import typed_nado.archive_v2.tickers
+from typed_nado import schemas
+from typed_nado.schemas import MarketPrice
 from tribulnation.sdk.core import MissingData
 from tribulnation.sdk.market import NextFunding, PerpStats, Ticker
 
@@ -54,7 +55,9 @@ async def selected(
   return {name: shared.symbols[name]['product_id'] for name in names}
 
 
-def parse_ticker(t: NadoTicker | None, price: MarketPrice | None) -> Ticker:
+def parse_ticker(
+  t: typed_nado.archive_v2.tickers.Ticker | None, price: MarketPrice | None
+) -> Ticker:
   """Last price and 24h volumes from the archive's ticker, best bid and ask from the
   gateway; Nado publishes no best-level sizes without a book request per market."""
   return Ticker(
@@ -136,7 +139,7 @@ async def perp_stats(
   return stats
 
 
-def parse_next_funding(rate: NadoFundingRate) -> NextFunding:
+def parse_next_funding(rate: schemas.FundingRate) -> NextFunding:
   """The indicative rate of the settlement after `update_time`, with its premium."""
   premium = rate.get('premium_x18')
   return NextFunding(

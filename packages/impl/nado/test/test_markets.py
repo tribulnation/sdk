@@ -204,3 +204,125 @@ async def test_tickers_join_the_archive_and_the_gateway(shared: Shared, fake: An
     Decimal('3277.38125'),
   )
   assert out['ETH-PERP'].last is None
+
+
+def serve_book(fake: Any, diffs: list[Any]):
+  """Answer `book_depth` with `diffs` and `market_liquidity` with a snapshot at `T0`."""
+
+  async def pushed() -> AsyncIterator[Any]:
+    for d in diffs:
+      yield d
+
+  async def unsubscribe():
+    pass
+
+  async def book_depth(product_id: int) -> Stream[Any, Any, Any]:
+    return Stream(reply=None, stream=pushed(), unsubscribe=unsubscribe)
+
+  async def market_liquidity(*, product_id: int, depth: int) -> Any:
+    return {
+      'bids': levels((100, '1')),
+      'asks': levels((101, '1')),
+      'timestamp': T0,
+      'product_id': 2,
+    }
+
+  fake.streams.book_depth = book_depth
+  fake.gateway.market_liquidity = market_liquidity
+
+
+def diff(last: int, first: int, max: int, *bids: tuple[int, str]) -> Any:
+  """A `book_depth` diff after the one ending `last` ms past `T0`."""
+  return {
+    'min_timestamp': at(first),
+    'max_timestamp': at(max),
+    'last_max_timestamp': at(last),
+    'bids': levels(*bids),
+    'asks': [],
+  }
+
+
+async def test_a_diff_lost_right_after_the_snapshot_ends_the_stream(
+  shared: Shared, fake: Any
+):
+  """The first diff past the snapshot must chain onto one the snapshot holds: when the
+  diff bridging it is lost (the next one follows a diff ending past the snapshot), the
+  book would miss that diff's levels, so the stream ends with `NetworkError`."""
+  serve_book(fake, [diff(10, 15, 20, (100, '0'))])
+  seen: list[Book] = []
+  with pytest.raises(NetworkError):
+    async with btc(shared).depth_stream(queue_size=10, overflow='fail') as stream:
+      async for book in stream:
+        seen.append(book)
+  assert len(seen) == 1
+
+
+async def test_the_diff_bridging_the_snapshot_is_applied(shared: Shared, fake: Any):
+  """A first diff after one ending at or before the snapshot is applied, and the
+  stream goes on chaining."""
+  serve_book(fake, [diff(-5, 1, 5, (100, '0'), (99, '2')), diff(5, 6, 9, (98, '1'))])
+  seen: list[Book] = []
+  with pytest.raises(NetworkError):  # the fake stream ends: the upstream closed
+    async with btc(shared).depth_stream(queue_size=10, overflow='fail') as stream:
+      async for book in stream:
+        seen.append(book)
+  assert [[(e.price, e.qty) for e in b.bids] for b in seen] == [
+    [(100, 1)],
+    [(99, 2)],
+    [(99, 2), (98, 1)],
+  ]
+
+
+async def test_isolated_only_markets_are_not_api_tradable(shared: Shared):
+  """The SDK signs cross-margin orders only, which an `isolated_only` market refuses
+  (reduce-only ones aside)."""
+  shared.symbols['BTC-PERP']['isolated_only'] = True
+  shared.symbols['KBTC']['isolated_only'] = True
+  assert not (await btc(shared).rules()).api
+  assert not (
+    await NadoSpotMarket(shared=shared, symbol='KBTC', product_id=1).rules()
+  ).api
+
+
+async def test_perp_stats_per_settlement_and_missing_prices(shared: Shared, fake: Any):
+  """Rates are the venue's 24-hour figures over 24; a market without prices is left
+  out of a full read and raises when named."""
+  from tribulnation.nado.market.exchanges import NadoPerpExchange
+  from tribulnation.sdk.core import MissingData
+
+  async def perp_prices(ids: list[int]) -> Any:
+    assert sorted(ids) in ([4], [2, 4])
+    return {
+      '2': {
+        'product_id': 2,
+        'index_price_x18': 64000 * X18,
+        'mark_price_x18': 64010 * X18,
+      }
+    }
+
+  async def funding_rates(ids: list[int]) -> Any:
+    return {'2': {'product_id': 2, 'funding_rate_x18': 24 * 10**12, 'update_time': T0}}
+
+  async def all_products() -> Any:
+    reply: dict[str, Any] = {
+      'spot_products': [],
+      'perp_products': [{'product_id': 2, 'state': {'open_interest': 3 * X18}}],
+    }
+    return reply
+
+  fake.archive.perp_prices = perp_prices
+  fake.archive.funding_rates = funding_rates
+  fake.gateway.all_products = all_products
+  exchange = NadoPerpExchange(shared=shared)
+  out = await exchange.perp_stats()
+  assert list(out) == ['BTC-PERP']
+  s = out['BTC-PERP']
+  assert (s.index, s.mark, s.funding, s.open_interest) == (
+    Decimal(64000),
+    Decimal(64010),
+    Decimal('0.000001'),
+    Decimal(3),
+  )
+  assert s.next_funding_time == datetime(2026, 11, 17, 11, tzinfo=timezone.utc)
+  with pytest.raises(MissingData):
+    await exchange.perp_stats(['ETH-PERP'])

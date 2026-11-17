@@ -236,8 +236,7 @@ async def test_report_moves_unsettled_perp_cash_into_usdt0(fake: Any):
     return reply
 
   async def positions(sender: str, **kwargs: Any) -> Any:
-    rows: list[Any] = [{'product_id': 2, 'average_entry_price': 60000 * X18}]
-    return {'positions': rows}
+    return {'positions': [window(2, '0.01', 60000)]}
 
   serve(fake, state)
   fake.archive.subaccounts = subaccounts
@@ -271,3 +270,180 @@ async def test_report_counts_a_closed_positions_unsettled_quote(fake: Any):
   fake.archive.subaccounts = subaccounts
   [sub] = (await Report(shared=shared).snapshot()).snapshot.subaccounts
   assert sub.balances == {'USDT0': Decimal('9.92')} and sub.positions == {}
+
+
+def window(product_id: int, amount: str, entry: int) -> Any:
+  """An open position window as `positions` sends it: absolute size and direction."""
+  size = Decimal(amount)
+  return {
+    'product_id': product_id,
+    'direction': size > 0,
+    'amount': int(abs(size) * X18),
+    'average_entry_price': entry * X18,
+  }
+
+
+def serve_windows(fake: Any, rows: list[Any]):
+  """Answer `positions` with `rows`, of the product asked for when one is."""
+
+  async def positions(sender: str, **kwargs: Any) -> Any:
+    pid = kwargs.get('product_id')
+    return {'positions': [r for r in rows if pid in (None, r['product_id'])]}
+
+  fake.archive.positions = positions
+
+
+def serve_subaccounts(fake: Any, *rows: Any):
+  """Answer `subaccounts` with `rows` (the cross `default` when none)."""
+
+  async def subaccounts(*, address: str) -> Any:
+    found: list[Any] = list(rows) or [
+      {'subaccount': SENDER, 'subaccount_name': 'default', 'isolated': False}
+    ]
+    return {'subaccounts': found}
+
+  fake.archive.subaccounts = subaccounts
+
+
+@pytest.mark.parametrize(
+  'rows',
+  [
+    [],
+    [window(2, '-0.01', 61000)],
+    [window(2, '0.004', 61000)],
+  ],
+  ids=['not-indexed', 'flipped', 'resized'],
+)
+async def test_an_archive_behind_the_gateway_is_an_error(
+  shared: Shared, fake: Any, rows: list[Any]
+):
+  """The archive indexes after the gateway: a window missing, of the other side or
+  another size is not the position's, so its entry price is refused in both the
+  market read and the report, rather than read as 0 or as the old window's."""
+  from tribulnation.sdk.core import ApiError
+
+  serve(
+    fake, info(initial='1', maintenance='1', unweighted='1', usdt0='10', btc='0.01')
+  )
+  serve_windows(fake, rows)
+  serve_subaccounts(fake)
+  with pytest.raises(ApiError):
+    await btc(shared).perp_position()
+  with pytest.raises(ApiError):
+    await Report(shared=shared).snapshot()
+
+
+async def test_the_matching_window_prices_the_position(shared: Shared, fake: Any):
+  """The open window of the same side and size gives the entry price."""
+  serve(
+    fake, info(initial='1', maintenance='1', unweighted='1', usdt0='10', btc='-0.01')
+  )
+  serve_windows(fake, [window(1, '0.5', 1), window(2, '-0.01', 61000)])
+  p = await btc(shared).perp_position()
+  assert (p.size, p.entry_price) == (Decimal('-0.01'), Decimal(61000))
+
+
+async def test_flat_isolated_rows_count_the_same_everywhere(shared: Shared, fake: Any):
+  """An isolated subaccount whose position is flat holds nothing: neither the market
+  reads nor the report refuse the wallet for it."""
+  flat: list[Any] = [{'base_balance': {'product_id': 2, 'balance': {'amount': 0}}}]
+  serve(
+    fake, info(initial='1', maintenance='1', unweighted='1', usdt0='10'), isolated=flat
+  )
+  serve_subaccounts(
+    fake,
+    {'subaccount': SENDER, 'subaccount_name': 'default', 'isolated': False},
+    {'subaccount': SENDER[:-2] + '01', 'subaccount_name': 'iso', 'isolated': True},
+  )
+  assert (await btc(shared).perp_position()).size == 0
+  [sub] = (await Report(shared=shared).snapshot()).snapshot.subaccounts
+  assert sub.balances == {'USDT0': Decimal(10)}
+
+
+async def test_fills_walk_full_pages_and_drop_the_boundary_repeats(
+  shared: Shared, fake: Any, monkeypatch: pytest.MonkeyPatch
+):
+  """A full page asks again from its oldest `submission_idx` (inclusive): the repeated
+  rows are dropped, and the walk stops at the first row before `start`."""
+  from tribulnation.nado.market import history
+
+  monkeypatch.setattr(history, 'MATCH_PAGE', 2)
+
+  def tx(idx: int) -> Any:
+    return {'submission_idx': idx, 'timestamp': T0 - timedelta(hours=10 - idx)}
+
+  pages: dict[int | None, Any] = {
+    None: {
+      'matches': [match(9, '1', '-1', '0'), match(8, '1', '-1', '0')],
+      'txs': [tx(9), tx(8)],
+    },
+    8: {
+      'matches': [match(8, '1', '-1', '0'), match(7, '1', '-1', '0')],
+      'txs': [tx(8), tx(7)],
+    },
+    7: {
+      'matches': [match(7, '1', '-1', '0'), match(1, '1', '-1', '0')],
+      'txs': [tx(7), tx(1)],
+    },
+  }
+  asked: list[int | None] = []
+
+  async def matches(subaccounts: list[str], **kwargs: Any) -> Any:
+    asked.append(kwargs['idx'])
+    return pages[kwargs['idx']]
+
+  fake.archive.matches = matches
+  rows = await btc(shared).trades_history(T0 - timedelta(hours=5), T0)
+  assert [t.id for t in rows] == [
+    f'{i}:{match(i, "0", "0", "0")["digest"]}' for i in (9, 8, 7)
+  ]
+  assert asked == [None, 8, 7]
+
+
+async def test_exchange_history_names_each_market(shared: Shared, fake: Any):
+  """Exchange-wide fills and funding carry their market's symbol; a product Nado no
+  longer lists is left out."""
+  from tribulnation.nado.market.exchanges import NadoPerpExchange
+
+  gone = match(5, '1', '-1', '0')
+  gone['post_balance'] = {'base': {'perp': {'product_id': 99}}}
+
+  async def matches(subaccounts: list[str], **kwargs: Any) -> Any:
+    assert sorted(kwargs['product_ids']) == [2, 4]
+    reply: dict[str, Any] = {
+      'matches': [match(6, '1', '-1', '0'), gone],
+      'txs': [
+        {'submission_idx': 6, 'timestamp': T0},
+        {'submission_idx': 5, 'timestamp': T0},
+      ],
+    }
+    return reply
+
+  async def interest_and_funding(sender: str, **kwargs: Any) -> Any:
+    rows: list[Any] = [
+      {'product_id': 4, 'idx': 1, 'timestamp': T0, 'amount': X18},
+      {'product_id': 99, 'idx': 0, 'timestamp': T0, 'amount': X18},
+    ]
+    return {'interest_payments': [], 'funding_payments': rows, 'next_idx': None}
+
+  fake.archive.matches = matches
+  fake.archive.interest_and_funding = interest_and_funding
+  exchange = NadoPerpExchange(shared=shared)
+  trades = await exchange.trades_history(None, T0 - timedelta(hours=1), T0)
+  assert [t.market_id for t in trades] == ['BTC-PERP']
+  payments = await exchange.funding_payments(None, T0 - timedelta(hours=1), T0)
+  assert [(p.market_id, p.amount) for p in payments] == [('ETH-PERP', Decimal(1))]
+
+
+async def test_fees_refetch_asks_afresh(shared: Shared, fake: Any):
+  """`fees(refetch=True)` reads the rates again instead of the minute-old answer."""
+  calls: list[int] = []
+
+  async def fee_rates(sender: str) -> Any:
+    calls.append(1)
+    rate = len(calls) * 10**14
+    return {'maker_fee_rates_x18': [0, 0, rate], 'taker_fee_rates_x18': [0, 0, rate]}
+
+  fake.gateway.fee_rates = fee_rates
+  assert (await btc(shared).fees()).maker_buy == Decimal('0.0001')
+  assert (await btc(shared).fees(refetch=True)).maker_buy == Decimal('0.0002')

@@ -41,6 +41,12 @@ TRADABLE = 'live'
 (`post_only`, `reduce_only`, `soft_reduce_only`, `not_tradable`) restrict it."""
 
 
+def api_tradable(s: Symbol) -> bool:
+  """Whether the SDK's orders trade: the market is `live` and takes cross-margin orders
+  (an `isolated_only` market refuses every one but reduce-only orders)."""
+  return s['trading_status'] == TRADABLE and not s['isolated_only']
+
+
 def standard_fees(s: Symbol) -> Fees:
   """The product's default maker and taker rates, the same for both sides."""
   return Fees.symmetric(
@@ -102,7 +108,7 @@ class OrderBookMarket(Public, Market):
 
   async def fees(self, *, refetch: bool = False) -> Fees:
     """The subaccount's maker and taker rates on this product (`fee_rates`)."""
-    return await account.fees(self.shared, self.product_id)
+    return await account.fees(self.shared, self.product_id, refetch=refetch)
 
   async def query_order(self, id: str) -> OrderState | None:
     """Look an order up by digest: on the book, else in the archive (orders that
@@ -199,7 +205,7 @@ class NadoPerpMarket(OrderBookMarket, PerpMarket):
   async def rules(self, *, refetch: bool = False) -> Rules:
     """The product's tick, size step and minimum notional (`min_size`, in USDT0), with
     its default rates; fees are charged in USDT0. `api` is true only while the market
-    is `live`."""
+    is `live` and not `isolated_only`."""
     s = await self.details(refetch=refetch)
     return Rules(
       fee_asset=QUOTE_ASSET,
@@ -207,7 +213,7 @@ class NadoPerpMarket(OrderBookMarket, PerpMarket):
       step_size=x18(s['size_increment']),
       min_value=x18(s['min_size']),
       fees=standard_fees(s),
-      api=s['trading_status'] == TRADABLE,
+      api=api_tradable(s),
       details=s,
     )
 
@@ -277,7 +283,8 @@ class NadoSpotMarket(OrderBookMarket, SpotMarket):
 
   async def rules(self, *, refetch: bool = False) -> SpotRules:
     """The product's tick, size step and minimum notional (`min_size`, in USDT0), with
-    its default rates; fees are charged in USDT0."""
+    its default rates; fees are charged in USDT0. `api` is true only while the market
+    is `live` and not `isolated_only`."""
     s = await self.details(refetch=refetch)
     return SpotRules(
       base=self.symbol,
@@ -287,7 +294,7 @@ class NadoSpotMarket(OrderBookMarket, SpotMarket):
       step_size=x18(s['size_increment']),
       min_value=x18(s['min_size']),
       fees=standard_fees(s),
-      api=s['trading_status'] == TRADABLE,
+      api=api_tradable(s),
       details=s,
     )
 

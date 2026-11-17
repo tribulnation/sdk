@@ -14,8 +14,11 @@ from datetime import timedelta
 from decimal import Decimal
 
 from typing_extensions import NoReturn
+from typed_nado.archive.positions import Position
 from typed_nado.gateway.fee_rates import FeeRates
+from typed_nado.gateway.isolated_positions import IsolatedPositions
 from typed_nado.schemas import AllProducts, SubaccountInfo
+from tribulnation.sdk.core import ApiError
 from tribulnation.sdk.market import Balance, Fees, PerpCollateral, PerpPosition
 
 from ..core import QUOTE_ASSET, QUOTE_PRODUCT, Shared, x18
@@ -37,6 +40,16 @@ async def summary(shared: Shared, *, ttl: timedelta | None = None) -> Subaccount
   )
 
 
+def held_isolated(reply: IsolatedPositions) -> set[int]:
+  """The perpetuals an `isolated_positions` reply holds a position on: rows of a flat
+  isolated subaccount hold nothing."""
+  return {
+    p['base_balance']['product_id']
+    for p in reply['isolated_positions']
+    if int(p['base_balance']['balance']['amount'])
+  }
+
+
 async def isolated_products(
   shared: Shared, *, ttl: timedelta | None = None
 ) -> set[int]:
@@ -47,11 +60,7 @@ async def isolated_products(
     lambda: shared.call(lambda: shared.client.gateway.isolated_positions(sender)),
     ttl=ttl,
   )
-  return {
-    p['base_balance']['product_id']
-    for p in reply['isolated_positions']
-    if int(p['base_balance']['balance']['amount'])
-  }
+  return held_isolated(reply)
 
 
 def unsupported_isolated(symbol: str) -> NoReturn:
@@ -62,20 +71,20 @@ def unsupported_isolated(symbol: str) -> NoReturn:
   )
 
 
-async def fee_rates(shared: Shared) -> FeeRates:
-  """The subaccount's fee rates per product."""
+async def fee_rates(shared: Shared, *, refetch: bool = False) -> FeeRates:
+  """The subaccount's fee rates per product, shared for a minute unless `refetch`."""
   sender = shared.require_sender()
   return await shared.reads.read(
     ('fee_rates', sender),
     lambda: shared.call(lambda: shared.client.gateway.fee_rates(sender)),
-    ttl=timedelta(minutes=1),
+    ttl=None if refetch else timedelta(minutes=1),
   )
 
 
-async def fees(shared: Shared, product_id: int) -> Fees:
+async def fees(shared: Shared, product_id: int, *, refetch: bool = False) -> Fees:
   """The subaccount's maker and taker rates on one product, the same for both sides
   (`fee_rates`, indexed by product id; a maker rebate is negative)."""
-  rates = await fee_rates(shared)
+  rates = await fee_rates(shared, refetch=refetch)
   return Fees.symmetric(
     maker=x18(rates['maker_fee_rates_x18'][product_id]),
     taker=x18(rates['taker_fee_rates_x18'][product_id]),
@@ -124,6 +133,31 @@ def perp_amount(info: SubaccountInfo, product_id: int) -> Decimal:
   return Decimal(0)
 
 
+def entry_price(windows: list[Position], product_id: int, size: Decimal) -> Decimal:
+  """The average entry price of the archive's open window holding `size`.
+
+  The archive indexes after the gateway, so right after a fill its open window can be
+  missing, still the old one of the other side (seen on mainnet, 2026-11-17: a gateway
+  long read against an archive short of the same size), or of the old size, whose
+  average is not this position's.
+
+  Raises:
+    ApiError: The archive has no open window of that side and size yet; reading again
+      later succeeds once it has indexed the fill.
+  """
+  for w in windows:
+    if (
+      w['product_id'] == product_id
+      and w['direction'] == (size > 0)
+      and x18(w['amount']) == abs(size)
+    ):
+      return x18(w['average_entry_price'])
+  raise ApiError(
+    f'Nado archive has not indexed the {size} position of product {product_id} yet: '
+    'its entry price is unknown'
+  )
+
+
 async def perp_position(
   shared: Shared, symbol: str, product_id: int, *, ttl: timedelta | None = None
 ) -> PerpPosition:
@@ -132,6 +166,7 @@ async def perp_position(
 
   Raises:
     NotImplementedError: The market holds an isolated position.
+    ApiError: The archive has not indexed the position yet.
   """
   info = await summary(shared, ttl=ttl)
   if product_id in await isolated_products(shared, ttl=ttl):
@@ -145,8 +180,7 @@ async def perp_position(
       sender, product_id=product_id, isolated=False, open=True, limit=1
     )
   )
-  rows = windows['positions']
-  entry = x18(rows[0]['average_entry_price']) if rows else Decimal(0)
+  entry = entry_price(windows['positions'], product_id, size)
   return PerpPosition(size=size, entry_price=entry)
 
 
