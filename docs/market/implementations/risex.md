@@ -89,8 +89,10 @@ trading is invite-only.
 - Funding settles hourly. `next_funding` and the funding in `perp_stats` are the venue's
   estimate of the next rate, positive when longs pay. `funding_payments` are positive
   when received, unsettled accruals of an open position included.
-- Market data and account reads are verified on mainnet; orders, cancels, fills and the
-  fills stream on testnet only.
+- Market data, account reads, orders, cancels and fills are verified on mainnet
+  (2026-11-17, a 0.00015 BTC round trip); the fills stream on testnet.
+- An account can be traded with only its address and a registered signer key; the
+  account key is needed only to register or revoke signers.
 
 <!-- next -->
 
