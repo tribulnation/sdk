@@ -48,5 +48,6 @@ min_mode = "private"
 [qualification.market.unsupported]
 usdc = [
   "fees", "open_orders", "trades_history", "position", "perp_position", "collateral",
-  "perp_collateral", "available_notional", "remaining_position_limit",
+  "perp_collateral", "available_notional", "remaining_position_limit", "leverage",
+  "collateral_id",
 ]
