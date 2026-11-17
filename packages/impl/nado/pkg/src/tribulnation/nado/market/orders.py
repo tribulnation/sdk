@@ -10,11 +10,12 @@ from decimal import Decimal
 from typing_extensions import Any, Mapping, Sequence
 from typed_nado import order_appendix
 from typed_nado.core.appendix import OrderType
-from typed_nado.schemas import Order as NadoOrder, PlaceOrderRequest, Symbol
+from typed_nado import schemas
+from typed_nado.schemas import PlaceOrderRequest, Symbol
 from tribulnation.sdk.core import BadRequest, OrderNotFound, OrderRejected
 from tribulnation.sdk.market import Order, OrderResponse, OrderState, Settings
 
-from ..core import GTC_EXPIRATION, Shared, to_x18
+from ..core import CLIENT_ORDER_IDS, GTC_EXPIRATION, Shared, to_x18
 from .common import parse_archived_order, parse_open_order
 
 NOT_FOUND = 2020
@@ -26,37 +27,33 @@ ORDER_TYPES: Mapping[str, OrderType] = {
 }
 """The appendix order type of each SDK order type: Nado has no market order, so
 `MARKET` is an immediate-or-cancel limit at the SDK `price`, the worst acceptable."""
-CLIENT_ID_LIMIT = 2**64
-"""Client ids must fit an unsigned 64-bit integer."""
 
 
 def spot_leverage(symbol: Symbol, settings: Settings) -> bool | None:
   """Whether the order may borrow: never on spot, unless `{'nado': {'spot_leverage':
   True}}` says so; perpetual orders send nothing (the venue's default)."""
-  if symbol['type'] != 'spot':
-    return None
-  return settings.get('nado', {}).get('spot_leverage', False)
+  if symbol['type'] == 'spot':
+    return settings.get('nado', {}).get('spot_leverage', False)
 
 
 def client_id(order: Order) -> int | None:
   """The order's `client_order_id` as the venue's integer `id`.
 
   Raises:
-    ValueError: It is not a decimal integer in `[0, 2^64)`.
+    ValueError: It is not a decimal integer in `[0, 2^63)`, the range
+      `random_client_order_id` draws from.
   """
-  raw = order.get('client_order_id')
-  if raw is None:
-    return None
-  try:
-    value = int(raw)
-  except ValueError:
-    raise ValueError(f'Nado client order ids are integers, got {raw!r}') from None
-  if not 0 <= value < CLIENT_ID_LIMIT:
-    raise ValueError(f'Nado client order ids fit 64 unsigned bits, got {raw!r}')
-  return value
+  if (raw := order.get('client_order_id')) is not None:
+    try:
+      value = int(raw)
+    except ValueError:
+      raise ValueError(f'Nado client order ids are integers, got {raw!r}') from None
+    if not 0 <= value < CLIENT_ORDER_IDS:
+      raise ValueError(f'Nado client order ids are below 2^63, got {raw!r}')
+    return value
 
 
-def nado_order(order: Order, settings: Settings = {}) -> NadoOrder:
+def nado_order(order: Order, settings: Settings = {}) -> schemas.Order:
   """The signed order struct for an SDK order: a limit at `price`, expiring with
   `GTC_EXPIRATION`, with the appendix of its type (reduce-only under
   `{'nado': {'reduce_only': True}}`).
@@ -141,7 +138,9 @@ async def place_orders(
   an order that could not be built (a bad quantity, price or client id) as its
   `ValueError`, and is not sent. The venue validates the whole batch first, so one
   invalid order refuses every order sent with it: each comes back as that
-  `OrderRejected`.
+  `OrderRejected`. Any other failure of the request (a network error, an uncoded
+  refusal) is each sent order's result too, as ADR 0059 asks of `place_orders`: whether
+  they rest is then unknown.
 
   Raises:
     AuthError: The client has no key to sign with.
@@ -159,13 +158,11 @@ async def place_orders(
     return [r for r in results if r is not None]
   try:
     replies = await shared.call(lambda: shared.client.gateway.place_orders(requests))
-  except BadRequest as exc:
-    if not coded(exc):
-      raise
+  except Exception as exc:
     # The sequencer validates the whole batch before placing any of it: one off-tick
     # order refused all three of a batch, and none rested (mainnet, 2026-11-17).
-    refusal = rejected(exc)
-    return [refusal if r is None else r for r in results]
+    failure = rejected(exc) if isinstance(exc, BadRequest) and coded(exc) else exc
+    return [failure if r is None else r for r in results]
   sent = iter(replies)
   out: list[OrderResponse | Exception] = []
   for result in results:
@@ -265,4 +262,3 @@ async def query_order(shared: Shared, product_id: int, id: str) -> OrderState | 
   for row in archived['orders']:
     if row['product_id'] == product_id and row['subaccount'].lower() == sender.lower():
       return parse_archived_order(row)
-  return None

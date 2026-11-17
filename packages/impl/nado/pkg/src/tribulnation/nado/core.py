@@ -244,7 +244,6 @@ class Shared(SDK):
     for name, s in symbols.items():
       if s['product_id'] == product_id:
         return name
-    return None
 
   async def asset_of(self, product_id: int) -> str | None:
     """The asset id of a spot product: `USDT0` for product 0, else its symbol."""

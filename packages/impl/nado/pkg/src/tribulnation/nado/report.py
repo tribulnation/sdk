@@ -12,22 +12,23 @@ from decimal import Decimal
 import asyncio
 
 from typing_extensions import AsyncContextManager, AsyncIterable, Collection, Iterable
+from typed_nado.archive.positions import Position
 from typed_nado.archive.subaccounts import Subaccount
 from typed_nado.schemas import SubaccountInfo
+from tribulnation.sdk import reporting
 from tribulnation.sdk.reporting import (
   HistoryRecord,
-  Position,
-  Report as SDKReport,
   Snapshot,
   SnapshotRecord,
   SubaccountSnapshot,
 )
 
 from .core import QUOTE_ASSET, Network, Shared, x18
+from .market.account import entry_price, held_isolated
 
 
 @dataclass(frozen=True, kw_only=True)
-class Report(SDKReport):
+class Report(reporting.Report):
   """Snapshots of every cross-margin subaccount of one wallet, named by subaccount
   name (`default`)."""
 
@@ -83,18 +84,12 @@ class Report(SDKReport):
     )
     return rows['subaccounts']
 
-  async def entry_prices(
-    self, sender: str, product_ids: list[int]
-  ) -> dict[int, Decimal]:
-    """The archive's average entry price of each open cross position."""
-    windows = await self.shared.call(
+  async def windows(self, sender: str) -> list[Position]:
+    """The archive's open cross position windows of a subaccount."""
+    reply = await self.shared.call(
       lambda: self.shared.client.archive.positions(sender, isolated=False, open=True)
     )
-    return {
-      p['product_id']: x18(p['average_entry_price'])
-      for p in windows['positions']
-      if p['product_id'] in product_ids
-    }
+    return reply['positions']
 
   async def subaccount(self, row: Subaccount) -> SubaccountSnapshot:
     """One cross subaccount: its non-zero spot balances (negative when borrowed) and
@@ -108,8 +103,8 @@ class Report(SDKReport):
     2026-11-17), and it is added the same way.
 
     Raises:
-      NotImplementedError: A position has no open window in the archive to read its
-        entry price from.
+      ApiError: The archive has not indexed a position yet (no open window of its
+        side and size), so its entry price is unknown.
     """
     sender = row['subaccount']
     info: SubaccountInfo = await self.shared.call(
@@ -130,18 +125,14 @@ class Report(SDKReport):
       if not int(b['balance']['amount']) and int(b['balance']['v_quote_balance']):
         settling = x18(b['balance']['v_quote_balance'])
         balances[QUOTE_ASSET] = balances.get(QUOTE_ASSET, Decimal(0)) + settling
-    positions: dict[str, Position] = {}
+    positions: dict[str, reporting.Position] = {}
     if open_perps:
-      entries = await self.entry_prices(sender, list(open_perps))
+      windows = await self.windows(sender)
       for pid, balance in open_perps.items():
-        if pid not in entries:
-          raise NotImplementedError(
-            f'Nado lists no open position window for product {pid}: its entry price '
-            'is unknown'
-          )
-        amount, entry = x18(balance['amount']), entries[pid]
+        amount = x18(balance['amount'])
+        entry = entry_price(windows, pid, amount)
         symbol = await self.shared.symbol_of(pid) or str(pid)
-        positions[symbol] = Position(size=amount, avg_price=entry)
+        positions[symbol] = reporting.Position(size=amount, avg_price=entry)
         unsettled = x18(balance['v_quote_balance']) + amount * entry
         balances[QUOTE_ASSET] = balances.get(QUOTE_ASSET, Decimal(0)) + unsettled
     return SubaccountSnapshot(
@@ -164,7 +155,7 @@ class Report(SDKReport):
         held = await self.shared.call(
           lambda: self.shared.client.gateway.isolated_positions(parent['subaccount'])
         )
-        if held['isolated_positions']:
+        if held_isolated(held):
           raise NotImplementedError(
             'Nado isolated positions are not supported: '
             f'{parent["subaccount_name"]} holds one'
