@@ -4,7 +4,7 @@ Futures venue (`fake_futures`)."""
 from datetime import timedelta
 from decimal import Decimal
 import asyncio
-from typing_extensions import Any, Callable
+from typing_extensions import Any, AsyncIterator, Callable
 
 import pytest
 
@@ -169,7 +169,7 @@ async def test_book_stream(venue: Venue):
 async def test_book_gap_fails_the_stream():
   """A skipped `seq` fails the stream rather than serving a wrong book."""
 
-  async def messages():
+  async def messages() -> AsyncIterator[dict[str, Any]]:
     yield {
       'feed': 'book_snapshot',
       'product_id': SYMBOL,
@@ -204,7 +204,7 @@ def test_next_hour():
 
 def test_schedule_falls_back_to_retail_levels():
   """A platform schedule the instrument doesn't publish falls back to its retail levels."""
-  instrument = {
+  instrument: dict[str, Any] = {
     'symbol': 'PF_IOTXUSD',
     'retailMarginLevels': [
       {'numNonContractUnits': 0, 'initialMargin': 0.1, 'maintenanceMargin': 0.05}

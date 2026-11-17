@@ -17,10 +17,12 @@ import hashlib
 import hmac
 import itertools
 import json
+from typing_extensions import Any
 
 import httpx
 import pytest_asyncio
 import websockets
+from websockets.asyncio.server import ServerConnection
 from typed_core.http import HttpClient
 
 from tribulnation.kraken.market.impl.futures_state import FuturesState
@@ -59,7 +61,7 @@ class Resting:
   size: Decimal
   filled: Decimal = Decimal(0)
 
-  def wire(self) -> dict:
+  def wire(self) -> dict[str, Any]:
     """As events and order status carry it."""
     return {
       'orderId': self.id,
@@ -86,13 +88,17 @@ class FakeFutures:
   """Size available at the best bid and ask."""
   position: Decimal = Decimal(0)
   entry: Decimal = Decimal(0)
-  orders: dict[str, Resting] = field(default_factory=dict)
-  closed: dict[str, tuple[Resting, str]] = field(default_factory=dict)
-  fills: list[dict] = field(default_factory=list)
-  requests: list[tuple[str, str, dict]] = field(default_factory=list)
-  sockets: set = field(default_factory=set)
-  fill_subscribers: set = field(default_factory=set)
-  ids: itertools.count = field(default_factory=lambda: itertools.count(1))
+  orders: dict[str, Resting] = field(default_factory=dict[str, Resting])
+  closed: dict[str, tuple[Resting, str]] = field(
+    default_factory=dict[str, tuple[Resting, str]]
+  )
+  fills: list[dict[str, Any]] = field(default_factory=list[dict[str, Any]])
+  requests: list[tuple[str, str, dict[str, str]]] = field(
+    default_factory=list[tuple[str, str, dict[str, str]]]
+  )
+  sockets: set[ServerConnection] = field(default_factory=set[ServerConnection])
+  fill_subscribers: set[ServerConnection] = field(default_factory=set[ServerConnection])
+  ids: 'itertools.count[int]' = field(default_factory=lambda: itertools.count(1))
   loop: asyncio.AbstractEventLoop | None = None
 
   def transport(self) -> httpx.MockTransport:
@@ -145,7 +151,7 @@ class FakeFutures:
       case _:
         return httpx.Response(404)
 
-  def answer(self, payload: dict) -> httpx.Response:
+  def answer(self, payload: dict[str, Any]) -> httpx.Response:
     """A success envelope."""
     return httpx.Response(200, json={'result': 'success', 'serverTime': NOW, **payload})
 
@@ -153,7 +159,7 @@ class FakeFutures:
     """Whether an order ID was ever seen."""
     return id in self.orders or id in self.closed
 
-  def status(self, id: str) -> dict:
+  def status(self, id: str) -> dict[str, Any]:
     """An `orders/status` entry."""
     if id in self.orders:
       order, status = self.orders[id], 'ENTERED_BOOK'
@@ -161,7 +167,7 @@ class FakeFutures:
       order, status = self.closed[id]
     return {'order': {'type': 'ORDER', **order.wire()}, 'status': status}
 
-  def open_row(self, order: Resting) -> dict:
+  def open_row(self, order: Resting) -> dict[str, Any]:
     """An `openorders` row."""
     return {
       'order_id': order.id,
@@ -178,7 +184,7 @@ class FakeFutures:
       'lastUpdateTime': NOW,
     }
 
-  def positions(self) -> list[dict]:
+  def positions(self) -> list[dict[str, Any]]:
     """The open position, if any."""
     if self.position == 0:
       return []
@@ -200,7 +206,9 @@ class FakeFutures:
     if side == 'sell' and price <= self.bid:
       return self.bid
 
-  def execute(self, order: Resting, qty: Decimal, price: Decimal, *, maker: bool):
+  def execute(
+    self, order: Resting, qty: Decimal, price: Decimal, *, maker: bool
+  ) -> dict[str, Any]:
     """Fill `qty` of `order` and push the fill."""
     order.filled += qty
     order.size -= qty
@@ -209,7 +217,7 @@ class FakeFutures:
     if self.position == 0 or (self.position > 0) == (signed > 0):
       self.entry = (self.entry * abs(self.position) + price * qty) / abs(new)
     self.position = new
-    fill = {
+    fill: dict[str, Any] = {
       'fill_id': f'f{next(self.ids)}',
       'symbol': SYMBOL,
       'side': order.side,
@@ -230,7 +238,7 @@ class FakeFutures:
       'orderPriorExecution': order.wire(),
     }
 
-  def send(self, params: dict) -> dict:
+  def send(self, params: dict[str, Any]) -> dict[str, Any]:
     """`sendorder`."""
     kind, side = params['orderType'], params['side']
     order = Resting(
@@ -246,7 +254,7 @@ class FakeFutures:
       return {'status': 'postWouldExecute', 'order_id': order.id, 'orderEvents': []}
     if kind == 'ioc' and take is None:
       return {'status': 'iocWouldNotExecute', 'order_id': order.id, 'orderEvents': []}
-    events = []
+    events: list[dict[str, Any]] = []
     if take is not None:
       events.append(self.execute(order, min(order.size, self.depth), take, maker=False))
     if kind == 'ioc' or order.size == 0:
@@ -266,7 +274,7 @@ class FakeFutures:
       'orderEvents': events,
     }
 
-  def edit(self, params: dict) -> dict:
+  def edit(self, params: dict[str, Any]) -> dict[str, Any]:
     """`editorder`: the open size and price become the new ones."""
     order = self.orders.get(params['orderId'])
     if order is None:
@@ -284,7 +292,7 @@ class FakeFutures:
       'orderEvents': [{'type': 'EDIT', 'old': old, 'new': order.wire()}],
     }
 
-  def cancel(self, id: str) -> dict:
+  def cancel(self, id: str) -> dict[str, Any]:
     """`cancelorder`."""
     order = self.orders.pop(id, None)
     if order is None:
@@ -296,7 +304,7 @@ class FakeFutures:
       'orderEvents': [{'type': 'CANCEL', 'order': order.wire()}],
     }
 
-  def instruction(self, instruction: dict) -> dict:
+  def instruction(self, instruction: dict[str, Any]) -> dict[str, Any]:
     """One batch instruction."""
     if instruction['order'] == 'send':
       params = {
@@ -314,7 +322,7 @@ class FakeFutures:
       del self.orders[id]
       self.closed[id] = (order, 'FULLY_EXECUTED')
 
-  def push_fill(self, fill: dict, *, fee: Decimal):
+  def push_fill(self, fill: dict[str, Any], *, fee: Decimal):
     """Push a fill on every `fills` subscriber."""
     message = json.dumps(
       {
@@ -341,7 +349,7 @@ class FakeFutures:
     for ws in list(self.fill_subscribers):
       asyncio.ensure_future(ws.send(message))
 
-  async def serve(self, ws):
+  async def serve(self, ws: ServerConnection):
     """The WebSocket side: challenge, `book` and `fills`."""
     self.sockets.add(ws)
     try:
@@ -395,7 +403,7 @@ class FakeFutures:
       self.sockets.discard(ws)
       self.fill_subscribers.discard(ws)
 
-  def book_snapshot(self, product: str) -> dict:
+  def book_snapshot(self, product: str) -> dict[str, Any]:
     """The `book_snapshot` frame."""
     return {
       'feed': 'book_snapshot',
@@ -418,7 +426,7 @@ BOOK_UPDATES = [('sell', 0.0277, 0.0), ('buy', 0.02765, 42.0)]
 """Updates after the snapshot: the best ask leaves, a bid joins inside the spread."""
 
 FEE_UID = '723888f7-0a8e-4183-8648-f920a22339e3'
-FEE_SCHEDULES = [
+FEE_SCHEDULES: list[dict[str, Any]] = [
   {
     'uid': FEE_UID,
     'name': 'MTF Linear Rebate Fees',
@@ -429,7 +437,7 @@ FEE_SCHEDULES = [
     ],
   }
 ]
-FLEX = {
+FLEX: dict[str, Any] = {
   'type': 'multiCollateralMarginAccount',
   'currencies': {
     'USD': {
@@ -454,7 +462,7 @@ FLEX = {
 }
 
 
-INSTRUMENT = {
+INSTRUMENT: dict[str, Any] = {
   'symbol': SYMBOL,
   'type': 'flexible_futures',
   'tradeable': True,
@@ -489,7 +497,12 @@ async def venue():
     fake.loop = asyncio.get_running_loop()
     port = server.sockets[0].getsockname()[1]
     url = f'ws://localhost:{port}'
-    yield fake, lambda **kw: market_on(fake, url, **kw)
+
+    def factory(*, schedule: str | None = None) -> PerpMarket:
+      """A market on this venue."""
+      return market_on(fake, url, schedule=schedule)
+
+    yield fake, factory
 
 
 def market_on(
