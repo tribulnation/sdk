@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tribulnation-risex"
+version = "0.1.0"
+description = "Tribulnation SDK implementation for RISEx perpetuals."
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+readme = {file = "README.md", content-type = "text/markdown"}
+dependencies = ["tribulnation-sdk>=4.0.0", "typed-risex>=0.1.0"]
+
+[project.urls]
+Repository = "https://github.com/tribulnation/sdk.git"
