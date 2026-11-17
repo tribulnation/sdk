@@ -15,14 +15,20 @@ from typing_extensions import (
   Callable,
   Iterable,
   Literal,
+  Mapping,
   TypedDict,
   TypeVar,
 )
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 import asyncio
 
-from tribulnation.sdk.core import ManagedResource, OverflowPolicy, Subscription
+from tribulnation.sdk.core import (
+  ManagedResource,
+  OverflowPolicy,
+  SharedReads,
+  Subscription,
+)
 from tribulnation.sdk.market import Book
 from tribulnation.kraken.core import Calls, wrap_exceptions
 
@@ -45,15 +51,6 @@ KrakenVenue = Literal['kraken', 'kraken_testnet']
 """`kraken` is the live venue; `kraken_testnet` is the Futures demo environment, which
 has perpetuals only."""
 
-BALANCE_TTL = timedelta(seconds=1)
-"""How long a fetched balance list is reused before another call is made.
-
-Kraken meters private REST calls with a per-account counter that decays at a fraction
-of a point per second, and `position`, `collateral` and `available_notional` each need
-the same `BalanceEx` answer, so a caller sweeping a handful of markets coalesces those
-calls rather than spending three counter points per market.
-"""
-
 
 @dataclass(kw_only=True)
 class Shared(Calls):
@@ -68,21 +65,22 @@ class Shared(Calls):
   venue: KrakenVenue = 'kraken'
   account_id: str | None = None
   """Root SDK account key; `None` when built directly, reporting `'kraken'` instead."""
-  balance_ttl: timedelta = BALANCE_TTL
   pairs: dict[str, PairInfo] | None = None
   perp_instruments: dict[str, FuturesInstrument] | None = None
   fee_asset: str | None = None
   perp_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
-  balances: dict[str, ExtendedBalance] | None = None
-  balances_at: datetime | None = None
+  spot_reads: SharedReads = field(default_factory=SharedReads)
+  """Account-wide Spot reads (`BalanceEx`), shared per `ttl` (ADR 0054).
+
+  Kraken meters private Spot REST calls with a per-account counter that decays at
+  0.33 to 1 point per second depending on the verification tier, and every market and
+  collateral ID of the account reads the same `BalanceEx` answer.
+  """
   depth_subscriptions: dict[tuple[str, BookDepth], Subscription[Book]] = field(
     default_factory=dict[tuple[str, BookDepth], Subscription[Book]]
   )
   executions: Subscription[ExecutionTradeEvent] | None = None
   pairs_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
-  balances_lock: asyncio.Lock = field(
-    default_factory=asyncio.Lock, init=False, repr=False
-  )
 
   @classmethod
   def new(
@@ -189,28 +187,21 @@ class Shared(Calls):
       self.fee_asset = matches[0]
     return self.fee_asset
 
-  async def load_balances(self, *, refetch: bool = False) -> dict[str, ExtendedBalance]:
-    """Fetch every asset's extended balance, keyed by internal asset id.
-
-    Reuses a result younger than `balance_ttl` rather than refetching -- see that
-    constant for the rate limit this exists to stay under.
+  async def load_balances(
+    self, *, ttl: timedelta | None
+  ) -> Mapping[str, ExtendedBalance]:
+    """Every asset's extended balance, keyed by internal asset id (`BalanceEx`).
 
     Args:
-      refetch: Refetch even when a fresh result is cached.
+      ttl: How old a shared answer may be; `None` asks afresh (ADR 0054).
     """
-    async with self.balances_lock:
-      now = datetime.now(timezone.utc)
-      fresh = (
-        self.balances is not None
-        and self.balances_at is not None
-        and now - self.balances_at < self.balance_ttl
-      )
-      if self.balances is None or refetch or not fresh:
-        self.balances = dict(
-          await self.call_kraken(self.client.spot.account.balance_ex)
-        )
-        self.balances_at = now
-      return self.balances
+    return await self.spot_reads.read(
+      'balances', lambda: self.call_kraken(self.client.spot.account.balance_ex), ttl=ttl
+    )
+
+  def forget_balances(self):
+    """Drop the shared balances, after an order or cancel that may have changed them."""
+    self.spot_reads.forget('balances')
 
   def depth_subscription(self, symbol: str, depth: BookDepth) -> Subscription[Book]:
     """The shared order-book subscription for one symbol and depth, created on

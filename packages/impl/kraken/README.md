@@ -41,7 +41,24 @@ async with KrakenMarket.new(futures_api_key=..., futures_private_key=...) as kra
   )
 ```
 
-The `kraken_testnet` venue is the Futures demo environment (perpetuals only).
+Spot trades with the Spot API key (`api_key`/`private_key`, or `KRAKEN_API_KEY`/
+`KRAKEN_PRIVATE_KEY`): REST limit orders (`LIMIT` GTC, `POST_ONLY` with the `post` flag,
+`MARKET` as an IOC limit at `price`), in-place amends, cancels, open and queried
+orders, `balances()` and the Spot collateral IDs (`kraken:spot:ZUSD`), and the
+`executions` fills stream. Spot and perpetuals can share one account with both key pairs,
+for a Spot/perpetual carry on Kraken:
+
+```python
+async with KrakenMarket.new(
+  api_key=..., private_key=..., futures_api_key=..., futures_private_key=...
+) as kraken:
+  spot = await kraken.spot_market('spot:KAVAUSD')
+  await spot.place_order({'type': 'POST_ONLY', 'qty': 500, 'price': '0.0790'})
+  print(await spot.balances(), await spot.collateral_ids())
+```
+
+The `kraken_testnet` venue is the Futures demo environment (perpetuals only). Spot has
+no testnet.
 
 ## Identifiers
 
