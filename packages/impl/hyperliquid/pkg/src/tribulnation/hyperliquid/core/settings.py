@@ -8,6 +8,16 @@ class Settings(TypedDict, total=False):
   reduce_only: bool
   limit_tif: Literal['Alo', 'Ioc', 'Gtc']
   index_price: Literal['oracle', 'mark']
+  fast_cancel: bool
+  """Send every cancel with Hyperliquid's fast-cancel flag (`f: true`). Defaults to
+  False: the flag is omitted.
+
+  Strict: do not use it on trigger orders. Hyperliquid refuses a fast cancel naming one,
+  and the refusal is raised (`ApiError`; the order still rests), never resent without
+  the flag. `cancel_open_orders` fast-cancels every open order, trigger orders included.
+  The SDK places no trigger orders. `batchModify` replacements carry no cancel and are
+  unaffected.
+  """
   tickers_fetch_depth: bool
   """Whether bulk tickers fetch order books for best bid and ask. Defaults to True."""
   tickers_depth_concurrent: int
