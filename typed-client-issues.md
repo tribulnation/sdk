@@ -128,3 +128,43 @@ agent's own (empty) account, so the call is effectively master-only.
   moved 20; agent with `vault` refused with `insufficient balance` (testnet, 2026-10-21)
 - Blocks: nothing in the SDK (no transfer method); `poc/market/spot.py` lifecycle signs its
   transfers with the master key and micro-units
+
+## typed-nado
+
+### `archive_v2.tickers` declares prices and volumes as `float`
+
+The archive's REST v2 sends `last_price`, `base_volume` and `quote_volume` as JSON numbers,
+and typed-nado declares them `float`, so a price reaches Python already rounded to a
+binary float. The same holds for `archive_v2.contracts` (`index_price`, `mark_price`,
+`funding_rate`, `open_interest`, ...).
+
+`archive_v2/tickers.py:26`:
+
+```python
+  last_price: float
+```
+
+- Kind: wrong-type
+- Observed: `"last_price": 64304.0`, `"quote_volume": 212003391.2444924` (BTC-PERP, mainnet, 2026-11-17)
+- Blocks: `pkg/src/tribulnation/nado/market/stats.py` (`decimal`, read back through the
+  float's shortest repr) and `poc/market/{perp,spot}.py` `tickers`
+- Suggestion (unverified): decode the v2 bodies with `parse_float=Decimal` and declare
+  `Decimal`
+
+### `archive.matches_paged` drops the `txs` that time each match
+
+A `Match` carries no time: it is joined to its transaction in the page's `txs` by
+`submission_idx`. `matches_paged` yields only `matches`, so a paged walk loses every
+fill's time, and the adapter walks `matches` by hand with `idx` instead.
+`matches_and_liquidations_paged` has the same gap.
+
+`archive/matches.py:37`:
+
+```python
+  def matches_paged(
+```
+
+- Kind: missing-endpoint (a paged walk that keeps each row's transaction)
+- Observed: `Matches = {matches, txs}`; `PaginatedResponse[Match, ...]`
+- Blocks: `pkg/src/tribulnation/nado/market/history.py` (`matches`, a hand walk)
+- Suggestion (unverified): page `(Match, Tx)` pairs, or attach the timestamp to each row

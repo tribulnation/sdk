@@ -1,0 +1,31 @@
+# auth = false means market data works on a credential-free (`public = true`) account;
+# auth = true means every call needs a real accounts.Nado() entry.
+
+[support.market]
+support = "full"
+auth = false
+kinds = ["spot", "perp"]
+note = "USDT0-settled perpetuals (`perp`) and spot assets against USDT0 (`spot`), on one subaccount's unified cross margin. Public data needs no credentials; an address alone serves every account read (Nado's reads are public), and the private key (the owner's, or its linked signer's) also places and cancels orders. Market ids are product symbols (`BTC-PERP`, `KBTC`); order ids are digests. `LIMIT` and `POST_ONLY` rest until cancelled (signed with a 2100-01-01 expiration); `MARKET` is an immediate-or-cancel limit at `price`, since Nado has no market order. Coded refusals of a placement (`2000` off-tick price, `2094` below the 100 USDT0 minimum notional, `2056` an IOC that does not cross, health, post-only) raise `OrderRejected`; `place_orders` is validated whole, so one invalid order refuses the batch. `replace_order` is the atomic `cancel_and_place`: a refused replacement leaves the original resting and raises `BadRequest`. Cancelling an order no longer on the book raises `OrderNotFound`. `query_order` finds a resting order on the book, else in the archive, which indexes only orders that filled at least once. Spot orders never borrow unless `settings={'nado': {'spot_leverage': True}}`; `settings={'nado': {'reduce_only': True}}` makes an order reduce-only. `rules().fees` are the products' default rates; `fees` reads the subaccount's per-product rates. Fees and funding are in USDT0. Tickers carry the last price and 24h volumes (the archive's, sent as JSON floats) and best bid/ask without sizes. Funding settles hourly; `next_funding`, `perp_stats` funding and funding rates are per hourly settlement (the venue's 24-hour figures over 24), positive when longs pay; funding payments are received-positive. Perpetuals' `collateral_id` is `<account>:spot:USDT0`, the unified account's USDT0. `perp_collateral` is the whole subaccount: equity is the unweighted health, the margins are its distance to the initial and maintenance healths, free collateral is the initial health. `leverage` is what the product's initial risk weights allow (cross margin has no per-account setting), and `available_notional` free collateral times it, which matched the venue's `max_order_size` for a buy below the oracle (mainnet, 2026-11-17). Resting orders hold nothing (health is checked at placement and at fill), so spot `free` is the balance, never negative, and USDT0's is further capped at the initial health. Isolated positions raise NotImplementedError from the account reads of their market. Order lifecycle verified on mainnet with post-only orders that could not fill. One taker round trip on BTC-PERP (mainnet, 2026-11-17): a `MARKET` buy of 0.00165 filled at 64207 and a reduce-only `MARKET` sell at 64202; the fills stream, `query_order` (from the archive), `trades_history` and `perp_position` (64207 entry while open, flat after) all reported them, and the round trip cost 0.082419 USDT0, exactly the two taker fees (0.074169) and the 5 USDT0 spread on 0.00165. A closed position's PnL reaches the USDT0 balance a few seconds later, when the venue settles it; until then only USDT0's `free` (capped at the initial health) reflects it."
+# Credential modes. Public (`public = true`, no address): market data only. An address
+# alone serves every account read below: Nado's reads are public, so the address mode
+# of ADR 0042. The private key adds placing and cancelling orders.
+
+[support.report]
+support = "partial"
+auth = true
+methods = ["snapshot"]
+note = "Snapshots of every cross subaccount of the wallet (an address suffices), named by subaccount name (`default`): non-zero spot balances by asset id (negative when borrowed) and perpetual positions by symbol at the archive's average entry price, with the perpetuals' funding and PnL not yet settled into USDT0 (closed positions' included) added to the USDT0 balance. Isolated positions raise NotImplementedError. History is not supported."
+
+[ids]
+asset = "symbol"
+market = "The product symbol (`BTC-PERP`, `KBTC`)."
+note = "Asset ids are spot product symbols (`KBTC`, `WETH`, `USDC`) and `USDT0` for product 0, the quote of every market."
+
+# Release qualification of account reads (ADR 0042); not shown in the support matrix.
+[qualification.market]
+min_mode = "address"
+address_methods = [
+  "fees", "open_orders", "query_order", "trades_history", "funding_payments",
+  "position", "perp_position", "collateral", "perp_collateral", "leverage",
+  "available_notional", "collateral_id", "balances", "collateral_ids",
+]

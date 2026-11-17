@@ -25,6 +25,7 @@ COMPATIBLE_IMPLEMENTATIONS = {
   'lighter': '0.13.0',
   'margin-trade': '0.3.0',
   'mexc': '3.0.0',
+  'nado': '0.1.0',
 }
 
 

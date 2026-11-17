@@ -40,7 +40,7 @@ The SDK sends the string unchanged, so an ID of your own must follow the venue's
 most limit its length and characters and reject an ID already in use.
 `random_client_order_id()` follows them by construction: 128 random bits as 32 hex digits on
 most venues, with `0x` in front on Hyperliquid, a UUID on Coinbase, and an integer in
-`[2^63, 2^64)` on GRVT. On markets without
+`[2^63, 2^64)` on GRVT, and a decimal integer below `2^63` on Nado. On markets without
 client order IDs it returns `None`, which `place_order` treats like no ID at all, so the code
 above runs unchanged everywhere. Either field is `None` on fills that don't report it:
 
@@ -59,6 +59,7 @@ above runs unchanged everywhere. Either field is `None` on fills that don't repo
 | Kraken | No trading | History and stream | Stream |
 | Lighter | Ignored | History and stream | — |
 | MEXC | `newClientOrderId` (spot) | History and stream | History and stream |
+| Nado | The order's `id`: a decimal integer below `2^64`, not kept unique | History and stream | Stream |
 
 Where you give none, Aster, Binance and Bybit spot generate an ID, and so does the SDK on
 Coinbase, which requires one: fills report that one. On Coinbase, reusing an ID doesn't

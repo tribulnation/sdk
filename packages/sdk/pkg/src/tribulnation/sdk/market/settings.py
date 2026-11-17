@@ -7,6 +7,7 @@ if TYPE_CHECKING:
   from tribulnation.hyperliquid.core.settings import Settings as HyperliquidSettings
   from tribulnation.lighter.market.common import Settings as LighterSettings
   from tribulnation.margin_trade.core import Settings as MarginTradeSettings
+  from tribulnation.nado.core import Settings as NadoSettings
 
 Settings = TypedDict(
   'Settings',
@@ -17,6 +18,7 @@ Settings = TypedDict(
     'hyperliquid': 'HyperliquidSettings',
     'lighter': 'LighterSettings',
     'margin-trade': 'MarginTradeSettings',
+    'nado': 'NadoSettings',
   },
   total=False,
 )

@@ -91,6 +91,11 @@ venue = "mexc"
 api_key = "$MEXC_ACCESS_KEY"
 api_secret = "$MEXC_SECRET_KEY"
 
+# The signing key also reads: every Nado account read is public.
+[accounts.nado]
+venue = "nado"
+private_key = "$NADO_PRIVATE_KEY"
+
 # EVM chains share one address.
 
 [accounts.ethereum]

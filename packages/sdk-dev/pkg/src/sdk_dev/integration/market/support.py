@@ -98,6 +98,13 @@ CASES: Mapping[str, Sequence[CandleCase]] = {
     CandleCase(market_id='perp:BTC_USDT_Perp', page=1000),
     CandleCase(market_id='spot:GRVT_USDT_SpotSwap', page=None),
   ],
+  # Product symbols are the same on mainnet and testnet; a walk asks for 500 per page.
+  # KBTC trades too rarely for 500 hourly candles to fit the window: hours without a
+  # trade have no candle, so one page reaches back months.
+  'nado': [
+    CandleCase(market_id='perp:BTC-PERP', page=500),
+    CandleCase(market_id='spot:KBTC', page=None),
+  ],
   # Testnet serves thousands of candles per response, so one page cannot straddle two.
   'lighter_testnet': [
     CandleCase(market_id='perp:4096', page=None),

@@ -23,6 +23,7 @@ from .accounts import (
   Lighter,
   MarginTrade,
   Grvt,
+  Nado,
   load_accounts,
 )
 
@@ -301,6 +302,27 @@ class ReportSDK:
       validate=account.validate,
     )
 
+  def nado(self, account: Nado, id: str) -> Report:
+    """Build Nado's snapshots of every cross subaccount of the wallet; its address is
+    enough (Nado's reads are public)."""
+    try:
+      from tribulnation.nado import Report as NadoReport
+    except ImportError as e:
+      raise ImportError(
+        'nado sdk is not installed. Please install it with `pip install tribulnation-nado`.'
+      ) from e
+    address = account.resolved_address
+    private_key = None if address else account.resolved_private_key
+    if address is None and private_key is None:
+      raise ValueError(f'Account {id} has no Nado address.')
+    return NadoReport.new(
+      address=address,
+      private_key=private_key,
+      subaccount=account.resolved_subaccount,
+      network='mainnet' if account.venue == 'nado' else 'testnet',
+      validate=account.validate,
+    )
+
   def venue(self, id: str, /) -> Report:
     if (account := self.accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
@@ -348,6 +370,8 @@ class ReportSDK:
         return self.margin_trade(account, id)
       case 'grvt' | 'grvt_testnet':
         return self.grvt(account, id)
+      case 'nado' | 'nado_testnet':
+        return self.nado(account, id)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 

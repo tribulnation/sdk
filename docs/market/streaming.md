@@ -65,6 +65,7 @@ would raise instead.
 | margin.trade | ✅ | ✅ |
 | GRVT | ✅ | ✅ |
 | Extended | ✅ | ✅ |
+| Nado | ✅ | ✅ |
 <!-- /streams -->
 
 Per-venue caveats are on the

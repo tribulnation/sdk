@@ -17,6 +17,7 @@ from tribulnation.sdk.impl.accounts import (
   Hyperliquid,
   Lighter,
   MarginTrade,
+  Nado,
 )
 from sdk_dev.repo import IMPL_DIR, repo_root
 from sdk_dev.support import AccountMode, ImplSurfaceSupport, load_impl_files, mainnet_of
@@ -143,6 +144,16 @@ def account_mode(account: Account, *, resolve: bool = True) -> AccountMode:
     if not keyed:
       return 'public'
     return 'private' if configured(account, 'private_key', resolve=resolve) else 'token'
+  if isinstance(account, Nado):
+    # Nado's reads are public: an address alone serves every account read (ADR 0042's
+    # address mode), and the private key, whose address is the default, adds trading.
+    if not account.public and not resolve:
+      return 'private' if account.private_key or not account.address else 'address'
+    if configured(account, 'private_key', resolve=resolve):
+      return 'private'
+    if configured(account, 'address', resolve=resolve):
+      return 'address'
+    return 'public'
   if isinstance(account, Aster):
     if not account.public and not resolve:
       return 'private'

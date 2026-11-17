@@ -163,3 +163,12 @@ repo = "https://github.com/tribulnation/sdk"
 path = "packages/impl/extended"
 pypi = "https://pypi.org/project/tribulnation-extended/"
 icon = "https://catalogue.tribulnation.com/icons/platform/extended.svg"
+
+[[venues]]
+slug = "nado"
+name = "Nado"
+tier = "development"
+repo = "https://github.com/tribulnation/sdk"
+path = "packages/impl/nado"
+pypi = "https://pypi.org/project/tribulnation-nado/"
+icon = "https://catalogue.tribulnation.com/icons/platform/nado.svg"

@@ -22,6 +22,7 @@ from .accounts import (
   Lighter,
   MarginTrade,
   Mexc,
+  Nado,
   load_accounts,
 )
 
@@ -303,6 +304,26 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       account_id=id,
     )
 
+  def nado(self, account: Nado, id: str) -> TradingVenue:
+    """Build Nado's spot and perpetual Market surface: an address reads the
+    subaccount, the private key also trades, and neither (public) serves market data
+    only."""
+    try:
+      from tribulnation.nado import NadoMarket
+    except ImportError as e:
+      raise ImportError(
+        'nado market is not installed. Please install it with `pip install tribulnation-nado`.'
+      ) from e
+    private_key = account.resolved_private_key
+    return NadoMarket.new(
+      network='mainnet' if account.venue == 'nado' else 'testnet',
+      private_key=private_key,
+      address=account.resolved_address,
+      subaccount=account.resolved_subaccount,
+      validate=account.validate,
+      account_id=id,
+    )
+
   def _venue(self, id: str, /) -> TradingVenue:
     if (account := self.accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
@@ -339,6 +360,8 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
         return self.margin_trade(account, id)
       case 'grvt' | 'grvt_testnet':
         return self.grvt(account, id)
+      case 'nado' | 'nado_testnet':
+        return self.nado(account, id)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 
