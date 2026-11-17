@@ -60,8 +60,12 @@ trading is invite-only.
 - `rules().fees` is `None`: the fee schedule is served to logged-in accounts only.
   `fees()` is the account's tier rates, one maker and one taker rate for every market;
   a negative maker rate is a rebate.
-- Candles serve `1m`, `5m`, `15m`, `1h`, `4h` and `1d`, as the venue sends them: some
-  have an `open` or `close` outside their `low`..`high` range.
+- Candles serve `1m`, `5m`, `15m`, `1h`, `4h` and `1d`, exactly as the venue sends
+  them. Some have an `open` or `close` outside their own `low`..`high` range (hourly
+  BTC over a week: about 6% of mainnet candles, 40% of testnet's); in every one
+  observed, the `open` was the previous candle's `close`. The SDK does not repair,
+  clamp or drop them, so check the ordering yourself if you rely on it. This is an
+  accepted venue limitation.
 - `place_order` signs an EIP-712 permit; sizes and prices are sent in whole steps and
   ticks, so off-grid values raise `ValueError` before signing. `LIMIT` rests until
   cancelled, `POST_ONLY` adds the post-only flag, and `MARKET` is an immediate-or-cancel
@@ -84,8 +88,7 @@ trading is invite-only.
   set.
 - Funding settles hourly. `next_funding` and the funding in `perp_stats` are the venue's
   estimate of the next rate, positive when longs pay. `funding_payments` are positive
-  when received, unsettled accruals of an open position included; on an account with an
-  open position they currently fail validation (`typed-risex` 0.1.0).
+  when received, unsettled accruals of an open position included.
 - Market data and account reads are verified on mainnet; orders, cancels, fills and the
   fills stream on testnet only.
 

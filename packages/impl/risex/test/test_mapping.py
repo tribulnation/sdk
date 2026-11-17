@@ -8,6 +8,7 @@ from types import SimpleNamespace
 from typing_extensions import Any, cast
 
 import pytest
+from pydantic import TypeAdapter
 from typed_risex import RISEx
 from typed_risex.account.funding_payments import FundingPayment as FundingRow
 from typed_risex.account.trade_history import AccountTrade
@@ -250,3 +251,29 @@ async def test_funding_payments_filter_and_sign():
   assert getattr(payment, 'market_id') == '1'
   with pytest.raises(ValueError):
     [p async for p in history.funding_payments(shared, 1, datetime(2026, 1, 1), T0)]
+
+
+async def test_unsettled_funding_rows_validate_and_count():
+  """An unsettled accrual sends `''` rates (typed-risex 0.1.1 accepts them): it still
+  validates and is funding all the same, its amount the negated `funding_payment`."""
+  wire: dict[str, object] = {
+    'market_id': 1,
+    'funding_payment': '19.468611333931637682',
+    'position_size': '0.5',
+    'block_number': 0,
+    'block_time': str(int(T0.timestamp() * 10**9)),
+    'tx_hash': '',
+    'side': 'long',
+    'funding_rate': '0.0000336',
+    'is_settled': False,
+    'funding_rate_8h': '',
+    'trade_side': '',
+    'entry_type': 'funding',
+  }
+  row = TypeAdapter(FundingRow).validate_python(wire)
+  assert row['funding_rate_8h'] == ''
+  shared = fake_shared(account=SimpleNamespace(funding_payments_paged=walk([row])))
+  [[payment]] = [
+    p async for p in history.funding_payments(shared, 1, T0 - timedelta(hours=1), T0)
+  ]
+  assert payment.amount == Decimal('-19.468611333931637682')

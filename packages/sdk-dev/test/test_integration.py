@@ -27,7 +27,7 @@ from sdk_dev.cli.test import runner
 from sdk_dev.integration import accounts, conftest
 from sdk_dev.integration.earn.conftest import fetch_instruments
 from sdk_dev.integration.market import account, suite, public
-from sdk_dev.integration.market.support import END, HOUR, CandlesResult
+from sdk_dev.integration.market.support import CASES, END, HOUR, CandlesResult
 from sdk_dev.integration.runtime import loop_of
 from sdk_dev.integration.support import describe_exception
 from sdk_dev.integration.wallet.conftest import fetch_wallet
@@ -227,6 +227,44 @@ def test_candle_conformance_rejects_misalignment():
   rows[0].time += timedelta(microseconds=1)
   with pytest.raises(AssertionError, match='Unaligned'):
     suite.check_series(CandlesResult(pages=[rows]), count=72)
+
+
+def unordered_candle() -> Candle:
+  """RISEx mainnet BTC 2026-11-13 16:00: an `open` above the candle's own `high`."""
+  return Candle(
+    time=END - HOUR,
+    open=Decimal('68880.4'),
+    high=Decimal('68861.8'),
+    low=Decimal('68357.2'),
+    close=Decimal('68656.8'),
+  )
+
+
+def test_candle_values_reject_unordered_ohlc_by_default():
+  """An `open` or `close` outside `[low, high]` fails every venue without a limitation."""
+  with pytest.raises(AssertionError):
+    suite.check_values([unordered_candle()])
+
+
+def test_candle_values_accept_declared_unordered_ohlc():
+  """A declared limitation passes the venue's native candle through (ADR 0061)."""
+  suite.check_values([unordered_candle()], unordered_ohlc=True)
+
+
+def test_candle_values_limitation_still_requires_low_below_high():
+  """The limitation covers `open`/`close` only: an inverted range still fails."""
+  candle = unordered_candle()
+  candle.low, candle.high = candle.high, candle.low
+  with pytest.raises(AssertionError):
+    suite.check_values([candle], unordered_ohlc=True)
+
+
+def test_unordered_ohlc_limitation_is_risex_only():
+  """Only RISEx declares the native-ordering limitation (ADR 0061)."""
+  declared = {
+    venue for venue, cases in CASES.items() for case in cases if case.unordered_ohlc
+  }
+  assert declared == {'risex'}
 
 
 def test_public_outcomes_continue_after_a_failure():

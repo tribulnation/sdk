@@ -1,8 +1,11 @@
 """Live conformance tests for `Market.candles` implementations."""
 
+from collections.abc import Sequence
 from decimal import Decimal
 
 import pytest
+
+from tribulnation.sdk.market import Candle
 
 from .support import HOUR, STRADDLE_EXTRA, WINDOW, CandleCase, CandlesResult
 
@@ -38,17 +41,28 @@ def test_candles_are_unique_aligned_and_bounded(window_result: CandlesResult):
   check_series(window_result, count=WINDOW)
 
 
-def test_candle_values_are_decimals_and_ordered(window_result: CandlesResult):
-  """Every price is a `Decimal` and `low <= open, close <= high` on every candle."""
-  if window_result.failure is not None:
-    pytest.skip('Fetch test failed for this market')
-  for candle in window_result.candles:
+def check_values(candles: Sequence[Candle], *, unordered_ohlc: bool = False):
+  """Every price is a `Decimal`, `low <= high`, and `low <= open, close <= high` unless
+  the venue's accepted limitation passes unordered native candles through (ADR 0061)."""
+  for candle in candles:
     for value in (candle.open, candle.high, candle.low, candle.close):
       assert isinstance(value, Decimal)
-    assert candle.low <= candle.open <= candle.high
-    assert candle.low <= candle.close <= candle.high
+    assert candle.low <= candle.high
+    if not unordered_ohlc:
+      assert candle.low <= candle.open <= candle.high
+      assert candle.low <= candle.close <= candle.high
     assert candle.volume is None or isinstance(candle.volume, Decimal)
     assert candle.quote_volume is None or isinstance(candle.quote_volume, Decimal)
+
+
+def test_candle_values_are_decimals_and_ordered(
+  window_result: CandlesResult, candle_case: CandleCase
+):
+  """Every price is a `Decimal` and `low <= open, close <= high` on every candle, but
+  for a venue's accepted native-ordering limitation (ADR 0061)."""
+  if window_result.failure is not None:
+    pytest.skip('Fetch test failed for this market')
+  check_values(window_result.candles, unordered_ohlc=candle_case.unordered_ohlc)
 
 
 def test_window_straddling_two_pages_respects_contract(

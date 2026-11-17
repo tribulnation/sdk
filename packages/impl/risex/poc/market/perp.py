@@ -595,7 +595,7 @@ async def funding_rates(market_id: str, /, start: datetime | None = None, end: d
 #
 # `account.funding_payments_paged`: one row per hourly accrual. The sign is the venue's opposite of the SDK's: `funding_payment` is positive when paid. Evidence: testnet, a 0.0001 BTC long at a rate of `-0.000750751` (longs receive) has `funding_payment` `-0.004879833131885902`, and the account's USDC balance `1009.970788075131885902` reconciles as `1010 - 0.034091758` (fills' PnL and fees) `+ 0.004879833131885902`; mainnet trader, a long at `+0.0000336` paid `19.47` (row `+19.47`) and a short at `+0.0000054` received (row `-2.44`). So received = `-funding_payment`. Rows not yet settled into the balance (`is_settled` false, while the position stays open) are funding all the same.
 #
-# Mainnet trader: **blocked**. Its unsettled rows carry `funding_rate_8h: ''`, which the declared `Decimal` rejects (see `typed-client-issues.md`). Testnet (flat account, settled rows only) validates.
+# Unsettled rows carry `funding_rate_8h: ''` (and `trade_side: ''`), and dividend rows `funding_rate: ''`: typed-risex 0.1.1 declares both rates `Decimal | Literal['']`. Neither rate is mapped: the amount is `funding_payment`, which every row carries. Mainnet trader (with open positions, so unsettled rows) and testnet both validate.
 
 # %%
 async def funding_payments(market_id: str | None, /, start: datetime, end: datetime, on: RISEx = testnet, account: str = ME) -> AsyncIterable[Sequence[FundingPayment]]:
@@ -604,13 +604,9 @@ async def funding_payments(market_id: str | None, /, start: datetime, end: datet
     yield [FundingPayment(amount=-r['funding_payment'], time=r['block_time']) for r in page]
 
 
-try:
-  blocked: object = len([p async for page in funding_payments('1', start, end, on=client, account=TRADER) for p in page])
-except Exception as e:
-  blocked = f'{type(e).__name__}: {str(e).splitlines()[1]}'
 {
   'testnet': {m: [p async for page in funding_payments(m, end - timedelta(days=2), end) for p in page] for m in MARKETS},
-  'mainnet trader': blocked,
+  'mainnet trader': len([p async for page in funding_payments('1', start, end, on=client, account=TRADER) for p in page]),
 }
 
 
@@ -751,7 +747,7 @@ async def available_notional(market_id: str, /, *, ttl: timedelta | None = None,
 # | `next_funding` | verified | `expected_funding_rate` stream |
 # | `perp_stats` | verified | refreshed markets plus one funding frame |
 # | `funding_rates` | verified | hourly settlements |
-# | `funding_payments` | blocked | testnet verified; `FundingPayment.funding_rate_8h` is `''` on unsettled rows, so any account with an open position fails validation |
+# | `funding_payments` | verified | testnet and a mainnet trader with open positions (unsettled rows, `funding_rate_8h` `''`), typed-risex 0.1.1 |
 # | `perp_position` | verified | mainnet trader; testnet flat |
 # | `leverage` | verified | effective leverage (market max when unset) |
 # | `position` | verified | |

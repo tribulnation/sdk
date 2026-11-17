@@ -218,3 +218,10 @@ def test_trading_adapters_require_sdk_4():
     )
     assert Version('3.99.0') not in requirement.specifier, venue
     assert Version('4.0.0') in requirement.specifier, venue
+
+
+def test_risex_requires_empty_funding_rates():
+  """typed-risex 0.1.0 rejects unsettled funding rows' empty `funding_rate_8h`."""
+  assert 'typed-risex>=0.1.1' in dependencies(
+    ROOT / 'packages/impl/risex/pkg/pyproject.toml',
+  )
