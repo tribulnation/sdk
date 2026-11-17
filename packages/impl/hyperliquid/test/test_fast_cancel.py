@@ -28,9 +28,10 @@ SUCCESS: dict[str, Any] = {
   'response': {'type': 'cancel', 'data': {'statuses': ['success']}},
 }
 NEVER_PLACED = 'Order was never placed, already canceled, or filled. asset=3'
-TRIGGER_REFUSAL = 'Cannot fast cancel a trigger order.'
-"""Stand-in for Hyperliquid's refusal of a fast cancel naming a trigger order: its text is
-undocumented, and the SDK does not depend on it."""
+TRIGGER_REFUSAL = 'Order not eligible for fast cancel. asset=3'
+"""Hyperliquid's refusal of a fast cancel on a trigger order, as a per-entry error (observed
+on testnet 2026-11-17: `{'error': 'Order not eligible for fast cancel. asset=3'}` with a
+top-level `status: ok`); the SDK does not depend on the text."""
 
 
 def entry(stat: Any) -> dict[str, Any]:
