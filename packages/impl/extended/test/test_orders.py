@@ -377,3 +377,14 @@ async def test_query_order_parses_signed_quantities():
   other = Client(account=Account(found=resting_order({'market': 'BTC-USD'})))
   assert await orders.query_order(shared(other), ETH, '11') is None
   assert await orders.query_order(shared(Client()), ETH, '11') is None
+
+
+async def test_float_inputs_keep_their_decimal_digits():
+  """A float `qty` and `price` are read by their shortest repr: `0.1` and `2345.3` are
+  on the market's grid and sent as those decimals, not refused as off-grid binary
+  expansions."""
+  client = Client()
+  order: Order = {'qty': 0.1, 'price': 2345.3, 'type': 'LIMIT'}
+  await orders.place_order(shared(client), market(ETH), order)
+  ((_, request),) = client.orders.calls
+  assert (request['qty'], request['price']) == (Decimal('0.1'), Decimal('2345.3'))

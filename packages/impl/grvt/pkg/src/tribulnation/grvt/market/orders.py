@@ -5,12 +5,11 @@ the placeholder `order_id` `0x00` (the venue assigns the real one when it proces
 order), while order lookups, cancellations and fills all carry the client order id.
 """
 
-from decimal import Decimal
-
 from typing_extensions import Any, Sequence, cast
 from typed_grvt.schemas import LimitOrder, MarketOrder, NewOrder, Order as GrvtOrder
 from tribulnation.sdk.core import BadRequest, OrderRejected
 from tribulnation.sdk.market import Order, OrderResponse, OrderState
+from tribulnation.sdk.util import to_decimal
 
 from ..core import Shared, random_client_order_id
 from .common import Settings, parse_order, scope
@@ -63,7 +62,7 @@ def new_order(
     raise ValueError(
       f'GRVT time_in_force applies to LIMIT orders only, not {order["type"]}'
     )
-  qty = Decimal(str(order['qty']))
+  qty = to_decimal(order['qty'])
   if not qty.is_finite() or not qty:
     raise ValueError('Order quantity must be finite and nonzero')
   if order['type'] == 'MARKET':
@@ -76,7 +75,7 @@ def new_order(
       ],
     }
     return market
-  price = Decimal(str(order['price']))
+  price = to_decimal(order['price'])
   if not price.is_finite() or price <= 0:
     raise ValueError('Limit price must be finite and positive')
   limit: LimitOrder = {

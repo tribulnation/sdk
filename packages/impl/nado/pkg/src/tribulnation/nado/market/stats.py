@@ -16,6 +16,7 @@ from typed_nado import schemas
 from typed_nado.schemas import MarketPrice
 from tribulnation.sdk.core import MissingData
 from tribulnation.sdk.market import NextFunding, PerpStats, Ticker
+from tribulnation.sdk.util import to_decimal
 
 from ..core import ProductType, Shared, x18
 
@@ -23,11 +24,6 @@ FUNDING_INTERVAL = timedelta(hours=1)
 """Funding settles every hour, on the hour."""
 DAY_INTERVALS = Decimal(24)
 """Settlements per day: the venue's 24-hour rates over this are per settlement."""
-
-
-def decimal(value: float) -> Decimal:
-  """A REST v2 float as the decimal it was sent as (its shortest repr)."""
-  return Decimal(repr(value))
 
 
 def side(price_x18: int) -> Decimal | None:
@@ -61,11 +57,11 @@ def parse_ticker(
   """Last price and 24h volumes from the archive's ticker, best bid and ask from the
   gateway; Nado publishes no best-level sizes without a book request per market."""
   return Ticker(
-    last=decimal(t['last_price']) if t is not None else None,
+    last=to_decimal(t['last_price']) if t is not None else None,
     bid=side(price['bid_x18']) if price is not None else None,
     ask=side(price['ask_x18']) if price is not None else None,
-    base_volume_24h=decimal(t['base_volume']) if t is not None else None,
-    quote_volume_24h=decimal(t['quote_volume']) if t is not None else None,
+    base_volume_24h=to_decimal(t['base_volume']) if t is not None else None,
+    quote_volume_24h=to_decimal(t['quote_volume']) if t is not None else None,
   )
 
 

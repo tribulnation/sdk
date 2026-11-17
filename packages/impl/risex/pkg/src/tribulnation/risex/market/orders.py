@@ -13,6 +13,7 @@ from typed_risex.markets.all import MarketInfo
 from typed_risex.schemas import LimitOrderRequest
 from tribulnation.sdk.core import BadRequest, OrderNotFound, OrderRejected
 from tribulnation.sdk.market import Order, OrderResponse, OrderState
+from tribulnation.sdk.util import to_decimal
 
 from ..core import Shared, wad
 from .common import parse_order
@@ -35,12 +36,10 @@ def client_code(exc: BadRequest) -> tuple[str, str] | None:
   """The venue's error code and message behind a translated `BadRequest`, if the venue
   answered with one."""
   cause = exc.__cause__
-  if not isinstance(cause, ClientBadRequest) or len(cause.args) < 2:
-    return None
-  code, message = cause.args[0], cause.args[1]
-  if not isinstance(code, str) or not isinstance(message, str):
-    return None
-  return code, message
+  if isinstance(cause, ClientBadRequest) and len(cause.args) >= 2:
+    code, message = cause.args[0], cause.args[1]
+    if isinstance(code, str) and isinstance(message, str):
+      return code, message
 
 
 async def submit(shared: Shared, send: Callable[[], Awaitable[T]]) -> T:
@@ -54,7 +53,7 @@ async def submit(shared: Shared, send: Callable[[], Awaitable[T]]) -> T:
     raise
 
 
-def whole(value: Decimal, step: Decimal, *, what: str, name: str) -> int:
+def whole(*, value: Decimal, step: Decimal, what: str, name: str) -> int:
   """`value` as a whole number of `step`s.
 
   Raises:
@@ -80,7 +79,7 @@ def order_request(market: MarketInfo, order: Order) -> LimitOrderRequest:
   """
   config = market['config']
   name = config['name']
-  qty, price = Decimal(order['qty']), Decimal(order['price'])
+  qty, price = to_decimal(order['qty']), to_decimal(order['price'])
   if qty == 0:
     raise ValueError(f'RISEx {name}: an order needs a non-zero qty')
   if price <= 0:
@@ -89,8 +88,12 @@ def order_request(market: MarketInfo, order: Order) -> LimitOrderRequest:
     'market_id': market['market_id'],
     'order_type': 1,
     'side': 0 if qty > 0 else 1,
-    'size_steps': whole(abs(qty), config['step_size'], what='qty', name=name),
-    'price_ticks': whole(price, config['step_price'], what='price', name=name),
+    'size_steps': whole(
+      value=abs(qty), step=config['step_size'], what='qty', name=name
+    ),
+    'price_ticks': whole(
+      value=price, step=config['step_price'], what='price', name=name
+    ),
   }
   if order['type'] == 'POST_ONLY':
     request['post_only'] = True
@@ -167,13 +170,11 @@ async def query_order(shared: Shared, market_id: int, id: str) -> OrderState | N
     found = await shared.call(lambda: shared.client.orders.get(id, market_id=market_id))
   except BadRequest as exc:
     answer = client_code(exc)
-    if answer is not None and answer[0] == 'NotFound':
-      return None
-    raise
-  o = found['order']
-  if o['market_id'] != market_id:
-    return None
-  return parse_order(o)
+    if answer is None or answer[0] != 'NotFound':
+      raise
+  else:
+    if (o := found['order'])['market_id'] == market_id:
+      return parse_order(o)
 
 
 async def open_orders(shared: Shared, market_id: int) -> Sequence[OrderState]:

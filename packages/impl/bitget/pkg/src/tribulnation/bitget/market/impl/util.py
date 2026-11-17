@@ -2,7 +2,6 @@
 
 from typing_extensions import Iterator
 from datetime import datetime, timedelta
-from decimal import Decimal
 
 MILLISECOND = timedelta(milliseconds=1)
 """Bitget timestamps are epoch milliseconds, so this is one indivisible step."""
@@ -17,17 +16,6 @@ answer a wider one with `00001: startTime and endTime interval cannot be greater
 
 PAGE = 100
 """Rows per page on the history and open-order endpoints; Bitget's documented maximum."""
-
-
-def dec(value: 'Decimal | float | str') -> Decimal:
-  """Read a Bitget number, whichever wire shape it arrived in.
-
-  Spot endpoints send decimal strings, which the client already parses to `Decimal`; the
-  futures and UTA order books send JSON numbers (confirmed live: `[78381.6, 0.0205]`),
-  which the client declares `float`. `str()` yields the shortest repr that round-trips,
-  so the venue's own digits survive the conversion.
-  """
-  return value if isinstance(value, Decimal) else Decimal(str(value))
 
 
 def windows(

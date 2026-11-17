@@ -66,6 +66,7 @@ from tribulnation.sdk.market import (
   Trade,
 )
 from tribulnation.sdk.market.types.candles import candle_windows
+from tribulnation.sdk.util import to_decimal
 from ..core import POSITION_RISK, Public, Scope, Shared
 from .settings import Settings as AsterSettings
 from .streams import (
@@ -405,7 +406,7 @@ def native_order(order: Order, settings: AsterSettings = {}) -> NativeOrder:
     raise ValueError(
       f'Aster time_in_force applies to LIMIT orders only, not {order["type"]}'
     )
-  qty = Decimal(str(order['qty']))
+  qty = to_decimal(order['qty'])
   if not qty.is_finite() or not qty:
     raise ValueError('Order quantity must be finite and nonzero')
   side = 'BUY' if qty > 0 else 'SELL'
@@ -419,7 +420,7 @@ def native_order(order: Order, settings: AsterSettings = {}) -> NativeOrder:
       time_in_force='GTC',
       client_order_id=client_order_id,
     )
-  price = Decimal(str(order['price']))
+  price = to_decimal(order['price'])
   if not price.is_finite() or price <= 0:
     raise ValueError('Limit price must be finite and positive')
   return NativeOrder(

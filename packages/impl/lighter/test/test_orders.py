@@ -211,3 +211,18 @@ async def test_price_protection_setting_rejects_replaces():
       settings={'lighter': {'replaces': '42', 'price_protection': False}},
     )
   assert client.tx.requests == client.tx.modifies == []
+
+
+async def test_float_inputs_keep_their_decimal_digits():
+  """A float `qty` and `price` are read by their shortest repr, so `0.1` and `2500.3`
+  stay on the 4- and 2-decimal grid instead of becoming their binary expansions; a
+  modify reads them the same way."""
+  client = Client()
+  order: Order = {'qty': 0.1, 'price': 2500.3, 'type': 'LIMIT'}
+  await orders.place_order(ioc_shared(client), MARKET, order)
+  await orders.place_order(
+    ioc_shared(client), MARKET, order, settings={'lighter': {'replaces': '42'}}
+  )
+  create, modify = client.tx.requests[0], client.tx.modifies[0]
+  assert (create['base_amount'], create['price']) == (1000, 250030)
+  assert (modify['base_amount'], modify['price']) == (1000, 250030)

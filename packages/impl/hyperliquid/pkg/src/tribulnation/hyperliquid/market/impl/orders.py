@@ -10,6 +10,7 @@ from tribulnation.sdk.market import (
   OrderState,
   Settings as MarketSettings,
 )
+from tribulnation.sdk.util import to_decimal
 
 from typed_hyperliquid.exchange.cancel import CancelRequestItem
 from typed_hyperliquid.exchange.modify_orders import (
@@ -64,8 +65,8 @@ def _export_order(
   else:
     raise ValueError(f'Unknown order type: {o["type"]}')
 
-  qty = Decimal(o['qty'])
-  price = Decimal(o['price'])
+  qty = to_decimal(o['qty'])
+  price = to_decimal(o['price'])
   if not valid_price(price, tick_size=self.tick_size, sig_figs=MAX_SIGNIFICANT_FIGURES):
     raise ValueError(
       f'Price {price} is off the Hyperliquid grid (at most {MAX_SIGNIFICANT_FIGURES} '
