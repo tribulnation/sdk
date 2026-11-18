@@ -233,6 +233,27 @@ class ExtendedPerpMarket(Public, PerpMarket):
         return row['leverage']
     raise ValueError(f'Extended returned no leverage for {name}')
 
+  async def set_leverage(self, leverage: Decimal):
+    """Set the sub-account's leverage on the market (`PATCH /user/leverage`).
+
+    Extended margins every perpetual in the sub-account's one cross pool, so there is
+    no margin mode to keep. The value is sent exactly as given: the venue takes a
+    decimal, so a fractional leverage is not refused here. The venue refuses a leverage
+    whose maximum position value the open position and orders exceed, or whose extra
+    margin the available balance does not cover. The shared leverage read is dropped,
+    so the next `leverage()` asks the venue.
+
+    Raises:
+      ValueError: `leverage` is not a positive finite number.
+    """
+    if not (leverage.is_finite() and leverage > 0):
+      raise ValueError(f'Leverage must be positive, got {leverage}')
+    name = self.name
+    await self.shared.call(
+      lambda: self.shared.client.account.update_leverage(name, leverage=leverage)
+    )
+    self.shared.reads.forget(('leverage', name))
+
   async def index(self, *, settings: Settings = {}) -> Decimal:
     """The market's index price, fresh from `info.markets`."""
     return (await self.shared.fresh(self.name))['marketStats']['indexPrice']
