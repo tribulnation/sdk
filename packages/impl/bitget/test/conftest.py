@@ -6,7 +6,7 @@ the resting orders, and answers the UTA v3 trading and account endpoints the SDK
 calls, so the order lifecycle can be exercised end to end without the venue.
 """
 
-from typing_extensions import Any
+from typing_extensions import Any, Literal
 from dataclasses import dataclass, field
 from decimal import Decimal
 from urllib.parse import parse_qsl, urlsplit
@@ -119,6 +119,8 @@ class FakeBitget:
   )
   reject_code: str | None = None
   """An error code `place-order` answers instead of placing, when set."""
+  info_failure: Literal['network', 'api'] | None = None
+  """How `order-info` fails, when set: a dropped connection or an error code."""
   requests: list[tuple[str, str, dict[str, Any]]] = field(
     default_factory=list[tuple[str, str, dict[str, Any]]]
   )
@@ -221,6 +223,10 @@ class FakeBitget:
 
   def order_info(self, id: str) -> httpx.Response:
     """One order's state, or Bitget's not-found code."""
+    if self.info_failure == 'network':
+      raise httpx.ConnectError('connection reset')
+    if self.info_failure == 'api':
+      return self.error('50000', 'system error')
     if (order := self.orders.get(id)) is None:
       return self.error('25204', 'Order does not exist')
     return self.answer(order.info())

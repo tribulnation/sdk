@@ -1,7 +1,7 @@
 """Trading a Bitget USDT-margined perpetual on a Unified Trading Account, end to end
 against the fake venue in `conftest.py`."""
 
-from typing_extensions import TYPE_CHECKING, Any, AsyncIterator, cast
+from typing_extensions import TYPE_CHECKING, Any, AsyncIterator, Literal, cast
 from decimal import Decimal
 
 import pytest
@@ -64,6 +64,27 @@ async def test_an_ioc_that_misses_the_book_reports_nothing_filled(
     {'type': 'LIMIT', 'qty': Decimal(2500), 'price': Decimal('0.0023')}, settings=IOC
   )
   assert r.filled_qty == 0
+
+
+@pytest.mark.parametrize('failure', ['network', 'api'])
+async def test_a_failed_read_back_still_returns_the_placed_order(
+  fake: 'FakeBitget',
+  market: PerpMarket,
+  failure: Literal['network', 'api'],
+  caplog: pytest.LogCaptureFixture,
+):
+  """The order was placed and may have filled: a failed read-back leaves the fill
+  unknown and is logged, rather than raising into a retry that would trade twice."""
+  fake.info_failure = failure
+  r = await market.place_order(
+    {'type': 'LIMIT', 'qty': Decimal(-2500), 'price': Decimal('0.0024')},
+    settings=IOC,
+  )
+  assert len(placed(fake)) == 1 and fake.position == -2500
+  assert r.id in fake.orders and r.filled_qty is None
+  assert any(
+    rec.levelname == 'WARNING' and r.id in rec.getMessage() for rec in caplog.records
+  )
 
 
 async def test_a_post_only_rests_is_listed_and_cancelled(

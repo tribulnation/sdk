@@ -8,8 +8,15 @@ hedge-mode account is refused by Bitget itself (it requires a `posSide`).
 
 from typing_extensions import Any, Literal, TypedDict, cast
 from decimal import Decimal
+import logging
 
-from tribulnation.sdk.core import ApiError, BadRequest, OrderNotFound, OrderRejected
+from tribulnation.sdk.core import (
+  ApiError,
+  BadRequest,
+  NetworkError,
+  OrderNotFound,
+  OrderRejected,
+)
 from tribulnation.sdk.market import Order, OrderResponse, OrderState, Settings
 from typed_bitget.uta.trade.order.info import OrderInfo
 from typed_bitget.uta.trade.order.place import LimitOrderRequest
@@ -17,6 +24,8 @@ from typed_bitget.uta.trade.order.place import LimitOrderRequest
 from .mixin import MarketMixin
 from .orders import open_orders
 from .parse import PERP
+
+log = logging.getLogger(__name__)
 
 TimeInForce = Literal['gtc', 'ioc', 'fok', 'post_only']
 
@@ -150,7 +159,9 @@ async def place_order(
 
   Bitget's placement answers only the order ID. An immediate order (IOC, FOK or
   `MARKET`) is read back once: if it is already done, `filled_qty` is its final fill,
-  else `None`.
+  else `None`. A failed read-back is logged and also leaves `filled_qty` `None`: the
+  order was placed, so the placement is returned rather than an error a caller could
+  retry into a second order.
 
   Raises:
     OrderRejected: Bitget refused it outright (`BadRequest`, or a code in
@@ -168,9 +179,13 @@ async def place_order(
     raise
   filled = None
   if request.get('timeInForce') in ('ioc', 'fok'):
-    info = await order_info(self, result['orderId'])
-    if info is not None and info['orderStatus'] in TERMINAL_STATUSES:
-      filled = info['cumExecQty']
+    try:
+      info = await order_info(self, result['orderId'])
+    except (NetworkError, ApiError) as e:
+      log.warning('Reading back placed order %s failed: %s', result['orderId'], e)
+    else:
+      if info is not None and info['orderStatus'] in TERMINAL_STATUSES:
+        filled = info['cumExecQty']
   return OrderResponse(id=result['orderId'], details=result, filled_qty=filled)
 
 
