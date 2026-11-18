@@ -1,3 +1,4 @@
+import logging
 from typing_extensions import AsyncContextManager, AsyncIterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -41,6 +42,7 @@ from .impl import (
   perps_position,
   perp_market_collateral,
   perp_leverage,
+  set_perp_leverage,
   perp_available_notional,
   perp_remaining_position_limit,
   open_orders,
@@ -52,6 +54,8 @@ from .impl import (
   trades_history,
   trades_stream,
 )
+
+log = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -143,6 +147,11 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
   async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
     """The account's `activeAssetData` leverage setting, capped at `maxLeverage`."""
     return await perp_leverage(self, ttl=ttl)
+
+  async def set_leverage(self, leverage: Decimal):
+    """Set the account's leverage here, keeping the margin mode; see `set_perp_leverage`."""
+    await set_perp_leverage(self, leverage)
+    log.info('%s: leverage set to %s', self.id, leverage)
 
   async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     """Free unified collateral times `leverage()`, for cross and isolated alike."""

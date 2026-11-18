@@ -1,6 +1,7 @@
 """The perpetual and spot Market objects; market ids are GRVT instrument names
 (`BTC_USDT_Perp`, `GRVT_USDT_SpotSwap`)."""
 
+import logging
 from dataclasses import dataclass
 import asyncio
 from datetime import datetime, timedelta
@@ -35,6 +36,8 @@ from tribulnation.sdk.market import (
 from ..core import random_client_order_id
 from . import account, books, history, orders, stats
 from .common import Public
+
+log = logging.getLogger(__name__)
 
 STANDARD_FEES = Fees.symmetric(maker=Decimal('-0.000001'), taker=Decimal('0.00045'))
 """Tier 1 of GRVT's published perpetual schedule (help.grvt.io, "How does Grvt's Fee
@@ -192,6 +195,17 @@ class GrvtPerpMarket(OrderBookMarket, PerpMarket):
   async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
     """The account's initial leverage on this market."""
     return await account.leverage(self.shared, self.instrument, ttl=ttl)
+
+  async def set_leverage(self, leverage: Decimal):
+    """Set the account's initial leverage on this market, keeping its margin type.
+
+    Raises:
+      ValueError: `leverage` is not positive with at most 6 decimals, or outside
+        the instrument's `[min_leverage, max_leverage]`.
+      AuthError: The client has no private key to sign with.
+    """
+    await account.set_leverage(self.shared, self.instrument, leverage)
+    log.info('%s: leverage set to %s', self.id, leverage)
 
   async def collateral_id(self) -> str:
     """The trading sub-account's cross pool, `<account_id>:<exchange_id>`: it funds

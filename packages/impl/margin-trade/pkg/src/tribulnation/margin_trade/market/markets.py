@@ -1,5 +1,6 @@
 """Spot and perpetual Market objects over margin.trade coin names."""
 
+import logging
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -33,6 +34,7 @@ from tribulnation.sdk.core import (
   PaginatedResponse,
 )
 from tribulnation.sdk.market.types.rules import valid_price
+from tribulnation.sdk.util import whole_leverage
 from tribulnation.sdk.market import (
   Book,
   Candle,
@@ -73,6 +75,8 @@ from ..core import (
   tick_size,
 )
 from .collateral import cross_collateral, spot_balance
+
+log = logging.getLogger(__name__)
 
 CANDLE_WIDTHS: dict[CandleInterval, timedelta] = {
   '1m': timedelta(minutes=1),
@@ -602,6 +606,32 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     )
     return Decimal(data['leverage']['value'])
 
+  async def set_leverage(self, leverage: Decimal):
+    """Set the account's leverage on this market (`updateLeverage`), keeping its mode.
+
+    Cross, unless the account's fresh `activeAssetData` setting is isolated or the
+    market allows isolated margin only (`isolated_only`). The request is signed like
+    orders, and the shared `activeAssetData` answer is dropped, so the next
+    `leverage()` reads the new setting. A leverage above the market's `maxLeverage` is
+    the venue's to refuse.
+
+    Raises:
+      ValueError: `leverage` is not a positive whole number.
+    """
+    value = whole_leverage(leverage)
+    address, coin = self.shared.address, self.coin
+    data = await self.shared.call(
+      lambda: self.client.info.active_asset_data(user=address, coin=coin)
+    )
+    isolated = data['leverage']['type'] == 'isolated' or isolated_only(self.meta)
+    await self.shared.call(
+      lambda: self.client.exchange.update_leverage(
+        asset=self.asset, is_cross=not isolated, leverage=value
+      )
+    )
+    self.shared.reads.forget(('activeAssetData', coin))
+    log.info('%s: leverage set to %s', self.id, leverage)
+
   async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """The cross bucket; an isolated position's own bucket is not supported."""
     state = await self.shared.call(
@@ -614,6 +644,13 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
           f'margin.trade isolated collateral is not supported [{self.id}]'
         )
     return cross_collateral(state)
+
+
+def isolated_only(item: PerpUniverseItem) -> bool:
+  """Whether the market refuses cross margin: `onlyIsolated`, or a `marginMode` of
+  `noCross` (the Hyperliquid modes the venue's schema mirrors). `strictIsolated` only
+  forbids removing margin from an open isolated position, so it allows cross."""
+  return bool(item.get('onlyIsolated')) or item.get('marginMode') == 'noCross'
 
 
 def placed(status: RestingStatus | FilledStatus) -> OrderResponse:

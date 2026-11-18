@@ -7,12 +7,14 @@ from typing_extensions import Any
 
 import pytest
 from typed_core import PaginatedResponse
+from typed_extended.core.envelope import raise_error
 
 from tribulnation.extended import ExtendedMarket
 from tribulnation.extended.market import ExtendedPerpExchange
 from tribulnation.extended.market.account import bucket
 from tribulnation.sdk import MarketSDK
 from tribulnation.sdk.impl import accounts
+from tribulnation.sdk.core import BadRequest
 from tribulnation.sdk.market import ExchangeFundingPayment
 
 NEXT = datetime(2026, 10, 22, 13, tzinfo=timezone.utc)
@@ -206,6 +208,84 @@ async def test_account_reads(exchange: ExtendedPerpExchange):
     'cross',
   )
   assert await exchange.available_notional('BTC-USD') == Decimal('8000')
+
+
+async def test_set_leverage_patches_the_market_and_forgets_the_read(
+  exchange: ExtendedPerpExchange,
+):
+  """One `PATCH /user/leverage` with the value as given (decimals included, the
+  sub-account's one cross pool has no margin mode to send), then a fresh `leverage()`."""
+  account = exchange.shared.client.account
+  calls: list[Any] = []
+  setting = {'BTC-USD': Decimal('10')}
+
+  async def leverage(markets: list[str]) -> list[Any]:
+    """The account's current setting."""
+    calls.append(('leverage', markets))
+    return [{'market': m, 'leverage': setting[m]} for m in markets]
+
+  async def update_leverage(market: str, *, leverage: Decimal) -> Any:
+    """Record the update, as the venue's empty acknowledgement."""
+    calls.append(('update_leverage', market, leverage))
+    setting[market] = leverage
+    return {}
+
+  account.leverage = leverage  # type: ignore[method-assign]
+  account.update_leverage = update_leverage  # type: ignore[method-assign]
+  ttl = timedelta(minutes=1)
+  assert await exchange.leverage('BTC-USD', ttl=ttl) == Decimal('10')
+  await exchange.set_leverage('BTC-USD', Decimal('5'))
+  await exchange.set_leverage('BTC-USD', Decimal('2.5'))
+  assert await exchange.leverage('BTC-USD', ttl=ttl) == Decimal('2.5')
+  assert calls == [
+    ('leverage', ['BTC-USD']),
+    ('update_leverage', 'BTC-USD', Decimal('5')),
+    ('update_leverage', 'BTC-USD', Decimal('2.5')),
+    ('leverage', ['BTC-USD']),
+  ]
+
+
+@pytest.mark.parametrize('value', ['0', '-3', 'NaN', 'Infinity'])
+async def test_set_leverage_refuses_bad_values_before_any_request(
+  exchange: ExtendedPerpExchange, value: str
+):
+  """Zero, negative and non-finite values raise `ValueError` without a request."""
+  calls: list[Any] = []
+
+  async def update_leverage(market: str, *, leverage: Decimal) -> Any:
+    """Record an update that should never be sent."""
+    calls.append(market)
+
+  exchange.shared.client.account.update_leverage = update_leverage  # type: ignore[method-assign]
+  with pytest.raises(ValueError):
+    await exchange.set_leverage('BTC-USD', Decimal(value))
+  assert calls == []
+
+
+async def test_a_refused_leverage_keeps_the_shared_read(exchange: ExtendedPerpExchange):
+  """A venue refusal (a position above the new maximum) raises `BadRequest` and leaves
+  the shared leverage read in place: nothing changed."""
+  account = exchange.shared.client.account
+  calls: list[str] = []
+
+  async def leverage(markets: list[str]) -> list[Any]:
+    """The account's current setting."""
+    calls.append('leverage')
+    return [{'market': 'BTC-USD', 'leverage': Decimal('10')}]
+
+  async def update_leverage(market: str, *, leverage: Decimal) -> Any:
+    """Refuse with a coded error envelope, as the venue does above the new maximum."""
+    error = {'code': 1000, 'message': 'refused'}
+    raise_error(400, error, {'status': 'ERROR', 'error': error})
+
+  account.leverage = leverage  # type: ignore[method-assign]
+  account.update_leverage = update_leverage  # type: ignore[method-assign]
+  ttl = timedelta(minutes=1)
+  await exchange.leverage('BTC-USD', ttl=ttl)
+  with pytest.raises(BadRequest):
+    await exchange.set_leverage('BTC-USD', Decimal('50'))
+  await exchange.leverage('BTC-USD', ttl=ttl)
+  assert calls == ['leverage']
 
 
 def test_no_balance_is_an_empty_bucket():

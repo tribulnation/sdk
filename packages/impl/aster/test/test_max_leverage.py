@@ -210,3 +210,24 @@ async def test_symbols_share_one_account_read(monkeypatch: pytest.MonkeyPatch):
   assert view.await_count == 1
   await s.futures_account(ttl=None)
   assert view.await_count == 2
+
+
+async def test_set_leverage_sends_the_setting_and_rereads(venue: dict[str, AsyncMock]):
+  """`set_leverage` sets the whole multiple and drops the shared `positionRisk`."""
+  s = shared()
+  assert await perp(s).leverage(ttl=MINUTE) == 20
+  await perp(s).set_leverage(Decimal(7))
+  call = venue['set'].await_args
+  assert call is not None and (call.args, call.kwargs) == ((SYMBOL,), {'leverage': 7})
+  venue['risk'].return_value = [risk(leverage=7)]
+  assert await perp(s).leverage(ttl=MINUTE) == 7
+
+
+@pytest.mark.parametrize('leverage', [Decimal(0), Decimal('2.5')])
+async def test_set_leverage_refuses_a_non_whole_multiple(
+  venue: dict[str, AsyncMock], leverage: Decimal
+):
+  """Nothing is sent for a leverage Aster cannot take."""
+  with pytest.raises(ValueError, match='positive whole number'):
+    await perp(shared()).set_leverage(leverage)
+  assert venue['set'].await_count == 0

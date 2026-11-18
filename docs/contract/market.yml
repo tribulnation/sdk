@@ -1428,9 +1428,33 @@ methods:
         nado: {market_id: 'nado:perp:BTC-PERP', leverage: '50', free: '8120.00', notional: '406000.00'}
         risex: {market_id: 'risex:perp:1', leverage: '10', free: '8120.00', notional: '81200.00'}
         kraken: {market_id: 'kraken:perp:PF_XBTUSD', leverage: '50', free: '7640.00', notional: '382000.00'}
+        bybit: {market_id: 'bybit:perp:BTCUSDT', leverage: '10', free: '8120.00', notional: '81200.00'}
       callTemplate: |
         leverage = await sdk.leverage('{{ constants[accounts[0]].market_id }}')
         notional = await sdk.available_notional('{{ constants[accounts[0]].market_id }}')
         print(leverage, notional)  # free collateral {{ constants[accounts[0]].free }} x leverage
       resultTemplate: |
         {{ constants[accounts[0]].leverage }} {{ constants[accounts[0]].notional }}
+
+  set_leverage:
+    group: Perpetual-only
+    kind: perp
+    public: false
+    example:
+      accountVenues: [hyperliquid]
+      constants:
+        hyperliquid: {market_id: 'hyperliquid::BTC', leverage: '5'}
+        aster: {market_id: 'aster:perp:BTCUSDT', leverage: '5'}
+        extended: {market_id: 'extended:perp:BTC-USD', leverage: '5'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', leverage: '5'}
+        lighter: {market_id: 'lighter:perp:1', leverage: '5'}
+        risex: {market_id: 'risex:perp:1', leverage: '10'}
+        margin-trade: {market_id: 'margin-trade:perp:BTC', leverage: '5'}
+        bybit: {market_id: 'bybit:perp:BTCUSDT', leverage: '5'}
+      callTemplate: |
+        from decimal import Decimal
+
+        await sdk.set_leverage('{{ constants[accounts[0]].market_id }}', Decimal('{{ constants[accounts[0]].leverage }}'))
+        print(await sdk.leverage('{{ constants[accounts[0]].market_id }}'))
+      resultTemplate: |
+        {{ constants[accounts[0]].leverage }}

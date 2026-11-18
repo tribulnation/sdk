@@ -1,5 +1,6 @@
 """The perpetual Market object; market ids are the venue's numeric `market_id`."""
 
+import logging
 from dataclasses import dataclass
 import asyncio
 from datetime import datetime, timedelta
@@ -30,6 +31,8 @@ from tribulnation.sdk.market import (
 from ..core import COLLATERAL, FUNDING_INTERVAL, listed, random_client_order_id
 from . import account, books, history, orders
 from .common import Public
+
+log = logging.getLogger(__name__)
 
 BPS = Decimal(10_000)
 
@@ -239,6 +242,18 @@ class RisexPerpMarket(Public, PerpMarket):
   async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
     """The account's leverage on the market: its setting, else the market maximum."""
     return await account.leverage(self.shared, self.index_id, ttl=ttl)
+
+  async def set_leverage(self, leverage: Decimal):
+    """Set the account's leverage on the market with a signed permit, leaving the
+    margin mode alone; the next `leverage()` reads the new setting.
+
+    Raises:
+      ValueError: `leverage` is not a positive whole number, is above 255, or is
+        above the market's `max_leverage`.
+      AuthError: The client has no signer key.
+    """
+    await account.set_leverage(self.shared, self.index_id, leverage)
+    log.info('%s: leverage set to %s', self.id, leverage)
 
   async def index(self, *, settings: Settings = {}) -> Decimal:
     """The market's oracle index price, past the venue's 5-minute cache."""

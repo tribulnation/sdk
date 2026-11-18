@@ -14,6 +14,7 @@ from .core import (
   PositionLimitExceeded,
   OpenInterestCapped,
   OrderNotFound,
+  LeverageNotSet,
   LogicError,
 )
 from .earn import Earn
@@ -45,6 +46,7 @@ __all__ = [
   'PositionLimitExceeded',
   'OpenInterestCapped',
   'OrderNotFound',
+  'LeverageNotSet',
   'LogicError',
   'Earn',
   'Wallet',

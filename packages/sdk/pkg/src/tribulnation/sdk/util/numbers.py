@@ -45,3 +45,16 @@ def trunc2tick(x: Decimal, tick_size: Decimal) -> Decimal:
 def ceil2tick(x: Decimal, tick_size: Decimal) -> Decimal:
   r = (x / tick_size).to_integral_value(rounding=ROUND_CEILING) * tick_size
   return r.normalize()
+
+
+def whole_leverage(leverage: Decimal) -> int:
+  """`leverage` as the positive whole number venues accept for a leverage setting.
+
+  Raises:
+    ValueError: `leverage` is not a positive whole number (NaN and infinities
+      included).
+  """
+  if leverage.is_finite() and leverage > 0 and leverage == leverage.to_integral_value():
+    return int(leverage)
+  else:
+    raise ValueError(f'Leverage must be a positive whole number, got {leverage}')

@@ -5,6 +5,8 @@ from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import AsyncMock
 
+import pytest
+
 from typing_extensions import Any, cast
 from typed_hyperliquid import Hyperliquid
 from typed_hyperliquid.info.active_asset_data import ActiveAssetData
@@ -98,3 +100,56 @@ async def test_available_notional_is_free_unified_balance_times_leverage():
   """`(total - hold) * leverage`, read from the account pool whatever the mode."""
   m, _ = market(leverage=[5])
   assert await m.available_notional() == Decimal(500)
+
+
+def settable(
+  setting: dict[str, Any], asset: dict[str, Any] | None = None
+) -> tuple[PerpMarket, SimpleNamespace]:
+  """A perpetual whose stub client answers one `activeAssetData` and `updateLeverage`."""
+  m, info = market(leverage=[])
+  info.active_asset_data = AsyncMock(return_value=asset_data(setting))
+  if asset is not None:
+    m.meta['asset_meta'].update(asset)  # type: ignore[typeddict-item]
+  exchange = SimpleNamespace(
+    update_leverage=AsyncMock(return_value={'type': 'default'})
+  )
+  cast(Any, m.shared.client).exchange = exchange
+  return m, exchange
+
+
+async def test_set_leverage_keeps_cross_and_rereads():
+  """A cross setting is updated as cross, and the next read asks afresh."""
+  m, exchange = settable({'type': 'cross', 'value': 3})
+  minute = timedelta(minutes=1)
+  await m.leverage(ttl=minute)
+  await m.set_leverage(Decimal(2))
+  exchange.update_leverage.assert_awaited_once_with(asset=0, is_cross=True, leverage=2)
+  await m.leverage(ttl=minute)
+  assert m.shared.client.info.active_asset_data.await_count == 3
+
+
+async def test_set_leverage_keeps_an_isolated_setting():
+  """An isolated setting stays isolated: Hyperliquid refuses a mode switch with a
+  position open, and the SDK never changes a margin mode."""
+  m, exchange = settable({'type': 'isolated', 'value': 3, 'rawUsd': Decimal(10)})
+  await m.set_leverage(Decimal(4))
+  exchange.update_leverage.assert_awaited_once_with(asset=0, is_cross=False, leverage=4)
+
+
+@pytest.mark.parametrize('asset', [{'onlyIsolated': True}, {'marginMode': 'noCross'}])
+async def test_set_leverage_is_isolated_where_cross_is_not_allowed(
+  asset: dict[str, Any],
+):
+  """An isolated-only asset (some HIP-3 markets) is set isolated."""
+  m, exchange = settable({'type': 'cross', 'value': 3}, asset)
+  await m.set_leverage(Decimal(3))
+  exchange.update_leverage.assert_awaited_once_with(asset=0, is_cross=False, leverage=3)
+
+
+@pytest.mark.parametrize('leverage', [Decimal(0), Decimal('1.5')])
+async def test_set_leverage_refuses_a_non_whole_multiple(leverage: Decimal):
+  """Nothing is sent for a leverage the venue cannot take."""
+  m, exchange = settable({'type': 'cross', 'value': 3})
+  with pytest.raises(ValueError, match='positive whole number'):
+    await m.set_leverage(leverage)
+  exchange.update_leverage.assert_not_awaited()

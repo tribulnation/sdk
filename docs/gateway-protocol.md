@@ -109,6 +109,7 @@ requests address a market as `<account_id>:<exchange_id>:<market_id>`, e.g.
 | `rules` | `market_id`, `refetch`? | Fetch trading rules. |
 | `fees` | `market_id`, `refetch`? | Fetch account-specific trading fees. |
 | `leverage` | `market_id`, `ttl`? | Fetch the account's leverage on a perpetual market. |
+| `set_leverage` | `market_id`, `leverage` | Set the account's leverage on a perpetual market (`leverage`: Decimal, positive; venues that take whole multiples only refuse fractions, others take the venue's own step). |
 | `candles` | `market_id`, `interval`, `start`, `end` | Fetch candles in a half-open window. |
 | `open_orders` | `market_id` | List the account's open orders. |
 | `query_order` | `market_id`, `order_id` | Look up one order. |
@@ -157,6 +158,7 @@ flight is joined. Null or absent asks the venue afresh (ADR 0054).
 | `rules` | `rules`: `SpotRules` or `Rules` |
 | `fees` | `fees`: `Fees` |
 | `leverage`, `index`, `available_notional` | `value`: Decimal |
+| `set_leverage` | none: the leverage was set |
 | `candles` | `candles`: list of `Candle` |
 | `open_orders` | `orders`: list of `OrderState` |
 | `query_order` | `order`: `OrderState` or `null` |
@@ -183,7 +185,7 @@ flight is joined. Null or absent asks the venue afresh (ADR 0054).
 
 `exc` names the SDK exception the gateway caught: `Error`, `NetworkError`,
 `ValidationError`, `ApiError`, `BadRequest`, `AuthError`, `RateLimited`,
-`OrderRejected`, `PositionLimitExceeded`, `OpenInterestCapped`, `OrderNotFound`, `LogicError`, `ValueError` or `NotImplementedError`. Clients map any
+`OrderRejected`, `PositionLimitExceeded`, `OpenInterestCapped`, `OrderNotFound`, `LeverageNotSet`, `LogicError`, `ValueError` or `NotImplementedError`. Clients map any
 other name to a generic error. An `end` without `error` is a clean end of the stream.
 
 ## Examples

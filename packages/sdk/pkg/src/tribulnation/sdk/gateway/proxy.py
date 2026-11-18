@@ -629,6 +629,12 @@ class ProxyPerpMarket(ProxyMarket, PerpMarket):
     )
     return resp.value
 
+  async def set_leverage(self, leverage: Decimal):
+    """Forward the leverage setting through the gateway."""
+    await self._conn.call(
+      codec.SetLeverageReq(id=self._mid(), market_id=self.id, leverage=leverage)
+    )
+
   async def collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """Forward collateral through the gateway."""
     return await self.perp_collateral(ttl=ttl)

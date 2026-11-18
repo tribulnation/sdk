@@ -1,12 +1,16 @@
 """Bybit's linear (USDT/USDC-margined) perpetual market (`category='linear'`)."""
 
+import logging
 from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
 import secrets
 
-from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
+from typed_bybit import ApiError as ClientApiError
+from typed_bybit.position.list import Position
+
+from tribulnation.sdk.core import MissingData, OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
   Book,
   Candle,
@@ -41,6 +45,50 @@ from .impl import (
   trades_history,
   trades_stream,
 )
+
+log = logging.getLogger(__name__)
+
+LEVERAGE_NOT_MODIFIED = 110043
+"""`retCode` for a set-leverage request that names the leverage already set."""
+
+
+def position_leverage(rows: Sequence[Position], symbol: str) -> Decimal:
+  """The symbol's leverage setting from its `/v5/position/list` rows.
+
+  A symbol-scoped request lists the symbol even when flat, with its setting. Hedge
+  mode lists a long and a short row; the lowest is used should they differ.
+
+  Raises:
+    MissingData: The response lists no row for the symbol.
+    NotImplementedError: The rows carry no leverage, as under portfolio margin,
+      where Bybit applies no per-symbol leverage.
+  """
+  rows = [r for r in rows if r['symbol'] == symbol]
+  if not rows:
+    raise MissingData(
+      'Bybit position list omits the symbol', market_id=symbol, field='leverage'
+    )
+  values = [Decimal(r['leverage']) for r in rows if r['leverage']]
+  if not values:
+    raise NotImplementedError(
+      f'Bybit reports no leverage for {symbol}; portfolio margin has none per symbol'
+    )
+  return min(values)
+
+
+def leverage_request(leverage: Decimal, step: Decimal) -> str:
+  """`leverage` as the plain decimal string Bybit accepts, on the symbol's step.
+
+  Args:
+    leverage: The multiple to set.
+    step: The symbol's `leverageFilter.leverageStep`.
+
+  Raises:
+    ValueError: `leverage` is not positive or not a multiple of `step`.
+  """
+  if leverage <= 0 or leverage % step != 0:
+    raise ValueError(f'Leverage must be a positive multiple of {step}, got {leverage}')
+  return f'{leverage.normalize():f}'
 
 
 @dataclass(kw_only=True, frozen=True)
@@ -177,6 +225,52 @@ class PerpMarket(MarketMixin, _PerpMarket):
       client=self.client, settings=self.settings, cache=self.cache
     )
     return await exchange.perp_collateral()
+
+  async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
+    """The symbol's leverage setting, from `/v5/position/list`.
+
+    Bybit lists the account's setting for every symbol, its default where never
+    configured, so this never raises `LeverageNotSet`. Reads are not shared: `ttl`
+    is accepted and every call asks the venue.
+    """
+    positions = await self.call_bybit(
+      lambda: self.client.position.list(
+        'linear', symbol=self.symbol, validate=self.validate
+      )
+    )
+    return position_leverage(positions['list'], self.symbol)
+
+  async def set_leverage(self, leverage: Decimal):
+    """Set the symbol's leverage (`POST /v5/position/set-leverage`).
+
+    Buy and sell leverage are set alike, as one-way mode and cross margin require.
+    The request takes no margin mode and leaves the account-wide one alone. Decimal
+    values are accepted on the symbol's `leverageStep`; the range is the venue's to
+    refuse. Setting the leverage already set (`retCode` 110043) succeeds.
+
+    Raises:
+      ValueError: `leverage` is not positive or not on the symbol's leverage step.
+    """
+    instruments = await self.perp_instruments()
+    step = instruments[self.symbol]['leverageFilter']['leverageStep']
+    value = leverage_request(leverage, step)
+
+    async def send():
+      """Send the request, treating Bybit's 'leverage not modified' as success."""
+      try:
+        await self.client.position.set_leverage(
+          'linear',
+          symbol=self.symbol,
+          buy_leverage=value,
+          sell_leverage=value,
+          validate=self.validate,
+        )
+      except ClientApiError as e:
+        if not e.args or e.args[0] != LEVERAGE_NOT_MODIFIED:
+          raise
+
+    await self.call_bybit(send)
+    log.info('%s: leverage set to %s', self.id, leverage)
 
   async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     """Fetch the max. notional position you can open: free collateral times leverage."""

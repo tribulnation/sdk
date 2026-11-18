@@ -68,7 +68,7 @@ from tribulnation.sdk.market import (
   Trade,
 )
 from tribulnation.sdk.market.types.candles import candle_windows
-from tribulnation.sdk.util import to_decimal
+from tribulnation.sdk.util import to_decimal, whole_leverage
 from ..core import POSITION_RISK, Public, Scope, Shared
 from .settings import Settings as AsterSettings
 from .streams import (
@@ -1144,6 +1144,27 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
         market_id=self.symbol,
         field='brackets',
       )
+
+  async def set_leverage(self, leverage: Decimal):
+    """Set the symbol's initial leverage (`POST /fapi/v1/leverage`).
+
+    The setting applies in either margin mode; the margin type is left alone. It is
+    sent under the symbol's leverage lock, so it never interleaves with a
+    `lower_to_max_leverage` check, and the shared `positionRisk` answer is dropped so
+    the next `leverage()` reads it. A leverage above the symbol's maximum is the
+    venue's to refuse.
+
+    Raises:
+      ValueError: `leverage` is not a positive whole number.
+    """
+    value = whole_leverage(leverage)
+    lock = self.shared.leverage_locks.setdefault(self.symbol, asyncio.Lock())
+    async with lock:
+      await self.shared.call(
+        lambda: self.api.account.set_leverage(self.symbol, leverage=value)
+      )
+      self.shared.reads.forget(POSITION_RISK)
+    log.info('%s: leverage set to %s', self.id, value)
 
   async def lower_to_max_leverage(self) -> bool:
     """After a `-2027` refusal, lower the symbol's leverage to the highest Aster now allows.
