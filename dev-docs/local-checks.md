@@ -43,7 +43,10 @@ file's own directory, so an accounts file elsewhere silently runs without creden
    `extended_testnet` signs for the testnet wallet's main sub-account
    (`EXTENDED_TESTNET_*`); the same wallet's sub-account 1 has its own key and Stark key
    (`EXTENDED_TESTNET_SUB1_*`), the counterparty and transfer target of testnet trading
-   runs, since testnet order books are usually empty.
+   runs, since testnet order books are usually empty. Nado and RISEx are `public = true`
+   with public third-party addresses (`NADO_ADDRESS`, `RISEX_ADDRESS`) and no keys:
+   every account read of theirs is public, so they qualify in address mode, and
+   RISEx's logged-in `fees` read is a `credential_mode` exclusion.
 2. Each account must reach its venue's `[qualification.market] min_mode` in
    `impl.toml`: `address`, `token` or `private`. The recorded account mode is derived
    from the credentials actually resolved, so a missing variable lowers it and the
