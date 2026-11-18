@@ -18,6 +18,7 @@ from tribulnation.sdk.market import (
 )
 from tribulnation.sdk.market.exchange import PerpExchange
 from tribulnation.sdk.market.venue import TradingVenue
+from tribulnation.sdk.util import whole_leverage
 
 
 def bucket(free: str) -> PerpCollateral:
@@ -110,3 +111,18 @@ async def test_collateral_ids_resolve_with_ttl():
   await TradingVenue.collateral(cast(Any, venue), 'spot:USDC', ttl=ttl)
   pool.collateral.assert_awaited_once_with(ttl=ttl)
   balance.assert_awaited_once_with('USDC', ttl=ttl)
+
+
+@pytest.mark.parametrize('leverage', ['5', '5.0', '1', '255'])
+def test_whole_leverage_takes_positive_whole_numbers(leverage: str):
+  """Whole values pass as ints, trailing zeros included."""
+  assert whole_leverage(Decimal(leverage)) == int(Decimal(leverage))
+
+
+@pytest.mark.parametrize(
+  'leverage', ['0', '-2', '2.5', 'NaN', 'sNaN', 'Infinity', '-Infinity']
+)
+def test_whole_leverage_refuses_with_value_error(leverage: str):
+  """Non-positive, fractional and non-finite values raise the same `ValueError`."""
+  with pytest.raises(ValueError, match='positive whole number'):
+    whole_leverage(Decimal(leverage))

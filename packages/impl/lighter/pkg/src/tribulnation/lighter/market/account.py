@@ -18,9 +18,9 @@ from ..core import percent
 CROSS, ISOLATED = 0, 1
 """Position margin modes."""
 UNIFIED = 1
+"""`account_trading_mode` of a unified account (USDC shared by spot and perps)."""
 FRACTION_UNITS = 10_000
 """Fixed-point initial margin fractions (market details, `L2UpdateLeverage`) are in 1e-4."""
-"""`account_trading_mode` of a unified account (USDC shared by spot and perps)."""
 
 
 def position_of(acct: DetailedAccount, market_id: int) -> AccountPosition | None:

@@ -109,7 +109,7 @@ requests address a market as `<account_id>:<exchange_id>:<market_id>`, e.g.
 | `rules` | `market_id`, `refetch`? | Fetch trading rules. |
 | `fees` | `market_id`, `refetch`? | Fetch account-specific trading fees. |
 | `leverage` | `market_id`, `ttl`? | Fetch the account's leverage on a perpetual market. |
-| `set_leverage` | `market_id`, `leverage` | Set the account's leverage on a perpetual market (`leverage`: Decimal, a positive whole number). |
+| `set_leverage` | `market_id`, `leverage` | Set the account's leverage on a perpetual market (`leverage`: Decimal, positive; venues that take whole multiples only refuse fractions, others take the venue's own step). |
 | `candles` | `market_id`, `interval`, `start`, `end` | Fetch candles in a half-open window. |
 | `open_orders` | `market_id` | List the account's open orders. |
 | `query_order` | `market_id`, `order_id` | Look up one order. |

@@ -234,7 +234,8 @@ class RisexPerpMarket(Public, PerpMarket):
     margin mode alone; the next `leverage()` reads the new setting.
 
     Raises:
-      ValueError: `leverage` is not a positive whole number, or is above 255.
+      ValueError: `leverage` is not a positive whole number, is above 255, or is
+        above the market's `max_leverage`.
       AuthError: The client has no signer key.
     """
     await account.set_leverage(self.shared, self.index_id, leverage)

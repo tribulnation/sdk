@@ -514,7 +514,6 @@ async def test_set_leverage_keeps_the_accounts_mode(
   'meta',
   [
     {**BTC, 'onlyIsolated': True},
-    {**BTC, 'marginMode': 'strictIsolated'},
     {**BTC, 'marginMode': 'noCross'},
   ],
 )
@@ -525,6 +524,16 @@ async def test_set_leverage_on_an_isolated_only_market_stays_isolated(
   _, update = leverage_endpoints(monkeypatch, 'cross')
   await account_perp(meta).set_leverage(Decimal(5))
   update.assert_awaited_once_with(asset=0, is_cross=False, leverage=5)
+
+
+async def test_set_leverage_on_a_strict_isolated_market_keeps_cross(
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """`strictIsolated` only locks an isolated position's margin, as on Hyperliquid:
+  an account on cross stays cross."""
+  _, update = leverage_endpoints(monkeypatch, 'cross')
+  await account_perp({**BTC, 'marginMode': 'strictIsolated'}).set_leverage(Decimal(5))
+  update.assert_awaited_once_with(asset=0, is_cross=True, leverage=5)
 
 
 @pytest.mark.parametrize('leverage', [Decimal(0), Decimal(-2), Decimal('2.5')])

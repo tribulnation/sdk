@@ -198,8 +198,8 @@ class GrvtPerpMarket(OrderBookMarket, PerpMarket):
     """Set the account's initial leverage on this market, keeping its margin type.
 
     Raises:
-      ValueError: `leverage` is not a positive whole number, or outside the
-        instrument's `[min_leverage, max_leverage]`.
+      ValueError: `leverage` is not positive with at most 6 decimals, or outside
+        the instrument's `[min_leverage, max_leverage]`.
       AuthError: The client has no private key to sign with.
     """
     await account.set_leverage(self.shared, self.instrument, leverage)

@@ -58,8 +58,9 @@ the call that sets it.
       without one), through the orders' nonce path but not their batch. The fraction is
       10000 / leverage and must be whole, so 3x is refused, not sent as 3.0003x. An
       accepted transaction can still be refused by the sequencer afterwards.
-   8. RISEx: the signed `update_leverage` permit, whole and at most 255 (a `uint8`); the
-      margin mode is a separate setting.
+   8. RISEx: the signed `update_leverage` permit, whole, at most 255 (a `uint8`) and
+      checked locally against the market's `max_leverage` before signing (above it the
+      permit reverts on chain); the margin mode is a separate setting.
    9. Refusing: Kraken Futures (a leverage preference moves the market to isolated
       margin) and Nado (cross margin has no setting). dYdX's `MsgUpdateLeverage` is not
       wrapped by the typed client yet. Binance, KuCoin and MEXC can set leverage but the

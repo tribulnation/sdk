@@ -647,11 +647,9 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
 
 def isolated_only(item: PerpUniverseItem) -> bool:
   """Whether the market refuses cross margin: `onlyIsolated`, or a `marginMode` of
-  `strictIsolated` or `noCross` (the Hyperliquid modes the venue's schema mirrors)."""
-  return bool(item.get('onlyIsolated')) or item.get('marginMode') in (
-    'strictIsolated',
-    'noCross',
-  )
+  `noCross` (the Hyperliquid modes the venue's schema mirrors). `strictIsolated` only
+  forbids removing margin from an open isolated position, so it allows cross."""
+  return bool(item.get('onlyIsolated')) or item.get('marginMode') == 'noCross'
 
 
 def placed(status: RestingStatus | FilledStatus) -> OrderResponse:

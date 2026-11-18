@@ -10,6 +10,7 @@ from typing_extensions import Any, cast
 
 import pytest
 from typed_risex import RISEx, BadRequest as ClientBadRequest
+from typed_risex.markets.all import MarketInfo
 
 from tribulnation.risex.core import Shared
 from tribulnation.risex.market.markets import RisexPerpMarket
@@ -40,11 +41,16 @@ class Account:
     return {'transaction_hash': '0x1', 'block_number': 1, 'receipt': {}}
 
 
-def market(fake: Account, *, signer: bool = True) -> RisexPerpMarket:
-  """BTC/USDC over a fake client, with or without a signer key."""
+def market(
+  fake: Account, *, signer: bool = True, max_leverage: Decimal = Decimal(50)
+) -> RisexPerpMarket:
+  """BTC/USDC over a fake client, its configuration cached with `max_leverage`, with
+  or without a signer key."""
   credentials = SimpleNamespace(signer_key=object() if signer else None)
   client = SimpleNamespace(account=fake, credentials=credentials)
   shared = Shared(client=cast(RISEx, client), address='0xabc')
+  row = {'market_id': 1, 'config': {'max_leverage': max_leverage}}
+  shared.markets[1] = cast(MarketInfo, row)
   return RisexPerpMarket(shared=shared, index_id=1)
 
 
@@ -73,20 +79,32 @@ async def test_set_leverage_sends_no_margin_mode():
 
 
 @pytest.mark.parametrize(
-  'leverage', [Decimal(0), Decimal(-2), Decimal('2.5'), Decimal(256)]
+  'leverage',
+  [Decimal(0), Decimal(-2), Decimal('2.5'), Decimal(51), Decimal(100), Decimal(255)],
 )
 async def test_set_leverage_refuses_before_signing(leverage: Decimal):
-  """Non-positive, fractional and above-`uint8` multiples send nothing."""
+  """Non-positive, fractional and above-maximum multiples send nothing: testnet BTC
+  (maximum 50) reverted 51, 100 and 255 on chain."""
   fake = Account()
   with pytest.raises(ValueError):
     await market(fake).set_leverage(leverage)
   assert fake.calls == []
 
 
-async def test_set_leverage_takes_the_uint8_maximum():
-  """255 is the highest multiple a permit carries."""
+async def test_set_leverage_takes_the_market_maximum():
+  """The market's `max_leverage` itself is sent: testnet BTC accepted 50."""
   fake = Account()
-  await market(fake).set_leverage(Decimal(255))
+  await market(fake).set_leverage(Decimal(50))
+  assert updates(fake) == [('update_leverage', (1, '50'))]
+
+
+async def test_set_leverage_refuses_above_the_uint8_cap():
+  """Above 255 is refused even where the market's maximum is higher."""
+  fake = Account()
+  m = market(fake, max_leverage=Decimal(1000))
+  with pytest.raises(ValueError, match='uint8'):
+    await m.set_leverage(Decimal(256))
+  await m.set_leverage(Decimal(255))
   assert updates(fake) == [('update_leverage', (1, '255'))]
 
 
@@ -110,6 +128,6 @@ async def test_a_refusal_is_translated_and_keeps_the_read():
   m = market(fake)
   assert await m.leverage(ttl=MINUTE) == 50
   with pytest.raises(BadRequest):
-    await m.set_leverage(Decimal(80))
+    await m.set_leverage(Decimal(20))
   assert await m.leverage(ttl=MINUTE) == 50
   assert [c[0] for c in fake.calls] == ['position', 'update_leverage']

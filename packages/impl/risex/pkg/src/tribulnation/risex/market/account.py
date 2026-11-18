@@ -86,12 +86,16 @@ async def set_leverage(shared: Shared, market_id: int, leverage: Decimal):
   """Set the account's leverage on the market (`account.update_leverage`).
 
   A signed permit, like orders, mined before the venue replies. The margin mode is a
-  separate venue setting (`update_margin_mode`), so this leaves it alone. The shared
-  `account.position` read is dropped, so the next `leverage()` reads the new setting.
-  A leverage above the market's maximum is the venue's to refuse.
+  separate venue setting (`update_margin_mode`), so this leaves it alone. The value is
+  checked against the market's `max_leverage` (the cached market configuration
+  `rules()` reports) before signing: above it the permit reverts on chain with
+  `InvalidLeverage` (testnet BTC, maximum 50: 51, 100 and 255 reverted, 50 was
+  accepted, 2026-11-18). The shared `account.position` read is dropped, so the next
+  `leverage()` reads the new setting.
 
   Raises:
-    ValueError: `leverage` is not a positive whole number, or is above 255.
+    ValueError: `leverage` is not a positive whole number, is above 255, or is above
+      the market's maximum.
     AuthError: The client has no signer key.
   """
   value = whole_leverage(leverage)
@@ -99,6 +103,11 @@ async def set_leverage(shared: Shared, market_id: int, leverage: Decimal):
     raise ValueError(
       f'RISEx leverage is at most {MAX_LEVERAGE_SETTING} (a uint8 in the permit), '
       f'got {leverage}'
+    )
+  maximum = (await shared.market(market_id))['config']['max_leverage']
+  if value > maximum:
+    raise ValueError(
+      f'RISEx market {market_id} allows leverage up to {maximum}, got {leverage}'
     )
   shared.require_signer()
   account = shared.require_account()
