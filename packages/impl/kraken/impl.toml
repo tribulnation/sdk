@@ -33,20 +33,35 @@ methods = [
   "tickers",
   "index",
   "perp_stats",
+  "next_funding",
   "funding_rates",
+  "funding_payments",
   "candles",
   "query_order",
   "open_orders",
   "trades_history",
   "trades_stream",
+  "place_order",
+  "place_orders",
+  "replace_order",
+  "cancel_order",
+  "cancel_orders",
+  "cancel_open_orders",
+  "position",
+  "collateral",
+  "collateral_id",
+  "leverage",
+  "available_notional",
+  "balances",
+  "collateral_ids",
 ]
-note = "Spot retains its existing public/private reads; perp adds public non-tradfi USD linear perpetuals with unit contract size, including tokenized assets classified that way by Kraken. Perp supports discovery, depth, tickers, rules, index, perp_stats, funding_rates and all six candle intervals. Futures streams, next_funding, account fees and all private/trading methods remain unsupported. Spot candles retain the recent API window (documented 720; 721 observed including forming). Perp candles use trade Charts in bounded 2000-open windows, preserve missing intervals, and filter aware half-open bounds. Funding history uses native relativeFundingRate, with settlement time = native period start + 1 hour and inclusive/open bounds. Perp standard fees and maximum order size remain unknown; USD fee currency resolves through Assets to ZUSD. Spot `position`, `collateral` and `available_notional` were removed in SDK 3.0 with the spot stand-ins (ADR 0051); spot `balances` and collateral IDs are not mapped yet."
-# Spot depth_stream is supported; perpetual streams are explicitly unsupported.
-# Public reads use the credential-free Kraken DEFAULT_ACCOUNTS entry.
+note = "Spot trades with the Spot API key (`api_key`/`private_key`, env `KRAKEN_API_KEY`/`KRAKEN_PRIVATE_KEY`) over REST: `LIMIT` is a GTC `limit`, `POST_ONLY` adds the `post` flag, `MARKET` is an IOC `limit` bounded by the order price, and settings `kraken.time_in_force = ioc` (or `post`) sends a `LIMIT` that way; every order asks for fees in the quote asset (`fciq`). `AddOrder` reports no execution, so spot `filled_qty` is `None`; `query_order` reads `QueryOrders`, open or closed. `replace_order` amends in place (`AmendOrder`, same txid; the new total is the filled part plus the new size); `place_orders`/`cancel_orders`/`cancel_open_orders` use the per-order defaults, never the account-wide `CancelAll`. Spot `balances` are `BalanceEx` `balance` and `balance - hold_trade`, shared per `ttl` across the account; Earn-allocated balances (`.F`, `.B`, `.S` ids) are not counted. Spot collateral IDs are `<account>:spot:<internal asset id>` (`kraken:spot:ZUSD`); the Spot wallet is separate from the Futures pool `<account>:perp` (ADR 0051). Private Spot reads (`BalanceEx`, `OpenOrders`, `QueryOrders`, `TradeVolume`) spend Kraken's per-key REST counter (decay 0.33 to 1 point/s by verification tier); orders and cancels spend the separate per-pair trading counter. Spot orders are verified against an in-memory venue only: Kraken Spot has no testnet. Perpetuals are the non-tradfi USD linear `PF_` contracts with unit contract size on the multi-collateral (flex) account. Public data needs no key; account reads, orders and the private feeds need a separate Futures API key (`futures_api_key`/`futures_private_key`, env `KRAKEN_FUTURES_API_KEY`/`KRAKEN_FUTURES_PRIVATE_KEY`). `depth_stream` folds the Futures WebSocket `book` feed (snapshot plus per-level deltas, sequence-checked); `trades_stream` is the `fills` feed with fees. `LIMIT` is `lmt`, `POST_ONLY` `post`, `MARKET` an `ioc` bounded by the order price; settings `kraken.time_in_force = ioc` sends a `LIMIT` as IOC. `replace_order` edits in place (`editorder`, same ID); `place_orders`/`cancel_orders` use `batchorder`. Collateral is the flex pool (`marginEquity`, `availableMargin`); isolated-margin buckets are not supported. Cross leverage is the inverse of the first-tier retail initial margin (`margin_schedule` selects a platform schedule). Fees are the instrument fee schedule tier for the account 30-day volume. `next_funding` is the ticker `relativeFundingRate` settled at the next full hour. `trades_history` (REST `fills`) carries no fees. `kraken_testnet` is the Futures demo environment (perpetuals only). Spot candles retain the recent API window (documented 720; 721 observed including forming). Perp candles use trade Charts in bounded 2000-open windows."
+# Public reads use the credential-free Kraken DEFAULT_ACCOUNTS entry; private
+# perpetual reads and orders need the Futures key pair.
 
 [ids]
 asset = "symbol"
-market = "Spot REST pair altname (`XBTUSD`, `ETHUSDC`); perpetual instrument symbol (`PF_XBTUSD`, `PF_ETHUSD`) under exchange perp."
+market = "Spot REST pair altname (`XBTUSD`, `KAVAUSD`, `ETHUSDC`), joined internally to the `AssetPairs` key (`XXBTZUSD`) and the WebSocket v2 symbol (`BTC/USD`, `KAVA/USD`); perpetual instrument symbol (`PF_XBTUSD`, `PF_ETHUSD`) under exchange perp."
 note = "Kraken's internal asset id (`XXBT`, `XETH`, `ZUSD`, `USDC`, `SOL`): what `Balance`, `Ledgers`, `TradesHistory`, `WithdrawMethods` and the default `AssetPairs`/`Assets` listings name assets by. `Earn/Strategies` answers in display names (`BTC`) and is re-keyed to the internal id through the venue's own `Assets` join on `altname`. Networks are Kraken's display network names (`Bitcoin`, `Arbitrum One`)."
 
 # Release qualification of account reads (ADR 0042); not shown in the support matrix.
@@ -54,4 +69,4 @@ note = "Kraken's internal asset id (`XXBT`, `XETH`, `ZUSD`, `USDC`, `SOL`): what
 min_mode = "private"
 
 [qualification.market.unsupported]
-perp = ["fees", "open_orders", "trades_history"]
+perp = []

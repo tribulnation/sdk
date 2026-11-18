@@ -4,45 +4,47 @@ from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
+import uuid
 
 from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
   Book,
   Candle,
   CandleInterval,
-  Collateral,
   Fees,
-  Market,
   Order,
   OrderResponse,
   OrderState,
-  Position,
-  Rules,
   Settings,
+  SpotBalances,
+  SpotMarket as BaseSpotMarket,
+  SpotRules,
   Trade,
 )
 
 from .impl import (
   MarketMixin,
-  available_notional,
-  collateral,
+  balances,
   depth,
   depth_stream,
-  open_orders,
-  position,
   rules,
   trades_history,
   trades_stream,
 )
+from .impl import orders
 from .impl.candles import CANDLE_INTERVALS, candles
 
 
 @dataclass(frozen=True, kw_only=True)
-class SpotMarket(MarketMixin, Market):
-  """Kraken implementation of `Market`, for one Spot pair.
+class SpotMarket(MarketMixin, BaseSpotMarket):
+  """Kraken implementation of `SpotMarket`, for one Spot pair (`kraken:spot:KAVAUSD`).
 
-  Order placement and cancellation are deliberately unimplemented: this package
-  reads Kraken, it does not trade on it.
+  Orders are REST limit orders on the Spot API key; balances are `BalanceEx`, shared
+  per `ttl` across the account's markets.
+
+  Settings, under `settings['kraken']` (the perpetuals' `KrakenSettings`):
+  `{'time_in_force': 'ioc'}` sends a `LIMIT` as immediate-or-cancel (`'post'`:
+  post-only). `reduce_only` raises `ValueError`: Spot has no position to reduce.
   """
 
   @property
@@ -66,8 +68,13 @@ class SpotMarket(MarketMixin, Market):
   ) -> AsyncContextManager[AsyncIterable[Book]]:
     return depth_stream(self, levels=levels, queue_size=queue_size, overflow=overflow)
 
-  async def rules(self, *, refetch: bool = False) -> Rules:
+  async def rules(self, *, refetch: bool = False) -> SpotRules:
+    """The pair's `AssetPairs` rules, with its internal base and quote asset ids."""
     return await rules(self, refetch=refetch)
+
+  async def balances(self, *, ttl: timedelta | None = None) -> SpotBalances:
+    """Base and quote balances from `BalanceEx`; `free` excludes `hold_trade`."""
+    return await balances(self, ttl=ttl)
 
   async def fees(self, *, refetch: bool = False) -> Fees:
     """Fetch the current account's per-pair schedule, converting percent to fractions.
@@ -109,7 +116,11 @@ class SpotMarket(MarketMixin, Market):
   CANDLE_INTERVALS = CANDLE_INTERVALS
 
   async def open_orders(self) -> Sequence[OrderState]:
-    return await open_orders(self)
+    return await orders.open_orders(self)
+
+  async def query_order(self, id: str) -> OrderState | None:
+    """One order by txid, open or closed (`QueryOrders`); `None` when unknown."""
+    return await orders.query_order(self, id)
 
   def trades_history(self, start: datetime, end: datetime) -> PaginatedResponse[Trade]:
     return PaginatedResponse(trades_history(self, start, end))
@@ -123,25 +134,29 @@ class SpotMarket(MarketMixin, Market):
   ) -> AsyncContextManager[AsyncIterable[Trade]]:
     return trades_stream(self, queue_size=queue_size, overflow=overflow)
 
-  async def position(self, *, ttl: timedelta | None = None) -> Position:
-    return await position(self)
-
-  async def collateral(self, *, ttl: timedelta | None = None) -> Collateral:
-    return await collateral(self)
-
-  async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
-    return await available_notional(self)
+  def random_client_order_id(self) -> str:
+    """A fresh UUID, one of the forms Kraken's `cl_ord_id` takes."""
+    return str(uuid.uuid4())
 
   async def place_order(
     self, order: Order, *, settings: Settings = {}
   ) -> OrderResponse:
-    raise NotImplementedError(
-      f'place_order is not implemented for this market [{self.id}]: '
-      'tribulnation-kraken reads Kraken and does not trade on it.'
-    )
+    """Place a `LIMIT` (GTC), `POST_ONLY` (`post` flag) or `MARKET` (IOC limit at
+    `price`); fees in the quote asset. `filled_qty` is `None`: `AddOrder` reports no
+    execution.
+
+    Raises:
+      OrderRejected: Kraken refused it: insufficient funds, below the minimums, a
+        post-only that would cross, an invalid price or size, ...
+    """
+    return await orders.place_order(self, order, settings=settings)
+
+  async def replace_order(
+    self, id: str, order: Order, *, settings: Settings = {}
+  ) -> OrderResponse:
+    """Amend `id` in place (`AmendOrder`, same txid); see `orders.replace_order`."""
+    return await orders.replace_order(self, id, order, settings=settings)
 
   async def cancel_order(self, id: str, *, settings: Settings = {}) -> Any:
-    raise NotImplementedError(
-      f'cancel_order is not implemented for this market [{self.id}]: '
-      'tribulnation-kraken reads Kraken and does not trade on it.'
-    )
+    """Cancel one order; `OrderNotFound` when Kraken no longer knows it."""
+    return await orders.cancel_order(self, id)

@@ -665,6 +665,7 @@ methods:
         hyperliquid: {market_id: 'hyperliquid::BTC', size: '0.014'}
         lighter: {market_id: 'lighter:perp:1', size: '0.014'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', size: '0.014'}
+        kraken: {market_id: 'kraken:perp:PF_XBTUSD', size: '0.014'}
       callTemplate: |
         pos = await sdk.position('{{ constants[accounts[0]].market_id }}')
       resultTemplate: |
@@ -704,6 +705,7 @@ methods:
         hyperliquid: {collateral_id: 'hyperliquid:spot:0', equity: '10240.55', free: '8120.00'}
         lighter: {collateral_id: 'lighter:spot:3', equity: '10240.55', free: '8120.00'}
         margin-trade: {collateral_id: 'margin-trade:perp', equity: '10240.55', free: '8120.00'}
+        kraken: {collateral_id: 'kraken:perp', equity: '10240.55', free: '8120.00'}
       callTemplate: |
         # A collateral ID, as collateral_id() or collateral_ids() return it
         c = await sdk.collateral('{{ constants[accounts[0]].collateral_id }}')
@@ -744,6 +746,7 @@ methods:
         hyperliquid: {market_id: 'hyperliquid::BTC', notional: '81200.00'}
         lighter: {market_id: 'lighter:perp:1', notional: '81200.00'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', notional: '81200.00'}
+        kraken: {market_id: 'kraken:perp:PF_XBTUSD', notional: '81200.00'}
       callTemplate: |
         notional = await sdk.available_notional('{{ constants[accounts[0]].market_id }}')
       resultTemplate: |
@@ -802,6 +805,7 @@ methods:
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', base_total: '0.5', base_free: '0.4', quote_total: '9875.20', quote_free: '7640.00'}
         lighter: {market_id: 'lighter:spot:2048', base_total: '0.5', base_free: '0.4', quote_total: '9875.20', quote_free: '7640.00'}
         margin-trade: {market_id: 'margin-trade:spot:PEARL/USDC', base_total: '0.5', base_free: '0.4', quote_total: '9875.20', quote_free: '7640.00'}
+        kraken: {market_id: 'kraken:spot:XBTUSD', base_total: '0.5', base_free: '0.4', quote_total: '9875.20', quote_free: '7640.00'}
       callTemplate: |
         b = await sdk.balances('{{ constants[accounts[0]].market_id }}')
         print(b.base.free, b.quote.free)  # what a sell, and a buy, can spend
@@ -821,6 +825,7 @@ methods:
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', base: '197', quote: '0'}
         lighter: {market_id: 'lighter:spot:2048', base: '1', quote: '3'}
         margin-trade: {market_id: 'margin-trade:spot:PEARL/USDC', base: 'PEARL', quote: 'USDC'}
+        kraken: {market_id: 'kraken:spot:XBTUSD', base: 'XXBT', quote: 'ZUSD'}
       callTemplate: |
         ids = await sdk.collateral_ids('{{ constants[accounts[0]].market_id }}')
         quote = await sdk.collateral(ids.quote)  # what a buy reserves on
@@ -844,6 +849,7 @@ methods:
         hyperliquid: {market_id: 'hyperliquid::BTC', collateral_id: 'hyperliquid:spot:0'}
         lighter: {market_id: 'lighter:perp:1', collateral_id: 'lighter:spot:3'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', collateral_id: 'margin-trade:perp'}
+        kraken: {market_id: 'kraken:perp:PF_XBTUSD', collateral_id: 'kraken:perp'}
       callTemplate: |
         id = await sdk.collateral_id('{{ constants[accounts[0]].market_id }}')
         pool = await sdk.collateral(id)  # shared by every market returning this ID
@@ -870,6 +876,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id: '13835058055282163712'}
         nado: {market_id: 'nado:perp:BTC-PERP', order_id: '0x4b673f27af419bd8563c58440555aa6e443cd3a944b1b6a5d72b5941ad905e51'}
         risex: {market_id: 'risex:perp:1', order_id: '0x000000000003b131000000000390d5e400000000000000ec'}
+        kraken: {market_id: 'kraken:spot:XBTUSD', order_id: 'OABC12-DE345-FGHI61'}
       callTemplate: |
         order = {'type': 'LIMIT', 'qty': 0.01, 'price': 60_000}
         response = await sdk.place_order('{{ constants[accounts[0]].market_id }}', order)
@@ -910,6 +917,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id1: '13835058055282163712', order_id2: '13835058055282163713'}
         nado: {market_id: 'nado:perp:BTC-PERP', order_id1: '0x4b673f27af419bd8563c58440555aa6e443cd3a944b1b6a5d72b5941ad905e51', order_id2: '0xc3840c0db67d023f68bcf1eaae65077080e232aaaa43f6e38cdf0f420ce6f4fd'}
         risex: {market_id: 'risex:perp:1', order_id1: '0x000000000003b131000000000390d5e400000000000000ec', order_id2: '0x000000000003b131000000000390d61b00000000000001df'}
+        kraken: {market_id: 'kraken:spot:XBTUSD', order_id1: 'OABC12-DE345-FGHI61', order_id2: 'OABC12-DE345-FGHI62'}
       callTemplate: |
         orders = [
           {'type': 'LIMIT', 'qty': 0.01, 'price': 60_000},
@@ -955,6 +963,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id: '13835058055282163712'}
         nado: {market_id: 'nado:perp:BTC-PERP', order_id: '0x4b673f27af419bd8563c58440555aa6e443cd3a944b1b6a5d72b5941ad905e51'}
         risex: {market_id: 'risex:perp:1', order_id: '0x000000000003b131000000000390d5e400000000000000ec'}
+        kraken: {market_id: 'kraken:spot:XBTUSD', order_id: 'OABC12-DE345-FGHI61'}
       callTemplate: |
         await sdk.cancel_order('{{ constants[accounts[0]].market_id }}', '{{ constants[accounts[0]].order_id }}')
         print('Cancellation request completed')
@@ -996,6 +1005,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id1: '13835058055282163712', order_id2: '13835058055282163713'}
         nado: {market_id: 'nado:perp:BTC-PERP', order_id1: '0x4b673f27af419bd8563c58440555aa6e443cd3a944b1b6a5d72b5941ad905e51', order_id2: '0xc3840c0db67d023f68bcf1eaae65077080e232aaaa43f6e38cdf0f420ce6f4fd'}
         risex: {market_id: 'risex:perp:1', order_id1: '0x000000000003b131000000000390d5e400000000000000ec', order_id2: '0x000000000003b131000000000390d61b00000000000001df'}
+        kraken: {market_id: 'kraken:spot:XBTUSD', order_id1: 'OABC12-DE345-FGHI61', order_id2: 'OABC12-DE345-FGHI62'}
       callTemplate: |
         await sdk.cancel_orders('{{ constants[accounts[0]].market_id }}', ['{{ constants[accounts[0]].order_id1 }}', '{{ constants[accounts[0]].order_id2 }}'])
         print('Cancellation request completed')
@@ -1037,6 +1047,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id1: '13835058055282163712', order_id2: '13835058055282163713'}
         nado: {market_id: 'nado:perp:BTC-PERP', order_id1: '0x4b673f27af419bd8563c58440555aa6e443cd3a944b1b6a5d72b5941ad905e51', order_id2: '0xc3840c0db67d023f68bcf1eaae65077080e232aaaa43f6e38cdf0f420ce6f4fd'}
         risex: {market_id: 'risex:perp:1', order_id1: '0x000000000003b131000000000390d5e400000000000000ec', order_id2: '0x000000000003b131000000000390d61b00000000000001df'}
+        kraken: {market_id: 'kraken:spot:XBTUSD', order_id1: 'OABC12-DE345-FGHI61', order_id2: 'OABC12-DE345-FGHI61'}
       callTemplate: |
         order = {'type': 'POST_ONLY', 'qty': 0.01, 'price': 60_100}
         response = await sdk.replace_order('{{ constants[accounts[0]].market_id }}', '{{ constants[accounts[0]].order_id1 }}', order)
@@ -1122,6 +1133,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp'}
         nado: {market_id: 'nado:perp:BTC-PERP'}
         risex: {market_id: 'risex:perp:1'}
+        kraken: {market_id: 'kraken:spot:XBTUSD'}
       callTemplate: |
         await sdk.cancel_open_orders('{{ constants[accounts[0]].market_id }}')
         print('Cancellation request completed')
@@ -1207,6 +1219,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', rate: '0.0001', annualized: '0.1095'}
         nado: {market_id: 'nado:perp:BTC-PERP', rate: '0.0000035', annualized: '0.03066'}
         risex: {market_id: 'risex:perp:1', rate: '0.000013', annualized: '0.11388'}
+        kraken: {market_id: 'kraken:perp:PF_XBTUSD', rate: '0.0001', annualized: '0.876'}
       callTemplate: |
         funding = await sdk.next_funding('{{ constants[accounts[0]].market_id }}')
         print(funding.rate, funding.annualized)
@@ -1292,6 +1305,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', amount1: '-1.24', amount2: '0.86'}
         nado: {market_id: 'nado:perp:BTC-PERP', amount1: '-1.24', amount2: '0.86'}
         risex: {market_id: 'risex:perp:1', amount1: '-1.24', amount2: '0.86'}
+        kraken: {market_id: 'kraken:perp:PF_XBTUSD', amount1: '-1.24', amount2: '0.86'}
       callTemplate: |
         async for page in sdk.funding_payments('{{ constants[accounts[0]].market_id }}', start, end):
           for payment in page:
@@ -1413,6 +1427,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', leverage: '20', free: '8120.00', notional: '162400.00'}
         nado: {market_id: 'nado:perp:BTC-PERP', leverage: '50', free: '8120.00', notional: '406000.00'}
         risex: {market_id: 'risex:perp:1', leverage: '10', free: '8120.00', notional: '81200.00'}
+        kraken: {market_id: 'kraken:perp:PF_XBTUSD', leverage: '50', free: '7640.00', notional: '382000.00'}
       callTemplate: |
         leverage = await sdk.leverage('{{ constants[accounts[0]].market_id }}')
         notional = await sdk.available_notional('{{ constants[accounts[0]].market_id }}')
