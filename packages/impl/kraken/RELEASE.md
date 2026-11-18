@@ -1,6 +1,6 @@
 # tribulnation-kraken 0.9.0
 
-Requires SDK >=4.1.0 (Kraken Futures keys on the account, [ADR 0065](../../../dev-docs/adr/0065-kraken-futures-and-spot-trading.md)) and typed-kraken >=0.6.0 (was >=0.4.0), for the authenticated Futures client.
+Requires SDK >=4.1.0 (Kraken Futures keys on the account, [ADR 0065](../../../dev-docs/adr/0065-kraken-futures-and-spot-trading.md)) and typed-kraken >=0.6.1 (was >=0.4.0), for the authenticated Futures client; 0.6.1 accepts Futures history answers without a result marker.
 
 Changed:
 
