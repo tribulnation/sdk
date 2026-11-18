@@ -3,11 +3,12 @@
 
 import logging
 from dataclasses import dataclass
+import asyncio
 from datetime import datetime, timedelta
 from decimal import Decimal
 
 from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
-from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
+from tribulnation.sdk.core import MissingData, OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
   Book,
   Candle,
@@ -23,6 +24,7 @@ from tribulnation.sdk.market import (
   PerpCollateral,
   PerpMarket,
   PerpPosition,
+  RemainingPositionLimit,
   Rules,
   Settings,
   SpotBalances,
@@ -222,6 +224,29 @@ class GrvtPerpMarket(OrderBookMarket, PerpMarket):
       account.cross_bucket(await account.summary(self.shared)).free_collateral
       * leverage
     )
+
+  async def remaining_position_limit(
+    self, *, ttl: timedelta | None = None
+  ) -> RemainingPositionLimit:
+    """The instrument's `max_position_size` less the position held in each direction,
+    at the ticker's mark price (`account.remaining_position_limit`).
+
+    Raises:
+      MissingData: The ticker carries no mark price.
+    """
+    instrument, position, ticker = await asyncio.gather(
+      self.shared.instrument(self.instrument, kind='PERPETUAL'),
+      account.perp_position(self.shared, self.instrument),
+      stats.ticker(self.shared, self.instrument),
+    )
+    mark = ticker.get('mark_price')
+    if mark is None:
+      raise MissingData(
+        f'GRVT sent no mark price for {self.instrument}',
+        market_id=self.instrument,
+        field='mark',
+      )
+    return account.remaining_position_limit(instrument, size=position.size, mark=mark)
 
   async def index(self, *, settings: Settings = {}) -> Decimal:
     """The index price."""

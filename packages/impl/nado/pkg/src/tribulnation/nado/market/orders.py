@@ -5,8 +5,6 @@ The SDK order id is the order's digest, the id Nado queries and cancels by. A
 queries and fill events but does not keep unique.
 """
 
-from decimal import Decimal
-
 from typing_extensions import Any, Mapping, Sequence
 from typed_nado import order_appendix
 from typed_nado.core.appendix import OrderType
@@ -14,6 +12,7 @@ from typed_nado import schemas
 from typed_nado.schemas import PlaceOrderRequest, Symbol
 from tribulnation.sdk.core import BadRequest, OrderNotFound, OrderRejected
 from tribulnation.sdk.market import Order, OrderResponse, OrderState, Settings
+from tribulnation.sdk.util import to_decimal
 
 from ..core import CLIENT_ORDER_IDS, GTC_EXPIRATION, Shared, to_x18
 from .common import parse_archived_order, parse_open_order
@@ -61,8 +60,8 @@ def nado_order(order: Order, settings: Settings = {}) -> schemas.Order:
   Raises:
     ValueError: The quantity is zero or not finite, or the price is not positive.
   """
-  qty = Decimal(str(order['qty']))
-  price = Decimal(str(order['price']))
+  qty = to_decimal(order['qty'])
+  price = to_decimal(order['price'])
   if not qty.is_finite() or not qty:
     raise ValueError('Order quantity must be finite and nonzero')
   if not price.is_finite() or price <= 0:

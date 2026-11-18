@@ -84,6 +84,11 @@ def owner_for(module: str, name: str, attribute: str, client: AsyncMock) -> SDK:
   # only its client.
   if module == 'tribulnation.margin_trade.core':
     client.credentials = None
+  # Kraken's `Shared` also owns the separate Futures client, through `perp.resource`.
+  if module == 'tribulnation.kraken.market.impl.mixin':
+    from tribulnation.kraken.market.impl.futures_state import FuturesState
+
+    object.__setattr__(owner, 'perp', FuturesState(client=AsyncMock()))
   object.__setattr__(owner, 'streams', {})
   object.__setattr__(owner, 'ws_stack', None)
   return owner
@@ -120,6 +125,27 @@ async def test_every_owned_client_translates_lifecycle_errors(
   assert client.__aexit__.await_count == (phase == 'exit')
 
 
+@pytest.mark.parametrize('phase', ['enter', 'exit'])
+async def test_kraken_futures_client_translates_lifecycle_errors(phase: str):
+  """Kraken's Futures client, owned through `perp.resource`, translates without retries."""
+  from tribulnation.kraken.market.impl.futures_state import FuturesState
+
+  original = ClientNetworkError('offline')
+  client = AsyncMock()
+  getattr(client, f'__a{phase}__').side_effect = original
+  client.__aexit__.return_value = False
+  state = FuturesState(client=client)
+  assert state.resource is state.resource
+  assert cast(ManagedResource[object], state.resource).resource is client
+  with Context().retried(max_retries=2, base_delay=0).use():
+    with pytest.raises(NetworkError) as caught:
+      async with state.resource:
+        pass
+  assert caught.value.__cause__ is original
+  assert client.__aenter__.await_count == 1
+  assert client.__aexit__.await_count == (phase == 'exit')
+
+
 def test_venue_lifecycle_structure():
   """Require data-only ownership declarations and tested policies for raw clients."""
   root = Path(__file__).resolve().parents[2] / 'impl'
@@ -148,9 +174,16 @@ def test_venue_lifecycle_structure():
             if key in tested:
               found.add(key)
             else:
-              assert value.attr in nested or (
-                module == 'tribulnation.dydx.report.history.main'
-                and value.attr == 'indexer'
+              assert (
+                value.attr in nested
+                or (
+                  module == 'tribulnation.dydx.report.history.main'
+                  and value.attr == 'indexer'
+                )
+                or (
+                  module == 'tribulnation.kraken.market.impl.mixin'
+                  and ast.unparse(value) == 'self.perp.resource'
+                )
               ), (path, cls.name, ast.unparse(value))
           else:
             # Fresh one-shot closers must carry policies too.

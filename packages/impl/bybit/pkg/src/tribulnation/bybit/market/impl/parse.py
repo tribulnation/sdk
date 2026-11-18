@@ -4,6 +4,7 @@ from typing_extensions import Literal, Sequence
 from decimal import Decimal
 
 from tribulnation.sdk.market import Book, Order, OrderState, Trade
+from tribulnation.sdk.util import to_decimal
 from typed_bybit.private.execution import ExecutionUpdate
 from typed_bybit.schemas import OrderbookLevel
 from typed_bybit.trade.create_order import (
@@ -77,7 +78,7 @@ def order_request(
   protection and ignores a limit price; `'POST_ONLY'` becomes a `PostOnly` limit
   order, and `'LIMIT'` a `GTC` one. A `client_order_id` is sent as `orderLinkId`.
   """
-  qty = Decimal(order['qty'])
+  qty = to_decimal(order['qty'])
   side: Literal['Buy', 'Sell'] = 'Buy' if qty > 0 else 'Sell'
   request: CreateMarketOrderRequest | CreateLimitOrderRequest
   if order['type'] == 'MARKET':
@@ -96,7 +97,7 @@ def order_request(
       side=side,
       orderType='Limit',
       qty=str(abs(qty)),
-      price=str(Decimal(order['price'])),
+      price=str(to_decimal(order['price'])),
       timeInForce='PostOnly' if order['type'] == 'POST_ONLY' else 'GTC',
     )
   if (client_order_id := order.get('client_order_id')) is not None:

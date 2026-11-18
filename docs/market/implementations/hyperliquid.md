@@ -52,8 +52,9 @@ Market IDs by exchange:
 
 ## Settings
 
-`place_order`, `index`, `depth` and `depth_stream` accept `settings={'hyperliquid': {...}}`,
-typed by the `Settings` TypedDict (`core/settings.py`). All keys are optional:
+`place_order`, the cancels, `replace_order(s)`, `index`, `depth` and `depth_stream` accept
+`settings={'hyperliquid': {...}}`, typed by the `Settings` TypedDict (`core/settings.py`).
+All keys are optional:
 
 | Key | Type | Applies to | Meaning |
 | --- | --- | --- | --- |
@@ -61,6 +62,7 @@ typed by the `Settings` TypedDict (`core/settings.py`). All keys are optional:
 | `limit_tif` | `TimeInForce` | `place_order` | Time-in-force for limit orders. |
 | `index_price` | `'oracle' \| 'mark'` | `index` (perp) | Which price `index()` returns; defaults to `'oracle'`. |
 | `depth_source` | `'l2' \| 'fast' \| 'bbo'` | `depth_stream`, `depth` | Which order-book feed to read; defaults to `'l2'`. |
+| `fast_cancel` | `bool` | `cancel_order(s)`, `cancel_open_orders`, `replace_order(s)` | Send cancels with Hyperliquid's fast-cancel flag (`f: true`); defaults to `False`, which omits the flag. Do not use it on trigger orders: Hyperliquid refuses a fast cancel naming one, and the refusal is raised as `ApiError` (the order still rests), never resent without the flag; `cancel_open_orders` fast-cancels every open order, trigger orders included. `POST_ONLY` replacements go through `batchModify`, which has no cancel. |
 
 `index_price='mark'` returns the market's mark price, falling back to the oracle price when
 mark is unavailable; the default `'oracle'` always returns the oracle price.
@@ -119,6 +121,11 @@ async with sdk.depth_stream('hl::ETH', settings={'hyperliquid': {'depth_source':
   because an isolated position is opened from that account pool, not from its own
   bucket, and because it needs one request instead of the mode-aware collateral's four.
   Like the old figure, it does not check the account abstraction mode.
+- **`remaining_position_limit`** (perp) is nothing either way while the coin is listed by
+  `perpsAtOpenInterestCap` (reduce-only for everyone), else the margin table's bound at
+  the account's leverage less the position held in each direction, `None` when no tier
+  binds (ADR 0062). Order errors at the open-interest cap raise `OpenInterestCapped`;
+  the margin tier limit (`PerpMaxPosition`) raises `PositionLimitExceeded`.
 - **Spot `balances`** are the base and quote tokens' `total` and `total - hold` from one
   `spot_clearinghouse_state` read. Spot rules name the pair by token index (`base='197'`,
   `quote='0'` for UBTC/USDC), Hyperliquid's asset IDs.

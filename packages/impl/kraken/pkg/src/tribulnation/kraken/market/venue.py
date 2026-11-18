@@ -14,8 +14,9 @@ from .perp_exchange import PerpExchange
 class KrakenMarket(SharedMixin, TradingVenue):
   """Kraken implementation of `TradingVenue`.
 
-  Spot retains its existing private capabilities; perpetuals expose public data
-  through the independent Futures REST and Charts transports.
+  Spot trades with the Spot API key; perpetuals trade with the separate Futures API
+  key, and serve public data without one. The `kraken_testnet` venue is the Futures
+  demo environment, which has perpetuals only.
   """
 
   @overload
@@ -35,7 +36,7 @@ class KrakenMarket(SharedMixin, TradingVenue):
 
   async def exchange(self, exchange_id: str, /) -> SpotExchange | PerpExchange:
     """Resolve the explicit Spot or qualified linear perpetual exchange."""
-    if exchange_id == 'spot':
+    if exchange_id == 'spot' and self.venue_id == 'kraken':
       return SpotExchange(shared=self.shared)
     if exchange_id == 'perp':
       return await self.perp_exchange(exchange_id)
@@ -48,8 +49,13 @@ class KrakenMarket(SharedMixin, TradingVenue):
     return PerpExchange(shared=self.shared)
 
   async def exchanges(self) -> Sequence[TradingVenue.ExchangeDescription]:
-    """List the public Spot and perpetual product identities."""
-    return [
-      {'id': 'spot', 'type': 'spot', 'name': 'Spot'},
-      {'id': 'perp', 'type': 'perp', 'name': 'Linear perpetuals'},
-    ]
+    """List the Spot (live venue only) and perpetual product identities."""
+    perp: TradingVenue.ExchangeDescription = {
+      'id': 'perp',
+      'type': 'perp',
+      'name': 'Linear perpetuals',
+    }
+    if self.venue_id == 'kraken':
+      return [{'id': 'spot', 'type': 'spot', 'name': 'Spot'}, perp]
+    else:
+      return [perp]

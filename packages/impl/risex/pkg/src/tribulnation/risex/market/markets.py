@@ -2,6 +2,7 @@
 
 import logging
 from dataclasses import dataclass
+import asyncio
 from datetime import datetime, timedelta
 from decimal import Decimal
 
@@ -21,6 +22,7 @@ from tribulnation.sdk.market import (
   PerpCollateral,
   PerpMarket,
   PerpPosition,
+  RemainingPositionLimit,
   Rules,
   Settings,
   Trade,
@@ -224,6 +226,18 @@ class RisexPerpMarket(Public, PerpMarket):
     """The account's cross pool, `<account_id>:perp`, for every market: RISEx has no
     spot exchange, and orders draw on the pool's free collateral."""
     return f'{self.account_id}:{self.exchange_id}'
+
+  async def remaining_position_limit(
+    self, *, ttl: timedelta | None = None
+  ) -> RemainingPositionLimit:
+    """`max_position_size` less the position held in each direction, bounded by the
+    room left under the market's `open_interest_limit`, at the mark price, from the
+    market's live row (`account.remaining_position_limit`)."""
+    market, position = await asyncio.gather(
+      self.shared.fresh(self.index_id),
+      account.perp_position(self.shared, self.index_id, ttl=ttl),
+    )
+    return account.remaining_position_limit(market, size=position.size)
 
   async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
     """The account's leverage on the market: its setting, else the market maximum."""

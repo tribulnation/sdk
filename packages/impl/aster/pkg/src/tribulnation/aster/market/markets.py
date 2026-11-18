@@ -39,6 +39,7 @@ from tribulnation.sdk.core import (
   OrderNotFound,
   OrderRejected,
   OverflowPolicy,
+  PositionLimitExceeded,
   PaginatedResponse,
 )
 from tribulnation.sdk.market import (
@@ -58,6 +59,7 @@ from tribulnation.sdk.market import (
   PerpCollateral,
   PerpMarket as SDKPerpMarket,
   PerpPosition,
+  RemainingPositionLimit,
   Rules,
   SpotBalances,
   SpotMarket as SDKSpotMarket,
@@ -66,7 +68,7 @@ from tribulnation.sdk.market import (
   Trade,
 )
 from tribulnation.sdk.market.types.candles import candle_windows
-from tribulnation.sdk.util import whole_leverage
+from tribulnation.sdk.util import to_decimal, whole_leverage
 from ..core import POSITION_RISK, Public, Scope, Shared
 from .settings import Settings as AsterSettings
 from .streams import (
@@ -101,6 +103,11 @@ NO_OPEN_INTEREST_CAP = Decimal(-1)
 """`remainingOpenableNotionalValue` when the symbol has no open-interest cap."""
 LEVERAGE_ABOVE_MAX = -2027
 """Aster refusing an order because the symbol's leverage exceeds the maximum it now allows."""
+POSITION_LIMIT_CODES = frozenset({-5018})
+"""Refusals of an order that would take the position past a limit: `-5018` "You've
+reached the maximum notional value limit for this symbol", the leverage bracket's
+`maxNotional` (mainnet, 2026-11-16). `-2027` is not one: Aster answers it when the
+symbol's leverage setting is above the maximum (see `lower_to_max_leverage`)."""
 LEVERAGE_RECHECK = 10.0
 """Seconds a symbol's leverage check after a `-2027` stands: concurrent orders refused
 together share one check and its outcome."""
@@ -149,6 +156,14 @@ def rejected(exc: BadRequest) -> bool:
     and bool(exc.args)
     and exc.args[0] != 408
   )
+
+
+def refusal(exc: BadRequest) -> OrderRejected:
+  """The `OrderRejected` for a definitive refusal (see `rejected`): `PositionLimitExceeded` for the codes in `POSITION_LIMIT_CODES`."""
+  if error_code(exc) in POSITION_LIMIT_CODES:
+    return PositionLimitExceeded(*exc.args)
+  else:
+    return OrderRejected(*exc.args)
 
 
 def leverage_above_max(exc: OrderRejected) -> bool:
@@ -406,7 +421,7 @@ def native_order(order: Order, settings: AsterSettings = {}) -> NativeOrder:
     raise ValueError(
       f'Aster time_in_force applies to LIMIT orders only, not {order["type"]}'
     )
-  qty = Decimal(str(order['qty']))
+  qty = to_decimal(order['qty'])
   if not qty.is_finite() or not qty:
     raise ValueError('Order quantity must be finite and nonzero')
   side = 'BUY' if qty > 0 else 'SELL'
@@ -420,7 +435,7 @@ def native_order(order: Order, settings: AsterSettings = {}) -> NativeOrder:
       time_in_force='GTC',
       client_order_id=client_order_id,
     )
-  price = Decimal(str(order['price']))
+  price = to_decimal(order['price'])
   if not price.is_finite() or price <= 0:
     raise ValueError('Limit price must be finite and positive')
   return NativeOrder(
@@ -662,13 +677,15 @@ class NativeMarket(Public, Market):
       OrderRejected: Aster refused the order with a definitive `4XX` code, or answered
         that it ended `EXPIRED`/`REJECTED` with nothing filled (e.g. an IOC that found
         nothing to match).
+      PositionLimitExceeded: The refusal's code is in `POSITION_LIMIT_CODES`: the
+        order would take the position past the leverage bracket's notional cap.
     """
     native = native_order(order, aster_settings(settings))
     try:
       row = await self.shared.call(lambda: self.submit(native))
     except BadRequest as exc:
       if rejected(exc):
-        raise OrderRejected(*exc.args) from exc
+        raise refusal(exc) from exc
       raise
     if dead_on_arrival(row):
       raise OrderRejected(f'Order {row["orderId"]} ended {row.get("status")}', row)
@@ -1077,6 +1094,33 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
       caps.append(cap)
     return max(min(caps), Decimal(0))
 
+  async def remaining_position_limit(
+    self, *, ttl: timedelta | None = None
+  ) -> RemainingPositionLimit:
+    """What the leverage bracket and the symbol's open-interest cap leave to open, per direction.
+
+    The bracket caps the position's absolute notional at `maxNotional` (at the current
+    leverage), so a direction has that cap less what the position already holds in
+    it. `remainingOpenableNotionalValue` (uncapped at `-1`) bounds both directions.
+    Unlike `available_notional`, free collateral is left out. Costs the shared
+    `positionRisk` and futures account reads plus one public request.
+    """
+    leverage = await self.leverage(ttl=ttl)
+    account = await self.shared.futures_account(ttl=ttl)
+    row = one_way_row(account['positions'], self.symbol)
+    remaining = await self.shared.call(
+      lambda: self.api.market.remaining_openable_notional_value(
+        self.symbol, leverage=int(leverage)
+      )
+    )
+    cap = remaining['remainingOpenableNotionalValue']
+    notional = abs(row['notional'])
+    return RemainingPositionLimit.capped(
+      max_notional=row['maxNotional'],
+      position=notional if row['positionAmt'] >= 0 else -notional,
+      remaining=None if cap == NO_OPEN_INTEREST_CAP else cap,
+    )
+
   async def max_leverage(self) -> int:
     """The highest initial leverage Aster allows on the symbol: its lowest notional bracket's.
 
@@ -1171,6 +1215,7 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     Raises:
       OrderRejected: As `NativeMarket.place_order`; after a `-2027`, the original
         refusal when the setting was not above the maximum or could not be lowered.
+      PositionLimitExceeded: As `NativeMarket.place_order`.
     """
     try:
       return await super().place_order(order, settings=settings)

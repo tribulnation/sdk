@@ -1,4 +1,4 @@
-"""Tickers, perpetual stats, next funding and the index price.
+"""Tickers, perpetual stats, next funding, the index price and open-interest room.
 
 Funding settles hourly, on the hour, and Nado quotes every rate (`funding_rate_x18`,
 `premium_x18`) as its 24-hour equivalent, positive when longs pay ("Funding Rates",
@@ -13,9 +13,15 @@ import asyncio
 from typing_extensions import Collection, Mapping
 import typed_nado.archive_v2.tickers
 from typed_nado import schemas
-from typed_nado.schemas import MarketPrice
+from typed_nado.schemas import MarketPrice, Symbol
 from tribulnation.sdk.core import MissingData
-from tribulnation.sdk.market import NextFunding, PerpStats, Ticker
+from tribulnation.sdk.market import (
+  NextFunding,
+  PerpStats,
+  RemainingPositionLimit,
+  Ticker,
+)
+from tribulnation.sdk.util import to_decimal
 
 from ..core import ProductType, Shared, x18
 
@@ -23,11 +29,6 @@ FUNDING_INTERVAL = timedelta(hours=1)
 """Funding settles every hour, on the hour."""
 DAY_INTERVALS = Decimal(24)
 """Settlements per day: the venue's 24-hour rates over this are per settlement."""
-
-
-def decimal(value: float) -> Decimal:
-  """A REST v2 float as the decimal it was sent as (its shortest repr)."""
-  return Decimal(repr(value))
 
 
 def side(price_x18: int) -> Decimal | None:
@@ -61,11 +62,11 @@ def parse_ticker(
   """Last price and 24h volumes from the archive's ticker, best bid and ask from the
   gateway; Nado publishes no best-level sizes without a book request per market."""
   return Ticker(
-    last=decimal(t['last_price']) if t is not None else None,
+    last=to_decimal(t['last_price']) if t is not None else None,
     bid=side(price['bid_x18']) if price is not None else None,
     ask=side(price['ask_x18']) if price is not None else None,
-    base_volume_24h=decimal(t['base_volume']) if t is not None else None,
-    quote_volume_24h=decimal(t['quote_volume']) if t is not None else None,
+    base_volume_24h=to_decimal(t['base_volume']) if t is not None else None,
+    quote_volume_24h=to_decimal(t['quote_volume']) if t is not None else None,
   )
 
 
@@ -160,3 +161,52 @@ async def index(shared: Shared, product_id: int) -> Decimal:
   """The archive's latest index price."""
   price = await shared.call(lambda: shared.client.archive.price(product_id))
   return x18(price['index_price_x18'])
+
+
+def open_interest_room(
+  symbol: Symbol, *, open_interest: Decimal, mark: Decimal
+) -> RemainingPositionLimit:
+  """What the product's `max_open_interest_x18` still lets anyone open, in USDT0, for
+  both directions: a new position on either side can raise open interest. `None` both
+  ways when uncapped (`null`).
+
+  The cap is notional: on mainnet (2026-11-17) caps were round amounts (BTC-PERP
+  165,000,000) that base sizes exceed (kBONK-PERP held 32,644,400 under a 10,000,000
+  cap). `open_interest` is the gateway's, in base units, which counts both sides (the
+  archive's `long_open_interest` is half of it). Which figure Nado holds against the
+  cap is undocumented, so the room is the cap less both sides at the mark: never more
+  than the venue's, possibly half of it.
+  """
+  cap = symbol['max_open_interest_x18']
+  if cap is None:
+    return RemainingPositionLimit()
+  else:
+    room = max(x18(cap) - open_interest * mark, Decimal(0))
+    return RemainingPositionLimit(long=room, short=room)
+
+
+async def remaining_position_limit(
+  shared: Shared, symbol: str, product_id: int
+) -> RemainingPositionLimit:
+  """The product's open-interest room (`open_interest_room`): its cached symbol, the
+  gateway's open interest (`all_products`) and the archive's mark price. Nado
+  publishes no per-account position cap.
+
+  Raises:
+    MissingData: `all_products` lists no state for the product.
+  """
+  row, products, price = await asyncio.gather(
+    shared.symbol(symbol, type='perp'),
+    shared.call(shared.client.gateway.all_products),
+    shared.call(lambda: shared.client.archive.price(product_id)),
+  )
+  for p in products['perp_products']:
+    if p['product_id'] == product_id:
+      return open_interest_room(
+        row,
+        open_interest=x18(p['state']['open_interest']),
+        mark=x18(price['mark_price_x18']),
+      )
+  raise MissingData(
+    f'Nado sent no open interest for {symbol}', market_id=symbol, field='open_interest'
+  )

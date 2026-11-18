@@ -6,6 +6,7 @@ import uuid
 
 from tribulnation.sdk.core import ApiError
 from tribulnation.sdk.market import Order, OrderResponse, OrderState, Settings
+from tribulnation.sdk.util import to_decimal
 
 from typed_coinbase.schemas import (
   Order as PlacedOrder,
@@ -52,8 +53,8 @@ async def open_orders(self: MarketMixin) -> Sequence[OrderState]:
 
 def order_configuration(order: Order) -> OrderConfiguration:
   """Map an SDK order onto the Advanced Trade order configuration it asks for."""
-  base_size = abs(Decimal(order['qty']))
-  price = Decimal(order['price'])
+  base_size = abs(to_decimal(order['qty']))
+  price = to_decimal(order['price'])
   if order['type'] == 'MARKET':
     market: MarketMarketIocConfiguration = {
       'market_market_ioc': {'base_size': base_size}
@@ -83,7 +84,7 @@ async def place_order(
   response = await self.app.advanced_trade.http.orders.create(
     client_order_id=client_order_id,
     product_id=self.product_id,
-    side='BUY' if Decimal(order['qty']) > 0 else 'SELL',
+    side='BUY' if to_decimal(order['qty']) > 0 else 'SELL',
     order_configuration=order_configuration(order),
   )
   # `create` returns a `CreateOrderSuccess | CreateOrderFailure` union discriminated by

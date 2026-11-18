@@ -49,6 +49,7 @@ from tribulnation.sdk.market import (
   OrderState,
   Position,
   PerpPosition,
+  RemainingPositionLimit,
   Collateral,
   PerpCollateral,
   FundingRate,
@@ -551,6 +552,15 @@ class ProxyPerpMarket(ProxyMarket, PerpMarket):
       codec.AvailableNotionalReq(id=self._mid(), market_id=self.id, ttl=ttl)
     )
     return resp.value
+
+  async def remaining_position_limit(
+    self, *, ttl: timedelta | None = None
+  ) -> RemainingPositionLimit:
+    """Forward the remaining position limit through the gateway."""
+    resp: codec.RemainingPositionLimitResp = await self._conn.call(
+      codec.RemainingPositionLimitReq(id=self._mid(), market_id=self.id, ttl=ttl)
+    )
+    return resp.limit
 
   async def collateral_id(self) -> str:
     """Forward the collateral ID through the gateway, caching it after the first call."""

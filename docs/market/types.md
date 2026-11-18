@@ -39,7 +39,9 @@ An `Order` is what you pass to `place_order`:
 }
 ```
 
-`Num` is anything numeric: `Decimal`, `int`, `float` or `str`, converted on the way in.
+`Num` is anything numeric: `Decimal`, `int`, `float` or `str`, converted on the way in
+by `tribulnation.sdk.util.to_decimal`. A `float` keeps the digits it was written with
+(its shortest repr), so `0.1` is sent as `0.1`, not as its binary expansion.
 
 - `OrderResponse`: the order `id`, which `cancel_order` and `query_order` take, raw
   `details`, and `filled_qty`: the unsigned base quantity the venue's placement response

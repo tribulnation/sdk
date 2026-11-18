@@ -79,6 +79,34 @@ class OrderRejected(ApiError):
     return super().__str__()
 
 
+class PositionLimitExceeded(OrderRejected):
+  """
+  The venue refused the order because it would take the position past a limit.
+
+  A limit on the position's size, not on collateral: e.g. the notional cap of the
+  account's leverage bracket on Aster, or the margin tier limit at the current
+  leverage on Hyperliquid. Free collateral does not lift it; orders that reduce the
+  position are still accepted. `MarginMarket.remaining_position_limit` reads what is left
+  where the venue publishes it.
+  """
+
+  def __str__(self):
+    return super().__str__()
+
+
+class OpenInterestCapped(PositionLimitExceeded):
+  """
+  The venue refused the order because the market's open interest is at its cap.
+
+  A market-wide limit, not the account's: no order that increases a position is
+  accepted until the venue lifts the cap or open interest falls, e.g. Hyperliquid's
+  `perpsAtOpenInterestCap` coins.
+  """
+
+  def __str__(self):
+    return super().__str__()
+
+
 class OrderNotFound(ApiError):
   """
   The venue answered that the order doesn't exist: it filled, was cancelled, or never rested.

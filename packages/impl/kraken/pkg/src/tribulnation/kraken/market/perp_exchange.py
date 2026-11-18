@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing_extensions import Collection, Mapping, Sequence
 
 from tribulnation.sdk.market import (
+  PerpCollateral,
   PerpExchange as BasePerpExchange,
   PerpStats,
   Settings,
@@ -14,12 +15,14 @@ from typed_kraken.schemas import FuturesMarketTicker
 
 from .impl import SharedMixin
 from .impl.perp_data import is_market_ticker, parse_stats, parse_ticker
+from .impl.perp_pool import pool_collateral
 from .perp_market import PerpMarket
 
 
 @dataclass(frozen=True, kw_only=True)
 class PerpExchange(SharedMixin, BasePerpExchange):
-  """Active non-tradfi linear perpetuals with USD quote and unit contract size."""
+  """Active non-tradfi linear perpetuals with USD quote and unit contract size, all
+  on the account's multi-collateral pool."""
 
   @property
   def exchange_id(self) -> str:
@@ -79,3 +82,13 @@ class PerpExchange(SharedMixin, BasePerpExchange):
       symbol: parse_stats(row)
       for symbol, row in (await self.snapshots(markets)).items()
     }
+
+  async def perp_collateral(
+    self, market_id: str | None = None, /, *, ttl: timedelta | None = None
+  ) -> PerpCollateral:
+    """The multi-collateral pool, or one market's bucket (see `PerpMarket`)."""
+    if market_id is not None:
+      market = await self.market(market_id)
+      return await market.perp_collateral(ttl=ttl)
+    else:
+      return await pool_collateral(self.shared, ttl=ttl)

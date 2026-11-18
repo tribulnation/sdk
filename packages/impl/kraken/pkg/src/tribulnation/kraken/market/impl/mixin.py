@@ -15,123 +15,72 @@ from typing_extensions import (
   Callable,
   Iterable,
   Literal,
+  Mapping,
   TypedDict,
   TypeVar,
 )
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 import asyncio
 
-from tribulnation.sdk.core import ManagedResource, OverflowPolicy, Subscription
+from tribulnation.sdk.core import (
+  ManagedResource,
+  OverflowPolicy,
+  SharedReads,
+  Subscription,
+)
 from tribulnation.sdk.market import Book
 from tribulnation.kraken.core import Calls, wrap_exceptions
 
 from typed_kraken import Kraken
 from typed_kraken.futures.instruments import FuturesInstrument
+from typed_kraken.futures_trading.http import DEMO_FUTURES_URL, FUTURES_URL
 from .perp_data import select_perps
 from typed_kraken.spot.account.balance_ex import ExtendedBalance
 from typed_kraken.spot.market_data.asset_pairs import AssetPair
 from typed_kraken.streams.private.executions import ExecutionTradeEvent
 
 from .depth import BookDepth, fold_books
+from .futures_state import FuturesState
+from .pairs import Meta, PairInfo, join_pairs
+from .streaming import context
 
 T = TypeVar('T')
 
-BALANCE_TTL = timedelta(seconds=1)
-"""How long a fetched balance list is reused before another call is made.
-
-Kraken meters private REST calls with a per-account counter that decays at a fraction
-of a point per second, and `position`, `collateral` and `available_notional` each need
-the same `BalanceEx` answer, so a caller sweeping a handful of markets coalesces those
-calls rather than spending three counter points per market.
-"""
-
-
-class PairInfo(TypedDict):
-  """One market's catalogue rows, in every spelling the client needs."""
-
-  key: str
-  """The `AssetPairs` key, which `Ticker` and `Depth` key their answers by (`XXBTZUSD`)."""
-  symbol: str
-  """The WebSocket v2 symbol (`BTC/USD`)."""
-  info: AssetPair
-
-
-class Meta(TypedDict):
-  """What a `SpotMarket` is constructed around."""
-
-  pair: PairInfo
-
-
-def context(
-  stream: AsyncIterable[T], unsubscribe: Callable[[], Awaitable[Any]]
-) -> Subscription.Context[T]:
-  """Wrap a typed-client stream as the `(iterator, unsubscribe)` pair a
-  `Subscription` fans out from.
-
-  Iteration is wrapped too, not just the subscribe call: a socket that drops
-  mid-stream raises from the `async for`, and that has to reach subscribers as a
-  `tribulnation.sdk.core` error like every other failure.
-  """
-
-  @wrap_exceptions
-  async def iterate() -> AsyncIterator[T]:
-    async for item in stream:
-      yield item
-
-  return Subscription.Context(iterate(), unsubscribe)
-
-
-def join_pairs(
-  internal: dict[str, AssetPair], display: dict[str, AssetPair]
-) -> dict[str, PairInfo]:
-  """Key the catalogue by altname, pairing each row with its WebSocket v2 symbol.
-
-  `AssetPairs` answers under internal keys by default and under display keys with
-  `assetVersion=1`; the display key *is* the WebSocket v2 symbol, and `altname` is
-  carried unchanged on both, so the two listings join exactly (1446 of 1446, checked
-  live).
-
-  Args:
-    internal: The default `AssetPairs` listing.
-    display: The `assetVersion=1` listing.
-  """
-  symbols = {
-    altname: symbol
-    for symbol, info in display.items()
-    if (altname := info.get('altname'))
-  }
-  out: dict[str, PairInfo] = {}
-  for key, info in internal.items():
-    altname = info.get('altname')
-    if altname is None or (symbol := symbols.get(altname)) is None:
-      continue
-    out[altname] = {'key': key, 'symbol': symbol, 'info': info}
-  return out
+KrakenVenue = Literal['kraken', 'kraken_testnet']
+"""`kraken` is the live venue; `kraken_testnet` is the Futures demo environment, which
+has perpetuals only."""
 
 
 @dataclass(kw_only=True)
 class Shared(Calls):
-  """State shared by every market of one Kraken client."""
+  """State shared by every market of one Kraken client.
+
+  Spot and the public perpetual reads go through `client`; the Futures account, orders
+  and feeds through `perp`, which holds the separate Futures API key.
+  """
 
   client: Kraken
+  perp: FuturesState = field(default_factory=FuturesState.new)
+  venue: KrakenVenue = 'kraken'
   account_id: str | None = None
   """Root SDK account key; `None` when built directly, reporting `'kraken'` instead."""
-  balance_ttl: timedelta = BALANCE_TTL
   pairs: dict[str, PairInfo] | None = None
   perp_instruments: dict[str, FuturesInstrument] | None = None
   fee_asset: str | None = None
   perp_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
-  balances: dict[str, ExtendedBalance] | None = None
-  balances_at: datetime | None = None
+  spot_reads: SharedReads = field(default_factory=SharedReads)
+  """Account-wide Spot reads (`BalanceEx`), shared per `ttl` (ADR 0054).
+
+  Kraken meters private Spot REST calls with a per-account counter that decays at
+  0.33 to 1 point per second depending on the verification tier, and every market and
+  collateral ID of the account reads the same `BalanceEx` answer.
+  """
   depth_subscriptions: dict[tuple[str, BookDepth], Subscription[Book]] = field(
     default_factory=dict[tuple[str, BookDepth], Subscription[Book]]
   )
   executions: Subscription[ExecutionTradeEvent] | None = None
   pairs_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
-  balances_lock: asyncio.Lock = field(
-    default_factory=asyncio.Lock, init=False, repr=False
-  )
 
   @classmethod
   def new(
@@ -139,15 +88,45 @@ class Shared(Calls):
     api_key: str | None = None,
     private_key: str | None = None,
     *,
+    futures_api_key: str | None = None,
+    futures_private_key: str | None = None,
+    venue: KrakenVenue = 'kraken',
+    margin_schedule: str | None = None,
     public: bool = False,
     validate: bool = True,
     account_id: str | None = None,
   ):
-    """Build the shared state around a fresh Kraken client."""
+    """Build the shared state around fresh Spot and Futures clients.
+
+    Args:
+      api_key: Spot API key; read from `KRAKEN_API_KEY` when omitted.
+      private_key: Spot API secret; read from `KRAKEN_PRIVATE_KEY` when omitted.
+      futures_api_key: Futures API key. Without a Futures key pair, the perpetuals
+        serve public data only.
+      futures_private_key: Futures API secret.
+      venue: `kraken`, or `kraken_testnet` for the Futures demo environment.
+      margin_schedule: See `Shared.margin_schedule`.
+      public: Build the Spot client without credentials.
+      validate: Validate responses.
+      account_id: Root SDK account key.
+    """
+    demo = venue == 'kraken_testnet'
     return cls(
       client=Kraken.new(
-        api_key=api_key, private_key=private_key, public=public, validate=validate
+        api_key=api_key,
+        private_key=private_key,
+        public=public,
+        validate=validate,
+        futures_url=DEMO_FUTURES_URL if demo else FUTURES_URL,
       ),
+      perp=FuturesState.new(
+        futures_api_key,
+        futures_private_key,
+        environment='demo' if demo else 'live',
+        margin_schedule=margin_schedule,
+        validate=validate,
+      ),
+      venue=venue,
       account_id=account_id,
     )
 
@@ -162,6 +141,7 @@ class Shared(Calls):
 
   def resources(self) -> Iterable[AsyncContextManager[object]]:
     yield self.client_resource
+    yield self.perp.resource
 
   async def load_pairs(self, *, refetch: bool = False) -> dict[str, PairInfo]:
     """Fetch and memoise the whole pair catalogue, keyed by altname.
@@ -207,28 +187,21 @@ class Shared(Calls):
       self.fee_asset = matches[0]
     return self.fee_asset
 
-  async def load_balances(self, *, refetch: bool = False) -> dict[str, ExtendedBalance]:
-    """Fetch every asset's extended balance, keyed by internal asset id.
-
-    Reuses a result younger than `balance_ttl` rather than refetching -- see that
-    constant for the rate limit this exists to stay under.
+  async def load_balances(
+    self, *, ttl: timedelta | None
+  ) -> Mapping[str, ExtendedBalance]:
+    """Every asset's extended balance, keyed by internal asset id (`BalanceEx`).
 
     Args:
-      refetch: Refetch even when a fresh result is cached.
+      ttl: How old a shared answer may be; `None` asks afresh (ADR 0054).
     """
-    async with self.balances_lock:
-      now = datetime.now(timezone.utc)
-      fresh = (
-        self.balances is not None
-        and self.balances_at is not None
-        and now - self.balances_at < self.balance_ttl
-      )
-      if self.balances is None or refetch or not fresh:
-        self.balances = dict(
-          await self.call_kraken(self.client.spot.account.balance_ex)
-        )
-        self.balances_at = now
-      return self.balances
+    return await self.spot_reads.read(
+      'balances', lambda: self.call_kraken(self.client.spot.account.balance_ex), ttl=ttl
+    )
+
+  def forget_balances(self):
+    """Drop the shared balances, after an order or cancel that may have changed them."""
+    self.spot_reads.forget('balances')
 
   def depth_subscription(self, symbol: str, depth: BookDepth) -> Subscription[Book]:
     """The shared order-book subscription for one symbol and depth, created on
@@ -282,16 +255,26 @@ class SharedMixin(Calls):
     api_key: str | None = None,
     private_key: str | None = None,
     *,
+    futures_api_key: str | None = None,
+    futures_private_key: str | None = None,
+    venue: KrakenVenue = 'kraken',
+    margin_schedule: str | None = None,
     public: bool = False,
     validate: bool = True,
     account_id: str | None = None,
   ):
-    """Build a market surface around a fresh Kraken client.
+    """Build a market surface around fresh Spot and Futures clients.
 
     Args:
-      api_key: Kraken API key; read from `KRAKEN_API_KEY` when omitted.
-      private_key: Kraken private key; read from `KRAKEN_PRIVATE_KEY` when omitted.
-      public: Build a credential-free client. Market data works without
+      api_key: Kraken Spot API key; read from `KRAKEN_API_KEY` when omitted.
+      private_key: Kraken Spot private key; read from `KRAKEN_PRIVATE_KEY` when omitted.
+      futures_api_key: Futures API key; without a Futures key pair the perpetuals
+        serve public data only.
+      futures_private_key: Futures API secret.
+      venue: `kraken`, or `kraken_testnet` for the Futures demo environment.
+      margin_schedule: `marginSchedules` key whose retail levels set cross-margin
+        leverage; `None` reads the instrument's `retailMarginLevels`.
+      public: Build a credential-free Spot client. Market data works without
         credentials; balances, orders and the private channels do not.
       validate: Validate responses.
       account_id: Root SDK account key, the first segment of every market ID;
@@ -299,14 +282,22 @@ class SharedMixin(Calls):
     """
     return cls(
       shared=Shared.new(
-        api_key, private_key, public=public, validate=validate, account_id=account_id
+        api_key,
+        private_key,
+        futures_api_key=futures_api_key,
+        futures_private_key=futures_private_key,
+        venue=venue,
+        margin_schedule=margin_schedule,
+        public=public,
+        validate=validate,
+        account_id=account_id,
       )
     )
 
   @property
-  def venue_id(self) -> Literal['kraken']:
-    """The Kraken platform owns every emitted native ID."""
-    return 'kraken'
+  def venue_id(self) -> KrakenVenue:
+    """`kraken`, or `kraken_testnet` on the Futures demo environment."""
+    return self.shared.venue
 
   @property
   def account_id(self) -> str:

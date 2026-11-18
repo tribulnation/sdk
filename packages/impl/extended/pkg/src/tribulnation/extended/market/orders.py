@@ -16,6 +16,7 @@ from typed_extended.orders.create_rfq import RfqLimitOrderRequest, RfqMarketOrde
 from typed_extended.orders.schemas import PlacedOrder
 from tribulnation.sdk.core import BadRequest, OrderRejected
 from tribulnation.sdk.market import Order, OrderResponse, OrderState
+from tribulnation.sdk.util import to_decimal
 
 from ..core import EXPIRY_MARGIN, ORDER_LIFETIME, Settings, Shared
 from .common import parse_order
@@ -125,8 +126,8 @@ async def place_order(
     raise ValueError(
       f'Extended time_in_force applies to LIMIT orders only, not {order["type"]}'
     )
-  qty = Decimal(order['qty'])
-  price = Decimal(order['price'])
+  qty = to_decimal(order['qty'])
+  price = to_decimal(order['price'])
   check_order(row, qty, price)
   if rfq and order['type'] == 'POST_ONLY':
     raise ValueError(

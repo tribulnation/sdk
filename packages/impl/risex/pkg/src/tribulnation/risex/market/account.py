@@ -1,4 +1,5 @@
-"""Positions, leverage and the account's cross-margin bucket, read by address.
+"""Positions, leverage, position limits and the account's cross-margin bucket, read by
+address.
 
 Every read here is public, keyed by the account's address, and shared between markets
 and concurrent callers for their `ttl`.
@@ -9,8 +10,9 @@ from decimal import Decimal
 
 from typing_extensions import Sequence
 from typed_risex.account.positions import BuilderPosition
+from typed_risex.markets.all import MarketInfo
 from typed_risex.portfolio.details import PortfolioDetails
-from tribulnation.sdk.market import PerpCollateral, PerpPosition
+from tribulnation.sdk.market import PerpCollateral, PerpPosition, RemainingPositionLimit
 from tribulnation.sdk.util import whole_leverage
 
 from ..core import Shared, wad
@@ -153,3 +155,24 @@ def bucket(d: PortfolioDetails) -> PerpCollateral:
 async def collateral(shared: Shared, *, ttl: timedelta | None) -> PerpCollateral:
   """The account's one cross bucket, whatever the market."""
   return bucket(await details(shared, ttl=ttl))
+
+
+def remaining_position_limit(
+  market: MarketInfo, *, size: Decimal
+) -> RemainingPositionLimit:
+  """The room per direction under the market's two caps, as notional at its mark price.
+
+  Both are in base units, like the venue's other sizes: `max_position_size` caps the
+  account's position, so a direction has it less what the position holds in it; the
+  market's `open_interest_limit` less its `open_interest` bounds both directions, as a
+  new position on either side can raise open interest. On mainnet (2026-11-17) the
+  open-interest limits were base amounts (BTC 750 beside 247.6 open) and every
+  `max_position_size` was `100000000`, binding nowhere.
+  """
+  mark = market['mark_price']
+  room = market['config']['open_interest_limit'] - market['open_interest']
+  return RemainingPositionLimit.capped(
+    max_notional=market['max_position_size'] * mark,
+    position=size * mark,
+    remaining=max(room, Decimal(0)) * mark,
+  )

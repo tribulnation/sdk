@@ -76,8 +76,9 @@ to record every required read-only suite below, even for market implementations.
    positions. Market checks cover reference-market discovery, books and public streams,
    rules, tickers, funding data, and candles, plus read-only account methods (fees,
    open orders, trade and funding history, positions, collateral, leverage, available
-   notional) checked for shape, never contents. Rules do not fetch personal fee tiers;
-   Coinbase catalogue reads also run on explicitly configured public-only accounts.
+   notional, remaining position limits) checked for shape, never contents. Rules do not
+   fetch personal fee tiers; Coinbase catalogue reads also run on explicitly configured
+   public-only accounts.
    Each venue's `[qualification.market]` table in `impl.toml` sets the weakest account
    mode evidence may use and which reads an address or read-only token serves; a
    declared read raising `NotImplementedError` or `AuthError` fails

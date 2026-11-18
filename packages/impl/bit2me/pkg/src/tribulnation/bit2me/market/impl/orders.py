@@ -5,6 +5,7 @@ from decimal import Decimal
 
 from tribulnation.sdk.core import ValidationError
 from tribulnation.sdk.market import Order, OrderResponse, OrderState, Settings
+from tribulnation.sdk.util import to_decimal
 
 from typed_bit2me.schemas import OrderResponse as Bit2MeOrder, OrderSide
 from typed_bit2me.v1.trading.orders.create import (
@@ -47,7 +48,7 @@ def dump_order(symbol: str, order: Order) -> OrderRequest:
   and ignores the SDK's `price` protection -- Bit2Me offers no worst-price bound on
   one. A `client_order_id` is sent as `clientOrderId`.
   """
-  qty = Decimal(order['qty'])
+  qty = to_decimal(order['qty'])
   side: OrderSide = 'buy' if qty > 0 else 'sell'
   amount = str(abs(qty))
   client_order_id = order.get('client_order_id')
@@ -68,7 +69,7 @@ def dump_order(symbol: str, order: Order) -> OrderRequest:
         'symbol': symbol,
         'amount': amount,
         'orderType': 'limit',
-        'price': str(Decimal(order['price'])),
+        'price': str(to_decimal(order['price'])),
       }
       if order['type'] == 'POST_ONLY':
         limit['postOnly'] = True

@@ -33,6 +33,7 @@ from tribulnation.sdk.market import (
   PerpPosition,
   PerpStats,
   Position,
+  RemainingPositionLimit,
   Rules,
   Balance,
   SpotBalances,
@@ -117,6 +118,7 @@ CLIENT_MESSAGES: list[codec.ClientMsg] = [
   codec.TradesHistoryReq(**MARKET, start=T, end=T_OFFSET),
   codec.PositionReq(**MARKET, ttl=timedelta(seconds=1)),
   codec.AvailableNotionalReq(**MARKET, ttl=timedelta(0)),
+  codec.RemainingPositionLimitReq(**MARKET, ttl=timedelta(seconds=1)),
   codec.PlaceOrderReq(
     **MARKET,
     order={
@@ -214,6 +216,9 @@ SERVER_MESSAGES: list[codec.ServerMsg] = [
   codec.TradesHistoryResp(id='r', trades=[TRADE]),
   codec.PositionResp(id='r', position=Position(size=D('1.5'))),
   codec.AvailableNotionalResp(id='r', value=D('1234.5678')),
+  codec.RemainingPositionLimitResp(
+    id='r', limit=RemainingPositionLimit(long=D('250.5'), short=None)
+  ),
   codec.PlaceOrderResp(
     id='r',
     response=OrderResponse(id='o1', details={'tx': {'height': 1}}, filled_qty=D('0.5')),

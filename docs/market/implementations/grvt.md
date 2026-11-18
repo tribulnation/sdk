@@ -24,7 +24,7 @@ Three credential modes, by what the account configures:
 | Method | Public | API key | API key and private key |
 | --- | --- | --- | --- |
 | Market data | yes | yes | yes |
-| `fees`, `query_order`, `open_orders`, `trades_history`, `trades_stream`, `position`, `collateral`, `balances`, `perp_position`, `perp_collateral`, `leverage`, `available_notional`, `funding_payments` | no | yes | yes |
+| `fees`, `query_order`, `open_orders`, `trades_history`, `trades_stream`, `position`, `collateral`, `balances`, `perp_position`, `perp_collateral`, `leverage`, `available_notional`, `remaining_position_limit`, `funding_payments` | no | yes | yes |
 | `cancel_order`, `cancel_orders`, `cancel_open_orders` | no | yes (unsigned; the venue checks the key's permissions) | yes |
 | `place_order`, `place_orders` | no | no | yes |
 
@@ -129,6 +129,11 @@ toggles response validation.
   either margin type. `available_notional` is the cross bucket's free collateral times it, for
   isolated markets too, without GRVT's position-size cap or risk brackets. The SDK
   does not set margin types or leverage; set them on the venue.
+- `remaining_position_limit` (ADR 0062) is the instrument's `max_position_size` (base
+  units, 1000 on BTC) less the position held in each direction, at the ticker's mark
+  price. The risk brackets (`margin_rules`) are not read: whether GRVT refuses an order
+  past a bracket at the account's leverage is unverified. GRVT publishes no
+  open-interest cap.
 - Spot `rules()` name the pair (`base`, `quote`); `fee_asset` is `None`, since the fee
   is charged in the asset a fill delivers (base on a buy, quote on a sell), and
   `rules().fees` is `None`: GRVT publishes no standard spot schedule. `fees()` reads the

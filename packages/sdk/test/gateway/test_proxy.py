@@ -22,8 +22,10 @@ from tribulnation.sdk import (
   ApiError,
   LeverageNotSet,
   NetworkError,
+  OpenInterestCapped,
   OrderNotFound,
   OrderRejected,
+  PositionLimitExceeded,
 )
 from tribulnation.sdk.core import PaginatedResponse, OverflowPolicy
 from tribulnation.sdk.market import (
@@ -41,6 +43,7 @@ from tribulnation.sdk.market import (
   PerpMarket,
   PerpPosition,
   Position,
+  RemainingPositionLimit,
   Rules,
   Settings,
   Trade,
@@ -241,6 +244,12 @@ class MockMarket(PerpMarket):
   async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     self.state.ttls.append(('available_notional', ttl))
     return Decimal('1000')
+
+  async def remaining_position_limit(
+    self, *, ttl: timedelta | None = None
+  ) -> RemainingPositionLimit:
+    self.state.ttls.append(('remaining_position_limit', ttl))
+    return RemainingPositionLimit(long=Decimal('250'), short=None)
 
   async def collateral_id(self) -> str:
     return 'mock:perp'
@@ -766,6 +775,36 @@ async def test_order_rejected_survives_gateway(
 
   with pytest.raises(OrderRejected, match='could not immediately match'):
     await market.place_order(order)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize('error', [PositionLimitExceeded, OpenInterestCapped])
+async def test_position_limit_refusals_survive_gateway(
+  sdk: ProxySDK, mock_state: MockState, error: type[OrderRejected]
+) -> None:
+  """A limit refusal keeps its class through the gateway, and is still an `OrderRejected`."""
+  mock_state.place_order_error = error('limit')
+  market = await sdk.perp_market(MARKET_ID)
+  order: Order = {'type': 'MARKET', 'qty': Decimal('1'), 'price': Decimal('100')}
+
+  with pytest.raises(error) as raised:
+    await market.place_order(order)
+
+  assert type(raised.value) is error and isinstance(raised.value, OrderRejected)
+
+
+@pytest.mark.asyncio
+async def test_remaining_position_limit_through_gateway(
+  sdk: ProxySDK, mock_state: MockState
+) -> None:
+  """The remaining position limit crosses the gateway with its unknown direction kept as `None`."""
+  market = await sdk.perp_market(MARKET_ID)
+  ttl = timedelta(seconds=1)
+
+  assert await market.remaining_position_limit(ttl=ttl) == RemainingPositionLimit(
+    long=Decimal('250'), short=None
+  )
+  assert mock_state.ttls[-1] == ('remaining_position_limit', ttl)
 
 
 @pytest.mark.asyncio

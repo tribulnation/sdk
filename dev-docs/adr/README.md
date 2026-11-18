@@ -42,7 +42,7 @@ not a changelog or a substitute for API documentation and tests.
 | [0017](0017-venue-resource-policies.md) | Venue-owned resource policies without whole-lifecycle middleware | Accepted |
 | [0018](0018-retire-bitget-classic-coin.md) | Retire confirmed Bitget Classic coin markets while preserving historical IDs | Accepted; amends 0008 and 0010 |
 | [0019](0019-kucoin-public-market.md) | KuCoin public spot and linear perpetual data with native identities and base units | Accepted |
-| [0020](0020-kraken-public-perpetuals.md) | Kraken public linear perpetual data with native identities and hourly funding settlement conversion | Accepted |
+| [0020](0020-kraken-public-perpetuals.md) | Kraken public linear perpetual data with native identities and hourly funding settlement conversion | Accepted; amended by 0065 (proposed) |
 | [0021](0021-deribit-public-market.md) | Deribit public spot and linear perpetuals with explicit candle and funding limits | Accepted |
 | [0022](0022-bit2me-one-sided-ticker-limitation.md) | Extend the Bit2Me native ticker limitation to stable one-sided books | Accepted; amends 0014; amended by 0048 |
 | [0023](0023-ticker-quote-volume.md) | Native 24-hour quote volume in tickers | Accepted |
@@ -65,7 +65,7 @@ not a changelog or a substitute for API documentation and tests.
 | [0040](0040-lighter-credential-modes.md) | Lighter credential modes: read-only tokens and public account reads | Proposed; implemented, not release-verified |
 | [0041](0041-venue-notional-caps.md) | Venue notional caps in available notional | Proposed; implemented for Aster, not release-verified; amended by 0042 |
 | [0042](0042-read-only-account-method-qualification.md) | Read-only account-method qualification | Accepted; implemented, not release-verified; amends 0013, 0039 and 0041; amended by 0060 |
-| [0043](0043-order-rejected.md) | Definitive order rejections as `OrderRejected` | Accepted; implemented for Hyperliquid, Aster, Lighter and Extended, not release-verified |
+| [0043](0043-order-rejected.md) | Definitive order rejections as `OrderRejected` | Accepted; implemented for Hyperliquid, Aster, Lighter, Extended and Bitget, not release-verified |
 | [0044](0044-trades-stream-settings-dydx-node-fills.md) | `trades_stream` settings and dYdX full node fills | Proposed; implemented, not release-verified; amended by 0045 and 0050 |
 | [0045](0045-dydx-node-feed-refuses-a-node-behind.md) | The dYdX node feed refuses a node behind the chain tip | Proposed; implemented, not release-verified; amends 0044; amended by 0050 |
 | [0046](0046-conflated-snapshot-streams.md) | Conflate snapshot streams before decoding, and report skipped books | Proposed; implemented for Binance, Aster and Hyperliquid, not release-verified |
@@ -84,4 +84,7 @@ not a changelog or a substitute for API documentation and tests.
 | [0059](0059-replace-orders-and-order-not-found.md) | `replace_order(s)` and `OrderNotFound` | Proposed |
 | [0060](0060-bitget-qualifies-uta.md) | Bitget qualifies with its UTA account | Accepted; amends 0042 |
 | [0061](0061-risex-unordered-native-candles.md) | RISEx native candles pass through unordered, as an accepted venue limitation | Accepted; implemented, not release-verified |
+| [0062](0062-remaining-position-limit-and-limit-refusals.md) | Remaining position limit, and position-limit refusals as typed errors | Proposed; implemented for Aster, Hyperliquid, Extended, GRVT, RISEx, Lighter and Nado, not release-verified |
+| [0064](0064-bitget-uta-perpetual-trading.md) | Bitget trades USDT-margined perpetuals on a Unified Trading Account | Proposed; builds on 0043 and 0060; implemented, not release-verified |
+| [0065](0065-kraken-futures-and-spot-trading.md) | Kraken Futures and Spot trading | Proposed; implemented, not release-verified; amends 0020 |
 | [0066](0066-set-leverage-and-leverage-not-set.md) | `set_leverage` and `LeverageNotSet` | Proposed; implemented for eight venues, not release-verified |

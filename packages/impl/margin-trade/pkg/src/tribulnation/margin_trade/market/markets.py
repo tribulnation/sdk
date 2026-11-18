@@ -58,6 +58,7 @@ from tribulnation.sdk.market import (
   SpotRules,
   Trade,
 )
+from tribulnation.sdk.util import to_decimal
 from ..core import (
   FUNDING_INTERVAL,
   MAX_SIGNIFICANT_FIGURES,
@@ -283,8 +284,8 @@ class NativeMarket(Public, Market):
     Raises:
       ValueError: The price is off the venue's grid (`Rules.valid_price`).
     """
-    qty = Decimal(order['qty'])
-    price = Decimal(order['price'])
+    qty = to_decimal(order['qty'])
+    price = to_decimal(order['price'])
     tick = tick_size(self.sz_decimals, max_decimals=self.price_decimals)
     if not valid_price(price, tick_size=tick, sig_figs=MAX_SIGNIFICANT_FIGURES):
       raise ValueError(

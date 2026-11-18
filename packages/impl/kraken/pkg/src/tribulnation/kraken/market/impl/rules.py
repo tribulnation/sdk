@@ -3,7 +3,7 @@
 from typing_extensions import TYPE_CHECKING
 from decimal import Decimal
 
-from tribulnation.sdk.market import Fees, Rules
+from tribulnation.sdk.market import Fees, SpotRules
 
 from typed_kraken.spot.market_data.asset_pairs import AssetPair
 
@@ -19,7 +19,7 @@ def first_tier(schedule: list[tuple[float, float]] | None) -> Decimal | None:
   return Decimal(str(min(schedule, key=lambda tier: tier[0])[1])) / 100
 
 
-def parse_rules(info: AssetPair) -> Rules:
+def parse_rules(info: AssetPair) -> SpotRules:
   """Map one `AssetPairs` row onto `Rules`.
 
   Fees are the base (lowest 30-day volume) tier of the pair's own schedule, in
@@ -27,7 +27,8 @@ def parse_rules(info: AssetPair) -> Rules:
   `fees` only, and the maker rate then equals the taker rate. `fee_asset` is the
   quote asset: that is where `TradesHistory` denominates `fee`. Kraken publishes no
   price bounds for a pair, only a minimum volume (`ordermin`) and a minimum cost
-  (`costmin`), so every price bound is left unset.
+  (`costmin`), so every price bound is left unset. `base` and `quote` are the pair's
+  internal asset ids (`KAVA`, `ZUSD`), the last segment of its collateral IDs.
   """
   fees = info.get('fees')
   fees_maker = info.get('fees_maker') or fees
@@ -35,7 +36,9 @@ def parse_rules(info: AssetPair) -> Rules:
   taker = first_tier(fees)
   tick_size = info.get('tick_size')
   quote = info.get('quote', '')
-  return Rules(
+  return SpotRules(
+    base=info.get('base', ''),
+    quote=quote,
     fee_asset=quote,
     tick_size=tick_size
     if tick_size is not None
@@ -51,7 +54,7 @@ def parse_rules(info: AssetPair) -> Rules:
   )
 
 
-async def rules(self: 'MarketMixin', *, refetch: bool = False) -> Rules:
+async def rules(self: 'MarketMixin', *, refetch: bool = False) -> SpotRules:
   """Fetch the market rules."""
   if not refetch:
     return parse_rules(self.info)

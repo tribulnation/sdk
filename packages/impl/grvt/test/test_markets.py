@@ -13,7 +13,13 @@ from tribulnation.grvt.market import books
 from tribulnation.grvt.market.exchanges import GrvtPerpExchange
 from tribulnation.grvt.market.markets import GrvtPerpMarket
 from tribulnation.sdk.core import MissingData
-from tribulnation.sdk.market import Book, Fees, NextFunding, PerpPosition
+from tribulnation.sdk.market import (
+  Book,
+  Fees,
+  NextFunding,
+  PerpPosition,
+  RemainingPositionLimit,
+)
 
 BTC = 'BTC_USDT_Perp'
 ETH = 'ETH_USDT_Perp'
@@ -493,3 +499,60 @@ def test_market_ids(shared: Shared):
   assert (btc.id, btc.venue_id) == (f'grvt:perp:{BTC}', 'grvt')
   testnet = Shared(client=shared.client, venue_id='grvt_testnet', account_id='t')
   assert market(testnet).id == f't:perp:{BTC}'
+
+
+@pytest.mark.parametrize(
+  'size,expected',
+  [
+    ('0', RemainingPositionLimit(long=Decimal(100000), short=Decimal(100000))),
+    ('-250', RemainingPositionLimit(long=Decimal(100000), short=Decimal(75000))),
+    ('1000.5', RemainingPositionLimit(long=Decimal(0), short=Decimal(100000))),
+  ],
+)
+async def test_remaining_position_limit_is_max_position_size_at_mark(
+  fake: Any,
+  make_shared: Any,
+  make_instrument: Any,
+  size: str,
+  expected: RemainingPositionLimit,
+):
+  """`max_position_size` (base) less the position held in each direction, at the
+  ticker's mark; a position past the cap leaves nothing that way."""
+  shared = make_shared(fake, make_instrument(BTC, max_position_size=Decimal('1000')))
+
+  async def positions(**kwargs: Any) -> list[dict[str, Any]]:
+    """The BTC position, if any."""
+    return [position(BTC, size)] if size != '0' else []
+
+  async def one(instrument: str, *, transport: str = 'http') -> dict[str, Any]:
+    """A round mark price: 1000 BTC is 100,000 USDT."""
+    return ticker(mark_price=Decimal(100))
+
+  fake.trading.positions = positions
+  fake.market.ticker = one
+  assert await market(shared).remaining_position_limit() == expected
+
+
+async def test_remaining_position_limit_without_a_cap_or_mark(
+  fake: Any, make_shared: Any, make_instrument: Any
+):
+  """No `max_position_size` is no known limit; a ticker without a mark raises."""
+  row = {k: v for k, v in make_instrument(BTC).items() if k != 'max_position_size'}
+  shared = make_shared(fake, row)
+
+  async def positions(**kwargs: Any) -> list[dict[str, Any]]:
+    """Flat."""
+    return []
+
+  marks: list[Any] = [Decimal(100), None]
+
+  async def one(instrument: str, *, transport: str = 'http') -> dict[str, Any]:
+    """The next mark, or none."""
+    mark = marks.pop(0)
+    return ticker(mark_price=mark) if mark is not None else {'instrument': BTC}
+
+  fake.trading.positions = positions
+  fake.market.ticker = one
+  assert await market(shared).remaining_position_limit() == RemainingPositionLimit()
+  with pytest.raises(MissingData):
+    await market(shared).remaining_position_limit()

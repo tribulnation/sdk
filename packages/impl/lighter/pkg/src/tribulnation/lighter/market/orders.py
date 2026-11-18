@@ -5,8 +5,6 @@ transaction only returns its hash (the venue assigns `order_index` on execution)
 the venue accepts the client index wherever it takes an `order_index`.
 """
 
-from decimal import Decimal
-
 from typing_extensions import Any, Sequence
 from typed_lighter.core.envelope import INVALID_NONCE, error_code
 from typed_lighter.core.exc import BadRequest as ClientBadRequest
@@ -14,6 +12,7 @@ from typed_lighter.schemas import SendTxResponse
 from typed_lighter.tx.create_order import IocLimitOrder, LimitOrder, MarketOrder
 from tribulnation.sdk.core import BadRequest, OrderRejected
 from tribulnation.sdk.market import Order, OrderResponse, OrderState, Settings
+from tribulnation.sdk.util import to_decimal
 
 from ..batching import OrderTx
 from ..core import Shared
@@ -95,10 +94,10 @@ async def place_order(
     return await modify_order(shared, market_id, replaces, order)
   shared.require_api_key()
   scaler = await shared.scaler(market_id)
-  qty = Decimal(order['qty'])
+  qty = to_decimal(order['qty'])
   client_index = shared.client_indexes.next()
   base_amount = scaler.size(abs(qty))
-  price = scaler.price(Decimal(order['price']))
+  price = scaler.price(to_decimal(order['price']))
   reduce_only = lighter.get('reduce_only', False)
   is_ask = qty < 0
   request: LimitOrder | IocLimitOrder | MarketOrder
@@ -177,8 +176,8 @@ async def modify_order(
   shared.require_api_key()
   index = client_index(id)
   scaler = await shared.scaler(market_id)
-  base_amount = scaler.size(abs(Decimal(order['qty'])))
-  price = scaler.price(Decimal(order['price']))
+  base_amount = scaler.size(abs(to_decimal(order['qty'])))
+  price = scaler.price(to_decimal(order['price']))
   response = await send(
     shared,
     OrderTx(

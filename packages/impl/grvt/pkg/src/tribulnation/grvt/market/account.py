@@ -1,16 +1,22 @@
-"""Account fees, positions, the cross and isolated collateral buckets, leverage and the
-spot wallet, of the client's trading sub-account."""
+"""Account fees, positions, the cross and isolated collateral buckets, leverage, position
+limits and the spot wallet, of the client's trading sub-account."""
 
 from datetime import timedelta
 from decimal import Decimal
 
 from typing_extensions import Literal
 
-from typed_grvt.schemas import ClientTier, Position, SpotBalance
+from typed_grvt.schemas import ClientTier, InstrumentDisplay, Position, SpotBalance
 from typed_grvt.trading.account_summary import SubAccount
 from typed_grvt.trading.all_initial_leverage import InitialLeverageResult
 from tribulnation.sdk.core import ApiError, MissingData
-from tribulnation.sdk.market import Balance, Fees, PerpCollateral, PerpPosition
+from tribulnation.sdk.market import (
+  Balance,
+  Fees,
+  PerpCollateral,
+  PerpPosition,
+  RemainingPositionLimit,
+)
 
 from ..core import FEE_UNIT, Shared
 from .common import scope
@@ -202,6 +208,23 @@ async def initial_leverage(
     if row['instrument'] == instrument:
       return row
   raise ValueError(f'GRVT reports no leverage for {instrument}')
+
+
+def remaining_position_limit(
+  instrument: InstrumentDisplay, *, size: Decimal, mark: Decimal
+) -> RemainingPositionLimit:
+  """`max_position_size` (base units, per position: 1000 on mainnet BTC_USDT_Perp,
+  2026-11-17) less the position held in each direction, as notional at `mark`; `None`
+  both ways where the instrument publishes no cap.
+
+  The risk brackets (`margin_rules`, a maximum leverage per notional tier) are not
+  read: whether GRVT refuses an order past a bracket at the account's leverage is
+  unverified. GRVT publishes no open-interest cap.
+  """
+  cap = instrument.get('max_position_size')
+  return RemainingPositionLimit.capped(
+    max_notional=None if cap is None else cap * mark, position=size * mark
+  )
 
 
 async def leverage(

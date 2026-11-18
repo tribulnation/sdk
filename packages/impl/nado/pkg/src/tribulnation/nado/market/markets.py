@@ -23,6 +23,7 @@ from tribulnation.sdk.market import (
   PerpCollateral,
   PerpMarket,
   PerpPosition,
+  RemainingPositionLimit,
   Rules,
   Settings,
   SpotBalances,
@@ -235,6 +236,15 @@ class NadoPerpMarket(OrderBookMarket, PerpMarket):
     """
     return await account.market_bucket(
       self.shared, self.symbol, self.product_id, ttl=ttl
+    )
+
+  async def remaining_position_limit(
+    self, *, ttl: timedelta | None = None
+  ) -> RemainingPositionLimit:
+    """The room left under the product's open-interest cap, both directions
+    (`stats.open_interest_room`); `None` both ways when uncapped."""
+    return await stats.remaining_position_limit(
+      self.shared, self.symbol, self.product_id
     )
 
   async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:

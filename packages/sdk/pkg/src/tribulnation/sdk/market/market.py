@@ -30,6 +30,7 @@ from .types import (
   OrderState,
   Position,
   PerpPosition,
+  RemainingPositionLimit,
   Trade,
   Rules,
   SpotRules,
@@ -613,6 +614,29 @@ class MarginMarket(Market):
     """
     leverage = await self.leverage(ttl=ttl)
     return (await self.collateral(ttl=ttl)).free_collateral * leverage
+
+  @SDK.method
+  async def remaining_position_limit(
+    self, *, ttl: timedelta | None = None
+  ) -> RemainingPositionLimit:
+    """Fetch how much more position the venue lets this account open here, per direction.
+
+    Per direction, the notional in quote units at the venue's mark by which the
+    position may still grow under the venue's position limits, which free collateral
+    does not lift: a static maximum position, leverage-dependent tiers (a leverage
+    bracket's notional cap, a margin tier limit) or the market's open-interest cap.
+    An order growing the position past them is refused with `PositionLimitExceeded`
+    (`OpenInterestCapped` for the market-wide cap). Size openings at the smaller of
+    this and `available_notional()`. The answer holds at the current leverage, and
+    is racy near an open-interest cap, which other accounts fill too.
+
+    The default reports no limits (`None` both ways): unknown, treated as unlimited.
+    Venues override it where they publish limits.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """
+    return RemainingPositionLimit()
 
   @SDK.method
   async def delta(self, *, ttl: timedelta | None = None) -> Decimal:

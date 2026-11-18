@@ -285,6 +285,7 @@ TRADING_ACCOUNTS: list[accounts.Account] = [
   accounts.Bybit(public=True),
   accounts.Coinbase(public=True),
   accounts.Kraken(public=True),
+  accounts.Kraken(venue='kraken_testnet', public=True),
   accounts.Kucoin(public=True),
 ]
 """One public account per venue the Market SDK can build; Deribit testnet is refused."""

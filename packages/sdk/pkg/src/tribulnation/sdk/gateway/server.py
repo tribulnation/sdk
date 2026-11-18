@@ -370,6 +370,13 @@ class Gateway:
             ttl=msg.ttl
           ),
         )
+      case codec.RemainingPositionLimitReq():
+        return codec.RemainingPositionLimitResp(
+          id=msg.id,
+          limit=await (
+            await self._margin_market(msg.market_id)
+          ).remaining_position_limit(ttl=msg.ttl),
+        )
       case codec.PlaceOrderReq():
         return codec.PlaceOrderResp(
           id=msg.id,

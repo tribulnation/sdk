@@ -90,6 +90,13 @@ market data only.
   decimals, so the figure can overstate the requirement by up to `0.0001 x equity`.
   `available_notional` is free collateral times the account's leverage, without the
   margin schedule's position-value cap.
+- `remaining_position_limit` (ADR 0062) is, per direction, the margin schedule's cap at
+  the account's leverage (the highest `upperBound` of a bracket open to users whose
+  `riskFactor` still allows the leverage, at most `maxPositionValue`) less the position
+  value held in that direction, bounded for both directions by `openInterestLimit` less
+  the market's `openInterest` (both USD; `0` is no limit). Extended counts resting and
+  triggered orders against the cap too; the SDK does not subtract them. The position's
+  own `maxPositionSize` (base units) is not used.
 - Funding settles hourly, on the hour, and the payment is stamped shortly after (45 s
   on testnet). Funding-rate history is positive when longs pay; `funding_payments`, per
   market or exchange-wide, are positive when received, as the venue signs them.

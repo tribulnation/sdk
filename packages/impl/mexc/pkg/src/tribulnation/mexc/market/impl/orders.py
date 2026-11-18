@@ -11,6 +11,7 @@ from typed_mexc.spot.http.trade.place_order import (
 
 from tribulnation.sdk.core import ValidationError
 from tribulnation.sdk.market import Order, OrderResponse, OrderState, Settings
+from tribulnation.sdk.util import to_decimal
 
 from tribulnation.mexc.core.exc import wrap_exceptions
 from .mixin import MarketMixin
@@ -54,7 +55,7 @@ def _parse_order(order: OpenOrder | MexcOrderStatus) -> OrderState:
 def _dump_order(
   symbol: str, order: Order, *, recv_window: int | None
 ) -> PlaceOrderRequest:
-  signed_qty = Decimal(order['qty'])
+  signed_qty = to_decimal(order['qty'])
   side: OrderSide = 'BUY' if signed_qty >= 0 else 'SELL'
   qty = abs(signed_qty)
   request: PlaceOrderRequest
@@ -67,7 +68,7 @@ def _dump_order(
         'side': side,
         'type': 'LIMIT',
         'quantity': qty,
-        'price': Decimal(order['price']),
+        'price': to_decimal(order['price']),
       }
     case 'POST_ONLY':
       request = {
@@ -75,7 +76,7 @@ def _dump_order(
         'side': side,
         'type': 'LIMIT_MAKER',
         'quantity': qty,
-        'price': Decimal(order['price']),
+        'price': to_decimal(order['price']),
       }
     case _:
       raise ValidationError(f'Unknown order type: {order["type"]}')

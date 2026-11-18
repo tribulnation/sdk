@@ -2,7 +2,13 @@ from typing_extensions import Any, Sequence
 from decimal import Decimal
 import asyncio
 
-from tribulnation.sdk.core import ApiError, OrderNotFound, OrderRejected
+from tribulnation.sdk.core import (
+  ApiError,
+  OpenInterestCapped,
+  OrderNotFound,
+  OrderRejected,
+  PositionLimitExceeded,
+)
 from tribulnation.sdk.market.types.rules import valid_price
 from tribulnation.sdk.market import (
   Order,
@@ -10,6 +16,7 @@ from tribulnation.sdk.market import (
   OrderState,
   Settings as MarketSettings,
 )
+from tribulnation.sdk.util import to_decimal
 
 from typed_hyperliquid.exchange.cancel import CancelRequestItem
 from typed_hyperliquid.exchange.modify_orders import (
@@ -40,6 +47,27 @@ NEW_ORDER_REFUSED = 'Error placing new order during modify:'
 rests (testnet, 2026-10-31)."""
 
 
+OPEN_INTEREST = 'open interest'
+"""Part of every refusal at a market's open-interest cap: `PositionIncreaseAtOpenInterestCap`,
+`PositionFlipAtOpenInterestCap` and `TooAggressiveAtOpenInterestCap` (documented), and
+`OpenInterestIncrease` ("would increase open interest too quickly"). Mainnet answered
+"Cannot increase position when open interest is at cap" (2026-11-16)."""
+MARGIN_TIER = 'margin tier limit'
+"""Part of the `PerpMaxPosition` refusal: "Order would cause position to exceed margin
+tier limit at current leverage"."""
+
+
+def refusal(error: str) -> OrderRejected:
+  """The `OrderRejected` for an order's `error` status: `OpenInterestCapped` or `PositionLimitExceeded` when it names that limit."""
+  lowered = error.lower()
+  if OPEN_INTEREST in lowered:
+    return OpenInterestCapped(error)
+  elif MARGIN_TIER in lowered:
+    return PositionLimitExceeded(error)
+  else:
+    return OrderRejected(error)
+
+
 def gone(error: str) -> bool:
   """Whether `error` says the order no longer rests."""
   return any(part in error for part in GONE)
@@ -64,8 +92,8 @@ def _export_order(
   else:
     raise ValueError(f'Unknown order type: {o["type"]}')
 
-  qty = Decimal(o['qty'])
-  price = Decimal(o['price'])
+  qty = to_decimal(o['qty'])
+  price = to_decimal(o['price'])
   if not valid_price(price, tick_size=self.tick_size, sig_figs=MAX_SIGNIFICANT_FIGURES):
     raise ValueError(
       f'Price {price} is off the Hyperliquid grid (at most {MAX_SIGNIFICANT_FIGURES} '
@@ -130,6 +158,10 @@ async def place_order(
       the market's `Rules`.
     OrderRejected: The action was refused as a whole (`status == 'err'`), or the
       order's own status carries an `error` (e.g. an IOC that could not match).
+    OpenInterestCapped: The order's `error` is a refusal at the market's
+      open-interest cap (`OPEN_INTEREST`).
+    PositionLimitExceeded: The order's `error` is the margin tier limit
+      (`MARGIN_TIER`).
     ApiError: The response carried no order status, so the outcome is unknown.
   """
   s: Settings = settings.get('hyperliquid', {})
@@ -144,7 +176,7 @@ async def place_order(
 
   stat = statuses[0]
   if 'error' in stat:
-    raise OrderRejected(stat['error'])
+    raise refusal(stat['error'])
   return placed(stat)
 
 
@@ -159,12 +191,33 @@ def placed(stat: RestingOrderStatus | FilledOrderStatus) -> OrderResponse:
     )
 
 
+def fast_cancel(settings: MarketSettings) -> bool:
+  """Whether `settings` opt in to fast cancels (`Settings.fast_cancel`)."""
+  s: Settings = settings.get('hyperliquid', {})
+  return s.get('fast_cancel', False)
+
+
 @wrap_exceptions
 async def cancel_order(
   self: SpotMarketMixin | PerpMarketMixin, id: str, *, settings: MarketSettings = {}
 ) -> Any:
-  cancel: CancelRequestItem = {'a': self.asset_id, 'o': int(id)}
-  result = await self.client.exchange.cancel(cancels=[cancel])
+  """Cancel one order, with the fast-cancel flag (`f: true`) when `settings` opt in.
+
+  Strict: a fast cancel is sent once, never resent without the flag. Hyperliquid
+  refuses a fast cancel naming a trigger order; that refusal is raised, and the order
+  still rests (`Settings.fast_cancel`).
+
+  Raises:
+    OrderNotFound: The order no longer rests (`gone`).
+    ApiError: Hyperliquid refused the cancel (the action, or its entry), or answered no
+      status; the order may still rest. Not `OrderRejected`, which says of a placement
+      that nothing rests (ADR 0043).
+  """
+  item: CancelRequestItem = {'a': self.asset_id, 'o': int(id)}
+  if fast_cancel(settings):
+    result = await self.client.exchange.cancel(cancels=[item], f=True)
+  else:
+    result = await self.client.exchange.cancel(cancels=[item])
   if result['status'] == 'err':
     raise ApiError(result['response'])
   statuses = result['response']['data']['statuses']
@@ -194,7 +247,7 @@ async def replace_orders(
   order is gone is placed afresh. An entry whose new order was refused after the old one
   was cancelled (`NEW_ORDER_REFUSED`) is an `OrderRejected`; any other entry error is an
   `ApiError`, since the old order may still rest. A refused or failed action fails each
-  of its entries.
+  of its entries. With `Settings.fast_cancel`, the other entries' cancels are fast.
   """
   s: Settings = settings.get('hyperliquid', {})
   modified = [i for i, (_, order) in enumerate(orders) if order['type'] == 'POST_ONLY']
@@ -210,7 +263,7 @@ async def replace_orders(
   async def cancel_then_place(id: str, order: Order) -> OrderResponse | Exception:
     """Replace an entry `batchModify` can't take, as the SDK default does."""
     try:
-      await cancel_order(self, id)
+      await cancel_order(self, id, settings=settings)
     except OrderNotFound:
       pass
     except Exception as e:
@@ -252,7 +305,7 @@ async def replace_orders(
       elif gone(stat['error']):
         return await place(order)
       elif stat['error'].startswith(NEW_ORDER_REFUSED):
-        return OrderRejected(stat['error'])
+        return refusal(stat['error'])
       else:
         return ApiError(stat['error'])
 

@@ -31,6 +31,8 @@ from tribulnation.sdk import (
   AuthError,
   RateLimited,
   OrderRejected,
+  PositionLimitExceeded,
+  OpenInterestCapped,
   OrderNotFound,
   LeverageNotSet,
   LogicError,
@@ -54,6 +56,7 @@ from tribulnation.sdk.market import (
   OrderState,
   Position,
   PerpPosition,
+  RemainingPositionLimit,
   Collateral,
   PerpCollateral,
   FundingRate,
@@ -153,6 +156,8 @@ EXCEPTIONS: dict[str, type[Exception]] = {
   'AuthError': AuthError,
   'RateLimited': RateLimited,
   'OrderRejected': OrderRejected,
+  'PositionLimitExceeded': PositionLimitExceeded,
+  'OpenInterestCapped': OpenInterestCapped,
   'OrderNotFound': OrderNotFound,
   'LeverageNotSet': LeverageNotSet,
   'LogicError': LogicError,
@@ -218,6 +223,14 @@ class PositionReq(Msg, kw_only=True, tag='position'):
 
 class AvailableNotionalReq(Msg, kw_only=True, tag='available_notional'):
   """Fetch the notional the account can still open on a market."""
+
+  market_id: str
+  ttl: timedelta | None = None
+  """How old a shared answer may be (ISO 8601 duration); null asks the venue afresh."""
+
+
+class RemainingPositionLimitReq(Msg, kw_only=True, tag='remaining_position_limit'):
+  """Fetch how much more position the venue lets the account open on a margin market."""
 
   market_id: str
   ttl: timedelta | None = None
@@ -520,6 +533,7 @@ CallReq = (
   | TradesHistoryReq
   | PositionReq
   | AvailableNotionalReq
+  | RemainingPositionLimitReq
   | PlaceOrderReq
   | CancelOrderReq
   | ReplaceOrderReq
@@ -587,6 +601,12 @@ class AvailableNotionalResp(Msg, kw_only=True, tag='available_notional'):
   """Notional the account can still open."""
 
   value: Decimal
+
+
+class RemainingPositionLimitResp(Msg, kw_only=True, tag='remaining_position_limit'):
+  """Remaining position limit per direction; null where no limit is known."""
+
+  limit: RemainingPositionLimit
 
 
 class PlaceOrderResp(Msg, kw_only=True, tag='place_order'):
@@ -803,6 +823,7 @@ ServerMsg = (
   | TradesHistoryResp
   | PositionResp
   | AvailableNotionalResp
+  | RemainingPositionLimitResp
   | PlaceOrderResp
   | CancelOrderResp
   | ReplaceOrderResp

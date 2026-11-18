@@ -13,6 +13,7 @@ from tribulnation.sdk.market import (
   Ticker,
   Trade,
 )
+from tribulnation.sdk.util import to_decimal
 from typed_bitget.classic.mix.market.contracts import MixContract
 from typed_bitget.classic.mix.order.fills import MixOrderFill
 from typed_bitget.classic.mix.order.open import MixOpenOrder
@@ -27,7 +28,6 @@ from typed_bitget.uta.trade.order.fills import Fill
 from typed_bitget.uta.trade.order.unfilled import UnfilledOrder
 from typed_bitget.uta_streams.fill import FillUpdate
 
-from .util import dec
 
 PerpProduct = Literal['USDT-FUTURES', 'USDC-FUTURES']
 """Native futures product lines, excluding dated contracts during discovery."""
@@ -87,10 +87,15 @@ def parse_book(
   bids: Sequence[tuple[Decimal | float, Decimal | float]],
   asks: Sequence[tuple[Decimal | float, Decimal | float]],
 ) -> Book:
-  """Build a `Book` from Bitget's `[price, size]` level arrays, whichever number shape."""
+  """Build a `Book` from Bitget's `[price, size]` level arrays, whichever number shape.
+
+  Spot books arrive as decimal strings (parsed to `Decimal`); futures and UTA books as
+  JSON numbers (`[78381.6, 0.0205]`, confirmed live), which `to_decimal` reads by their
+  shortest repr so the venue's own digits survive.
+  """
   return Book(
-    bids=[Book.Entry(dec(price), dec(qty)) for price, qty in bids],
-    asks=[Book.Entry(dec(price), dec(qty)) for price, qty in asks],
+    bids=[Book.Entry(to_decimal(price), to_decimal(qty)) for price, qty in bids],
+    asks=[Book.Entry(to_decimal(price), to_decimal(qty)) for price, qty in asks],
   )
 
 
