@@ -91,8 +91,13 @@ orders never borrow, and one that would is refused (`2017`).
   the initial health. `leverage` is what the product's initial risk weights allow (cross
   margin has no per-account leverage setting), and `available_notional` free collateral
   times it, which matched the venue's own `max_order_size`. A market holding an isolated
-  position raises `NotImplementedError` from its account reads. `remaining_position_limit`
-  reads no limits and returns `None` both ways (the SDK default, ADR 0062).
+  position raises `NotImplementedError` from its account reads.
+- `remaining_position_limit` (ADR 0062) is the room left under the product's
+  `max_open_interest_x18`, a notional cap (`null`: uncapped, `None` both ways), for both
+  directions, as a new position on either side can raise open interest. Nado publishes
+  no per-account cap. The cap is held against the gateway's open interest at the mark,
+  which counts both sides; which figure Nado compares is undocumented, so the room may
+  be half the venue's, never more. The cap comes from the cached `symbols`.
 - `rules().fees` are the products' default rates; `fees()` reads the subaccount's
   per-product rates. Nado's fixed sequencer fee is not a rate and is not included.
 - REST `depth` returns at most 100 levels per side. Depth streams apply the `book_depth`

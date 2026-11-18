@@ -22,6 +22,7 @@ from tribulnation.sdk.market import (
   PerpCollateral,
   PerpMarket,
   PerpPosition,
+  RemainingPositionLimit,
   Rules,
   Settings,
   SpotBalances,
@@ -259,6 +260,13 @@ class LighterPerpMarket(MarketBase, PerpMarket):
   async def next_funding(self, *, ttl: timedelta | None = None) -> NextFunding:
     """The predicted rate of the next hourly settlement."""
     return await stats.next_funding(self.shared, self.market_index, ttl=ttl)
+
+  async def remaining_position_limit(
+    self, *, ttl: timedelta | None = None
+  ) -> RemainingPositionLimit:
+    """The room left under the market's open-interest cap, both directions
+    (`stats.open_interest_room`); `None` both ways on an uncapped market."""
+    return await stats.remaining_position_limit(self.shared, self.market_index, ttl=ttl)
 
   def funding_rates(
     self, start: datetime | None = None, end: datetime | None = None

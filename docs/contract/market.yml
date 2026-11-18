@@ -776,10 +776,10 @@ methods:
         bitget: {market_id: 'bitget:usdt:BTCUSDT', long: "None", short: "None"}
         bybit: {market_id: 'bybit:perp:BTCUSDT', long: "None", short: "None"}
         dydx: {market_id: 'dydx:perp:BTC-USD', long: "None", short: "None"}
-        extended: {market_id: 'extended:perp:BTC-USD', long: "None", short: "None"}
-        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', long: "None", short: "None"}
-        nado: {market_id: 'nado:perp:BTC-PERP', long: "None", short: "None"}
-        risex: {market_id: 'risex:perp:1', long: "None", short: "None"}
+        extended: {market_id: 'extended:perp:BTC-USD', long: "Decimal('3998863.20')", short: "Decimal('4000000.00')"}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', long: "Decimal('81198863.20')", short: "Decimal('81200000.00')"}
+        nado: {market_id: 'nado:perp:BTC-PERP', long: "Decimal('149471379.47')", short: "Decimal('149471379.47')"}
+        risex: {market_id: 'risex:perp:1', long: "Decimal('40800000.00')", short: "Decimal('40800000.00')"}
         hyperliquid: {market_id: 'hyperliquid::BTC', long: "Decimal('148600.00')", short: "Decimal('150000.00')"}
         lighter: {market_id: 'lighter:perp:1', long: "None", short: "None"}
         margin-trade: {market_id: 'margin-trade:perp:BTC', long: "None", short: "None"}

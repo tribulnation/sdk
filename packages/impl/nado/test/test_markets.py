@@ -11,9 +11,9 @@ from tribulnation.nado.core import Shared
 from tribulnation.nado.market.markets import NadoPerpMarket, NadoSpotMarket
 from tribulnation.nado.market.stats import next_hour
 from tribulnation.sdk import NetworkError
-from tribulnation.sdk.market import Book
+from tribulnation.sdk.market import Book, RemainingPositionLimit
 
-from .conftest import X18
+from .conftest import X18, symbol
 
 T0 = datetime(2026, 11, 17, 10, 27, 40, tzinfo=timezone.utc)
 
@@ -326,3 +326,46 @@ async def test_perp_stats_per_settlement_and_missing_prices(shared: Shared, fake
   assert s.next_funding_time == datetime(2026, 11, 17, 11, tzinfo=timezone.utc)
   with pytest.raises(MissingData):
     await exchange.perp_stats(['ETH-PERP'])
+
+
+@pytest.mark.parametrize(
+  'cap,expected',
+  [
+    # 165M less both sides' 243.6034 BTC at 63,745.5.
+    (
+      165_000_000 * X18,
+      RemainingPositionLimit(
+        long=Decimal('149471379.4653'), short=Decimal('149471379.4653')
+      ),
+    ),
+    (10_000_000 * X18, RemainingPositionLimit(long=Decimal(0), short=Decimal(0))),
+    (None, RemainingPositionLimit()),
+  ],
+)
+async def test_remaining_position_limit_is_the_open_interest_room(
+  shared: Shared, fake: Any, cap: int | None, expected: RemainingPositionLimit
+):
+  """The notional cap less the gateway's open interest (both sides, base) at the mark,
+  for both directions; floored at 0; `None` both ways when uncapped."""
+  shared.symbols['BTC-PERP'] = symbol('BTC-PERP', 2, max_open_interest_x18=cap)
+  requested: list[int] = []
+
+  async def all_products() -> dict[str, Any]:
+    """BTC-PERP's open interest (mainnet, 2026-11-17) beside another product's."""
+    return {
+      'perp_products': [
+        {'product_id': 4, 'state': {'open_interest': str(10**6 * X18)}},
+        {'product_id': 2, 'state': {'open_interest': str(2436034 * X18 // 10**4)}},
+      ]
+    }
+
+  async def price(product_id: int) -> dict[str, Any]:
+    """A round-ish mark."""
+    requested.append(product_id)
+    return {'mark_price_x18': str(637455 * X18 // 10)}
+
+  fake.gateway.all_products = all_products
+  fake.archive.price = price
+  market = NadoPerpMarket(shared=shared, symbol='BTC-PERP', product_id=2)
+  assert await market.remaining_position_limit() == expected
+  assert requested == [2]

@@ -1,4 +1,5 @@
-"""Tickers, perpetual stats and predicted funding, from the `*market_stats` snapshots."""
+"""Tickers, perpetual stats, predicted funding and open-interest room, from the
+`*market_stats` snapshots."""
 
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -6,10 +7,51 @@ from decimal import Decimal
 from typing_extensions import Collection, Literal, Mapping
 from typed_lighter.schemas import MarketSelector, MarketStats, SpotMarketStats
 from tribulnation.sdk.core import ApiError
-from tribulnation.sdk.market import NextFunding, PerpStats, Ticker
+from tribulnation.sdk.market import (
+  NextFunding,
+  PerpStats,
+  RemainingPositionLimit,
+  Ticker,
+)
 
 from .. import streams
 from ..core import FUNDING_INTERVAL, Shared, percent
+
+
+UNCAPPED_OPEN_INTEREST = Decimal(2**56)
+"""`open_interest_limit` of a market without an open-interest cap (BTC, ETH)."""
+OPEN_INTEREST_LIMIT_UNIT = Decimal('0.000001')
+"""USDC per unit of `market_stats`' `open_interest_limit`, a raw 6-decimal amount.
+
+Typed-lighter documents it in USDC, but mainnet sent round raw amounts (`1e14` on SPY,
+`5e13` on USDCAD; 2026-11-17), and `orderBookDetails` gave the same caps in base units:
+SPY's `1e14` was 136,623 at a 731.94 mark, $100M."""
+
+
+def open_interest_room(s: MarketStats) -> RemainingPositionLimit:
+  """What the market's open-interest cap still lets anyone open, in USDC, for both
+  directions: a new position on either side can raise open interest. `None` both
+  ways for an uncapped market.
+
+  `open_interest` is one side's notional in USDC: SPY's `11,873,351.69` was half of
+  `orderBookDetails`' `open_interest_usd`, and its base `open_interest` at the mark.
+  """
+  limit = s['open_interest_limit']
+  if limit >= UNCAPPED_OPEN_INTEREST:
+    return RemainingPositionLimit()
+  else:
+    room = max(limit * OPEN_INTEREST_LIMIT_UNIT - s['open_interest'], Decimal(0))
+    return RemainingPositionLimit(long=room, short=room)
+
+
+async def remaining_position_limit(
+  shared: Shared, market_id: int, *, ttl: timedelta | None
+) -> RemainingPositionLimit:
+  """The market's open-interest room (`open_interest_room`), from its `market_stats`
+  snapshot. Lighter publishes no per-account position cap."""
+  return open_interest_room(
+    (await perp_snapshot(shared, market_id, ttl=ttl))[market_id]
+  )
 
 
 def price_or_none(value: Decimal | Literal['']) -> Decimal | None:
