@@ -9,3 +9,8 @@ Changed:
 3. Perpetual `leverage()` falls back to the retail margin levels when the platform has no schedule for the market.
 
 Every other method is unchanged.
+
+Release qualification on 2026-11-18 passed the read suites and market consistency.
+Committed evidence under `release-evidence/kraken/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
+release follows SDK 4.1.0 publication.
