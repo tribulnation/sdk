@@ -36,4 +36,9 @@ from .collateral import (
   spot_market_balances,
   spot_token_balance,
 )
-from .leverage import perp_leverage, perp_available_notional, perp_position_headroom, set_perp_leverage
+from .leverage import (
+  perp_leverage,
+  perp_available_notional,
+  perp_position_headroom,
+  set_perp_leverage,
+)
