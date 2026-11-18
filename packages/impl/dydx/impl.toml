@@ -35,6 +35,7 @@ methods = [
   "perp_position",
   "perp_collateral",
   "leverage",
+  "remaining_position_limit",
 ]
 note = "`candles` serves every contract interval in the indexer's native newest-first pages, filtered to the required `[start, end)` range. Public rules include active market fee holidays; personal fees also include referral tier overrides and staking discounts, with protocol PPM rounding. Fee holiday reads use Typed's generated public gRPC method until a convenience wrapper is available. Exchange-wide trades and funding history enumerate all subaccounts of the configured address and use native all-market indexer pages, including historical market tickers. Selected-market history likewise includes all address subaccounts. Funding payments preserve native received-positive amounts for both market and exchange history; negative amounts are paid. `set_leverage` is not implemented: dYdX sets leverage per subaccount and market with a signed `MsgUpdateLeverage` transaction, which the typed client does not wrap yet."
 # MarketSDK.DEFAULT_ACCOUNTS includes 'dydx' (Dydx(public=True)) — but that only covers
