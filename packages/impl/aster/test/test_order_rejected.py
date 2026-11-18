@@ -180,3 +180,22 @@ async def test_other_refusals_are_not_position_limits(monkeypatch: pytest.Monkey
     await market('perp').place_order(ORDER)
 
   assert not isinstance(raised.value, PositionLimitExceeded)
+
+
+async def test_a_position_limit_refusal_forgets_the_open_interest_allowance(
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """The symbol's cached allowance is dropped, so the next headroom read asks Aster again."""
+  body: dict[str, object] = {
+    'code': -5018,
+    'msg': "You've reached the maximum notional value limit for this symbol",
+  }
+  patch('perp', monkeypatch, AsyncMock(side_effect=ClientBadRequest(400, body)))
+  perp = market('perp')
+  perp.shared.allowances[('ASTERUSDT', 5)] = (0.0, Decimal(100))
+  perp.shared.allowances[('BTCUSDT', 5)] = (0.0, Decimal(100))
+
+  with pytest.raises(PositionLimitExceeded):
+    await perp.place_order(ORDER)
+
+  assert list(perp.shared.allowances) == [('BTCUSDT', 5)]

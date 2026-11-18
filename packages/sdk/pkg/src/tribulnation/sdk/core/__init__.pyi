@@ -24,7 +24,7 @@ from .invocations import (
   log,
   retry,
 )
-from .concurrency import SharedReads, managed_tasks
+from .concurrency import RequestBudget, SharedReads, managed_tasks
 from .lifecycle import AsyncResourceState, ManagedResource, resource_state
 from .stream import (
   Subscription,
@@ -61,6 +61,7 @@ __all__ = [
   'log',
   'retry',
   'managed_tasks',
+  'RequestBudget',
   'SharedReads',
   'AsyncResourceState',
   'ManagedResource',

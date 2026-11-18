@@ -31,12 +31,14 @@ they retried into the same wall.
    left out; callers bound openings by the smaller of the two.
 2. The default answers `None` both ways. Venues override it from limits they publish and
    the SDK reads live:
-   1. Aster: the bracket's `maxNotional` at the current leverage less the position held
-      in each direction, bounded by `remainingOpenableNotionalValue` (uncapped at `-1`).
+   1. Aster: the bracket's `maxNotionalValue` at the current leverage less the position
+      held in each direction, bounded by `remainingOpenableNotionalValue` (uncapped at
+      `-1`).
    2. Hyperliquid: nothing either way while `perpsAtOpenInterestCap` lists the coin
       (prefixed or not on a HIP-3 dex); otherwise the margin table's bound at the
-      account's leverage (the `lowerBound` of the first tier whose `maxLeverage` is below
-      it) less the position in each direction; `None` when no tier binds. The
+      position's leverage (the `lowerBound` of the first tier whose `maxLeverage` is below
+      it) less the position in each direction; `None` when no tier binds. A flat coin is
+      bounded at its `maxLeverage`, the tightest bound any setting has. The
       per-user `activeAssetData.maxTradeSzs` counts free margin too, so it is not used.
 3. `PositionLimitExceeded(OrderRejected)`: the venue refused the order because it would
    take the position past a limit. `OpenInterestCapped(PositionLimitExceeded)`: that
@@ -65,9 +67,19 @@ they retried into the same wall.
 
 ## Consequences
 
-1. Aster's headroom costs the shared `positionRisk` and futures-account reads plus one
-   public request; Hyperliquid's the shared `clearinghouseState` and `activeAssetData`
-   reads plus one shared, public `perpsAtOpenInterestCap` read per dex.
+1. Reading every market's headroom of an account at once costs a fixed number of
+   requests, not one per market (amended 2026-11-18, after polling one market per
+   strategy every 10 s had Aster ban the host's IP within a minute):
+   1. Aster: the all-symbol `positionRisk` read, shared by every symbol, and the
+      symbol's `remainingOpenableNotionalValue` (public, one symbol per request). Each
+      allowance answer is reused for 10 minutes whatever the caller's `ttl` (it is
+      market-wide and moves slowly), and all symbols of a client together send at most 3
+      back to back, then 3 a minute (`RequestBudget`): 30 symbols every 10 minutes. A symbol over budget keeps its
+      last answer, `None` before the first; a position-limit refusal drops it.
+   2. Hyperliquid: `clearinghouseState` and the public `perpsAtOpenInterestCap`, each
+      shared by every coin of a dex. The leverage is the open position's, so no
+      per-coin `activeAssetData` read.
+   Callers still choose how often to read: one reader per account, not per strategy.
 2. Other venues answer `None` until they adopt it. What they publish (2026-11-16):
    Lighter a market-wide `open_interest_limit` beside `open_interest`; dYdX
    `openInterestLowerCap`/`UpperCap` (margin scaling, not a hard cap); Bitget position

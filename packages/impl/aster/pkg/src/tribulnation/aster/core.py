@@ -32,6 +32,7 @@ from tribulnation.sdk.core import (
   AuthError,
   ManagedResource,
   OverflowPolicy,
+  RequestBudget,
   SDK,
   SharedReads,
   SkippingView,
@@ -49,6 +50,12 @@ DepthSource = Literal['depth', 'fast', 'bbo']
 wrap_exceptions = exception_wrapper()
 POSITION_RISK = 'positionRisk'
 """`SharedReads` key of the all-symbol `positionRisk` answer."""
+NO_OPEN_INTEREST_CAP = Decimal(-1)
+"""`remainingOpenableNotionalValue` when the symbol has no open-interest cap."""
+OPEN_INTEREST_TTL = timedelta(minutes=10)
+"""How long one symbol's open-interest allowance (`remainingOpenableNotionalValue`) is
+reused, whatever the caller's `ttl`: a market-wide figure, read one symbol per request,
+so it can't be read as often as the account's state (ADR 0060)."""
 
 
 @wrap_exceptions
@@ -145,6 +152,14 @@ class Shared(SDK):
   """One lock per perpetual symbol, so concurrent refusals lower its leverage once."""
   reads: SharedReads = field(default_factory=SharedReads)
   """Account-wide reads shared between symbols and concurrent callers."""
+  allowances: dict[tuple[str, int], tuple[float, Decimal | None]] = field(
+    default_factory=dict[tuple[str, int], tuple[float, Decimal | None]]
+  )
+  """Per symbol and leverage, when the open-interest allowance was last read (loop time) and its value."""
+  allowance_budget: RequestBudget = field(
+    default_factory=lambda: RequestBudget(burst=3, every=20.0)
+  )
+  """Bounds the allowance requests of all symbols together: 3 back to back, then one per 20 s."""
 
   @property
   def venue_id(self) -> Literal['aster', 'aster_testnet']:
@@ -246,6 +261,40 @@ class Shared(SDK):
       return mine
     else:
       return await self.call(lambda: self.client.futures.position.risk(symbol))
+
+  async def open_interest_allowance(
+    self, symbol: str, *, leverage: int
+  ) -> Decimal | None:
+    """The notional anyone may still open on `symbol` at `leverage`, `None` if uncapped or unknown.
+
+    Aster's `remainingOpenableNotionalValue`: public, one symbol per request. An answer
+    is reused for `OPEN_INTEREST_TTL`; past it, a new request goes out only within
+    `allowance_budget`, and a symbol over budget keeps its last answer (`None` before
+    the first). So reading many symbols' headroom costs at most 3 allowance requests a
+    minute over time (3 back to back at most), however many there are. A position-limit refusal drops the symbol's answer
+    (`forget_open_interest`), so the next read asks again.
+    """
+    now = asyncio.get_running_loop().time()
+    known = self.allowances.get((symbol, leverage))
+    if known is not None and now - known[0] < OPEN_INTEREST_TTL.total_seconds():
+      return known[1]
+    elif self.allowance_budget.take(now):
+      answer = await self.call(
+        lambda: self.client.futures.market.remaining_openable_notional_value(
+          symbol, leverage=leverage
+        )
+      )
+      cap = answer['remainingOpenableNotionalValue']
+      value = None if cap == NO_OPEN_INTEREST_CAP else cap
+      self.allowances[(symbol, leverage)] = (now, value)
+      return value
+    elif known is not None:
+      return known[1]
+
+  def forget_open_interest(self, symbol: str):
+    """Drop what is known of `symbol`'s open-interest allowance, e.g. after a position-limit refusal."""
+    for key in [k for k in self.allowances if k[0] == symbol]:
+      del self.allowances[key]
 
   @asynccontextmanager
   async def stream(

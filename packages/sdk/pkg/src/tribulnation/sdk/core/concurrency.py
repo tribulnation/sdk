@@ -114,6 +114,41 @@ class SharedReads:
         del self.inflight[key]
 
 
+@dataclass
+class RequestBudget:
+  """A token bucket bounding how often a kind of request is sent: `burst` at once, then one per `every` seconds.
+
+  For requests a venue answers one item at a time (e.g. one symbol per request),
+  whose callers can do without a fresh answer: a caller over budget keeps what it
+  knows instead of asking.
+  """
+
+  burst: int
+  """Requests that may go out back to back, and the most tokens ever saved up"""
+  every: float
+  """Seconds to earn one token back"""
+  tokens: float = field(init=False)
+  """Tokens available at `stamp`"""
+  stamp: float | None = field(default=None, init=False)
+  """Loop time `tokens` was counted at; `None` before the first request"""
+
+  def __post_init__(self):
+    self.tokens = float(self.burst)
+
+  def take(self, now: float) -> bool:
+    """Spend one token at loop time `now`, if there is one; whether the request may go out."""
+    if self.stamp is not None:
+      self.tokens = min(
+        float(self.burst), self.tokens + (now - self.stamp) / self.every
+      )
+    self.stamp = now
+    if self.tokens >= 1:
+      self.tokens -= 1
+      return True
+    else:
+      return False
+
+
 def retrieve(future: asyncio.Future[Any]):
   """Mark a shared request's failure as seen, so one nobody awaited any more isn't reported as never retrieved."""
   if not future.cancelled():

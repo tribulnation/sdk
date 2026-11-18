@@ -1,5 +1,7 @@
 """Position headroom from open-interest caps and margin tiers, and the typed limit refusals."""
 
+import asyncio
+from datetime import timedelta
 from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import AsyncMock
@@ -53,7 +55,14 @@ def market(
     []
     if szi is None
     else [
-      {'position': {'coin': coin, 'szi': Decimal(szi), 'positionValue': Decimal(value)}}
+      {
+        'position': {
+          'coin': coin,
+          'szi': Decimal(szi),
+          'positionValue': Decimal(value),
+          'leverage': {'type': 'cross', 'value': leverage},
+        }
+      }
     ]
   )
   info = SimpleNamespace(
@@ -108,17 +117,30 @@ async def test_builder_dex_coins_match_prefixed_or_not():
   'leverage,szi,value,expected',
   [
     (10, None, '0', PositionHeadroom(long=Decimal(3000), short=Decimal(3000))),
+    (5, None, '0', PositionHeadroom(long=Decimal(3000), short=Decimal(3000))),
     (10, '2', '1000', PositionHeadroom(long=Decimal(2000), short=Decimal(3000))),
     (10, '-2', '1000', PositionHeadroom(long=Decimal(3000), short=Decimal(2000))),
     (5, '2', '1000', PositionHeadroom()),
   ],
 )
-async def test_margin_tier_limits_the_position_at_the_accounts_leverage(
+async def test_margin_tier_limits_the_position_at_its_leverage(
   leverage: int, szi: str | None, value: str, expected: PositionHeadroom
 ):
-  """At 10x the position may grow to the 5x tier's 3000; at 5x no tier binds."""
+  """At 10x the position may grow to the 5x tier's 3000; at 5x no tier binds. A flat coin is bounded at `maxLeverage` (10x), whatever its setting."""
   m, _ = market(capped=['CANTO'], leverage=leverage, szi=szi, value=value)
   assert await m.position_headroom() == expected
+
+
+async def test_every_coins_headroom_costs_two_shared_reads():
+  """Many coins at once read `perpsAtOpenInterestCap` and `clearinghouseState` once each, and never `activeAssetData`."""
+  m, info = market(capped=[], szi='2', value='1000')
+  markets = [PerpMarket(shared=m.shared, dex=m.dex, meta=m.meta) for _ in range(20)]
+  await asyncio.gather(
+    *(x.position_headroom(ttl=timedelta(seconds=1)) for x in markets)
+  )
+  assert info.perps_at_open_interest_cap.await_count == 1
+  assert info.clearinghouse_state.await_count == 1
+  assert info.active_asset_data.await_count == 0
 
 
 async def test_single_tier_tables_have_no_limit():

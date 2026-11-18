@@ -68,7 +68,7 @@ from tribulnation.sdk.market import (
   Trade,
 )
 from tribulnation.sdk.market.types.candles import candle_windows
-from ..core import POSITION_RISK, Public, Scope, Shared
+from ..core import NO_OPEN_INTEREST_CAP, POSITION_RISK, Public, Scope, Shared
 from .settings import Settings as AsterSettings
 from .streams import (
   SOURCE_LEVELS,
@@ -98,8 +98,6 @@ AMBIGUOUS_CODES = frozenset({-1000, -1001, -1006, -1007, -1008})
 under which the order's execution status is unknown, even on a `4XX`."""
 DEAD_STATUSES = frozenset({'EXPIRED', 'REJECTED'})
 """Final statuses of an order that will never rest."""
-NO_OPEN_INTEREST_CAP = Decimal(-1)
-"""`remainingOpenableNotionalValue` when the symbol has no open-interest cap."""
 LEVERAGE_ABOVE_MAX = -2027
 """Aster refusing an order because the symbol's leverage exceeds the maximum it now allows."""
 POSITION_LIMIT_CODES = frozenset({-5018})
@@ -1098,26 +1096,25 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
   ) -> PositionHeadroom:
     """What the leverage bracket and the symbol's open-interest cap leave to open, per direction.
 
-    The bracket caps the position's absolute notional at `maxNotional` (at the current
-    leverage), so a direction has that cap less what the position already holds in
-    it. `remainingOpenableNotionalValue` (uncapped at `-1`) bounds both directions.
-    Unlike `available_notional`, free collateral is left out. Costs the shared
-    `positionRisk` and futures account reads plus one public request.
+    The bracket caps the position's absolute notional at `maxNotionalValue` (at the
+    current leverage), so a direction has that cap less what the position already holds
+    in it. The symbol's open-interest allowance (`Shared.open_interest_allowance`)
+    bounds both directions. Unlike `available_notional`, free collateral is left out.
+
+    Costs the all-symbol `positionRisk` read, shared by every symbol (`ttl`), and at
+    most 3 allowance requests a minute for all symbols together, each answer reused for
+    10 minutes (ADR 0060).
     """
-    leverage = await self.leverage(ttl=ttl)
-    account = await self.shared.futures_account(ttl=ttl)
-    row = one_way_row(account['positions'], self.symbol)
-    remaining = await self.shared.call(
-      lambda: self.api.market.remaining_openable_notional_value(
-        self.symbol, leverage=int(leverage)
-      )
+    row = await self.one_way_position(ttl=ttl)
+    leverage = int(position_leverage([row], self.symbol))
+    remaining = await self.shared.open_interest_allowance(
+      self.symbol, leverage=leverage
     )
-    cap = remaining['remainingOpenableNotionalValue']
     notional = abs(row['notional'])
     return PositionHeadroom.capped(
-      max_notional=row['maxNotional'],
+      max_notional=row['maxNotionalValue'],
       position=notional if row['positionAmt'] >= 0 else -notional,
-      remaining=None if cap == NO_OPEN_INTEREST_CAP else cap,
+      remaining=remaining,
     )
 
   async def max_leverage(self) -> int:
@@ -1193,10 +1190,14 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     Raises:
       OrderRejected: As `NativeMarket.place_order`; after a `-2027`, the original
         refusal when the setting was not above the maximum or could not be lowered.
-      PositionLimitExceeded: As `NativeMarket.place_order`.
+      PositionLimitExceeded: As `NativeMarket.place_order`; the symbol's open-interest
+        allowance is read again on the next `position_headroom`.
     """
     try:
       return await super().place_order(order, settings=settings)
+    except PositionLimitExceeded:
+      self.shared.forget_open_interest(self.symbol)
+      raise
     except OrderRejected as e:
       if not leverage_above_max(e):
         raise
