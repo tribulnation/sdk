@@ -9,7 +9,7 @@ from typed_core.util import Stream
 
 from tribulnation.nado.core import Shared
 from tribulnation.nado.market.markets import NadoPerpMarket, NadoSpotMarket
-from tribulnation.nado.market.stats import next_hour
+from tribulnation.nado.market.stats import EMPTY_SIDE_X18, next_hour, side
 from tribulnation.sdk import NetworkError
 from tribulnation.sdk.market import Book, RemainingPositionLimit
 
@@ -204,6 +204,17 @@ async def test_tickers_join_the_archive_and_the_gateway(shared: Shared, fake: An
     Decimal('3277.38125'),
   )
   assert out['ETH-PERP'].last is None
+
+
+@pytest.mark.parametrize('price_x18', [0, EMPTY_SIDE_X18, 2**127, -(2**127)])
+def test_empty_side_sentinels_are_none(price_x18: int):
+  """The gateway's empty-side sentinels (`0`, the i128 bounds) are no best level."""
+  assert side(price_x18) is None
+
+
+def test_quoted_side_is_x18_price():
+  """A real best level reads as its x18 price."""
+  assert side(170 * X18) == Decimal(170)
 
 
 def serve_book(fake: Any, diffs: list[Any]):

@@ -307,14 +307,19 @@ def test_public_address_reports_do_not_require_signing_secrets(
 ):
   """Read-only Report qualification needs an address, not trading authority."""
   from sdk_dev.integration.accounts import require_report_credentials
-  from tribulnation.sdk.impl.accounts import Dydx, Hyperliquid, Binance
+  from tribulnation.sdk.impl.accounts import Binance, Dydx, Hyperliquid, Nado
 
   monkeypatch.delenv('UNSET_REPORT_ADDRESS', raising=False)
+  monkeypatch.delenv('NADO_ADDRESS', raising=False)
+  monkeypatch.delenv('NADO_PRIVATE_KEY', raising=False)
   for account in (
     Dydx(address='dydx1test', public=True),
     Hyperliquid(address='0xtest', public=True),
+    Nado(address='0xtest', public=True),
   ):
     require_report_credentials(account)
+  with pytest.raises(pytest.skip.Exception):
+    require_report_credentials(Nado(public=True))
   with pytest.raises(pytest.skip.Exception):
     require_report_credentials(
       Hyperliquid(address='$UNSET_REPORT_ADDRESS', public=True)

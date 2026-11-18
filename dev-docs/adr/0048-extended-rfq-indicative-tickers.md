@@ -7,6 +7,8 @@
 3. Amends: [ADR 0014](0014-bit2me-native-ticker-limitation.md) and
    [ADR 0022](0022-bit2me-one-sided-ticker-limitation.md) (the native ticker limitation,
    until now Bit2Me spot only).
+4. Amended by: [ADR 0067](0067-risex-quoteless-ticker-limitation.md) (RISEx `perp`
+   tickers without a top of book).
 
 ## Context
 
