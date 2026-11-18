@@ -13,7 +13,13 @@ from typed_aster.futures.trade.place_order import PlaceOrder as PerpOrders
 from typed_aster.spot.trade.place_order import PlaceOrder as SpotOrders
 from tribulnation.aster import AsterMarket
 from tribulnation.aster.market.markets import PerpMarket, SpotMarket
-from tribulnation.sdk.core import ApiError, BadRequest, OrderRejected, RateLimited
+from tribulnation.sdk.core import (
+  ApiError,
+  BadRequest,
+  OrderRejected,
+  PositionLimitExceeded,
+  RateLimited,
+)
 from tribulnation.sdk.market import Order, Settings
 
 ORDER: Order = {'type': 'POST_ONLY', 'qty': Decimal('1'), 'price': Decimal('0.75')}
@@ -146,3 +152,31 @@ async def test_expired_ioc_is_rejected_only_when_unfilled(
   else:
     response = await market('perp').place_order(order, settings=settings)
     assert response.id == '9'
+
+
+@pytest.mark.parametrize('scope', ['spot', 'perp'])
+async def test_bracket_notional_cap_is_a_position_limit(
+  scope: str, monkeypatch: pytest.MonkeyPatch
+):
+  """`-5018` (mainnet, 2026-11-16) refuses for the bracket's notional cap, not collateral."""
+  body: dict[str, object] = {
+    'code': -5018,
+    'msg': "You've reached the maximum notional value limit for this symbol",
+  }
+  patch(scope, monkeypatch, AsyncMock(side_effect=ClientBadRequest(400, body)))
+
+  with pytest.raises(PositionLimitExceeded) as raised:
+    await market(scope).place_order(ORDER)
+
+  assert raised.value.args == (400, body)
+
+
+async def test_other_refusals_are_not_position_limits(monkeypatch: pytest.MonkeyPatch):
+  """Insufficient margin stays a plain `OrderRejected`: collateral is a separate bound."""
+  body: dict[str, object] = {'code': -2019, 'msg': 'Margin is insufficient.'}
+  patch('perp', monkeypatch, AsyncMock(side_effect=ClientBadRequest(400, body)))
+
+  with pytest.raises(OrderRejected) as raised:
+    await market('perp').place_order(ORDER)
+
+  assert not isinstance(raised.value, PositionLimitExceeded)

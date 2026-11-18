@@ -27,6 +27,7 @@ from tribulnation.sdk.market import (
   PerpCollateral,
   PerpPosition,
   Position,
+  RemainingPositionLimit,
   Rules,
   SpotBalances,
   Trade,
@@ -62,6 +63,7 @@ ACCOUNT_READS = (
   'perp_collateral',
   'leverage',
   'available_notional',
+  'remaining_position_limit',
   'collateral_id',
   'balances',
   'collateral_ids',
@@ -358,6 +360,7 @@ async def collect_account(
             'position': margin.position,
             'collateral': margin.collateral,
             'available_notional': margin.available_notional,
+            'remaining_position_limit': margin.remaining_position_limit,
             'leverage': margin.leverage,
             'collateral_id': collateral_id,
           }
@@ -595,6 +598,19 @@ def check_available_notional(value: object):
   require(finite(value) and cast(Decimal, value) >= 0, 'available_notional: negative')
 
 
+def check_remaining_position_limit(value: object):
+  """Per direction, a finite non-negative notional, or `None` without a known limit (ADR 0062)."""
+  require(
+    isinstance(value, RemainingPositionLimit), 'remaining_position_limit: wrong type'
+  )
+  limit = cast(RemainingPositionLimit, value)
+  for side in (limit.long, limit.short):
+    require(
+      side is None or (finite(side) and side >= 0),
+      'remaining_position_limit: negative',
+    )
+
+
 def check(method: str, result: AccountResults):
   """Validate one collected read against its contract."""
   value = result.values[method]
@@ -625,6 +641,8 @@ def check(method: str, result: AccountResults):
     check_leverage(value)
   elif method == 'available_notional':
     check_available_notional(value)
+  elif method == 'remaining_position_limit':
+    check_remaining_position_limit(value)
   elif method == 'balances':
     check_balances(value)
   elif method == 'collateral_ids':

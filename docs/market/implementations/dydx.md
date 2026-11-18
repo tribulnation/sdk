@@ -263,6 +263,8 @@ guarantee ordering. `volume` is `baseTokenVolume`, `quote_volume` is
   shared with `rules()`; `refetch=True` reloads it.
 - **`available_notional`** is the SDK default: the addressed subaccount's
   `freeCollateral` (its `perp_collateral().free_collateral`) × `leverage()`.
+- **`remaining_position_limit`** reads no limits and returns `None` both ways (the SDK default, ADR 0062): dYdX's `openInterestLowerCap`/`UpperCap`
+  scale margin requirements rather than cap positions.
 - **`collateral_id`** is the addressed subaccount's pool: `<account>:perp` for the parent,
   `<account>:perp.<N>` for child subaccount `N`. Orders are margined by that subaccount's
   own free collateral; nothing moves collateral between subaccounts on placement

@@ -28,6 +28,7 @@ from .types import (
   OrderState,
   Position,
   PerpPosition,
+  RemainingPositionLimit,
   Trade,
   Rules,
   SpotRules,
@@ -570,6 +571,22 @@ class TradingMarkets(SDK):
     """
     market = await self.perp_market(market_id)
     return await market.available_notional(ttl=ttl)
+
+  @SDK.method
+  async def remaining_position_limit(
+    self, market_id: str, /, *, ttl: timedelta | None = None
+  ) -> RemainingPositionLimit:
+    """Fetch how much more position the venue lets the account open on a perpetual
+    market, per direction; see `MarginMarket.remaining_position_limit`.
+
+    Notional in quote units by which a long or short position may still grow under
+    the venue's position limits, excluding collateral; `None` where no limit is known.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """
+    market = await self.perp_market(market_id)
+    return await market.remaining_position_limit(ttl=ttl)
 
   @SDK.method
   async def perp_position(

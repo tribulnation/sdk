@@ -33,6 +33,7 @@ from tribulnation.sdk.core import MissingData
 from tribulnation.sdk.market import (
   Balance,
   PerpCollateral,
+  RemainingPositionLimit,
   SpotBalances,
   SpotCollateralIds,
 )
@@ -403,6 +404,59 @@ async def test_available_notional_applies_bracket_and_open_interest_caps(
   )
   assert await perp().available_notional() == Decimal(expected)
   assert cap.await_args is not None and cap.await_args.kwargs == {'leverage': 5}
+
+
+SHORT_BTC: dict[str, Any] = {
+  **LONG,
+  'positionAmt': Decimal('-0.01'),
+  'notional': Decimal(-1200),
+}
+
+
+@pytest.mark.parametrize(
+  'row,max_notional,remaining,expected',
+  [
+    (
+      LONG,
+      '2000',
+      '-1',
+      RemainingPositionLimit(long=Decimal(800), short=Decimal(2000)),
+    ),
+    (
+      LONG,
+      '2000',
+      '500',
+      RemainingPositionLimit(long=Decimal(500), short=Decimal(500)),
+    ),
+    (
+      SHORT_BTC,
+      '2000',
+      '-1',
+      RemainingPositionLimit(long=Decimal(2000), short=Decimal(800)),
+    ),
+    (LONG, '1000', '-1', RemainingPositionLimit(long=Decimal(0), short=Decimal(1000))),
+  ],
+)
+async def test_remaining_position_limit_is_the_bracket_room_per_direction(
+  row: dict[str, Any],
+  max_notional: str,
+  remaining: str,
+  expected: RemainingPositionLimit,
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """`maxNotional` less what each direction holds, bounded by the symbol's remaining cap; free balance plays no part."""
+  monkeypatch.setattr(Risk, 'risk', AsyncMock(return_value=risk(5)))
+  capped: dict[str, Any] = {**row, 'maxNotional': Decimal(max_notional)}
+  monkeypatch.setattr(
+    InfoWithJoinMargin,
+    'info_with_join_margin',
+    AsyncMock(return_value=account(capped, availableBalance='1')),
+  )
+  cap = AsyncMock(return_value={'remainingOpenableNotionalValue': Decimal(remaining)})
+  monkeypatch.setattr(
+    RemainingOpenableNotionalValue, 'remaining_openable_notional_value', cap
+  )
+  assert await perp().remaining_position_limit() == expected
 
 
 def contract(symbol: str) -> dict[str, Any]:

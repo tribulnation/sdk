@@ -26,6 +26,6 @@ note = "The one asset id is `USDC`, the collateral, fee and funding asset."
 min_mode = "address"
 address_methods = [
   "open_orders", "query_order", "trades_history", "funding_payments", "position",
-  "perp_position", "collateral", "perp_collateral", "leverage", "available_notional",
+  "perp_position", "collateral", "perp_collateral", "leverage", "available_notional", "remaining_position_limit",
   "collateral_id",
 ]

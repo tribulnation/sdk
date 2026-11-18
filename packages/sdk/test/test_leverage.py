@@ -79,7 +79,14 @@ async def test_leverage_routing_preserves_ttl():
 
 
 @pytest.mark.parametrize(
-  'name', ['position', 'perp_position', 'available_notional', 'next_funding']
+  'name',
+  [
+    'position',
+    'perp_position',
+    'available_notional',
+    'remaining_position_limit',
+    'next_funding',
+  ],
 )
 async def test_margin_reads_route_ttl(name: str):
   """Venue and exchange shortcuts hand the caller's `ttl` to the market."""

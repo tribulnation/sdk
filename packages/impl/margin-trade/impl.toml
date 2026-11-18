@@ -8,7 +8,7 @@ kinds = ["spot", "perp"]
 methods = [
   "depth", "depth_stream", "tickers", "rules", "candles",
   "query_order", "open_orders", "trades_history", "trades_stream",
-  "position", "collateral", "available_notional",
+  "position", "collateral", "available_notional", "remaining_position_limit",
   "place_order", "place_orders", "cancel_order", "cancel_orders", "replace_order", "replace_orders",
   "cancel_open_orders",
   "index", "next_funding", "perp_stats", "funding_payments", "perp_position",
@@ -41,6 +41,6 @@ note = "Asset IDs are the venue's token symbols (`USDC`, `PEARL`), and `USD` for
 min_mode = "address"
 address_methods = [
   "fees", "open_orders", "query_order", "trades_history", "funding_payments", "position",
-  "perp_position", "collateral", "perp_collateral", "leverage", "available_notional",
+  "perp_position", "collateral", "perp_collateral", "leverage", "available_notional", "remaining_position_limit",
   "balances", "collateral_ids", "collateral_id",
 ]

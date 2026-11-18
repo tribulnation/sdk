@@ -29,6 +29,7 @@ from tribulnation.sdk.market import (
   PerpCollateral,
   PerpPosition,
   Position,
+  RemainingPositionLimit,
   Rules,
   SpotBalances,
   Trade,
@@ -339,6 +340,20 @@ def test_leverage_and_available_notional_checks():
   fails(reads.check_available_notional, -SECRET)
 
 
+def test_remaining_position_limit_check():
+  """Each direction is a non-negative notional or `None`; anything else fails."""
+  reads.check_remaining_position_limit(RemainingPositionLimit())
+  reads.check_remaining_position_limit(
+    RemainingPositionLimit(long=Decimal(0), short=SECRET)
+  )
+  fails(reads.check_remaining_position_limit, RemainingPositionLimit(long=-SECRET))
+  fails(
+    reads.check_remaining_position_limit,
+    RemainingPositionLimit(short=Decimal('NaN')),
+  )
+  fails(reads.check_remaining_position_limit, SECRET)
+
+
 def test_trades_check_uses_the_collected_rules():
   """The dispatcher requires a rules read before judging fill fee assets."""
   result = AccountResults(account_id='acct', spot=True, start=START, end=END)
@@ -367,6 +382,7 @@ def test_contract_kinds_keep_the_recorded_exclusions():
     'perp_collateral',
     'leverage',
     'available_notional',
+    'remaining_position_limit',
     'collateral_id',
   }
   from sdk_dev.integration.market.public import READS

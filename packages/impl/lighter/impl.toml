@@ -31,6 +31,6 @@ note = "The venue's numeric `asset_id` as a decimal string (`'3'` is USDC, `'1'`
 min_mode = "token"
 address_methods = [
   "trades_history", "position", "perp_position", "collateral", "perp_collateral",
-  "leverage", "available_notional", "balances", "collateral_ids", "collateral_id",
+  "leverage", "available_notional", "remaining_position_limit", "balances", "collateral_ids", "collateral_id",
 ]
 token_methods = ["fees", "open_orders", "query_order", "funding_payments"]
