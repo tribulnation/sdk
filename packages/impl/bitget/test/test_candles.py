@@ -86,12 +86,16 @@ async def test_half_open_windows_preserve_native_order(harness: Harness):
 
 
 async def test_trading_is_unimplemented_offline(harness: Harness):
-  """Check the deliberate trading gap using a fixture client, never a live account."""
-  with pytest.raises(NotImplementedError, match='Trading is not implemented'):
+  """Check the deliberate trading gap on spot and USDC futures using a fixture client,
+  never a live account. USDT futures trade (`test_perp_trading.py`)."""
+  if harness.market.product == 'USDT-FUTURES':
+    pytest.skip('USDT futures trade on a UTA account: see test_perp_trading.py')
+  gap = 'Trading is not implemented|implemented for USDT-FUTURES only'
+  with pytest.raises(NotImplementedError, match=gap):
     await harness.market.place_order(
       {'type': 'LIMIT', 'qty': Decimal(1), 'price': Decimal(1)}
     )
-  with pytest.raises(NotImplementedError, match='Trading is not implemented'):
+  with pytest.raises(NotImplementedError, match=gap):
     await harness.market.cancel_order('fixture-order')
   harness.request.assert_not_called()
 

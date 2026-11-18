@@ -12,7 +12,8 @@
 
 # Bitget Market
 
-> Spot and USDT-, USDC- and coin-margined perpetuals, read-only. `tribulnation-bitget`, venue name
+> Spot and USDT-, USDC- and coin-margined perpetuals. Trading covers USDT-margined perpetuals on a
+> Unified Trading Account; everything else is read-only. `tribulnation-bitget`, venue name
 > `bitget`.
 
 See the [generic market interface](../index.md) for the shared method surface. This page
@@ -62,8 +63,29 @@ dropped).
   endpoints, so they answer the same on a Classic account, a UTA account and the built-in
   public one. Account-scoped reads on `spot` and `usdt` dispatch on the account's mode;
   `usdc` account reads are not implemented.
-- **Trading is not implemented.** `place_order`, `cancel_order`, `cancel_orders` and
-  `cancel_open_orders` raise `NotImplementedError`.
+- **Trading is implemented for UTA `usdt` only**, on cross margin in one-way position mode.
+  On a Classic account, on `spot` and on `usdc`, `place_order` and `cancel_order` raise
+  `NotImplementedError`, and so does `leverage` on a perpetual. Bitget itself refuses
+  orders from an account in hedge mode.
+  - `LIMIT` is sent `gtc`, or with `settings['bitget']['time_in_force']` (`ioc` or `fok`).
+    `POST_ONLY` is `post_only`, and `MARKET` is an `ioc` limit at the order's price, which
+    bounds it. `settings['bitget']['reduce_only']` sends `reduceOnly`.
+  - Bitget's placement answers only the order ID. An immediate order (`ioc`, `fok` or
+    `MARKET`) is read back once, and `filled_qty` is its final fill if it is already done,
+    else `None`.
+  - A malformed request (`BadRequest`) and the codes `22002` (no position to reduce),
+    `40762` (size over the balance), `43012` (insufficient balance) and `45110` (under the
+    minimum order value) raise `OrderRejected`. Any other error stays an ambiguous
+    `ApiError`.
+  - `cancel_order` of an order Bitget does not know (`25204`) raises `OrderNotFound`.
+    `cancel_open_orders` cancels the symbol in one request, and with nothing open it
+    returns an empty result.
+  - `replace_order` modifies an order in place (with `autoCancel`) when nothing of it is
+    filled and the side and time in force are unchanged. Otherwise it cancels the order
+    and places the new one, because Bitget's modified `qty` includes the filled part.
+  - `leverage` is the symbol's cross row of the account settings. It raises `ValueError`
+    until a cross leverage has been set for the symbol. `collateral_id` is the unified
+    pool `<account>:usdt`.
 - **`rules`** come from the public symbol and contract catalogues, cached after the first
   call. Bitget publishes decimal-place counts rather than tick sizes, so `tick_size` and
   `step_size` are derived from them (`priceEndStep * 10 ** -pricePlace` on perps). The fee
@@ -75,7 +97,8 @@ dropped).
 - **`depth`** on `spot` takes any `levels` (150 a side by default); on futures the venue
   serves a fixed depth of 1, 5, 15, 50 or 100 levels, so a request is served by the next
   size up and trimmed. **`depth_stream`** folds the `books` channel (a full snapshot, then
-  deltas) into whole books; `levels` trims each delivered book.
+  deltas) into whole books; `levels` trims each delivered book. On futures it fails with
+  `NetworkError` on a broken `seq`/`pseq` chain, since the channel has no checksum.
 - **`candles`** serves every `CandleInterval` (`CANDLE_INTERVALS` is the full set) on all three
   exchanges, with required timezone-aware `start` and `end` bounds. Opening timestamps
   are filtered to `[start, end)`; responses retain their native order with no ordering
@@ -99,6 +122,11 @@ dropped).
   no symbol filter, so it is narrowed client-side.
 - **`trades_stream`** subscribes to the private `fill` channel: per product line and symbol
   on Classic, one account-wide channel narrowed to the market on UTA.
+  Private channels need a login on their own connection. When Bitget announces a reset
+  (`30033`, "Service upgrade in progress") or answers a private subscribe with `30004`
+  ("User not logged in"), typed-bitget 0.6.1+ closes the private connection, so running
+  private streams raise `NetworkError`, and the next subscribe opens a fresh connection
+  and logs in there (a `30004` subscribe is retried that way, with backoff).
 - SDK 3.0 removed the spot stand-ins from `Market` (ADR 0051); this venue does not map spot `balances` or collateral IDs yet, so the spot `position`, `collateral` and `available_notional` below are the
   adapter's own methods, reachable on its concrete `SpotMarket`/`SpotExchange` only.
 - **`position`** on `spot` is the base-coin balance (available, frozen and locked on
@@ -110,15 +138,20 @@ dropped).
   unsupported on Classic, whose spot wallet has no pool-level figure.
 - **`perp_collateral`** on UTA is the unified margin pool (`accountEquity`, `effEquity`,
   `imr`, `mmr`, `leverage`), with `margin_mode` read from the account's per-symbol
-  settings (`cross` when the symbol has none, and always for the exchange-level pool).
+  settings (`cross` unless the symbol has only `isolated` rows, and always for the
+  exchange-level pool). `free_collateral` is `effEquity - imr`, never negative: `effEquity`
+  alone counts margin already in use as free.
   On Classic it is unsupported: the futures wallet reports no initial or maintenance
   margin. **`available_notional`** on `usdt` is the free margin times the contract's
-  maximum leverage (`available` of the futures wallet on Classic, `effEquity` on UTA).
+  maximum leverage (`available` of the futures wallet on Classic, the pool's
+  `free_collateral` on UTA).
   **`remaining_position_limit`** reads no limits and returns `None` both ways (the SDK default, ADR 0062); Bitget's position tiers are not read.
 - **Fees** on trades are reported the SDK's way, positive when charged: Classic signs a
   fee charged negative and is flipped, UTA already agrees. A fill charged in several
   coins reports the first coin only.
-- `query_order` is the base implementation: it scans `open_orders()`.
+- **`query_order`** on UTA `usdt` reads `order-info`, so it answers for filled and cancelled
+  orders too, and returns `None` for an order Bitget does not know. Elsewhere it scans
+  `open_orders()`.
 
 ## Example
 
