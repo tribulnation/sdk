@@ -160,21 +160,28 @@ async def test_remaining_position_limit_reads_the_market_snapshot():
   6-decimal limit less one side's open interest in USDC (mainnet SPY, 2026-11-17)."""
   s, client = shared()
 
-  @asynccontextmanager
-  async def one(selector: Any) -> AsyncIterator[AsyncIterator[Any]]:
+  def one(selector: Any) -> StreamManager[Any, Any, Any]:
     """SPY's snapshot."""
 
-    async def frames() -> AsyncIterator[Any]:
-      """The subscribe snapshot of one market."""
-      yield {
-        'market_stats': {
-          'market_id': 128,
-          'open_interest': Decimal('11873351.69062'),
-          'open_interest_limit': Decimal('100000000000000'),
-        }
-      }
+    async def connect() -> Stream[Any, Any, Any]:
+      """Open the channel."""
 
-    yield frames()
+      async def frames() -> AsyncIterator[Any]:
+        """The subscribe snapshot of one market."""
+        yield {
+          'market_stats': {
+            'market_id': 128,
+            'open_interest': Decimal('11873351.69062'),
+            'open_interest_limit': Decimal('100000000000000'),
+          }
+        }
+
+      async def unsubscribe():
+        """Close the channel."""
+
+      return Stream(None, frames(), unsubscribe)
+
+    return StreamManager(connect)
 
   client.streams.market_stats = one  # type: ignore[method-assign]
   market = LighterPerpMarket(shared=s, market_index=128)
