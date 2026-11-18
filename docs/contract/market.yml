@@ -1389,3 +1389,20 @@ methods:
         print(leverage, notional)  # free collateral {{ constants[accounts[0]].free }} x leverage
       resultTemplate: |
         {{ constants[accounts[0]].leverage }} {{ constants[accounts[0]].notional }}
+
+  set_leverage:
+    group: Perpetual-only
+    kind: perp
+    public: false
+    example:
+      accountVenues: [hyperliquid]
+      constants:
+        hyperliquid: {market_id: 'hyperliquid::BTC', leverage: '5'}
+        aster: {market_id: 'aster:perp:BTCUSDT', leverage: '5'}
+      callTemplate: |
+        from decimal import Decimal
+
+        await sdk.set_leverage('{{ constants[accounts[0]].market_id }}', Decimal('{{ constants[accounts[0]].leverage }}'))
+        print(await sdk.leverage('{{ constants[accounts[0]].market_id }}'))
+      resultTemplate: |
+        {{ constants[accounts[0]].leverage }}

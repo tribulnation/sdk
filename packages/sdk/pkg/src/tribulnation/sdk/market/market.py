@@ -573,6 +573,27 @@ class MarginMarket(Market):
     raise NotImplementedError(f'Account leverage is not implemented: {self.id}')
 
   @SDK.method
+  async def set_leverage(self, leverage: Decimal):
+    """Set the account's leverage on this market, the value `leverage()` then reads.
+
+    The explicit way to configure a market before trading it where the venue reports
+    no leverage until one is set (`leverage()` raises `LeverageNotSet`). It keeps the
+    market's margin mode: cross where the SDK trades cross, and isolated only where
+    the venue allows nothing else. It changes an account setting, so callers decide
+    when; the SDK never calls it on its own.
+
+    Margin-only, like `leverage()`. Unsupported implementations, and venues whose
+    leverage is not a per-market setting, raise `NotImplementedError`.
+
+    Args:
+      leverage: The multiple to set, a positive whole number on every venue so far.
+
+    Raises:
+      ValueError: `leverage` is not a positive whole number.
+    """
+    raise NotImplementedError(f'Setting leverage is not implemented: {self.id}')
+
+  @SDK.method
   async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     """Fetch the maximum notional position you can open right now.
 

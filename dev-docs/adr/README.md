@@ -84,3 +84,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0059](0059-replace-orders-and-order-not-found.md) | `replace_order(s)` and `OrderNotFound` | Proposed |
 | [0060](0060-bitget-qualifies-uta.md) | Bitget qualifies with its UTA account | Accepted; amends 0042 |
 | [0061](0061-risex-unordered-native-candles.md) | RISEx native candles pass through unordered, as an accepted venue limitation | Accepted; implemented, not release-verified |
+| [0066](0066-set-leverage-and-leverage-not-set.md) | `set_leverage` and `LeverageNotSet` | Proposed; implemented for Bitget, Aster and Hyperliquid, not release-verified |
