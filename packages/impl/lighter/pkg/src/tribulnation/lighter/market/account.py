@@ -6,16 +6,20 @@ depend on the mode, and only unified accounts are supported, as for Hyperliquid.
 
 from decimal import Decimal
 
+from typing_extensions import Literal
 from typed_lighter.api.account.get import DetailedAccount
 from typed_lighter.api.markets.order_book_details import PerpsOrderBookDetail
 from typed_lighter.schemas import AccountAsset, AccountPosition
 from tribulnation.sdk.market import Balance, PerpCollateral, PerpPosition
+from tribulnation.sdk.util import whole_leverage
 
 from ..core import percent
 
 CROSS, ISOLATED = 0, 1
 """Position margin modes."""
 UNIFIED = 1
+FRACTION_UNITS = 10_000
+"""Fixed-point initial margin fractions (market details, `L2UpdateLeverage`) are in 1e-4."""
 """`account_trading_mode` of a unified account (USDC shared by spot and perps)."""
 
 
@@ -101,6 +105,46 @@ def perp_leverage(
   if leverage == leverage.to_integral_value():
     return leverage.quantize(Decimal(1))  # `10`, not `1E+1`
   return leverage
+
+
+def leverage_fraction(leverage: Decimal) -> int:
+  """The `L2UpdateLeverage` initial margin fraction for `leverage`: `10_000 / leverage`.
+
+  Only leverages dividing 10 000 convert exactly (`3` would be `3333.3`); the rest are
+  refused rather than rounded to a setting the caller did not ask for.
+
+  Raises:
+    ValueError: `leverage` is not a positive whole number, or does not divide 10 000.
+  """
+  value = whole_leverage(leverage)
+  fraction, rest = divmod(FRACTION_UNITS, value)
+  if rest:
+    raise ValueError(
+      f'Lighter sets leverage as a whole 1/10000 margin fraction; {value}x is not one '
+      '(the leverage must divide 10000)'
+    )
+  return fraction
+
+
+def check_fraction(fraction: int, detail: PerpsOrderBookDetail):
+  """Refuse a fraction below the market's `min_initial_margin_fraction`.
+
+  Raises:
+    ValueError: The leverage it stands for is above the market's maximum.
+  """
+  floor = detail['min_initial_margin_fraction']
+  if fraction < floor:
+    raise ValueError(
+      f'Leverage {FRACTION_UNITS // fraction}x is above the Lighter market maximum of '
+      f'{Decimal(FRACTION_UNITS) / floor:f}x'
+    )
+
+
+def margin_mode(acct: DetailedAccount, market_id: int) -> Literal['cross', 'isolated']:
+  """The market's margin mode: its position entry's, else cross, the venue's default for
+  a market the account never configured."""
+  p = position_of(acct, market_id)
+  return 'isolated' if p is not None and p['margin_mode'] == ISOLATED else 'cross'
 
 
 def balance_of(acct: DetailedAccount, asset_id: int) -> AccountAsset | None:

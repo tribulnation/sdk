@@ -1401,6 +1401,7 @@ methods:
         aster: {market_id: 'aster:perp:BTCUSDT', leverage: '5'}
         extended: {market_id: 'extended:perp:BTC-USD', leverage: '5'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', leverage: '5'}
+        lighter: {market_id: 'lighter:perp:1', leverage: '5'}
       callTemplate: |
         from decimal import Decimal
 

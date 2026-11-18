@@ -219,6 +219,38 @@ class LighterPerpMarket(MarketBase, PerpMarket):
     )
     return account.perp_leverage(acct, self.market_index, detail)
 
+  async def set_leverage(self, leverage: Decimal):
+    """Set the account's leverage here (`L2UpdateLeverage`), keeping the margin mode.
+
+    The venue takes an initial margin fraction in 1/10000 (`10_000 / leverage`), so
+    only leverages dividing 10 000 are accepted (`3` is refused rather than rounded).
+    The mode is read fresh from `/account`: the position's, else cross. The transaction
+    goes through the client's nonce manager like cancel-all, outside the order batcher
+    (ADR 0057), and the shared `/account` answer is dropped so the next `leverage()`
+    reads the new setting (also on a failure, whose outcome may be unknown). Acceptance is not execution: the sequencer may still reject
+    it (for example, an open position's margin not covering the new fraction).
+
+    Raises:
+      ValueError: `leverage` is not a positive whole number, does not divide 10 000, or
+        is above the market's maximum.
+      AuthError: The client has no API key.
+    """
+    fraction = account.leverage_fraction(leverage)
+    self.shared.require_api_key()
+    market_index = self.market_index
+    account.check_fraction(fraction, await self.shared.perp(market_index))
+    acct = await self.shared.account(ttl=None)
+    mode = account.margin_mode(acct, market_index)
+    try:
+      response = await self.shared.call(
+        lambda: self.shared.client.tx.update_leverage(
+          market_index=market_index, initial_margin_fraction=fraction, margin_mode=mode
+        )
+      )
+    finally:
+      self.shared.reads.forget(('account', await self.shared.account_index()))
+    self.shared.batcher.quota.record(response)
+
   async def collateral_id(self) -> str:
     """USDC's spot ID `<account_id>:spot:3` on a unified account, where perps margin the
     spot USDC balance; the perpetual pool `<account_id>:perp` on a classic one.
