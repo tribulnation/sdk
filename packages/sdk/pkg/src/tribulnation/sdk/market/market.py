@@ -586,10 +586,12 @@ class MarginMarket(Market):
     leverage is not a per-market setting, raise `NotImplementedError`.
 
     Args:
-      leverage: The multiple to set, a positive whole number on every venue so far.
+      leverage: The multiple to set. Venues that take whole multiples only refuse
+        fractions; others take the venue's own step.
 
     Raises:
-      ValueError: `leverage` is not a positive whole number.
+      ValueError: `leverage` is not positive, or not a value the venue can set,
+        before anything is sent.
     """
     raise NotImplementedError(f'Setting leverage is not implemented: {self.id}')
 

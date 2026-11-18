@@ -11,7 +11,6 @@ from typed_grvt.trading.account_summary import SubAccount
 from typed_grvt.trading.all_initial_leverage import InitialLeverageResult
 from tribulnation.sdk.core import ApiError, MissingData
 from tribulnation.sdk.market import Balance, Fees, PerpCollateral, PerpPosition
-from tribulnation.sdk.util import whole_leverage
 
 from ..core import FEE_UNIT, Shared
 from .common import scope
@@ -219,6 +218,10 @@ async def leverage(
   return row['leverage']
 
 
+LEVERAGE_STEP = Decimal('0.000001')
+"""GRVT's finest leverage: the signed value is an integer of millionths."""
+
+
 async def set_leverage(shared: Shared, instrument: str, leverage: Decimal):
   """Set the account's initial leverage on the instrument (`set_position_config`).
 
@@ -229,12 +232,16 @@ async def set_leverage(shared: Shared, instrument: str, leverage: Decimal):
   the next `leverage()` asks the venue.
 
   Raises:
-    ValueError: `leverage` is not a positive whole number, outside the instrument's
-      allowed range, or the venue reports no leverage for the instrument.
+    ValueError: `leverage` is not positive with at most 6 decimals, is outside the
+      instrument's allowed range, or the venue reports no leverage for it.
     AuthError: The client has no private key to sign with.
     ApiError: The venue did not acknowledge the change.
   """
-  value = whole_leverage(leverage)
+  if not (leverage.is_finite() and leverage > 0 and leverage % LEVERAGE_STEP == 0):
+    raise ValueError(
+      f'GRVT leverage is positive with at most 6 decimals, got {leverage}'
+    )
+  value = Decimal(format(leverage.normalize(), 'f'))
   shared.require_signer()
   row = await initial_leverage(shared, instrument, ttl=None)
   if not row['min_leverage'] <= value <= row['max_leverage']:
@@ -245,7 +252,7 @@ async def set_leverage(shared: Shared, instrument: str, leverage: Decimal):
   try:
     reply = await shared.call(
       lambda: shared.client.trading.set_position_config(
-        instrument=instrument, margin_type=row['margin_type'], leverage=Decimal(value)
+        instrument=instrument, margin_type=row['margin_type'], leverage=value
       )
     )
   finally:

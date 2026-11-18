@@ -2,7 +2,8 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: proposed; implemented for Bitget, Aster and Hyperliquid, not release-verified
+1. Status: proposed; implemented for Aster, Bybit, Extended, GRVT, Hyperliquid, Lighter,
+   margin.trade and RISEx, not release-verified
 2. Date: 2026-11-18
 
 ## Context
@@ -27,34 +28,48 @@ the call that sets it.
    the earlier `ValueError` keeps working. Bitget raises it; venues that always
    report a setting (their default for unconfigured markets) never do.
 2. `MarginMarket.set_leverage(leverage)` sets the account's leverage on one market,
-   with root delegations on `TradingMarkets`, `PerpExchange` and `TradingVenue`. It
-   takes a positive whole number (`whole_leverage`), raising `ValueError` before any
-   request otherwise. It never changes a margin mode: cross where the SDK trades
+   with root delegations on `TradingMarkets`, `PerpExchange` and `TradingVenue`. The
+   value is checked before any request, raising `ValueError`: venues that take whole
+   multiples refuse fractions (`whole_leverage`), others accept the venue's own step,
+   and a value the venue's unit cannot carry exactly is refused rather than rounded.
+   It never changes a margin mode: cross where the SDK trades
    cross, isolated only where the account's setting already is isolated or the venue
    allows nothing else. After setting, shared leverage reads are dropped, so the next
    `leverage()` asks the venue.
 3. The SDK never calls `set_leverage` on its own, and `leverage()` keeps refusing when
    nothing is set. Applying a default is the caller's policy.
 4. Venues:
-   1. Bitget: `POST /api/v3/account/set-leverage`, `USDT-FUTURES`, `crossed`, on UTA
-      accounts only (Classic raises `NotImplementedError`, like every trading call).
-   2. Aster: `POST /fapi/v1/leverage`, under the symbol's leverage lock shared with
-      the `-2027` check (ADR 0055); the margin type is left alone.
-   3. Hyperliquid: `updateLeverage` on the asset, cross unless the account's setting
-      is isolated or the asset is isolated-only (`onlyIsolated`, `marginMode:
-      noCross`, as on some HIP-3 dexes).
-   4. Kraken Futures: `NotImplementedError`. Cross leverage is the margin schedule's;
-      a leverage preference moves the market to isolated margin.
-   5. Other venues: the base `NotImplementedError` until implemented.
+   1. Aster: `POST /fapi/v1/leverage`, whole, under the symbol's leverage lock shared
+      with the `-2027` check (ADR 0055); the margin type is left alone.
+   2. Bitget: `POST /api/v3/account/set-leverage`, whole, `USDT-FUTURES`, `crossed`, on
+      UTA accounts only; it lands with Bitget's perpetual trading, the only venue that
+      raises `LeverageNotSet`.
+   3. Bybit: `POST /v5/position/set-leverage`, buy equal to sell, on the instrument's
+      `leverageStep`; "leverage not modified" (110043) counts as done. The margin mode
+      is account-wide and untouched. Bybit gains `leverage()` with it.
+   4. Extended: `PATCH /user/leverage`, decimal; the venue is cross only.
+   5. GRVT: the signed `set_position_config`, with the instrument's current margin type
+      read afresh and sent back; up to 6 decimals, within the instrument's range.
+   6. Hyperliquid and margin.trade: `updateLeverage`, whole, cross unless the account's
+      setting is isolated or the asset is isolated-only.
+   7. Lighter: the `L2UpdateLeverage` transaction with the position's margin mode (cross
+      without one), through the orders' nonce path but not their batch. The fraction is
+      10000 / leverage and must be whole, so 3x is refused, not sent as 3.0003x. An
+      accepted transaction can still be refused by the sequencer afterwards.
+   8. RISEx: the signed `update_leverage` permit, whole and at most 255 (a `uint8`); the
+      margin mode is a separate setting.
+   9. Refusing: Kraken Futures (a leverage preference moves the market to isolated
+      margin) and Nado (cross margin has no setting). dYdX's `MsgUpdateLeverage` is not
+      wrapped by the typed client yet. Binance, KuCoin and MEXC can set leverage but the
+      SDK does not trade their perpetuals; Deribit has no per-market setting.
 5. The gateway carries both: a `set_leverage` request (`market_id`, `leverage`) with an
    empty `set_leverage` reply, and `LeverageNotSet` as a typed remote exception.
 
-## Not yet decided
+## Contract
 
-The contract reference (`docs/contract/market.yml`) gets no `set_leverage` entry in
-this change. dYdX, Extended, GRVT and Lighter declare `support = "full"` for Market,
-which would claim a method they do not implement; adding the entry needs either
-those venues' implementations or explicit `partial` lists.
+`docs/contract/market.yml` lists `set_leverage` as a perpetual-only method. Venues
+that cannot set leverage (dYdX, Nado) declare explicit `partial` method lists instead
+of `support = "full"`.
 
 ## Alternatives considered
 

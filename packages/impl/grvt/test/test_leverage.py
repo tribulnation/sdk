@@ -61,11 +61,14 @@ async def test_request_keeps_the_margin_type(shared: Shared, fake: Any):
   reads, sent = serve(fake)
   await GrvtPerpMarket(shared=shared, instrument=ETH).set_leverage(Decimal('5'))
   await GrvtPerpMarket(shared=shared, instrument=BTC).set_leverage(Decimal('20.0'))
+  await GrvtPerpMarket(shared=shared, instrument=ETH).set_leverage(Decimal('2.500000'))
   assert sent == [
     {'instrument': ETH, 'margin_type': 'CROSS', 'leverage': Decimal(5)},
     {'instrument': BTC, 'margin_type': 'ISOLATED', 'leverage': Decimal(20)},
+    {'instrument': ETH, 'margin_type': 'CROSS', 'leverage': Decimal('2.5')},
   ]
-  assert reads == [1, 1]
+  assert [str(s['leverage']) for s in sent] == ['5', '20', '2.5']
+  assert reads == [1, 1, 1]
 
 
 async def test_shared_read_is_forgotten(shared: Shared, fake: Any):
@@ -79,9 +82,9 @@ async def test_shared_read_is_forgotten(shared: Shared, fake: Any):
   assert await eth.leverage(ttl=hour) == 3 and reads == [1, 1, 1]
 
 
-@pytest.mark.parametrize('value', ['0', '-2', '2.5', '51'])
+@pytest.mark.parametrize('value', ['0', '-2', '2.0000001', '51'])
 async def test_bad_values_send_nothing(shared: Shared, fake: Any, value: str):
-  """Non-whole, non-positive and out-of-range values raise before any change is sent."""
+  """Too fine, non-positive and out-of-range values raise before any change is sent."""
   _, sent = serve(fake)
   with pytest.raises(ValueError):
     await GrvtPerpMarket(shared=shared, instrument=ETH).set_leverage(Decimal(value))
