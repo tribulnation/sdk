@@ -191,12 +191,33 @@ def placed(stat: RestingOrderStatus | FilledOrderStatus) -> OrderResponse:
     )
 
 
+def fast_cancel(settings: MarketSettings) -> bool:
+  """Whether `settings` opt in to fast cancels (`Settings.fast_cancel`)."""
+  s: Settings = settings.get('hyperliquid', {})
+  return s.get('fast_cancel', False)
+
+
 @wrap_exceptions
 async def cancel_order(
   self: SpotMarketMixin | PerpMarketMixin, id: str, *, settings: MarketSettings = {}
 ) -> Any:
-  cancel: CancelRequestItem = {'a': self.asset_id, 'o': int(id)}
-  result = await self.client.exchange.cancel(cancels=[cancel])
+  """Cancel one order, with the fast-cancel flag (`f: true`) when `settings` opt in.
+
+  Strict: a fast cancel is sent once, never resent without the flag. Hyperliquid
+  refuses a fast cancel naming a trigger order; that refusal is raised, and the order
+  still rests (`Settings.fast_cancel`).
+
+  Raises:
+    OrderNotFound: The order no longer rests (`gone`).
+    ApiError: Hyperliquid refused the cancel (the action, or its entry), or answered no
+      status; the order may still rest. Not `OrderRejected`, which says of a placement
+      that nothing rests (ADR 0043).
+  """
+  item: CancelRequestItem = {'a': self.asset_id, 'o': int(id)}
+  if fast_cancel(settings):
+    result = await self.client.exchange.cancel(cancels=[item], f=True)
+  else:
+    result = await self.client.exchange.cancel(cancels=[item])
   if result['status'] == 'err':
     raise ApiError(result['response'])
   statuses = result['response']['data']['statuses']
@@ -226,7 +247,7 @@ async def replace_orders(
   order is gone is placed afresh. An entry whose new order was refused after the old one
   was cancelled (`NEW_ORDER_REFUSED`) is an `OrderRejected`; any other entry error is an
   `ApiError`, since the old order may still rest. A refused or failed action fails each
-  of its entries.
+  of its entries. With `Settings.fast_cancel`, the other entries' cancels are fast.
   """
   s: Settings = settings.get('hyperliquid', {})
   modified = [i for i, (_, order) in enumerate(orders) if order['type'] == 'POST_ONLY']
@@ -242,7 +263,7 @@ async def replace_orders(
   async def cancel_then_place(id: str, order: Order) -> OrderResponse | Exception:
     """Replace an entry `batchModify` can't take, as the SDK default does."""
     try:
-      await cancel_order(self, id)
+      await cancel_order(self, id, settings=settings)
     except OrderNotFound:
       pass
     except Exception as e:
