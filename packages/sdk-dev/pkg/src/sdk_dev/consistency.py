@@ -29,11 +29,17 @@ Kind = Literal['spot', 'perp']
 Status = Literal['pass', 'fail', 'unavailable', 'excluded', 'deferred', 'limitation']
 
 # Reviewed native ticker quote limitations, by venue and exchange: Bit2Me spot's stale
-# or zero tickers (ADRs 0014/0022) and Extended's indicative RFQ tickers (ADR 0048).
-NATIVE_TICKER_SCOPES = frozenset({('bit2me', 'spot'), ('extended', 'perp')})
+# or zero tickers (ADRs 0014/0022), Extended's indicative RFQ tickers (ADR 0048) and
+# RISEx's tickers without a top of book (ADR 0067).
+NATIVE_TICKER_SCOPES = frozenset(
+  {('bit2me', 'spot'), ('extended', 'perp'), ('risex', 'perp')}
+)
 RFQ_VENUES = frozenset({'extended'})
 """Venues whose native ticker limitation covers RFQ markets only, read from
 `rules().details['is_rfq']` (ADR 0048)."""
+QUOTELESS_TICKER_VENUES = frozenset({'risex'})
+"""Venues whose native ticker limitation covers missing ticker sides only: their
+tickers publish no best bid or ask (ADR 0067)."""
 
 # Bitget UTA coin is an explicitly deferred product, and Coinbase INTX perpetuals were
 # dropped ahead of their Advanced Trade retirement (ADR 0031).
@@ -394,9 +400,10 @@ def native_ticker_limitation(venue: str, check: Check) -> bool:
   """Recognize only reviewed native quote discrepancies against valid live books.
 
   ADRs 0014/0022 permit Bit2Me spot's stale, zero or missing native ticker sides,
-  and ADR 0048 Extended's indicative tickers on RFQ markets (whose book is the RFQ
-  quotes), against stable nonempty book sides: not wrong IDs, failed requests,
-  slow brackets, malformed/negative prices or Extended order-book markets.
+  ADR 0048 Extended's indicative tickers on RFQ markets (whose book is the RFQ
+  quotes) and ADR 0067 RISEx's missing ticker sides, against stable nonempty book
+  sides: not wrong IDs, failed requests, slow brackets, malformed/negative prices,
+  Extended order-book markets or RISEx ticker prices.
   """
   parts: list[object] = json.loads(check.id)
   if (
@@ -420,6 +427,7 @@ def native_ticker_limitation(venue: str, check: Check) -> bool:
       or not row.ticker_ids_match
       or row.elapsed_seconds > BRACKET_SECONDS
       or bracket_result(row) is not False
+      or (venue in QUOTELESS_TICKER_VENUES and (row.bid, row.ask) != (None, None))
     ):
       return False
     try:

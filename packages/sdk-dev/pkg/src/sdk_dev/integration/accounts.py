@@ -220,7 +220,7 @@ def require_report_credentials(account: Account):
     if owner is None:
       pytest.skip('Report checks require a configured address or account key')
     return
-  if isinstance(account, MarginTrade):
+  if isinstance(account, (MarginTrade, Nado)):
     try:
       owner = account.resolved_address or account.resolved_private_key
     except ValueError:

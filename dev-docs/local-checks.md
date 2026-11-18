@@ -153,6 +153,11 @@ same observation shape become `limitation/native_ticker_quotes`; order-book mark
 such as the `BTC-USD` reference must pass. See
 [ADR 0048](adr/0048-extended-rfq-indicative-tickers.md).
 
+RISEx `perp` tickers publish no best bid or ask at all. Checks of the same observation
+shape whose ticker sides are missing in every bracket become
+`limitation/native_ticker_quotes`; a RISEx ticker that quotes a side must match. See
+[ADR 0067](adr/0067-risex-quoteless-ticker-limitation.md).
+
 This suite does not call personal `fees()` or other account reads, place orders, transfer funds, or claim
 every discovery-only instrument received a depth comparison. The report preserves
 its inventory so that sample coverage is inspectable. Existing `sdk-dev test

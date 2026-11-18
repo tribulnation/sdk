@@ -1022,3 +1022,81 @@ async def test_only_rfq_venues_record_an_rfq_flag(
   quote.rfq = True
   with pytest.raises(ValueError, match='RFQ'):
     verify_payload(report.model_dump(mode='json'), catalogue=catalogue, root=root)
+
+
+@pytest.fixture
+async def risex_sdk(
+  root: Path, sdk: MarketSDK, catalogue: Catalogue, monkeypatch: pytest.MonkeyPatch
+) -> MarketSDK:
+  """Exercise RISEx's approved exchange, whose tickers carry no best bid or ask."""
+  directory = root / 'packages/impl/risex'
+  directory.mkdir()
+  (directory / 'impl.toml').write_text(
+    (root / 'packages/impl/fixture/impl.toml').read_text()
+  )
+  monkeypatch.setitem(consistency.CASES, 'risex', [])
+  monkeypatch.setattr(sdk.accounts['local'], 'venue', 'risex')
+  owner = await sdk.venue('local')
+  exchange = await owner.exchange('')
+  market = await exchange.market('BTC/USD')
+  for obj in (owner, exchange, market):
+    monkeypatch.setattr(obj, 'venue_id', 'risex')
+  for obj in (exchange, market):
+    monkeypatch.setattr(obj, 'exchange_id', 'perp')
+  cast(AsyncMock, owner.exchanges).return_value = [
+    {'id': 'perp', 'type': 'spot', 'name': 'RISEx'}
+  ]
+  catalogue.spot_instruments['risex'] = catalogue.spot_instruments.pop('fixture')
+  catalogue.spot_instruments['risex']['BTC/USD']['exchange'] = 'perp'
+
+  async def tickers(markets: list[str] | None = None) -> dict[str, Ticker]:
+    """The last price only, as RISEx's market data publishes."""
+    keys = ['BTC/USD'] if markets is None else markets
+    return {key: Ticker(last=Decimal(100)) for key in keys}
+
+  cast(AsyncMock, exchange.tickers).side_effect = tickers
+  return sdk
+
+
+async def test_risex_quoteless_ticker_is_a_visible_limitation(
+  root: Path, risex_sdk: MarketSDK, catalogue: Catalogue
+):
+  """A ticker without bid and ask against a live book is a limitation (ADR 0067)."""
+  report = Payload.model_validate(await collect(risex_sdk, 'local', 'risex', catalogue))
+  quote = next(check for check in report.checks if check.quotes)
+  assert (quote.status, quote.code, quote.rfq) == (
+    'limitation',
+    'native_ticker_quotes',
+    None,
+  )
+  assert all(consistency.bracket_result(row) is False for row in quote.quotes)
+  verify_payload(report.model_dump(mode='json'), catalogue=catalogue, root=root)
+  for field in ('bid', 'ask'):
+    original = quote.quotes[1]
+    quote.quotes[1] = original.model_copy(update={field: '99'})
+    with pytest.raises(ValueError):
+      verify_payload(report.model_dump(mode='json'), catalogue=catalogue, root=root)
+    quote.quotes[1] = original
+  assert not consistency.native_ticker_limitation(
+    'risex',
+    quote.model_copy(update={'id': check_id('ticker_depth', 'spot', 'BTC/USD')}),
+  )
+
+
+async def test_risex_ticker_prices_must_match(
+  root: Path, risex_sdk: MarketSDK, catalogue: Catalogue
+):
+  """A RISEx ticker that does quote a side is compared like any other venue's."""
+  exchange = await (await risex_sdk.venue('local')).exchange('perp')
+
+  async def tickers(markets: list[str] | None = None) -> dict[str, Ticker]:
+    """A quoted ticker far from the book."""
+    keys = ['BTC/USD'] if markets is None else markets
+    return {key: Ticker(bid=Decimal(10), ask=Decimal(20)) for key in keys}
+
+  cast(AsyncMock, exchange.tickers).side_effect = tickers
+  report = Payload.model_validate(await collect(risex_sdk, 'local', 'risex', catalogue))
+  quote = next(check for check in report.checks if check.quotes)
+  assert (quote.status, quote.code) == ('fail', 'mismatch')
+  with pytest.raises(ValueError):
+    verify_payload(report.model_dump(mode='json'), catalogue=catalogue, root=root)

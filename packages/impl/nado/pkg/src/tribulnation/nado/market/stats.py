@@ -31,9 +31,16 @@ DAY_INTERVALS = Decimal(24)
 """Settlements per day: the venue's 24-hour rates over this are per settlement."""
 
 
+EMPTY_SIDE_X18 = 2**127 - 1
+"""The i128 bound Nado's gateway quotes as the ask of an empty side (ADA-PERP's ask read
+170141183460469231731.6873037 against an empty book, mainnet, 2026-11-18); an empty
+bid is `0`, or the opposite bound."""
+
+
 def side(price_x18: int) -> Decimal | None:
-  """A best bid or ask, `None` where the side is empty (`0`)."""
-  return x18(price_x18) if int(price_x18) > 0 else None
+  """A best bid or ask, `None` where the side is empty (`0` or an i128 bound)."""
+  if 0 < int(price_x18) < EMPTY_SIDE_X18:
+    return x18(price_x18)
 
 
 def per_interval(rate_x18: int) -> Decimal:
