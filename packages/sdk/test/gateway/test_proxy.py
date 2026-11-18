@@ -18,7 +18,13 @@ from tribulnation.sdk.gateway import codec
 from tribulnation.sdk.impl.accounts import VenueId
 from tribulnation.sdk.gateway.proxy import ProxySDK
 from tribulnation.sdk.gateway.server import Gateway
-from tribulnation.sdk import ApiError, NetworkError, OrderNotFound, OrderRejected
+from tribulnation.sdk import (
+  ApiError,
+  LeverageNotSet,
+  NetworkError,
+  OrderNotFound,
+  OrderRejected,
+)
 from tribulnation.sdk.core import PaginatedResponse, OverflowPolicy
 from tribulnation.sdk.market import (
   Book,
@@ -76,6 +82,10 @@ class MockState:
     default_factory=list[tuple[str, timedelta | None]]
   )
   """The `ttl` every account or snapshot read received, with the method, in call order."""
+  leverage_set: list[Decimal] = field(default_factory=list[Decimal])
+  """Every leverage `set_leverage` received, in call order."""
+  leverage_error: Exception | None = None
+  """What `leverage` raises, when set."""
 
 
 def book(price: str = '100') -> Book:
@@ -169,7 +179,13 @@ class MockMarket(PerpMarket):
   async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
     """Report a fresh setting distinct from a shared one."""
     self.state.ttls.append(('leverage', ttl))
+    if self.state.leverage_error is not None:
+      raise self.state.leverage_error
     return Decimal('4') if ttl is None else Decimal('5')
+
+  async def set_leverage(self, leverage: Decimal):
+    """Record the setting."""
+    self.state.leverage_set.append(leverage)
 
   def candles(self, interval, start, end):
     """Provide an empty fixture candle window."""
@@ -896,6 +912,26 @@ async def test_leverage_forwards_ttl_through_gateway(sdk: ProxySDK) -> None:
   requests = [req for req in sent if isinstance(req, codec.LeverageReq)]
   assert [req.ttl for req in requests] == [None, timedelta(seconds=30)]
   assert all(req.market_id == MARKET_ID for req in requests)
+
+
+@pytest.mark.asyncio
+async def test_set_leverage_crosses_the_gateway(
+  mock_state: MockState, sdk: ProxySDK
+) -> None:
+  """`set_leverage` reaches the gateway-side market with its exact value."""
+  market = await sdk.perp_market(MARKET_ID)
+  await market.set_leverage(Decimal('5'))
+  assert mock_state.leverage_set == [Decimal('5')]
+
+
+@pytest.mark.asyncio
+async def test_leverage_not_set_keeps_its_type(
+  mock_state: MockState, sdk: ProxySDK
+) -> None:
+  """A gateway-side `LeverageNotSet` reaches the client as `LeverageNotSet`."""
+  mock_state.leverage_error = LeverageNotSet('No cross leverage set for BTC-USD')
+  with pytest.raises(LeverageNotSet, match='No cross leverage set'):
+    await (await sdk.perp_market(MARKET_ID)).leverage()
 
 
 @pytest.mark.asyncio

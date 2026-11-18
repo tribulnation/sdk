@@ -215,3 +215,11 @@ def test_schedule_falls_back_to_retail_levels():
   }
   assert leverage_of(instrument, [], schedule='europa') == 10  # type: ignore[arg-type]
   assert leverage_of(instrument, [], schedule='dlt') == 2  # type: ignore[arg-type]
+
+
+@pytest.mark.asyncio
+async def test_set_leverage_is_not_supported(venue: Venue):
+  """Cross leverage comes from the margin schedule; a preference would go isolated."""
+  _, market_on = venue
+  with pytest.raises(NotImplementedError, match='isolated margin'):
+    await market_on().set_leverage(Decimal(5))

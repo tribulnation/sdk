@@ -5,6 +5,9 @@ from decimal import Decimal
 import asyncio
 
 from typed_hyperliquid.info.active_asset_data import ActiveAssetData
+from typed_hyperliquid.info.perp_meta_and_asset_ctxs import PerpUniverseAsset
+
+from tribulnation.sdk.util import whole_leverage
 
 from tribulnation.hyperliquid.core import wrap_exceptions
 from .collateral import spot_collateral
@@ -43,6 +46,35 @@ async def perp_leverage(
   asset = perp_meta['universe'][find_asset_idx(coin, perp_meta)]
   data = await self.shared.active_asset_data(coin, ttl=ttl)
   return parse_leverage(data, max_leverage=asset['maxLeverage'])
+
+
+def cross_allowed(asset: PerpUniverseAsset) -> bool:
+  """Whether the asset may trade on cross margin (HIP-3 markets may be isolated-only)."""
+  return not asset.get('onlyIsolated') and asset.get('marginMode') != 'noCross'
+
+
+@wrap_exceptions
+async def set_perp_leverage(self: PerpMarketMixin, leverage: Decimal):
+  """Set the account's leverage on this market (`updateLeverage`), keeping its mode.
+
+  Cross, unless the account's setting on the asset is isolated or the asset allows
+  isolated margin only. The shared `activeAssetData` answer is dropped, so the next
+  `leverage()` reads the new setting.
+
+  Raises:
+    ValueError: `leverage` is not a positive whole number.
+  """
+  value = whole_leverage(leverage)
+  coin = self.asset_name
+  data = await self.shared.active_asset_data(coin, ttl=None)
+  setting = data.get('leverage')
+  isolated = setting is not None and setting['type'] == 'isolated'
+  await self.client.exchange.update_leverage(
+    asset=self.asset_id,
+    is_cross=cross_allowed(self.asset_meta) and not isolated,
+    leverage=value,
+  )
+  self.shared.forget_active_asset_data(coin)
 
 
 @wrap_exceptions

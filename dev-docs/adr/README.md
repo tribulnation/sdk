@@ -83,3 +83,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0058](0058-market-delta-and-hold.md) | Default `delta()` and `hold()` on spot and margin markets | Proposed; builds on 0051; implemented, not release-verified |
 | [0059](0059-replace-orders-and-order-not-found.md) | `replace_order(s)` and `OrderNotFound` | Proposed |
 | [0060](0060-bitget-qualifies-uta.md) | Bitget qualifies with its UTA account | Accepted; amends 0042 |
+| [0066](0066-set-leverage-and-leverage-not-set.md) | `set_leverage` and `LeverageNotSet` | Proposed; implemented for Bitget, Aster and Hyperliquid, not release-verified |

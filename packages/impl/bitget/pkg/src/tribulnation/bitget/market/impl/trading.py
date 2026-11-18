@@ -9,7 +9,14 @@ hedge-mode account is refused by Bitget itself (it requires a `posSide`).
 from typing_extensions import Any, Literal, TypedDict, cast
 from decimal import Decimal
 
-from tribulnation.sdk.core import ApiError, BadRequest, OrderNotFound, OrderRejected
+from tribulnation.sdk.core import (
+  ApiError,
+  BadRequest,
+  LeverageNotSet,
+  OrderNotFound,
+  OrderRejected,
+)
+from tribulnation.sdk.util import whole_leverage
 from tribulnation.sdk.market import Order, OrderResponse, OrderState, Settings
 from typed_bitget.uta.trade.order.info import OrderInfo
 from typed_bitget.uta.trade.order.place import LimitOrderRequest
@@ -283,7 +290,7 @@ async def cross_leverage(self: MarketMixin) -> Decimal:
 
   Raises:
     NotImplementedError: Not a UTA account's `USDT-FUTURES` market.
-    ValueError: No cross leverage is set for the symbol.
+    LeverageNotSet: No cross leverage is set for the symbol.
   """
   await require_trading(self)
   settings = await self.call(
@@ -299,7 +306,27 @@ async def cross_leverage(self: MarketMixin) -> Decimal:
   if rows:
     return rows[0]
   else:
-    raise ValueError(
-      f'No cross leverage set on Bitget for {self.symbol}: set it once (app, or '
-      '`uta.account.leverage.set`) before trading.'
+    raise LeverageNotSet(
+      f'No cross leverage set on Bitget for {self.symbol}: set it once '
+      '(`set_leverage`, or the app) before trading.'
     )
+
+
+async def set_cross_leverage(self: MarketMixin, leverage: Decimal):
+  """Set the symbol's cross leverage on a UTA account (`account/set-leverage`).
+
+  Raises:
+    NotImplementedError: Not a UTA account's `USDT-FUTURES` market.
+    ValueError: `leverage` is not a positive whole number.
+  """
+  value = whole_leverage(leverage)
+  await require_trading(self)
+  await self.call(
+    lambda: self.client.uta.account.leverage.set(
+      PERP,
+      symbol=self.symbol,
+      leverage=str(value),
+      margin_mode='crossed',
+      validate=self.validate,
+    )
+  )

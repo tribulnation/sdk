@@ -161,6 +161,7 @@ CLIENT_MESSAGES: list[codec.ClientMsg] = [
   codec.UnsubMsg(id='r'),
   codec.FeesReq(**MARKET, refetch=True),
   codec.LeverageReq(**MARKET, ttl=timedelta(minutes=1)),
+  codec.SetLeverageReq(**MARKET, leverage=D('5')),
   codec.CandlesReq(**MARKET, interval='1h', start=T, end=T_OFFSET),
   codec.ExchangeReq(**EXCHANGE),
   codec.TickersReq(**EXCHANGE, markets=['BTC', 'ETH'], settings=SETTINGS),
@@ -268,6 +269,7 @@ SERVER_MESSAGES: list[codec.ServerMsg] = [
   codec.EndMsg(id='r', exc='NetworkError', error='gone'),
   codec.FeesResp(id='r', fees=FEES),
   codec.LeverageResp(id='r', value=D('1.818181818181818181818181818')),
+  codec.SetLeverageResp(id='r'),
   codec.CandlesResp(
     id='r',
     candles=[

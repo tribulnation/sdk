@@ -91,6 +91,20 @@ class OrderNotFound(ApiError):
     return super().__str__()
 
 
+class LeverageNotSet(Error, ValueError):
+  """
+  The account has no leverage set on this market, and the venue applies none by default.
+
+  Raised by `leverage()` where the venue only reports a leverage once the account has
+  set one (Bitget's unified account). Set one with `set_leverage()`; the SDK never
+  guesses the venue's default. A `ValueError` too, for callers that caught the plain
+  `ValueError` raised before.
+  """
+
+  def __str__(self):
+    return super().__str__()
+
+
 class LogicError(Error):
   """Logic error: invalid assumptions, logic, or other bugs on the SDK side."""
 

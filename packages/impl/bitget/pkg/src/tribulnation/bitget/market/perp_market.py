@@ -261,3 +261,7 @@ class PerpMarket(MarketMixin, _PerpMarket):
   async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
     """The cross leverage set for this symbol; see `impl.trading.cross_leverage`."""
     return await trading.cross_leverage(self)
+
+  async def set_leverage(self, leverage: Decimal):
+    """Set the symbol's cross leverage; see `impl.trading.set_cross_leverage`."""
+    await trading.set_cross_leverage(self, leverage)

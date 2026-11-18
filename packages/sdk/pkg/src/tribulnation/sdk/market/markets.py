@@ -601,6 +601,15 @@ class TradingMarkets(SDK):
     return await market.leverage(ttl=ttl)
 
   @SDK.method
+  async def set_leverage(self, market_id: str, /, leverage: Decimal):
+    """Set the account's leverage on a perpetual market.
+
+    See `MarginMarket.set_leverage`.
+    """
+    market = await self.perp_market(market_id)
+    await market.set_leverage(leverage)
+
+  @SDK.method
   async def perp_collateral(
     self, id: str, /, *, ttl: timedelta | None = None
   ) -> PerpCollateral:

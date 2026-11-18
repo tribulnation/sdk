@@ -310,6 +310,10 @@ class Shared(SDK):
       ttl=ttl,
     )
 
+  def forget_active_asset_data(self, coin: str):
+    """Drop the shared leverage setting of `coin`, e.g. after changing it."""
+    self.reads.forget(('activeAssetData', self.address, coin))
+
   async def user_abstraction(self) -> UserAbstraction:
     """The account's mode, one request per `ABSTRACTION_TTL` for every caller."""
     address = self.address

@@ -12,6 +12,7 @@ from .core import (
   RateLimited,
   OrderRejected,
   OrderNotFound,
+  LeverageNotSet,
   LogicError,
 )
 from .earn import Earn
@@ -41,6 +42,7 @@ __all__ = [
   'RateLimited',
   'OrderRejected',
   'OrderNotFound',
+  'LeverageNotSet',
   'LogicError',
   'Earn',
   'Wallet',
