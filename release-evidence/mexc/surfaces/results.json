@@ -279,6 +279,14 @@
       {
         "exclusion": "perp_only",
         "failed": 0,
+        "id": "market.test_account_read[\"spot:BTCUSDT\", \"remaining_position_limit\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
         "id": "market.test_account_read[\"spot:BTCUSDT\", \"collateral_id\"]",
         "network": "mainnet",
         "passed": 0,
@@ -496,6 +504,14 @@
         "exclusion": "unsupported",
         "failed": 0,
         "id": "market.test_account_read[\"perp:BTC_USDT\", \"available_notional\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTC_USDT\", \"remaining_position_limit\"]",
         "network": "mainnet",
         "passed": 0,
         "skipped": 0

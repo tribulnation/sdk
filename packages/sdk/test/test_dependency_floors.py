@@ -8,26 +8,32 @@ from typing_extensions import cast
 
 ROOT = Path(__file__).resolve().parents[3]
 COMPATIBLE_IMPLEMENTATIONS = {
-  'aster': '0.14.0',
+  'aster': '0.15.0',
   'binance': '0.9.0',
-  'bit2me': '0.10.0',
-  'bitget': '0.12.0',
-  'bybit': '0.8.0',
-  'coinbase': '0.6.0',
+  'bit2me': '0.10.1',
+  'bitget': '0.14.0',
+  'bybit': '0.10.0',
+  'coinbase': '0.6.1',
   'deribit': '0.7.0',
-  'dydx': '0.21.0',
+  'dydx': '0.21.1',
   'ethereum': '0.6.0',
-  'extended': '0.2.0',
-  'grvt': '0.2.0',
-  'hyperliquid': '0.20.0',
-  'kraken': '0.8.0',
+  'extended': '0.4.0',
+  'grvt': '0.4.0',
+  'hyperliquid': '0.21.0',
+  'kraken': '0.9.0',
   'kucoin': '0.7.0',
-  'lighter': '0.13.0',
-  'margin-trade': '0.3.0',
-  'mexc': '3.0.0',
+  'lighter': '0.14.0',
+  'margin-trade': '0.4.0',
+  'mexc': '3.0.1',
   'nado': '0.1.0',
   'risex': '0.1.0',
 }
+SDK_4_1_ADAPTERS = tuple(
+  venue
+  for venue in COMPATIBLE_IMPLEMENTATIONS
+  if venue not in ('binance', 'deribit', 'ethereum', 'kucoin')
+)
+"""Adapters released with SDK 4.1, which require it."""
 
 
 def dependencies(path: Path) -> list[str]:
@@ -217,7 +223,21 @@ def test_trading_adapters_require_sdk_4():
       if Requirement(value).name == 'tribulnation-sdk'
     )
     assert Version('3.99.0') not in requirement.specifier, venue
-    assert Version('4.0.0') in requirement.specifier, venue
+
+
+def test_adapters_released_with_sdk_4_1_require_it():
+  """Adapters released with SDK 4.1 are qualified against it, and most import its
+  `to_decimal`, `set_leverage`/`LeverageNotSet` or `remaining_position_limit` and
+  position-limit refusals (ADR 0062, ADR 0066), so none may resolve against SDK 4.0."""
+  for venue in SDK_4_1_ADAPTERS:
+    manifest = ROOT / f'packages/impl/{venue}/pkg/pyproject.toml'
+    requirement = next(
+      Requirement(value)
+      for value in dependencies(manifest)
+      if Requirement(value).name == 'tribulnation-sdk'
+    )
+    assert Version('4.0.99') not in requirement.specifier, venue
+    assert Version('4.1.0') in requirement.specifier, venue
 
 
 def test_risex_requires_empty_funding_rates():

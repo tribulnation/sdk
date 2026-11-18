@@ -86,22 +86,25 @@ venue = "margin-trade"
 address = "$MARGIN_TRADE_ADDRESS"
 public = true
 
-# RISEx account reads are public: an address alone serves them. The account key adds
-# the logged-in `fees` read.
+# RISEx account reads are public: an address alone serves them (address mode, ADR
+# 0042). `RISEX_ADDRESS` is a public third-party account; no key, so `fees` is a
+# `credential_mode` exclusion.
 [accounts.risex]
 venue = "risex"
 address = "$RISEX_ADDRESS"
-signer_key = "$RISEX_SIGNER_KEY"
+public = true
 
 [accounts.mexc]
 venue = "mexc"
 api_key = "$MEXC_ACCESS_KEY"
 api_secret = "$MEXC_SECRET_KEY"
 
-# The signing key also reads: every Nado account read is public.
+# Every Nado account read is public: an address alone serves them (address mode, ADR
+# 0042). `NADO_ADDRESS` is a public third-party account; no signing key.
 [accounts.nado]
 venue = "nado"
-private_key = "$NADO_PRIVATE_KEY"
+address = "$NADO_ADDRESS"
+public = true
 
 # EVM chains share one address.
 

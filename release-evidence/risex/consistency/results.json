@@ -1,0 +1,279 @@
+{
+  "payload": {
+    "account_id": "risex",
+    "checks": [
+      {
+        "code": "ok",
+        "id": "[\"discovery\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"exchange_identity\",\"perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"perp\",\"bulk\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"perp\",\"empty\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"perp\",\"selected\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"setup\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "native_ticker_quotes",
+        "id": "[\"ticker_depth\",\"perp\",\"1\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": "62647.6",
+            "after_bid": "62647.5",
+            "ask": null,
+            "attempt": 1,
+            "before_ask": "62647.6",
+            "before_bid": "62647.5",
+            "bid": null,
+            "elapsed_seconds": 0.9917721580713987,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": "62647.6",
+            "after_bid": "62647.5",
+            "ask": null,
+            "attempt": 2,
+            "before_ask": "62647.6",
+            "before_bid": "62647.5",
+            "bid": null,
+            "elapsed_seconds": 0.8299159391317517,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": "62647.6",
+            "after_bid": "62647.5",
+            "ask": null,
+            "attempt": 3,
+            "before_ask": "62647.6",
+            "before_bid": "62647.5",
+            "bid": null,
+            "elapsed_seconds": 0.8333469568751752,
+            "ticker_ids_match": true
+          }
+        ],
+        "rfq": null,
+        "status": "limitation"
+      },
+      {
+        "code": "native_ticker_quotes",
+        "id": "[\"ticker_depth\",\"perp\",\"10\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": "3.2274",
+            "after_bid": "3.22674",
+            "ask": null,
+            "attempt": 1,
+            "before_ask": "3.2274",
+            "before_bid": "3.22674",
+            "bid": null,
+            "elapsed_seconds": 0.7824992339592427,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": "3.2274",
+            "after_bid": "3.22674",
+            "ask": null,
+            "attempt": 2,
+            "before_ask": "3.2274",
+            "before_bid": "3.22674",
+            "bid": null,
+            "elapsed_seconds": 0.8174323530402035,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": "3.22634",
+            "after_bid": "3.22574",
+            "ask": null,
+            "attempt": 3,
+            "before_ask": "3.2274",
+            "before_bid": "3.22674",
+            "bid": null,
+            "elapsed_seconds": 0.8148900801315904,
+            "ticker_ids_match": true
+          }
+        ],
+        "rfq": null,
+        "status": "limitation"
+      },
+      {
+        "code": "native_ticker_quotes",
+        "id": "[\"ticker_depth\",\"perp\",\"11\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": "20.573",
+            "after_bid": "20.5673",
+            "ask": null,
+            "attempt": 1,
+            "before_ask": "20.577",
+            "before_bid": "20.5728",
+            "bid": null,
+            "elapsed_seconds": 0.7984543379861861,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": "20.573",
+            "after_bid": "20.5673",
+            "ask": null,
+            "attempt": 2,
+            "before_ask": "20.573",
+            "before_bid": "20.5673",
+            "bid": null,
+            "elapsed_seconds": 0.8405110239982605,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": "20.573",
+            "after_bid": "20.5673",
+            "ask": null,
+            "attempt": 3,
+            "before_ask": "20.573",
+            "before_bid": "20.5673",
+            "bid": null,
+            "elapsed_seconds": 0.8182588708586991,
+            "ticker_ids_match": true
+          }
+        ],
+        "rfq": null,
+        "status": "limitation"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"perp\",\"bulk\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"perp\",\"empty\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"perp\",\"selected\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      }
+    ],
+    "discovery": [
+      {
+        "exchange": "perp",
+        "kind": "perp",
+        "markets": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "14",
+          "15",
+          "16",
+          "17",
+          "18",
+          "19",
+          "20",
+          "21",
+          "22",
+          "23",
+          "24",
+          "25",
+          "26",
+          "27",
+          "28",
+          "29",
+          "30",
+          "31",
+          "32",
+          "33",
+          "34",
+          "35",
+          "36",
+          "37",
+          "38",
+          "39",
+          "40",
+          "41",
+          "42",
+          "43",
+          "44",
+          "45",
+          "46",
+          "47",
+          "48",
+          "49",
+          "50",
+          "51",
+          "52",
+          "53",
+          "54",
+          "55",
+          "56",
+          "57"
+        ]
+      }
+    ],
+    "venue": "risex",
+    "version": 6
+  }
+}

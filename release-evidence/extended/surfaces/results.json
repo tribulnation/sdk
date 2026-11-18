@@ -231,6 +231,14 @@
       {
         "exclusion": null,
         "failed": 0,
+        "id": "market.test_account_read[\"perp:BTC-USD\", \"remaining_position_limit\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
         "id": "market.test_account_read[\"perp:BTC-USD\", \"collateral_id\"]",
         "network": "mainnet",
         "passed": 1,
