@@ -226,6 +226,16 @@ class RisexPerpMarket(Public, PerpMarket):
     """The account's leverage on the market: its setting, else the market maximum."""
     return await account.leverage(self.shared, self.index_id, ttl=ttl)
 
+  async def set_leverage(self, leverage: Decimal):
+    """Set the account's leverage on the market with a signed permit, leaving the
+    margin mode alone; the next `leverage()` reads the new setting.
+
+    Raises:
+      ValueError: `leverage` is not a positive whole number, or is above 255.
+      AuthError: The client has no signer key.
+    """
+    await account.set_leverage(self.shared, self.index_id, leverage)
+
   async def index(self, *, settings: Settings = {}) -> Decimal:
     """The market's oracle index price, past the venue's 5-minute cache."""
     return (await self.shared.fresh(self.index_id))['index_price']

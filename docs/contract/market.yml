@@ -1402,6 +1402,7 @@ methods:
         extended: {market_id: 'extended:perp:BTC-USD', leverage: '5'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', leverage: '5'}
         lighter: {market_id: 'lighter:perp:1', leverage: '5'}
+        risex: {market_id: 'risex:perp:1', leverage: '10'}
       callTemplate: |
         from decimal import Decimal
 

@@ -11,11 +11,14 @@ from typing_extensions import Sequence
 from typed_risex.account.positions import BuilderPosition
 from typed_risex.portfolio.details import PortfolioDetails
 from tribulnation.sdk.market import PerpCollateral, PerpPosition
+from tribulnation.sdk.util import whole_leverage
 
 from ..core import Shared, wad
 
 ISOLATED = 1
 """The venue's `margin_mode` of an isolated position (`0` is cross)."""
+MAX_LEVERAGE_SETTING = 255
+"""The highest leverage a permit can carry: it commits to the value as a `uint8`."""
 ISOLATED_UNOBSERVED = (
   'RISEx isolated positions are not supported yet: how the account summary counts '
   'their margin is unobserved'
@@ -77,6 +80,32 @@ async def leverage(shared: Shared, market_id: int, *, ttl: timedelta | None) -> 
     ttl=ttl,
   )
   return row['position']['leverage']
+
+
+async def set_leverage(shared: Shared, market_id: int, leverage: Decimal):
+  """Set the account's leverage on the market (`account.update_leverage`).
+
+  A signed permit, like orders, mined before the venue replies. The margin mode is a
+  separate venue setting (`update_margin_mode`), so this leaves it alone. The shared
+  `account.position` read is dropped, so the next `leverage()` reads the new setting.
+  A leverage above the market's maximum is the venue's to refuse.
+
+  Raises:
+    ValueError: `leverage` is not a positive whole number, or is above 255.
+    AuthError: The client has no signer key.
+  """
+  value = whole_leverage(leverage)
+  if value > MAX_LEVERAGE_SETTING:
+    raise ValueError(
+      f'RISEx leverage is at most {MAX_LEVERAGE_SETTING} (a uint8 in the permit), '
+      f'got {leverage}'
+    )
+  shared.require_signer()
+  account = shared.require_account()
+  await shared.call(
+    lambda: shared.client.account.update_leverage(market_id, leverage=str(value))
+  )
+  shared.reads.forget(('position', account, market_id))
 
 
 async def details(shared: Shared, *, ttl: timedelta | None) -> PortfolioDetails:
