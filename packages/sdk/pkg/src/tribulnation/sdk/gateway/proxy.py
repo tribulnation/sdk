@@ -49,6 +49,7 @@ from tribulnation.sdk.market import (
   OrderState,
   Position,
   PerpPosition,
+  PositionHeadroom,
   Collateral,
   PerpCollateral,
   FundingRate,
@@ -551,6 +552,15 @@ class ProxyPerpMarket(ProxyMarket, PerpMarket):
       codec.AvailableNotionalReq(id=self._mid(), market_id=self.id, ttl=ttl)
     )
     return resp.value
+
+  async def position_headroom(
+    self, *, ttl: timedelta | None = None
+  ) -> PositionHeadroom:
+    """Forward position headroom through the gateway."""
+    resp: codec.PositionHeadroomResp = await self._conn.call(
+      codec.PositionHeadroomReq(id=self._mid(), market_id=self.id, ttl=ttl)
+    )
+    return resp.headroom
 
   async def collateral_id(self) -> str:
     """Forward the collateral ID through the gateway, caching it after the first call."""

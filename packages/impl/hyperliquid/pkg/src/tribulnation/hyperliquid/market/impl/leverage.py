@@ -1,10 +1,17 @@
-"""Account leverage on perpetual markets and the opening capacity it implies."""
+"""Account leverage on perpetual markets, the opening capacity it implies, and the venue's position limits."""
 
 from datetime import timedelta
 from decimal import Decimal
 import asyncio
 
 from typed_hyperliquid.info.active_asset_data import ActiveAssetData
+from typed_hyperliquid.info.clearinghouse_state import ClearinghouseState
+from typed_hyperliquid.info.perp_meta_and_asset_ctxs import (
+  PerpDexMeta,
+  PerpUniverseAsset,
+)
+
+from tribulnation.sdk.market import PositionHeadroom
 
 from tribulnation.hyperliquid.core import wrap_exceptions
 from .collateral import spot_collateral
@@ -60,3 +67,75 @@ async def perp_available_notional(
   )
   _, free = spot_collateral(state, self.collateral_meta['index'])
   return free * leverage
+
+
+def tier_limit(
+  meta: PerpDexMeta, asset: PerpUniverseAsset, *, leverage: Decimal
+) -> Decimal | None:
+  """The most position notional the asset's margin table allows at `leverage`.
+
+  A tier's `maxLeverage` applies from its `lowerBound` up, so the position may grow
+  up to the first tier that no longer allows `leverage`; beyond it Hyperliquid refuses
+  orders with `PerpMaxPosition`. `None` when every tier allows it, or the asset's
+  table is not listed (ids below 50 are single-tier tables at `maxLeverage`).
+  """
+  tables = dict(meta['marginTables'])
+  if (table := tables.get(asset.get('marginTableId', -1))) is not None:
+    bounds = [
+      t['lowerBound'] for t in table['marginTiers'] if t['maxLeverage'] < leverage
+    ]
+    return min(bounds, default=None)
+
+
+def held_position(
+  state: ClearinghouseState, coin: str
+) -> tuple[Decimal, Decimal | None]:
+  """The signed notional of the position in `coin` (`positionValue`, positive long) and its leverage; 0 and None when flat."""
+  for entry in state['assetPositions']:
+    pos = entry['position']
+    if pos['coin'] == coin:
+      value = pos['positionValue'] if pos['szi'] >= 0 else -pos['positionValue']
+      return value, Decimal(pos['leverage']['value'])
+  return Decimal(0), None
+
+
+def capped(coin: str, capped_coins: frozenset[str]) -> bool:
+  """Whether `coin` (`dex:`-prefixed off the default dex) is listed at its open-interest cap, prefixed or not."""
+  return coin in capped_coins or coin.partition(':')[2] in capped_coins
+
+
+@wrap_exceptions
+async def perp_position_headroom(
+  self: PerpMarketMixin, *, ttl: timedelta | None = None
+) -> PositionHeadroom:
+  """Nothing while the coin is at its open-interest cap, else the margin tier limit's room.
+
+  `perpsAtOpenInterestCap` lists coins where only reducing orders are accepted, so
+  neither direction may grow. Otherwise the margin table bounds the position's
+  notional at its leverage (`tier_limit`); without such a bound the headroom is
+  unknown (`None`). Hyperliquid's own per-user figures
+  (`activeAssetData.maxTradeSzs`) also count free margin, which
+  `available_notional()` covers, so they are not used here.
+
+  Costs two reads shared by every coin of the dex (`ttl`): `perpsAtOpenInterestCap`
+  and `clearinghouseState`. The leverage is the open position's; a flat coin is
+  bounded at the asset's `maxLeverage`, the tightest tier limit any setting has, rather
+  than reading the setting (`activeAssetData`) one coin per request.
+  """
+  coin = self.asset_name
+  capped_coins, (_, meta, _), state = await asyncio.gather(
+    self.shared.perps_at_open_interest_cap(self.dex_name, ttl=ttl),
+    self.shared.load_perp_meta_for_dex(self.dex_name),
+    self.shared.clearinghouse_state(self.dex_name, ttl=ttl),
+  )
+  if capped(coin, capped_coins):
+    return PositionHeadroom(long=Decimal(0), short=Decimal(0))
+  else:
+    asset = meta['universe'][find_asset_idx(coin, meta)]
+    position, leverage = held_position(state, coin)
+    return PositionHeadroom.capped(
+      max_notional=tier_limit(
+        meta, asset, leverage=leverage or Decimal(asset['maxLeverage'])
+      ),
+      position=position,
+    )

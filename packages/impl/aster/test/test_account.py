@@ -3,7 +3,8 @@
 Fixtures follow mainnet payload shapes observed on 2026-10-08, with invented values.
 """
 
-from datetime import datetime, timezone
+import asyncio
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from unittest.mock import AsyncMock
 from typing_extensions import Any
@@ -33,6 +34,7 @@ from tribulnation.sdk.core import MissingData
 from tribulnation.sdk.market import (
   Balance,
   PerpCollateral,
+  PositionHeadroom,
   SpotBalances,
   SpotCollateralIds,
 )
@@ -403,6 +405,153 @@ async def test_available_notional_applies_bracket_and_open_interest_caps(
   )
   assert await perp().available_notional() == Decimal(expected)
   assert cap.await_args is not None and cap.await_args.kwargs == {'leverage': 5}
+
+
+def risk_row(
+  symbol: str = 'BTCUSDT',
+  *,
+  amount: str = '0',
+  notional: str = '0',
+  max_notional: str = '1000000',
+  leverage: int = 5,
+) -> dict[str, Any]:
+  """A one-way `positionRisk` row, as the all-symbol read lists every symbol."""
+  return {
+    'symbol': symbol,
+    'leverage': leverage,
+    'marginType': 'cross',
+    'positionSide': 'BOTH',
+    'positionAmt': Decimal(amount),
+    'entryPrice': Decimal(0),
+    'notional': Decimal(notional),
+    'maxNotionalValue': Decimal(max_notional),
+  }
+
+
+@pytest.mark.parametrize(
+  'amount,notional,max_notional,remaining,expected',
+  [
+    (
+      '0.01',
+      '1200',
+      '2000',
+      '-1',
+      PositionHeadroom(long=Decimal(800), short=Decimal(2000)),
+    ),
+    (
+      '0.01',
+      '1200',
+      '2000',
+      '500',
+      PositionHeadroom(long=Decimal(500), short=Decimal(500)),
+    ),
+    (
+      '-0.01',
+      '-1200',
+      '2000',
+      '-1',
+      PositionHeadroom(long=Decimal(2000), short=Decimal(800)),
+    ),
+    (
+      '0.01',
+      '1200',
+      '1000',
+      '-1',
+      PositionHeadroom(long=Decimal(0), short=Decimal(1000)),
+    ),
+  ],
+)
+async def test_position_headroom_is_the_bracket_room_per_direction(
+  amount: str,
+  notional: str,
+  max_notional: str,
+  remaining: str,
+  expected: PositionHeadroom,
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """`maxNotionalValue` less what each direction holds, bounded by the symbol's remaining cap; free balance plays no part."""
+  row = risk_row(amount=amount, notional=notional, max_notional=max_notional)
+  monkeypatch.setattr(Risk, 'risk', AsyncMock(return_value=[row]))
+  cap = AsyncMock(return_value={'remainingOpenableNotionalValue': Decimal(remaining)})
+  monkeypatch.setattr(
+    RemainingOpenableNotionalValue, 'remaining_openable_notional_value', cap
+  )
+  assert await perp().position_headroom() == expected
+  assert cap.await_args is not None and cap.await_args.kwargs == {'leverage': 5}
+
+
+HEADROOM_SYMBOLS = [f'S{i}USDT' for i in range(22)]
+
+
+def headroom_venue(
+  monkeypatch: pytest.MonkeyPatch,
+) -> tuple[AsterMarket, AsyncMock, AsyncMock]:
+  """One client listing every symbol of `HEADROOM_SYMBOLS` in `positionRisk`, allowance 300 on each; the two endpoint mocks."""
+  risk_mock = AsyncMock(return_value=[risk_row(s) for s in HEADROOM_SYMBOLS])
+  monkeypatch.setattr(Risk, 'risk', risk_mock)
+  cap = AsyncMock(return_value={'remainingOpenableNotionalValue': Decimal(300)})
+  monkeypatch.setattr(
+    RemainingOpenableNotionalValue, 'remaining_openable_notional_value', cap
+  )
+  return AsterMarket.new(public=True), risk_mock, cap
+
+
+async def headroom_round(venue: AsterMarket) -> list[PositionHeadroom]:
+  """Every symbol's headroom, read at once as `AccountCollateral` does."""
+  markets = [PerpMarket(shared=venue.shared, symbol=s) for s in HEADROOM_SYMBOLS]
+  return await asyncio.gather(
+    *(m.position_headroom(ttl=timedelta(seconds=1)) for m in markets)
+  )
+
+
+async def test_headroom_of_every_symbol_costs_one_account_read_and_a_bounded_allowance(
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """22 symbols at once: one `positionRisk` and the allowance burst (3); the rest are unknown (`None`) until the budget refills, never one request per symbol."""
+  venue, risk_mock, cap = headroom_venue(monkeypatch)
+  rows = await headroom_round(venue)
+  assert risk_mock.await_count == 1
+  assert cap.await_count == 3
+  assert sum(r.long == Decimal(300) for r in rows) == 3
+  assert all(r.long == Decimal(1000000) for r in rows if r.long != Decimal(300))
+
+
+async def test_allowance_budget_bounds_requests_per_minute(
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """Read every minute for an hour: the allowance requests stay within the burst plus 3 a minute, and each symbol is reused for 10 minutes."""
+  venue, risk_mock, cap = headroom_venue(monkeypatch)
+  clock = [0.0]
+  loop = asyncio.get_running_loop()
+  monkeypatch.setattr(loop, 'time', lambda: clock[0])
+  counts: list[int] = []
+  for _ in range(60):
+    before = cap.await_count
+    await headroom_round(venue)
+    counts.append(cap.await_count - before)
+    clock[0] += 60
+  assert counts[0] == 3
+  assert max(counts) <= 3
+  for start in range(60):
+    for end in range(start + 1, 61):
+      assert sum(counts[start:end]) <= 3 * (end - start)
+  # 22 symbols every 10 minutes is 2.2 a minute, within budget: every one is read.
+  assert {c.args[0] for c in cap.await_args_list} == set(HEADROOM_SYMBOLS)
+  assert risk_mock.await_count == 60
+
+
+async def test_a_position_limit_refusal_reads_the_allowance_again(
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """`forget_open_interest` drops the symbol's answer: the next headroom asks again, within budget."""
+  venue, _, cap = headroom_venue(monkeypatch)
+  market = PerpMarket(shared=venue.shared, symbol=HEADROOM_SYMBOLS[0])
+  await market.position_headroom()
+  await market.position_headroom()
+  assert cap.await_count == 1
+  venue.shared.forget_open_interest(HEADROOM_SYMBOLS[0])
+  await market.position_headroom()
+  assert cap.await_count == 2
 
 
 def contract(symbol: str) -> dict[str, Any]:

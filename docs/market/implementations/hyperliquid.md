@@ -119,6 +119,12 @@ async with sdk.depth_stream('hl::ETH', settings={'hyperliquid': {'depth_source':
   because an isolated position is opened from that account pool, not from its own
   bucket, and because it needs one request instead of the mode-aware collateral's four.
   Like the old figure, it does not check the account abstraction mode.
+- **`position_headroom`** (perp) is nothing either way while the coin is listed by
+  `perpsAtOpenInterestCap` (reduce-only for everyone), else the margin table's bound at
+  the position's leverage (a flat coin's `maxLeverage`, the tightest bound) less the
+  position held in each direction, `None` when no tier binds (ADR 0060). It reads only
+  `perpsAtOpenInterestCap` and `clearinghouseState`, each shared by every coin of the dex. Order errors at the open-interest cap raise `OpenInterestCapped`;
+  the margin tier limit (`PerpMaxPosition`) raises `PositionLimitExceeded`.
 - **Spot `balances`** are the base and quote tokens' `total` and `total - hold` from one
   `spot_clearinghouse_state` read. Spot rules name the pair by token index (`base='197'`,
   `quote='0'` for UBTC/USDC), Hyperliquid's asset IDs.
