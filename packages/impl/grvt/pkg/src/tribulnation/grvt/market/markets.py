@@ -191,6 +191,16 @@ class GrvtPerpMarket(OrderBookMarket, PerpMarket):
     """The account's initial leverage on this market."""
     return await account.leverage(self.shared, self.instrument, ttl=ttl)
 
+  async def set_leverage(self, leverage: Decimal):
+    """Set the account's initial leverage on this market, keeping its margin type.
+
+    Raises:
+      ValueError: `leverage` is not a positive whole number, or outside the
+        instrument's `[min_leverage, max_leverage]`.
+      AuthError: The client has no private key to sign with.
+    """
+    await account.set_leverage(self.shared, self.instrument, leverage)
+
   async def collateral_id(self) -> str:
     """The trading sub-account's cross pool, `<account_id>:<exchange_id>`: it funds
     isolated positions too, whose margin moves out of it when they open."""

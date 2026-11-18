@@ -8,8 +8,10 @@ from typing_extensions import Literal
 
 from typed_grvt.schemas import ClientTier, Position, SpotBalance
 from typed_grvt.trading.account_summary import SubAccount
-from tribulnation.sdk.core import MissingData
+from typed_grvt.trading.all_initial_leverage import InitialLeverageResult
+from tribulnation.sdk.core import ApiError, MissingData
 from tribulnation.sdk.market import Balance, Fees, PerpCollateral, PerpPosition
+from tribulnation.sdk.util import whole_leverage
 
 from ..core import FEE_UNIT, Shared
 from .common import scope
@@ -177,24 +179,76 @@ def market_bucket(s: SubAccount, instrument: str) -> PerpCollateral:
   return cross_bucket(s)
 
 
-async def leverage(
+LEVERAGE_READ = ('all_initial_leverage',)
+"""The shared key of the account-wide `all_initial_leverage` read."""
+
+
+async def initial_leverage(
   shared: Shared, instrument: str, *, ttl: timedelta | None = None
-) -> Decimal:
-  """The account's initial leverage on the instrument (`all_initial_leverage`, 10 unless
-  changed). It is the instrument's setting in either margin type: an isolated position
-  opens with it too. One account-wide answer serves every instrument, shared for the
-  caller's `ttl`.
+) -> InitialLeverageResult:
+  """The account's leverage setting on the instrument, with its margin type and allowed
+  range (`all_initial_leverage`). One account-wide answer serves every instrument,
+  shared for the caller's `ttl`.
 
   Raises:
     ValueError: The venue reports no leverage for the instrument.
   """
   shared.require_session()
   response = await shared.reads.read(
-    ('all_initial_leverage',),
+    LEVERAGE_READ,
     lambda: shared.call(shared.client.trading.all_initial_leverage),
     ttl=ttl,
   )
   for row in response['results']:
     if row['instrument'] == instrument:
-      return row['leverage']
+      return row
   raise ValueError(f'GRVT reports no leverage for {instrument}')
+
+
+async def leverage(
+  shared: Shared, instrument: str, *, ttl: timedelta | None = None
+) -> Decimal:
+  """The account's initial leverage on the instrument (`all_initial_leverage`, 10 unless
+  changed). It is the instrument's setting in either margin type: an isolated position
+  opens with it too.
+
+  Raises:
+    ValueError: The venue reports no leverage for the instrument.
+  """
+  row = await initial_leverage(shared, instrument, ttl=ttl)
+  return row['leverage']
+
+
+async def set_leverage(shared: Shared, instrument: str, leverage: Decimal):
+  """Set the account's initial leverage on the instrument (`set_position_config`).
+
+  The endpoint sets the margin type too, so the instrument's current one is read
+  afresh and sent back unchanged. The request is EIP-712 signed by the client, like
+  orders. A value outside the instrument's `[min_leverage, max_leverage]` (from the
+  same read) is refused before sending. The shared leverage read is dropped after, so
+  the next `leverage()` asks the venue.
+
+  Raises:
+    ValueError: `leverage` is not a positive whole number, outside the instrument's
+      allowed range, or the venue reports no leverage for the instrument.
+    AuthError: The client has no private key to sign with.
+    ApiError: The venue did not acknowledge the change.
+  """
+  value = whole_leverage(leverage)
+  shared.require_signer()
+  row = await initial_leverage(shared, instrument, ttl=None)
+  if not row['min_leverage'] <= value <= row['max_leverage']:
+    raise ValueError(
+      f'GRVT allows leverage {row["min_leverage"]} to {row["max_leverage"]} on '
+      f'{instrument}, got {value}'
+    )
+  try:
+    reply = await shared.call(
+      lambda: shared.client.trading.set_position_config(
+        instrument=instrument, margin_type=row['margin_type'], leverage=Decimal(value)
+      )
+    )
+  finally:
+    shared.reads.forget(LEVERAGE_READ)
+  if not reply['ack']:
+    raise ApiError(f'GRVT did not acknowledge leverage {value} on {instrument}')

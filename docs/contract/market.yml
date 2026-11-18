@@ -1400,6 +1400,7 @@ methods:
         hyperliquid: {market_id: 'hyperliquid::BTC', leverage: '5'}
         aster: {market_id: 'aster:perp:BTCUSDT', leverage: '5'}
         extended: {market_id: 'extended:perp:BTC-USD', leverage: '5'}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', leverage: '5'}
       callTemplate: |
         from decimal import Decimal
 
