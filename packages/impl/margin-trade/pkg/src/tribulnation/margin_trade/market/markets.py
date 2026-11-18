@@ -33,6 +33,7 @@ from tribulnation.sdk.core import (
   PaginatedResponse,
 )
 from tribulnation.sdk.market.types.rules import valid_price
+from tribulnation.sdk.util import whole_leverage
 from tribulnation.sdk.market import (
   Book,
   Candle,
@@ -601,6 +602,31 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     )
     return Decimal(data['leverage']['value'])
 
+  async def set_leverage(self, leverage: Decimal):
+    """Set the account's leverage on this market (`updateLeverage`), keeping its mode.
+
+    Cross, unless the account's fresh `activeAssetData` setting is isolated or the
+    market allows isolated margin only (`isolated_only`). The request is signed like
+    orders, and the shared `activeAssetData` answer is dropped, so the next
+    `leverage()` reads the new setting. A leverage above the market's `maxLeverage` is
+    the venue's to refuse.
+
+    Raises:
+      ValueError: `leverage` is not a positive whole number.
+    """
+    value = whole_leverage(leverage)
+    address, coin = self.shared.address, self.coin
+    data = await self.shared.call(
+      lambda: self.client.info.active_asset_data(user=address, coin=coin)
+    )
+    isolated = data['leverage']['type'] == 'isolated' or isolated_only(self.meta)
+    await self.shared.call(
+      lambda: self.client.exchange.update_leverage(
+        asset=self.asset, is_cross=not isolated, leverage=value
+      )
+    )
+    self.shared.reads.forget(('activeAssetData', coin))
+
   async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """The cross bucket; an isolated position's own bucket is not supported."""
     state = await self.shared.call(
@@ -613,6 +639,15 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
           f'margin.trade isolated collateral is not supported [{self.id}]'
         )
     return cross_collateral(state)
+
+
+def isolated_only(item: PerpUniverseItem) -> bool:
+  """Whether the market refuses cross margin: `onlyIsolated`, or a `marginMode` of
+  `strictIsolated` or `noCross` (the Hyperliquid modes the venue's schema mirrors)."""
+  return bool(item.get('onlyIsolated')) or item.get('marginMode') in (
+    'strictIsolated',
+    'noCross',
+  )
 
 
 def placed(status: RestingStatus | FilledStatus) -> OrderResponse:

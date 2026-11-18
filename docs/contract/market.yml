@@ -1403,6 +1403,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', leverage: '5'}
         lighter: {market_id: 'lighter:perp:1', leverage: '5'}
         risex: {market_id: 'risex:perp:1', leverage: '10'}
+        margin-trade: {market_id: 'margin-trade:perp:BTC', leverage: '5'}
       callTemplate: |
         from decimal import Decimal
 

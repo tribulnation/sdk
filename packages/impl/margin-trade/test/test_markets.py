@@ -1,15 +1,19 @@
 """Order placement, price rounding and market metadata mapping, without network calls."""
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from unittest.mock import AsyncMock
-from typing_extensions import Any, Callable
+from typing_extensions import Any, Callable, Literal
 
 import pytest
+import typed_core
 from typed_margin_trade.exchange.batch_modify import BatchModify
 from typed_margin_trade.exchange.cancel import Cancel
 from typed_margin_trade.exchange.order import Order as OrderEndpoint
+from typed_margin_trade.exchange.update_leverage import UpdateLeverage
+from typed_margin_trade.info.active_asset_data import ActiveAssetDataEndpoint
 from typed_margin_trade.schemas import (
+  ActiveAssetData,
   ClearinghouseState,
   FilledOrder,
   L2Book,
@@ -75,6 +79,8 @@ PAIR: SpotPair = {
   'spotMinBuyQuoteAmount': Decimal('10'),
   'spotMinSellBaseQuantity': Decimal('10'),
 }
+
+ADDRESS = '0x' + '1' * 40
 
 
 def perp() -> PerpMarket:
@@ -467,3 +473,93 @@ async def test_unsupported_methods_raise():
   """Funding-rate history is not served by the venue."""
   with pytest.raises(NotImplementedError):
     perp().funding_rates()
+
+
+def leverage_endpoints(
+  monkeypatch: pytest.MonkeyPatch, mode: Literal['cross', 'isolated'] = 'cross'
+) -> tuple[AsyncMock, AsyncMock]:
+  """Stub `activeAssetData` (the account's `mode` at 3x) and `updateLeverage`."""
+  data: ActiveAssetData = {
+    'user': ADDRESS,
+    'coin': 'BTC',
+    'leverage': {'type': mode, 'value': 3},
+    'maxTradeSzs': [Decimal(1), Decimal(1)],
+    'availableToTrade': [Decimal(100), Decimal(100)],
+  }
+  read = AsyncMock(return_value=data)
+  update = AsyncMock(return_value=None)
+  monkeypatch.setattr(ActiveAssetDataEndpoint, 'active_asset_data', read)
+  monkeypatch.setattr(UpdateLeverage, 'update_leverage', update)
+  return read, update
+
+
+def account_perp(meta: PerpUniverseItem = BTC) -> PerpMarket:
+  """A testnet perpetual reading `ADDRESS`'s account."""
+  shared = MarginTradeMarket.new(mainnet=False, address=ADDRESS).shared
+  return PerpMarket(shared=shared, meta=meta)
+
+
+@pytest.mark.parametrize('mode', ['cross', 'isolated'])
+async def test_set_leverage_keeps_the_accounts_mode(
+  mode: Literal['cross', 'isolated'], monkeypatch: pytest.MonkeyPatch
+):
+  """The whole value goes to the market's asset index in the mode read fresh."""
+  read, update = leverage_endpoints(monkeypatch, mode)
+  await account_perp({**BTC, 'index': 7}).set_leverage(Decimal('5.0'))
+  read.assert_awaited_once_with(user=ADDRESS, coin='BTC')
+  update.assert_awaited_once_with(asset=7, is_cross=mode == 'cross', leverage=5)
+
+
+@pytest.mark.parametrize(
+  'meta',
+  [
+    {**BTC, 'onlyIsolated': True},
+    {**BTC, 'marginMode': 'strictIsolated'},
+    {**BTC, 'marginMode': 'noCross'},
+  ],
+)
+async def test_set_leverage_on_an_isolated_only_market_stays_isolated(
+  meta: PerpUniverseItem, monkeypatch: pytest.MonkeyPatch
+):
+  """A market refusing cross margin is set isolated whatever the account reports."""
+  _, update = leverage_endpoints(monkeypatch, 'cross')
+  await account_perp(meta).set_leverage(Decimal(5))
+  update.assert_awaited_once_with(asset=0, is_cross=False, leverage=5)
+
+
+@pytest.mark.parametrize('leverage', [Decimal(0), Decimal(-2), Decimal('2.5')])
+async def test_set_leverage_refuses_bad_values_before_any_request(
+  leverage: Decimal, monkeypatch: pytest.MonkeyPatch
+):
+  """Only positive whole numbers are sent; nothing is read or written otherwise."""
+  read, update = leverage_endpoints(monkeypatch)
+  with pytest.raises(ValueError, match='positive whole'):
+    await account_perp().set_leverage(leverage)
+  read.assert_not_awaited()
+  update.assert_not_awaited()
+
+
+async def test_set_leverage_forgets_the_shared_read(monkeypatch: pytest.MonkeyPatch):
+  """After setting, `leverage()` asks the venue again rather than reuse its answer."""
+  read, _ = leverage_endpoints(monkeypatch)
+  m = account_perp()
+  hour = timedelta(hours=1)
+  assert await m.leverage(ttl=hour) == Decimal(3)
+  assert await m.leverage(ttl=hour) == Decimal(3)
+  assert read.await_count == 1
+  await m.set_leverage(Decimal(5))
+  assert read.await_count == 2
+  await m.leverage(ttl=hour)
+  assert read.await_count == 3
+
+
+async def test_failed_set_leverage_is_translated(monkeypatch: pytest.MonkeyPatch):
+  """A venue refusal surfaces as the SDK's error, and the shared read is kept."""
+  read, update = leverage_endpoints(monkeypatch)
+  update.side_effect = typed_core.ApiError('leverage above maxLeverage')
+  m = account_perp()
+  await m.leverage(ttl=timedelta(hours=1))
+  with pytest.raises(ApiError, match='maxLeverage'):
+    await m.set_leverage(Decimal(50))
+  await m.leverage(ttl=timedelta(hours=1))
+  assert read.await_count == 2
