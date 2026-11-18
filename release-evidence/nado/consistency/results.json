@@ -1,0 +1,402 @@
+{
+  "payload": {
+    "account_id": "nado",
+    "checks": [
+      {
+        "code": "ok",
+        "id": "[\"discovery\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"exchange_identity\",\"perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"exchange_identity\",\"spot\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"spot\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"perp\",\"bulk\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"perp\",\"empty\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"perp\",\"selected\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"setup\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"perp\",\"AAPL-PERP\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": "352.73",
+            "after_bid": "352.7",
+            "ask": "352.73",
+            "attempt": 1,
+            "before_ask": "352.73",
+            "before_bid": "352.7",
+            "bid": "352.7",
+            "elapsed_seconds": 0.7849378869868815,
+            "ticker_ids_match": true
+          }
+        ],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"perp\",\"AAVE-PERP\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": "107.26",
+            "after_bid": "107.24",
+            "ask": "107.26",
+            "attempt": 1,
+            "before_ask": "107.26",
+            "before_bid": "107.24",
+            "bid": "107.24",
+            "elapsed_seconds": 0.7851236970163882,
+            "ticker_ids_match": true
+          }
+        ],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "empty_book",
+        "id": "[\"ticker_depth\",\"perp\",\"ADA-PERP\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 1,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 0.7813191439490765,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 2,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 0.7655407020356506,
+            "ticker_ids_match": true
+          },
+          {
+            "after_ask": null,
+            "after_bid": null,
+            "ask": null,
+            "attempt": 3,
+            "before_ask": null,
+            "before_bid": null,
+            "bid": null,
+            "elapsed_seconds": 0.7782839080318809,
+            "ticker_ids_match": true
+          }
+        ],
+        "rfq": null,
+        "status": "unavailable"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"perp\",\"BTC-PERP\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": "62682",
+            "after_bid": "62681",
+            "ask": "62682",
+            "attempt": 1,
+            "before_ask": "62682",
+            "before_bid": "62681",
+            "bid": "62681",
+            "elapsed_seconds": 0.7990872110240161,
+            "ticker_ids_match": true
+          }
+        ],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"spot\",\"KBTC\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": "62769",
+            "after_bid": "62739",
+            "ask": "62769",
+            "attempt": 1,
+            "before_ask": "62769",
+            "before_bid": "62739",
+            "bid": "62739",
+            "elapsed_seconds": 0.7774432240985334,
+            "ticker_ids_match": true
+          }
+        ],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"spot\",\"USDC\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": "1.0009",
+            "after_bid": "1.0005",
+            "ask": "1.0009",
+            "attempt": 1,
+            "before_ask": "1.0009",
+            "before_bid": "1.0005",
+            "bid": "1.0005",
+            "elapsed_seconds": 0.7833554998505861,
+            "ticker_ids_match": true
+          }
+        ],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"spot\",\"WETH\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": "1752.21",
+            "after_bid": "1751.63",
+            "ask": "1752.23",
+            "attempt": 1,
+            "before_ask": "1752.27",
+            "before_bid": "1751.63",
+            "bid": "1751.63",
+            "elapsed_seconds": 0.7722320640459657,
+            "ticker_ids_match": true
+          }
+        ],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"perp\",\"bulk\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"perp\",\"empty\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"perp\",\"selected\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"spot\",\"bulk\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"spot\",\"empty\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"spot\",\"selected\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      }
+    ],
+    "discovery": [
+      {
+        "exchange": "perp",
+        "kind": "perp",
+        "markets": [
+          "AVGO-PERP",
+          "MSFT-PERP",
+          "QQQ-PERP",
+          "INTC-PERP",
+          "AAPL-PERP",
+          "MSTR-PERP",
+          "WLD-PERP",
+          "WLFI-PERP",
+          "ASTER-PERP",
+          "AMZN-PERP",
+          "PENG-PERP",
+          "MEGA-PERP",
+          "DELL-PERP",
+          "JUP-PERP",
+          "CASHCAT-PERP",
+          "XPL-PERP",
+          "EURUSD-PERP",
+          "SKHY-PERP",
+          "NVDA-PERP",
+          "LINK-PERP",
+          "AMD-PERP",
+          "XMR-PERP",
+          "LTC-PERP",
+          "ADA-PERP",
+          "MU-PERP",
+          "NEAR-PERP",
+          "BNB-PERP",
+          "CHIP-PERP",
+          "ANTHROPIC-PERP",
+          "AVAX-PERP",
+          "XAG-PERP",
+          "MRVL-PERP",
+          "LIT-PERP",
+          "TSLA-PERP",
+          "BTC-PERP",
+          "ARB-PERP",
+          "GBPUSD-PERP",
+          "USDJPY-PERP",
+          "BBX-PERP",
+          "LLY-PERP",
+          "ENA-PERP",
+          "USELESS-PERP",
+          "CRCL-PERP",
+          "VVV-PERP",
+          "GOOGL-PERP",
+          "SUI-PERP",
+          "MON-PERP",
+          "kPEPE-PERP",
+          "AAVE-PERP",
+          "SKY-PERP",
+          "DOGE-PERP",
+          "WTI-PERP",
+          "XAUT-PERP",
+          "SOL-PERP",
+          "NBIS-PERP",
+          "UNI-PERP",
+          "EIGEN-PERP",
+          "SNDK-PERP",
+          "ZRO-PERP",
+          "FARTCOIN-PERP",
+          "SKR-PERP",
+          "HIMS-PERP",
+          "ONDO-PERP",
+          "HYPE-PERP",
+          "TAO-PERP",
+          "kBONK-PERP",
+          "META-PERP",
+          "ANSEM-PERP",
+          "SPCX-PERP",
+          "XRP-PERP",
+          "ZHIPU-PERP",
+          "ETH-PERP",
+          "PUMP-PERP",
+          "VIRTUAL-PERP",
+          "ZEC-PERP",
+          "ORCL-PERP",
+          "AXS-PERP",
+          "BCH-PERP",
+          "TON-PERP",
+          "PENGU-PERP",
+          "PONS-PERP",
+          "BERA-PERP",
+          "SPY-PERP"
+        ]
+      },
+      {
+        "exchange": "spot",
+        "kind": "spot",
+        "markets": [
+          "wMSFTx",
+          "wAMZNx",
+          "kHYPE",
+          "KBTC",
+          "wGOOGLx",
+          "WETH",
+          "wMETAx",
+          "XAUT0",
+          "wQQQx",
+          "wNVDAx",
+          "wTSLAx",
+          "wAAPLx",
+          "USDC",
+          "wSPYx"
+        ]
+      }
+    ],
+    "venue": "nado",
+    "version": 6
+  }
+}

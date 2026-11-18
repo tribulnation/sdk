@@ -231,6 +231,14 @@
       {
         "exclusion": null,
         "failed": 0,
+        "id": "market.test_account_read[\":BTC\", \"remaining_position_limit\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
         "id": "market.test_account_read[\":BTC\", \"collateral_id\"]",
         "network": "mainnet",
         "passed": 1,
@@ -455,6 +463,14 @@
       {
         "exclusion": null,
         "failed": 0,
+        "id": "market.test_account_read[\"xyz:xyz:SILVER\", \"remaining_position_limit\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
         "id": "market.test_account_read[\"xyz:xyz:SILVER\", \"collateral_id\"]",
         "network": "mainnet",
         "passed": 1,
@@ -672,6 +688,14 @@
         "exclusion": "perp_only",
         "failed": 0,
         "id": "market.test_account_read[\"spot:UBTC/USDC:142\", \"available_notional\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "perp_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"spot:UBTC/USDC:142\", \"remaining_position_limit\"]",
         "network": "mainnet",
         "passed": 0,
         "skipped": 0
