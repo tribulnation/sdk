@@ -1383,6 +1383,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', leverage: '20', free: '8120.00', notional: '162400.00'}
         nado: {market_id: 'nado:perp:BTC-PERP', leverage: '50', free: '8120.00', notional: '406000.00'}
         risex: {market_id: 'risex:perp:1', leverage: '10', free: '8120.00', notional: '81200.00'}
+        bybit: {market_id: 'bybit:perp:BTCUSDT', leverage: '10', free: '8120.00', notional: '81200.00'}
       callTemplate: |
         leverage = await sdk.leverage('{{ constants[accounts[0]].market_id }}')
         notional = await sdk.available_notional('{{ constants[accounts[0]].market_id }}')
@@ -1404,6 +1405,7 @@ methods:
         lighter: {market_id: 'lighter:perp:1', leverage: '5'}
         risex: {market_id: 'risex:perp:1', leverage: '10'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', leverage: '5'}
+        bybit: {market_id: 'bybit:perp:BTCUSDT', leverage: '5'}
       callTemplate: |
         from decimal import Decimal
 
