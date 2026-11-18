@@ -88,4 +88,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0064](0064-bitget-uta-perpetual-trading.md) | Bitget trades USDT-margined perpetuals on a Unified Trading Account | Proposed; builds on 0043 and 0060; implemented, not release-verified |
 | [0065](0065-kraken-futures-and-spot-trading.md) | Kraken Futures and Spot trading | Proposed; implemented, not release-verified; amends 0020 |
 | [0066](0066-set-leverage-and-leverage-not-set.md) | `set_leverage` and `LeverageNotSet` | Proposed; implemented for eight venues, not release-verified |
-| [0067](0067-risex-quoteless-ticker-limitation.md) | RISEx tickers without a top of book, as a visible limitation | Proposed; amends 0048; implemented, not release-verified |
+| [0067](0067-risex-quoteless-ticker-limitation.md) | RISEx tickers without a top of book, as a visible limitation | Accepted; implemented, not release-verified; amends 0048 |
