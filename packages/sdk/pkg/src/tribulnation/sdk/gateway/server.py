@@ -269,6 +269,9 @@ class Gateway:
           id=msg.id,
           value=await (await self._perp_market(msg.market_id)).leverage(ttl=msg.ttl),
         )
+      case codec.SetLeverageReq():
+        await (await self._perp_market(msg.market_id)).set_leverage(msg.leverage)
+        return codec.SetLeverageResp(id=msg.id)
       case codec.CandlesReq():
         return codec.CandlesResp(
           id=msg.id,

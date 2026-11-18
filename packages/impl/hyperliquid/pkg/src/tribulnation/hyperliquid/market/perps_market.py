@@ -41,6 +41,7 @@ from .impl import (
   perps_position,
   perp_market_collateral,
   perp_leverage,
+  set_perp_leverage,
   perp_available_notional,
   perp_position_headroom,
   open_orders,
@@ -143,6 +144,10 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
   async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
     """The account's `activeAssetData` leverage setting, capped at `maxLeverage`."""
     return await perp_leverage(self, ttl=ttl)
+
+  async def set_leverage(self, leverage: Decimal):
+    """Set the account's leverage here, keeping the margin mode; see `set_perp_leverage`."""
+    await set_perp_leverage(self, leverage)
 
   async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     """Free unified collateral times `leverage()`, for cross and isolated alike."""

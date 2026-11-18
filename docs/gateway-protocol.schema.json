@@ -23,6 +23,9 @@
           "$ref": "#/$defs/LeverageReq"
         },
         {
+          "$ref": "#/$defs/SetLeverageReq"
+        },
+        {
           "$ref": "#/$defs/CandlesReq"
         },
         {
@@ -134,6 +137,7 @@
           "depth": "#/$defs/DepthReq",
           "fees": "#/$defs/FeesReq",
           "leverage": "#/$defs/LeverageReq",
+          "set_leverage": "#/$defs/SetLeverageReq",
           "candles": "#/$defs/CandlesReq",
           "exchange": "#/$defs/ExchangeReq",
           "tickers": "#/$defs/TickersReq",
@@ -182,6 +186,9 @@
         },
         {
           "$ref": "#/$defs/LeverageResp"
+        },
+        {
+          "$ref": "#/$defs/SetLeverageResp"
         },
         {
           "$ref": "#/$defs/CandlesResp"
@@ -292,6 +299,7 @@
           "depth": "#/$defs/DepthResp",
           "fees": "#/$defs/FeesResp",
           "leverage": "#/$defs/LeverageResp",
+          "set_leverage": "#/$defs/SetLeverageResp",
           "candles": "#/$defs/CandlesResp",
           "exchange": "#/$defs/ExchangeResp",
           "tickers": "#/$defs/TickersResp",
@@ -430,6 +438,34 @@
         "tag",
         "id",
         "market_id"
+      ]
+    },
+    "SetLeverageReq": {
+      "title": "SetLeverageReq",
+      "description": "Set the account's leverage on a perpetual market.",
+      "type": "object",
+      "properties": {
+        "tag": {
+          "enum": [
+            "set_leverage"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "market_id": {
+          "type": "string"
+        },
+        "leverage": {
+          "type": "string",
+          "format": "decimal"
+        }
+      },
+      "required": [
+        "tag",
+        "id",
+        "market_id",
+        "leverage"
       ]
     },
     "CandlesReq": {
@@ -1835,6 +1871,25 @@
         "tag",
         "id",
         "value"
+      ]
+    },
+    "SetLeverageResp": {
+      "title": "SetLeverageResp",
+      "description": "The leverage was set.",
+      "type": "object",
+      "properties": {
+        "tag": {
+          "enum": [
+            "set_leverage"
+          ]
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "tag",
+        "id"
       ]
     },
     "CandlesResp": {

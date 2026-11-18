@@ -34,6 +34,7 @@ from tribulnation.sdk import (
   PositionLimitExceeded,
   OpenInterestCapped,
   OrderNotFound,
+  LeverageNotSet,
   LogicError,
 )
 from tribulnation.sdk.market import (
@@ -158,6 +159,7 @@ EXCEPTIONS: dict[str, type[Exception]] = {
   'PositionLimitExceeded': PositionLimitExceeded,
   'OpenInterestCapped': OpenInterestCapped,
   'OrderNotFound': OrderNotFound,
+  'LeverageNotSet': LeverageNotSet,
   'LogicError': LogicError,
 }
 
@@ -440,6 +442,13 @@ class LeverageReq(Msg, kw_only=True, tag='leverage'):
   """How old a shared answer may be (ISO 8601 duration); null asks the venue afresh."""
 
 
+class SetLeverageReq(Msg, kw_only=True, tag='set_leverage'):
+  """Set the account's leverage on a perpetual market."""
+
+  market_id: str
+  leverage: Decimal
+
+
 class CandlesReq(Msg, kw_only=True, tag='candles'):
   """Fetch candles in a half-open time window."""
 
@@ -509,6 +518,7 @@ CallReq = (
   DepthReq
   | FeesReq
   | LeverageReq
+  | SetLeverageReq
   | CandlesReq
   | ExchangeReq
   | TickersReq
@@ -761,6 +771,10 @@ class LeverageResp(Msg, kw_only=True, tag='leverage'):
   value: Decimal
 
 
+class SetLeverageResp(Msg, kw_only=True, tag='set_leverage'):
+  """The leverage was set."""
+
+
 class CandlesResp(Msg, kw_only=True, tag='candles'):
   """Historical candles, preserving the SDK's value types."""
 
@@ -798,6 +812,7 @@ ServerMsg = (
   DepthResp
   | FeesResp
   | LeverageResp
+  | SetLeverageResp
   | CandlesResp
   | ExchangeResp
   | TickersResp

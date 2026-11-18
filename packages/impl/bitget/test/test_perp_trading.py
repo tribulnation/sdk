@@ -6,7 +6,13 @@ from decimal import Decimal
 
 import pytest
 
-from tribulnation.sdk.core import ApiError, NetworkError, OrderNotFound, OrderRejected
+from tribulnation.sdk.core import (
+  ApiError,
+  LeverageNotSet,
+  NetworkError,
+  OrderNotFound,
+  OrderRejected,
+)
 from tribulnation.sdk.market import Settings
 from tribulnation.bitget.market.impl import merged_books
 from tribulnation.bitget.market.perp_market import PerpMarket
@@ -210,8 +216,43 @@ async def test_a_symbol_without_a_leverage_setting_raises(
 ):
   """Bitget lists no row until leverage is set; guessing its default could under-hold."""
   fake.symbol_configs.clear()
-  with pytest.raises(ValueError, match='No cross leverage'):
+  with pytest.raises(LeverageNotSet, match='No cross leverage'):
     await market.leverage()
+
+
+async def test_set_leverage_sets_the_cross_row_it_then_reads(
+  fake: 'FakeBitget', market: PerpMarket
+):
+  """`set_leverage` sends a cross setting for the symbol, which `leverage` reads."""
+  fake.symbol_configs.clear()
+  await market.set_leverage(Decimal(3))
+  assert (
+    'POST',
+    'account/set-leverage',
+    {
+      'category': 'USDT-FUTURES',
+      'symbol': 'IOTXUSDT',
+      'leverage': '3',
+      'marginMode': 'crossed',
+    },
+  ) in fake.requests
+  assert await market.leverage() == 3
+
+
+@pytest.mark.parametrize('leverage', [Decimal(0), Decimal(-2), Decimal('2.5')])
+async def test_set_leverage_refuses_a_non_whole_multiple(
+  fake: 'FakeBitget', market: PerpMarket, leverage: Decimal
+):
+  """Only a positive whole multiple is sent; anything else raises before a request."""
+  with pytest.raises(ValueError, match='positive whole number'):
+    await market.set_leverage(leverage)
+  assert not any(e == 'account/set-leverage' for _, e, _ in fake.requests)
+
+
+async def test_a_classic_account_sets_no_leverage(classic_market: PerpMarket):
+  """Leverage is set on UTA accounts only, like every trading call."""
+  with pytest.raises(NotImplementedError):
+    await classic_market.set_leverage(Decimal(3))
 
 
 async def test_the_pool_funds_orders_and_its_free_part_excludes_margin_in_use(
