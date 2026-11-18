@@ -61,3 +61,9 @@ must handle the unordered rows themselves. The flag is test-side metadata, so th
 offline evidence verifiers are unchanged and no other venue's evidence is affected. If
 RISEx fixes its candles, the flag should be removed so the full check guards the
 regression. Acceptance is not release readiness.
+
+Correction (2026-11-17): "no other venue's evidence is affected" above is wrong. The
+flag is qualification tooling under `packages/sdk-dev/pkg/src`, which release scoping
+counts as affecting every venue ([ADR 0033](0033-change-scoped-release-evidence.md),
+decision 2), so each venue's next release after this change needs fresh evidence. The
+decision itself is unchanged.

@@ -23,6 +23,7 @@ from tribulnation.sdk.market import (
   OrderState,
   Settings as MarketSettings,
 )
+from tribulnation.sdk.util import to_decimal
 from typed_dydx.protos.cosmos.tx.v1beta1 import BroadcastTxResponse
 from typed_dydx.protos.dydxprotocol import clob, subaccounts
 from tribulnation.dydx.core import wrap_exceptions
@@ -220,9 +221,9 @@ def _flags(order: Order, settings: Settings) -> Flags:
 
 def export_order(order: Order, settings: Settings) -> OrderParams:
   """Convert an SDK order into dYdX ergonomic order parameters."""
-  signed_qty = Decimal(order['qty'])
+  signed_qty = to_decimal(order['qty'])
   side = 'BUY' if signed_qty >= 0 else 'SELL'
-  price = Decimal(order['price'])
+  price = to_decimal(order['price'])
   size = abs(signed_qty)
   time_in_force = _time_in_force(order, settings)
   reduce_only = settings.get('reduce_only', False)
