@@ -573,7 +573,7 @@ class MarginMarket(Market):
     raise NotImplementedError(f'Account leverage is not implemented: {self.id}')
 
   @SDK.method
-  async def set_leverage(self, leverage: Decimal):
+  async def set_leverage(self, leverage: Decimal) -> None:
     """Set the account's leverage on this market, the value `leverage()` then reads.
 
     The explicit way to configure a market before trading it where the venue reports

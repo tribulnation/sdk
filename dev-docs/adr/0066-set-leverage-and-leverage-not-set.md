@@ -35,7 +35,9 @@ the call that sets it.
    It never changes a margin mode: cross where the SDK trades
    cross, isolated only where the account's setting already is isolated or the venue
    allows nothing else. After setting, shared leverage reads are dropped, so the next
-   `leverage()` asks the venue.
+   `leverage()` asks the venue. Each venue logs the change at `INFO` on its module's
+   logger (`<market id>: leverage set to <value>`); the caller's logging configuration
+   decides where it goes.
 3. The SDK never calls `set_leverage` on its own, and `leverage()` keeps refusing when
    nothing is set. Applying a default is the caller's policy.
 4. Venues:

@@ -1,5 +1,6 @@
 """The perpetual Market object; market ids are the venue's market names (`BTC-USD`)."""
 
+import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -28,6 +29,8 @@ from tribulnation.sdk.market import (
 from ..core import FUNDING_INTERVAL
 from . import account, books, history, orders
 from .common import Public
+
+log = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -253,6 +256,7 @@ class ExtendedPerpMarket(Public, PerpMarket):
       lambda: self.shared.client.account.update_leverage(name, leverage=leverage)
     )
     self.shared.reads.forget(('leverage', name))
+    log.info('%s: leverage set to %s', self.id, leverage)
 
   async def index(self, *, settings: Settings = {}) -> Decimal:
     """The market's index price, fresh from `info.markets`."""

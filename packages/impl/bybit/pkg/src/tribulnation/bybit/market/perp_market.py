@@ -1,5 +1,6 @@
 """Bybit's linear (USDT/USDC-margined) perpetual market (`category='linear'`)."""
 
+import logging
 from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -44,6 +45,8 @@ from .impl import (
   trades_history,
   trades_stream,
 )
+
+log = logging.getLogger(__name__)
 
 LEVERAGE_NOT_MODIFIED = 110043
 """`retCode` for a set-leverage request that names the leverage already set."""
@@ -267,6 +270,7 @@ class PerpMarket(MarketMixin, _PerpMarket):
           raise
 
     await self.call_bybit(send)
+    log.info('%s: leverage set to %s', self.id, leverage)
 
   async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
     """Fetch the max. notional position you can open: free collateral times leverage."""

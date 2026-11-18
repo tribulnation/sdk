@@ -1,5 +1,6 @@
 """Spot and perpetual Market objects over margin.trade coin names."""
 
+import logging
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -73,6 +74,8 @@ from ..core import (
   tick_size,
 )
 from .collateral import cross_collateral, spot_balance
+
+log = logging.getLogger(__name__)
 
 CANDLE_WIDTHS: dict[CandleInterval, timedelta] = {
   '1m': timedelta(minutes=1),
@@ -626,6 +629,7 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
       )
     )
     self.shared.reads.forget(('activeAssetData', coin))
+    log.info('%s: leverage set to %s', self.id, leverage)
 
   async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """The cross bucket; an isolated position's own bucket is not supported."""

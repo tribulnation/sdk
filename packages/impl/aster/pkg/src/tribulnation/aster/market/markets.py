@@ -1120,7 +1120,7 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
         lambda: self.api.account.set_leverage(self.symbol, leverage=value)
       )
       self.shared.reads.forget(POSITION_RISK)
-    log.info('Aster %s leverage set to %s', self.symbol, value)
+    log.info('%s: leverage set to %s', self.id, value)
 
   async def lower_to_max_leverage(self) -> bool:
     """After a `-2027` refusal, lower the symbol's leverage to the highest Aster now allows.

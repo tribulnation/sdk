@@ -1,5 +1,6 @@
 """Perpetual and spot Market objects; market ids are the venue's numeric `market_id`."""
 
+import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -34,6 +35,8 @@ from ..core import FEE_TICK, USDC, percent
 from .account import UNIFIED
 from . import account, books, history, orders, stats
 from .common import Public
+
+log = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -250,6 +253,7 @@ class LighterPerpMarket(MarketBase, PerpMarket):
     finally:
       self.shared.reads.forget(('account', await self.shared.account_index()))
     self.shared.batcher.quota.record(response)
+    log.info('%s: leverage set to %s', self.id, leverage)
 
   async def collateral_id(self) -> str:
     """USDC's spot ID `<account_id>:spot:3` on a unified account, where perps margin the
