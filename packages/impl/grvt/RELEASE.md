@@ -1,19 +1,12 @@
-# tribulnation-grvt 0.3.0
+# tribulnation-grvt 0.4.0
 
-Requires SDK >=4.0.0 (`place_orders` results per order, `replace_order(s)` and `OrderNotFound`, [ADR 0059](../../../dev-docs/adr/0059-replace-orders-and-order-not-found.md)), typed-grvt >=0.2.0 and typed-core >=0.13, unchanged. `replace_order(s)` use the SDK default (cancel, then place); GRVT cancels asynchronously, so a cancel of a gone order is not reported as `OrderNotFound`.
+Requires SDK >=4.1.0 (`set_leverage`, `remaining_position_limit` and `to_decimal`, [ADR 0062](../../../dev-docs/adr/0062-remaining-position-limit-and-limit-refusals.md), [ADR 0066](../../../dev-docs/adr/0066-set-leverage-and-leverage-not-set.md)), typed-grvt >=0.2.0 and typed-core >=0.13, unchanged.
 
-New:
+Changed:
 
-1. A `spot` exchange of GRVT's `SPOT_SWAP` instruments (`GRVT_USDT_SpotSwap`, `USDC_USDT_SpotSwap`): ordinary order books traded with the perpetuals' endpoints and settled in the trading sub-account's spot wallet, separate from its futures wallet. Spot markets are SDK `SpotMarket`s sharing the perpetuals' book, candle, order, cancellation and fill paths.
-2. Spot `balances()`/`balance()` read the spot account summary: `total` is the balance, `free` is `available_to_transfer`. On testnet, resting `POST_ONLY` orders hold their quote cost (buys) or base quantity (sells) there, and cancellations release it.
-3. Spot `collateral_ids()` are `<account>:spot:<asset>` ([ADR 0051](../../../dev-docs/adr/0051-spot-perp-market-types-collateral-ids.md)).
-4. Spot `rules()` have no `fee_asset` and no fees (GRVT publishes no standard spot schedule); `fees()` reads the account tier's spot rates. Fills pay fees in the delivered asset.
-5. Account filters (open orders, trades, fills) carry the instrument's kind, since `GRVT_USDT_SpotSwap` shares base and quote with `GRVT_USDT_Perp`.
-
-Spot trading was verified on testnet (`POST_ONLY` and `MARKET` buys and sells, the three cancellation methods, the fills stream and trade history); no spot order was placed on mainnet.
+1. `settings['grvt'] = {'time_in_force': 'IMMEDIATE_OR_CANCEL'}` sends a `LIMIT` order immediate-or-cancel; on `MARKET` or `POST_ONLY` it raises `ValueError` before signing.
+2. `set_leverage(leverage)` through the signed `set_position_config`, keeping the margin type (up to 6 decimals, within the instrument's bounds; needs the signer key).
+3. `remaining_position_limit()` reads `max_position_size` less the position held in each direction.
+4. Order quantity and price go through the SDK's `to_decimal` (behaviour change): a `float` input keeps its decimal digits (`0.1` is sent as `0.1`) instead of its binary expansion, which grid checks refused or which reached the wire with 50 digits.
 
 Every other method is unchanged.
-
-Release qualification on 2026-11-04 passed the read suites and market consistency.
-Committed evidence under `release-evidence/grvt/` matches pinned Catalogue
-`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes.

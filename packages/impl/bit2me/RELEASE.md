@@ -1,14 +1,9 @@
-# tribulnation-bit2me 0.10.0
+# tribulnation-bit2me 0.10.1
 
-Requires SDK >=3.0.0 (spot and margin market types, collateral IDs and read `ttl`) and typed-bit2me >=0.4.0. Upgrade the SDK and this adapter together: SDK 3.0 changes the base classes this adapter subclasses, so older adapters do not work with it, and this one does not work with SDK 2.
+Requires SDK >=4.1.0 (`set_leverage`, `remaining_position_limit` and `to_decimal`, [ADR 0062](../../../dev-docs/adr/0062-remaining-position-limit-and-limit-refusals.md), [ADR 0066](../../../dev-docs/adr/0066-set-leverage-and-leverage-not-set.md)) and typed-bit2me >=0.4.0, unchanged.
 
-Spot markets no longer serve `position`, `collateral` and `available_notional` through the SDK interface: SDK 3.0 removes them from spot markets ([ADR 0051](../../../dev-docs/adr/0051-spot-perp-market-types-collateral-ids.md)). Spot `balances` and collateral IDs are not mapped yet.
+Changed:
 
-The reads SDK 3.0 gives a `ttl` accept it and ignore it: every read asks the venue ([ADR 0054](../../../dev-docs/adr/0054-caller-chosen-read-staleness.md)).
+1. Order quantity and price go through the SDK's `to_decimal` (behaviour change): a `float` input keeps its decimal digits (`0.1` is sent as `0.1`) instead of its binary expansion, which grid checks refused or which reached the wire with 50 digits.
 
 Every other method is unchanged.
-
-Release qualification on 2026-10-27 passed the read suites and market consistency.
-Committed evidence under `release-evidence/bit2me/` matches pinned Catalogue
-`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
-release follows SDK 3.0.0 publication.
