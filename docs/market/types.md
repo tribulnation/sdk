@@ -66,7 +66,10 @@ raises, rather than quietly placing a different order.
   diff), and in-place `buy`/`sell`. Quantities are base units, and
   `notional = price × qty`. `scaled(m)` returns the book in units of `m` base units each
   (e.g. `m = 1000` turns a Hyperliquid `kPEPE` book into PEPE): prices divided by `m`,
-  quantities multiplied, notionals preserved. `time` is the exchange time the book was current as of,
+  quantities multiplied, notionals preserved. The constructor sorts the levels
+  best-first, as does decoding a book from the gateway, whatever order the levels
+  arrive in. The book's methods rely on that order (`best_bid`/`best_ask` are the
+  first levels): if you edit `bids` or `asks` in place, keep it. `time` is the exchange time the book was current as of,
   timezone-aware UTC. For snapshot feeds (each message a complete book or its top
   levels) it is the time the snapshot was current: the venue's push, event or output
   time for it where the message carries one. For incremental (diff) and on-change
