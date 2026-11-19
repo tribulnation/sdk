@@ -9,6 +9,7 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
+import logging
 
 from tribulnation.sdk.core import PaginatedResponse, ApiError, OverflowPolicy
 from tribulnation.sdk.market import (
@@ -30,12 +31,15 @@ from tribulnation.sdk.market import (
   Trade,
 )
 
+from typed_dydx.indexer.schemas import PerpetualMarket
+
 from tribulnation.dydx.core import wrap_exceptions
 from .impl import (
   CANDLE_INTERVALS,
   MarketMixin,
   candles,
-  max_leverage,
+  account_leverage,
+  custom_imf_ppm,
   parse_book,
   trades_history,
   trades_stream,
@@ -48,6 +52,8 @@ from .impl import (
   cancel_order,
   cancel_orders,
 )
+
+log = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -167,20 +173,68 @@ class Market(MarketMixin, PerpMarket):
     else:
       return f'{self.account_id}:perp.{self.subaccount}'
 
-  async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
-    """`1 / effective initial margin fraction`, from the cached market metadata.
-
-    dYdX has no per-account leverage setting: every subaccount, cross or isolated,
-    opens at the market's initial margin fraction, scaled up by open interest (see
-    `effective_imf`). The open interest and oracle price are those of the cached
-    market list (shared with `rules()`), which `rules(refetch=True)`, tickers and
-    perpetual stats reload; `ttl` is accepted and ignored, like on every dYdX read.
-    """
+  async def cached_market(self) -> PerpetualMarket:
+    """This market's row of the cached market list (shared with `rules()`)."""
     markets = await self.shared.load_markets()
     market = markets.get(self.market)
     if market is None:
       raise ApiError(f'dYdX market not found: {self.market}')
-    return max_leverage(market)
+    return market
+
+  async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
+    """`1 / initial margin fraction`: the larger of the market's effective one and the
+    subaccount's own setting (`MsgUpdateLeverage`), as the chain margins it.
+
+    The market's fraction is its base one scaled up by open interest (see
+    `effective_imf`), from the cached market list (shared with `rules()`), which
+    `rules(refetch=True)`, tickers and perpetual stats reload. The subaccount's setting
+    is read from the chain on every call, so a `set_leverage()` shows once its
+    transaction is in a block. `ttl` is accepted and ignored, like on every dYdX read.
+
+    Raises:
+      AuthError: No address is configured.
+    """
+    address = self.address
+    market = await self.cached_market()
+    pair = int(market['clobPairId'])
+    settings = await self.call_dydx(
+      lambda: self.client.chain.clob.leverage(address, number=self.subaccount)
+    )
+    custom = next(
+      (e.custom_imf_ppm for e in settings.clob_pair_leverage if e.clob_pair_id == pair),
+      None,
+    )
+    return account_leverage(market, custom)
+
+  async def set_leverage(self, leverage: Decimal):
+    """Set the subaccount's leverage here with a signed `MsgUpdateLeverage`.
+
+    The chain takes a custom initial margin fraction in parts per million
+    (`1_000_000 / leverage`), so only leverages with a whole ppm fraction are accepted:
+    `2.5` and `8` are, `3` is refused rather than rounded. dYdX has no margin mode to
+    keep: the setting belongs to the subaccount (cross for the parent, isolated for a
+    child holding an isolated position), and the market's open-interest-scaled fraction
+    still applies when larger. The transaction is simulated first, so the chain's
+    refusals (above the market's maximum, or margin the subaccount's collateral would
+    no longer cover) raise before anything is broadcast. Acceptance is not inclusion:
+    `leverage()` reads the new setting once the transaction is in a block.
+
+    Raises:
+      ValueError: `leverage` is not positive, below 1, above the market's maximum, or
+        not `1_000_000` divided by a whole number.
+      AuthError: The client has no wallet.
+    """
+    market = await self.cached_market()
+    ppm = custom_imf_ppm(leverage, market)
+    pair = int(market['clobPairId'])
+    node = self.client.node
+    wrap_exceptions(node.require_wallet)()
+    await self.call_dydx(
+      lambda: node.update_leverage(
+        {pair: ppm}, subaccount=self.subaccount, simulate=True
+      )
+    )
+    log.info('%s: leverage set to %s', self.id, leverage)
 
   async def place_order(
     self, order: Order, *, settings: Settings = {}
