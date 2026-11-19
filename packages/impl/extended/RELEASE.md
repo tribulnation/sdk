@@ -7,3 +7,8 @@ Changed:
 1. `remaining_position_limit()` shares its reads by default (`ttl` 30 s): the all-market `markets`, positions and leverage reads, one request each shared by every market, instead of per-market reads.
 
 Every other method is unchanged.
+
+Release qualification on 2026-11-19 passed the read suites and market consistency.
+Committed evidence under `release-evidence/extended/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
+release follows SDK 4.2.0 publication.
