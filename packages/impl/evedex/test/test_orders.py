@@ -7,6 +7,7 @@ import pytest
 from tribulnation.evedex.core import ORDER_ID, random_client_order_id
 from tribulnation.evedex.market.markets import EvedexPerpMarket
 from tribulnation.sdk.core import AuthError, OrderNotFound, OrderRejected
+from tribulnation.sdk.market import Order
 
 from .conftest import BUY_ID, SELL_ID, Fake, order, position, refusal
 
@@ -22,19 +23,18 @@ def placements(fake: Fake) -> list[dict[str, object]]:
 
 
 async def test_each_order_type_is_a_limit_at_the_account_leverage(fake: Fake):
-  """`LIMIT` is GTC, `POST_ONLY` adds `postOnly`, `MARKET` is an IOC limit; sells are
-  `SELL` with an unsigned quantity, all at the position record's leverage."""
+  """`LIMIT` is GTC, `MARKET` is an IOC limit; sells are `SELL` with an unsigned
+  quantity, all at the position record's leverage."""
   fake.positions = [position(leverage=3)]
   m = market(fake)
   await m.place_order({'type': 'LIMIT', 'qty': '6', 'price': '0.95'})
-  await m.place_order({'type': 'POST_ONLY', 'qty': Decimal('-6.5'), 'price': '1.01'})
+  await m.place_order({'type': 'LIMIT', 'qty': Decimal('-6.5'), 'price': '1.01'})
   await m.place_order({'type': 'MARKET', 'qty': '6', 'price': '0.9999'})
-  limit, post, ioc = placements(fake)
+  limit, sell, ioc = placements(fake)
   assert limit['side'] == 'BUY' and limit['quantity'] == Decimal('6')
-  assert limit['time_in_force'] is None and limit['post_only'] is None
+  assert limit['time_in_force'] is None and 'post_only' not in limit
   assert limit['leverage'] == 3
-  assert post['side'] == 'SELL' and post['quantity'] == Decimal('6.5')
-  assert post['post_only'] == 'yes'
+  assert sell['side'] == 'SELL' and sell['quantity'] == Decimal('6.5')
   assert ioc['time_in_force'] == 'IOC' and ioc['limit_price'] == Decimal('0.9999')
 
 
@@ -135,3 +135,22 @@ async def test_set_leverage_checks_the_maximum(fake: Fake):
   for bad in (Decimal('2.5'), Decimal(101), Decimal(0)):
     with pytest.raises(ValueError):
       await m.set_leverage(bad)
+
+
+async def test_post_only_is_refused_before_anything_is_sent(fake: Fake):
+  """The venue refuses `postOnly`, so `POST_ONLY` raises before signing, and a
+  `POST_ONLY` replacement before cancelling the order it would replace."""
+  m = market(fake)
+  post: Order = {'type': 'POST_ONLY', 'qty': '6', 'price': '0.95'}
+  with pytest.raises(NotImplementedError):
+    await m.place_order(post)
+  with pytest.raises(NotImplementedError):
+    await m.replace_order(SELL_ID, post)
+  assert fake.calls == []
+
+
+async def test_rules_bound_prices_by_the_mark_band(fake: Fake):
+  """`markPriceLimit` either side of the mark; the absolute range stays in details."""
+  rules = await market(fake, keyed=False).rules()
+  assert rules.rel_min_price == Decimal('0.7') and rules.rel_max_price == Decimal('1.3')
+  assert rules.min_value == 5 and rules.details['minPrice'] == Decimal('0.1973')

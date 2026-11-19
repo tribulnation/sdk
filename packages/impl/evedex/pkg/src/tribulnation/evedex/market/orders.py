@@ -18,6 +18,10 @@ from tribulnation.sdk.util import to_decimal
 from ..core import ORDER_ID, Shared, venue_label
 from .common import parse_order
 
+POST_ONLY_REFUSED = (
+  'EVEDEX refuses post-only orders (`post_only_not_allowed_error` on mainnet and demo, '
+  '2026-11-19)'
+)
 NOT_FOUND = 'order_not_found_error'
 """The label of a cancel or lookup of an order id the venue does not know."""
 
@@ -63,19 +67,23 @@ async def place_order(
 ) -> OrderResponse:
   """Sign and send one limit order at the account's leverage on the instrument.
 
-  `LIMIT` is good-till-cancelled, `POST_ONLY` adds `postOnly`, and `MARKET` is an
-  immediate-or-cancel limit at `price` (the venue's own market order is sized in USD
-  and bounded only by the instrument's slippage limit). The venue reports no execution
-  at placement, so `filled_qty` is `None`.
+  `LIMIT` is good-till-cancelled and `MARKET` an immediate-or-cancel limit at `price`
+  (the venue's own market order is sized in USD and bounded only by the instrument's
+  slippage limit); a non-crossing IOC limit ends `CANCELLED`, nothing resting (mainnet,
+  2026-11-19). The venue reports no execution at placement, so `filled_qty` is `None`.
 
   Raises:
+    NotImplementedError: A `POST_ONLY` order: EVEDEX refuses `postOnly` with
+      `post_only_not_allowed_error` (mainnet and demo, 2026-11-19).
     AuthError: The client has no wallet key.
     ValueError: See `checked`.
     OrderRejected: The venue refused the order: nothing rests.
   """
+  kind = order['type']
+  if kind == 'POST_ONLY':
+    raise NotImplementedError(POST_ONLY_REFUSED)
   qty, price = checked(instrument, order)
   shared.require_wallet()
-  kind = order['type']
   client_id = order.get('client_order_id')
 
   async def send() -> NewOrder:
@@ -87,7 +95,6 @@ async def place_order(
       quantity=abs(qty),
       limit_price=price,
       time_in_force='IOC' if kind == 'MARKET' else None,
-      post_only='yes' if kind == 'POST_ONLY' else None,
       id=client_id,
     )
 

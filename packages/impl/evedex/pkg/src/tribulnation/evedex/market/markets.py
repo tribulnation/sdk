@@ -133,8 +133,10 @@ class EvedexPerpMarket(Public, PerpMarket):
     """Tick (`priceIncrement`), step (`quantityIncrement`), minimum and maximum
     quantity, minimum notional (`minVolume`) and the instrument's standard fee rates.
     `api` is open for every account (`trading` `all` or `schedule`, the session open
-    and the matcher active). The current accepted price range, the mark-price band
-    (`markPriceLimit`) and the leverage tiers stay in `details`."""
+    and the matcher active). The relative price bounds are the mark-price band,
+    `markPriceLimit` either side of the mark (±30% on most instruments; a buy 7% under
+    the mark was accepted on mainnet, 2026-11-19). The absolute range the venue
+    accepts now (`minPrice`/`maxPrice`) and the leverage tiers stay in `details`."""
     row = await self.shared.instrument(self.name, refetch=refetch)
     fees = row['fees']
     return Rules(
@@ -144,6 +146,8 @@ class EvedexPerpMarket(Public, PerpMarket):
       fixed_min_qty=row['minQuantity'],
       min_value=row['minVolume'],
       max_qty=row['maxQuantity'],
+      rel_min_price=1 - row['markPriceLimit'],
+      rel_max_price=1 + row['markPriceLimit'],
       fees=Fees.symmetric(maker=fees['maker'], taker=fees['taker']),
       api=tradable(row),
       details={
@@ -195,14 +199,15 @@ class EvedexPerpMarket(Public, PerpMarket):
     self, order: Order, *, settings: Settings = {}
   ) -> OrderResponse:
     """Sign and send a limit order at the account's leverage on the market: `LIMIT`
-    rests until cancelled, `POST_ONLY` adds `postOnly`, `MARKET` is an
-    immediate-or-cancel limit at `price`.
+    rests until cancelled, `MARKET` is an immediate-or-cancel limit at `price`.
+    `POST_ONLY` is not supported: the venue refuses `postOnly`.
 
     `client_order_id` becomes the order's id, so it must be a venue order id
     (`random_client_order_id()`). `filled_qty` is `None`: the venue accepts orders
     before executing them.
 
     Raises:
+      NotImplementedError: A `POST_ONLY` order.
       AuthError: The client has no wallet key.
       ValueError: Zero size, non-positive or off-grid price or size, or a client order
         id that is not a venue order id.
@@ -213,6 +218,19 @@ class EvedexPerpMarket(Public, PerpMarket):
       account.leverage(self.shared, self.name, ttl=None),
     )
     return await orders.place_order(self.shared, row, order, leverage=leverage)
+
+  async def replace_order(
+    self, id: str, order: Order, *, settings: Settings = {}
+  ) -> OrderResponse:
+    """Cancel `id`, then place `order` (the SDK default; the venue's `replace_limit` is
+    not mapped). A `POST_ONLY` replacement is refused before `id` is cancelled.
+
+    Raises:
+      NotImplementedError: A `POST_ONLY` order; `id` still rests.
+    """
+    if order['type'] == 'POST_ONLY':
+      raise NotImplementedError(orders.POST_ONLY_REFUSED)
+    return await super().replace_order(id, order, settings=settings)
 
   async def cancel_order(self, id: str, *, settings: Settings = {}) -> Any:
     """Cancel by id.

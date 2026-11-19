@@ -46,6 +46,33 @@ Response = list[InstrumentInfo] | list[InstrumentSummary] | list[Instrument]
   union to the requested shape; `poc/market/perp.py` cells 1, 6 and 22
 - Suggestion (unverified): `@overload` on `fields`
 
+### Centrifugo `temporary` subscribe errors raise the final `ApiError`
+
+`raise_error` maps every Centrifugo command error outside permission, token and
+bad-request codes to `ApiError`, ignoring the error's `temporary` flag. On 2026-11-19
+(probed read-only after the owner's 14:09 UTC run) prod answered every subscribe, public and private alike
+(`futures-perp:orderBook-XRPUSD-0.1`, `futures-perp:heartbeat`,
+`futures-perp:orderFills-83911`), with `{"code": 100, "message": "internal server
+error", "temporary": true}`, after a successful `connect`. Centrifugo's `temporary`
+means the client should retry; as an `ApiError` the SDK translates it to its final
+`ApiError`, which no retry middleware treats as transient. Subscribes at 13:39 and
+13:56 the same day succeeded.
+
+`core/transport/ws.py:101`:
+
+```python
+  if code in (UNKNOWN_CHANNEL, BAD_REQUEST):
+    raise BadRequest(context)
+  raise ApiError(context)
+```
+
+- Kind: wrong-type (error classification: a transient failure raised as a final one)
+- Observed: code `100`, `temporary: true`, on every channel, wallet session or none
+- Blocks: `pkg/src/tribulnation/evedex/market/books.py` and `market/history.py`
+  (`depth_stream` and `trades_stream` cannot be retried on it); the owner's 2026-11-19
+  lifecycle run, whose `trades_stream` saw none of its 2 fills
+- Suggestion (unverified): `NetworkError` when `temporary` is true
+
 ## typed-lighter
 
 ### `Candle` OHLCV fields are `float`

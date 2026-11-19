@@ -30,8 +30,9 @@ fills an unset key from them when the other one is given.
    and the next hourly funding settlement. No funding-rate history is published.
 3. Account and trading: fees, order queries, open orders, trade history, positions,
    collateral, leverage, available notional and remaining position limit with an API
-   key; `set_leverage` too. The fills stream, `MARKET` (an IOC limit), `LIMIT` and
-   `POST_ONLY` orders and every cancellation method with the private key. Refusals
+   key; `set_leverage` too. The fills stream, `MARKET` (an IOC limit) and `LIMIT`
+   orders and every cancellation method with the private key. EVEDEX refuses post-only
+   orders, so `POST_ONLY` raises `NotImplementedError`. Refusals
    raise `OrderRejected`. Funding payments are not supported.
 
 `Report` snapshots one account, its trading balance and positions and its wallet:
