@@ -4,6 +4,7 @@ from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
+import logging
 from uuid import uuid4
 
 from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
@@ -45,6 +46,8 @@ from .impl import (
 from .impl import trading
 from .impl.account import not_supported_classic_collateral
 from .impl.parse import PerpProduct, perp_exchange_id
+
+log = logging.getLogger(__name__)
 
 
 @dataclass(kw_only=True, frozen=True)
@@ -261,3 +264,8 @@ class PerpMarket(MarketMixin, _PerpMarket):
   async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
     """The cross leverage set for this symbol; see `impl.trading.cross_leverage`."""
     return await trading.cross_leverage(self)
+
+  async def set_leverage(self, leverage: Decimal):
+    """Set the symbol's cross leverage; see `impl.trading.set_cross_leverage`."""
+    value = await trading.set_cross_leverage(self, leverage)
+    log.info('%s: leverage set to %s', self.id, value)

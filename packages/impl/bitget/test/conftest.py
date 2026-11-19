@@ -170,12 +170,32 @@ class FakeBitget:
         return self.answer({'list': rows, 'cursor': None})
       case 'account/settings':
         return self.answer(self.settings())
+      case 'account/set-leverage':
+        return self.set_leverage(params)
       case 'account/assets':
         return self.answer(ASSETS)
       case 'position/current-position':
         return self.answer({'list': self.positions()})
       case _:
         raise AssertionError(f'unexpected request {request.method} {url.path}')
+
+  def set_leverage(self, params: dict[str, Any]) -> httpx.Response:
+    """Set a symbol's cross leverage, replacing its cross row."""
+    assert params['category'] == 'USDT-FUTURES' and params['marginMode'] == 'crossed'
+    self.symbol_configs[:] = [
+      c
+      for c in self.symbol_configs
+      if not (c['symbol'] == params['symbol'] and c['marginMode'] == 'crossed')
+    ]
+    self.symbol_configs.append(
+      {
+        'category': 'USDT-FUTURES',
+        'symbol': params['symbol'],
+        'marginMode': 'crossed',
+        'leverage': params['leverage'],
+      }
+    )
+    return self.answer('success')
 
   def answer(self, data: Any) -> httpx.Response:
     """A successful envelope."""
