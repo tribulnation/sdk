@@ -161,10 +161,10 @@ class Shared(SDK):
   spot: dict[str, SpotSymbol] = field(default_factory=dict[str, SpotSymbol])
   perp: dict[str, FuturesSymbol] = field(default_factory=dict[str, FuturesSymbol])
   lock: asyncio.Lock = field(default_factory=asyncio.Lock)
-  books: dict[tuple[Scope, str, DepthSource], Subscription[Book]] = field(
-    default_factory=dict[tuple[Scope, str, DepthSource], Subscription[Book]]
+  books: dict[tuple[Scope, str, DepthSource, int], Subscription[Book]] = field(
+    default_factory=dict[tuple[Scope, str, DepthSource, int], Subscription[Book]]
   )
-  """One shared upstream per exchange, symbol and depth source."""
+  """One shared upstream per exchange, symbol, depth source and levels per side."""
   trades: dict[Scope, Subscription[tuple[str, Trade]]] = field(
     default_factory=dict[Scope, Subscription[tuple[str, Trade]]]
   )

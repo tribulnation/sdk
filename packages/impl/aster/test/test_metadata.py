@@ -76,7 +76,7 @@ async def test_missing_premium_row_is_missing_data(monkeypatch: pytest.MonkeyPat
 
 
 @pytest.mark.parametrize(
-  'levels,limit', [(None, 1000), (1, 5), (5, 5), (6, 10), (101, 500)]
+  'levels,limit', [(None, 1000), (1, 5), (5, 5), (6, 10), (101, 500), (1001, 1000)]
 )
 async def test_depth_requests_the_smallest_native_limit(
   levels: int | None, limit: int, monkeypatch: pytest.MonkeyPatch
@@ -89,7 +89,7 @@ async def test_depth_requests_the_smallest_native_limit(
   assert endpoint.await_args is not None
   assert endpoint.await_args.kwargs['limit'] == limit
   with pytest.raises(ValueError):
-    await market.depth(levels=1001)
+    await market.depth(levels=0)
 
 
 def test_error_code_tolerates_unexpected_payloads():
