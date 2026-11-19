@@ -46,10 +46,11 @@ NOT_FOUND_CODES = frozenset({'25204', '40768', '43001'})
 """Codes answering that an order does not exist: `25204` (UTA, confirmed live on
 `order-info` for an unknown ID, 2026-11-16), `40768`/`43001` (Classic v2's)."""
 
-REJECTED_CODES = frozenset({'22002', '40762', '43012', '45110'})
+REJECTED_CODES = frozenset({'22002', '40092', '40762', '43012', '45110'})
 """Codes refusing an order outright, nothing placed: no position to reduce (`22002`),
-size over the balance (`40762`), insufficient balance (`43012`), under the minimum
-order value (`45110`). Malformed requests (`BadRequest`) are refusals too; any other
+service unavailable to the account for regulatory or eligibility reasons (`40092`,
+seen live), size over the balance (`40762`), insufficient balance (`43012`), under the
+minimum order value (`45110`). Malformed requests (`BadRequest`) are refusals too; any other
 error stays an ambiguous `ApiError`."""
 
 TERMINAL_STATUSES = frozenset({'filled', 'cancelled', 'canceled', 'rejected'})
