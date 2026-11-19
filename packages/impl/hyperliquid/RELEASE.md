@@ -8,3 +8,8 @@ Changed:
 2. `remaining_position_limit()` shares its reads by default (`ttl` 30 s) and costs two reads shared by every coin of the dex: the leverage comes from the position in `clearinghouseState`, with no `activeAssetData` per coin. A flat coin is bounded at the asset's `maxLeverage`, the tightest bound any setting has, so a flat coin set below its maximum may read less room than the venue allows, never more.
 
 Every other method is unchanged.
+
+Release qualification on 2026-11-19 passed the read suites and market consistency.
+Committed evidence under `release-evidence/hyperliquid/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
+release follows SDK 4.2.0 publication.
