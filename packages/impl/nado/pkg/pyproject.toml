@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tribulnation-nado"
-version = "0.2.0"
+version = "0.2.1"
 description = "Tribulnation SDK implementation for Nado spot and perpetual markets."
 license = "MIT"
 license-files = ["LICENSE"]
