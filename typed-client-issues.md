@@ -21,6 +21,31 @@ venue rejects both.
 - Observed: `{'code': -1102, 'msg': "Mandatory parameter 'quantity' was not sent, was empty/null, or malformed."}` for a step-rounded 190-unit `ENAUSDT` order
 - Blocks: nothing listed today. `native_order` writes quantities and prices through `plain_decimal`, which is enough for every value of `1E-6` or more. A price below `1E-6` would still be rejected; the lowest Aster price is `0.0000095` (`1000SATSUSDT`), against a smallest tick of `1E-8`.
 
+## typed-evedex
+
+### `Instruments.instruments` returns the union of every `fields` shape
+
+`exchange.market.instruments` sends a different record per `fields` (full records by
+default, summaries for `short`, full records with funding, volume and open interest for
+`metrics`), but declares one return type for all three, so a caller who asked for
+`metrics` still gets the union and has to cast to reach `fundingRate` or `openInterest`.
+The values validate as the right member (prod, 2026-11-19: `fields='metrics'` rows keep
+every metric), so this is a typing gap, not a validation one.
+
+`exchange/market/instruments.py:177`:
+
+```python
+Response = list[InstrumentInfo] | list[InstrumentSummary] | list[Instrument]
+```
+
+- Kind: wrong-type (declared wider than any one call returns)
+- Observed: `fields=None` sends `InstrumentInfo` rows, `fields='metrics'` sends
+  `Instrument` rows (70 of each on prod)
+- Blocks: `pkg/src/tribulnation/evedex/core.py` (`load_instruments`) and
+  `pkg/src/tribulnation/evedex/market/exchanges.py` (`metrics`): a `cast` bridging the
+  union to the requested shape; `poc/market/perp.py` cells 1, 6 and 22
+- Suggestion (unverified): `@overload` on `fields`
+
 ## typed-lighter
 
 ### `Candle` OHLCV fields are `float`
