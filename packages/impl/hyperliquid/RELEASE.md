@@ -1,9 +1,11 @@
-# tribulnation-hyperliquid 0.22.1
+# tribulnation-hyperliquid 0.22.2
 
 Requires SDK >=4.2.0 and typed-hyperliquid >=2.6.0, unchanged.
 
-Fixed:
+README: logo header.
 
-1. Spot tickers report each pair's own 24h volume. Each pair now takes its volume from its own asset context, matched by `coin`, instead of by position; since the first delisted index, pairs had been reading another pair's volume.
+No code changes.
 
-Every other method is unchanged.
+Release qualification on 2026-11-19 passed the read suites and market consistency.
+Committed evidence under `release-evidence/hyperliquid/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes.
