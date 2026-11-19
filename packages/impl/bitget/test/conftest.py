@@ -119,6 +119,8 @@ class FakeBitget:
   )
   reject_code: str | None = None
   """An error code `place-order` answers instead of placing, when set."""
+  reject_msg: str = 'refused'
+  """The message sent with `reject_code`."""
   info_failure: Literal['network', 'api'] | None = None
   """How `order-info` fails, when set: a dropped connection or an error code."""
   requests: list[tuple[str, str, dict[str, Any]]] = field(
@@ -212,7 +214,7 @@ class FakeBitget:
   def place(self, params: dict[str, Any]) -> httpx.Response:
     """Place an order: match what crosses, rest the rest unless immediate."""
     if self.reject_code is not None:
-      return self.error(self.reject_code, 'refused')
+      return self.error(self.reject_code, self.reject_msg)
     assert params['category'] == 'USDT-FUTURES' and params['symbol'] == SYMBOL
     assert params['orderType'] == 'limit' and params['marginMode'] == 'crossed'
     order = Resting(

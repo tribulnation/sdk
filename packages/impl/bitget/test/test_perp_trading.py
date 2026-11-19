@@ -207,6 +207,23 @@ async def test_a_definitive_refusal_is_order_rejected(
     )
 
 
+async def test_a_regulatory_refusal_is_order_rejected(
+  fake: 'FakeBitget', market: PerpMarket
+):
+  """`40092` (captured live, `data` null) refuses the account outright: nothing is
+  placed, so `OrderRejected` rather than an ambiguous `ApiError`."""
+  fake.reject_code = '40092'
+  fake.reject_msg = (
+    'This service is currently unavailable due to applicable regulatory '
+    'requirements or account eligibility conditions.'
+  )
+  with pytest.raises(OrderRejected):
+    await market.place_order(
+      {'type': 'LIMIT', 'qty': Decimal(2500), 'price': Decimal('0.0024')}
+    )
+  assert len(placed(fake)) == 1
+
+
 async def test_an_unknown_error_stays_ambiguous(fake: 'FakeBitget', market: PerpMarket):
   """A code not known to refuse outright may have placed: a plain `ApiError`."""
   fake.reject_code = '50000'
