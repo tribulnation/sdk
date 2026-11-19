@@ -14,8 +14,10 @@ class Settings(TypedDict, total=False):
   depth_source: DepthSource
   """Which feed `depth_stream`/`depth` read. Defaults to `'depth'`.
 
-  - `'depth'`: partial depth `@depth20`, 20 levels per side, pushed at most every
-    250 ms on perpetuals and every 100 ms on spot (`@depth20@100ms`).
+  - `'depth'`: partial depth `@depth<N>`, up to 20 levels per side, pushed at most
+    every 250 ms on perpetuals and every 100 ms on spot (`@depth<N>@100ms`). `N` is
+    the smallest of 5, 10 and 20 holding the stream's `levels` (20 when unset or
+    above 20), and books are trimmed to `levels`.
   - `'fast'`: partial depth `@depth5@100ms`, 5 levels per side at most every 100 ms on
     both exchanges. Faster than `'depth'` on perpetuals; on spot only shallower.
   - `'bbo'`: `@bookTicker`, the best bid and ask with sizes, pushed on every change.

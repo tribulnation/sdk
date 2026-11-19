@@ -74,10 +74,12 @@ from ..core import POSITION_RISK, Public, Scope, Shared
 from .settings import Settings as AsterSettings
 from .streams import (
   SOURCE_LEVELS,
+  book_feed,
   book_time,
   connect_books,
   connect_trades,
   depth_source,
+  depth_tier,
 )
 
 log = logging.getLogger(__name__)
@@ -531,18 +533,19 @@ class NativeMarket(Public, Market):
     full reach.
 
     Args:
-      levels: Keep at most this many levels per side.
+      levels: Keep at most this many levels per side; an upper bound, so more than
+        the source serves returns what it serves.
       settings: Venue settings; `aster.depth_source` selects the shape.
+
+    Raises:
+      ValueError: `levels` is below 1, or the source is unknown.
     """
-    if levels is not None and not 1 <= levels <= DEPTH_LIMITS[-1]:
-      raise ValueError(f'levels must be between 1 and {DEPTH_LIMITS[-1]}')
+    if levels is not None and levels < 1:
+      raise ValueError('levels must be at least 1')
     source = depth_source(settings)
-    if source != 'depth':
-      cap = SOURCE_LEVELS[source]
-      levels = cap if levels is None else min(levels, cap)
-    limit: DepthLimit = next(
-      n for n in DEPTH_LIMITS if n >= (levels or DEPTH_LIMITS[-1])
-    )
+    cap = DEPTH_LIMITS[-1] if source == 'depth' else SOURCE_LEVELS[source]
+    levels = cap if levels is None else min(levels, cap)
+    limit: DepthLimit = next(n for n in DEPTH_LIMITS if n >= levels)
     raw = await self.shared.call(
       lambda: self.api.market.depth(self.symbol, limit=limit)
     )
@@ -551,7 +554,7 @@ class NativeMarket(Public, Market):
       asks=[Book.Entry(*r) for r in raw['asks']],
       time=book_time(raw),
     )
-    return book if levels is None else book.limit(levels)
+    return book.limit(levels)
 
   def depth_stream(
     self,
@@ -563,34 +566,39 @@ class NativeMarket(Public, Market):
   ) -> AsyncContextManager[AsyncIterable[Book]]:
     """Stream books from the `aster.depth_source` feed, `'depth'` (20 levels) by default.
 
-    Consumers of one symbol and source share a single upstream subscription; each
-    source is a different feed (see `Settings.depth_source`), so books from different
-    sources need not agree tick-for-tick. While every consumer keeps only the newest
-    book (the default `queue_size=1, overflow='latest'`), the upstream keeps only the
-    newest frame, so a stale one is never decoded nor converted; the yielded stream's
-    `skipped` counts the books this consumer never saw.
+    `levels` is an upper bound: `'depth'` subscribes to the smallest partial-depth
+    tier (5, 10 or 20) holding `min(levels, 20)` and trims to it, so `levels=50`
+    serves 20 and `levels=7` reads `@depth10` and keeps 7; `'fast'` and `'bbo'` serve
+    at most 5 and 1. Consumers of one symbol, source and tier share a single upstream
+    subscription; each source is a different feed (see `Settings.depth_source`), so
+    books from different sources need not agree tick-for-tick. While every consumer
+    keeps only the newest book (the default `queue_size=1, overflow='latest'`), the
+    upstream keeps only the newest frame, so a stale one is never decoded nor
+    converted; the yielded stream's `skipped` counts the books this consumer never saw.
 
     Args:
-      levels: Keep at most this many levels per side; it never selects the source.
+      levels: Keep at most this many levels per side; it selects the `'depth'` tier,
+        never the source.
       queue_size: Books buffered for this subscriber.
       overflow: What to do when the buffer is full.
       settings: Venue settings; `aster.depth_source` selects the feed.
 
     Raises:
-      ValueError: `levels` is outside 1-20, or the source is unknown.
+      ValueError: `levels` is below 1, or the source is unknown.
     """
-    if levels is not None and not 1 <= levels <= 20:
-      raise ValueError('Aster depth streams support 1-20 levels')
-    source = depth_source(settings)
+    if levels is not None and levels < 1:
+      raise ValueError('levels must be at least 1')
+    source, served = book_feed(self.scope, depth_source(settings), levels)
+    tier = depth_tier(served)
     return self.shared.stream(
       self.shared.books,
-      (self.scope, self.symbol, source),
-      lambda: connect_books(self.shared, self.scope, self.symbol, source),
+      (self.scope, self.symbol, source, served),
+      lambda: connect_books(self.shared, self.scope, self.symbol, source, tier=tier),
       select=lambda book: book if levels is None else book.limit(levels),
       queue_size=queue_size,
       overflow=overflow,
       connect_latest=lambda: connect_books(
-        self.shared, self.scope, self.symbol, source, keep_latest=True
+        self.shared, self.scope, self.symbol, source, tier=tier, keep_latest=True
       ),
     )
 

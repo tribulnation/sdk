@@ -72,7 +72,7 @@ def message(channel: str) -> Any:
   """A validated push for a channel, shaped as its feed sends it."""
   if channel.endswith('@bookTicker'):
     return validator(FuturesBookTickerEvent).python(ticker_wire())
-  levels = 5 if '@depth5' in channel else 20
+  levels = int(channel.split('@depth')[1].split('@')[0])
   return validator(DepthUpdate).python(depth_wire(levels))
 
 
@@ -123,13 +123,15 @@ def test_depth_source_setting():
 
 @pytest.mark.parametrize('scope', ['spot', 'perp'])
 async def test_invalid_stream_arguments(scope: Scope):
-  """An unknown source or out-of-range `levels` raises before subscribing."""
+  """An unknown source or `levels` below 1 raises before subscribing."""
   async with AsterMarket.new(public=True, mainnet=False) as venue:
     m = market(venue, scope)
     with pytest.raises(ValueError):
       m.depth_stream(settings=cast(Settings, {'aster': {'depth_source': 'l2'}}))
     with pytest.raises(ValueError):
-      m.depth_stream(levels=21, settings=settings('bbo'))
+      m.depth_stream(levels=0, settings=settings('bbo'))
+    with pytest.raises(ValueError):
+      await m.depth(levels=0)
 
 
 class Feeds:
@@ -200,6 +202,55 @@ async def test_source_channel(
   assert book.time == EVENT
 
 
+@pytest.mark.parametrize(
+  ('scope', 'source', 'levels', 'channel', 'kept'),
+  [
+    ('perp', 'depth', 50, 'btcusdt@depth20', 20),
+    ('spot', 'depth', 50, 'btcusdt@depth20@100ms', 20),
+    ('perp', 'depth', 7, 'btcusdt@depth10', 7),
+    ('spot', 'depth', 7, 'btcusdt@depth10@100ms', 7),
+    ('perp', 'depth', 3, 'btcusdt@depth5', 3),
+    ('spot', 'depth', 3, 'btcusdt@depth5@100ms', 3),
+    ('perp', 'depth', 20, 'btcusdt@depth20', 20),
+    ('perp', 'fast', 50, 'btcusdt@depth5@100ms', 5),
+    ('spot', 'bbo', 50, 'btcusdt@bookTicker', 1),
+  ],
+)
+async def test_levels_is_an_upper_bound(
+  scope: Scope,
+  source: DepthSource,
+  levels: int,
+  channel: str,
+  kept: int,
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """`levels` above the source's reach serves what it has; `'depth'` picks the
+  smallest tier holding `levels` and trims to it."""
+  feeds = Feeds()
+  feeds.install(monkeypatch)
+  async with AsterMarket.new(public=True, mainnet=False) as venue:
+    stream = market(venue, scope).depth_stream(levels=levels, settings=settings(source))
+    async with stream as books:
+      book = await anext(aiter(books))
+  assert feeds.subscribed == [channel]
+  assert len(book.bids) == len(book.asks) == kept
+
+
+async def test_spot_shallow_depth_shares_the_fast_feed(monkeypatch: pytest.MonkeyPatch):
+  """Spot `'depth'` at 5 levels or fewer is the `'fast'` feed, so they share it."""
+  feeds = Feeds()
+  feeds.install(monkeypatch)
+  async with AsterMarket.new(public=True, mainnet=False) as venue:
+    m = market(venue, 'spot')
+    async with (
+      m.depth_stream(levels=3) as shallow,
+      m.depth_stream(settings=settings('fast')) as fast,
+    ):
+      books = await asyncio.gather(*(anext(aiter(s)) for s in (shallow, fast)))
+  assert feeds.subscribed == ['btcusdt@depth5@100ms']
+  assert [len(b.bids) for b in books] == [3, 5]
+
+
 @pytest.mark.parametrize('scope', ['spot', 'perp'])
 async def test_parallel_sources_share_per_source(
   scope: Scope, monkeypatch: pytest.MonkeyPatch
@@ -228,6 +279,8 @@ async def test_parallel_sources_share_per_source(
   [
     ('depth', None, 1000, 20),
     ('depth', 3, 5, 3),
+    ('depth', 7, 10, 7),
+    ('depth', 5000, 1000, 20),
     ('fast', None, 5, 5),
     ('fast', 3, 5, 3),
     ('fast', 50, 5, 5),

@@ -10,6 +10,7 @@ from typing_extensions import (
   AsyncIterator,
   Awaitable,
   Callable,
+  Literal,
   Mapping,
   TypeVar,
 )
@@ -33,6 +34,9 @@ T = TypeVar('T')
 SOURCE_LEVELS: Mapping[DepthSource, int] = {'depth': 20, 'fast': 5, 'bbo': 1}
 """Levels per side each depth source delivers; REST `depth` trims `'fast'` and `'bbo'`
 to the same shape."""
+DepthTier = Literal[5, 10, 20]
+"""The level counts Aster's partial-depth streams offer."""
+DEPTH_TIERS: tuple[DepthTier, ...] = (5, 10, 20)
 RENEWAL_INTERVAL = 25 * 60
 """Seconds between keepalives; listen keys expire after 60 minutes."""
 
@@ -52,6 +56,37 @@ def depth_source(settings: Settings) -> DepthSource:
       f'Unknown Aster depth_source {source!r}; expected one of {list(SOURCE_LEVELS)}'
     )
   return source
+
+
+def depth_tier(levels: int | None) -> DepthTier:
+  """The smallest partial-depth tier holding `levels`, capped at the deepest (20).
+
+  Args:
+    levels: The requested levels per side; `None` (or above 20) wants the deepest.
+  """
+  wanted = DEPTH_TIERS[-1] if levels is None else min(levels, DEPTH_TIERS[-1])
+  return next(tier for tier in DEPTH_TIERS if tier >= wanted)
+
+
+def book_feed(
+  scope: Scope, source: DepthSource, levels: int | None
+) -> tuple[DepthSource, int]:
+  """The native feed serving `levels` from `source`, as `(source, levels per side)`.
+
+  `'depth'` subscribes to the smallest partial-depth tier holding `levels`; `'fast'`
+  and `'bbo'` have one size. Spot `'depth'` at 5 levels is the `'fast'` feed itself
+  (`@depth5@100ms`), so it is named that way and shares its subscription.
+
+  Args:
+    scope: The exchange.
+    source: The selected depth source.
+    levels: The requested levels per side, or `None` for the source's deepest.
+  """
+  if source == 'depth':
+    tier = depth_tier(levels)
+    return ('fast', tier) if scope == 'spot' and tier == 5 else ('depth', tier)
+  else:
+    return source, SOURCE_LEVELS[source]
 
 
 def book_time(
@@ -144,6 +179,7 @@ def depth_feed(
   symbol: str,
   source: DepthSource,
   *,
+  tier: DepthTier = 20,
   keep_latest: bool = False,
 ) -> StreamManager[Book, Any, Any]:
   """The native stream behind one depth source, parsed into books.
@@ -156,6 +192,7 @@ def depth_feed(
     scope: The exchange.
     symbol: The native symbol.
     source: Which feed to subscribe to; see `Settings.depth_source`.
+    tier: Levels per side of the `'depth'` source's partial-depth stream.
     keep_latest: Drop a frame unread, undecoded and unconverted when a newer one
       arrives first (typed `keep_latest`).
   """
@@ -168,13 +205,13 @@ def depth_feed(
       return streams.partial_depth_speed(
         name, levels=5, speed='100ms', keep_latest=keep_latest
       ).map(parse_book)
-    return streams.partial_depth(name, levels=20, keep_latest=keep_latest).map(
+    return streams.partial_depth(name, levels=tier, keep_latest=keep_latest).map(
       parse_book
     )
   spot = shared.client.spot.streams
   if source == 'bbo':
     return spot.book_ticker(name, keep_latest=keep_latest).map(parse_bbo)
-  levels = 5 if source == 'fast' else 20
+  levels: DepthTier = 5 if source == 'fast' else tier
   return spot.partial_depth(
     name, levels=levels, speed='100ms', keep_latest=keep_latest
   ).map(parse_book)
@@ -187,18 +224,22 @@ async def connect_books(
   symbol: str,
   source: DepthSource,
   *,
+  tier: DepthTier = 20,
   keep_latest: bool = False,
 ) -> Subscription.Context[Book]:
-  """Open one stream per symbol and source, shared by every subscriber.
+  """Open one stream per symbol, source and tier, shared by every subscriber.
 
   Args:
     shared: The owner of the client.
     scope: The exchange.
     symbol: The native symbol.
     source: Which feed to subscribe to.
+    tier: Levels per side of the `'depth'` source's partial-depth stream.
     keep_latest: Keep only the newest unread snapshot; see `depth_feed`.
   """
-  stream = await depth_feed(shared, scope, symbol, source, keep_latest=keep_latest)
+  stream = await depth_feed(
+    shared, scope, symbol, source, tier=tier, keep_latest=keep_latest
+  )
   return Subscription.Context(
     translated(stream),
     wrap_exceptions(stream.unsubscribe),
