@@ -8,3 +8,8 @@ Changed:
 2. `remaining_position_limit()` shares its reads by default (`ttl` 30 s): every perpetual position from one shared request; the instrument's ticker is shared for `ttl` and not read where no cap is published.
 
 Every other method is unchanged.
+
+Release qualification on 2026-11-19 passed the read suites and market consistency.
+Committed evidence under `release-evidence/grvt/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
+release follows SDK 4.2.0 publication.
