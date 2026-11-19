@@ -486,7 +486,8 @@ def check_position(value: object):
 
 
 def check_perp_position(value: object, position: object):
-  """A valid entry price for any open size, agreeing with `position()`."""
+  """A valid entry price for any open size, a positive liquidation price or none (none
+  when flat), agreeing with `position()`."""
   require(isinstance(value, PerpPosition), 'perp_position: not a PerpPosition')
   perp = cast(PerpPosition, value)
   require(finite(perp.size), 'perp_position: non-finite size')
@@ -497,6 +498,15 @@ def check_perp_position(value: object, position: object):
   require(
     perp.size == 0 or perp.entry_price > 0,
     'perp_position: open position without an entry price',
+  )
+  liquidation = perp.liquidation_price
+  require(
+    liquidation is None or (finite(liquidation) and liquidation > 0),
+    'perp_position: invalid liquidation price',
+  )
+  require(
+    perp.size != 0 or liquidation is None,
+    'perp_position: liquidation price on a flat position',
   )
   require(isinstance(position, Position), 'perp_position: position() was not read')
   require(

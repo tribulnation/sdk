@@ -154,6 +154,10 @@ async with sdk.depth_stream('hl::ETH', settings={'hyperliquid': {'depth_source':
   `margin_mode='isolated'`. HL gives no isolated maintenance figure directly, so it is
   approximated as `positionValue / (2 · maxLeverage)` (half the initial-margin fraction at max
   leverage).
+- **`perp_position().liquidation_price`** is the position's `liquidationPx` in its dex's
+  `clearinghouseState` (HIP-3 dexes included), `None` where the venue writes `null`: on
+  mainnet (2026-11-19) cross longs the account's collateral covered read `null`, while
+  cross shorts and isolated positions carried a price (ADR 0068).
 - **`collateral`** (spot) returns the quote-token balance (`equity=total`,
   `free_collateral=total-hold`).
 - **`fees`** and **`rules().fees`** apply Hyperliquid's published fee formula: the

@@ -1337,21 +1337,22 @@ methods:
     example:
       accountVenues: [dydx]
       constants:
-        aster: {market_id: 'aster:perp:BTCUSDT', size: '0.5', entry_price: '58230.10'}
-        dydx: {market_id: 'dydx:perp:BTC-USD', size: '0.5', entry_price: '58230.10'}
-        hyperliquid: {market_id: 'hyperliquid::BTC', size: '0.3', entry_price: '58190.40'}
-        bitget: {market_id: 'bitget:usdt:BTCUSDT', size: '0.5', entry_price: '58230.10'}
-        bybit: {market_id: 'bybit:perp:BTCUSDT', size: '0.5', entry_price: '58230.10'}
-        lighter: {market_id: 'lighter:perp:1', size: '0.5', entry_price: '58230.10'}
-        extended: {market_id: 'extended:perp:BTC-USD', size: '0.5', entry_price: '58230'}
-        margin-trade: {market_id: 'margin-trade:perp:BTC', size: '0.5', entry_price: '58230.10'}
-        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', size: '0.5', entry_price: '58230.10'}
-        nado: {market_id: 'nado:perp:BTC-PERP', size: '0.5', entry_price: '58230'}
-        risex: {market_id: 'risex:perp:1', size: '0.5', entry_price: '58230'}
+        aster: {market_id: 'aster:perp:BTCUSDT', size: '0.5', entry_price: '58230.10', liquidation_price: "Decimal('55617.42')"}
+        dydx: {market_id: 'dydx:perp:BTC-USD', size: '0.5', entry_price: '58230.10', liquidation_price: "None"}
+        hyperliquid: {market_id: 'hyperliquid::BTC', size: '0.3', entry_price: '58190.40', liquidation_price: "Decimal('55588.27')"}
+        bitget: {market_id: 'bitget:usdt:BTCUSDT', size: '0.5', entry_price: '58230.10', liquidation_price: "None"}
+        bybit: {market_id: 'bybit:perp:BTCUSDT', size: '0.5', entry_price: '58230.10', liquidation_price: "None"}
+        lighter: {market_id: 'lighter:perp:1', size: '0.5', entry_price: '58230.10', liquidation_price: "Decimal('55617.42')"}
+        extended: {market_id: 'extended:perp:BTC-USD', size: '0.5', entry_price: '58230', liquidation_price: "None"}
+        margin-trade: {market_id: 'margin-trade:perp:BTC', size: '0.5', entry_price: '58230.10', liquidation_price: "None"}
+        grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', size: '0.5', entry_price: '58230.10', liquidation_price: "Decimal('55617.42')"}
+        nado: {market_id: 'nado:perp:BTC-PERP', size: '0.5', entry_price: '58230', liquidation_price: "None"}
+        risex: {market_id: 'risex:perp:1', size: '0.5', entry_price: '58230', liquidation_price: "None"}
       callTemplate: |
         pos = await sdk.perp_position('{{ constants[accounts[0]].market_id }}')
+        # liquidation_price is the venue's estimate; None when flat or not reported
       resultTemplate: |
-        PerpPosition(size=Decimal('{{ constants[accounts[0]].size }}'), entry_price=Decimal('{{ constants[accounts[0]].entry_price }}'))
+        PerpPosition(size=Decimal('{{ constants[accounts[0]].size }}'), entry_price=Decimal('{{ constants[accounts[0]].entry_price }}'), liquidation_price={{ constants[accounts[0]].liquidation_price }})
     catalogue:
       callTemplate: |
         # pip install tribulnation-catalogue

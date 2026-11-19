@@ -102,7 +102,7 @@ Hold a `Market` reference in hot loops; use the scoped one-shot calls otherwise.
   - `next_funding() -> FundingRate`
   - `funding_rates(start, end=None) -> AsyncIterable[Sequence[FundingRate]]`: market-wide rate history
   - `funding_payments(start, end) -> AsyncIterable[Sequence[FundingPayment]]`: your own settled cashflows
-  - `perp_position() -> PerpPosition`: includes entry price
+  - `perp_position() -> PerpPosition`: includes entry price and the venue's estimated liquidation price (ADR 0068)
   - `position() -> Position`, `collateral() -> PerpCollateral`, `leverage() -> Decimal`
   - `available_notional() -> Decimal`: max. notional you could open now
   - `remaining_position_limit() -> RemainingPositionLimit`: per direction, how much more the venue's position limits let the position grow (ADR 0062)

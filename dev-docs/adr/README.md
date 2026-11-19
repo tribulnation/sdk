@@ -89,3 +89,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0065](0065-kraken-futures-and-spot-trading.md) | Kraken Futures and Spot trading | Proposed; implemented, not release-verified; amends 0020 |
 | [0066](0066-set-leverage-and-leverage-not-set.md) | `set_leverage` and `LeverageNotSet` | Proposed; implemented for eight venues, not release-verified |
 | [0067](0067-risex-quoteless-ticker-limitation.md) | RISEx tickers without a top of book, as a visible limitation | Accepted; implemented, not release-verified; amends 0048 |
+| [0068](0068-perp-position-liquidation-price.md) | The venue's estimated liquidation price on `PerpPosition` | Proposed; implemented for Hyperliquid, Aster, Lighter and GRVT, not release-verified |

@@ -674,7 +674,11 @@ class FundingPaymentsResp(Msg, kw_only=True, tag='funding_payments'):
 
 
 class PerpPositionResp(Msg, kw_only=True, tag='perp_position'):
-  """Perpetual position."""
+  """Perpetual position.
+
+  A gateway predating `liquidation_price` omits it, which decodes as `None`; a client
+  predating it ignores it (ADR 0068).
+  """
 
   position: PerpPosition
 

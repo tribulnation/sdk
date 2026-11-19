@@ -82,15 +82,31 @@ def spot_balance(rows: list[SpotBalance], asset: str) -> Balance:
 
 
 async def perp_position(shared: Shared, instrument: str) -> PerpPosition:
-  """The signed position and average entry; flat when the venue lists none."""
+  """The signed position, average entry and estimated liquidation price; flat when the
+  venue lists none (see `parse_position`)."""
   shared.require_session()
   kind, base, quote = scope(await shared.instrument(instrument))
   rows = await shared.call(
     lambda: shared.client.trading.positions(kind=kind, base=base, quote=quote)
   )
+  return parse_position(rows, instrument)
+
+
+def parse_position(rows: list[Position], instrument: str) -> PerpPosition:
+  """The instrument's row of a `positions` answer; flat when it lists none.
+
+  `est_liquidation_price` is `0.0` wherever the venue names no price, which the SDK
+  reports as `None`: recorded on a cross long its collateral covered, while isolated
+  positions carried a price.
+  """
   for p in rows:
     if p['instrument'] == instrument:
-      return PerpPosition(size=p['size'], entry_price=p['entry_price'])
+      liquidation = p['est_liquidation_price']
+      return PerpPosition(
+        size=p['size'],
+        entry_price=p['entry_price'],
+        liquidation_price=liquidation if liquidation > 0 else None,
+      )
   return PerpPosition()
 
 

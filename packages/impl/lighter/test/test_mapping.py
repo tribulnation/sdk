@@ -135,6 +135,7 @@ def position(**fields: Any) -> AccountPosition:
     'avg_entry_price': Decimal('2715.43'),
     'position_value': Decimal('54.279200'),
     'unrealized_pnl': Decimal('0.007500'),
+    'liquidation_price': Decimal('0'),
     'initial_margin_fraction': Decimal('10.00'),
     'margin_mode': 1,
     'allocated_margin': Decimal('25.465340'),
@@ -242,6 +243,29 @@ def test_perp_position_is_signed():
   acct = detailed(positions=[position(sign=-1)])
   assert account.perp_position(acct, 4095).size == Decimal('-0.0200')
   assert account.perp_position(acct, 1).size == 0
+
+
+@pytest.mark.parametrize(
+  ('fields', 'liquidation'),
+  [
+    (
+      {'sign': -1, 'liquidation_price': Decimal('180804.67703006903')},
+      '180804.67703006903',
+    ),
+    ({'sign': 1, 'liquidation_price': Decimal('0')}, None),
+    ({'position': Decimal('0.0000'), 'liquidation_price': Decimal('0')}, None),
+  ],
+  ids=['cross-short', 'cross-long-covered', 'flat'],
+)
+def test_perp_position_reads_the_liquidation_price(
+  fields: dict[str, Any], liquidation: str | None
+):
+  """`liquidation_price` passes through; the `0` the venue writes on flat entries and
+  covered cross longs is `None` (values from typed-lighter's mainnet account example 03)."""
+  acct = detailed(positions=[position(margin_mode=0, **fields)])
+  expected = Decimal(liquidation) if liquidation is not None else None
+  assert account.perp_position(acct, 4095).liquidation_price == expected
+  assert account.perp_position(acct, 1).liquidation_price is None
 
 
 def usdc(**fields: Any) -> dict[str, Any]:

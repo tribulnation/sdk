@@ -297,7 +297,9 @@ class MockMarket(PerpMarket):
 
   async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
     self.state.ttls.append(('perp_position', ttl))
-    return PerpPosition()
+    return PerpPosition(
+      size=Decimal('-3'), entry_price=Decimal('0.31'), liquidation_price=Decimal('0.4')
+    )
 
 
 @dataclass
@@ -805,6 +807,19 @@ async def test_remaining_position_limit_through_gateway(
     long=Decimal('250'), short=None
   )
   assert mock_state.ttls[-1] == ('remaining_position_limit', ttl)
+
+
+@pytest.mark.asyncio
+async def test_perp_position_keeps_the_liquidation_price_through_gateway(
+  sdk: ProxySDK,
+) -> None:
+  """A proxied market's `perp_position()` carries the venue's liquidation price, read
+  as `agentctl` reads it: `(await sdk.market(id)).perp_position()`."""
+  market = await sdk.market(MARKET_ID)
+  assert isinstance(market, PerpMarket)
+  assert await market.perp_position() == PerpPosition(
+    size=Decimal('-3'), entry_price=Decimal('0.31'), liquidation_price=Decimal('0.4')
+  )
 
 
 @pytest.mark.asyncio

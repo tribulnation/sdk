@@ -592,7 +592,8 @@ class TradingMarkets(SDK):
   async def perp_position(
     self, market_id: str, /, *, ttl: timedelta | None = None
   ) -> PerpPosition:
-    """Fetch your open perpetual position: signed `size` plus average `entry_price`.
+    """Fetch your open perpetual position: signed `size`, average `entry_price` and the
+    venue's estimated `liquidation_price` (`None` where there is none).
 
     Args:
       ttl: How old a shared answer may be; `None` asks afresh. See `Market`.

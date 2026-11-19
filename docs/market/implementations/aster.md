@@ -149,6 +149,9 @@ async with sdk.depth_stream('aster:perp:BTCUSDT', settings={'aster': {'depth_sou
   `positionRisk`'s `isolatedMargin` and the cross equity matches the account's
   `totalCrossWalletBalance` plus `totalCrossUnPnl`. Aster rejects isolated margin in
   Multi-Assets mode, so isolated positions only exist on single-asset accounts.
+- `perp_position().liquidation_price` is the one-way `positionRisk` row's
+  `liquidationPrice`, `None` where Aster writes `0` (flat symbols, and wherever it names
+  no price) (ADR 0068).
 - `perp_stats` joins the bulk premium index with the funding configuration in two
   requests. Open interest (base units) has no bulk source: it is read per contract only
   when at most five contracts are named, and is `None` otherwise. A symbol without a

@@ -154,7 +154,9 @@ fee-token conversion or rounding.
 ## Positions, balances and collateral
 
 - `Position`: `size`, in signed base units, on margin markets. `PerpPosition` adds
-  `entry_price`.
+  `entry_price` and `liquidation_price`: the venue's estimate of the mark price that
+  liquidates the position, `None` when flat, when the venue names none, or on venues
+  that don't report it.
 - `Balance`: one spot asset's `total` and `free`, where `free` excludes what open orders
   hold. `SpotBalances` holds a pair's `base` and `quote`; `SpotCollateralIds` their
   collateral IDs.
