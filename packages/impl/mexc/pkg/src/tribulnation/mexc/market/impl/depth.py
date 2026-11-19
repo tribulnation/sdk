@@ -176,7 +176,7 @@ async def depth_stream(
   queue_size: int = 1,
   overflow: OverflowPolicy = 'latest',
 ):
-  # `levels` is accepted for API compatibility but does not size the shared
-  # streaming book (mirrors dYdX); use `depth(levels=...)` for a sized snapshot.
+  """Subscribe to the shared streaming book; `levels` trims each subscriber's copy
+  rather than sizing the shared book."""
   async with self.subscribe_depth(queue_size=queue_size, overflow=overflow) as stream:
-    yield detached_books(stream)
+    yield detached_books(stream, levels)

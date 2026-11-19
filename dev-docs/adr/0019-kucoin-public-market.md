@@ -2,7 +2,8 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: accepted; implementation and qualification are tracked separately.
+1. Status: accepted; implementation and qualification are tracked separately. Depth
+   sizes above the maximum amended by [0071](0071-depth-levels-upper-bound.md).
 2. Date: 2026-09-18
 
 ## Context

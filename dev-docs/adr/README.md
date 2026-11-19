@@ -41,9 +41,9 @@ not a changelog or a substitute for API documentation and tests.
 | [0016](0016-report-snapshot-release-scope.md) | Qualify Report snapshots; application auditing owns history correctness | Accepted; amends 0013 |
 | [0017](0017-venue-resource-policies.md) | Venue-owned resource policies without whole-lifecycle middleware | Accepted |
 | [0018](0018-retire-bitget-classic-coin.md) | Retire confirmed Bitget Classic coin markets while preserving historical IDs | Accepted; amends 0008 and 0010 |
-| [0019](0019-kucoin-public-market.md) | KuCoin public spot and linear perpetual data with native identities and base units | Accepted |
+| [0019](0019-kucoin-public-market.md) | KuCoin public spot and linear perpetual data with native identities and base units | Accepted; depth sizes amended by 0071 |
 | [0020](0020-kraken-public-perpetuals.md) | Kraken public linear perpetual data with native identities and hourly funding settlement conversion | Accepted; amended by 0065 (proposed) |
-| [0021](0021-deribit-public-market.md) | Deribit public spot and linear perpetuals with explicit candle and funding limits | Accepted |
+| [0021](0021-deribit-public-market.md) | Deribit public spot and linear perpetuals with explicit candle and funding limits | Accepted; depth sizes amended by 0071 |
 | [0022](0022-bit2me-one-sided-ticker-limitation.md) | Extend the Bit2Me native ticker limitation to stable one-sided books | Accepted; amends 0014; amended by 0048 |
 | [0023](0023-ticker-quote-volume.md) | Native 24-hour quote volume in tickers | Accepted |
 | [0024](0024-exchange-account-history.md) | Native exchange-wide personal history with market-attributed records | Accepted |
@@ -92,3 +92,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0068](0068-perp-position-liquidation-price.md) | The venue's estimated liquidation price on `PerpPosition` | Proposed; implemented for Hyperliquid, Aster, Lighter and GRVT, not release-verified |
 | [0069](0069-position-limits-shared-by-default.md) | Remaining position limits shared by default, from account-wide reads | Proposed; amends 0054 and 0062; implemented, not release-verified |
 | [0070](0070-book-order-invariant-hot-paths.md) | Book paths rely on the book-order invariant | Proposed; amends 0049; implemented, not release-verified |
+| [0071](0071-depth-levels-upper-bound.md) | Depth `levels` is an upper bound, served at a venue's maximum rather than refused | Proposed; amends 0019 and 0021; implemented, not release-verified |

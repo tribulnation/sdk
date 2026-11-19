@@ -20,12 +20,11 @@ async def depth_stream(
 ) -> AsyncGenerator[AsyncIterable[Book]]:
   """Subscribe to this market's order book.
 
-  `levels` is accepted for interface compatibility and does not resize the shared
-  subscription, which every consumer of this symbol reads from; use `depth(levels=...)`
-  for a sized snapshot.
+  `levels` trims each subscriber's copy rather than resizing the shared subscription,
+  which every consumer of this symbol reads from.
   """
   async with self.subscribe_depth(queue_size=queue_size, overflow=overflow) as stream:
-    yield detached_books(stream)
+    yield detached_books(stream, levels)
 
 
 @asynccontextmanager

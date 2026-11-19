@@ -37,8 +37,8 @@ Canonical Catalogue market translations still need to be added.
 | Method | Supported behavior |
 | --- | --- |
 | Discovery/tickers | All active supported markets or selected ticker IDs; native bid/ask/last and base volume |
-| REST depth | 1–100 levels, default 20; quantities in base units |
-| Depth stream | Shared public full snapshots, 1–20 levels, default 20; bounded subscriber queues |
+| REST depth | Up to 100 levels, default 20 (a larger `levels` serves 100); quantities in base units |
+| Depth stream | Shared public full snapshots, up to 20 levels, default 20 (a larger `levels` serves 20); bounded subscriber queues |
 | Candles | Native spot and linear perpetual trade prices; `1m`, `5m`, `15m`, `1h` |
 | Index/statistics | Native index/mark and optional base-unit open interest for linear perpetuals |
 

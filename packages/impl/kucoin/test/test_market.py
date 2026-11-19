@@ -163,8 +163,8 @@ async def test_ticker_and_stats_selection_preserve_native_units():
   assert stats.funding is None
 
 
-async def test_depth_normalizes_lots_and_rejects_unqualified_sizes():
-  """No private full-book fallback for requests beyond the public limit."""
+async def test_depth_normalizes_lots_and_caps_sizes_above_the_limit():
+  """No private full-book fallback: requests beyond the public limit are served at it."""
   request = AsyncMock(return_value={'bids': [(99.5, 2)], 'asks': [(100.5, 3)]})
   shared = shared_client(futures=SimpleNamespace(part_orderbook=request))
   market = LinearPerpMarket(
@@ -173,10 +173,13 @@ async def test_depth_normalizes_lots_and_rejects_unqualified_sizes():
   book = await market.depth(levels=100)
   assert book.bids[0].price == D('99.5') and book.bids[0].qty == D('.002')
   assert request.await_args is not None and request.await_args.args == ('100',)
-  for levels in [0, -1, 101]:
+  for above in (101, 5000):
+    await market.depth(levels=above)
+    assert request.await_args is not None and request.await_args.args == ('100',)
+  for levels in [0, -1]:
     with pytest.raises(ValueError):
       await market.depth(levels=levels)
-  assert request.await_count == 1
+  assert request.await_count == 3
 
 
 @pytest.mark.parametrize('perp,cap', [(False, 1500), (True, 200)])
@@ -340,6 +343,45 @@ async def test_stream_fans_out_once_and_unsubscribes_after_last_reader():
       assert connect.await_count == 1
     Stream.unsubscribe.assert_not_called()
   Stream.unsubscribe.assert_awaited_once()
+
+
+async def test_stream_above_five_levels_serves_the_five_level_feed():
+  """`levels` above the stream's five-level maximum serves the five-level snapshot."""
+  queue: asyncio.Queue[dict[str, list[tuple[Decimal, int]]]] = asyncio.Queue()
+
+  async def iterate() -> AsyncIterator[dict[str, list[tuple[Decimal, int]]]]:
+    """Keep the fake upstream open until the subscriber leaves."""
+    while True:
+      yield await queue.get()
+
+  class Stream:
+    """Minimal native stream with a no-op cleanup."""
+
+    unsubscribe = AsyncMock()
+
+    def __aiter__(self):
+      """Return the shared queue iterator."""
+      return iterate()
+
+  connect = AsyncMock(return_value=Stream())
+  shared = shared_client(
+    streams=SimpleNamespace(futures_public=SimpleNamespace(orderbook_level5=connect))
+  )
+  market = LinearPerpMarket(
+    shared=shared, symbol='XBTUSDTM', contract_multiplier=D('.001')
+  )
+  async with market.depth_stream(levels=50) as books:
+    queue.put_nowait(
+      {
+        'bids': [(D(99 - i), 1) for i in range(5)],
+        'asks': [(D(101 + i), 1) for i in range(5)],
+      }
+    )
+    book = await asyncio.wait_for(anext(aiter(books)), 1)
+  assert len(book.bids) == len(book.asks) == 5
+  with pytest.raises(ValueError):
+    async with market.depth_stream(levels=0):
+      pass
 
 
 async def test_market_sdk_constructs_public_kucoin_without_credentials(

@@ -18,6 +18,15 @@ BookDepth = Literal[10, 25, 100, 500, 1000]
 
 BOOK_DEPTHS: tuple[BookDepth, ...] = (10, 25, 100, 500, 1000)
 
+REST_DEPTH_MAX = 500
+"""The most levels per side REST `Depth` serves; a larger `count` falls back to 100."""
+
+
+def rest_count(levels: int | None) -> int | None:
+  """The REST `count` for `levels`: capped at 500, since Kraken answers a larger count
+  with its 100-level default rather than its deepest book (confirmed live)."""
+  return levels if levels is None else min(levels, REST_DEPTH_MAX)
+
 
 def book_depth(levels: int | None) -> BookDepth:
   """The smallest channel depth holding `levels` per side.
@@ -89,10 +98,11 @@ async def depth(self: 'MarketMixin', *, levels: int | None = None) -> Book:
   """Fetch the market order book.
 
   `Depth` takes `count` as the maximum levels per side and answers keyed by the
-  pair's internal name, whatever spelling was asked for.
+  pair's internal name, whatever spelling was asked for. `count` is capped at 500
+  (see `rest_count`).
   """
   raw = await self.call_kraken(
-    lambda: self.client.spot.market_data.depth(self.altname, count=levels)
+    lambda: self.client.spot.market_data.depth(self.altname, count=rest_count(levels))
   )
   return parse_book(raw[self.meta['pair']['key']])
 

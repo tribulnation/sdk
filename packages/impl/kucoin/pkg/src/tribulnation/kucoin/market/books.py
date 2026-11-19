@@ -9,10 +9,15 @@ from tribulnation.sdk.market import Book, detached_books
 from .common import Shared
 
 
-def check_levels(levels: int | None, *, maximum: int):
-  """Reject requests beyond the qualified public book depth."""
-  if levels is not None and not 1 <= levels <= maximum:
-    raise ValueError(f'KuCoin supports between 1 and {maximum} levels for this read')
+def capped_levels(levels: int | None, *, maximum: int) -> int | None:
+  """The levels per side to serve: `levels` capped at the read's `maximum`.
+
+  `levels` is an upper bound, so a request above the qualified depth is served at
+  that depth rather than refused; only a non-positive request is invalid.
+  """
+  if levels is not None and levels < 1:
+    raise ValueError('KuCoin depth levels must be positive')
+  return levels if levels is None else min(levels, maximum)
 
 
 async def depth(
@@ -24,7 +29,7 @@ async def depth(
   levels: int | None = None,
 ) -> Book:
   """Read public partial books; linear perpetual sizes are contract lots."""
-  check_levels(levels, maximum=100)
+  levels = capped_levels(levels, maximum=100)
   size = '100' if levels is not None and levels > 20 else '20'
   if exchange == 'spot':
     raw = await shared.call(
@@ -107,7 +112,7 @@ async def depth_stream(
   overflow: OverflowPolicy = 'latest',
 ):
   """Fan out a snapshot feed with the SDK's bounded per-subscriber queues."""
-  check_levels(levels, maximum=5)
+  levels = capped_levels(levels, maximum=5)
   source = subscription(shared, exchange, symbol, multiplier)
 
   async with source.subscribe(queue_size=queue_size, overflow=overflow) as stream:

@@ -113,6 +113,7 @@ def test_the_futures_depth_enum_rounds_up_and_caps_at_max():
   assert perp_depth_limit(50) == '50'
   assert perp_depth_limit(51) == 'max'
   assert perp_depth_limit(500) == 'max'
+  assert perp_depth_limit(10**6) == 'max'
 
 
 def test_a_one_sided_spot_ticker_reports_no_size():

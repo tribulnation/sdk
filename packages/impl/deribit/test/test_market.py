@@ -127,7 +127,9 @@ async def test_empty_discovery_is_cached_and_explicit_refresh_reloads():
 
 
 async def test_book_units_sorting_limits_and_unsupported_sizes():
-  """Native linear quantities are already base coins, despite contract_size=0.0001."""
+  """Native linear quantities are already base coins, despite contract_size=0.0001.
+
+  `levels` is an upper bound: above the 100-level maximum it is served at 100."""
   request = AsyncMock(
     return_value={
       'bids': [(98.0, 3.0), (99.0, 2.0)],
@@ -143,11 +145,14 @@ async def test_book_units_sorting_limits_and_unsupported_sizes():
   assert (book.asks[0].price, book.asks[0].qty) == (101, 4)
   await market.depth(levels=51)
   assert request.await_args is not None and request.await_args.kwargs['depth'] == 100
-  sizes: list[int] = [0, -1, 101, True]
+  for above in (101, 5000):
+    await market.depth(levels=above)
+    assert request.await_args is not None and request.await_args.kwargs['depth'] == 100
+  sizes: list[int] = [0, -1, True]
   for size in sizes:
     with pytest.raises(ValueError):
       await market.depth(levels=size)
-  assert request.await_count == 2
+  assert request.await_count == 4
 
 
 @pytest.mark.parametrize('quote_volume', [None, 0.0, 197.25])
@@ -339,6 +344,42 @@ async def test_stream_shares_upstream_and_copies_books_for_each_reader():
       assert connect.await_count == 1
     Stream.unsubscribe.assert_not_called()
   Stream.unsubscribe.assert_awaited_once()
+
+
+async def test_stream_above_twenty_levels_serves_the_twenty_level_feed():
+  """`levels` above the stream's 20-level maximum subscribes and serves at most 20."""
+  queue: asyncio.Queue[dict[str, list[tuple[float, float]]]] = asyncio.Queue()
+
+  async def iterate() -> AsyncIterator[dict[str, list[tuple[float, float]]]]:
+    """Keep the fake native stream open until cancellation."""
+    while True:
+      yield await queue.get()
+
+  class Stream:
+    """Native stream with a no-op unsubscribe."""
+
+    unsubscribe = AsyncMock()
+
+    def __aiter__(self):
+      """Read the shared queue."""
+      return iterate()
+
+  connect = AsyncMock(return_value=Stream())
+  shared = shared_client(
+    SimpleNamespace(),
+    streams=SimpleNamespace(market_data=SimpleNamespace(book_grouped=connect)),
+  )
+  market = LinearPerpMarket(shared=shared, symbol='BTC_USDC-PERPETUAL')
+  bids = [(100.0 - i, 1.0) for i in range(1, 21)]
+  asks = [(100.0 + i, 1.0) for i in range(1, 21)]
+  async with market.depth_stream(levels=50) as books:
+    queue.put_nowait({'bids': bids, 'asks': asks})
+    book = await asyncio.wait_for(anext(aiter(books)), 1)
+  assert len(book.bids) == len(book.asks) == 20
+  assert connect.await_args is not None and connect.await_args.kwargs['depth'] == '20'
+  with pytest.raises(ValueError):
+    async with market.depth_stream(levels=0):
+      pass
 
 
 async def test_unsupported_financial_methods_fail_before_network_reads():
