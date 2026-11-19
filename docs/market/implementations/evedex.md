@@ -53,10 +53,10 @@ balance cannot be funded through the API.
   delta; markets share one connection.
 - Tickers take the last price and 24h volumes (base and USD) from one instrument read,
   and the best bid and ask from one top-of-book request per market.
-- `rules()` carries the tick, step, quantity bounds, the 5 USD minimum notional and the
-  instrument's standard fee rates. The price range the venue accepts now and its
-  mark-price band (`markPriceLimit`) are in `details`, not price bounds. `fees()` is the
-  account's rates.
+- `rules()` carries the tick, step, quantity bounds, the 5 USD minimum notional, the
+  instrument's standard fee rates and relative price bounds from its mark-price band
+  (`markPriceLimit`: ±30% of the mark on most instruments, ±50% on some). The absolute
+  price range the venue accepts now is in `details`. `fees()` is the account's rates.
 - Candles serve `1m`, `5m`, `15m`, `1h`, `4h` and `1d`, with volume in the base asset
   and in USD.
 - `index` is the base coin's index price times the instrument's lot size (1000 on
@@ -67,9 +67,11 @@ balance cannot be funded through the API.
   longs pay. `funding_rates` and `funding_payments` are not supported: the venue
   publishes no rate history, and its account ledger's funding entries name no market.
 - Orders are limit orders, signed with the wallet, at the account's leverage on the
-  market. `LIMIT` rests until cancelled, `POST_ONLY` adds the post-only flag, and
-  `MARKET` is an immediate-or-cancel limit at `price` (the venue's own market order is
-  sized in USD and bounded only by its slippage limit). Off-grid prices and sizes raise
+  market. `LIMIT` rests until cancelled, and `MARKET` is an immediate-or-cancel limit at
+  `price` (the venue's own market order is sized in USD and bounded only by its slippage
+  limit); one that cannot fill ends cancelled. `POST_ONLY` is not supported: EVEDEX
+  refuses post-only orders, so `place_order` and `replace_order` raise
+  `NotImplementedError` before sending anything. Off-grid prices and sizes raise
   `ValueError` before signing. The venue executes orders asynchronously after accepting
   them, so `filled_qty` is `None`.
 - `client_order_id` is sent as the order's own id, so it must have the venue's form;
@@ -79,7 +81,9 @@ balance cannot be funded through the API.
   `OrderNotFound`. `replace_order` cancels, then places. `cancel_open_orders` is the
   venue's mass cancel of the market.
 - `trades_history` reads each page's order sides in one request and the fills' fees
-  with one request per order; `trades_stream` fills carry no fee.
+  with one request per order; `trades_stream` fills carry no fee. The stream's
+  delivery of fills is not confirmed yet: during the mainnet trading run the venue
+  refused every WebSocket subscription with a temporary error.
 - Collateral is the account's one cross bucket, `<account>:perp` for every market:
   equity is the trading balance plus unrealized PnL, free collateral the venue's
   available balance. `perp_position` reports no liquidation price (the venue publishes a
@@ -89,8 +93,8 @@ balance cannot be funded through the API.
 - `remaining_position_limit` is the market's leverage-tier notional at the account's
   leverage, less the position held, at the mark. Accounts with their own leverage
   limits raise `NotImplementedError`.
-- Market data and account reads are verified on mainnet (2026-11-19). Placing,
-  cancelling and leverage changes are pending a mainnet run.
+- Market data, account reads, orders, cancels, leverage changes and fill history are
+  verified on mainnet (2026-11-19, a 6.6 XRP round trip).
 
 <!-- next -->
 
