@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from decimal import Decimal
 
 from tribulnation.sdk.core import OverflowPolicy
-from tribulnation.sdk.market import Book
+from tribulnation.sdk.market import Book, detached_books
 
 from typed_bit2me.trading_ws.order_book import OrderBookUpdate
 
@@ -63,9 +63,8 @@ async def depth_stream(
 ):
   """Subscribe to the market order book.
 
-  `levels` is accepted for interface compatibility and does not size the streamed
-  book: the channel sends whatever depth it sends. Use `depth(levels=...)` for a
-  sized snapshot.
+  The channel sends whatever depth it sends (100 levels a side, observed live);
+  `levels` trims each subscriber's own copy of the shared book.
   """
   async with self.subscribe_depth(queue_size=queue_size, overflow=overflow) as stream:
-    yield stream
+    yield detached_books(stream, levels)

@@ -112,10 +112,11 @@ class PerpMarket(SharedMixin, _PerpMarket):
     raw = await self.client.usdm_futures.http.market.depth(
       symbol=self.symbol, limit=rest_levels(levels)
     )
-    return Book(
+    book = Book(
       bids=[Book.Entry(price, qty) for price, qty in raw['bids']],
       asks=[Book.Entry(price, qty) for price, qty in raw['asks']],
     )
+    return book if levels is None else book.limit(levels)
 
   def depth_stream(
     self,
@@ -135,10 +136,12 @@ class PerpMarket(SharedMixin, _PerpMarket):
     """
 
     def to_book(event: PartialDepthEvent) -> Book:
-      return Book(
+      """The pushed snapshot, trimmed from the stream's 5/10/20 tier to `levels`."""
+      book = Book(
         bids=[Book.Entry(price, qty) for price, qty in event['b']],
         asks=[Book.Entry(price, qty) for price, qty in event['a']],
       )
+      return book if levels is None else book.limit(levels)
 
     return self.client.usdm_futures.public_streams.partial_depth(
       self.symbol.lower(),

@@ -115,10 +115,12 @@ class SpotMarket(SharedMixin, Market):
     """
 
     def to_book(event: PartialDepthEvent) -> Book:
-      return Book(
+      """The pushed snapshot, trimmed from the stream's 5/10/20 tier to `levels`."""
+      book = Book(
         bids=[Book.Entry(price, qty) for price, qty in event['bids']],
         asks=[Book.Entry(price, qty) for price, qty in event['asks']],
       )
+      return book if levels is None else book.limit(levels)
 
     return self.client.spot.streams.partial_depth(
       self.symbol.lower(),

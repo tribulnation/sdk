@@ -128,6 +128,25 @@ async def test_rest_depth_and_missing_book(shared: Shared):
   assert (missing.value.market_id, missing.value.field) == ('BTC-USD', 'depth')
 
 
+@pytest.mark.parametrize(('levels', 'served'), [(3, 3), (10**6, 30)])
+async def test_rest_depth_serves_at_most_levels(
+  shared: Shared, levels: int, served: int
+):
+  """`levels` is an upper bound: above the venue's book the whole book is served."""
+
+  async def orderbook(market: str) -> Any:
+    """A 30-level book a side."""
+    return {
+      'market': market,
+      'bid': [{'price': Decimal(99 - i), 'qty': Decimal(1)} for i in range(30)],
+      'ask': [{'price': Decimal(101 + i), 'qty': Decimal(1)} for i in range(30)],
+    }
+
+  shared.client.info.orderbook = orderbook  # type: ignore[method-assign]
+  book = await books.depth(shared, 'BTC-USD', levels=levels)
+  assert len(book.bids) == len(book.asks) == served
+
+
 async def test_rfq_depth_is_the_quotes_snapshot(shared: Shared):
   """An RFQ market's depth is the first quotes snapshot, stamped with its time; the
   REST book is not read."""

@@ -138,7 +138,9 @@ class Market(SDK):
   async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
     """Fetch the market order book.
 
-    - `levels`: cap the number of levels per side; `None` returns the full book.
+    - `levels`: at most this many levels per side; venues serve fewer when they
+      publish fewer, and a value above a venue's maximum is served at that maximum,
+      never refused. `None` returns the full book.
     - `settings`: venue-specific options keyed by venue name; each venue reads only
       its own key and ignores the rest.
     """
@@ -157,8 +159,11 @@ class Market(SDK):
 
     Venues fan out a shared upstream to each subscriber through a bounded queue:
 
-    - `levels`: cap the number of levels per side; `None` streams the full book.
-      It trims whatever the feed delivers and never selects the feed.
+    - `levels`: at most this many levels per side; venues serve fewer when they
+      publish fewer, and a value above a venue's maximum is served at that maximum,
+      never refused. `None` streams the full book. It trims whatever the feed
+      delivers and never selects the feed, beyond a venue subscribing at the
+      smallest fixed depth that covers it.
     - `queue_size`: how many books to buffer for this subscriber.
     - `overflow`: what to do when the buffer is full. The default `'latest'`
       keeps only the newest book (a slow consumer skips stale books); pass

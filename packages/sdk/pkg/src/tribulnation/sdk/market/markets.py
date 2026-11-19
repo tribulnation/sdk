@@ -132,7 +132,9 @@ class TradingMarkets(SDK):
     """Fetch the market order book, bids and asks best-first.
 
     Args:
-      levels: Cap the number of levels per side. `None` returns the full book.
+      levels: At most this many levels per side; venues serve fewer when they publish
+        fewer, and a value above a venue's maximum is served at that maximum, never
+        refused. `None` returns the full book.
       settings: Venue-specific options keyed by venue name, e.g.
         `{'hyperliquid': {'depth_source': 'bbo'}}`; each venue reads only its own key.
     """
@@ -159,7 +161,9 @@ class TradingMarkets(SDK):
     fallback used by generic markets ignores both.
 
     Args:
-      levels: Cap the number of levels per side. `None` streams the full book.
+      levels: At most this many levels per side; venues serve fewer when they publish
+        fewer, and a value above a venue's maximum is served at that maximum, never
+        refused. `None` streams the full book.
       queue_size: Books buffered for this subscriber.
       overflow: `'latest'` silently drops stale books when the buffer is full;
         `'fail'` raises `NetworkError` instead, so you can reconnect.

@@ -94,6 +94,8 @@ API key (`futures_api_key`/`futures_private_key`). One account can hold both.
 - Spot `depth_stream` subscribes at the smallest of Kraken's fixed book depths (10, 25, 100,
   500, 1000) holding `levels`, folds the channel's snapshot-then-updates into whole
   books, and trims each to `levels`. Subscriptions are shared per symbol and depth.
+- Spot REST `depth` serves at most 500 levels per side; a larger `levels` asks for 500,
+  since Kraken answers a larger `count` with its 100-level default.
 - Spot `rules()` reads `AssetPairs`: `tick_size` and the `lot_decimals` step, `ordermin` as
   the minimum quantity and `costmin` as the minimum cost; Kraken publishes no price
   bounds. Fees are the base tier of the pair's own schedule, in the quote asset — and

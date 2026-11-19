@@ -139,6 +139,8 @@ async def test_depth_populates_time():
   [
     ('l2', None, 20),
     ('l2', 3, 3),
+    ('l2', 50, 20),
+    ('l2', 10**6, 20),
     ('fast', None, 5),
     ('fast', 3, 3),
     ('fast', 10, 5),
@@ -172,8 +174,10 @@ MESSAGES = {'l2': l2_messages(20), 'fast': l2_messages(5), 'bbo': bbo_messages()
   [
     ('l2', None, [20, 20]),
     ('l2', 3, [3, 3]),
+    ('l2', 10**6, [20, 20]),
     ('fast', None, [5, 5]),
     ('fast', 2, [2, 2]),
+    ('fast', 10**6, [5, 5]),
     ('bbo', None, [1, 1]),
     ('bbo', 5, [1, 1]),
   ],

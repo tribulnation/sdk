@@ -14,6 +14,7 @@ import logging
 from tribulnation.sdk.core import PaginatedResponse, ApiError, OverflowPolicy
 from tribulnation.sdk.market import (
   Book,
+  detached_books,
   Candle,
   CandleInterval,
   FundingPayment,
@@ -70,8 +71,9 @@ class Market(MarketMixin, PerpMarket):
 
   @wrap_exceptions
   async def depth(self, *, levels: int | None = None, settings: Settings = {}) -> Book:
-    book = await self.indexer.data.get_order_book(self.market)
-    return parse_book(book)
+    """Fetch the Indexer's full book, trimmed to `levels` when given."""
+    book = parse_book(await self.indexer.data.get_order_book(self.market))
+    return book if levels is None else book.limit(levels)
 
   @asynccontextmanager
   async def depth_stream(
@@ -82,10 +84,12 @@ class Market(MarketMixin, PerpMarket):
     overflow: OverflowPolicy = 'latest',
     settings: Settings = {},
   ) -> AsyncGenerator[AsyncIterable[Book]]:
+    """Fan out the shared Indexer book; each subscriber reads its own copy, trimmed to
+    `levels`."""
     async with self.subscribe_depth(
       self.market, queue_size=queue_size, overflow=overflow
     ) as stream:
-      yield stream
+      yield detached_books(stream, levels)
 
   async def rules(self, *, refetch: bool = False) -> Rules:
     return await self.shared.rules(self.market, refetch=refetch)

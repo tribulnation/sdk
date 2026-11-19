@@ -218,7 +218,8 @@ async def test_index_is_the_mini_ticker_index(shared: Shared, fake: Any):
 
 
 @pytest.mark.parametrize(
-  'levels,depth', [(None, 500), (1, 10), (10, 10), (11, 50), (100, 100), (600, 500)]
+  'levels,depth',
+  [(None, 500), (1, 10), (10, 10), (11, 50), (100, 100), (600, 500), (10**6, 500)],
 )
 def test_depth_asks_the_smallest_covering_venue_depth(levels: int | None, depth: int):
   """10, 50, 100 or 500 levels per side; the largest when nothing covers."""

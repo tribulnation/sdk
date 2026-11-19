@@ -88,7 +88,9 @@ async with sdk.depth_stream(market_id, settings=settings) as books:
 ```
 
 Different feeds are different streams and need not agree tick-for-tick. `levels` only trims
-the books a feed delivers; it never picks the feed. The options are documented per venue:
+the books a feed delivers; it never picks the feed. It is an upper bound: a venue serves at
+most `levels` per side, and fewer when it publishes fewer, so a `levels` above a venue's
+maximum is served at that maximum rather than refused. The options are documented per venue:
 [Hyperliquid](implementations/hyperliquid.md#depth-sources),
 [Aster](implementations/aster.md#depth-sources) and
 [Lighter](implementations/lighter.md#depth-sources).

@@ -22,15 +22,19 @@ def parse_book(
 
 
 def check_levels(levels: int | None, *, maximum: int) -> int:
-  """Validate the requested depth, defaulting to twenty levels."""
+  """The levels per side to serve: `levels` capped at `maximum`, twenty by default.
+
+  `levels` is an upper bound, so a request above the read's maximum is served at the
+  maximum rather than refused; only a non-positive request is invalid.
+  """
   size = 20 if levels is None else levels
-  if isinstance(size, bool) or not isinstance(size, int) or not 1 <= size <= maximum:
-    raise ValueError(f'Deribit supports 1-{maximum} levels for this read')
-  return size
+  if isinstance(size, bool) or not isinstance(size, int) or size < 1:
+    raise ValueError('Deribit depth levels must be a positive integer')
+  return min(size, maximum)
 
 
 async def depth(shared: Shared, symbol: str, *, levels: int | None = None) -> Book:
-  """Request the smallest sufficient native depth up to one hundred levels."""
+  """Request the smallest native depth covering `levels`, capped at one hundred."""
   size = check_levels(levels, maximum=100)
   choices: tuple[Literal[1, 5, 10, 20, 50, 100], ...] = (1, 5, 10, 20, 50, 100)
   native: Literal[1, 5, 10, 20, 50, 100] = next(n for n in choices if n >= size)
