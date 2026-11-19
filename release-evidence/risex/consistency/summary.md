@@ -1,6 +1,6 @@
 # Local SDK evidence: risex
 
-Run completed: 2026-11-19T14:30:38.804874+00:00
+Run completed: 2026-11-19T20:18:45.435419+00:00
 
 This records a trusted local run, not cryptographic proof. Release policy must separately validate required check coverage and statuses.
 

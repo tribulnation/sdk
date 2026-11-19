@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tribulnation-risex"
-version = "0.2.0"
+version = "0.2.1"
 description = "Tribulnation SDK implementation for RISEx perpetuals."
 license = "MIT"
 license-files = ["LICENSE"]
