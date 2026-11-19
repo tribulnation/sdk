@@ -13,11 +13,13 @@ import logging
 from tribulnation.sdk.core import (
   ApiError,
   BadRequest,
+  LeverageNotSet,
   NetworkError,
   OrderNotFound,
   OrderRejected,
 )
 from tribulnation.sdk.market import Order, OrderResponse, OrderState, Settings
+from tribulnation.sdk.util import to_decimal, whole_leverage
 from typed_bitget.uta.trade.order.info import OrderInfo
 from typed_bitget.uta.trade.order.place import LimitOrderRequest
 
@@ -85,12 +87,12 @@ def order_request(
   market: MarketMixin, order: Order, settings: BitgetSettings
 ) -> LimitOrderRequest:
   """The UTA `place-order` request placing `order` on cross margin."""
-  qty = Decimal(order['qty'])
+  qty = to_decimal(order['qty'])
   request: LimitOrderRequest = {
     'category': PERP,
     'symbol': market.symbol,
     'qty': abs(qty),
-    'price': Decimal(order['price']),
+    'price': to_decimal(order['price']),
     'side': 'buy' if qty > 0 else 'sell',
     'orderType': 'limit',
     'timeInForce': time_in_force(order, settings),
@@ -243,7 +245,7 @@ async def replace_order(
   """
   await require_trading(self)
   info = await order_info(self, id)
-  qty = Decimal(order['qty'])
+  qty = to_decimal(order['qty'])
   modifiable = (
     info is not None
     and info['orderStatus'] not in TERMINAL_STATUSES
@@ -257,7 +259,7 @@ async def replace_order(
         lambda: self.client.uta.trade.order.modify(
           order_id=id,
           qty=str(abs(qty)),
-          price=Decimal(order['price']),
+          price=to_decimal(order['price']),
           auto_cancel='yes',
           symbol=self.symbol,
           category=PERP,
@@ -298,7 +300,7 @@ async def cross_leverage(self: MarketMixin) -> Decimal:
 
   Raises:
     NotImplementedError: Not a UTA account's `USDT-FUTURES` market.
-    ValueError: No cross leverage is set for the symbol.
+    LeverageNotSet: No cross leverage is set for the symbol.
   """
   await require_trading(self)
   settings = await self.call(
@@ -314,7 +316,39 @@ async def cross_leverage(self: MarketMixin) -> Decimal:
   if rows:
     return rows[0]
   else:
-    raise ValueError(
-      f'No cross leverage set on Bitget for {self.symbol}: set it once (app, or '
-      '`uta.account.leverage.set`) before trading.'
+    raise LeverageNotSet(
+      f'No cross leverage set on Bitget for {self.symbol}: set it once '
+      '(`set_leverage`, or the app) before trading.'
     )
+
+
+async def set_cross_leverage(self: MarketMixin, leverage: Decimal) -> int:
+  """Set the symbol's cross leverage on a UTA account (`account/set-leverage`).
+
+  The SDK trades Bitget on cross margin only, so the cross setting is the one sent;
+  an isolated row is left alone. The value must be a whole multiple no higher than
+  the contract's `maxLever`, checked before anything is sent. Leverage reads are not
+  shared, so the next `leverage()` reads the new setting. Returns the value sent.
+
+  Raises:
+    ValueError: `leverage` is not a positive whole number, or exceeds `maxLever`.
+    NotImplementedError: Not a UTA account's `USDT-FUTURES` market.
+  """
+  value = whole_leverage(leverage)
+  await require_trading(self)
+  contracts = await self.perp_contracts(PERP)
+  max_leverage = contracts[self.symbol]['maxLever']
+  if value > max_leverage:
+    raise ValueError(
+      f'Leverage {value} exceeds the maximum of {max_leverage} on Bitget {self.symbol}'
+    )
+  await self.call(
+    lambda: self.client.uta.account.leverage.set(
+      PERP,
+      symbol=self.symbol,
+      leverage=str(value),
+      margin_mode='crossed',
+      validate=self.validate,
+    )
+  )
+  return value

@@ -3,10 +3,17 @@ against the fake venue in `conftest.py`."""
 
 from typing_extensions import TYPE_CHECKING, Any, AsyncIterator, Literal, cast
 from decimal import Decimal
+import logging
 
 import pytest
 
-from tribulnation.sdk.core import ApiError, NetworkError, OrderNotFound, OrderRejected
+from tribulnation.sdk.core import (
+  ApiError,
+  LeverageNotSet,
+  NetworkError,
+  OrderNotFound,
+  OrderRejected,
+)
 from tribulnation.sdk.market import Settings
 from tribulnation.bitget.market.impl import merged_books
 from tribulnation.bitget.market.perp_market import PerpMarket
@@ -231,8 +238,79 @@ async def test_a_symbol_without_a_leverage_setting_raises(
 ):
   """Bitget lists no row until leverage is set; guessing its default could under-hold."""
   fake.symbol_configs.clear()
-  with pytest.raises(ValueError, match='No cross leverage'):
+  with pytest.raises(LeverageNotSet, match='No cross leverage'):
     await market.leverage()
+
+
+async def test_set_leverage_sets_the_cross_row_it_then_reads(
+  fake: 'FakeBitget', market: PerpMarket, caplog: pytest.LogCaptureFixture
+):
+  """`set_leverage` sends a cross setting for the symbol, which `leverage` reads."""
+  fake.symbol_configs.clear()
+  with caplog.at_level(logging.INFO, logger='tribulnation.bitget.market.perp_market'):
+    await market.set_leverage(Decimal('3.0'))
+  assert (
+    'POST',
+    'account/set-leverage',
+    {
+      'category': 'USDT-FUTURES',
+      'symbol': 'IOTXUSDT',
+      'leverage': '3',
+      'marginMode': 'crossed',
+    },
+  ) in fake.requests
+  assert await market.leverage() == 3
+  assert f'{market.id}: leverage set to 3' in caplog.messages
+
+
+async def test_set_leverage_keeps_an_isolated_row(
+  fake: 'FakeBitget', market: PerpMarket
+):
+  """Only the cross setting changes; an isolated row for the symbol stays."""
+  isolated = {
+    'category': 'USDT-FUTURES',
+    'symbol': 'IOTXUSDT',
+    'marginMode': 'isolated',
+    'leverage': '10',
+  }
+  fake.symbol_configs.append(isolated)
+  await market.set_leverage(Decimal(7))
+  assert isolated in fake.symbol_configs
+  assert await market.leverage() == 7
+
+
+@pytest.mark.parametrize(
+  'leverage',
+  [Decimal(0), Decimal(-2), Decimal('2.5'), Decimal('NaN'), Decimal(51)],
+)
+async def test_set_leverage_refuses_what_bitget_cannot_carry(
+  fake: 'FakeBitget', market: PerpMarket, leverage: Decimal
+):
+  """Fractions, non-positive values and values above `maxLever` (50) raise before a
+  request: nothing is rounded or clamped."""
+  with pytest.raises(ValueError):
+    await market.set_leverage(leverage)
+  assert not any(e == 'account/set-leverage' for _, e, _ in fake.requests)
+
+
+async def test_a_classic_account_sets_no_leverage(
+  fake: 'FakeBitget', classic_market: PerpMarket
+):
+  """Leverage is set on UTA accounts only, like every trading call."""
+  with pytest.raises(NotImplementedError):
+    await classic_market.set_leverage(Decimal(3))
+  assert not any(e == 'account/set-leverage' for _, e, _ in fake.requests)
+
+
+async def test_float_order_inputs_keep_their_decimal_digits(
+  fake: 'FakeBitget', market: PerpMarket
+):
+  """Floats go through `to_decimal`: `0.0024` is sent as written, not its binary
+  expansion."""
+  order: Any = {'type': 'POST_ONLY', 'qty': 2500.0, 'price': 0.0024}
+  await market.place_order(order)
+  body = placed(fake)[-1]
+  assert body['price'] == '0.0024' and Decimal(body['qty']) == 2500
 
 
 async def test_the_pool_funds_orders_and_its_free_part_excludes_margin_in_use(

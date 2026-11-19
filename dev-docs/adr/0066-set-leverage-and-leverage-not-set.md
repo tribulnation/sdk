@@ -2,8 +2,8 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: proposed; implemented for Aster, Bybit, Extended, GRVT, Hyperliquid, Lighter,
-   margin.trade and RISEx, not release-verified; Kraken Futures and Nado refuse
+1. Status: proposed; implemented for Aster, Bitget, Bybit, Extended, GRVT, Hyperliquid,
+   Lighter, margin.trade and RISEx, not release-verified; Kraken Futures and Nado refuse
    (`NotImplementedError`, before any request)
 2. Date: 2026-11-18
 
@@ -45,8 +45,11 @@ the call that sets it.
    1. Aster: `POST /fapi/v1/leverage`, whole, under the symbol's leverage lock shared
       with the `-2027` check (ADR 0055); the margin type is left alone.
    2. Bitget: `POST /api/v3/account/set-leverage`, whole, `USDT-FUTURES`, `crossed`, on
-      UTA accounts only; it lands with Bitget's perpetual trading, the only venue that
-      raises `LeverageNotSet`.
+      UTA accounts only, and checked locally against the contract's `maxLever`; the
+      only venue whose `leverage()` raises `LeverageNotSet`. Order placement does not
+      map a venue error to it yet: no Bitget code for an order refused for want of a
+      leverage setting is documented or observed, and finding one would take a
+      mainnet order (Bitget has no testnet in the typed client).
    3. Bybit: `POST /v5/position/set-leverage`, buy equal to sell, on the instrument's
       `leverageStep`; "leverage not modified" (110043) counts as done. The margin mode
       is account-wide and untouched. Bybit gains `leverage()` with it.

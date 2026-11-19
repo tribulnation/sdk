@@ -1452,6 +1452,7 @@ methods:
         risex: {market_id: 'risex:perp:1', leverage: '10'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', leverage: '5'}
         bybit: {market_id: 'bybit:perp:BTCUSDT', leverage: '5'}
+        bitget: {market_id: 'bitget:usdt:BTCUSDT', leverage: '5'}
       callTemplate: |
         from decimal import Decimal
 
