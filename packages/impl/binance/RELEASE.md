@@ -1,14 +1,19 @@
-# tribulnation-binance 0.9.0
+# tribulnation-binance 0.9.1
 
-Requires SDK >=3.0.0 (spot and margin market types, collateral IDs and read `ttl`). Upgrade the SDK and this adapter together: SDK 3.0 changes the base classes this adapter subclasses, so older adapters do not work with it, and this one does not work with SDK 2.
+Requires SDK >=3.0.0 and typed-binance >=1.6.0, unchanged.
 
-Spot markets no longer serve `position`, `collateral` and `available_notional` through the SDK interface: SDK 3.0 removes them from spot markets ([ADR 0051](../../../dev-docs/adr/0051-spot-perp-market-types-collateral-ids.md)). Spot `balances` and collateral IDs are not mapped yet.
+Fixed:
 
-The reads SDK 3.0 gives a `ttl` accept it and ignore it: every read asks the venue ([ADR 0054](../../../dev-docs/adr/0054-caller-chosen-read-staleness.md)).
+1. `depth_stream(levels=N)` on spot and USD-M perpetuals, and USD-M REST `depth(levels=N)`, serve at most `N` levels per side ([ADR 0071](../../../dev-docs/adr/0071-depth-levels-upper-bound.md)): books are trimmed to `levels` instead of returning the whole 5/10/20 stream tier or REST limit tier that covers it.
+
+Changed:
+
+1. The Market support declaration names the market kinds served, `spot` and `perp` ([ADR 0056](../../../dev-docs/adr/0056-market-kind-aware-support.md)); nothing else in it changed.
+
+README: logo header.
 
 Every other method is unchanged.
 
-Release qualification on 2026-10-27 passed the read suites and market consistency.
+Release qualification on 2026-11-19 passed the read suites and market consistency.
 Committed evidence under `release-evidence/binance/` matches pinned Catalogue
-`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
-release follows SDK 3.0.0 publication.
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes.
