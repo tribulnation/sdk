@@ -14896,14 +14896,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.1283",
-            "after_bid": "0.1282",
-            "ask": "0.1283",
+            "after_ask": "0.1241",
+            "after_bid": "0.1239",
+            "ask": "0.1241",
             "attempt": 1,
-            "before_ask": "0.1283",
-            "before_bid": "0.1282",
-            "bid": "0.1282",
-            "elapsed_seconds": 1.2637275280430913,
+            "before_ask": "0.1241",
+            "before_bid": "0.1239",
+            "bid": "0.1239",
+            "elapsed_seconds": 2.634702267125249,
             "ticker_ids_match": true
           }
         ],
@@ -14916,14 +14916,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.0002537",
-            "after_bid": "0.0002534",
-            "ask": "0.0002537",
+            "after_ask": "0.0002577",
+            "after_bid": "0.0002573",
+            "ask": "0.0002577",
             "attempt": 1,
-            "before_ask": "0.0002537",
-            "before_bid": "0.0002534",
-            "bid": "0.0002534",
-            "elapsed_seconds": 0.7682894649915397,
+            "before_ask": "0.0002577",
+            "before_bid": "0.0002573",
+            "bid": "0.0002573",
+            "elapsed_seconds": 2.615167011041194,
             "ticker_ids_match": true
           }
         ],
@@ -14936,14 +14936,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.08070",
-            "after_bid": "0.08050",
-            "ask": "0.08070",
+            "after_ask": "0.08210",
+            "after_bid": "0.08190",
+            "ask": "0.08210",
             "attempt": 1,
-            "before_ask": "0.08070",
-            "before_bid": "0.08050",
-            "bid": "0.08050",
-            "elapsed_seconds": 1.6120163528248668,
+            "before_ask": "0.08210",
+            "before_bid": "0.08190",
+            "bid": "0.08190",
+            "elapsed_seconds": 2.6411604878958315,
             "ticker_ids_match": true
           }
         ],
@@ -14956,14 +14956,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "62862.90",
-            "after_bid": "62862.80",
-            "ask": "62858.40",
+            "after_ask": "63632.60",
+            "after_bid": "63632.50",
+            "ask": "63624.30",
             "attempt": 1,
-            "before_ask": "62848.80",
-            "before_bid": "62848.70",
-            "bid": "62858.30",
-            "elapsed_seconds": 1.8961487440392375,
+            "before_ask": "63624.30",
+            "before_bid": "63624.20",
+            "bid": "63624.20",
+            "elapsed_seconds": 2.379513731924817,
             "ticker_ids_match": true
           }
         ],
@@ -14976,14 +14976,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.1285",
-            "after_bid": "0.1283",
-            "ask": "0.1285",
+            "after_ask": "0.1242",
+            "after_bid": "0.1241",
+            "ask": "0.1243",
             "attempt": 1,
-            "before_ask": "0.1285",
-            "before_bid": "0.1283",
-            "bid": "0.1283",
-            "elapsed_seconds": 0.725506235146895,
+            "before_ask": "0.1243",
+            "before_bid": "0.1241",
+            "bid": "0.1241",
+            "elapsed_seconds": 1.3465097269508988,
             "ticker_ids_match": true
           }
         ],
@@ -14996,14 +14996,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.06645",
-            "after_bid": "0.06638",
-            "ask": "0.06645",
+            "after_ask": "0.06635",
+            "after_bid": "0.06628",
+            "ask": "0.06635",
             "attempt": 1,
-            "before_ask": "0.06645",
-            "before_bid": "0.06638",
-            "bid": "0.06638",
-            "elapsed_seconds": 1.3854309229645878,
+            "before_ask": "0.06635",
+            "before_bid": "0.0663",
+            "bid": "0.0663",
+            "elapsed_seconds": 1.5764071040321141,
             "ticker_ids_match": true
           }
         ],
@@ -15016,14 +15016,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.01738",
-            "after_bid": "0.01736",
-            "ask": "0.01738",
+            "after_ask": "0.01656",
+            "after_bid": "0.01653",
+            "ask": "0.01658",
             "attempt": 1,
-            "before_ask": "0.01738",
-            "before_bid": "0.01736",
-            "bid": "0.01736",
-            "elapsed_seconds": 0.7692788161803037,
+            "before_ask": "0.01658",
+            "before_bid": "0.01653",
+            "bid": "0.01653",
+            "elapsed_seconds": 2.1099092711228877,
             "ticker_ids_match": true
           }
         ],
@@ -15036,14 +15036,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "62917.9",
-            "after_bid": "62917.8",
-            "ask": "62917.9",
+            "after_ask": "63615.7",
+            "after_bid": "63615.6",
+            "ask": "63615.7",
             "attempt": 1,
-            "before_ask": "62917.9",
-            "before_bid": "62917.8",
-            "bid": "62917.8",
-            "elapsed_seconds": 1.3778890371322632,
+            "before_ask": "63619.5",
+            "before_bid": "63619.4",
+            "bid": "63615.6",
+            "elapsed_seconds": 1.598285597981885,
             "ticker_ids_match": true
           }
         ],
@@ -15702,6 +15702,7 @@
           "ARKUSDT",
           "ARMUSDT",
           "ARPAUSDT",
+          "ARTYSTOCKUSDT",
           "ARUSDT",
           "ARXUSDT",
           "ASMLUSDT",
@@ -15907,6 +15908,7 @@
           "ETHFIUSDT",
           "ETHPERP",
           "ETHUSDT",
+          "ETNUSDT",
           "EULUSDT",
           "EURUSDUSDT",
           "EVAAUSDT",
@@ -16005,6 +16007,7 @@
           "ICPUSDT",
           "IDOLUSDT",
           "IDUSDT",
+          "IGVUSDT",
           "ILVUSDT",
           "IMXUSDT",
           "INFQUSDT",
