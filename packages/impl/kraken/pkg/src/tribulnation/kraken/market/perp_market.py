@@ -373,6 +373,20 @@ class PerpMarket(SharedMixin, BasePerpMarket):
       schedule=self.perp.margin_schedule,
     )
 
+  async def set_leverage(self, leverage: Decimal) -> None:
+    """Not supported: cross leverage on Kraken is the margin schedule's, not a setting.
+
+    A leverage preference (`PUT /leveragepreferences`) would move the market to isolated
+    margin, which the SDK never does on its own (ADR 0066).
+
+    Raises:
+      NotImplementedError: Always, before anything is sent.
+    """
+    raise NotImplementedError(
+      f'Kraken cross leverage is set by the margin schedule; a leverage preference '
+      f'would switch {self.symbol} to isolated margin [{self.id}]'
+    )
+
   async def perp_collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """The multi-collateral (cross) bucket; an isolated position's is not supported."""
     preferences = await self.perp.leverage_preferences(ttl=ttl)

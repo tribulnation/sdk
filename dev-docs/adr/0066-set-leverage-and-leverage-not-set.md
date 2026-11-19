@@ -3,7 +3,8 @@
 [ADR index](README.md) · [Developer documentation](../README.md)
 
 1. Status: proposed; implemented for Aster, Bybit, Extended, GRVT, Hyperliquid, Lighter,
-   margin.trade and RISEx, not release-verified
+   margin.trade and RISEx, not release-verified; Kraken Futures and Nado refuse
+   (`NotImplementedError`, before any request)
 2. Date: 2026-11-18
 
 ## Context
@@ -61,8 +62,9 @@ the call that sets it.
    8. RISEx: the signed `update_leverage` permit, whole, at most 255 (a `uint8`) and
       checked locally against the market's `max_leverage` before signing (above it the
       permit reverts on chain); the margin mode is a separate setting.
-   9. Refusing: Kraken Futures (a leverage preference moves the market to isolated
-      margin) and Nado (cross margin has no setting). dYdX's `MsgUpdateLeverage` is not
+   9. Refusing, with `NotImplementedError` before any request: Kraken Futures (cross
+      leverage is the margin schedule's; a leverage preference moves the market to
+      isolated margin) and Nado (cross margin has no setting). dYdX's `MsgUpdateLeverage` is not
       wrapped by the typed client yet. Binance, KuCoin and MEXC can set leverage but the
       SDK does not trade their perpetuals; Deribit has no per-market setting.
 5. The gateway carries both: a `set_leverage` request (`market_id`, `leverage`) with an

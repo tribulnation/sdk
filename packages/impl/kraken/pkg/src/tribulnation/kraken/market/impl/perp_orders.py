@@ -1,6 +1,5 @@
 """Order entry on a Kraken perpetual: send, batch, edit and cancel."""
 
-from decimal import Decimal
 from typing_extensions import TYPE_CHECKING, Any, Sequence, cast
 
 from tribulnation.sdk.core import OrderNotFound
@@ -10,6 +9,7 @@ from tribulnation.sdk.market import (
   PerpMarket as BasePerpMarket,
   Settings,
 )
+from tribulnation.sdk.util import to_decimal
 from typed_kraken.futures_trading.types import BatchInstruction
 
 from .perp_account import (
@@ -34,7 +34,7 @@ def send_instruction(
   market: 'PerpMarket', order: Order, venue: KrakenSettings, tag: str
 ) -> BatchInstruction:
   """The batch instruction placing `order`."""
-  qty = Decimal(order['qty'])
+  qty = to_decimal(order['qty'])
   instruction: BatchInstruction = {
     'order': 'send',
     'order_tag': tag,
@@ -42,7 +42,7 @@ def send_instruction(
     'symbol': market.symbol,
     'side': 'buy' if qty > 0 else 'sell',
     'size': abs(qty),
-    'limitPrice': Decimal(order['price']),
+    'limitPrice': to_decimal(order['price']),
   }
   if (cli_ord_id := order.get('client_order_id')) is not None:
     instruction['cliOrdId'] = cli_ord_id
@@ -64,14 +64,14 @@ async def place_order(
   """
   venue = venue_settings(settings)
   kind = order_type(order, venue)
-  qty = Decimal(order['qty'])
+  qty = to_decimal(order['qty'])
   result = await market.call_kraken(
     lambda: market.perp.client.trading.send_order(
       order_type=kind,
       symbol=market.symbol,
       side='buy' if qty > 0 else 'sell',
       size=abs(qty),
-      limit_price=Decimal(order['price']),
+      limit_price=to_decimal(order['price']),
       cli_ord_id=order.get('client_order_id'),
       reduce_only=venue.get('reduce_only'),
     )
@@ -125,13 +125,13 @@ async def replace_order(
     OrderRejected: A post-only edit would have crossed: the order was cancelled.
     ApiError: Kraken refused the edit; the order still rests as it was.
   """
-  qty = Decimal(order['qty'])
+  qty = to_decimal(order['qty'])
   state = await market.query_order(id)
   if state is not None and state.active and (state.qty > 0) != (qty > 0):
     return await BasePerpMarket.replace_order(market, id, order, settings=settings)
   result = await market.call_kraken(
     lambda: market.perp.client.trading.edit_order(
-      order_id=id, size=abs(qty), limit_price=Decimal(order['price'])
+      order_id=id, size=abs(qty), limit_price=to_decimal(order['price'])
     )
   )
   market.perp.forget_account()
