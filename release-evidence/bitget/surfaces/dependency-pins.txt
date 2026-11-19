@@ -46,7 +46,7 @@ six==1.17.0
 tornado==6.6.1
 traitlets==5.16.1
 tribulnation-catalogue==0.4.3
-typed-bitget==0.6.2
+typed-bitget==0.6.3
 typed-core==0.14.0
 typer==0.29.1
 typing-extensions==4.16.0
