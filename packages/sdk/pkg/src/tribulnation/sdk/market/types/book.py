@@ -263,7 +263,7 @@ class Book:
     bids = self.bids.copy()
     asks = self.asks.copy()
     for e in updates.bids:
-      set_level(bids, e, key=negated_price, at=-e.price)
+      set_level(bids, e, key=negated_price, at=e.price.copy_negate())
     for e in updates.asks:
       set_level(asks, e, key=price_of, at=e.price)
 
@@ -296,8 +296,8 @@ price_of = attrgetter('price')
 
 
 def negated_price(entry: Book.Entry) -> Decimal:
-  """A level's negated price: the ascending sort key of bids."""
-  return -entry.price
+  """A level's negated price, exact under any decimal context: the sort key of bids."""
+  return entry.price.copy_negate()
 
 
 def set_level(

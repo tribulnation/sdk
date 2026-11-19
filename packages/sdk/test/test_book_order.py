@@ -1,7 +1,7 @@
 """Book order: sorted on construction, kept by `update`, the wire and derived books."""
 
 import random
-from decimal import Decimal
+from decimal import Decimal, localcontext
 
 import pytest
 from typing_extensions import AsyncIterator
@@ -166,6 +166,15 @@ def test_update_last_repeat_in_a_delta_wins():
   book = Book(bids=[entry(5, 1)])
   book.update(Book(bids=[entry(6, 1), entry(6, 0), entry(5, 3), entry(5, 4)]))
   assert levels(book.bids) == [(5, 4)]
+
+
+def test_update_ignores_the_decimal_context():
+  """Bid levels are located exactly, even under a low-precision decimal context."""
+  book = Book(bids=[entry('12345.5', 1), entry('12345.4', 1)])
+  with localcontext() as context:
+    context.prec = 4
+    book.update(Book(bids=[entry('12345.4', 0)]))
+  assert levels(book.bids) == [(Decimal('12345.5'), 1)]
 
 
 @pytest.mark.parametrize('seed', range(5))
