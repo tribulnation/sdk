@@ -174,6 +174,9 @@ async with sdk.depth_stream('lighter:perp:1', settings={'lighter': {'depth_sourc
 - Trade times are the trade's block timestamp, a few seconds before execution.
 - Perpetual collateral: the exchange bucket is cross margin; a market held in isolated
   margin reports its own bucket.
+- `perp_position().liquidation_price` is the account position's `liquidation_price`,
+  `None` where Lighter writes `0` (flat entries, and cross longs the collateral covers).
+  Small cross shorts in large accounts read prices far above the mark (ADR 0068).
 - Perpetual `leverage` is `1 / initial margin fraction`: the account's configured fraction
   for the market (the account's position entry, `initial_margin_fraction`, in percent), or
   the market's `default_initial_margin_fraction` for a market the account never

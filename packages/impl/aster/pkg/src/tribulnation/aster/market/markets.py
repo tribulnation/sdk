@@ -409,6 +409,20 @@ def position_leverage(rows: Sequence[PositionRisk], symbol: str) -> Decimal:
   return Decimal(min(values))
 
 
+def parse_position(row: PositionRisk) -> PerpPosition:
+  """A one-way `positionRisk` row as a position.
+
+  `liquidationPrice` is `0` on flat rows and wherever the venue names no price, which
+  the SDK reports as `None`.
+  """
+  liquidation = row['liquidationPrice']
+  return PerpPosition(
+    size=row['positionAmt'],
+    entry_price=row['entryPrice'],
+    liquidation_price=liquidation if liquidation > 0 else None,
+  )
+
+
 def native_order(order: Order, settings: AsterSettings = {}) -> NativeOrder:
   """Map MARKET, LIMIT (GTC, or the `time_in_force` setting) and POST_ONLY (GTX) orders.
 
@@ -1037,9 +1051,8 @@ class PerpMarket(NativeMarket, SDKPerpMarket):
     return rows[0]
 
   async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
-    """Read the signed one-way size and entry price."""
-    row = await self.one_way_position(ttl=ttl)
-    return PerpPosition(size=row['positionAmt'], entry_price=row['entryPrice'])
+    """Read the signed one-way size, entry price and liquidation price."""
+    return parse_position(await self.one_way_position(ttl=ttl))
 
   async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
     """The symbol's configured initial leverage, from the shared `positionRisk` read.

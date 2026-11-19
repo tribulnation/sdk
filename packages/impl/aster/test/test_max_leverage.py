@@ -41,6 +41,7 @@ def risk(symbol: str = SYMBOL, leverage: int = 20) -> dict[str, Any]:
     'positionSide': 'BOTH',
     'positionAmt': Decimal(0),
     'entryPrice': Decimal(0),
+    'liquidationPrice': Decimal(0),
   }
 
 

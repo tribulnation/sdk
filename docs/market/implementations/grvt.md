@@ -125,6 +125,10 @@ toggles response validation.
   an unrealized profit be removed, free collateral overstates it while in profit. A
   market without a position reads the cross bucket, whatever its margin type, since an
   isolated position's margin is taken from the cross pool when it opens.
+- `perp_position().liquidation_price` is the position's `est_liquidation_price`, `None`
+  where GRVT writes `0.0`: recorded on a cross long its collateral covered, while
+  isolated positions carried a price. Whether GRVT estimates a price for cross positions
+  at all is unverified (ADR 0068).
 - `leverage` is the account's initial leverage on the market (10 unless changed), in
   either margin type. `available_notional` is the cross bucket's free collateral times it, for
   isolated markets too, without GRVT's position-size cap or risk brackets. The SDK

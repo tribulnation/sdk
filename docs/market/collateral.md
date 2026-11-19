@@ -86,8 +86,10 @@ No field is ever `None`. A field only exists if every supported venue can produc
 truthfully.
 
 > [!NOTE]
-> There's no per-position `liquidation_price`: not every venue can give one, and
-> `maintenance_ratio` answers the same question.
+> Collateral carries no liquidation price: not every venue can give one, and
+> `maintenance_ratio` answers the same question for the whole bucket. Where a venue
+> publishes its own per-position estimate, `perp_position()` reports it as
+> `PerpPosition.liquidation_price`, which is `None` wherever there is none (ADR 0068).
 
 ## Spot balances
 

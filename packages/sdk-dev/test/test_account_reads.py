@@ -247,6 +247,17 @@ def test_position_checks():
   fails(reads.check_perp_position, perp, None)
 
 
+def test_liquidation_price_checks():
+  """A liquidation price is positive and finite, or `None`; a flat position has none."""
+  short = PerpPosition(size=-SECRET, entry_price=SECRET, liquidation_price=SECRET)
+  reads.check_perp_position(short, Position(size=-SECRET))
+  for bad in (Decimal(0), -SECRET, Decimal('Infinity')):
+    invalid = PerpPosition(size=-SECRET, entry_price=SECRET, liquidation_price=bad)
+    fails(reads.check_perp_position, invalid, Position(size=-SECRET))
+  flat = PerpPosition(liquidation_price=SECRET)
+  fails(reads.check_perp_position, flat, Position())
+
+
 def test_collateral_checks():
   """Free never exceeds equity; margins are ordered and modes known."""
   reads.check_collateral(

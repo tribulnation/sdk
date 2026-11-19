@@ -247,6 +247,12 @@ SERVER_MESSAGES: list[codec.ServerMsg] = [
   codec.PerpPositionResp(
     id='r', position=PerpPosition(size=D('-2'), entry_price=D('99.5'))
   ),
+  codec.PerpPositionResp(
+    id='r',
+    position=PerpPosition(
+      size=D('-2'), entry_price=D('99.5'), liquidation_price=D('133942.6839044118')
+    ),
+  ),
   codec.CollateralResp(id='r', collateral=PERP_COLLATERAL),
   codec.CollateralResp(
     id='r', collateral=Collateral(equity=D('10'), free_collateral=D('9'))
@@ -430,6 +436,44 @@ def test_unknown_fields_are_ignored():
   """A newer peer's optional field does not break an older decoder."""
   frame = b'{"tag": "venues", "id": "r", "added_later": 1}'
   assert codec.decode_client(frame) == codec.VenuesReq(id='r')
+
+
+def test_perp_position_without_liquidation_price_decodes_as_none():
+  """A gateway predating `liquidation_price` omits it; the reply decodes with `None`."""
+  frame = (
+    b'{"id":"r","position":{"size":"-2","entry_price":"99.5"},"tag":"perp_position"}'
+  )
+  assert codec.decode_server(frame) == codec.PerpPositionResp(
+    id='r', position=PerpPosition(size=D('-2'), entry_price=D('99.5'))
+  )
+
+
+@dataclass(kw_only=True)
+class PerpPositionBefore:
+  """`PerpPosition` as clients before `liquidation_price` decode it."""
+
+  size: Decimal = Decimal(0)
+  entry_price: Decimal = Decimal(0)
+
+
+class PerpPositionRespBefore(codec.Msg, kw_only=True, tag='perp_position'):
+  """`PerpPositionResp` as clients before `liquidation_price` decode it."""
+
+  position: PerpPositionBefore
+
+
+def test_older_clients_ignore_the_liquidation_price():
+  """A reply carrying `liquidation_price` decodes in a client that predates it."""
+  msg = codec.PerpPositionResp(
+    id='r',
+    position=PerpPosition(
+      size=D('-2'), entry_price=D('99.5'), liquidation_price=D('120.25')
+    ),
+  )
+  frame = codec.encode_server(msg)
+  assert json.loads(frame)['position']['liquidation_price'] == '120.25'
+  before = msgspec.json.decode(frame, type=PerpPositionRespBefore)
+  assert before.position == PerpPositionBefore(size=D('-2'), entry_price=D('99.5'))
 
 
 def test_checked_in_schema_is_current():

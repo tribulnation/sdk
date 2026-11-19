@@ -2984,7 +2984,7 @@
     },
     "PerpPositionResp": {
       "title": "PerpPositionResp",
-      "description": "Perpetual position.",
+      "description": "Perpetual position.\n\n  A gateway predating `liquidation_price` omits it, which decodes as `None`; a client\n  predating it ignores it (ADR 0068).",
       "type": "object",
       "properties": {
         "tag": {
@@ -3018,6 +3018,18 @@
           "type": "string",
           "format": "decimal",
           "default": "0"
+        },
+        "liquidation_price": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": []

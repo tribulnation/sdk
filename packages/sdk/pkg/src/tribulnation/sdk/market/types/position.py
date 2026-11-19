@@ -12,6 +12,14 @@ class Position:
 class PerpPosition(Position):
   entry_price: Decimal = Decimal(0)
   """Position average entry price (in quote units). Only meaningful if size != 0"""
+  liquidation_price: Decimal | None = None
+  """The venue's estimated liquidation price (in quote units, compared with its mark price).
+
+  An estimate the venue publishes, passed through: under cross margin it moves with the
+  account's other positions and collateral. `None` when flat, when the venue names no
+  price (collateral covering any move, written as `0` or `null`), or when the adapter
+  does not read one (ADR 0068).
+  """
 
 
 @dataclass(frozen=True, kw_only=True)

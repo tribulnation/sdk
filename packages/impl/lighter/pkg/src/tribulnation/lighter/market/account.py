@@ -29,11 +29,21 @@ def position_of(acct: DetailedAccount, market_id: int) -> AccountPosition | None
 
 
 def perp_position(acct: DetailedAccount, market_id: int) -> PerpPosition:
-  """The signed position and average entry (`position` is unsigned beside `sign`)."""
+  """The signed position, average entry and estimated liquidation price.
+
+  `position` is unsigned beside `sign`. `liquidation_price` is `0` on flat entries and
+  wherever the venue names no price (a cross long its collateral covers), which the
+  SDK reports as `None`.
+  """
   p = position_of(acct, market_id)
   if p is None:
     return PerpPosition()
-  return PerpPosition(size=p['position'] * p['sign'], entry_price=p['avg_entry_price'])
+  liquidation = p['liquidation_price']
+  return PerpPosition(
+    size=p['position'] * p['sign'],
+    entry_price=p['avg_entry_price'],
+    liquidation_price=liquidation if liquidation > 0 else None,
+  )
 
 
 def cross_free(acct: DetailedAccount) -> Decimal:

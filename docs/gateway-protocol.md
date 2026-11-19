@@ -167,7 +167,7 @@ flight is joined. Null or absent asks the venue afresh (ADR 0054).
 | `balance` | `balance`: `Balance` |
 | `balances` | `balances`: `SpotBalances` |
 | `collateral_id` | `value`: collateral ID string |
-| `perp_position` | `position`: `PerpPosition` |
+| `perp_position` | `position`: `PerpPosition`, `{"size", "entry_price", "liquidation_price"}`; `liquidation_price` is a Decimal or `null` when there is none, and gateways predating it omit it (read as `null`) |
 | `remaining_position_limit` | `limit`: `RemainingPositionLimit`, `{"long", "short"}`, each a Decimal or `null` when no limit is known |
 | `place_order` | `response`: `OrderResponse` |
 | `replace_order` | `response`: `OrderResponse` |

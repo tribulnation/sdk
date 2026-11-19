@@ -728,7 +728,8 @@ class PerpMarket(MarginMarket):
   @SDK.method
   @abstractmethod
   async def perp_position(self, *, ttl: timedelta | None = None) -> PerpPosition:
-    """Fetch your open position in the perpetual market.
+    """Fetch your open position in the perpetual market, with the venue's estimated
+    liquidation price where it reports one.
 
     Args:
       ttl: How old a shared answer may be; `None` asks afresh. See `Market`.

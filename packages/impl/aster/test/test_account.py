@@ -33,6 +33,7 @@ from tribulnation.sdk.core import MissingData
 from tribulnation.sdk.market import (
   Balance,
   PerpCollateral,
+  PerpPosition,
   RemainingPositionLimit,
   SpotBalances,
   SpotCollateralIds,
@@ -324,6 +325,49 @@ def test_buckets_without_equity_report_zero_leverage():
 def perp(symbol: str = 'BTCUSDT') -> PerpMarket:
   """A mainnet perpetual over a credential-free client; requests are mocked."""
   return PerpMarket(shared=AsterMarket.new(public=True).shared, symbol=symbol)
+
+
+ISOLATED_LONG: dict[str, Any] = {
+  'symbol': 'BTCUSDT',
+  'positionAmt': Decimal('0.001'),
+  'entryPrice': Decimal('83711.6'),
+  'markPrice': Decimal('83745.21855852'),
+  'unRealizedProfit': Decimal('0.03361855'),
+  'liquidationPrice': Decimal('79717.08126316'),
+  'leverage': 20,
+  'maxNotionalValue': Decimal('1000000000'),
+  'marginType': 'isolated',
+  'isolatedMargin': Decimal('4.22742999'),
+  'isAutoAddMargin': False,
+  'positionSide': 'BOTH',
+  'notional': Decimal('83.74521855'),
+  'isolatedWallet': Decimal('4.19381144'),
+  'updateTime': datetime(2026, 9, 24, tzinfo=timezone.utc),
+}
+"""An open isolated BTCUSDT long (typed-aster's `positionRisk` example 04)."""
+
+
+async def test_perp_position_reads_the_liquidation_price(
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """`liquidationPrice` passes through; the `0` of a flat row is `None`."""
+  flat: dict[str, Any] = {
+    **ISOLATED_LONG,
+    'symbol': 'ETHUSDT',
+    'positionAmt': Decimal('0.000'),
+    'entryPrice': Decimal('0.0'),
+    'liquidationPrice': Decimal('0'),
+    'marginType': 'cross',
+  }
+  monkeypatch.setattr(Risk, 'risk', AsyncMock(return_value=[ISOLATED_LONG, flat]))
+  assert await perp().perp_position() == PerpPosition(
+    size=Decimal('0.001'),
+    entry_price=Decimal('83711.6'),
+    liquidation_price=Decimal('79717.08126316'),
+  )
+  assert await perp('ETHUSDT').perp_position() == PerpPosition(
+    size=Decimal('0.000'), entry_price=Decimal('0.0'), liquidation_price=None
+  )
 
 
 async def test_perp_collateral_follows_the_symbols_margin_mode(

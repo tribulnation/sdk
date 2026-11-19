@@ -280,7 +280,9 @@ async def test_depth_stream_applies_deltas_after_the_snapshot(
   assert unsubscribed == [True]
 
 
-def position(name: str, size: str, margin_type: str = 'CROSS') -> dict[str, Any]:
+def position(
+  name: str, size: str, margin_type: str = 'CROSS', liquidation: str = '0.0'
+) -> dict[str, Any]:
   """A position row of `account_summary` and `positions`."""
   return {
     'instrument': name,
@@ -288,6 +290,7 @@ def position(name: str, size: str, margin_type: str = 'CROSS') -> dict[str, Any]
     'notional': Decimal(size) * 81835,
     'entry_price': Decimal('81835.0'),
     'unrealized_pnl': Decimal(0),
+    'est_liquidation_price': Decimal(liquidation),
     'margin_type': margin_type,
   }
 
@@ -374,6 +377,31 @@ async def test_perp_position_is_signed(shared: Shared, fake: Any):
   )
   assert requests == [{'kind': ['PERPETUAL'], 'base': ['BTC'], 'quote': ['USDT']}]
   assert await market(shared, ETH).perp_position() == PerpPosition()
+
+
+@pytest.mark.parametrize(
+  ('row', 'liquidation'),
+  [
+    (position(BTC, '0.002'), None),
+    (position(BTC, '0.002', 'ISOLATED', '74347.276'), Decimal('74347.276')),
+  ],
+  ids=['cross-none', 'isolated'],
+)
+async def test_perp_position_reads_the_estimated_liquidation_price(
+  shared: Shared, fake: Any, row: dict[str, Any], liquidation: Decimal | None
+):
+  """`est_liquidation_price` is the position's liquidation price; the `0.0` the venue
+  wrote for a cross long its collateral covered is none (rows as in typed-grvt's
+  `positions` examples 02 and 03)."""
+
+  async def positions(**kwargs: Any) -> list[dict[str, Any]]:
+    """The one BTC position."""
+    return [row]
+
+  fake.trading.positions = positions
+  assert await market(shared).perp_position() == PerpPosition(
+    size=Decimal('0.002'), entry_price=Decimal('81835.0'), liquidation_price=liquidation
+  )
 
 
 async def test_cross_bucket_and_available_notional(shared: Shared, fake: Any):
