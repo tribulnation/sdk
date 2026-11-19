@@ -166,7 +166,7 @@ all_tickers = await tickers()
 # %% [markdown]
 # ## `rules`
 #
-# `priceIncrement` is the tick, `quantityIncrement` the step; `minQuantity`/`maxQuantity` bound the size and `minVolume` (5 USD everywhere) the notional. `fees` are the instrument's standard rates (0.015% maker, 0.045% taker on all 70, 2026-11-19). `minPrice`/`maxPrice` are the range accepted now (they move with the price), and `markPriceLimit` (`0.3` on 62 instruments, `0.5` on 8) is documented as the largest distance of a limit price from the mark, though the client's docs and the owner both describe a ±5% band: until the lifecycle run settles it, none of the three becomes a price bound and all stay in `details`. `api`: `trading` is `all` (or `schedule`), the session `OPEN` and the matcher `active`.
+# `priceIncrement` is the tick, `quantityIncrement` the step; `minQuantity`/`maxQuantity` bound the size and `minVolume` (5 USD everywhere) the notional. `fees` are the instrument's standard rates (0.015% maker, 0.045% taker on all 70, 2026-11-19). `markPriceLimit` (`0.3` on 62 instruments, `0.5` on 8) is the largest distance of a limit price from the mark, so it gives the relative price bounds: the owner's mainnet run (2026-11-19) had a buy 7% under the mark accepted, so the ±5% band the client's docs describe does not hold. `minPrice`/`maxPrice` (the absolute range accepted now, which moves with the price) stay in `details`. `api`: `trading` is `all` (or `schedule`), the session `OPEN` and the matcher `active`.
 
 # %%
 async def rules(market_id: str, /, *, refetch: bool = False) -> Rules:
@@ -178,9 +178,11 @@ async def rules(market_id: str, /, *, refetch: bool = False) -> Rules:
     fixed_min_qty=r['minQuantity'],
     min_value=r['minVolume'],
     max_qty=r['maxQuantity'],
+    rel_min_price=1 - r['markPriceLimit'],
+    rel_max_price=1 + r['markPriceLimit'],
     fees=Fees.symmetric(maker=r['fees']['maker'], taker=r['fees']['taker']),
     api=r['trading'] in ('all', 'schedule') and r['marketState'] == 'OPEN' and r['matcherState'] == 'active',
-    details={'minPrice': r['minPrice'], 'maxPrice': r['maxPrice'], 'markPriceLimit': r['markPriceLimit'], 'maxLeverage': r['maxLeverage']},
+    details={'minPrice': r['minPrice'], 'maxPrice': r['maxPrice'], 'maxLeverage': r['maxLeverage']},
   )
 
 
@@ -361,10 +363,12 @@ except TimeoutError:
 # %% [markdown]
 # ## `place_order`
 #
-# `exchange.orders.place_limit`, signed with the wallet (EIP-712 `new_limit_order`). `leverage` is part of the signed struct, so every order carries the account's current setting on the instrument (the position record's `leverage`, 1 when never set). `quantity`/`limitPrice` are rounded half-up to 8 decimals before signing, so off-grid values are refused before the call. The order `id` (`DDDDD:<26 hex>`, days since 2025-07-24) is the client's: `client_order_id` is sent as the id, else the client generates one (`typed_evedex.core.order_id`). Mapping: `LIMIT` is GTC (the venue default), `POST_ONLY` adds `postOnly: 'yes'` (refused on demo with `post_only_not_allowed_error`), `MARKET` is a limit with `timeInForce: 'IOC'` at `price`: the venue's own market order is sized in USD (`cashQuantity`) and bounded only by the instrument's slippage limit, not by `price`. The reply is the accepted order (`NEW`); execution is asynchronous, so nothing filled is reported. A refusal is a `4xx` with a `label` (`mark_price_limit_exceeded_error`, `insufficient_funds_error`, `post_only_not_allowed_error`): nothing rests.
+# `exchange.orders.place_limit`, signed with the wallet (EIP-712 `new_limit_order`). `leverage` is part of the signed struct, so every order carries the account's current setting on the instrument (the position record's `leverage`, 1 when never set). `quantity`/`limitPrice` are rounded half-up to 8 decimals before signing, so off-grid values are refused before the call. The order `id` (`DDDDD:<26 hex>`, days since 2025-07-24) is the client's: `client_order_id` is sent as the id, else the client generates one (`typed_evedex.core.order_id`). Mapping: `LIMIT` is GTC (the venue default) and `MARKET` a limit with `timeInForce: 'IOC'` at `price`: the venue's own market order is sized in USD (`cashQuantity`) and bounded only by the instrument's slippage limit, not by `price`. The owner's mainnet run (2026-11-19) confirmed the IOC: a non-crossing one ended `CANCELLED`, nothing resting, and crossing ones filled (a 6.6 XRP round trip). `POST_ONLY` is not supported: `postOnly: 'yes'` is refused with `post_only_not_allowed_error` on mainnet as on demo, so it raises before signing. The reply is the accepted order (`NEW`); execution is asynchronous, so nothing filled is reported. A refusal is a `4xx` with a `label` (`mark_price_limit_exceeded_error`, `insufficient_funds_error`, `post_only_not_allowed_error`): nothing rests.
 
 # %%
 async def place_order(market_id: str, /, order: Order, *, settings: Settings = {}) -> OrderResponse:
+  if order['type'] == 'POST_ONLY':
+    raise NotImplementedError('EVEDEX refuses post-only orders')
   qty, price = Decimal(order['qty']), Decimal(order['price'])
   positions = (await client.exchange.positions.list())['list']
   leverage = next((p['leverage'] for p in positions if p['instrument'] == market_id), 1)
@@ -375,13 +379,12 @@ async def place_order(market_id: str, /, order: Order, *, settings: Settings = {
     quantity=abs(qty),
     limit_price=price,
     time_in_force='IOC' if order['type'] == 'MARKET' else None,
-    post_only='yes' if order['type'] == 'POST_ONLY' else None,
     id=order.get('client_order_id') or order_id(),
   )
   return OrderResponse(id=placed['id'], details=placed)
 
 
-# not executed: state-changing; mainnet trading is the owner's lifecycle run (poc/lifecycle.py)
+# not executed: state-changing; verified by the owner's mainnet lifecycle run (poc/lifecycle.py, 2026-11-19)
 mark = table['XRPUSD']['markPrice']
 await place_order('XRPUSD', {'type': 'LIMIT', 'qty': Decimal('6'), 'price': (mark * Decimal('0.97')).quantize(Decimal('0.0001'))})
 
@@ -396,7 +399,7 @@ async def cancel_order(market_id: str, /, id: str, *, settings: Settings = {}) -
   return await client.exchange.orders.cancel(id)
 
 
-# not executed: state-changing; mainnet trading is the owner's lifecycle run (poc/lifecycle.py)
+# not executed: state-changing; verified by the owner's mainnet lifecycle run (poc/lifecycle.py, 2026-11-19)
 await cancel_order('XRPUSD', '<order id>')
 
 
@@ -410,7 +413,7 @@ async def cancel_orders(market_id: str, /, ids: Sequence[str], *, settings: Sett
   return [await cancel_order(market_id, id) for id in ids]
 
 
-# not executed: state-changing; mainnet trading is the owner's lifecycle run (poc/lifecycle.py)
+# not executed: state-changing; verified by the owner's mainnet lifecycle run (poc/lifecycle.py, 2026-11-19)
 await cancel_orders('XRPUSD', ['<order id>'])
 
 
@@ -425,7 +428,7 @@ async def replace_order(market_id: str, /, id: str, order: Order, *, settings: S
   return await place_order(market_id, order)
 
 
-# not executed: state-changing; mainnet trading is the owner's lifecycle run (poc/lifecycle.py)
+# not executed: state-changing; verified by the owner's mainnet lifecycle run (poc/lifecycle.py, 2026-11-19)
 await replace_order('XRPUSD', '<order id>', {'type': 'LIMIT', 'qty': Decimal('6'), 'price': Decimal('0.95')})
 
 
@@ -439,7 +442,7 @@ async def replace_orders(market_id: str, /, orders: Sequence[tuple[str, Order]],
   return [await replace_order(market_id, id, order) for id, order in orders]
 
 
-# not executed: state-changing; mainnet trading is the owner's lifecycle run (poc/lifecycle.py)
+# not executed: state-changing; verified by the owner's mainnet lifecycle run (poc/lifecycle.py, 2026-11-19)
 await replace_orders('XRPUSD', [('<order id>', {'type': 'LIMIT', 'qty': Decimal('6'), 'price': Decimal('0.95')})])
 
 
@@ -453,7 +456,7 @@ async def cancel_open_orders(market_id: str, /, *, settings: Settings = {}) -> A
   return await client.exchange.orders.cancel_by_instrument(market_id)
 
 
-# not executed: state-changing; mainnet trading is the owner's lifecycle run (poc/lifecycle.py)
+# not executed: state-changing; verified by the owner's mainnet lifecycle run (poc/lifecycle.py, 2026-11-19)
 await cancel_open_orders('XRPUSD')
 
 
@@ -585,7 +588,7 @@ async def set_leverage(market_id: str, /, leverage: Decimal):
   await client.exchange.positions.set_leverage(market_id, leverage=int(leverage))
 
 
-# not executed: state-changing; mainnet trading is the owner's lifecycle run (poc/lifecycle.py)
+# not executed: state-changing; verified by the owner's mainnet lifecycle run (poc/lifecycle.py, 2026-11-19)
 await set_leverage('XRPUSD', Decimal(2))
 
 
@@ -695,27 +698,27 @@ await collateral()
 # | `depth` | verified | REST, 100 levels a side, stamped |
 # | `depth_stream` | verified | whole-book publications at `round=0.1` (each instrument's own tick) |
 # | `tickers` | verified | last and volumes from one metrics read; bid/ask from one `marketLevel=1` book per market |
-# | `rules` | verified | tick, step, min/max qty, min notional, standard fees; price bands in `details` |
+# | `rules` | verified | tick, step, min/max qty, min notional, standard fees, `markPriceLimit` band |
 # | `fees` | verified | `me.tradingFees`, personal overrides first |
 # | `candles` | verified | six SDK widths; base and USD volume |
 # | `query_order` | verified | a filled order; unknown id is `None` |
-# | `open_orders` | empty | nothing rests; populated by the lifecycle run |
-# | `trades_history` | verified | the account's two XRPUSD fills, side from the orders, fee from `orders.fills` |
-# | `trades_stream` | empty | subscribed with the wallet session; fills only during the lifecycle run |
-# | `place_order` | not attempted | pending the owner's lifecycle run (`poc/lifecycle.py`) |
-# | `cancel_order` | not attempted | pending the lifecycle run |
-# | `cancel_orders` | not attempted | SDK default; pending the lifecycle run |
-# | `replace_order` | not attempted | SDK default; pending the lifecycle run |
-# | `replace_orders` | not attempted | SDK default; pending the lifecycle run |
-# | `cancel_open_orders` | not attempted | `mass-cancel`; pending the lifecycle run |
+# | `open_orders` | verified | lifecycle run: resting orders listed with fill progress |
+# | `trades_history` | verified | the account's XRPUSD fills, side from the orders, fee from `orders.fills`; the lifecycle run's 2 round-trip fills |
+# | `trades_stream` | blocked | subscribes (13:39 UTC); received none of the lifecycle run's 2 fills: prod answered every subscribe with a `temporary` code-100 error then (see `typed-client-issues.md`, "Centrifugo `temporary` subscribe errors raise the final `ApiError`"); rerun `poc/lifecycle.py --round-trip` |
+# | `place_order` | verified | mainnet lifecycle run (2026-11-19, 6.6 XRP round trip): LIMIT rests, MARKET (IOC limit) fills or ends `CANCELLED`; `POST_ONLY` refused by the venue, so not supported |
+# | `cancel_order` | verified | lifecycle run; a second cancel and an unknown id raise `OrderNotFound` |
+# | `cancel_orders` | verified | SDK default; lifecycle run |
+# | `replace_order` | verified | SDK default (cancel, then place); lifecycle run |
+# | `replace_orders` | verified | SDK default over `replace_order` |
+# | `cancel_open_orders` | verified | `mass-cancel`; lifecycle run |
 # | `index` | verified | `avgLastPrice * lotSize` |
 # | `next_funding` | verified | current rate pro-rated to the hourly settlement (docs); no payment observed yet |
 # | `perp_stats` | verified | one metrics read |
 # | `funding_rates` | not supported | no rate history published |
 # | `funding_payments` | not supported | ledger rows name no instrument |
-# | `perp_position` | empty | flat; populated by the lifecycle run |
+# | `perp_position` | verified | lifecycle run: a 6.6 XRP long at 0.9907, then flat |
 # | `leverage` | verified | position record, default 1 |
-# | `set_leverage` | not attempted | pending the lifecycle run |
+# | `set_leverage` | verified | lifecycle run: 1 to 2 and back |
 # | `position` | empty | flat |
 # | `collateral_id` | verified | `<account>:perp` |
 # | `available_notional` | verified | SDK default |
