@@ -6,7 +6,7 @@ from decimal import Decimal
 
 from typing_extensions import Collection, Literal, Mapping
 from typed_lighter.schemas import MarketSelector, MarketStats, SpotMarketStats
-from tribulnation.sdk.core import ApiError
+from tribulnation.sdk.core import ApiError, MissingData
 from tribulnation.sdk.market import (
   NextFunding,
   PerpStats,
@@ -47,11 +47,22 @@ def open_interest_room(s: MarketStats) -> RemainingPositionLimit:
 async def remaining_position_limit(
   shared: Shared, market_id: int, *, ttl: timedelta | None
 ) -> RemainingPositionLimit:
-  """The market's open-interest room (`open_interest_room`), from its `market_stats`
-  snapshot. Lighter publishes no per-account position cap."""
-  return open_interest_room(
-    (await perp_snapshot(shared, market_id, ttl=ttl))[market_id]
-  )
+  """The market's open-interest room (`open_interest_room`), from the all-market
+  `market_stats` snapshot every market shares for `ttl` (ADR 0069). Lighter publishes
+  no per-account position cap.
+
+  Raises:
+    MissingData: The snapshot omits the market.
+  """
+  stats = await perp_snapshot(shared, 'all', ttl=ttl)
+  if (row := stats.get(market_id)) is not None:
+    return open_interest_room(row)
+  else:
+    raise MissingData(
+      'Lighter market_stats omits the market',
+      market_id=str(market_id),
+      field='open_interest_limit',
+    )
 
 
 def price_or_none(value: Decimal | Literal['']) -> Decimal | None:

@@ -186,7 +186,8 @@ async with sdk.depth_stream('lighter:perp:1', settings={'lighter': {'depth_sourc
   cross collateral times it, kept over the SDK default because isolated positions are
   funded from cross collateral rather than their own bucket.
 - Perpetual `remaining_position_limit` (ADR 0062) is the room left under the market's
-  open-interest cap, for both directions, from its `market_stats` snapshot:
+  open-interest cap, for both directions, from the all-market `market_stats` snapshot
+  every market shares for `ttl` (30 s by default, ADR 0069):
   `open_interest_limit` (a raw 6-decimal USDC amount, `2^56` when uncapped, then `None`
   both ways) less `open_interest` (one side's notional in USDC). Lighter publishes no
   per-account cap. Near the cap the figure is racy: other accounts take the same room.

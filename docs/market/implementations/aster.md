@@ -174,11 +174,18 @@ async with sdk.depth_stream('aster:perp:BTCUSDT', settings={'aster': {'depth_sou
   reversing a position is not modelled. Testnet does not serve
   `remainingOpenableNotionalValue` (HTTP 404), so perpetual `available_notional` fails
   there.
-- Perpetual `remaining_position_limit` is the bracket's room per direction: `maxNotional` less
-  the notional the position holds in that direction, bounded by
-  `remainingOpenableNotionalValue`; free balance is left out (ADR 0062). An order refused
-  for the bracket's cap (`-5018`) raises `PositionLimitExceeded`. It fails on testnet,
-  which does not serve `remainingOpenableNotionalValue`.
+- Perpetual `remaining_position_limit` is the bracket's room per direction:
+  `maxNotionalValue` less the notional the position holds in that direction, bounded by
+  `remainingOpenableNotionalValue`; free balance is left out (ADR 0062). Every symbol
+  reads the one all-symbol `positionRisk` answer, shared for `ttl` (30 s by default).
+  `remainingOpenableNotionalValue` is public, market-wide and answered one symbol per
+  request (weight 50), so each symbol's answer is reused for 15 minutes whatever the
+  `ttl`, and all symbols of a client together send at most one every 30 s, the oldest
+  answer asked for first; a symbol not read yet has no open-interest bound meanwhile. Perpetual `available_notional` reads the
+  allowance the same way. Polling 22 symbols costs at most 4 requests a minute
+  (ADR 0069). An order refused for the bracket's cap (`-5018`) raises
+  `PositionLimitExceeded` and marks the positions and the symbol's allowance for a new
+  read. It fails on testnet, which does not serve `remainingOpenableNotionalValue`.
 - Spot `balances` total each asset's free plus locked amounts, with the free part as
   `free`; mainnet only, as testnet omits funded balances. Spot and futures wallets are
   separate, so a spot asset's collateral ID is `<account>:spot:<asset>` (`aster:spot:USDT`)
