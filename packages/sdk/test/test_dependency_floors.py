@@ -34,7 +34,15 @@ SDK_4_1_ADAPTERS = tuple(
   if venue not in ('binance', 'deribit', 'ethereum', 'kucoin')
 )
 """Adapters released with SDK 4.1, which require it."""
-SDK_4_2_ADAPTERS = ('aster', 'extended', 'grvt', 'hyperliquid', 'lighter', 'nado', 'risex')
+SDK_4_2_ADAPTERS = (
+  'aster',
+  'extended',
+  'grvt',
+  'hyperliquid',
+  'lighter',
+  'nado',
+  'risex',
+)
 """Adapters released with SDK 4.2, which require it."""
 
 
