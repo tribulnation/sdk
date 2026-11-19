@@ -1,4 +1,4 @@
-"""Book order: sorted on construction, kept by `update`, the wire and derived books."""
+"""Book order: sorted on construction and wire decode, kept by `update` and derived books."""
 
 import random
 from decimal import Decimal, localcontext
@@ -97,19 +97,26 @@ def test_best_levels_of_empty_sides_raise_value_error():
         book.best_ask
 
 
-def test_wire_decode_keeps_level_order():
-  """Decoded books keep the order on the wire without re-sorting: the protocol sends
-  levels in book order, and books the SDK encodes round-trip unchanged."""
+def test_wire_decode_round_trips_books():
+  """Books the SDK encodes decode unchanged."""
   book = Book(bids=[entry(3, 1), entry(2, 1)], asks=[entry(4, 1), entry(5, 1)])
   resp = codec.decode_server(codec.encode_server(codec.DepthResp(id='1', book=book)))
   assert isinstance(resp, codec.DepthResp) and resp.book == book
+
+
+def test_wire_decode_sorts_out_of_order_levels():
+  """A peer sending levels out of book order still yields a sorted book with the
+  right best bid and ask: decoding does not trust the wire order."""
   frame = (
     b'{"id":"1","tag":"depth","book":{"bids":[{"price":"2","qty":"1"},'
-    b'{"price":"3","qty":"1"}],"asks":[]}}'
+    b'{"price":"4","qty":"2"},{"price":"3","qty":"3"}],"asks":[{"price":"9","qty":"1"},'
+    b'{"price":"5","qty":"2"},{"price":"7","qty":"3"}]}}'
   )
   resp = codec.decode_server(frame)
   assert isinstance(resp, codec.DepthResp)
-  assert [e.price for e in resp.book.bids] == [2, 3]
+  assert levels(resp.book.bids) == [(4, 2), (3, 3), (2, 1)]
+  assert levels(resp.book.asks) == [(5, 2), (7, 3), (9, 1)]
+  assert resp.book.best_bid.price == 4 and resp.book.best_ask.price == 5
 
 
 def test_limit_keeps_order_and_shares_entries():

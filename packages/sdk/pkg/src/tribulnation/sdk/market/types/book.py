@@ -9,7 +9,7 @@ from tribulnation.sdk.core.stream import Skipping, SkippingView
 from .fees import Fees
 
 
-@dataclass(kw_only=True, init=False)
+@dataclass(kw_only=True)
 class Book:
   @dataclass
   class Entry:
@@ -46,24 +46,16 @@ class Book:
   transport header such as HTTP `Date`.
   """
 
-  def __init__(
-    self,
-    *,
-    bids: list[Entry] | None = None,
-    asks: list[Entry] | None = None,
-    time: datetime | None = None,
-  ):
-    """Build a book, sorting `bids` and `asks` in place into book order.
+  def __post_init__(self):
+    """Sort `bids` and `asks` in place into book order.
 
-    Sorting is stable and nearly linear on levels already in order, which is cheaper
-    than checking the order first. Books that skip it keep the order they have:
-    `presorted` ones, those decoded from the gateway wire (msgspec does not call
-    `__init__`; the protocol sends levels in book order), and those maintained by
-    `update` or derived by `copy`, `frozen` and `limit`.
+    Runs for every constructed book and for every book msgspec decodes from the
+    gateway wire, so a book is in order whatever order its input had. Sorting is
+    stable and nearly linear on levels already in order, which is cheaper than
+    checking the order first. Only `presorted` skips it, for levels the SDK itself
+    keeps in order: those maintained by `update` or derived by `copy`, `frozen` and
+    `limit`.
     """
-    self.bids = [] if bids is None else bids
-    self.asks = [] if asks is None else asks
-    self.time = time
     self.bids.sort(key=price_of, reverse=True)
     self.asks.sort(key=price_of)
 

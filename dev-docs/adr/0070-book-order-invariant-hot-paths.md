@@ -25,15 +25,17 @@ paths still paying for that order again and again:
 
 ## Decision
 
-1. The book-order invariant is load-bearing: the constructor sorts, every SDK path
-   that derives or maintains a book keeps the order, and readers rely on it.
-2. The constructor sorts in place with an `attrgetter` key, as before but cheaper. It
-   moves from `__post_init__` to `__init__`, which msgspec does not call, so books
-   decoded from the wire keep the order the protocol already requires. Sorting a
-   side that is already in order is nearly linear and costs less than checking the
-   order first (42 µs against 55 to 80 µs for a pure-Python check, 500 levels a
-   side), so untrusted input keeps being sorted, not validated. `limit` slices
-   without re-sorting.
+1. The book-order invariant is load-bearing: every path that builds a book from
+   outside levels sorts, every SDK path that derives or maintains a book keeps the
+   order, and readers rely on it.
+2. `__post_init__` sorts both sides in place with an `attrgetter` key, as before but
+   cheaper. It runs for the constructor and for every book msgspec decodes from the
+   gateway wire: the wire order is not trusted. Sorting a side that is already in
+   order is nearly linear and costs less than checking the order first (about 45 µs
+   against 55 to 80 µs for a pure-Python check, 500 levels a side), so input keeps
+   being sorted, not validated. Only `presorted` skips the sort, for levels the SDK
+   itself keeps in order: `copy`, `frozen` and `limit`, which slices without
+   re-sorting.
 3. `best_bid` and `best_ask` return the first level and raise `ValueError` on an
    empty side, as the scans did.
 4. `update` locates each changed price by binary search in copies of the two lists,
@@ -56,23 +58,26 @@ paths still paying for that order again and again:
    the public constructor for what `presorted` already does internally, and the check
    is slower than the sort it would skip.
 3. A separate wire-only `Book` struct in the codec: it would change the schema's type
-   names or need a conversion step on every message, for the same effect as moving
-   the sort into `__init__`.
+   names or need a conversion step on every message.
 4. A `depth_stream` argument to skip the copy: it changes the Market contract of
    every venue, while only the gateway needs it.
+5. Trusting the wire order, by sorting in an `__init__` msgspec does not call: an
+   earlier draft of this record accepted it. Withdrawn: a peer sending levels out of
+   order would yield books whose `best_bid`, `best_ask` and `update` are wrong, and
+   the sort it saves is a small share of a decode.
 
 ## Consequences
 
 1. On 500 levels a side (`packages/sdk/test/bench_book_hot_paths.py`), construction
-   of sorted levels falls from about 80 to 47 µs, a wire decode from about 790 to
-   720 µs, `best_bid` + `best_ask` from 84 to 0.2 µs, and an update of 1 to 4 levels
-   a side from about 115 to 14 µs. The gateway no longer spends about 255 µs copying
+   of sorted levels falls from about 77 to 48 µs, a wire decode, still sorting, from
+   about 775 to 750 µs, `best_bid` + `best_ask` from 82 to 0.2 µs, and an update of 1
+   to 4 levels a side from about 114 to 14 µs. The gateway no longer spends about 255 µs copying
    each streamed book it reads.
 2. Code that appends to or reorders `bids`/`asks` by hand and then reads `best_bid`,
    `best_ask` or `update`s the book gets wrong results; it must keep the order or
    rebuild the book with the constructor.
-3. A gateway peer that sends levels out of order, against the protocol, now yields
-   books in that order.
+3. A gateway peer that sends levels out of order, against the protocol, still yields
+   sorted books.
 4. `reading_books_only` is inherited by tasks created while it is set. The gateway
    sets it only in its stream tasks, whose subscriptions create producer tasks that
    do not read `detached_books`.
