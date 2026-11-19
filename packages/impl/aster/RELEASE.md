@@ -1,17 +1,14 @@
-# tribulnation-aster 0.16.0
+# tribulnation-aster 0.16.1
 
-Requires SDK >=4.2.0 (`POSITION_LIMIT_TTL`, [ADR 0069](../../../dev-docs/adr/0069-position-limits-shared-by-default.md); `PerpPosition.liquidation_price`, [ADR 0068](../../../dev-docs/adr/0068-perp-position-liquidation-price.md)) and typed-aster >=0.7.0, unchanged.
+Requires SDK >=4.2.0 and typed-aster >=0.7.0, unchanged.
 
-Changed:
+Fixed:
 
-1. `perp_position()` carries Aster's `liquidationPrice` as `liquidation_price` (`None` when flat or named `0`).
-2. `remaining_position_limit()` shares its reads by default (`ttl` 30 s): the bracket cap, position and leverage come from the all-symbol `positionRisk`, shared by every symbol, with no futures-account read.
-3. The per-symbol open-interest allowance (`remainingOpenableNotionalValue`, weight 50) is shared per symbol and leverage for 15 minutes whatever the caller's `ttl`, and requests of all symbols together are spaced 30 s apart; a free turn goes to the oldest answer asked for. Until a symbol's allowance is first read, its open-interest bound is unknown. `available_notional` reads it the same way.
-4. A `-5018` refusal drops the shared `positionRisk` and marks the symbol's allowance stale.
+1. `depth_stream(levels=N)` no longer raises for `N` above 20: `levels` is an upper bound. The default `'depth'` source subscribes to the smallest partial-depth tier (5, 10 or 20) holding `min(N, 20)` and trims books to `N`, so `levels=50` serves 20 levels and `levels=7` reads `@depth10` and keeps 7. `'fast'` and `'bbo'` serve at most 5 and 1. Spot `'depth'` at 5 levels or fewer shares the `'fast'` feed (`@depth5@100ms`).
+2. REST `depth(levels=N)` caps at 1000 levels instead of raising. Only `levels < 1` still raises `ValueError`.
 
 Every other method is unchanged.
 
 Release qualification on 2026-11-19 passed the read suites and market consistency.
 Committed evidence under `release-evidence/aster/` matches pinned Catalogue
-`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
-release follows SDK 4.2.0 publication.
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes.
