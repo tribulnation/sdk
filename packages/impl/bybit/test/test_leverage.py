@@ -1,4 +1,5 @@
-"""Linear leverage: read from the position list, set on the symbol's leverage step."""
+"""Linear leverage: read from the position list, set on the symbol's leverage step,
+and used for the available notional."""
 
 from decimal import Decimal
 from unittest.mock import AsyncMock
@@ -38,16 +39,25 @@ def market(step: str = '0.01') -> PerpMarket:
   return PerpMarket(client=Bybit.new(public=True), cache=cache, symbol=SYMBOL)
 
 
+def wallet(available: str) -> dict[str, Any]:
+  """A `/v5/account/wallet-balance` answer with one unified account."""
+  return {'list': [{'accountType': 'UNIFIED', 'totalAvailableBalance': available}]}
+
+
 @pytest.fixture
 def venue(monkeypatch: pytest.MonkeyPatch) -> dict[str, AsyncMock]:
-  """Patch the position list and set-leverage endpoints."""
+  """Patch the position list, set-leverage and account endpoints."""
   client = Bybit.new(public=True)
   mocks = {
     'list': AsyncMock(return_value={'category': 'linear', 'list': [row('10')]}),
     'set': AsyncMock(return_value={}),
+    'wallet': AsyncMock(return_value=wallet('1000')),
+    'info': AsyncMock(return_value={'marginMode': 'REGULAR_MARGIN'}),
   }
   monkeypatch.setattr(type(client.position), 'list', mocks['list'])
   monkeypatch.setattr(type(client.position), 'set_leverage', mocks['set'])
+  monkeypatch.setattr(type(client.account), 'wallet_balance', mocks['wallet'])
+  monkeypatch.setattr(type(client.account), 'info', mocks['info'])
   return mocks
 
 
@@ -139,3 +149,34 @@ async def test_set_then_read(venue: dict[str, AsyncMock]):
   venue['list'].return_value = {'category': 'linear', 'list': [row('20')]}
   assert await m.leverage() == Decimal(20)
   assert venue['list'].await_count == 2
+
+
+async def test_available_notional_uses_set_leverage(venue: dict[str, AsyncMock]):
+  """Free collateral times the symbol's setting, not the catalogue maximum (100)."""
+  venue['list'].return_value = {'category': 'linear', 'list': [row('5')]}
+  assert await market().available_notional() == Decimal(5000)
+
+
+async def test_available_notional_reads_two_endpoints(venue: dict[str, AsyncMock]):
+  """One symbol-scoped position list and one wallet balance, nothing else."""
+  await market().available_notional()
+  assert venue['list'].await_count == 1
+  assert venue['list'].await_args_list[-1].kwargs['symbol'] == SYMBOL
+  assert venue['wallet'].await_count == 1
+  venue['info'].assert_not_awaited()
+
+
+async def test_available_notional_empty_balance(venue: dict[str, AsyncMock]):
+  """An empty available balance, or no unified account, opens nothing."""
+  venue['wallet'].return_value = wallet('')
+  assert await market().available_notional() == 0
+  venue['wallet'].return_value = {'list': []}
+  assert await market().available_notional() == 0
+
+
+async def test_available_notional_without_leverage(venue: dict[str, AsyncMock]):
+  """Portfolio margin has no setting: raise before reading the balance."""
+  venue['list'].return_value = {'category': 'linear', 'list': [row('')]}
+  with pytest.raises(NotImplementedError):
+    await market().available_notional()
+  venue['wallet'].assert_not_awaited()

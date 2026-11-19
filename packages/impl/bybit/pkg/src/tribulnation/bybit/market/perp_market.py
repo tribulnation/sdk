@@ -273,11 +273,17 @@ class PerpMarket(MarketMixin, _PerpMarket):
     log.info('%s: leverage set to %s', self.id, leverage)
 
   async def available_notional(self, *, ttl: timedelta | None = None) -> Decimal:
-    """Fetch the max. notional position you can open: free collateral times leverage."""
-    instruments = await self.perp_instruments()
-    collateral = await self.perp_collateral()
-    max_leverage = instruments[self.symbol]['leverageFilter']['maxLeverage']
-    return collateral.free_collateral * max_leverage
+    """Fetch the max. notional position you can open: free collateral times leverage.
+
+    The leverage is the symbol's setting (`leverage()`), read first so an account
+    without one raises before the balance is read. Free collateral is the unified
+    account's `totalAvailableBalance`, from the wallet balance alone: two requests,
+    skipping the account info and position sweep `perp_collateral()` also makes.
+    """
+    leverage = await self.leverage(ttl=ttl)
+    account = await self.unified_balance()
+    free = num(account['totalAvailableBalance']) if account is not None else Decimal(0)
+    return free * leverage
 
   async def index(self, *, settings: Settings = {}) -> Decimal:
     """Fetch the market index price."""
