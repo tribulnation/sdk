@@ -137,7 +137,10 @@ toggles response validation.
   units, 1000 on BTC) less the position held in each direction, at the ticker's mark
   price. The risk brackets (`margin_rules`) are not read: whether GRVT refuses an order
   past a bracket at the account's leverage is unverified. GRVT publishes no
-  open-interest cap.
+  open-interest cap. Every instrument reads one all-perpetual `positions` answer shared
+  for `ttl` (30 s by default); GRVT has no all-instrument ticker, so a capped
+  instrument reads its own ticker, shared for `ttl`, and an uncapped one none
+  (ADR 0069).
 - Spot `rules()` name the pair (`base`, `quote`); `fee_asset` is `None`, since the fee
   is charged in the asset a fill delivers (base on a buy, quote on a sell), and
   `rules().fees` is `None`: GRVT publishes no standard spot schedule. `fees()` reads the

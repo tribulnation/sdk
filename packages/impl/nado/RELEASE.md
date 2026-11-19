@@ -1,13 +1,14 @@
-# tribulnation-nado 0.1.0
+# tribulnation-nado 0.2.0
 
-First release. Requires SDK >=4.1.0, typed-nado >=0.1.0 and typed-core >=0.14.
+Requires SDK >=4.2.0 (`POSITION_LIMIT_TTL`, [ADR 0069](../../../dev-docs/adr/0069-position-limits-shared-by-default.md)), typed-nado >=0.1.0 and typed-core >=0.14, unchanged.
 
-1. Market: Nado's USDT0-settled perpetual and spot markets (support `partial`): reference data, books and streams, rules, tickers, funding and candles, and account reads keyed by the owner's `address` alone (Nado's reads are public). With the EIP-712 `private_key` (the owner's or a linked signer's) it also places and cancels orders.
-2. `remaining_position_limit()` reads `max_open_interest_x18` less the gateway's open interest.
-3. Report: `snapshot()` from the subaccount's address.
-4. Accounts `nado` and `nado_testnet` in the SDK (`NADO_ADDRESS`, `NADO_PRIVATE_KEY`, `NADO_SUBACCOUNT`).
+Changed:
 
-Release qualification on 2026-11-18 passed the read suites and market consistency.
+1. `remaining_position_limit()` shares its reads by default (`ttl` 30 s): `all_products` and the perpetual index/mark prices, one request each shared by every market; an uncapped market reads nothing.
+
+Every other method is unchanged.
+
+Release qualification on 2026-11-19 passed the read suites and market consistency.
 Committed evidence under `release-evidence/nado/` matches pinned Catalogue
 `e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
-release follows SDK 4.1.0 publication.
+release follows SDK 4.2.0 publication.

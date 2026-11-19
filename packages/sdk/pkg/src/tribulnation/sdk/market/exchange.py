@@ -41,6 +41,7 @@ from .types import (
 )
 from .settings import Settings
 from .market import (
+  POSITION_LIMIT_TTL,
   Market,
   MarketKind,
   SpotMarket,
@@ -546,13 +547,14 @@ class PerpExchange(Exchange):
 
   @SDK.method
   async def remaining_position_limit(
-    self, market_id: str, /, *, ttl: timedelta | None = None
+    self, market_id: str, /, *, ttl: timedelta | None = POSITION_LIMIT_TTL
   ) -> RemainingPositionLimit:
     """Fetch how much more position the venue lets the account open on a market, per
     direction; see `MarginMarket.remaining_position_limit`.
 
     Args:
-      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+      ttl: How old a shared answer may be, `POSITION_LIMIT_TTL` unless given; `None`
+        asks afresh. See `Market`.
     """
     market = await self.market(market_id)
     return await market.remaining_position_limit(ttl=ttl)

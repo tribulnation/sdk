@@ -116,7 +116,7 @@ requests address a market as `<account_id>:<exchange_id>:<market_id>`, e.g.
 | `trades_history` | `market_id`, `start`, `end` | Fetch the account's fills in a window. |
 | `position` | `market_id`, `ttl`? | Fetch a margin market's position. |
 | `available_notional` | `market_id`, `ttl`? | Fetch the notional the account can still open on a margin market. |
-| `remaining_position_limit` | `market_id`, `ttl`? | Fetch how much more position the venue lets the account open on a margin market, per direction. |
+| `remaining_position_limit` | `market_id`, `ttl`? | Fetch how much more position the venue lets the account open on a margin market, per direction. Clients send their default `ttl` (`POSITION_LIMIT_TTL`, 30 s); absent or null asks afresh. |
 | `balances` | `market_id`, `ttl`? | Fetch a spot market's base and quote balances. |
 | `collateral_id` | `market_id` | Fetch the collateral ID funding new orders on a margin market. |
 | `place_order` | `market_id`, `order`, `settings`? | Place one order. `order` is `{"type", "qty", "price", "client_order_id"?}`, `type` one of `MARKET`, `LIMIT`, `POST_ONLY`, and a negative `qty` sells. |

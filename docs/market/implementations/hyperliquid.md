@@ -123,8 +123,12 @@ async with sdk.depth_stream('hl::ETH', settings={'hyperliquid': {'depth_source':
   Like the old figure, it does not check the account abstraction mode.
 - **`remaining_position_limit`** (perp) is nothing either way while the coin is listed by
   `perpsAtOpenInterestCap` (reduce-only for everyone), else the margin table's bound at
-  the account's leverage less the position held in each direction, `None` when no tier
-  binds (ADR 0062). Order errors at the open-interest cap raise `OpenInterestCapped`;
+  the position's leverage less the position held in each direction, `None` when no tier
+  binds (ADR 0062). Every coin of a dex reads one `clearinghouseState` and one
+  `perpsAtOpenInterestCap` answer, shared for `ttl` (30 s by default); a flat coin is
+  bounded at its `maxLeverage`, the tightest bound any setting has, rather than reading
+  its setting (`activeAssetData`) one coin per request, so it may read less room than
+  the venue allows at a lower setting, never more (ADR 0069). Order errors at the open-interest cap raise `OpenInterestCapped`;
   the margin tier limit (`PerpMaxPosition`) raises `PositionLimitExceeded`.
 - **Spot `balances`** are the base and quote tokens' `total` and `total - hold` from one
   `spot_clearinghouse_state` read. Spot rules name the pair by token index (`base='197'`,

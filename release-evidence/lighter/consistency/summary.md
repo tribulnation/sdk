@@ -1,5 +1,5 @@
 # Local SDK evidence: lighter
 
-Run completed: 2026-11-18T17:10:00.037976+00:00
+Run completed: 2026-11-19T14:29:42.863802+00:00
 
 This records a trusted local run, not cryptographic proof. Release policy must separately validate required check coverage and statuses.

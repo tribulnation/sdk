@@ -96,7 +96,9 @@ market data only.
   value held in that direction, bounded for both directions by `openInterestLimit` less
   the market's `openInterest` (both USD; `0` is no limit). Extended counts resting and
   triggered orders against the cap too; the SDK does not subtract them. The position's
-  own `maxPositionSize` (base units) is not used.
+  own `maxPositionSize` (base units) is not used. Every market reads one all-market
+  `markets`, `positions` and `leverage` answer, each shared for `ttl` (30 s by default,
+  ADR 0069).
 - Funding settles hourly, on the hour, and the payment is stamped shortly after (45 s
   on testnet). Funding-rate history is positive when longs pay; `funding_payments`, per
   market or exchange-wide, are positive when received, as the venue signs them.

@@ -1,5 +1,6 @@
 """Rules, depth and its diff stream, candles, tickers, perpetual stats and funding."""
 
+import asyncio
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
@@ -359,10 +360,13 @@ async def test_remaining_position_limit_is_the_open_interest_room(
   """The notional cap less the gateway's open interest (both sides, base) at the mark,
   for both directions; floored at 0; `None` both ways when uncapped."""
   shared.symbols['BTC-PERP'] = symbol('BTC-PERP', 2, max_open_interest_x18=cap)
-  requested: list[int] = []
+  shared.symbols['ETH-PERP'] = symbol('ETH-PERP', 4, max_open_interest_x18=cap)
+  requested: list[list[int]] = []
+  products: list[None] = []
 
   async def all_products() -> dict[str, Any]:
     """BTC-PERP's open interest (mainnet, 2026-11-17) beside another product's."""
+    products.append(None)
     return {
       'perp_products': [
         {'product_id': 4, 'state': {'open_interest': str(10**6 * X18)}},
@@ -370,13 +374,20 @@ async def test_remaining_position_limit_is_the_open_interest_room(
       ]
     }
 
-  async def price(product_id: int) -> dict[str, Any]:
-    """A round-ish mark."""
-    requested.append(product_id)
-    return {'mark_price_x18': str(637455 * X18 // 10)}
+  async def perp_prices(product_ids: list[int]) -> dict[str, Any]:
+    """A round-ish mark for every product."""
+    requested.append(product_ids)
+    return {str(i): {'mark_price_x18': str(637455 * X18 // 10)} for i in product_ids}
 
   fake.gateway.all_products = all_products
-  fake.archive.price = price
-  market = NadoPerpMarket(shared=shared, symbol='BTC-PERP', product_id=2)
-  assert await market.remaining_position_limit() == expected
-  assert requested == [2]
+  fake.archive.perp_prices = perp_prices
+  btc = NadoPerpMarket(shared=shared, symbol='BTC-PERP', product_id=2)
+  eth = NadoPerpMarket(shared=shared, symbol='ETH-PERP', product_id=4)
+  limit, _ = await asyncio.gather(
+    btc.remaining_position_limit(), eth.remaining_position_limit()
+  )
+  assert limit == expected
+  if cap is None:
+    assert requested == [] and products == []
+  else:
+    assert requested == [[2, 4]] and len(products) == 1

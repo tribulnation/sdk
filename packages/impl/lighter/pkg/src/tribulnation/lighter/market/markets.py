@@ -9,6 +9,7 @@ import asyncio
 from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
 from tribulnation.sdk.core import ApiError, OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
+  POSITION_LIMIT_TTL,
   Book,
   Candle,
   CandleInterval,
@@ -298,7 +299,7 @@ class LighterPerpMarket(MarketBase, PerpMarket):
     return await stats.next_funding(self.shared, self.market_index, ttl=ttl)
 
   async def remaining_position_limit(
-    self, *, ttl: timedelta | None = None
+    self, *, ttl: timedelta | None = POSITION_LIMIT_TTL
   ) -> RemainingPositionLimit:
     """The room left under the market's open-interest cap, both directions
     (`stats.open_interest_room`); `None` both ways on an uncapped market."""

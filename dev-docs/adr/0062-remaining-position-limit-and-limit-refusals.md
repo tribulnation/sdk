@@ -6,7 +6,9 @@
    [0042](0042-read-only-account-method-qualification.md),
    [0043](0043-order-rejected.md) and [0056](0056-market-kind-aware-support.md);
    implemented for Aster, Hyperliquid, Extended, GRVT, RISEx, Lighter and Nado, not
-   release-verified
+   release-verified; amended by [0069](0069-position-limits-shared-by-default.md): the
+   default `ttl` shares, the reads are account-wide, Aster's bracket comes from
+   `positionRisk` and Hyperliquid's leverage from the position
 2. Date: 2026-11-16; amended 2026-11-17 (renamed from "position headroom", added to the
    contract and to account-read qualification)
 

@@ -17,6 +17,7 @@ from typing_extensions import (
 )
 from typed_extended import Extended
 from typed_extended.core.networks import Network
+from typed_extended.account.schemas import AccountLeverage, Position as PositionRow
 from typed_extended.info.markets import Market as MarketRow
 from tribulnation.sdk import SDK
 from tribulnation.sdk.core import (
@@ -86,7 +87,8 @@ class Shared(SDK):
   )
   """One shared account stream per market, filtered to its fills."""
   reads: SharedReads = field(default_factory=SharedReads)
-  """Account reads shared between concurrent callers (`leverage()`)."""
+  """Reads shared between markets and concurrent callers (`leverage()`, the all-market
+  reads of `remaining_position_limit()`)."""
 
   @classmethod
   def new(
@@ -186,6 +188,33 @@ class Shared(SDK):
     if row is None or row['type'] != 'PERPETUAL':
       raise ValueError(f'Unknown Extended perpetual market: {name!r}')
     return row
+
+  async def live_market(self, name: str, *, ttl: timedelta | None) -> MarketRow:
+    """One perpetual's row with live statistics, from one all-market request shared
+    for `ttl` (see `SharedReads`).
+
+    Raises:
+      ValueError: The deployment has no perpetual market of that name.
+    """
+    rows = await self.reads.read(
+      ('markets',), lambda: self.call(self.client.info.markets), ttl=ttl
+    )
+    for row in rows:
+      if row['name'] == name and row['type'] == 'PERPETUAL':
+        return row
+    raise ValueError(f'Unknown Extended perpetual market: {name!r}')
+
+  async def positions(self, *, ttl: timedelta | None) -> list[PositionRow]:
+    """Every open position of the sub-account, from one request shared for `ttl`."""
+    return await self.reads.read(
+      ('positions',), lambda: self.call(self.client.account.positions), ttl=ttl
+    )
+
+  async def leverages(self, *, ttl: timedelta | None) -> list[AccountLeverage]:
+    """The sub-account's leverage on every perpetual, from one request shared for `ttl`."""
+    return await self.reads.read(
+      ('leverage',), lambda: self.call(self.client.account.leverage), ttl=ttl
+    )
 
   async def fresh(self, name: str) -> MarketRow:
     """One market's row with live statistics, from its own request.

@@ -7,6 +7,7 @@ import secrets
 
 from tribulnation.sdk.core import PaginatedResponse, OverflowPolicy
 from tribulnation.sdk.market import (
+  POSITION_LIMIT_TTL,
   Candle,
   CandleInterval,
   PerpMarket as _PerpMarket,
@@ -158,7 +159,7 @@ class PerpMarket(PerpMarketMixin, _PerpMarket):
     return await perp_available_notional(self, ttl=ttl)
 
   async def remaining_position_limit(
-    self, *, ttl: timedelta | None = None
+    self, *, ttl: timedelta | None = POSITION_LIMIT_TTL
   ) -> RemainingPositionLimit:
     """Nothing at the coin's open-interest cap, else the margin tier limit's room (`perp_remaining_position_limit`)."""
     return await perp_remaining_position_limit(self, ttl=ttl)

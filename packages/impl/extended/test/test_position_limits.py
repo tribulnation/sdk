@@ -2,6 +2,7 @@
 market's `maxPositionValue` and its `openInterestLimit` (mainnet OP-USD's schedule,
 2026-11-17)."""
 
+import asyncio
 from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import AsyncMock
@@ -14,8 +15,10 @@ from tribulnation.extended.market.account import (
   open_interest_room,
   remaining_position_limit,
 )
+from typed_extended import Extended
+from tribulnation.extended.core import Shared
 from tribulnation.extended.market.markets import ExtendedPerpMarket
-from tribulnation.sdk.market import RemainingPositionLimit
+from tribulnation.sdk.market import POSITION_LIMIT_TTL, RemainingPositionLimit
 
 D = Decimal
 
@@ -121,22 +124,38 @@ def test_at_the_open_interest_limit_nothing_grows():
   )
 
 
-async def test_market_reads_live_stats_positions_and_leverage():
-  """The market method combines the fresh market row, the positions and the leverage."""
+def perp_row(name: str) -> Any:
+  """OP-USD's row under another name, as the all-market read lists it."""
+  return {**market(), 'name': name, 'type': 'PERPETUAL'}
 
-  async def call(f: Any) -> Any:
-    """Run the request directly, without retries."""
-    return await f()
 
-  positions = AsyncMock(return_value=[position('SHORT', '100000')])
-  shared = SimpleNamespace(
-    fresh=AsyncMock(return_value=market()),
-    call=call,
-    client=SimpleNamespace(account=SimpleNamespace(positions=positions)),
+async def test_every_market_shares_three_reads_per_ttl(monkeypatch: pytest.MonkeyPatch):
+  """Every market's limit comes from one all-market `markets`, `positions` and
+  `leverage` request each, shared for the default `ttl`; past it, they are read again."""
+  now = [1000.0]
+  monkeypatch.setattr(asyncio.get_running_loop(), 'time', lambda: now[0])
+  names = [f'M{i:02d}-USD' for i in range(22)]
+  client = SimpleNamespace(
+    info=SimpleNamespace(markets=AsyncMock(return_value=[perp_row(n) for n in names])),
+    account=SimpleNamespace(
+      positions=AsyncMock(return_value=[position('SHORT', '100000', names[0])]),
+      leverage=AsyncMock(
+        return_value=[{'market': n, 'leverage': D('12.5')} for n in names]
+      ),
+    ),
   )
-  m = SimpleNamespace(
-    name='OP-USD', shared=shared, leverage=AsyncMock(return_value=D('12.5'))
-  )
-  limit = await ExtendedPerpMarket.remaining_position_limit(cast(Any, m))
-  assert limit == RemainingPositionLimit(long=D('1500000'), short=D('1400000'))
-  positions.assert_awaited_once_with(['OP-USD'])
+  shared = Shared(client=cast(Extended, client))
+  perps = [ExtendedPerpMarket(shared=shared, name=n) for n in names]
+  limits = await asyncio.gather(*(m.remaining_position_limit() for m in perps))
+  assert limits[0] == RemainingPositionLimit(long=D('1500000'), short=D('1400000'))
+  assert limits[1] == RemainingPositionLimit(long=D('1500000'), short=D('1500000'))
+  for m in perps:
+    now[0] += 1
+    await m.remaining_position_limit()
+  endpoints = [client.info.markets, client.account.positions, client.account.leverage]
+  assert [e.await_count for e in endpoints] == [1, 1, 1]
+  for e in endpoints:
+    e.assert_awaited_with()
+  now[0] += POSITION_LIMIT_TTL.total_seconds()
+  await asyncio.gather(*(m.remaining_position_limit() for m in perps))
+  assert [e.await_count for e in endpoints] == [2, 2, 2]

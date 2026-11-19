@@ -9,6 +9,7 @@ from decimal import Decimal
 from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
 from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
+  POSITION_LIMIT_TTL,
   Book,
   Candle,
   CandleInterval,
@@ -228,13 +229,16 @@ class RisexPerpMarket(Public, PerpMarket):
     return f'{self.account_id}:{self.exchange_id}'
 
   async def remaining_position_limit(
-    self, *, ttl: timedelta | None = None
+    self, *, ttl: timedelta | None = POSITION_LIMIT_TTL
   ) -> RemainingPositionLimit:
     """`max_position_size` less the position held in each direction, bounded by the
     room left under the market's `open_interest_limit`, at the mark price, from the
-    market's live row (`account.remaining_position_limit`)."""
+    market's live row (`account.remaining_position_limit`).
+
+    The live rows of every market and the account's positions are one request each,
+    shared by all markets for `ttl` (ADR 0069)."""
     market, position = await asyncio.gather(
-      self.shared.fresh(self.index_id),
+      self.shared.live_market(self.index_id, ttl=ttl),
       account.perp_position(self.shared, self.index_id, ttl=ttl),
     )
     return account.remaining_position_limit(market, size=position.size)

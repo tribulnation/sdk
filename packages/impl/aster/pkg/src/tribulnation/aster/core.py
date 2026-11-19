@@ -49,6 +49,22 @@ DepthSource = Literal['depth', 'fast', 'bbo']
 wrap_exceptions = exception_wrapper()
 POSITION_RISK = 'positionRisk'
 """`SharedReads` key of the all-symbol `positionRisk` answer."""
+ALLOWANCE = 'remainingOpenableNotionalValue'
+"""First part of the `SharedReads` key of a symbol's open-interest allowance, with the
+symbol and leverage."""
+NO_OPEN_INTEREST_CAP = Decimal(-1)
+"""`remainingOpenableNotionalValue` when the symbol has no open-interest cap."""
+ALLOWANCE_TTL = timedelta(minutes=15)
+"""How long a symbol's open-interest allowance is reused, whatever the caller's `ttl`
+(ADR 0069): a market-wide figure Aster answers one symbol per request (weight 50)."""
+ALLOWANCE_SPACING = timedelta(seconds=30)
+"""Least time between two allowance requests of one client, whatever the symbol: 30
+symbols' allowances every `ALLOWANCE_TTL`, 2 requests a minute at most."""
+ALLOWANCE_QUEUE = timedelta(minutes=2)
+"""How long a symbol asking for a new allowance keeps its place in the queue for turns,
+so one no longer polled (e.g. after a leverage change) stops holding up the others."""
+AllowanceKey = tuple[str, str, int]
+"""`SharedReads` key of a symbol's open-interest allowance: `ALLOWANCE`, symbol, leverage."""
 
 
 @wrap_exceptions
@@ -116,6 +132,24 @@ def new_client(
   )
 
 
+@dataclass
+class Turns:
+  """Turns at least `every` seconds apart, for requests one client may send only so often."""
+
+  every: float
+  """Least loop-time seconds between two turns."""
+  next: float = float('-inf')
+  """Loop time from which the next turn may be taken."""
+
+  def take(self, now: float) -> bool:
+    """Whether a turn is free at loop time `now`, taking it if so."""
+    if now >= self.next:
+      self.next = now + self.every
+      return True
+    else:
+      return False
+
+
 @dataclass(frozen=True, kw_only=True)
 class Shared(SDK):
   """Own one client, its symbol metadata and the account's shared streams."""
@@ -145,6 +179,14 @@ class Shared(SDK):
   """One lock per perpetual symbol, so concurrent refusals lower its leverage once."""
   reads: SharedReads = field(default_factory=SharedReads)
   """Account-wide reads shared between symbols and concurrent callers."""
+  allowance_turns: Turns = field(
+    default_factory=lambda: Turns(every=ALLOWANCE_SPACING.total_seconds())
+  )
+  """Paces the open-interest allowance requests of all symbols together."""
+  allowance_queue: dict[AllowanceKey, float] = field(
+    default_factory=dict[AllowanceKey, float]
+  )
+  """Allowances asking for a new read, with the loop time each last asked."""
 
   @property
   def venue_id(self) -> Literal['aster', 'aster_testnet']:
@@ -246,6 +288,69 @@ class Shared(SDK):
       return mine
     else:
       return await self.call(lambda: self.client.futures.position.risk(symbol))
+
+  async def open_interest_allowance(
+    self, symbol: str, *, leverage: int
+  ) -> Decimal | None:
+    """The notional anyone may still open on `symbol` at `leverage`; `None` if uncapped or not read yet.
+
+    Aster's `remainingOpenableNotionalValue` is public, market-wide and answered one
+    symbol per request, so it is shared through `reads` for `ALLOWANCE_TTL` whatever
+    the caller's `ttl`, and requests of all symbols together are spaced by
+    `ALLOWANCE_SPACING`. A free turn goes to the oldest answer asked for (one never read
+    first, `allowance_due`), so no symbol starves however many are polled. A symbol
+    whose answer is older and that finds no turn keeps it until its turn comes; one
+    never read answers `None` meanwhile (ADR 0069).
+    """
+    key: AllowanceKey = (ALLOWANCE, symbol, leverage)
+    now = asyncio.get_running_loop().time()
+    known = self.reads.answers.get(key)
+    current = known is not None and now - known[0] < ALLOWANCE_TTL.total_seconds()
+    if not current:
+      self.allowance_queue[key] = now
+    if (
+      current
+      or key in self.reads.inflight
+      or (self.allowance_due(key, now=now) and self.allowance_turns.take(now))
+    ):
+      self.allowance_queue.pop(key, None)
+      return await self.reads.read(
+        key, lambda: self.read_allowance(symbol, leverage=leverage), ttl=ALLOWANCE_TTL
+      )
+    elif known is not None:
+      return known[1]
+
+  def allowance_due(self, key: AllowanceKey, *, now: float) -> bool:
+    """Whether `key`'s answer is the oldest of the allowances that asked within
+    `ALLOWANCE_QUEUE` (never read counts as oldest), dropping those that stopped asking."""
+    for k, asked in list(self.allowance_queue.items()):
+      if now - asked >= ALLOWANCE_QUEUE.total_seconds():
+        del self.allowance_queue[k]
+
+    def started(k: AllowanceKey) -> float:
+      """When the request of `k`'s answer started; never read is the oldest."""
+      answer = self.reads.answers.get(k)
+      return float('-inf') if answer is None else answer[0]
+
+    return started(key) <= min(map(started, self.allowance_queue), default=started(key))
+
+  async def read_allowance(self, symbol: str, *, leverage: int) -> Decimal | None:
+    """One `remainingOpenableNotionalValue` request; `None` when uncapped (`-1`)."""
+    answer = await self.call(
+      lambda: self.client.futures.market.remaining_openable_notional_value(
+        symbol, leverage=leverage
+      )
+    )
+    cap = answer['remainingOpenableNotionalValue']
+    return None if cap == NO_OPEN_INTEREST_CAP else cap
+
+  def stale_limits(self, symbol: str):
+    """After a position-limit refusal on `symbol`: the next reads ask for the positions
+    again, and its allowance (still answered meanwhile) at its next turn."""
+    self.reads.forget(POSITION_RISK)
+    for key, (_, value) in list(self.reads.answers.items()):
+      if isinstance(key, tuple) and key[:2] == (ALLOWANCE, symbol):
+        self.reads.answers[key] = (float('-inf'), value)
 
   @asynccontextmanager
   async def stream(

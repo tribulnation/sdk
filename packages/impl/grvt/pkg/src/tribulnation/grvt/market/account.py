@@ -92,6 +92,17 @@ async def perp_position(shared: Shared, instrument: str) -> PerpPosition:
   return parse_position(rows, instrument)
 
 
+async def perp_positions(shared: Shared, *, ttl: timedelta | None) -> list[Position]:
+  """Every perpetual position of the sub-account, from one request shared by all
+  instruments for `ttl`."""
+  shared.require_session()
+  return await shared.reads.read(
+    ('positions', 'PERPETUAL'),
+    lambda: shared.call(lambda: shared.client.trading.positions(kind=['PERPETUAL'])),
+    ttl=ttl,
+  )
+
+
 def parse_position(rows: list[Position], instrument: str) -> PerpPosition:
   """The instrument's row of a `positions` answer; flat when it lists none.
 

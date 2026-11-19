@@ -1,6 +1,7 @@
 """Venue rows as SDK values: fills, funding signs, books, positions, collateral,
 candle chunks and snapshots."""
 
+import asyncio
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from types import SimpleNamespace
@@ -21,7 +22,7 @@ from tribulnation.risex.market.books import frame_book
 from tribulnation.risex.market.common import funding_received, parse_trade
 from tribulnation.risex.market.markets import RisexPerpMarket
 from tribulnation.risex.report import Report
-from tribulnation.sdk.market import RemainingPositionLimit
+from tribulnation.sdk.market import POSITION_LIMIT_TTL, RemainingPositionLimit
 
 T0 = datetime(2026, 11, 17, 10, tzinfo=timezone.utc)
 
@@ -315,14 +316,39 @@ def test_remaining_position_limit(
   assert (limit.long, limit.short) == expected
 
 
-async def test_market_reads_its_live_row_and_position(monkeypatch: pytest.MonkeyPatch):
-  """The market method combines the fresh market row and the account's position."""
-  shared = fake_shared(account=SimpleNamespace(positions_paged=walk(positions())))
+async def test_markets_share_the_live_rows_and_positions(
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """Every market's limit comes from one all-market live read and one positions read,
+  shared for the default `ttl`; past it, both are read again."""
+  now = [1000.0]
+  monkeypatch.setattr(asyncio.get_running_loop(), 'time', lambda: now[0])
+  live: list[Any] = []
+  paged: list[Any] = []
 
-  async def fresh(self: Shared, market_id: int) -> Any:
-    """BTC's live row, with a 1 BTC cap."""
-    return market_row(max_size='1')
+  async def markets_all(force_refresh: bool | None = None, **kwargs: Any) -> Any:
+    """BTC's live row with a 1 BTC cap, and 21 more markets; never filtered."""
+    live.append((force_refresh, kwargs))
+    rows: list[Any] = [
+      {**market_row(max_size='1'), 'market_id': i} for i in range(1, 23)
+    ]
+    return {'markets': rows}
 
-  monkeypatch.setattr(Shared, 'fresh', fresh)
-  limit = await RisexPerpMarket(shared=shared, index_id=1).remaining_position_limit()
-  assert limit == RemainingPositionLimit(long=Decimal(60000), short=Decimal('59994'))
+  def positions_paged(*args: Any, **kwargs: Any) -> Pages:
+    paged.append(args)
+    return Pages(positions())
+
+  shared = fake_shared(
+    account=SimpleNamespace(positions_paged=positions_paged),
+    markets=SimpleNamespace(all=markets_all),
+  )
+  perps = [RisexPerpMarket(shared=shared, index_id=i) for i in range(1, 23)]
+  limits = await asyncio.gather(*(m.remaining_position_limit() for m in perps))
+  assert limits[0] == RemainingPositionLimit(
+    long=Decimal(60000), short=Decimal('59994')
+  )
+  assert limits[1] == RemainingPositionLimit(long=Decimal(60000), short=Decimal(60000))
+  assert live == [(True, {})] and len(paged) == 1
+  now[0] += POSITION_LIMIT_TTL.total_seconds()
+  await asyncio.gather(*(m.remaining_position_limit() for m in perps))
+  assert len(live) == 2 and len(paged) == 2
