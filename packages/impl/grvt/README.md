@@ -1,4 +1,16 @@
-# GRVT SDK
+<p align="center">
+  <a href="https://tribulnation.com/sdk/docs/market/implementations/grvt">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://tribulnation.com/media/lockups/grvt-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://tribulnation.com/media/lockups/grvt-light.svg">
+      <img alt="Tribulnation SDK GRVT" src="https://tribulnation.com/media/lockups/grvt-light.svg" width="520">
+    </picture>
+  </a>
+</p>
+
+<p align="center">
+  <em>Tribulnation SDK implementation for GRVT perpetual markets.</em>
+</p>
 
 USDT-margined perpetual and spot Market support, and Report snapshots, for
 [GRVT](https://grvt.io/), built on `typed-grvt`. Install with

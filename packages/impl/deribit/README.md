@@ -1,4 +1,16 @@
-# Deribit SDK
+<p align="center">
+  <a href="https://tribulnation.com/sdk/docs/market/implementations/deribit">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://tribulnation.com/media/lockups/deribit-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://tribulnation.com/media/lockups/deribit-light.svg">
+      <img alt="Tribulnation SDK Deribit" src="https://tribulnation.com/media/lockups/deribit-light.svg" width="520">
+    </picture>
+  </a>
+</p>
+
+<p align="center">
+  <em>Tribulnation SDK implementation for Deribit.</em>
+</p>
 
 Public mainnet spot and linear perpetual Market data, read-only ledger reporting,
 wallet network methods and reward-bearing balances. The public Market expansion is

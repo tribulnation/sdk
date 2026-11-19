@@ -1,6 +1,16 @@
-# Hyperliquid SDK
+<p align="center">
+  <a href="https://tribulnation.com/sdk/docs/market/implementations/hyperliquid">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://tribulnation.com/media/lockups/hyperliquid-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://tribulnation.com/media/lockups/hyperliquid-light.svg">
+      <img alt="Tribulnation SDK Hyperliquid" src="https://tribulnation.com/media/lockups/hyperliquid-light.svg" width="520">
+    </picture>
+  </a>
+</p>
 
-> Tribulnation SDK implementation for Hyperliquid.
+<p align="center">
+  <em>Tribulnation SDK implementation for Hyperliquid.</em>
+</p>
 
 ## Installation
 
