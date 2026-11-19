@@ -1,10 +1,11 @@
-# tribulnation-ethereum 0.6.1
+# tribulnation-ethereum 0.6.2
 
-Translate native client acquisition and cleanup failures through managed resource
-adapters. Entry and exit policies remain independent; this release adds no automatic
-resource retries. Decorated calls inside the lifecycle retain context middleware.
+Requires SDK >=2.0.2, typed-alchemy >=2.1.0, typed-ethereum >=0.2.0, typed-etherscan >=0.4.0 and typed-moralis >=0.3.0, unchanged.
 
-Requires tribulnation-sdk >=2.0.2. Publish after the SDK patch release.
+README: logo header.
 
-The release workflow requires fresh passing read-only qualification for this exact
-version and dependency floor before publication.
+No code changes.
+
+Release qualification on 2026-11-19 passed the read suites.
+Committed evidence under `release-evidence/ethereum/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes.
