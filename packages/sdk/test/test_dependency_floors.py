@@ -8,25 +8,25 @@ from typing_extensions import cast
 
 ROOT = Path(__file__).resolve().parents[3]
 COMPATIBLE_IMPLEMENTATIONS = {
-  'aster': '0.15.0',
+  'aster': '0.16.0',
   'binance': '0.9.0',
   'bit2me': '0.10.1',
-  'bitget': '0.14.0',
-  'bybit': '0.10.0',
+  'bitget': '0.14.1',
+  'bybit': '0.10.1',
   'coinbase': '0.6.1',
   'deribit': '0.7.0',
-  'dydx': '0.21.1',
-  'ethereum': '0.6.0',
-  'extended': '0.4.0',
-  'grvt': '0.4.0',
-  'hyperliquid': '0.21.0',
-  'kraken': '0.9.0',
+  'dydx': '0.22.0',
+  'ethereum': '0.6.1',
+  'extended': '0.5.0',
+  'grvt': '0.5.0',
+  'hyperliquid': '0.22.0',
+  'kraken': '0.9.1',
   'kucoin': '0.7.0',
-  'lighter': '0.14.0',
+  'lighter': '0.15.0',
   'margin-trade': '0.4.0',
   'mexc': '3.0.1',
-  'nado': '0.1.0',
-  'risex': '0.1.0',
+  'nado': '0.2.0',
+  'risex': '0.2.0',
 }
 SDK_4_1_ADAPTERS = tuple(
   venue
@@ -34,6 +34,16 @@ SDK_4_1_ADAPTERS = tuple(
   if venue not in ('binance', 'deribit', 'ethereum', 'kucoin')
 )
 """Adapters released with SDK 4.1, which require it."""
+SDK_4_2_ADAPTERS = (
+  'aster',
+  'extended',
+  'grvt',
+  'hyperliquid',
+  'lighter',
+  'nado',
+  'risex',
+)
+"""Adapters released with SDK 4.2, which require it."""
 
 
 def dependencies(path: Path) -> list[str]:
@@ -237,7 +247,21 @@ def test_adapters_released_with_sdk_4_1_require_it():
       if Requirement(value).name == 'tribulnation-sdk'
     )
     assert Version('4.0.99') not in requirement.specifier, venue
-    assert Version('4.1.0') in requirement.specifier, venue
+
+
+def test_adapters_released_with_sdk_4_2_require_it():
+  """Adapters released with SDK 4.2 import its `POSITION_LIMIT_TTL` and most fill
+  `PerpPosition.liquidation_price` (ADR 0068, ADR 0069), so none may resolve against
+  SDK 4.1."""
+  for venue in SDK_4_2_ADAPTERS:
+    manifest = ROOT / f'packages/impl/{venue}/pkg/pyproject.toml'
+    requirement = next(
+      Requirement(value)
+      for value in dependencies(manifest)
+      if Requirement(value).name == 'tribulnation-sdk'
+    )
+    assert Version('4.1.99') not in requirement.specifier, venue
+    assert Version('4.2.0') in requirement.specifier, venue
 
 
 def test_risex_requires_empty_funding_rates():
