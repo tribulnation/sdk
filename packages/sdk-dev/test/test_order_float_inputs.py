@@ -80,6 +80,24 @@ def hyperliquid() -> tuple[Any, Any]:
   return o['s'], o['p']
 
 
+def kraken_spot() -> tuple[Any, Any]:
+  """Kraken Spot's `AddOrder` request: decimal strings."""
+  from tribulnation.kraken.market.impl.orders import add_order_request
+
+  market = SimpleNamespace(altname='XBTUSD')
+  o = cast(dict[str, Any], add_order_request(cast(Any, market), ORDER, {}))
+  return Decimal(o['volume']), Decimal(o['price'])
+
+
+def kraken_perp() -> tuple[Any, Any]:
+  """Kraken Futures' `batchorder` send instruction."""
+  from tribulnation.kraken.market.impl.perp_orders import send_instruction
+
+  market = SimpleNamespace(symbol='PF_XBTUSD')
+  o = cast(dict[str, Any], send_instruction(cast(Any, market), ORDER, {}, '0'))
+  return o['size'], o['limitPrice']
+
+
 def margin_trade() -> tuple[Any, Any]:
   """margin.trade's order spec, on a perpetual with a `0.1` tick (5 size decimals)."""
   from tribulnation.margin_trade.market.markets import NativeMarket
@@ -130,6 +148,8 @@ BUILDERS: list[Callable[[], tuple[Any, Any]]] = [
   dydx,
   grvt,
   hyperliquid,
+  kraken_spot,
+  kraken_perp,
   margin_trade,
   mexc,
   nado,

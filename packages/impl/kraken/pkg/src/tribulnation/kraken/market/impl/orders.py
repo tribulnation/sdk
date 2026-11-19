@@ -7,6 +7,7 @@ from decimal import Decimal
 from tribulnation.sdk.core import ApiError, BadRequest, OrderNotFound, OrderRejected
 from tribulnation.sdk.market import Order, OrderResponse, OrderState, Settings
 from tribulnation.sdk.market import SpotMarket as BaseSpotMarket
+from tribulnation.sdk.util import to_decimal
 
 from typed_kraken.spot.account import open_orders as listing
 from typed_kraken.spot.account import query_orders as queried
@@ -124,14 +125,14 @@ def add_order_request(
   """
   if venue.get('reduce_only'):
     raise ValueError(f'reduce_only is not supported on Kraken Spot [{self.altname}]')
-  qty = Decimal(order['qty'])
+  qty = to_decimal(order['qty'])
   kind = order_type(order, venue)
   request: AddOrderLimit = {
     'pair': self.altname,
     'type': 'buy' if qty > 0 else 'sell',
     'ordertype': 'limit',
     'volume': decimal_text(abs(qty)),
-    'price': decimal_text(Decimal(order['price'])),
+    'price': decimal_text(to_decimal(order['price'])),
     'oflags': 'post,fciq' if kind == 'post' else 'fciq',
   }
   if kind == 'ioc':
@@ -183,7 +184,7 @@ async def replace_order(
     OrderRejected: The order was gone and the new one was refused.
     ApiError: Kraken refused the amend; `id` still rests as it was.
   """
-  qty = Decimal(order['qty'])
+  qty = to_decimal(order['qty'])
   state = await query_order(self, id)
   if state is None or not state.active:
     return await place_order(self, order, settings=settings)
@@ -196,7 +197,7 @@ async def replace_order(
         lambda: self.client.spot.trading.amend_order(
           txid=id,
           order_qty=decimal_text(total),
-          limit_price=decimal_text(Decimal(order['price'])),
+          limit_price=decimal_text(to_decimal(order['price'])),
           post_only=True if order['type'] == 'POST_ONLY' else None,
         )
       )
