@@ -14,6 +14,7 @@ from packaging.requirements import Requirement
 from packaging.utils import canonicalize_name
 from packaging.version import Version
 from pydantic import BaseModel, ConfigDict, Field, JsonValue
+from typing_extensions import cast
 
 from sdk_dev.release_scope import (
   normalized_input,
@@ -451,6 +452,34 @@ def waiver_summary(checks: list[JsonValue]) -> str:
   )
 
 
+def public_only_summary(checks: list[JsonValue]) -> str:
+  """State plainly which reads a public-only qualification left unverified (ADR 0072)."""
+  excluded = [
+    check
+    for check in checks
+    if isinstance(check, dict) and check.get('exclusion') == 'public_only'
+  ]
+  if not excluded:
+    return ''
+  reports = sum(str(check.get('id', '')).startswith('report.') for check in excluded)
+  return (
+    '\nPublic-only qualification: this venue qualifies with a public account by '
+    'declared policy (impl.toml and ADR 0072). Its account reads and Report are NOT '
+    f'verified by this release evidence: {len(excluded) - reports} account-read and '
+    f'{reports} Report checks are recorded as `public_only` exclusions, not passes.\n'
+  )
+
+
+def public_only_notice(payload: dict[str, object]) -> str | None:
+  """The plain one-line statement a public-only qualification needs (ADR 0072)."""
+  checks = payload.get('checks')
+  if isinstance(checks, list) and public_only_summary(cast(list[JsonValue], checks)):
+    return (
+      f'{payload.get("venue")}: public-only qualification; account reads and Report '
+      'are NOT verified by release evidence (see impl.toml and ADR 0072).'
+    )
+
+
 def write_report(
   output: Path,
   *,
@@ -516,6 +545,7 @@ def write_report(
         'withdrawal methods still had to pass. See ADR 0027; this is not a pass.\n'
       )
     summary += waiver_summary(checks)
+    summary += public_only_summary(checks)
   summary = summary.encode()
   manifest = Manifest(
     before=before,

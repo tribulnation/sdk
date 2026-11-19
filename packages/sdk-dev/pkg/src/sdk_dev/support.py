@@ -14,7 +14,7 @@ import tomllib
 
 import pydantic
 import yaml
-from typing_extensions import Literal, NotRequired, TypedDict
+from typing_extensions import Literal, NotRequired, Self, TypedDict
 
 MarketKind = Literal['spot', 'perp']
 """A kind of market (ADR 0051). A contract method with a `kind` exists only on markets
@@ -171,8 +171,12 @@ class MarketQualification(pydantic.BaseModel):
 
   model_config = pydantic.ConfigDict(extra='forbid')
 
-  min_mode: Literal['address', 'token', 'private']
-  """The weakest account mode release evidence may be recorded with."""
+  min_mode: AccountMode
+  """The weakest account mode release evidence may be recorded with. `public` is an
+  opt-in (ADR 0072): account reads and Report on a public account are then recorded as
+  `public_only` exclusions, unverified by release evidence, and `note` must say why."""
+  note: str | None = pydantic.Field(default=None, min_length=1)
+  """Why the venue qualifies below its account reads; required with `public`."""
   address_methods: list[str] = []
   """Account reads served with only a public address or account index."""
   token_methods: list[str] = []
@@ -183,6 +187,18 @@ class MarketQualification(pydantic.BaseModel):
   surface-level `methods` list cannot say that one product line lacks them."""
   waived: list[Waiver] = []
   """Declared reads the qualification account cannot observe (ADR 0042)."""
+
+  @pydantic.model_validator(mode='after')
+  def public_needs_a_note(self) -> Self:
+    """A public-only venue must state its reason beside the declaration."""
+    if self.min_mode == 'public' and self.note is None:
+      raise ValueError('min_mode = "public" requires a note giving the reason')
+    return self
+
+  @property
+  def public_only(self) -> bool:
+    """Whether release evidence may leave every account read unverified (ADR 0072)."""
+    return self.min_mode == 'public'
 
 
 class ImplQualification(pydantic.BaseModel):

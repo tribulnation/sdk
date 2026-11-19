@@ -46,18 +46,27 @@ file's own directory, so an accounts file elsewhere silently runs without creden
    runs, since testnet order books are usually empty. Nado and RISEx are `public = true`
    with public third-party addresses (`NADO_ADDRESS`, `RISEX_ADDRESS`) and no keys:
    every account read of theirs is public, so they qualify in address mode, and
-   RISEx's logged-in `fees` read is a `credential_mode` exclusion.
+   RISEx's logged-in `fees` read is a `credential_mode` exclusion. EVEDEX is
+   `public = true` with no key: it runs no private-data tests by policy
+   ([ADR 0072](adr/0072-public-only-release-qualification.md)).
 2. Each account must reach its venue's `[qualification.market] min_mode` in
    `impl.toml`: `address`, `token` or `private`. The recorded account mode is derived
    from the credentials actually resolved, so a missing variable lowers it and the
    verifier rejects the report ([ADR 0042](adr/0042-read-only-account-method-qualification.md)).
+   A venue may instead opt in to `min_mode = "public"`, with a `note` giving the reason
+   (only EVEDEX does). Its account reads and an authenticated Report are then
+   `public_only` exclusions on a public account: recorded, never passed, and NOT
+   verified by release evidence. The summary and `sdk-dev results verify` say so
+   ([ADR 0072](adr/0072-public-only-release-qualification.md)).
 3. Testnet accounts use `<venue>_testnet` ids and venues (`<venue>-testnet` for a
    hyphenated slug such as `margin-trade`), so no mainnet slug selects them. Name them explicitly for testnet diagnostics.
 4. Bitget has one mainnet account, `bitget_uta`, with an explicit `uta = true`: the
    former Classic account was upgraded to UTA. Qualify with `--account bitget_uta`
    ([ADR 0060](adr/0060-bitget-qualifies-uta.md)). GRVT has two: qualify
    with `--account grvt`, the read-only key; `grvt_trade` holds a trading key on the
-   same sub-account, for mainnet order checks.
+   same sub-account, for mainnet order checks. EVEDEX has two: qualify with
+   `--account evedex`, the public account; `evedex_trade` holds the API and wallet
+   keys for hand-run account reads and order checks, never for release evidence.
 5. Deribit's split qualification pairs `deribit_public` with `deribit_testnet`
    (see below).
 
@@ -255,7 +264,8 @@ empty account passes. The declared unsupported MEXC perpetual stream, spot-only
 methods and single-page retention cases are excluded, not passed. Account cases
 carry their own codes: `order_lifecycle` (`query_order`), `perp_only`,
 `unsupported` (undeclared, or listed per exchange in `impl.toml`),
-`credential_mode` (the recorded account mode cannot serve the method) and
+`credential_mode` (the recorded account mode cannot serve the method; `public_only`
+on a venue that qualifies public-only, ADR 0072) and
 `bitget_classic` (perpetual collateral reads on a Classic account; the tracked UTA
 account never records it). A declared read raising `NotImplementedError` or `AuthError`
 fails, unless `impl.toml` waives it (`waived:credential_scope` for `AuthError`,

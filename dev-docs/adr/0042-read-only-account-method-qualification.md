@@ -3,7 +3,8 @@
 [ADR index](README.md) · [Developer documentation](../README.md)
 
 1. Status: accepted; implemented, not release-verified; Bitget qualification account
-   amended by [ADR 0060](0060-bitget-qualifies-uta.md)
+   amended by [ADR 0060](0060-bitget-qualifies-uta.md); a `public` minimum mode added
+   by [ADR 0072](0072-public-only-release-qualification.md)
 2. Date: 2026-10-08
 3. Amends: [ADR 0013](0013-all-read-suites-release-gate.md) (required market read
    cases), the fee-read decision 7 of [ADR 0039](0039-hyperliquid-hip3-spot-fees.md)
