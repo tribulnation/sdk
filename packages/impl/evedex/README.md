@@ -32,7 +32,8 @@ fills an unset key from them when the other one is given.
    collateral, leverage, available notional and remaining position limit with an API
    key; `set_leverage` too. The fills stream, `MARKET` (an IOC limit) and `LIMIT`
    orders and every cancellation method with the private key. EVEDEX refuses post-only
-   orders, so `POST_ONLY` raises `NotImplementedError`. Refusals
+   orders, so `POST_ONLY` raises `NotImplementedError`. Stream fills carry no fee, and
+   their ids differ from `trades_history`'s. Refusals
    raise `OrderRejected`. Funding payments are not supported.
 
 `Report` snapshots one account, its trading balance and positions and its wallet:

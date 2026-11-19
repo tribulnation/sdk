@@ -84,7 +84,12 @@ def parse_fill(
 
 
 def parse_stream_fill(f: OrderFillUpdate) -> Trade:
-  """A fill from the account's `orderFills` channel, which carries no fee."""
+  """A fill from the account's `orderFills` channel, which carries no fee.
+
+  Its id is the venue's `executionId`, which the fill history does not carry: the id the
+  two share, `matchId`, is not declared by typed-evedex (typed-client-issues.md), so the
+  same fill has a different `Trade.id` here and in `trades_history`.
+  """
   return Trade(
     id=f['executionId'],
     order_id=f['orderId'],

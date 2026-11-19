@@ -21,6 +21,7 @@ Mainnet run, 2026-11-19 14:09 UTC (owner): every step passed except `POST_ONLY`
 (`post_only_not_allowed_error`) and the fills stream, which received none of the two
 round-trip fills: the venue's WebSocket answered every subscribe with a `temporary`
 code-100 error at the time, and the listener's failure went unreported.
+A `--round-trip` rerun at 14:18 UTC received both fills on the stream.
 """
 
 from datetime import datetime, timedelta, timezone

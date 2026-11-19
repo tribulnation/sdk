@@ -704,7 +704,7 @@ await collateral()
 # | `query_order` | verified | a filled order; unknown id is `None` |
 # | `open_orders` | verified | lifecycle run: resting orders listed with fill progress |
 # | `trades_history` | verified | the account's XRPUSD fills, side from the orders, fee from `orders.fills`; the lifecycle run's 2 round-trip fills |
-# | `trades_stream` | blocked | subscribes (13:39 UTC); received none of the lifecycle run's 2 fills: prod answered every subscribe with a `temporary` code-100 error then (see `typed-client-issues.md`, "Centrifugo `temporary` subscribe errors raise the final `ApiError`"); rerun `poc/lifecycle.py --round-trip` |
+# | `trades_stream` | verified | mainnet lifecycle `--round-trip` (2026-11-19): both fills, side and maker flag; no fee; `Trade.id` is `executionId`, not the history's fill id (the common `matchId` is undeclared, `typed-client-issues.md`). An earlier run saw no fills: prod refused every subscribe with a temporary code-100 error for a few minutes |
 # | `place_order` | verified | mainnet lifecycle run (2026-11-19, 6.6 XRP round trip): LIMIT rests, MARKET (IOC limit) fills or ends `CANCELLED`; `POST_ONLY` refused by the venue, so not supported |
 # | `cancel_order` | verified | lifecycle run; a second cancel and an unknown id raise `OrderNotFound` |
 # | `cancel_orders` | verified | SDK default; lifecycle run |

@@ -81,9 +81,10 @@ balance cannot be funded through the API.
   `OrderNotFound`. `replace_order` cancels, then places. `cancel_open_orders` is the
   venue's mass cancel of the market.
 - `trades_history` reads each page's order sides in one request and the fills' fees
-  with one request per order; `trades_stream` fills carry no fee. The stream's
-  delivery of fills is not confirmed yet: during the mainnet trading run the venue
-  refused every WebSocket subscription with a temporary error.
+  with one request per order. `trades_stream` fills carry no fee, and their `id` is the
+  venue's execution id while `trades_history` reports the fill's own id: the same fill
+  has two different `Trade.id`s. Match a stream fill to its history row by `order_id`,
+  price and time.
 - Collateral is the account's one cross bucket, `<account>:perp` for every market:
   equity is the trading balance plus unrealized PnL, free collateral the venue's
   available balance. `perp_position` reports no liquidation price (the venue publishes a
@@ -93,8 +94,8 @@ balance cannot be funded through the API.
 - `remaining_position_limit` is the market's leverage-tier notional at the account's
   leverage, less the position held, at the mark. Accounts with their own leverage
   limits raise `NotImplementedError`.
-- Market data, account reads, orders, cancels, leverage changes and fill history are
-  verified on mainnet (2026-11-19, a 6.6 XRP round trip).
+- Market data, account reads, orders, cancels, leverage changes, fill history and the
+  fills stream are verified on mainnet (2026-11-19, 6.6 XRP round trips).
 
 <!-- next -->
 

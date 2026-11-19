@@ -73,6 +73,29 @@ means the client should retry; as an `ApiError` the SDK translates it to its fin
   lifecycle run, whose `trades_stream` saw none of its 2 fills
 - Suggestion (unverified): `NetworkError` when `temporary` is true
 
+### `OrderFillUpdate` drops the fill's `matchId`
+
+The `orderFills` channel sends each fill's `matchId`, the id the account's fill history
+(`exchange.fills`, `AccountFill.matchId`) carries for the same execution, but
+`OrderFillUpdate` does not declare it, so validation drops it. The stream's own id,
+`executionId`, appears nowhere in the history, and the history's fill `id` (a UUID)
+nowhere on the stream, so a stream fill cannot be matched to its history row.
+
+`streams/account/fills.py:8`:
+
+```python
+class OrderFillUpdate(TypedDict):
+  """One fill."""
+```
+
+- Kind: missing field (sent on every publication, undeclared)
+- Observed: the client's own capture (`spec/endpoints/streams/account/fills/examples/01`)
+  has `"matchId": "73229075469303826"` on the 12:16:30 XRPUSD buy, and
+  `exchange.fills` lists that fill with the same `matchId` (prod, 2026-11-19)
+- Blocks: `pkg/src/tribulnation/evedex/market/common.py` (`parse_stream_fill` uses
+  `executionId`, `parse_fill` the history `id`: one fill, two SDK trade ids)
+- Suggestion (unverified): declare `matchId: str`
+
 ## typed-lighter
 
 ### `Candle` OHLCV fields are `float`
