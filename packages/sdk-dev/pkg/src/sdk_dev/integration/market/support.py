@@ -113,6 +113,8 @@ CASES: Mapping[str, Sequence[CandleCase]] = {
   # opens, so the hourly window fits one page. Some native candles break OHLC ordering
   # (ADR 0061).
   'risex': [CandleCase(market_id='perp:1', page=None, unordered_ohlc=True)],
+  # One request serves up to 100,000 candles, so the hourly window fits one page.
+  'evedex': [CandleCase(market_id='perp:BTCUSD', page=None)],
   # Testnet serves thousands of candles per response, so one page cannot straddle two.
   'lighter_testnet': [
     CandleCase(market_id='perp:4096', page=None),

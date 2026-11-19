@@ -19,6 +19,7 @@ from tribulnation.sdk.impl.accounts import (
   Kucoin,
   Lighter,
   Risex,
+  Evedex,
 )
 from tribulnation.sdk.market import (
   Balance,
@@ -61,6 +62,8 @@ def clean_env(monkeypatch: pytest.MonkeyPatch):
     'RISEX_ADDRESS',
     'RISEX_ACCOUNT_KEY',
     'RISEX_SIGNER_KEY',
+    'EVEDEX_API_KEY',
+    'EVEDEX_PRIVATE_KEY',
   ):
     monkeypatch.delenv(name, raising=False)
   return monkeypatch
@@ -96,6 +99,20 @@ def test_risex_address_reads_and_keys_trade(clean_env: pytest.MonkeyPatch):
   assert account_mode(Risex(public=True)) == 'address'
   clean_env.setenv('RISEX_SIGNER_KEY', '0x' + '1' * 64)
   assert account_mode(Risex()) == 'private'
+
+
+def test_evedex_api_key_reads_and_the_wallet_trades(clean_env: pytest.MonkeyPatch):
+  """An EVEDEX API key alone serves every account read, a read-only token's role; the
+  wallet's private key adds trading."""
+  assert account_mode(Evedex(api_key='$K'), resolve=False) == 'token'
+  assert account_mode(Evedex(), resolve=False) == 'private'
+  keyed = Evedex(api_key='$K', private_key='$P')
+  assert account_mode(keyed, resolve=False) == 'private'
+  assert account_mode(Evedex(public=True)) == 'public'
+  clean_env.setenv('EVEDEX_API_KEY', 'key')
+  assert account_mode(Evedex()) == 'token'
+  clean_env.setenv('EVEDEX_PRIVATE_KEY', '0x' + '1' * 64)
+  assert account_mode(Evedex()) == 'private'
 
 
 def test_grvt_api_key_reads_as_a_token(clean_env: pytest.MonkeyPatch):

@@ -43,6 +43,10 @@ CREDENTIAL_OVERRIDES = {
     'account_key': '$RISEX_ACCOUNT_KEY',
     'signer_key': '$RISEX_SIGNER_KEY',
   },
+  'evedex': {
+    'api_key': '$EVEDEX_API_KEY',
+    'private_key': '$EVEDEX_PRIVATE_KEY',
+  },
   'extended': {
     'api_key': '$EXTENDED_API_KEY',
     'stark_private_key': '$EXTENDED_STARK_PRIVATE_KEY',
@@ -88,6 +92,7 @@ def generate_accounts_toml(*, public: bool = False) -> dict[str, str]:
     Mexc,
     Nado,
     Risex,
+    Evedex,
   )
 
   classes: dict[str, type[BaseAccount]] = {
@@ -108,6 +113,7 @@ def generate_accounts_toml(*, public: bool = False) -> dict[str, str]:
     'grvt': Grvt,
     'nado': Nado,
     'risex': Risex,
+    'evedex': Evedex,
     'extended': Extended,
     'deribit': Deribit,
   }

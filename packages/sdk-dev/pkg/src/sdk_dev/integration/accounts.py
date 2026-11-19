@@ -19,6 +19,7 @@ from tribulnation.sdk.impl.accounts import (
   MarginTrade,
   Nado,
   Risex,
+  Evedex,
 )
 from sdk_dev.repo import IMPL_DIR, repo_root
 from sdk_dev.support import AccountMode, ImplSurfaceSupport, load_impl_files, mainnet_of
@@ -167,6 +168,16 @@ def account_mode(account: Account, *, resolve: bool = True) -> AccountMode:
     if configured(account, 'address', resolve=resolve):
       return 'address'
     return 'public'
+  if isinstance(account, Evedex):
+    # An API key alone reads every account method, as a read-only token does (ADR
+    # 0042); the wallet's private key adds trading and the fills stream.
+    if not account.public and not resolve:
+      return 'token' if account.api_key and not account.private_key else 'private'
+    if configured(account, 'private_key', resolve=resolve):
+      return 'private'
+    if configured(account, 'api_key', resolve=resolve):
+      return 'token'
+    return 'public'
   if isinstance(account, Aster):
     if not account.public and not resolve:
       return 'private'
@@ -219,6 +230,14 @@ def require_report_credentials(account: Account):
       owner = None
     if owner is None:
       pytest.skip('Report checks require a configured address or account key')
+    return
+  if isinstance(account, Evedex):
+    try:
+      key = account.resolved_api_key or account.resolved_private_key
+    except ValueError:
+      key = None
+    if key is None:
+      pytest.skip('Report checks require a configured API key or private key')
     return
   if isinstance(account, (MarginTrade, Nado)):
     try:

@@ -98,6 +98,7 @@ VenueId = _Literal[
   'nado_testnet',
   'risex',
   'risex_testnet',
+  'evedex',
   'bit2me',
   'bitget',
   'binance',
@@ -982,6 +983,41 @@ class Risex(VenueAccount):
 
 
 @_dataclass(frozen=True)
+class Evedex(VenueAccount):
+  """EVEDEX account on the production exchange (evedex.com). An API key alone serves
+  every account read, as a read-only token; the wallet's `private_key` also reads,
+  places and cancels orders and opens the private fills stream. With `public` and
+  neither, market data only."""
+
+  venue: _Literal['evedex'] = 'evedex'
+  api_key: str | None = None
+  """API key, for account reads; defaults to `EVEDEX_API_KEY`. Optional with a
+  private key."""
+  private_key: str | None = None
+  """The wallet's private key, which signs orders; defaults to `EVEDEX_PRIVATE_KEY`.
+  Optional: without it the account only reads."""
+  validate: bool = True
+  """Whether to type-validate incoming responses."""
+
+  @property
+  def resolved_private_key(self) -> str | None:
+    """The wallet key; always optional on its own."""
+    return resolve_env_var(self.private_key or '$EVEDEX_PRIVATE_KEY', require=False)
+
+  @property
+  def resolved_api_key(self) -> str | None:
+    """The API key; required unless `public` or a private key is configured."""
+    return resolve_env_var(
+      self.api_key or '$EVEDEX_API_KEY',
+      require=not self.public and self.resolved_private_key is None,
+    )
+
+  def verify_env_vars(self):
+    """Fail before constructing clients when a private account has neither key."""
+    self.resolved_api_key
+
+
+@_dataclass(frozen=True)
 class Evm(BaseAccount):
   Venue = _Literal[
     'ethereum',
@@ -1025,6 +1061,7 @@ Account = _Annotated[
   | Grvt
   | Nado
   | Risex
+  | Evedex
   | Evm,
   _pydantic.Discriminator('venue'),
 ]

@@ -27,6 +27,7 @@ COMPATIBLE_IMPLEMENTATIONS = {
   'mexc': '3.0.1',
   'nado': '0.1.0',
   'risex': '0.1.0',
+  'evedex': '0.1.0',
 }
 SDK_4_1_ADAPTERS = tuple(
   venue
