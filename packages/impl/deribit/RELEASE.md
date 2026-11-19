@@ -1,12 +1,19 @@
-# tribulnation-deribit 0.7.0
+# tribulnation-deribit 0.7.1
 
-Requires SDK >=3.0.0 (spot and margin market types, collateral IDs and read `ttl`) and typed-deribit >=0.3.0. Upgrade the SDK and this adapter together: SDK 3.0 changes the base classes this adapter subclasses, so older adapters do not work with it, and this one does not work with SDK 2.
+Requires SDK >=3.0.0 and typed-deribit >=0.3.0, unchanged.
 
-Markets drop the `position`, `collateral` and `available_notional` stubs SDK 3.0 removes from spot ([ADR 0051](../../../dev-docs/adr/0051-spot-perp-market-types-collateral-ids.md)); they raised `NotImplementedError` before. Perpetuals keep raising it from `perp_position` and `perp_collateral`. The reads SDK 3.0 gives a `ttl` accept it and ignore it: every read asks the venue ([ADR 0054](../../../dev-docs/adr/0054-caller-chosen-read-staleness.md)).
+Fixed:
+
+1. `levels` is an upper bound ([ADR 0071](../../../dev-docs/adr/0071-depth-levels-upper-bound.md)): `depth(levels=N)` above 100 and `depth_stream(levels=N)` above 20 are served at that maximum instead of raising `ValueError`. Only a non-positive `levels` still raises.
+
+Changed:
+
+1. The Market support declaration names the market kinds served, `spot` and `perp` ([ADR 0056](../../../dev-docs/adr/0056-market-kind-aware-support.md)), and its note describes the depth caps.
+
+README: logo header.
 
 Every other method is unchanged.
 
-Release qualification on 2026-10-27 passed the read suites and market consistency.
+Release qualification on 2026-11-19 passed the read suites and market consistency.
 Committed evidence under `release-evidence/deribit/` matches pinned Catalogue
-`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
-release follows SDK 3.0.0 publication.
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes.
