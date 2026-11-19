@@ -10,6 +10,7 @@ from decimal import Decimal
 from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
 from tribulnation.sdk.core import MissingData, OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
+  POSITION_LIMIT_TTL,
   Book,
   Candle,
   CandleInterval,
@@ -226,27 +227,35 @@ class GrvtPerpMarket(OrderBookMarket, PerpMarket):
     )
 
   async def remaining_position_limit(
-    self, *, ttl: timedelta | None = None
+    self, *, ttl: timedelta | None = POSITION_LIMIT_TTL
   ) -> RemainingPositionLimit:
     """The instrument's `max_position_size` less the position held in each direction,
     at the ticker's mark price (`account.remaining_position_limit`).
 
+    Every perpetual position comes from one request shared by all instruments for
+    `ttl` (ADR 0069). GRVT has no all-instrument ticker, so the mark is the
+    instrument's own ticker, shared for `ttl`, and not read where no cap is published.
+
     Raises:
       MissingData: The ticker carries no mark price.
     """
-    instrument, position, ticker = await asyncio.gather(
+    instrument, rows = await asyncio.gather(
       self.shared.instrument(self.instrument, kind='PERPETUAL'),
-      account.perp_position(self.shared, self.instrument),
-      stats.ticker(self.shared, self.instrument),
+      account.perp_positions(self.shared, ttl=ttl),
+    )
+    size = account.parse_position(rows, self.instrument).size
+    if instrument.get('max_position_size') is None:
+      return RemainingPositionLimit()
+    name = self.instrument
+    ticker = await self.shared.reads.read(
+      ('ticker', name), lambda: stats.ticker(self.shared, name), ttl=ttl
     )
     mark = ticker.get('mark_price')
     if mark is None:
       raise MissingData(
-        f'GRVT sent no mark price for {self.instrument}',
-        market_id=self.instrument,
-        field='mark',
+        f'GRVT sent no mark price for {name}', market_id=name, field='mark'
       )
-    return account.remaining_position_limit(instrument, size=position.size, mark=mark)
+    return account.remaining_position_limit(instrument, size=size, mark=mark)
 
   async def index(self, *, settings: Settings = {}) -> Decimal:
     """The index price."""

@@ -97,7 +97,10 @@ orders never borrow, and one that would is refused (`2017`).
   directions, as a new position on either side can raise open interest. Nado publishes
   no per-account cap. The cap is held against the gateway's open interest at the mark,
   which counts both sides; which figure Nado compares is undocumented, so the room may
-  be half the venue's, never more. The cap comes from the cached `symbols`.
+  be half the venue's, never more. The cap comes from the cached `symbols`; the open
+  interest (`all_products`) and every perpetual's mark (`perp_prices`) from one request
+  each, shared by all markets for `ttl` (30 s by default, ADR 0069). An uncapped product
+  reads nothing.
 - `rules().fees` are the products' default rates; `fees()` reads the subaccount's
   per-product rates. Nado's fixed sequencer fee is not a rate and is not included.
 - REST `depth` returns at most 100 levels per side. Depth streams apply the `book_depth`

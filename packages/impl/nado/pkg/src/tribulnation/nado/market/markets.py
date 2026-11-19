@@ -9,6 +9,7 @@ from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
 from typed_nado.schemas import Symbol
 from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
+  POSITION_LIMIT_TTL,
   Book,
   Candle,
   CandleInterval,
@@ -239,12 +240,12 @@ class NadoPerpMarket(OrderBookMarket, PerpMarket):
     )
 
   async def remaining_position_limit(
-    self, *, ttl: timedelta | None = None
+    self, *, ttl: timedelta | None = POSITION_LIMIT_TTL
   ) -> RemainingPositionLimit:
     """The room left under the product's open-interest cap, both directions
     (`stats.open_interest_room`); `None` both ways when uncapped."""
     return await stats.remaining_position_limit(
-      self.shared, self.symbol, self.product_id
+      self.shared, self.symbol, self.product_id, ttl=ttl
     )
 
   async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:

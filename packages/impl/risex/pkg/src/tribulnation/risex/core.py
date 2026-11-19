@@ -249,6 +249,21 @@ class Shared(SDK):
       raise ValueError(f'Unknown RISEx market: {market_id!r}')
     return row
 
+  async def live_market(self, market_id: int, *, ttl: timedelta | None) -> MarketInfo:
+    """One market's row with live prices, past the venue's 5-minute cache, from one
+    all-market request shared for `ttl` (see `SharedReads`).
+
+    Raises:
+      ValueError: The deployment has no market of that id.
+    """
+    result = await self.reads.read(
+      ('markets',), lambda: self.call(lambda: self.client.markets.all(True)), ttl=ttl
+    )
+    for row in result['markets']:
+      if row['market_id'] == market_id:
+        return row
+    raise ValueError(f'Unknown RISEx market: {market_id!r}')
+
   async def fresh(self, market_id: int) -> MarketInfo:
     """One market's row with live prices, past the venue's 5-minute cache.
 

@@ -57,8 +57,9 @@ trading is invite-only.
 - Tickers carry only the last price and the 24h quote volume: the venue publishes no
   best bid/ask in its market data, nor a base volume. `perp_stats` open interest is in
   base units.
-- `remaining_position_limit` (ADR 0062) reads the market's live row and the account's
-  position: `max_position_size` less the position held in each direction, bounded for
+- `remaining_position_limit` (ADR 0062) reads the market's live row, from one
+  all-market request, and the account's positions, both shared by every market for
+  `ttl` (30 s by default, ADR 0069): `max_position_size` less the position held in each direction, bounded for
   both directions by the room left under the market's `open_interest_limit` (less its
   `open_interest`), as notional at the mark price. All three are base amounts (mainnet,
   2026-11-17: BTC's limit 750 beside 247.6 open); every `max_position_size` read

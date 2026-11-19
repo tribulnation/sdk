@@ -13,7 +13,7 @@ import asyncio
 from typing_extensions import Collection, Mapping
 import typed_nado.archive_v2.tickers
 from typed_nado import schemas
-from typed_nado.schemas import MarketPrice, Symbol
+from typed_nado.schemas import MarketPrice, PerpPrices, Symbol
 from tribulnation.sdk.core import MissingData
 from tribulnation.sdk.market import (
   NextFunding,
@@ -193,20 +193,32 @@ def open_interest_room(
 
 
 async def remaining_position_limit(
-  shared: Shared, symbol: str, product_id: int
+  shared: Shared, symbol: str, product_id: int, *, ttl: timedelta | None
 ) -> RemainingPositionLimit:
   """The product's open-interest room (`open_interest_room`): its cached symbol, the
-  gateway's open interest (`all_products`) and the archive's mark price. Nado
-  publishes no per-account position cap.
+  gateway's open interest (`all_products`) and the archive's mark price (`perp_prices`
+  of every perpetual), each request shared by all markets for `ttl` (ADR 0069). An
+  uncapped product reads nothing. Nado publishes no per-account position cap.
 
   Raises:
-    MissingData: `all_products` lists no state for the product.
+    MissingData: `all_products` lists no state for the product, or the archive no
+      price.
   """
-  row, products, price = await asyncio.gather(
-    shared.symbol(symbol, type='perp'),
-    shared.call(shared.client.gateway.all_products),
-    shared.call(lambda: shared.client.archive.price(product_id)),
+  row = await shared.symbol(symbol, type='perp')
+  if row['max_open_interest_x18'] is None:
+    return RemainingPositionLimit()
+  products, prices = await asyncio.gather(
+    shared.reads.read(
+      ('all_products',),
+      lambda: shared.call(shared.client.gateway.all_products),
+      ttl=ttl,
+    ),
+    perp_prices(shared, ttl=ttl),
   )
+  if (price := prices.get(str(product_id))) is None:
+    raise MissingData(
+      f'Nado sent no mark price for {symbol}', market_id=symbol, field='mark'
+    )
   for p in products['perp_products']:
     if p['product_id'] == product_id:
       return open_interest_room(
@@ -216,4 +228,17 @@ async def remaining_position_limit(
       )
   raise MissingData(
     f'Nado sent no open interest for {symbol}', market_id=symbol, field='open_interest'
+  )
+
+
+async def perp_prices(
+  shared: Shared, *, ttl: timedelta | None
+) -> Mapping[str, PerpPrices]:
+  """Index and mark prices of every listed perpetual by product id, from one archive
+  request shared for `ttl`."""
+  ids = list((await selected(shared, None, 'perp')).values())
+  return await shared.reads.read(
+    ('perp_prices',),
+    lambda: shared.call(lambda: shared.client.archive.perp_prices(ids)),
+    ttl=ttl,
   )

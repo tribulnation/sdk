@@ -450,57 +450,62 @@ async def test_available_notional_applies_bracket_and_open_interest_caps(
   assert cap.await_args is not None and cap.await_args.kwargs == {'leverage': 5}
 
 
-SHORT_BTC: dict[str, Any] = {
-  **LONG,
-  'positionAmt': Decimal('-0.01'),
-  'notional': Decimal(-1200),
-}
+def risk_row(notional: str, max_notional: str) -> dict[str, Any]:
+  """A one-way BTCUSDT `positionRisk` row at leverage 5 holding `notional` (negative short)."""
+  return {
+    **risk(5)[0],
+    'positionAmt': Decimal(notional) / 120000,
+    'notional': Decimal(notional),
+    'maxNotionalValue': Decimal(max_notional),
+  }
 
 
 @pytest.mark.parametrize(
-  'row,max_notional,remaining,expected',
+  'notional,max_notional,remaining,expected',
   [
     (
-      LONG,
+      '1200',
       '2000',
       '-1',
       RemainingPositionLimit(long=Decimal(800), short=Decimal(2000)),
     ),
     (
-      LONG,
+      '1200',
       '2000',
       '500',
       RemainingPositionLimit(long=Decimal(500), short=Decimal(500)),
     ),
     (
-      SHORT_BTC,
+      '-1200',
       '2000',
       '-1',
       RemainingPositionLimit(long=Decimal(2000), short=Decimal(800)),
     ),
-    (LONG, '1000', '-1', RemainingPositionLimit(long=Decimal(0), short=Decimal(1000))),
+    (
+      '1200',
+      '1000',
+      '-1',
+      RemainingPositionLimit(long=Decimal(0), short=Decimal(1000)),
+    ),
   ],
 )
 async def test_remaining_position_limit_is_the_bracket_room_per_direction(
-  row: dict[str, Any],
+  notional: str,
   max_notional: str,
   remaining: str,
   expected: RemainingPositionLimit,
   monkeypatch: pytest.MonkeyPatch,
 ):
-  """`maxNotional` less what each direction holds, bounded by the symbol's remaining cap; free balance plays no part."""
-  monkeypatch.setattr(Risk, 'risk', AsyncMock(return_value=risk(5)))
-  capped: dict[str, Any] = {**row, 'maxNotional': Decimal(max_notional)}
+  """`maxNotionalValue` less what each direction holds, bounded by the symbol's remaining cap; free balance plays no part."""
   monkeypatch.setattr(
-    InfoWithJoinMargin,
-    'info_with_join_margin',
-    AsyncMock(return_value=account(capped, availableBalance='1')),
+    Risk, 'risk', AsyncMock(return_value=[risk_row(notional, max_notional)])
   )
   cap = AsyncMock(return_value={'remainingOpenableNotionalValue': Decimal(remaining)})
   monkeypatch.setattr(
     RemainingOpenableNotionalValue, 'remaining_openable_notional_value', cap
   )
   assert await perp().remaining_position_limit() == expected
+  assert cap.await_args is not None and cap.await_args.kwargs == {'leverage': 5}
 
 
 def contract(symbol: str) -> dict[str, Any]:

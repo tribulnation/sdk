@@ -154,13 +154,19 @@ publishes no limit the SDK reads. Size an opening at the smaller of it and
 `available_notional()`. An order past such a limit raises `PositionLimitExceeded`
 (`OpenInterestCapped` for a market-wide cap), both `OrderRejected` (ADR 0062).
 
+Unlike the other account reads, `remaining_position_limit()` shares by default: its `ttl`
+defaults to `POSITION_LIMIT_TTL` (30 seconds), and venues answer every market of an
+account from a few account-wide reads shared for it. Polling it for every market costs a
+few requests per `ttl`, not a few per market; pass `ttl=None` for a fresh read
+(ADR 0069).
+
 ## Read staleness
 
 `balances`, `balance`, `position`, `perp_position`, `collateral`, `perp_collateral`,
 `leverage`, `available_notional`, `next_funding`, `tickers` and `perp_stats` take
 `ttl: timedelta | None`, how old an answer you accept:
 
-- `ttl=None` (the default) asks the venue afresh: the answer comes from a request started
+- `ttl=None` (the default, except for `remaining_position_limit`) asks the venue afresh: the answer comes from a request started
   after your call. Use it right after a fill or an order, when an earlier answer could
   predate what you just saw.
 - `ttl=timedelta(seconds=1)` (any `timedelta`, `0` included) shares: an answer whose request

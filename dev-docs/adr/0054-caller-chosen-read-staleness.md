@@ -2,7 +2,9 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: proposed; amends decision 2 of [0053](0053-shared-account-reads-aster-max-leverage.md); implemented, not release-verified
+1. Status: proposed; amends decision 2 of [0053](0053-shared-account-reads-aster-max-leverage.md); implemented, not release-verified;
+   decision 1's `None` default amended for `remaining_position_limit` by
+   [0069](0069-position-limits-shared-by-default.md)
 2. Date: 2026-10-27
 
 ## Context

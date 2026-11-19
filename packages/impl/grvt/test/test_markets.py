@@ -1,6 +1,7 @@
 """Market mappings from rows the venue sent: rules and fees, tickers and stats, funding,
 books, positions, collateral and leverage."""
 
+import asyncio
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
@@ -14,6 +15,7 @@ from tribulnation.grvt.market.exchanges import GrvtPerpExchange
 from tribulnation.grvt.market.markets import GrvtPerpMarket
 from tribulnation.sdk.core import MissingData
 from tribulnation.sdk.market import (
+  POSITION_LIMIT_TTL,
   Book,
   Fees,
   NextFunding,
@@ -564,23 +566,65 @@ async def test_remaining_position_limit_is_max_position_size_at_mark(
 async def test_remaining_position_limit_without_a_cap_or_mark(
   fake: Any, make_shared: Any, make_instrument: Any
 ):
-  """No `max_position_size` is no known limit; a ticker without a mark raises."""
+  """No `max_position_size` is no known limit, read without a ticker; a capped
+  instrument whose ticker has no mark raises."""
   row = {k: v for k, v in make_instrument(BTC).items() if k != 'max_position_size'}
-  shared = make_shared(fake, row)
+  capped = make_instrument(ETH, max_position_size=Decimal('1000'))
+  shared = make_shared(fake, row, capped)
+  tickers: list[str] = []
 
   async def positions(**kwargs: Any) -> list[dict[str, Any]]:
     """Flat."""
     return []
 
-  marks: list[Any] = [Decimal(100), None]
-
   async def one(instrument: str, *, transport: str = 'http') -> dict[str, Any]:
-    """The next mark, or none."""
-    mark = marks.pop(0)
-    return ticker(mark_price=mark) if mark is not None else {'instrument': BTC}
+    """A ticker without a mark."""
+    tickers.append(instrument)
+    return {'instrument': instrument}
 
   fake.trading.positions = positions
   fake.market.ticker = one
   assert await market(shared).remaining_position_limit() == RemainingPositionLimit()
+  assert tickers == []
   with pytest.raises(MissingData):
-    await market(shared).remaining_position_limit()
+    await market(shared, ETH).remaining_position_limit()
+
+
+async def test_remaining_position_limit_shares_the_positions_and_tickers(
+  fake: Any, make_shared: Any, make_instrument: Any, monkeypatch: pytest.MonkeyPatch
+):
+  """Every instrument's limit reads one all-perpetual `positions` request, and each its
+  ticker, shared for the default `ttl`; past it, both are read again."""
+  now = [1000.0]
+  monkeypatch.setattr(asyncio.get_running_loop(), 'time', lambda: now[0])
+  shared = make_shared(
+    fake,
+    make_instrument(BTC, max_position_size=Decimal('1000')),
+    make_instrument(ETH, max_position_size=Decimal('1000')),
+  )
+  requests: list[Any] = []
+
+  async def positions(**kwargs: Any) -> list[dict[str, Any]]:
+    """A BTC short."""
+    requests.append(kwargs)
+    return [position(BTC, '-250')]
+
+  async def one(instrument: str, *, transport: str = 'http') -> dict[str, Any]:
+    """A round mark price: 1000 is 100,000 USDT."""
+    requests.append(instrument)
+    return ticker(mark_price=Decimal(100))
+
+  fake.trading.positions = positions
+  fake.market.ticker = one
+  perps = [market(shared), market(shared, ETH)] * 3
+  limits = await asyncio.gather(*(m.remaining_position_limit() for m in perps))
+  assert limits[:2] == [
+    RemainingPositionLimit(long=Decimal(100000), short=Decimal(75000)),
+    RemainingPositionLimit(long=Decimal(100000), short=Decimal(100000)),
+  ]
+  now[0] += 1
+  await asyncio.gather(*(m.remaining_position_limit() for m in perps))
+  assert sorted(map(str, requests)) == sorted([str({'kind': ['PERPETUAL']}), BTC, ETH])
+  now[0] += POSITION_LIMIT_TTL.total_seconds()
+  await asyncio.gather(*(m.remaining_position_limit() for m in perps))
+  assert len(requests) == 6

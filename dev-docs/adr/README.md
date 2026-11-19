@@ -76,7 +76,7 @@ not a changelog or a substitute for API documentation and tests.
 | [0051](0051-spot-perp-market-types-collateral-ids.md) | Spot and margin market types, and collateral IDs | Proposed; amends 0009 and 0038 |
 | [0052](0052-dydx-indexer-channels-reconnect.md) | dYdX indexer channels reconnect; `'fastest'` rides short drops, `'indexer'` ends | Proposed; implemented, not release-verified; amends 0050 |
 | [0053](0053-shared-account-reads-aster-max-leverage.md) | Shared account reads, and Aster orders at the symbol's maximum leverage | Proposed; implemented, not release-verified; decision 2 amended by 0054, decision 3 by 0055 |
-| [0054](0054-caller-chosen-read-staleness.md) | Caller-chosen read staleness | Proposed; amends 0053; implemented, not release-verified |
+| [0054](0054-caller-chosen-read-staleness.md) | Caller-chosen read staleness | Proposed; amends 0053; implemented, not release-verified; `remaining_position_limit`'s default amended by 0069 |
 | [0055](0055-aster-lower-leverage-on-refusal.md) | Aster lowers leverage only when an order is refused for it | Proposed; amends 0053; implemented, not release-verified |
 | [0056](0056-market-kind-aware-support.md) | Market-kind-aware support declarations | Proposed; builds on 0051; implemented, not release-verified |
 | [0057](0057-lighter-batched-order-transactions.md) | Lighter sends waiting order transactions as one `sendTxBatch` | Proposed; implemented, not release-verified |
@@ -84,9 +84,10 @@ not a changelog or a substitute for API documentation and tests.
 | [0059](0059-replace-orders-and-order-not-found.md) | `replace_order(s)` and `OrderNotFound` | Proposed |
 | [0060](0060-bitget-qualifies-uta.md) | Bitget qualifies with its UTA account | Accepted; amends 0042 |
 | [0061](0061-risex-unordered-native-candles.md) | RISEx native candles pass through unordered, as an accepted venue limitation | Accepted; implemented, not release-verified |
-| [0062](0062-remaining-position-limit-and-limit-refusals.md) | Remaining position limit, and position-limit refusals as typed errors | Proposed; implemented for Aster, Hyperliquid, Extended, GRVT, RISEx, Lighter and Nado, not release-verified |
+| [0062](0062-remaining-position-limit-and-limit-refusals.md) | Remaining position limit, and position-limit refusals as typed errors | Proposed; implemented for Aster, Hyperliquid, Extended, GRVT, RISEx, Lighter and Nado, not release-verified; reads and default `ttl` amended by 0069 |
 | [0064](0064-bitget-uta-perpetual-trading.md) | Bitget trades USDT-margined perpetuals on a Unified Trading Account | Proposed; builds on 0043 and 0060; implemented, not release-verified |
 | [0065](0065-kraken-futures-and-spot-trading.md) | Kraken Futures and Spot trading | Proposed; implemented, not release-verified; amends 0020 |
 | [0066](0066-set-leverage-and-leverage-not-set.md) | `set_leverage` and `LeverageNotSet` | Proposed; implemented for ten venues, not release-verified |
 | [0067](0067-risex-quoteless-ticker-limitation.md) | RISEx tickers without a top of book, as a visible limitation | Accepted; implemented, not release-verified; amends 0048 |
 | [0068](0068-perp-position-liquidation-price.md) | The venue's estimated liquidation price on `PerpPosition` | Proposed; implemented for Hyperliquid, Aster, Lighter and GRVT, not release-verified |
+| [0069](0069-position-limits-shared-by-default.md) | Remaining position limits shared by default, from account-wide reads | Proposed; amends 0054 and 0062; implemented, not release-verified |

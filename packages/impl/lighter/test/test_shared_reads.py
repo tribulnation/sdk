@@ -5,6 +5,7 @@ from datetime import timedelta
 from decimal import Decimal
 import asyncio
 
+import pytest
 from typing_extensions import Any, AsyncIterator, cast
 from typed_core.util import Stream, StreamManager
 from typed_lighter import Lighter
@@ -12,7 +13,8 @@ from typed_lighter import Lighter
 from tribulnation.lighter.core import Shared
 from tribulnation.lighter.market import stats
 from tribulnation.lighter.market.markets import LighterPerpMarket
-from tribulnation.sdk.market import RemainingPositionLimit
+from tribulnation.sdk.core import MissingData
+from tribulnation.sdk.market import POSITION_LIMIT_TTL, RemainingPositionLimit
 
 ACCOUNT = 7
 SECOND = timedelta(seconds=1)
@@ -155,24 +157,35 @@ async def test_fresh_account_reads_are_not_shared(monkeypatch: Any):
   assert client.api.account.requests == 3
 
 
-async def test_remaining_position_limit_reads_the_market_snapshot():
-  """The market's `market_stats` row gives the open-interest room both ways: the raw
-  6-decimal limit less one side's open interest in USDC (mainnet SPY, 2026-11-17)."""
+async def test_remaining_position_limit_reads_the_all_market_snapshot(
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """A market's `market_stats` row gives the open-interest room both ways: the raw
+  6-decimal limit less one side's open interest in USDC (mainnet SPY, 2026-11-17).
+  Every market reads one `all` snapshot, shared for the default `ttl`."""
+  now = [1000.0]
+  monkeypatch.setattr(asyncio.get_running_loop(), 'time', lambda: now[0])
   s, client = shared()
+  selectors: list[Any] = []
+  ids = range(128, 150)
 
-  def one(selector: Any) -> StreamManager[Any, Any, Any]:
-    """SPY's snapshot."""
+  def everything(selector: Any) -> StreamManager[Any, Any, Any]:
+    """The snapshot of every market, SPY's among them."""
+    selectors.append(selector)
 
     async def connect() -> Stream[Any, Any, Any]:
       """Open the channel."""
 
       async def frames() -> AsyncIterator[Any]:
-        """The subscribe snapshot of one market."""
+        """The subscribe snapshot of every market."""
         yield {
           'market_stats': {
-            'market_id': 128,
-            'open_interest': Decimal('11873351.69062'),
-            'open_interest_limit': Decimal('100000000000000'),
+            str(i): {
+              'market_id': i,
+              'open_interest': Decimal('11873351.69062'),
+              'open_interest_limit': Decimal('100000000000000'),
+            }
+            for i in ids
           }
         }
 
@@ -183,12 +196,19 @@ async def test_remaining_position_limit_reads_the_market_snapshot():
 
     return StreamManager(connect)
 
-  client.streams.market_stats = one  # type: ignore[method-assign]
-  market = LighterPerpMarket(shared=s, market_index=128)
+  client.streams.market_stats = everything  # type: ignore[method-assign]
+  perps = [LighterPerpMarket(shared=s, market_index=i) for i in ids]
   room = Decimal('88126648.30938')
-  assert await market.remaining_position_limit() == RemainingPositionLimit(
-    long=room, short=room
-  )
+  limits = await asyncio.gather(*(m.remaining_position_limit() for m in perps))
+  assert limits == [RemainingPositionLimit(long=room, short=room)] * len(perps)
+  now[0] += 1
+  await asyncio.gather(*(m.remaining_position_limit() for m in perps))
+  assert selectors == ['all']
+  now[0] += POSITION_LIMIT_TTL.total_seconds()
+  await perps[0].remaining_position_limit()
+  assert selectors == ['all', 'all']
+  with pytest.raises(MissingData):
+    await LighterPerpMarket(shared=s, market_index=1).remaining_position_limit()
 
 
 def test_open_interest_room_caps_and_floors():

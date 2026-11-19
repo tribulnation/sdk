@@ -18,6 +18,7 @@ from tribulnation.sdk.core import (
   OverflowPolicy,
 )
 from tribulnation.sdk.market import (
+  POSITION_LIMIT_TTL,
   TradingMarkets,
   Market,
   SpotMarket,
@@ -554,7 +555,7 @@ class ProxyPerpMarket(ProxyMarket, PerpMarket):
     return resp.value
 
   async def remaining_position_limit(
-    self, *, ttl: timedelta | None = None
+    self, *, ttl: timedelta | None = POSITION_LIMIT_TTL
   ) -> RemainingPositionLimit:
     """Forward the remaining position limit through the gateway."""
     resp: codec.RemainingPositionLimitResp = await self._conn.call(

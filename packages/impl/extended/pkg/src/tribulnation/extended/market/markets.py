@@ -9,6 +9,7 @@ from decimal import Decimal
 from typing_extensions import Any, AsyncContextManager, AsyncIterable, Sequence
 from tribulnation.sdk.core import OverflowPolicy, PaginatedResponse
 from tribulnation.sdk.market import (
+  POSITION_LIMIT_TTL,
   Book,
   Candle,
   CandleInterval,
@@ -225,21 +226,28 @@ class ExtendedPerpMarket(Public, PerpMarket):
     return f'{self.account_id}:{self.exchange_id}'
 
   async def remaining_position_limit(
-    self, *, ttl: timedelta | None = None
+    self, *, ttl: timedelta | None = POSITION_LIMIT_TTL
   ) -> RemainingPositionLimit:
     """The margin schedule's position-value cap at the account's leverage (bounded by
     `maxPositionValue`) less the position held in each direction, and the room left
     under the market's `openInterestLimit` for both directions (`account`).
 
     Resting and triggered orders, which Extended counts against the cap too, are not
-    subtracted. Reads the market's live statistics, the positions and the leverage.
+    subtracted. Reads every market's live statistics, every position and every
+    leverage setting, each in one request shared by all markets for `ttl` (ADR 0069).
+
+    Raises:
+      ValueError: The venue reports no leverage for the market.
     """
-    market, rows, leverage = await asyncio.gather(
-      self.shared.fresh(self.name),
-      self.shared.call(lambda: self.shared.client.account.positions([self.name])),
-      self.leverage(ttl=ttl),
+    market, rows, leverages = await asyncio.gather(
+      self.shared.live_market(self.name, ttl=ttl),
+      self.shared.positions(ttl=ttl),
+      self.shared.leverages(ttl=ttl),
     )
-    return account.remaining_position_limit(market, rows, leverage=leverage)
+    for row in leverages:
+      if row['market'] == self.name:
+        return account.remaining_position_limit(market, rows, leverage=row['leverage'])
+    raise ValueError(f'Extended returned no leverage for {self.name}')
 
   async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
     """The sub-account's leverage setting on the market (the venue default until
@@ -275,6 +283,7 @@ class ExtendedPerpMarket(Public, PerpMarket):
       lambda: self.shared.client.account.update_leverage(name, leverage=leverage)
     )
     self.shared.reads.forget(('leverage', name))
+    self.shared.reads.forget(('leverage',))
     log.info('%s: leverage set to %s', self.id, leverage)
 
   async def index(self, *, settings: Settings = {}) -> Decimal:

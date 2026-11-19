@@ -37,7 +37,13 @@ from .types import (
   PerpStats,
 )
 from .settings import Settings
-from .market import Market, SpotMarket, PerpMarket, open_trades_stream
+from .market import (
+  POSITION_LIMIT_TTL,
+  Market,
+  SpotMarket,
+  PerpMarket,
+  open_trades_stream,
+)
 from .exchange import Exchange, SpotExchange, PerpExchange
 from .venue import TradingVenue
 from .ids import QualifiedExchangeId, QualifiedMarketId
@@ -574,7 +580,7 @@ class TradingMarkets(SDK):
 
   @SDK.method
   async def remaining_position_limit(
-    self, market_id: str, /, *, ttl: timedelta | None = None
+    self, market_id: str, /, *, ttl: timedelta | None = POSITION_LIMIT_TTL
   ) -> RemainingPositionLimit:
     """Fetch how much more position the venue lets the account open on a perpetual
     market, per direction; see `MarginMarket.remaining_position_limit`.
@@ -583,7 +589,8 @@ class TradingMarkets(SDK):
     the venue's position limits, excluding collateral; `None` where no limit is known.
 
     Args:
-      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+      ttl: How old a shared answer may be, `POSITION_LIMIT_TTL` unless given; `None`
+        asks afresh. See `Market`.
     """
     market = await self.perp_market(market_id)
     return await market.remaining_position_limit(ttl=ttl)

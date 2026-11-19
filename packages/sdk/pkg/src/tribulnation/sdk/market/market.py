@@ -40,6 +40,9 @@ from .settings import Settings
 
 MarketKind = Literal['spot', 'perp']
 """What a market or exchange trades; narrow the static type with `is_spot`/`is_perp`."""
+POSITION_LIMIT_TTL = timedelta(seconds=30)
+"""`remaining_position_limit`'s default `ttl` (ADR 0069): position limits move slowly and
+are polled for every market of an account, so its reads share by default."""
 
 
 def open_trades_stream(
@@ -83,6 +86,9 @@ class Market(SDK):
 
   An answer is at most `ttl` plus its request's latency old. Venues without shared
   reads accept `ttl` and ignore it: every read asks the venue.
+
+  `MarginMarket.remaining_position_limit` is the one read sharing by default: its `ttl`
+  defaults to `POSITION_LIMIT_TTL` (ADR 0069).
   """
 
   @property
@@ -617,7 +623,7 @@ class MarginMarket(Market):
 
   @SDK.method
   async def remaining_position_limit(
-    self, *, ttl: timedelta | None = None
+    self, *, ttl: timedelta | None = POSITION_LIMIT_TTL
   ) -> RemainingPositionLimit:
     """Fetch how much more position the venue lets this account open here, per direction.
 
@@ -633,8 +639,13 @@ class MarginMarket(Market):
     The default reports no limits (`None` both ways): unknown, treated as unlimited.
     Venues override it where they publish limits.
 
+    Unlike the other reads, it shares by default (ADR 0069): callers poll it for every
+    market of an account, and venues answer all of them from account-wide reads shared
+    for `ttl`, so a round over many markets costs a few requests, not a few per market.
+
     Args:
-      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+      ttl: How old a shared answer may be, `POSITION_LIMIT_TTL` unless given; `None`
+        asks afresh. See `Market`.
     """
     return RemainingPositionLimit()
 
