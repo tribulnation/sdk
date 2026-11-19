@@ -23,6 +23,7 @@ OWNERS = [
   ('tribulnation.grvt.core', 'Shared', 'client'),
   ('tribulnation.nado.core', 'Shared', 'client'),
   ('tribulnation.risex.core', 'Shared', 'client'),
+  ('tribulnation.evedex.core', 'Shared', 'client'),
   ('tribulnation.binance.core', 'SdkMixin', 'client'),
   ('tribulnation.binance.market.impl.mixin', 'SharedMixin', 'client'),
   ('tribulnation.bit2me.core.mixin', 'Mixin', 'client'),

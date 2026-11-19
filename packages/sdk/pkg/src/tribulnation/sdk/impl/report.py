@@ -25,6 +25,7 @@ from .accounts import (
   Grvt,
   Nado,
   Risex,
+  Evedex,
   load_accounts,
 )
 
@@ -344,6 +345,22 @@ class ReportSDK:
       validate=account.validate,
     )
 
+  def evedex(self, account: Evedex, id: str) -> Report:
+    """Build EVEDEX's snapshots of one account; an API key is enough."""
+    try:
+      from tribulnation.evedex import Report as EvedexReport
+    except ImportError as e:
+      raise ImportError(
+        'evedex sdk is not installed. Please install it with `pip install tribulnation-evedex`.'
+      ) from e
+    private_key = account.resolved_private_key
+    api_key = account.resolved_api_key
+    if private_key is None and api_key is None:
+      raise ValueError(f'Account {id} has no EVEDEX API key or private key.')
+    return EvedexReport.new(
+      private_key=private_key, api_key=api_key, validate=account.validate
+    )
+
   def venue(self, id: str, /) -> Report:
     if (account := self.accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
@@ -395,6 +412,8 @@ class ReportSDK:
         return self.nado(account, id)
       case 'risex' | 'risex_testnet':
         return self.risex(account, id)
+      case 'evedex':
+        return self.evedex(account, id)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 

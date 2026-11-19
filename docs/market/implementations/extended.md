@@ -120,6 +120,6 @@ market data only.
 
 ---
 
-← [Deribit Market](deribit.md) · **Next:** [GRVT Market](grvt.md) →
+← [EVEDEX Market](evedex.md) · **Next:** [GRVT Market](grvt.md) →
 
 <!-- /next -->

@@ -21,6 +21,81 @@ venue rejects both.
 - Observed: `{'code': -1102, 'msg': "Mandatory parameter 'quantity' was not sent, was empty/null, or malformed."}` for a step-rounded 190-unit `ENAUSDT` order
 - Blocks: nothing listed today. `native_order` writes quantities and prices through `plain_decimal`, which is enough for every value of `1E-6` or more. A price below `1E-6` would still be rejected; the lowest Aster price is `0.0000095` (`1000SATSUSDT`), against a smallest tick of `1E-8`.
 
+## typed-evedex
+
+### `Instruments.instruments` returns the union of every `fields` shape
+
+`exchange.market.instruments` sends a different record per `fields` (full records by
+default, summaries for `short`, full records with funding, volume and open interest for
+`metrics`), but declares one return type for all three, so a caller who asked for
+`metrics` still gets the union and has to cast to reach `fundingRate` or `openInterest`.
+The values validate as the right member (prod, 2026-11-19: `fields='metrics'` rows keep
+every metric), so this is a typing gap, not a validation one.
+
+`exchange/market/instruments.py:177`:
+
+```python
+Response = list[InstrumentInfo] | list[InstrumentSummary] | list[Instrument]
+```
+
+- Kind: wrong-type (declared wider than any one call returns)
+- Observed: `fields=None` sends `InstrumentInfo` rows, `fields='metrics'` sends
+  `Instrument` rows (70 of each on prod)
+- Blocks: `pkg/src/tribulnation/evedex/core.py` (`load_instruments`) and
+  `pkg/src/tribulnation/evedex/market/exchanges.py` (`metrics`): a `cast` bridging the
+  union to the requested shape; `poc/market/perp.py` cells 1, 6 and 22
+- Suggestion (unverified): `@overload` on `fields`
+
+### Centrifugo `temporary` subscribe errors raise the final `ApiError`
+
+`raise_error` maps every Centrifugo command error outside permission, token and
+bad-request codes to `ApiError`, ignoring the error's `temporary` flag. On 2026-11-19
+(probed read-only after the owner's 14:09 UTC run) prod answered every subscribe, public and private alike
+(`futures-perp:orderBook-XRPUSD-0.1`, `futures-perp:heartbeat`,
+`futures-perp:orderFills-83911`), with `{"code": 100, "message": "internal server
+error", "temporary": true}`, after a successful `connect`. Centrifugo's `temporary`
+means the client should retry; as an `ApiError` the SDK translates it to its final
+`ApiError`, which no retry middleware treats as transient. Subscribes at 13:39 and
+13:56 the same day succeeded.
+
+`core/transport/ws.py:101`:
+
+```python
+  if code in (UNKNOWN_CHANNEL, BAD_REQUEST):
+    raise BadRequest(context)
+  raise ApiError(context)
+```
+
+- Kind: wrong-type (error classification: a transient failure raised as a final one)
+- Observed: code `100`, `temporary: true`, on every channel, wallet session or none
+- Blocks: `pkg/src/tribulnation/evedex/market/books.py` and `market/history.py`
+  (`depth_stream` and `trades_stream` cannot be retried on it); the owner's 2026-11-19
+  lifecycle run, whose `trades_stream` saw none of its 2 fills
+- Suggestion (unverified): `NetworkError` when `temporary` is true
+
+### `OrderFillUpdate` drops the fill's `matchId`
+
+The `orderFills` channel sends each fill's `matchId`, the id the account's fill history
+(`exchange.fills`, `AccountFill.matchId`) carries for the same execution, but
+`OrderFillUpdate` does not declare it, so validation drops it. The stream's own id,
+`executionId`, appears nowhere in the history, and the history's fill `id` (a UUID)
+nowhere on the stream, so a stream fill cannot be matched to its history row.
+
+`streams/account/fills.py:8`:
+
+```python
+class OrderFillUpdate(TypedDict):
+  """One fill."""
+```
+
+- Kind: missing field (sent on every publication, undeclared)
+- Observed: the client's own capture (`spec/endpoints/streams/account/fills/examples/01`)
+  has `"matchId": "73229075469303826"` on the 12:16:30 XRPUSD buy, and
+  `exchange.fills` lists that fill with the same `matchId` (prod, 2026-11-19)
+- Blocks: `pkg/src/tribulnation/evedex/market/common.py` (`parse_stream_fill` uses
+  `executionId`, `parse_fill` the history `id`: one fill, two SDK trade ids)
+- Suggestion (unverified): declare `matchId: str`
+
 ## typed-lighter
 
 ### `Candle` OHLCV fields are `float`

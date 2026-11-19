@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tribulnation-evedex"
+version = "0.1.0"
+description = "Tribulnation SDK implementation for EVEDEX perpetuals."
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+dependencies = ["tribulnation-sdk>=4.1.0", "typed-evedex>=0.1.0"]
+readme = {file = "README.md", content-type = "text/markdown"}
+
+[project.urls]
+Repository = "https://github.com/tribulnation/sdk.git"

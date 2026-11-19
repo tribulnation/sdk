@@ -15,6 +15,7 @@ from .accounts import (
   Grvt,
   Nado,
   Risex,
+  Evedex,
   Evm,
 )
 from .market import MarketSDK
@@ -39,6 +40,7 @@ __all__ = [
   'Grvt',
   'Nado',
   'Risex',
+  'Evedex',
   'Evm',
   'MarketSDK',
   'EarnSDK',

@@ -277,6 +277,7 @@ TRADING_ACCOUNTS: list[accounts.Account] = [
   accounts.Nado(venue='nado_testnet', public=True),
   accounts.Risex(public=True),
   accounts.Risex(venue='risex_testnet', public=True),
+  accounts.Evedex(public=True),
   accounts.Deribit(public=True),
   accounts.Mexc(public=True),
   accounts.Bit2Me(public=True),

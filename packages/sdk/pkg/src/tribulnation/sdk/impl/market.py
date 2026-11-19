@@ -24,6 +24,7 @@ from .accounts import (
   Mexc,
   Nado,
   Risex,
+  Evedex,
   load_accounts,
 )
 
@@ -350,6 +351,22 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
       account_id=id,
     )
 
+  def evedex(self, account: Evedex, id: str) -> TradingVenue:
+    """Build EVEDEX's perpetual Market surface on one account: an API key reads it,
+    the wallet's private key also trades, and neither (public) serves market data only."""
+    try:
+      from tribulnation.evedex import EvedexMarket
+    except ImportError as e:
+      raise ImportError(
+        'evedex market is not installed. Please install it with `pip install tribulnation-evedex`.'
+      ) from e
+    return EvedexMarket.new(
+      private_key=account.resolved_private_key,
+      api_key=account.resolved_api_key,
+      validate=account.validate,
+      account_id=id,
+    )
+
   def _venue(self, id: str, /) -> TradingVenue:
     if (account := self.accounts.get(id)) is None:
       raise ValueError(f'No account found for venue id: {id}')
@@ -390,6 +407,8 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
         return self.nado(account, id)
       case 'risex' | 'risex_testnet':
         return self.risex(account, id)
+      case 'evedex':
+        return self.evedex(account, id)
       case _:
         raise ValueError(f'Unsupported venue: {account.venue}')
 

@@ -181,3 +181,12 @@ repo = "https://github.com/tribulnation/sdk"
 path = "packages/impl/risex"
 pypi = "https://pypi.org/project/tribulnation-risex/"
 icon = "https://catalogue.tribulnation.com/icons/platform/risex.svg"
+
+[[venues]]
+slug = "evedex"
+name = "EVEDEX"
+tier = "development"
+repo = "https://github.com/tribulnation/sdk"
+path = "packages/impl/evedex"
+pypi = "https://pypi.org/project/tribulnation-evedex/"
+icon = "https://catalogue.tribulnation.com/icons/platform/evedex.svg"

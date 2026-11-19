@@ -67,6 +67,7 @@ would raise instead.
 | Extended | ✅ | ✅ |
 | Nado | ✅ | ✅ |
 | RISEx | ✅ | ✅ |
+| EVEDEX | ✅ | ✅ |
 <!-- /streams -->
 
 Per-venue caveats are on the

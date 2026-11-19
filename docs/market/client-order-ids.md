@@ -40,7 +40,7 @@ The SDK sends the string unchanged, so an ID of your own must follow the venue's
 most limit its length and characters and reject an ID already in use.
 `random_client_order_id()` follows them by construction: 128 random bits as 32 hex digits on
 most venues, with `0x` in front on Hyperliquid, a UUID on Coinbase, and an integer in
-`[2^63, 2^64)` on GRVT, and a decimal integer below `2^63` on Nado. On markets without
+`[2^63, 2^64)` on GRVT, a decimal integer below `2^63` on Nado, and the venue's own order-id form on EVEDEX. On markets without
 client order IDs it returns `None`, which `place_order` treats like no ID at all, so the code
 above runs unchanged everywhere. Either field is `None` on fills that don't report it:
 
@@ -53,6 +53,7 @@ above runs unchanged everywhere. Either field is `None` on fills that don't repo
 | Bybit | `orderLinkId`, up to 36 characters | History and stream | History and stream |
 | Coinbase | `client_order_id` | History and stream | Stream |
 | dYdX | Ignored | Stream | — |
+| EVEDEX | The order's `id`: `DDDDD:<26 hex>`, days since 2025-07-24 then random hex; generated when none is given | History and stream | History and stream (the order id) |
 | Extended | The order's `id` (`externalId`), not kept unique; 32 hex digits generated | History (testnet) and stream (stream fills not yet observed) | History (testnet) and stream (stream fills not yet observed) |
 | GRVT | `client_order_id`: an integer, also the SDK order id | History and stream | History and stream |
 | Hyperliquid | `cloid`: `0x` and 32 hex digits | History and stream | History and stream |

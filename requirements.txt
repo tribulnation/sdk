@@ -26,3 +26,4 @@ pytest-asyncio
 -e packages/impl/extended/pkg
 -e packages/impl/nado/pkg
 -e packages/impl/risex/pkg
+-e packages/impl/evedex/pkg

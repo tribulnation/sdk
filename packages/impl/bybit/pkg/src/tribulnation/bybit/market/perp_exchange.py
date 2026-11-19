@@ -77,10 +77,10 @@ class PerpExchange(VenueMixin, _PerpExchange):
     return {
       t['symbol']: Ticker(
         last=t['lastPrice'],
-        bid=t['bid1Price'],
-        ask=t['ask1Price'],
-        bid_qty=t['bid1Size'],
-        ask_qty=t['ask1Size'],
+        bid=num(t['bid1Price']),
+        ask=num(t['ask1Price']),
+        bid_qty=num(t['bid1Size']),
+        ask_qty=num(t['ask1Size']),
         base_volume_24h=t['volume24h'],
         quote_volume_24h=t['turnover24h'],
       )
