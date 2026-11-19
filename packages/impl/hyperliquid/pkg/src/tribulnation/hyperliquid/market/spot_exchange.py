@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
 
+from typed_hyperliquid.info.spot_meta_and_asset_ctxs import SpotAssetCtx, SpotPair
+
 from tribulnation.sdk import SDK
 from tribulnation.sdk.core import PaginatedResponse
 from tribulnation.sdk.market import (
@@ -35,6 +37,31 @@ def parse_market_id(market_id: str) -> tuple[str, str, int]:
   ticker, idx_str = market_id.rsplit(':', 1)
   base, quote = ticker.split('/', 1)
   return base, quote, int(idx_str)
+
+
+def spot_contexts(
+  universe: Sequence[SpotPair], asset_ctxs: Sequence[SpotAssetCtx]
+) -> dict[int, SpotAssetCtx]:
+  """Match each spot pair to its own asset context, keyed by spot index.
+
+  `spotMetaAndAssetCtxs` returns one context per spot index, delisted indices
+  included, while `universe` lists only the live pairs and skips the rest, so the
+  two lists do not line up by position. Each context names its pair in `coin`
+  (`universe[].name`); a context without `coin` is taken from the pair's own
+  index. A pair with no context of its own is left out rather than given a
+  neighbour's.
+  """
+  by_coin = {ctx['coin']: ctx for ctx in asset_ctxs if 'coin' in ctx}
+  out: dict[int, SpotAssetCtx] = {}
+  for pair in universe:
+    ctx = by_coin.get(pair['name'])
+    if ctx is None and pair['index'] < len(asset_ctxs):
+      candidate = asset_ctxs[pair['index']]
+      if 'coin' not in candidate:
+        ctx = candidate
+    if ctx is not None:
+      out[pair['index']] = ctx
+  return out
 
 
 @SDK.method
@@ -96,9 +123,11 @@ class SpotExchange(SpotMixin, _SpotExchange):
     tokens_by_index = {t['index']: t for t in spot_meta['tokens']}
     wanted = None if markets is None else set(markets)
 
+    contexts = spot_contexts(spot_meta['universe'], asset_ctxs)
+
     result: dict[str, Ticker] = {}
     coin_to_market: dict[str, str] = {}
-    for asset, ctx in zip(spot_meta['universe'], asset_ctxs):
+    for asset in spot_meta['universe']:
       spot_index = asset['index']
       base_idx, quote_idx = asset['tokens']
       base_name = tokens_by_index[base_idx]['name']
@@ -106,11 +135,12 @@ class SpotExchange(SpotMixin, _SpotExchange):
       mid = _market_id(base_name, quote_name, spot_index)
       if wanted is not None and mid not in wanted:
         continue
+      ctx = contexts.get(spot_index)
       result[mid] = Ticker(
         # Asset contexts publish a midpoint, not the last traded price.
         last=None,
-        base_volume_24h=ctx.get('dayBaseVlm'),
-        quote_volume_24h=ctx['dayNtlVlm'],
+        base_volume_24h=None if ctx is None else ctx.get('dayBaseVlm'),
+        quote_volume_24h=None if ctx is None else ctx['dayNtlVlm'],
       )
       coin_to_market[asset['name']] = mid
 
