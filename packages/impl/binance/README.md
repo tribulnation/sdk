@@ -1,6 +1,16 @@
-# Binance SDK
+<p align="center">
+  <a href="https://tribulnation.com/sdk/docs/support#binance">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://tribulnation.com/media/lockups/binance-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://tribulnation.com/media/lockups/binance-light.svg">
+      <img alt="Tribulnation SDK Binance" src="https://tribulnation.com/media/lockups/binance-light.svg" width="520">
+    </picture>
+  </a>
+</p>
 
-> Tribulnation SDK implementation for Binance.
+<p align="center">
+  <em>Tribulnation SDK implementation for Binance.</em>
+</p>
 
 ## Installation
 

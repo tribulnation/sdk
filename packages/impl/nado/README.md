@@ -1,4 +1,16 @@
-# Nado SDK
+<p align="center">
+  <a href="https://tribulnation.com/sdk/docs/market/implementations/nado">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://tribulnation.com/media/lockups/nado-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://tribulnation.com/media/lockups/nado-light.svg">
+      <img alt="Tribulnation SDK Nado" src="https://tribulnation.com/media/lockups/nado-light.svg" width="520">
+    </picture>
+  </a>
+</p>
+
+<p align="center">
+  <em>Tribulnation SDK implementation for Nado spot and perpetual markets.</em>
+</p>
 
 USDT0-settled perpetual and spot Market support, and Report snapshots, for
 [Nado](https://www.nado.xyz/), built on `typed-nado`. Install with

@@ -1,4 +1,16 @@
-# margin.trade SDK
+<p align="center">
+  <a href="https://tribulnation.com/sdk/docs/market/implementations/margin-trade">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://tribulnation.com/media/lockups/margin-trade-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://tribulnation.com/media/lockups/margin-trade-light.svg">
+      <img alt="Tribulnation SDK margin.trade" src="https://tribulnation.com/media/lockups/margin-trade-light.svg" width="520">
+    </picture>
+  </a>
+</p>
+
+<p align="center">
+  <em>Tribulnation SDK implementation for margin.trade spot and perpetual markets.</em>
+</p>
 
 Spot and USDC-margined perpetual Market support, and Report snapshots and history, for
 [margin.trade](https://margin.trade/), built on `typed-margin-trade`. Install with

@@ -1,4 +1,16 @@
-# Lighter SDK
+<p align="center">
+  <a href="https://tribulnation.com/sdk/docs/market/implementations/lighter">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://tribulnation.com/media/lockups/lighter-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://tribulnation.com/media/lockups/lighter-light.svg">
+      <img alt="Tribulnation SDK Lighter" src="https://tribulnation.com/media/lockups/lighter-light.svg" width="520">
+    </picture>
+  </a>
+</p>
+
+<p align="center">
+  <em>Tribulnation SDK implementation for Lighter.</em>
+</p>
 
 Perpetual and spot Market support for [Lighter](https://lighter.xyz/), built on
 `typed-lighter`. Install with `pip install tribulnation-lighter`.

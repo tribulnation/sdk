@@ -1,4 +1,16 @@
-# Extended SDK
+<p align="center">
+  <a href="https://tribulnation.com/sdk/docs/market/implementations/extended">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://tribulnation.com/media/lockups/extended-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://tribulnation.com/media/lockups/extended-light.svg">
+      <img alt="Tribulnation SDK Extended" src="https://tribulnation.com/media/lockups/extended-light.svg" width="520">
+    </picture>
+  </a>
+</p>
+
+<p align="center">
+  <em>Tribulnation SDK implementation for Extended perpetuals.</em>
+</p>
 
 Perpetual Market and Report support for [Extended](https://extended.exchange/), built on
 `typed-extended`. Install with `pip install tribulnation-extended`.

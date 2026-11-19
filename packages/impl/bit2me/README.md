@@ -1,6 +1,16 @@
-# Bit2Me SDK
+<p align="center">
+  <a href="https://tribulnation.com/sdk/docs/support#bit2me">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://tribulnation.com/media/lockups/bit2me-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://tribulnation.com/media/lockups/bit2me-light.svg">
+      <img alt="Tribulnation SDK Bit2Me" src="https://tribulnation.com/media/lockups/bit2me-light.svg" width="520">
+    </picture>
+  </a>
+</p>
 
-> Tribulnation SDK implementation for Bit2Me.
+<p align="center">
+  <em>Tribulnation SDK implementation for Bit2Me.</em>
+</p>
 
 ## Installation
 

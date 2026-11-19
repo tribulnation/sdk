@@ -1,4 +1,16 @@
-# RISEx SDK
+<p align="center">
+  <a href="https://tribulnation.com/sdk/docs/market/implementations/risex">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://tribulnation.com/media/lockups/risex-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://tribulnation.com/media/lockups/risex-light.svg">
+      <img alt="Tribulnation SDK RISEx" src="https://tribulnation.com/media/lockups/risex-light.svg" width="520">
+    </picture>
+  </a>
+</p>
+
+<p align="center">
+  <em>Tribulnation SDK implementation for RISEx perpetuals.</em>
+</p>
 
 Perpetual Market and Report support for [RISEx](https://rise.trade/), built on
 `typed-risex`. Install with `pip install tribulnation-risex`.

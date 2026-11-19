@@ -1,4 +1,16 @@
-# Aster SDK
+<p align="center">
+  <a href="https://tribulnation.com/sdk/docs/market/implementations/aster">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://tribulnation.com/media/lockups/aster-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://tribulnation.com/media/lockups/aster-light.svg">
+      <img alt="Tribulnation SDK Aster" src="https://tribulnation.com/media/lockups/aster-light.svg" width="520">
+    </picture>
+  </a>
+</p>
+
+<p align="center">
+  <em>Tribulnation SDK implementation for Aster spot and perpetual markets.</em>
+</p>
 
 Spot and linear perpetual Market support for [Aster](https://www.asterdex.com/),
 built on `typed-aster`. Install with `pip install tribulnation-aster`.

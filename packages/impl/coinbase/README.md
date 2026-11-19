@@ -1,6 +1,16 @@
-# Coinbase SDK
+<p align="center">
+  <a href="https://tribulnation.com/sdk/docs/market/implementations/coinbase">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://tribulnation.com/media/lockups/coinbase-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://tribulnation.com/media/lockups/coinbase-light.svg">
+      <img alt="Tribulnation SDK Coinbase" src="https://tribulnation.com/media/lockups/coinbase-light.svg" width="520">
+    </picture>
+  </a>
+</p>
 
-> Tribulnation SDK implementation for Coinbase.
+<p align="center">
+  <em>Tribulnation SDK implementation for Coinbase.</em>
+</p>
 
 ## Installation
 

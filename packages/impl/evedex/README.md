@@ -1,4 +1,16 @@
-# EVEDEX SDK
+<p align="center">
+  <a href="https://tribulnation.com/sdk/docs/market/implementations/evedex">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://tribulnation.com/media/lockups/evedex-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://tribulnation.com/media/lockups/evedex-light.svg">
+      <img alt="Tribulnation SDK EVEDEX" src="https://tribulnation.com/media/lockups/evedex-light.svg" width="520">
+    </picture>
+  </a>
+</p>
+
+<p align="center">
+  <em>Tribulnation SDK implementation for EVEDEX perpetuals.</em>
+</p>
 
 Perpetual Market and Report support for [EVEDEX](https://evedex.com/), built on
 `typed-evedex`. Install with `pip install tribulnation-evedex`.
