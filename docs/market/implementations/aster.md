@@ -180,8 +180,8 @@ async with sdk.depth_stream('aster:perp:BTCUSDT', settings={'aster': {'depth_sou
   reads the one all-symbol `positionRisk` answer, shared for `ttl` (30 s by default).
   `remainingOpenableNotionalValue` is public, market-wide and answered one symbol per
   request (weight 50), so each symbol's answer is reused for 15 minutes whatever the
-  `ttl`, and all symbols of a client together send at most one every 30 s; a symbol not
-  read yet has no open-interest bound meanwhile. Perpetual `available_notional` reads the
+  `ttl`, and all symbols of a client together send at most one every 30 s, the oldest
+  answer asked for first; a symbol not read yet has no open-interest bound meanwhile. Perpetual `available_notional` reads the
   allowance the same way. Polling 22 symbols costs at most 4 requests a minute
   (ADR 0069). An order refused for the bracket's cap (`-5018`) raises
   `PositionLimitExceeded` and marks the positions and the symbol's allowance for a new

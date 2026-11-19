@@ -59,8 +59,10 @@ with a `ttl`, the per-symbol requests were never shared.
    longer than the caller's `ttl` and paced across symbols. Aster's
    `remainingOpenableNotionalValue` is shared per symbol and leverage for 15 minutes
    whatever the `ttl`, and the requests of all symbols of a client together are at
-   least 30 s apart. A symbol whose answer is older keeps it until its turn; one never
-   read has no open-interest bound (`None`) meanwhile. `available_notional` reads the
+   least 30 s apart. A free turn goes to the oldest answer asked for within the last
+   2 minutes, one never read first, so no symbol starves when more are polled than
+   turns come round in 15 minutes. A symbol whose answer is older keeps it until its
+   turn; one never read has no open-interest bound (`None`) meanwhile. `available_notional` reads the
    allowance the same way.
 4. An Aster `PositionLimitExceeded` refusal drops the shared `positionRisk` answer and
    marks the symbol's allowance for a new read at its next turn, keeping its value

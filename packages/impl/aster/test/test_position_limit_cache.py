@@ -1,6 +1,7 @@
 """`remaining_position_limit` over many symbols: shared account reads and a paced allowance (ADR 0069)."""
 
 import asyncio
+import sys
 from datetime import timedelta
 from decimal import Decimal
 from typing_extensions import Any
@@ -216,3 +217,19 @@ async def test_request_budget_of_a_minute_of_polling(monkeypatch: pytest.MonkeyP
     per_minute.append(venue.requests - before)
   assert max(per_minute) <= 4
   assert set(venue.allowance_calls) == set(SYMBOLS)
+
+
+async def test_more_symbols_than_turns_all_get_their_allowance(
+  monkeypatch: pytest.MonkeyPatch,
+):
+  """With more symbols than turns per `ALLOWANCE_TTL`, a free turn goes to the oldest
+  answer asked for, so the symbols last in a round are not starved."""
+  symbols = [f'S{i:02d}USDT' for i in range(50)]
+  monkeypatch.setattr(sys.modules[__name__], 'SYMBOLS', symbols)
+  venue, now, perps = Venue(monkeypatch), clock(monkeypatch), markets()
+  start = now[0]
+  for step in range(12 * 30):
+    now[0] = start + 5 * step
+    await poll(perps)
+  assert set(venue.allowance_calls) == set(symbols)
+  assert len(venue.allowance_calls) <= 2 * 30
