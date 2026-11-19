@@ -73,6 +73,9 @@ raises, rather than quietly placing a different order.
   feeds it is the time of the latest exchange event reflected (the matching-engine or
   transaction time where the venue offers several); it only advances when the book
   changes, so an old `time` on a quiet book means "unchanged", not necessarily stale.
+  The constructor sorts the levels best-first, and the book's methods rely on that
+  order (`best_bid`/`best_ask` are the first levels): if you edit `bids` or `asks` in
+  place, keep it.
   It is `None` when the venue provides no such timestamp, and is never local receive
   time or a transport header such as HTTP `Date`. Availability: Hyperliquid sets the
   block time on REST and WS; Aster the event/output time `E` (falling back to the

@@ -161,3 +161,71 @@ async def test_rest_depth_has_no_time():
   book = await books.depth(cast(Shared, shared), MARKET)
   assert book.best_bid.price == Decimal(100)
   assert book.time is None
+
+
+async def test_stream_applies_delta_sequences():
+  """Deltas replace, add and remove levels incrementally (zero size removes one), and
+  each yielded book keeps its levels through later deltas."""
+
+  def lvl(price: str, size: str) -> dict[str, Any]:
+    """A raw price level."""
+    return {'price': price, 'size': size}
+
+  raw = [
+    frame(
+      'subscribed',
+      us=TIME_US,
+      begin=0,
+      nonce=1,
+      bids=[lvl('100', '1'), lvl('99', '2'), lvl('98', '3')],
+      asks=[lvl('101', '1'), lvl('102', '2'), lvl('103', '3')],
+    ),
+    frame(
+      'update',
+      us=TIME_US + 1,
+      begin=1,
+      nonce=2,
+      bids=[lvl('99', '5'), lvl('97.5', '1'), lvl('100', '0')],
+      asks=[lvl('102', '0'), lvl('104', '0')],
+    ),
+    frame(
+      'update',
+      us=TIME_US + 2,
+      begin=2,
+      nonce=3,
+      bids=[lvl('99.5', '4')],
+      asks=[lvl('101', '0'), lvl('103', '0'), lvl('105', '1')],
+    ),
+  ]
+  rows = [validator(OrderBookUpdate).python(f) for f in raw]
+
+  def order_book(market_id: int) -> StreamManager[Any, Any, Any]:
+    """Open the fixture stream."""
+
+    async def connect() -> Stream[Any, Any, Any]:
+      """The typed stream over the fixture frames."""
+      fixture = Frames(rows)
+      return Stream(None, fixture, fixture.unsubscribe)
+
+    return StreamManager(connect)
+
+  shared = SimpleNamespace(
+    books={}, client=SimpleNamespace(streams=SimpleNamespace(order_book=order_book))
+  )
+  ctx = await books.subscription(cast(Shared, shared), MARKET).subscribe_stream()
+  out = [book async for book in ctx.iterator]
+
+  def levels(entries: list[Any]) -> list[tuple[str, str]]:
+    """Levels as normalized strings."""
+    return [(f'{e.price.normalize():f}', f'{e.qty.normalize():f}') for e in entries]
+
+  assert [levels(b.bids) for b in out] == [
+    [('100', '1'), ('99', '2'), ('98', '3')],
+    [('99', '5'), ('98', '3'), ('97.5', '1')],
+    [('99.5', '4'), ('99', '5'), ('98', '3'), ('97.5', '1')],
+  ]
+  assert [levels(b.asks) for b in out] == [
+    [('101', '1'), ('102', '2'), ('103', '3')],
+    [('101', '1'), ('103', '3')],
+    [('105', '1')],
+  ]

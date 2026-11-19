@@ -1,12 +1,15 @@
-from typing_extensions import AsyncIterable, AsyncIterator, Sequence, overload
+from typing_extensions import AsyncIterable, AsyncIterator, Callable, Sequence, overload
+from bisect import bisect_left, bisect_right
+from contextvars import ContextVar
 from dataclasses import dataclass, field
 from datetime import datetime
 from decimal import Decimal
+from operator import attrgetter
 from tribulnation.sdk.core.stream import Skipping, SkippingView
 from .fees import Fees
 
 
-@dataclass(kw_only=True)
+@dataclass(kw_only=True, init=False)
 class Book:
   @dataclass
   class Entry:
@@ -43,17 +46,50 @@ class Book:
   transport header such as HTTP `Date`.
   """
 
-  def __post_init__(self):
-    self.bids.sort(key=lambda e: e.price, reverse=True)
-    self.asks.sort(key=lambda e: e.price)
+  def __init__(
+    self,
+    *,
+    bids: list[Entry] | None = None,
+    asks: list[Entry] | None = None,
+    time: datetime | None = None,
+  ):
+    """Build a book, sorting `bids` and `asks` in place into book order.
+
+    Sorting is stable and nearly linear on levels already in order, which is cheaper
+    than checking the order first. Books that skip it keep the order they have:
+    `presorted` ones, those decoded from the gateway wire (msgspec does not call
+    `__init__`; the protocol sends levels in book order), and those maintained by
+    `update` or derived by `copy`, `frozen` and `limit`.
+    """
+    self.bids = [] if bids is None else bids
+    self.asks = [] if asks is None else asks
+    self.time = time
+    self.bids.sort(key=price_of, reverse=True)
+    self.asks.sort(key=price_of)
 
   @property
   def best_bid(self) -> Entry:
-    return max(self.bids, key=lambda e: e.price)
+    """The highest bid, the first level.
+
+    Raises:
+      ValueError: If the book has no bids.
+    """
+    if self.bids:
+      return self.bids[0]
+    else:
+      raise ValueError('The book has no bids')
 
   @property
   def best_ask(self) -> Entry:
-    return min(self.asks, key=lambda e: e.price)
+    """The lowest ask, the first level.
+
+    Raises:
+      ValueError: If the book has no asks.
+    """
+    if self.asks:
+      return self.asks[0]
+    else:
+      raise ValueError('The book has no asks')
 
   @overload
   def market_buy_price(self, *, qty: Decimal) -> Decimal | None:
@@ -167,12 +203,8 @@ class Book:
     )
 
   def limit(self, levels: int) -> 'Book':
-    """Limit the book to `levels` levels."""
-    return Book(
-      bids=self.bids[:levels],
-      asks=self.asks[:levels],
-      time=self.time,
-    )
+    """Limit the book to `levels` levels, sharing the kept entries."""
+    return presorted(bids=self.bids[:levels], asks=self.asks[:levels], time=self.time)
 
   @property
   def mark_price(self) -> Decimal:
@@ -221,33 +253,25 @@ class Book:
       between existing levels are left as they are.
     - `time` takes the update's timestamp, when it carries one.
 
+    Levels are located by binary search, so the book must be in book order, as every
+    constructor and `update` leave it. A changed or removed price replaces all of its
+    levels; repeated prices the update does not touch are kept.
+
     References:
       - [dYdX: Uncrossing the orderbook](https://docs.dydx.xyz/interaction/data/watch-orderbook)
     """
-    bids = {e.price: e for e in self.bids}
-    asks = {e.price: e for e in self.asks}
+    bids = self.bids.copy()
+    asks = self.asks.copy()
     for e in updates.bids:
-      if e.qty > 0:
-        bids[e.price] = e
-      else:
-        bids.pop(e.price, None)
+      set_level(bids, e, key=negated_price, at=-e.price)
     for e in updates.asks:
-      if e.qty > 0:
-        asks[e.price] = e
-      else:
-        asks.pop(e.price, None)
+      set_level(asks, e, key=price_of, at=e.price)
 
-    sorted_bids = [bids[p] for p in sorted(bids.keys(), reverse=True)]
-    sorted_asks = [asks[p] for p in sorted(asks.keys())]
     new_bids = {e.price for e in updates.bids if e.qty > 0}
     new_asks = {e.price for e in updates.asks if e.qty > 0}
     i = j = 0
-    while (
-      i < len(sorted_bids)
-      and j < len(sorted_asks)
-      and sorted_asks[j].price <= sorted_bids[i].price
-    ):
-      bid, ask = sorted_bids[i], sorted_asks[j]
+    while i < len(bids) and j < len(asks) and asks[j].price <= bids[i].price:
+      bid, ask = bids[i], asks[j]
       new_bid, new_ask = bid.price in new_bids, ask.price in new_asks
       if new_bid and new_ask:
         if ask.qty >= bid.qty:
@@ -261,10 +285,39 @@ class Book:
       else:
         break
 
-    self.bids = sorted_bids[i:]
-    self.asks = sorted_asks[j:]
+    self.bids = bids[i:] if i else bids
+    self.asks = asks[j:] if j else asks
     if updates.time is not None:
       self.time = updates.time
+
+
+price_of = attrgetter('price')
+"""A level's price: the sort key of asks."""
+
+
+def negated_price(entry: Book.Entry) -> Decimal:
+  """A level's negated price: the ascending sort key of bids."""
+  return -entry.price
+
+
+def set_level(
+  entries: list[Book.Entry],
+  entry: Book.Entry,
+  *,
+  key: Callable[[Book.Entry], Decimal],
+  at: Decimal,
+):
+  """Set `entry`'s price level in `entries`, in place, removing it for a zero quantity.
+
+  Args:
+    entries: Levels sorted ascending by `key`.
+    entry: The new level.
+    key: The sort key of `entries`.
+    at: `key` of `entry`.
+  """
+  lo = bisect_left(entries, at, key=key)
+  hi = bisect_right(entries, at, lo=lo, key=key)
+  entries[lo:hi] = [entry] if entry.qty > 0 else []
 
 
 def presorted(
@@ -278,6 +331,12 @@ def presorted(
   return book
 
 
+reading_books_only: ContextVar[bool] = ContextVar('reading_books_only', default=False)
+"""Set in a task that never mutates the books it reads, such as the gateway encoding
+them for its clients: `detached_books` then hands that task the shared frozen books,
+trimmed, instead of copying every level. Tasks it creates inherit the setting."""
+
+
 def detached_books(
   books: AsyncIterable[Book], levels: int | None = None
 ) -> AsyncIterable[Book]:
@@ -286,7 +345,8 @@ def detached_books(
   Copy on read: a book replaced in the subscriber's inbox before being read is never
   copied, so a slow subscriber costs nothing for the books it skips. Each delivered
   book is the subscriber's to mutate (`buy`, `sell`, ...), never seen by the stream nor
-  by other subscribers. Keeps the source's `skipped` count when it has one.
+  by other subscribers. Keeps the source's `skipped` count when it has one. A reader
+  under `reading_books_only` gets the shared books without the copy.
 
   Args:
     books: A subscriber's stream of shared books, e.g. `Book.frozen` ones.
@@ -295,7 +355,8 @@ def detached_books(
 
   async def copies() -> AsyncIterator[Book]:
     async for book in books:
-      yield book.copy() if levels is None else book.limit(levels).copy()
+      trimmed = book if levels is None else book.limit(levels)
+      yield trimmed if reading_books_only.get() else trimmed.copy()
 
   if isinstance(books, Skipping):
     return SkippingView(copies(), books)

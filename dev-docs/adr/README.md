@@ -71,7 +71,7 @@ not a changelog or a substitute for API documentation and tests.
 | [0046](0046-conflated-snapshot-streams.md) | Conflate snapshot streams before decoding, and report skipped books | Proposed; implemented for Binance, Aster and Hyperliquid, not release-verified |
 | [0047](0047-grvt-credential-modes.md) | GRVT credential modes and definitive order refusals | Accepted; implemented, not release-verified |
 | [0048](0048-extended-rfq-indicative-tickers.md) | Extended RFQ depth from quotes, with indicative tickers as a visible limitation | Accepted; implemented, not release-verified; amends 0014 and 0022; amended by 0067 |
-| [0049](0049-book-streams-copy-on-read.md) | Book streams share a frozen book and copy it on read | Proposed; implemented, not release-verified |
+| [0049](0049-book-streams-copy-on-read.md) | Book streams share a frozen book and copy it on read | Proposed; implemented, not release-verified; incremental `update` and the gateway's uncopied reads amended by 0070 |
 | [0050](0050-dydx-fill-socket.md) | dYdX fills from a local fill socket, and `'fastest'` over every source | Proposed; implemented, not release-verified; amends 0044 and 0045; amended by 0052 |
 | [0051](0051-spot-perp-market-types-collateral-ids.md) | Spot and margin market types, and collateral IDs | Proposed; amends 0009 and 0038 |
 | [0052](0052-dydx-indexer-channels-reconnect.md) | dYdX indexer channels reconnect; `'fastest'` rides short drops, `'indexer'` ends | Proposed; implemented, not release-verified; amends 0050 |
@@ -91,3 +91,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0067](0067-risex-quoteless-ticker-limitation.md) | RISEx tickers without a top of book, as a visible limitation | Accepted; implemented, not release-verified; amends 0048 |
 | [0068](0068-perp-position-liquidation-price.md) | The venue's estimated liquidation price on `PerpPosition` | Proposed; implemented for Hyperliquid, Aster, Lighter and GRVT, not release-verified |
 | [0069](0069-position-limits-shared-by-default.md) | Remaining position limits shared by default, from account-wide reads | Proposed; amends 0054 and 0062; implemented, not release-verified |
+| [0070](0070-book-order-invariant-hot-paths.md) | Book paths rely on the book-order invariant | Proposed; amends 0049; implemented, not release-verified |

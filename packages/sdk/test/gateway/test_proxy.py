@@ -49,6 +49,7 @@ from tribulnation.sdk.market import (
   Trade,
   TradingMarkets,
 )
+from tribulnation.sdk.market.types.book import reading_books_only
 from tribulnation.sdk.market.exchange import PerpExchange
 from tribulnation.sdk.market.venue import ExchangeDescription, TradingVenue
 
@@ -75,6 +76,8 @@ class MockState:
   depth_stream_wait: bool = False
   depth_stream_started: asyncio.Event = field(default_factory=asyncio.Event)
   depth_stream_unsubscribed: int = 0
+  depth_stream_reads_only: list[bool] = field(default_factory=list[bool])
+  """`reading_books_only` as each stream item was produced."""
   depth_settings: list[Settings] = field(default_factory=list[Settings])
   """The `settings` every `depth`/`depth_stream` call received, in call order."""
   trades_settings: list[Settings] = field(default_factory=list[Settings])
@@ -156,6 +159,7 @@ class MockMarket(PerpMarket):
     async def gen() -> AsyncIterator[Book]:
       self.state.depth_stream_started.set()
       for item in items:
+        self.state.depth_stream_reads_only.append(reading_books_only.get())
         if isinstance(item, Exception):
           raise item
         yield item.limit(levels) if levels is not None else item
@@ -493,6 +497,9 @@ async def test_depth_stream_clean_completion(
 
   assert [b.best_bid.price for b in received] == [Decimal('99'), Decimal('109')]
   assert mock_state.depth_stream_unsubscribed == 1
+  # The gateway only encodes the books, so it reads them without copying.
+  assert mock_state.depth_stream_reads_only == [True, True]
+  assert not reading_books_only.get()
   ctx = await sdk._conn.ctx
   assert ctx.subs == {}
 

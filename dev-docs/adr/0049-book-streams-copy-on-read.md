@@ -2,7 +2,9 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: proposed; implemented, not release-verified
+1. Status: proposed; implemented, not release-verified; amended by
+   [0070](0070-book-order-invariant-hot-paths.md) (incremental `update`, uncopied
+   gateway reads)
 2. Date: 2026-10-23
 
 ## Context

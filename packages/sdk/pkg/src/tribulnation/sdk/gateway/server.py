@@ -24,6 +24,7 @@ from tribulnation.sdk.market import (
   is_margin,
 )
 from tribulnation.sdk.market.market import open_trades_stream
+from tribulnation.sdk.market.types.book import reading_books_only
 
 from . import codec
 
@@ -146,6 +147,9 @@ class Gateway:
     sub_tasks: dict[str, asyncio.Task[None]],
   ):
     """Forward a venue subscription and close it on disconnect."""
+    # This task only encodes the books it reads, so it reads the shared frozen books
+    # without a per-level copy each (ADR 0070).
+    reading_books_only.set(True)
 
     async def send_end(exc: Exception | None = None) -> bool:
       """Send stream completion if the transport is still writable."""
