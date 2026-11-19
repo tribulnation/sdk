@@ -10,3 +10,8 @@ Changed:
 4. A `-5018` refusal drops the shared `positionRisk` and marks the symbol's allowance stale.
 
 Every other method is unchanged.
+
+Release qualification on 2026-11-19 passed the read suites and market consistency.
+Committed evidence under `release-evidence/aster/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
+release follows SDK 4.2.0 publication.
