@@ -1,0 +1,272 @@
+{
+  "recorded": "POST https://api.hyperliquid.xyz/info {\"type\":\"spotMetaAndAssetCtxs\"} at 2026-11-19T16:18Z: 353 pairs (indices 0..1191, first gap at index 71) and 1192 contexts, one per spot index. Trimmed to the pairs at indices 0, 70, 72, 107, 140, 142 and 151, their tokens, and the contexts of those pairs plus @71 (no pair) and @141 (pair left out), in recorded order.",
+  "response": [
+    {
+      "tokens": [
+        {
+          "name": "USDC",
+          "szDecimals": 8,
+          "weiDecimals": 8,
+          "index": 0,
+          "tokenId": "0x6d1e7cde53ba9467b783cb7c530ce054",
+          "isCanonical": true,
+          "evmContract": {
+            "address": "0x6b9e773128f453f5c2c60935ee2de2cbc5390a24",
+            "evm_extra_wei_decimals": -2
+          },
+          "fullName": null,
+          "deployerTradingFeeShare": "0.0"
+        },
+        {
+          "name": "PURR",
+          "szDecimals": 0,
+          "weiDecimals": 5,
+          "index": 1,
+          "tokenId": "0xc1fb593aeffbeb02f85e0308e9956a90",
+          "isCanonical": true,
+          "evmContract": {
+            "address": "0x9b498c3c8a0b8cd8ba1d9851d40d186f1872b44e",
+            "evm_extra_wei_decimals": 13
+          },
+          "fullName": null,
+          "deployerTradingFeeShare": "0.0"
+        },
+        {
+          "name": "FRIED",
+          "szDecimals": 2,
+          "weiDecimals": 8,
+          "index": 102,
+          "tokenId": "0xbd859b02096be7a23dd1527269be10a0",
+          "isCanonical": false,
+          "evmContract": null,
+          "fullName": "Hypurrfried",
+          "deployerTradingFeeShare": "0.0"
+        },
+        {
+          "name": "NOCEX",
+          "szDecimals": 2,
+          "weiDecimals": 8,
+          "index": 105,
+          "tokenId": "0x5901399de6f487a6f7b11b1487811c86",
+          "isCanonical": false,
+          "evmContract": {
+            "address": "0x9281973406d2d347fe2ff2af7daa36464b618bbb",
+            "evm_extra_wei_decimals": 10
+          },
+          "fullName": "NO CEX",
+          "deployerTradingFeeShare": "0.0"
+        },
+        {
+          "name": "HYPE",
+          "szDecimals": 2,
+          "weiDecimals": 8,
+          "index": 150,
+          "tokenId": "0x0d01dc56dcaaca66ad901c959b4011ec",
+          "isCanonical": false,
+          "evmContract": null,
+          "fullName": "Hyperliquid",
+          "deployerTradingFeeShare": "0.0"
+        },
+        {
+          "name": "HWTR",
+          "szDecimals": 2,
+          "weiDecimals": 8,
+          "index": 189,
+          "tokenId": "0xad426cf28a66dc0c8f3b931018ba9845",
+          "isCanonical": false,
+          "evmContract": {
+            "address": "0x5804bf271d9e691611eea1267b24c1f3d0723639",
+            "evm_extra_wei_decimals": 10
+          },
+          "fullName": "First AI investment DAO on Hyperliquid",
+          "deployerTradingFeeShare": "0.0"
+        },
+        {
+          "name": "UBTC",
+          "szDecimals": 5,
+          "weiDecimals": 10,
+          "index": 197,
+          "tokenId": "0x8f254b963e8468305d409b33aa137c67",
+          "isCanonical": false,
+          "evmContract": {
+            "address": "0x9fdbda0a5e284c32744d2f17ee5c74b284993463",
+            "evm_extra_wei_decimals": -2
+          },
+          "fullName": "Unit Bitcoin",
+          "deployerTradingFeeShare": "1.0"
+        },
+        {
+          "name": "UETH",
+          "szDecimals": 4,
+          "weiDecimals": 9,
+          "index": 221,
+          "tokenId": "0xe1edd30daaf5caac3fe63569e24748da",
+          "isCanonical": false,
+          "evmContract": {
+            "address": "0xbe6727b535545c67d5caa73dea54865b92cf7907",
+            "evm_extra_wei_decimals": 9
+          },
+          "fullName": "Unit Ethereum",
+          "deployerTradingFeeShare": "1.0"
+        }
+      ],
+      "universe": [
+        {
+          "tokens": [
+            1,
+            0
+          ],
+          "name": "PURR/USDC",
+          "index": 0,
+          "isCanonical": true
+        },
+        {
+          "tokens": [
+            102,
+            0
+          ],
+          "name": "@70",
+          "index": 70,
+          "isCanonical": false
+        },
+        {
+          "tokens": [
+            105,
+            0
+          ],
+          "name": "@72",
+          "index": 72,
+          "isCanonical": false
+        },
+        {
+          "tokens": [
+            150,
+            0
+          ],
+          "name": "@107",
+          "index": 107,
+          "isCanonical": false
+        },
+        {
+          "tokens": [
+            189,
+            0
+          ],
+          "name": "@140",
+          "index": 140,
+          "isCanonical": false
+        },
+        {
+          "tokens": [
+            197,
+            0
+          ],
+          "name": "@142",
+          "index": 142,
+          "isCanonical": false
+        },
+        {
+          "tokens": [
+            221,
+            0
+          ],
+          "name": "@151",
+          "index": 151,
+          "isCanonical": false
+        }
+      ]
+    },
+    [
+      {
+        "prevDayPx": "0.085185",
+        "dayNtlVlm": "1215315.7214920004",
+        "markPx": "0.082133",
+        "midPx": "0.0820945",
+        "circulatingSupply": "594619656.0911899805",
+        "coin": "PURR/USDC",
+        "totalSupply": "594619667.3977099657",
+        "dayBaseVlm": "15023135.0"
+      },
+      {
+        "prevDayPx": "0.017633",
+        "dayNtlVlm": "0.0",
+        "markPx": "0.017633",
+        "midPx": "0.017649",
+        "circulatingSupply": "612680.5489014901",
+        "coin": "@70",
+        "totalSupply": "999592.31124922",
+        "dayBaseVlm": "0.0"
+      },
+      {
+        "prevDayPx": "0.0",
+        "dayNtlVlm": "0.0",
+        "markPx": "1.0",
+        "midPx": null,
+        "circulatingSupply": "0.0",
+        "coin": "@71",
+        "totalSupply": "0.0",
+        "dayBaseVlm": "0.0"
+      },
+      {
+        "prevDayPx": "0.81366",
+        "dayNtlVlm": "611.0936894",
+        "markPx": "0.8161",
+        "midPx": "0.81732",
+        "circulatingSupply": "511551.22830656",
+        "coin": "@72",
+        "totalSupply": "998326.79830656",
+        "dayBaseVlm": "749.13"
+      },
+      {
+        "prevDayPx": "65.6",
+        "dayNtlVlm": "40156103.4671499133",
+        "markPx": "67.716",
+        "midPx": "67.715",
+        "circulatingSupply": "301554724.6719500422",
+        "coin": "@107",
+        "totalSupply": "998719749.8129457235",
+        "dayBaseVlm": "596129.1799999999"
+      },
+      {
+        "prevDayPx": "0.000028",
+        "dayNtlVlm": "18.62263956",
+        "markPx": "0.000027",
+        "midPx": "0.000041",
+        "circulatingSupply": "111501836.4935691357",
+        "coin": "@140",
+        "totalSupply": "119880747.5267152339",
+        "dayBaseVlm": "665094.27"
+      },
+      {
+        "prevDayPx": "0.002001",
+        "dayNtlVlm": "0.0",
+        "markPx": "0.002001",
+        "midPx": "0.00675",
+        "circulatingSupply": "777771595.047976613",
+        "coin": "@141",
+        "totalSupply": "777771595.047976613",
+        "dayBaseVlm": "0.0"
+      },
+      {
+        "prevDayPx": "62755.0",
+        "dayNtlVlm": "38633694.5591400042",
+        "markPx": "63083.0",
+        "midPx": "63078.5",
+        "circulatingSupply": "20999999.9967175983",
+        "coin": "@142",
+        "totalSupply": "20999999.996717602",
+        "dayBaseVlm": "613.29495"
+      },
+      {
+        "prevDayPx": "1762.5",
+        "dayNtlVlm": "8057440.4427700024",
+        "markPx": "1776.9",
+        "midPx": "1776.85",
+        "circulatingSupply": "99999999.9659904838",
+        "coin": "@151",
+        "totalSupply": "99999999.9695341438",
+        "dayBaseVlm": "4532.3074"
+      }
+    ]
+  ]
+}

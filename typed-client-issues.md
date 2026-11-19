@@ -96,6 +96,35 @@ class OrderFillUpdate(TypedDict):
   `executionId`, `parse_fill` the history `id`: one fill, two SDK trade ids)
 - Suggestion (unverified): declare `matchId: str`
 
+## typed-hyperliquid
+
+### `spotMetaAndAssetCtxs` contexts are documented as one per pair, in universe order
+
+The module documents `SpotMeta.universe` as "in the same order as the asset contexts
+that follow", and the response as "one asset context per entry of `universe`, in the
+same order". The venue sends one context per spot index instead, delisted indices
+included, while `universe` lists only the live pairs and skips the rest. On 2026-11-19
+prod answered 353 pairs (indices 0 to 1191, the first gap at index 71) with 1192
+contexts. Zipped by position, from the first gap on a pair reads another pair's context:
+`UBTC/USDC` (`@142`) read `@140`'s 18.62 USDC of 24h volume instead of its own
+38.6 million. Every context named its pair in `coin` (`ctxs[pair.index].coin ==
+pair.name` held for 353 of 353), but `coin` is typed `NotRequired`.
+
+`info/spot_meta_and_asset_ctxs.py` (typed-hyperliquid 2.6.0):
+
+```python
+  universe: list[SpotPair]
+  """Every tradable spot pair, each combining a base and a quote token from `tokens`, in the same order as the asset contexts that follow."""
+```
+
+- Kind: wrong-doc (the documented alignment does not hold), and `SpotAssetCtx.coin` is
+  `NotRequired` though every context carries it
+- Observed: `len(universe) == 353`, `len(ctxs) == 1192`; `universe[71].index == 72`
+- Blocks: nothing. `market/spot_exchange.py` (`spot_contexts`) joins by `coin`, and by
+  the pair's index for a context without one
+- Suggestion (unverified): document one context per spot index, joined by `coin` or
+  `@{index}`, and declare `coin: str`
+
 ## typed-lighter
 
 ### `Candle` OHLCV fields are `float`
