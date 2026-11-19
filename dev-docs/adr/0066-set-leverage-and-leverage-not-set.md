@@ -2,9 +2,9 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: proposed; implemented for Aster, Bitget, Bybit, Extended, GRVT, Hyperliquid,
-   Lighter, margin.trade and RISEx, not release-verified; Kraken Futures and Nado refuse
-   (`NotImplementedError`, before any request)
+1. Status: proposed; implemented for Aster, Bitget, Bybit, dYdX, Extended, GRVT,
+   Hyperliquid, Lighter, margin.trade and RISEx, not release-verified; Kraken Futures and
+   Nado refuse (`NotImplementedError`, before any request)
 2. Date: 2026-11-18
 
 ## Context
@@ -65,18 +65,27 @@ the call that sets it.
    8. RISEx: the signed `update_leverage` permit, whole, at most 255 (a `uint8`) and
       checked locally against the market's `max_leverage` before signing (above it the
       permit reverts on chain); the margin mode is a separate setting.
-   9. Refusing, with `NotImplementedError` before any request: Kraken Futures (cross
-      leverage is the margin schedule's; a leverage preference moves the market to
-      isolated margin) and Nado (cross margin has no setting). dYdX's `MsgUpdateLeverage` is not
-      wrapped by the typed client yet. Binance, KuCoin and MEXC can set leverage but the
-      SDK does not trade their perpetuals; Deribit has no per-market setting.
+   9. dYdX: the signed `MsgUpdateLeverage` (typed-dydx 3.8.0) for the market's CLOB pair
+      and the addressed subaccount, simulated before broadcast so the chain's refusals
+      raise first. The chain takes a custom initial margin fraction in ppm
+      (`1_000_000 / leverage`), which must be whole (3x is refused) and at least the
+      market's base fraction (its maximum leverage); there is no margin mode to keep.
+      The chain margins the larger of that fraction and the market's open-interest-scaled
+      one, so dYdX's `leverage()` becomes the inverse of that larger fraction, reading
+      the subaccount's setting from the chain on every call, and needs an address; it
+      was `1 / effective IMF` (ADR 0038).
+   10. Refusing, with `NotImplementedError` before any request: Kraken Futures (cross
+       leverage is the margin schedule's; a leverage preference moves the market to
+       isolated margin) and Nado (cross margin has no setting). Binance, KuCoin and MEXC
+       can set leverage but the SDK does not trade their perpetuals; Deribit has no
+       per-market setting.
 5. The gateway carries both: a `set_leverage` request (`market_id`, `leverage`) with an
    empty `set_leverage` reply, and `LeverageNotSet` as a typed remote exception.
 
 ## Contract
 
 `docs/contract/market.yml` lists `set_leverage` as a perpetual-only method. Venues
-that cannot set leverage (dYdX, Nado) declare explicit `partial` method lists instead
+that cannot set leverage (Nado) declare explicit `partial` method lists instead
 of `support = "full"`.
 
 ## Alternatives considered
