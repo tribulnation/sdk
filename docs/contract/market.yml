@@ -83,6 +83,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', bid: '60123.00', ask: '60124.10'}
         nado: {market_id: 'nado:perp:BTC-PERP', bid: '60123', ask: '60124'}
         risex: {market_id: 'risex:perp:1', bid: '60123', ask: '60124'}
+        evedex: {market_id: 'evedex:perp:BTCUSD', bid: '60123', ask: '60124'}
       callTemplate: |
         book = await sdk.depth('{{ constants[accounts[0]].market_id }}', levels=5)
         bid = book.best_bid.price if book.bids else None
@@ -142,6 +143,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', ticks: [{bid: '60123.40', ask: '60124.00'}, {bid: '60123.50', ask: '60124.00'}, {bid: '60122.90', ask: '60123.60'}, {bid: '60123.10', ask: '60123.90'}]}
         nado: {market_id: 'nado:perp:BTC-PERP', ticks: [{bid: '60123', ask: '60124'}, {bid: '60124', ask: '60125'}, {bid: '60122', ask: '60123'}, {bid: '60123', ask: '60124'}]}
         risex: {market_id: 'risex:perp:1', ticks: [{bid: '60123', ask: '60124'}, {bid: '60124', ask: '60125'}, {bid: '60122', ask: '60123'}, {bid: '60123', ask: '60124'}]}
+        evedex: {market_id: 'evedex:perp:BTCUSD', ticks: [{bid: '60123', ask: '60124'}, {bid: '60124', ask: '60125'}, {bid: '60122', ask: '60123'}, {bid: '60123', ask: '60124'}]}
       callTemplate: |
         async with sdk.depth_stream('{{ constants[accounts[0]].market_id }}') as books:
           async for book in books:
@@ -203,6 +205,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', instrument_id: 'BTC_USDT_Perp', fee_asset: 'USDT', tick_size: '0.1', step_size: '0.001'}
         nado: {market_id: 'nado:perp:BTC-PERP', instrument_id: 'BTC-PERP', fee_asset: 'USDT0', tick_size: '1', step_size: '0.00005'}
         risex: {market_id: 'risex:perp:1', instrument_id: '1', fee_asset: 'USDC', tick_size: '0.1', step_size: '0.000001'}
+        evedex: {market_id: 'evedex:perp:BTCUSD', instrument_id: 'BTCUSD', fee_asset: 'usdt', tick_size: '0.1', step_size: '0.001'}
       callTemplate: |
         rules = await sdk.rules('{{ constants[accounts[0]].market_id }}')
         price = rules.round_price(Decimal('60123.456'))
@@ -259,6 +262,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp'}
         nado: {market_id: 'nado:perp:BTC-PERP'}
         risex: {market_id: 'risex:perp:1'}
+        evedex: {market_id: 'evedex:perp:BTCUSD'}
       callTemplate: |
         fees = await sdk.fees('{{ constants[accounts[0]].market_id }}')
         print(fees.taker_buy, fees.taker_sell)
@@ -300,6 +304,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', open1: '60124.10', close1: '60151.30', open2: '60151.30', close2: '60099.00'}
         nado: {market_id: 'nado:perp:BTC-PERP', open1: '60124', close1: '60151', open2: '60151', close2: '60099'}
         risex: {market_id: 'risex:perp:1', open1: '60124', close1: '60151', open2: '60151', close2: '60099'}
+        evedex: {market_id: 'evedex:perp:BTCUSD', open1: '60124', close1: '60151', open2: '60151', close2: '60099'}
       callTemplate: |
         async for page in sdk.candles('{{ constants[accounts[0]].market_id }}', '1h', start, end):
           for candle in page:
@@ -359,6 +364,7 @@ methods:
         grvt: {exchange_id: 'grvt:perp', markets: [{key: 'BTC_USDT_Perp', last: '60123.40', bid: '60123.00', ask: '60124.10'}]}
         nado: {exchange_id: 'nado:perp', markets: [{key: 'BTC-PERP', last: '60123', bid: '60123', ask: '60124'}]}
         risex: {exchange_id: 'risex:perp', markets: [{key: '1', last: '60123', bid: '60123', ask: '60124'}]}
+        evedex: {exchange_id: 'evedex:perp', markets: [{key: 'BTCUSD', last: '60123', bid: '60123', ask: '60124'}]}
       callTemplate: |
         snapshot = await sdk.tickers('{{ constants[accounts[0]].exchange_id }}')
       resultTemplate: |
@@ -429,6 +435,7 @@ methods:
         grvt: {exchange_id: 'grvt:perp', key: 'BTC_USDT_Perp', index: '60120.00', mark: '60125.50', funding: '0.000012', open_interest: '812.4'}
         nado: {exchange_id: 'nado:perp', key: 'BTC-PERP', index: '60120.00', mark: '60125.50', funding: '0.0000035', open_interest: '812.4'}
         risex: {exchange_id: 'risex:perp', key: '1', index: '60120', mark: '60125', funding: '0.000013', open_interest: '812.4'}
+        evedex: {exchange_id: 'evedex:perp', key: 'BTCUSD', index: '60120', mark: '60125', funding: '0.000013', open_interest: '812.4'}
         aster: {exchange_id: 'aster:perp', key: 'BTCUSDT', index: '60120.00', mark: '60125.50', funding: '0.0001', open_interest: '812.4'}
       callTemplate: |
         stats = await sdk.perp_stats('{{ constants[accounts[0]].exchange_id }}')
@@ -476,6 +483,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id: '13835058055282163712', price: '59500', qty: '0.01'}
         nado: {market_id: 'nado:perp:BTC-PERP', order_id: '0x4b673f27af419bd8563c58440555aa6e443cd3a944b1b6a5d72b5941ad905e51', price: '59500', qty: '0.01'}
         risex: {market_id: 'risex:perp:1', order_id: '0x000000000003b131000000000390d5e400000000000000ec', price: '59500', qty: '0.01'}
+        evedex: {market_id: 'evedex:perp:BTCUSD', order_id: '00483:8ea0f9fa29101942ff321425ec', price: '59500', qty: '0.01'}
       callTemplate: |
         state = await sdk.query_order('{{ constants[accounts[0]].market_id }}', '{{ constants[accounts[0]].order_id }}')
       resultTemplate: |
@@ -520,6 +528,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id: '13835058055282163712', price: '59500', qty: '0.01'}
         nado: {market_id: 'nado:perp:BTC-PERP', order_id: '0x4b673f27af419bd8563c58440555aa6e443cd3a944b1b6a5d72b5941ad905e51', price: '59500', qty: '0.01'}
         risex: {market_id: 'risex:perp:1', order_id: '0x000000000003b131000000000390d5e400000000000000ec', price: '59500', qty: '0.01'}
+        evedex: {market_id: 'evedex:perp:BTCUSD', order_id: '00483:8ea0f9fa29101942ff321425ec', price: '59500', qty: '0.01'}
       callTemplate: |
         orders = await sdk.open_orders('{{ constants[accounts[0]].market_id }}')
       resultTemplate: |
@@ -566,6 +575,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'USDT'}
         nado: {market_id: 'nado:perp:BTC-PERP', price1: '60123', qty1: '0.01', price2: '60050', qty2: '-0.02', fee_asset: 'USDT0'}
         risex: {market_id: 'risex:perp:1', price1: '60123', qty1: '0.01', price2: '60050', qty2: '-0.02', fee_asset: 'USDC'}
+        evedex: {market_id: 'evedex:perp:BTCUSD', price1: '60123', qty1: '0.01', price2: '60050', qty2: '-0.02', fee_asset: 'usdt'}
       callTemplate: |
         trades = []
         async for page in sdk.trades_history('{{ constants[accounts[0]].market_id }}', start, end):
@@ -621,6 +631,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', ticks: [{price: '60123.40', qty: '0.01'}, {price: '60124.00', qty: '-0.02'}, {price: '60125.10', qty: '0.05'}]}
         nado: {market_id: 'nado:perp:BTC-PERP', ticks: [{price: '60123', qty: '0.01'}, {price: '60124', qty: '-0.02'}, {price: '60125', qty: '0.05'}]}
         risex: {market_id: 'risex:perp:1', ticks: [{price: '60123', qty: '0.01'}, {price: '60124', qty: '-0.02'}, {price: '60125', qty: '0.05'}]}
+        evedex: {market_id: 'evedex:perp:BTCUSD', ticks: [{price: '60123', qty: '0.01'}, {price: '60124', qty: '-0.02'}, {price: '60125', qty: '0.05'}]}
       callTemplate: |
         async with sdk.trades_stream('{{ constants[accounts[0]].market_id }}') as trades:
           async for trade in trades:
@@ -662,6 +673,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', size: '0.014'}
         nado: {market_id: 'nado:perp:BTC-PERP', size: '0.014'}
         risex: {market_id: 'risex:perp:1', size: '0.014'}
+        evedex: {market_id: 'evedex:perp:BTCUSD', size: '0.014'}
         hyperliquid: {market_id: 'hyperliquid::BTC', size: '0.014'}
         lighter: {market_id: 'lighter:perp:1', size: '0.014'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', size: '0.014'}
@@ -702,6 +714,7 @@ methods:
         grvt: {collateral_id: 'grvt:perp', equity: '10240.55', free: '8120.00'}
         nado: {collateral_id: 'nado:spot:USDT0', equity: '10240.55', free: '8120.00'}
         risex: {collateral_id: 'risex:perp', equity: '10240.55', free: '8120.00'}
+        evedex: {collateral_id: 'evedex:perp', equity: '10240.55', free: '8120.00'}
         hyperliquid: {collateral_id: 'hyperliquid:spot:0', equity: '10240.55', free: '8120.00'}
         lighter: {collateral_id: 'lighter:spot:3', equity: '10240.55', free: '8120.00'}
         margin-trade: {collateral_id: 'margin-trade:perp', equity: '10240.55', free: '8120.00'}
@@ -743,6 +756,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', notional: '81200.00'}
         nado: {market_id: 'nado:perp:BTC-PERP', notional: '406000.00'}
         risex: {market_id: 'risex:perp:1', notional: '81200.00'}
+        evedex: {market_id: 'evedex:perp:BTCUSD', notional: '81200.00'}
         hyperliquid: {market_id: 'hyperliquid::BTC', notional: '81200.00'}
         lighter: {market_id: 'lighter:perp:1', notional: '81200.00'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', notional: '81200.00'}
@@ -783,6 +797,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', long: "Decimal('81198863.20')", short: "Decimal('81200000.00')"}
         nado: {market_id: 'nado:perp:BTC-PERP', long: "Decimal('149471379.47')", short: "Decimal('149471379.47')"}
         risex: {market_id: 'risex:perp:1', long: "Decimal('40800000.00')", short: "Decimal('40800000.00')"}
+        evedex: {market_id: 'evedex:perp:BTCUSD', long: "Decimal('40800000.00')", short: "Decimal('40800000.00')"}
         hyperliquid: {market_id: 'hyperliquid::BTC', long: "Decimal('148600.00')", short: "Decimal('150000.00')"}
         lighter: {market_id: 'lighter:perp:1', long: "None", short: "None"}
         margin-trade: {market_id: 'margin-trade:perp:BTC', long: "None", short: "None"}
@@ -846,6 +861,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', collateral_id: 'grvt:perp'}
         nado: {market_id: 'nado:perp:BTC-PERP', collateral_id: 'nado:spot:USDT0'}
         risex: {market_id: 'risex:perp:1', collateral_id: 'risex:perp'}
+        evedex: {market_id: 'evedex:perp:BTCUSD', collateral_id: 'evedex:perp'}
         hyperliquid: {market_id: 'hyperliquid::BTC', collateral_id: 'hyperliquid:spot:0'}
         lighter: {market_id: 'lighter:perp:1', collateral_id: 'lighter:spot:3'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', collateral_id: 'margin-trade:perp'}
@@ -876,6 +892,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id: '13835058055282163712'}
         nado: {market_id: 'nado:perp:BTC-PERP', order_id: '0x4b673f27af419bd8563c58440555aa6e443cd3a944b1b6a5d72b5941ad905e51'}
         risex: {market_id: 'risex:perp:1', order_id: '0x000000000003b131000000000390d5e400000000000000ec'}
+        evedex: {market_id: 'evedex:perp:BTCUSD', order_id: '00483:8ea0f9fa29101942ff321425ec'}
         kraken: {market_id: 'kraken:spot:XBTUSD', order_id: 'OABC12-DE345-FGHI61'}
       callTemplate: |
         order = {'type': 'LIMIT', 'qty': 0.01, 'price': 60_000}
@@ -917,6 +934,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id1: '13835058055282163712', order_id2: '13835058055282163713'}
         nado: {market_id: 'nado:perp:BTC-PERP', order_id1: '0x4b673f27af419bd8563c58440555aa6e443cd3a944b1b6a5d72b5941ad905e51', order_id2: '0xc3840c0db67d023f68bcf1eaae65077080e232aaaa43f6e38cdf0f420ce6f4fd'}
         risex: {market_id: 'risex:perp:1', order_id1: '0x000000000003b131000000000390d5e400000000000000ec', order_id2: '0x000000000003b131000000000390d61b00000000000001df'}
+        evedex: {market_id: 'evedex:perp:BTCUSD', order_id1: '00483:8ea0f9fa29101942ff321425ec', order_id2: '00483:ff96987b2e82e00d336ad19b3f'}
         kraken: {market_id: 'kraken:spot:XBTUSD', order_id1: 'OABC12-DE345-FGHI61', order_id2: 'OABC12-DE345-FGHI62'}
       callTemplate: |
         orders = [
@@ -963,6 +981,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id: '13835058055282163712'}
         nado: {market_id: 'nado:perp:BTC-PERP', order_id: '0x4b673f27af419bd8563c58440555aa6e443cd3a944b1b6a5d72b5941ad905e51'}
         risex: {market_id: 'risex:perp:1', order_id: '0x000000000003b131000000000390d5e400000000000000ec'}
+        evedex: {market_id: 'evedex:perp:BTCUSD', order_id: '00483:8ea0f9fa29101942ff321425ec'}
         kraken: {market_id: 'kraken:spot:XBTUSD', order_id: 'OABC12-DE345-FGHI61'}
       callTemplate: |
         await sdk.cancel_order('{{ constants[accounts[0]].market_id }}', '{{ constants[accounts[0]].order_id }}')
@@ -1005,6 +1024,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id1: '13835058055282163712', order_id2: '13835058055282163713'}
         nado: {market_id: 'nado:perp:BTC-PERP', order_id1: '0x4b673f27af419bd8563c58440555aa6e443cd3a944b1b6a5d72b5941ad905e51', order_id2: '0xc3840c0db67d023f68bcf1eaae65077080e232aaaa43f6e38cdf0f420ce6f4fd'}
         risex: {market_id: 'risex:perp:1', order_id1: '0x000000000003b131000000000390d5e400000000000000ec', order_id2: '0x000000000003b131000000000390d61b00000000000001df'}
+        evedex: {market_id: 'evedex:perp:BTCUSD', order_id1: '00483:8ea0f9fa29101942ff321425ec', order_id2: '00483:ff96987b2e82e00d336ad19b3f'}
         kraken: {market_id: 'kraken:spot:XBTUSD', order_id1: 'OABC12-DE345-FGHI61', order_id2: 'OABC12-DE345-FGHI62'}
       callTemplate: |
         await sdk.cancel_orders('{{ constants[accounts[0]].market_id }}', ['{{ constants[accounts[0]].order_id1 }}', '{{ constants[accounts[0]].order_id2 }}'])
@@ -1047,6 +1067,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id1: '13835058055282163712', order_id2: '13835058055282163713'}
         nado: {market_id: 'nado:perp:BTC-PERP', order_id1: '0x4b673f27af419bd8563c58440555aa6e443cd3a944b1b6a5d72b5941ad905e51', order_id2: '0xc3840c0db67d023f68bcf1eaae65077080e232aaaa43f6e38cdf0f420ce6f4fd'}
         risex: {market_id: 'risex:perp:1', order_id1: '0x000000000003b131000000000390d5e400000000000000ec', order_id2: '0x000000000003b131000000000390d61b00000000000001df'}
+        evedex: {market_id: 'evedex:perp:BTCUSD', order_id1: '00483:8ea0f9fa29101942ff321425ec', order_id2: '00483:ff96987b2e82e00d336ad19b3f'}
         kraken: {market_id: 'kraken:spot:XBTUSD', order_id1: 'OABC12-DE345-FGHI61', order_id2: 'OABC12-DE345-FGHI61'}
       callTemplate: |
         order = {'type': 'POST_ONLY', 'qty': 0.01, 'price': 60_100}
@@ -1088,6 +1109,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', order_id1: '13835058055282163712', order_id2: '13835058055282163713'}
         nado: {market_id: 'nado:perp:BTC-PERP', order_id1: '0x4b673f27af419bd8563c58440555aa6e443cd3a944b1b6a5d72b5941ad905e51', order_id2: '0xc3840c0db67d023f68bcf1eaae65077080e232aaaa43f6e38cdf0f420ce6f4fd'}
         risex: {market_id: 'risex:perp:1', order_id1: '0x000000000003b131000000000390d5e400000000000000ec', order_id2: '0x000000000003b131000000000390d61b00000000000001df'}
+        evedex: {market_id: 'evedex:perp:BTCUSD', order_id1: '00483:8ea0f9fa29101942ff321425ec', order_id2: '00483:ff96987b2e82e00d336ad19b3f'}
       callTemplate: |
         orders = [
           ('{{ constants[accounts[0]].order_id1 }}', {'type': 'POST_ONLY', 'qty': 0.01, 'price': 60_100}),
@@ -1133,6 +1155,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp'}
         nado: {market_id: 'nado:perp:BTC-PERP'}
         risex: {market_id: 'risex:perp:1'}
+        evedex: {market_id: 'evedex:perp:BTCUSD'}
         kraken: {market_id: 'kraken:spot:XBTUSD'}
       callTemplate: |
         await sdk.cancel_open_orders('{{ constants[accounts[0]].market_id }}')
@@ -1178,6 +1201,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', index: '60120.00'}
         nado: {market_id: 'nado:perp:BTC-PERP', index: '60120.00'}
         risex: {market_id: 'risex:perp:1', index: '60120'}
+        evedex: {market_id: 'evedex:perp:BTCUSD', index: '60120'}
       callTemplate: |
         price = await sdk.index('{{ constants[accounts[0]].market_id }}')
       resultTemplate: |
@@ -1219,6 +1243,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', rate: '0.0001', annualized: '0.1095'}
         nado: {market_id: 'nado:perp:BTC-PERP', rate: '0.0000035', annualized: '0.03066'}
         risex: {market_id: 'risex:perp:1', rate: '0.000013', annualized: '0.11388'}
+        evedex: {market_id: 'evedex:perp:BTCUSD', rate: '0.000013', annualized: '0.11388'}
         kraken: {market_id: 'kraken:perp:PF_XBTUSD', rate: '0.0001', annualized: '0.876'}
       callTemplate: |
         funding = await sdk.next_funding('{{ constants[accounts[0]].market_id }}')
@@ -1348,6 +1373,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', size: '0.5', entry_price: '58230.10', liquidation_price: "Decimal('55617.42')"}
         nado: {market_id: 'nado:perp:BTC-PERP', size: '0.5', entry_price: '58230', liquidation_price: "None"}
         risex: {market_id: 'risex:perp:1', size: '0.5', entry_price: '58230', liquidation_price: "None"}
+        evedex: {market_id: 'evedex:perp:BTCUSD', size: '0.5', entry_price: '58230', liquidation_price: "None"}
       callTemplate: |
         pos = await sdk.perp_position('{{ constants[accounts[0]].market_id }}')
         # liquidation_price is the venue's estimate; None when flat or not reported
@@ -1387,6 +1413,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
         nado: {market_id: 'nado:perp:BTC-PERP', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
         risex: {market_id: 'risex:perp:1', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
+        evedex: {market_id: 'evedex:perp:BTCUSD', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
         aster: {market_id: 'aster:perp:BTCUSDT', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
       callTemplate: |
         c = await sdk.perp_collateral('{{ constants[accounts[0]].market_id }}')
@@ -1428,6 +1455,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', leverage: '20', free: '8120.00', notional: '162400.00'}
         nado: {market_id: 'nado:perp:BTC-PERP', leverage: '50', free: '8120.00', notional: '406000.00'}
         risex: {market_id: 'risex:perp:1', leverage: '10', free: '8120.00', notional: '81200.00'}
+        evedex: {market_id: 'evedex:perp:BTCUSD', leverage: '10', free: '8120.00', notional: '81200.00'}
         kraken: {market_id: 'kraken:perp:PF_XBTUSD', leverage: '50', free: '7640.00', notional: '382000.00'}
         bybit: {market_id: 'bybit:perp:BTCUSDT', leverage: '10', free: '8120.00', notional: '81200.00'}
       callTemplate: |
@@ -1450,6 +1478,7 @@ methods:
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', leverage: '5'}
         lighter: {market_id: 'lighter:perp:1', leverage: '5'}
         risex: {market_id: 'risex:perp:1', leverage: '10'}
+        evedex: {market_id: 'evedex:perp:BTCUSD', leverage: '10'}
         margin-trade: {market_id: 'margin-trade:perp:BTC', leverage: '5'}
         bybit: {market_id: 'bybit:perp:BTCUSDT', leverage: '5'}
         bitget: {market_id: 'bitget:usdt:BTCUSDT', leverage: '5'}

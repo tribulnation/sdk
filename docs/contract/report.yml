@@ -28,6 +28,7 @@ methods:
       grvt: The funding wallet and each readable trading sub-account's futures (cash, isolated positions' balances included, without unrealized PnL; positions) and spot wallets, with an API key.
       nado: Every cross subaccount of the wallet (spot balances, negative when borrowed, with unsettled perpetual funding and PnL in USDT0; positions at their entry price), with an address.
       risex: One account, read by address and labelled by it, with the settled USDC balance (without unrealized PnL) and open positions; isolated positions raise NotImplementedError.
+      evedex: The trading balance (USDT without unrealized PnL; positions) and the smart-account wallet, with an API key.
     example:
       accountVenues: [hyperliquid]
       constants:
@@ -48,6 +49,7 @@ methods:
         grvt: {subaccounts: 3, balances: 2}
         nado: {subaccounts: 1, balances: 1}
         risex: {subaccounts: 1, balances: 1}
+        evedex: {subaccounts: 2, balances: 2}
         mexc: {subaccounts: 1, balances: 2}
       callTemplate: |
         sdk = report.venue('{{ accounts[0] }}')
