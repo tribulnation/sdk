@@ -1,3 +1,17 @@
+# tribulnation-bybit 0.10.2
+
+Requires SDK >=4.1.0, unchanged, and typed-bybit >=0.3.5 (was >=0.3.4).
+
+Fixed:
+
+1. Perpetual tickers (`tickers()`) return `None` for an empty book side's bid or ask price and size, instead of `''`. typed-bybit 0.3.5 types those linear ticker fields as `Decimal | ''`, and they are now read through `num()`, as spot tickers already were.
+
+Every other method is unchanged.
+
+Release qualification on 2026-11-19 passed the read suites and market consistency.
+Committed evidence under `release-evidence/bybit/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes.
+
 # tribulnation-bybit 0.10.1
 
 Requires SDK >=4.1.0, unchanged, and typed-bybit >=0.3.4 (was >=0.3.1).
