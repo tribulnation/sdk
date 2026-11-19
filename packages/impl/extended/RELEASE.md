@@ -1,14 +1,11 @@
-# tribulnation-extended 0.5.0
+# tribulnation-extended 0.5.1
 
-Requires SDK >=4.2.0 (`POSITION_LIMIT_TTL`, [ADR 0069](../../../dev-docs/adr/0069-position-limits-shared-by-default.md)) and typed-extended >=0.2.0, unchanged.
+Requires SDK >=4.2.0 and typed-extended >=0.2.0, unchanged.
 
-Changed:
+README: logo header.
 
-1. `remaining_position_limit()` shares its reads by default (`ttl` 30 s): the all-market `markets`, positions and leverage reads, one request each shared by every market, instead of per-market reads.
-
-Every other method is unchanged.
+No code changes.
 
 Release qualification on 2026-11-19 passed the read suites and market consistency.
 Committed evidence under `release-evidence/extended/` matches pinned Catalogue
-`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. This adapter
-release follows SDK 4.2.0 publication.
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes.
