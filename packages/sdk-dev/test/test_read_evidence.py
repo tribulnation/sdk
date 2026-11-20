@@ -620,3 +620,78 @@ def test_summary_lists_every_waiver():
   summary = waiver_summary(checks)
   assert 'usdm:BTCUSDT' in summary and 'waived:credential_scope, skipped' in summary
   assert waiver_summary(passing('bybit').model_dump(mode='json')['checks']) == ''
+
+
+def test_public_only_venue_records_account_reads_and_report_as_exclusions():
+  """EVEDEX qualifies public-only: its account reads and Report are visible exclusions,
+  never passes, and the summary says they are unverified (ADR 0072)."""
+  from sdk_dev.evidence import public_only_notice, public_only_summary
+
+  assert minimum('evedex') == 'public'
+  cases = cases_of('evedex')
+  reads = account_cases('evedex')
+  assert reads['perp:BTCUSD fees'] == 'public_only'
+  assert reads['perp:BTCUSD perp_collateral'] == 'public_only'
+  assert reads['perp:BTCUSD query_order'] == 'order_lifecycle'
+  assert reads['perp:BTCUSD funding_payments'] == 'unsupported'
+  report = [case for case in cases.values() if case.surface == 'report']
+  assert report and all(case.exclusion == 'public_only' for case in report)
+  assert any(
+    case.exclusion is None for case in cases.values() if case.surface == 'market'
+  )
+  good = passing('evedex')
+  evidence.verify_payload(good.model_dump(mode='json'), root=repo_root())
+  updates: list[dict[str, object]] = [
+    {'passed': 1},
+    {'skipped': 1},
+    {'exclusion': None, 'passed': 1},
+  ]
+  for values in updates:
+    bad = good.model_copy(deep=True)
+    index = next(
+      i for i, row in enumerate(bad.checks) if row.exclusion == 'public_only'
+    )
+    bad.checks[index] = bad.checks[index].model_copy(update=values)
+    with pytest.raises(ValueError):
+      evidence.verify_payload(bad.model_dump(mode='json'), root=repo_root())
+  summary = public_only_summary(good.model_dump(mode='json')['checks'])
+  assert 'NOT verified' in summary and f'{len(report)} Report' in summary
+  assert public_only_notice(good.model_dump(mode='json')) is not None
+  assert public_only_summary(passing('binance').model_dump(mode='json')['checks']) == ''
+  assert public_only_notice(passing('binance').model_dump(mode='json')) is None
+
+
+def test_public_only_venue_still_runs_reads_a_stronger_account_serves():
+  """A keyed EVEDEX account runs its account reads and Report as required checks."""
+  token = cases_of('evedex', 'token')
+  assert all(case.exclusion != 'public_only' for case in token.values())
+  assert account_cases('evedex', 'token')['perp:BTCUSD fees'] is None
+  evidence.verify_payload(
+    passing('evedex', 'token').model_dump(mode='json'), root=repo_root()
+  )
+
+
+@pytest.mark.parametrize('venue', ['aster', 'grvt', 'dydx', 'risex'])
+def test_public_accounts_stay_below_minimum_elsewhere(venue: str):
+  """Only a venue declaring `min_mode = "public"` accepts a public account."""
+  assert minimum(venue) != 'public'
+  report = passing(venue, 'public')
+  assert all(row.exclusion != 'public_only' for row in report.checks)
+  with pytest.raises(ValueError, match='below'):
+    evidence.verify_payload(report.model_dump(mode='json'), root=repo_root())
+
+
+def test_public_min_mode_requires_a_reason():
+  """`min_mode = "public"` without a note is rejected when impl.toml is loaded."""
+  import pydantic
+
+  from sdk_dev.support import MarketQualification
+
+  with pytest.raises(pydantic.ValidationError):
+    MarketQualification.model_validate({'min_mode': 'public'})
+  with pytest.raises(pydantic.ValidationError):
+    MarketQualification.model_validate({'min_mode': 'public', 'note': ''})
+  assert MarketQualification.model_validate(
+    {'min_mode': 'public', 'note': 'Policy.'}
+  ).public_only
+  assert not MarketQualification.model_validate({'min_mode': 'token'}).public_only

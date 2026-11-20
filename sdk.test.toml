@@ -44,13 +44,14 @@ venue = "dydx"
 address = "$DYDX_ADDRESS"
 public = true
 
-# An API key: every account read (token mode, ADR 0042), no trading.
+# Public, no keys: EVEDEX qualifies public-only by policy (ADR 0072), so release
+# evidence holds no private data; its account reads and Report are not verified by it.
 [accounts.evedex]
 venue = "evedex"
-api_key = "$EVEDEX_API_KEY"
+public = true
 
-# The same account with the wallet key, for mainnet order checks and the fills stream;
-# qualification uses `evedex` (select it with `--account evedex`).
+# An API key and the wallet key, for mainnet account reads, order checks and the fills
+# stream by hand; qualification uses `evedex` (select it with `--account evedex`).
 [accounts.evedex_trade]
 venue = "evedex"
 api_key = "$EVEDEX_API_KEY"

@@ -17,6 +17,7 @@ from typing_extensions import Literal
 from .consistency import StrictModel
 from .integration.market.account import (
   ACCOUNT_READS,
+  PUBLIC_ONLY,
   account_exclusion,
   check_waivers,
   market_kinds,
@@ -27,6 +28,7 @@ from .integration.market.support import CASES
 from .repo import CONTRACT_DIR, repo_root
 from .support import (
   AccountMode,
+  ImplFile,
   is_testnet,
   load_impl_files,
   load_method_kinds,
@@ -103,6 +105,20 @@ def test_names(path: Path) -> set[str]:
   }
 
 
+def public_report(impl: ImplFile, mode: AccountMode) -> bool:
+  """Whether Report is a `public_only` exclusion: an authenticated Report on a public
+  account of a venue that declares public-only qualification (ADR 0072)."""
+  qualification = impl.qualification.market
+  report = impl.support.get('report')
+  return (
+    qualification is not None
+    and qualification.public_only
+    and mode == 'public'
+    and report is not None
+    and report.auth
+  )
+
+
 def inventory(
   root: Path, venue: str, *, mode: AccountMode, bitget_uta: bool | None = None
 ) -> dict[str, Case]:
@@ -132,6 +148,8 @@ def inventory(
           exclusion = 'unsupported'
         elif suspended(venue, f'{surface}.{test}'):
           exclusion = 'venue_withdrawals_suspended'
+        elif surface == 'report' and public_report(impl, mode):
+          exclusion = PUBLIC_ONLY
         cases.append(
           Case(
             surface=surface,

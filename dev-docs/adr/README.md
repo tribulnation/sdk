@@ -64,7 +64,7 @@ not a changelog or a substitute for API documentation and tests.
 | [0039](0039-hyperliquid-hip3-spot-fees.md) | Hyperliquid HIP-3 and spot fees via the official formula | Accepted; implemented, not release-verified; amended by 0042 |
 | [0040](0040-lighter-credential-modes.md) | Lighter credential modes: read-only tokens and public account reads | Proposed; implemented, not release-verified |
 | [0041](0041-venue-notional-caps.md) | Venue notional caps in available notional | Proposed; implemented for Aster, not release-verified; amended by 0042 |
-| [0042](0042-read-only-account-method-qualification.md) | Read-only account-method qualification | Accepted; implemented, not release-verified; amends 0013, 0039 and 0041; amended by 0060 |
+| [0042](0042-read-only-account-method-qualification.md) | Read-only account-method qualification | Accepted; implemented, not release-verified; amends 0013, 0039 and 0041; amended by 0060 and 0072 |
 | [0043](0043-order-rejected.md) | Definitive order rejections as `OrderRejected` | Accepted; implemented for Hyperliquid, Aster, Lighter, Extended and Bitget, not release-verified |
 | [0044](0044-trades-stream-settings-dydx-node-fills.md) | `trades_stream` settings and dYdX full node fills | Proposed; implemented, not release-verified; amended by 0045 and 0050 |
 | [0045](0045-dydx-node-feed-refuses-a-node-behind.md) | The dYdX node feed refuses a node behind the chain tip | Proposed; implemented, not release-verified; amends 0044; amended by 0050 |
@@ -93,3 +93,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0069](0069-position-limits-shared-by-default.md) | Remaining position limits shared by default, from account-wide reads | Proposed; amends 0054 and 0062; implemented, not release-verified |
 | [0070](0070-book-order-invariant-hot-paths.md) | Book paths rely on the book-order invariant | Proposed; amends 0049; implemented, not release-verified |
 | [0071](0071-depth-levels-upper-bound.md) | Depth `levels` is an upper bound, served at a venue's maximum rather than refused | Proposed; amends 0019 and 0021; implemented, not release-verified |
+| [0072](0072-public-only-release-qualification.md) | Public-only release qualification | Accepted; implemented, not release-verified; amends 0042 |

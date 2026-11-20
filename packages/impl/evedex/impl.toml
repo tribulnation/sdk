@@ -30,8 +30,12 @@ market = "The instrument name (`BTCUSD`, `1000PEPEUSD`), the id every venue call
 note = "The one asset id is the venue's coin `usdt`, the collateral, fee and funding coin, written lowercase as the venue sends it."
 
 # Release qualification of account reads (ADR 0042); not shown in the support matrix.
+# Public-only qualification (ADR 0072): the tracked `evedex` account is public, so its
+# account reads and Report are `public_only` exclusions. `token_methods` still says
+# what an API key serves.
 [qualification.market]
-min_mode = "token"
+min_mode = "public"
+note = "No private-data tests for EVEDEX, by policy: release evidence runs a public account. Account reads and Report were verified by hand on mainnet on 2026-11-19, not by release evidence."
 token_methods = [
   "fees", "open_orders", "query_order", "trades_history", "position", "perp_position",
   "collateral", "perp_collateral", "leverage", "available_notional",

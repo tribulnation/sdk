@@ -461,6 +461,9 @@ def test_exclusion_policy_order():
   assert code('grvt', 'perp', 'position', 'address') == 'credential_mode'
   assert code('grvt', 'perp', 'fees', 'token') is None
   assert code('aster', 'perp', 'fees', 'public') == 'credential_mode'
+  assert code('evedex', 'perp', 'fees', 'public') == 'public_only'
+  assert code('evedex', 'perp', 'fees', 'token') is None
+  assert code('evedex', 'perp', 'funding_payments', 'public') == 'unsupported'
   assert code('bitget', 'usdt', 'perp_collateral', uta=False) == 'bitget_classic'
   assert code('bitget', 'usdt', 'perp_collateral', uta=True) is None
   assert code('bitget', 'usdt', 'perp_collateral', uta=None) is None

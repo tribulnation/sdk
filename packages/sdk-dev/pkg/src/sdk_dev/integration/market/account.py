@@ -70,6 +70,10 @@ ACCOUNT_READS = (
 )
 """Account-scoped Market reads, one case each per reference market."""
 
+PUBLIC_ONLY = 'public_only'
+"""Exclusion of a read the account cannot serve on a venue that qualifies with a public
+account by declared policy (ADR 0072): not verified by release evidence."""
+
 STATIC_EXCLUSIONS = {'query_order': 'order_lifecycle'}
 """Reads a read-only suite cannot exercise: an order ID to query needs an order
 placed and cancelled, which is trading."""
@@ -165,7 +169,7 @@ def account_exclusion(
   if qualification is None:
     raise ValueError('Declared account methods need a [qualification.market] table')
   if mode_rank(mode) < mode_rank(required_mode(qualification, method)):
-    return 'credential_mode'
+    return PUBLIC_ONLY if qualification.public_only else 'credential_mode'
   if (
     venue == 'bitget'
     and bitget_uta is False

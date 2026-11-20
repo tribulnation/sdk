@@ -131,9 +131,10 @@ def verify_one(
   venue: str | None = None,
   scope: Literal['surfaces', 'consistency'] | None = None,
 ):
-  """Verify both content provenance and the independently reconstructed check inventory."""
+  """Verify both content provenance and the independently reconstructed check inventory,
+  printing the public-only notice for a report that carries one."""
   from sdk_dev.consistency import verify_payload
-  from sdk_dev.evidence import verify_report
+  from sdk_dev.evidence import public_only_notice, verify_report
 
   payload = verify_report(root, report, catalogue)
   if venue is not None and payload.get('venue') != venue:
@@ -145,6 +146,8 @@ def verify_one(
     from sdk_dev.read_evidence import verify_payload as verify_surfaces
 
     verify_surfaces(payload, root=root)
+    if (notice := public_only_notice(payload)) is not None:
+      typer.echo(notice)
   else:
     verify_payload(payload, catalogue=load_snapshot(catalogue), root=root)
 
@@ -167,7 +170,7 @@ def test_surfaces(
   ] = None,
 ):
   """Record required read-only suites without saving private records."""
-  from sdk_dev.evidence import capture, write_report
+  from sdk_dev.evidence import capture, public_only_notice, write_report
   from sdk_dev.read_evidence import collect, collect_deribit, verify_payload
 
   try:
@@ -206,6 +209,8 @@ def test_surfaces(
     )
     raise typer.Exit(1) from None
   typer.echo('Supported read suites passed; use sdk-dev results verify before release.')
+  if (notice := public_only_notice(payload)) is not None:
+    typer.echo(notice)
   if testnet_account is not None:
     typer.echo(
       'Deribit: public metadata verified on mainnet; private Report on testnet only.'
