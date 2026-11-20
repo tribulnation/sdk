@@ -1,0 +1,270 @@
+{
+  "payload": {
+    "account_mode": "public",
+    "account_venue": "evedex",
+    "bitget_uta": null,
+    "checks": [
+      {
+        "exclusion": "public_only",
+        "failed": 0,
+        "id": "report.test_snapshot_can_be_fetched[null, null]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "public_only",
+        "failed": 0,
+        "id": "report.test_snapshot_time_is_tz_aware[null, null]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "public_only",
+        "failed": 0,
+        "id": "report.test_snapshot_balances_are_finite_decimals[null, null]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_candle_values_are_decimals_and_ordered[\"perp:BTCUSD\", null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_candles_are_unique_aligned_and_bounded[\"perp:BTCUSD\", null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_candles_can_be_fetched[\"perp:BTCUSD\", null]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "retention_single_page",
+        "failed": 0,
+        "id": "market.test_window_straddling_two_pages_respects_contract[\"perp:BTCUSD\", null]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"perp:BTCUSD\", \"exchanges\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"perp:BTCUSD\", \"markets\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"perp:BTCUSD\", \"depth\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"perp:BTCUSD\", \"depth_stream\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"perp:BTCUSD\", \"rules\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"perp:BTCUSD\", \"tickers\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"perp:BTCUSD\", \"index\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"perp:BTCUSD\", \"next_funding\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_public_read[\"perp:BTCUSD\", \"funding_rates\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": null,
+        "failed": 0,
+        "id": "market.test_public_read[\"perp:BTCUSD\", \"perp_stats\"]",
+        "network": "mainnet",
+        "passed": 1,
+        "skipped": 0
+      },
+      {
+        "exclusion": "public_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSD\", \"fees\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "public_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSD\", \"open_orders\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "order_lifecycle",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSD\", \"query_order\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "public_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSD\", \"trades_history\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "unsupported",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSD\", \"funding_payments\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "public_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSD\", \"position\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "public_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSD\", \"perp_position\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "public_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSD\", \"collateral\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "public_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSD\", \"perp_collateral\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "public_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSD\", \"leverage\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "public_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSD\", \"available_notional\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "public_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSD\", \"remaining_position_limit\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "public_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSD\", \"collateral_id\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "spot_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSD\", \"balances\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      },
+      {
+        "exclusion": "spot_only",
+        "failed": 0,
+        "id": "market.test_account_read[\"perp:BTCUSD\", \"collateral_ids\"]",
+        "network": "mainnet",
+        "passed": 0,
+        "skipped": 0
+      }
+    ],
+    "completed": true,
+    "private_account_venue": null,
+    "scope": "surfaces",
+    "venue": "evedex",
+    "version": 5
+  }
+}

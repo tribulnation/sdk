@@ -1,0 +1,238 @@
+{
+  "payload": {
+    "account_id": "evedex",
+    "checks": [
+      {
+        "code": "ok",
+        "id": "[\"discovery\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"exchange_identity\",\"perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"market_identity\",\"perp\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"perp\",\"bulk\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"perp\",\"empty\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"perp_stats\",\"perp\",\"selected\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"setup\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"perp\",\"1000BONKUSD\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": "0.002189",
+            "after_bid": "0.002188",
+            "ask": "0.002189",
+            "attempt": 1,
+            "before_ask": "0.002189",
+            "before_bid": "0.002188",
+            "bid": "0.002188",
+            "elapsed_seconds": 0.06734583806246519,
+            "ticker_ids_match": true
+          }
+        ],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"perp\",\"1000PEPEUSD\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": "0.003607",
+            "after_bid": "0.003606",
+            "ask": "0.003607",
+            "attempt": 1,
+            "before_ask": "0.003607",
+            "before_bid": "0.003606",
+            "bid": "0.003606",
+            "elapsed_seconds": 0.07151952292770147,
+            "ticker_ids_match": true
+          }
+        ],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"perp\",\"AAVEUSD\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": "102.65",
+            "after_bid": "102.63",
+            "ask": "102.65",
+            "attempt": 1,
+            "before_ask": "102.65",
+            "before_bid": "102.63",
+            "bid": "102.63",
+            "elapsed_seconds": 0.110570905264467,
+            "ticker_ids_match": true
+          }
+        ],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"perp\",\"BTCUSD\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": "61913",
+            "after_bid": "61909.6",
+            "ask": "61913",
+            "attempt": 1,
+            "before_ask": "61913",
+            "before_bid": "61909.6",
+            "bid": "61909.6",
+            "elapsed_seconds": 0.06615090882405639,
+            "ticker_ids_match": true
+          }
+        ],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"perp\",\"bulk\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"perp\",\"empty\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"tickers\",\"perp\",\"selected\"]",
+        "missing_data": null,
+        "quotes": [],
+        "rfq": null,
+        "status": "pass"
+      }
+    ],
+    "discovery": [
+      {
+        "exchange": "perp",
+        "kind": "perp",
+        "markets": [
+          "1000BONKUSD",
+          "1000PEPEUSD",
+          "AAVEUSD",
+          "ANTUSD",
+          "APTUSD",
+          "ARBUSD",
+          "ASTERUSD",
+          "ATOMUSD",
+          "AUDUSD",
+          "AVAXUSD",
+          "BCHUSD",
+          "BNBUSD",
+          "BTCUSD",
+          "CLUSD",
+          "COINUSD",
+          "CRCLUSD",
+          "DASHUSD",
+          "DOGEUSD",
+          "DOTUSD",
+          "DXYUSD",
+          "ENAUSD",
+          "ETHUSD",
+          "EURUSD",
+          "FARTCOINUSD",
+          "GBPUSD",
+          "GRAMUSD",
+          "HYPEUSD",
+          "LINKUSD",
+          "LTCUSD",
+          "MSTRUSD",
+          "MYXUSD",
+          "NAS100USD",
+          "NATGASUSD",
+          "NEARUSD",
+          "NVDAUSD",
+          "OPENAIUSD",
+          "OPUSD",
+          "PENGUUSD",
+          "PIPPINUSD",
+          "PUMPFUNUSD",
+          "RIVERUSD",
+          "SAHARAUSD",
+          "SOLUSD",
+          "SPCXUSD",
+          "SPYUSD",
+          "STRKUSD",
+          "SUIUSD",
+          "TAOUSD",
+          "TRXUSD",
+          "TSLAUSD",
+          "US30USD",
+          "USDCADUSD",
+          "USDJPYUSD",
+          "VIRTUALUSD",
+          "WLDUSD",
+          "WLFIUSD",
+          "XAGUSD",
+          "XAUTUSD",
+          "XRPUSD",
+          "ZECUSD",
+          "ZROUSD"
+        ]
+      }
+    ],
+    "venue": "evedex",
+    "version": 6
+  }
+}

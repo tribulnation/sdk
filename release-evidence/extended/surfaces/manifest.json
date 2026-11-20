@@ -218,7 +218,7 @@
         "version": "2026.9.1"
       },
       "sdk-dev": {
-        "files_sha256": "b11c758dc5f7beb58442bb0695f2064798fc826ee9587903641b7c972deba221",
+        "files_sha256": "6c2985914fe67f9c9513c62f563a462ef1ae0f79acd6935e6bfd2d1ed72d20cd",
         "metadata_sha256": "6e562fabf4a160a2f9a213337f73d5c2de2fd5d05e67d330443c4c67f88b21dc",
         "version": "0"
       },
@@ -254,7 +254,7 @@
       },
       "tribulnation-sdk": {
         "files_sha256": "bc30029fb7f35e8955c0c29e459cbfa9f87bbf90c37f40842d3fdbafb4a695ae",
-        "metadata_sha256": "fa44c63f9a5ae6a5249f6df4da4274acdf5b8fffd5929ff0e98b20d726959044",
+        "metadata_sha256": "981032567a5f2f97953a6bc7dac829532889a0df1e6c90689e3a5c853ff9b529",
         "version": "0"
       },
       "typed-core": {
@@ -264,8 +264,8 @@
       },
       "typed-extended": {
         "files_sha256": "12365f268eb13436abefb9c403b2f2b33111c2874ba6f309eaf38d7ec31061bb",
-        "metadata_sha256": "aa861fe636e9d1d65d391852d7cc74b96a007b403e7d851485bc264fbc2bf02f",
-        "version": "0.2.1"
+        "metadata_sha256": "862cdde44b5ee5f23ceb8c443239ed2c2c7f6f86503bf97c8852a8c9f0eaf1b6",
+        "version": "0.2.0"
       },
       "typer": {
         "files_sha256": "b6abb631dc69a00b9b719d8b34c421b2da51e73513c58e6c6d58ab0ba8726b1b",
@@ -290,7 +290,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "875452dffa24b365b8ea7cabf84f216ca31da19ae24755aba062a310ef2a6ac4",
+    "source_sha256": "6c0cad8ea24938b4d2670094c6ff7c62afc73b80f7e8a93910ea042ae64937ee",
     "venue": "extended"
   },
   "before": {
@@ -512,7 +512,7 @@
         "version": "2026.9.1"
       },
       "sdk-dev": {
-        "files_sha256": "b11c758dc5f7beb58442bb0695f2064798fc826ee9587903641b7c972deba221",
+        "files_sha256": "6c2985914fe67f9c9513c62f563a462ef1ae0f79acd6935e6bfd2d1ed72d20cd",
         "metadata_sha256": "6e562fabf4a160a2f9a213337f73d5c2de2fd5d05e67d330443c4c67f88b21dc",
         "version": "0"
       },
@@ -548,7 +548,7 @@
       },
       "tribulnation-sdk": {
         "files_sha256": "bc30029fb7f35e8955c0c29e459cbfa9f87bbf90c37f40842d3fdbafb4a695ae",
-        "metadata_sha256": "fa44c63f9a5ae6a5249f6df4da4274acdf5b8fffd5929ff0e98b20d726959044",
+        "metadata_sha256": "981032567a5f2f97953a6bc7dac829532889a0df1e6c90689e3a5c853ff9b529",
         "version": "0"
       },
       "typed-core": {
@@ -558,8 +558,8 @@
       },
       "typed-extended": {
         "files_sha256": "12365f268eb13436abefb9c403b2f2b33111c2874ba6f309eaf38d7ec31061bb",
-        "metadata_sha256": "aa861fe636e9d1d65d391852d7cc74b96a007b403e7d851485bc264fbc2bf02f",
-        "version": "0.2.1"
+        "metadata_sha256": "862cdde44b5ee5f23ceb8c443239ed2c2c7f6f86503bf97c8852a8c9f0eaf1b6",
+        "version": "0.2.0"
       },
       "typer": {
         "files_sha256": "b6abb631dc69a00b9b719d8b34c421b2da51e73513c58e6c6d58ab0ba8726b1b",
@@ -584,12 +584,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "875452dffa24b365b8ea7cabf84f216ca31da19ae24755aba062a310ef2a6ac4",
+    "source_sha256": "6c0cad8ea24938b4d2670094c6ff7c62afc73b80f7e8a93910ea042ae64937ee",
     "venue": "extended"
   },
-  "finished": "2026-11-19T20:18:10.694148Z",
+  "finished": "2026-11-20T11:06:53.589373Z",
   "results_sha256": "af746611ac32c2b6ef46866ebd36cbfea740abd1e44db55f583602edd6d0975a",
   "schema_version": 2,
-  "started": "2026-11-19T20:17:40.942229Z",
-  "summary_sha256": "3859b9d39d652295c68e9ac4c404c4c445a0818368b2c28b98f92e0b8763479f"
+  "started": "2026-11-20T11:06:19.643787Z",
+  "summary_sha256": "73ff05e7fc6eb5feaea04a1d5c82596dc1e13f7499ff41d4f4ff360313fd93de"
 }

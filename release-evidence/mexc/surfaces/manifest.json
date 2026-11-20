@@ -223,7 +223,7 @@
         "version": "2026.9.1"
       },
       "sdk-dev": {
-        "files_sha256": "b11c758dc5f7beb58442bb0695f2064798fc826ee9587903641b7c972deba221",
+        "files_sha256": "6c2985914fe67f9c9513c62f563a462ef1ae0f79acd6935e6bfd2d1ed72d20cd",
         "metadata_sha256": "6e562fabf4a160a2f9a213337f73d5c2de2fd5d05e67d330443c4c67f88b21dc",
         "version": "0"
       },
@@ -259,7 +259,7 @@
       },
       "tribulnation-sdk": {
         "files_sha256": "bc30029fb7f35e8955c0c29e459cbfa9f87bbf90c37f40842d3fdbafb4a695ae",
-        "metadata_sha256": "fa44c63f9a5ae6a5249f6df4da4274acdf5b8fffd5929ff0e98b20d726959044",
+        "metadata_sha256": "981032567a5f2f97953a6bc7dac829532889a0df1e6c90689e3a5c853ff9b529",
         "version": "0"
       },
       "typed-core": {
@@ -295,7 +295,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "0bbf66fd71581043de4dd928c6543a49d309e908be72e6e655d1978ffd7814b2",
+    "source_sha256": "01aa95e84061b878f99df45f5b95bc4fb5a86264455769672d78a67ff859685b",
     "venue": "mexc"
   },
   "before": {
@@ -522,7 +522,7 @@
         "version": "2026.9.1"
       },
       "sdk-dev": {
-        "files_sha256": "b11c758dc5f7beb58442bb0695f2064798fc826ee9587903641b7c972deba221",
+        "files_sha256": "6c2985914fe67f9c9513c62f563a462ef1ae0f79acd6935e6bfd2d1ed72d20cd",
         "metadata_sha256": "6e562fabf4a160a2f9a213337f73d5c2de2fd5d05e67d330443c4c67f88b21dc",
         "version": "0"
       },
@@ -558,7 +558,7 @@
       },
       "tribulnation-sdk": {
         "files_sha256": "bc30029fb7f35e8955c0c29e459cbfa9f87bbf90c37f40842d3fdbafb4a695ae",
-        "metadata_sha256": "fa44c63f9a5ae6a5249f6df4da4274acdf5b8fffd5929ff0e98b20d726959044",
+        "metadata_sha256": "981032567a5f2f97953a6bc7dac829532889a0df1e6c90689e3a5c853ff9b529",
         "version": "0"
       },
       "typed-core": {
@@ -594,12 +594,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "0bbf66fd71581043de4dd928c6543a49d309e908be72e6e655d1978ffd7814b2",
+    "source_sha256": "01aa95e84061b878f99df45f5b95bc4fb5a86264455769672d78a67ff859685b",
     "venue": "mexc"
   },
-  "finished": "2026-11-19T20:17:26.647319Z",
+  "finished": "2026-11-20T11:06:05.405301Z",
   "results_sha256": "bcf490f5e381716104a394c4654cc76c24b9f93e989b4c7e1f3e0086b56958ca",
   "schema_version": 2,
-  "started": "2026-11-19T20:17:10.251354Z",
-  "summary_sha256": "3c79e86f34346a55c697f54ad4e5299e2e864fc0ebfb30c695d235bed8d5e7c5"
+  "started": "2026-11-20T11:05:50.521863Z",
+  "summary_sha256": "8c3c3c59e5bd93cd98baaffefaab0ca00e5279b7123766cada999b94c10e7864"
 }
