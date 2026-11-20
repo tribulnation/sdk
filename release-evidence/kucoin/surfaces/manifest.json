@@ -218,7 +218,7 @@
         "version": "2026.9.1"
       },
       "sdk-dev": {
-        "files_sha256": "b11c758dc5f7beb58442bb0695f2064798fc826ee9587903641b7c972deba221",
+        "files_sha256": "6c2985914fe67f9c9513c62f563a462ef1ae0f79acd6935e6bfd2d1ed72d20cd",
         "metadata_sha256": "6e562fabf4a160a2f9a213337f73d5c2de2fd5d05e67d330443c4c67f88b21dc",
         "version": "0"
       },
@@ -254,7 +254,7 @@
       },
       "tribulnation-sdk": {
         "files_sha256": "bc30029fb7f35e8955c0c29e459cbfa9f87bbf90c37f40842d3fdbafb4a695ae",
-        "metadata_sha256": "fa44c63f9a5ae6a5249f6df4da4274acdf5b8fffd5929ff0e98b20d726959044",
+        "metadata_sha256": "981032567a5f2f97953a6bc7dac829532889a0df1e6c90689e3a5c853ff9b529",
         "version": "0"
       },
       "typed-core": {
@@ -290,7 +290,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "0b66cbf67b9bde5358cb373e9de8fa3f5f22b0aad611d7a9f017d5bf67fbe8ce",
+    "source_sha256": "249bcd0a9f9cbe1f716329c5881f13dd512f27cd022f7e4104303fa3d8ec05df",
     "venue": "kucoin"
   },
   "before": {
@@ -512,7 +512,7 @@
         "version": "2026.9.1"
       },
       "sdk-dev": {
-        "files_sha256": "b11c758dc5f7beb58442bb0695f2064798fc826ee9587903641b7c972deba221",
+        "files_sha256": "6c2985914fe67f9c9513c62f563a462ef1ae0f79acd6935e6bfd2d1ed72d20cd",
         "metadata_sha256": "6e562fabf4a160a2f9a213337f73d5c2de2fd5d05e67d330443c4c67f88b21dc",
         "version": "0"
       },
@@ -548,7 +548,7 @@
       },
       "tribulnation-sdk": {
         "files_sha256": "bc30029fb7f35e8955c0c29e459cbfa9f87bbf90c37f40842d3fdbafb4a695ae",
-        "metadata_sha256": "fa44c63f9a5ae6a5249f6df4da4274acdf5b8fffd5929ff0e98b20d726959044",
+        "metadata_sha256": "981032567a5f2f97953a6bc7dac829532889a0df1e6c90689e3a5c853ff9b529",
         "version": "0"
       },
       "typed-core": {
@@ -584,12 +584,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "0b66cbf67b9bde5358cb373e9de8fa3f5f22b0aad611d7a9f017d5bf67fbe8ce",
+    "source_sha256": "249bcd0a9f9cbe1f716329c5881f13dd512f27cd022f7e4104303fa3d8ec05df",
     "venue": "kucoin"
   },
-  "finished": "2026-11-19T20:17:13.893477Z",
+  "finished": "2026-11-20T11:06:06.519380Z",
   "results_sha256": "59a4f426daac1949ddf4160a406cfbb44c6f56f759e16cf7ee0235bb3e450c1f",
   "schema_version": 2,
-  "started": "2026-11-19T20:16:55.783546Z",
-  "summary_sha256": "3a919f8be34ce88d07ad7a5c30b28edcc779b30d677d0765235d0c8c8839b7e2"
+  "started": "2026-11-20T11:05:49.083975Z",
+  "summary_sha256": "1d5075ffa3120a3cd5e6de66b0b718b8820819c8d71798dffa18baf970bdf64c"
 }
