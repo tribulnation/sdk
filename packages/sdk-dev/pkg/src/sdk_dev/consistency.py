@@ -3,7 +3,7 @@
 import asyncio
 import json
 import re
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Collection
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from time import monotonic
@@ -158,37 +158,59 @@ def samples(venue: str, item: Discovery) -> list[str]:
   return sorted(selected)
 
 
-def valid_market_id(venue: str, exchange: str, market: str) -> bool:
+NAMESPACE_IDS: dict[tuple[str, str], Callable[[str], bool]] = {
+  ('bitget', 'coin'): lambda m: (
+    m.endswith('USD_CM') and m.removesuffix('_CM').isalnum()
+  ),
+  ('bitget', 'usdt'): lambda m: m.isalnum() and m.endswith('USDT'),
+  ('bitget', 'usdc'): lambda m: m.isalnum() and m.endswith('PERP'),
+  ('bitget', 'coin-classic'): lambda m: m.isalnum() and m.endswith('USD'),
+  ('coinbase', 'intx'): lambda m: m.endswith('-PERP-INTX'),
+  ('mexc', 'perp'): lambda m: bool(re.fullmatch(r'[^_:]+_[^_:]+', m)),
+}
+"""Native ID conventions of known product namespaces, by venue and exchange: they tell
+apart API namespaces a venue shares one symbol space across, not asset identity."""
+VENUE_IDS: dict[str, Callable[[str], bool]] = {
+  'bitget': str.isalnum,
+  'dydx': lambda m: m.endswith('-USD'),
+}
+"""Native ID conventions of a venue's exchanges without a namespace convention."""
+
+
+def valid_market_id(
+  venue: str, exchange: str, market: str, *, exchanges: Collection[str]
+) -> bool:
   """Check native ID conventions without asserting that an instrument is listed.
 
-  Other venues retain opaque IDs, including Hyperliquid's significant colons.
-  These rules distinguish known API namespaces, not asset identity or coverage.
+  The exchange must be one the venue reports in `exchanges()` (the discovered
+  inventory): any of them is accepted, whatever its kind, with no list of exchanges
+  per venue. Known namespaces keep their conventions (`NAMESPACE_IDS`), and other
+  exchanges of a venue follow its convention (`VENUE_IDS`), if any. Other venues retain
+  opaque IDs, including Hyperliquid's significant colons.
+
+  Args:
+    venue: Venue slug.
+    exchange: Exchange ID the market is listed under.
+    market: Native market ID.
+    exchanges: Exchange IDs the venue reported.
   """
-  if not market or market != market.strip() or any(c.isspace() for c in market):
+  if (
+    exchange not in exchanges
+    or not market
+    or market != market.strip()
+    or any(c.isspace() for c in market)
+  ):
     return False
   if market.startswith(f'{venue}:') or (exchange and market.startswith(f'{exchange}:')):
     # HIP-3 prefixes are part of the native symbol, not SDK qualification.
     if venue != 'hyperliquid':
       return False
-  if venue == 'bitget':
-    if exchange == 'coin':
-      return market.endswith('USD_CM') and market.removesuffix('_CM').isalnum()
-    return market.isalnum() and (
-      exchange == 'spot'
-      or exchange == 'usdt'
-      and market.endswith('USDT')
-      or exchange == 'usdc'
-      and market.endswith('PERP')
-      or exchange == 'coin-classic'
-      and market.endswith('USD')
-    )
-  if venue == 'coinbase' and exchange == 'intx':
-    return market.endswith('-PERP-INTX')
-  if venue == 'mexc' and exchange == 'perp':
-    return bool(re.fullmatch(r'[^_:]+_[^_:]+', market))
-  if venue == 'dydx':
-    return market.endswith('-USD')
-  return True
+  if (rule := NAMESPACE_IDS.get((venue, exchange))) is not None:
+    return rule(market)
+  elif (rule := VENUE_IDS.get(venue)) is not None:
+    return rule(market)
+  else:
+    return True
 
 
 def coverage_missing(report: Payload, exchange: str | None, market: str) -> bool:
@@ -271,9 +293,10 @@ def verify_payload(
     raise ValueError('Consistency evidence is empty')
   if len({item.exchange for item in report.discovery}) != len(report.discovery):
     raise ValueError('Duplicate discovered exchange IDs')
+  discovered = {item.exchange for item in report.discovery}
   for item in report.discovery:
     if len(set(item.markets)) != len(item.markets) or any(
-      not valid_market_id(report.venue, item.exchange, market)
+      not valid_market_id(report.venue, item.exchange, market, exchanges=discovered)
       for market in item.markets
     ):
       raise ValueError('Invalid discovered market inventory')
@@ -344,7 +367,7 @@ def verify_payload(
     if (
       item is None
       or item.kind != kind
-      or not valid_market_id(report.venue, item.exchange, market)
+      or not valid_market_id(report.venue, item.exchange, market, exchanges=discovered)
     ):
       raise ValueError('Catalogue identity contradicts discovery')
 
@@ -632,7 +655,12 @@ async def collect(
           discovered.markets
         )
         for market_id in discovered.markets:
-          valid &= valid_market_id(venue, exchange_id, market_id)
+          valid &= valid_market_id(
+            venue,
+            exchange_id,
+            market_id,
+            exchanges={item['id'] for item in descriptions},
+          )
           market = await request(exchange.market(market_id))
           markets[exchange_id, market_id] = market
           valid &= (market.venue_id, market.exchange_id, market.market_id) == (
@@ -766,7 +794,12 @@ async def collect(
     identity = (
       item is not None
       and item.kind == kind
-      and valid_market_id(venue, item.exchange, market_id)
+      and valid_market_id(
+        venue,
+        item.exchange,
+        market_id,
+        exchanges={item.exchange for item in report.discovery},
+      )
     )
     add(check_id('catalogue_identity', kind, market_id), identity)
     if identity and coverage_missing(report, exchange_id, market_id):

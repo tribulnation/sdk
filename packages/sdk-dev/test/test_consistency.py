@@ -11,7 +11,13 @@ from typing_extensions import cast
 from tribulnation.catalogue import Catalogue
 from tribulnation.sdk import ApiError, MissingData
 from tribulnation.sdk.impl.market import MarketSDK
-from tribulnation.sdk.market import Book, PerpExchange, PerpStats, Ticker
+from tribulnation.sdk.market import (
+  Book,
+  MarginExchange,
+  PerpExchange,
+  PerpStats,
+  Ticker,
+)
 
 from sdk_dev import consistency
 from sdk_dev.consistency import Payload, check_id, collect, verify_payload
@@ -218,8 +224,114 @@ def test_native_id_conventions_do_not_assert_market_existence(
   venue: str, exchange: str, good: str, bad: str
 ):
   """Known product namespace mismatches remain blocking independently of listings."""
-  assert consistency.valid_market_id(venue, exchange, good)
-  assert not consistency.valid_market_id(venue, exchange, bad)
+  assert consistency.valid_market_id(venue, exchange, good, exchanges={exchange})
+  assert not consistency.valid_market_id(venue, exchange, bad, exchanges={exchange})
+
+
+@pytest.mark.parametrize('venue', ['bitget', 'fixture'])
+def test_every_reported_exchange_is_accepted(venue: str):
+  """Spot, margin and perpetual exchanges a venue reports are all accepted, with no
+  list of exchanges per venue: a margin exchange uses its venue's convention."""
+  exchanges = {'spot', 'margin', 'usdt'}
+  for exchange in exchanges:
+    assert consistency.valid_market_id(venue, exchange, 'BTCUSDT', exchanges=exchanges)
+
+
+def kinds_sdk(exchanges: dict[str, type | None]) -> MarketSDK:
+  """A venue reporting one exchange per kind, each listing the same `BTCUSDT` market:
+  `None` builds a spot exchange, a class an exchange of that class."""
+
+  async def tickers(markets: list[str] | None = None) -> dict[str, Ticker]:
+    """Quote the one market for every selection."""
+    keys = ['BTCUSDT'] if markets is None else markets
+    return {key: Ticker(bid=Decimal(99), ask=Decimal(101)) for key in keys}
+
+  def exchange(id: str, cls: type | None) -> object:
+    """Build the exchange `id` and its market."""
+    market = SimpleNamespace(
+      venue_id='fixture',
+      exchange_id=id,
+      market_id='BTCUSDT',
+      depth=AsyncMock(
+        return_value=Book(
+          bids=[Book.Entry(Decimal(99), Decimal(1))],
+          asks=[Book.Entry(Decimal(101), Decimal(1))],
+        )
+      ),
+    )
+    value = SimpleNamespace() if cls is None else Mock(spec=cls)
+    value.exchange_id = id
+    value.venue_id = 'fixture'
+    value.markets = AsyncMock(return_value=['BTCUSDT'])
+    value.market = AsyncMock(return_value=market)
+    value.tickers = AsyncMock(side_effect=tickers)
+    return value
+
+  built = {id: exchange(id, cls) for id, cls in exchanges.items()}
+  kinds: dict[type | None, str] = {
+    None: 'spot',
+    MarginExchange: 'margin',
+    PerpExchange: 'perp',
+  }
+  owner = SimpleNamespace(
+    venue_id='fixture',
+    exchange=AsyncMock(side_effect=built.__getitem__),
+    exchanges=AsyncMock(
+      return_value=[
+        {'id': id, 'type': kinds[cls], 'name': id} for id, cls in exchanges.items()
+      ]
+    ),
+  )
+  return cast(
+    MarketSDK,
+    SimpleNamespace(
+      accounts={'local': SimpleNamespace(venue='fixture')},
+      venue=AsyncMock(return_value=owner),
+    ),
+  )
+
+
+async def test_spot_margin_and_perp_venue_verifies(root: Path, catalogue: Catalogue):
+  """A venue reporting spot, margin and perpetual exchanges records and verifies, the
+  margin exchange's markets included, with no venue-specific exchange list."""
+  catalogue.spot_instruments['fixture'] = {}
+  sdk = kinds_sdk({'spot': None, 'margin': MarginExchange, 'usdt': PerpExchange})
+  result = await collect(sdk, 'local', 'fixture', catalogue)
+  verify_payload(result, catalogue=catalogue, root=root)
+  report = Payload.model_validate(result)
+  assert [(item.exchange, item.kind) for item in report.discovery] == [
+    ('spot', 'spot'),
+    ('margin', 'margin'),
+    ('usdt', 'perp'),
+  ]
+  assert (
+    next(
+      check
+      for check in report.checks
+      if check.id == check_id('market_identity', 'margin')
+    ).status
+    == 'pass'
+  )
+
+
+async def test_market_of_unreported_exchange_is_rejected(
+  root: Path, catalogue: Catalogue
+):
+  """A Catalogue row on an exchange the venue did not report contradicts discovery."""
+  catalogue.spot_instruments['fixture'] = {
+    'BTCUSDT': {'exchange': 'margin', 'base': 'bitcoin', 'quote': 'dollar'}
+  }
+  sdk = kinds_sdk({'spot': None, 'usdt': PerpExchange})
+  result = await collect(sdk, 'local', 'fixture', catalogue)
+  with pytest.raises(ValueError):
+    verify_payload(result, catalogue=catalogue, root=root)
+
+
+def test_unreported_exchange_is_rejected():
+  """An exchange the venue did not report is not accepted, whatever the market ID."""
+  assert not consistency.valid_market_id(
+    'fixture', 'margin', 'BTCUSDT', exchanges={'spot', 'usdt'}
+  )
 
 
 async def test_asset_translation_checks_are_retired(

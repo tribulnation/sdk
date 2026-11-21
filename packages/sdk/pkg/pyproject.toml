@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tribulnation-sdk"
-version = "4.2.1"
+version = "4.3.0"
 authors = [
   {name="Marcel Claramunt", email="marcel@tribulnation.com"}
 ]
@@ -45,7 +45,7 @@ mexc = ["tribulnation-mexc>=3.0.2"]
 dydx = ["tribulnation-dydx>=0.22.1"]
 hyperliquid = ["tribulnation-hyperliquid>=0.22.2"]
 binance = ["tribulnation-binance>=0.9.1"]
-bitget = ["tribulnation-bitget>=0.14.2"]
+bitget = ["tribulnation-bitget>=0.15.0"]
 bit2me = ["tribulnation-bit2me>=0.10.2"]
 ethereum = ["tribulnation-ethereum>=0.6.2"]
 bybit = ["tribulnation-bybit>=0.10.3"]

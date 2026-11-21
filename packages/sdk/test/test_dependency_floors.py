@@ -11,7 +11,7 @@ COMPATIBLE_IMPLEMENTATIONS = {
   'aster': '0.16.1',
   'binance': '0.9.1',
   'bit2me': '0.10.2',
-  'bitget': '0.14.2',
+  'bitget': '0.15.0',
   'bybit': '0.10.3',
   'coinbase': '0.6.2',
   'deribit': '0.7.1',
@@ -45,6 +45,8 @@ SDK_4_2_ADAPTERS = (
   'risex',
 )
 """Adapters released with SDK 4.2, which require it."""
+SDK_4_3_ADAPTERS = ('bitget',)
+"""Adapters released with SDK 4.3, which require it."""
 
 
 def dependencies(path: Path) -> list[str]:
@@ -263,6 +265,20 @@ def test_adapters_released_with_sdk_4_2_require_it():
     )
     assert Version('4.1.99') not in requirement.specifier, venue
     assert Version('4.2.0') in requirement.specifier, venue
+
+
+def test_adapters_released_with_sdk_4_3_require_it():
+  """Adapters released with SDK 4.3 subclass its `MarginExchange` and return
+  `InterestPayment` (ADR 0073), so none may resolve against SDK 4.2."""
+  for venue in SDK_4_3_ADAPTERS:
+    manifest = ROOT / f'packages/impl/{venue}/pkg/pyproject.toml'
+    requirement = next(
+      Requirement(value)
+      for value in dependencies(manifest)
+      if Requirement(value).name == 'tribulnation-sdk'
+    )
+    assert Version('4.2.99') not in requirement.specifier, venue
+    assert Version('4.3.0') in requirement.specifier, venue
 
 
 def test_risex_requires_empty_funding_rates():
