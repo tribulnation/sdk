@@ -1,37 +1,60 @@
-# tribulnation-sdk 4.2.1
+# tribulnation-sdk 4.3.0
 
-A patch release: faster `Book` hot paths, EVEDEX accounts and clarified depth `levels`.
-Existing signatures are unchanged; adapters keep their current floors.
+A minor release: spot margin becomes a market kind, with borrow interest as its carry
+([ADR 0073](../../dev-docs/adr/0073-spot-margin-market-kind.md)). Nothing is removed;
+upgrade tribulnation-bitget 0.15.0, released with it, together (see the end of these
+notes).
 
 New:
 
-1. `Evedex` accounts (`venue = "evedex"`) for `MarketSDK` and `ReportSDK`, served by
-   tribulnation-evedex: an API key reads the account, the wallet's private key also
-   trades, and `public` with neither serves market data only.
+1. `MarketKind` is `'spot' | 'margin' | 'perp'`. `MarginMarket.kind` answers
+   `'margin'` (spot pairs traded on borrowed money); `PerpMarket` still answers
+   `'perp'`. `ExchangeDescription.type` is a `MarketKind`, so `exchanges()` can list
+   margin exchanges.
+2. `MarginExchange` (in `tribulnation.sdk.market`), kind `'margin'`: it carries the
+   margin reads that were on `PerpExchange` (`position`, `leverage`, `set_leverage`,
+   `collateral_id`, `available_notional`, `remaining_position_limit`, `collateral`),
+   and `PerpExchange` now derives from it. `is_margin` also narrows exchanges.
+3. `margin_exchange()` and `margin_market()` on the root (`MarketSDK`) and on each
+   venue resolve margin or perpetual exchanges and markets, e.g.
+   `bitget:margin:LITUSDT`.
+4. `MarginMarket.interest_payments(start, end) -> PaginatedResponse[InterestPayment]`
+   and `InterestPayment(time, asset, amount)`: the borrow interest on the base asset,
+   in that asset's units, negative when paid. `MarginExchange.interest_payments(None,
+   start, end)` lists every asset the pool owes; the root and venue route
+   `interest_payments(market_id, start, end)`. The default raises
+   `NotImplementedError`. A charge is reported by one market of the asset only, and
+   where the venue adds interest to the debt, `position()` already includes it: add
+   it to fill-based P&L, not to a mark-to-market of the position.
 
 Changed:
 
-1. `Book` keeps its levels in book order instead of re-deriving it
-   ([ADR 0070](../../dev-docs/adr/0070-book-order-invariant-hot-paths.md)):
-   `best_bid`/`best_ask` read the first level, `update` applies each delta by binary
-   search, and `limit`, `copy` and `frozen` keep the order without re-sorting. Every
-   book built from outside levels, including those decoded from the gateway wire, is
-   still sorted on construction.
-2. `Book.update` requires a book in book order. A changed or removed price replaces
-   every level at that price; repeated prices the update does not touch are kept,
-   where they were previously merged into the last one.
-3. `Book.update` negates bid prices exactly (`copy_negate`), so a low-precision
-   `Decimal` context no longer locates the wrong bid level.
-4. The gateway's stream tasks read the shared frozen books without copying every
-   level (the `reading_books_only` context variable); every other subscriber still
-   gets its own copy (ADR 0049).
-5. `depth`/`depth_stream` document `levels` as an upper bound: venues serve fewer
-   levels when they publish fewer, and a value above a venue's maximum is served at that
-   maximum, never refused. The adapter releases since 4.2.0 implement it.
+1. The root and venue margin reads (`position`, `leverage`, `set_leverage`,
+   `collateral_id`, `available_notional`, `remaining_position_limit`) and pool
+   collateral IDs resolve through `margin_market()` instead of `perp_market()`, so
+   they accept spot-margin markets as well as perpetuals. Perpetual-only reads keep
+   `perp_market()`.
+2. `is_margin` stays true for perpetuals, which trade on margin; `kind == 'margin'`
+   tells a spot-margin market apart. Code matching `MarketKind` or
+   `ExchangeDescription.type` exhaustively must handle `'margin'`.
+3. `MarginMarket.delta` documents that markets of one asset share a holding (every
+   spot pair of a base, every margin pair of a unified pool), so deltas are summed
+   once per account and asset, not once per market.
 
-The venue extras rise to the releases published since 4.2.0 (aster 0.16.1, binance
-0.9.1, bit2me 0.10.2, bitget 0.14.2, bybit 0.10.3, coinbase 0.6.2, deribit 0.7.1, dydx
-0.22.1, ethereum 0.6.2, extended 0.5.1, grvt 0.5.1, hyperliquid 0.22.2, kraken 0.9.2,
-kucoin 0.7.1, lighter 0.15.1, margin-trade 0.4.1, mexc 3.0.2, nado 0.2.1, risex 0.2.1)
-and add `evedex` (tribulnation-evedex 0.1.0, released after this version and qualified
-public-only, [ADR 0072](../../dev-docs/adr/0072-public-only-release-qualification.md)).
+Gateway (still `tribulnation-gateway.v2`):
+
+1. The `exchange` reply's `type` gains `'margin'`, sent only for exchanges earlier
+   gateways misreported as `'spot'`. Proxies build `ProxyMarginExchange` and
+   `ProxyMarginMarket` over the existing margin messages; `leverage`, `set_leverage`
+   and exchange collateral accept margin markets.
+2. **Compatibility:** a client older than 4.3.0 fails to decode an `exchange` reply
+   naming `margin` (it used to misread the exchange as spot). Upgrade clients before,
+   or together with, a gateway serving a venue with margin exchanges (Bitget from
+   0.15.0).
+3. `interest_payments` is not carried: it would be a new message kind, a protocol
+   version change. Proxies raise `NotImplementedError`; read interest with a direct
+   SDK.
+
+This release goes with tribulnation-bitget 0.15.0 (its `margin` exchange and
+`interest_payments`), which requires SDK >=4.3.0; the `bitget` extra rises to it. The
+other adapters keep their current releases and floors.
