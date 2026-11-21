@@ -19,3 +19,10 @@ Known limitation:
 2. Classic accounts raise `NotImplementedError` on every `margin` account read and order. The gateway does not carry `interest_payments` (SDK 4.3.0).
 
 Every other method is unchanged.
+
+Release qualification on 2026-11-21 passed the read suites and market consistency, with the
+`margin` exchange's 628 markets in the discovered inventory. Committed evidence under
+`release-evidence/bitget/` matches pinned Catalogue
+`e3ad9fbd6cd49fb84855c3d3fccbe9f1936a13f1`; offline release verification passes. The margin
+account reads were checked by hand, read-only, on mainnet the same day; `interest_payments`
+answered empty (no ledger row yet). This adapter release follows SDK 4.3.0 publication.
