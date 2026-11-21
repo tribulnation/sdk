@@ -79,7 +79,9 @@ dropped).
     category, deduplicated by ID, 30-day windows), signed negative and in the coin's
     units. Debt is pool-wide, so it counts whichever pair borrowed the coin; the
     exchange's `interest_payments(None, start, end)` lists every coin, USDT included.
-    The ledger keeps 90 days.
+    The ledger keeps 90 days. Not yet verified live: on 2026-11-21 hourly interest
+    grew the debt without any ledger row, so it may answer empty until Bitget books
+    the settlement.
   - `rules()` reads the `MARGIN` rows of `uta.market.instruments` unvalidated: the typed
     client's schema refuses them (`areaSymbol` is `null`). Classic accounts raise
     `NotImplementedError` on every account read and order.

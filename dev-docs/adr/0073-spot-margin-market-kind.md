@@ -83,6 +83,10 @@ exchanges split into `SpotExchange` and `PerpExchange`. Bitget's UTA cross spot 
    `margin`, where it used to misread the exchange as spot.
 3. Venue adapters adopting it need the release of `tribulnation-sdk` that ships these
    types; Bitget's floor rises with it.
-4. Bitget's interest rows are typed from the venue's enumeration; no interest row had
-   been booked yet when this was written, so the parse is verified against the ledger's
-   documented shape and its other `_OUT` rows, not a live interest row.
+4. Bitget's interest rows are typed from the venue's enumeration and not verified live.
+   On 2026-11-21 a 548.22 LIT margin short's debt grew by the first hour's interest at
+   borrow (09:57) and by 0.0237 LIT at 11:00, yet the ledger showed no row of any type in
+   any category: Bitget may book `INTEREST_SETTLEMENT_OUT` later (daily, or on repayment)
+   or not at all. Until a row is seen, `interest_payments` may answer empty while
+   interest accrues into the debt; the debt itself (`account/assets`) is then the only
+   record.
