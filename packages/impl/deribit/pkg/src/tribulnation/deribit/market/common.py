@@ -2,9 +2,10 @@
 
 import asyncio
 from dataclasses import dataclass, field
-from typing_extensions import AsyncContextManager, Iterable, Literal
+from typing_extensions import AsyncContextManager, Collection, Iterable, Literal
 from typed_deribit.market_data.get_instruments import InstrumentItem
 from typed_deribit.market_data.ticker import Ticker
+from typed_deribit.schemas import BookSummary
 from tribulnation.sdk import SDK
 from tribulnation.sdk.core import Subscription
 from tribulnation.sdk.market import Book
@@ -54,6 +55,20 @@ class Shared(Mixin):
         selected = {r['instrument_name']: r for r in rows if product(r) is not None}
         self.inventory['instruments'] = selected
     return self.inventory['instruments']
+
+  async def summaries(
+    self, currencies: Collection[str], *, kind: Literal['spot', 'future']
+  ) -> dict[str, BookSummary]:
+    """Read one book summary request per currency, keyed by instrument name."""
+    result: dict[str, BookSummary] = {}
+    for currency in sorted(currencies):
+      rows = await self.call(
+        lambda: self.client.market_data.get_book_summary_by_currency(
+          currency=currency, kind=kind
+        )
+      )
+      result.update((row['instrument_name'], row) for row in rows)
+    return result
 
   async def ticker(self, symbol: str) -> Ticker:
     """Pace shared ticker reads to at most ten requests per second."""

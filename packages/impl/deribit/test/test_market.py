@@ -199,19 +199,68 @@ async def test_tickers_query_only_requested_product_scopes_and_keep_nulls(
   request.assert_awaited_once_with(currency=currency, kind=kind)
 
 
-async def test_stats_use_native_index_and_base_interest_without_funding_forecast():
-  """No midpoint index, contract-size multiplier or invented next-payment fields."""
-  request = AsyncMock(
-    return_value={'index_price': 100.5, 'mark_price': 101.0, 'open_interest': 2.0}
+async def test_stats_read_one_futures_summary_per_quote_currency():
+  """The estimated delivery price is the index; no midpoint, multiplier or forecast."""
+  summary = AsyncMock(
+    return_value=[
+      dict(
+        instrument_name='BTC_USDC-PERPETUAL',
+        estimated_delivery_price=100.5,
+        mark_price=101.0,
+        mid_price=100.0,
+        open_interest=2.0,
+        current_funding=0.001,
+        funding_8h=0.002,
+      ),
+      dict(
+        instrument_name='BTC_USDC-26DEC26', estimated_delivery_price=1.0, mark_price=1.0
+      ),
+    ]
   )
-  shared = shared_client(SimpleNamespace(ticker=request))
+  ticker = AsyncMock()
+  shared = shared_client(
+    SimpleNamespace(get_book_summary_by_currency=summary, ticker=ticker)
+  )
   exchange = await DeribitMarket(shared=shared).perp_exchange('perp')
-  assert await exchange.perp_stats([]) == {}
-  row = (await exchange.perp_stats())['BTC_USDC-PERPETUAL']
+  assert await exchange.perp_stats([]) == await exchange.perp_stats(['UNKNOWN']) == {}
+  summary.assert_not_called()
+  rows = await exchange.perp_stats()
+  assert set(rows) == {'BTC_USDC-PERPETUAL'}
+  row = rows['BTC_USDC-PERPETUAL']
   assert row.index == Decimal('100.5') and row.mark == 101 and row.open_interest == 2
   assert row.funding is row.next_funding_time is row.funding_interval is None
-  request.return_value = {'index_price': 100.5, 'mark_price': 101.0}
+  summary.assert_awaited_once_with(currency='USDC', kind='future')
+  ticker.assert_not_called()
+  summary.return_value = [
+    dict(
+      instrument_name='BTC_USDC-PERPETUAL',
+      estimated_delivery_price=100.5,
+      mark_price=101.0,
+    )
+  ]
   assert (await exchange.perp_stats())['BTC_USDC-PERPETUAL'].open_interest is None
+
+
+@pytest.mark.parametrize(
+  'summaries',
+  [[], [dict(instrument_name='BTC_USDC-PERPETUAL', mark_price=99.0)]],
+)
+async def test_stats_fall_back_to_the_ticker_without_a_summary_index(
+  summaries: list[dict[str, object]],
+):
+  """A missing summary row or index reads that one instrument's ticker instead."""
+  ticker = AsyncMock(
+    return_value={'index_price': 100.5, 'mark_price': 101.0, 'open_interest': 2.0}
+  )
+  shared = shared_client(
+    SimpleNamespace(
+      get_book_summary_by_currency=AsyncMock(return_value=summaries), ticker=ticker
+    )
+  )
+  exchange = await DeribitMarket(shared=shared).perp_exchange('perp')
+  row = (await exchange.perp_stats(['BTC_USDC-PERPETUAL']))['BTC_USDC-PERPETUAL']
+  assert row.index == Decimal('100.5') and row.mark == 101 and row.open_interest == 2
+  ticker.assert_awaited_once_with('BTC_USDC-PERPETUAL')
 
 
 async def test_sparse_windows_retry_only_failed_request_and_remove_boundary_rows():

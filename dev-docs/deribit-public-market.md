@@ -14,7 +14,7 @@ Deribit 0.3.0 and SDK 2.2.0, separate from Terminal collection/serving rollout.
 | REST depth | 1–100 levels, default 20 | `get_order_book`, native base quantities |
 | Depth stream | 1–20 levels, default 20 | Shared `book_grouped`, `100ms`, full snapshots |
 | Trade candles | Native spot and linear perpetuals; four intraday intervals | `get_tradingview_chart_data`, `transport='ws'` |
-| Index/statistics | Native index, mark, optional base open interest | `ticker`, paced shared requests |
+| Index/statistics | Native index, mark, optional base open interest | Bulk: one futures `get_book_summary_by_currency` per quote currency (index = `estimated_delivery_price`); single market and fallback: paced `ticker` |
 | Rules/account fees | Unsupported | Fee denomination and quantity-step fallback unqualified |
 | Scheduled funding | Unsupported | Continuous accrual does not establish SDK payment-time semantics |
 | Private Market/trading | Unsupported | Explicit `NotImplementedError` |
