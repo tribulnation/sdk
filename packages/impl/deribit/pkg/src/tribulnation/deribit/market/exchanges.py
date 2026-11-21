@@ -57,26 +57,20 @@ class SpotExchange(Public, Exchange):
       for r in selected.values()
     }
     kind: Literal['spot', 'future'] = 'spot' if self.exchange_id == 'spot' else 'future'
-    result: dict[str, Ticker] = {}
-    for currency in sorted(currencies):
-      rows = await self.shared.call(
-        lambda: self.shared.client.market_data.get_book_summary_by_currency(
-          currency=currency, kind=kind
-        )
+    summaries = await self.shared.summaries(currencies, kind=kind)
+    return {
+      name: Ticker(
+        last=None if row['last'] is None else Decimal(str(row['last'])),
+        bid=None if row['bid_price'] is None else Decimal(str(row['bid_price'])),
+        ask=None if row['ask_price'] is None else Decimal(str(row['ask_price'])),
+        base_volume_24h=Decimal(str(row['volume'])),
+        quote_volume_24h=Decimal(str(row['volume_notional']))
+        if 'volume_notional' in row
+        else None,
       )
-      for row in rows:
-        name = row['instrument_name']
-        if name in selected:
-          result[name] = Ticker(
-            last=None if row['last'] is None else Decimal(str(row['last'])),
-            bid=None if row['bid_price'] is None else Decimal(str(row['bid_price'])),
-            ask=None if row['ask_price'] is None else Decimal(str(row['ask_price'])),
-            base_volume_24h=Decimal(str(row['volume'])),
-            quote_volume_24h=Decimal(str(row['volume_notional']))
-            if 'volume_notional' in row
-            else None,
-          )
-    return result
+      for name, row in summaries.items()
+      if name in selected
+    }
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -102,18 +96,36 @@ class LinearPerpExchange(SpotExchange, PerpExchange):
     settings: Settings = {},
     ttl: timedelta | None = None,
   ) -> Mapping[str, PerpStats]:
-    """Read native index, mark and base open interest with shared request pacing."""
+    """Read native index, mark and base open interest, one request per quote currency.
+
+    A perpetual's estimated delivery price is its index price, so the futures book
+    summaries carry every field of the ticker path. An instrument missing from the
+    summaries, or without an estimated delivery price, falls back to its paced ticker.
+    """
     if markets is not None and not markets:
       return {}
+    definitions = await self.shared.symbols()
     selected = [s for s in await self.markets() if markets is None or s in markets]
+    summaries = (
+      await self.shared.summaries(
+        {definitions[s]['quote_currency'] for s in selected}, kind='future'
+      )
+      if selected
+      else {}
+    )
     result: dict[str, PerpStats] = {}
     for symbol in selected:
-      row = await self.shared.ticker(symbol)
+      row = summaries.get(symbol)
+      if row is not None and 'estimated_delivery_price' in row:
+        native, index = row, row['estimated_delivery_price']
+      else:
+        native = await self.shared.ticker(symbol)
+        index = native['index_price']
       result[symbol] = PerpStats(
-        index=Decimal(str(row['index_price'])),
-        mark=Decimal(str(row['mark_price'])),
+        index=Decimal(str(index)),
+        mark=Decimal(str(native['mark_price'])),
         open_interest=None
-        if 'open_interest' not in row
-        else Decimal(str(row['open_interest'])),
+        if 'open_interest' not in native
+        else Decimal(str(native['open_interest'])),
       )
     return result
