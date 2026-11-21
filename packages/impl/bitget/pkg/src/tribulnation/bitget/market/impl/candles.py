@@ -15,6 +15,7 @@ from tribulnation.sdk.market import Candle, CandleInterval, candle_width, candle
 from typed_bitget.schemas import MixCandle, MixKlineInterval, SpotKlineInterval
 
 from .mixin import MarketMixin
+from .parse import futures_product
 from .util import MILLISECOND
 
 SPOT_INTERVALS: Mapping[CandleInterval, SpotKlineInterval] = {
@@ -143,9 +144,7 @@ async def perp_candles(
   the page cap; neither rows nor pages are sorted or buffered across the history.
   """
   granularity = PERP_INTERVALS[interval]
-  product = self.product
-  if product == 'SPOT':
-    raise ValueError('Perpetual candles require a futures product')
+  product = futures_product(self.product)
   width = candle_width(interval)
 
   for lower, upper in candle_windows(start, end, interval, size=PERP_PAGE - 2):

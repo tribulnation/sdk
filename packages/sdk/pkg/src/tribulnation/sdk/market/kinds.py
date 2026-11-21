@@ -1,4 +1,4 @@
-"""Narrow a market or exchange to what it trades (ADR 0051).
+"""Narrow a market or exchange to what it trades (ADR 0051, ADR 0073).
 
 Methods cannot narrow `self`, so these are functions: `if is_spot(market):` lets the
 type checker see a `SpotMarket` in the branch.
@@ -7,7 +7,7 @@ type checker see a `SpotMarket` in the branch.
 from typing_extensions import TypeIs, overload
 
 from .market import Market, SpotMarket, MarginMarket, PerpMarket
-from .exchange import Exchange, SpotExchange, PerpExchange
+from .exchange import Exchange, SpotExchange, MarginExchange, PerpExchange
 
 
 @overload
@@ -28,7 +28,15 @@ def is_perp(x: Market | Exchange, /) -> bool:
   return isinstance(x, (PerpMarket, PerpExchange))
 
 
-def is_margin(x: Market, /) -> TypeIs[MarginMarket]:
-  """Whether `x` trades on margin (perpetuals today): it has `collateral_id()`,
-  `position()` and `leverage()`."""
-  return isinstance(x, MarginMarket)
+@overload
+def is_margin(x: Market, /) -> TypeIs[MarginMarket]: ...
+@overload
+def is_margin(x: Exchange, /) -> TypeIs[MarginExchange]: ...
+def is_margin(x: Market | Exchange, /) -> bool:
+  """Whether `x` trades on margin: it has `collateral_id()`, `position()`,
+  `leverage()` and `interest_payments()`.
+
+  True for kind `'margin'` (spot pairs on borrowed money) and for perpetuals, which
+  are margin markets too; `x.kind == 'margin'` tells the first apart.
+  """
+  return isinstance(x, (MarginMarket, MarginExchange))

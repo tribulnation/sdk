@@ -23,6 +23,7 @@ from .types import (
   FundingRate,
   NextFunding,
   FundingPayment,
+  InterestPayment,
   Order,
   OrderResponse,
   OrderState,
@@ -41,10 +42,11 @@ from .market import (
   POSITION_LIMIT_TTL,
   Market,
   SpotMarket,
+  MarginMarket,
   PerpMarket,
   open_trades_stream,
 )
-from .exchange import Exchange, SpotExchange, PerpExchange
+from .exchange import Exchange, SpotExchange, MarginExchange, PerpExchange
 from .venue import TradingVenue
 from .ids import QualifiedExchangeId, QualifiedMarketId
 
@@ -83,6 +85,16 @@ class TradingMarkets(SDK):
     return await venue.spot_exchange(qualified.exchange_id)
 
   @SDK.method
+  async def margin_exchange(self, id: str, /) -> MarginExchange:
+    """Fetch a margin exchange by ID: kind `'margin'`, or a perpetual exchange.
+
+    - `id`: `<account_id>:<exchange_id>`
+    """
+    qualified = QualifiedExchangeId.parse(id)
+    venue = await self.venue(qualified.account_id)
+    return await venue.margin_exchange(qualified.exchange_id)
+
+  @SDK.method
   async def perp_exchange(self, id: str, /) -> PerpExchange:
     """Fetch a perpetual exchange by ID.
 
@@ -112,6 +124,17 @@ class TradingMarkets(SDK):
     qualified = QualifiedMarketId.parse(id)
     venue = await self.venue(qualified.account_id)
     exchange = await venue.spot_exchange(qualified.exchange_id)
+    return await exchange.market(qualified.market_id)
+
+  @SDK.method
+  async def margin_market(self, id: str, /) -> MarginMarket:
+    """Fetch a margin (or perpetual) market by ID, e.g. `bitget:margin:LITUSDT`.
+
+    - `id`: `<account_id>:<exchange_id>:<market_id>`
+    """
+    qualified = QualifiedMarketId.parse(id)
+    venue = await self.venue(qualified.account_id)
+    exchange = await venue.margin_exchange(qualified.exchange_id)
     return await exchange.market(qualified.market_id)
 
   @SDK.method
@@ -367,8 +390,8 @@ class TradingMarkets(SDK):
     - `<account_id>:<exchange_id>:<asset>` (`mt:spot:USDC`, or `hl:spot:0` where the
       venue's asset IDs are indices): a spot asset; `equity` is its total balance and
       `free_collateral` what open orders do not hold.
-    - `<account_id>:<exchange_id>` (`dydx:perp`): a perpetual exchange's pool, as
-      `PerpCollateral`.
+    - `<account_id>:<exchange_id>` (`dydx:perp`): a margin or perpetual exchange's
+      pool, as `PerpCollateral`.
 
     For the bucket backing one perpetual market (mode-aware, isolated included), use
     `perp_collateral(<market id>)`.
@@ -541,7 +564,8 @@ class TradingMarkets(SDK):
   async def position(
     self, market_id: str, /, *, ttl: timedelta | None = None
   ) -> Position:
-    """Fetch your open position in a perpetual market, as a signed size in base units.
+    """Fetch your open position in a margin or perpetual market, as a signed size in
+    base units.
 
     The same data as `perp_position()`, typed as the base `Position`. Spot markets have
     balances instead: see `balances()`.
@@ -549,27 +573,27 @@ class TradingMarkets(SDK):
     Args:
       ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
     """
-    market = await self.perp_market(market_id)
+    market = await self.margin_market(market_id)
     return await market.position(ttl=ttl)
 
   @SDK.method
   async def collateral_id(self, market_id: str, /) -> str:
-    """The collateral ID of the money funding new orders on a perpetual market.
+    """The collateral ID of the money funding new orders on a margin or perpetual market.
 
     A margin pool (`dydx:perp`), or on a unified account the collateral token's spot
     ID (`hl:spot:0`: USDC, by token index). Isolated positions return the pool new
     margin is drawn from.
     Resolve it with `collateral()`.
     """
-    market = await self.perp_market(market_id)
+    market = await self.margin_market(market_id)
     return await market.collateral_id()
 
   @SDK.method
   async def available_notional(
     self, market_id: str, /, *, ttl: timedelta | None = None
   ) -> Decimal:
-    """Fetch the maximum notional position you could open right now on a perpetual
-    market.
+    """Fetch the maximum notional position you could open right now on a margin or
+    perpetual market.
 
     The free collateral of the bucket backing the market times the account's
     `leverage()` on it, unless the venue publishes a more precise figure. This is
@@ -579,15 +603,15 @@ class TradingMarkets(SDK):
     Args:
       ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
     """
-    market = await self.perp_market(market_id)
+    market = await self.margin_market(market_id)
     return await market.available_notional(ttl=ttl)
 
   @SDK.method
   async def remaining_position_limit(
     self, market_id: str, /, *, ttl: timedelta | None = POSITION_LIMIT_TTL
   ) -> RemainingPositionLimit:
-    """Fetch how much more position the venue lets the account open on a perpetual
-    market, per direction; see `MarginMarket.remaining_position_limit`.
+    """Fetch how much more position the venue lets the account open on a margin or
+    perpetual market, per direction; see `MarginMarket.remaining_position_limit`.
 
     Notional in quote units by which a long or short position may still grow under
     the venue's position limits, excluding collateral; `None` where no limit is known.
@@ -596,7 +620,7 @@ class TradingMarkets(SDK):
       ttl: How old a shared answer may be, `POSITION_LIMIT_TTL` unless given; `None`
         asks afresh. See `Market`.
     """
-    market = await self.perp_market(market_id)
+    market = await self.margin_market(market_id)
     return await market.remaining_position_limit(ttl=ttl)
 
   @SDK.method
@@ -616,7 +640,7 @@ class TradingMarkets(SDK):
   async def leverage(
     self, market_id: str, /, *, ttl: timedelta | None = None
   ) -> Decimal:
-    """Fetch the leverage this account can open at on a perpetual market.
+    """Fetch the leverage this account can open at on a margin or perpetual market.
 
     The multiple of free collateral the account can open as notional: opening `n` of
     notional needs `n / leverage` of collateral. Account-specific (e.g. a per-market
@@ -626,16 +650,16 @@ class TradingMarkets(SDK):
     Args:
       ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
     """
-    market = await self.perp_market(market_id)
+    market = await self.margin_market(market_id)
     return await market.leverage(ttl=ttl)
 
   @SDK.method
   async def set_leverage(self, market_id: str, /, leverage: Decimal):
-    """Set the account's leverage on a perpetual market.
+    """Set the account's leverage on a margin or perpetual market.
 
     See `MarginMarket.set_leverage`.
     """
-    market = await self.perp_market(market_id)
+    market = await self.margin_market(market_id)
     await market.set_leverage(leverage)
 
   @SDK.method
@@ -718,4 +742,23 @@ class TradingMarkets(SDK):
     """
     market = await self.perp_market(market_id)
     async for page in market.funding_payments(start, end):
+      yield page
+
+  @SDK.method
+  @PaginatedResponse.lift
+  async def interest_payments(
+    self, market_id: str, /, start: datetime, end: datetime
+  ) -> AsyncIterable[Sequence[InterestPayment]]:
+    """Fetch the borrow interest charged on a margin market's position, paginated:
+    its carry, as `funding_payments` is a perpetual's.
+
+    Each `InterestPayment` names the borrowed `asset` and a signed `amount` in its
+    units, negative when paid. Credential-scoped. See `MarginMarket.interest_payments`.
+
+    Args:
+      start: Start of the window (inclusive).
+      end: End of the window (inclusive).
+    """
+    market = await self.margin_market(market_id)
+    async for page in market.interest_payments(start, end):
       yield page

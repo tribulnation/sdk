@@ -1161,6 +1161,7 @@ async def test_unknown_account_fails_resolution_without_caching(sdk: ProxySDK) -
   [
     codec.ExchangeResp(id='e', type='perp', venue_id='hyperliquid'),
     codec.ExchangeResp(id='e', type='spot', venue_id='dydx_testnet'),
+    codec.ExchangeResp(id='e', type='margin', venue_id='bitget'),
     codec.VenueResp(id='v', venue_id='hyperliquid'),
   ],
 )

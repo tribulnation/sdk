@@ -2,9 +2,12 @@
 synthetic catalogue.
 """
 
-from tribulnation.catalogue import Catalogue
+from dataclasses import dataclass
 
-from sdk_dev.catalogue import Ids, check_keys, gap, market_key, platform_of
+from tribulnation.catalogue import Catalogue
+from tribulnation.sdk.market import TradingVenue
+
+from sdk_dev.catalogue import Ids, check_keys, gap, market_ids, market_key, platform_of
 
 
 def catalogue() -> Catalogue:
@@ -104,3 +107,38 @@ def test_gap_is_empty_when_everything_translates():
   assert gap(
     'binance', Ids(assets={'BTC'}, spot_markets={'BTCUSDT'}), catalogue()
   ).empty
+
+
+@dataclass
+class FakeExchange:
+  """An exchange listing fixed markets."""
+
+  listed: list[str]
+
+  async def markets(self) -> list[str]:
+    """The fixed markets."""
+    return self.listed
+
+
+@dataclass
+class FakeVenue:
+  """A venue with a spot, a spot-margin and a perpetual exchange."""
+
+  async def exchanges(self) -> list[TradingVenue.ExchangeDescription]:
+    """Spot, margin and perpetuals."""
+    return [
+      {'id': 'spot', 'type': 'spot', 'name': 'Spot'},
+      {'id': 'margin', 'type': 'margin', 'name': 'Spot Margin'},
+      {'id': 'usdt', 'type': 'perp', 'name': 'USDT Perpetuals'},
+    ]
+
+  async def exchange(self, exchange_id: str) -> FakeExchange:
+    """Each exchange lists one market."""
+    return FakeExchange(listed=['LITUSDT'])
+
+
+async def test_margin_pairs_are_checked_against_spot_instruments():
+  """A spot-margin exchange's pairs are spot pairs, not perpetuals."""
+  ids = await market_ids(FakeVenue())  # type: ignore[arg-type]
+  assert ids.spot_markets == {'spot:LITUSDT', 'margin:LITUSDT'}
+  assert ids.perp_markets == {'usdt:LITUSDT'}

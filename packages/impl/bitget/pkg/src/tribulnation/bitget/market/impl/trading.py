@@ -1,9 +1,15 @@
-"""Trading a USDT-margined perpetual on a Unified Trading Account (UTA).
+"""Trading a USDT-margined perpetual or a spot-margin pair on a Unified Trading
+Account (UTA).
 
-Orders go on cross margin in one-way position mode, the account's settings this
-adapter supports: a Classic account and the USDC product line raise
+Perpetual orders go on cross margin in one-way position mode, the account's settings
+this adapter supports: a Classic account and the USDC product line raise
 `NotImplementedError` rather than place an order whose margin bucket is a guess, and a
 hedge-mode account is refused by Bitget itself (it requires a `posSide`).
+
+Spot-margin (`MARGIN`) orders trade the pair's spot book on the unified pool: a sell of
+more base than the pool holds auto-borrows the rest at placement, and a buy repays
+debt first (the account's `repayMode: auto`). Bitget takes no `marginMode` or
+`reduceOnly` on them.
 """
 
 from typing_extensions import Any, Literal, TypedDict, cast
@@ -25,7 +31,7 @@ from typed_bitget.uta.trade.order.place import LimitOrderRequest
 
 from .mixin import MarketMixin
 from .orders import open_orders
-from .parse import PERP
+from .parse import MARGIN, PERP
 
 log = logging.getLogger(__name__)
 
@@ -39,7 +45,7 @@ class BitgetSettings(TypedDict, total=False):
   """Time in force a `LIMIT` order is sent with: `gtc` (rests, the default), `ioc` or
   `fok`."""
   reduce_only: bool
-  """Only reduce the position."""
+  """Only reduce the position. Perpetuals only: a spot-margin order refuses it."""
 
 
 NOT_FOUND_CODES = frozenset({'25204', '40768', '43001'})
@@ -52,6 +58,9 @@ service unavailable to the account for regulatory or eligibility reasons (`40092
 seen live), size over the balance (`40762`), insufficient balance (`43012`), under the
 minimum order value (`45110`). Malformed requests (`BadRequest`) are refusals too; any other
 error stays an ambiguous `ApiError`."""
+
+TradingProduct = Literal['USDT-FUTURES', 'MARGIN']
+"""The categories this adapter trades."""
 
 TERMINAL_STATUSES = frozenset({'filled', 'cancelled', 'canceled', 'rejected'})
 """`orderStatus` values of an order that no longer rests; any other (`live`,
@@ -84,24 +93,49 @@ def time_in_force(order: Order, settings: BitgetSettings) -> TimeInForce:
       return settings.get('time_in_force', 'gtc')
 
 
+def trading_product(market: MarketMixin) -> TradingProduct:
+  """The market's category, when it is one this adapter trades.
+
+  Raises:
+    NotImplementedError: Not a `USDT-FUTURES` or `MARGIN` market.
+  """
+  product = market.product
+  if product == PERP or product == MARGIN:
+    return product
+  else:
+    raise NotImplementedError(
+      f'Bitget trading is implemented for USDT-FUTURES and MARGIN only, not {product}.'
+    )
+
+
 def order_request(
   market: MarketMixin, order: Order, settings: BitgetSettings
 ) -> LimitOrderRequest:
-  """The UTA `place-order` request placing `order` on cross margin."""
+  """The UTA `place-order` request placing `order`: on cross margin for a perpetual,
+  on the unified pool (auto-borrowing) for a spot-margin pair.
+
+  Raises:
+    NotImplementedError: `reduce_only` was asked of a spot-margin order, which Bitget
+      does not take: sending the order without it would place a different order.
+  """
   qty = to_decimal(order['qty'])
+  product = trading_product(market)
   request: LimitOrderRequest = {
-    'category': PERP,
+    'category': product,
     'symbol': market.symbol,
     'qty': abs(qty),
     'price': to_decimal(order['price']),
     'side': 'buy' if qty > 0 else 'sell',
     'orderType': 'limit',
     'timeInForce': time_in_force(order, settings),
-    'marginMode': 'crossed',
   }
+  if product == PERP:
+    request['marginMode'] = 'crossed'
   if (client_oid := order.get('client_order_id')) is not None:
     request['clientOid'] = client_oid
   if (reduce_only := settings.get('reduce_only')) is not None:
+    if product == MARGIN:
+      raise NotImplementedError('Bitget spot-margin orders take no reduce-only flag.')
     request['reduceOnly'] = 'yes' if reduce_only else 'no'
   return request
 
@@ -119,20 +153,30 @@ def parse_order_info(info: OrderInfo) -> OrderState:
   )
 
 
-async def require_trading(self: MarketMixin):
-  """Refuse to trade anywhere but a UTA account's USDT-margined perpetuals.
+async def require_trading(self: MarketMixin) -> TradingProduct:
+  """Refuse to trade anywhere but a UTA account's USDT-margined perpetuals and
+  spot-margin pairs; the market's category otherwise.
 
   Raises:
-    NotImplementedError: Not a `USDT-FUTURES` market, or a Classic account.
+    NotImplementedError: Not a `USDT-FUTURES` or `MARGIN` market, or a Classic
+      account.
   """
-  if self.product != PERP:
-    raise NotImplementedError(
-      f'Bitget trading is implemented for USDT-FUTURES only, not {self.product}.'
-    )
+  product = trading_product(self)
   if not await self.is_uta():
     raise NotImplementedError(
       'Bitget trading is implemented for Unified Trading Accounts only.'
     )
+  return product
+
+
+async def require_perp_trading(self: MarketMixin):
+  """`require_trading`, narrowed to a UTA account's USDT-margined perpetuals.
+
+  Raises:
+    NotImplementedError: Not a `USDT-FUTURES` market, or a Classic account.
+  """
+  if await require_trading(self) != PERP:
+    raise NotImplementedError('Bitget per-symbol leverage is a perpetual setting.')
 
 
 def refusal(e: ApiError) -> ApiError:
@@ -199,11 +243,11 @@ async def cancel_order(self: MarketMixin, id: str) -> Any:
     OrderNotFound: Bitget answered that the order does not exist (filled, cancelled,
       or never placed).
   """
-  await require_trading(self)
+  product = await require_trading(self)
   try:
     return await self.call(
       lambda: self.client.uta.trade.order.cancel(
-        order_id=id, category=PERP, symbol=self.symbol, validate=self.validate
+        order_id=id, category=product, symbol=self.symbol, validate=self.validate
       )
     )
   except ApiError as e:
@@ -218,11 +262,11 @@ async def cancel_open_orders(self: MarketMixin) -> Any:
   With nothing open, Bitget answers `25204` (order does not exist; confirmed live,
   2026-11-16): that is nothing to cancel, so an empty result is returned.
   """
-  await require_trading(self)
+  product = await require_trading(self)
   try:
     return await self.call(
       lambda: self.client.uta.trade.order.cancel_symbol(
-        PERP, symbol=self.symbol, validate=self.validate
+        product, symbol=self.symbol, validate=self.validate
       )
     )
   except ApiError as e:
@@ -236,16 +280,18 @@ async def replace_order(
 ) -> OrderResponse:
   """Replace resting order `id` with `order`.
 
-  An order with nothing filled, of the same side and time in force, is modified in
-  place (`modify-order` with `autoCancel`, so a failed modify leaves nothing resting)
-  and the answer's order ID returned. Any other is cancelled and `order` placed anew:
-  Bitget's modified `qty` is the order's total size, filled part included.
+  On a perpetual, an order with nothing filled, of the same side and time in force, is
+  modified in place (`modify-order` with `autoCancel`, so a failed modify leaves
+  nothing resting) and the answer's order ID returned. Any other is cancelled and
+  `order` placed anew: Bitget's modified `qty` is the order's total size, filled part
+  included. A spot-margin order is always cancelled and placed anew, so the borrow
+  taken at placement follows the new order alone.
 
   Raises:
     OrderRejected: Bitget refused the modification; `id` is cancelled.
   """
-  await require_trading(self)
-  info = await order_info(self, id)
+  product = await require_trading(self)
+  info = None if product == MARGIN else await order_info(self, id)
   qty = to_decimal(order['qty'])
   modifiable = (
     info is not None
@@ -263,7 +309,7 @@ async def replace_order(
           price=to_decimal(order['price']),
           auto_cancel='yes',
           symbol=self.symbol,
-          category=PERP,
+          category=product,
           validate=self.validate,
         )
       )
@@ -286,7 +332,7 @@ async def query_order(self: MarketMixin, id: str) -> OrderState | None:
   A Classic account finds resting orders only (the scan of `open_orders`).
   """
   self.require_account_surface()
-  if self.product == PERP and await self.is_uta():
+  if self.product in (PERP, MARGIN) and await self.is_uta():
     info = await order_info(self, id)
     return None if info is None else parse_order_info(info)
   else:
@@ -303,7 +349,7 @@ async def cross_leverage(self: MarketMixin) -> Decimal:
     NotImplementedError: Not a UTA account's `USDT-FUTURES` market.
     LeverageNotSet: No cross leverage is set for the symbol.
   """
-  await require_trading(self)
+  await require_perp_trading(self)
   settings = await self.call(
     lambda: self.client.uta.account.settings(validate=self.validate)
   )
@@ -336,7 +382,7 @@ async def set_cross_leverage(self: MarketMixin, leverage: Decimal) -> int:
     NotImplementedError: Not a UTA account's `USDT-FUTURES` market.
   """
   value = whole_leverage(leverage)
-  await require_trading(self)
+  await require_perp_trading(self)
   contracts = await self.perp_contracts(PERP)
   max_leverage = contracts[self.symbol]['maxLever']
   if value > max_leverage:

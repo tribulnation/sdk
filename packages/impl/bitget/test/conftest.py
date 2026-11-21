@@ -23,6 +23,7 @@ from typed_core.http import HttpClient
 
 from tribulnation.bitget.core import SdkMixin
 from tribulnation.bitget.market.impl import Cache
+from tribulnation.bitget.market import BitgetMarket, MarginMarket
 from tribulnation.bitget.market.perp_market import PerpMarket
 
 ACCESS_KEY = 'fake-access'
@@ -378,3 +379,174 @@ def market(fake: FakeBitget) -> PerpMarket:
 def classic_market(fake: FakeBitget) -> PerpMarket:
   """A Classic-account market on the fake venue."""
   return market_on(fake, uta=False)
+
+
+# --- Spot margin (UTA `MARGIN` category) -------------------------------------------
+# The pool keeps per-coin balances the way Bitget reported them live on 2026-11-21: a
+# resting margin sell auto-borrows the base it lacks at placement and locks it,
+# leaving `balance` (net of debt, excluding what is locked) at minus the borrow, and
+# buys repay debt first (`repayMode: auto`).
+
+PAIR = 'LITUSDT'
+INSTRUMENT: dict[str, Any] = {
+  'symbol': PAIR,
+  'category': 'MARGIN',
+  'baseCoin': 'LIT',
+  'quoteCoin': 'USDT',
+  'symbolType': 'crypto',
+  'areaSymbol': None,
+  'buyLimitPriceRatio': '0.1',
+  'sellLimitPriceRatio': '0.1',
+  'minOrderQty': '0.01',
+  'maxOrderQty': '0',
+  'pricePrecision': '4',
+  'quantityPrecision': '2',
+  'quotePrecision': '6',
+  'minOrderAmount': '1',
+  'status': 'online',
+  'maintainTime': '',
+  'launchTime': '1768487400000',
+}
+"""The live `MARGIN` row of LITUSDT (2026-11-21), trimmed; numbers as strings."""
+
+
+@dataclass
+class Coin:
+  """One coin of the unified pool: free holding, locked in orders, borrowed."""
+
+  free: Decimal = Decimal(0)
+  locked: Decimal = Decimal(0)
+  debt: Decimal = Decimal(0)
+
+  def repay(self):
+    """Auto-repay: free coins pay debt first."""
+    paid = min(self.free, self.debt)
+    self.free -= paid
+    self.debt -= paid
+
+  def row(self, coin: str) -> dict[str, str]:
+    """As `account/assets` lists it: `balance` is net of debt and excludes `locked`."""
+    balance = self.free - self.debt
+    return {
+      'coin': coin,
+      'equity': str(balance),
+      'usdValue': str(balance),
+      'balance': str(balance),
+      'available': str(self.free),
+      'debt': str(self.debt),
+      'locked': str(self.locked),
+      'bonus': '0',
+    }
+
+
+@dataclass
+class FakeMargin(FakeBitget):
+  """`FakeBitget`, trading the `MARGIN` category of one spot pair on a unified pool."""
+
+  bid: Decimal = Decimal('2.3000')
+  ask: Decimal = Decimal('2.3010')
+  lit: Coin = field(default_factory=Coin)
+  usdt: Coin = field(default_factory=lambda: Coin(free=Decimal(1000)))
+
+  def handle(self, request: httpx.Request) -> httpx.Response:
+    """Serve the margin catalogue and the pool, else the base fake."""
+    path = request.url.path.removeprefix('/api/v3/')
+    if path == 'market/instruments':
+      self.requests.append((request.method, path, dict(request.url.params)))
+      return self.answer([INSTRUMENT])
+    if path == 'account/assets':
+      self.requests.append((request.method, path, {}))
+      rows = [self.lit.row('LIT'), self.usdt.row('USDT')]
+      return self.answer({**ASSETS, 'assets': rows})
+    return super().handle(request)
+
+  def place(self, params: dict[str, Any]) -> httpx.Response:
+    """Place a margin order: a sell borrows the base it lacks and locks it."""
+    assert params['category'] == 'MARGIN' and params['symbol'] == PAIR
+    assert 'marginMode' not in params and 'reduceOnly' not in params
+    order = Resting(
+      id=str(next(self.ids)),
+      client_oid=params.get('clientOid', ''),
+      side=params['side'],
+      price=Decimal(params['price']),
+      qty=Decimal(params['qty']),
+      tif=params['timeInForce'],
+    )
+    self.orders[order.id] = order
+    crosses = (
+      order.price >= self.ask if order.side == 'buy' else order.price <= self.bid
+    )
+    if crosses and order.tif == 'post_only':
+      order.status = 'cancelled'
+      return self.answer({'orderId': order.id, 'clientOid': order.client_oid})
+    if order.side == 'sell':
+      self.lit.debt += max(order.qty - self.lit.free, Decimal(0))
+      self.lit.free = max(self.lit.free - order.qty, Decimal(0))
+      self.lit.locked += order.qty
+    if crosses:
+      self.execute(order, min(order.qty, self.depth))
+    if order.tif in ('ioc', 'fok') and order.status not in ('filled', 'cancelled'):
+      self.release(order)
+    return self.answer({'orderId': order.id, 'clientOid': order.client_oid})
+
+  def execute(self, order: Resting, qty: Decimal):
+    """Fill `qty` of `order`, moving coins and repaying debt."""
+    super().execute(order, qty)
+    if order.side == 'sell':
+      self.lit.locked -= qty
+      self.usdt.free += qty * order.price
+    else:
+      self.usdt.free -= qty * order.price
+      self.lit.free += qty
+      self.lit.repay()
+
+  def fill(self, id: str):
+    """The book trades through resting order `id`, filling it whole."""
+    order = self.orders[id]
+    self.execute(order, order.qty - order.filled)
+
+  def release(self, order: Resting):
+    """Cancel `order`, returning a sell's locked base (which then repays its debt)."""
+    order.status = 'cancelled'
+    if order.side == 'sell':
+      rest = order.qty - order.filled
+      self.lit.locked -= rest
+      self.lit.free += rest
+      self.lit.repay()
+
+  def cancel_one(self, order: Resting) -> dict[str, str]:
+    """Cancel a resting order."""
+    self.release(order)
+    return {'orderId': order.id, 'clientOid': order.client_oid}
+
+
+def venue_on(fake: FakeMargin, *, uta: bool = True) -> BitgetMarket:
+  """A venue whose client talks to `fake`."""
+  http = HttpClient()
+  http._client = httpx.AsyncClient(transport=fake.transport())  # type: ignore[attr-defined]
+  client = Bitget.new(
+    access_key=ACCESS_KEY, secret_key=SECRET, passphrase=PASSPHRASE, http=http
+  )
+  return BitgetMarket(account=SdkMixin(client=client, uta=uta), cache=Cache('bg'))
+
+
+@pytest.fixture
+def margin_fake() -> FakeMargin:
+  """A fresh unified pool with 1000 USDT and no LIT."""
+  return FakeMargin()
+
+
+@pytest.fixture
+async def margin(margin_fake: FakeMargin) -> MarginMarket:
+  """The LITUSDT margin market, resolved through the venue by its ID."""
+  market = await venue_on(margin_fake).market(f'margin:{PAIR}')
+  assert isinstance(market, MarginMarket)
+  return market
+
+
+@pytest.fixture
+async def classic_margin(margin_fake: FakeMargin) -> MarginMarket:
+  """The LITUSDT margin market on a Classic account."""
+  market = await venue_on(margin_fake, uta=False).market(f'margin:{PAIR}')
+  assert isinstance(market, MarginMarket)
+  return market

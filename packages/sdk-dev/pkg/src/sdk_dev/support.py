@@ -16,9 +16,11 @@ import pydantic
 import yaml
 from typing_extensions import Literal, NotRequired, Self, TypedDict
 
-MarketKind = Literal['spot', 'perp']
-"""A kind of market (ADR 0051). A contract method with a `kind` exists only on markets
-of that kind; a venue's `kinds` says which of them it serves (ADR 0056)."""
+MarketKind = Literal['spot', 'margin', 'perp']
+"""A kind of market (ADR 0051, ADR 0073). A contract method with a `kind` exists only on
+markets of that kind; a venue's `kinds` says which of them it serves (ADR 0056). `perp`
+methods are the margin and perpetual ones; `margin` names the methods only spot-margin
+venues are documented for."""
 
 
 class ImplSurfaceSupport(pydantic.BaseModel):

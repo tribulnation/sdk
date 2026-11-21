@@ -788,7 +788,9 @@ class CandlesResp(Msg, kw_only=True, tag='candles'):
 class ExchangeResp(Msg, kw_only=True, tag='exchange'):
   """Resolved exchange product type and venue."""
 
-  type: Literal['spot', 'perp']
+  type: Literal['spot', 'margin', 'perp']
+  """The exchange's kind. `margin` (spot pairs on borrowed money, ADR 0073) is sent
+  only for exchanges earlier gateways misreported as `spot`."""
   venue_id: VenueId
   """Venue the gateway-side exchange reports, e.g. `'hyperliquid'`."""
 

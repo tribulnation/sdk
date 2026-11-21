@@ -1,3 +1,5 @@
+from .margin_exchange import MarginExchange
+from .margin_market import MarginMarket
 from .perp_exchange import PerpExchange
 from .perp_market import PerpMarket
 from .spot_exchange import SpotExchange

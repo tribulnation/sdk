@@ -22,6 +22,7 @@ from tribulnation.sdk.market import (
   TradingMarkets,
   Market,
   SpotMarket,
+  MarginMarket,
   PerpMarket,
   is_spot,
   is_perp,
@@ -29,7 +30,12 @@ from tribulnation.sdk.market import (
   QualifiedMarketId,
 )
 from tribulnation.sdk.market.venue import TradingVenue, ExchangeDescription
-from tribulnation.sdk.market.exchange import Exchange, SpotExchange, PerpExchange
+from tribulnation.sdk.market.exchange import (
+  Exchange,
+  SpotExchange,
+  MarginExchange,
+  PerpExchange,
+)
 from tribulnation.sdk.impl.accounts import VenueId
 from tribulnation.sdk.market import (
   Book,
@@ -55,6 +61,7 @@ from tribulnation.sdk.market import (
   PerpCollateral,
   FundingRate,
   FundingPayment,
+  InterestPayment,
 )
 
 from . import codec
@@ -534,8 +541,9 @@ class ProxySpotMarket(ProxyMarket, SpotMarket):
 
 
 @dataclass
-class ProxyPerpMarket(ProxyMarket, PerpMarket):
-  """A perpetual market with funding, position and margin RPCs."""
+class ProxyMarginMarket(ProxyMarket, MarginMarket):
+  """A margin market (kind `'margin'`, or the base of a perpetual) with position and
+  margin RPCs."""
 
   _collateral_id: str | None = field(default=None, init=False, repr=False)
   """Cached `collateral_id()`."""
@@ -571,6 +579,45 @@ class ProxyPerpMarket(ProxyMarket, PerpMarket):
       )
       self._collateral_id = resp.value
     return self._collateral_id
+
+  async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
+    """Forward account leverage through the gateway, which keeps the shared answers."""
+    resp: codec.LeverageResp = await self._conn.call(
+      codec.LeverageReq(id=self._mid(), market_id=self.id, ttl=ttl)
+    )
+    return resp.value
+
+  async def set_leverage(self, leverage: Decimal):
+    """Forward the leverage setting through the gateway."""
+    await self._conn.call(
+      codec.SetLeverageReq(id=self._mid(), market_id=self.id, leverage=leverage)
+    )
+
+  async def collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
+    """Forward the margin bucket backing this market through the gateway.
+
+    Raises:
+      ValueError: The gateway answered a bucket without margin fields.
+    """
+    resp: codec.CollateralResp = await self._conn.call(
+      codec.CollateralReq(id=self._mid(), market_id=self.id, ttl=ttl)
+    )
+    if not isinstance(resp.collateral, PerpCollateral):
+      raise ValueError(f'market {self.id} answered collateral without margin fields')
+    return resp.collateral
+
+  def interest_payments(
+    self, start: datetime, end: datetime
+  ) -> PaginatedResponse[InterestPayment]:
+    """Not carried by gateway protocol v2: read interest with a direct SDK."""
+    raise NotImplementedError(
+      f'Interest payments are not carried by {codec.PROTOCOL} [{self.id}].'
+    )
+
+
+@dataclass
+class ProxyPerpMarket(ProxyMarginMarket, PerpMarket):
+  """A perpetual market with funding RPCs on top of the margin ones."""
 
   async def index(self, *, settings: Settings = {}) -> Decimal:
     """Forward index through the gateway."""
@@ -622,19 +669,6 @@ class ProxyPerpMarket(ProxyMarket, PerpMarket):
       codec.PerpPositionReq(id=self._mid(), market_id=self.id, ttl=ttl)
     )
     return resp.position
-
-  async def leverage(self, *, ttl: timedelta | None = None) -> Decimal:
-    """Forward account leverage through the gateway, which keeps the shared answers."""
-    resp: codec.LeverageResp = await self._conn.call(
-      codec.LeverageReq(id=self._mid(), market_id=self.id, ttl=ttl)
-    )
-    return resp.value
-
-  async def set_leverage(self, leverage: Decimal):
-    """Forward the leverage setting through the gateway."""
-    await self._conn.call(
-      codec.SetLeverageReq(id=self._mid(), market_id=self.id, leverage=leverage)
-    )
 
   async def collateral(self, *, ttl: timedelta | None = None) -> PerpCollateral:
     """Forward collateral through the gateway."""
@@ -737,7 +771,41 @@ class ProxySpotExchange(ProxyExchange, SpotExchange):
 
 
 @dataclass
-class ProxyPerpExchange(ProxyExchange, PerpExchange):
+class ProxyMarginExchange(ProxyExchange, MarginExchange):
+  """A margin exchange (kind `'margin'`) constructing margin market proxies."""
+
+  async def market(self, market_id: str, /) -> MarginMarket:
+    """Borrow a margin market on this connection."""
+    return ProxyMarginMarket(
+      self._conn, self._account_id, self._exchange_id, market_id, self._venue_id
+    )
+
+  async def collateral(
+    self, market_id: str | None = None, /, *, ttl: timedelta | None = None
+  ) -> PerpCollateral:
+    """Forward the exchange's pool, or a market's bucket, through the gateway.
+
+    Raises:
+      ValueError: The gateway answered a pool without margin fields.
+    """
+    if market_id is not None:
+      market = await self.market(market_id)
+      return await market.collateral(ttl=ttl)
+    resp: codec.CollateralResp = await self._conn.call(
+      codec.ExchangeCollateralReq(
+        id=str(uuid4()),
+        account_id=self._account_id,
+        exchange_id=self._exchange_id,
+        ttl=ttl,
+      )
+    )
+    if not isinstance(resp.collateral, PerpCollateral):
+      raise ValueError(f'exchange {self.id} answered collateral without margin fields')
+    return resp.collateral
+
+
+@dataclass
+class ProxyPerpExchange(ProxyMarginExchange, PerpExchange):
   """A perpetual exchange constructing perpetual market proxies."""
 
   async def market(self, market_id: str, /) -> PerpMarket:
@@ -807,7 +875,13 @@ async def resolve_exchange(
     resp: codec.ExchangeResp = await conn.call(
       codec.ExchangeReq(id=str(uuid4()), account_id=account_id, exchange_id=exchange_id)
     )
-    cls = ProxyPerpExchange if resp.type == 'perp' else ProxySpotExchange
+    match resp.type:
+      case 'perp':
+        cls = ProxyPerpExchange
+      case 'margin':
+        cls = ProxyMarginExchange
+      case 'spot':
+        cls = ProxySpotExchange
     exchange = cls(conn, account_id, exchange_id, resp.venue_id)
     cache[address] = exchange
   return exchange

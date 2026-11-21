@@ -16,6 +16,7 @@ from typing_extensions import (
   Literal,
   Mapping,
   TypeVar,
+  cast,
 )
 from dataclasses import dataclass, field
 import asyncio
@@ -30,7 +31,16 @@ from typed_bitget.classic_streams.orderbook import OrderBookPush
 from typed_bitget.uta_streams.fill import FillUpdate
 
 from tribulnation.bitget.core import SdkMixin, wrap_exceptions
-from .parse import PERP, PerpProduct, Product, parse_book
+from .parse import (
+  MARGIN,
+  PERP,
+  ClassicProduct,
+  MarginInstrument,
+  PerpProduct,
+  Product,
+  classic_product,
+  parse_book,
+)
 
 T = TypeVar('T')
 
@@ -113,6 +123,9 @@ class Cache:
   account_id: str | None = None
   """Root SDK account key; `None` when built directly, reporting `'bitget'` instead."""
   spot: dict[str, SpotSymbol] = field(default_factory=dict[str, SpotSymbol])
+  margin: dict[str, MarginInstrument] = field(
+    default_factory=dict[str, MarginInstrument]
+  )
   perp: dict[PerpProduct, dict[str, MixContract]] = field(
     default_factory=dict[PerpProduct, dict[str, MixContract]]
   )
@@ -124,6 +137,7 @@ class Cache:
   )
   uta_fills: Subscription[FillUpdate] | None = None
   spot_lock: asyncio.Lock = field(default_factory=asyncio.Lock, repr=False)
+  margin_lock: asyncio.Lock = field(default_factory=asyncio.Lock, repr=False)
   perp_lock: asyncio.Lock = field(default_factory=asyncio.Lock, repr=False)
 
 
@@ -232,6 +246,32 @@ class VenueMixin(SDK):
       self.cache.spot = {s['symbol']: s for s in symbols}
       return self.cache.spot
 
+  async def margin_instruments(
+    self, *, refetch: bool = False
+  ) -> Mapping[str, MarginInstrument]:
+    """Fetch every UTA spot-margin pair and its rules, keyed by symbol.
+
+    Read unvalidated: the typed client's `Instrument` refuses margin rows (see
+    `MarginInstrument`).
+
+    Args:
+      refetch: Refresh the catalogue even when one is already cached.
+    """
+    if self.cache.margin and not refetch:
+      return self.cache.margin
+    async with self.cache.margin_lock:
+      if self.cache.margin and not refetch:
+        return self.cache.margin
+      rows = await self.call(
+        lambda: self.client.uta.market.instruments(MARGIN, validate=False)
+      )
+      self.cache.margin = {
+        r['symbol']: cast(MarginInstrument, r)
+        for r in cast(list[dict[str, Any]], rows)
+        if r['category'] == MARGIN
+      }
+      return self.cache.margin
+
   async def perp_contracts(
     self, product: PerpProduct = PERP, *, refetch: bool = False
   ) -> Mapping[str, MixContract]:
@@ -259,7 +299,9 @@ class VenueMixin(SDK):
       }
       return self.cache.perp[product]
 
-  def depth_subscription(self, product: Product, symbol: str) -> Subscription[Book]:
+  def depth_subscription(
+    self, product: ClassicProduct, symbol: str
+  ) -> Subscription[Book]:
     """Get (or open) the shared full-depth order book subscription for one symbol.
 
     Public channels are served by the Classic v2 socket in either account mode.
@@ -282,7 +324,7 @@ class VenueMixin(SDK):
     return subscription
 
   def classic_fill_subscription(
-    self, product: Product, symbol: str
+    self, product: ClassicProduct, symbol: str
   ) -> 'Subscription[SpotFill | MixFill1]':
     """Get (or open) a Classic-mode account's fill subscription for one symbol.
 
@@ -329,7 +371,7 @@ class MarketMixin(VenueMixin):
 
   def require_account_surface(self):
     """Keep newly added public products out of unqualified account-data adapters."""
-    if self.product not in ('SPOT', PERP):
+    if self.product not in ('SPOT', MARGIN, PERP):
       raise NotImplementedError(
         'Bitget USDC and coin futures support public market data only.'
       )
@@ -368,7 +410,8 @@ class MarketMixin(VenueMixin):
     self, *, queue_size: int = 1, overflow: OverflowPolicy = 'latest'
   ):
     """Subscribe to this market's shared order book stream."""
-    return self.depth_subscription(self.product, self.symbol).subscribe(
+    product = classic_product(self.product)
+    return self.depth_subscription(product, self.symbol).subscribe(
       queue_size=queue_size, overflow=overflow
     )
 
@@ -377,6 +420,8 @@ class MarketMixin(VenueMixin):
   ):
     """Subscribe to this market's Classic-mode fill stream."""
     self.require_account_surface()
+    if self.product == MARGIN:
+      raise NotImplementedError('Bitget spot margin is UTA-only: no Classic fills.')
     return self.classic_fill_subscription(self.product, self.symbol).subscribe(
       queue_size=queue_size, overflow=overflow
     )

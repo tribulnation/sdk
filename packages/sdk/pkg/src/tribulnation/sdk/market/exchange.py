@@ -35,6 +35,7 @@ from .types import (
   ExchangeTrade,
   ExchangeFundingPayment,
   FundingPayment,
+  InterestPayment,
   Rules,
   SpotRules,
   Fees,
@@ -45,6 +46,7 @@ from .market import (
   Market,
   MarketKind,
   SpotMarket,
+  MarginMarket,
   PerpMarket,
   open_trades_stream,
 )
@@ -75,7 +77,7 @@ class Exchange(SDK):
 
   @property
   def kind(self) -> MarketKind:
-    """`'spot'` or `'perp'`, like its markets' `kind`."""
+    """`'spot'`, `'margin'` or `'perp'`, like its markets' `kind`."""
     raise NotImplementedError(f'Exchange kind is not implemented: {self.id}')
 
   @property
@@ -377,7 +379,137 @@ class SpotExchange(Exchange):
     return await market.collateral_ids()
 
 
-class PerpExchange(Exchange):
+class MarginExchange(Exchange):
+  """An abstract exchange of margin markets (ADR 0073): kind `'margin'` for spot pairs
+  traded on borrowed money, and the base of `PerpExchange`."""
+
+  @property
+  def kind(self) -> Literal['margin', 'perp']:
+    """`'margin'`; `PerpExchange` answers `'perp'`."""
+    return 'margin'
+
+  @SDK.method
+  @abstractmethod
+  async def market(self, market_id: str, /) -> MarginMarket:
+    """Fetch a margin market by ID."""
+
+  @SDK.method
+  @PaginatedResponse.lift
+  async def interest_payments(
+    self, market_id: str | None, /, start: datetime, end: datetime
+  ) -> AsyncIterable[Sequence[InterestPayment]]:
+    """Fetch borrow interest charged for one market or the whole exchange.
+
+    Args:
+      market_id: Native market ID, or `None` for every borrowed asset of the
+        exchange's pool, quote and collateral debt included.
+      start: Inclusive start of the history window.
+      end: Inclusive end of the history window.
+
+    See `MarginMarket.interest_payments`. Exchange-wide support is venue-specific;
+    unsupported calls raise `NotImplementedError`.
+    """
+    if market_id is None:
+      raise NotImplementedError(
+        f'Exchange-wide interest payments are not supported [{self.id}].'
+      )
+    market = await self.market(market_id)
+    async for page in market.interest_payments(start, end):
+      yield page
+
+  @SDK.method
+  async def leverage(
+    self, market_id: str, /, *, ttl: timedelta | None = None
+  ) -> Decimal:
+    """Fetch the leverage this account can open at on the selected market.
+
+    See `MarginMarket.leverage`.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """
+    market = await self.market(market_id)
+    return await market.leverage(ttl=ttl)
+
+  @SDK.method
+  async def set_leverage(self, market_id: str, /, leverage: Decimal):
+    """Set the account's leverage on a market.
+
+    See `MarginMarket.set_leverage`.
+    """
+    market = await self.market(market_id)
+    await market.set_leverage(leverage)
+
+  @SDK.method
+  async def position(
+    self, market_id: str, /, *, ttl: timedelta | None = None
+  ) -> Position:
+    """Fetch your open position in the market.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """
+    market = await self.market(market_id)
+    return await market.position(ttl=ttl)
+
+  @SDK.method
+  async def collateral_id(self, market_id: str, /) -> str:
+    """The collateral ID funding new orders on a market; see `MarginMarket.collateral_id`."""
+    market = await self.market(market_id)
+    return await market.collateral_id()
+
+  @SDK.method
+  async def available_notional(
+    self, market_id: str, /, *, ttl: timedelta | None = None
+  ) -> Decimal:
+    """Fetch the maximum notional position you can open right now: the free
+    collateral times the account's `leverage()` on the market.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """
+    market = await self.market(market_id)
+    return await market.available_notional(ttl=ttl)
+
+  @SDK.method
+  async def remaining_position_limit(
+    self, market_id: str, /, *, ttl: timedelta | None = POSITION_LIMIT_TTL
+  ) -> RemainingPositionLimit:
+    """Fetch how much more position the venue lets the account open on a market, per
+    direction; see `MarginMarket.remaining_position_limit`.
+
+    Args:
+      ttl: How old a shared answer may be, `POSITION_LIMIT_TTL` unless given; `None`
+        asks afresh. See `Market`.
+    """
+    market = await self.market(market_id)
+    return await market.remaining_position_limit(ttl=ttl)
+
+  @SDK.method
+  async def collateral(
+    self, market_id: str | None = None, /, *, ttl: timedelta | None = None
+  ) -> PerpCollateral:
+    """Fetch collateral.
+
+    - `market_id=None`: this exchange's pool, which collateral ID `<account_id>:<exchange_id>` names.
+    - `market_id='<id>'`: the market's mode-aware bucket.
+
+    The default answers a market's bucket; the pool is venue-specific and raises
+    `NotImplementedError` unless the exchange overrides it. `PerpExchange` defers to
+    `perp_collateral`.
+
+    Args:
+      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
+    """
+    if market_id is not None:
+      market = await self.market(market_id)
+      return await market.collateral(ttl=ttl)
+    raise NotImplementedError(
+      f'Collateral is not supported by this exchange [{self.id}].'
+    )
+
+
+class PerpExchange(MarginExchange):
   """An abstract perpetual exchange interface."""
 
   @property
@@ -490,74 +622,6 @@ class PerpExchange(Exchange):
     """
     market = await self.market(market_id)
     return await market.perp_position(ttl=ttl)
-
-  @SDK.method
-  async def leverage(
-    self, market_id: str, /, *, ttl: timedelta | None = None
-  ) -> Decimal:
-    """Fetch the leverage this account can open at on the selected market.
-
-    See `MarginMarket.leverage`.
-
-    Args:
-      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
-    """
-    market = await self.market(market_id)
-    return await market.leverage(ttl=ttl)
-
-  @SDK.method
-  async def set_leverage(self, market_id: str, /, leverage: Decimal):
-    """Set the account's leverage on a perpetual market.
-
-    See `MarginMarket.set_leverage`.
-    """
-    market = await self.market(market_id)
-    await market.set_leverage(leverage)
-
-  @SDK.method
-  async def position(
-    self, market_id: str, /, *, ttl: timedelta | None = None
-  ) -> Position:
-    """Fetch your open position in the market.
-
-    Args:
-      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
-    """
-    market = await self.market(market_id)
-    return await market.position(ttl=ttl)
-
-  @SDK.method
-  async def collateral_id(self, market_id: str, /) -> str:
-    """The collateral ID funding new orders on a market; see `MarginMarket.collateral_id`."""
-    market = await self.market(market_id)
-    return await market.collateral_id()
-
-  @SDK.method
-  async def available_notional(
-    self, market_id: str, /, *, ttl: timedelta | None = None
-  ) -> Decimal:
-    """Fetch the maximum notional position you can open right now: the free
-    collateral times the account's `leverage()` on the market.
-
-    Args:
-      ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
-    """
-    market = await self.market(market_id)
-    return await market.available_notional(ttl=ttl)
-
-  @SDK.method
-  async def remaining_position_limit(
-    self, market_id: str, /, *, ttl: timedelta | None = POSITION_LIMIT_TTL
-  ) -> RemainingPositionLimit:
-    """Fetch how much more position the venue lets the account open on a market, per
-    direction; see `MarginMarket.remaining_position_limit`.
-
-    Args:
-      ttl: How old a shared answer may be, `POSITION_LIMIT_TTL` unless given; `None`
-        asks afresh. See `Market`.
-    """
-    market = await self.market(market_id)
-    return await market.remaining_position_limit(ttl=ttl)
 
   @SDK.method
   async def collateral(

@@ -91,7 +91,7 @@ def test_support_matrix_exports_declared_kinds(tmp_path: Path):
 
 def test_committed_declarations_agree_with_the_contracts():
   """No committed impl.toml contradicts a contract's kinds, and every perpetual-only
-  venue is `full` without being counted for spot methods."""
+  venue is `full` without being counted for spot or spot-margin methods."""
   root = repo_root()
   impls = load_impl_files(root / 'packages/impl')
   for contract in sorted((root / 'docs/contract').glob('*.yml')):
@@ -101,4 +101,4 @@ def test_committed_declarations_agree_with_the_contracts():
     assert impls[venue].support['market'].support == 'full'
     for method, kind in kinds.items():
       eligible = venue in method_universe(impls, 'market', method, kind=kind)
-      assert eligible == (kind != 'spot'), (venue, method)
+      assert eligible == (kind not in ('spot', 'margin')), (venue, method)

@@ -2,7 +2,8 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: proposed; implemented, not release-verified
+1. Status: proposed; implemented, not release-verified; amended by
+   [0073](0073-spot-margin-market-kind.md) (a `margin` contract kind)
 2. Date: 2026-10-28
 3. Builds on: [ADR 0051](0051-spot-perp-market-types-collateral-ids.md) (spot and
    margin market types)

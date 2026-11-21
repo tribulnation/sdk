@@ -25,7 +25,8 @@
 # handful of methods). Display order follows first-appearance order in this file.
 #
 # `kind`: the kind of market a method exists on (`spot`: SpotMarket; `perp`: margin and
-# perpetual markets), absent when every market has it (ADR 0051). A venue is eligible
+# perpetual markets; `margin`: documented for spot-margin venues only, ADR 0073), absent
+# when every market has it (ADR 0051). A venue is eligible
 # only if its impl.toml `[support.market] kinds` include it, so a perpetuals-only `full`
 # venue needs no spot examples (ADR 0056).
 #
@@ -1354,6 +1355,22 @@ methods:
       resultTemplate: |
         dydx -> dydx:perp:BTC-USD
         hyperliquid -> hyperliquid::BTC
+
+  interest_payments:
+    group: Margin-only
+    kind: margin
+    public: false
+    example:
+      accountVenues: [bitget]
+      constants:
+        bitget: {market_id: 'bitget:margin:LITUSDT', asset: 'LIT', amount1: '-0.0228', amount2: '-0.0229'}
+      callTemplate: |
+        async for page in sdk.interest_payments('{{ constants[accounts[0]].market_id }}', start, end):
+          for payment in page:
+            print(payment.time, payment.asset, payment.amount)
+      resultTemplate: |
+        2026-11-21 11:00:00 {{ constants[accounts[0]].asset }} {{ constants[accounts[0]].amount1 }}
+        2026-11-21 12:00:00 {{ constants[accounts[0]].asset }} {{ constants[accounts[0]].amount2 }}
 
   perp_position:
     group: Perpetual-only

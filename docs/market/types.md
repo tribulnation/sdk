@@ -181,6 +181,17 @@ fee-token conversion or rounding.
 Rates are fractions of 1, so `0.01` is 1%. `premium` is the mark-vs-index quantity funding
 is computed from, and it's `None` on venues that don't report it, like dYdX.
 
+## Margin
+
+- `InterestPayment`: `time`, `asset` and `amount`. Borrow interest, a margin position's
+  carry (ADR 0073): `asset` is the venue-native ID of the borrowed asset and `amount` a
+  signed amount in its units, negative when paid. Convert it at the asset's price to
+  compare with funding, which is in quote units. A charge is on the borrowed asset, not
+  on a market: where several markets borrow one asset from a shared pool, one of them
+  reports it, so a sum over markets counts it once. Venues that add interest to the
+  debt already include it in `position()`: add charges to fill-based P&L, never on top
+  of a mark-to-market of the position.
+
 ## Funding payment migration in SDK 2.10
 
 Upgrade the SDK and your funding-capable adapters together: Hyperliquid 0.11.0,

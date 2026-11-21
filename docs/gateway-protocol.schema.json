@@ -2001,6 +2001,7 @@
         },
         "type": {
           "enum": [
+            "margin",
             "perp",
             "spot"
           ]
@@ -3299,6 +3300,7 @@
         },
         "type": {
           "enum": [
+            "margin",
             "perp",
             "spot"
           ]

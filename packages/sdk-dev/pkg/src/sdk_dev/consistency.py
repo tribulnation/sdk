@@ -13,7 +13,7 @@ from typing_extensions import Literal, TypeVar, cast
 from tribulnation.catalogue import Catalogue
 from tribulnation.sdk import MissingData
 from tribulnation.sdk.impl.market import MarketSDK
-from tribulnation.sdk.market import Exchange, Market, PerpExchange
+from tribulnation.sdk.market import Exchange, Market, MarginExchange, PerpExchange
 
 from .integration.market.support import CASES
 from .repo import CONTRACT_DIR, repo_root
@@ -25,7 +25,7 @@ BRACKET_SECONDS = 15
 TOLERANCE = Decimal('0.005')
 RETRIES = 3
 T = TypeVar('T')
-Kind = Literal['spot', 'perp']
+Kind = Literal['spot', 'margin', 'perp']
 Status = Literal['pass', 'fail', 'unavailable', 'excluded', 'deferred', 'limitation']
 
 # Reviewed native ticker quote limitations, by venue and exchange: Bit2Me spot's stale
@@ -210,7 +210,7 @@ def catalogue_delisted(
   """Use reviewed, fingerprinted lifecycle data, never infer delisting from a book."""
   table = (
     catalogue.spot_instruments
-    if item.kind == 'spot'
+    if item.kind != 'perp'
     else catalogue.perpetual_instruments
   )
   row = table.get(venue, {}).get(market)
@@ -614,7 +614,13 @@ async def collect(
       try:
         exchange = await request(owner.exchange(exchange_id))
         exchanges[exchange_id] = exchange
-        kind = 'perp' if isinstance(exchange, PerpExchange) else 'spot'
+        kind = (
+          'perp'
+          if isinstance(exchange, PerpExchange)
+          else 'margin'
+          if isinstance(exchange, MarginExchange)
+          else 'spot'
+        )
         add(
           check_id('exchange_identity', exchange_id),
           exchange.exchange_id == exchange_id

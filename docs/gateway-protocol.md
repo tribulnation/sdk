@@ -36,6 +36,10 @@ JSON Schema [gateway-protocol.schema.json](https://github.com/tribulnation/sdk/b
       `available_notional`, `collateral` and `collateral_id` address margin (perpetual)
       markets only, spot markets answer `balances`, and spot `rules` replies carry `base`
       and `quote`.
+   5. Margin markets of kind `margin` (ADR 0073) are addressed by the same margin
+      requests as perpetuals, `leverage` and `set_leverage` included. Their
+      `interest_payments` is not carried: it would be a new message kind, a version
+      change, so proxies raise `NotImplementedError` for it.
 4. The version changes only when a frame stops meaning the same thing to a peer of the
    previous version: a removed or renamed field or kind, a changed value encoding, or a
    new required field. Adding an optional field or a reply field is not a version
@@ -150,7 +154,7 @@ flight is joined. Null or absent asks the venue afresh (ADR 0054).
 | `venues` | `venues`: list of account keys |
 | `venue` | `venue_id` |
 | `exchanges` | `exchanges`: list of `{"id", "type", "name", "url"?}` |
-| `exchange` | `type` (`"spot"` or `"perp"`), `venue_id` |
+| `exchange` | `type` (`"spot"`, `"margin"` or `"perp"`; `"margin"` since ADR 0073, for spot pairs on borrowed money that earlier gateways reported as `"spot"`), `venue_id` |
 | `markets` | `markets`: list of market IDs |
 | `tickers` | `tickers`: object of market ID to `Ticker` |
 | `perp_stats` | `stats`: object of market ID to `PerpStats` |

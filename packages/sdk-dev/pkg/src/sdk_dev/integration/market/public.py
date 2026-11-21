@@ -8,7 +8,7 @@ from urllib.parse import urlsplit
 import asyncio
 
 import pytest
-from typing_extensions import cast
+from typing_extensions import cast, get_args
 from sdk_dev.narrow import is_mapping
 
 from tribulnation.sdk import Context, MarketSDK, NetworkError, RateLimited
@@ -16,6 +16,7 @@ from tribulnation.sdk.market import (
   Book,
   FundingRate,
   Market,
+  MarketKind,
   NextFunding,
   PerpMarket,
   PerpExchange,
@@ -220,7 +221,7 @@ def test_public_read(public_result: PublicResults, public_market: str, method: s
       assert isinstance(identifier, str) and identifier not in ids
       ids.add(identifier)
       assert isinstance(name, str) and name.strip()
-      assert description.get('type') in ('spot', 'perp')
+      assert description.get('type') in get_args(MarketKind)
       if 'url' in description:
         url = description['url']
         assert isinstance(url, str)
