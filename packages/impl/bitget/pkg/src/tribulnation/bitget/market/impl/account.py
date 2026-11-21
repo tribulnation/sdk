@@ -52,6 +52,28 @@ async def spot_position(self: VenueMixin, base: str) -> Position:
   return Position(size=asset['available'] + asset['frozen'] + asset['locked'])
 
 
+def margin_exposure(row: AccountAsset | None) -> Decimal:
+  """Net holding of one coin in a UTA pool: what is owned less what is borrowed.
+
+  Bitget's `balance` is documented as "net of borrowed amount", but it also leaves out
+  what open orders lock: a resting margin sell of 10 LIT, auto-borrowed at placement,
+  read `balance` -10, `debt` 10, `locked` 10 (confirmed live, 2026-11-21) while nothing
+  had traded -- the borrowed 10 sits locked in the order. So the exposure is
+  `balance + locked`: 0 while the sell rests, -10 once it fills (nothing locked then).
+  No row means nothing held and nothing owed.
+  """
+  return row['balance'] + row['locked'] if row else Decimal(0)
+
+
+async def margin_position(self: VenueMixin, base: str) -> Position:
+  """The net base-coin exposure of a UTA spot-margin pair, negative when short.
+
+  The unified pool holds one balance per coin, so this is the same coin whichever pair
+  or product it was bought, sold or borrowed through.
+  """
+  return Position(size=margin_exposure(await uta_coin(self, base)))
+
+
 async def spot_collateral(self: VenueMixin, quote: str) -> Collateral:
   """The quote-asset balance backing a spot market: total held, and the free part."""
   if await self.is_uta():

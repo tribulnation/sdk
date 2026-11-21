@@ -1,6 +1,6 @@
 """Mapping between Bitget payloads and the SDK's market types."""
 
-from typing_extensions import Literal, Sequence
+from typing_extensions import Literal, Sequence, TypedDict
 from datetime import datetime, timedelta
 from decimal import Decimal
 
@@ -32,12 +32,37 @@ from typed_bitget.uta_streams.fill import FillUpdate
 PerpProduct = Literal['USDT-FUTURES', 'USDC-FUTURES']
 """Native futures product lines, excluding dated contracts during discovery."""
 
-Product = Literal['SPOT', 'USDT-FUTURES', 'USDC-FUTURES']
+Product = Literal['SPOT', 'MARGIN', 'USDT-FUTURES', 'USDC-FUTURES']
 """Bitget product lines used to address public endpoints.
 
 The same strings name a Classic v2 `productType`/`instType` and a UTA v3
-`category`, so one alias serves both account modes.
+`category`, so one alias serves both account modes. `MARGIN` is a UTA v3 category
+only: its book, tickers and candles are the spot pair's, read under `SPOT`.
 """
+
+MARGIN: Literal['MARGIN'] = 'MARGIN'
+"""The UTA cross spot-margin category behind the `margin` exchange."""
+
+ClassicProduct = Literal['SPOT', 'USDT-FUTURES', 'USDC-FUTURES']
+"""The product lines Classic v2 endpoints and public channels address."""
+
+
+def classic_product(product: Product) -> ClassicProduct:
+  """The Classic v2 product line serving `product`'s public data: a margin pair's
+  book and candles are its spot pair's."""
+  return 'SPOT' if product == MARGIN else product
+
+
+def futures_product(product: Product) -> PerpProduct:
+  """`product` as a futures line, for endpoints only futures have.
+
+  Raises:
+    ValueError: `product` is spot or spot margin.
+  """
+  if product == 'SPOT' or product == MARGIN:
+    raise ValueError(f'{product} is not a futures product')
+  return product
+
 
 PERP: Literal['USDT-FUTURES'] = 'USDT-FUTURES'
 """The USDT-margined product behind the `usdt` exchange."""
@@ -172,6 +197,53 @@ def parse_spot_rules(symbol: SpotSymbol) -> Rules:
     fees=Fees.symmetric(maker=symbol['makerFeeRate'], taker=symbol['takerFeeRate']),
     api=symbol['status'] == 'online',
     details=symbol,
+  )
+
+
+class MarginInstrument(TypedDict):
+  """The fields read from one `MARGIN` row of `uta.market.instruments`, as sent.
+
+  The typed client's `Instrument` refuses these rows (`areaSymbol` is `null` on margin
+  pairs, confirmed live 2026-11-21), so they are read unvalidated: every number arrives
+  as a decimal string.
+  """
+
+  symbol: str
+  baseCoin: str
+  quoteCoin: str
+  pricePrecision: str
+  """Decimal places of the price."""
+  quantityPrecision: str
+  """Decimal places of the base quantity."""
+  minOrderQty: str
+  """Minimum order quantity, in base coin."""
+  maxOrderQty: str
+  """Maximum order quantity, in base coin; `0` when uncapped (confirmed live)."""
+  minOrderAmount: str
+  """Minimum order value, in quote coin."""
+  buyLimitPriceRatio: str
+  sellLimitPriceRatio: str
+  status: str
+
+
+def parse_margin_rules(instrument: MarginInstrument) -> Rules:
+  """Map one margin pair's trading rules onto `Rules`.
+
+  Tick and step are powers of ten from the decimal-place counts, as on spot. The row
+  publishes no fee rates; the account's come from `fees()`.
+  """
+  max_qty = Decimal(instrument['maxOrderQty'])
+  return Rules(
+    fee_asset=instrument['quoteCoin'],
+    tick_size=Decimal(10) ** -int(instrument['pricePrecision']),
+    step_size=Decimal(10) ** -int(instrument['quantityPrecision']),
+    fixed_min_qty=Decimal(instrument['minOrderQty']) or None,
+    min_value=Decimal(instrument['minOrderAmount']) or None,
+    max_qty=max_qty or None,
+    rel_min_price=1 - Decimal(instrument['sellLimitPriceRatio']),
+    rel_max_price=1 + Decimal(instrument['buyLimitPriceRatio']),
+    api=instrument['status'] == 'online',
+    details=instrument,
   )
 
 

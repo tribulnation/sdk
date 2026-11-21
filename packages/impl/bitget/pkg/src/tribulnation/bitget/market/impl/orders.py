@@ -3,7 +3,7 @@
 from tribulnation.sdk.market import OrderState
 
 from .mixin import MarketMixin
-from .parse import parse_mix_order, parse_spot_order, parse_uta_order
+from .parse import futures_product, parse_mix_order, parse_spot_order, parse_uta_order
 from .util import PAGE
 
 
@@ -36,7 +36,10 @@ async def open_orders(self: MarketMixin) -> list[OrderState]:
       cursor = rows[-1]['orderId']
   else:
     paging = self.client.classic.mix.order.open_paged(
-      symbol=self.symbol, product_type=self.product, limit=PAGE, validate=self.validate
+      symbol=self.symbol,
+      product_type=futures_product(self.product),
+      limit=PAGE,
+      validate=self.validate,
     )
     async for rows in paging.via(self.call):
       out.extend(parse_mix_order(o) for o in rows)

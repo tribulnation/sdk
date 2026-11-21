@@ -90,7 +90,7 @@ async def test_trading_is_unimplemented_offline(harness: Harness):
   never a live account. USDT futures trade (`test_perp_trading.py`)."""
   if harness.market.product == 'USDT-FUTURES':
     pytest.skip('USDT futures trade on a UTA account: see test_perp_trading.py')
-  gap = 'Trading is not implemented|implemented for USDT-FUTURES only'
+  gap = 'Trading is not implemented|implemented for USDT-FUTURES and MARGIN only'
   with pytest.raises(NotImplementedError, match=gap):
     await harness.market.place_order(
       {'type': 'LIMIT', 'qty': Decimal(1), 'price': Decimal(1)}

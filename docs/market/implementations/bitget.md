@@ -12,8 +12,9 @@
 
 # Bitget Market
 
-> Spot and USDT-, USDC- and coin-margined perpetuals. Trading covers USDT-margined perpetuals on a
-> Unified Trading Account; everything else is read-only. `tribulnation-bitget`, venue name
+> Spot, spot margin and USDT-, USDC- and coin-margined perpetuals. Trading covers USDT-margined
+> perpetuals and cross spot-margin pairs on a Unified Trading Account; everything else is
+> read-only. `tribulnation-bitget`, venue name
 > `bitget`.
 
 See the [generic market interface](../index.md) for the shared method surface. This page
@@ -34,6 +35,7 @@ USDC futures expose public data only; their account methods raise
 | `exchange_id` | Type | What it is |
 | --- | --- | --- |
 | `spot` | spot | Every spot pair. |
+| `margin` | margin | UTA cross spot-margin pairs (category `MARGIN`). Not listed by `exchanges()`, whose `type` names spot and perpetual exchanges only; request it by ID. |
 | `usdt` | perp | USDT-margined perpetuals (`USDT-FUTURES`). |
 | `usdc` | perp | USDC-margined perpetuals (`USDC-FUTURES`). |
 
@@ -49,7 +51,7 @@ Catalogue entries remain active; this is an SDK capability deferral.
 
 Market IDs are Bitget's Classic API symbols: `BTCUSDT` on `spot` and `usdt`,
 `BTCPERP` on `usdc`.
-Full SDK IDs include `bitget:usdt:BTCUSDT` and `bitget:usdc:BTCPERP`; a configured
+Full SDK IDs include `bitget:usdt:BTCUSDT`, `bitget:margin:LITUSDT` and `bitget:usdc:BTCPERP`; a configured
 account key can replace `bitget`.
 The former USDT exchange ID `perp` is replaced by `usdt`, without an alias.
 `Exchange.markets()` returns the symbols of the public catalogue: every spot pair, and
@@ -58,12 +60,30 @@ dropped).
 
 ## Venue-specific semantics
 
+- **Spot margin (`margin`) is a `MarginMarket` on a UTA account.** It trades the spot
+  pair's book in category `MARGIN`; book, tickers and candles are the spot pair's.
+  - A sell of more base than the unified pool holds auto-borrows the rest at placement;
+    buys repay debt first (`repayMode: auto`). Bitget takes no `reduceOnly` on margin, so
+    `settings['bitget']['reduce_only']` raises `NotImplementedError`. `replace_order`
+    always cancels and places anew.
+  - `position()` (and so `delta()`) is the pool's net holding of the base coin, negative
+    when borrowed and sold: `balance + locked` of `account/assets`. Bitget's `balance` is
+    net of debt but excludes what orders lock, so a resting borrowed sell reads 0 and a
+    filled one minus its size. A spot holding of the same coin is the same exposure and
+    counts too.
+  - `collateral()` is the unified pool, as on `usdt`, and `collateral_id()` is
+    `<account>:usdt`; resolving `<account>:margin` gives the same pool.
+  - `leverage()` is the account's listed cross `MARGIN` setting for the pair, else 1.
+  - `rules()` reads the `MARGIN` rows of `uta.market.instruments` unvalidated: the typed
+    client's schema refuses them (`areaSymbol` is `null`). Classic accounts raise
+    `NotImplementedError` on every account read and order.
+
 - **Public data is mode-independent.** `markets`, `depth`, `depth_stream`, `tickers`,
   `rules`, `perp_stats`, `index`, `next_funding` and `funding_rates` read the venue's public
   endpoints, so they answer the same on a Classic account, a UTA account and the built-in
   public one. Account-scoped reads on `spot` and `usdt` dispatch on the account's mode;
   `usdc` account reads are not implemented.
-- **Trading is implemented for UTA `usdt` only**, on cross margin in one-way position mode.
+- **Trading is implemented for UTA `usdt` and `margin` only**; `usdt` on cross margin in one-way position mode.
   On a Classic account, on `spot` and on `usdc`, `place_order` and `cancel_order` raise
   `NotImplementedError`, and so does `leverage` on a perpetual. Bitget itself refuses
   orders from an account in hedge mode.
