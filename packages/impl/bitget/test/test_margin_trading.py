@@ -14,7 +14,11 @@ from decimal import Decimal
 import pytest
 
 from tribulnation.bitget.market import BitgetMarket, MarginMarket
-from tribulnation.bitget.market.impl.account import margin_exposure
+from tribulnation.bitget.market.impl.account import (
+  margin_exposure,
+  spot_holding,
+  spot_position,
+)
 from tribulnation.sdk.core import Subscription
 from tribulnation.sdk.market import Settings
 
@@ -104,6 +108,41 @@ async def test_a_sell_of_held_coins_borrows_only_what_it_lacks(
   )
   assert margin_fake.lit.debt == 6
   assert (await margin.position()).size == -6
+
+
+async def test_spot_reads_what_the_pool_owns_and_margin_the_net(
+  margin_fake: 'FakeMargin', margin: MarginMarket
+):
+  """One pool, read twice without double counting a short: owning 4 LIT and selling
+  10 on margin, spot holds 0 and margin is -6; spot alone would have read -6 too."""
+  margin_fake.lit.free = Decimal(4)
+  assert (await spot_position(margin, 'LIT')).size == 4
+  r = await margin.place_order(
+    {'type': 'POST_ONLY', 'qty': Decimal(-10), 'price': Decimal('2.32')}
+  )
+  assert (await spot_position(margin, 'LIT')).size == 10
+  assert (await margin.position()).size == 4
+  margin_fake.fill(r.id)
+  assert (await spot_position(margin, 'LIT')).size == 0
+  assert (await margin.position()).size == -6
+
+
+async def test_every_margin_pair_of_a_coin_reads_the_same_pool_holding(
+  margin_fake: 'FakeMargin', margin: MarginMarket
+):
+  """`LITUSDC` borrows from the same LIT debt as `LITUSDT`: both read it, since a
+  strategy on either sizes from it, so consumers count it once per coin."""
+  rows = dict(await margin.margin_instruments())
+  rows['LITUSDC'] = {**rows[PAIR], 'symbol': 'LITUSDC', 'quoteCoin': 'USDC'}
+  margin.cache.margin = rows
+  other = await BitgetMarket(account=margin.account, cache=margin.cache).margin_market(
+    'margin:LITUSDC'
+  )
+  r = await margin.place_order(
+    {'type': 'LIMIT', 'qty': Decimal(-10), 'price': Decimal('2.30')}
+  )
+  margin_fake.fill(r.id)
+  assert (await margin.position()).size == (await other.position()).size == -10
 
 
 async def test_replace_cancels_and_places_anew(
@@ -249,3 +288,20 @@ def test_exposure_adds_back_what_orders_lock():
   }
   assert margin_exposure(row) == 0
   assert margin_exposure(None) == 0
+
+
+def test_spot_holds_what_is_owned_never_what_is_owed():
+  """The live 548 LIT short (2026-11-21) holds nothing on spot; no row holds nothing."""
+  row: AccountAsset = {
+    'coin': 'LIT',
+    'equity': Decimal('-548.26695058'),
+    'usdValue': Decimal(-1200),
+    'balance': Decimal('-548.26695058'),
+    'available': Decimal('-548.26695058'),
+    'debt': Decimal('548.26695058'),
+    'locked': Decimal(0),
+    'bonus': Decimal(0),
+  }
+  assert spot_holding(row) == 0
+  assert margin_exposure(row) == Decimal('-548.26695058')
+  assert spot_holding(None) == 0

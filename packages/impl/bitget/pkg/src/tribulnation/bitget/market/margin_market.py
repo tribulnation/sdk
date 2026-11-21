@@ -37,6 +37,7 @@ from .impl import (
   CANDLE_INTERVALS,
   MarketMixin,
   depth_stream,
+  interest_pair,
   interest_payments,
   open_orders,
   parse_book,
@@ -177,7 +178,11 @@ class MarginMarket(MarketMixin, _MarginMarket):
     """Fetch your net base-coin holding: owned less borrowed, negative when short.
 
     It is the unified pool's whole balance of the coin, so a spot holding of the same
-    coin on this account counts too: it is the same exposure.
+    coin on this account counts too: it is the same exposure. Every margin pair of
+    the coin (`LINKUSDT`, `LINKUSDC`) reads this same figure, and each must, since a
+    strategy trading either one sizes from it: count it once per account and coin,
+    not once per pair. The spot markets read only what the pool owns (0 for a
+    borrowed-and-sold short). Accrued interest is in the debt, so it is in here.
     """
     await self.require_uta()
     return await margin_position(self, await self.base_coin())
@@ -220,15 +225,22 @@ class MarginMarket(MarketMixin, _MarginMarket):
     `INTEREST_SETTLEMENT_OUT` rows for it, in base units, negative when paid.
 
     Debt in the coin is pool-wide, so interest on it counts here whichever pair or
-    product borrowed it. Interest on borrowed USDT (the quote) is the pool's:
+    product borrowed it, and only one pair of the coin reports it (`interest_pair`:
+    the USDT-quoted one); the others answer nothing, so a sum over margin markets
+    counts each charge once. Interest on borrowed USDT (the quote) is the pool's:
     `MarginExchange.interest_payments(None, ...)`.
+
+    Bitget adds interest to the debt, so `position()` already includes it: add these
+    rows to fill-based P&L, not to a mark-to-market of `position()`.
     """
 
     async def pages() -> AsyncIterator[Sequence[InterestPayment]]:
       await self.require_uta()
-      coin = await self.base_coin()
-      async for page in interest_payments(self, start, end, coin=coin):
-        yield page
+      instruments = await self.margin_instruments()
+      coin = instruments[self.symbol]['baseCoin']
+      if interest_pair(instruments, coin) == self.symbol:
+        async for page in interest_payments(self, start, end, coin=coin):
+          yield page
 
     return PaginatedResponse(pages())
 

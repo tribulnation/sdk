@@ -56,7 +56,12 @@ class BitgetMarket(VenueMixin, TradingVenue):
     )
 
   async def exchanges(self) -> list[TradingVenue.ExchangeDescription]:
-    """List available exchanges: spot, UTA cross spot margin and the perpetuals."""
+    """List available exchanges: spot, UTA cross spot margin and the perpetuals.
+
+    On a UTA, spot and margin markets read one pool: a margin pair's position is the
+    pool's net holding of its base coin, and a spot pair's only what the pool owns,
+    so a borrowed-and-sold short shows once, on margin.
+    """
     return [
       {'id': 'spot', 'type': 'spot', 'name': 'Spot'},
       {'id': 'margin', 'type': 'margin', 'name': 'Spot Margin'},

@@ -85,8 +85,9 @@ class MarginExchange(VenueMixin, _MarginExchange):
   def interest_payments(
     self, market_id: str | None, /, start: datetime, end: datetime
   ) -> PaginatedResponse[InterestPayment]:
-    """Fetch borrow interest for one pair (`MarginMarket.interest_payments`), or with
-    `market_id=None` for every coin the unified pool owes, USDT included.
+    """Fetch borrow interest for one pair (`MarginMarket.interest_payments`: each
+    coin's charges on one pair only), or with `market_id=None` for every coin the
+    unified pool owes, USDT included.
 
     Raises:
       NotImplementedError: The account is in Classic mode.

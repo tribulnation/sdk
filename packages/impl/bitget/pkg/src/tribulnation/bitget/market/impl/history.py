@@ -4,14 +4,21 @@ Every page is fetched through `call`, so the retriable unit is the single reques
 failed rather than the whole sweep.
 """
 
-from typing_extensions import AsyncIterator, Literal, Sequence
+from typing_extensions import AsyncIterator, Literal, Mapping, Sequence
 from datetime import datetime, timedelta
 
 from tribulnation.sdk.market import FundingRate, InterestPayment, Trade
 from typed_bitget.uta.account.financial_records import FinancialRecord
 
 from .mixin import MarketMixin, VenueMixin
-from .parse import futures_product, parse_mix_fill, parse_spot_fill, parse_uta_fill
+from .parse import (
+  MARGIN_COIN,
+  MarginInstrument,
+  futures_product,
+  parse_mix_fill,
+  parse_spot_fill,
+  parse_uta_fill,
+)
 from .util import HISTORY_WINDOW, PAGE, windows
 
 INTEREST = 'INTEREST_SETTLEMENT_OUT'
@@ -108,6 +115,27 @@ def parse_interest(record: FinancialRecord) -> InterestPayment:
   return InterestPayment(
     time=record['ts'], asset=record['coin'], amount=record['amount']
   )
+
+
+def interest_pair(instruments: Mapping[str, MarginInstrument], coin: str) -> str | None:
+  """The one margin pair that reports `coin`'s borrow interest, if any pair borrows it.
+
+  Interest is charged per coin on the unified pool, not per pair, and the ledger row
+  names no pair: every pair of the coin (`LINKUSDT`, `LINKUSDC`) would read the same
+  rows. So one pair owns them, the USDT-quoted one when listed, else the first symbol,
+  and summing interest over every margin market counts each charge once.
+
+  Args:
+    instruments: The `MARGIN` catalogue, keyed by symbol.
+    coin: The borrowed base coin, e.g. `LIT`.
+  """
+  pairs = sorted(
+    (row['quoteCoin'] != MARGIN_COIN, symbol)
+    for symbol, row in instruments.items()
+    if row['baseCoin'] == coin
+  )
+  if pairs:
+    return pairs[0][1]
 
 
 async def interest_payments(

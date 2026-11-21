@@ -107,7 +107,11 @@ async for page in sdk.interest_payments('bitget:margin:LITUSDT', start, end):
     print(payment.time, payment.asset, payment.amount)  # negative when paid
 ```
 
-Each `InterestPayment` names the borrowed `asset` and an `amount` in its units.
+Each `InterestPayment` names the borrowed `asset` and an `amount` in its units. A charge
+is reported by one market only, so summing over markets counts it once; where the venue
+adds interest to the debt, `position()` already includes it. Positions are not per
+market in the same way: every spot pair of a base, and on a unified account every margin
+pair of a base, reads the same holding, so sum `delta()` once per account and asset.
 `exchange.interest_payments(None, start, end)` lists every asset the exchange's pool
 owes, quote debt included, where the venue supports it. For how markets map to
 the money they spend, see [Collateral & Risk](collateral.md#at-a-glance).

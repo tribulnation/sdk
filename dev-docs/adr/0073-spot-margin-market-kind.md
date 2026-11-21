@@ -46,7 +46,11 @@ exchanges split into `SpotExchange` and `PerpExchange`. Bitget's UTA cross spot 
    when paid. Quote or collateral debt is pool-wide on unified accounts, so it is not a
    market's: `MarginExchange.interest_payments(None, start, end)` lists every asset.
    The root and venue route `interest_payments(market_id, start, end)`. The default
-   raises `NotImplementedError`, like exchange-wide funding.
+   raises `NotImplementedError`, like exchange-wide funding. A charge is on an asset,
+   not a market, so where several markets borrow one asset from a shared pool the
+   implementation reports each charge on one of them only: a sum over markets counts
+   it once. Where the venue adds interest to the debt, `position()` includes it, so
+   consumers add interest to fill-based P&L, not to a mark-to-market of the position.
 5. **Gateway.** `ExchangeResp.type` gains `margin`, sent only for exchanges earlier
    gateways misreported as `spot`; proxies build `ProxyMarginExchange` and
    `ProxyMarginMarket`, which use the existing margin messages. `interest_payments` would
@@ -59,7 +63,14 @@ exchanges split into `SpotExchange` and `PerpExchange`. Bitget's UTA cross spot 
    are the public `MARGIN` instrument catalogue. Interest is the UTA ledger's
    `INTEREST_SETTLEMENT_OUT` rows (`/api/v3/account/financial-records`), read under every
    category and deduplicated by ID, since the venue does not say which category books
-   pool-wide interest.
+   pool-wide interest. Of a coin's margin pairs (27 coins have several, e.g. `LINKUSDT`
+   and `LINKUSDC`), the USDT-quoted one, else the first symbol, reports them.
+8. **Positions on one pool.** A margin pair's `position()` is the pool's net holding of
+   its base coin, and every margin pair of the coin reads it: a strategy on any of them
+   sizes from it, so zeroing all but one would make the others trade blind. Like spot
+   balances across the pairs of one base, it is counted once per account and asset
+   (`Market.delta` says so). The `spot` markets on a UTA read only what the pool owns,
+   so a borrowed-and-sold short is not repeated on spot.
 
 ## Alternatives considered
 

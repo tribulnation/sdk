@@ -7,7 +7,7 @@ from .account import (
   uta_pool,
 )
 from .candles import CANDLE_INTERVALS, perp_candles, spot_candles
-from .history import funding_rates, interest_payments, trades_history
+from .history import funding_rates, interest_pair, interest_payments, trades_history
 from .mixin import Cache, MarketMixin, VenueMixin, merged_books
 from .orders import open_orders
 from .parse import (

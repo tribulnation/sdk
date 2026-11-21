@@ -238,7 +238,8 @@ async def report_ids(report: Report) -> Ids:
 async def market_ids(venue: TradingVenue) -> Ids:
   """
   The market IDs every exchange of a trading venue lists, keyed the way the catalogue
-  keys instruments.
+  keys instruments. Spot-margin pairs are spot pairs traded on borrowed money, so they
+  are checked against the spot instruments, as `consistency` reads them.
 
   Args:
     venue: The venue's market implementation.
@@ -248,8 +249,8 @@ async def market_ids(venue: TradingVenue) -> Ids:
     for description in await venue.exchanges():
       exchange = await venue.exchange(description['id'])
       keys = {market_key(description['id'], m) for m in await exchange.markets()}
-      if description['type'] == 'spot':
-        ids.spot_markets |= keys
-      else:
+      if description['type'] == 'perp':
         ids.perp_markets |= keys
+      else:
+        ids.spot_markets |= keys
   return ids

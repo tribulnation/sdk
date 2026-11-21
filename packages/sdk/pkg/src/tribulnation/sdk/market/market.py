@@ -208,6 +208,11 @@ class Market(SDK):
     Signed: what you own or are long is positive. `SpotMarket` answers its total base
     balance, `MarginMarket` its position size.
 
+    It is the account's exposure to the asset, which several markets can share: every
+    spot pair of one base reads the same balance, and on a unified account every
+    margin pair of one base reads the same pool holding. Sum deltas once per account
+    and asset, not once per market.
+
     Markets of venues not yet migrated to `SpotMarket`/`MarginMarket` raise
     `NotImplementedError`. Not abstract, so venue packages released before it keep
     instantiating (ADR 0058).
@@ -671,11 +676,19 @@ class MarginMarket(Market):
     """Fetch the borrow interest charged on this market's position: its carry, as
     `PerpMarket.funding_payments` is a perpetual's.
 
-    Interest on the base asset this market borrows to go short. Debt in the quote or
+    Interest on the base asset this market borrows to go short. Amounts are in the
+    borrowed asset's units, negative when paid. Rows are per borrowed asset, not per
+    market: where several markets borrow one asset from a shared pool, the venue
+    charges the asset once, and implementations report each charge on one of those
+    markets only, so a sum over markets counts it once. Debt in the quote or
     collateral asset is pool-wide on unified accounts, so it is not this market's:
-    `MarginExchange.interest_payments(None, ...)` lists it. Amounts are in the
-    borrowed asset's units, negative when paid. Unsupported implementations raise
-    `NotImplementedError`.
+    `MarginExchange.interest_payments(None, ...)` lists it.
+
+    Venues that add interest to the debt already include it in `position()`. Add
+    these rows to fill-based (cost-basis) P&L, never on top of a mark-to-market of
+    `position()`, which would count the interest twice.
+
+    Unsupported implementations raise `NotImplementedError`.
 
     Args:
       start: Start of the window (inclusive).

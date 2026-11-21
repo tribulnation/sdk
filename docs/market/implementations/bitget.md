@@ -70,15 +70,23 @@ dropped).
     when borrowed and sold: `balance + locked` of `account/assets`. Bitget's `balance` is
     net of debt but excludes what orders lock, so a resting borrowed sell reads 0 and a
     filled one minus its size. A spot holding of the same coin is the same exposure and
-    counts too.
+    counts too. Every margin pair of a coin (`LINKUSDT`, `LINKUSDC`) reads this same
+    figure, so count it once per account and coin. Accrued interest is added to the
+    debt, so it is in the position before the ledger books it.
+  - On a UTA, the `spot` markets' `position()` is what the pool owns of the coin,
+    `balance + locked + debt`, never what it owes: a borrowed-and-sold short reads 0 on
+    `spot:LITUSDT` and minus its size on `margin:LITUSDT`, not twice.
   - `collateral()` is the unified pool, as on `usdt`, and `collateral_id()` is
     `<account>:usdt`; resolving `<account>:margin` gives the same pool.
   - `leverage()` is the account's listed cross `MARGIN` setting for the pair, else 1.
   - `interest_payments(start, end)` is the borrow interest on the base coin: the UTA
     ledger's `INTEREST_SETTLEMENT_OUT` rows (`/api/v3/account/financial-records`, every
     category, deduplicated by ID, 30-day windows), signed negative and in the coin's
-    units. Debt is pool-wide, so it counts whichever pair borrowed the coin; the
-    exchange's `interest_payments(None, start, end)` lists every coin, USDT included.
+    units. Debt is pool-wide, so it counts whichever pair borrowed the coin, and one
+    pair per coin reports it, the USDT-quoted one (else the first symbol); the coin's
+    other pairs answer nothing. Since the interest is already in `position()`, add it
+    to fill-based P&L only. The exchange's `interest_payments(None, start, end)` lists
+    every coin, USDT included.
     The ledger keeps 90 days. Not yet verified live: on 2026-11-21 hourly interest
     grew the debt without any ledger row, so it may answer empty until Bitget books
     the settlement.

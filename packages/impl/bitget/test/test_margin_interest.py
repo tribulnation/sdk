@@ -13,6 +13,7 @@ import httpx
 import pytest
 
 from tribulnation.bitget.market import BitgetMarket, MarginMarket
+from tribulnation.bitget.market.impl import interest_pair
 from tribulnation.bitget.market.margin_exchange import MarginExchange
 from tribulnation.sdk.market import InterestPayment, is_margin
 
@@ -110,6 +111,35 @@ async def test_a_pair_reads_the_interest_on_its_base_coin(
   assert all(
     q['coin'] == 'LIT' and q['type'] == 'INTEREST_SETTLEMENT_OUT' for q in queries
   )
+
+
+async def test_only_one_pair_of_a_coin_reports_its_interest(
+  ledger: 'FakeMargin', margin: MarginMarket
+):
+  """`LITUSDC` borrows the same LIT: its pair answers nothing and `LITUSDT` every
+  charge, so a sum over every margin market of LIT counts each charge once."""
+  rows = dict(await margin.margin_instruments())
+  rows['LITUSDC'] = {**rows[PAIR], 'symbol': 'LITUSDC', 'quoteCoin': 'USDC'}
+  margin.cache.margin = rows
+  other = await venue_of(margin).margin_market('margin:LITUSDC')
+  assert isinstance(other, MarginMarket)
+  summed = [
+    *await margin.interest_payments(START, END),
+    *await other.interest_payments(START, END),
+  ]
+  assert sorted(p.amount for p in summed) == [Decimal('-0.0229'), Decimal('-0.0228')]
+
+
+def test_the_interest_pair_is_quoted_in_usdt_else_the_first_symbol():
+  """USDT-quoted first; without one, the first symbol; a coin no pair borrows, none."""
+  rows: Any = {
+    s: {'baseCoin': 'TRX', 'quoteCoin': s.removeprefix('TRX')}
+    for s in ('TRXETH', 'TRXUSDC', 'TRXUSDT')
+  }
+  assert interest_pair(rows, 'TRX') == 'TRXUSDT'
+  del rows['TRXUSDT']
+  assert interest_pair(rows, 'TRX') == 'TRXETH'
+  assert interest_pair(rows, 'LIT') is None
 
 
 async def test_the_exchange_reads_every_coin_the_pool_owes(
