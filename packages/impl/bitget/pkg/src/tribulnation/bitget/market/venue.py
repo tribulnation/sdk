@@ -56,13 +56,10 @@ class BitgetMarket(VenueMixin, TradingVenue):
     )
 
   async def exchanges(self) -> list[TradingVenue.ExchangeDescription]:
-    """List available exchanges.
-
-    `margin` is left out: `ExchangeDescription.type` names only spot and perpetual
-    exchanges, and a margin pair is neither. Request it by ID.
-    """
+    """List available exchanges: spot, UTA cross spot margin and the perpetuals."""
     return [
       {'id': 'spot', 'type': 'spot', 'name': 'Spot'},
+      {'id': 'margin', 'type': 'margin', 'name': 'Spot Margin'},
       {'id': 'usdt', 'type': 'perp', 'name': 'USDT Perpetuals'},
       {'id': 'usdc', 'type': 'perp', 'name': 'USDC Perpetuals'},
     ]

@@ -9,6 +9,7 @@ from .collateral import (
   Hold,
 )
 from .funding import FundingRate, NextFunding, FundingPayment, ExchangeFundingPayment
+from .interest import InterestPayment
 from .orders import Order, OrderResponse, OrderState
 from .position import Position, PerpPosition, RemainingPositionLimit
 from .stats import PerpStats

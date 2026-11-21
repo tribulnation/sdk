@@ -2,7 +2,7 @@
 
 [ADR index](README.md) · [Developer documentation](../README.md)
 
-1. Status: proposed
+1. Status: proposed; amended by [0073](0073-spot-margin-market-kind.md) (a `margin` kind and `MarginExchange`)
 2. Date: 2026-10-24
 3. Amends: [ADR 0009](0009-catalogue-owned-asset-identity.md) (spot rules name their
    assets) and [ADR 0038](0038-account-market-leverage.md) (the spot

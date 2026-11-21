@@ -35,7 +35,7 @@ USDC futures expose public data only; their account methods raise
 | `exchange_id` | Type | What it is |
 | --- | --- | --- |
 | `spot` | spot | Every spot pair. |
-| `margin` | margin | UTA cross spot-margin pairs (category `MARGIN`). Not listed by `exchanges()`, whose `type` names spot and perpetual exchanges only; request it by ID. |
+| `margin` | margin | UTA cross spot-margin pairs (category `MARGIN`), listed by `exchanges()` with `type` `margin`. `markets()` are the marginable pairs of the public instrument catalogue (`/api/v3/market/instruments?category=MARGIN`). |
 | `usdt` | perp | USDT-margined perpetuals (`USDT-FUTURES`). |
 | `usdc` | perp | USDC-margined perpetuals (`USDC-FUTURES`). |
 
@@ -74,6 +74,12 @@ dropped).
   - `collateral()` is the unified pool, as on `usdt`, and `collateral_id()` is
     `<account>:usdt`; resolving `<account>:margin` gives the same pool.
   - `leverage()` is the account's listed cross `MARGIN` setting for the pair, else 1.
+  - `interest_payments(start, end)` is the borrow interest on the base coin: the UTA
+    ledger's `INTEREST_SETTLEMENT_OUT` rows (`/api/v3/account/financial-records`, every
+    category, deduplicated by ID, 30-day windows), signed negative and in the coin's
+    units. Debt is pool-wide, so it counts whichever pair borrowed the coin; the
+    exchange's `interest_payments(None, start, end)` lists every coin, USDT included.
+    The ledger keeps 90 days.
   - `rules()` reads the `MARGIN` rows of `uta.market.instruments` unvalidated: the typed
     client's schema refuses them (`areaSymbol` is `null`). Classic accounts raise
     `NotImplementedError` on every account read and order.

@@ -15,6 +15,7 @@ from tribulnation.sdk.market import (
   Collateral,
   MarginMarket,
   Market,
+  MarginExchange,
   PerpExchange,
   PerpStats,
   Settings,
@@ -116,9 +117,13 @@ def venue_of(**exchanges: Any) -> Any:
   async def perp_exchange(exchange_id: str) -> PerpExchange:
     return await TradingVenue.perp_exchange(cast(Any, stub), exchange_id)
 
+  async def margin_exchange(exchange_id: str) -> MarginExchange:
+    return await TradingVenue.margin_exchange(cast(Any, stub), exchange_id)
+
   stub.exchange = exchange
   stub.spot_exchange = spot_exchange
   stub.perp_exchange = perp_exchange
+  stub.margin_exchange = margin_exchange
   return stub
 
 
@@ -166,7 +171,7 @@ async def test_venue_resolves_spot_assets_and_perp_pools():
 async def test_resolver_rejects_ids_naming_the_wrong_kind():
   """A spot exchange has no pool; a perpetual exchange has no assets."""
   venue = venue_of(spot=FakeSpotExchange(), perp=FakePerpExchange())
-  with pytest.raises(ValueError, match='not a perpetual exchange'):
+  with pytest.raises(ValueError, match='not a margin or perpetual exchange'):
     await TradingVenue.collateral(venue, 'spot')
   with pytest.raises(ValueError, match='not a spot exchange'):
     await TradingVenue.collateral(venue, 'perp:USDC')
@@ -183,7 +188,8 @@ async def test_root_resolver_routes_by_account_key():
 
 
 async def test_root_routes_spot_and_margin_reads_by_kind():
-  """Balances go through spot markets; margin reads through perpetual markets."""
+  """Balances go through spot markets; margin reads through margin markets, which
+  perpetuals are."""
   market = SimpleNamespace(
     balances=AsyncMock(return_value='balances'),
     collateral_ids=AsyncMock(return_value='ids'),
@@ -193,7 +199,7 @@ async def test_root_routes_spot_and_margin_reads_by_kind():
   )
   root = SimpleNamespace(
     spot_market=AsyncMock(return_value=market),
-    perp_market=AsyncMock(return_value=market),
+    margin_market=AsyncMock(return_value=market),
   )
   stub = cast(Any, root)
   assert await TradingMarkets.balances(stub, 'hl:spot:UBTC/USDC:142') == 'balances'
@@ -202,7 +208,7 @@ async def test_root_routes_spot_and_margin_reads_by_kind():
   assert await TradingMarkets.collateral_id(stub, 'hl::ETH') == 'hl:spot:0'
   assert await TradingMarkets.position(stub, 'hl::ETH') == 'position'
   assert await TradingMarkets.available_notional(stub, 'hl::ETH') == 3
-  assert root.perp_market.await_count == 3
+  assert root.margin_market.await_count == 3
 
 
 def test_kinds_narrow_exchanges():

@@ -17,6 +17,8 @@ from tribulnation.sdk.market import (
   Book,
   OrderResponse,
   Trade,
+  Exchange,
+  MarketKind,
   SpotMarket,
   MarginMarket,
   is_spot,
@@ -64,7 +66,7 @@ class Gateway:
     return mkt
 
   async def _margin_market(self, market_id: str) -> MarginMarket:
-    """Require a margin (perpetual) market for this request."""
+    """Require a margin or perpetual market for this request."""
     mkt = await self._market(market_id)
     if not is_margin(mkt):
       raise ValueError(f'market {market_id} is not a margin market')
@@ -271,10 +273,10 @@ class Gateway:
       case codec.LeverageReq():
         return codec.LeverageResp(
           id=msg.id,
-          value=await (await self._perp_market(msg.market_id)).leverage(ttl=msg.ttl),
+          value=await (await self._margin_market(msg.market_id)).leverage(ttl=msg.ttl),
         )
       case codec.SetLeverageReq():
-        await (await self._perp_market(msg.market_id)).set_leverage(msg.leverage)
+        await (await self._margin_market(msg.market_id)).set_leverage(msg.leverage)
         return codec.SetLeverageResp(id=msg.id)
       case codec.CandlesReq():
         return codec.CandlesResp(
@@ -289,7 +291,7 @@ class Gateway:
         )
         return codec.ExchangeResp(
           id=msg.id,
-          type='perp' if is_perp(exchange) else 'spot',
+          type=wire_kind(exchange),
           venue_id=exchange.venue_id,
         )
       case codec.TickersReq():
@@ -315,7 +317,7 @@ class Gateway:
           ),
         )
       case codec.ExchangeCollateralReq():
-        exchange = await (await self._sdk.venue(msg.account_id)).perp_exchange(
+        exchange = await (await self._sdk.venue(msg.account_id)).margin_exchange(
           msg.exchange_id
         )
         return codec.CollateralResp(
@@ -568,3 +570,14 @@ async def run_gateway(socket_path: str, sdk: TradingMarkets):
     except FileNotFoundError:
       pass
     log.info('gateway stopped')
+
+
+def wire_kind(exchange: Exchange) -> MarketKind:
+  """The exchange's `kind` as `ExchangeResp.type`: told apart by class, so an exchange
+  that does not implement `kind` still resolves."""
+  if is_perp(exchange):
+    return 'perp'
+  elif is_margin(exchange):
+    return 'margin'
+  else:
+    return 'spot'

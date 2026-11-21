@@ -26,7 +26,7 @@ The markets implementation is structured following the market IDs: `account` →
 ### Exchange discovery metadata
 
 `await venue.exchanges()` returns `ExchangeDescription` records with required
-`id`, `type` (`spot` or `perp`) and nonempty `name`, plus an optional official
+`id`, `type` (`spot`, `margin` or `perp`, the kind of its markets) and nonempty `name`, plus an optional official
 HTTPS `url`. Names describe product families within a venue, not necessarily
 distinct legal entities. They may change and are never identifiers.
 
@@ -74,12 +74,16 @@ rules, book = await asyncio.gather(
 )
 ```
 
-**Spot or perpetual?** Every `Market` has books, trades, orders, rules and fees. Account
+**Spot, margin or perpetual?** Every `Market` has books, trades, orders, rules and fees. Account
 reads depend on what it trades: a `SpotMarket` has `balances()` and `collateral_ids()`, a
-margin market (`PerpMarket`) `position()`, `collateral()`, `leverage()`,
-`available_notional()`, `remaining_position_limit()` and `collateral_id()`. So `market.position()` on a plain `Market`
-fails type checking, and on a spot market at runtime. `is_spot` and `is_perp` narrow the
-type for your type checker; `market.kind` names it:
+`MarginMarket` `position()`, `collateral()`, `leverage()`,
+`available_notional()`, `remaining_position_limit()`, `collateral_id()` and
+`interest_payments()`. A spot pair traded on borrowed money (`bitget:margin:LITUSDT`) is a
+`MarginMarket` of kind `margin`; a `PerpMarket` is a `MarginMarket` too, of kind `perp`, and
+adds funding and index. So `market.position()` on a plain `Market`
+fails type checking, and on a spot market at runtime. `is_spot`, `is_margin` (true for
+perpetuals as well) and `is_perp` narrow the type for your type checker; `market.kind`
+(`'spot'`, `'margin'` or `'perp'`) names it (ADR 0073):
 
 ![Market splits into SpotMarket, with balances() and collateral_ids(), and MarginMarket, with position(), collateral(), leverage(), available_notional() and collateral_id(); PerpMarket derives from MarginMarket and adds funding and index.](media/market-types.svg)
 
@@ -91,8 +95,21 @@ if is_spot(market):
   balances = await market.balances()
 ```
 
-`sdk.spot_market(id)` and `sdk.perp_market(id)` resolve and check the kind in one call.
-Exchanges split the same way, into `SpotExchange` and `PerpExchange`. For how markets map to
+`sdk.spot_market(id)`, `sdk.margin_market(id)` (margin or perpetual) and
+`sdk.perp_market(id)` resolve and check the kind in one call. Exchanges split the same
+way, into `SpotExchange`, `MarginExchange` and `PerpExchange(MarginExchange)`.
+
+Borrow interest is a margin position's carry, as funding is a perpetual's:
+
+```python
+async for page in sdk.interest_payments('bitget:margin:LITUSDT', start, end):
+  for payment in page:
+    print(payment.time, payment.asset, payment.amount)  # negative when paid
+```
+
+Each `InterestPayment` names the borrowed `asset` and an `amount` in its units.
+`exchange.interest_payments(None, start, end)` lists every asset the exchange's pool
+owes, quote debt included, where the venue supports it. For how markets map to
 the money they spend, see [Collateral & Risk](collateral.md#at-a-glance).
 
 ## Exchange-wide account history

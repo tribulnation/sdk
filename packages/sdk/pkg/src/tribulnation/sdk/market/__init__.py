@@ -11,6 +11,7 @@ from .types import (
   NextFunding,
   FundingPayment,
   ExchangeFundingPayment,
+  InterestPayment,
   Order,
   OrderResponse,
   OrderState,
@@ -38,7 +39,7 @@ from .market import (
   MarginMarket,
   PerpMarket,
 )
-from .exchange import Exchange, SpotExchange, PerpExchange
+from .exchange import Exchange, SpotExchange, MarginExchange, PerpExchange
 from .kinds import is_spot, is_perp, is_margin
 from .ids import QualifiedExchangeId, QualifiedMarketId
 from .venue import TradingVenue, ExchangeDescription

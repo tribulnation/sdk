@@ -3,7 +3,6 @@ from typing_extensions import (
   AsyncIterable,
   AsyncGenerator,
   Sequence,
-  Literal,
   TypedDict,
   Collection,
   Mapping,
@@ -24,6 +23,7 @@ from .types import (
   SpotBalances,
   SpotCollateralIds,
   NextFunding,
+  InterestPayment,
   Order,
   OrderResponse,
   OrderState,
@@ -39,12 +39,14 @@ from .settings import Settings
 from .market import (
   POSITION_LIMIT_TTL,
   Market,
+  MarketKind,
   SpotMarket,
+  MarginMarket,
   PerpMarket,
   open_trades_stream,
 )
-from .exchange import Exchange, SpotExchange, PerpExchange
-from .kinds import is_spot, is_perp
+from .exchange import Exchange, SpotExchange, MarginExchange, PerpExchange
+from .kinds import is_spot, is_margin, is_perp
 
 
 class ExchangeDescription(TypedDict):
@@ -52,7 +54,9 @@ class ExchangeDescription(TypedDict):
 
   id: str
   """Opaque stable ID, including the empty string; never a display label."""
-  type: Literal['spot', 'perp']
+  type: MarketKind
+  """What its markets trade, their `kind`: `'spot'`, `'margin'` (spot pairs on borrowed
+  money) or `'perp'`. Consumers handle kinds they do not know by skipping them."""
   name: str
   """Nonempty human-readable name within the venue; not an identity or guarantee."""
   url: NotRequired[str]
@@ -332,7 +336,7 @@ class TradingVenue(SDK):
   async def collateral(self, id: str, /, *, ttl: timedelta | None = None) -> Collateral:
     """Resolve a collateral ID, without its account key.
 
-    - `<exchange_id>` (`perp`): a perpetual exchange's pool.
+    - `<exchange_id>` (`perp`): a margin or perpetual exchange's pool.
     - `<exchange_id>:<asset>` (`spot:USDC`): one spot asset's balance, with
       `equity = total` and `free_collateral = free`.
 
@@ -345,8 +349,42 @@ class TradingVenue(SDK):
       balance = await spot.balance(asset, ttl=ttl)
       return Collateral(equity=balance.total, free_collateral=balance.free)
     else:
-      perp = await self.perp_exchange(exchange_id)
-      return await perp.collateral(ttl=ttl)
+      margin = await self.margin_exchange(exchange_id)
+      return await margin.collateral(ttl=ttl)
+
+  @SDK.method
+  async def margin_exchange(self, exchange_id: str, /) -> MarginExchange:
+    """Fetch a margin exchange by ID: kind `'margin'`, or a perpetual exchange, which
+    trades on margin too.
+
+    Raises:
+      ValueError: The exchange does not trade on margin.
+    """
+    exchange = await self.exchange(exchange_id)
+    if not is_margin(exchange):
+      raise ValueError(f'{self.id}:{exchange_id} is not a margin or perpetual exchange')
+    return exchange
+
+  @SDK.method
+  async def margin_market(self, exchange_market_id: str, /) -> MarginMarket:
+    """Fetch a margin (or perpetual) market by ID.
+
+    - `exchange_market_id`: `<exchange_id>:<market_id>`
+    """
+    exchange_id, market_id = exchange_market_id.split(':', 1)
+    exchange = await self.margin_exchange(exchange_id)
+    return await exchange.market(market_id)
+
+  @SDK.method
+  @PaginatedResponse.lift
+  async def interest_payments(
+    self, market_id: str, /, start: datetime, end: datetime
+  ) -> AsyncIterable[Sequence[InterestPayment]]:
+    """Fetch the borrow interest charged on a margin market's position; see
+    `MarginMarket.interest_payments`."""
+    market = await self.margin_market(market_id)
+    async for page in market.interest_payments(start, end):
+      yield page
 
   @SDK.method
   async def perp_exchange(self, exchange_id: str, /) -> PerpExchange:
@@ -416,31 +454,31 @@ class TradingVenue(SDK):
   async def position(
     self, market_id: str, /, *, ttl: timedelta | None = None
   ) -> Position:
-    """Fetch your open position in a perpetual market.
+    """Fetch your open position in a margin or perpetual market.
 
     Args:
       ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
     """
-    market = await self.perp_market(market_id)
+    market = await self.margin_market(market_id)
     return await market.position(ttl=ttl)
 
   @SDK.method
   async def collateral_id(self, market_id: str, /) -> str:
-    """The collateral ID funding new orders on a perpetual market."""
-    market = await self.perp_market(market_id)
+    """The collateral ID funding new orders on a margin or perpetual market."""
+    market = await self.margin_market(market_id)
     return await market.collateral_id()
 
   @SDK.method
   async def available_notional(
     self, market_id: str, /, *, ttl: timedelta | None = None
   ) -> Decimal:
-    """Fetch the maximum notional position you can open right now on a perpetual
-    market: the free collateral times the account's `leverage()` on it.
+    """Fetch the maximum notional position you can open right now on a margin or
+    perpetual market: the free collateral times the account's `leverage()` on it.
 
     Args:
       ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
     """
-    market = await self.perp_market(market_id)
+    market = await self.margin_market(market_id)
     return await market.available_notional(ttl=ttl)
 
   @SDK.method
@@ -454,7 +492,7 @@ class TradingVenue(SDK):
       ttl: How old a shared answer may be, `POSITION_LIMIT_TTL` unless given; `None`
         asks afresh. See `Market`.
     """
-    market = await self.perp_market(market_id)
+    market = await self.margin_market(market_id)
     return await market.remaining_position_limit(ttl=ttl)
 
   @SDK.method
@@ -482,18 +520,18 @@ class TradingVenue(SDK):
     Args:
       ttl: How old a shared answer may be; `None` asks afresh. See `Market`.
     """
-    market = await self.perp_market(market_id)
+    market = await self.margin_market(market_id)
     return await market.leverage(ttl=ttl)
 
   @SDK.method
   async def set_leverage(self, market_id: str, /, leverage: Decimal):
-    """Set the account's leverage on a perpetual market.
+    """Set the account's leverage on a margin or perpetual market.
 
     - `market_id`: `<exchange_id>:<market_id>`.
 
     See `MarginMarket.set_leverage`.
     """
-    market = await self.perp_market(market_id)
+    market = await self.margin_market(market_id)
     await market.set_leverage(leverage)
 
   @SDK.method

@@ -63,13 +63,13 @@ def test_spot_markets_have_no_margin_stand_ins():
 
 
 async def test_leverage_routing_preserves_ttl():
-  """Root, venue and exchange calls reach the exact perpetual market and `ttl`."""
+  """Root, venue and exchange calls reach the exact margin market and `ttl`."""
   call = AsyncMock(return_value=Decimal(10))
   target = SimpleNamespace(leverage=call)
   ttl = timedelta(seconds=30)
   for method, router, identifier in (
-    (TradingMarkets.leverage, 'perp_market', 'hl:perp:BTC'),
-    (TradingVenue.leverage, 'perp_market', 'perp:BTC'),
+    (TradingMarkets.leverage, 'margin_market', 'hl:perp:BTC'),
+    (TradingVenue.leverage, 'margin_market', 'perp:BTC'),
     (PerpExchange.leverage, 'market', 'BTC'),
   ):
     resolve = AsyncMock(return_value=target)
@@ -90,13 +90,17 @@ async def test_leverage_routing_preserves_ttl():
   ],
 )
 async def test_margin_reads_route_ttl(name: str):
-  """Venue and exchange shortcuts hand the caller's `ttl` to the market."""
+  """Venue and exchange shortcuts hand the caller's `ttl` to the market: margin
+  reads through `margin_market`, perpetual-only ones through `perp_market`."""
   call = AsyncMock(return_value=None)
   target = SimpleNamespace(**{name: call})
   ttl = timedelta(seconds=1)
+  router = (
+    'perp_market' if name in ('perp_position', 'next_funding') else 'margin_market'
+  )
   for method, router, identifier in (
-    (getattr(TradingMarkets, name), 'perp_market', 'hl:perp:BTC'),
-    (getattr(TradingVenue, name), 'perp_market', 'perp:BTC'),
+    (getattr(TradingMarkets, name), router, 'hl:perp:BTC'),
+    (getattr(TradingVenue, name), router, 'perp:BTC'),
     (getattr(PerpExchange, name), 'market', 'BTC'),
   ):
     stub = SimpleNamespace(**{router: AsyncMock(return_value=target)})
@@ -111,7 +115,7 @@ async def test_collateral_ids_resolve_with_ttl():
   balance = AsyncMock(return_value=Balance(total=Decimal(5), free=Decimal(4)))
   spot = SimpleNamespace(balance=balance)
   venue = SimpleNamespace(
-    perp_exchange=AsyncMock(return_value=pool),
+    margin_exchange=AsyncMock(return_value=pool),
     spot_exchange=AsyncMock(return_value=spot),
   )
   await TradingVenue.collateral(cast(Any, venue), 'perp', ttl=ttl)

@@ -71,6 +71,7 @@ async def test_product_caches_are_independent(venue: BitgetMarket):
   """Shared transport must not let one product's symbol overwrite another's rules."""
   assert [item['id'] for item in await venue.exchanges()] == [
     'spot',
+    'margin',
     'usdt',
     'usdc',
   ]

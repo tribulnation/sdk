@@ -21,6 +21,7 @@ from tribulnation.sdk.market import (
   Candle,
   CandleInterval,
   Fees,
+  InterestPayment,
   MarginMarket as _MarginMarket,
   Order,
   OrderResponse,
@@ -36,6 +37,7 @@ from .impl import (
   CANDLE_INTERVALS,
   MarketMixin,
   depth_stream,
+  interest_payments,
   open_orders,
   parse_book,
   spot_candles,
@@ -210,6 +212,25 @@ class MarginMarket(MarketMixin, _MarginMarket):
       and c['marginMode'] == 'crossed'
     ]
     return rows[0] if rows else DEFAULT_LEVERAGE
+
+  def interest_payments(
+    self, start: datetime, end: datetime
+  ) -> PaginatedResponse[InterestPayment]:
+    """Fetch the interest charged on the pair's base coin: the UTA ledger's
+    `INTEREST_SETTLEMENT_OUT` rows for it, in base units, negative when paid.
+
+    Debt in the coin is pool-wide, so interest on it counts here whichever pair or
+    product borrowed it. Interest on borrowed USDT (the quote) is the pool's:
+    `MarginExchange.interest_payments(None, ...)`.
+    """
+
+    async def pages() -> AsyncIterator[Sequence[InterestPayment]]:
+      await self.require_uta()
+      coin = await self.base_coin()
+      async for page in interest_payments(self, start, end, coin=coin):
+        yield page
+
+    return PaginatedResponse(pages())
 
   async def fees(self, *, refetch: bool = False) -> Fees:
     """Read this account's margin rates for the pair (UTA `fee-rate`, `MARGIN`)."""

@@ -1,18 +1,30 @@
 """Bitget's cross spot-margin exchange on a Unified Trading Account: every margin pair."""
 
-from datetime import timedelta
-from typing_extensions import Collection, Mapping, Sequence
+from datetime import datetime, timedelta
+from typing_extensions import AsyncIterator, Collection, Mapping, Sequence
 from dataclasses import dataclass
 import asyncio
 
-from tribulnation.sdk.market import Exchange, PerpCollateral, Settings, Ticker
+from tribulnation.sdk.core import PaginatedResponse
+from tribulnation.sdk.market import (
+  InterestPayment,
+  MarginExchange as _MarginExchange,
+  PerpCollateral,
+  Settings,
+  Ticker,
+)
 
-from .impl import VenueMixin, parse_spot_ticker, uta_perp_collateral
+from .impl import (
+  VenueMixin,
+  interest_payments,
+  parse_spot_ticker,
+  uta_perp_collateral,
+)
 from .margin_market import MarginMarket
 
 
 @dataclass(kw_only=True, frozen=True)
-class MarginExchange(VenueMixin, Exchange):
+class MarginExchange(VenueMixin, _MarginExchange):
   """Bitget UTA cross spot margin (category `MARGIN`)."""
 
   @property
@@ -20,7 +32,8 @@ class MarginExchange(VenueMixin, Exchange):
     return 'margin'
 
   async def markets(self) -> Sequence[str]:
-    """List the pairs tradable on margin."""
+    """List the marginable pairs: the public UTA instrument catalogue's `MARGIN`
+    rows (`/api/v3/market/instruments?category=MARGIN`)."""
     return list(await self.margin_instruments())
 
   async def market(self, market_id: str, /) -> MarginMarket:
@@ -68,3 +81,28 @@ class MarginExchange(VenueMixin, Exchange):
         'Bitget spot margin is implemented for Unified Trading Accounts only.'
       )
     return await uta_perp_collateral(self)
+
+  def interest_payments(
+    self, market_id: str | None, /, start: datetime, end: datetime
+  ) -> PaginatedResponse[InterestPayment]:
+    """Fetch borrow interest for one pair (`MarginMarket.interest_payments`), or with
+    `market_id=None` for every coin the unified pool owes, USDT included.
+
+    Raises:
+      NotImplementedError: The account is in Classic mode.
+    """
+
+    async def pages() -> AsyncIterator[Sequence[InterestPayment]]:
+      if market_id is None:
+        if not await self.is_uta():
+          raise NotImplementedError(
+            'Bitget spot margin is implemented for Unified Trading Accounts only.'
+          )
+        async for page in interest_payments(self, start, end, coin=None):
+          yield page
+      else:
+        market = await self.market(market_id)
+        async for page in market.interest_payments(start, end):
+          yield page
+
+    return PaginatedResponse(pages())

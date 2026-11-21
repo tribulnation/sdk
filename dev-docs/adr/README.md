@@ -73,12 +73,12 @@ not a changelog or a substitute for API documentation and tests.
 | [0048](0048-extended-rfq-indicative-tickers.md) | Extended RFQ depth from quotes, with indicative tickers as a visible limitation | Accepted; implemented, not release-verified; amends 0014 and 0022; amended by 0067 |
 | [0049](0049-book-streams-copy-on-read.md) | Book streams share a frozen book and copy it on read | Proposed; implemented, not release-verified; incremental `update` and the gateway's uncopied reads amended by 0070 |
 | [0050](0050-dydx-fill-socket.md) | dYdX fills from a local fill socket, and `'fastest'` over every source | Proposed; implemented, not release-verified; amends 0044 and 0045; amended by 0052 |
-| [0051](0051-spot-perp-market-types-collateral-ids.md) | Spot and margin market types, and collateral IDs | Proposed; amends 0009 and 0038 |
+| [0051](0051-spot-perp-market-types-collateral-ids.md) | Spot and margin market types, and collateral IDs | Proposed; amends 0009 and 0038; amended by 0073 |
 | [0052](0052-dydx-indexer-channels-reconnect.md) | dYdX indexer channels reconnect; `'fastest'` rides short drops, `'indexer'` ends | Proposed; implemented, not release-verified; amends 0050 |
 | [0053](0053-shared-account-reads-aster-max-leverage.md) | Shared account reads, and Aster orders at the symbol's maximum leverage | Proposed; implemented, not release-verified; decision 2 amended by 0054, decision 3 by 0055 |
 | [0054](0054-caller-chosen-read-staleness.md) | Caller-chosen read staleness | Proposed; amends 0053; implemented, not release-verified; `remaining_position_limit`'s default amended by 0069 |
 | [0055](0055-aster-lower-leverage-on-refusal.md) | Aster lowers leverage only when an order is refused for it | Proposed; amends 0053; implemented, not release-verified |
-| [0056](0056-market-kind-aware-support.md) | Market-kind-aware support declarations | Proposed; builds on 0051; implemented, not release-verified |
+| [0056](0056-market-kind-aware-support.md) | Market-kind-aware support declarations | Proposed; builds on 0051; implemented, not release-verified; amended by 0073 |
 | [0057](0057-lighter-batched-order-transactions.md) | Lighter sends waiting order transactions as one `sendTxBatch` | Proposed; implemented, not release-verified |
 | [0058](0058-market-delta-and-hold.md) | Default `delta()` and `hold()` on spot and margin markets | Proposed; builds on 0051; implemented, not release-verified |
 | [0059](0059-replace-orders-and-order-not-found.md) | `replace_order(s)` and `OrderNotFound` | Proposed |
@@ -94,3 +94,4 @@ not a changelog or a substitute for API documentation and tests.
 | [0070](0070-book-order-invariant-hot-paths.md) | Book paths rely on the book-order invariant | Proposed; amends 0049; implemented, not release-verified |
 | [0071](0071-depth-levels-upper-bound.md) | Depth `levels` is an upper bound, served at a venue's maximum rather than refused | Proposed; amends 0019 and 0021; implemented, not release-verified |
 | [0072](0072-public-only-release-qualification.md) | Public-only release qualification | Accepted; implemented, not release-verified; amends 0042 |
+| [0073](0073-spot-margin-market-kind.md) | Spot margin is a market kind, with borrow interest as its carry | Proposed; amends 0051 and 0056; implemented for Bitget, not release-verified |

@@ -4,14 +4,27 @@ Every page is fetched through `call`, so the retriable unit is the single reques
 failed rather than the whole sweep.
 """
 
-from typing_extensions import AsyncIterator, Sequence
-from datetime import datetime
+from typing_extensions import AsyncIterator, Literal, Sequence
+from datetime import datetime, timedelta
 
-from tribulnation.sdk.market import FundingRate, Trade
+from tribulnation.sdk.market import FundingRate, InterestPayment, Trade
+from typed_bitget.uta.account.financial_records import FinancialRecord
 
-from .mixin import MarketMixin
+from .mixin import MarketMixin, VenueMixin
 from .parse import futures_product, parse_mix_fill, parse_spot_fill, parse_uta_fill
 from .util import HISTORY_WINDOW, PAGE, windows
+
+INTEREST = 'INTEREST_SETTLEMENT_OUT'
+"""The UTA ledger type of a borrow-interest charge ("interest deducted from the
+account", Bitget's UTA enumeration of financial-record types)."""
+LEDGER_CATEGORIES: Sequence[
+  Literal['SPOT', 'MARGIN', 'USDT-FUTURES', 'COIN-FUTURES', 'USDC-FUTURES']
+] = ('MARGIN', 'SPOT', 'USDT-FUTURES', 'USDC-FUTURES', 'COIN-FUTURES')
+"""Every category the ledger is addressed by. Debt is pool-wide on a UTA, so an
+interest row is not documented under any one product: each is read, rows deduplicated
+by ID."""
+LEDGER_WINDOW = timedelta(days=30)
+"""Window per ledger request, well inside the 90 days of history the venue keeps."""
 
 
 async def trades_history(
@@ -87,3 +100,39 @@ async def funding_rates(
     ]
     if start is not None and rows and rows[-1]['fundingTime'] < start:
       break
+
+
+def parse_interest(record: FinancialRecord) -> InterestPayment:
+  """Map one UTA ledger interest row onto an `InterestPayment`; the ledger's `amount`
+  is already signed, negative for a charge."""
+  return InterestPayment(
+    time=record['ts'], asset=record['coin'], amount=record['amount']
+  )
+
+
+async def interest_payments(
+  self: VenueMixin, start: datetime, end: datetime, *, coin: str | None
+) -> AsyncIterator[Sequence[InterestPayment]]:
+  """Walk the UTA ledger's borrow-interest charges, one page at a time.
+
+  Args:
+    start: Inclusive start of the window.
+    end: Inclusive end of the window.
+    coin: Keep one borrowed coin, e.g. `LIT`; `None` keeps every coin.
+  """
+  seen: set[str] = set()
+  for category in LEDGER_CATEGORIES:
+    for lower, upper in windows(start, end, LEDGER_WINDOW):
+      paging = self.client.uta.account.financial_records_paged(
+        category,
+        coin=coin,
+        type=INTEREST,
+        start_time=lower,
+        end_time=upper,
+        limit=PAGE,
+        validate=self.validate,
+      )
+      async for rows in paging.via(self.call):
+        fresh = [r for r in rows if r['id'] not in seen]
+        seen.update(r['id'] for r in fresh)
+        yield [parse_interest(r) for r in fresh]

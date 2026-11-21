@@ -25,6 +25,7 @@ from .types import (
   FundingRate,
   NextFunding,
   FundingPayment,
+  InterestPayment,
   Order,
   OrderResponse,
   OrderState,
@@ -38,8 +39,10 @@ from .types import (
 )
 from .settings import Settings
 
-MarketKind = Literal['spot', 'perp']
-"""What a market or exchange trades; narrow the static type with `is_spot`/`is_perp`."""
+MarketKind = Literal['spot', 'margin', 'perp']
+"""What a market or exchange trades (ADR 0073): `'spot'` its cash balances, `'margin'`
+a spot pair on borrowed money (a `MarginMarket` that is not a perpetual), `'perp'` a
+perpetual. Narrow the static type with `is_spot`/`is_margin`/`is_perp`."""
 POSITION_LIMIT_TTL = timedelta(seconds=30)
 """`remaining_position_limit`'s default `ttl` (ADR 0069): position limits move slowly and
 are polled for every market of an account, so its reads share by default."""
@@ -93,10 +96,11 @@ class Market(SDK):
 
   @property
   def kind(self) -> MarketKind:
-    """`'spot'` or `'perp'`. It does not narrow the static type; `is_spot`/`is_perp` do.
+    """`'spot'`, `'margin'` or `'perp'`. It does not narrow the static type;
+    `is_spot`/`is_margin`/`is_perp` do.
 
     Raises `NotImplementedError` on a market that is neither a `SpotMarket` nor a
-    `PerpMarket` yet.
+    `MarginMarket` yet.
     """
     raise NotImplementedError(f'Market kind is not implemented: {self.id}')
 
@@ -526,8 +530,14 @@ class SpotMarket(Market):
 class MarginMarket(Market):
   """An abstract market traded on margin: positions backed by a collateral pool.
 
-  Perpetuals are margin markets; options can be later.
+  A spot pair traded on borrowed money (kind `'margin'`, ADR 0073) is one; perpetuals
+  (`PerpMarket`, kind `'perp'`) are too, and options can be later.
   """
+
+  @property
+  def kind(self) -> Literal['margin', 'perp']:
+    """`'margin'`; `PerpMarket` answers `'perp'`."""
+    return 'margin'
 
   @SDK.method
   @abstractmethod
@@ -653,6 +663,25 @@ class MarginMarket(Market):
         asks afresh. See `Market`.
     """
     return RemainingPositionLimit()
+
+  @SDK.method
+  def interest_payments(
+    self, start: datetime, end: datetime
+  ) -> PaginatedResponse[InterestPayment]:
+    """Fetch the borrow interest charged on this market's position: its carry, as
+    `PerpMarket.funding_payments` is a perpetual's.
+
+    Interest on the base asset this market borrows to go short. Debt in the quote or
+    collateral asset is pool-wide on unified accounts, so it is not this market's:
+    `MarginExchange.interest_payments(None, ...)` lists it. Amounts are in the
+    borrowed asset's units, negative when paid. Unsupported implementations raise
+    `NotImplementedError`.
+
+    Args:
+      start: Start of the window (inclusive).
+      end: End of the window (inclusive).
+    """
+    raise NotImplementedError(f'Interest payments are not implemented: {self.id}')
 
   @SDK.method
   async def delta(self, *, ttl: timedelta | None = None) -> Decimal:
