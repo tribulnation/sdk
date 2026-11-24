@@ -3,12 +3,12 @@
     "account_id": "kraken",
     "checks": [
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_1INCHUSD\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "coverage_deferred",
@@ -891,12 +891,12 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_LQTYUSD\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "coverage_deferred",
@@ -1139,20 +1139,20 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_PIXELUSD\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_PNUTUSD\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -1371,12 +1371,12 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_SSVUSD\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "coverage_deferred",
@@ -1579,12 +1579,12 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_USUALUSD\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "coverage_deferred",
@@ -1731,12 +1731,12 @@
         "status": "deferred"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"PF_ZBTUSD\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -24156,38 +24156,18 @@
       },
       {
         "code": "ok",
-        "id": "[\"ticker_depth\",\"perp\",\"PF_1INCHUSD\"]",
-        "missing_data": null,
-        "quotes": [
-          {
-            "after_ask": "0.06123",
-            "after_bid": "0.06029",
-            "ask": "0.06123",
-            "attempt": 1,
-            "before_ask": "0.06123",
-            "before_bid": "0.06029",
-            "bid": "0.06029",
-            "elapsed_seconds": 0.0905221146531403,
-            "ticker_ids_match": true
-          }
-        ],
-        "rfq": null,
-        "status": "pass"
-      },
-      {
-        "code": "ok",
         "id": "[\"ticker_depth\",\"perp\",\"PF_AAPLXUSD\"]",
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "348.28",
-            "after_bid": "348.13",
-            "ask": "348.28",
+            "after_ask": "353.36",
+            "after_bid": "353.2",
+            "ask": "353.36",
             "attempt": 1,
-            "before_ask": "348.28",
-            "before_bid": "348.13",
-            "bid": "348.13",
-            "elapsed_seconds": 0.09275636309757829,
+            "before_ask": "353.36",
+            "before_bid": "353.2",
+            "bid": "353.2",
+            "elapsed_seconds": 0.11835566721856594,
             "ticker_ids_match": true
           }
         ],
@@ -24200,14 +24180,34 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "100.29",
-            "after_bid": "100.21",
-            "ask": "100.29",
+            "after_ask": "94.46",
+            "after_bid": "94.4",
+            "ask": "94.46",
             "attempt": 1,
-            "before_ask": "100.29",
-            "before_bid": "100.21",
-            "bid": "100.21",
-            "elapsed_seconds": 0.08499116497114301,
+            "before_ask": "94.46",
+            "before_bid": "94.4",
+            "bid": "94.4",
+            "elapsed_seconds": 0.10998687474057078,
+            "ticker_ids_match": true
+          }
+        ],
+        "rfq": null,
+        "status": "pass"
+      },
+      {
+        "code": "ok",
+        "id": "[\"ticker_depth\",\"perp\",\"PF_ACEUSD\"]",
+        "missing_data": null,
+        "quotes": [
+          {
+            "after_ask": "0.03624",
+            "after_bid": "0.03581",
+            "ask": "0.03624",
+            "attempt": 1,
+            "before_ask": "0.03624",
+            "before_bid": "0.03581",
+            "bid": "0.03581",
+            "elapsed_seconds": 0.09908113116398454,
             "ticker_ids_match": true
           }
         ],
@@ -24220,14 +24220,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "59814.0",
-            "after_bid": "59813.0",
-            "ask": "59814.0",
+            "after_ask": "60107.0",
+            "after_bid": "60106.0",
+            "ask": "60107.0",
             "attempt": 1,
-            "before_ask": "59814.0",
-            "before_bid": "59813.0",
-            "bid": "59813.0",
-            "elapsed_seconds": 0.13435786170884967,
+            "before_ask": "60105.0",
+            "before_bid": "60104.0",
+            "bid": "60106.0",
+            "elapsed_seconds": 0.14287058589980006,
             "ticker_ids_match": true
           }
         ],
@@ -24240,14 +24240,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.1010000",
-            "after_bid": "0.1000000",
-            "ask": "0.1010000",
+            "after_ask": "0.0870000",
+            "after_bid": "0.0860000",
+            "ask": "0.0870000",
             "attempt": 1,
-            "before_ask": "0.1010000",
-            "before_bid": "0.1000000",
-            "bid": "0.1000000",
-            "elapsed_seconds": 0.09853444760665298,
+            "before_ask": "0.0870000",
+            "before_bid": "0.0860000",
+            "bid": "0.0860000",
+            "elapsed_seconds": 0.09408580278977752,
             "ticker_ids_match": true
           }
         ],
@@ -24260,14 +24260,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.1100000",
-            "after_bid": "0.1090000",
-            "ask": "0.1100000",
+            "after_ask": "0.0950000",
+            "after_bid": "0.0940000",
+            "ask": "0.0950000",
             "attempt": 1,
-            "before_ask": "0.1100000",
-            "before_bid": "0.1090000",
-            "bid": "0.1090000",
-            "elapsed_seconds": 0.12619247986003757,
+            "before_ask": "0.0950000",
+            "before_bid": "0.0940000",
+            "bid": "0.0940000",
+            "elapsed_seconds": 0.0995342880487442,
             "ticker_ids_match": true
           }
         ],
@@ -24280,14 +24280,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.05530",
-            "after_bid": "0.05520",
-            "ask": "0.05530",
+            "after_ask": "0.05310",
+            "after_bid": "0.05300",
+            "ask": "0.05310",
             "attempt": 1,
-            "before_ask": "0.05530",
-            "before_bid": "0.05520",
-            "bid": "0.05520",
-            "elapsed_seconds": 0.10009112674742937,
+            "before_ask": "0.05310",
+            "before_bid": "0.05300",
+            "bid": "0.05300",
+            "elapsed_seconds": 0.10022775689139962,
             "ticker_ids_match": true
           }
         ],
@@ -24300,14 +24300,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "59806.30000",
-            "after_bid": "59806.20000",
-            "ask": "59806.30000",
+            "after_ask": "60101.70000",
+            "after_bid": "60101.60000",
+            "ask": "60101.70000",
             "attempt": 1,
-            "before_ask": "59806.30000",
-            "before_bid": "59806.20000",
-            "bid": "59806.20000",
-            "elapsed_seconds": 0.09217200288549066,
+            "before_ask": "60101.70000",
+            "before_bid": "60101.60000",
+            "bid": "60101.60000",
+            "elapsed_seconds": 0.0903836446814239,
             "ticker_ids_match": true
           }
         ],
@@ -25851,7 +25851,6 @@
           "PF_ZECUSD",
           "PF_QTUMUSD",
           "PF_DASHUSD",
-          "PF_1INCHUSD",
           "PF_SUSHIUSD",
           "PF_RUNEUSD",
           "PF_EGLDUSD",
@@ -25877,7 +25876,6 @@
           "PF_WLDUSD",
           "PF_CFXUSD",
           "PF_PAXGUSD",
-          "PF_AGLDUSD",
           "PF_SEIUSD",
           "PF_BNBUSD",
           "PF_PYTHUSD",
@@ -25904,12 +25902,9 @@
           "PF_CTSIUSD",
           "PF_TURBOUSD",
           "PF_TLMUSD",
-          "PF_PIXELUSD",
-          "PF_PEOPLEUSD",
           "PF_BRETTUSD",
           "PF_POPCATUSD",
           "PF_MEWUSD",
-          "PF_BBUSD",
           "PF_TRBUSD",
           "PF_ZROUSD",
           "PF_PORTALUSD",
@@ -25927,17 +25922,13 @@
           "PF_NEIROUSD",
           "PF_ACEUSD",
           "PF_CATIUSD",
-          "PF_LQTYUSD",
           "PF_RAYUSD",
           "PF_ROSEUSD",
           "PF_GOATUSD",
           "PF_MOODENGUSD",
-          "PF_SSVUSD",
-          "PF_ONTUSD",
           "PF_KAIAUSD",
           "PF_GRASSUSD",
           "PF_CAKEUSD",
-          "PF_PNUTUSD",
           "PF_MORPHOUSD",
           "PF_ZENUSD",
           "PF_CSPRUSD",
@@ -25945,7 +25936,6 @@
           "PF_SPXUSD",
           "PF_CROUSD",
           "PF_PENGUUSD",
-          "PF_USUALUSD",
           "PF_CHILLGUYUSD",
           "PF_TRUMPUSD",
           "PF_MELANIAUSD",
@@ -25969,7 +25959,6 @@
           "PF_XPLUSD",
           "PF_OPENUSD",
           "PF_RIVERUSD",
-          "PF_ZBTUSD",
           "PF_NIGHTUSD",
           "PF_GLDXUSD",
           "PF_QQQXUSD",
@@ -26005,7 +25994,6 @@
           "PF_SOXSUSD",
           "PF_INTCUSD",
           "PF_MUUSD",
-          "PF_TREADUSD",
           "PF_PONSUSD",
           "PF_OURAXUSD",
           "PF_MOONSHOTXUSD",

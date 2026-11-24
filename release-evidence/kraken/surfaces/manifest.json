@@ -248,7 +248,7 @@
         "version": "0.4.3"
       },
       "tribulnation-kraken": {
-        "files_sha256": "decdedf218cf76aef39f256bc39885e7159e857ae038157b2e8940838fec3477",
+        "files_sha256": "a148736aca2eeb96f2ecd47bc55c697476f79cadd2847748950c91a6ddb7ec85",
         "metadata_sha256": "eb68d95aa87b0b869bdcb4fe99fb3f706deb5ba6239b37cdd5787e7bd600d02e",
         "version": "0"
       },
@@ -290,7 +290,7 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "8eb2dc50418ccfd862751cf7981c4af7c4c07e1c066911bb40e0086d6ab96abe",
+    "source_sha256": "0bd74abcd190cd27872e767cdae11086d107ad331c429de411e0c57d6710cba1",
     "venue": "kraken"
   },
   "before": {
@@ -542,7 +542,7 @@
         "version": "0.4.3"
       },
       "tribulnation-kraken": {
-        "files_sha256": "decdedf218cf76aef39f256bc39885e7159e857ae038157b2e8940838fec3477",
+        "files_sha256": "a148736aca2eeb96f2ecd47bc55c697476f79cadd2847748950c91a6ddb7ec85",
         "metadata_sha256": "eb68d95aa87b0b869bdcb4fe99fb3f706deb5ba6239b37cdd5787e7bd600d02e",
         "version": "0"
       },
@@ -584,12 +584,12 @@
     },
     "python": "3.12",
     "schema_version": 2,
-    "source_sha256": "8eb2dc50418ccfd862751cf7981c4af7c4c07e1c066911bb40e0086d6ab96abe",
+    "source_sha256": "0bd74abcd190cd27872e767cdae11086d107ad331c429de411e0c57d6710cba1",
     "venue": "kraken"
   },
-  "finished": "2026-11-21T15:56:25.316091Z",
+  "finished": "2026-11-24T18:09:30.050926Z",
   "results_sha256": "30afa9c5665d653e6bb022afe534cb0924f66f4627106ca3bcf2f2e7dd6bad6e",
   "schema_version": 2,
-  "started": "2026-11-21T15:56:17.522647Z",
-  "summary_sha256": "dd10b564a4a78da75cd62f49f839487e9d062b02cdc9b8a4dc0589f6790dcca2"
+  "started": "2026-11-24T18:09:21.419455Z",
+  "summary_sha256": "bf3a6388a363f349fe1f44a6ab5fd75ad9c5a425cdbdd22882bec4313b96e7a0"
 }
