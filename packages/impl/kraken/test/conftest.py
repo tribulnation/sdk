@@ -100,6 +100,8 @@ class FakeFutures:
   fill_subscribers: set[ServerConnection] = field(default_factory=set[ServerConnection])
   ids: 'itertools.count[int]' = field(default_factory=lambda: itertools.count(1))
   loop: asyncio.AbstractEventLoop | None = None
+  edit_refusal: str | None = None
+  """A status `editorder` answers instead of editing, the order left as it was."""
 
   def transport(self) -> httpx.MockTransport:
     """The REST side."""
@@ -279,6 +281,8 @@ class FakeFutures:
     order = self.orders.get(params['orderId'])
     if order is None:
       return {'status': 'orderForEditNotFound', 'orderEvents': []}
+    if self.edit_refusal is not None:
+      return {'status': self.edit_refusal, 'orderId': order.id, 'orderEvents': []}
     price = Decimal(params['limitPrice'])
     if order.kind == 'post' and self.crossing(order.side, price) is not None:
       del self.orders[order.id]

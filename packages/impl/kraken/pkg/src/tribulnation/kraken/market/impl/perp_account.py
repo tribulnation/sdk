@@ -114,19 +114,25 @@ def order_response(
 def edit_outcome(status: EditStatus | BatchStatus, id: str) -> OrderResponse:
   """The response to an edit: the same order, resting with its new size and price.
 
+  An edit that crossed reports what filled; `filled` with executions means the
+  edited order filled whole.
+
   Raises:
-    OrderNotFound: The order no longer rests (`orderForEditNotFound`).
-    OrderRejected: The post-only edit would have crossed and the order was cancelled
-      (`postWouldExecute`).
-    ApiError: Any other refusal; the order still rests as it was.
+    OrderNotFound: The order no longer rested (`orderForEditNotFound`, `notFound`,
+      or `filled` before the edit).
+    OrderRejected: The post-only edit would have crossed and Kraken cancelled the
+      order (`postWouldExecute`).
+    ApiError: Any other refusal (`invalidSize`, `invalidPrice`,
+      `insufficientAvailableFunds`, `selfFill`, ...); the order still rests as it was.
   """
+  filled = executed(status.get('orderEvents') or [])
   match status['status']:
-    case 'edited' | 'filled':
-      return OrderResponse(
-        id=id, details=status, filled_qty=executed(status.get('orderEvents') or [])
-      )
-    case 'orderForEditNotFound':
-      raise OrderNotFound(f'Kraken Futures order {id} not found for edit', status)
+    case 'edited':
+      return OrderResponse(id=id, details=status, filled_qty=filled)
+    case 'filled' if filled > 0:
+      return OrderResponse(id=id, details=status, filled_qty=filled)
+    case 'orderForEditNotFound' | 'notFound' | 'filled':
+      raise OrderNotFound(f'Kraken Futures order {id} no longer rests', status)
     case 'postWouldExecute':
       raise OrderRejected(f'Kraken Futures post-only edit of {id} would cross', status)
     case other:

@@ -1,14 +1,9 @@
 """Order entry on a Kraken perpetual: send, batch, edit and cancel."""
 
-from typing_extensions import TYPE_CHECKING, Any, Sequence, cast
+from typing_extensions import TYPE_CHECKING, Any, Literal, Sequence, cast
 
-from tribulnation.sdk.core import OrderNotFound
-from tribulnation.sdk.market import (
-  Order,
-  OrderResponse,
-  PerpMarket as BasePerpMarket,
-  Settings,
-)
+from tribulnation.sdk.core import OrderNotFound, OrderRejected
+from tribulnation.sdk.market import Order, OrderResponse, OrderState, Settings
 from tribulnation.sdk.util import to_decimal
 from typed_kraken.futures_trading.types import BatchInstruction
 
@@ -17,6 +12,7 @@ from .perp_account import (
   KrakenSettings,
   cancel_outcome,
   edit_outcome,
+  open_order_state,
   order_response,
   order_type,
 )
@@ -77,7 +73,11 @@ async def place_order(
     )
   )
   market.perp.forget_account()
-  return order_response(result['sendStatus'], immediate=kind in IMMEDIATE)
+  response = order_response(result['sendStatus'], immediate=kind in IMMEDIATE)
+  market.perp.remember(
+    response.id, symbol=market.symbol, side='buy' if qty > 0 else 'sell'
+  )
+  return response
 
 
 async def place_orders(
@@ -106,40 +106,77 @@ async def place_orders(
     """The `i`-th order's response, or its error."""
     try:
       immediate = order_type(order, venue) in IMMEDIATE
-      return order_response(statuses[str(i)], immediate=immediate)
+      response = order_response(statuses[str(i)], immediate=immediate)
     except Exception as e:
       return e
+    side = 'buy' if to_decimal(order['qty']) > 0 else 'sell'
+    market.perp.remember(response.id, symbol=market.symbol, side=side)
+    return response
 
   return [outcome(i, order) for i, order in enumerate(orders)]
+
+
+async def order_side(market: 'PerpMarket', id: str) -> Literal['buy', 'sell']:
+  """The side of resting order `id` of this market.
+
+  Read from the orders this client placed or listed, so no request is made for
+  them; any other is asked of Kraken (`orders/status`) once.
+
+  Raises:
+    OrderNotFound: `id` is not a resting order of this market.
+  """
+  if (known := market.perp.orders.get(id)) is not None and market.owns(known[0]):
+    return known[1]
+  state = await market.query_order(id)
+  if state is not None and state.active:
+    side = 'buy' if state.qty > 0 else 'sell'
+    market.perp.remember(id, symbol=market.symbol, side=side)
+    return side
+  else:
+    raise OrderNotFound(f'Kraken Futures order {id} does not rest in {market.symbol}')
 
 
 async def replace_order(
   market: 'PerpMarket', id: str, order: Order, *, settings: Settings = {}
 ) -> OrderResponse:
-  """Edit `id` in place to `order`'s price and size (the size to rest from now on).
+  """Edit `id` in place (`editorder`) to `order`'s price and size, the size to rest
+  from now on (Kraken's default `RELATIVE` quantity mode).
 
-  The order keeps its ID. An order already gone is placed afresh. An edit can't
-  change the side, so a replacement on the other side cancels and places.
+  The order keeps its ID. Nothing is ever placed for an order that
+  no longer rests. An edit can't change the side, so a replacement on the other
+  side cancels `id`, then places `order`.
 
   Raises:
-    OrderRejected: A post-only edit would have crossed: the order was cancelled.
-    ApiError: Kraken refused the edit; the order still rests as it was.
+    OrderNotFound: `id` no longer rests (filled, cancelled or unknown); nothing
+      was placed.
+    OrderRejected: A post-only edit would have crossed: Kraken cancelled the order.
+    ApiError: Kraken refused the edit (`invalidSize`, `invalidPrice`,
+      `insufficientAvailableFunds`, ...); the order still rests as it was.
   """
   qty = to_decimal(order['qty'])
-  state = await market.query_order(id)
-  if state is not None and state.active and (state.qty > 0) != (qty > 0):
-    return await BasePerpMarket.replace_order(market, id, order, settings=settings)
+  if await order_side(market, id) != ('buy' if qty > 0 else 'sell'):
+    await cancel_order(market, id, settings=settings)
+    return await place_order(market, order, settings=settings)
   result = await market.call_kraken(
     lambda: market.perp.client.trading.edit_order(
       order_id=id, size=abs(qty), limit_price=to_decimal(order['price'])
     )
   )
   market.perp.forget_account()
-  status = result['editStatus']
-  if status['status'] == 'orderForEditNotFound':
-    return await place_order(market, order, settings=settings)
-  else:
-    return edit_outcome(status, id)
+  try:
+    return edit_outcome(result['editStatus'], id)
+  except (OrderNotFound, OrderRejected):
+    market.perp.orders.pop(id, None)
+    raise
+
+
+async def open_orders(market: 'PerpMarket') -> Sequence[OrderState]:
+  """This market's open orders, whose sides are kept for later edits."""
+  result = await market.call_kraken(market.perp.client.trading.open_orders)
+  rows = [row for row in result['openOrders'] if market.owns(row['symbol'])]
+  for row in rows:
+    market.perp.remember(row['order_id'], symbol=market.symbol, side=row['side'])
+  return [open_order_state(row) for row in rows]
 
 
 async def cancel_order(
