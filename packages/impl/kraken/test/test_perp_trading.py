@@ -8,7 +8,7 @@ from typing_extensions import Any, AsyncIterator, Callable
 
 import pytest
 
-from tribulnation.sdk import NetworkError, OrderNotFound, OrderRejected
+from tribulnation.sdk import ApiError, NetworkError, OrderNotFound, OrderRejected
 from tribulnation.sdk.market import Fees, Trade
 from tribulnation.kraken.market.impl.perp_account import leverage_of
 from tribulnation.kraken.market.impl.perp_streams import fold_futures_books
@@ -112,16 +112,115 @@ async def test_batches(venue: Venue):
     assert isinstance(cancelled[2], OrderNotFound)
 
 
+def endpoints(fake: Any) -> list[str]:
+  """The endpoints the fake venue was asked, in order."""
+  return [endpoint for _, endpoint, _ in fake.requests]
+
+
 @pytest.mark.asyncio
-async def test_replace_gone_order_places_afresh(venue: Venue):
-  """Editing an order that no longer rests places the replacement."""
+async def test_replace_edits_without_querying(venue: Venue):
+  """A known order is edited by ID alone: one `editorder`, no `orders/status`."""
   fake, market_on = venue
   market = market_on()
   async with market:
-    response = await market.replace_order(
-      'gone', {'type': 'POST_ONLY', 'qty': Decimal(5), 'price': Decimal('0.0270')}
+    placed = await market.place_order(
+      {'type': 'POST_ONLY', 'qty': Decimal(100), 'price': Decimal('0.0270')}
     )
-    assert response.id in fake.orders
+    fake.requests.clear()
+    edited = await market.replace_order(
+      placed.id, {'type': 'POST_ONLY', 'qty': Decimal(60), 'price': Decimal('0.0271')}
+    )
+    assert edited.id == placed.id and edited.filled_qty == 0
+    assert endpoints(fake) == ['editorder']
+    assert fake.orders[placed.id].size == 60
+
+  listed = market_on()
+  async with listed:
+    await listed.open_orders()
+    fake.requests.clear()
+    await listed.replace_order(
+      placed.id, {'type': 'POST_ONLY', 'qty': Decimal(50), 'price': Decimal('0.0272')}
+    )
+    assert endpoints(fake) == ['editorder']
+
+
+@pytest.mark.asyncio
+async def test_replace_filled_order_places_nothing(venue: Venue):
+  """Editing an order that filled raises `OrderNotFound` and sends no new order."""
+  fake, market_on = venue
+  market = market_on()
+  async with market:
+    placed = await market.place_order(
+      {'type': 'POST_ONLY', 'qty': Decimal(100), 'price': Decimal('0.0270')}
+    )
+    fake.fill_maker(placed.id, Decimal(100))
+    fake.requests.clear()
+    with pytest.raises(OrderNotFound):
+      await market.replace_order(
+        placed.id,
+        {'type': 'POST_ONLY', 'qty': Decimal(100), 'price': Decimal('0.0271')},
+      )
+    assert endpoints(fake) == ['editorder']
+    assert not fake.orders
+
+
+@pytest.mark.asyncio
+async def test_replace_unknown_order_places_nothing(venue: Venue):
+  """An ID this client never saw is looked up once; gone, it raises `OrderNotFound`."""
+  fake, market_on = venue
+  market = market_on()
+  async with market:
+    with pytest.raises(OrderNotFound):
+      await market.replace_order(
+        'gone', {'type': 'POST_ONLY', 'qty': Decimal(5), 'price': Decimal('0.0270')}
+      )
+    assert endpoints(fake) == ['orders/status']
+    assert not fake.orders
+
+
+@pytest.mark.asyncio
+async def test_replace_refusals(venue: Venue):
+  """A crossing post-only edit is rejected (the order is gone); others leave it."""
+  fake, market_on = venue
+  market = market_on()
+  async with market:
+    placed = await market.place_order(
+      {'type': 'POST_ONLY', 'qty': Decimal(100), 'price': Decimal('0.0270')}
+    )
+    fake.edit_refusal = 'invalidSize'
+    with pytest.raises(ApiError) as refused:
+      await market.replace_order(
+        placed.id,
+        {'type': 'POST_ONLY', 'qty': Decimal(100), 'price': Decimal('0.0271')},
+      )
+    assert not isinstance(refused.value, OrderRejected | OrderNotFound)
+    assert fake.orders[placed.id].price == Decimal('0.0270')
+
+    fake.edit_refusal = None
+    with pytest.raises(OrderRejected):
+      await market.replace_order(
+        placed.id,
+        {'type': 'POST_ONLY', 'qty': Decimal(100), 'price': Decimal('0.0280')},
+      )
+    assert not fake.orders
+    assert 'sendorder' not in endpoints(fake)[1:]
+
+
+@pytest.mark.asyncio
+async def test_replace_other_side_cancels_then_places(venue: Venue):
+  """An edit can't flip the side: the order is cancelled and the replacement placed."""
+  fake, market_on = venue
+  market = market_on()
+  async with market:
+    placed = await market.place_order(
+      {'type': 'POST_ONLY', 'qty': Decimal(100), 'price': Decimal('0.0270')}
+    )
+    fake.requests.clear()
+    flipped = await market.replace_order(
+      placed.id, {'type': 'POST_ONLY', 'qty': Decimal(-100), 'price': Decimal('0.0280')}
+    )
+    assert endpoints(fake) == ['cancelorder', 'sendorder']
+    assert flipped.id != placed.id and fake.orders[flipped.id].side == 'sell'
 
 
 @pytest.mark.asyncio

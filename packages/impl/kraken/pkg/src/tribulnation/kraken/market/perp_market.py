@@ -46,7 +46,6 @@ from .impl.perp_account import (
   fees_of,
   funding_payment,
   leverage_of,
-  open_order_state,
   parse_fill,
   position,
   status_state,
@@ -225,9 +224,8 @@ class PerpMarket(SharedMixin, BasePerpMarket):
     return PaginatedResponse(pages())
 
   async def open_orders(self) -> Sequence[OrderState]:
-    """This market's open orders."""
-    result = await self.call_kraken(self.perp.client.trading.open_orders)
-    return [open_order_state(r) for r in result['openOrders'] if self.owns(r['symbol'])]
+    """This market's open orders; see `perp_orders.open_orders`."""
+    return await perp_orders.open_orders(self)
 
   async def query_order(self, id: str) -> OrderState | None:
     """An open or recently closed order of this market, by ID (`orders/status`)."""
@@ -314,7 +312,11 @@ class PerpMarket(SharedMixin, BasePerpMarket):
   async def replace_order(
     self, id: str, order: Order, *, settings: Settings = {}
   ) -> OrderResponse:
-    """Edit `id` in place to `order`'s price and size; see `perp_orders.replace_order`."""
+    """Edit `id` in place to `order`'s price and size; see `perp_orders.replace_order`.
+
+    Raises:
+      OrderNotFound: `id` no longer rests; nothing was placed.
+    """
     return await perp_orders.replace_order(self, id, order, settings=settings)
 
   async def cancel_order(self, id: str, *, settings: Settings = {}) -> Any:

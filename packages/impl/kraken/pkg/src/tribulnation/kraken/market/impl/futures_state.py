@@ -4,7 +4,7 @@ account-wide reads and its fan-out feeds."""
 from dataclasses import dataclass, field
 from datetime import timedelta
 from functools import cached_property
-from typing_extensions import Awaitable, Callable, TypeVar
+from typing_extensions import Awaitable, Callable, Literal, TypeVar
 
 from tribulnation.sdk.core import ManagedResource, SharedReads, Subscription
 from tribulnation.sdk.market import Book
@@ -22,6 +22,8 @@ from .perp_streams import fold_futures_books, futures_fills
 from .streaming import context
 
 T = TypeVar('T')
+KNOWN_ORDERS = 4096
+"""How many orders' symbol and side `FuturesState.orders` keeps, latest first."""
 
 
 @dataclass(kw_only=True)
@@ -38,6 +40,11 @@ class FuturesState(Calls):
     default_factory=dict[str, Subscription[Book]]
   )
   fills: Subscription[WsFill] | None = None
+  orders: dict[str, tuple[str, Literal['buy', 'sell']]] = field(
+    default_factory=dict[str, tuple[str, Literal['buy', 'sell']]]
+  )
+  """Symbol and side of the orders placed or listed through this client, by ID: they
+  never change, so an edit checks them without asking Kraken."""
 
   @classmethod
   def new(
@@ -102,6 +109,13 @@ class FuturesState(Calls):
     """Drop shared answers a just-sent order may have changed."""
     self.reads.forget('accounts')
     self.reads.forget('positions')
+
+  def remember(self, id: str, *, symbol: str, side: Literal['buy', 'sell']):
+    """Keep an order's symbol and side, dropping the oldest past `KNOWN_ORDERS`."""
+    self.orders.pop(id, None)
+    self.orders[id] = (symbol, side)
+    while len(self.orders) > KNOWN_ORDERS:
+      del self.orders[next(iter(self.orders))]
 
   def book(self, symbol: str) -> Subscription[Book]:
     """The shared book feed of one perpetual, created on first use."""
