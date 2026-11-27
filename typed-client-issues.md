@@ -159,6 +159,18 @@ A throttled request (HTTP 429, `429000`) carries `gw-ratelimit-limit`,
 - Blocks: nothing. `tribulnation.kucoin.retry_after` reads it once released and answers
   `None` before.
 
+### Spot HF `get_by_order_id` cannot answer a missing order
+
+KuCoin answers `GET /api/v1/hf/orders/{orderId}` for an unknown or expired order ID with
+success (`200000`) and `data: null` (seen live on 2026-11-27), but the endpoint's
+response type is `HfOrder`, so a validated call raises `ValidationError` instead of
+returning `None`.
+
+- Kind: wrong type (`HfOrder | None`)
+- Fix: typed-dev spec change declaring the nullable response
+- Blocks: nothing. `tribulnation.kucoin` reads the row with `validate=False` and
+  validates it once it is known to exist.
+
 ## typed-lighter
 
 ### `Candle` OHLCV fields are `float`
