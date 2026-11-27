@@ -460,17 +460,55 @@ async def test_cancel_open_orders_is_one_symbol_scoped_request():
   perp_all.assert_awaited_once_with('XBTUSDTM')
 
 
-async def test_order_states_use_signed_base_units():
-  """Open orders and queries are signed; futures lots convert, other symbols are None."""
-  spot_row: Row = {
+def hf_order_json(**fields: object) -> dict[str, object]:
+  """A spot HF order as `/api/v1/hf/orders/{orderId}` sends it, before validation."""
+  row: dict[str, object] = {
     'id': 's1',
     'symbol': 'BTC-USDT',
-    'side': 'sell',
-    'price': D(100),
-    'size': D(2),
-    'dealSize': D('0.5'),
+    'opType': 'DEAL',
+    'type': 'limit',
+    'side': 'buy',
+    'price': '100',
+    'size': '1',
+    'funds': '0',
+    'dealSize': '0',
+    'dealFunds': '0',
+    'fee': '0',
+    'feeCurrency': 'USDT',
+    'stp': None,
+    'timeInForce': 'GTC',
+    'postOnly': False,
+    'hidden': False,
+    'iceberg': False,
+    'visibleSize': '0',
+    'cancelAfter': 0,
+    'channel': 'API',
+    'clientOid': 'c1',
+    'remark': None,
+    'tags': None,
+    'cancelExist': False,
+    'createdAt': 1764000000000,
+    'lastUpdatedAt': 1764000000000,
+    'tradeType': 'TRADE',
+    'inOrderBook': True,
+    'cancelledSize': '0',
+    'cancelledFunds': '0',
+    'remainSize': '0',
+    'remainFunds': '0',
+    'tax': '0',
+    'cancelReason': None,
     'active': True,
   }
+  return row | fields
+
+
+async def test_order_states_use_signed_base_units():
+  """Open orders and queries are signed; futures lots convert, other symbols are None.
+
+  A spot query KuCoin answers with `data: null` (an unknown order ID, seen live) is
+  `None`, not a validation error.
+  """
+  spot_row = hf_order_json(id='s1', side='sell', price='100', size='2', dealSize='0.5')
   perp_row: Row = {
     'id': 'p1',
     'symbol': 'XBTUSDTM',
@@ -493,7 +531,9 @@ async def test_order_states_use_signed_base_units():
     spot=SimpleNamespace(
       orders_hf=SimpleNamespace(
         get_open_orders=AsyncMock(return_value=None),
-        get_by_order_id=AsyncMock(return_value=spot_row),
+        get_by_order_id=AsyncMock(
+          side_effect=[spot_row, None, spot_row | {'symbol': 'ETH-USDT'}]
+        ),
       )
     ),
     futures=SimpleNamespace(
@@ -512,6 +552,8 @@ async def test_order_states_use_signed_base_units():
   assert await spot.open_orders() == []
   state = await spot.query_order('s1')
   assert state is not None and (state.qty, state.filled_qty) == (D(-2), D('-0.5'))
+  assert await spot.query_order('missing') is None
+  assert await spot.query_order('s1') is None
   (open_perp,) = await perp.open_orders()
   assert (open_perp.qty, open_perp.filled_qty) == (D('0.010'), D('0.004'))
   assert (await perp.query_order('p1')) is not None

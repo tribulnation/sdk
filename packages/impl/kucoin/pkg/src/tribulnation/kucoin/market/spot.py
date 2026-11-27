@@ -5,6 +5,8 @@ from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from typing_extensions import Any, AsyncIterator, Sequence, cast
 
+from typed_core.validation import validator
+from typed_kucoin.schemas import HfOrder
 from typed_kucoin.spot.orders_hf.batch_add_sync import HfBatchAddOrderSyncResult
 from typed_kucoin.streams.spot_margin_private.order_v2 import OrderChangeEvent
 from tribulnation.sdk.core import Error, MissingData, OrderRejected, PaginatedResponse
@@ -37,6 +39,8 @@ from .orders import (
 
 TRADES_PAGE = 100
 """Fills per page of the HF fills endpoint."""
+HF_ORDER = validator(HfOrder)
+"""Validator of one HF order row, applied after the `data: null` check."""
 
 
 def dead(status: str | None, filled: Decimal | None) -> bool:
@@ -174,13 +178,21 @@ class SpotMarket(NativeMarket, SDKSpotMarket):
     )
 
   async def fetch_order(self, id: str) -> OrderState | None:
-    """Read one HF order of this pair."""
-    row = await self.shared.call(
+    """Read one HF order of this pair.
+
+    KuCoin answers an unknown (or expired) order ID with success and `data: null`,
+    which typed-kucoin's `HfOrder` response type does not admit, so the row is read
+    unvalidated and validated here once it is known to exist.
+    """
+    raw = await self.shared.call(
       lambda: self.client.spot.orders_hf.get_by_order_id(
-        order_id=id, symbol=self.symbol
+        order_id=id, symbol=self.symbol, validate=False
       )
     )
-    return spot_order_state(row) if row['symbol'] == self.symbol else None
+    if (data := cast(object, raw)) is not None:
+      row = HF_ORDER.python(data)
+      if row['symbol'] == self.symbol:
+        return spot_order_state(row)
 
   async def open_orders(self) -> Sequence[OrderState]:
     """Read this pair's open HF orders."""
