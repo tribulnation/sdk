@@ -57,10 +57,7 @@ Two things are transcribed rather than reconstructed:
 ```python
 from datetime import datetime, timedelta, timezone
 
-from dotenv import load_dotenv
 from tribulnation.sdk import ReportSDK, accounts
-
-load_dotenv()
 
 report = ReportSDK({'kraken': accounts.Kraken()}).venue('kraken')
 end = datetime.now(timezone.utc)

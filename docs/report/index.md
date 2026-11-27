@@ -24,9 +24,6 @@ Like every SDK root, `ReportSDK` has no implicit accounts: every account must be
 
 ```python
 from tribulnation.sdk import ReportSDK, accounts
-from dotenv import load_dotenv
-
-load_dotenv()
 
 report = ReportSDK(
   {

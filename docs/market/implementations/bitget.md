@@ -96,8 +96,8 @@ dropped).
 
 - **Public data is mode-independent.** `markets`, `depth`, `depth_stream`, `tickers`,
   `rules`, `perp_stats`, `index`, `next_funding` and `funding_rates` read the venue's public
-  endpoints, so they answer the same on a Classic account, a UTA account and the built-in
-  public one. Account-scoped reads on `spot` and `usdt` dispatch on the account's mode;
+  endpoints, so they answer the same on a Classic account, a UTA account and a
+  `public=True` one. Account-scoped reads on `spot` and `usdt` dispatch on the account's mode;
   `usdc` account reads are not implemented.
 - **Trading is implemented for UTA `usdt` and `margin` only**; `usdt` on cross margin in one-way position mode.
   On a Classic account, on `spot` and on `usdc`, `place_order` and `cancel_order` raise
@@ -192,10 +192,7 @@ dropped).
 ## Example
 
 ```python
-from dotenv import load_dotenv
 from tribulnation.sdk import MarketSDK, accounts
-
-load_dotenv()
 
 sdk = MarketSDK({'bg': accounts.Bitget()})
 

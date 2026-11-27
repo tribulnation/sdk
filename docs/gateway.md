@@ -64,7 +64,7 @@ from tribulnation.sdk.gateway import ProxySDK
 
 async def read_book():
     async with ProxySDK.at('unix:///tmp/tribulnation-sdk.sock') as sdk:
-        market = await sdk.market('hl:perp:BTC')
+        market = await sdk.market('hl::BTC')
         return await market.depth()
 ```
 
@@ -72,7 +72,7 @@ IDs given to `ProxySDK` are account-based addresses, and each proxy's `id` stays
 that address: every later request (`depth`, `place_order`, ...) is routed with it.
 As with the direct SDK, `account_id` is the address's account key and `venue_id` is
 the venue the gateway-side object reports, so a market resolved as
-`hl:perp:BTC` with the account above has `id == 'hl:perp:BTC'`,
+`hl::BTC` with the account above has `id == 'hl::BTC'`,
 `account_id == 'hl'` and `venue_id == 'hyperliquid'`.
 
 1. `market`, `perp_market`, `exchange` and `perp_exchange` make one round trip,

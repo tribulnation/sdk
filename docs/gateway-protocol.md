@@ -95,7 +95,7 @@ defined in the schema. Two of them need care:
 A request's reply has the same tag, except `exchange_collateral` (answered by
 `collateral`) and `exchange_perp_collateral` (answered by `perp_collateral`). Market
 requests address a market as `<account_id>:<exchange_id>:<market_id>`, e.g.
-`hl:perp:BTC`; exchange requests address it as `account_id` plus `exchange_id`.
+`hl::BTC`; exchange requests address it as `account_id` plus `exchange_id`.
 
 | `tag` | Fields | Purpose |
 |---|---|---|

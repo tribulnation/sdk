@@ -43,9 +43,6 @@ component:
     from datetime import datetime, timedelta, timezone
     from decimal import Decimal
     from tribulnation.sdk import MarketSDK
-    from dotenv import load_dotenv
-
-    load_dotenv()
 
     sdk = MarketSDK.load('sdk.toml')
     end = datetime.now(timezone.utc)

@@ -3,9 +3,7 @@ component:
   preamble: |
     from datetime import datetime, timedelta, timezone
     from tribulnation.sdk import ReportSDK
-    from dotenv import load_dotenv
 
-    load_dotenv()
     report = ReportSDK.load('sdk.toml')
     end = datetime.now(timezone.utc)
     start = end - timedelta(days=30)

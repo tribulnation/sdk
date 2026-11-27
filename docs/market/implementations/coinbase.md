@@ -19,11 +19,9 @@
 Authenticated access is recommended, especially for `tickers()` over many markets:
 
 ```python
-from dotenv import load_dotenv
 from tribulnation.sdk import MarketSDK, accounts
 
-load_dotenv()  # COINBASE_API_KEY_NAME and COINBASE_PRIVATE_KEY
-
+# reads COINBASE_API_KEY_NAME and COINBASE_PRIVATE_KEY from the environment
 async with MarketSDK({'coinbase': accounts.Coinbase()}) as sdk:
     tickers = await sdk.tickers('coinbase:spot', markets=['BTC-USD', 'ETH-USD'])
 ```

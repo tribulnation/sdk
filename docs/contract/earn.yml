@@ -2,9 +2,7 @@
 component:
   preamble: |
     from tribulnation.sdk import EarnSDK
-    from dotenv import load_dotenv
 
-    load_dotenv()
     earn = EarnSDK.load('sdk.toml')
   ref: tribulnation.sdk.earn.sdk:Earn
   title: Earn

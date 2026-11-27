@@ -20,9 +20,6 @@ Method reference: [Methods](methods.md).
 
 ```python
 from tribulnation.sdk import EarnSDK, accounts
-from dotenv import load_dotenv
-
-load_dotenv()
 
 earn = EarnSDK({'binance': accounts.Binance(), 'mexc': accounts.Mexc()})
 

@@ -20,9 +20,6 @@ Method reference: [Methods](methods.md).
 
 ```python
 from tribulnation.sdk import WalletSDK, accounts
-from dotenv import load_dotenv
-
-load_dotenv()
 
 wallet = WalletSDK({'binance': accounts.Binance(), 'bitget': accounts.Bitget()})
 
