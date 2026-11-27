@@ -1,0 +1,15 @@
+name: Feature Request
+description: Ask for a new venue, method or feature
+body:
+  - type: textarea
+    id: request
+    attributes:
+      label: What you'd like
+      description: The venue, method or behaviour you need.
+    validations:
+      required: true
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Why
+      description: What you're trying to do, and how you work around it today.

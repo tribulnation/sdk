@@ -1,0 +1,28 @@
+name: Bug Report
+description: Report a bug in the SDK or one of the venue packages
+body:
+  - type: input
+    id: package-version
+    attributes:
+      label: Packages & versions
+      description: The SDK and the venue package involved.
+      placeholder: tribulnation-sdk==4.3.0, tribulnation-binance==0.9.1
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: The failing call, the error or wrong value you got.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal reproduction
+      description: Leave out API keys and account IDs.
+      render: python
