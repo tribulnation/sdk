@@ -5,9 +5,19 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing_extensions import Collection, Mapping, Sequence
 
-from tribulnation.sdk.market import Exchange, PerpExchange, PerpStats, Settings, Ticker
+from tribulnation.sdk.market import (
+  Balance,
+  PerpCollateral,
+  PerpExchange,
+  PerpStats,
+  Settings,
+  SpotExchange as SDKSpotExchange,
+  Ticker,
+)
+from .account import cross_collateral, spot_balance
 from .common import Public
-from .markets import LinearPerpMarket, SpotMarket
+from .perp import POOL_CURRENCY, LinearPerpMarket
+from .spot import SpotMarket
 
 
 def positive_price(value: Decimal | None) -> Decimal | None:
@@ -16,8 +26,8 @@ def positive_price(value: Decimal | None) -> Decimal | None:
 
 
 @dataclass(frozen=True, kw_only=True)
-class SpotExchange(Public, Exchange):
-  """Classic spot public market data."""
+class SpotExchange(Public, SDKSpotExchange):
+  """Classic spot pairs, trading from the spot `trade` account."""
 
   @property
   def exchange_id(self) -> str:
@@ -29,6 +39,10 @@ class SpotExchange(Public, Exchange):
     return [
       s for s, row in (await self.shared.spot_symbols()).items() if row['enableTrading']
     ]
+
+  async def balance(self, asset: str, /, *, ttl: timedelta | None = None) -> Balance:
+    """One asset of the spot `trade` account; zero when it holds none."""
+    return spot_balance(await self.shared.spot_accounts(ttl=ttl), asset)
 
   async def market(self, market_id: str, /) -> SpotMarket:
     """Reject unknown IDs before constructing a market object."""
@@ -121,6 +135,16 @@ class LinearPerpExchange(Public, PerpExchange):
         quote_volume_24h=Decimal(str(c['turnoverOf24h'])),
       )
     return result
+
+  async def perp_collateral(
+    self, market_id: str | None = None, /, *, ttl: timedelta | None = None
+  ) -> PerpCollateral:
+    """The USDT futures pool (`<account_id>:perp`), or a market's bucket."""
+    if market_id is not None:
+      return await super().perp_collateral(market_id, ttl=ttl)
+    else:
+      account = await self.shared.futures_account(POOL_CURRENCY, ttl=ttl)
+      return cross_collateral(account, await self.shared.positions(ttl=ttl))
 
   async def perp_stats(
     self,

@@ -160,6 +160,6 @@ toggles response validation.
 
 ---
 
-← [Extended Market](extended.md) · **Next:** [Lighter Market](lighter.md) →
+← [Extended Market](extended.md) · **Next:** [KuCoin Market](kucoin.md) →
 
 <!-- /next -->

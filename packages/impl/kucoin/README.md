@@ -12,10 +12,9 @@
   <em>Tribulnation SDK implementation for KuCoin.</em>
 </p>
 
-Read-only Classic spot-side reporting, wallet network methods and simple Earn listings.
-The source checkout also implements credential-free public Classic spot and linear
-perpetual Market data. This expansion is unreleased; the existing 0.2.1 release does
-not contain it.
+Classic spot and linear perpetual Market data and trading, read-only Classic spot-side
+reporting, wallet network methods and simple Earn listings. Trading is unreleased and
+not yet verified live.
 
 ```python
 from tribulnation.sdk import ReportSDK, accounts
@@ -43,13 +42,13 @@ async with reports.venue('kucoin') as report:
 5. Earn lists five simple savings/staking families. Structured dual investments are
    excluded because their contingent principal conversion is not a plain APR product.
 
-## Public Market data (unreleased)
+## Public Market data
 
 ```python
 from datetime import datetime, timedelta, timezone
 from tribulnation.kucoin import KucoinMarket
 
-async with KucoinMarket.new() as venue:
+async with KucoinMarket.new(public=True) as venue:
   spot = await venue.exchange('spot')
   print(await spot.tickers(['BTC-USDT']))
   market = await venue.perp_market('perp:XBTUSDTM')
@@ -72,8 +71,32 @@ async with KucoinMarket.new() as venue:
 - Funding history uses inclusive bounds; an omitted start walks earliest available
   settlements. Perpetual statistics expose index, mark and base-unit open interest;
   use `next_funding()` for the current cycle's rate, next settlement and interval.
-- `rules().fees` is unknown. Account fees and all private Market/trading methods are
-  unsupported. Use the separate Report surface for supported Classic spot reporting.
+- `rules().fees` is unknown; `fees()` reads the account's rates.
+
+## Trading (unreleased)
+
+```python
+from decimal import Decimal
+from tribulnation.sdk import MarketSDK, accounts
+
+# Reads KUCOIN_API_KEY, KUCOIN_API_SECRET and KUCOIN_API_PASSPHRASE.
+sdk = MarketSDK({'kucoin': accounts.Kucoin()})
+market = await sdk.perp_market('kucoin:perp:XBTUSDTM')
+print(await market.fees())  # maker rebates are negative rates
+order = await market.place_order(
+  {'type': 'POST_ONLY', 'qty': Decimal('0.001'), 'price': Decimal('60000')}
+)
+await market.cancel_order(order.id)
+```
+
+- Spot (HF orders, the `trade` account) and linear perpetuals (one-way, cross margin).
+  Quantities are base units; futures orders must be whole contracts.
+- `LIMIT` is GTC, `POST_ONLY` sets `postOnly`, `MARKET` is an IOC limit at the price.
+- Orders are checked against the rules before sending (`ValueError`), refusals raise
+  `OrderRejected`, missing orders `OrderNotFound`.
+- See [the KuCoin Market page](../../../docs/market/implementations/kucoin.md) for
+  collateral, leverage, fees, streams and history, and
+  `scripts/live_trading.py` for the live check (not run in CI).
 
 See the [qualification handoff](../../../dev-docs/kucoin-public-market.md) for observed
 limits, Catalogue follow-up and release/version requirements.
