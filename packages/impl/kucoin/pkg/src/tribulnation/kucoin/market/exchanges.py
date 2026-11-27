@@ -18,6 +18,8 @@ from .account import cross_collateral, spot_balance
 from .common import Public
 from .perp import POOL_CURRENCY, LinearPerpMarket
 from .spot import SpotMarket
+from .uta import UtaPerpMarket, UtaSpotMarket
+from . import unified
 
 
 def positive_price(value: Decimal | None) -> Decimal | None:
@@ -166,3 +168,47 @@ class LinearPerpExchange(Public, PerpExchange):
       for symbol, c in rows.items()
       if markets is None or symbol in markets
     }
+
+
+@dataclass(frozen=True, kw_only=True)
+class UtaSpotExchange(SpotExchange):
+  """Spot pairs of a Unified Trading Account: public data as Classic, account reads and
+  orders through UTA."""
+
+  async def balance(self, asset: str, /, *, ttl: timedelta | None = None) -> Balance:
+    """One currency of the unified account; zero when it holds none."""
+    return unified.balance(await self.shared.uta_balance(ttl=ttl), asset)
+
+  async def market(self, market_id: str, /) -> UtaSpotMarket:
+    """Reject unknown IDs before constructing a market object."""
+    if market_id not in await self.shared.spot_symbols():
+      raise ValueError(f'Unknown KuCoin spot market: {market_id}')
+    return UtaSpotMarket(shared=self.shared, symbol=market_id)
+
+
+@dataclass(frozen=True, kw_only=True)
+class UtaPerpExchange(LinearPerpExchange):
+  """Linear perpetuals of a Unified Trading Account, margined by its one pool."""
+
+  async def market(self, market_id: str, /) -> UtaPerpMarket:
+    """Construct only a qualified linear perpetual, retaining its native ID."""
+    row = (await self.shared.perp_symbols()).get(market_id)
+    if row is None:
+      raise ValueError(f'Unknown or unsupported KuCoin linear perpetual: {market_id}')
+    return UtaPerpMarket(
+      shared=self.shared,
+      symbol=market_id,
+      contract_multiplier=Decimal(str(row['multiplier'])),
+    )
+
+  async def perp_collateral(
+    self, market_id: str | None = None, /, *, ttl: timedelta | None = None
+  ) -> PerpCollateral:
+    """The unified pool (`<account_id>:perp`), or a market's bucket."""
+    if market_id is not None:
+      return await super().perp_collateral(market_id, ttl=ttl)
+    else:
+      overview = await self.shared.uta_overview(ttl=ttl)
+      return unified.unified_collateral(
+        overview, await self.shared.uta_positions(ttl=ttl)
+      )

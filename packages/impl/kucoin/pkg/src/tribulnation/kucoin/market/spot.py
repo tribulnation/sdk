@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
-from typing_extensions import Any, AsyncIterator, Sequence, cast
+from typing_extensions import Any, AsyncIterator, Awaitable, Sequence, cast
 
 from typed_core.validation import validator
 from typed_kucoin.schemas import HfOrder
@@ -165,7 +165,7 @@ class SpotMarket(NativeMarket, SDKSpotMarket):
       return [refusal(exc) if refused(exc) else exc] * len(orders)
     return [batch_result(r) for r in rows]
 
-  def cancel(self, id: str):
+  def cancel(self, id: str) -> Awaitable[object]:
     """Cancel synchronously, so the answer is final."""
     return self.client.spot.orders_hf.cancel_by_order_id_sync(
       order_id=id, symbol=self.symbol

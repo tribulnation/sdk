@@ -25,7 +25,10 @@ from typed_kucoin.schemas import (
   PositionDetail,
   SpotSymbol,
 )
+from typed_kucoin.schemas import UtaExecutionEvent, UtaPosition
 from typed_kucoin.streams.spot_margin_private.order_v2 import OrderChangeEvent
+from typed_kucoin.uta.account.balance import UtaAccountBalance
+from typed_kucoin.uta.account.overview import UtaAccountOverview
 from tribulnation.sdk import SDK
 from tribulnation.sdk.core import (
   OverflowPolicy,
@@ -38,13 +41,27 @@ from ..core import Mixin
 
 U = TypeVar('U')
 Scope = Literal['spot', 'perp']
-"""The two KuCoin Classic product lines: HF spot and linear perpetual futures."""
-OrderEvent = OrderChangeEvent | FuturesOrderEvent
-"""A private order lifecycle push of either product line."""
+"""The two product lines: spot and linear perpetual futures."""
+Mode = Literal['classic', 'unified']
+"""The account's mode: Classic (separate spot and futures accounts and APIs) or Unified
+Trading Account (one account and one API for every product line)."""
+Feed = Literal['spot', 'perp', 'unified']
+"""A private order-event upstream: one per Classic product line, one for UTA."""
+OrderEvent = OrderChangeEvent | FuturesOrderEvent | UtaExecutionEvent
+"""A private push of a fill or order change: Classic spot or futures order lifecycle, or
+a UTA execution."""
 SPOT_ACCOUNTS = 'spot_accounts'
 """`SharedReads` key of the spot `trade` account balances."""
 POSITIONS = 'positions'
 """`SharedReads` key of the all-symbol futures position list."""
+UTA_BALANCE = 'uta_balance'
+"""`SharedReads` key of the UTA per-currency assets."""
+UTA_OVERVIEW = 'uta_overview'
+"""`SharedReads` key of the UTA margin overview."""
+UTA_POSITIONS = 'uta_positions'
+"""`SharedReads` key of the UTA open futures positions."""
+POSITIONS_PAGE = 200
+"""Most rows one UTA position or open-order page holds."""
 
 
 def linear_perpetual(row: FuturesContract) -> bool:
@@ -69,10 +86,16 @@ class Shared(Mixin):
   books: dict[tuple[str, str], Subscription[Book]] = field(
     default_factory=dict[tuple[str, str], Subscription[Book]]
   )
-  orders: dict[Scope, Subscription[OrderEvent]] = field(
-    default_factory=dict[Scope, Subscription[OrderEvent]]
+  orders: dict[Feed, Subscription[OrderEvent]] = field(
+    default_factory=dict[Feed, Subscription[OrderEvent]]
   )
-  """One private order-event upstream per product line, fanned out to every market."""
+  """One private order-event upstream per feed, fanned out to every market."""
+  mode: Mode | None = None
+  """The account mode this client was built for; `None` detects it on first use."""
+  detected: dict[Literal['mode'], Mode] = field(
+    default_factory=dict[Literal['mode'], Mode]
+  )
+  """The detected account mode, once read."""
   reads: SharedReads = field(default_factory=SharedReads)
   """Account-wide reads shared between markets and concurrent callers (ADR 0054)."""
   leverages: dict[str, int] = field(default_factory=dict[str, int])
@@ -84,6 +107,31 @@ class Shared(Mixin):
     futures fee rates. typed-kucoin roots every Account endpoint at the spot host, where
     these two do not exist, so they are rebound to the futures connection here."""
     return Account(client=self.client.futures_rest_client)
+
+  @property
+  def private(self) -> bool:
+    """Whether the client carries credentials."""
+    return self.client.default_client.credentials is not None
+
+  async def account_mode(self) -> Mode:
+    """The account's mode: the one passed to `new`, else detected once and cached.
+
+    A public client is Classic without a request; it reads only public data, which is
+    the same in both modes. Otherwise `GET /api/ua/v2/account/mode` (weight 30, any
+    key) answers `CLASSIC` or `UNIFIED` for the key's own account.
+    """
+    if self.mode is not None:
+      return self.mode
+    elif not self.private:
+      return 'classic'
+    else:
+      async with self.lock:
+        if 'mode' not in self.detected:
+          row = await self.call(self.client.uta.account.mode)
+          self.detected['mode'] = (
+            'unified' if row['selfAccountMode'] == 'UNIFIED' else 'classic'
+          )
+      return self.detected['mode']
 
   async def spot_symbols(self, *, refetch: bool = False) -> dict[str, SpotSymbol]:
     """Cache the venue's complete spot definitions, including disabled pairs."""
@@ -136,10 +184,48 @@ class Shared(Mixin):
 
     return await self.reads.read(('futures_account', currency), fetch, ttl=ttl)
 
+  async def uta_balance(self, *, ttl: timedelta | None) -> UtaAccountBalance:
+    """The UTA per-currency assets, one request for every currency."""
+
+    async def fetch() -> UtaAccountBalance:
+      """One signed request."""
+      return await self.call(self.client.uta.account.balance)
+
+    return await self.reads.read(UTA_BALANCE, fetch, ttl=ttl)
+
+  async def uta_overview(self, *, ttl: timedelta | None) -> UtaAccountOverview:
+    """The UTA account-level margin summary, in USD."""
+
+    async def fetch() -> UtaAccountOverview:
+      """One signed request."""
+      return await self.call(self.client.uta.account.overview)
+
+    return await self.reads.read(UTA_OVERVIEW, fetch, ttl=ttl)
+
+  async def uta_positions(self, *, ttl: timedelta | None) -> list[UtaPosition]:
+    """Every open UTA futures position, every page."""
+
+    async def fetch() -> list[UtaPosition]:
+      """Page until a short page."""
+      rows: list[UtaPosition] = []
+      page = 1
+      while True:
+        batch = await self.call(
+          lambda: self.client.uta.positions.open_positions(
+            page_number=page, page_size=POSITIONS_PAGE
+          )
+        )
+        rows.extend(batch)
+        if len(batch) < POSITIONS_PAGE:
+          return rows
+        page += 1
+
+    return await self.reads.read(UTA_POSITIONS, fetch, ttl=ttl)
+
   @asynccontextmanager
   async def stream(
     self,
-    scope: Scope,
+    scope: Feed,
     connect: Callable[[], Awaitable[Subscription.Context[OrderEvent]]],
     *,
     select: Callable[[OrderEvent], U | None],

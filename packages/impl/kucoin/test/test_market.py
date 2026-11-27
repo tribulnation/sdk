@@ -80,6 +80,7 @@ def shared_client(
     client=cast(KuCoin, SimpleNamespace(spot=spot, futures=futures, streams=streams)),
     spot={'BTC-USDT': spot_symbol()},
     perp={'XBTUSDTM': contract()},
+    mode='classic',
   )
 
 

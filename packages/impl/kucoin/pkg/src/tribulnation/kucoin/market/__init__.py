@@ -1,15 +1,21 @@
-"""KuCoin's Classic spot and linear perpetual Market surface."""
+"""KuCoin's spot and linear perpetual Market surface, Classic or Unified Trading Account."""
 
 import os
 
 from typed_kucoin import KuCoin
 from tribulnation.sdk.market import TradingVenue
-from .common import Public, Shared
-from .exchanges import LinearPerpExchange, SpotExchange
+from .common import Mode, Public, Shared
+from .exchanges import (
+  LinearPerpExchange,
+  SpotExchange,
+  UtaPerpExchange,
+  UtaSpotExchange,
+)
 
 
 class KucoinMarket(Public, TradingVenue):
-  """KuCoin Classic spot and linear perpetuals: public data, account reads and trading."""
+  """KuCoin spot and linear perpetuals: public data, account reads and trading, on a
+  Classic account or a Unified Trading Account (UTA)."""
 
   @classmethod
   def new(
@@ -21,6 +27,7 @@ class KucoinMarket(Public, TradingVenue):
     public: bool | None = None,
     validate: bool = True,
     account_id: str | None = None,
+    mode: Mode | None = None,
   ):
     """Create the venue over one client.
 
@@ -38,6 +45,12 @@ class KucoinMarket(Public, TradingVenue):
         releases before trading support built this venue.
       validate: Validate responses against the typed client's schemas.
       account_id: Root SDK account key, the first segment of every market ID.
+      mode: The account's mode: `'classic'` (separate spot and futures accounts, the
+        Classic APIs) or `'unified'` (a Unified Trading Account: one account, the UTA
+        API and private WebSocket). `None` detects it on the first account read or
+        trade, with one `GET /api/ua/v2/account/mode`, and caches it for the client's
+        life; a public client is Classic without a request. Public market data is the
+        same in both modes.
 
     Raises:
       AuthError: `public` is `False` and a credential is neither passed nor set.
@@ -55,23 +68,32 @@ class KucoinMarket(Public, TradingVenue):
       public=public,
       validate=validate,
     )
-    return cls(shared=Shared(client=client, account_id=account_id))
+    return cls(shared=Shared(client=client, account_id=account_id, mode=mode))
 
   async def exchanges(self) -> list[TradingVenue.ExchangeDescription]:
-    """Expose explicit product identities for spot and linear perpetuals."""
+    """Expose explicit product identities for spot and linear perpetuals, named after
+    the account mode (detected first when not given)."""
+    prefix = 'Unified' if await self.shared.account_mode() == 'unified' else 'Classic'
     return [
-      {'id': 'spot', 'type': 'spot', 'name': 'Classic Spot'},
-      {'id': 'perp', 'type': 'perp', 'name': 'Classic Linear Perpetuals'},
+      {'id': 'spot', 'type': 'spot', 'name': f'{prefix} Spot'},
+      {'id': 'perp', 'type': 'perp', 'name': f'{prefix} Linear Perpetuals'},
     ]
 
   async def exchange(self, exchange_id: str, /) -> SpotExchange | LinearPerpExchange:
     """Reject unknown exchange IDs instead of redirecting them."""
     if exchange_id == 'spot':
-      return SpotExchange(shared=self.shared)
-    return await self.perp_exchange(exchange_id)
+      if await self.shared.account_mode() == 'unified':
+        return UtaSpotExchange(shared=self.shared)
+      else:
+        return SpotExchange(shared=self.shared)
+    else:
+      return await self.perp_exchange(exchange_id)
 
   async def perp_exchange(self, exchange_id: str, /) -> LinearPerpExchange:
     """Only the perp exchange ID denotes supported perpetuals."""
     if exchange_id != 'perp':
       raise ValueError(f'Unknown KuCoin perpetual exchange: {exchange_id}')
-    return LinearPerpExchange(shared=self.shared)
+    elif await self.shared.account_mode() == 'unified':
+      return UtaPerpExchange(shared=self.shared)
+    else:
+      return LinearPerpExchange(shared=self.shared)

@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
-from typing_extensions import Any, AsyncIterator, Sequence, cast
+from typing_extensions import Any, AsyncIterator, Awaitable, Sequence, cast
 
 from typed_kucoin.schemas import (
   FuturesAddOrderLimit,
@@ -284,13 +284,13 @@ class LinearPerpMarket(NativeMarket, PerpMarket):
       return [refusal(exc) if refused(exc) else exc] * len(orders)
     return [batch_placed(r) for r in rows]
 
-  def cancel(self, id: str):
+  def cancel(self, id: str) -> Awaitable[object]:
     """Cancel by order ID; KuCoin processes it asynchronously."""
     return self.client.futures.orders.cancel_by_order_id(id)
 
   async def cancel_orders(
     self, ids: Sequence[str], *, settings: Settings = {}
-  ) -> Sequence[FuturesBatchCancelResult | Exception]:
+  ) -> Sequence[Any]:
     """Cancel in native batches of ten: per order, its acknowledgement or its error."""
     results: list[FuturesBatchCancelResult | Exception] = []
     for offset in range(0, len(ids), BATCH_CANCEL):
