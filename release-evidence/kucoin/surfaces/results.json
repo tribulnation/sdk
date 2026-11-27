@@ -189,19 +189,19 @@
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": null,
         "failed": 0,
         "id": "market.test_account_read[\"spot:BTC-USDT\", \"fees\"]",
         "network": "mainnet",
-        "passed": 0,
+        "passed": 1,
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": null,
         "failed": 0,
         "id": "market.test_account_read[\"spot:BTC-USDT\", \"open_orders\"]",
         "network": "mainnet",
-        "passed": 0,
+        "passed": 1,
         "skipped": 0
       },
       {
@@ -213,11 +213,11 @@
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": null,
         "failed": 0,
         "id": "market.test_account_read[\"spot:BTC-USDT\", \"trades_history\"]",
         "network": "mainnet",
-        "passed": 0,
+        "passed": 1,
         "skipped": 0
       },
       {
@@ -293,19 +293,19 @@
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": null,
         "failed": 0,
         "id": "market.test_account_read[\"spot:BTC-USDT\", \"balances\"]",
         "network": "mainnet",
-        "passed": 0,
+        "passed": 1,
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": null,
         "failed": 0,
         "id": "market.test_account_read[\"spot:BTC-USDT\", \"collateral_ids\"]",
         "network": "mainnet",
-        "passed": 0,
+        "passed": 1,
         "skipped": 0
       },
       {
@@ -421,19 +421,19 @@
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": null,
         "failed": 0,
         "id": "market.test_account_read[\"perp:XBTUSDTM\", \"fees\"]",
         "network": "mainnet",
-        "passed": 0,
+        "passed": 1,
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": null,
         "failed": 0,
         "id": "market.test_account_read[\"perp:XBTUSDTM\", \"open_orders\"]",
         "network": "mainnet",
-        "passed": 0,
+        "passed": 1,
         "skipped": 0
       },
       {
@@ -445,67 +445,67 @@
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": null,
         "failed": 0,
         "id": "market.test_account_read[\"perp:XBTUSDTM\", \"trades_history\"]",
         "network": "mainnet",
-        "passed": 0,
+        "passed": 1,
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": null,
         "failed": 0,
         "id": "market.test_account_read[\"perp:XBTUSDTM\", \"funding_payments\"]",
         "network": "mainnet",
-        "passed": 0,
+        "passed": 1,
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": null,
         "failed": 0,
         "id": "market.test_account_read[\"perp:XBTUSDTM\", \"position\"]",
         "network": "mainnet",
-        "passed": 0,
+        "passed": 1,
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": null,
         "failed": 0,
         "id": "market.test_account_read[\"perp:XBTUSDTM\", \"perp_position\"]",
         "network": "mainnet",
-        "passed": 0,
+        "passed": 1,
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": null,
         "failed": 0,
         "id": "market.test_account_read[\"perp:XBTUSDTM\", \"collateral\"]",
         "network": "mainnet",
-        "passed": 0,
+        "passed": 1,
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": null,
         "failed": 0,
         "id": "market.test_account_read[\"perp:XBTUSDTM\", \"perp_collateral\"]",
         "network": "mainnet",
-        "passed": 0,
+        "passed": 1,
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": null,
         "failed": 0,
         "id": "market.test_account_read[\"perp:XBTUSDTM\", \"leverage\"]",
         "network": "mainnet",
-        "passed": 0,
+        "passed": 1,
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": null,
         "failed": 0,
         "id": "market.test_account_read[\"perp:XBTUSDTM\", \"available_notional\"]",
         "network": "mainnet",
-        "passed": 0,
+        "passed": 1,
         "skipped": 0
       },
       {
@@ -517,11 +517,11 @@
         "skipped": 0
       },
       {
-        "exclusion": "unsupported",
+        "exclusion": null,
         "failed": 0,
         "id": "market.test_account_read[\"perp:XBTUSDTM\", \"collateral_id\"]",
         "network": "mainnet",
-        "passed": 0,
+        "passed": 1,
         "skipped": 0
       },
       {
