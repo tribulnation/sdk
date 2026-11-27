@@ -9,11 +9,11 @@ One async, typed Python interface for trading and market data across crypto exch
 
 ## Why use it
 
-- **One interface for 20 venues.** Code written against `Market`, `Earn`, `Wallet` and `Report` runs on any venue that implements them. To switch venues, or run several accounts on one venue, you change the ID string.
-- **Validated responses.** Each venue adapter is built on a [Typed](https://tribulnation.com/typed) client, so venue responses are checked before they reach your code.
-- **`Decimal` and `datetime`.** Prices, sizes and fees are `Decimal`, and timestamps are timezone-aware `datetime`. No floats, no epoch integers.
-- **Spot, margin and perpetual markets.** The types tell them apart: perpetuals add funding and index price, margin markets add borrow interest.
-- **Reports from exchanges and chains.** `Report` reads balance and position history, `Earn` lists yield products, and `Wallet` covers deposits and withdrawals.
+- **🎯 One interface for 20 venues.** Code written against `Market`, `Earn`, `Wallet` and `Report` runs on any venue that implements them. To switch venues, or run several accounts on one venue, you change the ID string.
+- **🛡️ Validated responses.** Each venue adapter is built on a [Typed](https://tribulnation.com/typed) client, so venue responses are checked before they reach your code.
+- **🔢 `Decimal` and `datetime`.** Prices, sizes and fees are `Decimal`, and timestamps are timezone-aware `datetime`. No floats, no epoch integers.
+- **📈 Spot, margin and perpetual markets.** The types tell them apart: perpetuals add funding and index price, margin markets add borrow interest.
+- **📊 Reports from exchanges and chains.** `Report` reads balance and position history, `Earn` lists yield products, and `Wallet` covers deposits and withdrawals.
 
 ## Install
 
