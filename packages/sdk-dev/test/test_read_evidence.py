@@ -437,9 +437,14 @@ def test_account_inventory_follows_support_modes_and_exchanges():
     for case in classic.values()
     if case.exclusion == 'bitget_classic'
   } == {'usdt:BTCUSDT collateral', 'usdt:BTCUSDT perp_collateral'}
-  for venue in ('deribit', 'kucoin'):
-    codes = set(account_cases(venue).values())
-    assert codes == {'unsupported', 'order_lifecycle', 'perp_only', 'spot_only'}
+  codes = set(account_cases('deribit').values())
+  assert codes == {'unsupported', 'order_lifecycle', 'perp_only', 'spot_only'}
+  kucoin = account_cases('kucoin')
+  assert kucoin['perp:XBTUSDTM perp_position'] is None
+  assert kucoin['perp:XBTUSDTM funding_payments'] is None
+  assert kucoin['perp:XBTUSDTM remaining_position_limit'] == 'unsupported'
+  assert kucoin['spot:BTC-USDT balances'] is None
+  assert kucoin['spot:BTC-USDT perp_position'] == 'perp_only'
 
 
 def test_qualification_tables_name_real_account_reads():

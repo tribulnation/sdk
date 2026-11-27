@@ -58,6 +58,7 @@ above runs unchanged everywhere. Either field is `None` on fills that don't repo
 | GRVT | `client_order_id`: an integer, also the SDK order id | History and stream | History and stream |
 | Hyperliquid | `cloid`: `0x` and 32 hex digits | History and stream | History and stream |
 | Kraken | No trading | History and stream | Stream |
+| KuCoin | `clientOid`, up to 40 characters; 32 hex digits generated when none is given | History and stream | Stream |
 | Lighter | Ignored | History and stream | — |
 | MEXC | `newClientOrderId` (spot) | History and stream | History and stream |
 | Nado | The order's `id`: a decimal integer below `2^64`, not kept unique | History and stream | Stream |
@@ -65,8 +66,8 @@ above runs unchanged everywhere. Either field is `None` on fills that don't repo
 Where you give none, Aster, Binance and Bybit spot generate an ID, and so does the SDK on
 Coinbase, which requires one: fills report that one. On Coinbase, reusing an ID doesn't
 place a second order; you get back the order already placed under it. On Extended it
-does: the venue accepts a second order under the same ID. Deribit and KuCoin
-serve public data only.
+does: the venue accepts a second order under the same ID. Deribit serves public data
+only.
 
 <!-- next -->
 

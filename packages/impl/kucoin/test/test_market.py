@@ -18,7 +18,8 @@ from typed_kucoin.schemas import FuturesContract, SpotSymbol
 from tribulnation.kucoin import KucoinMarket
 from tribulnation.kucoin.market.common import Shared
 from tribulnation.kucoin.market.exchanges import SpotExchange
-from tribulnation.kucoin.market.markets import LinearPerpMarket, SpotMarket
+from tribulnation.kucoin.market.perp import LinearPerpMarket
+from tribulnation.kucoin.market.spot import SpotMarket
 from tribulnation.sdk import Context, MarketSDK, NetworkError, accounts
 from tribulnation.sdk.market.types.candles import CandleInterval
 
@@ -57,6 +58,8 @@ def spot_symbol() -> SpotSymbol:
     SpotSymbol,
     dict(
       symbol='BTC-USDT',
+      baseCurrency='BTC',
+      quoteCurrency='USDT',
       enableTrading=True,
       feeCurrency='USDT',
       priceIncrement=D('0.1'),
@@ -122,14 +125,7 @@ async def test_rules_are_public_and_quantities_use_base_units():
   assert sr.fees is None and pr.fees is None
   assert pr.step_size == pr.fixed_min_qty == D('.001')
   assert pr.max_qty == 100
-  with pytest.raises(NotImplementedError):
-    await perp.fees()
-  with pytest.raises(NotImplementedError):
-    await perp.position()
-  with pytest.raises(NotImplementedError):
-    await perp.perp_position()
-  with pytest.raises(NotImplementedError):
-    await spot.place_order({'type': 'LIMIT', 'qty': D(1), 'price': D(100)})
+  assert sr.base == 'BTC' and sr.quote == 'USDT'
 
 
 async def test_ticker_and_stats_selection_preserve_native_units():

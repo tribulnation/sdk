@@ -27,6 +27,7 @@ Per-method differences are on the [Methods](../methods.md) page, under each meth
 - [EVEDEX](evedex.md) — perpetuals; instrument-name market ids, an API key for account reads, wallet-signed orders
 - [Extended](extended.md) — perpetuals; one sub-account per API key, RFQ markets' books from their quotes
 - [GRVT](grvt.md) — perpetuals and spot; instrument-name market ids, a read-only API key for account reads
+- [KuCoin](kucoin.md) — Classic spot and linear perpetuals; contracts converted to base units, cross-margin trading
 - [Lighter](lighter.md) — perpetuals and spot; numeric market ids, unified accounts for spot collateral
 - [margin.trade](margin-trade.md) — perpetuals and spot; Solana keys with agent wallets, per-market fee rates
 - [Nado](nado.md) — perpetuals and spot on one unified account; symbol market ids, an address for account reads

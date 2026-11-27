@@ -33,10 +33,12 @@ def test_kucoin_and_deribit_public_expansion_preserves_private_surface_scope():
     assert support['market']['support'] == 'partial'
     assert support['market']['auth'] is False
     assert 'candles' in support['market']['methods']
-    assert 'place_order' not in support['market']['methods']
     if venue == 'deribit':
+      assert 'place_order' not in support['market']['methods']
       assert 'rules' not in support['market']['methods']
       assert 'next_funding' not in support['market']['methods']
       assert 'funding_rates' not in support['market']['methods']
+    else:
+      assert 'place_order' in support['market']['methods']
     assert support['report']['support'] == 'partial'
     assert support['earn']['support'] == 'partial'

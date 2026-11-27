@@ -209,6 +209,6 @@ async with sdk.depth_stream('lighter:perp:1', settings={'lighter': {'depth_sourc
 
 ---
 
-← [GRVT Market](grvt.md) · **Next:** [margin.trade Market](margin-trade.md) →
+← [KuCoin Market](kucoin.md) · **Next:** [margin.trade Market](margin-trade.md) →
 
 <!-- /next -->

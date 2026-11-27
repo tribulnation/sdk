@@ -215,12 +215,23 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
     )
 
   def kucoin(self, account: Kucoin, id: str) -> TradingVenue:
-    """Build KuCoin's credential-free public Market surface."""
+    """Build KuCoin's spot and linear perpetual Market surface: public data with a
+    `public` account, account reads and trading with the API key."""
     try:
       from tribulnation.kucoin import KucoinMarket
     except ImportError as e:
       raise ImportError('Install tribulnation-kucoin to use this venue.') from e
-    return KucoinMarket.new(validate=account.validate, account_id=id)
+    if account.public:
+      return KucoinMarket.new(validate=account.validate, account_id=id, public=True)
+    else:
+      return KucoinMarket.new(
+        account.resolved_api_key,
+        account.resolved_api_secret,
+        account.resolved_api_passphrase,
+        public=False,
+        validate=account.validate,
+        account_id=id,
+      )
 
   def deribit(self, account: Deribit, id: str) -> TradingVenue:
     """Build Deribit's credential-free mainnet public Market surface."""

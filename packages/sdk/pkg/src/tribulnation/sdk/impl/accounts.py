@@ -504,7 +504,12 @@ class Kraken(VenueAccount):
 
 @_dataclass(frozen=True)
 class Kucoin(VenueAccount):
-  """Kucoin Classic API account."""
+  """Kucoin Classic API account.
+
+  One API key (key, secret and the passphrase chosen when creating it) serves the spot
+  and futures hosts. A sub-account's own API key reads and trades that sub-account;
+  `public=True` needs none, for public market data.
+  """
 
   venue: _Literal['kucoin'] = 'kucoin'
   api_key: str = '$KUCOIN_API_KEY'

@@ -250,6 +250,7 @@ methods:
       accountVenues: [binance]
       constants:
         aster: {market_id: 'aster:perp:BTCUSDT'}
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM'}
         binance: {market_id: 'binance:spot:BTCUSDT'}
         hyperliquid: {market_id: 'hyperliquid::BTC'}
         kraken: {market_id: 'kraken:spot:XBTUSD'}
@@ -469,6 +470,7 @@ methods:
       accountVenues: [mexc]
       constants:
         aster: {market_id: 'aster:perp:BTCUSDT', order_id: '12345678', price: '59500', qty: '0.01'}
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM', order_id: '6745c02703aa673ceec2a168', price: '59500', qty: '0.01'}
         mexc: {market_id: 'mexc:spot:BTCUSDT', order_id: '4834937', price: '59500', qty: '0.01'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id: '184920371', price: '59480', qty: '0.02'}
         binance: {market_id: 'binance:spot:BTCUSDT', order_id: '4834937', price: '59500', qty: '0.01'}
@@ -514,6 +516,7 @@ methods:
       accountVenues: [mexc]
       constants:
         aster: {market_id: 'aster:perp:BTCUSDT', order_id: '12345678', price: '59500', qty: '0.01'}
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM', order_id: '6745c02703aa673ceec2a168', price: '59500', qty: '0.01'}
         mexc: {market_id: 'mexc:spot:BTCUSDT', order_id: '4834937', price: '59500', qty: '0.01'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id: '184920371', price: '59480', qty: '0.02'}
         binance: {market_id: 'binance:spot:BTCUSDT', order_id: '4834937', price: '59500', qty: '0.01'}
@@ -561,6 +564,7 @@ methods:
       accountVenues: [mexc]
       constants:
         aster: {market_id: 'aster:perp:BTCUSDT', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'USDT'}
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'USDT'}
         mexc: {market_id: 'mexc:spot:BTCUSDT', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: USDT}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', price1: '60095.60', qty1: '0.01', price2: '60040.00', qty2: '-0.02', fee_asset: '197'}
         coinbase: {market_id: 'coinbase:spot:BTC-USD', price1: '60123.40', qty1: '0.01', price2: '60050.00', qty2: '-0.02', fee_asset: 'USD'}
@@ -607,6 +611,7 @@ methods:
       accountVenues: [mexc]
       constants:
         aster: {market_id: 'aster:perp:BTCUSDT', ticks: [{price: '60123.40', qty: '0.01'}, {price: '60124.00', qty: '-0.02'}, {price: '60125.10', qty: '0.05'}]}
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM', ticks: [{price: '60123.40', qty: '0.01'}, {price: '60124.00', qty: '-0.02'}, {price: '60125.10', qty: '0.05'}]}
         mexc:
           market_id: 'mexc:spot:BTCUSDT'
           ticks:
@@ -667,6 +672,7 @@ methods:
       accountVenues: [dydx]
       constants:
         aster: {market_id: 'aster:perp:BTCUSDT', size: '0.014'}
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM', size: '0.014'}
         bitget: {market_id: 'bitget:usdt:BTCUSDT', size: '0.014'}
         bybit: {market_id: 'bybit:perp:BTCUSDT', size: '0.014'}
         dydx: {market_id: 'dydx:perp:BTC-USD', size: '0.014'}
@@ -708,6 +714,7 @@ methods:
       accountVenues: [hyperliquid]
       constants:
         aster: {collateral_id: 'aster:perp', equity: '10240.55', free: '8120.00'}
+        kucoin: {collateral_id: 'kucoin:perp', equity: '10240.55', free: '8120.00'}
         bitget: {collateral_id: 'bitget:usdt', equity: '10240.55', free: '8120.00'}
         bybit: {collateral_id: 'bybit:perp', equity: '10240.55', free: '8120.00'}
         dydx: {collateral_id: 'dydx:perp', equity: '10240.55', free: '8120.00'}
@@ -750,6 +757,7 @@ methods:
       accountVenues: [dydx]
       constants:
         aster: {market_id: 'aster:perp:BTCUSDT', notional: '81200.00'}
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM', notional: '81200.00'}
         bitget: {market_id: 'bitget:usdt:BTCUSDT', notional: '81200.00'}
         bybit: {market_id: 'bybit:perp:BTCUSDT', notional: '81200.00'}
         dydx: {market_id: 'dydx:perp:BTC-USD', notional: '81200.00'}
@@ -816,6 +824,7 @@ methods:
       accountVenues: [hyperliquid]
       constants:
         aster: {market_id: 'aster:spot:ASTERUSDT', base_total: '0.5', base_free: '0.4', quote_total: '9875.20', quote_free: '7640.00'}
+        kucoin: {market_id: 'kucoin:spot:BTC-USDT', base_total: '0.5', base_free: '0.4', quote_total: '9875.20', quote_free: '7640.00'}
         grvt: {market_id: 'grvt:spot:GRVT_USDT_SpotSwap', base_total: '1200.0', base_free: '1000.0', quote_total: '9875.20', quote_free: '7640.00'}
         nado: {market_id: 'nado:spot:KBTC', base_total: '0.05', base_free: '0.05', quote_total: '9875.20', quote_free: '7640.00'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', base_total: '0.5', base_free: '0.4', quote_total: '9875.20', quote_free: '7640.00'}
@@ -836,6 +845,7 @@ methods:
       accountVenues: [hyperliquid]
       constants:
         aster: {market_id: 'aster:spot:ASTERUSDT', base: 'ASTER', quote: 'USDT'}
+        kucoin: {market_id: 'kucoin:spot:BTC-USDT', base: 'BTC', quote: 'USDT'}
         grvt: {market_id: 'grvt:spot:GRVT_USDT_SpotSwap', base: 'GRVT', quote: 'USDT'}
         nado: {market_id: 'nado:spot:KBTC', base: 'KBTC', quote: 'USDT0'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', base: '197', quote: '0'}
@@ -856,6 +866,7 @@ methods:
       accountVenues: [hyperliquid]
       constants:
         aster: {market_id: 'aster:perp:BTCUSDT', collateral_id: 'aster:perp'}
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM', collateral_id: 'kucoin:perp'}
         bitget: {market_id: 'bitget:usdt:BTCUSDT', collateral_id: 'bitget:usdt'}
         dydx: {market_id: 'dydx:perp:BTC-USD', collateral_id: 'dydx:perp'}
         extended: {market_id: 'extended:perp:BTC-USD', collateral_id: 'extended:perp'}
@@ -880,6 +891,7 @@ methods:
       accountVenues: [mexc]
       constants:
         aster: {market_id: 'aster:perp:BTCUSDT', order_id: '12345678'}
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM', order_id: '6745c02703aa673ceec2a168'}
         bitget: {market_id: 'bitget:usdt:BTCUSDT', order_id: '1376521890123456789'}
         mexc: {market_id: 'mexc:spot:BTCUSDT', order_id: '4834937'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id: '184920371'}
@@ -924,6 +936,7 @@ methods:
       accountVenues: [hyperliquid]
       constants:
         aster: {market_id: 'aster:perp:BTCUSDT', order_id1: '12345678', order_id2: '12345679'}
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM', order_id1: '6745c02703aa673ceec2a168', order_id2: '6745c02703aa673ceec2a169'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id1: '184920371', order_id2: '184920372'}
         bybit: {market_id: 'bybit:spot:BTCUSDT', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
         coinbase: {market_id: 'coinbase:spot:BTC-USD', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
@@ -969,6 +982,7 @@ methods:
       accountVenues: [mexc]
       constants:
         aster: {market_id: 'aster:perp:BTCUSDT', order_id: '12345678'}
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM', order_id: '6745c02703aa673ceec2a168'}
         bitget: {market_id: 'bitget:usdt:BTCUSDT', order_id: '1376521890123456789'}
         mexc: {market_id: 'mexc:spot:BTCUSDT', order_id: '4834937'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id: '184920371'}
@@ -1013,6 +1027,7 @@ methods:
       accountVenues: [mexc]
       constants:
         aster: {market_id: 'aster:perp:BTCUSDT', order_id1: '12345678', order_id2: '12345679'}
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM', order_id1: '6745c02703aa673ceec2a168', order_id2: '6745c02703aa673ceec2a169'}
         mexc: {market_id: 'mexc:spot:BTCUSDT', order_id1: '4834937', order_id2: '4834938'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id1: '184920371', order_id2: '184920372'}
         bybit: {market_id: 'bybit:spot:BTCUSDT', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
@@ -1056,6 +1071,7 @@ methods:
       accountVenues: [hyperliquid]
       constants:
         aster: {market_id: 'aster:perp:BTCUSDT', order_id1: '12345678', order_id2: '12345679'}
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM', order_id1: '6745c02703aa673ceec2a168', order_id2: '6745c02703aa673ceec2a169'}
         bitget: {market_id: 'bitget:usdt:BTCUSDT', order_id1: '1376521890123456789', order_id2: '1376521890123456790'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id1: '184920371', order_id2: '184920372'}
         bybit: {market_id: 'bybit:spot:BTCUSDT', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
@@ -1099,6 +1115,7 @@ methods:
       accountVenues: [hyperliquid]
       constants:
         aster: {market_id: 'aster:perp:BTCUSDT', order_id1: '12345678', order_id2: '12345679'}
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM', order_id1: '6745c02703aa673ceec2a168', order_id2: '6745c02703aa673ceec2a169'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142', order_id1: '184920371', order_id2: '184920372'}
         bybit: {market_id: 'bybit:spot:BTCUSDT', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
         coinbase: {market_id: 'coinbase:spot:BTC-USD', order_id1: '00000000-0000-4000-8000-000000000001', order_id2: '00000000-0000-4000-8000-000000000002'}
@@ -1143,6 +1160,7 @@ methods:
       accountVenues: [mexc]
       constants:
         aster: {market_id: 'aster:perp:BTCUSDT'}
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM'}
         bitget: {market_id: 'bitget:usdt:BTCUSDT'}
         mexc: {market_id: 'mexc:spot:BTCUSDT'}
         hyperliquid: {market_id: 'hyperliquid:spot:UBTC/USDC:142'}
@@ -1322,6 +1340,7 @@ methods:
       accountVenues: [dydx]
       constants:
         aster: {market_id: 'aster:perp:BTCUSDT', amount1: '0.25', amount2: '-0.10'}
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM', amount1: '0.25', amount2: '-0.10'}
         dydx: {market_id: 'dydx:perp:BTC-USD', amount1: '-1.24', amount2: '0.86'}
         hyperliquid: {market_id: 'hyperliquid::BTC', amount1: '-1.05', amount2: '0.74'}
         bybit: {market_id: 'bybit:perp:BTCUSDT', amount1: '-1.24', amount2: '0.86'}
@@ -1380,6 +1399,7 @@ methods:
       accountVenues: [dydx]
       constants:
         aster: {market_id: 'aster:perp:BTCUSDT', size: '0.5', entry_price: '58230.10', liquidation_price: "Decimal('55617.42')"}
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM', size: '0.5', entry_price: '58230.10', liquidation_price: "Decimal('55617.42')"}
         dydx: {market_id: 'dydx:perp:BTC-USD', size: '0.5', entry_price: '58230.10', liquidation_price: "None"}
         hyperliquid: {market_id: 'hyperliquid::BTC', size: '0.3', entry_price: '58190.40', liquidation_price: "Decimal('55588.27')"}
         bitget: {market_id: 'bitget:usdt:BTCUSDT', size: '0.5', entry_price: '58230.10', liquidation_price: "None"}
@@ -1432,6 +1452,7 @@ methods:
         risex: {market_id: 'risex:perp:1', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
         evedex: {market_id: 'evedex:perp:BTCUSD', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
         aster: {market_id: 'aster:perp:BTCUSDT', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM', equity: '10240.55', leverage: '2.10', maintenance_ratio: '0.183'}
       callTemplate: |
         c = await sdk.perp_collateral('{{ constants[accounts[0]].market_id }}')
         print(c.maintenance_ratio)
@@ -1464,6 +1485,7 @@ methods:
       constants:
         hyperliquid: {market_id: 'hyperliquid::BTC', leverage: '20', free: '7640.00', notional: '152800.00'}
         aster: {market_id: 'aster:perp:BTCUSDT', leverage: '20', free: '8120.00', notional: '162400.00'}
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM', leverage: '20', free: '8120.00', notional: '162400.00'}
         bitget: {market_id: 'bitget:usdt:BTCUSDT', leverage: '10', free: '8120.00', notional: '81200.00'}
         dydx: {market_id: 'dydx:perp:BTC-USD', leverage: '20', free: '8120.00', notional: '162400.00'}
         lighter: {market_id: 'lighter:perp:1', leverage: '20', free: '8120.00', notional: '162400.00'}
@@ -1491,6 +1513,7 @@ methods:
       constants:
         hyperliquid: {market_id: 'hyperliquid::BTC', leverage: '5'}
         aster: {market_id: 'aster:perp:BTCUSDT', leverage: '5'}
+        kucoin: {market_id: 'kucoin:perp:XBTUSDTM', leverage: '5'}
         extended: {market_id: 'extended:perp:BTC-USD', leverage: '5'}
         grvt: {market_id: 'grvt:perp:BTC_USDT_Perp', leverage: '5'}
         lighter: {market_id: 'lighter:perp:1', leverage: '5'}

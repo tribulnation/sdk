@@ -125,6 +125,40 @@ pair.name` held for 353 of 353), but `coin` is typed `NotRequired`.
 - Suggestion (unverified): document one context per spot index, joined by `coin` or
   `@{index}`, and declare `coin: str`
 
+## typed-kucoin
+
+### Futures account endpoints under `account` are rooted at the spot host
+
+`KuCoin.account` is built on `default_client` (`api.kucoin.com`), but three of its
+endpoints live on `api-futures.kucoin.com`: `futures_account` (`/api/v1/account-overview`),
+`futures_ledgers` and `trade_fee.actual_fee_futures` (`/api/v1/trade-fees` on the
+futures host; the spot host answers the same path with spot rates). Their own spec notes
+say so (`spec/endpoints/account/futures_account/upstream.md`: "Reached via
+`futures_client`").
+
+`main.py`:
+
+```python
+  def account(self) -> Account:
+    return Account(client=self.default_client)
+```
+
+- Kind: wrong-host routing
+- Observed: in the spec capture notes; not called through the client against mainnet
+- Blocks: nothing. `tribulnation.kucoin` rebinds `Account` to `futures_rest_client`
+  (`Shared.futures_api`) for the futures overview and futures fee rates.
+
+### `RateLimited` drops the `gw-ratelimit-reset` header
+
+A throttled request (HTTP 429, `429000`) carries `gw-ratelimit-limit`,
+`gw-ratelimit-remaining` and `gw-ratelimit-reset`, but `core/envelope.py` raises
+`RateLimited(status, payload)` without them, so a caller cannot wait out the reset.
+
+- Kind: missing data
+- Fix: typed-dev PR attaching a `RateLimit` mapping as the error's last argument
+- Blocks: nothing. `tribulnation.kucoin.retry_after` reads it once released and answers
+  `None` before.
+
 ## typed-lighter
 
 ### `Candle` OHLCV fields are `float`
