@@ -12,7 +12,8 @@
 
 # KuCoin Market
 
-> Classic spot and linear perpetuals. `tribulnation-kucoin`, venue name `kucoin`.
+> Spot and linear perpetuals, on a Classic account or a Unified Trading Account (UTA).
+> `tribulnation-kucoin`, venue name `kucoin`.
 
 See the [generic market interface](../index.md) for the shared method surface. This page
 covers only what is KuCoin-specific.
@@ -34,6 +35,13 @@ These are the defaults, so `venue = "kucoin"` alone reads the three variables. O
 serves both KuCoin hosts (`api.kucoin.com` for spot, `api-futures.kucoin.com` for
 futures) and both private WebSocket connections. A sub-account's own API key reads and
 trades that sub-account. `validate` toggles response validation.
+
+`mode` selects the account mode: `"classic"`, `"unified"`, or unset (the default), which
+detects it once per client with `GET /api/ua/v2/account/mode` on the first account read
+or trade. A public account is Classic without a request. Public market data is the same
+in both modes; account reads, orders and fills follow the mode (see
+[Unified Trading Account](#unified-trading-account)). Setting `mode` needs
+`tribulnation-kucoin>=0.9.0`.
 
 ## Exchange & ID conventions
 
@@ -98,12 +106,68 @@ trades that sub-account. `validate` toggles response validation.
 - `trades_history` walks seven-day windows up to now (spot HF fills; futures trades,
   liquidations and ADL), keeping each fill once. `funding_payments` walks one-day windows.
 
+## Unified Trading Account
+
+A Unified Trading Account (KuCoin's UTA, account mode `UNIFIED`) holds spot, cross margin
+and futures in one account and is traded through the UTA REST V2 API
+(`/api/ua/v2/...`, one endpoint per action for every product line) and the UTA private
+WebSocket (`wss://wsapi-push.kucoin.com`, signature-authenticated). With `mode =
+"unified"` (or detected), every account read, order and fill goes there; public data and
+`rules()` stay the Classic ones. The account mode is switched on KuCoin's side
+(`POST /api/ua/v2/account/mode`); the SDK never switches it.
+
+- Orders: spot sizes are base units (`sizeUnit=BASECCY`), futures sizes whole contracts
+  (`UNIT`) on `marginMode=CROSS`; no leverage is sent with an order. `LIMIT`,
+  `POST_ONLY` and `MARKET` map as on Classic. UTA acknowledges every order before
+  matching, on spot too: a `MARKET` order is read back once (done with nothing filled
+  raises `OrderRejected`), and a crossing post-only comes back as an order ID, then shows
+  as cancelled with nothing filled. There is no batch placement: `place_orders` places
+  one by one. `cancel_orders` uses the native batch cancel (20 per request),
+  `cancel_open_orders` the per-symbol cancel-all (100 per request, repeated).
+- `query_order` reads the order details, which keep a cancelled order without fills for
+  2 hours and one with fills for 168 hours; older or unknown IDs answer `None`.
+- Spot `balances()` and `balance(asset)` read the unified per-currency assets: `total` is
+  the spot balance, `free` what spot orders can spend, `min(balance, equity) - hold`
+  (KuCoin's rule: unrealized futures losses reduce it, profits do not add to it).
+- `perp_collateral()` (and the exchange's `perp_collateral()`) is the one unified pool, in
+  USD: `equity` is the collateral-adjusted equity (every enabled collateral currency, USDT
+  and USDC included, at its collateral ratio, less liabilities), `free_collateral` the
+  account's available margin, `initial_margin`/`maintenance_margin` the account's IM and
+  MM, `leverage` the cross positions' value over equity. An isolated position reports its
+  own margin.
+- `collateral_id()` is `<account>:perp` for every linear contract, USDT- and
+  USDC-settled alike: both draw on the one pool, so USDC held in the account margins
+  USDT contracts (at USDC's collateral ratio, `1` up to 40M USD on 2026-11-27). Spot
+  markets keep their per-asset IDs, `<account>:spot:<asset>`.
+- `leverage()`/`set_leverage()` read and change the contract's leverage
+  (`/api/ua/v2/unified/account/leverage`, `modify-leverage`); a contract with no cross
+  setting raises `LeverageNotSet`. `available_notional()` is available margin times it.
+- `fees()` reads `/api/ua/v2/user/fee-rate`: the account's actual maker and taker rates,
+  a negative maker rate being a rebate. It reports no tax rate.
+- `trades_stream` reads the UTA `execution` channel, one connection for every spot and
+  perpetual market of the account. Fills carry the fee, the liquidity role, and the
+  order and client order IDs; settlement fills are skipped. The channel carries no
+  product line, so a spot market also sees cross margin fills of its pair.
+- `trades_history` walks seven-day windows of the UTA fills (trades, liquidations,
+  ADL); `funding_payments` 90-day windows of the UTA funding history.
+- Errors: the UTA codes map like the Classic ones (`116217` and `116239`-`116241` raise
+  `PositionLimitExceeded`; `110179`, `116052`, `116101`, `116102` mean a missing order).
+  A UTA endpoint answering that the account is not unified (`116104`, `163520`,
+  `116500`, ...) is an `ApiError`, never `OrderRejected`: the client's `mode` does not
+  match the account.
+
 ## Verification
 
 Public reads are verified on mainnet. Trading, the private streams and the account reads
 are tested against fake responses only. `packages/impl/kucoin/scripts/live_trading.py`
 reads every account method and, with `--place`, rests and cancels one minimum-size
-post-only order per market.
+post-only order per market; `--fill` buys and sells back the minimum; `--mode unified`
+checks the account is a UTA first.
+
+UTA: the account-mode detection and the private WebSocket's authentication and
+subscription were checked live on 2026-11-27 against a Classic account. No UTA account
+read, order or fill has been verified live yet: they are tested against fake responses
+built from KuCoin's documentation examples.
 
 <!-- next -->
 

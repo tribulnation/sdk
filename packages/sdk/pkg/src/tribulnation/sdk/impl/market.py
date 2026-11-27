@@ -216,13 +216,24 @@ class MarketSDK(TradingMarkets, VenueOwner[TradingVenue]):
 
   def kucoin(self, account: Kucoin, id: str) -> TradingVenue:
     """Build KuCoin's spot and linear perpetual Market surface: public data with a
-    `public` account, account reads and trading with the API key."""
+    `public` account, account reads and trading with the API key, on a Classic account
+    or a Unified Trading Account (`account.mode`, detected when unset)."""
     try:
       from tribulnation.kucoin import KucoinMarket
     except ImportError as e:
       raise ImportError('Install tribulnation-kucoin to use this venue.') from e
     if account.public:
       return KucoinMarket.new(validate=account.validate, account_id=id, public=True)
+    elif account.mode is not None:
+      return KucoinMarket.new(
+        account.resolved_api_key,
+        account.resolved_api_secret,
+        account.resolved_api_passphrase,
+        public=False,
+        validate=account.validate,
+        account_id=id,
+        mode=account.mode,
+      )
     else:
       return KucoinMarket.new(
         account.resolved_api_key,

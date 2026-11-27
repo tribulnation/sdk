@@ -6,6 +6,15 @@ credentials. Run it by hand, from the repository root:
   KUCOIN_API_KEY=... KUCOIN_API_SECRET=... KUCOIN_API_PASSPHRASE=... \\
     python packages/impl/kucoin/scripts/live_trading.py --exchange both
 
+`--mode` selects the account mode the SDK uses: `auto` (default) detects it with
+`GET /api/ua/v2/account/mode`; `classic` or `unified` forces one and stops before
+anything else when the account is in the other mode. A Unified Trading Account (UTA)
+routes every read, order and fill below through the UTA API and private WebSocket:
+
+  python packages/impl/kucoin/scripts/live_trading.py --mode unified --exchange both
+  python packages/impl/kucoin/scripts/live_trading.py --mode unified --place --cross
+  python packages/impl/kucoin/scripts/live_trading.py --mode unified --fill
+
 Without `--place` it only reads (rules, fees, balances, position, collateral, leverage,
 open orders, recent fills). With `--place` it, per market:
 
@@ -18,6 +27,11 @@ open orders, recent fills). With `--place` it, per market:
 5. with `--cross`, places a minimum-size POST_ONLY buy at the best ask, which KuCoin must
    not fill: spot must raise `OrderRejected`; on futures the order must end cancelled
    with nothing filled.
+
+With `--fill`, per market: one minimum-size MARKET buy (an IOC limit a little above the
+best ask), its fill seen on `trades_stream` and in `trades_history`, then one
+minimum-size MARKET sell closing it again. It pays the taker fee twice and the spread
+once: roughly 0.2-0.3 USD per market at the minimum sizes.
 
 Orders carry a client order ID and nothing is left resting: every placed order is
 cancelled in a `finally`. The minimum futures order is one contract (0.001 BTC on
@@ -131,6 +145,51 @@ async def trade(market: Market, *, depth: Decimal, cross: bool):
           pass
 
 
+async def take(market: Market):
+  """Buy the minimum at the ask with a MARKET order, then sell it back the same way."""
+  print(f'\n== {market.id} (tiny fill)')
+  rules = await market.rules()
+  book = await market.depth(levels=1)
+  check(bool(book.bids and book.asks), 'book has both sides')
+  ask, bid = book.asks[0].price, book.bids[0].price
+  qty = rules.min_qty(ask)
+  start = datetime.now(timezone.utc) - timedelta(seconds=5)
+  async with market.trades_stream() as fills:
+    bought = await market.place_order(
+      {
+        'type': 'MARKET',
+        'qty': qty,
+        'price': rules.trunc_price(ask * Decimal('1.002')),
+        'client_order_id': market.random_client_order_id(),
+      }
+    )
+    print(f'  bought {bought.id}: {qty} at most {ask * Decimal("1.002")}')
+    fill = await asyncio.wait_for(anext(aiter(fills)), 10)
+    check(
+      fill.order_id == bought.id and fill.qty > 0, 'trades_stream sees the buy fill'
+    )
+    print(f'  fill: {fill.qty} @ {fill.price}, maker {fill.maker}, fee {fill.fee}')
+    sold = await market.place_order(
+      {
+        'type': 'MARKET',
+        'qty': -fill.qty if is_perp(market) else -qty,
+        'price': rules.trunc_price(bid * Decimal('0.998')),
+      }
+    )
+    print(f'  sold {sold.id}')
+    await asyncio.wait_for(anext(aiter(fills)), 10)
+  await asyncio.sleep(2)
+  history = [
+    t
+    async for page in market.trades_history(start, datetime.now(timezone.utc))
+    for t in page
+  ]
+  ids = {t.order_id for t in history}
+  check(bought.id in ids and sold.id in ids, 'trades_history lists both fills')
+  if is_perp(market):
+    check((await market.perp_position()).size == 0, 'position is flat again')
+
+
 async def main():
   """Run the selected checks."""
   parser = argparse.ArgumentParser(description='Live KuCoin trading check.')
@@ -142,6 +201,10 @@ async def main():
     '--cross', action='store_true', help='also try a crossing post-only'
   )
   parser.add_argument('--depth', type=Decimal, default=Decimal('0.1'))
+  parser.add_argument(
+    '--fill', action='store_true', help='buy and sell back the minimum (pays fees)'
+  )
+  parser.add_argument('--mode', choices=['auto', 'classic', 'unified'], default='auto')
   args = parser.parse_args()
   names = ('KUCOIN_API_KEY', 'KUCOIN_API_SECRET', 'KUCOIN_API_PASSPHRASE')
   if missing := [n for n in names if not os.environ.get(n)]:
@@ -152,11 +215,21 @@ async def main():
   if args.exchange in ('perp', 'both'):
     ids.append(f'perp:{args.perp_market}')
   async with KucoinMarket.new(public=False) as venue:
+    detected = await venue.shared.account_mode()
+    print(f'account mode: {detected}')
+    if args.mode != 'auto' and args.mode != detected:
+      sys.exit(f'The account is {detected}, not {args.mode}: nothing was sent.')
+    if detected == 'unified':
+      print(
+        f'unified pool: {await (await venue.perp_exchange("perp")).perp_collateral()}'
+      )
     for id in ids:
       market = await venue.market(id)
       await read(market)
       if args.place:
         await trade(market, depth=args.depth, cross=args.cross)
+      if args.fill:
+        await take(market)
   print('\nall checks passed')
 
 

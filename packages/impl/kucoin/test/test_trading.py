@@ -100,6 +100,7 @@ def market_pair(
     spot={'BTC-USDT': spot_symbol()},
     perp={'XBTUSDTM': contract(), 'XBTUSDCM': contract('XBTUSDCM', 'USDC')},
     account_id='kc',
+    mode='classic',
   )
   vars(shared)['futures_api'] = futures_api
   return (

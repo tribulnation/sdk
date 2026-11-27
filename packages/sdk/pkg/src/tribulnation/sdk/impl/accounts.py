@@ -504,7 +504,7 @@ class Kraken(VenueAccount):
 
 @_dataclass(frozen=True)
 class Kucoin(VenueAccount):
-  """Kucoin Classic API account.
+  """Kucoin account, Classic or Unified Trading Account (UTA).
 
   One API key (key, secret and the passphrase chosen when creating it) serves the spot
   and futures hosts. A sub-account's own API key reads and trades that sub-account;
@@ -516,6 +516,9 @@ class Kucoin(VenueAccount):
   api_secret: str = '$KUCOIN_API_SECRET'
   api_passphrase: str = '$KUCOIN_API_PASSPHRASE'
   validate: bool = True
+  mode: _Literal['classic', 'unified'] | None = None
+  """`'classic'` or `'unified'` (UTA). `None` lets the Market surface detect it once, on
+  the first account read or trade. Needs `tribulnation-kucoin>=0.9.0` when set."""
 
   @property
   def resolved_api_key(self) -> str | None:
