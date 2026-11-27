@@ -77,7 +77,8 @@ async def place_order(
       `post_only_not_allowed_error` (mainnet and demo, 2026-11-19).
     AuthError: The client has no wallet key.
     ValueError: See `checked`.
-    OrderRejected: The venue refused the order: nothing rests.
+    OrderRejected: The venue refused the order: nothing rests. The stored positions
+      answer is dropped, in case the leverage signed was stale.
   """
   kind = order['type']
   if kind == 'POST_ONLY':
@@ -101,8 +102,10 @@ async def place_order(
   try:
     placed = await shared.call(send)
   except BadRequest as exc:
+    shared.reads.forget(('positions',))
     raise OrderRejected(*exc.args) from exc
   if placed['status'] in ('REJECTED', 'ERROR'):
+    shared.reads.forget(('positions',))
     raise OrderRejected(placed['status'], placed.get('rejectedReason'), placed)
   return OrderResponse(id=placed['id'], details=placed)
 

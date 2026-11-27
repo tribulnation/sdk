@@ -110,6 +110,8 @@ class Fake:
   orders: list[dict[str, Any]] = field(default_factory=lambda: [order()])
   opened: list[dict[str, Any]] = field(default_factory=list[dict[str, Any]])
   positions: list[dict[str, Any]] = field(default_factory=lambda: [position()])
+  positions_reads: int = 0
+  """How many times `positions.list` was read."""
   fill_pages: list[list[dict[str, Any]]] = field(
     default_factory=list[list[dict[str, Any]]]
   )
@@ -179,6 +181,7 @@ class Fake:
       return Pages(fake.fill_pages)
 
     async def positions_list() -> Any:
+      fake.positions_reads += 1
       return {'list': fake.positions}
 
     async def set_leverage(instrument: str, *, leverage: int) -> Any:
