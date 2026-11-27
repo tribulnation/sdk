@@ -30,18 +30,21 @@ For example, say you have this `sdk.toml`:
 ```toml
 [accounts.mexc_account1]
 venue = "mexc"
+public = true
 
 [accounts.hl]
 venue = "hyperliquid"
+public = true
 
-[accounts.binance] # already exists by default
+[accounts.binance]
 venue = "binance"
+public = true
 ```
 
 Then the following are valid market identifiers:
 
 - `hl:spot:HYPE/USDC:107`: a spot market on Hyperliquid
-- `hl::BTC-USD`: a perpetual market on Hyperliquid's default DEX (`''`)
+- `hl::BTC`: a perpetual market on Hyperliquid's default DEX (`''`)
 - `hl:xyz:xyz:CL`: a perpetual market on Hyperliquid's `xyz` DEX
 - `mexc_account1:spot:BTCUSDT`: a spot market on MEXC (with a custom account name `mexc_account1`)
 - `binance:usdm:ETHUSDC`: a USD-M perpetual market on Binance
@@ -53,7 +56,7 @@ that opened them (`(await sdk.market(market.id)).id == market.id`):
 
 | Attribute | Example (account `hl`) | Meaning |
 | --- | --- | --- |
-| `market.id` | `hl::BTC-USD` | `<account_id>:<exchange_id>:<market_id>` |
+| `market.id` | `hl::BTC` | `<account_id>:<exchange_id>:<market_id>` |
 | `exchange.id` | `hl:` | `<account_id>:<exchange_id>` |
 | `venue.id` | `hl` | the account key |
 | `account_id` | `hl` | the account key the object was opened under |

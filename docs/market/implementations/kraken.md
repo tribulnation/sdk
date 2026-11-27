@@ -117,21 +117,18 @@ API key (`futures_api_key`/`futures_private_key`). One account can hold both.
 ## Example
 
 ```python
-from dotenv import load_dotenv
 from tribulnation.sdk import MarketSDK, accounts
-
-load_dotenv()
 
 sdk = MarketSDK({'kraken_account1': accounts.Kraken()})
 
 book = await sdk.depth('kraken_account1:spot:XBTUSD', levels=5)
-async with sdk.depth_stream('kraken:spot:XBTUSD', levels=10) as books:
+async with sdk.depth_stream('kraken_account1:spot:XBTUSD', levels=10) as books:
   async for book in books:
     print(book.best_bid, book.best_ask)
     break
 ```
 
-Public perpetual reads use the built-in public account:
+Public perpetual reads work on a venue opened with `public=True`:
 
 ```python
 from tribulnation.kraken import KrakenMarket

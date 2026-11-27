@@ -2,9 +2,7 @@
 component:
   preamble: |
     from tribulnation.sdk import WalletSDK
-    from dotenv import load_dotenv
 
-    load_dotenv()
     wallet = WalletSDK.load('sdk.toml')
   ref: tribulnation.sdk.wallet.sdk:Wallet
   title: Wallet

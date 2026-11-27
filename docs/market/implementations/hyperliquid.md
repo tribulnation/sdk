@@ -43,9 +43,10 @@ universe. Under the hood `perp_exchange(dex)` treats `''` and `None` equivalentl
 Market IDs by exchange:
 
 - **Perp** — the asset name, e.g. `BTC`. Full ID: `hyperliquid::BTC` (empty exchange
-  segment = default DEX) or `hyperliquid:<dex>:BTC`.
-- **Spot** — canonical form `BASE/QUOTE:ASSET_IDX`, e.g. `BTC/USDC:0`. Full ID:
-  `hyperliquid:spot:BTC/USDC:0`. The `ASSET_IDX` is Hyperliquid's `spotMeta.universe[].index`;
+  segment = default DEX). On another DEX the asset name carries the DEX
+  prefix: `hyperliquid:<dex>:<dex>:<coin>`, e.g. `hyperliquid:xyz:xyz:CL`.
+- **Spot** — canonical form `BASE/QUOTE:ASSET_IDX`, e.g. `UBTC/USDC:142`. Full ID:
+  `hyperliquid:spot:UBTC/USDC:142`. The `ASSET_IDX` is Hyperliquid's `spotMeta.universe[].index`;
   `market()` cross-checks that the `BASE/QUOTE` names match that index and raises on
   mismatch. `Exchange.markets()` returns fully-formed `BASE/QUOTE:IDX` strings you can pass
   straight back in.
@@ -196,10 +197,7 @@ async with sdk.depth_stream('hl::ETH', settings={'hyperliquid': {'depth_source':
 ## Example
 
 ```python
-from dotenv import load_dotenv
 from tribulnation.sdk import MarketSDK, accounts
-
-load_dotenv()
 
 sdk = MarketSDK({'hl': accounts.Hyperliquid()})
 
@@ -207,7 +205,7 @@ sdk = MarketSDK({'hl': accounts.Hyperliquid()})
 await sdk.index('hl::BTC')
 
 # spot
-book = await sdk.depth('hl:spot:BTC/USDC:0')
+book = await sdk.depth('hl:spot:UBTC/USDC:142')
 
 await sdk.place_order(
   'hl::ETH',

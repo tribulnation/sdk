@@ -21,20 +21,22 @@ covers only what is MEXC-specific.
 
 ## Account
 
-Mainnet only, no testnet. `validate` toggles pydantic validation of API responses. The
-built-in `mexc` account is `accounts.Mexc(public=True)`, read-only.
+Mainnet only, no testnet. `validate` toggles pydantic validation of API responses. An
+`accounts.Mexc(public=True)` account is read-only and needs no keys.
 
 ## Exchange & ID conventions
 
 - Exchanges are `spot` and public linear perpetuals (`perp`).
 - Market IDs are native MEXC symbols: `BTCUSDT` for spot and `BTC_USDT` for perpetuals.
-- Full SDK ID: `mexc:spot:BTCUSDT` (or `<your-account-key>:spot:BTCUSDT`).
+- Full SDK IDs: `mexc:spot:BTCUSDT` and `mexc:perp:BTC_USDT` (or `<your-account-key>:spot:BTCUSDT`).
 - `Exchange.markets()` returns the symbol keys from the venue's exchange-info.
 
 ## Venue-specific semantics
 
-- Spot only — there is no `PerpMarket`/`PerpExchange`, so `perp_exchange`, `index`,
-  `next_funding`, `funding_*`, and `perp_position` are unsupported for this venue.
+- Perpetuals are public data only: `depth`, `tickers`, `perp_stats`, `index`, `next_funding`,
+  `funding_rates`, `candles` and `rules` work, while `place_order`, `cancel_order`,
+  `open_orders`, `perp_position`, `perp_collateral`, `fees` and the other account reads raise
+  `NotImplementedError`. Trading and account reads are spot only.
 - SDK 3.0 removed the spot stand-ins from `Market` (ADR 0051); this venue does not map spot `balances` or collateral IDs yet, so spot `position`, `collateral` and `available_notional` are no longer part of
   the SDK interface.
 - `collateral` (spot) reports the quote-asset balance: `equity = free + locked`,
@@ -52,10 +54,7 @@ built-in `mexc` account is `accounts.Mexc(public=True)`, read-only.
 ## Example
 
 ```python
-from dotenv import load_dotenv
 from tribulnation.sdk import MarketSDK, accounts
-
-load_dotenv()
 
 sdk = MarketSDK({'mexc_account1': accounts.Mexc()})
 

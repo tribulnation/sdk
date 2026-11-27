@@ -21,7 +21,7 @@ covers only what is dYdX-specific.
 
 ## Account
 
-`venue` selects the network: `dydx` is mainnet, `dydx_testnet` is testnet. The built-in `dydx` account is `accounts.Dydx(public=True)`, read-only.
+`venue` selects the network: `dydx` is mainnet, `dydx_testnet` is testnet. An `accounts.Dydx(public=True)` account is read-only.
 
 **Either `address` or `mnemonic` must resolve to a value.** The address is required for all
 indexer reads (subaccount, positions, orders, collateral). The mnemonic is only needed for
@@ -300,9 +300,6 @@ The `settings` payload maps directly onto dYdX order flags and expiry:
 ```python
 import os
 from tribulnation.sdk import MarketSDK, accounts
-from dotenv import load_dotenv
-
-load_dotenv()
 
 market = MarketSDK(
   {

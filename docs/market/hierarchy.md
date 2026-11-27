@@ -160,22 +160,22 @@ Perpetual markets are scope similarly, just use different methods:
 **Top/Venue level**:
 
 ```python
-await sdk.next_funding('mexc:perp:BTCUSDT') # raises if the market isn't a perpetual
+await sdk.next_funding('mexc:perp:BTC_USDT') # raises if the market isn't a perpetual
 venue = await sdk.venue('mexc')
-await venue.next_funding('perp:BTCUSDT') # raises if the market isn't a perpetual
+await venue.next_funding('perp:BTC_USDT') # raises if the market isn't a perpetual
 ```
 
 **Exchange**:
 
 ```python
 exchange = await sdk.perp_exchange('mexc:perp') # raises ValueError if you pass a non-perpetual exchange ID
-await exchange.next_funding('BTCUSDT')
+await exchange.next_funding('BTC_USDT')
 ```
 
 **Market**:
 
 ```python
-market = await sdk.perp_market('mexc:perp:BTCUSDT') # raises ValueError if you pass a non-perpetual market ID
+market = await sdk.perp_market('mexc:perp:BTC_USDT') # raises ValueError if you pass a non-perpetual market ID
 await market.next_funding()
 ```
 

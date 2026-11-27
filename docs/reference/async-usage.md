@@ -134,9 +134,9 @@ See [Streaming](../market/streaming.md) for buffering and overflow behaviour.
 
 ## Notes
 
-- Exceptions raised while *acquiring* a resource are not translated into the SDK error
-  taxonomy — you may see a venue-native error from `async with`. See
-  [issue #2](https://github.com/tribulnation/sdk/issues/2).
+- Errors raised while entering or leaving a resource (`async with`) are translated into
+  the SDK error types, like errors from any other method. See
+  [Context](context.md#resource-acquisition-and-cleanup).
 - Writing your own SDK object, or a venue implementation? Owning resources is covered in
   [CONTRIBUTING.md](https://github.com/tribulnation/sdk/blob/main/CONTRIBUTING.md#writing-sdk-objects).
 
