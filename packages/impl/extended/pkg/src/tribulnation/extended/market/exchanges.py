@@ -71,8 +71,8 @@ class ExtendedPerpExchange(Public, PerpExchange):
     return 'perp'
 
   async def markets(self) -> Sequence[str]:
-    """Every listed perpetual (`ACTIVE`, `REDUCE_ONLY` or `PRELISTED`), by name;
-    `rules().api` says which trade."""
+    """Every listed perpetual (`ACTIVE`, `REDUCE_ONLY`, `REDUCE_ONLY_OI` or `PRELISTED`),
+    by name; `rules().api` says which trade."""
     return listed_perps(await self.shared.load_markets())
 
   async def market(self, market_id: str, /) -> ExtendedPerpMarket:

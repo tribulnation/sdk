@@ -72,6 +72,7 @@ def market(
 MARKETS = [
   market('BTC-USD'),
   market('MKR-USD', status='REDUCE_ONLY', bidPrice=Decimal(0), askPrice=Decimal(0)),
+  market('CAP-USD', status='REDUCE_ONLY_OI'),
   market('NEW-USD', status='PRELISTED'),
   market('OLD-USD', status='DELISTED'),
   market('BTCSPOT-USD', kind='SPOT'),
@@ -93,7 +94,7 @@ async def exchange():
 
 async def test_markets_list_listed_perpetuals(exchange: ExtendedPerpExchange):
   """Spot and delisted markets are not listed; a delisted perpetual still resolves."""
-  assert await exchange.markets() == ['BTC-USD', 'MKR-USD', 'NEW-USD']
+  assert await exchange.markets() == ['BTC-USD', 'MKR-USD', 'CAP-USD', 'NEW-USD']
   assert (await exchange.market('OLD-USD')).id == 'extended:perp:OLD-USD'
   with pytest.raises(ValueError):
     await exchange.market('BTCSPOT-USD')
@@ -144,6 +145,15 @@ async def test_rules_carry_the_side_specific_band(exchange: ExtendedPerpExchange
   )
   assert (rules.fee_asset, rules.fees, rules.api) == ('USD', None, True)
   assert not (await exchange.rules('MKR-USD')).api
+
+
+async def test_open_interest_capped_market_is_listed_reduce_only(
+  exchange: ExtendedPerpExchange,
+):
+  """`REDUCE_ONLY_OI` (open interest above the market's limit) is listed, but `api` is
+  off, like `REDUCE_ONLY`."""
+  assert 'CAP-USD' in await exchange.markets()
+  assert not (await exchange.rules('CAP-USD')).api
 
 
 async def test_account_reads(exchange: ExtendedPerpExchange):
