@@ -21,7 +21,7 @@ COMPATIBLE_IMPLEMENTATIONS = {
   'grvt': '0.5.1',
   'hyperliquid': '0.22.2',
   'kraken': '0.9.2',
-  'kucoin': '0.7.1',
+  'kucoin': '0.9.0',
   'lighter': '0.15.1',
   'margin-trade': '0.4.1',
   'mexc': '3.0.2',
