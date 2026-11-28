@@ -34,7 +34,7 @@ gateway = "tribulnation.sdk.gateway.cli:app"
 [project.optional-dependencies]
 gateway = ["aiohttp>=3.12,<4", "msgspec>=0.19,<1", "python-dotenv>=1,<2"]
 aster = ["tribulnation-aster>=0.16.1"]
-extended = ["tribulnation-extended>=0.5.1"]
+extended = ["tribulnation-extended>=0.5.2"]
 lighter = ["tribulnation-lighter>=0.15.1"]
 margin-trade = ["tribulnation-margin-trade>=0.4.1"]
 grvt = ["tribulnation-grvt>=0.5.1"]

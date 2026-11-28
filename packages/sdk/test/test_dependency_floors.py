@@ -17,7 +17,7 @@ COMPATIBLE_IMPLEMENTATIONS = {
   'deribit': '0.7.1',
   'dydx': '0.22.1',
   'ethereum': '0.6.2',
-  'extended': '0.5.1',
+  'extended': '0.5.2',
   'grvt': '0.5.1',
   'hyperliquid': '0.22.2',
   'kraken': '0.9.2',
