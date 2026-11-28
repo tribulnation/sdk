@@ -67,7 +67,9 @@ balance cannot be funded through the API.
   longs pay. `funding_rates` and `funding_payments` are not supported: the venue
   publishes no rate history, and its account ledger's funding entries name no market.
 - Orders are limit orders, signed with the wallet, at the account's leverage on the
-  market. `LIMIT` rests until cancelled, and `MARKET` is an immediate-or-cancel limit at
+  market. That leverage comes from the last positions read, of any age: only the first
+  order reads it, `set_leverage` and a refused order drop it, so a leverage changed by
+  hand on the venue is read again after the next refusal. `LIMIT` rests until cancelled, and `MARKET` is an immediate-or-cancel limit at
   `price` (the venue's own market order is sized in USD and bounded only by its slippage
   limit); one that cannot fill ends cancelled. `POST_ONLY` is not supported: EVEDEX
   refuses post-only orders, so `place_order` and `replace_order` raise
