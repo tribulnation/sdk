@@ -1,6 +1,6 @@
 # Local SDK evidence: evedex
 
-Run completed: 2026-11-21T15:54:39.720347+00:00
+Run completed: 2026-11-28T10:13:06.735740+00:00
 
 This records a trusted local run, not cryptographic proof. Release policy must separately validate required check coverage and statuses.
 
