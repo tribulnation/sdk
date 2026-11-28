@@ -45,6 +45,27 @@ async def test_unset_leverage_is_the_venue_default(fake: Fake):
   assert placements(fake)[0]['leverage'] == 1
 
 
+async def test_orders_reuse_the_stored_leverage(fake: Fake):
+  """Only the first order reads the positions for its leverage; `set_leverage` and a
+  refusal drop the stored answer, so the next order reads the setting afresh."""
+  fake.positions = [position(leverage=3)]
+  m = market(fake)
+  buy: Order = {'type': 'LIMIT', 'qty': '6', 'price': '0.95'}
+  await m.place_order(buy)
+  await m.place_order(buy)
+  assert fake.positions_reads == 1
+  await m.set_leverage(Decimal(2))
+  fake.positions = [position(leverage=2)]
+  await m.place_order(buy)
+  assert fake.positions_reads == 2 and placements(fake)[-1]['leverage'] == 2
+  fake.error = refusal(400, 'mark_price_limit_exceeded_error')
+  with pytest.raises(OrderRejected):
+    await m.place_order(buy)
+  fake.positions = [position(leverage=5)]
+  await m.place_order(buy)
+  assert fake.positions_reads == 3 and placements(fake)[-1]['leverage'] == 5
+
+
 async def test_client_order_ids_are_the_order_ids(fake: Fake):
   """A client order id is sent as the order's id and must have the venue's form."""
   m = market(fake)

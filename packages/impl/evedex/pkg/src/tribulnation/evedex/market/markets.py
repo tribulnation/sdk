@@ -204,7 +204,8 @@ class EvedexPerpMarket(Public, PerpMarket):
 
     `client_order_id` becomes the order's id, so it must be a venue order id
     (`random_client_order_id()`). `filled_qty` is `None`: the venue accepts orders
-    before executing them.
+    before executing them. The leverage is the last positions answer read, of any age
+    (`account.ANY_AGE`), so an order is one request once one is stored.
 
     Raises:
       NotImplementedError: A `POST_ONLY` order.
@@ -215,7 +216,7 @@ class EvedexPerpMarket(Public, PerpMarket):
     """
     row, leverage = await asyncio.gather(
       self.shared.instrument(self.name),
-      account.leverage(self.shared, self.name, ttl=None),
+      account.leverage(self.shared, self.name, ttl=account.ANY_AGE),
     )
     return await orders.place_order(self.shared, row, order, leverage=leverage)
 

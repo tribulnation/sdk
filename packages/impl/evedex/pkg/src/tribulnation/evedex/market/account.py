@@ -22,6 +22,12 @@ OVERRIDE_UNOBSERVED = (
   'supported yet: which instruments they apply to is undocumented'
 )
 
+ANY_AGE = timedelta.max
+"""The `ttl` of the leverage an order signs: any stored positions answer will do, so an
+order costs no read once one is stored. The setting changes through `set_leverage`, which
+drops the stored answer, or by hand on the venue; a refused order drops it too
+(`orders.place_order`), so the next one reads the setting afresh."""
+
 
 async def positions(shared: Shared, *, ttl: timedelta | None) -> Sequence[Position]:
   """Every position record of the account (`positions.list`), flat ones included: a
