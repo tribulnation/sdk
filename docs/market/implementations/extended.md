@@ -43,8 +43,9 @@ market data only.
 ## IDs
 
 - One exchange, `perp`. Market ids are the venue's market names (`BTC-USD`), the same on
-  mainnet and testnet. `markets()` lists the `ACTIVE`, `REDUCE_ONLY` and `PRELISTED`
-  ones; `rules().api` is true for `ACTIVE` only.
+  mainnet and testnet. `markets()` lists the `ACTIVE`, `REDUCE_ONLY`, `REDUCE_ONLY_OI`
+  (reduce-only while open interest is above the market's limit) and `PRELISTED` ones;
+  `rules().api` is true for `ACTIVE` only.
 - The collateral, fee and funding asset is `USD`. Order ids are Extended's numeric order
   ids.
 

@@ -41,7 +41,8 @@ class Public(SDK):
 
 
 def listed_perps(markets: Mapping[str, MarketRow]) -> list[str]:
-  """The perpetuals `markets()` lists: `ACTIVE`, `REDUCE_ONLY` and `PRELISTED` ones."""
+  """The perpetuals `markets()` lists: `ACTIVE`, `REDUCE_ONLY`, `REDUCE_ONLY_OI` and
+  `PRELISTED` ones."""
   return [
     name
     for name, m in markets.items()

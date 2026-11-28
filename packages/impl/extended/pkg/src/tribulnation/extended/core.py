@@ -56,9 +56,10 @@ class Settings(TypedDict, total=False):
 COLLATERAL = 'USD'
 """The deployment's one collateral asset: margin, PnL, trading fees and funding settle in
 it, and every market names it as `collateralAssetName`."""
-LISTED = frozenset({'ACTIVE', 'REDUCE_ONLY', 'PRELISTED'})
+LISTED = frozenset({'ACTIVE', 'REDUCE_ONLY', 'REDUCE_ONLY_OI', 'PRELISTED'})
 """Market statuses `markets()` lists: every perpetual that is not delisted or disabled
-(`rules().api` says which trade)."""
+(`rules().api` says which trade). `REDUCE_ONLY_OI` is reduce-only while open interest is
+above the market's `openInterestLimit`."""
 
 
 def network_venue_id(network: Network) -> VenueId:
