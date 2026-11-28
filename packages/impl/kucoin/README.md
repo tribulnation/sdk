@@ -14,7 +14,7 @@
 
 Spot and linear perpetual Market data and trading on Classic accounts and Unified
 Trading Accounts (UTA), read-only Classic spot-side reporting, wallet network methods
-and simple Earn listings. Trading is not yet verified live.
+and simple Earn listings. Perpetual trading is verified live on a Unified Trading Account.
 
 ```python
 from tribulnation.sdk import ReportSDK, accounts
@@ -97,7 +97,8 @@ await market.cancel_order(order.id)
 - Unified Trading Accounts: `accounts.Kucoin(mode='unified')`, or leave `mode` unset to
   detect it. Every account read, order and fill then uses the UTA API and private
   WebSocket; perpetuals margin from the one unified pool (`collateral_id` `<account>:perp`,
-  USDC included). UTA support is tested against documented responses only.
+  USDC included). Verified live on a mainnet UTA on 2026-11-28: account reads on
+  both lines, and perpetual post-only place, query, cancel and a minimum-size fill.
 - See [the KuCoin Market page](../../../docs/market/implementations/kucoin.md) for
   collateral, leverage, fees, streams and history, and
   `scripts/live_trading.py` for the live check (not run in CI).

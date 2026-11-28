@@ -158,16 +158,28 @@ WebSocket (`wss://wsapi-push.kucoin.com`, signature-authenticated). With `mode =
 
 ## Verification
 
-Public reads are verified on mainnet. Trading, the private streams and the account reads
-are tested against fake responses only. `packages/impl/kucoin/scripts/live_trading.py`
+Public reads are verified on mainnet. `packages/impl/kucoin/scripts/live_trading.py`
 reads every account method and, with `--place`, rests and cancels one minimum-size
 post-only order per market; `--fill` buys and sells back the minimum; `--mode unified`
 checks the account is a UTA first.
 
-UTA: the account-mode detection and the private WebSocket's authentication and
-subscription were checked live on 2026-11-27 against a Classic account. No UTA account
-read, order or fill has been verified live yet: they are tested against fake responses
-built from KuCoin's documentation examples.
+Classic: the account reads and the private order channels were checked live on a mainnet
+account on 2026-11-27, with a key without trading permission. Classic orders and fills are
+tested against fake responses only.
+
+UTA: verified live on a mainnet Unified Trading Account on 2026-11-28 with
+`live_trading.py --mode unified`:
+
+1. Mode detection answers `unified`; the unified pool (`perp_collateral`), spot balances and
+   the perpetual account reads pass on both lines (`--exchange both`).
+2. On perpetual `XBTUSDTM`: a post-only order is placed, queried, listed in `open_orders`
+   and cancelled; a second cancel raises `OrderNotFound`; a crossing post-only is
+   cancelled by the venue, unfilled.
+3. On `XBTUSDTM`: a minimum-size market buy and sell fill; `trades_stream` reports the fill
+   with its liquidity role and fee, `trades_history` lists both, and the position is flat
+   again.
+
+UTA spot orders and fills are tested against fake responses only.
 
 <!-- next -->
 
