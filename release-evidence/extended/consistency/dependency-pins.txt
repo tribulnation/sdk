@@ -46,7 +46,7 @@ six==1.17.0
 tornado==6.6.1
 traitlets==5.16.1
 tribulnation-catalogue==0.5.0
-typed-core==0.15.0
+typed-core==0.14.0
 typed-extended==0.2.2
 typer==0.29.3
 typing-extensions==4.16.0

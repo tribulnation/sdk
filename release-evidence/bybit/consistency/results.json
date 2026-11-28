@@ -2963,12 +2963,12 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"perp\",\"TOWNSUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -4355,12 +4355,12 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"CATIUSDC\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -4571,12 +4571,12 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"DIAMUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -4963,12 +4963,12 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"FLOKIUSDC\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -5051,12 +5051,12 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"GMTUSDC\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -5331,12 +5331,12 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"JASMYUSDC\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -5939,12 +5939,12 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"NSUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -5963,12 +5963,12 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"OBTUSDT\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -6635,12 +6635,12 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"STXUSDC\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -6755,12 +6755,12 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"TIAUSDC\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -6787,12 +6787,12 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"TOWNSUSDC\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -7363,12 +7363,12 @@
         "status": "pass"
       },
       {
-        "code": "ok",
+        "code": "coverage_deferred",
         "id": "[\"catalogue_coverage\",\"spot\",\"ZKUSDC\"]",
         "missing_data": null,
         "quotes": [],
         "rfq": null,
-        "status": "pass"
+        "status": "deferred"
       },
       {
         "code": "ok",
@@ -14896,14 +14896,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.1099",
-            "after_bid": "0.1098",
-            "ask": "0.1099",
+            "after_ask": "0.1018",
+            "after_bid": "0.1016",
+            "ask": "0.1018",
             "attempt": 1,
-            "before_ask": "0.1099",
-            "before_bid": "0.1098",
-            "bid": "0.1098",
-            "elapsed_seconds": 1.7368625099770725,
+            "before_ask": "0.1018",
+            "before_bid": "0.1017",
+            "bid": "0.1017",
+            "elapsed_seconds": 1.7790612089447677,
             "ticker_ids_match": true
           }
         ],
@@ -14916,14 +14916,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.0002419",
-            "after_bid": "0.0002415",
-            "ask": "0.0002419",
+            "after_ask": "0.0002440",
+            "after_bid": "0.0002437",
+            "ask": "0.0002440",
             "attempt": 1,
-            "before_ask": "0.0002419",
-            "before_bid": "0.0002415",
-            "bid": "0.0002415",
-            "elapsed_seconds": 1.9359586676582694,
+            "before_ask": "0.0002440",
+            "before_bid": "0.0002437",
+            "bid": "0.0002437",
+            "elapsed_seconds": 1.7123267110437155,
             "ticker_ids_match": true
           }
         ],
@@ -14936,14 +14936,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.07864",
-            "after_bid": "0.07848",
-            "ask": "0.07864",
+            "after_ask": "0.08273",
+            "after_bid": "0.08264",
+            "ask": "0.08273",
             "attempt": 1,
-            "before_ask": "0.07864",
-            "before_bid": "0.07848",
-            "bid": "0.07848",
-            "elapsed_seconds": 2.297792713623494,
+            "before_ask": "0.08273",
+            "before_bid": "0.08267",
+            "bid": "0.08264",
+            "elapsed_seconds": 2.481695014052093,
             "ticker_ids_match": true
           }
         ],
@@ -14956,14 +14956,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "59883.50",
-            "after_bid": "59883.40",
-            "ask": "59882.50",
+            "after_ask": "59033.00",
+            "after_bid": "59032.90",
+            "ask": "59059.80",
             "attempt": 1,
-            "before_ask": "59882.50",
-            "before_bid": "59882.40",
-            "bid": "59882.40",
-            "elapsed_seconds": 1.3483106694184244,
+            "before_ask": "59081.00",
+            "before_bid": "59080.90",
+            "bid": "59059.70",
+            "elapsed_seconds": 2.031761039979756,
             "ticker_ids_match": true
           }
         ],
@@ -14976,14 +14976,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.1102",
-            "after_bid": "0.11",
-            "ask": "0.1102",
+            "after_ask": "0.1019",
+            "after_bid": "0.1017",
+            "ask": "0.1019",
             "attempt": 1,
-            "before_ask": "0.1102",
-            "before_bid": "0.11",
-            "bid": "0.11",
-            "elapsed_seconds": 1.6753674461506307,
+            "before_ask": "0.1019",
+            "before_bid": "0.1017",
+            "bid": "0.1017",
+            "elapsed_seconds": 0.9934971481561661,
             "ticker_ids_match": true
           }
         ],
@@ -14996,14 +14996,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.06055",
-            "after_bid": "0.0605",
-            "ask": "0.06053",
+            "after_ask": "0.05565",
+            "after_bid": "0.05562",
+            "ask": "0.05566",
             "attempt": 1,
-            "before_ask": "0.06053",
-            "before_bid": "0.06048",
-            "bid": "0.06048",
-            "elapsed_seconds": 0.9972324911504984,
+            "before_ask": "0.05566",
+            "before_bid": "0.05563",
+            "bid": "0.05563",
+            "elapsed_seconds": 1.4476706860587,
             "ticker_ids_match": true
           }
         ],
@@ -15016,14 +15016,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "0.01598",
-            "after_bid": "0.01596",
-            "ask": "0.01598",
+            "after_ask": "0.01646",
+            "after_bid": "0.0164",
+            "ask": "0.01646",
             "attempt": 1,
-            "before_ask": "0.01598",
-            "before_bid": "0.01596",
-            "bid": "0.01596",
-            "elapsed_seconds": 1.9087094208225608,
+            "before_ask": "0.01646",
+            "before_bid": "0.0164",
+            "bid": "0.0164",
+            "elapsed_seconds": 0.7655983339063823,
             "ticker_ids_match": true
           }
         ],
@@ -15036,14 +15036,14 @@
         "missing_data": null,
         "quotes": [
           {
-            "after_ask": "59913.8",
-            "after_bid": "59913.7",
-            "ask": "59913.8",
+            "after_ask": "59152.4",
+            "after_bid": "59152.3",
+            "ask": "59168.7",
             "attempt": 1,
-            "before_ask": "59913.8",
-            "before_bid": "59913.7",
-            "bid": "59913.7",
-            "elapsed_seconds": 1.9041232648305595,
+            "before_ask": "59168.7",
+            "before_bid": "59168.6",
+            "bid": "59168.6",
+            "elapsed_seconds": 0.7571961297653615,
             "ticker_ids_match": true
           }
         ],
@@ -15233,7 +15233,6 @@
           "TRXUSDC",
           "ICPUSDC",
           "LINKUSDC",
-          "GMTUSDC",
           "SHIBUSDC",
           "LDOUSDC",
           "APEUSDC",
@@ -15244,7 +15243,6 @@
           "APTUSDT",
           "APTUSDC",
           "USDTEUR",
-          "MCRTUSDT",
           "MASKUSDT",
           "PEOPLEUSDT",
           "TWTUSDT",
@@ -15262,7 +15260,6 @@
           "IDUSDT",
           "ARBUSDC",
           "ARBUSDT",
-          "MBXUSDT",
           "AXLUSDT",
           "CGPTUSDT",
           "SUIUSDT",
@@ -15353,7 +15350,6 @@
           "IOUSDT",
           "ATHUSDT",
           "COOKIEUSDT",
-          "ZKUSDC",
           "ZKUSDT",
           "POPCATUSDT",
           "ZROUSDC",
@@ -15381,21 +15377,17 @@
           "USDTPLN",
           "ETHPLN",
           "BTCPLN",
-          "FLOKIUSDC",
           "BCHUSDC",
           "NEARUSDC",
           "ORDERUSDT",
           "KASUSDC",
           "ONDOUSDC",
-          "JASMYUSDC",
           "ATOMUSDC",
           "FETUSDC",
           "UNIUSDC",
-          "TIAUSDC",
           "INJUSDC",
           "CATIUSDT",
           "HMSTRUSDT",
-          "CATIUSDC",
           "CATIEUR",
           "EIGENUSDT",
           "NAVXUSDT",
@@ -15410,7 +15402,6 @@
           "GRASSUSDT",
           "KAIAUSDT",
           "SWELLUSDT",
-          "NSUSDT",
           "GOATUSDT",
           "MORPHOUSDT",
           "NEIROCTOUSDT",
@@ -15440,7 +15431,6 @@
           "TOSHIUSDT",
           "GPSUSDT",
           "SOLVUSDT",
-          "OBTUSDT",
           "SOSOUSDT",
           "TRUMPUSDT",
           "TRUMPUSDC",
@@ -15450,7 +15440,6 @@
           "BERAUSDT",
           "AVLUSDT",
           "B3USDT",
-          "DIAMUSDT",
           "USDTBUSDT",
           "ROAMUSDT",
           "REDUSDT",
@@ -15502,7 +15491,6 @@
           "HOODXUSDT",
           "AMZNXUSDT",
           "GOOGLXUSDT",
-          "STXUSDC",
           "PYTHUSDC",
           "USD1USDT",
           "MNTUSD1",
@@ -15516,7 +15504,6 @@
           "CATUSDT",
           "TREEUSDT",
           "TOWNSUSDT",
-          "TOWNSUSDC",
           "PROVEUSDT",
           "CFGUSDT",
           "WLFIUSDT",
@@ -15682,6 +15669,7 @@
           "AMGNUSDT",
           "AMZNUSDT",
           "AMZUUSDT",
+          "ANDDUSDT",
           "ANETUSDT",
           "ANIMEUSDT",
           "ANKRUSDT",
@@ -15867,6 +15855,7 @@
           "DEXEUSDT",
           "DGAIUSDT",
           "DIAUSDT",
+          "DISUSDT",
           "DJTUSDT",
           "DKNGUSDT",
           "DNAUSDT",
@@ -16054,6 +16043,7 @@
           "KODEX200USDT",
           "KORUUSDT",
           "KOUSDT",
+          "KRUSDT",
           "KSMUSDT",
           "KSTRUSDT",
           "KUAISHOUUSDT",
@@ -16128,6 +16118,7 @@
           "MOVEUSDT",
           "MOVRUSDT",
           "MPUSDT",
+          "MPWRUSDT",
           "MRKUSDT",
           "MRNAUSDT",
           "MRVLUSDT",
@@ -16168,8 +16159,10 @@
           "NUSTOCKUSDT",
           "NVDAUSDT",
           "NVDLUSDT",
+          "NVDUSDT",
           "NVOUSDT",
           "NXPCUSDT",
+          "NXPIUSDT",
           "OGNUSDT",
           "OGUSDT",
           "OKBUSDT",
@@ -16312,7 +16305,9 @@
           "SMHUSDT",
           "SMICUSDT",
           "SMRUSDT",
+          "SMTCUSDT",
           "SNDKUSDT",
+          "SNDQUSDT",
           "SNOWUSDT",
           "SNPSUSDT",
           "SNTUSDT",
@@ -16349,7 +16344,6 @@
           "STEEMUSDT",
           "STMUSDT",
           "STONKUSDT",
-          "STORJUSDT",
           "STOUSDT",
           "STRKPERP",
           "STRKUSDT",
@@ -16373,16 +16367,17 @@
           "TEMUSDT",
           "TENCENTUSDT",
           "TERUSDT",
+          "TGTSTOCKUSDT",
           "THETAUSDT",
           "THEUSDT",
           "TIAPERP",
           "TIAUSDT",
+          "TJXUSDT",
           "TLMUSDT",
           "TLTUSDT",
           "TMFUSDT",
           "TMOUSDT",
           "TNSRUSDT",
-          "TOWNSUSDT",
           "TQQQUSDT",
           "TRBUSDT",
           "TREEUSDT",
